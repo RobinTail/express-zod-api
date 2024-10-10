@@ -8,6 +8,7 @@ import {
   defaultResultHandler,
   ResultHandler,
   BuiltinLogger,
+  createConfig,
 } from "../../src";
 import { givePort } from "../helpers";
 import { setTimeout } from "node:timers/promises";
@@ -129,42 +130,38 @@ describe("App", async () => {
     },
   };
   vi.spyOn(console, "log").mockImplementation(vi.fn()); // mutes logo output
-  const server = (
-    await createServer(
-      {
-        http: { listen: port },
-        compression: { threshold: 1 },
-        beforeRouting: ({ app, getChildLogger }) => {
-          depd("express")("Sample deprecation message");
-          app.use((req, {}, next) => {
-            const childLogger = getChildLogger(req);
-            assert("isChild" in childLogger && childLogger.isChild);
-            next();
-          });
-        },
-        cors: false,
-        startupLogo: true,
-        gracefulShutdown: { events: ["FAKE"] },
-        logger,
-        childLoggerProvider: ({ parent }) =>
-          Object.defineProperty(parent, "isChild", { value: true }),
-        inputSources: {
-          post: ["query", "body", "files"],
-        },
-      },
-      routing,
-    )
-  ).httpServer;
-  await vi.waitFor(() => assert(server.listening), { timeout: 1e4 });
+  const config = createConfig({
+    http: { listen: port },
+    compression: { threshold: 1 },
+    beforeRouting: ({ app, getChildLogger }) => {
+      depd("express")("Sample deprecation message");
+      app.use((req, {}, next) => {
+        const childLogger = getChildLogger(req);
+        assert("isChild" in childLogger && childLogger.isChild);
+        next();
+      });
+    },
+    cors: false,
+    startupLogo: true,
+    gracefulShutdown: { events: ["FAKE"] },
+    logger,
+    childLoggerProvider: ({ parent }) =>
+      Object.defineProperty(parent, "isChild", { value: true }),
+    inputSources: {
+      post: ["query", "body", "files"],
+    },
+  });
+  const { httpServer } = await createServer(config, routing);
+  await vi.waitFor(() => assert(httpServer.listening), { timeout: 1e4 });
   expect(warnMethod).toHaveBeenCalledWith(
     "DeprecationError (express): Sample deprecation message",
     expect.any(Array), // stack
   );
 
   afterAll(async () => {
-    server.close();
+    httpServer.close();
     // this approach works better than .close() callback
-    await vi.waitFor(() => assert(!server.listening), { timeout: 1e4 });
+    await vi.waitFor(() => assert(!httpServer.listening), { timeout: 1e4 });
     vi.restoreAllMocks();
   });
 
@@ -474,7 +471,7 @@ describe("App", async () => {
         timeout: 1000,
       });
       await setTimeout(1500);
-      expect(server.listening).toBeFalsy();
+      expect(httpServer.listening).toBeFalsy();
       expect(spy).toHaveBeenCalled();
     });
   });
