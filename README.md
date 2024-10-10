@@ -99,7 +99,7 @@ These people contributed to the improvement of the library by reporting bugs, ma
 [<img src="https://github.com/miki725.png" alt="@miki725" width="50px" />](https://github.com/miki725)
 [<img src="https://github.com/dev-m1-macbook.png" alt="@dev-m1-macbook" width="50px" />](https://github.com/dev-m1-macbook)
 [<img src="https://github.com/McMerph.png" alt="@McMerph" width="50px" />](https://github.com/McMerph)
-[<img src="https://github.com/shroudedcode.png" alt="@shroudedcode" width="50px" />](https://github.com/shroudedcode)
+[<img src="https://github.com/niklashigi.png" alt="@niklashigi" width="50px" />](https://github.com/niklashigi)
 [<img src="https://github.com/maxcohn.png" alt="@maxcohn" width="50px" />](https://github.com/maxcohn)
 [<img src="https://github.com/VideoSystemsTech.png" alt="@VideoSystemsTech" width="50px" />](https://github.com/VideoSystemsTech)
 [<img src="https://github.com/TheWisestOne.png" alt="@TheWisestOne" width="50px" />](https://github.com/TheWisestOne)
