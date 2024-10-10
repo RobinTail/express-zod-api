@@ -564,8 +564,7 @@ Please note: If you only want to send specific headers on requests to a specific
 ## Enabling HTTPS
 
 The modern API standard often assumes the use of a secure data transfer protocol, confirmed by a TLS certificate, also
-often called an SSL certificate in habit. When using the `createServer()` method, you can additionally configure and
-run the HTTPS server.
+often called an SSL certificate in habit. This way you can additionally (or solely) configure and run the HTTPS server:
 
 ```typescript
 import { createConfig, createServer } from "express-zod-api";
@@ -583,10 +582,7 @@ const config = createConfig({
 
 // 'await' is only needed if you're going to use the returned entities.
 // For top level CJS you can wrap you code with (async () => { ... })()
-const { app, httpServer, httpsServer, logger } = await createServer(
-  config,
-  routing,
-);
+const { app, httpsServer, logger } = await createServer(config, routing);
 ```
 
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
