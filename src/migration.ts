@@ -60,30 +60,30 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
           if (httpProp && httpProp.value.type === "ObjectExpression") {
             const nested = httpProp.value.properties;
             const movable = nested.filter(complement(propByName("listen")));
-            if (movable.length > 0) {
+            for (const prop of movable) {
+              const propText = ctx.sourceCode.text.slice(
+                prop.range[0],
+                prop.range[1],
+              );
+              const comma = ctx.sourceCode.getTokenAfter(prop);
               ctx.report({
                 node: httpProp,
                 messageId: "move",
                 data: {
-                  subject: "properties",
+                  subject:
+                    prop.type === "Property" && prop.key.type === "Identifier"
+                      ? prop.key.name
+                      : "the property",
                   from: httpProp.key.name,
                   to: `the top level of ${node.callee.name} argument`,
                 },
-                fix: (fixer) =>
-                  movable.flatMap((prop) => {
-                    const propText = ctx.sourceCode.text.slice(
-                      prop.range[0],
-                      prop.range[1],
-                    );
-                    const comma = ctx.sourceCode.getTokenAfter(prop);
-                    return [
-                      fixer.insertTextAfter(httpProp, `, ${propText}`),
-                      fixer.removeRange([
-                        prop.range[0],
-                        comma?.value === "," ? comma.range[1] : prop.range[1],
-                      ]),
-                    ];
-                  }),
+                fix: (fixer) => [
+                  fixer.insertTextAfter(httpProp, `, ${propText}`),
+                  fixer.removeRange([
+                    prop.range[0],
+                    comma?.value === "," ? comma.range[1] : prop.range[1],
+                  ]),
+                ],
               });
             }
           }

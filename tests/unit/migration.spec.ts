@@ -32,13 +32,13 @@ tester.run("v21", migration.rules.v21, {
       ],
     },
     {
-      code: `createConfig({ http: { listen: 8090, upload: true, beforeRouting: () => {} } });`,
-      output: `createConfig({ http: { listen: 8090,   }, upload: true, beforeRouting: () => {} });`,
+      code: `createConfig({ http: { listen: 8090, upload: true } });`,
+      output: `createConfig({ http: { listen: 8090,  }, upload: true });`,
       errors: [
         {
           messageId: "move",
           data: {
-            subject: "properties",
+            subject: "upload",
             from: "http",
             to: "the top level of createConfig argument",
           },
