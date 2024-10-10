@@ -359,7 +359,6 @@ import { createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
 
 const config = createConfig({
-  http: { listen: 80 },
   beforeRouting: ({ app, logger, getChildLogger }) => {
     logger.info("Serving the API documentation at https://example.com/docs");
     app.use("/docs", ui.serve, ui.setup(documentation));
@@ -572,7 +571,6 @@ run the HTTPS server.
 import { createConfig, createServer } from "express-zod-api";
 
 const config = createConfig({
-  http: { listen: 80 },
   https: {
     options: {
       cert: fs.readFileSync("fullchain.pem", "utf-8"),
