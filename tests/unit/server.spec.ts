@@ -176,7 +176,6 @@ describe("Server", () => {
 
     test("should create a HTTPS server on request", async () => {
       const configMock = {
-        http: { listen: givePort() },
         https: {
           listen: givePort(),
           options: { cert: "cert", key: "key" },
