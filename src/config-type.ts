@@ -139,20 +139,22 @@ type BeforeRouting = (params: {
   getChildLogger: ChildLoggerExtractor;
 }) => void | Promise<void>;
 
+interface HttpConfig {
+  /** @desc Port, UNIX socket or custom options. */
+  listen: number | string | ListenOptions;
+}
+
+interface HttpsConfig extends HttpConfig {
+  /** @desc At least "cert" and "key" options required. */
+  options: ServerOptions;
+}
+
 export interface ServerConfig<TAG extends string = string>
   extends CommonConfig<TAG> {
   /** @desc HTTP server configuration. */
-  http?: {
-    /** @desc Port, UNIX socket or custom options. */
-    listen: number | string | ListenOptions;
-  };
+  http?: HttpConfig;
   /** @desc HTTPS server configuration. */
-  https?: {
-    /** @desc At least "cert" and "key" options required. */
-    options: ServerOptions;
-    /** @desc Port, UNIX socket or custom options. */
-    listen: number | string | ListenOptions;
-  };
+  https?: HttpsConfig;
   /**
    * @desc Custom JSON parser.
    * @default express.json()
