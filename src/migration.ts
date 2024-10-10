@@ -4,6 +4,10 @@ import {
   type TSESTree,
 } from "@typescript-eslint/utils";
 
+const changedProps = {
+  server: "http",
+};
+
 const v21 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
@@ -24,22 +28,27 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
         const argument = node.arguments[0];
         if (argument.type === "ObjectExpression") {
           const serverProp = argument.properties.find(
-            (entry): entry is TSESTree.Property =>
+            (
+              entry,
+            ): entry is TSESTree.Property & {
+              key: TSESTree.Identifier & { name: "server" };
+            } =>
               entry.type === "Property" &&
               entry.key.type === "Identifier" &&
               entry.key.name === "server" &&
               entry.value.type === "ObjectExpression",
           );
           if (serverProp) {
+            const replacement = changedProps[serverProp.key.name];
             ctx.report({
               node: serverProp,
               messageId: "change",
               data: {
                 subject: "property",
-                from: "server",
-                to: "http",
+                from: serverProp.key.name,
+                to: replacement,
               },
-              fix: (fixer) => fixer.replaceText(serverProp.key, "http"),
+              fix: (fixer) => fixer.replaceText(serverProp.key, replacement),
             });
           }
         }
