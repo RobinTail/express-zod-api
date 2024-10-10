@@ -1,14 +1,51 @@
-import { ESLintUtils, type TSESLint } from "@typescript-eslint/utils";
+import {
+  ESLintUtils,
+  type TSESLint,
+  type TSESTree,
+} from "@typescript-eslint/utils";
 
 const v21 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     fixable: "code",
     schema: [],
-    messages: {},
+    messages: {
+      change: "Change {{subject}} {{from}} to {{to}}.",
+    },
   },
   defaultOptions: [],
-  create: () => ({}),
+  create: (ctx) => ({
+    CallExpression: (node) => {
+      if (
+        node.callee.type === "Identifier" &&
+        node.callee.name === "createConfig" &&
+        node.arguments.length === 1
+      ) {
+        const argument = node.arguments[0];
+        if (argument.type === "ObjectExpression") {
+          const serverProp = argument.properties.find(
+            (entry): entry is TSESTree.Property =>
+              entry.type === "Property" &&
+              entry.key.type === "Identifier" &&
+              entry.key.name === "server" &&
+              entry.value.type === "ObjectExpression",
+          );
+          if (serverProp) {
+            ctx.report({
+              node: serverProp,
+              messageId: "change",
+              data: {
+                subject: "property",
+                from: "server",
+                to: "http",
+              },
+              fix: (fixer) => fixer.replaceText(serverProp.key, "http"),
+            });
+          }
+        }
+      }
+    },
+  }),
 });
 
 /**

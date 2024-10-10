@@ -19,6 +19,17 @@ describe("Migration", () => {
 });
 
 tester.run("v21", migration.rules.v21, {
-  valid: [{ code: `import {} from "express-zod-api"` }],
-  invalid: [],
+  valid: [{ code: `createConfig({ http: {} });` }],
+  invalid: [
+    {
+      code: `createConfig({ server: {} });`,
+      output: `createConfig({ http: {} });`,
+      errors: [
+        {
+          messageId: "change",
+          data: { subject: "property", from: "server", to: "http" },
+        },
+      ],
+    },
+  ],
 });
