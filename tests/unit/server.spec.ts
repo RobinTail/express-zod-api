@@ -1,3 +1,5 @@
+import http from "node:http";
+import https from "node:https";
 import { moveRaw } from "../../src/server-helpers";
 import { givePort } from "../helpers";
 import {
@@ -22,6 +24,7 @@ import {
   createServer,
   defaultResultHandler,
   ez,
+  createConfig,
 } from "../../src";
 import express from "express";
 
@@ -37,11 +40,11 @@ describe("Server", () => {
   describe("createServer()", () => {
     test("Should create server with minimal config", async () => {
       const port = givePort();
-      const configMock: ServerConfig = {
+      const configMock = {
         http: { listen: port },
         cors: true,
         startupLogo: false,
-        logger: { level: "warn" },
+        logger: { level: "warn" as const },
       };
       const routingMock = {
         v1: {
@@ -57,7 +60,14 @@ describe("Server", () => {
           }),
         },
       };
-      await createServer(configMock, routingMock);
+      const { httpServer, httpsServer } = await createServer(
+        createConfig(configMock),
+        routingMock,
+      );
+      expect(httpServer).toBeTruthy();
+      expect(httpsServer).toBeUndefined();
+      expectTypeOf(httpServer).toMatchTypeOf<http.Server>();
+      expectTypeOf(httpsServer).toBeUndefined();
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.use).toHaveBeenCalledTimes(2);
@@ -182,8 +192,8 @@ describe("Server", () => {
         },
         cors: true,
         startupLogo: false,
-        logger: { level: "warn" },
-      } satisfies ServerConfig;
+        logger: { level: "warn" as const },
+      };
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
@@ -195,8 +205,14 @@ describe("Server", () => {
         },
       };
 
-      const { httpsServer } = await createServer(configMock, routingMock);
+      const { httpServer, httpsServer } = await createServer(
+        createConfig(configMock),
+        routingMock,
+      );
+      expect(httpServer).toBeUndefined();
       expect(httpsServer).toBeTruthy();
+      expectTypeOf(httpServer).toBeUndefined();
+      expectTypeOf(httpsServer).toMatchTypeOf<https.Server>();
       expect(createHttpsServerSpy).toHaveBeenCalledWith(
         configMock.https.options,
         appMock,
