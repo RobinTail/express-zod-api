@@ -168,7 +168,7 @@ Create a minimal configuration. _See all available options
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
+  http: {
     listen: 8090, // port, UNIX socket or options
   },
   cors: true,
@@ -359,12 +359,9 @@ import { createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
 
 const config = createConfig({
-  server: {
-    listen: 80,
-    beforeRouting: ({ app, logger, getChildLogger }) => {
-      logger.info("Serving the API documentation at https://example.com/docs");
-      app.use("/docs", ui.serve, ui.setup(documentation));
-    },
+  beforeRouting: ({ app, logger, getChildLogger }) => {
+    logger.info("Serving the API documentation at https://example.com/docs");
+    app.use("/docs", ui.serve, ui.setup(documentation));
   },
 });
 ```
@@ -567,16 +564,12 @@ Please note: If you only want to send specific headers on requests to a specific
 ## Enabling HTTPS
 
 The modern API standard often assumes the use of a secure data transfer protocol, confirmed by a TLS certificate, also
-often called an SSL certificate in habit. When using the `createServer()` method, you can additionally configure and
-run the HTTPS server.
+often called an SSL certificate in habit. This way you can additionally (or solely) configure and run the HTTPS server:
 
 ```typescript
 import { createConfig, createServer } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    listen: 80,
-  },
   https: {
     options: {
       cert: fs.readFileSync("fullchain.pem", "utf-8"),
@@ -589,10 +582,7 @@ const config = createConfig({
 
 // 'await' is only needed if you're going to use the returned entities.
 // For top level CJS you can wrap you code with (async () => { ... })()
-const { app, httpServer, httpsServer, logger } = await createServer(
-  config,
-  routing,
-);
+const { app, httpsServer, logger } = await createServer(config, routing);
 ```
 
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
@@ -690,10 +680,8 @@ Install the following additional packages: `compression` and `@types/compression
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    /** @link https://www.npmjs.com/package/compression#options */
-    compression: { threshold: "1kb" }, // or true
-  },
+  /** @link https://www.npmjs.com/package/compression#options */
+  compression: { threshold: "1kb" }, // or true
 });
 ```
 
@@ -909,9 +897,7 @@ configure file uploads:
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    upload: true, // or options
-  },
+  upload: true, // or options
 });
 ```
 
@@ -926,15 +912,13 @@ upload might look this way:
 import createHttpError from "http-errors";
 
 const config = createConfig({
-  server: {
-    upload: {
-      limits: { fileSize: 51200 }, // 50 KB
-      limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
-      beforeUpload: ({ request, logger }) => {
-        if (!canUpload(request)) {
-          throw createHttpError(403, "Not authorized");
-        }
-      },
+  upload: {
+    limits: { fileSize: 51200 }, // 50 KB
+    limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
+    beforeUpload: ({ request, logger }) => {
+      if (!canUpload(request)) {
+        throw createHttpError(403, "Not authorized");
+      }
     },
   },
 });
