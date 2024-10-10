@@ -224,6 +224,27 @@ describe("Server", () => {
       );
     });
 
+    test("should create both HTTP and HTTPS servers", async () => {
+      const configMock = {
+        http: { listen: givePort() },
+        https: {
+          listen: givePort(),
+          options: { cert: "cert", key: "key" },
+        },
+        cors: true,
+        startupLogo: false,
+        logger: { level: "warn" as const },
+      };
+      const { httpServer, httpsServer } = await createServer(
+        createConfig(configMock),
+        {},
+      );
+      expect(httpServer).toBeTruthy();
+      expect(httpsServer).toBeTruthy();
+      expectTypeOf(httpServer).toMatchTypeOf<http.Server>();
+      expectTypeOf(httpsServer).toMatchTypeOf<https.Server>();
+    });
+
     test("should enable compression on request", async () => {
       const configMock = {
         http: { listen: givePort() },
