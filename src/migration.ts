@@ -3,10 +3,22 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils";
+import { complement } from "ramda";
 
 const changedProps = {
   server: "http",
 };
+
+const propByName =
+  <T extends string>(name: T) =>
+  (
+    entry: TSESTree.ObjectLiteralElement,
+  ): entry is TSESTree.Property & {
+    key: TSESTree.Identifier & { name: T };
+  } =>
+    entry.type === "Property" &&
+    entry.key.type === "Identifier" &&
+    entry.key.name === name;
 
 const v21 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
@@ -15,6 +27,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
     schema: [],
     messages: {
       change: "Change {{subject}} {{from}} to {{to}}.",
+      move: "Move {{subject}} from {{from}} to {{to}}.",
     },
   },
   defaultOptions: [],
@@ -27,17 +40,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
       ) {
         const argument = node.arguments[0];
         if (argument.type === "ObjectExpression") {
-          const serverProp = argument.properties.find(
-            (
-              entry,
-            ): entry is TSESTree.Property & {
-              key: TSESTree.Identifier & { name: "server" };
-            } =>
-              entry.type === "Property" &&
-              entry.key.type === "Identifier" &&
-              entry.key.name === "server" &&
-              entry.value.type === "ObjectExpression",
-          );
+          const serverProp = argument.properties.find(propByName("server"));
           if (serverProp) {
             const replacement = changedProps[serverProp.key.name];
             ctx.report({
@@ -50,6 +53,39 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
               },
               fix: (fixer) => fixer.replaceText(serverProp.key, replacement),
             });
+          }
+          const httpProp = argument.properties.find(
+            propByName(changedProps.server),
+          );
+          if (httpProp && httpProp.value.type === "ObjectExpression") {
+            const nested = httpProp.value.properties;
+            const movable = nested.filter(complement(propByName("listen")));
+            if (movable.length > 0) {
+              ctx.report({
+                node: httpProp,
+                messageId: "move",
+                data: {
+                  subject: "properties",
+                  from: httpProp.key.name,
+                  to: `the top level of ${node.callee.name} argument`,
+                },
+                fix: (fixer) =>
+                  movable.flatMap((prop) => {
+                    const propText = ctx.sourceCode.text.slice(
+                      prop.range[0],
+                      prop.range[1],
+                    );
+                    const comma = ctx.sourceCode.getTokenAfter(prop);
+                    return [
+                      fixer.insertTextAfter(httpProp, `, ${propText}`),
+                      fixer.removeRange([
+                        prop.range[0],
+                        comma?.value === "," ? comma.range[1] : prop.range[1],
+                      ]),
+                    ];
+                  }),
+              });
+            }
           }
         }
       }

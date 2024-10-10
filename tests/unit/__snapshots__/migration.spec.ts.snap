@@ -10,6 +10,7 @@ exports[`Migration > should consist of one rule being the major version of the p
         "fixable": "code",
         "messages": {
           "change": "Change {{subject}} {{from}} to {{to}}.",
+          "move": "Move {{subject}} from {{from}} to {{to}}.",
         },
         "schema": [],
         "type": "problem",
