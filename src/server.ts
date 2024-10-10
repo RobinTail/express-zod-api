@@ -56,6 +56,8 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   return { notFoundHandler, logger: rootLogger };
 };
 
+type WhenDefined<T, U> = T extends undefined ? undefined : U;
+
 export const createServer = async <
   HTTP extends ServerConfig["http"],
   HTTPS extends ServerConfig["https"],
@@ -120,12 +122,14 @@ export const createServer = async <
     app,
     logger: rootLogger,
     httpServer: (httpServer &&
-      starter(httpServer, config.http?.listen)) as HTTP extends undefined
-      ? undefined
-      : http.Server,
+      starter(httpServer, config.http?.listen)) as WhenDefined<
+      HTTP,
+      http.Server
+    >,
     httpsServer: (httpsServer &&
-      starter(httpsServer, config.https?.listen)) as HTTPS extends undefined
-      ? undefined
-      : https.Server,
+      starter(httpsServer, config.https?.listen)) as WhenDefined<
+      HTTPS,
+      https.Server
+    >,
   };
 };
