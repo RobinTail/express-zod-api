@@ -19,6 +19,34 @@ describe("Migration", () => {
 });
 
 tester.run("v21", migration.rules.v21, {
-  valid: [{ code: `import {} from "express-zod-api"` }],
-  invalid: [],
+  valid: [
+    `createConfig({ http: {} });`,
+    `createConfig({ http: { listen: 8090 }, upload: true });`,
+  ],
+  invalid: [
+    {
+      code: `createConfig({ server: {} });`,
+      output: `createConfig({ http: {} });`,
+      errors: [
+        {
+          messageId: "change",
+          data: { subject: "property", from: "server", to: "http" },
+        },
+      ],
+    },
+    {
+      code: `createConfig({ http: { listen: 8090, upload: true } });`,
+      output: `createConfig({ http: { listen: 8090,  }, upload: true });`,
+      errors: [
+        {
+          messageId: "move",
+          data: {
+            subject: "upload",
+            from: "http",
+            to: "the top level of createConfig argument",
+          },
+        },
+      ],
+    },
+  ],
 });
