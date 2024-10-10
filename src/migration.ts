@@ -1,5 +1,6 @@
 import {
   ESLintUtils,
+  AST_NODE_TYPES as NT,
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils";
@@ -26,7 +27,7 @@ type PropWithId = TSESTree.Property & {
 const isPropWithId = (
   subject: TSESTree.ObjectLiteralElement,
 ): subject is PropWithId =>
-  subject.type === "Property" && subject.key.type === "Identifier";
+  subject.type === NT.Property && subject.key.type === NT.Identifier;
 
 const propByName =
   <T extends string>(subject: T | ReadonlyArray<T>) =>
@@ -52,12 +53,12 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
   create: (ctx) => ({
     CallExpression: (node) => {
       if (
-        node.callee.type === "Identifier" &&
+        node.callee.type === NT.Identifier &&
         node.callee.name === createConfigName &&
         node.arguments.length === 1
       ) {
         const argument = node.arguments[0];
-        if (argument.type === "ObjectExpression") {
+        if (argument.type === NT.ObjectExpression) {
           const serverProp = argument.properties.find(
             propByName(serverPropName),
           );
@@ -77,7 +78,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
           const httpProp = argument.properties.find(
             propByName(changedProps.server),
           );
-          if (httpProp && httpProp.value.type === "ObjectExpression") {
+          if (httpProp && httpProp.value.type === NT.ObjectExpression) {
             const nested = httpProp.value.properties;
             const movable = nested.filter(propByName(movedProps));
             for (const prop of movable) {
