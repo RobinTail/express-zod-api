@@ -23,7 +23,7 @@ const shouldAct = <T extends Record<string, unknown>>(
   scope: T,
 ): subject is keyof T => typeof subject === "string" && subject in scope;
 
-const v20 = ESLintUtils.RuleCreator.withoutDocs({
+const v21 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     fixable: "code",
@@ -163,9 +163,9 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
  *          import migration from "express-zod-api/migration";
  *          export default [
  *            { languageOptions: {parser}, plugins: {migration} },
- *            { files: ["**\/*.ts"], rules: { "migration/v20": "error" } }
+ *            { files: ["**\/*.ts"], rules: { "migration/v21": "error" } }
  *          ];
  * */
 export default {
-  rules: { v20 },
+  rules: { v21 },
 } satisfies TSESLint.Linter.Plugin;
