@@ -1,8 +1,11 @@
 import { defineConfig, Options } from "tsup";
 import { version, engines, name } from "./package.json";
 import semver from "semver";
+import { renderUnicodeCompact } from "uqr";
 
 const minNode = semver.minVersion(engines.node)!;
+
+const qrDocs = renderUnicodeCompact(`https://ez.robintail.cz/v${version}`);
 
 const commons: Options = {
   format: ["cjs", "esm"],
@@ -30,8 +33,10 @@ export default defineConfig([
          */
         options.supported["dynamic-import"] = false;
       }
+      options.charset = "utf8";
       options.define = {
         "process.env.TSUP_BUILD": `"v${version} (${format.toUpperCase()})"`,
+        "process.env.DOCS_QR": `"${qrDocs.replace(/\n/g, "\\n")}"`,
       };
     },
   },

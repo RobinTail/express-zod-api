@@ -36,6 +36,7 @@ export const getStartupLogo = () => {
                     888${proud}
 ${dedicationMessage}888${slogan}
 ${thanks}
+${hex("#AAA").bgHex("#000")(process.env.DOCS_QR || "")}
 `;
 
   return logo
