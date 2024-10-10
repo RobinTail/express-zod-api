@@ -38,9 +38,7 @@ describe("Server", () => {
     test("Should create server with minimal config", async () => {
       const port = givePort();
       const configMock: ServerConfig = {
-        server: {
-          listen: port,
-        },
+        http: { listen: port },
         cors: true,
         startupLogo: false,
         logger: { level: "warn" },
@@ -90,12 +88,10 @@ describe("Server", () => {
       const infoMethod = vi.spyOn(customLogger, "info");
       const port = givePort();
       const configMock = {
-        server: {
-          listen: { port }, // testing Net::ListenOptions
-          jsonParser: vi.fn(),
-          rawParser: vi.fn(),
-          beforeRouting: vi.fn(),
-        },
+        http: { listen: { port } }, // testing Net::ListenOptions
+        jsonParser: vi.fn(),
+        rawParser: vi.fn(),
+        beforeRouting: vi.fn(),
         cors: true,
         startupLogo: false,
         errorHandler: {
@@ -133,7 +129,7 @@ describe("Server", () => {
       expect(appMock).toBeTruthy();
       expect(appMock.use).toHaveBeenCalledTimes(2);
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
-      expect(configMock.server.beforeRouting).toHaveBeenCalledWith({
+      expect(configMock.beforeRouting).toHaveBeenCalledWith({
         app: appMock,
         logger: customLogger,
         getChildLogger: expect.any(Function),
@@ -143,31 +139,31 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
-        configMock.server.jsonParser,
+        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledTimes(1);
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/test",
-        configMock.server.jsonParser,
+        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.patch).toHaveBeenCalledTimes(1);
       expect(appMock.patch).toHaveBeenCalledWith(
         "/v1/raw",
-        configMock.server.rawParser,
+        configMock.rawParser,
         moveRaw,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledTimes(2);
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/test",
-        configMock.server.jsonParser,
+        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/raw",
-        configMock.server.rawParser,
+        configMock.rawParser,
         moveRaw,
         expect.any(Function), // endpoint
       );
@@ -180,13 +176,10 @@ describe("Server", () => {
 
     test("should create a HTTPS server on request", async () => {
       const configMock = {
-        server: { listen: givePort() },
+        http: { listen: givePort() },
         https: {
           listen: givePort(),
-          options: {
-            cert: "cert",
-            key: "key",
-          },
+          options: { cert: "cert", key: "key" },
         },
         cors: true,
         startupLogo: false,
@@ -218,10 +211,8 @@ describe("Server", () => {
 
     test("should enable compression on request", async () => {
       const configMock = {
-        server: {
-          listen: givePort(),
-          compression: true,
-        },
+        http: { listen: givePort() },
+        compression: true,
         cors: true,
         startupLogo: false,
         logger: { level: "warn" },
@@ -244,13 +235,11 @@ describe("Server", () => {
 
     test("should enable uploads on request", async () => {
       const configMock = {
-        server: {
-          listen: givePort(),
-          upload: {
-            limits: { fileSize: 1024 },
-            limitError: new Error("Too heavy"),
-            beforeUpload: vi.fn(),
-          },
+        http: { listen: givePort() },
+        upload: {
+          limits: { fileSize: 1024 },
+          limitError: new Error("Too heavy"),
+          beforeUpload: vi.fn(),
         },
         cors: true,
         startupLogo: false,
@@ -281,9 +270,7 @@ describe("Server", () => {
 
     test("should enable raw on request", async () => {
       const configMock = {
-        server: {
-          listen: givePort(),
-        },
+        http: { listen: givePort() },
         cors: true,
         startupLogo: false,
         logger: { level: "warn" },
