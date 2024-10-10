@@ -1,5 +1,3 @@
-import http from "node:http";
-import https from "node:https";
 import { moveRaw } from "../../src/server-helpers";
 import { givePort } from "../helpers";
 import {
@@ -13,6 +11,8 @@ import {
   createHttpsServerSpy,
   httpListenSpy,
   httpsListenSpy,
+  HttpServer,
+  HttpsServer,
 } from "../http-mock";
 import { z } from "zod";
 import {
@@ -66,7 +66,7 @@ describe("Server", () => {
       );
       expect(httpServer).toBeTruthy();
       expect(httpsServer).toBeUndefined();
-      expectTypeOf(httpServer).toMatchTypeOf<http.Server>();
+      expectTypeOf(httpServer).toMatchTypeOf<HttpServer>();
       expectTypeOf(httpsServer).toBeUndefined();
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
@@ -212,7 +212,7 @@ describe("Server", () => {
       expect(httpServer).toBeUndefined();
       expect(httpsServer).toBeTruthy();
       expectTypeOf(httpServer).toBeUndefined();
-      expectTypeOf(httpsServer).toMatchTypeOf<https.Server>();
+      expectTypeOf(httpsServer).toMatchTypeOf<HttpsServer>();
       expect(createHttpsServerSpy).toHaveBeenCalledWith(
         configMock.https.options,
         appMock,
@@ -241,8 +241,8 @@ describe("Server", () => {
       );
       expect(httpServer).toBeTruthy();
       expect(httpsServer).toBeTruthy();
-      expectTypeOf(httpServer).toMatchTypeOf<http.Server>();
-      expectTypeOf(httpsServer).toMatchTypeOf<https.Server>();
+      expectTypeOf(httpServer).toMatchTypeOf<HttpServer>();
+      expectTypeOf(httpsServer).toMatchTypeOf<HttpsServer>();
     });
 
     test("should enable compression on request", async () => {
