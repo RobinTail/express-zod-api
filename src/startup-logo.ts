@@ -10,7 +10,7 @@ export const getStartupLogo = () => {
   const thanks = italic(
     "Thank you for choosing Express Zod API for your project.".padStart(132),
   );
-  const dedicationMessage = italic("for Zoey".padEnd(20));
+  const dedicationMessage = italic("for Kesaria".padEnd(20));
 
   const pink = hex("#F5A9B8");
   const blue = hex("#5BCEFA");
