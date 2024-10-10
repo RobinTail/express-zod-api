@@ -82,10 +82,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
             const nested = httpProp.value.properties;
             const movable = nested.filter(propByName(movedProps));
             for (const prop of movable) {
-              const propText = ctx.sourceCode.text.slice(
-                prop.range[0],
-                prop.range[1],
-              );
+              const propText = ctx.sourceCode.text.slice(...prop.range);
               const comma = ctx.sourceCode.getTokenAfter(prop);
               ctx.report({
                 node: httpProp,
