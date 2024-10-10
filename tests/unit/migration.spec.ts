@@ -12,8 +12,7 @@ const tester = new RuleTester({
 });
 
 describe("Migration", () => {
-  /** @todo activate when version changed to v21*/
-  test.skip("should consist of one rule being the major version of the package", () => {
+  test("should consist of one rule being the major version of the package", () => {
     expect(migration.rules).toHaveProperty(`v${version.split(".")[0]}`);
     expect(migration).toMatchSnapshot();
   });
