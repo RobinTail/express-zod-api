@@ -19,7 +19,10 @@ describe("Migration", () => {
 });
 
 tester.run("v21", migration.rules.v21, {
-  valid: [{ code: `createConfig({ http: {} });` }],
+  valid: [
+    `createConfig({ http: {} });`,
+    `createConfig({ http: { listen: 8090 }, upload: true });`,
+  ],
   invalid: [
     {
       code: `createConfig({ server: {} });`,
