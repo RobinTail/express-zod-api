@@ -203,6 +203,7 @@ export interface AppConfig<TAG extends string = string>
   app: IRouter;
 }
 
+/** @desc Must define at least http or https property (or both) */
 export function createConfig(config: ServerConfig<undefined, undefined>): never;
 export function createConfig<HTTP extends HttpConfig, TAG extends string>(
   config: ServerConfig<HTTP, undefined, TAG>,
