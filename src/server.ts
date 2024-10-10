@@ -56,7 +56,13 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   return { notFoundHandler, logger: rootLogger };
 };
 
-export const createServer = async (config: ServerConfig, routing: Routing) => {
+export const createServer = async <
+  HTTP extends ServerConfig["http"],
+  HTTPS extends ServerConfig["https"],
+>(
+  config: ServerConfig<HTTP, HTTPS>,
+  routing: Routing,
+) => {
   const {
     rootLogger,
     getChildLogger,
@@ -113,7 +119,13 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   return {
     app,
     logger: rootLogger,
-    httpServer: httpServer && starter(httpServer, config.http?.listen),
-    httpsServer: httpsServer && starter(httpsServer, config.https?.listen),
+    httpServer: (httpServer &&
+      starter(httpServer, config.http?.listen)) as HTTP extends undefined
+      ? undefined
+      : http.Server,
+    httpsServer: (httpsServer &&
+      starter(httpsServer, config.https?.listen)) as HTTPS extends undefined
+      ? undefined
+      : https.Server,
   };
 };

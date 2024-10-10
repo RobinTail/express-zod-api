@@ -149,12 +149,15 @@ interface HttpsConfig extends HttpConfig {
   options: ServerOptions;
 }
 
-export interface ServerConfig<TAG extends string = string>
-  extends CommonConfig<TAG> {
+export interface ServerConfig<
+  HTTP extends HttpConfig | undefined = HttpConfig | undefined,
+  HTTPS extends HttpsConfig | undefined = HttpsConfig | undefined,
+  TAG extends string = string,
+> extends CommonConfig<TAG> {
   /** @desc HTTP server configuration. */
-  http?: HttpConfig;
+  http?: HTTP;
   /** @desc HTTPS server configuration. */
-  https?: HttpsConfig;
+  https?: HTTPS;
   /**
    * @desc Custom JSON parser.
    * @default express.json()
@@ -200,9 +203,18 @@ export interface AppConfig<TAG extends string = string>
   app: IRouter;
 }
 
-export function createConfig<TAG extends string>(
-  config: ServerConfig<TAG>,
-): ServerConfig<TAG>;
+export function createConfig(config: ServerConfig<undefined, undefined>): never;
+export function createConfig<HTTP extends HttpConfig, TAG extends string>(
+  config: ServerConfig<HTTP, undefined, TAG>,
+): ServerConfig<HTTP, undefined, TAG>;
+export function createConfig<HTTPS extends HttpsConfig, TAG extends string>(
+  config: ServerConfig<undefined, HTTPS, TAG>,
+): ServerConfig<undefined, HTTPS, TAG>;
+export function createConfig<
+  HTTP extends HttpConfig,
+  HTTPS extends HttpsConfig,
+  TAG extends string,
+>(config: ServerConfig<HTTP, HTTPS, TAG>): ServerConfig<HTTP, HTTPS, TAG>;
 export function createConfig<TAG extends string>(
   config: AppConfig<TAG>,
 ): AppConfig<TAG>;
