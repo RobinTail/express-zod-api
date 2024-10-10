@@ -2,7 +2,6 @@ import express from "express";
 import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
-import { ListenOptions } from "node:net";
 import { reject, isNil } from "ramda";
 import { BuiltinLogger } from "./builtin-logger";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
@@ -101,10 +100,16 @@ export const createServer = async <
   initRouting({ app, routing, getChildLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
-  const starter = <T extends http.Server | https.Server>(
-    server: T,
-    subject?: number | string | ListenOptions,
-  ) => server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
+  const starter = <
+    T extends http.Server | https.Server,
+    S extends HTTP | HTTPS,
+  >(
+    server?: T,
+    subject?: S,
+  ) =>
+    server?.listen(subject?.listen, () =>
+      rootLogger.info("Listening", subject?.listen),
+    ) as WhenDefined<S, T>;
 
   const httpServer = config.http && http.createServer(app);
   const httpsServer =
@@ -121,15 +126,7 @@ export const createServer = async <
   return {
     app,
     logger: rootLogger,
-    httpServer: (httpServer &&
-      starter(httpServer, config.http?.listen)) as WhenDefined<
-      HTTP,
-      http.Server
-    >,
-    httpsServer: (httpsServer &&
-      starter(httpsServer, config.https?.listen)) as WhenDefined<
-      HTTPS,
-      https.Server
-    >,
+    httpServer: starter(httpServer, config.http),
+    httpsServer: starter(httpsServer, config.https),
   };
 };
