@@ -65,7 +65,7 @@ describe("Index Entrypoint", () => {
         logger: { level: "silent" };
       }>().toMatchTypeOf<AppConfig>();
       expectTypeOf<{
-        server: { listen: 8090 };
+        http: { listen: 8090 };
         logger: { level: "silent" };
         cors: false;
       }>().toMatchTypeOf<ServerConfig>();

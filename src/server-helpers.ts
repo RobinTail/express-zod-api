@@ -102,7 +102,7 @@ export const createUploadParsers = async ({
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
   const { limitError, beforeUpload, ...options } = {
-    ...(typeof config.server.upload === "object" && config.server.upload),
+    ...(typeof config.upload === "object" && config.upload),
   };
   const parsers: RequestHandler[] = [];
   parsers.push(async (request, response, next) => {

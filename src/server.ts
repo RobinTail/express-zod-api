@@ -2,6 +2,7 @@ import express from "express";
 import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
+import { reject, isNil } from "ramda";
 import { BuiltinLogger } from "./builtin-logger";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
 import { isLoggerInstance } from "./logger-helpers";
@@ -54,7 +55,13 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   return { notFoundHandler, logger: rootLogger };
 };
 
-export const createServer = async (config: ServerConfig, routing: Routing) => {
+export const createServer = async <
+  HTTP extends ServerConfig["http"],
+  HTTPS extends ServerConfig["https"],
+>(
+  config: ServerConfig<HTTP, HTTPS>,
+  routing: Routing,
+) => {
   const {
     rootLogger,
     getChildLogger,
@@ -64,27 +71,25 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   } = makeCommonEntities(config);
   const app = express().disable("x-powered-by").use(loggingMiddleware);
 
-  if (config.server.compression) {
+  if (config.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
     app.use(
       compressor(
-        typeof config.server.compression === "object"
-          ? config.server.compression
-          : undefined,
+        typeof config.compression === "object" ? config.compression : undefined,
       ),
     );
   }
 
   const parsers: Parsers = {
-    json: [config.server.jsonParser || express.json()],
-    raw: [config.server.rawParser || express.raw(), moveRaw],
-    upload: config.server.upload
+    json: [config.jsonParser || express.json()],
+    raw: [config.rawParser || express.raw(), moveRaw],
+    upload: config.upload
       ? await createUploadParsers({ config, getChildLogger })
       : [],
   };
 
-  if (config.server.beforeRouting) {
-    await config.server.beforeRouting({
+  if (config.beforeRouting) {
+    await config.beforeRouting({
       app,
       logger: rootLogger,
       getChildLogger,
@@ -93,18 +98,24 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   initRouting({ app, routing, getChildLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
-  const starter = <T extends http.Server | https.Server>(
-    server: T,
-    subject?: typeof config.server.listen,
-  ) => server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
+  const starter = <
+    T extends http.Server | https.Server,
+    S extends HTTP | HTTPS,
+  >(
+    server?: T,
+    subject?: S,
+  ) =>
+    server?.listen(subject?.listen, () =>
+      rootLogger.info("Listening", subject?.listen),
+    ) as S extends undefined ? undefined : T;
 
-  const httpServer = http.createServer(app);
+  const httpServer = config.http && http.createServer(app);
   const httpsServer =
     config.https && https.createServer(config.https.options, app);
 
   if (config.gracefulShutdown) {
     installTerminationListener({
-      servers: [httpServer].concat(httpsServer || []),
+      servers: reject(isNil, [httpServer, httpsServer]),
       logger: rootLogger,
       options: config.gracefulShutdown === true ? {} : config.gracefulShutdown,
     });
@@ -113,7 +124,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   return {
     app,
     logger: rootLogger,
-    httpServer: starter(httpServer, config.server.listen),
-    httpsServer: httpsServer && starter(httpsServer, config.https?.listen),
+    httpServer: starter(httpServer, config.http),
+    httpsServer: starter(httpsServer, config.https),
   };
 };

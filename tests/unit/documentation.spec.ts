@@ -21,7 +21,7 @@ describe("Documentation", () => {
   const sampleConfig = createConfig({
     cors: true,
     logger: { level: "silent" },
-    server: { listen: givePort() },
+    http: { listen: givePort() },
   });
 
   describe("Basic cases", () => {

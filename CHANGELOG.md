@@ -2033,7 +2033,7 @@ new Client({
 
 ### v10.1.3
 
-- Fixed issue #929, found and reported by [@shroudedcode](https://github.com/shroudedcode).
+- Fixed issue #929, found and reported by [@niklashigi](https://github.com/niklashigi).
   - Customized description of request parameters have not been depicted correctly when generating the documentation.
 
 ### v10.1.2
@@ -2485,7 +2485,7 @@ output/anything: Number must be greater than 0
 ### v8.4.3
 
 - The regular expression used for validating `z.dateIn()` made easier
-  by [@shroudedcode](https://github.com/shroudedcode).
+  by [@niklashigi](https://github.com/niklashigi).
 
 ```typescript
 const before = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/;
@@ -2564,7 +2564,7 @@ z.object({}).transform(() => []); // never[] inherits Array inherits Object, {} 
 
 ### v8.3.3
 
-- Fixed the bug #672 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+- Fixed the bug #672 found and reported by [@niklashigi](https://github.com/niklashigi).
   - Preserving the custom description of `z.dateIn()` and `z.dateOut()` schemas when generating OpenAPI documentation.
 
 ```yaml
@@ -2577,7 +2577,7 @@ after:
 
 ### v8.3.2
 
-- Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+- Fixed the bug #673 found and reported by [@niklashigi](https://github.com/niklashigi).
   - Preventing double parsing of incoming data by input schemas of middlewares containing transformations.
   - The bug caused inability of using any transforming schema in middlewares.
   - In particular, but not limited with: using `z.dateIn()` in middlewares.
@@ -2727,7 +2727,7 @@ const routing: Routing = {
 ### v7.9.3
 
 - This version contains a cherry-picked fix made in v8.3.2.
-- Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+- Fixed the bug #673 found and reported by [@niklashigi](https://github.com/niklashigi).
   - Preventing double parsing of incoming data by input schemas of middlewares containing transformations.
   - The bug caused inability of using any transforming schema in middlewares.
   - In particular, but not limited with: using `z.dateIn()` in middlewares.
