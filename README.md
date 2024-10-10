@@ -168,7 +168,7 @@ Create a minimal configuration. _See all available options
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
+  http: {
     listen: 8090, // port, UNIX socket or options
   },
   cors: true,
@@ -359,12 +359,10 @@ import { createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
 
 const config = createConfig({
-  server: {
-    listen: 80,
-    beforeRouting: ({ app, logger, getChildLogger }) => {
-      logger.info("Serving the API documentation at https://example.com/docs");
-      app.use("/docs", ui.serve, ui.setup(documentation));
-    },
+  http: { listen: 80 },
+  beforeRouting: ({ app, logger, getChildLogger }) => {
+    logger.info("Serving the API documentation at https://example.com/docs");
+    app.use("/docs", ui.serve, ui.setup(documentation));
   },
 });
 ```
@@ -574,9 +572,7 @@ run the HTTPS server.
 import { createConfig, createServer } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    listen: 80,
-  },
+  http: { listen: 80 },
   https: {
     options: {
       cert: fs.readFileSync("fullchain.pem", "utf-8"),
@@ -690,10 +686,8 @@ Install the following additional packages: `compression` and `@types/compression
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    /** @link https://www.npmjs.com/package/compression#options */
-    compression: { threshold: "1kb" }, // or true
-  },
+  /** @link https://www.npmjs.com/package/compression#options */
+  compression: { threshold: "1kb" }, // or true
 });
 ```
 
@@ -909,9 +903,7 @@ configure file uploads:
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    upload: true, // or options
-  },
+  upload: true, // or options
 });
 ```
 
@@ -926,15 +918,13 @@ upload might look this way:
 import createHttpError from "http-errors";
 
 const config = createConfig({
-  server: {
-    upload: {
-      limits: { fileSize: 51200 }, // 50 KB
-      limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
-      beforeUpload: ({ request, logger }) => {
-        if (!canUpload(request)) {
-          throw createHttpError(403, "Not authorized");
-        }
-      },
+  upload: {
+    limits: { fileSize: 51200 }, // 50 KB
+    limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
+    beforeUpload: ({ request, logger }) => {
+      if (!canUpload(request)) {
+        throw createHttpError(403, "Not authorized");
+      }
     },
   },
 });
