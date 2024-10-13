@@ -324,27 +324,16 @@ import { defaultEndpointsFactory } from "express-zod-api";
 
 const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
   // caution: new connection on every request:
-  const db = mongoose.connect("mongodb://connection.string");
+  const connection = mongoose.connect("mongodb://connection.string");
   const privateKey = await readFile("private-key.pem", "utf-8");
+  using db = { connection, [Symbol.asyncDispose]: connection.close }; // "using" is TS 5.2 feature
   return { db, privateKey };
 });
 ```
 
 **Notice on resources cleanup**: If necessary, you can release resources at the end of the request processing in a
-custom [Result Handler](#response-customization):
-
-```typescript
-import { ResultHandler } from "express-zod-api";
-
-const resultHandlerWithCleanup = new ResultHandler({
-  handler: ({ options }) => {
-    // necessary to check for certain option presence:
-    if ("db" in options && options.db) {
-      options.db.connection.close(); // sample cleanup
-    }
-  },
-});
-```
+custom [Result Handler](#response-customization), or consider TypeScript 5.2 keyword `using` for
+[automatic disposal](https://www.totaltypescript.com/typescript-5-2-new-keyword-using).
 
 ## Using native express middlewares
 
