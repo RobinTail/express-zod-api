@@ -324,9 +324,9 @@ import { defaultEndpointsFactory } from "express-zod-api";
 
 const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
   // caution: new connection on every request:
-  const connection = mongoose.connect("mongodb://connection.string");
+  const connection = await mongoose.connect("mongodb://connection.string");
   const privateKey = await readFile("private-key.pem", "utf-8");
-  using db = { connection, [Symbol.asyncDispose]: connection.close }; // "using" is TS 5.2 feature
+  await using db = { connection, [Symbol.asyncDispose]: connection.close }; // "using" is TS 5.2 feature
   return { db, privateKey };
 });
 ```
