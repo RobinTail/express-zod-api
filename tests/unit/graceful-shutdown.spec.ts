@@ -1,7 +1,7 @@
 import forge from "node-forge";
 import http from "node:http";
 import https from "node:https";
-import { Agent } from "undici";
+import { Agent, fetch } from "undici";
 import { setTimeout } from "node:timers/promises";
 import { monitor } from "../../src/graceful-shutdown";
 import { givePort } from "../helpers";
