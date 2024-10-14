@@ -40,6 +40,13 @@ export default [
     },
   },
   {
+    name: "source/plugin",
+    files: ["src/zod-plugin.ts"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": "off",
+    },
+  },
+  {
     name: "source/migration",
     files: ["src/migration.ts"],
     rules: {
@@ -55,13 +62,6 @@ export default [
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": ["warn"],
-    },
-  },
-  {
-    name: "source/plugin",
-    files: ["src/zod-plugin.ts"],
-    rules: {
-      "@typescript-eslint/no-unused-vars": "off",
     },
   },
   {
