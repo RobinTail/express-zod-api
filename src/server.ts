@@ -69,7 +69,9 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     parserFailureHandler,
     loggingMiddleware,
   } = makeCommonEntities(config);
-  const app = bridge(express).disable("x-powered-by").use(loggingMiddleware);
+  const app = (config.http2 ? bridge(express) : express())
+    .disable("x-powered-by")
+    .use(loggingMiddleware);
 
   if (config.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
