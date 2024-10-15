@@ -23,15 +23,6 @@ const appMock = {
   init: vi.fn(),
 };
 
-const resetAppMock = () => {
-  for (const key in appMock) {
-    const prop = appMock[key as keyof typeof appMock];
-    if (prop && "mockClear" in prop && typeof prop.mockClear === "function") {
-      prop.mockClear();
-    }
-  }
-};
-
 const expressMock = () => appMock;
 expressMock.json = () => expressJsonMock;
 expressMock.raw = () => expressRawMock;
@@ -51,5 +42,4 @@ export {
   expressRawMock,
   staticMock,
   staticHandler,
-  resetAppMock,
 };
