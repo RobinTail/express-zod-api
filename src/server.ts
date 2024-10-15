@@ -2,9 +2,13 @@ import express from "express";
 import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
-import { reject, isNil } from "ramda";
 import { BuiltinLogger } from "./builtin-logger";
-import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
+import {
+  AppConfig,
+  CommonConfig,
+  HttpConfig,
+  ServerConfig,
+} from "./config-type";
 import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
@@ -55,13 +59,7 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   return { notFoundHandler, logger: rootLogger };
 };
 
-export const createServer = async <
-  HTTP extends ServerConfig["http"],
-  HTTPS extends ServerConfig["https"],
->(
-  config: ServerConfig<HTTP, HTTPS>,
-  routing: Routing,
-) => {
+export const createServer = async (config: ServerConfig, routing: Routing) => {
   const {
     rootLogger,
     getChildLogger,
@@ -98,24 +96,26 @@ export const createServer = async <
   initRouting({ app, routing, getChildLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
-  const starter = <
-    T extends http.Server | https.Server,
-    S extends HTTP | HTTPS,
-  >(
-    server?: T,
-    subject?: S,
-  ) =>
-    server?.listen(subject?.listen, () =>
-      rootLogger.info("Listening", subject?.listen),
-    ) as S extends undefined ? undefined : T;
+  const makeStarter =
+    (server: http.Server | https.Server, subject: HttpConfig["listen"]) => () =>
+      server.listen(subject, () => rootLogger.info("Listening", subject));
 
-  const httpServer = config.http && http.createServer(app);
-  const httpsServer =
-    config.https && https.createServer(config.https.options, app);
+  const created: Array<http.Server | https.Server> = [];
+  const starters: Array<() => http.Server | https.Server> = [];
+  if (config.http) {
+    const httpServer = http.createServer(app);
+    created.push(httpServer);
+    starters.push(makeStarter(httpServer, config.http.listen));
+  }
+  if (config.https) {
+    const httpsServer = https.createServer(config.https.options, app);
+    created.push(httpsServer);
+    starters.push(makeStarter(httpsServer, config.https.listen));
+  }
 
   if (config.gracefulShutdown) {
     installTerminationListener({
-      servers: reject(isNil, [httpServer, httpsServer]),
+      servers: created,
       logger: rootLogger,
       options: config.gracefulShutdown === true ? {} : config.gracefulShutdown,
     });
@@ -124,7 +124,6 @@ export const createServer = async <
   return {
     app,
     logger: rootLogger,
-    httpServer: starter(httpServer, config.http),
-    httpsServer: starter(httpsServer, config.https),
+    servers: starters.map((starter) => starter()),
   };
 };
