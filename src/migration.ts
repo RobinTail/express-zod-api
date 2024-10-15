@@ -6,7 +6,9 @@ import {
 } from "@typescript-eslint/utils";
 
 const createConfigName = "createConfig";
+const createServerName = "createServer";
 const serverPropName = "server";
+const serversPropName = "servers";
 
 const changedProps = {
   [serverPropName]: "http",
@@ -20,13 +22,13 @@ const movedProps = [
   "beforeRouting",
 ] as const;
 
+const removedProps = ["httpServer", "httpsServer"];
+
 type PropWithId = TSESTree.Property & {
   key: TSESTree.Identifier;
 };
 
-const isPropWithId = (
-  subject: TSESTree.ObjectLiteralElement,
-): subject is PropWithId =>
+const isPropWithId = (subject: TSESTree.Node): subject is PropWithId =>
   subject.type === NT.Property && subject.key.type === NT.Identifier;
 
 const propByName =
@@ -101,6 +103,36 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
                 ],
               });
             }
+          }
+        }
+      }
+      if (
+        node.callee.type === NT.Identifier &&
+        node.callee.name === createServerName
+      ) {
+        const assignment = ctx.sourceCode.getAncestors(node).findLast(
+          (
+            parent,
+          ): parent is TSESTree.VariableDeclarator & {
+            id: TSESTree.ObjectPattern;
+          } =>
+            parent.type === NT.VariableDeclarator &&
+            parent.id.type === NT.ObjectPattern,
+        );
+        if (assignment) {
+          const removable = assignment.id.properties
+            .filter((prop) => isPropWithId(prop))
+            .filter((prop) => removedProps.includes(prop.key.name));
+          for (const prop of removable) {
+            ctx.report({
+              node: prop,
+              messageId: "change",
+              data: {
+                subject: "property",
+                from: prop.key.name,
+                to: serversPropName,
+              },
+            });
           }
         }
       }

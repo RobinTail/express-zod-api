@@ -22,6 +22,7 @@ tester.run("v21", migration.rules.v21, {
   valid: [
     `createConfig({ http: {} });`,
     `createConfig({ http: { listen: 8090 }, upload: true });`,
+    `const { app, servers, logger } = await createServer();`,
   ],
   invalid: [
     {
@@ -45,6 +46,19 @@ tester.run("v21", migration.rules.v21, {
             from: "http",
             to: "the top level of createConfig argument",
           },
+        },
+      ],
+    },
+    {
+      code: `const { app, httpServer, httpsServer, logger } = await createServer();`,
+      errors: [
+        {
+          messageId: "change",
+          data: { subject: "property", from: "httpServer", to: "servers" },
+        },
+        {
+          messageId: "change",
+          data: { subject: "property", from: "httpsServer", to: "servers" },
         },
       ],
     },
