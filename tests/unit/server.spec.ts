@@ -30,6 +30,10 @@ describe("Server", () => {
     vi.restoreAllMocks();
   });
 
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   test("Express is mocked", () => {
     expect(expressMock).toBeTruthy();
   });
