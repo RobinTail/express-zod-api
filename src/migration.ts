@@ -8,10 +8,13 @@ import {
 const createConfigName = "createConfig";
 const createServerName = "createServer";
 const serverPropName = "server";
-const serversPropName = "servers";
+const httpServerPropName = "httpServer";
+const httpsServerPropName = "httpsServer";
 
 const changedProps = {
   [serverPropName]: "http",
+  [httpServerPropName]: "servers",
+  [httpsServerPropName]: "servers",
 };
 
 const movedProps = [
@@ -22,8 +25,6 @@ const movedProps = [
   "beforeRouting",
 ] as const;
 
-const removedProps = ["httpServer", "httpsServer"];
-
 type PropWithId = TSESTree.Property & {
   key: TSESTree.Identifier;
 };
@@ -33,9 +34,7 @@ const isPropWithId = (subject: TSESTree.Node): subject is PropWithId =>
 
 const propByName =
   <T extends string>(subject: T | ReadonlyArray<T>) =>
-  (
-    entry: TSESTree.ObjectLiteralElement,
-  ): entry is PropWithId & { key: { name: T } } =>
+  (entry: TSESTree.Node): entry is PropWithId & { key: { name: T } } =>
     isPropWithId(entry) &&
     (Array.isArray(subject)
       ? subject.includes(entry.key.name)
@@ -120,9 +119,9 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
             parent.id.type === NT.ObjectPattern,
         );
         if (assignment) {
-          const removable = assignment.id.properties
-            .filter((prop) => isPropWithId(prop))
-            .filter((prop) => removedProps.includes(prop.key.name));
+          const removable = assignment.id.properties.filter(
+            propByName([httpServerPropName, httpsServerPropName] as const),
+          );
           for (const prop of removable) {
             ctx.report({
               node: prop,
@@ -130,7 +129,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
               data: {
                 subject: "property",
                 from: prop.key.name,
-                to: serversPropName,
+                to: changedProps[prop.key.name],
               },
             });
           }
