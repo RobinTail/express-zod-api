@@ -2,6 +2,8 @@ import express from "express";
 import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
+import http2 from "node:http2";
+import bridge from "http2-express-bridge";
 import { reject, isNil } from "ramda";
 import { BuiltinLogger } from "./builtin-logger";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
@@ -69,7 +71,7 @@ export const createServer = async <
     parserFailureHandler,
     loggingMiddleware,
   } = makeCommonEntities(config);
-  const app = express().disable("x-powered-by").use(loggingMiddleware);
+  const app = bridge(express).disable("x-powered-by").use(loggingMiddleware);
 
   if (config.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
@@ -112,6 +114,8 @@ export const createServer = async <
   const httpServer = config.http && http.createServer(app);
   const httpsServer =
     config.https && https.createServer(config.https.options, app);
+  const http2Server =
+    config.http2 && http2.createSecureServer(config.http2.options, app);
 
   if (config.gracefulShutdown) {
     installTerminationListener({

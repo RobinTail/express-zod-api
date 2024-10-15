@@ -1,5 +1,6 @@
 import http from "node:http";
 import https from "node:https";
+import http2 from "node:http2";
 import { setInterval } from "node:timers/promises";
 import type { Socket } from "node:net";
 import type { ActualLogger } from "./logger-helpers";
@@ -12,7 +13,7 @@ import {
 } from "./graceful-helpers";
 
 export const monitor = (
-  servers: Array<http.Server | https.Server>,
+  servers: Array<http.Server | https.Server | http2.Http2SecureServer>,
   { timeout = 1e3, logger }: { timeout?: number; logger?: ActualLogger } = {},
 ) => {
   let pending: Promise<PromiseSettledResult<void>[]> | undefined;
