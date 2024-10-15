@@ -34,5 +34,3 @@ const createHttpsServerSpy = vi
   });
 
 export { createHttpsServerSpy, httpsListenSpy, httpListenSpy };
-export type HttpServer = http.Server;
-export type HttpsServer = https.Server;
