@@ -140,7 +140,7 @@ type BeforeRouting = (params: {
   getChildLogger: ChildLoggerExtractor;
 }) => void | Promise<void>;
 
-interface HttpConfig {
+export interface HttpConfig {
   /** @desc Port, UNIX socket or custom options. */
   listen: number | string | ListenOptions;
 }
@@ -154,15 +154,12 @@ interface Http2Config extends HttpConfig {
   options: http2.ServerOptions;
 }
 
-export interface ServerConfig<
-  HTTP extends HttpConfig | undefined = HttpConfig | undefined,
-  HTTPS extends HttpsConfig | undefined = HttpsConfig | undefined,
-  TAG extends string = string,
-> extends CommonConfig<TAG> {
+export interface ServerConfig<TAG extends string = string>
+  extends CommonConfig<TAG> {
   /** @desc HTTP server configuration. */
-  http?: HTTP;
+  http?: HttpConfig;
   /** @desc HTTPS server configuration. */
-  https?: HTTPS;
+  https?: HttpsConfig;
   http2?: Http2Config;
   /**
    * @desc Custom JSON parser.
@@ -209,19 +206,9 @@ export interface AppConfig<TAG extends string = string>
   app: IRouter;
 }
 
-/** @desc Must define at least http or https property (or both) */
-export function createConfig(config: ServerConfig<undefined, undefined>): never;
-export function createConfig<HTTP extends HttpConfig, TAG extends string>(
-  config: ServerConfig<HTTP, undefined, TAG>,
-): ServerConfig<HTTP, undefined, TAG>;
-export function createConfig<HTTPS extends HttpsConfig, TAG extends string>(
-  config: ServerConfig<undefined, HTTPS, TAG>,
-): ServerConfig<undefined, HTTPS, TAG>;
-export function createConfig<
-  HTTP extends HttpConfig,
-  HTTPS extends HttpsConfig,
-  TAG extends string,
->(config: ServerConfig<HTTP, HTTPS, TAG>): ServerConfig<HTTP, HTTPS, TAG>;
+export function createConfig<TAG extends string>(
+  config: ServerConfig<TAG>,
+): ServerConfig<TAG>;
 export function createConfig<TAG extends string>(
   config: AppConfig<TAG>,
 ): AppConfig<TAG>;

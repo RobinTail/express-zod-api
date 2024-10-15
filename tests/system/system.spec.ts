@@ -151,7 +151,9 @@ describe("App", async () => {
       post: ["query", "body", "files"],
     },
   });
-  const { httpServer } = await createServer(config, routing);
+  const {
+    servers: [httpServer],
+  } = await createServer(config, routing);
   await vi.waitFor(() => assert(httpServer.listening), { timeout: 1e4 });
   expect(warnMethod).toHaveBeenCalledWith(
     "DeprecationError (express): Sample deprecation message",

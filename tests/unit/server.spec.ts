@@ -11,8 +11,6 @@ import {
   createHttpsServerSpy,
   httpListenSpy,
   httpsListenSpy,
-  HttpServer,
-  HttpsServer,
 } from "../http-mock";
 import { z } from "zod";
 import {
@@ -60,14 +58,12 @@ describe("Server", () => {
           }),
         },
       };
-      const { httpServer, httpsServer } = await createServer(
+      const { servers } = await createServer(
         createConfig(configMock),
         routingMock,
       );
-      expect(httpServer).toBeTruthy();
-      expect(httpsServer).toBeUndefined();
-      expectTypeOf(httpServer).toMatchTypeOf<HttpServer>();
-      expectTypeOf(httpsServer).toBeUndefined();
+      expect(servers).toHaveLength(1);
+      expect(servers[0]).toBeTruthy();
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.use).toHaveBeenCalledTimes(2);
@@ -205,14 +201,12 @@ describe("Server", () => {
         },
       };
 
-      const { httpServer, httpsServer } = await createServer(
+      const { servers } = await createServer(
         createConfig(configMock),
         routingMock,
       );
-      expect(httpServer).toBeUndefined();
-      expect(httpsServer).toBeTruthy();
-      expectTypeOf(httpServer).toBeUndefined();
-      expectTypeOf(httpsServer).toMatchTypeOf<HttpsServer>();
+      expect(servers).toHaveLength(1);
+      expect(servers[0]).toBeTruthy();
       expect(createHttpsServerSpy).toHaveBeenCalledWith(
         configMock.https.options,
         appMock,
@@ -235,14 +229,10 @@ describe("Server", () => {
         startupLogo: false,
         logger: { level: "warn" as const },
       };
-      const { httpServer, httpsServer } = await createServer(
-        createConfig(configMock),
-        {},
-      );
-      expect(httpServer).toBeTruthy();
-      expect(httpsServer).toBeTruthy();
-      expectTypeOf(httpServer).toMatchTypeOf<HttpServer>();
-      expectTypeOf(httpsServer).toMatchTypeOf<HttpsServer>();
+      const { servers } = await createServer(createConfig(configMock), {});
+      expect(servers).toHaveLength(2);
+      expect(servers[0]).toBeTruthy();
+      expect(servers[1]).toBeTruthy();
     });
 
     test("should enable compression on request", async () => {
