@@ -1,4 +1,4 @@
-import type { Mock } from "vitest";
+import { makeRequestMock, makeResponseMock } from "../src/testing";
 
 const expressJsonMock = vi.fn();
 const expressRawMock = vi.fn();
@@ -11,27 +11,34 @@ vi.mock("express-fileupload", () => ({ default: fileUploadMock }));
 const staticHandler = vi.fn();
 const staticMock = vi.fn(() => staticHandler);
 
-let appMock: Record<
-  "disable" | "use" | "get" | "post" | "put" | "patch" | "delete" | "options",
-  Mock
->;
-
-const expressMock = () => {
-  appMock = {
-    disable: vi.fn(() => appMock),
-    use: vi.fn(() => appMock),
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
-    patch: vi.fn(),
-    delete: vi.fn(),
-    options: vi.fn(),
-  };
-  return appMock;
+const appMock = {
+  disable: vi.fn(() => appMock),
+  use: vi.fn(() => appMock),
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  patch: vi.fn(),
+  delete: vi.fn(),
+  options: vi.fn(),
+  init: vi.fn(),
 };
+
+const resetAppMock = () => {
+  for (const key in appMock) {
+    const prop = appMock[key as keyof typeof appMock];
+    if (prop && "mockClear" in prop && typeof prop.mockClear === "function") {
+      prop.mockClear();
+    }
+  }
+};
+
+const expressMock = () => appMock;
 expressMock.json = () => expressJsonMock;
 expressMock.raw = () => expressRawMock;
 expressMock.static = staticMock;
+expressMock.application = appMock;
+expressMock.request = makeRequestMock();
+expressMock.response = makeResponseMock();
 
 vi.mock("express", () => ({ default: expressMock }));
 
@@ -44,4 +51,5 @@ export {
   expressRawMock,
   staticMock,
   staticHandler,
+  resetAppMock,
 };

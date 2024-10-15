@@ -6,6 +6,7 @@ import {
   expressJsonMock,
   expressMock,
   expressRawMock,
+  resetAppMock,
 } from "../express-mock";
 import {
   createHttpsServerSpy,
@@ -29,6 +30,10 @@ import express from "express";
 describe("Server", () => {
   afterAll(() => {
     vi.restoreAllMocks();
+  });
+
+  afterEach(() => {
+    resetAppMock();
   });
 
   test("Express is mocked", () => {
