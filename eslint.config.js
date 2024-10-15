@@ -18,29 +18,36 @@ export default [
   ...tsPlugin.configs.recommended,
   prettierOverrides,
   prettierRules,
-  // Things to turn off globally
-  { ignores: ["dist/", "coverage/", "migration/"] },
+  { name: "globally/ignored", ignores: ["dist/", "coverage/", "migration/"] },
   {
+    name: "globally/disabled",
     rules: {
       "no-empty": ["error", { allowEmptyCatch: true }],
       "no-empty-pattern": ["error", { allowObjectPatternsAsParameters: true }],
     },
   },
-  // Things to turn on globally
   {
+    name: "globally/enabled",
     rules: {
       "unicorn/prefer-node-protocol": "error",
     },
   },
-  // For the sources
   {
+    name: "source/all",
     files: ["src/*.ts"],
     rules: {
       "allowed/dependencies": ["error", { typeOnly: ["eslint", "prettier"] }],
     },
   },
-  // For migration particularly
   {
+    name: "source/plugin",
+    files: ["src/zod-plugin.ts"],
+    rules: {
+      "@typescript-eslint/no-unused-vars": "off",
+    },
+  },
+  {
+    name: "source/migration",
     files: ["src/migration.ts"],
     rules: {
       "allowed/dependencies": [
@@ -49,23 +56,16 @@ export default [
       ],
     },
   },
-  // For tests
   {
+    name: "tests/all",
     files: ["tests/**/*.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": ["warn"],
     },
   },
-  // Special needs of plugin
   {
-    files: ["src/zod-plugin.ts"],
-    rules: {
-      "@typescript-eslint/no-unused-vars": "off",
-    },
-  },
-  // Special needs of the generated code
-  {
+    name: "generated/all",
     files: ["tests/*/quick-start.ts", "example/example.client.ts"],
     rules: {
       "prettier/prettier": "off",
