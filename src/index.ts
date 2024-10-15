@@ -29,7 +29,7 @@ export {
   InputValidationError,
   MissingPeerError,
 } from "./errors";
-export { testEndpoint } from "./testing";
+export { testEndpoint, testMiddleware } from "./testing";
 export { Integration } from "./integration";
 
 export { ez } from "./proprietary-schemas";
