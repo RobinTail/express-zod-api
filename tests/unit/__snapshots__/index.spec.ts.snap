@@ -93,9 +93,12 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "InputValidationError",
   "MissingPeerError",
   "testEndpoint",
+  "testMiddleware",
   "Integration",
   "ez",
 ]
 `;
 
 exports[`Index Entrypoint > exports > testEndpoint should have certain value 1`] = `[Function]`;
+
+exports[`Index Entrypoint > exports > testMiddleware should have certain value 1`] = `[Function]`;
