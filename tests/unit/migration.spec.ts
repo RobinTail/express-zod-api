@@ -20,6 +20,7 @@ describe("Migration", () => {
 
 tester.run("v21", migration.rules.v21, {
   valid: [
+    `(() => {})()`,
     `createConfig({ http: {} });`,
     `createConfig({ http: { listen: 8090 }, upload: true });`,
     `const { app, servers, logger } = await createServer();`,
