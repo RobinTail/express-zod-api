@@ -6,10 +6,15 @@ import {
 } from "@typescript-eslint/utils";
 
 const createConfigName = "createConfig";
+const createServerName = "createServer";
 const serverPropName = "server";
+const httpServerPropName = "httpServer";
+const httpsServerPropName = "httpsServer";
 
 const changedProps = {
   [serverPropName]: "http",
+  [httpServerPropName]: "servers",
+  [httpsServerPropName]: "servers",
 };
 
 const movedProps = [
@@ -24,16 +29,17 @@ type PropWithId = TSESTree.Property & {
   key: TSESTree.Identifier;
 };
 
-const isPropWithId = (
-  subject: TSESTree.ObjectLiteralElement,
-): subject is PropWithId =>
+const isPropWithId = (subject: TSESTree.Node): subject is PropWithId =>
   subject.type === NT.Property && subject.key.type === NT.Identifier;
+
+const isAssignment = (
+  parent: TSESTree.Node,
+): parent is TSESTree.VariableDeclarator & { id: TSESTree.ObjectPattern } =>
+  parent.type === NT.VariableDeclarator && parent.id.type === NT.ObjectPattern;
 
 const propByName =
   <T extends string>(subject: T | ReadonlyArray<T>) =>
-  (
-    entry: TSESTree.ObjectLiteralElement,
-  ): entry is PropWithId & { key: { name: T } } =>
+  (entry: TSESTree.Node): entry is PropWithId & { key: { name: T } } =>
     isPropWithId(entry) &&
     (Array.isArray(subject)
       ? subject.includes(entry.key.name)
@@ -52,8 +58,8 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
   defaultOptions: [],
   create: (ctx) => ({
     CallExpression: (node) => {
+      if (node.callee.type !== NT.Identifier) return;
       if (
-        node.callee.type === NT.Identifier &&
         node.callee.name === createConfigName &&
         node.arguments.length === 1
       ) {
@@ -101,6 +107,27 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
                 ],
               });
             }
+          }
+        }
+      }
+      if (node.callee.name === createServerName) {
+        const assignment = ctx.sourceCode
+          .getAncestors(node)
+          .findLast(isAssignment);
+        if (assignment) {
+          const removable = assignment.id.properties.filter(
+            propByName([httpServerPropName, httpsServerPropName] as const),
+          );
+          for (const prop of removable) {
+            ctx.report({
+              node: prop,
+              messageId: "change",
+              data: {
+                subject: "property",
+                from: prop.key.name,
+                to: changedProps[prop.key.name],
+              },
+            });
           }
         }
       }

@@ -10,6 +10,12 @@
 
 ## Version 20
 
+### v20.14.3
+
+- Fixed: missing export of `testMiddleware`:
+  - The feature introduced in v20.4.0 but was not available;
+  - The issue reported by [@Tomtec331](https://github.com/Tomtec331).
+
 ### v20.14.2
 
 - Documentation: promoting Express 5 as the recommended version for new projects;
@@ -205,7 +211,8 @@ declare module "express-zod-api" {
 - Feat: middleware testing helper: `testMiddleware()`, similar to `testEndpoint()`:
   - There is also an ability to pass `options` collected from outputs of previous middlewares, if the one being tested
     somehow depends on them.
-  - The method returns: `Promise<{ output, requestMock, responseMock, loggerMock }>`.
+  - The method returns: `Promise<{ output, requestMock, responseMock, loggerMock }>`;
+  - Export fixed in v20.14.3.
 
 ```typescript
 import { z } from "zod";

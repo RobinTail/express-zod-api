@@ -4,11 +4,12 @@ import { z } from "zod";
 import {
   EndpointsFactory,
   Method,
+  createConfig,
   createServer,
   defaultResultHandler,
   ResultHandler,
   BuiltinLogger,
-  createConfig,
+  Middleware,
 } from "../../src";
 import { givePort } from "../helpers";
 import { setTimeout } from "node:timers/promises";
@@ -18,115 +19,98 @@ describe("App", async () => {
   const logger = new BuiltinLogger({ level: "silent" });
   const infoMethod = vi.spyOn(logger, "info");
   const warnMethod = vi.spyOn(logger, "warn");
+  const corsedEndpoint = new EndpointsFactory(defaultResultHandler)
+    .use(
+      cors({
+        credentials: true,
+        exposedHeaders: ["Content-Range", "X-Content-Range"],
+      }),
+      { provider: () => ({ corsDone: true }) },
+    )
+    .build({
+      method: "get",
+      input: z.object({}),
+      output: z.object({ corsDone: z.boolean() }),
+      handler: async ({ options: { corsDone } }) => ({ corsDone }),
+    });
+  const faultyResultHandler = new ResultHandler({
+    positive: z.object({}),
+    negative: z.object({}),
+    handler: () => assert.fail("I am faulty"),
+  });
+  const faultyMiddleware = new Middleware({
+    input: z.object({
+      mwError: z
+        .any()
+        .optional()
+        .transform((value) =>
+          assert(!value, "Custom error in the Middleware input validation"),
+        ),
+    }),
+    handler: async () => ({}),
+  });
+  const faultyEndpoint = new EndpointsFactory(faultyResultHandler)
+    .addMiddleware(faultyMiddleware)
+    .build({
+      method: "get",
+      input: z.object({
+        epError: z
+          .any()
+          .optional()
+          .transform((value) =>
+            assert(!value, "Custom error in the Endpoint input validation"),
+          ),
+      }),
+      output: z.object({ test: z.string() }),
+      handler: async () => ({ test: "Should not work" }),
+    });
+  const testEndpoint = new EndpointsFactory(defaultResultHandler)
+    .addMiddleware({
+      input: z.object({
+        key: z.string().refine((v) => v === "123", "Invalid key"),
+      }),
+      handler: async () => ({ user: { id: 354 } }),
+    })
+    .addMiddleware({
+      input: z.object({}),
+      handler: async ({ request, options: { user } }) => ({
+        method: request.method.toLowerCase() as Method,
+        permissions: user.id === 354 ? ["any"] : [],
+      }),
+    })
+    .build({
+      methods: ["get", "post"],
+      input: z.object({ something: z.string() }),
+      output: z.object({ anything: z.number().positive() }).passthrough(), // allow excessive keys
+      handler: async ({
+        input: { key, something },
+        options: { user, permissions, method },
+      }) => {
+        // Problem 787: should lead to ZodError that is NOT considered as the IOSchema validation error
+        if (something === "internal_zod_error") {
+          z.number().parse("");
+        }
+        return {
+          anything: something === "joke" ? 300 : -100500,
+          doubleKey: key.repeat(2),
+          userId: user.id,
+          permissions,
+          method,
+        };
+      },
+    });
+  const longEndpoint = new EndpointsFactory(defaultResultHandler).build({
+    method: "get",
+    input: z.object({}),
+    output: z.object({}),
+    handler: async () => setTimeout(5000, {}),
+  });
   const routing = {
     v1: {
-      corsed: new EndpointsFactory(defaultResultHandler)
-        .use(
-          cors({
-            credentials: true,
-            exposedHeaders: ["Content-Range", "X-Content-Range"],
-          }),
-          {
-            provider: () => ({ corsDone: true }),
-          },
-        )
-        .build({
-          method: "get",
-          input: z.object({}),
-          output: z.object({ corsDone: z.boolean() }),
-          handler: async ({ options }) => ({
-            corsDone: options.corsDone,
-          }),
-        }),
-      faulty: new EndpointsFactory(
-        new ResultHandler({
-          positive: z.object({}),
-          negative: z.object({}),
-          handler: () => assert.fail("I am faulty"),
-        }),
-      )
-        .addMiddleware({
-          input: z.object({
-            mwError: z
-              .any()
-              .optional()
-              .transform((value) =>
-                assert(
-                  !value,
-                  "Custom error in the Middleware input validation",
-                ),
-              ),
-          }),
-          handler: async () => ({}),
-        })
-        .build({
-          method: "get",
-          input: z.object({
-            epError: z
-              .any()
-              .optional()
-              .transform((value) =>
-                assert(!value, "Custom error in the Endpoint input validation"),
-              ),
-          }),
-          output: z.object({
-            test: z.string(),
-          }),
-          handler: async () => ({
-            test: "Should not work",
-          }),
-        }),
-      test: new EndpointsFactory(defaultResultHandler)
-        .addMiddleware({
-          input: z.object({
-            key: z.string().refine((v) => v === "123", "Invalid key"),
-          }),
-          handler: async () => ({
-            user: {
-              id: 354,
-            },
-          }),
-        })
-        .addMiddleware({
-          input: z.object({}),
-          handler: async ({ request, options: { user } }) => ({
-            method: request.method.toLowerCase() as Method,
-            permissions: user.id === 354 ? ["any"] : [],
-          }),
-        })
-        .build({
-          methods: ["get", "post"],
-          input: z.object({
-            something: z.string(),
-          }),
-          output: z
-            .object({
-              anything: z.number().positive(),
-            })
-            .passthrough(), // allow excessive keys
-          handler: async ({
-            input: { key, something },
-            options: { user, permissions, method },
-          }) => {
-            // Problem 787: should lead to ZodError that is NOT considered as the IOSchema validation error
-            if (something === "internal_zod_error") {
-              z.number().parse("");
-            }
-            return {
-              anything: something === "joke" ? 300 : -100500,
-              doubleKey: key.repeat(2),
-              userId: user.id,
-              permissions,
-              method,
-            };
-          },
-        }),
-      long: new EndpointsFactory(defaultResultHandler).build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({}),
-        handler: async () => setTimeout(5000, {}),
-      }),
+      corsed: corsedEndpoint,
+      faulty: faultyEndpoint,
+      test: testEndpoint,
+      long: longEndpoint,
     },
   };
   vi.spyOn(console, "log").mockImplementation(vi.fn()); // mutes logo output
@@ -151,7 +135,9 @@ describe("App", async () => {
       post: ["query", "body", "files"],
     },
   });
-  const { httpServer } = await createServer(config, routing);
+  const {
+    servers: [httpServer],
+  } = await createServer(config, routing);
   await vi.waitFor(() => assert(httpServer.listening), { timeout: 1e4 });
   expect(warnMethod).toHaveBeenCalledWith(
     "DeprecationError (express): Sample deprecation message",

@@ -83,6 +83,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the library by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/Tomtec331.png" alt="@Tomtec331" width="50px" />](https://github.com/Tomtec331)
 [<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
 [<img src="https://github.com/boarush.png" alt="@boarush" width="50px" />](https://github.com/boarush)
 [<img src="https://github.com/daniel-white.png" alt="@daniel-white" width="50px" />](https://github.com/daniel-white)
@@ -582,7 +583,7 @@ const config = createConfig({
 
 // 'await' is only needed if you're going to use the returned entities.
 // For top level CJS you can wrap you code with (async () => { ... })()
-const { app, httpsServer, logger } = await createServer(config, routing);
+const { app, servers, logger } = await createServer(config, routing);
 ```
 
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
