@@ -10,7 +10,7 @@
     "typescript": "~5.1.0"
   },
   "scripts": {
-    "pretest": "echo 'import { createLogger } from \"express-zod-api\";' > sample.ts",
+    "pretest": "echo 'createConfig({ server: { listen: 8090, upload: true, beforeRouting: () => {}, } });' > sample.ts",
     "test": "eslint --fix && vitest --run && rm sample.ts"
   }
 }

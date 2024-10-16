@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   EndpointsFactory,
   Method,
+  createConfig,
   createServer,
   defaultResultHandler,
   ResultHandler,
@@ -113,34 +114,30 @@ describe("App", async () => {
     },
   };
   vi.spyOn(console, "log").mockImplementation(vi.fn()); // mutes logo output
-  const server = (
-    await createServer(
-      {
-        server: {
-          listen: port,
-          compression: { threshold: 1 },
-          beforeRouting: ({ app, getChildLogger }) => {
-            depd("express")("Sample deprecation message");
-            app.use((req, {}, next) => {
-              const childLogger = getChildLogger(req);
-              assert("isChild" in childLogger && childLogger.isChild);
-              next();
-            });
-          },
-        },
-        cors: false,
-        startupLogo: true,
-        gracefulShutdown: { events: ["FAKE"] },
-        logger,
-        childLoggerProvider: ({ parent }) =>
-          Object.defineProperty(parent, "isChild", { value: true }),
-        inputSources: {
-          post: ["query", "body", "files"],
-        },
-      },
-      routing,
-    )
-  ).httpServer;
+  const config = createConfig({
+    http: { listen: port },
+    compression: { threshold: 1 },
+    beforeRouting: ({ app, getChildLogger }) => {
+      depd("express")("Sample deprecation message");
+      app.use((req, {}, next) => {
+        const childLogger = getChildLogger(req);
+        assert("isChild" in childLogger && childLogger.isChild);
+        next();
+      });
+    },
+    cors: false,
+    startupLogo: true,
+    gracefulShutdown: { events: ["FAKE"] },
+    logger,
+    childLoggerProvider: ({ parent }) =>
+      Object.defineProperty(parent, "isChild", { value: true }),
+    inputSources: {
+      post: ["query", "body", "files"],
+    },
+  });
+  const {
+    servers: [server],
+  } = await createServer(config, routing);
   await vi.waitFor(() => assert(server.listening), { timeout: 1e4 });
   expect(warnMethod).toHaveBeenCalledWith(
     "DeprecationError (express): Sample deprecation message",

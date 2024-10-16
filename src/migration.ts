@@ -1,154 +1,135 @@
-import { ESLintUtils, type TSESLint } from "@typescript-eslint/utils";
-import { name as importName } from "../package.json";
+import {
+  ESLintUtils,
+  AST_NODE_TYPES as NT,
+  type TSESLint,
+  type TSESTree,
+} from "@typescript-eslint/utils";
 
-const testerName = "testEndpoint";
-
-const changedMethods = {
-  createLogger: "BuiltinLogger",
-  createResultHandler: "ResultHandler",
-  createMiddleware: "Middleware",
-};
+const createConfigName = "createConfig";
+const createServerName = "createServer";
+const serverPropName = "server";
+const httpServerPropName = "httpServer";
+const httpsServerPropName = "httpsServer";
 
 const changedProps = {
-  getPositiveResponse: "positive",
-  getNegativeResponse: "negative",
-  responseProps: "responseOptions",
-  middleware: "handler",
+  [serverPropName]: "http",
+  [httpServerPropName]: "servers",
+  [httpsServerPropName]: "servers",
 };
 
-const removedProps = { fnMethod: null };
+const movedProps = [
+  "jsonParser",
+  "upload",
+  "compression",
+  "rawParser",
+  "beforeRouting",
+] as const;
 
-const shouldAct = <T extends Record<string, unknown>>(
-  subject: unknown,
-  scope: T,
-): subject is keyof T => typeof subject === "string" && subject in scope;
+type PropWithId = TSESTree.Property & {
+  key: TSESTree.Identifier;
+};
 
-const v20 = ESLintUtils.RuleCreator.withoutDocs({
+const isPropWithId = (subject: TSESTree.Node): subject is PropWithId =>
+  subject.type === NT.Property && subject.key.type === NT.Identifier;
+
+const isAssignment = (
+  parent: TSESTree.Node,
+): parent is TSESTree.VariableDeclarator & { id: TSESTree.ObjectPattern } =>
+  parent.type === NT.VariableDeclarator && parent.id.type === NT.ObjectPattern;
+
+const propByName =
+  <T extends string>(subject: T | ReadonlyArray<T>) =>
+  (entry: TSESTree.Node): entry is PropWithId & { key: { name: T } } =>
+    isPropWithId(entry) &&
+    (Array.isArray(subject)
+      ? subject.includes(entry.key.name)
+      : entry.key.name === subject);
+
+const v21 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     fixable: "code",
     schema: [],
     messages: {
       change: "Change {{subject}} {{from}} to {{to}}.",
-      remove: "Remove {{subject}} {{name}}.",
+      move: "Move {{subject}} from {{from}} to {{to}}.",
     },
   },
   defaultOptions: [],
   create: (ctx) => ({
-    ImportDeclaration: (node) => {
-      if (node.source.value === importName) {
-        for (const spec of node.specifiers) {
-          if (
-            spec.type === "ImportSpecifier" &&
-            shouldAct(spec.imported.name, changedMethods)
-          ) {
-            const replacement = changedMethods[spec.imported.name];
+    CallExpression: (node) => {
+      if (node.callee.type !== NT.Identifier) return;
+      if (
+        node.callee.name === createConfigName &&
+        node.arguments.length === 1
+      ) {
+        const argument = node.arguments[0];
+        if (argument.type === NT.ObjectExpression) {
+          const serverProp = argument.properties.find(
+            propByName(serverPropName),
+          );
+          if (serverProp) {
+            const replacement = changedProps[serverProp.key.name];
             ctx.report({
-              node: spec.imported,
+              node: serverProp,
               messageId: "change",
               data: {
-                subject: "import",
-                from: spec.imported.name,
+                subject: "property",
+                from: serverProp.key.name,
                 to: replacement,
               },
-              fix: (fixer) => fixer.replaceText(spec, replacement),
+              fix: (fixer) => fixer.replaceText(serverProp.key, replacement),
             });
           }
-        }
-      }
-    },
-    CallExpression: (node) => {
-      if (
-        node.callee.type === "Identifier" &&
-        shouldAct(node.callee.name, changedMethods)
-      ) {
-        const replacement = `new ${changedMethods[node.callee.name]}`;
-        ctx.report({
-          node: node.callee,
-          messageId: "change",
-          data: { subject: "call", from: node.callee.name, to: replacement },
-          fix: (fixer) => fixer.replaceText(node.callee, replacement),
-        });
-      }
-      if (
-        node.callee.type === "Identifier" &&
-        node.callee.name === testerName &&
-        node.arguments.length === 1 &&
-        node.arguments[0].type === "ObjectExpression"
-      ) {
-        for (const prop of node.arguments[0].properties) {
-          if (prop.type === "Property" && prop.key.type === "Identifier") {
-            if (shouldAct(prop.key.name, changedProps)) {
-              const replacement = changedProps[prop.key.name];
+          const httpProp = argument.properties.find(
+            propByName(changedProps.server),
+          );
+          if (httpProp && httpProp.value.type === NT.ObjectExpression) {
+            const nested = httpProp.value.properties;
+            const movable = nested.filter(propByName(movedProps));
+            for (const prop of movable) {
+              const propText = ctx.sourceCode.text.slice(...prop.range);
+              const comma = ctx.sourceCode.getTokenAfter(prop);
               ctx.report({
-                node: prop,
-                messageId: "change",
+                node: httpProp,
+                messageId: "move",
                 data: {
-                  subject: "property",
-                  from: prop.key.name,
-                  to: replacement,
+                  subject: isPropWithId(prop) ? prop.key.name : "the property",
+                  from: httpProp.key.name,
+                  to: `the top level of ${node.callee.name} argument`,
                 },
-                fix: (fixer) => fixer.replaceText(prop.key, replacement),
-              });
-            }
-            if (shouldAct(prop.key.name, removedProps)) {
-              ctx.report({
-                node: prop,
-                messageId: "remove",
-                data: { subject: "property", name: prop.key.name },
-                fix: (fixer) =>
-                  ctx.sourceCode.getTokenAfter(prop)?.value === "," &&
-                  prop.range
-                    ? fixer.removeRange([prop.range[0], prop.range[1] + 1])
-                    : fixer.remove(prop),
+                fix: (fixer) => [
+                  fixer.insertTextAfter(httpProp, `, ${propText}`),
+                  fixer.removeRange([
+                    prop.range[0],
+                    comma?.value === "," ? comma.range[1] : prop.range[1],
+                  ]),
+                ],
               });
             }
           }
         }
       }
-    },
-    NewExpression: (node) => {
-      if (
-        node.callee.type === "Identifier" &&
-        [
-          changedMethods.createResultHandler,
-          changedMethods.createMiddleware,
-        ].includes(node.callee.name) &&
-        node.arguments.length === 1 &&
-        node.arguments[0].type === "ObjectExpression"
-      ) {
-        for (const prop of node.arguments[0].properties) {
-          if (
-            prop.type === "Property" &&
-            prop.key.type === "Identifier" &&
-            shouldAct(prop.key.name, changedProps)
-          ) {
-            const replacement = changedProps[prop.key.name];
+      if (node.callee.name === createServerName) {
+        const assignment = ctx.sourceCode
+          .getAncestors(node)
+          .findLast(isAssignment);
+        if (assignment) {
+          const removable = assignment.id.properties.filter(
+            propByName([httpServerPropName, httpsServerPropName] as const),
+          );
+          for (const prop of removable) {
             ctx.report({
               node: prop,
               messageId: "change",
               data: {
                 subject: "property",
                 from: prop.key.name,
-                to: replacement,
+                to: changedProps[prop.key.name],
               },
-              fix: (fixer) => fixer.replaceText(prop.key, replacement),
             });
           }
         }
-      }
-    },
-    Identifier: (node) => {
-      if (
-        node.name === "MockOverrides" &&
-        node.parent.type === "TSInterfaceDeclaration"
-      ) {
-        ctx.report({
-          node,
-          messageId: "remove",
-          data: { subject: "augmentation", name: node.name },
-          fix: (fixer) => fixer.remove(node.parent),
-        });
       }
     },
   }),
@@ -163,9 +144,9 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
  *          import migration from "express-zod-api/migration";
  *          export default [
  *            { languageOptions: {parser}, plugins: {migration} },
- *            { files: ["**\/*.ts"], rules: { "migration/v20": "error" } }
+ *            { files: ["**\/*.ts"], rules: { "migration/v21": "error" } }
  *          ];
  * */
 export default {
-  rules: { v20 },
+  rules: { v21 },
 } satisfies TSESLint.Linter.Plugin;
