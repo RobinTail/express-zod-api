@@ -1,7 +1,6 @@
 import type compression from "compression";
 import { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
-import type http2 from "node:http2";
 import type https from "node:https";
 import { BuiltinLoggerConfig } from "./builtin-logger";
 import { AbstractEndpoint } from "./endpoint";
@@ -150,17 +149,13 @@ interface HttpsConfig extends HttpConfig {
   options: https.ServerOptions;
 }
 
-interface Http2Config extends HttpConfig {
-  options: http2.SecureServerOptions;
-}
-
 export interface ServerConfig<TAG extends string = string>
   extends CommonConfig<TAG> {
   /** @desc HTTP server configuration. */
   http?: HttpConfig;
   /** @desc HTTPS server configuration. */
   https?: HttpsConfig;
-  http2?: Http2Config;
+  http2?: boolean;
   /**
    * @desc Custom JSON parser.
    * @default express.json()

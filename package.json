@@ -77,13 +77,10 @@
   },
   "dependencies": {
     "ansis": "^3.2.0",
-    "http2-express-bridge": "^1.0.7",
     "node-mocks-http": "^1.16.1",
     "openapi3-ts": "^4.4.0",
-    "ramda": "^0.30.1"
-  },
-  "resolutions": {
-    "http2-express-bridge/send": "^1.0.0"
+    "ramda": "^0.30.1",
+    "spdy-fixes": "^4.0.5"
   },
   "peerDependencies": {
     "@types/compression": "^1.7.5",

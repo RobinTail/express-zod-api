@@ -5,7 +5,8 @@ import { fetch, Agent } from "undici";
 describe("HTTP2", async () => {
   const port = givePort();
   const config = createConfig({
-    http2: { listen: port, options: signCert() },
+    https: { listen: port, options: signCert() },
+    http2: true,
     cors: true,
     startupLogo: false,
     logger: { level: "info" },

@@ -3,7 +3,7 @@ import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
 import http2 from "node:http2";
-import bridge from "http2-express-bridge";
+import spdy from "spdy-fixes";
 import { BuiltinLogger } from "./builtin-logger";
 import {
   AppConfig,
@@ -69,9 +69,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     parserFailureHandler,
     loggingMiddleware,
   } = makeCommonEntities(config);
-  const app = (config.http2 ? bridge(express) : express())
-    .disable("x-powered-by")
-    .use(loggingMiddleware);
+  const app = express().disable("x-powered-by").use(loggingMiddleware);
 
   if (config.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
@@ -114,19 +112,25 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     () => http.Server | https.Server | http2.Http2SecureServer
   > = [];
   if (config.http) {
-    const httpServer = http.createServer(app);
+    const httpServer = config.http2
+      ? spdy.createServer(
+          http.Server,
+          { spdy: { protocols: ["h2", "http/1.1"] } },
+          app,
+        )
+      : http.createServer(app);
     created.push(httpServer);
     starters.push(makeStarter(httpServer, config.http.listen));
   }
   if (config.https) {
-    const httpsServer = https.createServer(config.https.options, app);
+    const httpsServer = config.http2
+      ? spdy.createServer(
+          { ...config.https.options, spdy: { protocols: ["h2", "http/1.1"] } },
+          app,
+        )
+      : https.createServer(config.https.options, app);
     created.push(httpsServer);
     starters.push(makeStarter(httpsServer, config.https.listen));
-  }
-  if (config.http2) {
-    const http2Server = http2.createSecureServer(config.http2.options, app);
-    created.push(http2Server);
-    starters.push(makeStarter(http2Server, config.http2.listen));
   }
 
   if (config.gracefulShutdown) {
