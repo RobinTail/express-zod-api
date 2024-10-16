@@ -1,7 +1,7 @@
 import type compression from "compression";
 import { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
-import { ServerOptions } from "node:https";
+import type https from "node:https";
 import { BuiltinLoggerConfig } from "./builtin-logger";
 import { AbstractEndpoint } from "./endpoint";
 import { AbstractLogger, ActualLogger } from "./logger-helpers";
@@ -146,7 +146,7 @@ export interface HttpConfig {
 
 interface HttpsConfig extends HttpConfig {
   /** @desc At least "cert" and "key" options required. */
-  options: ServerOptions;
+  options: https.ServerOptions;
 }
 
 export interface ServerConfig<TAG extends string = string>
@@ -155,6 +155,7 @@ export interface ServerConfig<TAG extends string = string>
   http?: HttpConfig;
   /** @desc HTTPS server configuration. */
   https?: HttpsConfig;
+  http2?: boolean;
   /**
    * @desc Custom JSON parser.
    * @default express.json()

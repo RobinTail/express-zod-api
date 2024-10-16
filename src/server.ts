@@ -2,6 +2,8 @@ import express from "express";
 import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
+import http2 from "node:http2";
+import spdy from "spdy-fixes";
 import { BuiltinLogger } from "./builtin-logger";
 import {
   AppConfig,
@@ -97,18 +99,36 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   app.use(parserFailureHandler, notFoundHandler);
 
   const makeStarter =
-    (server: http.Server | https.Server, subject: HttpConfig["listen"]) => () =>
+    (
+      server: http.Server | https.Server | http2.Http2SecureServer,
+      subject: HttpConfig["listen"],
+    ) =>
+    () =>
       server.listen(subject, () => rootLogger.info("Listening", subject));
 
-  const created: Array<http.Server | https.Server> = [];
-  const starters: Array<() => http.Server | https.Server> = [];
+  const created: Array<http.Server | https.Server | http2.Http2SecureServer> =
+    [];
+  const starters: Array<
+    () => http.Server | https.Server | http2.Http2SecureServer
+  > = [];
   if (config.http) {
-    const httpServer = http.createServer(app);
+    const httpServer = config.http2
+      ? spdy.createServer(
+          http.Server,
+          { spdy: { protocols: ["h2", "http/1.1"] } },
+          app,
+        )
+      : http.createServer(app);
     created.push(httpServer);
     starters.push(makeStarter(httpServer, config.http.listen));
   }
   if (config.https) {
-    const httpsServer = https.createServer(config.https.options, app);
+    const httpsServer = config.http2
+      ? spdy.createServer(
+          { ...config.https.options, spdy: { protocols: ["h2", "http/1.1"] } },
+          app,
+        )
+      : https.createServer(config.https.options, app);
     created.push(httpsServer);
     starters.push(makeStarter(httpsServer, config.https.listen));
   }
