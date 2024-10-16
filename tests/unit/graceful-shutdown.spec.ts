@@ -1,11 +1,14 @@
 import http from "node:http";
 import https from "node:https";
+import http2 from "node:http2";
 import { Agent, fetch } from "undici";
 import { setTimeout } from "node:timers/promises";
 import { monitor } from "../../src/graceful-shutdown";
 import { givePort, signCert } from "../helpers";
 
 describe("monitor()", () => {
+  const cert = signCert();
+
   const makeHttpServer = (handler: http.RequestListener) =>
     new Promise<[http.Server, number]>((resolve) => {
       const subject = http.createServer(handler);
@@ -15,7 +18,16 @@ describe("monitor()", () => {
 
   const makeHttpsServer = (handler: http.RequestListener) =>
     new Promise<[https.Server, number]>((resolve) => {
-      const subject = https.createServer(signCert(), handler);
+      const subject = https.createServer(cert, handler);
+      const port = givePort();
+      subject.listen(port, () => resolve([subject, port]));
+    });
+
+  const makeHttp2Server = (
+    handler: Parameters<(typeof http2)["createSecureServer"]>[1],
+  ) =>
+    new Promise<[http2.Http2SecureServer, number]>((resolve) => {
+      const subject = http2.createSecureServer(cert, handler);
       const port = givePort();
       subject.listen(port, () => resolve([subject, port]));
     });
@@ -167,6 +179,28 @@ describe("monitor()", () => {
       await graceful.shutdown();
     },
   );
+
+  test("terminates http2 server", { timeout: 500 }, async () => {
+    const handler = (async (req, res) => {
+      expect(req.httpVersion).toBe("2.0");
+      await setTimeout(350);
+      res.end("foo");
+    }) as Parameters<typeof makeHttp2Server>[0];
+    const [httpsServer, port] = await makeHttp2Server(handler);
+    const graceful = monitor([httpsServer], { timeout: 150 });
+    void fetch(`https://localhost:${port}`, {
+      dispatcher: new Agent({
+        connect: { rejectUnauthorized: false },
+        allowH2: true,
+      }),
+    }).catch(vi.fn());
+    await setTimeout(50);
+    expect(graceful.sockets.size).toBeGreaterThan(0);
+    void graceful.shutdown();
+    await setTimeout(150);
+    expect(graceful.sockets.size).toBe(0);
+    await graceful.shutdown();
+  });
 
   test(
     "closes immediately after in-flight connections are closed (#16)",
