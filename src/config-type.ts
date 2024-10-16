@@ -151,7 +151,7 @@ interface HttpsConfig extends HttpConfig {
 }
 
 interface Http2Config extends HttpConfig {
-  options: http2.ServerOptions;
+  options: http2.SecureServerOptions;
 }
 
 export interface ServerConfig<TAG extends string = string>
