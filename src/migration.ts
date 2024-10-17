@@ -40,6 +40,7 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
         for (const spec of node.specifiers) {
           if (
             spec.type === "ImportSpecifier" &&
+            spec.imported.type === "Identifier" &&
             shouldAct(spec.imported.name, changedMethods)
           ) {
             const replacement = changedMethods[spec.imported.name];
