@@ -62,7 +62,7 @@ export class BuiltinLogger implements AbstractLogger {
     this.hasColor = hasColor;
   }
 
-  protected prettyPrint(subject: unknown) {
+  protected prettyPrint(subject: unknown): string {
     const { depth = 2 } = this.config;
     return inspect(subject, {
       depth,
@@ -72,7 +72,7 @@ export class BuiltinLogger implements AbstractLogger {
     });
   }
 
-  protected print(method: Severity, message: string, meta?: unknown) {
+  protected print(method: Severity, message: string, meta?: unknown): void {
     if (this.config.level === "silent" || isHidden(method, this.config.level)) {
       return;
     }
@@ -94,23 +94,23 @@ export class BuiltinLogger implements AbstractLogger {
     console.log(output.join(" "));
   }
 
-  public debug(message: string, meta?: unknown) {
+  public debug(message: string, meta?: unknown): void {
     this.print("debug", message, meta);
   }
 
-  public info(message: string, meta?: unknown) {
+  public info(message: string, meta?: unknown): void {
     this.print("info", message, meta);
   }
 
-  public warn(message: string, meta?: unknown) {
+  public warn(message: string, meta?: unknown): void {
     this.print("warn", message, meta);
   }
 
-  public error(message: string, meta?: unknown) {
+  public error(message: string, meta?: unknown): void {
     this.print("error", message, meta);
   }
 
-  public child(ctx: Context) {
+  public child(ctx: Context): BuiltinLogger {
     return new BuiltinLogger({ ...this.config, ctx });
   }
 
@@ -119,7 +119,7 @@ export class BuiltinLogger implements AbstractLogger {
   public profile(options: ProfilerOptions): () => void;
   public profile(subject: string | ProfilerOptions) {
     const start = performance.now();
-    return () => {
+    return (): void => {
       const duration = performance.now() - start;
       const {
         message,

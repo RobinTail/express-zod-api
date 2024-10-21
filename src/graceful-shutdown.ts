@@ -34,7 +34,7 @@ export const monitor = (
     for (const event of ["connection", "secureConnection"])
       server.on(event, watch);
 
-  const workflow = async () => {
+  const workflow = async (): NonNullable<typeof pending> => {
     for (const server of servers) server.on("request", weAreClosed);
     logger?.info("Graceful shutdown", { sockets: sockets.size, timeout });
     for (const socket of sockets)
@@ -45,5 +45,8 @@ export const monitor = (
     return Promise.allSettled(servers.map(closeAsync));
   };
 
-  return { sockets, shutdown: () => (pending ??= workflow()) };
+  return {
+    sockets,
+    shutdown: (): ReturnType<typeof workflow> => (pending ??= workflow()),
+  };
 };

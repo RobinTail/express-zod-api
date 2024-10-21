@@ -137,7 +137,9 @@ export class EndpointsFactory<
     const { middlewares, resultHandler } = this;
     const methods = "methods" in rest ? rest.methods : [rest.method];
     const getOperationId =
-      typeof operationId === "function" ? operationId : () => operationId;
+      typeof operationId === "function"
+        ? operationId
+        : (): string | undefined => operationId;
     const scopes =
       "scopes" in rest
         ? rest.scopes

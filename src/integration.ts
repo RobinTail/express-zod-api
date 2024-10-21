@@ -674,7 +674,7 @@ export class Integration {
     );
   }
 
-  protected printUsage(printerOptions?: ts.PrinterOptions) {
+  protected printUsage(printerOptions?: ts.PrinterOptions): string | undefined {
     return this.usage.length
       ? this.usage
           .map((entry) =>
@@ -686,7 +686,7 @@ export class Integration {
       : undefined;
   }
 
-  public print(printerOptions?: ts.PrinterOptions) {
+  public print(printerOptions?: ts.PrinterOptions): string {
     const usageExampleText = this.printUsage(printerOptions);
     const commentNode =
       usageExampleText &&
@@ -715,13 +715,14 @@ export class Integration {
   public async printFormatted({
     printerOptions,
     format: userDefined,
-  }: FormattedPrintingOptions = {}) {
+  }: FormattedPrintingOptions = {}): Promise<string> {
     let format = userDefined;
     if (!format) {
       try {
         const prettierFormat = (await loadPeer<typeof Prettier>("prettier"))
           .format;
-        format = (text) => prettierFormat(text, { filepath: "client.ts" });
+        format = (text): Promise<string> =>
+          prettierFormat(text, { filepath: "client.ts" });
       } catch {}
     }
 

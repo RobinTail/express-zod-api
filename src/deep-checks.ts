@@ -80,12 +80,12 @@ export const hasNestedSchema = (
   return false;
 };
 
-export const hasUpload = (subject: IOSchema) =>
+export const hasUpload = (subject: IOSchema): boolean =>
   hasNestedSchema(subject, {
     condition: (schema) => schema._def[metaSymbol]?.brand === ezUploadBrand,
   });
 
-export const hasRaw = (subject: IOSchema) =>
+export const hasRaw = (subject: IOSchema): boolean =>
   hasNestedSchema(subject, {
     condition: (schema) => schema._def[metaSymbol]?.brand === ezRawBrand,
     maxDepth: 3,

@@ -102,7 +102,7 @@ const shortDescriptionLimit = 50;
 const isoDateDocumentationUrl =
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
-const samples = {
+const samples: Record<Extract<SchemaObjectType, string>, unknown> = {
   integer: 0,
   number: 0,
   string: "",
@@ -110,7 +110,7 @@ const samples = {
   object: {},
   null: null,
   array: [],
-} satisfies Record<Extract<SchemaObjectType, string>, unknown>;
+};
 
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
@@ -118,7 +118,7 @@ const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
 export const getRoutePathParams = (path: string): string[] =>
   path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
 
-export const reformatParamsInPath = (path: string) =>
+export const reformatParamsInPath = (path: string): string =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
 export const depictDefault: Depicter = (
@@ -181,7 +181,7 @@ export const depictDiscriminatedUnion: Depicter = (
 /** @throws AssertionError */
 const tryFlattenIntersection = (
   children: Array<SchemaObject | ReferenceObject>,
-) => {
+): SchemaObject => {
   const [left, right] = children
     .filter(isSchemaObject)
     .filter(
@@ -284,7 +284,7 @@ export const depictObject: Depicter = (
   { isResponse, next },
 ) => {
   const keys = Object.keys(schema.shape);
-  const isOptionalProp = (prop: z.ZodTypeAny) =>
+  const isOptionalProp = (prop: z.ZodTypeAny): boolean =>
     isResponse && hasCoercion(prop)
       ? prop instanceof z.ZodOptional
       : prop.isOptional();
@@ -533,7 +533,7 @@ export const depictObjectProperties = (
   next: Parameters<Depicter>[1]["next"],
 ) => map(next, shape);
 
-const makeSample = (depicted: SchemaObject) => {
+const makeSample = (depicted: SchemaObject): unknown => {
   const firstType = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
@@ -676,9 +676,9 @@ export const depictRequestParams = ({
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
   const areHeadersEnabled = inputSources.includes("headers");
-  const isPathParam = (name: string) =>
+  const isPathParam = (name: string): boolean =>
     areParamsEnabled && pathParams.includes(name);
-  const isHeaderParam = (name: string) =>
+  const isHeaderParam = (name: string): boolean =>
     areHeadersEnabled && isCustomHeader(name);
 
   const parameters = Object.keys(shape)
@@ -1057,7 +1057,7 @@ export const depictTags = <TAG extends string>(
     return result;
   });
 
-export const ensureShortDescription = (description: string) =>
+export const ensureShortDescription = (description: string): string =>
   description.length <= shortDescriptionLimit
     ? description
     : description.slice(0, shortDescriptionLimit - 1) + "…";

@@ -88,7 +88,7 @@ export class Endpoint<
     outputSchema,
     handler,
     resultHandler,
-    getOperationId = () => undefined,
+    getOperationId = (): undefined => undefined,
     scopes = [],
     middlewares = [],
     tags = [],
@@ -137,7 +137,9 @@ export class Endpoint<
     };
   }
 
-  public override getDescription(variant: DescriptionVariant) {
+  public override getDescription(
+    variant: DescriptionVariant,
+  ): string | undefined {
     return this.#descriptions[variant];
   }
 
@@ -204,7 +206,7 @@ export class Endpoint<
     };
   }
 
-  async #parseOutput(output: z.input<OUT>) {
+  async #parseOutput(output: z.input<OUT>): Promise<FlatObject> {
     try {
       return (await this.#schemas.output.parseAsync(output)) as FlatObject;
     } catch (e) {
@@ -226,7 +228,7 @@ export class Endpoint<
     response: Response;
     logger: ActualLogger;
     options: Partial<OPT>;
-  }) {
+  }): Promise<void> {
     for (const mw of this.#middlewares) {
       if (method === "options" && !(mw instanceof ExpressMiddleware)) {
         continue;
@@ -253,7 +255,7 @@ export class Endpoint<
     input: Readonly<FlatObject>;
     options: OPT;
     logger: ActualLogger;
-  }) {
+  }): Promise<z.input<OUT>> {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
       finalInput = (await this.#schemas.input.parseAsync(
@@ -285,7 +287,7 @@ export class Endpoint<
     input: FlatObject;
     output: FlatObject | null;
     options: Partial<OPT>;
-  }) {
+  }): Promise<void> {
     try {
       await this.#resultHandler.execute({
         error,
@@ -320,7 +322,7 @@ export class Endpoint<
     logger: ActualLogger;
     config: CommonConfig;
     siblingMethods?: Method[];
-  }) {
+  }): Promise<void> {
     const method = getActualMethod(request);
     const options: Partial<OPT> = {};
     let output: FlatObject | null = null;

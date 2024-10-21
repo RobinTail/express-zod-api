@@ -100,7 +100,7 @@ export class Documentation extends OpenApiBuilder {
     path: string,
     method: Method,
     userDefined?: string,
-  ) {
+  ): string {
     const operationId = userDefined || makeCleanId(method, path);
     let lastSuffix = this.lastOperationIdSuffixes.get(operationId);
     if (lastSuffix === undefined) {
@@ -122,7 +122,9 @@ export class Documentation extends OpenApiBuilder {
     return `${operationId}${lastSuffix}`;
   }
 
-  protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
+  protected ensureUniqSecuritySchemaName(
+    subject: SecuritySchemeObject,
+  ): string {
     const serializedSubject = JSON.stringify(subject);
     for (const name in this.rootDoc.components?.securitySchemes || {}) {
       if (

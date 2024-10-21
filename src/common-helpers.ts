@@ -97,7 +97,7 @@ export const logInternalError = ({
   input: FlatObject | null;
   error: Error;
   statusCode: number;
-}) => {
+}): void => {
   if (statusCode === 500) {
     logger.error(`Internal server error\n${error.stack}\n`, {
       url: request.url,
@@ -157,10 +157,10 @@ export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
     ? schema._def.coerce
     : false;
 
-export const ucFirst = (subject: string) =>
+export const ucFirst = (subject: string): string =>
   subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
 
-export const makeCleanId = (...args: string[]) =>
+export const makeCleanId = (...args: string[]): string =>
   args
     .flatMap((entry) => entry.split(/[^A-Z0-9]/gi)) // split by non-alphanumeric characters
     .flatMap((entry) =>
@@ -185,5 +185,5 @@ export const tryToTransform = <T>(
 };
 
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
-export const isObject = (subject: unknown) =>
+export const isObject = (subject: unknown): subject is object =>
   typeof subject === "object" && subject !== null;
