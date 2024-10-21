@@ -1,0 +1,13 @@
+{
+  // https://jsr.io/docs/package-configuration
+  "$schema": "https://jsr.io/schema/config-file.v1.json",
+  "name": "@robintail/express-zod-api",
+  "version": "20.14.3",
+  "exports": {
+    ".": "./src/index.ts"
+    // "./migration": "./src/migration.ts"
+  },
+  "publish": {
+    "include": ["src"]
+  }
+}
