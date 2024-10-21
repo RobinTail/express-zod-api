@@ -31,14 +31,14 @@ export const isLoggerInstance = (subject: unknown): subject is AbstractLogger =>
 export const isSeverity = (subject: PropertyKey): subject is Severity =>
   subject in severity;
 
-export const isHidden = (subject: Severity, gate: Severity) =>
+export const isHidden = (subject: Severity, gate: Severity): boolean =>
   severity[subject] < severity[gate];
 
 /**
  * @todo consider Intl units when Node 18 dropped (microsecond unit is missing, picosecond is not in list)
  * @link https://tc39.es/ecma402/#table-sanctioned-single-unit-identifiers
  * */
-const makeNumberFormat = (fraction = 0) =>
+const makeNumberFormat = (fraction = 0): Intl.NumberFormat =>
   Intl.NumberFormat(undefined, {
     useGrouping: false,
     minimumFractionDigits: 0,
@@ -59,7 +59,7 @@ const pickTimeUnit = (ms: number): [string, number, Intl.NumberFormat] => {
   return ["minute", ms / 6e4, floatFormat];
 };
 
-export const formatDuration = (durationMs: number) => {
+export const formatDuration = (durationMs: number): string => {
   const [unit, converted, formatter] = pickTimeUnit(durationMs);
   return `${formatter.format(converted)} ${unit}${converted > 1 ? "s" : ""}`;
 };

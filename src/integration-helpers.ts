@@ -24,7 +24,9 @@ export const emptyTail = f.createTemplateTail("");
 
 export const spacingMiddle = f.createTemplateMiddle(" ");
 
-export const makeTemplateType = (names: Array<ts.Identifier | string>) =>
+export const makeTemplateType = (
+  names: Array<ts.Identifier | string>,
+): ts.TemplateLiteralTypeNode =>
   f.createTemplateLiteralType(
     emptyHeading,
     names.map((name, index) =>
@@ -41,7 +43,7 @@ export const makeParam = (
   name: ts.Identifier,
   type?: ts.TypeNode,
   mod?: ts.Modifier[],
-) =>
+): ts.ParameterDeclaration =>
   f.createParameterDeclaration(
     mod,
     undefined,
@@ -54,7 +56,7 @@ export const makeParam = (
 export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,
   mod?: ts.Modifier[],
-) =>
+): ts.ParameterDeclaration[] =>
   chain(
     ([name, node]) => [makeParam(f.createIdentifier(name), node, mod)],
     toPairs(params),
@@ -63,7 +65,7 @@ export const makeParams = (
 export const makeRecord = (
   key: ts.Identifier | ts.KeywordTypeSyntaxKind,
   value: ts.KeywordTypeSyntaxKind,
-) =>
+): ts.ExpressionWithTypeArguments =>
   f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
     typeof key === "number"
       ? f.createKeywordTypeNode(key)
@@ -73,9 +75,13 @@ export const makeRecord = (
 
 export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],
-) => f.createConstructorDeclaration(undefined, params, f.createBlock([]));
+): ts.ConstructorDeclaration =>
+  f.createConstructorDeclaration(undefined, params, f.createBlock([]));
 
-export const makeInterfaceProp = (name: string, ref: string) =>
+export const makeInterfaceProp = (
+  name: string,
+  ref: string,
+): ts.PropertySignature =>
   f.createPropertySignature(
     undefined,
     name,
@@ -87,7 +93,7 @@ export const makeConst = (
   name: ts.Identifier,
   value: ts.Expression,
   type?: ts.TypeNode,
-) =>
+): ts.VariableDeclarationList =>
   f.createVariableDeclarationList(
     [f.createVariableDeclaration(name, undefined, type, value)],
     ts.NodeFlags.Const,
@@ -96,7 +102,7 @@ export const makeConst = (
 export const makePublicLiteralType = (
   name: ts.Identifier,
   literals: string[],
-) =>
+): ts.TypeAliasDeclaration =>
   f.createTypeAliasDeclaration(
     exportModifier,
     name,
@@ -108,14 +114,17 @@ export const makePublicLiteralType = (
     ),
   );
 
-export const makePublicType = (name: ts.Identifier, value: ts.TypeNode) =>
+export const makePublicType = (
+  name: ts.Identifier,
+  value: ts.TypeNode,
+): ts.TypeAliasDeclaration =>
   f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
 
 export const makePublicReadonlyProp = (
   name: ts.Identifier,
   type: ts.TypeNode,
   exp: ts.Expression,
-) =>
+): ts.PropertyDeclaration =>
   f.createPropertyDeclaration(
     publicReadonlyModifier,
     name,
@@ -128,18 +137,21 @@ export const makePublicClass = (
   name: ts.Identifier,
   constructor: ts.ConstructorDeclaration,
   props: ts.PropertyDeclaration[],
-) =>
+): ts.ClassDeclaration =>
   f.createClassDeclaration(exportModifier, name, undefined, undefined, [
     constructor,
     ...props,
   ]);
 
-export const makeIndexedPromise = (type: ts.Identifier, index: ts.TypeNode) =>
+export const makeIndexedPromise = (
+  type: ts.Identifier,
+  index: ts.TypeNode,
+): ts.TypeReferenceNode =>
   f.createTypeReferenceNode("Promise", [
     f.createIndexedAccessTypeNode(f.createTypeReferenceNode(type), index),
   ]);
 
-export const makeAnyPromise = () =>
+export const makeAnyPromise = (): ts.TypeReferenceNode =>
   f.createTypeReferenceNode("Promise", [
     f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
   ]);
@@ -148,7 +160,7 @@ export const makePublicExtendedInterface = (
   name: ts.Identifier,
   extender: ts.HeritageClause[],
   props: ts.PropertySignature[],
-) =>
+): ts.InterfaceDeclaration =>
   f.createInterfaceDeclaration(
     exportModifier,
     name,
@@ -160,14 +172,15 @@ export const makePublicExtendedInterface = (
 const aggregateDeclarations = chain(([name, id]: [string, ts.Identifier]) => [
   f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
 ]);
-export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
-  aggregateDeclarations(toPairs(params));
+export const makeTypeParams = (
+  params: Record<string, ts.Identifier>,
+): ts.TypeParameterDeclaration[] => aggregateDeclarations(toPairs(params));
 
 export const makeArrowFn = (
   params: ts.Identifier[],
   body: ts.ConciseBody,
   isAsync?: boolean,
-) =>
+): ts.ArrowFunction =>
   f.createArrowFunction(
     isAsync ? asyncModifier : undefined,
     undefined,
@@ -181,7 +194,7 @@ export const makeObjectKeysReducer = (
   obj: ts.Identifier,
   exp: ts.Expression,
   initial: ts.Expression,
-) =>
+): ts.CallExpression =>
   f.createCallExpression(
     f.createPropertyAccessExpression(
       f.createCallExpression(
@@ -205,4 +218,5 @@ export const makeObjectKeysReducer = (
     ],
   );
 
-export const quoteProp = (...parts: [Method, string]) => `"${parts.join(" ")}"`;
+export const quoteProp = (...parts: [Method, string]): string =>
+  `"${parts.join(" ")}"`;

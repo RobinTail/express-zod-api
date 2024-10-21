@@ -60,7 +60,7 @@ export class Middleware<
     return this.#security;
   }
 
-  public override getSchema() {
+  public override getSchema(): IN {
     return this.#schema;
   }
 
@@ -74,7 +74,7 @@ export class Middleware<
     request: Request;
     response: Response;
     logger: ActualLogger;
-  }) {
+  }): Promise<OUT> {
     try {
       const validInput = (await this.#schema.parseAsync(input)) as z.output<IN>;
       return this.#handler({ ...rest, input: validInput });
@@ -112,7 +112,7 @@ export class ExpressMiddleware<
       input: z.object({}),
       handler: async ({ request, response }) =>
         new Promise<OUT>((resolve, reject) => {
-          const next = (err?: unknown) => {
+          const next = (err?: unknown): void => {
             if (err && err instanceof Error) {
               return reject(transformer(err));
             }

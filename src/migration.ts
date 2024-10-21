@@ -35,7 +35,7 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
   },
   defaultOptions: [],
   create: (ctx) => ({
-    ImportDeclaration: (node) => {
+    ImportDeclaration: (node): void => {
       if (node.source.value === importName) {
         for (const spec of node.specifiers) {
           if (
@@ -58,7 +58,7 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
         }
       }
     },
-    CallExpression: (node) => {
+    CallExpression: (node): void => {
       if (
         node.callee.type === "Identifier" &&
         shouldAct(node.callee.name, changedMethods)
@@ -108,7 +108,7 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
         }
       }
     },
-    NewExpression: (node) => {
+    NewExpression: (node): void => {
       if (
         node.callee.type === "Identifier" &&
         [
@@ -139,7 +139,7 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
         }
       }
     },
-    Identifier: (node) => {
+    Identifier: (node): void => {
       if (
         node.name === "MockOverrides" &&
         node.parent.type === "TSInterfaceDeclaration"

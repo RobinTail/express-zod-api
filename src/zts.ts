@@ -17,7 +17,7 @@ import {
 
 const { factory: f } = ts;
 
-const samples = {
+const samples: Partial<Record<ts.KeywordTypeSyntaxKind, unknown>> = {
   [ts.SyntaxKind.AnyKeyword]: "",
   [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
   [ts.SyntaxKind.BooleanKeyword]: false,
@@ -25,7 +25,7 @@ const samples = {
   [ts.SyntaxKind.ObjectKeyword]: {},
   [ts.SyntaxKind.StringKeyword]: "",
   [ts.SyntaxKind.UndefinedKeyword]: undefined,
-} satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
+};
 
 const onLiteral: Producer = ({ value }: z.ZodLiteral<LiteralType>) =>
   f.createLiteralTypeNode(
@@ -86,7 +86,7 @@ const onSomeUnion: Producer = (
   { next },
 ) => f.createUnionTypeNode(options.map(next));
 
-const makeSample = (produced: ts.TypeNode) =>
+const makeSample = (produced: ts.TypeNode): unknown =>
   samples?.[produced.kind as keyof typeof samples];
 
 const onEffects: Producer = (
@@ -267,7 +267,7 @@ export const zodToTs = (
     brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
     ctx: ZTSContext;
   },
-) =>
+): ts.TypeNode =>
   walkSchema(schema, {
     rules: { ...brandHandling, ...producers },
     onMissing: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),

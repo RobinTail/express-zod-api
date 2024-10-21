@@ -17,20 +17,19 @@ export interface ZTSContext extends FlatObject {
 
 export type Producer = SchemaHandler<ts.TypeNode, ZTSContext>;
 
-export const addJsDocComment = (node: ts.Node, text: string) => {
-  ts.addSyntheticLeadingComment(
+export const addJsDocComment = (node: ts.Node, text: string) =>
+  void ts.addSyntheticLeadingComment(
     node,
     ts.SyntaxKind.MultiLineCommentTrivia,
     `* ${text} `,
     true,
   );
-};
 
 export const createTypeAlias = (
   node: ts.TypeNode,
   identifier: string,
   comment?: string,
-) => {
+): ts.TypeAliasDeclaration => {
   const typeAlias = f.createTypeAliasDeclaration(
     undefined,
     f.createIdentifier(identifier),
@@ -46,7 +45,7 @@ export const createTypeAlias = (
 export const printNode = (
   node: ts.Node,
   printerOptions?: ts.PrinterOptions,
-) => {
+): string => {
   const sourceFile = ts.createSourceFile(
     "print.ts",
     "",
@@ -60,9 +59,9 @@ export const printNode = (
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
-export const makePropertyIdentifier = (name: string) => {
-  if (safePropRegex.test(name)) {
-    return f.createIdentifier(name);
-  }
-  return f.createStringLiteral(name);
-};
+export const makePropertyIdentifier = (
+  name: string,
+): ts.Identifier | ts.StringLiteral =>
+  safePropRegex.test(name)
+    ? f.createIdentifier(name)
+    : f.createStringLiteral(name);

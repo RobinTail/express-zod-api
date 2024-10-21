@@ -159,7 +159,7 @@ export const makeChildLoggerExtractor =
     (request as EquippedRequest).res?.locals[metaSymbol]?.logger || fallback;
 
 export const installDeprecationListener = (logger: ActualLogger) =>
-  process.on("deprecation", ({ message, namespace, name, stack }) =>
+  void process.on("deprecation", ({ message, namespace, name, stack }) =>
     logger.warn(
       `${name} (${namespace}): ${message}`,
       stack.split("\n").slice(1),
@@ -174,7 +174,7 @@ export const installTerminationListener = ({
   servers: Parameters<typeof monitor>[0];
   options: Extract<ServerConfig["gracefulShutdown"], object>;
   logger: ActualLogger;
-}) => {
+}): void => {
   const graceful = monitor(servers, { logger, timeout });
   const onTerm = () => graceful.shutdown().then(() => process.exit());
   for (const trigger of events) process.on(trigger, onTerm);

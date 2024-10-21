@@ -1,6 +1,6 @@
 import { Ansis, gray, hex, italic, whiteBright } from "ansis";
 
-export const getStartupLogo = () => {
+export const getStartupLogo = (): string => {
   const proud = italic("Proudly supports transgender community.".padStart(109));
   const slogan = italic(
     "Start your API server with I/O schema validation and custom middlewares in minutes.".padStart(

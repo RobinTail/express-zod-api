@@ -47,7 +47,7 @@ export abstract class AbstractResultHandler {
   protected constructor(handler: Handler) {
     this.#handler = handler;
   }
-  public execute(...params: Parameters<Handler>) {
+  public execute(...params: Parameters<Handler>): ReturnType<Handler> {
     return this.#handler(...params);
   }
 }
@@ -115,7 +115,7 @@ export const defaultResultHandler = new ResultHandler({
         message: getMessageFromError(new Error("Sample error message")),
       },
     }),
-  handler: ({ error, input, output, request, response, logger }) => {
+  handler: ({ error, input, output, request, response, logger }): void => {
     if (!error) {
       response
         .status(defaultStatusCodes.positive)
@@ -157,7 +157,7 @@ export const arrayResultHandler = new ResultHandler({
   negative: z
     .string()
     .example(getMessageFromError(new Error("Sample error message"))),
-  handler: ({ response, output, error, logger, request, input }) => {
+  handler: ({ response, output, error, logger, request, input }): void => {
     if (error) {
       const statusCode = getStatusCodeFromError(error);
       logInternalError({ logger, statusCode, request, error, input });

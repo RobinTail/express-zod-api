@@ -12,7 +12,7 @@ export const lastResortHandler = ({
   error,
   logger,
   response,
-}: LastResortHandlerParams) => {
+}: LastResortHandlerParams): void => {
   logger.error(`Result handler failure: ${error.message}.`);
   response
     .status(500)

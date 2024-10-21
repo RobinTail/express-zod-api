@@ -25,7 +25,7 @@ export const initRouting = ({
   config: CommonConfig;
   routing: Routing;
   parsers?: Parsers;
-}) =>
+}): void =>
   walkRouting({
     routing,
     hasCors: !!config.cors,

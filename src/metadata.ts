@@ -12,7 +12,7 @@ export interface Metadata {
 }
 
 /** @link https://github.com/colinhacks/zod/blob/3e4f71e857e75da722bd7e735b6d657a70682df2/src/types.ts#L485 */
-export const cloneSchema = <T extends z.ZodType>(schema: T) => {
+export const cloneSchema = <T extends z.ZodType>(schema: T): T => {
   const copy = schema.describe(schema.description as string);
   copy._def[metaSymbol] = // clone for deep copy, issue #827
     clone(copy._def[metaSymbol]) || ({ examples: [] } satisfies Metadata);

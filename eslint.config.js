@@ -37,6 +37,14 @@ export default [
     files: ["src/*.ts"],
     rules: {
       "allowed/dependencies": ["error", { typeOnly: ["eslint", "prettier"] }],
+      "@typescript-eslint/explicit-function-return-type": [
+        "warn",
+        {
+          allowIIFEs: true,
+          allowConciseArrowFunctionExpressionsStartingWithVoid: true,
+          allowDirectConstAssertionInArrowFunctions: true,
+        },
+      ],
     },
   },
   {

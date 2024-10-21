@@ -25,7 +25,7 @@ export const walkRouting = ({
   onStatic,
   parentPath,
   hasCors,
-}: RoutingWalkerParams) => {
+}: RoutingWalkerParams): void => {
   const pairs = Object.entries(routing).map(
     ([key, value]) => [key.trim(), value] as const,
   );
