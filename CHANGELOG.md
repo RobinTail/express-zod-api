@@ -2597,11 +2597,13 @@ after:
 ### v8.3.0
 
 - Feature #600: Top level refinements.
-  - Starting this version you can use the `.refine()` method on the `z.object()` of the input schema.
+  - Starting this version you can use the `.refine()` method on the `z.object()` of the input schema;
   - This feature might be useful, for example, when you have multiple optional properties on the top level, but at
-    least one of them has to be specified.
-  - Currently, only the refinements of `z.object()` are supported.
-    - You can not combine it with `z.union()`, `z.intersetion()`, `z.discriminatedUnion()`, `.or()`, `.and()` yet.
+    least one of them has to be specified;
+  - Currently, only the refinements of `z.object()` are supported:
+    - You can not combine it with `z.union()`, `z.intersetion()`, `z.discriminatedUnion()`, `.or()`, `.and()` yet;
+  - The feature suggested by [@johngeorgewright](https://github.com/johngeorgewright)
+    and [ssteuteville](https://github.com/ssteuteville).
 
 ```typescript
 // example

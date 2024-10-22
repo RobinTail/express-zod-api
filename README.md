@@ -110,6 +110,8 @@ These people contributed to the improvement of the library by reporting bugs, ma
 [<img src="https://github.com/lazylace37.png" alt="@lazylace37" width="50px" />](https://github.com/lazylace37)
 [<img src="https://github.com/leosuncin.png" alt="@leosuncin" width="50px" />](https://github.com/leosuncin)
 [<img src="https://github.com/kirdk.png" alt="@kirdk" width="50px" />](https://github.com/kirdk)
+[<img src="https://github.com/johngeorgewright.png" alt="@johngeorgewright" width="50px" />](https://github.com/johngeorgewright)
+[<img src="https://github.com/ssteuteville.png" alt="@ssteuteville" width="50px" />](https://github.com/ssteuteville)
 [<img src="https://github.com/rayzr522.png" alt="@rayzr522" width="50px" />](https://github.com/rayzr522)
 
 # How it works
