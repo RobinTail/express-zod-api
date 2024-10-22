@@ -4095,7 +4095,8 @@ const myResultHandlerV2 = createResultHandler({
 
 ### v1.2.0
 
-- Ability to specify the endpoint description and [export it to the Swagger / OpenAPI specification](https://github.com/RobinTail/express-zod-api#swagger--openapi-specification).
+- Ability to specify the endpoint description and export it to the Swagger / OpenAPI specification:
+  - The feature suggested by [@glitch452](https://github.com/glitch452).
 
 ```typescript
 // example

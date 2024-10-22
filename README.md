@@ -117,6 +117,7 @@ These people contributed to the improvement of the library by reporting bugs, ma
 [<img src="https://github.com/hellovai.png" alt="@hellovai" width="50px" />](https://github.com/hellovai)
 [<img src="https://github.com/Isaac-Leonard.png" alt="@Isaac-Leonard" width="50px" />](https://github.com/Isaac-Leonard)
 [<img src="https://github.com/digimuza.png" alt="@digimuza" width="50px" />](https://github.com/digimuza)
+[<img src="https://github.com/glitch452.png" alt="@glitch452" width="50px" />](https://github.com/glitch452)
 
 # How it works
 
