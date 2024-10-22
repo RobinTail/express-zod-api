@@ -2,6 +2,7 @@ import { DependsOnMethod, Routing, ServeStatic } from "../src";
 import { rawAcceptingEndpoint } from "./endpoints/accept-raw";
 import { createUserEndpoint } from "./endpoints/create-user";
 import { listUsersEndpoint } from "./endpoints/list-users";
+import { mapSetCompatEndpoint } from "./endpoints/map-set-compat";
 import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
 import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
 import { sendAvatarEndpoint } from "./endpoints/send-avatar";
@@ -33,6 +34,8 @@ export const routing: Routing = {
       // raw body acceptance example
       raw: rawAcceptingEndpoint,
     },
+    // Map and Set serialization feature
+    serialize: mapSetCompatEndpoint,
   },
   // path /public serves static files from /example/assets
   public: new ServeStatic(join("example", "assets"), {
