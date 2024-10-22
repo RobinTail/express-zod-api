@@ -3536,16 +3536,17 @@ const newInputSourcesByDefault: InputSources = {
 
 ### v2.10.0
 
-- Feature #165. You can add examples to the generated documentation.
-  - Introducing new method `withMeta()`. You can wrap any Zod schema in it, for example: `withMeta(z.string())`.
+- Feature #165. You can add examples to the generated documentation:
+  - Introducing new method `withMeta()`. You can wrap any Zod schema in it, for example: `withMeta(z.string())`;
   - `withMeta()` provides you with additional methods for generated documentation. At the moment there is one so far:
-    `withMeta().example()`.
-  - You can use `.example()` multiple times for specifying several examples for your schema.
-  - You can specify example for the whole IO schema or just for a one of its properties.
+    `withMeta().example()`;
+  - You can use `.example()` multiple times for specifying several examples for your schema;
+  - You can specify example for the whole IO schema or just for a one of its properties;
   - `withMeta()` can be used within Endpoint and Middleware as well. Their input examples will be merged for the
-    generated documentation.
-  - Check out the example of the generated documentation in the `example` folder.
-  - Notice: `withMeta()` mutates its argument.
+    generated documentation;
+  - Check out the example of the generated documentation in the `example` folder;
+  - Notice: `withMeta()` mutates its argument;
+  - The feature suggested by [@digimuza](https://github.com/digimuza).
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
