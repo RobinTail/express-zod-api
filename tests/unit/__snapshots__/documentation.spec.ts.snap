@@ -1728,10 +1728,10 @@ paths:
                       set:
                         type: array
                         items:
-                          type: number
-                          format: double
-                          minimum: -1.7976931348623157e+308
-                          maximum: 1.7976931348623157e+308
+                          type: integer
+                          format: int64
+                          minimum: -9007199254740991
+                          maximum: 9007199254740991
                     required:
                       - map
                       - set
@@ -2467,10 +2467,10 @@ components:
             set:
               type: array
               items:
-                type: number
-                format: double
-                minimum: -1.7976931348623157e+308
-                maximum: 1.7976931348623157e+308
+                type: integer
+                format: int64
+                minimum: -9007199254740991
+                maximum: 9007199254740991
           required:
             - map
             - set

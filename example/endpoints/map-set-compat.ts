@@ -7,7 +7,7 @@ export const mapSetCompatEndpoint = defaultEndpointsFactory.build({
   input: z.object({}),
   output: z.object({
     map: z.map(z.string(), z.boolean()),
-    set: z.set(z.number()),
+    set: z.set(z.number().int()),
   }),
   handler: async () => ({
     map: new Map<string, boolean>()
