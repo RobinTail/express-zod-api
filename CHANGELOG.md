@@ -1469,7 +1469,8 @@ operationId:
   - Read the migration guide below.
 - Features:
   - Supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
-    - Package `winston` is now optional.
+    - Package `winston` is now optional;
+    - The feature suggested by [@bobgubko](https://github.com/bobgubko).
   - Supporting any testing framework having a function mocking method for `testEndpoint()`:
     - Both `jest` and `vitest` are supported automatically;
     - With most modern Node.js you can also use the integrated `node:test` module.
