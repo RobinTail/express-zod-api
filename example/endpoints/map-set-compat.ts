@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defaultEndpointsFactory } from "../../src";
 
-/** @desc This endpoint demonstrates Map and Set serialization compatibility */
+/** @desc This endpoint demonstrates Map and Set serialization feature */
 export const mapSetCompatEndpoint = defaultEndpointsFactory.build({
   method: "get",
   input: z.object({}),
