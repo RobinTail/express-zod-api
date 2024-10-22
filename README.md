@@ -88,6 +88,7 @@ These people contributed to the improvement of the library by reporting bugs, ma
 [<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
 [<img src="https://github.com/boarush.png" alt="@boarush" width="50px" />](https://github.com/boarush)
 [<img src="https://github.com/shawncarr.png" alt="@shawncarr" width="50px" />](https://github.com/shawncarr)
+[<img src="https://github.com/ben-xD.png" alt="@ben-xD" width="50px" />](https://github.com/ben-xD)
 [<img src="https://github.com/daniel-white.png" alt="@daniel-white" width="50px" />](https://github.com/daniel-white)
 [<img src="https://github.com/kotsmile.png" alt="@kotsmile" width="50px" />](https://github.com/kotsmile)
 [<img src="https://github.com/arlyon.png" alt="@arlyon" width="50px" />](https://github.com/arlyon)
