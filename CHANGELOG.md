@@ -3327,9 +3327,10 @@ const config = createConfig({
 
 ### v5.2.0
 
-- Feature #254: the ability to configure routes for serving static files.
-  - Use `new ServeStatic()` with the same arguments as `express.static()`.
+- Feature #254: the ability to configure routes for serving static files:
+  - Use `new ServeStatic()` with the same arguments as `express.static()`;
   - You can find the documentation on these arguments here: http://expressjs.com/en/4x/api.html#express.static
+  - The feature suggested by [@Isaac-Leonard](https://github.com/Isaac-Leonard).
 
 ```typescript
 import { Routing, ServeStatic } from "express-zod-api";
