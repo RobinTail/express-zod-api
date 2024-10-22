@@ -84,6 +84,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 These people contributed to the improvement of the library by reporting bugs, making changes and suggesting ideas:
 
 [<img src="https://github.com/Tomtec331.png" alt="@Tomtec331" width="50px" />](https://github.com/Tomtec331)
+[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
 [<img src="https://github.com/boarush.png" alt="@boarush" width="50px" />](https://github.com/boarush)
 [<img src="https://github.com/daniel-white.png" alt="@daniel-white" width="50px" />](https://github.com/daniel-white)

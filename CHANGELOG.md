@@ -83,7 +83,8 @@ createConfig({
 - Feat: providing child logger to `beforeRouting()` hook:
   - The function assigned to config property `server.beforeRouting` now accepts additional argument `getChildLogger()`;
   - The featured method accepts `request` and returns a child logger if `childLoggerProvider()` is configured;
-  - Otherwise, it returns the root logger (same for all requests, same as the `logger` argument).
+  - Otherwise, it returns the root logger (same for all requests, same as the `logger` argument);
+  - The feature suggested by [@williamgcampbell](https://github.com/williamgcampbell).
 
 ```ts
 import { createConfig } from "express-zod-api";
