@@ -38,8 +38,6 @@ import {
   when,
   xprod,
   zip,
-  invoker,
-  identity,
 } from "ramda";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
