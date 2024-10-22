@@ -2651,13 +2651,14 @@ const exampleEndpoint = yourEndpointsFactory.build({
 
 - Feature #571: tagging the endpoints.
   - Good news dear community! You can now tag your endpoints using the new properties of the `.build()` method
-    of the `EndpointsFactory`.
-  - For your convenience and for the sake of Semantics, there are singular and plural properties: `tag` and `tags`.
+    of the `EndpointsFactory`;
+  - For your convenience and for the sake of Semantics, there are singular and plural properties: `tag` and `tags`;
   - By default, these properties allow any string, so in order to enforce restrictions and achieve the consistency
     across all endpoints, the possible tags should be declared in the configuration first and also a brand
-    new `EndpointsFactory` instantiation approach is required.
-  - The configuration has got a new `tags` property for declaring possible tags and their descriptions.
-  - Tags are an important part of the generated documentation for the OpenAPI standard.
+    new `EndpointsFactory` instantiation approach is required;
+  - The configuration has got a new `tags` property for declaring possible tags and their descriptions;
+  - Tags are an important part of the generated documentation for the OpenAPI standard;
+  - The feature suggested by [@TheWisestOne](https://github.com/TheWisestOne).
 - The property `scopes` (introduced in v7.9.0) has got its singular variation `scope`.
 
 ```typescript
