@@ -4,9 +4,9 @@ import http from "node:http";
 import https from "node:https";
 import { BuiltinLogger } from "./builtin-logger";
 import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
-import { isLoggerInstance } from "./logger-helpers";
+import { ActualLogger, isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
-import { defaultResultHandler } from "./result-handler";
+import { AbstractResultHandler, defaultResultHandler } from "./result-handler";
 import { Parsers, Routing, initRouting } from "./routing";
 import {
   createLoggingMiddleware,
@@ -17,10 +17,20 @@ import {
   installDeprecationListener,
   moveRaw,
   installTerminationListener,
+  ChildLoggerExtractor,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
-const makeCommonEntities = (config: CommonConfig) => {
+const makeCommonEntities = (
+  config: CommonConfig,
+): {
+  rootLogger: ActualLogger;
+  notFoundHandler: express.RequestHandler;
+  parserFailureHandler: express.ErrorRequestHandler;
+  loggingMiddleware: express.RequestHandler;
+  getChildLogger: ChildLoggerExtractor;
+  errorHandler: AbstractResultHandler;
+} => {
   if (config.startupLogo !== false) console.log(getStartupLogo());
   const errorHandler = config.errorHandler || defaultResultHandler;
   const rootLogger = isLoggerInstance(config.logger)
@@ -42,7 +52,13 @@ const makeCommonEntities = (config: CommonConfig) => {
   };
 };
 
-export const attachRouting = (config: AppConfig, routing: Routing) => {
+export const attachRouting = (
+  config: AppConfig,
+  routing: Routing,
+): {
+  notFoundHandler: express.RequestHandler;
+  logger: ActualLogger;
+} => {
   const { rootLogger, getChildLogger, notFoundHandler, loggingMiddleware } =
     makeCommonEntities(config);
   initRouting({
@@ -54,7 +70,15 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   return { notFoundHandler, logger: rootLogger };
 };
 
-export const createServer = async (config: ServerConfig, routing: Routing) => {
+export const createServer = async (
+  config: ServerConfig,
+  routing: Routing,
+): Promise<{
+  app: express.IRouter;
+  logger: ActualLogger;
+  httpServer: http.Server;
+  httpsServer?: https.Server;
+}> => {
   const {
     rootLogger,
     getChildLogger,
@@ -96,7 +120,8 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   const starter = <T extends http.Server | https.Server>(
     server: T,
     subject?: typeof config.server.listen,
-  ) => server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
+  ): T =>
+    server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
 
   const httpServer = http.createServer(app);
   const httpsServer =
