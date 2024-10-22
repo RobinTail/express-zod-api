@@ -531,7 +531,7 @@ export const depictNumber: Depicter = ({
 export const depictObjectProperties = (
   { shape }: z.ZodObject<z.ZodRawShape>,
   next: Parameters<Depicter>[1]["next"],
-) => map(next, shape);
+): Record<string, ReturnType<Depicter>> => map(next, shape);
 
 const makeSample = (depicted: SchemaObject): unknown => {
   const firstType = (
@@ -670,7 +670,7 @@ export const depictRequestParams = ({
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
-}) => {
+}): ParameterObject[] => {
   const { shape } = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");

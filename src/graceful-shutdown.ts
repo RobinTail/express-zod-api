@@ -11,11 +11,13 @@ import {
   weAreClosed,
 } from "./graceful-helpers";
 
+type ShutdownType = Promise<PromiseSettledResult<void>[]>;
+
 export const monitor = (
   servers: Array<http.Server | https.Server>,
   { timeout = 1e3, logger }: { timeout?: number; logger?: ActualLogger } = {},
-) => {
-  let pending: Promise<PromiseSettledResult<void>[]> | undefined;
+): { sockets: Set<Socket>; shutdown: () => ShutdownType } => {
+  let pending: ShutdownType | undefined;
   const sockets = new Set<Socket>();
   const destroy = (socket: Socket) => void sockets.delete(socket.destroy());
 
@@ -34,7 +36,7 @@ export const monitor = (
     for (const event of ["connection", "secureConnection"])
       server.on(event, watch);
 
-  const workflow = async (): NonNullable<typeof pending> => {
+  const workflow = async (): ShutdownType => {
     for (const server of servers) server.on("request", weAreClosed);
     logger?.info("Graceful shutdown", { sockets: sockets.size, timeout });
     for (const socket of sockets)
@@ -47,6 +49,6 @@ export const monitor = (
 
   return {
     sockets,
-    shutdown: (): ReturnType<typeof workflow> => (pending ??= workflow()),
+    shutdown: (): ShutdownType => (pending ??= workflow()),
   };
 };
