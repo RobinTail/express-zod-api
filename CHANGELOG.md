@@ -2166,7 +2166,8 @@ new OpenAPI({
 ### v9.3.1
 
 - Hotfix for the feature #856
-  - `$ref` is equipped with the required prefix: `#/components/schemas/`.
+  - `$ref` is equipped with the required prefix: `#/components/schemas/`;
+  - The issue reported by [@TheWisestOne](https://github.com/TheWisestOne).
 
 ```yaml
 before:
