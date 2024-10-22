@@ -47,13 +47,16 @@ declare module "zod" {
 const exampleSetter = function (
   this: z.ZodType,
   value: (typeof this)["_input"],
-) {
+): typeof this {
   const copy = cloneSchema(this);
   copy._def[metaSymbol]!.examples.push(value);
   return copy;
 };
 
-const labelSetter = function (this: z.ZodDefault<z.ZodTypeAny>, label: string) {
+const labelSetter = function (
+  this: z.ZodDefault<z.ZodTypeAny>,
+  label: string,
+): typeof this {
   const copy = cloneSchema(this);
   copy._def[metaSymbol]!.defaultLabel = label;
   return copy;
@@ -62,7 +65,7 @@ const labelSetter = function (this: z.ZodDefault<z.ZodTypeAny>, label: string) {
 const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
-) {
+): z.ZodBranded<z.ZodType, NonNullable<typeof brand>> {
   return new z.ZodBranded({
     typeName: z.ZodFirstPartyTypeKind.ZodBranded,
     type: this,
