@@ -2927,10 +2927,11 @@ const myFactory = defaultEndpointsFactory.addExpressMiddleware(
 
 ### v7.5.0
 
-- Feature #503: configurable CORS headers.
-  - The configuration options `cors` now accepts a function that returns custom headers.
-  - The function may be asynchronous.
-  - Setting `cors: true` implies the default headers.
+- Feature #503: configurable CORS headers:
+  - The configuration options `cors` now accepts a function that returns custom headers;
+  - The function may be asynchronous;
+  - Setting `cors: true` implies the default headers;
+  - The feature suggested by [@HardCoreQual](https://github.com/HardCoreQual).
 
 ```typescript
 import { createConfig } from "express-zod-api";
