@@ -1581,8 +1581,9 @@ logger.info("Listening", 8090);
   - Explore its additional options [in Express.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
 - When the feature is enabled, the raw data is placed into `request.body.raw` property, being `Buffer`.
 - The proprietary schema `ez.file()` is now equipped with two additional refinements:
-  - `.string()` — for parsing string data, default for backward compatibility.
-  - `.buffer()` — for parsing `Buffer` and to accept the incoming raw data.
+  - `.string()` — for parsing string data, default for backward compatibility;
+  - `.buffer()` — for parsing `Buffer` and to accept the incoming raw data;
+  - The feature suggested by [@master-chu](https://github.com/master-chu).
 - In order to define an input schemas of endpoints and middlewares, a new shorthand schema exposed for your convenience:
   - `ez.raw()` — which is the same as `z.object({ raw: ez.file().buffer() })`.
   - Thus, the raw data becomes available to a handler as `input.raw` property.
