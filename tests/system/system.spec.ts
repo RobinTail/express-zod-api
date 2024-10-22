@@ -104,12 +104,27 @@ describe("App", async () => {
     output: z.object({}),
     handler: async () => setTimeout(5000, {}),
   });
+  const customSerializationEndpoint = new EndpointsFactory(
+    defaultResultHandler,
+  ).build({
+    method: "get",
+    input: z.object({}),
+    output: z.object({
+      map: z.map(z.string(), z.boolean()),
+      set: z.set(z.number()),
+    }),
+    handler: async () => ({
+      map: new Map<string, boolean>().set("sampleKey", true),
+      set: new Set<number>().add(123).add(456).add(123),
+    }),
+  });
   const routing = {
     v1: {
       corsed: corsedEndpoint,
       faulty: faultyEndpoint,
       test: testEndpoint,
       long: longEndpoint,
+      serial: customSerializationEndpoint,
     },
   };
   vi.spyOn(console, "log").mockImplementation(vi.fn()); // mutes logo output
@@ -253,6 +268,19 @@ describe("App", async () => {
       expect(response.headers.get("Access-Control-Expose-Headers")).toBe(
         "Content-Range,X-Content-Range",
       );
+    });
+
+    test("Feat #1500: should serialize Map and Set", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/serial`);
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: "success",
+        data: {
+          map: { sampleKey: true },
+          set: [123, 456],
+        },
+      });
     });
   });
 

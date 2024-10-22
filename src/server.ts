@@ -62,7 +62,16 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     parserFailureHandler,
     loggingMiddleware,
   } = makeCommonEntities(config);
-  const app = express().disable("x-powered-by").use(loggingMiddleware);
+  const app = express()
+    .disable("x-powered-by")
+    .set("json replacer", ({}: PropertyKey, value: unknown) =>
+      value instanceof Map
+        ? Object.fromEntries(value.entries())
+        : value instanceof Set
+          ? Array.from(value)
+          : value,
+    )
+    .use(loggingMiddleware);
 
   if (config.server.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
