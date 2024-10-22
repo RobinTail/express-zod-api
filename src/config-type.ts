@@ -204,6 +204,6 @@ export function createConfig<TAG extends string>(
 export function createConfig<TAG extends string>(
   config: AppConfig<TAG>,
 ): AppConfig<TAG>;
-export function createConfig(config: AppConfig | ServerConfig) {
+export function createConfig(config: AppConfig | ServerConfig): typeof config {
   return config;
 }

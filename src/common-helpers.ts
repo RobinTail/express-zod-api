@@ -29,7 +29,7 @@ export const defaultInputSources: InputSources = {
 };
 const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 
-export const getActualMethod = (request: Request) =>
+export const getActualMethod = (request: Request): Method | AuxMethod =>
   request.method.toLowerCase() as Method | AuxMethod;
 
 export const isCustomHeader = (name: string): name is `x-${string}` =>

@@ -143,14 +143,16 @@ export class Endpoint<
     return this.#descriptions[variant];
   }
 
-  public override getMethods() {
+  public override getMethods(): ReadonlyArray<Method> {
     return this.#methods;
   }
 
   public override getSchema(variant: "input"): IN;
   public override getSchema(variant: "output"): OUT;
   public override getSchema(variant: ResponseVariant): z.ZodTypeAny;
-  public override getSchema(variant: IOVariant | ResponseVariant) {
+  public override getSchema(
+    variant: IOVariant | ResponseVariant,
+  ): z.ZodTypeAny {
     if (variant === "input" || variant === "output") {
       return this.#schemas[variant];
     }
@@ -159,11 +161,11 @@ export class Endpoint<
       .reduce((agg, schema) => agg.or(schema));
   }
 
-  public override getMimeTypes(variant: MimeVariant) {
+  public override getMimeTypes(variant: MimeVariant): ReadonlyArray<string> {
     return this.#mimeTypes[variant];
   }
 
-  public override getRequestType() {
+  public override getRequestType(): ContentType {
     return this.#requestType;
   }
 
@@ -171,7 +173,7 @@ export class Endpoint<
     return this.#responses[variant];
   }
 
-  public override getSecurity() {
+  public override getSecurity(): LogicalContainer<Security> {
     return this.#middlewares.reduce<LogicalContainer<Security>>(
       (acc, middleware) => {
         const security = middleware.getSecurity();
@@ -181,11 +183,11 @@ export class Endpoint<
     );
   }
 
-  public override getScopes() {
+  public override getScopes(): ReadonlyArray<SCO> {
     return this.#scopes;
   }
 
-  public override getTags() {
+  public override getTags(): ReadonlyArray<TAG> {
     return this.#tags;
   }
 
