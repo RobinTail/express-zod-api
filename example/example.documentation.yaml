@@ -547,6 +547,71 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/serialize:
+    get:
+      operationId: GetV1Serialize
+      responses:
+        "200":
+          description: GET /v1/serialize Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                    properties:
+                      map:
+                        type: array
+                        items:
+                          type: array
+                          prefixItems:
+                            - type: string
+                            - type: boolean
+                          items:
+                            not: {}
+                      set:
+                        type: array
+                        items:
+                          type: number
+                          format: double
+                          minimum: -1.7976931348623157e+308
+                          maximum: 1.7976931348623157e+308
+                    required:
+                      - map
+                      - set
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/serialize Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
 components:
   schemas:
     2048581c137c5b2130eb860e3ae37da196dfc25b:

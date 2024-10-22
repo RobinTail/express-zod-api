@@ -38,6 +38,8 @@ import {
   when,
   xprod,
   zip,
+  invoker,
+  identity,
 } from "ramda";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
@@ -433,6 +435,38 @@ export const depictTuple: Depicter = (
   items: rest === null ? { not: {} } : next(rest),
 });
 
+export const depictMap: Depicter = (
+  { keySchema, valueSchema }: z.ZodMap,
+  ctx,
+) => {
+  assert(
+    ctx.isResponse,
+    new DocumentationError({
+      message: "Map is not supported for input schema.",
+      ...ctx,
+    }),
+  );
+  return ctx.next(z.array(z.tuple([keySchema, valueSchema])));
+};
+
+export const depictSet: Depicter = (
+  { _def: { valueType, minSize, maxSize } }: z.ZodSet,
+  ctx,
+) => {
+  assert(
+    ctx.isResponse,
+    new DocumentationError({
+      message: "Set is not supported for input schema.",
+      ...ctx,
+    }),
+  );
+  return pipe(
+    (arr: z.ZodArray<z.ZodTypeAny>) => (minSize ? arr.min(minSize.value) : arr),
+    (arr: z.ZodArray<z.ZodTypeAny>) => (maxSize ? arr.min(maxSize.value) : arr),
+    ctx.next,
+  )(z.array(valueType));
+};
+
 export const depictString: Depicter = ({
   isEmail,
   isURL,
@@ -757,6 +791,8 @@ export const depicters: HandlingRules<
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
+  ZodMap: depictMap,
+  ZodSet: depictSet,
   [ezFileBrand]: depictFile,
   [ezUploadBrand]: depictUpload,
   [ezDateOutBrand]: depictDateOut,
