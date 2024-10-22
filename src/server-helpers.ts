@@ -181,7 +181,6 @@ export const installTerminationListener = ({
 };
 
 export const jsonReplacer = ({}: PropertyKey, value: unknown) => {
-  if (value instanceof Map) return Object.fromEntries(value);
-  if (value instanceof Set) return Array.from(value);
+  if (value instanceof Map || value instanceof Set) return Array.from(value);
   return value;
 };

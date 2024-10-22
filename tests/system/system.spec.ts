@@ -277,7 +277,7 @@ describe("App", async () => {
       expect(json).toEqual({
         status: "success",
         data: {
-          map: { sampleKey: true },
+          map: [["sampleKey", true]],
           set: [123, 456],
         },
       });
