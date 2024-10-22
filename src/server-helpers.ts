@@ -179,3 +179,9 @@ export const installTerminationListener = ({
   const onTerm = () => graceful.shutdown().then(() => process.exit());
   for (const trigger of events) process.on(trigger, onTerm);
 };
+
+export const jsonReplacer = ({}: PropertyKey, value: unknown) => {
+  if (value instanceof Map) return Object.fromEntries(value.entries());
+  if (value instanceof Set) return Array.from(value);
+  return value;
+};

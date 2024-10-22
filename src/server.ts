@@ -17,6 +17,7 @@ import {
   installDeprecationListener,
   moveRaw,
   installTerminationListener,
+  jsonReplacer,
 } from "./server-helpers";
 import { getStartupLogo } from "./startup-logo";
 
@@ -64,13 +65,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   } = makeCommonEntities(config);
   const app = express()
     .disable("x-powered-by")
-    .set("json replacer", ({}: PropertyKey, value: unknown) =>
-      value instanceof Map
-        ? Object.fromEntries(value.entries())
-        : value instanceof Set
-          ? Array.from(value)
-          : value,
-    )
+    .set("json replacer", jsonReplacer)
     .use(loggingMiddleware);
 
   if (config.server.compression) {
