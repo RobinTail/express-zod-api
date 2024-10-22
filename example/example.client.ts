@@ -136,8 +136,8 @@ type GetV1SerializeResponse =
   | {
       status: "success";
       data: {
-        map: any;
-        set: any;
+        map: [string, boolean][];
+        set: number[];
       };
     }
   | {

@@ -52,8 +52,13 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
             ] | bigint)[];
         };
     }>;
-    map: any;
-    set: any;
+    map: [
+        string,
+        {
+            string: string;
+        }[]
+    ][];
+    set: string[];
     intersection: (string & number) | bigint;
     promise: any;
     function: any;

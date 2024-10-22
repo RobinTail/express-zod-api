@@ -153,6 +153,12 @@ const onTuple: Producer = (
       .concat(rest === null ? [] : f.createRestTypeNode(next(rest))),
   );
 
+const onMap: Producer = ({ keySchema, valueSchema }: z.ZodMap, { next }) =>
+  next(z.array(z.tuple([keySchema, valueSchema])));
+
+const onSet: Producer = ({ _def: { valueType } }: z.ZodSet, { next }) =>
+  next(z.array(valueType));
+
 const onRecord: Producer = (
   { keySchema, valueSchema }: z.ZodRecord<z.ZodTypeAny>,
   { next },
@@ -254,6 +260,8 @@ const producers: HandlingRules<
   ZodPipeline: onPipeline,
   ZodLazy: onLazy,
   ZodReadonly: onReadonly,
+  ZodMap: onMap,
+  ZodSet: onSet,
   [ezFileBrand]: onFile,
   [ezRawBrand]: onRaw,
 };
