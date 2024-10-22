@@ -470,7 +470,8 @@ const config = createConfig({
   - The constructors of `Documentation` and `Integration` now accept new property `brandHandling` (object);
   - Its keys should be the brands you want to handle in a special way;
   - Its values are functions having your schema as the first argument and a context in the second place;
-  - In case you need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
+  - In case you need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`;
+  - The feature suggested by [@shawncarr](https://github.com/shawncarr).
 
 ```ts
 import ts from "typescript";
