@@ -1374,7 +1374,8 @@ securitySchemes:
     class when the `prettier` package is installed (detects automatically).
     - Ability to supply your own typescript formatting function into that new method.
   - Ability to split the response types (to positive and negative ones) when generating the client or API types.
-    - Featuring the `splitResponse` option of the `Integration` class constructor.
+    - Featuring the `splitResponse` option of the `Integration` class constructor;
+    - The feature suggested by [@shawncarr](https://github.com/shawncarr).
 - How to migrate:
   - If you are using `successfulResponseDescription` option of `Documentation` constructor:
     - Replace it with `descriptions/positiveResponse` assigned with the string returning function;
