@@ -3051,15 +3051,16 @@ interface After {
 
 ### v6.1.0
 
-- Feature #403: API Client Generator.
-  - A new way of informing the frontend about the I/O types of endpoints.
-  - The new approach offers automatic generation of a client based on routing to a typescript file.
+- Feature #403: API Client Generator:
+  - A new way of informing the frontend about the I/O types of endpoints;
+  - The new approach offers automatic generation of a client based on routing to a typescript file;
   - The generated client is flexibly configurable on the frontend side using an implementation function that
-    directly makes requests to an endpoint using the libraries and methods of your choice.
-  - The client asserts the type of request parameters and response.
-  - Path params are excluded from `params` after being substituted.
-  - The client now accepts a function parameter of `Implementation` type.
-  - Its parameter `path` now contains substituted path params.
+    directly makes requests to an endpoint using the libraries and methods of your choice;
+  - The client asserts the type of request parameters and response;
+  - Path params are excluded from `params` after being substituted;
+  - The client now accepts a function parameter of `Implementation` type;
+  - Its parameter `path` now contains substituted path params;
+  - The feature suggested by [@hellovai](https://github.com/hellovai).
 
 ```typescript
 // example client-generator.ts
