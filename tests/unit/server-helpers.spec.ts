@@ -10,6 +10,7 @@ import {
   moveRaw,
   installDeprecationListener,
   installTerminationListener,
+  jsonReplacer,
 } from "../../src/server-helpers";
 import { defaultResultHandler, ResultHandler } from "../../src";
 import { Request } from "express";
@@ -277,6 +278,16 @@ describe("Server helpers", () => {
         options: { events: ["NOT_HAPPEN"] },
       });
       expect(spy).toHaveBeenCalledWith("NOT_HAPPEN", expect.any(Function));
+    });
+  });
+
+  describe("jsonReplacer", () => {
+    test.each([
+      new Map().set("a", 123),
+      new Set().add(["a", 123]),
+      [["a", 123]],
+    ])("should serialize Map and Set %#", (subject) => {
+      expect(JSON.stringify(subject, jsonReplacer)).toBe('[["a",123]]');
     });
   });
 });
