@@ -180,6 +180,11 @@ export const installTerminationListener = ({
   for (const trigger of events) process.on(trigger, onTerm);
 };
 
+/**
+ * @desc Enables Map and Set serialization. Performance optimized implementation.
+ * Using array for Map, because Map can have keys of any type
+ * Using for..of instead of Array.from() because it's faster
+ * */
 export const jsonReplacer = (_key: PropertyKey, value: unknown) => {
   if (value instanceof Map || value instanceof Set) {
     const result: unknown[] = [];
