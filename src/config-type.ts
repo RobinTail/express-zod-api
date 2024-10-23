@@ -152,7 +152,7 @@ export interface ServerConfig<TAG extends string = string>
      * */
     jsonParser?: RequestHandler;
     /**
-     * @desc Enables support of Map and Set for response.json(), but it canbe twice slower
+     * @desc Enables support of Map and Set for response.json(), but it can make it almost twice slower
      */
     jsonAdvancedSerialization?: boolean;
     /**
