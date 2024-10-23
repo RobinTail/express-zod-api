@@ -1,17 +1,50 @@
 import { bench } from "vitest";
-import { keys, keysIn } from "ramda";
-import { defaultStatusCodes } from "../../src/api-response";
+import { jsonReplacer as current } from "../../src/server-helpers";
 
-describe("Experiment %s", () => {
-  bench("Object.keys()", () => {
-    Object.keys(defaultStatusCodes);
+const sample = {
+  a: {
+    b: {
+      c: {
+        d: new Map(),
+        e: new Set(),
+        f: 10,
+        g: 20,
+        h: 30,
+        i: 40,
+      },
+    },
+  },
+};
+
+const control = (_key: PropertyKey, v: unknown) => v;
+
+const featured = (_key: PropertyKey, value: unknown) => {
+  if (value instanceof Map || value instanceof Set) return Array.from(value);
+  return value;
+};
+
+describe("Experiment", () => {
+  bench("no replacer", () => {
+    JSON.stringify(sample);
   });
 
-  bench("R.keys()", () => {
-    keys(defaultStatusCodes);
+  bench("empty replacer", () => {
+    JSON.stringify(sample, control);
   });
 
-  bench("R.keysIn()", () => {
-    keysIn(defaultStatusCodes);
-  });
+  bench(
+    "current implementation",
+    () => {
+      JSON.stringify(sample, current);
+    },
+    { time: 10000 },
+  );
+
+  bench(
+    "featured implementation",
+    () => {
+      JSON.stringify(sample, featured);
+    },
+    { time: 10000 },
+  );
 });

@@ -180,7 +180,7 @@ export const installTerminationListener = ({
   for (const trigger of events) process.on(trigger, onTerm);
 };
 
-export const jsonReplacer = ({}: PropertyKey, value: unknown) => {
+export const jsonReplacer = (_key: PropertyKey, value: unknown) => {
   if (value instanceof Map || value instanceof Set) return Array.from(value);
   return value;
 };
