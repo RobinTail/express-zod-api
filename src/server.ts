@@ -65,7 +65,10 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   } = makeCommonEntities(config);
   const app = express()
     .disable("x-powered-by")
-    .set("json replacer", jsonReplacer)
+    .set(
+      "json replacer",
+      config.server.jsonAdvancedSerialization ? jsonReplacer : undefined,
+    )
     .use(loggingMiddleware);
 
   if (config.server.compression) {

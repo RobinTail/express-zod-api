@@ -152,6 +152,10 @@ export interface ServerConfig<TAG extends string = string>
      * */
     jsonParser?: RequestHandler;
     /**
+     * @desc Enables support of Map and Set for response.json(), but it canbe twice slower
+     */
+    jsonAdvancedSerialization?: boolean;
+    /**
      * @desc Enable or configure uploads handling.
      * @default undefined
      * @requires express-fileupload
