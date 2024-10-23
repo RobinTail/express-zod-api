@@ -285,6 +285,7 @@ describe("Server helpers", () => {
     test.each([
       new Map().set("a", 123),
       new Set().add(["a", 123]),
+      new Set().add(new Set().add("a").add(123)),
       [["a", 123]],
     ])("should serialize Map and Set %#", (subject) => {
       expect(JSON.stringify(subject, jsonReplacer)).toBe('[["a",123]]');
