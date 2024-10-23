@@ -19,7 +19,11 @@ const sample = {
 const control = (_key: PropertyKey, v: unknown) => v;
 
 const featured = (_key: PropertyKey, value: unknown) => {
-  if (value instanceof Map || value instanceof Set) return Array.from(value);
+  if (value instanceof Map || value instanceof Set) {
+    const result: unknown[] = [];
+    for (const item of value) result.push(item);
+    return result;
+  }
   return value;
 };
 
