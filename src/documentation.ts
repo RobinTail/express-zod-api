@@ -66,6 +66,7 @@ interface DocumentationParams {
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
    * @default JSON.stringify() + SHA1 hash as a hex digest
+   * @todo can use Map instead?
    * */
   serializer?: (schema: z.ZodTypeAny) => string;
   /**
