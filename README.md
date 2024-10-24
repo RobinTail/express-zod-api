@@ -84,8 +84,11 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 These people contributed to the improvement of the library by reporting bugs, making changes and suggesting ideas:
 
 [<img src="https://github.com/Tomtec331.png" alt="@Tomtec331" width="50px" />](https://github.com/Tomtec331)
+[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
 [<img src="https://github.com/boarush.png" alt="@boarush" width="50px" />](https://github.com/boarush)
+[<img src="https://github.com/shawncarr.png" alt="@shawncarr" width="50px" />](https://github.com/shawncarr)
+[<img src="https://github.com/ben-xD.png" alt="@ben-xD" width="50px" />](https://github.com/ben-xD)
 [<img src="https://github.com/daniel-white.png" alt="@daniel-white" width="50px" />](https://github.com/daniel-white)
 [<img src="https://github.com/kotsmile.png" alt="@kotsmile" width="50px" />](https://github.com/kotsmile)
 [<img src="https://github.com/arlyon.png" alt="@arlyon" width="50px" />](https://github.com/arlyon)
@@ -93,10 +96,10 @@ These people contributed to the improvement of the library by reporting bugs, ma
 [<img src="https://github.com/danclaytondev.png" alt="@danclaytondev" width="50px" />](https://github.com/danclaytondev)
 [<img src="https://github.com/huyhoang160593.png" alt="@huyhoang160593" width="50px" />](https://github.com/huyhoang160593)
 [<img src="https://github.com/sarahssharkey.png" alt="@sarahssharkey" width="50px" />](https://github.com/sarahssharkey)
-[<img src="https://github.com/shawncarr.png" alt="@shawncarr" width="50px" />](https://github.com/shawncarr)
+[<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
+[<img src="https://github.com/master-chu.png" alt="@master-chu" width="50px" />](https://github.com/master-chu)
 [<img src="https://github.com/alindsay55661.png" alt="@alindsay55661" width="50px" />](https://github.com/alindsay55661)
 [<img src="https://github.com/john-schmitz.png" alt="@john-schmitz" width="50px" />](https://github.com/john-schmitz)
-[<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
 [<img src="https://github.com/miki725.png" alt="@miki725" width="50px" />](https://github.com/miki725)
 [<img src="https://github.com/dev-m1-macbook.png" alt="@dev-m1-macbook" width="50px" />](https://github.com/dev-m1-macbook)
 [<img src="https://github.com/McMerph.png" alt="@McMerph" width="50px" />](https://github.com/McMerph)
@@ -107,7 +110,14 @@ These people contributed to the improvement of the library by reporting bugs, ma
 [<img src="https://github.com/lazylace37.png" alt="@lazylace37" width="50px" />](https://github.com/lazylace37)
 [<img src="https://github.com/leosuncin.png" alt="@leosuncin" width="50px" />](https://github.com/leosuncin)
 [<img src="https://github.com/kirdk.png" alt="@kirdk" width="50px" />](https://github.com/kirdk)
+[<img src="https://github.com/johngeorgewright.png" alt="@johngeorgewright" width="50px" />](https://github.com/johngeorgewright)
+[<img src="https://github.com/ssteuteville.png" alt="@ssteuteville" width="50px" />](https://github.com/ssteuteville)
 [<img src="https://github.com/rayzr522.png" alt="@rayzr522" width="50px" />](https://github.com/rayzr522)
+[<img src="https://github.com/HardCoreQual.png" alt="@HardCoreQual" width="50px" />](https://github.com/HardCoreQual)
+[<img src="https://github.com/hellovai.png" alt="@hellovai" width="50px" />](https://github.com/hellovai)
+[<img src="https://github.com/Isaac-Leonard.png" alt="@Isaac-Leonard" width="50px" />](https://github.com/Isaac-Leonard)
+[<img src="https://github.com/digimuza.png" alt="@digimuza" width="50px" />](https://github.com/digimuza)
+[<img src="https://github.com/glitch452.png" alt="@glitch452" width="50px" />](https://github.com/glitch452)
 
 # How it works
 

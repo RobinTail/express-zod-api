@@ -83,7 +83,8 @@ createConfig({
 - Feat: providing child logger to `beforeRouting()` hook:
   - The function assigned to config property `server.beforeRouting` now accepts additional argument `getChildLogger()`;
   - The featured method accepts `request` and returns a child logger if `childLoggerProvider()` is configured;
-  - Otherwise, it returns the root logger (same for all requests, same as the `logger` argument).
+  - Otherwise, it returns the root logger (same for all requests, same as the `logger` argument);
+  - The feature suggested by [@williamgcampbell](https://github.com/williamgcampbell).
 
 ```ts
 import { createConfig } from "express-zod-api";
@@ -469,7 +470,8 @@ const config = createConfig({
   - The constructors of `Documentation` and `Integration` now accept new property `brandHandling` (object);
   - Its keys should be the brands you want to handle in a special way;
   - Its values are functions having your schema as the first argument and a context in the second place;
-  - In case you need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
+  - In case you need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`;
+  - The feature suggested by [@shawncarr](https://github.com/shawncarr).
 
 ```ts
 import ts from "typescript";
@@ -710,9 +712,10 @@ const labeledDefaultSchema = withMeta(
 - Featuring `zod-sockets` for implementing subscriptions on your API:
   - I have developed an additional pluggable library, Zod Sockets, which has similar principles and capabilities, but
     uses the websocket transport and Socket.IO protocol, so that the user of a client application could subscribe to
-    subsequent updates initiated by the server.
+    subsequent updates initiated by the server;
   - Check out an [example of the synergy between two libraries](https://github.com/RobinTail/zod-sockets#subscriptions)
-    and the [Demo Chat application](https://github.com/RobinTail/chat).
+    and the [Demo Chat application](https://github.com/RobinTail/chat);
+  - The feature suggested by [@ben-xD](https://github.com/ben-xD).
 
 ### v18.1.0
 
@@ -1371,7 +1374,8 @@ securitySchemes:
     class when the `prettier` package is installed (detects automatically).
     - Ability to supply your own typescript formatting function into that new method.
   - Ability to split the response types (to positive and negative ones) when generating the client or API types.
-    - Featuring the `splitResponse` option of the `Integration` class constructor.
+    - Featuring the `splitResponse` option of the `Integration` class constructor;
+    - The feature suggested by [@shawncarr](https://github.com/shawncarr).
 - How to migrate:
   - If you are using `successfulResponseDescription` option of `Documentation` constructor:
     - Replace it with `descriptions/positiveResponse` assigned with the string returning function;
@@ -1465,7 +1469,8 @@ operationId:
   - Read the migration guide below.
 - Features:
   - Supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
-    - Package `winston` is now optional.
+    - Package `winston` is now optional;
+    - The feature suggested by [@bobgubko](https://github.com/bobgubko).
   - Supporting any testing framework having a function mocking method for `testEndpoint()`:
     - Both `jest` and `vitest` are supported automatically;
     - With most modern Node.js you can also use the integrated `node:test` module.
@@ -1576,8 +1581,9 @@ logger.info("Listening", 8090);
   - Explore its additional options [in Express.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
 - When the feature is enabled, the raw data is placed into `request.body.raw` property, being `Buffer`.
 - The proprietary schema `ez.file()` is now equipped with two additional refinements:
-  - `.string()` — for parsing string data, default for backward compatibility.
-  - `.buffer()` — for parsing `Buffer` and to accept the incoming raw data.
+  - `.string()` — for parsing string data, default for backward compatibility;
+  - `.buffer()` — for parsing `Buffer` and to accept the incoming raw data;
+  - The feature suggested by [@master-chu](https://github.com/master-chu).
 - In order to define an input schemas of endpoints and middlewares, a new shorthand schema exposed for your convenience:
   - `ez.raw()` — which is the same as `z.object({ raw: ez.file().buffer() })`.
   - Thus, the raw data becomes available to a handler as `input.raw` property.
@@ -2160,7 +2166,8 @@ new OpenAPI({
 ### v9.3.1
 
 - Hotfix for the feature #856
-  - `$ref` is equipped with the required prefix: `#/components/schemas/`.
+  - `$ref` is equipped with the required prefix: `#/components/schemas/`;
+  - The issue reported by [@TheWisestOne](https://github.com/TheWisestOne).
 
 ```yaml
 before:
@@ -2590,11 +2597,13 @@ after:
 ### v8.3.0
 
 - Feature #600: Top level refinements.
-  - Starting this version you can use the `.refine()` method on the `z.object()` of the input schema.
+  - Starting this version you can use the `.refine()` method on the `z.object()` of the input schema;
   - This feature might be useful, for example, when you have multiple optional properties on the top level, but at
-    least one of them has to be specified.
-  - Currently, only the refinements of `z.object()` are supported.
-    - You can not combine it with `z.union()`, `z.intersetion()`, `z.discriminatedUnion()`, `.or()`, `.and()` yet.
+    least one of them has to be specified;
+  - Currently, only the refinements of `z.object()` are supported:
+    - You can not combine it with `z.union()`, `z.intersetion()`, `z.discriminatedUnion()`, `.or()`, `.and()` yet;
+  - The feature suggested by [@johngeorgewright](https://github.com/johngeorgewright)
+    and [ssteuteville](https://github.com/ssteuteville).
 
 ```typescript
 // example
@@ -2642,13 +2651,14 @@ const exampleEndpoint = yourEndpointsFactory.build({
 
 - Feature #571: tagging the endpoints.
   - Good news dear community! You can now tag your endpoints using the new properties of the `.build()` method
-    of the `EndpointsFactory`.
-  - For your convenience and for the sake of Semantics, there are singular and plural properties: `tag` and `tags`.
+    of the `EndpointsFactory`;
+  - For your convenience and for the sake of Semantics, there are singular and plural properties: `tag` and `tags`;
   - By default, these properties allow any string, so in order to enforce restrictions and achieve the consistency
     across all endpoints, the possible tags should be declared in the configuration first and also a brand
-    new `EndpointsFactory` instantiation approach is required.
-  - The configuration has got a new `tags` property for declaring possible tags and their descriptions.
-  - Tags are an important part of the generated documentation for the OpenAPI standard.
+    new `EndpointsFactory` instantiation approach is required;
+  - The configuration has got a new `tags` property for declaring possible tags and their descriptions;
+  - Tags are an important part of the generated documentation for the OpenAPI standard;
+  - The feature suggested by [@TheWisestOne](https://github.com/TheWisestOne).
 - The property `scopes` (introduced in v7.9.0) has got its singular variation `scope`.
 
 ```typescript
@@ -2917,10 +2927,11 @@ const myFactory = defaultEndpointsFactory.addExpressMiddleware(
 
 ### v7.5.0
 
-- Feature #503: configurable CORS headers.
-  - The configuration options `cors` now accepts a function that returns custom headers.
-  - The function may be asynchronous.
-  - Setting `cors: true` implies the default headers.
+- Feature #503: configurable CORS headers:
+  - The configuration options `cors` now accepts a function that returns custom headers;
+  - The function may be asynchronous;
+  - Setting `cors: true` implies the default headers;
+  - The feature suggested by [@HardCoreQual](https://github.com/HardCoreQual).
 
 ```typescript
 import { createConfig } from "express-zod-api";
@@ -3040,15 +3051,16 @@ interface After {
 
 ### v6.1.0
 
-- Feature #403: API Client Generator.
-  - A new way of informing the frontend about the I/O types of endpoints.
-  - The new approach offers automatic generation of a client based on routing to a typescript file.
+- Feature #403: API Client Generator:
+  - A new way of informing the frontend about the I/O types of endpoints;
+  - The new approach offers automatic generation of a client based on routing to a typescript file;
   - The generated client is flexibly configurable on the frontend side using an implementation function that
-    directly makes requests to an endpoint using the libraries and methods of your choice.
-  - The client asserts the type of request parameters and response.
-  - Path params are excluded from `params` after being substituted.
-  - The client now accepts a function parameter of `Implementation` type.
-  - Its parameter `path` now contains substituted path params.
+    directly makes requests to an endpoint using the libraries and methods of your choice;
+  - The client asserts the type of request parameters and response;
+  - Path params are excluded from `params` after being substituted;
+  - The client now accepts a function parameter of `Implementation` type;
+  - Its parameter `path` now contains substituted path params;
+  - The feature suggested by [@hellovai](https://github.com/hellovai).
 
 ```typescript
 // example client-generator.ts
@@ -3315,9 +3327,10 @@ const config = createConfig({
 
 ### v5.2.0
 
-- Feature #254: the ability to configure routes for serving static files.
-  - Use `new ServeStatic()` with the same arguments as `express.static()`.
+- Feature #254: the ability to configure routes for serving static files:
+  - Use `new ServeStatic()` with the same arguments as `express.static()`;
   - You can find the documentation on these arguments here: http://expressjs.com/en/4x/api.html#express.static
+  - The feature suggested by [@Isaac-Leonard](https://github.com/Isaac-Leonard).
 
 ```typescript
 import { Routing, ServeStatic } from "express-zod-api";
@@ -3524,16 +3537,17 @@ const newInputSourcesByDefault: InputSources = {
 
 ### v2.10.0
 
-- Feature #165. You can add examples to the generated documentation.
-  - Introducing new method `withMeta()`. You can wrap any Zod schema in it, for example: `withMeta(z.string())`.
+- Feature #165. You can add examples to the generated documentation:
+  - Introducing new method `withMeta()`. You can wrap any Zod schema in it, for example: `withMeta(z.string())`;
   - `withMeta()` provides you with additional methods for generated documentation. At the moment there is one so far:
-    `withMeta().example()`.
-  - You can use `.example()` multiple times for specifying several examples for your schema.
-  - You can specify example for the whole IO schema or just for a one of its properties.
+    `withMeta().example()`;
+  - You can use `.example()` multiple times for specifying several examples for your schema;
+  - You can specify example for the whole IO schema or just for a one of its properties;
   - `withMeta()` can be used within Endpoint and Middleware as well. Their input examples will be merged for the
-    generated documentation.
-  - Check out the example of the generated documentation in the `example` folder.
-  - Notice: `withMeta()` mutates its argument.
+    generated documentation;
+  - Check out the example of the generated documentation in the `example` folder;
+  - Notice: `withMeta()` mutates its argument;
+  - The feature suggested by [@digimuza](https://github.com/digimuza).
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
@@ -4081,7 +4095,8 @@ const myResultHandlerV2 = createResultHandler({
 
 ### v1.2.0
 
-- Ability to specify the endpoint description and [export it to the Swagger / OpenAPI specification](https://github.com/RobinTail/express-zod-api#swagger--openapi-specification).
+- Ability to specify the endpoint description and export it to the Swagger / OpenAPI specification:
+  - The feature suggested by [@glitch452](https://github.com/glitch452).
 
 ```typescript
 // example
