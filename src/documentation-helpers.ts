@@ -72,6 +72,7 @@ import { UploadSchema, ezUploadBrand } from "./upload-schema";
 
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
+  hasAdvancedSerialization?: boolean;
   serializer: (schema: z.ZodTypeAny) => string;
   getRef: (name: string) => ReferenceObject | undefined;
   makeRef: (
@@ -444,7 +445,11 @@ export const depictMap: Depicter = (
       ...ctx,
     }),
   );
-  return ctx.next(z.array(z.tuple([keySchema, valueSchema])));
+  return ctx.next(
+    ctx.hasAdvancedSerialization
+      ? z.array(z.tuple([keySchema, valueSchema]))
+      : z.object({}),
+  );
 };
 
 export const depictSet: Depicter = (
@@ -458,6 +463,9 @@ export const depictSet: Depicter = (
       ...ctx,
     }),
   );
+  if (!ctx.hasAdvancedSerialization) {
+    return ctx.next(z.object({}));
+  }
   return pipe(
     (arr: z.ZodArray<z.ZodTypeAny>) => (minSize ? arr.min(minSize.value) : arr),
     (arr: z.ZodArray<z.ZodTypeAny>) => (maxSize ? arr.min(maxSize.value) : arr),
@@ -893,6 +901,7 @@ export const depictResponse = ({
   makeRef,
   composition,
   hasMultipleStatusCodes,
+  hasAdvancedSerialization,
   statusCode,
   brandHandling,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
@@ -903,6 +912,7 @@ export const depictResponse = ({
   variant: ResponseVariant;
   statusCode: number;
   hasMultipleStatusCodes: boolean;
+  hasAdvancedSerialization: boolean;
 }): ResponseObject => {
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema(schema, {
@@ -911,6 +921,7 @@ export const depictResponse = ({
       onMissing,
       ctx: {
         isResponse: true,
+        hasAdvancedSerialization,
         serializer,
         getRef,
         makeRef,
