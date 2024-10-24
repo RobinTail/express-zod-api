@@ -166,13 +166,11 @@ describe("Server helpers", () => {
     const beforeUploadMock = vi.fn();
     const parsers = await createUploadParsers({
       config: {
-        server: {
-          listen: 8090,
-          upload: {
-            limits: { fileSize: 1024 },
-            limitError: new Error("Too heavy"),
-            beforeUpload: beforeUploadMock,
-          },
+        http: { listen: 8090 },
+        upload: {
+          limits: { fileSize: 1024 },
+          limitError: new Error("Too heavy"),
+          beforeUpload: beforeUploadMock,
         },
         cors: false,
         logger: { level: "silent" },

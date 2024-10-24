@@ -3,7 +3,12 @@ import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
 import { BuiltinLogger } from "./builtin-logger";
-import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
+import {
+  AppConfig,
+  CommonConfig,
+  HttpConfig,
+  ServerConfig,
+} from "./config-type";
 import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
@@ -64,27 +69,25 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   } = makeCommonEntities(config);
   const app = express().disable("x-powered-by").use(loggingMiddleware);
 
-  if (config.server.compression) {
+  if (config.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
     app.use(
       compressor(
-        typeof config.server.compression === "object"
-          ? config.server.compression
-          : undefined,
+        typeof config.compression === "object" ? config.compression : undefined,
       ),
     );
   }
 
   const parsers: Parsers = {
-    json: [config.server.jsonParser || express.json()],
-    raw: [config.server.rawParser || express.raw(), moveRaw],
-    upload: config.server.upload
+    json: [config.jsonParser || express.json()],
+    raw: [config.rawParser || express.raw(), moveRaw],
+    upload: config.upload
       ? await createUploadParsers({ config, getChildLogger })
       : [],
   };
 
-  if (config.server.beforeRouting) {
-    await config.server.beforeRouting({
+  if (config.beforeRouting) {
+    await config.beforeRouting({
       app,
       logger: rootLogger,
       getChildLogger,
@@ -93,18 +96,26 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   initRouting({ app, routing, getChildLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
-  const starter = <T extends http.Server | https.Server>(
-    server: T,
-    subject?: typeof config.server.listen,
-  ) => server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
+  const makeStarter =
+    (server: http.Server | https.Server, subject: HttpConfig["listen"]) => () =>
+      server.listen(subject, () => rootLogger.info("Listening", subject));
 
-  const httpServer = http.createServer(app);
-  const httpsServer =
-    config.https && https.createServer(config.https.options, app);
+  const created: Array<http.Server | https.Server> = [];
+  const starters: Array<() => http.Server | https.Server> = [];
+  if (config.http) {
+    const httpServer = http.createServer(app);
+    created.push(httpServer);
+    starters.push(makeStarter(httpServer, config.http.listen));
+  }
+  if (config.https) {
+    const httpsServer = https.createServer(config.https.options, app);
+    created.push(httpsServer);
+    starters.push(makeStarter(httpsServer, config.https.listen));
+  }
 
   if (config.gracefulShutdown) {
     installTerminationListener({
-      servers: [httpServer].concat(httpsServer || []),
+      servers: created,
       logger: rootLogger,
       options: config.gracefulShutdown === true ? {} : config.gracefulShutdown,
     });
@@ -113,7 +124,6 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   return {
     app,
     logger: rootLogger,
-    httpServer: starter(httpServer, config.server.listen),
-    httpsServer: httpsServer && starter(httpsServer, config.https?.listen),
+    servers: starters.map((starter) => starter()),
   };
 };
