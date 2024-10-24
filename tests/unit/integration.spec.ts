@@ -8,12 +8,13 @@ import {
   defaultEndpointsFactory,
   ResultHandler,
 } from "../../src";
+import { config } from "../../example/config";
 
 describe("Integration", () => {
   test.each(["client", "types"] as const)(
     "Should generate a %s for example API",
     async (variant) => {
-      const client = new Integration({ variant, routing });
+      const client = new Integration({ variant, routing, config });
       expect(await client.printFormatted()).toMatchSnapshot();
     },
   );

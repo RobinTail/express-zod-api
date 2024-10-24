@@ -153,11 +153,23 @@ const onTuple: Producer = (
       .concat(rest === null ? [] : f.createRestTypeNode(next(rest))),
   );
 
-const onMap: Producer = ({ keySchema, valueSchema }: z.ZodMap, { next }) =>
-  next(z.array(z.tuple([keySchema, valueSchema])));
+const onMap: Producer = (
+  { keySchema, valueSchema }: z.ZodMap,
+  { next, hasAdvancedSerialization, isResponse },
+) =>
+  next(
+    isResponse && hasAdvancedSerialization
+      ? z.array(z.tuple([keySchema, valueSchema]))
+      : z.object({}),
+  );
 
-const onSet: Producer = ({ _def: { valueType } }: z.ZodSet, { next }) =>
-  next(z.array(valueType));
+const onSet: Producer = (
+  { _def: { valueType } }: z.ZodSet,
+  { next, hasAdvancedSerialization, isResponse },
+) =>
+  next(
+    isResponse && hasAdvancedSerialization ? z.array(valueType) : z.object({}),
+  );
 
 const onRecord: Producer = (
   { keySchema, valueSchema }: z.ZodRecord<z.ZodTypeAny>,

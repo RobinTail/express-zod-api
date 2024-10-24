@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`zod-to-ts > Example > should produce the expected results 1`] = `
+exports[`zod-to-ts > Example > should produce the expected results 0 1`] = `
 "{
     string: string;
     number: number;
@@ -14,6 +14,85 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     } | "hi";
     enum: "hi" | "bye";
     intersectionWithTransform: (number & bigint) & (number & string);
+    date: any;
+    undefined?: any;
+    null: null;
+    void?: any;
+    any?: any;
+    unknown?: any;
+    never: any;
+    optionalString?: string | undefined;
+    nullablePartialObject: {
+        string?: string | undefined;
+        number?: number | undefined;
+        fixedArrayOfString?: string[] | undefined;
+        object?: {
+            string: string;
+        } | undefined;
+    } | null;
+    tuple: [
+        string,
+        number,
+        {
+            string: string;
+        }
+    ];
+    tupleRest: [
+        string,
+        number,
+        ...boolean
+    ];
+    record: Record<string, {
+        object: {
+            arrayOfUnions: ([
+                string,
+                {
+                    string: string;
+                }
+            ] | bigint)[];
+        };
+    }>;
+    map: {};
+    set: {};
+    intersection: (string & number) | bigint;
+    promise: any;
+    function: any;
+    optDefaultString?: string | undefined;
+    refinedStringWithSomeBullshit: (string | number) & ((bigint | null) | undefined);
+    nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
+    lazy: Type51497f7e879bae48c3fbad2fa68050d1e08bbf82;
+    discUnion: {
+        kind: "circle";
+        radius: number;
+    } | {
+        kind: "square";
+        x: number;
+    } | {
+        kind: "triangle";
+        x: number;
+        y: number;
+    };
+    branded: string;
+    catch?: number;
+    pipeline: string;
+    readonly: string;
+}"
+`;
+
+exports[`zod-to-ts > Example > should produce the expected results 1 1`] = `
+"{
+    string: string;
+    number: number;
+    arrayOfObjects: {
+        string: string;
+    }[];
+    boolean: boolean;
+    circular: Type118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f;
+    union: {
+        number: number;
+    } | "hi";
+    enum: "hi" | "bye";
+    intersectionWithTransform: any;
     date: any;
     undefined?: any;
     null: null;
@@ -79,7 +158,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     };
     branded: string;
     catch?: number;
-    pipeline: string;
+    pipeline: number;
     readonly: string;
 }"
 `;
