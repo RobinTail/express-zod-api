@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.18.0, 18.x, 20.9.0, 20.x, 22.0.0, 22.x]
+        node-version: [18.18.0, 18.x, 20.9.0, 20.x, 22.0.0, 22.x, 23.1.0, 23.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Get yarn cache dir
@@ -36,7 +36,7 @@ jobs:
         path: ${{ steps.yarnCache.outputs.dir }}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
     - name: Install dependencies
-      run: yarn install
+      run: yarn install --ignore-engines
     - name: Lint
       run: yarn lint
     - name: Test
