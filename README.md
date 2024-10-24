@@ -49,6 +49,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    4. [Accepting raw data](#accepting-raw-data)
    5. [Graceful shutdown](#graceful-shutdown)
    6. [Subscriptions](#subscriptions)
+   7. [Map and Set serialization](#map-and-set-serialization)
 7. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [Generating a Frontend Client](#generating-a-frontend-client)
@@ -1194,6 +1195,19 @@ synergy between two libraries on handling the incoming `subscribe` and `unsubscr
 (broadcast) the `time` event every second with a current time in its payload:
 
 https://github.com/RobinTail/zod-sockets#subscriptions
+
+## Map and Set serialization
+
+You can enable the support of `Map` and `Set` serialization and you `z.map()` and `z.set()` within your output and
+response schemas using the `jsonAdvancedSerialization` option in your config. Note, that `Map<K, V>` will be serialized
+as an array of tuples `Array<[K, V]>` because its keys can have any type. This also works in `Documentation` and
+`Integration` generators if you supply the config. Check out [example endpoint](example/endpoints/map-set-compat.ts).
+
+```ts
+const config = createConfig({
+  server: { jsonAdvancedSerialization: true },
+});
+```
 
 # Integration and Documentation
 
