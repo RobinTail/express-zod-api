@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
+import assert from "node:assert/strict";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
-import { hasRaw, hasUpload } from "./deep-checks";
+import { hasJsonIncompatibleSchema, hasRaw, hasUpload } from "./deep-checks";
 import {
   FlatObject,
   getActualMethod,
@@ -11,6 +12,7 @@ import {
 import { CommonConfig } from "./config-type";
 import {
   InputValidationError,
+  IOSchemaError,
   OutputValidationError,
   ResultHandlerError,
 } from "./errors";
@@ -126,6 +128,14 @@ export class Endpoint<
       : hasRaw(inputSchema)
         ? "raw"
         : "json";
+    if (this.#requestType === "json") {
+      assert(
+        !hasJsonIncompatibleSchema(inputSchema, false),
+        new IOSchemaError(
+          "The input endpoint schema (including middlewares) contains an unsupported JSON payload type.",
+        ),
+      );
+    }
     this.#mimeTypes = {
       input: Object.freeze([contentTypes[this.#requestType]]),
       positive: Object.freeze(
@@ -135,6 +145,18 @@ export class Endpoint<
         this.#responses.negative.flatMap(({ mimeTypes }) => mimeTypes),
       ),
     };
+    for (const kind in this.#responses) {
+      assert(
+        this.#responses.positive.every(({ schema, mimeTypes }) =>
+          mimeTypes.includes(contentTypes.json)
+            ? !hasJsonIncompatibleSchema(schema, true)
+            : true,
+        ),
+        new IOSchemaError(
+          `The ${kind} response endpoint schema (including ResultHandler) contains an unsupported JSON payload type.`,
+        ),
+      );
+    }
   }
 
   public override getDescription(variant: DescriptionVariant) {

@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { EmptyObject } from "./common-helpers";
+import { ezDateInBrand } from "./date-in-schema";
+import { ezDateOutBrand } from "./date-out-schema";
+import { ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { metaSymbol } from "./metadata";
+import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
 import { HandlingRules, NextHandlerInc, SchemaHandler } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
@@ -22,11 +26,15 @@ const onIntersection: Check = (
 ) => [_def.left, _def.right].some(next);
 
 const onElective: Check = (
-  schema: z.ZodOptional<z.ZodTypeAny> | z.ZodNullable<z.ZodTypeAny>,
+  schema:
+    | z.ZodOptional<z.ZodTypeAny>
+    | z.ZodNullable<z.ZodTypeAny>
+    | z.ZodReadonly<z.ZodTypeAny>
+    | z.ZodBranded<z.ZodTypeAny, string | number | symbol>,
   { next },
 ) => next(schema.unwrap());
 
-const checks: HandlingRules<boolean, EmptyObject, z.ZodFirstPartyTypeKind> = {
+const ioChecks: HandlingRules<boolean, EmptyObject, z.ZodFirstPartyTypeKind> = {
   ZodObject: ({ shape }: z.ZodObject<z.ZodRawShape>, { next }) =>
     Object.values(shape).some(next),
   ZodUnion: onSomeUnion,
@@ -44,7 +52,11 @@ const checks: HandlingRules<boolean, EmptyObject, z.ZodFirstPartyTypeKind> = {
 
 interface NestedSchemaLookupProps {
   condition: (schema: z.ZodTypeAny) => boolean;
-  rules?: HandlingRules<boolean>;
+  rules?: HandlingRules<
+    boolean,
+    EmptyObject,
+    z.ZodFirstPartyTypeKind | ProprietaryBrand
+  >;
   maxDepth?: number;
   depth?: number;
 }
@@ -54,7 +66,7 @@ export const hasNestedSchema = (
   subject: z.ZodTypeAny,
   {
     condition,
-    rules = checks,
+    rules = ioChecks,
     depth = 1,
     maxDepth = Number.POSITIVE_INFINITY,
   }: NestedSchemaLookupProps,
@@ -64,7 +76,8 @@ export const hasNestedSchema = (
   }
   const handler =
     depth < maxDepth
-      ? rules[subject._def.typeName as keyof typeof rules]
+      ? rules[subject._def[metaSymbol]?.brand as keyof typeof rules] ||
+        rules[subject._def.typeName as keyof typeof rules]
       : undefined;
   if (handler) {
     return handler(subject, {
@@ -89,4 +102,43 @@ export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema(subject, {
     condition: (schema) => schema._def[metaSymbol]?.brand === ezRawBrand,
     maxDepth: 3,
+  });
+
+const jsonIncompatibleSchemas: z.ZodFirstPartyTypeKind[] = [
+  z.ZodFirstPartyTypeKind.ZodMap,
+  z.ZodFirstPartyTypeKind.ZodSet,
+  z.ZodFirstPartyTypeKind.ZodBigInt,
+  z.ZodFirstPartyTypeKind.ZodFunction,
+  z.ZodFirstPartyTypeKind.ZodSymbol,
+  z.ZodFirstPartyTypeKind.ZodNaN,
+  z.ZodFirstPartyTypeKind.ZodDate,
+];
+
+export const hasJsonIncompatibleSchema = (
+  subject: IOSchema,
+  isResponse: boolean,
+) =>
+  hasNestedSchema(subject, {
+    condition: (schema) =>
+      jsonIncompatibleSchemas.includes(schema._def.typeName),
+    rules: {
+      ...ioChecks,
+      ZodBranded: onElective,
+      ZodReadonly: onElective,
+      ZodCatch: ({ _def: { innerType } }: z.ZodCatch<z.ZodTypeAny>, { next }) =>
+        next(innerType),
+      ZodPipeline: (
+        { _def }: z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>,
+        { next },
+      ) => next(_def[isResponse ? "out" : "in"]),
+      // ZodLazy: ({ schema }: z.ZodLazy<z.ZodTypeAny>, { next }) => next(schema),
+      ZodTuple: ({ items, _def: { rest } }: z.AnyZodTuple, { next }) =>
+        [...items].concat(rest ?? []).some(next),
+      ZodEffects: isResponse ? () => false : ioChecks.ZodEffects, // not applicable for response
+      [ezDateOutBrand]: () => !isResponse,
+      [ezDateInBrand]: () => isResponse,
+      [ezRawBrand]: () => isResponse,
+      [ezUploadBrand]: () => isResponse,
+      [ezFileBrand]: () => false,
+    },
   });
