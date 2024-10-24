@@ -49,6 +49,8 @@ import {
   onEach,
   onMissing,
   reformatParamsInPath,
+  depictMap,
+  depictSet,
 } from "../../src/documentation-helpers";
 import { walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
@@ -471,6 +473,46 @@ describe("Documentation helpers", () => {
   describe("depictArray()", () => {
     test("should set type:array and pass items depiction", () => {
       expect(depictArray(z.array(z.boolean()), requestCtx)).toMatchSnapshot();
+    });
+  });
+
+  describe("depictMap()", () => {
+    test("should throw for input", () => {
+      expect(() =>
+        depictMap(z.map(z.string(), z.number()), requestCtx),
+      ).toThrow(/Map is not supported for input schema/);
+    });
+    test("should depict as array of tuples when advanced serialization enabled", () => {
+      expect(
+        depictMap(z.map(z.string(), z.number()), {
+          ...responseCtx,
+          hasAdvancedSerialization: true,
+        }),
+      ).toMatchSnapshot();
+    });
+    test("should depict as an empty object when serialization disabled", () => {
+      expect(
+        depictMap(z.map(z.string(), z.number()), responseCtx),
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictSet()", () => {
+    test("should throw for input", () => {
+      expect(() => depictSet(z.set(z.string()), requestCtx)).toThrow(
+        /Set is not supported for input schema/,
+      );
+    });
+    test("should depict as array when advanced serialization enabled", () => {
+      expect(
+        depictSet(z.set(z.string()), {
+          ...responseCtx,
+          hasAdvancedSerialization: true,
+        }),
+      ).toMatchSnapshot();
+    });
+    test("should depict as an empty object when serialization disabled", () => {
+      expect(depictSet(z.set(z.string()), responseCtx)).toMatchSnapshot();
     });
   });
 

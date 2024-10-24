@@ -72,6 +72,7 @@ import { UploadSchema, ezUploadBrand } from "./upload-schema";
 
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
+  hasAdvancedSerialization?: boolean;
   serializer: (schema: z.ZodTypeAny) => string;
   getRef: (name: string) => ReferenceObject | undefined;
   makeRef: (
@@ -433,6 +434,45 @@ export const depictTuple: Depicter = (
   items: rest === null ? { not: {} } : next(rest),
 });
 
+export const depictMap: Depicter = (
+  { keySchema, valueSchema }: z.ZodMap,
+  ctx,
+) => {
+  assert(
+    ctx.isResponse,
+    new DocumentationError({
+      message: "Map is not supported for input schema.",
+      ...ctx,
+    }),
+  );
+  return ctx.next(
+    ctx.hasAdvancedSerialization
+      ? z.array(z.tuple([keySchema, valueSchema]))
+      : z.object({}),
+  );
+};
+
+export const depictSet: Depicter = (
+  { _def: { valueType, minSize, maxSize } }: z.ZodSet,
+  ctx,
+) => {
+  assert(
+    ctx.isResponse,
+    new DocumentationError({
+      message: "Set is not supported for input schema.",
+      ...ctx,
+    }),
+  );
+  if (!ctx.hasAdvancedSerialization) {
+    return ctx.next(z.object({}));
+  }
+  return pipe(
+    (arr: z.ZodArray<z.ZodTypeAny>) => (minSize ? arr.min(minSize.value) : arr),
+    (arr: z.ZodArray<z.ZodTypeAny>) => (maxSize ? arr.min(maxSize.value) : arr),
+    ctx.next,
+  )(z.array(valueType));
+};
+
 export const depictString: Depicter = ({
   isEmail,
   isURL,
@@ -757,6 +797,8 @@ export const depicters: HandlingRules<
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
+  ZodMap: depictMap,
+  ZodSet: depictSet,
   [ezFileBrand]: depictFile,
   [ezUploadBrand]: depictUpload,
   [ezDateOutBrand]: depictDateOut,
@@ -859,6 +901,7 @@ export const depictResponse = ({
   makeRef,
   composition,
   hasMultipleStatusCodes,
+  hasAdvancedSerialization,
   statusCode,
   brandHandling,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
@@ -869,6 +912,7 @@ export const depictResponse = ({
   variant: ResponseVariant;
   statusCode: number;
   hasMultipleStatusCodes: boolean;
+  hasAdvancedSerialization?: boolean;
 }): ResponseObject => {
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema(schema, {
@@ -877,6 +921,7 @@ export const depictResponse = ({
       onMissing,
       ctx: {
         isResponse: true,
+        hasAdvancedSerialization,
         serializer,
         getRef,
         makeRef,

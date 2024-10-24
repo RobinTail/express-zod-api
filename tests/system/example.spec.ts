@@ -242,6 +242,22 @@ describe("Example", async () => {
         expect(json).toMatchSnapshot();
       },
     );
+
+    test("Feat #1500: should serialize Map and Set", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/serialize`);
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: "success",
+        data: {
+          map: [
+            ["sampleKey", true],
+            ["anotherOne", false],
+          ],
+          set: [123, 456],
+        },
+      });
+    });
   });
 
   describe("Negative", () => {

@@ -555,7 +555,6 @@ describe("Documentation", () => {
 
     test.each([
       z.undefined(),
-      z.map(z.any(), z.any()),
       z.function(),
       z.promise(z.any()),
       z.unknown(),

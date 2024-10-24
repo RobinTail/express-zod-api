@@ -2,6 +2,47 @@
 
 ## Version 20
 
+### v20.15.0
+
+- Featuring `Map` and `Set` serialization support in response:
+  - It was not possible to use those entities in output schema — reported by [@t1nky](https://github.com/t1nky);
+  - That was because `JSON.stringify()` does not serialize `Map` and `Set` entities by default;
+  - This version brings the new config option `jsonAdvancedSerialization` enabling the feature;
+  - `z.map()` and `z.set()` can be used in output and response schemas when that option is enabled;
+  - The feature enables you to use `Map` and `Set` benefits such as unique items and faster operation;
+  - The serialization performance of `response.json()`, however, can decrease globally for your API;
+  - `Map<K, V>` will be serialized as an array of tuples `Array<[K, V]>` because its keys can have any type;
+  - That behaviour is also supported by `Documentation` and `Integration` generators when the option enabled;
+    - For that you should also supply the `config` option into the `Integration::constructor()`;
+
+```ts
+import {
+  createConfig,
+  defaultEndpointsFactory,
+  Integration,
+} from "express-zod-api";
+import { z } from "zod";
+
+const config = createConfig({
+  server: { jsonAdvancedSerialization: true },
+});
+
+const mapSetCompatEndpoint = defaultEndpointsFactory.build({
+  output: z.object({
+    map: z.map(z.string(), z.boolean()),
+    set: z.set(z.number().int()),
+  }),
+  handler: async () => ({
+    map: new Map<string, boolean>()
+      .set("sampleKey", true)
+      .set("anotherOne", false),
+    set: new Set<number>().add(123).add(456),
+  }),
+});
+
+new Integration({ routing, config }); // config option added:
+```
+
 ### v20.14.3
 
 - Fixed: missing export of `testMiddleware`:

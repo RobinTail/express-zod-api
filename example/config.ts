@@ -12,6 +12,7 @@ export const config = createConfig({
       limitError: createHttpError(413, "The file is too large"), // affects uploadAvatarEndpoint
     },
     compression: true, // affects sendAvatarEndpoint
+    jsonAdvancedSerialization: true, // for mapSetCompatEndpoint
     beforeRouting: async ({ app }) => {
       // third-party middlewares serving their own routes or establishing their own routing besides the API
       const documentation = yaml.parse(

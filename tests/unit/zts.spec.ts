@@ -172,8 +172,11 @@ describe("zod-to-ts", () => {
       readonly: z.string().readonly(),
     });
 
-    test("should produce the expected results", () => {
-      const node = zodToTs(example, { ctx });
+    test.each([
+      ctx,
+      { ...ctx, isResponse: true, hasAdvancedSerialization: true },
+    ])("should produce the expected results %#", (context) => {
+      const node = zodToTs(example, { ctx: context });
       expect(printNode(node)).toMatchSnapshot();
     });
   });

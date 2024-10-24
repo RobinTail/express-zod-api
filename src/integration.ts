@@ -1,6 +1,7 @@
 import ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
+import { AppConfig, ServerConfig } from "./config-type";
 import {
   emptyHeading,
   emptyTail,
@@ -43,6 +44,8 @@ type IOKind = "input" | "response" | ResponseVariant;
 
 interface IntegrationParams {
   routing: Routing;
+  /** @todo consider required in v21 */
+  config?: ServerConfig | AppConfig;
   /**
    * @desc What should be generated
    * @example "types" — types of your endpoint requests and responses (for a DIY solution)
@@ -58,6 +61,7 @@ interface IntegrationParams {
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
    * @default JSON.stringify() + SHA1 hash as a hex digest
+   * @todo can use Map instead?
    * */
   serializer?: (schema: z.ZodTypeAny) => string;
   /**
@@ -153,6 +157,7 @@ export class Integration {
 
   public constructor({
     routing,
+    config,
     brandHandling,
     variant = "client",
     serializer = defaultSerializer,
@@ -168,6 +173,10 @@ export class Integration {
           makeAlias: this.makeAlias.bind(this),
           optionalPropStyle,
         };
+        const hasAdvancedSerialization =
+          config &&
+          "server" in config &&
+          config.server.jsonAdvancedSerialization;
         const inputId = makeCleanId(method, path, "input");
         const input = zodToTs(endpoint.getSchema("input"), {
           brandHandling,
@@ -180,7 +189,7 @@ export class Integration {
         const positiveResponse = splitResponse
           ? zodToTs(positiveSchema, {
               brandHandling,
-              ctx: { ...commons, isResponse: true },
+              ctx: { ...commons, hasAdvancedSerialization, isResponse: true },
             })
           : undefined;
         const negativeResponseId = splitResponse
@@ -190,7 +199,7 @@ export class Integration {
         const negativeResponse = splitResponse
           ? zodToTs(negativeSchema, {
               brandHandling,
-              ctx: { ...commons, isResponse: true },
+              ctx: { ...commons, hasAdvancedSerialization, isResponse: true },
             })
           : undefined;
         const genericResponseId = makeCleanId(method, path, "response");
@@ -202,7 +211,7 @@ export class Integration {
               ])
             : zodToTs(positiveSchema.or(negativeSchema), {
                 brandHandling,
-                ctx: { ...commons, isResponse: true },
+                ctx: { ...commons, hasAdvancedSerialization, isResponse: true },
               });
         this.program.push(createTypeAlias(input, inputId));
         if (positiveResponse && positiveResponseId) {

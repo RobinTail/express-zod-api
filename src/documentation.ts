@@ -16,7 +16,7 @@ import {
   defaultSerializer,
   makeCleanId,
 } from "./common-helpers";
-import { CommonConfig } from "./config-type";
+import { AppConfig, ServerConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
@@ -52,7 +52,7 @@ interface DocumentationParams {
   version: string;
   serverUrl: string | [string, ...string[]];
   routing: Routing;
-  config: CommonConfig;
+  config: ServerConfig | AppConfig;
   /**
    * @desc Descriptions of various components based on their properties (method, path, operationId).
    * @desc When composition set to "components", component name is generated from this description
@@ -66,6 +66,7 @@ interface DocumentationParams {
   /**
    * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
    * @default JSON.stringify() + SHA1 hash as a hex digest
+   * @todo can use Map instead?
    * */
   serializer?: (schema: z.ZodTypeAny) => string;
   /**
@@ -211,6 +212,8 @@ export class Documentation extends OpenApiBuilder {
               statusCode,
               hasMultipleStatusCodes:
                 apiResponses.length > 1 || statusCodes.length > 1,
+              hasAdvancedSerialization:
+                "server" in config && config.server.jsonAdvancedSerialization,
               description: descriptions?.[`${variant}Response`]?.call(null, {
                 method,
                 path,

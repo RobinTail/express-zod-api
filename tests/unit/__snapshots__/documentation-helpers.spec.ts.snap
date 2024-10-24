@@ -524,6 +524,35 @@ exports[`Documentation helpers > depictLiteral() > should set type and involve c
 }
 `;
 
+exports[`Documentation helpers > depictMap() > should depict as an empty object when serialization disabled 1`] = `
+{
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictMap() > should depict as array of tuples when advanced serialization enabled 1`] = `
+{
+  "items": {
+    "items": {
+      "not": {},
+    },
+    "prefixItems": [
+      {
+        "type": "string",
+      },
+      {
+        "format": "double",
+        "maximum": 1.7976931348623157e+308,
+        "minimum": -1.7976931348623157e+308,
+        "type": "number",
+      },
+    ],
+    "type": "array",
+  },
+  "type": "array",
+}
+`;
+
 exports[`Documentation helpers > depictNull() > should give type:null 1`] = `
 {
   "type": "null",
@@ -1141,6 +1170,21 @@ exports[`Documentation helpers > depictSecurityRefs() > should populate the scop
     ],
   },
 ]
+`;
+
+exports[`Documentation helpers > depictSet() > should depict as an empty object when serialization disabled 1`] = `
+{
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictSet() > should depict as array when advanced serialization enabled 1`] = `
+{
+  "items": {
+    "type": "string",
+  },
+  "type": "array",
+}
 `;
 
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 0 1`] = `
