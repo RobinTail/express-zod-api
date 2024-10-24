@@ -213,9 +213,7 @@ export class Documentation extends OpenApiBuilder {
               hasMultipleStatusCodes:
                 apiResponses.length > 1 || statusCodes.length > 1,
               hasAdvancedSerialization:
-                ("server" in config &&
-                  config.server.jsonAdvancedSerialization) ||
-                false,
+                "server" in config && config.server.jsonAdvancedSerialization,
               description: descriptions?.[`${variant}Response`]?.call(null, {
                 method,
                 path,

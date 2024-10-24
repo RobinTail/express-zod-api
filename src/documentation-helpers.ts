@@ -912,7 +912,7 @@ export const depictResponse = ({
   variant: ResponseVariant;
   statusCode: number;
   hasMultipleStatusCodes: boolean;
-  hasAdvancedSerialization: boolean;
+  hasAdvancedSerialization?: boolean;
 }): ResponseObject => {
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema(schema, {
