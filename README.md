@@ -1214,6 +1214,7 @@ Consider installing `prettier` and using the async `printFormatted()` method.
 import { Integration } from "express-zod-api";
 
 const client = new Integration({
+  config,
   routing,
   variant: "client", // <— optional, see also "types" for a DIY solution
   optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
@@ -1360,12 +1361,12 @@ const ruleForClient: Producer = (
 ) => ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
 
 new Documentation({
-  /* config, routing, title, version */
+  /* config, routing, title, version, */
   brandHandling: { [myBrand]: ruleForDocs },
 });
 
 new Integration({
-  /* routing */
+  /* config, routing, */
   brandHandling: { [myBrand]: ruleForClient },
 });
 ```
