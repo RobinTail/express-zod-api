@@ -36,19 +36,11 @@ describe("Experiment", () => {
     JSON.stringify(sample, control);
   });
 
-  bench(
-    "current implementation",
-    () => {
-      JSON.stringify(sample, current);
-    },
-    { time: 10000 },
-  );
+  bench("current implementation", () => {
+    JSON.stringify(sample, current);
+  });
 
-  bench(
-    "featured implementation",
-    () => {
-      JSON.stringify(sample, featured);
-    },
-    { time: 10000 },
-  );
+  bench("featured implementation", () => {
+    JSON.stringify(sample, featured);
+  });
 });
