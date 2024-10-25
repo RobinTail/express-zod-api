@@ -37,24 +37,26 @@ export const initRouting = ({
     onEndpoint: (endpoint, path, method, siblingMethods) => {
       const requestType = endpoint.getRequestType();
       if (!verified.has(endpoint)) {
-        if (
-          requestType === "json" &&
-          hasJsonIncompatibleSchema(endpoint.getSchema("input"), false)
-        ) {
-          rootLogger.warn(
-            "The input endpoint schema (including middlewares) contains an unsupported JSON payload type.",
-            { path, method },
-          );
+        if (requestType === "json") {
+          try {
+            hasJsonIncompatibleSchema(endpoint.getSchema("input"), false);
+          } catch (reason) {
+            rootLogger.warn(
+              "The final input schema of the endpoint contains an unsupported JSON payload type.",
+              { path, method, reason },
+            );
+          }
         }
         for (const variant of ["positive", "negative"] as const) {
-          if (
-            endpoint.getMimeTypes(variant).includes(contentTypes.json) &&
-            hasJsonIncompatibleSchema(endpoint.getSchema(variant), true)
-          ) {
-            rootLogger.warn(
-              `The ${variant} response endpoint schema (including ResultHandler) contains an unsupported JSON payload type.`,
-              { path, method },
-            );
+          if (endpoint.getMimeTypes(variant).includes(contentTypes.json)) {
+            try {
+              hasJsonIncompatibleSchema(endpoint.getSchema(variant), true);
+            } catch (reason) {
+              rootLogger.warn(
+                `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
+                { path, method, reason },
+              );
+            }
           }
         }
         verified.add(endpoint);

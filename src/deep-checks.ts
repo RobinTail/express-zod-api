@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { z } from "zod";
 import { EmptyObject } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
@@ -102,6 +103,7 @@ export const hasRaw = (subject: IOSchema) =>
     maxDepth: 3,
   });
 
+/** @throws AssertionError with incompatible schema constructor */
 export const hasJsonIncompatibleSchema = (
   subject: IOSchema,
   isResponse: boolean,
@@ -124,20 +126,20 @@ export const hasJsonIncompatibleSchema = (
       ZodTuple: ({ items, _def: { rest } }: z.AnyZodTuple, { next }) =>
         [...items].concat(rest ?? []).some(next),
       ZodEffects: isResponse ? undefined : ioChecks.ZodEffects, // not applicable for response
-      ZodDate: () => !isResponse,
-      ZodNaN: () => true,
-      ZodSymbol: () => true,
-      ZodFunction: () => true,
-      ZodMap: () => true,
-      ZodSet: () => true,
-      ZodBigInt: () => true,
-      ZodVoid: () => true,
-      ZodPromise: () => true,
-      ZodNever: () => true,
-      [ezDateOutBrand]: () => !isResponse,
-      [ezDateInBrand]: () => isResponse,
-      [ezRawBrand]: () => isResponse,
-      [ezUploadBrand]: () => isResponse,
+      ZodNaN: () => assert.fail("z.nan()"),
+      ZodSymbol: () => assert.fail("z.symbol()"),
+      ZodFunction: () => assert.fail("z.function()"),
+      ZodMap: () => assert.fail("z.map()"),
+      ZodSet: () => assert.fail("z.set()"),
+      ZodBigInt: () => assert.fail("z.bigint()"),
+      ZodVoid: () => assert.fail("z.void()"),
+      ZodPromise: () => assert.fail("z.promise()"),
+      ZodNever: () => assert.fail("z.never()"),
+      ZodDate: () => !isResponse && assert.fail("z.date()"),
+      [ezDateOutBrand]: () => !isResponse && assert.fail("ez.dateOut()"),
+      [ezDateInBrand]: () => isResponse && assert.fail("ez.dateIn()"),
+      [ezRawBrand]: () => isResponse && assert.fail("ez.raw()"),
+      [ezUploadBrand]: () => isResponse && assert.fail("ez.upload()"),
       [ezFileBrand]: () => false,
     },
   });

@@ -434,12 +434,12 @@ describe("Routing", () => {
       });
       expect(rootLogger._getLogs().warn).toEqual([
         [
-          "The input endpoint schema (including middlewares) contains an unsupported JSON payload type.",
-          { method: "get", path: "/path" },
+          "The final input schema of the endpoint contains an unsupported JSON payload type.",
+          { method: "get", path: "/path", reason: expect.any(Error) },
         ],
         [
-          "The positive response endpoint schema (including ResultHandler) contains an unsupported JSON payload type.",
-          { method: "get", path: "/path" },
+          "The final positive response schema of the endpoint contains an unsupported JSON payload type.",
+          { method: "get", path: "/path", reason: expect.any(Error) },
         ],
       ]);
     });
