@@ -104,23 +104,14 @@ export const hasRaw = (subject: IOSchema) =>
     maxDepth: 3,
   });
 
-/** @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description */
-const isMonkeyPatched = (subject: object) => "toJSON" in subject;
-
 const jsonIncompatibleSchemas: z.ZodFirstPartyTypeKind[] = [
   z.ZodFirstPartyTypeKind.ZodNaN,
   z.ZodFirstPartyTypeKind.ZodSymbol,
-]
-  .concat(
-    isMonkeyPatched(Function.prototype)
-      ? []
-      : z.ZodFirstPartyTypeKind.ZodFunction,
-  )
-  .concat(isMonkeyPatched(Map.prototype) ? [] : z.ZodFirstPartyTypeKind.ZodMap)
-  .concat(isMonkeyPatched(Set.prototype) ? [] : z.ZodFirstPartyTypeKind.ZodSet)
-  .concat(
-    isMonkeyPatched(BigInt.prototype) ? [] : z.ZodFirstPartyTypeKind.ZodBigInt,
-  );
+  z.ZodFirstPartyTypeKind.ZodFunction,
+  z.ZodFirstPartyTypeKind.ZodMap,
+  z.ZodFirstPartyTypeKind.ZodSet,
+  z.ZodFirstPartyTypeKind.ZodBigInt,
+];
 
 export const hasJsonIncompatibleSchema = (
   subject: IOSchema,
