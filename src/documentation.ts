@@ -77,22 +77,21 @@ export class Documentation extends OpenApiBuilder {
   protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   protected lastOperationIdSuffixes = new Map<string, number>();
   protected responseVariants = keys(defaultStatusCodes);
-  protected references = new Map<z.ZodTypeAny, ReferenceObject>();
+  protected references = new Map<z.ZodTypeAny, string>();
 
   protected makeRef(
     schema: z.ZodTypeAny,
     depicted: SchemaObject | ReferenceObject,
-    name = this.references.get(schema)?.$ref.split("/").pop() ??
-      `Schema${this.references.size}`,
+    name = this.references.get(schema) ?? `Schema${this.references.size}`,
   ): ReferenceObject {
-    const reference: ReferenceObject = { $ref: `#/components/schemas/${name}` };
     this.addSchema(name, depicted);
-    this.references.set(schema, reference);
-    return reference;
+    this.references.set(schema, name);
+    return this.getRef(schema)!;
   }
 
   protected getRef(schema: z.ZodTypeAny): ReferenceObject | undefined {
-    return this.references.get(schema);
+    const name = this.references.get(schema);
+    return name ? { $ref: `#/components/schemas/${name}` } : undefined;
   }
 
   protected ensureUniqOperationId(
