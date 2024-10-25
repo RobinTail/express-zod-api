@@ -1,17 +1,18 @@
 import { bench } from "vitest";
-import { keys, keysIn } from "ramda";
-import { defaultStatusCodes } from "../../src/api-response";
 
 describe("Experiment %s", () => {
-  bench("Object.keys()", () => {
-    Object.keys(defaultStatusCodes);
+  const map = new WeakMap();
+  const set = new WeakSet();
+  const obj = {};
+
+  bench("WeakMap.has()", () => {
+    map.has({});
   });
 
-  bench("R.keys()", () => {
-    keys(defaultStatusCodes);
+  bench("WeakSet.has()", () => {
+    set.has({});
   });
 
-  bench("R.keysIn()", () => {
-    keysIn(defaultStatusCodes);
-  });
+  bench("control: in", () => void ("test" in obj));
+  bench("control: hasOwn", () => void Object.hasOwn(obj, "test"));
 });

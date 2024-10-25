@@ -2,6 +2,17 @@
 
 ## Version 20
 
+### v20.15.0
+
+- Feat: warn about potentially unserializable schema used for JSON operating endpoints:
+  - This version will warn you if you're using a schema that might not work in request or response, in particular:
+    - Generally unserializable objects: `z.map()`, `z.set()`, `z.bigint()`;
+    - JSON incompatible entities: `z.never()`, `z.void()`, `z.promise()`, `z.symbol()`, `z.nan()`;
+    - Non-revivable in request: `z.date()`;
+    - Incorrectly used in request: `ez.dateOut()`;
+    - Incorrectly used in response: `ez.dateIn()`, `ez.upload()`, `ez.raw()`;
+  - The feature suggested by [@t1nky](https://github.com/t1nky).
+
 ### v20.14.3
 
 - Fixed: missing export of `testMiddleware`:

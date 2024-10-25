@@ -13,6 +13,7 @@ import {
   Routing,
   ServeStatic,
   defaultResultHandler,
+  ez,
 } from "../../src";
 import {
   makeLoggerMock,
@@ -66,11 +67,13 @@ describe("Routing", () => {
           },
         },
       };
+      const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
+        rootLogger,
       });
       expect(appMock.get).toHaveBeenCalledTimes(2);
       expect(appMock.post).toHaveBeenCalledTimes(2);
@@ -95,11 +98,13 @@ describe("Routing", () => {
         cors: true,
         startupLogo: false,
       };
+      const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
+        rootLogger,
       });
       expect(staticMock).toHaveBeenCalledWith(__dirname, { dotfiles: "deny" });
       expect(appMock.use).toHaveBeenCalledTimes(1);
@@ -141,11 +146,13 @@ describe("Routing", () => {
           }),
         },
       };
+      const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
+        rootLogger,
       });
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.post).toHaveBeenCalledTimes(1);
@@ -178,12 +185,14 @@ describe("Routing", () => {
           }),
         },
       };
+      const rootLogger = new BuiltinLogger({ level: "silent" });
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+          getChildLogger: () => rootLogger,
           config: configMock as CommonConfig,
           routing,
+          rootLogger,
         }),
       ).toThrowErrorMatchingSnapshot();
     });
@@ -223,11 +232,13 @@ describe("Routing", () => {
           patch: putAndPatchEndpoint,
         }),
       };
+      const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
+        rootLogger,
       });
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/hello");
@@ -259,11 +270,13 @@ describe("Routing", () => {
           },
         },
       };
+      const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
+        rootLogger,
       });
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
@@ -288,11 +301,13 @@ describe("Routing", () => {
           },
         },
       };
+      const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getChildLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
+        rootLogger,
       });
       expect(appMock.get).toHaveBeenCalledTimes(2);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
@@ -308,10 +323,12 @@ describe("Routing", () => {
         output: z.object({}),
         handler: handlerMock,
       });
+      const rootLogger = new BuiltinLogger({ level: "silent" });
       expect(() =>
         initRouting({
+          rootLogger,
           app: appMock as unknown as IRouter,
-          getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+          getChildLogger: () => rootLogger,
           config: configMock as CommonConfig,
           routing: {
             v1: {
@@ -322,8 +339,9 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
         initRouting({
+          rootLogger,
           app: appMock as unknown as IRouter,
-          getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+          getChildLogger: () => rootLogger,
           config: configMock as CommonConfig,
           routing: {
             "v1/user/retrieve": endpointMock,
@@ -354,10 +372,12 @@ describe("Routing", () => {
           },
         },
       };
-      const loggerMock = makeLoggerMock();
+      const rootLogger = makeLoggerMock();
+      const childLogger = makeLoggerMock();
       initRouting({
+        rootLogger,
         app: appMock as unknown as IRouter,
-        getChildLogger: () => loggerMock,
+        getChildLogger: () => childLogger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -372,19 +392,56 @@ describe("Routing", () => {
       await routeHandler(requestMock, responseMock, nextMock);
       expect(nextMock).toHaveBeenCalledTimes(0);
       expect(handlerMock).toHaveBeenCalledTimes(1);
-      expect(loggerMock._getLogs().error).toHaveLength(0);
+      expect(childLogger._getLogs().error).toHaveLength(0);
       expect(handlerMock).toHaveBeenCalledWith({
         input: {
           test: 123,
         },
         options: {},
-        logger: loggerMock,
+        logger: childLogger,
       });
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getJSONData()).toEqual({
         status: "success",
         data: { result: true },
       });
+    });
+
+    test.each([
+      [z.bigint(), z.set(z.string())],
+      [z.nan(), z.map(z.string(), z.boolean())],
+      [z.date().pipe(z.string()), z.symbol().catch(Symbol("test"))],
+      [z.function().transform(() => "test"), z.tuple([z.function()])],
+      [ez.dateOut(), ez.dateIn()],
+      [z.lazy(() => z.void()), ez.raw()],
+      [z.promise(z.any()), ez.upload()],
+      [z.never(), z.tuple([ez.file()]).rest(z.nan())],
+    ])("should warn about JSON incompatible schemas %#", (input, output) => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        method: "get",
+        input: z.object({ input }),
+        output: z.object({ output }),
+        handler: vi.fn(),
+      });
+      const configMock = { cors: false, startupLogo: false };
+      const rootLogger = makeLoggerMock();
+      initRouting({
+        rootLogger,
+        app: appMock as unknown as IRouter,
+        getChildLogger: () => rootLogger,
+        config: configMock as CommonConfig,
+        routing: { path: endpoint },
+      });
+      expect(rootLogger._getLogs().warn).toEqual([
+        [
+          "The final input schema of the endpoint contains an unsupported JSON payload type.",
+          { method: "get", path: "/path", reason: expect.any(Error) },
+        ],
+        [
+          "The final positive response schema of the endpoint contains an unsupported JSON payload type.",
+          { method: "get", path: "/path", reason: expect.any(Error) },
+        ],
+      ]);
     });
   });
 });
