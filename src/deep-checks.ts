@@ -105,8 +105,10 @@ export const hasRaw = (subject: IOSchema) =>
 export const hasJsonIncompatibleSchema = (
   subject: IOSchema,
   isResponse: boolean,
-) =>
-  hasNestedSchema(subject, {
+) => {
+  const lazies = new WeakSet<z.ZodLazy<z.ZodTypeAny>>();
+  return hasNestedSchema(subject, {
+    maxDepth: 300,
     rules: {
       ...ioChecks,
       ZodBranded: onWrapped,
@@ -117,7 +119,8 @@ export const hasJsonIncompatibleSchema = (
         { _def }: z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>,
         { next },
       ) => next(_def[isResponse ? "out" : "in"]),
-      // ZodLazy: ({ schema }: z.ZodLazy<z.ZodTypeAny>, { next }) => next(schema),
+      ZodLazy: (lazy: z.ZodLazy<z.ZodTypeAny>, { next }) =>
+        lazies.has(lazy) ? false : lazies.add(lazy) && next(lazy.schema),
       ZodTuple: ({ items, _def: { rest } }: z.AnyZodTuple, { next }) =>
         [...items].concat(rest ?? []).some(next),
       ZodEffects: isResponse ? undefined : ioChecks.ZodEffects, // not applicable for response
@@ -138,3 +141,4 @@ export const hasJsonIncompatibleSchema = (
       [ezFileBrand]: () => false,
     },
   });
+};

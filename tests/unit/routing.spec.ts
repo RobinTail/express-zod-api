@@ -413,7 +413,7 @@ describe("Routing", () => {
       [z.date().pipe(z.string()), z.symbol().catch(Symbol("test"))],
       [z.function().transform(() => "test"), z.tuple([z.function()])],
       [ez.dateOut(), ez.dateIn()],
-      [z.void(), ez.raw()],
+      [z.lazy(() => z.void()), ez.raw()],
       [z.promise(z.any()), ez.upload()],
       [z.never(), z.tuple([ez.file()]).rest(z.nan())],
     ])("should warn about JSON incompatible schemas %#", (input, output) => {
