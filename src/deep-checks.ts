@@ -111,7 +111,6 @@ const jsonIncompatibleSchemas: z.ZodFirstPartyTypeKind[] = [
   z.ZodFirstPartyTypeKind.ZodFunction,
   z.ZodFirstPartyTypeKind.ZodSymbol,
   z.ZodFirstPartyTypeKind.ZodNaN,
-  z.ZodFirstPartyTypeKind.ZodDate,
 ];
 
 export const hasJsonIncompatibleSchema = (
@@ -135,6 +134,7 @@ export const hasJsonIncompatibleSchema = (
       ZodTuple: ({ items, _def: { rest } }: z.AnyZodTuple, { next }) =>
         [...items].concat(rest ?? []).some(next),
       ZodEffects: isResponse ? () => false : ioChecks.ZodEffects, // not applicable for response
+      ZodDate: () => !isResponse,
       [ezDateOutBrand]: () => !isResponse,
       [ezDateInBrand]: () => isResponse,
       [ezRawBrand]: () => isResponse,
