@@ -1,7 +1,6 @@
 import ts from "typescript";
 import { z } from "zod";
 import { f } from "../../src/integration-helpers";
-import { defaultSerializer } from "../../src/common-helpers";
 import { zodToTs } from "../../src/zts";
 import { ZTSContext, createTypeAlias, printNode } from "../../src/zts-helpers";
 
@@ -10,9 +9,7 @@ describe("zod-to-ts", () => {
     printNode(node, { newLine: ts.NewLineKind.LineFeed });
   const ctx: ZTSContext = {
     isResponse: false,
-    getAlias: vi.fn((name: string) => f.createTypeReferenceNode(name)),
-    makeAlias: vi.fn(),
-    serializer: defaultSerializer,
+    makeAlias: vi.fn(() => f.createTypeReferenceNode("SomeType")),
     optionalPropStyle: { withQuestionMark: true, withUndefined: true },
   };
 

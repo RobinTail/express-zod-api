@@ -1,6 +1,5 @@
 import { Request } from "express";
 import { isHttpError } from "http-errors";
-import { createHash } from "node:crypto";
 import { pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
@@ -169,10 +168,6 @@ export const makeCleanId = (...args: string[]) =>
     )
     .map(ucFirst)
     .join("");
-
-/** @todo remove */
-export const defaultSerializer = (schema: z.ZodTypeAny): string =>
-  createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
 
 export const tryToTransform = <T>(
   schema: z.ZodEffects<z.ZodTypeAny, T>,

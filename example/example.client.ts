@@ -1,6 +1,6 @@
-type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
+type Type0 = {
   title: string;
-  features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+  features: Type0;
 }[];
 
 type GetV1UserRetrieveInput = {} & {
@@ -16,7 +16,7 @@ type GetV1UserRetrieveResponse =
         name: string;
         features: {
           title: string;
-          features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+          features: Type0;
         }[];
       };
     }

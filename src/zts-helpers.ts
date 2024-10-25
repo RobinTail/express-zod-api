@@ -9,9 +9,11 @@ export type LiteralType = string | number | boolean;
 
 export interface ZTSContext extends FlatObject {
   isResponse: boolean;
-  getAlias: (name: string) => ts.TypeReferenceNode | undefined;
-  makeAlias: (name: string, type: ts.TypeNode) => ts.TypeReferenceNode;
-  serializer: (schema: z.ZodTypeAny) => string;
+  makeAlias: (
+    schema: z.ZodTypeAny,
+    image: () => ts.TypeNode,
+    name?: string,
+  ) => ts.TypeReferenceNode;
   optionalPropStyle: { withQuestionMark?: boolean; withUndefined?: boolean };
 }
 

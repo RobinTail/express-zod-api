@@ -28,7 +28,7 @@ import {
   quoteProp,
   spacingMiddle,
 } from "./integration-helpers";
-import { defaultSerializer, makeCleanId } from "./common-helpers";
+import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
 import { contentTypes } from "./content-type";
 import { loadPeer } from "./peer-helpers";
@@ -56,8 +56,8 @@ interface IntegrationParams {
    * */
   splitResponse?: boolean;
   /**
-   * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
-   * @default JSON.stringify() + SHA1 hash as a hex digest
+   * @deprecated no longer used
+   * @todo remove in v21
    * */
   serializer?: (schema: z.ZodTypeAny) => string;
   /**
@@ -106,7 +106,7 @@ export class Integration {
     }
   >();
   protected paths: string[] = [];
-  protected aliases = new Map<string, ts.TypeAliasDeclaration>();
+  protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
@@ -142,20 +142,26 @@ export class Integration {
     props: ts.PropertySignature[];
   }> = [];
 
-  protected getAlias(name: string): ts.TypeReferenceNode | undefined {
-    return this.aliases.has(name) ? f.createTypeReferenceNode(name) : undefined;
-  }
-
-  protected makeAlias(name: string, type: ts.TypeNode): ts.TypeReferenceNode {
-    this.aliases.set(name, createTypeAlias(type, name));
-    return this.getAlias(name)!;
+  protected makeAlias(
+    schema: z.ZodTypeAny,
+    image: () => ts.TypeNode,
+    name = this.aliases.get(schema)?.name?.text,
+  ): ts.TypeReferenceNode {
+    if (!name) {
+      name = `Type${this.aliases.size}`;
+      this.aliases.set(
+        schema,
+        createTypeAlias(f.createLiteralTypeNode(f.createNull()), name),
+      );
+      this.aliases.set(schema, createTypeAlias(image(), name));
+    }
+    return f.createTypeReferenceNode(name);
   }
 
   public constructor({
     routing,
     brandHandling,
     variant = "client",
-    serializer = defaultSerializer,
     splitResponse = false,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
   }: IntegrationParams) {
@@ -163,8 +169,6 @@ export class Integration {
       routing,
       onEndpoint: (endpoint, path, method) => {
         const commons = {
-          serializer,
-          getAlias: this.getAlias.bind(this),
           makeAlias: this.makeAlias.bind(this),
           optionalPropStyle,
         };
