@@ -72,10 +72,12 @@ import { UploadSchema, ezUploadBrand } from "./upload-schema";
 
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
-  getRef: (schema: z.ZodTypeAny) => ReferenceObject | undefined;
   makeRef: (
     schema: z.ZodTypeAny,
-    depicted: SchemaObject | ReferenceObject,
+    image:
+      | SchemaObject
+      | ReferenceObject
+      | (() => SchemaObject | ReferenceObject),
     name?: string,
   ) => ReferenceObject;
   path: string;
@@ -88,7 +90,7 @@ export type Depicter = SchemaHandler<
 >;
 
 interface ReqResHandlingProps<S extends z.ZodTypeAny>
-  extends Pick<OpenAPIContext, "getRef" | "makeRef" | "path" | "method"> {
+  extends Pick<OpenAPIContext, "makeRef" | "path" | "method"> {
   schema: S;
   composition: "inline" | "components";
   description?: string;
@@ -581,9 +583,8 @@ export const depictBranded: Depicter = (
 
 export const depictLazy: Depicter = (
   lazy: z.ZodLazy<z.ZodTypeAny>,
-  { next, getRef, makeRef },
-): ReferenceObject =>
-  getRef(lazy) ?? (makeRef(lazy, {}) && makeRef(lazy, next(lazy.schema))); // create & update
+  { next, makeRef },
+): ReferenceObject => makeRef(lazy, () => next(lazy.schema));
 
 export const depictRaw: Depicter = (schema: RawSchema, { next }) =>
   next(schema.unwrap().shape.raw);
@@ -651,7 +652,6 @@ export const depictRequestParams = ({
   method,
   schema,
   inputSources,
-  getRef,
   makeRef,
   composition,
   brandHandling,
@@ -690,7 +690,7 @@ export const depictRequestParams = ({
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: { isResponse: false, getRef, makeRef, path, method },
+      ctx: { isResponse: false, makeRef, path, method },
     });
     const result =
       composition === "components"
@@ -835,7 +835,6 @@ export const depictResponse = ({
   schema,
   mimeTypes,
   variant,
-  getRef,
   makeRef,
   composition,
   hasMultipleStatusCodes,
@@ -855,7 +854,7 @@ export const depictResponse = ({
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: { isResponse: true, getRef, makeRef, path, method },
+      ctx: { isResponse: true, makeRef, path, method },
     }),
   );
   const media: MediaTypeObject = {
@@ -976,7 +975,6 @@ export const depictBody = ({
   path,
   schema,
   mimeTypes,
-  getRef,
   makeRef,
   composition,
   brandHandling,
@@ -992,7 +990,7 @@ export const depictBody = ({
         rules: { ...brandHandling, ...depicters },
         onEach,
         onMissing,
-        ctx: { isResponse: false, getRef, makeRef, path, method },
+        ctx: { isResponse: false, makeRef, path, method },
       }),
       paramNames,
     ),

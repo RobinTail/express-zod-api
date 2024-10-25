@@ -2029,7 +2029,7 @@ components:
       type: string
       pattern: \\d+
       description: a numeric string containing the id of the user
-    Schema1:
+    Schema0:
       type: array
       items:
         type: object
@@ -2037,7 +2037,7 @@ components:
           title:
             type: string
           features:
-            $ref: "#/components/schemas/Schema1"
+            $ref: "#/components/schemas/Schema0"
         required:
           - title
           - features
@@ -2065,7 +2065,7 @@ components:
                   title:
                     type: string
                   features:
-                    $ref: "#/components/schemas/Schema1"
+                    $ref: "#/components/schemas/Schema0"
                 required:
                   - title
                   - features

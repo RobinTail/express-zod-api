@@ -54,13 +54,11 @@ import { walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Documentation helpers", () => {
-  const getRefMock = vi.fn();
-  const makeRefMock = vi.fn(getRefMock);
+  const makeRefMock = vi.fn();
   const requestCtx = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: false,
-    getRef: getRefMock,
     makeRef: makeRefMock,
     serializer: defaultSerializer,
     next: (schema: z.ZodTypeAny) =>
@@ -75,7 +73,6 @@ describe("Documentation helpers", () => {
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
-    getRef: getRefMock,
     makeRef: makeRefMock,
     serializer: defaultSerializer,
     next: (schema: z.ZodTypeAny) =>
@@ -88,7 +85,6 @@ describe("Documentation helpers", () => {
   } satisfies OpenAPIContext;
 
   beforeEach(() => {
-    getRefMock.mockClear();
     makeRefMock.mockClear();
   });
 
@@ -779,23 +775,18 @@ describe("Documentation helpers", () => {
     test.each([recursiveArray, directlyRecursive, recursiveObject])(
       "should handle circular references %#",
       (schema) => {
-        getRefMock
-          .mockImplementationOnce(() => undefined)
-          .mockImplementation(
-            (): ReferenceObject => ({
-              $ref: "#/components/schemas/SomeSchema",
-            }),
-          );
-        expect(getRefMock.mock.calls.length).toBe(0);
+        makeRefMock.mockImplementationOnce(
+          (): ReferenceObject => ({
+            $ref: "#/components/schemas/SomeSchema",
+          }),
+        );
+        expect(makeRefMock.mock.calls.length).toBe(0);
         expect(depictLazy(schema, responseCtx)).toMatchSnapshot();
-        expect(getRefMock).toHaveBeenCalledTimes(4);
-        for (const call of getRefMock.mock.calls) {
-          expect(call[0]).toBe(schema);
-        }
-        expect(makeRefMock).toHaveBeenCalledTimes(2);
-        expect(makeRefMock.mock.calls[0]).toEqual([schema, {}]);
-        expect(makeRefMock.mock.calls[1][0]).toEqual(schema);
-        expect(makeRefMock.mock.calls[1][1]).toMatchSnapshot();
+        expect(makeRefMock).toHaveBeenCalledTimes(1);
+        expect(makeRefMock.mock.calls[0]).toEqual([
+          schema,
+          expect.any(Function),
+        ]);
       },
     );
   });

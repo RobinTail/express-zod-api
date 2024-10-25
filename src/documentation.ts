@@ -81,17 +81,19 @@ export class Documentation extends OpenApiBuilder {
 
   protected makeRef(
     schema: z.ZodTypeAny,
-    depicted: SchemaObject | ReferenceObject,
-    name = this.references.get(schema) ?? `Schema${this.references.size}`,
+    image:
+      | SchemaObject
+      | ReferenceObject
+      | (() => SchemaObject | ReferenceObject),
+    name = this.references.get(schema),
   ): ReferenceObject {
-    this.addSchema(name, depicted);
-    this.references.set(schema, name);
-    return this.getRef(schema)!;
-  }
-
-  protected getRef(schema: z.ZodTypeAny): ReferenceObject | undefined {
-    const name = this.references.get(schema);
-    return name ? { $ref: `#/components/schemas/${name}` } : undefined;
+    if (!name) {
+      name = `Schema${this.references.size}`;
+      this.references.set(schema, name);
+      if (typeof image === "function") image = image();
+    }
+    if (typeof image === "object") this.addSchema(name, image);
+    return { $ref: `#/components/schemas/${name}` };
   }
 
   protected ensureUniqOperationId(
@@ -163,7 +165,6 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         brandHandling,
-        getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),
       };
       const [shortDesc, description] = (["short", "long"] as const).map(
