@@ -1,7 +1,7 @@
 import { IRouter, RequestHandler } from "express";
 import { CommonConfig } from "./config-type";
 import { ContentType, contentTypes } from "./content-type";
-import { hasJsonIncompatibleSchema } from "./deep-checks";
+import { assertJsonCompatible } from "./deep-checks";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { ActualLogger } from "./logger-helpers";
@@ -39,7 +39,7 @@ export const initRouting = ({
       if (!verified.has(endpoint)) {
         if (requestType === "json") {
           try {
-            hasJsonIncompatibleSchema(endpoint.getSchema("input"), false);
+            assertJsonCompatible(endpoint.getSchema("input"), "in");
           } catch (reason) {
             rootLogger.warn(
               "The final input schema of the endpoint contains an unsupported JSON payload type.",
@@ -50,7 +50,7 @@ export const initRouting = ({
         for (const variant of ["positive", "negative"] as const) {
           if (endpoint.getMimeTypes(variant).includes(contentTypes.json)) {
             try {
-              hasJsonIncompatibleSchema(endpoint.getSchema(variant), true);
+              assertJsonCompatible(endpoint.getSchema(variant), "out");
             } catch (reason) {
               rootLogger.warn(
                 `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,

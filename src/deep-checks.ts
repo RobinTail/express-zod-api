@@ -104,9 +104,9 @@ export const hasRaw = (subject: IOSchema) =>
   });
 
 /** @throws AssertionError with incompatible schema constructor */
-export const hasJsonIncompatibleSchema = (
+export const assertJsonCompatible = (
   subject: IOSchema,
-  isResponse: boolean,
+  direction: "in" | "out",
 ) => {
   const lazies = new WeakSet<z.ZodLazy<z.ZodTypeAny>>();
   return hasNestedSchema(subject, {
@@ -120,12 +120,12 @@ export const hasJsonIncompatibleSchema = (
       ZodPipeline: (
         { _def }: z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>,
         { next },
-      ) => next(_def[isResponse ? "out" : "in"]),
+      ) => next(_def[direction]),
       ZodLazy: (lazy: z.ZodLazy<z.ZodTypeAny>, { next }) =>
         lazies.has(lazy) ? false : lazies.add(lazy) && next(lazy.schema),
       ZodTuple: ({ items, _def: { rest } }: z.AnyZodTuple, { next }) =>
         [...items].concat(rest ?? []).some(next),
-      ZodEffects: isResponse ? undefined : ioChecks.ZodEffects, // not applicable for response
+      ZodEffects: { out: undefined, in: ioChecks.ZodEffects }[direction],
       ZodNaN: () => assert.fail("z.nan()"),
       ZodSymbol: () => assert.fail("z.symbol()"),
       ZodFunction: () => assert.fail("z.function()"),
@@ -135,11 +135,11 @@ export const hasJsonIncompatibleSchema = (
       ZodVoid: () => assert.fail("z.void()"),
       ZodPromise: () => assert.fail("z.promise()"),
       ZodNever: () => assert.fail("z.never()"),
-      ZodDate: () => !isResponse && assert.fail("z.date()"),
-      [ezDateOutBrand]: () => !isResponse && assert.fail("ez.dateOut()"),
-      [ezDateInBrand]: () => isResponse && assert.fail("ez.dateIn()"),
-      [ezRawBrand]: () => isResponse && assert.fail("ez.raw()"),
-      [ezUploadBrand]: () => isResponse && assert.fail("ez.upload()"),
+      ZodDate: () => direction === "in" && assert.fail("z.date()"),
+      [ezDateOutBrand]: () => direction === "in" && assert.fail("ez.dateOut()"),
+      [ezDateInBrand]: () => direction === "out" && assert.fail("ez.dateIn()"),
+      [ezRawBrand]: () => direction === "out" && assert.fail("ez.raw()"),
+      [ezUploadBrand]: () => direction === "out" && assert.fail("ez.upload()"),
       [ezFileBrand]: () => false,
     },
   });
