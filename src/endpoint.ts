@@ -128,9 +128,11 @@ export class Endpoint<
       : hasRaw(inputSchema)
         ? "raw"
         : "json";
-    if (this.#requestType === "json") {
-      assert(
-        !hasJsonIncompatibleSchema(inputSchema, false),
+    if (
+      this.#requestType === "json" &&
+      hasJsonIncompatibleSchema(inputSchema, false)
+    ) {
+      console.warn(
         new IOSchemaError(
           "The input endpoint schema (including middlewares) contains an unsupported JSON payload type.",
         ),
@@ -146,16 +148,19 @@ export class Endpoint<
       ),
     };
     for (const kind in this.#responses) {
-      assert(
-        this.#responses.positive.every(({ schema, mimeTypes }) =>
-          mimeTypes.includes(contentTypes.json)
-            ? !hasJsonIncompatibleSchema(schema, true)
-            : true,
-        ),
-        new IOSchemaError(
-          `The ${kind} response endpoint schema (including ResultHandler) contains an unsupported JSON payload type.`,
-        ),
-      );
+      if (
+        this.#responses.positive.some(
+          ({ schema, mimeTypes }) =>
+            mimeTypes.includes(contentTypes.json) &&
+            hasJsonIncompatibleSchema(schema, true),
+        )
+      ) {
+        console.warn(
+          new IOSchemaError(
+            `The ${kind} response endpoint schema (including ResultHandler) contains an unsupported JSON payload type.`,
+          ),
+        );
+      }
     }
   }
 
