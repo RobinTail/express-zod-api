@@ -25,7 +25,7 @@ const onIntersection: Check = (
   { next },
 ) => [_def.left, _def.right].some(next);
 
-const onElective: Check = (
+const onWrapped: Check = (
   schema:
     | z.ZodOptional<z.ZodTypeAny>
     | z.ZodNullable<z.ZodTypeAny>
@@ -42,8 +42,8 @@ const ioChecks: HandlingRules<boolean, EmptyObject, z.ZodFirstPartyTypeKind> = {
   ZodIntersection: onIntersection,
   ZodEffects: (schema: z.ZodEffects<z.ZodTypeAny>, { next }) =>
     next(schema.innerType()),
-  ZodOptional: onElective,
-  ZodNullable: onElective,
+  ZodOptional: onWrapped,
+  ZodNullable: onWrapped,
   ZodRecord: ({ valueSchema }: z.ZodRecord, { next }) => next(valueSchema),
   ZodArray: ({ element }: z.ZodArray<z.ZodTypeAny>, { next }) => next(element),
   ZodDefault: ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
@@ -123,8 +123,8 @@ export const hasJsonIncompatibleSchema = (
       jsonIncompatibleSchemas.includes(schema._def.typeName),
     rules: {
       ...ioChecks,
-      ZodBranded: onElective,
-      ZodReadonly: onElective,
+      ZodBranded: onWrapped,
+      ZodReadonly: onWrapped,
       ZodCatch: ({ _def: { innerType } }: z.ZodCatch<z.ZodTypeAny>, { next }) =>
         next(innerType),
       ZodPipeline: (
