@@ -419,12 +419,8 @@ describe("Routing", () => {
     ])("should warn about JSON incompatible schemas %#", (input, output) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
         method: "get",
-        input: z.object({
-          test: input,
-        }),
-        output: z.object({
-          result: output,
-        }),
+        input: z.object({ input }),
+        output: z.object({ output }),
         handler: vi.fn(),
       });
       const configMock = { cors: false, startupLogo: false };
