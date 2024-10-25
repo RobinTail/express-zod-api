@@ -1,6 +1,5 @@
 import { ReferenceObject } from "openapi3-ts/oas31";
 import { z } from "zod";
-import { defaultSerializer } from "../../src/common-helpers";
 import { DocumentationError, ez } from "../../src";
 import {
   OpenAPIContext,
@@ -60,7 +59,6 @@ describe("Documentation helpers", () => {
     method: "get",
     isResponse: false,
     makeRef: makeRefMock,
-    serializer: defaultSerializer,
     next: (schema: z.ZodTypeAny) =>
       walkSchema(schema, {
         rules: depicters,
@@ -74,7 +72,6 @@ describe("Documentation helpers", () => {
     method: "get",
     isResponse: true,
     makeRef: makeRefMock,
-    serializer: defaultSerializer,
     next: (schema: z.ZodTypeAny) =>
       walkSchema(schema, {
         rules: depicters,
