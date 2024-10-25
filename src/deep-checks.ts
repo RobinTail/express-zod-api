@@ -120,7 +120,7 @@ export const hasJsonIncompatibleSchema = (
       // ZodLazy: ({ schema }: z.ZodLazy<z.ZodTypeAny>, { next }) => next(schema),
       ZodTuple: ({ items, _def: { rest } }: z.AnyZodTuple, { next }) =>
         [...items].concat(rest ?? []).some(next),
-      ZodEffects: isResponse ? () => false : ioChecks.ZodEffects, // not applicable for response
+      ZodEffects: isResponse ? undefined : ioChecks.ZodEffects, // not applicable for response
       ZodDate: () => !isResponse,
       ZodNaN: () => true,
       ZodSymbol: () => true,
@@ -128,6 +128,9 @@ export const hasJsonIncompatibleSchema = (
       ZodMap: () => true,
       ZodSet: () => true,
       ZodBigInt: () => true,
+      ZodVoid: () => true,
+      ZodPromise: () => true,
+      ZodNever: () => true,
       [ezDateOutBrand]: () => !isResponse,
       [ezDateInBrand]: () => isResponse,
       [ezRawBrand]: () => isResponse,

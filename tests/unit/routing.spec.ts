@@ -13,6 +13,7 @@ import {
   Routing,
   ServeStatic,
   defaultResultHandler,
+  ez,
 } from "../../src";
 import {
   makeLoggerMock,
@@ -404,6 +405,53 @@ describe("Routing", () => {
         status: "success",
         data: { result: true },
       });
+    });
+
+    test.each([
+      [z.bigint(), z.set(z.string())],
+      [z.nan(), z.map(z.string(), z.boolean())],
+      [z.date().pipe(z.string()), z.symbol().catch(Symbol("test"))],
+      [z.function().transform(() => "test"), z.tuple([z.function()])],
+      [ez.dateOut(), ez.dateIn()],
+      [z.void(), ez.raw()],
+      [z.promise(z.any()), ez.upload()],
+      [z.never(), z.tuple([ez.file()]).rest(z.nan())],
+    ])("should warn about JSON incompatible schemas %#", (input, output) => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        method: "get",
+        input: z.object({
+          test: input,
+        }),
+        output: z.object({
+          result: output,
+        }),
+        handler: vi.fn(),
+      });
+      const configMock = { cors: false, startupLogo: false };
+      const rootLogger = makeLoggerMock();
+      initRouting({
+        rootLogger,
+        app: appMock as unknown as IRouter,
+        getChildLogger: () => rootLogger,
+        config: configMock as CommonConfig,
+        routing: { path: endpoint },
+      });
+      expect(rootLogger._getLogs().warn).toEqual([
+        [
+          "The input endpoint schema (including middlewares) contains an unsupported JSON payload type.",
+          {
+            method: "get",
+            path: "/path",
+          },
+        ],
+        [
+          "The positive response endpoint schema (including ResultHandler) contains an unsupported JSON payload type.",
+          {
+            method: "get",
+            path: "/path",
+          },
+        ],
+      ]);
     });
   });
 });
