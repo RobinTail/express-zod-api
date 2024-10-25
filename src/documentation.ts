@@ -60,7 +60,7 @@ interface DocumentationParams {
   /** @default inline */
   composition?: "inline" | "components";
   /**
-   * @deprecated
+   * @deprecated no longer used
    * @todo remove in v21
    * */
   serializer?: (schema: z.ZodTypeAny) => string;
