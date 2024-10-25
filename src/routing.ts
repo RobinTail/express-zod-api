@@ -1,8 +1,10 @@
 import { IRouter, RequestHandler } from "express";
 import { CommonConfig } from "./config-type";
-import { ContentType } from "./content-type";
+import { ContentType, contentTypes } from "./content-type";
+import { hasJsonIncompatibleSchema } from "./deep-checks";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
+import { ActualLogger } from "./logger-helpers";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { ChildLoggerExtractor } from "./server-helpers";
@@ -15,12 +17,14 @@ export type Parsers = Record<ContentType, RequestHandler[]>;
 
 export const initRouting = ({
   app,
+  rootLogger,
   getChildLogger,
   config,
   routing,
   parsers,
 }: {
   app: IRouter;
+  rootLogger: ActualLogger;
   getChildLogger: ChildLoggerExtractor;
   config: CommonConfig;
   routing: Routing;
@@ -30,6 +34,26 @@ export const initRouting = ({
     routing,
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
+      if (
+        endpoint.getRequestType() === "json" &&
+        hasJsonIncompatibleSchema(endpoint.getSchema("input"), false)
+      ) {
+        rootLogger.warn(
+          "The input endpoint schema (including middlewares) contains an unsupported JSON payload type.",
+          { path, method },
+        );
+      }
+      for (const variant of ["positive", "negative"] as const) {
+        if (
+          endpoint.getMimeTypes(variant).includes(contentTypes.json) &&
+          hasJsonIncompatibleSchema(endpoint.getSchema(variant), true)
+        ) {
+          rootLogger.warn(
+            `The ${variant} response endpoint schema (including ResultHandler) contains an unsupported JSON payload type.`,
+            { path, method },
+          );
+        }
+      }
       app[method](
         path,
         ...(parsers?.[endpoint.getRequestType()] || []),
