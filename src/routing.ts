@@ -30,7 +30,7 @@ export const initRouting = ({
   routing: Routing;
   parsers?: Parsers;
 }) => {
-  const verified = new WeakMap<AbstractEndpoint, boolean>();
+  const verified = new WeakSet<AbstractEndpoint>();
   walkRouting({
     routing,
     hasCors: !!config.cors,
@@ -57,7 +57,7 @@ export const initRouting = ({
             );
           }
         }
-        verified.set(endpoint, true);
+        verified.add(endpoint);
       }
       app[method](
         path,
