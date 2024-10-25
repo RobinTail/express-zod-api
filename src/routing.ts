@@ -34,8 +34,9 @@ export const initRouting = ({
     routing,
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
+      const requestType = endpoint.getRequestType();
       if (
-        endpoint.getRequestType() === "json" &&
+        requestType === "json" &&
         hasJsonIncompatibleSchema(endpoint.getSchema("input"), false)
       ) {
         rootLogger.warn(
@@ -56,7 +57,7 @@ export const initRouting = ({
       }
       app[method](
         path,
-        ...(parsers?.[endpoint.getRequestType()] || []),
+        ...(parsers?.[requestType] || []),
         async (request, response) =>
           endpoint.execute({
             request,
