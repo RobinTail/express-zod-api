@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import { fail } from "node:assert/strict";
 import { z } from "zod";
 import { EmptyObject } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
@@ -104,10 +104,7 @@ export const hasRaw = (subject: IOSchema) =>
   });
 
 /** @throws AssertionError with incompatible schema constructor */
-export const assertJsonCompatible = (
-  subject: IOSchema,
-  direction: "in" | "out",
-) => {
+export const assertJsonCompatible = (subject: IOSchema, dir: "in" | "out") => {
   const lazies = new WeakSet<z.ZodLazy<z.ZodTypeAny>>();
   return hasNestedSchema(subject, {
     maxDepth: 300,
@@ -120,26 +117,26 @@ export const assertJsonCompatible = (
       ZodPipeline: (
         { _def }: z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>,
         { next },
-      ) => next(_def[direction]),
+      ) => next(_def[dir]),
       ZodLazy: (lazy: z.ZodLazy<z.ZodTypeAny>, { next }) =>
         lazies.has(lazy) ? false : lazies.add(lazy) && next(lazy.schema),
       ZodTuple: ({ items, _def: { rest } }: z.AnyZodTuple, { next }) =>
         [...items].concat(rest ?? []).some(next),
-      ZodEffects: { out: undefined, in: ioChecks.ZodEffects }[direction],
-      ZodNaN: () => assert.fail("z.nan()"),
-      ZodSymbol: () => assert.fail("z.symbol()"),
-      ZodFunction: () => assert.fail("z.function()"),
-      ZodMap: () => assert.fail("z.map()"),
-      ZodSet: () => assert.fail("z.set()"),
-      ZodBigInt: () => assert.fail("z.bigint()"),
-      ZodVoid: () => assert.fail("z.void()"),
-      ZodPromise: () => assert.fail("z.promise()"),
-      ZodNever: () => assert.fail("z.never()"),
-      ZodDate: () => direction === "in" && assert.fail("z.date()"),
-      [ezDateOutBrand]: () => direction === "in" && assert.fail("ez.dateOut()"),
-      [ezDateInBrand]: () => direction === "out" && assert.fail("ez.dateIn()"),
-      [ezRawBrand]: () => direction === "out" && assert.fail("ez.raw()"),
-      [ezUploadBrand]: () => direction === "out" && assert.fail("ez.upload()"),
+      ZodEffects: { out: undefined, in: ioChecks.ZodEffects }[dir],
+      ZodNaN: () => fail("z.nan()"),
+      ZodSymbol: () => fail("z.symbol()"),
+      ZodFunction: () => fail("z.function()"),
+      ZodMap: () => fail("z.map()"),
+      ZodSet: () => fail("z.set()"),
+      ZodBigInt: () => fail("z.bigint()"),
+      ZodVoid: () => fail("z.void()"),
+      ZodPromise: () => fail("z.promise()"),
+      ZodNever: () => fail("z.never()"),
+      ZodDate: () => dir === "in" && fail("z.date()"),
+      [ezDateOutBrand]: () => dir === "in" && fail("ez.dateOut()"),
+      [ezDateInBrand]: () => dir === "out" && fail("ez.dateIn()"),
+      [ezRawBrand]: () => dir === "out" && fail("ez.raw()"),
+      [ezUploadBrand]: () => dir === "out" && fail("ez.upload()"),
       [ezFileBrand]: () => false,
     },
   });
