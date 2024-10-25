@@ -170,6 +170,7 @@ export const makeCleanId = (...args: string[]) =>
     .map(ucFirst)
     .join("");
 
+/** @todo remove */
 export const defaultSerializer = (schema: z.ZodTypeAny): string =>
   createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
 

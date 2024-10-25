@@ -11,11 +11,7 @@ import { keys, pluck } from "ramda";
 import { z } from "zod";
 import { defaultStatusCodes } from "./api-response";
 import { DocumentationError } from "./errors";
-import {
-  defaultInputSources,
-  defaultSerializer,
-  makeCleanId,
-} from "./common-helpers";
+import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
@@ -64,8 +60,8 @@ interface DocumentationParams {
   /** @default inline */
   composition?: "inline" | "components";
   /**
-   * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
-   * @default JSON.stringify() + SHA1 hash as a hex digest
+   * @deprecated
+   * @todo remove in v21
    * */
   serializer?: (schema: z.ZodTypeAny) => string;
   /**
@@ -81,19 +77,22 @@ export class Documentation extends OpenApiBuilder {
   protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   protected lastOperationIdSuffixes = new Map<string, number>();
   protected responseVariants = keys(defaultStatusCodes);
+  protected references = new Map<z.ZodTypeAny, ReferenceObject>();
 
   protected makeRef(
-    name: string,
-    schema: SchemaObject | ReferenceObject,
+    schema: z.ZodTypeAny,
+    depicted: SchemaObject | ReferenceObject,
+    name = this.references.get(schema)?.$ref.split("/").pop() ??
+      `Schema${this.references.size}`,
   ): ReferenceObject {
-    this.addSchema(name, schema);
-    return this.getRef(name)!;
+    const reference: ReferenceObject = { $ref: `#/components/schemas/${name}` };
+    this.addSchema(name, depicted);
+    this.references.set(schema, reference);
+    return reference;
   }
 
-  protected getRef(name: string): ReferenceObject | undefined {
-    return name in (this.rootDoc.components?.schemas || {})
-      ? { $ref: `#/components/schemas/${name}` }
-      : undefined;
+  protected getRef(schema: z.ZodTypeAny): ReferenceObject | undefined {
+    return this.references.get(schema);
   }
 
   protected ensureUniqOperationId(
@@ -147,7 +146,6 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     hasSummaryFromDescription = true,
     composition = "inline",
-    serializer = defaultSerializer,
   }: DocumentationParams) {
     super();
     this.addInfo({ title, version });
@@ -165,7 +163,6 @@ export class Documentation extends OpenApiBuilder {
         method,
         endpoint,
         composition,
-        serializer,
         brandHandling,
         getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),

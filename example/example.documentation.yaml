@@ -48,7 +48,7 @@ paths:
                             title:
                               type: string
                             features:
-                              $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                              $ref: "#/components/schemas/Schema0"
                           required:
                             - title
                             - features
@@ -549,7 +549,7 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    2048581c137c5b2130eb860e3ae37da196dfc25b:
+    Schema0:
       type: array
       items:
         type: object
@@ -557,7 +557,7 @@ components:
           title:
             type: string
           features:
-            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+            $ref: "#/components/schemas/Schema0"
         required:
           - title
           - features
