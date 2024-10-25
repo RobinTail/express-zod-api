@@ -29,31 +29,35 @@ export const initRouting = ({
   config: CommonConfig;
   routing: Routing;
   parsers?: Parsers;
-}) =>
+}) => {
+  const verified = new WeakMap<AbstractEndpoint, boolean>();
   walkRouting({
     routing,
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
       const requestType = endpoint.getRequestType();
-      if (
-        requestType === "json" &&
-        hasJsonIncompatibleSchema(endpoint.getSchema("input"), false)
-      ) {
-        rootLogger.warn(
-          "The input endpoint schema (including middlewares) contains an unsupported JSON payload type.",
-          { path, method },
-        );
-      }
-      for (const variant of ["positive", "negative"] as const) {
+      if (!verified.has(endpoint)) {
         if (
-          endpoint.getMimeTypes(variant).includes(contentTypes.json) &&
-          hasJsonIncompatibleSchema(endpoint.getSchema(variant), true)
+          requestType === "json" &&
+          hasJsonIncompatibleSchema(endpoint.getSchema("input"), false)
         ) {
           rootLogger.warn(
-            `The ${variant} response endpoint schema (including ResultHandler) contains an unsupported JSON payload type.`,
+            "The input endpoint schema (including middlewares) contains an unsupported JSON payload type.",
             { path, method },
           );
         }
+        for (const variant of ["positive", "negative"] as const) {
+          if (
+            endpoint.getMimeTypes(variant).includes(contentTypes.json) &&
+            hasJsonIncompatibleSchema(endpoint.getSchema(variant), true)
+          ) {
+            rootLogger.warn(
+              `The ${variant} response endpoint schema (including ResultHandler) contains an unsupported JSON payload type.`,
+              { path, method },
+            );
+          }
+        }
+        verified.set(endpoint, true);
       }
       app[method](
         path,
@@ -72,3 +76,4 @@ export const initRouting = ({
       app.use(path, handler);
     },
   });
+};
