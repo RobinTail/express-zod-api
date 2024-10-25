@@ -51,7 +51,7 @@ const ioChecks: HandlingRules<boolean, EmptyObject, z.ZodFirstPartyTypeKind> = {
 };
 
 interface NestedSchemaLookupProps {
-  condition: (schema: z.ZodTypeAny) => boolean;
+  condition?: (schema: z.ZodTypeAny) => boolean;
   rules?: HandlingRules<
     boolean,
     EmptyObject,
@@ -71,9 +71,7 @@ export const hasNestedSchema = (
     maxDepth = Number.POSITIVE_INFINITY,
   }: NestedSchemaLookupProps,
 ): boolean => {
-  if (condition(subject)) {
-    return true;
-  }
+  if (condition?.(subject)) return true;
   const handler =
     depth < maxDepth
       ? rules[subject._def[metaSymbol]?.brand as keyof typeof rules] ||
@@ -104,22 +102,11 @@ export const hasRaw = (subject: IOSchema) =>
     maxDepth: 3,
   });
 
-const jsonIncompatibleSchemas: z.ZodFirstPartyTypeKind[] = [
-  z.ZodFirstPartyTypeKind.ZodNaN,
-  z.ZodFirstPartyTypeKind.ZodSymbol,
-  z.ZodFirstPartyTypeKind.ZodFunction,
-  z.ZodFirstPartyTypeKind.ZodMap,
-  z.ZodFirstPartyTypeKind.ZodSet,
-  z.ZodFirstPartyTypeKind.ZodBigInt,
-];
-
 export const hasJsonIncompatibleSchema = (
   subject: IOSchema,
   isResponse: boolean,
 ) =>
   hasNestedSchema(subject, {
-    condition: (schema) =>
-      jsonIncompatibleSchemas.includes(schema._def.typeName),
     rules: {
       ...ioChecks,
       ZodBranded: onWrapped,
@@ -135,6 +122,12 @@ export const hasJsonIncompatibleSchema = (
         [...items].concat(rest ?? []).some(next),
       ZodEffects: isResponse ? () => false : ioChecks.ZodEffects, // not applicable for response
       ZodDate: () => !isResponse,
+      ZodNaN: () => true,
+      ZodSymbol: () => true,
+      ZodFunction: () => true,
+      ZodMap: () => true,
+      ZodSet: () => true,
+      ZodBigInt: () => true,
       [ezDateOutBrand]: () => !isResponse,
       [ezDateInBrand]: () => isResponse,
       [ezRawBrand]: () => isResponse,
