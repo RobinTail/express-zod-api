@@ -425,9 +425,9 @@ export interface Response extends Record<MethodPath, any> {
 `;
 
 exports[`Integration > Should generate a client for example API 1`] = `
-"type Type0 = {
+"type Type1 = {
   title: string;
-  features: Type0;
+  features: Type1;
 }[];
 
 type GetV1UserRetrieveInput = {} & {
@@ -443,7 +443,7 @@ type GetV1UserRetrieveResponse =
         name: string;
         features: {
           title: string;
-          features: Type0;
+          features: Type1;
         }[];
       };
     }
@@ -668,9 +668,9 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
 `;
 
 exports[`Integration > Should generate a types for example API 1`] = `
-"type Type0 = {
+"type Type1 = {
   title: string;
-  features: Type0;
+  features: Type1;
 }[];
 
 type GetV1UserRetrieveInput = {} & {
@@ -686,7 +686,7 @@ type GetV1UserRetrieveResponse =
         name: string;
         features: {
           title: string;
-          features: Type0;
+          features: Type1;
         }[];
       };
     }

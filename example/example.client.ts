@@ -1,6 +1,6 @@
-type Type0 = {
+type Type1 = {
   title: string;
-  features: Type0;
+  features: Type1;
 }[];
 
 type GetV1UserRetrieveInput = {} & {
@@ -16,7 +16,7 @@ type GetV1UserRetrieveResponse =
         name: string;
         features: {
           title: string;
-          features: Type0;
+          features: Type1;
         }[];
       };
     }

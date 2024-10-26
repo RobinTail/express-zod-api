@@ -48,7 +48,7 @@ paths:
                             title:
                               type: string
                             features:
-                              $ref: "#/components/schemas/Schema0"
+                              $ref: "#/components/schemas/Schema1"
                           required:
                             - title
                             - features
@@ -549,7 +549,7 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    Schema0:
+    Schema1:
       type: array
       items:
         type: object
@@ -557,7 +557,7 @@ components:
           title:
             type: string
           features:
-            $ref: "#/components/schemas/Schema0"
+            $ref: "#/components/schemas/Schema1"
         required:
           - title
           - features

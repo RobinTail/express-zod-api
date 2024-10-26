@@ -88,7 +88,7 @@ export class Documentation extends OpenApiBuilder {
     name = this.references.get(schema),
   ): ReferenceObject {
     if (!name) {
-      name = `Schema${this.references.size}`;
+      name = `Schema${this.references.size + 1}`;
       this.references.set(schema, name);
       if (typeof subject === "function") subject = subject();
     }
