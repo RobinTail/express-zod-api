@@ -777,7 +777,7 @@ describe("Documentation helpers", () => {
             $ref: "#/components/schemas/SomeSchema",
           }),
         );
-        expect(makeRefMock.mock.calls.length).toBe(0);
+        expect(makeRefMock).not.toHaveBeenCalled();
         expect(depictLazy(schema, responseCtx)).toMatchSnapshot();
         expect(makeRefMock).toHaveBeenCalledTimes(1);
         expect(makeRefMock).toHaveBeenCalledWith(schema, expect.any(Function));
