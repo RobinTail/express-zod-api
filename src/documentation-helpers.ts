@@ -74,7 +74,7 @@ export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   makeRef: (
     schema: z.ZodTypeAny,
-    image:
+    subject:
       | SchemaObject
       | ReferenceObject
       | (() => SchemaObject | ReferenceObject),

@@ -81,7 +81,7 @@ export class Documentation extends OpenApiBuilder {
 
   protected makeRef(
     schema: z.ZodTypeAny,
-    image:
+    subject:
       | SchemaObject
       | ReferenceObject
       | (() => SchemaObject | ReferenceObject),
@@ -90,9 +90,9 @@ export class Documentation extends OpenApiBuilder {
     if (!name) {
       name = `Schema${this.references.size}`;
       this.references.set(schema, name);
-      if (typeof image === "function") image = image();
+      if (typeof subject === "function") subject = subject();
     }
-    if (typeof image === "object") this.addSchema(name, image);
+    if (typeof subject === "object") this.addSchema(name, subject);
     return { $ref: `#/components/schemas/${name}` };
   }
 
