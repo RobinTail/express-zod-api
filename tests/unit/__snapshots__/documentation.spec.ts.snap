@@ -1200,7 +1200,7 @@ paths:
                             title:
                               type: string
                             features:
-                              $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                              $ref: "#/components/schemas/Schema1"
                           required:
                             - title
                             - features
@@ -1701,7 +1701,7 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    2048581c137c5b2130eb860e3ae37da196dfc25b:
+    Schema1:
       type: array
       items:
         type: object
@@ -1709,7 +1709,7 @@ components:
           title:
             type: string
           features:
-            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+            $ref: "#/components/schemas/Schema1"
         required:
           - title
           - features
@@ -2029,7 +2029,7 @@ components:
       type: string
       pattern: \\d+
       description: a numeric string containing the id of the user
-    2048581c137c5b2130eb860e3ae37da196dfc25b:
+    Schema1:
       type: array
       items:
         type: object
@@ -2037,7 +2037,7 @@ components:
           title:
             type: string
           features:
-            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+            $ref: "#/components/schemas/Schema1"
         required:
           - title
           - features
@@ -2065,7 +2065,7 @@ components:
                   title:
                     type: string
                   features:
-                    $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - title
                   - features
@@ -2530,7 +2530,7 @@ paths:
                           name:
                             type: string
                           subcategories:
-                            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                            $ref: "#/components/schemas/Schema1"
                         required:
                           - name
                           - subcategories
@@ -2567,7 +2567,7 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    2048581c137c5b2130eb860e3ae37da196dfc25b:
+    Schema1:
       type: array
       items:
         type: object
@@ -2575,7 +2575,7 @@ components:
           name:
             type: string
           subcategories:
-            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+            $ref: "#/components/schemas/Schema1"
         required:
           - name
           - subcategories

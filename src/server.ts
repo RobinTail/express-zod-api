@@ -52,6 +52,7 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
     makeCommonEntities(config);
   initRouting({
     app: config.app.use(loggingMiddleware),
+    rootLogger,
     routing,
     getChildLogger,
     config,
@@ -93,7 +94,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       getChildLogger,
     });
   }
-  initRouting({ app, routing, getChildLogger, config, parsers });
+  initRouting({ app, routing, rootLogger, getChildLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
   const makeStarter =

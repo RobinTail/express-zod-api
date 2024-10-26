@@ -8,7 +8,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
         string: string;
     }[];
     boolean: boolean;
-    circular: Type118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f;
+    circular: SomeType;
     union: {
         number: number;
     } | "hi";
@@ -60,7 +60,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     optDefaultString?: string | undefined;
     refinedStringWithSomeBullshit: (string | number) & ((bigint | null) | undefined);
     nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
-    lazy: Type51497f7e879bae48c3fbad2fa68050d1e08bbf82;
+    lazy: SomeType;
     discUnion: {
         kind: "circle";
         radius: number;

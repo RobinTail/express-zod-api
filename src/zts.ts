@@ -193,19 +193,8 @@ const onPipeline: Producer = (
 
 const onNull: Producer = () => f.createLiteralTypeNode(f.createNull());
 
-const onLazy: Producer = (
-  { schema }: z.ZodLazy<z.ZodTypeAny>,
-  { getAlias, makeAlias, next, serializer: serialize },
-) => {
-  const name = `Type${serialize(schema)}`;
-  return (
-    getAlias(name) ||
-    (() => {
-      makeAlias(name, f.createLiteralTypeNode(f.createNull())); // make empty type first
-      return makeAlias(name, next(schema)); // update
-    })()
-  );
-};
+const onLazy: Producer = (lazy: z.ZodLazy<z.ZodTypeAny>, { makeAlias, next }) =>
+  makeAlias(lazy, () => next(lazy.schema));
 
 const onFile: Producer = (schema: FileSchema) => {
   const subject = schema.unwrap();
