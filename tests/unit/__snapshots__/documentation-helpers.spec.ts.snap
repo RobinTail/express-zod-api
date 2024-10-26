@@ -451,48 +451,19 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
 
 exports[`Documentation helpers > depictLazy > should handle circular references 0 1`] = `
 {
-  "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 0 2`] = `
-{
-  "items": {
-    "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
-  },
-  "type": "array",
+  "$ref": "#/components/schemas/SomeSchema",
 }
 `;
 
 exports[`Documentation helpers > depictLazy > should handle circular references 1 1`] = `
 {
-  "$ref": "#/components/schemas/7a225c55e65ab4a2fd3ce390265b255ee6747049",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 1 2`] = `
-{
-  "$ref": "#/components/schemas/7a225c55e65ab4a2fd3ce390265b255ee6747049",
+  "$ref": "#/components/schemas/SomeSchema",
 }
 `;
 
 exports[`Documentation helpers > depictLazy > should handle circular references 2 1`] = `
 {
-  "$ref": "#/components/schemas/118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 2 2`] = `
-{
-  "properties": {
-    "prop": {
-      "$ref": "#/components/schemas/118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
-    },
-  },
-  "required": [
-    "prop",
-  ],
-  "type": "object",
+  "$ref": "#/components/schemas/SomeSchema",
 }
 `;
 

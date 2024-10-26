@@ -1357,7 +1357,7 @@ const ruleForDocs: Depicter = (
 
 const ruleForClient: Producer = (
   schema: typeof myBrandedSchema, // you should assign type yourself
-  { next, isResponse, serializer }, // handle a nested schema using next()
+  { next, isResponse }, // handle a nested schema using next()
 ) => ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
 
 new Documentation({

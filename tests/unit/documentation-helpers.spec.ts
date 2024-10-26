@@ -1,6 +1,5 @@
-import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
+import { ReferenceObject } from "openapi3-ts/oas31";
 import { z } from "zod";
-import { defaultSerializer } from "../../src/common-helpers";
 import { DocumentationError, ez } from "../../src";
 import {
   OpenAPIContext,
@@ -54,19 +53,12 @@ import { walkSchema } from "../../src/schema-walker";
 import { serializeSchemaForTest } from "../helpers";
 
 describe("Documentation helpers", () => {
-  const getRefMock = vi.fn();
-  const makeRefMock = vi.fn(
-    (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
-      $ref: `#/components/schemas/${name}`,
-    }),
-  );
+  const makeRefMock = vi.fn();
   const requestCtx = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: false,
-    getRef: getRefMock,
     makeRef: makeRefMock,
-    serializer: defaultSerializer,
     next: (schema: z.ZodTypeAny) =>
       walkSchema(schema, {
         rules: depicters,
@@ -79,9 +71,7 @@ describe("Documentation helpers", () => {
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
-    getRef: getRefMock,
     makeRef: makeRefMock,
-    serializer: defaultSerializer,
     next: (schema: z.ZodTypeAny) =>
       walkSchema(schema, {
         rules: depicters,
@@ -92,7 +82,6 @@ describe("Documentation helpers", () => {
   } satisfies OpenAPIContext;
 
   beforeEach(() => {
-    getRefMock.mockClear();
     makeRefMock.mockClear();
   });
 
@@ -780,38 +769,20 @@ describe("Documentation helpers", () => {
       z.object({ prop: recursiveObject }),
     );
 
-    test.each([
-      {
-        schema: recursiveArray,
-        hash: "6cbbd837811754902ea1e68d3e5c75e36250b880",
-      },
-      {
-        schema: directlyRecursive,
-        hash: "7a225c55e65ab4a2fd3ce390265b255ee6747049",
-      },
-      {
-        schema: recursiveObject,
-        hash: "118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
-      },
-    ])("should handle circular references %#", ({ schema, hash }) => {
-      getRefMock
-        .mockImplementationOnce(() => undefined)
-        .mockImplementationOnce(
-          (name: string): ReferenceObject => ({
-            $ref: `#/components/schemas/${name}`,
+    test.each([recursiveArray, directlyRecursive, recursiveObject])(
+      "should handle circular references %#",
+      (schema) => {
+        makeRefMock.mockImplementationOnce(
+          (): ReferenceObject => ({
+            $ref: "#/components/schemas/SomeSchema",
           }),
         );
-      expect(getRefMock.mock.calls.length).toBe(0);
-      expect(depictLazy(schema, responseCtx)).toMatchSnapshot();
-      expect(getRefMock).toHaveBeenCalledTimes(2);
-      for (const call of getRefMock.mock.calls) {
-        expect(call[0]).toBe(hash);
-      }
-      expect(makeRefMock).toHaveBeenCalledTimes(2);
-      expect(makeRefMock.mock.calls[0]).toEqual([hash, {}]);
-      expect(makeRefMock.mock.calls[1][0]).toBe(hash);
-      expect(makeRefMock.mock.calls[1][1]).toMatchSnapshot();
-    });
+        expect(makeRefMock).not.toHaveBeenCalled();
+        expect(depictLazy(schema, responseCtx)).toMatchSnapshot();
+        expect(makeRefMock).toHaveBeenCalledTimes(1);
+        expect(makeRefMock).toHaveBeenCalledWith(schema, expect.any(Function));
+      },
+    );
   });
 
   describe("depictSecurity()", () => {
