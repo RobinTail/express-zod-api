@@ -11,7 +11,7 @@ export interface ZTSContext extends FlatObject {
   isResponse: boolean;
   makeAlias: (
     schema: z.ZodTypeAny,
-    image: () => ts.TypeNode,
+    produce: () => ts.TypeNode,
   ) => ts.TypeReferenceNode;
   optionalPropStyle: { withQuestionMark?: boolean; withUndefined?: boolean };
 }

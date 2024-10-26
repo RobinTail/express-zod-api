@@ -144,7 +144,7 @@ export class Integration {
 
   protected makeAlias(
     schema: z.ZodTypeAny,
-    image: () => ts.TypeNode,
+    produce: () => ts.TypeNode,
   ): ts.TypeReferenceNode {
     let name = this.aliases.get(schema)?.name?.text;
     if (!name) {
@@ -153,7 +153,7 @@ export class Integration {
         schema,
         createTypeAlias(f.createLiteralTypeNode(f.createNull()), name),
       );
-      this.aliases.set(schema, createTypeAlias(image(), name));
+      this.aliases.set(schema, createTypeAlias(produce(), name));
     }
     return f.createTypeReferenceNode(name);
   }
