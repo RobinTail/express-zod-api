@@ -2,6 +2,13 @@
 
 ## Version 20
 
+### v20.15.1
+
+- Deprecating `serializer` property on `Documentation` and `Integration` constructor argument:
+  - That property was introduced in v9.3.0 and utilized for comparing schemas in order to handle possible circular
+    references within `z.lazy()`;
+  - The property is no longer in use and will be removed in version 21.
+
 ### v20.15.0
 
 - Feat: warn about potentially unserializable schema used for JSON operating endpoints:

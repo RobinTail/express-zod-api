@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Example API
-  version: 20.15.0
+  version: 20.15.1
 paths:
   /v1/user/retrieve:
     get:
@@ -48,7 +48,7 @@ paths:
                             title:
                               type: string
                             features:
-                              $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                              $ref: "#/components/schemas/Schema1"
                           required:
                             - title
                             - features
@@ -549,7 +549,7 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    2048581c137c5b2130eb860e3ae37da196dfc25b:
+    Schema1:
       type: array
       items:
         type: object
@@ -557,7 +557,7 @@ components:
           title:
             type: string
           features:
-            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+            $ref: "#/components/schemas/Schema1"
         required:
           - title
           - features
