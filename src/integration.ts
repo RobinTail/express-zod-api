@@ -56,11 +56,6 @@ interface IntegrationParams {
    * */
   splitResponse?: boolean;
   /**
-   * @deprecated no longer used
-   * @todo remove in v21
-   * */
-  serializer?: (schema: z.ZodTypeAny) => string;
-  /**
    * @desc configures the style of object's optional properties
    * @default { withQuestionMark: true, withUndefined: true }
    */

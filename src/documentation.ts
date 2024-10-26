@@ -60,11 +60,6 @@ interface DocumentationParams {
   /** @default inline */
   composition?: "inline" | "components";
   /**
-   * @deprecated no longer used
-   * @todo remove in v21
-   * */
-  serializer?: (schema: z.ZodTypeAny) => string;
-  /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
