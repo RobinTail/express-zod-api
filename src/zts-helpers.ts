@@ -30,18 +30,16 @@ export const addJsDocComment = (node: ts.Node, text: string) => {
 
 export const createTypeAlias = (
   node: ts.TypeNode,
-  identifier: string,
+  name: string,
   comment?: string,
 ) => {
   const typeAlias = f.createTypeAliasDeclaration(
     undefined,
-    f.createIdentifier(identifier),
+    f.createIdentifier(name),
     undefined,
     node,
   );
-  if (comment) {
-    addJsDocComment(typeAlias, comment);
-  }
+  if (comment) addJsDocComment(typeAlias, comment);
   return typeAlias;
 };
 
