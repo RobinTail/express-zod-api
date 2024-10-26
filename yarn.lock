@@ -721,9 +721,9 @@
     "@types/node" "*"
 
 "@types/depd@^1.1.36":
-  version "1.1.36"
-  resolved "https://registry.yarnpkg.com/@types/depd/-/depd-1.1.36.tgz#7633366ce394e6aa046cedb55e70143e9bca67cd"
-  integrity sha512-+apvfj5Bn6ORfud9XrgoIu6H6s2pTN+X8rQ2LgkA3YUXY+PiXkCJjizh8qxv8CrLtXlxw3NCmYrNbbeckVOQrA==
+  version "1.1.37"
+  resolved "https://registry.yarnpkg.com/@types/depd/-/depd-1.1.37.tgz#dc8a8b9e450acaba3f6308c5927e6a3062b80c87"
+  integrity sha512-PkEYFHnqDFgs+bJXJX0L8mq7sn3DWh+TP0m8BBJUJfZ2WcjRm7jd7Cq68jIJt+c31R1gX0cwSK1ZXOECvN97Rg==
   dependencies:
     "@types/node" "*"
 
