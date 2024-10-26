@@ -145,8 +145,8 @@ export class Integration {
   protected makeAlias(
     schema: z.ZodTypeAny,
     image: () => ts.TypeNode,
-    name = this.aliases.get(schema)?.name?.text,
   ): ts.TypeReferenceNode {
+    let name = this.aliases.get(schema)?.name?.text;
     if (!name) {
       name = `Type${this.aliases.size}`;
       this.aliases.set(

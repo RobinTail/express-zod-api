@@ -12,7 +12,6 @@ export interface ZTSContext extends FlatObject {
   makeAlias: (
     schema: z.ZodTypeAny,
     image: () => ts.TypeNode,
-    name?: string,
   ) => ts.TypeReferenceNode;
   optionalPropStyle: { withQuestionMark?: boolean; withUndefined?: boolean };
 }
