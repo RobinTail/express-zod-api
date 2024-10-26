@@ -1,5 +1,20 @@
 # Changelog
 
+## Version 21
+
+### v21.0.0
+
+- Minimum supported versions of `express`: 4.21.1 and 5.0.1 (fixed vulnerabilities);
+- Running HTTP server made optional (can now configure HTTPS only):
+  - Object argument of the `createConfig()` method changed:
+    - The `server` property renamed to `http` and made optional;
+    - Its nested properties moved to the top level of the config object:
+      `jsonParser`, `upload`, `compression`, `rawParser` and `beforeRouting`.
+  - The object resolved from the `createServer()` method changed:
+    - Properties `httpServer` and `httpsServer` are removed;
+    - Added `servers` property — array containing those server instances in the same order.
+- The `serializer` property of `Documentation` and `Integration` constructor argument removed.
+
 ## Version 20
 
 ### v20.15.1
