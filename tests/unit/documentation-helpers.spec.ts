@@ -780,10 +780,7 @@ describe("Documentation helpers", () => {
         expect(makeRefMock.mock.calls.length).toBe(0);
         expect(depictLazy(schema, responseCtx)).toMatchSnapshot();
         expect(makeRefMock).toHaveBeenCalledTimes(1);
-        expect(makeRefMock.mock.calls[0]).toEqual([
-          schema,
-          expect.any(Function),
-        ]);
+        expect(makeRefMock).toHaveBeenCalledWith(schema, expect.any(Function));
       },
     );
   });
