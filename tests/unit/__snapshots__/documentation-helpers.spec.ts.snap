@@ -455,22 +455,7 @@ exports[`Documentation helpers > depictLazy > should handle circular references 
 }
 `;
 
-exports[`Documentation helpers > depictLazy > should handle circular references 0 2`] = `
-{
-  "items": {
-    "$ref": "#/components/schemas/SomeSchema",
-  },
-  "type": "array",
-}
-`;
-
 exports[`Documentation helpers > depictLazy > should handle circular references 1 1`] = `
-{
-  "$ref": "#/components/schemas/SomeSchema",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 1 2`] = `
 {
   "$ref": "#/components/schemas/SomeSchema",
 }
@@ -479,20 +464,6 @@ exports[`Documentation helpers > depictLazy > should handle circular references 
 exports[`Documentation helpers > depictLazy > should handle circular references 2 1`] = `
 {
   "$ref": "#/components/schemas/SomeSchema",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 2 2`] = `
-{
-  "properties": {
-    "prop": {
-      "$ref": "#/components/schemas/SomeSchema",
-    },
-  },
-  "required": [
-    "prop",
-  ],
-  "type": "object",
 }
 `;
 
