@@ -149,10 +149,8 @@ export class Integration {
     let name = this.aliases.get(schema)?.name?.text;
     if (!name) {
       name = `Type${this.aliases.size}`;
-      this.aliases.set(
-        schema,
-        createTypeAlias(f.createLiteralTypeNode(f.createNull()), name),
-      );
+      const temp = f.createLiteralTypeNode(f.createNull());
+      this.aliases.set(schema, createTypeAlias(temp, name));
       this.aliases.set(schema, createTypeAlias(produce(), name));
     }
     return f.createTypeReferenceNode(name);
