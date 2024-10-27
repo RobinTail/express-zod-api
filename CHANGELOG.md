@@ -13,7 +13,19 @@
   - The object resolved from the `createServer()` method changed:
     - Properties `httpServer` and `httpsServer` are removed;
     - Added `servers` property — array containing those server instances in the same order.
-- The `serializer` property of `Documentation` and `Integration` constructor argument removed.
+- The `serializer` property of `Documentation` and `Integration` constructor argument removed;
+- Consider the automated migration using the built-in ESLint rule.
+
+```js
+// eslint.config.mjs — minimal ESLint 9 config to apply migrations automatically using "eslint --fix"
+import parser from "@typescript-eslint/parser";
+import migration from "express-zod-api/migration";
+
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v21": "error" } },
+];
+```
 
 ## Version 20
 
