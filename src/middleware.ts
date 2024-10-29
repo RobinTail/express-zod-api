@@ -31,7 +31,7 @@ export class Middleware<
   OPT extends FlatObject,
   OUT extends FlatObject,
   SCO extends string,
-  IN extends IOSchema<"strip">,
+  IN extends IOSchema<"strip"> = z.ZodObject<EmptyObject, "strip">,
 > extends AbstractMiddleware {
   readonly #schema: IN;
   readonly #security?: LogicalContainer<
@@ -40,11 +40,11 @@ export class Middleware<
   readonly #handler: Handler<z.output<IN>, OPT, OUT>;
 
   constructor({
-    input,
+    input = z.object({}) as IN,
     security,
     handler,
   }: {
-    input: IN;
+    input?: IN;
     security?: LogicalContainer<
       Security<Extract<keyof z.input<IN>, string>, SCO>
     >;
@@ -88,12 +88,7 @@ export class ExpressMiddleware<
   R extends Request,
   S extends Response,
   OUT extends FlatObject,
-> extends Middleware<
-  FlatObject,
-  OUT,
-  string,
-  z.ZodObject<EmptyObject, "strip">
-> {
+> extends Middleware<FlatObject, OUT, string> {
   constructor(
     nativeMw: (
       request: R,
@@ -109,7 +104,6 @@ export class ExpressMiddleware<
     } = {},
   ) {
     super({
-      input: z.object({}),
       handler: async ({ request, response }) =>
         new Promise<OUT>((resolve, reject) => {
           const next = (err?: unknown) => {
