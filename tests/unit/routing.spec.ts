@@ -200,7 +200,6 @@ describe("Routing", () => {
       const input = z.object({});
       const output = z.object({});
       const getEndpoint = factory.build({
-        method: "get",
         input,
         output,
         handler,
@@ -408,7 +407,6 @@ describe("Routing", () => {
       [z.never(), z.tuple([ez.file()]).rest(z.nan())],
     ])("should warn about JSON incompatible schemas %#", (input, output) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
-        method: "get",
         input: z.object({ input }),
         output: z.object({ output }),
         handler: vi.fn(),

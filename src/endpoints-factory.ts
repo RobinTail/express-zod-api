@@ -30,7 +30,7 @@ type BuildProps<
   description?: string;
   shortDescription?: string;
   operationId?: string | ((method: Method) => string);
-} & ({ method: Method } | { methods: Method[] }) &
+} & ({ method?: Method } | { methods?: Method[] }) &
   ({ scopes?: SCO[] } | { scope?: SCO }) &
   ({ tags?: TAG[] } | { tag?: TAG });
 
@@ -130,7 +130,10 @@ export class EndpointsFactory<
     TAG
   > {
     const { middlewares, resultHandler } = this;
-    const methods = "methods" in rest ? rest.methods : [rest.method];
+    const methods =
+      "methods" in rest && rest.methods
+        ? rest.methods
+        : [("method" in rest && rest.method) || "get"];
     const getOperationId =
       typeof operationId === "function" ? operationId : () => operationId;
     const scopes =

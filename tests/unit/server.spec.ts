@@ -197,7 +197,6 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
             output: z.object({}),
             handler: vi.fn(),
           }),
@@ -249,7 +248,6 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
             output: z.object({}),
             handler: vi.fn(),
           }),
@@ -276,7 +274,6 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
             input: z.object({
               file: ez.upload(),
             }),
@@ -306,7 +303,6 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
             input: ez.raw(),
             output: z.object({}),
             handler: vi.fn(),

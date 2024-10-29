@@ -206,7 +206,7 @@ The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supp
 import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
-  method: "get", // or methods: ["get", "post", ...]
+  // method: "get" (default) or methods: ["get", "post", ...]
   input: z.object({
     name: z.string().optional(),
   }),
@@ -442,7 +442,6 @@ arrays of numbers.
 import { z } from "zod";
 
 const getUserEndpoint = endpointsFactory.build({
-  method: "get",
   input: z.object({
     id: z.string().transform((id) => parseInt(id, 10)),
     ids: z
@@ -474,7 +473,6 @@ import snakify from "snakify-ts";
 import { z } from "zod";
 
 const endpoint = endpointsFactory.build({
-  method: "get",
   input: z
     .object({ user_id: z.string() })
     .transform((inputs) => camelize(inputs, /* shallow: */ true)),
@@ -755,7 +753,6 @@ You then need to specify these parameters in the endpoint input schema in the us
 
 ```typescript
 const getUserEndpoint = endpointsFactory.build({
-  method: "get",
   input: z.object({
     // id is the route path param, always string
     id: z.string().transform((value) => parseInt(value, 10)),
@@ -779,15 +776,18 @@ It can also be the same Endpoint that handles multiple methods as well.
 ```typescript
 import { DependsOnMethod } from "express-zod-api";
 
+const endpointA = factory.build({ methods: ["get", "delete"] });
+const endpointB = factory.build({ methods: ["post", "patch"] });
+
 // the route /v1/user has two Endpoints
 // which handle a couple of methods each
 const routing: Routing = {
   v1: {
     user: new DependsOnMethod({
-      get: yourEndpointA,
-      delete: yourEndpointA,
-      post: yourEndpointB,
-      patch: yourEndpointB,
+      get: endpointA,
+      delete: endpointA,
+      post: endpointB,
+      patch: endpointB,
     }),
   },
 };
@@ -1140,7 +1140,6 @@ createConfig({
 });
 
 defaultEndpointsFactory.build({
-  method: "get",
   input: z.object({
     "x-request-id": z.string(), // this one is from request.headers
     id: z.string(), // this one is from request.query
