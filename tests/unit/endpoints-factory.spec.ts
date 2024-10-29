@@ -73,11 +73,9 @@ describe("EndpointsFactory", () => {
     test("Should accept creation props", () => {
       defaultEndpointsFactory
         .addMiddleware({
-          input: z.object({}),
           handler: async () => ({ test: "fist option" }),
         })
         .addMiddleware({
-          input: z.object({}),
           handler: async ({ options }) => {
             expectTypeOf(options.test).toEqualTypeOf<string>();
             return { second: `another option, ${options.test}` };

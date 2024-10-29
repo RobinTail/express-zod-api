@@ -200,7 +200,6 @@ describe("Server", () => {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
             method: "get",
-            input: z.object({}),
             output: z.object({}),
             handler: vi.fn(),
           }),
@@ -234,7 +233,6 @@ describe("Server", () => {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
             method: "get",
-            input: z.object({}),
             output: z.object({}),
             handler: vi.fn(),
           }),

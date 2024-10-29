@@ -127,7 +127,6 @@ describe("Endpoint", () => {
       const handlerMock = vi.fn();
       const endpoint = defaultEndpointsFactory.build({
         method: "get",
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -159,7 +158,6 @@ describe("Endpoint", () => {
     test("Should throw on output validation failure", async () => {
       const endpoint = defaultEndpointsFactory.build({
         method: "post",
-        input: z.object({}),
         output: z.object({ email: z.string().email() }),
         handler: async () => ({ email: "not email" }),
       });
@@ -175,7 +173,6 @@ describe("Endpoint", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const endpoint = factory.build({
         method: "post",
-        input: z.object({}),
         output: z.object({
           test: z.number().transform(() => assert.fail("Something unexpected")),
         }),
@@ -210,7 +207,6 @@ describe("Endpoint", () => {
       const handlerMock = vi.fn();
       const endpoint = factory.build({
         method: "post",
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -246,7 +242,6 @@ describe("Endpoint", () => {
       const factory = new EndpointsFactory(resultHandler);
       const endpoint = factory.build({
         method: "get",
-        input: z.object({}),
         output: z.object({
           test: z.string(),
         }),
@@ -307,7 +302,6 @@ describe("Endpoint", () => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
           method: "get",
-          input: z.object({}),
           output: z.object({ something: z.number() }),
           handler: vi.fn(),
         });
@@ -325,7 +319,6 @@ describe("Endpoint", () => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
           method: "get",
-          input: z.object({}),
           output: z.object({ something: z.number() }),
           handler: vi.fn(),
         });
@@ -446,7 +439,6 @@ describe("Endpoint", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const endpoint = factory.build({
         method: "post",
-        input: z.object({}),
         output: z.object({
           test: z.number().transform(() => assert.fail("Something unexpected")),
         }),
@@ -473,7 +465,6 @@ describe("Endpoint", () => {
       );
       const endpoint = factory.build({
         method: "get",
-        input: z.object({}),
         output: z.object({
           test: z.string(),
         }),
@@ -491,12 +482,10 @@ describe("Endpoint", () => {
 
     test("thrown in middleware and caught in execute()", async () => {
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
-        input: z.object({}),
         handler: async () => assert.fail("Something went wrong"),
       });
       const endpoint = factory.build({
         methods: ["post"],
-        input: z.object({}),
         output: z.object({}),
         handler: async () => ({}),
       });
@@ -676,7 +665,6 @@ describe("Endpoint", () => {
         .addMiddleware(dateInputMiddleware)
         .build({
           method: "get",
-          input: z.object({}),
           output: z.object({}),
           handler: async ({ input: { middleware_date_input }, logger }) => {
             logger.debug(
