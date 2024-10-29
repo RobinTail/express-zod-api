@@ -57,13 +57,11 @@ describe("EndpointsFactory", () => {
       defaultEndpointsFactory
         .addMiddleware(
           new Middleware({
-            input: z.object({}),
             handler: async () => ({ test: "fist option" }),
           }),
         )
         .addMiddleware(
           new Middleware({
-            input: z.object({}),
             handler: async ({ options }) => {
               expectTypeOf(options.test).toEqualTypeOf<string>();
               return { second: `another option, ${options.test}` };

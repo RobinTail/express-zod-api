@@ -620,12 +620,10 @@ describe("Documentation", () => {
             },
           ],
         },
-        input: z.object({}),
         handler: vi.fn<any>(),
       });
       const mw3 = new Middleware({
         security: { type: "bearer", format: "JWT" },
-        input: z.object({}),
         handler: vi.fn<any>(),
       });
       const spec = new Documentation({
