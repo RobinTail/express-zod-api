@@ -20,5 +20,7 @@ export default defineConfig({
       reporter: [["text", { maxCols: 120 }], "json-summary", "html", "lcov"],
       include: ["src/**"],
     },
+    /** @see https://github.com/vitest-dev/vitest/issues/6806 */
+    server: { deps: { external: [/\/node_modules\//] } },
   },
 });
