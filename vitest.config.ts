@@ -15,6 +15,7 @@ export default defineConfig({
       dirname(fileURLToPath(import.meta.url)),
       "vitest.setup.ts",
     ),
+    server: { deps: { external: ["typescript"] } },
     coverage: {
       provider: "istanbul",
       reporter: [["text", { maxCols: 120 }], "json-summary", "html", "lcov"],
