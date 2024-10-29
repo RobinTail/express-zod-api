@@ -123,11 +123,11 @@ export class EndpointsFactory<
     operationId,
     ...rest
   }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
-    z.ZodIntersection<IN, BIN>,
     BOUT,
     OUT,
     SCO,
-    TAG
+    TAG,
+    z.ZodIntersection<IN, BIN>
   > {
     const { middlewares, resultHandler } = this;
     const methods = "methods" in rest ? rest.methods : [rest.method];
