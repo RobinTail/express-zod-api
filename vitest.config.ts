@@ -21,6 +21,6 @@ export default defineConfig({
       include: ["src/**"],
     },
     /** @see https://github.com/vitest-dev/vitest/issues/6806 */
-    server: { deps: { external: ["typescript"] } },
+    server: { deps: { external: [/\/node_modules\//] } },
   },
 });
