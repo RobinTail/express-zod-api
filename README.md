@@ -207,7 +207,6 @@ import { z } from "zod";
 const helloWorldEndpoint = defaultEndpointsFactory.build({
   method: "get", // or methods: ["get", "post", ...]
   input: z.object({
-    // for empty input use z.object({})
     name: z.string().optional(),
   }),
   output: z.object({
@@ -320,7 +319,6 @@ import { defaultEndpointsFactory } from "express-zod-api";
 const factory = defaultEndpointsFactory
   .addMiddleware(authMiddleware) // add Middleware instance or use shorter syntax:
   .addMiddleware({
-    input: z.object({}),
     handler: async ({ options: { user } }) => ({}), // options.user from authMiddleware
   });
 ```
