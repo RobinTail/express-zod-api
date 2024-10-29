@@ -15,11 +15,12 @@ export default defineConfig({
       dirname(fileURLToPath(import.meta.url)),
       "vitest.setup.ts",
     ),
-    server: { deps: { external: ["typescript"] } },
     coverage: {
       provider: "istanbul",
       reporter: [["text", { maxCols: 120 }], "json-summary", "html", "lcov"],
       include: ["src/**"],
     },
+    /** @see https://github.com/vitest-dev/vitest/issues/6806 */
+    server: { deps: { external: ["typescript"] } },
   },
 });
