@@ -28,10 +28,10 @@ export abstract class AbstractMiddleware {
 }
 
 export class Middleware<
-  IN extends IOSchema<"strip">,
   OPT extends FlatObject,
   OUT extends FlatObject,
   SCO extends string,
+  IN extends IOSchema<"strip">,
 > extends AbstractMiddleware {
   readonly #schema: IN;
   readonly #security?: LogicalContainer<
@@ -89,10 +89,10 @@ export class ExpressMiddleware<
   S extends Response,
   OUT extends FlatObject,
 > extends Middleware<
-  z.ZodObject<EmptyObject, "strip">,
   FlatObject,
   OUT,
-  string
+  string,
+  z.ZodObject<EmptyObject, "strip">
 > {
   constructor(
     nativeMw: (

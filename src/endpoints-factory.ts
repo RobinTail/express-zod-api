@@ -78,8 +78,8 @@ export class EndpointsFactory<
     ASCO extends string,
   >(
     subject:
-      | Middleware<AIN, OUT, AOUT, ASCO>
-      | ConstructorParameters<typeof Middleware<AIN, OUT, AOUT, ASCO>>[0],
+      | Middleware<OUT, AOUT, ASCO, AIN>
+      | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
     return EndpointsFactory.#create<
       z.ZodIntersection<IN, AIN>,
