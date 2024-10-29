@@ -60,11 +60,11 @@ export abstract class AbstractEndpoint {
 }
 
 export class Endpoint<
+  IN extends IOSchema,
   OUT extends IOSchema,
   OPT extends FlatObject,
   SCO extends string,
   TAG extends string,
-  IN extends IOSchema,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
   readonly #methods: ReadonlyArray<Method>;
