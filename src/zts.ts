@@ -1,3 +1,4 @@
+import { pluck } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
@@ -174,10 +175,11 @@ const onIntersection: Producer = (
   { _def }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
   { next },
 ) => {
-  if (_def.left instanceof z.ZodObject && _def.right instanceof z.ZodObject) {
-    return next(_def.left.merge(_def.right));
-  }
-  return f.createIntersectionTypeNode([_def.left, _def.right].map(next));
+  const nodes = [_def.left, _def.right].map(next);
+  const areObjects = nodes.every(ts.isTypeLiteralNode);
+  return areObjects
+    ? f.createTypeLiteralNode(pluck("members", nodes).flat())
+    : f.createIntersectionTypeNode(nodes);
 };
 
 const onDefault: Producer = ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
