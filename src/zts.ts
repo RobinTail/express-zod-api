@@ -1,4 +1,3 @@
-import { pluck } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
@@ -178,7 +177,7 @@ const onIntersection: Producer = (
   const nodes = [left, right].map(next);
   const areObjects = nodes.every(ts.isTypeLiteralNode);
   return areObjects
-    ? f.createTypeLiteralNode(pluck("members", nodes).flat())
+    ? f.createTypeLiteralNode(nodes.flatMap(({ members }) => members))
     : f.createIntersectionTypeNode(nodes);
 };
 
