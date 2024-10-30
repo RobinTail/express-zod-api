@@ -171,9 +171,15 @@ const onRecord: Producer = (
   );
 
 const onIntersection: Producer = (
-  { _def }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
+  { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
   { next },
-) => f.createIntersectionTypeNode([_def.left, _def.right].map(next));
+) => {
+  const nodes = [left, right].map(next);
+  const areObjects = nodes.every(ts.isTypeLiteralNode);
+  return areObjects
+    ? f.createTypeLiteralNode(nodes.flatMap(({ members }) => members))
+    : f.createIntersectionTypeNode(nodes);
+};
 
 const onDefault: Producer = ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
   next(_def.innerType);
