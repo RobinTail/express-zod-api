@@ -17,6 +17,23 @@ import {
 
 const { factory: f } = ts;
 
+const primitives: ts.KeywordTypeSyntaxKind[] = [
+  ts.SyntaxKind.AnyKeyword,
+  ts.SyntaxKind.BigIntKeyword,
+  ts.SyntaxKind.BooleanKeyword,
+  ts.SyntaxKind.NeverKeyword,
+  ts.SyntaxKind.NumberKeyword,
+  ts.SyntaxKind.ObjectKeyword,
+  ts.SyntaxKind.StringKeyword,
+  ts.SyntaxKind.SymbolKeyword,
+  ts.SyntaxKind.UndefinedKeyword,
+  ts.SyntaxKind.UnknownKeyword,
+  ts.SyntaxKind.VoidKeyword,
+];
+
+const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
+  (primitives as ts.SyntaxKind[]).includes(node.kind);
+
 const samples = {
   [ts.SyntaxKind.AnyKeyword]: "",
   [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
@@ -84,7 +101,14 @@ const onSomeUnion: Producer = (
     | z.ZodUnion<z.ZodUnionOptions>
     | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>,
   { next },
-) => f.createUnionTypeNode(options.map(next));
+) => {
+  const nodes = new Map<ts.TypeNode | ts.KeywordTypeSyntaxKind, ts.TypeNode>();
+  for (const option of options) {
+    const node = next(option);
+    nodes.set(isPrimitive(node) ? node.kind : node, node);
+  }
+  return f.createUnionTypeNode(Array.from(nodes.values()));
+};
 
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];

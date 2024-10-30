@@ -84,7 +84,7 @@ type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendResponse = string | string;
+type GetV1AvatarSendResponse = string;
 
 type GetV1AvatarStreamInput = {
   userId: string;
