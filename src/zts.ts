@@ -172,10 +172,10 @@ const onRecord: Producer = (
   );
 
 const onIntersection: Producer = (
-  { _def }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
+  { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
   { next },
 ) => {
-  const nodes = [_def.left, _def.right].map(next);
+  const nodes = [left, right].map(next);
   const areObjects = nodes.every(ts.isTypeLiteralNode);
   return areObjects
     ? f.createTypeLiteralNode(pluck("members", nodes).flat())
