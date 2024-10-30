@@ -3,36 +3,20 @@ import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
-import { FileSchema, ezFileBrand } from "./file-schema";
+import { ezFileBrand, FileSchema } from "./file-schema";
 import { ProprietaryBrand } from "./proprietary-schemas";
-import { RawSchema, ezRawBrand } from "./raw-schema";
+import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
+  addJsDocComment,
+  isPrimitive,
   LiteralType,
+  makePropertyIdentifier,
   Producer,
   ZTSContext,
-  addJsDocComment,
-  makePropertyIdentifier,
 } from "./zts-helpers";
 
 const { factory: f } = ts;
-
-const primitives: ts.KeywordTypeSyntaxKind[] = [
-  ts.SyntaxKind.AnyKeyword,
-  ts.SyntaxKind.BigIntKeyword,
-  ts.SyntaxKind.BooleanKeyword,
-  ts.SyntaxKind.NeverKeyword,
-  ts.SyntaxKind.NumberKeyword,
-  ts.SyntaxKind.ObjectKeyword,
-  ts.SyntaxKind.StringKeyword,
-  ts.SyntaxKind.SymbolKeyword,
-  ts.SyntaxKind.UndefinedKeyword,
-  ts.SyntaxKind.UnknownKeyword,
-  ts.SyntaxKind.VoidKeyword,
-];
-
-const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
-  (primitives as ts.SyntaxKind[]).includes(node.kind);
 
 const samples = {
   [ts.SyntaxKind.AnyKeyword]: "",
