@@ -173,7 +173,12 @@ const onRecord: Producer = (
 const onIntersection: Producer = (
   { _def }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
   { next },
-) => f.createIntersectionTypeNode([_def.left, _def.right].map(next));
+) => {
+  if (_def.left instanceof z.ZodObject && _def.right instanceof z.ZodObject) {
+    return next(_def.left.merge(_def.right));
+  }
+  return f.createIntersectionTypeNode([_def.left, _def.right].map(next));
+};
 
 const onDefault: Producer = ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
   next(_def.innerType);
