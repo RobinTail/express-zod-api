@@ -65,3 +65,20 @@ export const makePropertyIdentifier = (name: string) => {
   }
   return f.createStringLiteral(name);
 };
+
+const primitives: ts.KeywordTypeSyntaxKind[] = [
+  ts.SyntaxKind.AnyKeyword,
+  ts.SyntaxKind.BigIntKeyword,
+  ts.SyntaxKind.BooleanKeyword,
+  ts.SyntaxKind.NeverKeyword,
+  ts.SyntaxKind.NumberKeyword,
+  ts.SyntaxKind.ObjectKeyword,
+  ts.SyntaxKind.StringKeyword,
+  ts.SyntaxKind.SymbolKeyword,
+  ts.SyntaxKind.UndefinedKeyword,
+  ts.SyntaxKind.UnknownKeyword,
+  ts.SyntaxKind.VoidKeyword,
+];
+
+export const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
+  (primitives as ts.SyntaxKind[]).includes(node.kind);

@@ -3,16 +3,17 @@ import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
-import { FileSchema, ezFileBrand } from "./file-schema";
+import { ezFileBrand, FileSchema } from "./file-schema";
 import { ProprietaryBrand } from "./proprietary-schemas";
-import { RawSchema, ezRawBrand } from "./raw-schema";
+import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
+  addJsDocComment,
+  isPrimitive,
   LiteralType,
+  makePropertyIdentifier,
   Producer,
   ZTSContext,
-  addJsDocComment,
-  makePropertyIdentifier,
 } from "./zts-helpers";
 
 const { factory: f } = ts;
@@ -84,7 +85,14 @@ const onSomeUnion: Producer = (
     | z.ZodUnion<z.ZodUnionOptions>
     | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>,
   { next },
-) => f.createUnionTypeNode(options.map(next));
+) => {
+  const nodes = new Map<ts.TypeNode | ts.KeywordTypeSyntaxKind, ts.TypeNode>();
+  for (const option of options) {
+    const node = next(option);
+    nodes.set(isPrimitive(node) ? node.kind : node, node);
+  }
+  return f.createUnionTypeNode(Array.from(nodes.values()));
+};
 
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
