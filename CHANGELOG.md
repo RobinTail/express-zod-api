@@ -5,7 +5,7 @@
 ### v20.15.2
 
 - Fixed duplicated client types in unions:
-  - When `splitResponse` option is disabled on `Integration` primitive positive/negative responses were duplicated.
+  - When `splitResponse` option is disabled on `Integration` primitive response types could have been duplicated.
 
 ```diff
 - type GetV1AvatarSendResponse = string | string;
