@@ -2,6 +2,16 @@
 
 ## Version 20
 
+### v20.15.2
+
+- Fixed duplicated client types in unions:
+  - When `splitResponse` option is disabled on `Integration` primitive positive/negative responses were duplicated.
+
+```diff
+- type GetV1AvatarSendResponse = string | string;
++ type GetV1AvatarSendResponse = string;
+```
+
 ### v20.15.1
 
 - Deprecating `serializer` property on `Documentation` and `Integration` constructor argument:
