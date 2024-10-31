@@ -50,7 +50,7 @@ export const initRouting = ({
         for (const variant of ["positive", "negative"] as const) {
           if (endpoint.getMimeTypes(variant).includes(contentTypes.json)) {
             try {
-              assertJsonCompatible(endpoint.getSchema(variant), "out");
+              assertJsonCompatible(endpoint.getSchema("output"), "out");
             } catch (reason) {
               rootLogger.warn(
                 `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
