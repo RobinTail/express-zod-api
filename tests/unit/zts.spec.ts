@@ -1,5 +1,6 @@
 import ts from "typescript";
 import { z } from "zod";
+import { ez } from "../../src";
 import { f } from "../../src/integration-helpers";
 import { zodToTs } from "../../src/zts";
 import { ZTSContext, createTypeAlias, printNode } from "../../src/zts-helpers";
@@ -22,6 +23,16 @@ describe("zod-to-ts", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
+
+  describe.each(["string", "base64", "binary", "buffer"] as const)(
+    "ez.file(%s)",
+    (variant) => {
+      test("should depend on variant", () => {
+        const node = zodToTs(ez.file(variant), { ctx });
+        expect(printNodeTest(node)).toMatchSnapshot();
+      });
+    },
+  );
 
   describe("createTypeAlias()", () => {
     const identifier = "User";
