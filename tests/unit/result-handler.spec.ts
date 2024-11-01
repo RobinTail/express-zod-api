@@ -217,6 +217,16 @@ describe("ResultHandler", () => {
   test("arrayResultHandler should fail when there is no items prop in the output", () => {
     const responseMock = makeResponseMock();
     const loggerMock = makeLoggerMock();
+    const positiveSchema = arrayResultHandler
+      .getPositiveResponse(
+        z.object({ anything: z.number() }).example({ anything: 118 }),
+      )
+      .pop()?.schema;
+    expect(positiveSchema?._def).toHaveProperty("typeName", "ZodArray");
+    expect(positiveSchema).toHaveProperty(
+      ["element", "_def", "typeName"],
+      "ZodAny",
+    );
     arrayResultHandler.execute({
       error: null,
       input: { something: 453 },
