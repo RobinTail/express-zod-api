@@ -274,6 +274,14 @@ describe("zod-to-ts", () => {
       const node = zodToTs(schema, { ctx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
+
+    test("specially handles coercive schema in response", () => {
+      const schema = z.object({
+        prop: z.coerce.string(),
+      });
+      const node = zodToTs(schema, { ctx: { ...ctx, isResponse: true } });
+      expect(printNodeTest(node)).toMatchSnapshot();
+    });
   });
 
   describe("PrimitiveSchema", () => {

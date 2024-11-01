@@ -188,6 +188,12 @@ exports[`zod-to-ts > z.object() > escapes correctly 1`] = `
 }"
 `;
 
+exports[`zod-to-ts > z.object() > specially handles coercive schema in response 1`] = `
+"{
+    prop: string;
+}"
+`;
+
 exports[`zod-to-ts > z.object() > supports string literal properties 1`] = `
 "{
     "5": number;
