@@ -254,9 +254,10 @@ describe("Endpoint", () => {
       });
       const { loggerMock, responseMock, requestMock } = await testEndpoint({
         endpoint,
+        requestProps: { path: "/some" },
       });
       expect(loggerMock._getLogs().error).toEqual([
-        ["Result Handler failure", new Error("Something unexpected happened")],
+        ["Result Handler failure", new Error("Failed to respond to GET /some")],
       ]);
       expect(spy).toHaveBeenCalledWith({
         error: null,
@@ -479,9 +480,12 @@ describe("Endpoint", () => {
         }),
         handler: async () => ({ test: "OK" }),
       });
-      const { loggerMock, responseMock } = await testEndpoint({ endpoint });
+      const { loggerMock, responseMock } = await testEndpoint({
+        endpoint,
+        requestProps: { path: "/some" },
+      });
       expect(loggerMock._getLogs().error).toEqual([
-        ["Result Handler failure", new Error("Something unexpected happened")],
+        ["Result Handler failure", new Error("Failed to respond to GET /some")],
       ]);
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getData()).toBe(

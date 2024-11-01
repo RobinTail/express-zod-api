@@ -51,26 +51,26 @@ export const createParserFailureHandler =
 export const createNotFoundHandler =
   ({ errorHandler, getChildLogger }: HandlerCreatorParams): RequestHandler =>
   async (request, response) => {
-    const error = createHttpError(
-      404,
-      `Can not ${request.method} ${request.path}`,
-    );
+    const action = `${request.method} ${request.path}`;
     const logger = getChildLogger(request);
     try {
       errorHandler.execute({
         request,
         response,
         logger,
-        error,
         input: null,
         output: null,
         options: {},
+        error: createHttpError(404, `Can not ${action}`),
       });
     } catch (e) {
       lastResortHandler({
         response,
         logger,
-        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
+        error: new ResultHandlerError(
+          `Error handler failed to process ${action}`,
+          makeErrorFromAnything(e),
+        ),
       });
     }
   };
