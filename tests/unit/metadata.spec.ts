@@ -65,5 +65,14 @@ describe("Metadata", () => {
         { a: { b: "another", c: 789 } },
       ]);
     });
+
+    test("should avoid non-object examples", () => {
+      const src = z
+        .object({ items: z.array(z.string()) })
+        .example({ items: ["a", "b", "c"] });
+      const dest = z.string().example("a").example("b");
+      const result = copyMeta(src, dest);
+      expect(result._def[metaSymbol]?.examples).toEqual(["a", "b"]);
+    });
   });
 });

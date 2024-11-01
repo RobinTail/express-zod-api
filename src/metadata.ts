@@ -33,7 +33,7 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
     ([destExample, srcExample]) =>
       typeof destExample === "object" && typeof srcExample === "object"
         ? mergeDeepRight({ ...destExample }, { ...srcExample })
-        : srcExample, // not supposed to be called on non-object schemas
+        : destExample, // not supposed to be called on non-object schemas
   );
   return result;
 };
