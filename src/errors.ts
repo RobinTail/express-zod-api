@@ -56,11 +56,8 @@ export class InputValidationError extends IOSchemaError {
 export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";
 
-  constructor(
-    message: string,
-    public readonly originalError?: Error,
-  ) {
-    super(message);
+  constructor(message: string, cause?: Error) {
+    super(message, { cause });
   }
 }
 
