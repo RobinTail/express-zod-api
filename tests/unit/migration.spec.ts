@@ -132,7 +132,7 @@ tester.run("v20", migration.rules.v20, {
       ],
     },
     {
-      code: `testEndpoint({ fnMethod: {}, responseProps: {} })`,
+      code: `testEndpoint({ fnMethod: {}, responseProps: {} })`, // with comma
       output: `testEndpoint({  responseOptions: {} })`,
       errors: [
         {
@@ -146,6 +146,24 @@ tester.run("v20", migration.rules.v20, {
             from: "responseProps",
             to: "responseOptions",
           },
+        },
+      ],
+    },
+    {
+      code: `testEndpoint({ responseProps: {}, fnMethod: {} })`, // without comma
+      output: `testEndpoint({ responseOptions: {},  })`,
+      errors: [
+        {
+          messageId: "change",
+          data: {
+            subject: "property",
+            from: "responseProps",
+            to: "responseOptions",
+          },
+        },
+        {
+          messageId: "remove",
+          data: { subject: "property", name: "fnMethod" },
         },
       ],
     },
