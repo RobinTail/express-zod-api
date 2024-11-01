@@ -72,7 +72,10 @@ export class InputValidationError extends IOSchemaError {
 export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";
 
-  constructor(message: string, cause?: Error) {
+  constructor(
+    message: string,
+    public override readonly cause?: Error,
+  ) {
     super(message, { cause });
   }
 }
