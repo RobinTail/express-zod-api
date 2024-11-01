@@ -84,8 +84,9 @@ describe("ResultHandler", () => {
     test("Should handle generic error", () => {
       const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock();
+      const error = new Error("Some error");
       subject.execute({
-        error: new Error("Some error"),
+        error,
         input: { something: 453 },
         output: { anything: 118 },
         request: requestMock,
@@ -95,8 +96,9 @@ describe("ResultHandler", () => {
       });
       expect(loggerMock._getLogs().error).toEqual([
         [
-          expect.stringMatching(/^Internal server error\nError: Some error/),
+          "Internal server error",
           {
+            error,
             payload: { something: 453 },
             url: "http://something/v1/anything",
           },
