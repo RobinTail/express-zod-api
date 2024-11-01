@@ -6,6 +6,7 @@ import {
   arrayResultHandler,
   defaultResultHandler,
   ResultHandler,
+  CommonConfig,
 } from "../../src";
 import { ResultHandlerError } from "../../src/errors";
 import { metaSymbol } from "../../src/metadata";
@@ -93,6 +94,7 @@ describe("ResultHandler", () => {
         response: responseMock,
         logger: loggerMock,
         options: {},
+        config: {} as CommonConfig,
       });
       expect(loggerMock._getLogs().error).toEqual([
         [
@@ -134,6 +136,7 @@ describe("ResultHandler", () => {
         input: { something: 453 },
         output: { anything: 118 },
         options: {},
+        config: {} as CommonConfig,
         request: requestMock,
         response: responseMock,
         logger: loggerMock,
@@ -159,6 +162,7 @@ describe("ResultHandler", () => {
         input: { something: 453 },
         output: { anything: 118 },
         options: {},
+        config: {} as CommonConfig,
         request: requestMock,
         response: responseMock,
         logger: loggerMock,
@@ -184,6 +188,7 @@ describe("ResultHandler", () => {
         input: { something: 453 },
         output: { anything: 118, items: ["One", "Two", "Three"] },
         options: {},
+        config: {} as CommonConfig,
         request: requestMock,
         response: responseMock,
         logger: loggerMock,
@@ -234,6 +239,7 @@ describe("ResultHandler", () => {
       input: { something: 453 },
       output: { anything: 118 },
       options: {},
+      config: {} as CommonConfig,
       request: requestMock,
       response: responseMock,
       logger: loggerMock,

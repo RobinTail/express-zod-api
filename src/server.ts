@@ -30,7 +30,7 @@ const makeCommonEntities = (config: CommonConfig) => {
   installDeprecationListener(rootLogger);
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
   const getChildLogger = makeChildLoggerExtractor(rootLogger);
-  const commons = { getChildLogger, errorHandler };
+  const commons = { getChildLogger, errorHandler, config };
   const notFoundHandler = createNotFoundHandler(commons);
   const parserFailureHandler = createParserFailureHandler(commons);
   return {

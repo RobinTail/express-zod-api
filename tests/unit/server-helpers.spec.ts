@@ -27,6 +27,7 @@ describe("Server helpers", () => {
       const handler = createParserFailureHandler({
         errorHandler: defaultResultHandler,
         getChildLogger: () => makeLoggerMock(),
+        config: {} as CommonConfig,
       });
       const next = vi.fn();
       handler(undefined, makeRequestMock(), makeResponseMock(), next);
@@ -48,6 +49,7 @@ describe("Server helpers", () => {
         const handler = createParserFailureHandler({
           errorHandler,
           getChildLogger: () => makeLoggerMock(),
+          config: {} as CommonConfig,
         });
         await handler(
           error,
@@ -74,6 +76,7 @@ describe("Server helpers", () => {
       const handler = createNotFoundHandler({
         errorHandler,
         getChildLogger: () => makeLoggerMock(),
+        config: {} as CommonConfig,
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -105,6 +108,7 @@ describe("Server helpers", () => {
       const handler = createNotFoundHandler({
         errorHandler,
         getChildLogger: () => makeLoggerMock(),
+        config: {} as CommonConfig,
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({

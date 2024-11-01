@@ -277,6 +277,7 @@ export class Endpoint<
     input,
     output,
     options,
+    config,
   }: {
     error: Error | null;
     request: Request;
@@ -285,6 +286,7 @@ export class Endpoint<
     input: FlatObject;
     output: FlatObject | null;
     options: Partial<OPT>;
+    config: CommonConfig;
   }) {
     try {
       await this.#resultHandler.execute({
@@ -295,6 +297,7 @@ export class Endpoint<
         logger,
         input,
         options,
+        config,
       });
     } catch (e) {
       lastResortHandler({
@@ -374,6 +377,7 @@ export class Endpoint<
       error,
       logger,
       options,
+      config,
     });
   }
 }

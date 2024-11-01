@@ -109,6 +109,7 @@ describe("Endpoint", () => {
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(resultHandlerSpy).toHaveBeenCalledWith({
         error: null,
+        config: { cors: false, logger: loggerMock },
         input: { n: 453 },
         logger: loggerMock,
         options: { inc: 454 },
@@ -261,6 +262,7 @@ describe("Endpoint", () => {
       ]);
       expect(spy).toHaveBeenCalledWith({
         error: null,
+        config: { cors: false, logger: loggerMock },
         logger: loggerMock,
         input: {},
         options: {},

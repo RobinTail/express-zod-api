@@ -13,6 +13,7 @@ import {
   isObject,
   logInternalError,
 } from "./common-helpers";
+import { CommonConfig } from "./config-type";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
@@ -29,6 +30,7 @@ type Handler<RES = unknown> = (params: {
   request: Request;
   response: Response<RES>;
   logger: ActualLogger;
+  config: CommonConfig;
 }) => void | Promise<void>;
 
 export type Result<S extends z.ZodTypeAny = z.ZodTypeAny> =
@@ -115,7 +117,7 @@ export const defaultResultHandler = new ResultHandler({
         message: getMessageFromError(new Error("Sample error message")),
       },
     }),
-  handler: ({ error, input, output, request, response, logger }) => {
+  handler: ({ error, input, output, request, response, logger, config }) => {
     if (!error) {
       response
         .status(defaultStatusCodes.positive)
@@ -126,7 +128,12 @@ export const defaultResultHandler = new ResultHandler({
     logInternalError({ logger, statusCode, request, error, input });
     response.status(statusCode).json({
       status: "error",
-      error: { message: getMessageFromError(error) },
+      error: {
+        message:
+          statusCode === 500 && config.hideInternalErrors
+            ? "Internal server error"
+            : getMessageFromError(error),
+      },
     });
   },
 });

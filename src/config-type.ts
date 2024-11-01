@@ -43,6 +43,13 @@ export interface CommonConfig<TAG extends string = string> {
    */
   cors: boolean | HeadersProvider;
   /**
+   * @desc Avoid disclosing internal error messages (500) by defaultResultHandler (negative response)
+   * @default false
+   * @todo set true in v21
+   * @see defaultResultHandler
+   * */
+  hideInternalErrors?: boolean;
+  /**
    * @desc The ResultHandler to use for handling routing, parsing and upload errors
    * @default defaultResultHandler
    * @see defaultResultHandler

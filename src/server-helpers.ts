@@ -22,12 +22,14 @@ type EquippedRequest = Request<
 export type ChildLoggerExtractor = (request: Request) => ActualLogger;
 
 interface HandlerCreatorParams {
+  config: CommonConfig;
   errorHandler: AbstractResultHandler;
   getChildLogger: ChildLoggerExtractor;
 }
 
 export const createParserFailureHandler =
   ({
+    config,
     errorHandler,
     getChildLogger,
   }: HandlerCreatorParams): ErrorRequestHandler =>
@@ -39,6 +41,7 @@ export const createParserFailureHandler =
       error: isHttpError(error)
         ? error
         : createHttpError(400, makeErrorFromAnything(error).message),
+      config,
       request,
       response,
       input: null,
@@ -49,12 +52,17 @@ export const createParserFailureHandler =
   };
 
 export const createNotFoundHandler =
-  ({ errorHandler, getChildLogger }: HandlerCreatorParams): RequestHandler =>
+  ({
+    config,
+    errorHandler,
+    getChildLogger,
+  }: HandlerCreatorParams): RequestHandler =>
   async (request, response) => {
     const action = `${request.method} ${request.path}`;
     const logger = getChildLogger(request);
     try {
       errorHandler.execute({
+        config,
         request,
         response,
         logger,
