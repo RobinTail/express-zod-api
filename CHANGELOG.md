@@ -2,6 +2,19 @@
 
 ## Version 20
 
+### v20.15.3
+
+- Merge intersected object types in generated client:
+  - This fixes "empty object" intersection problem for endpoints having middlwares without inputs.
+
+```diff
+- type GetV1UserRetrieveInput = {} & {
++ type GetV1UserRetrieveInput = {
+    /** a numeric string containing the id of the user */
+    id: string;
+  };
+```
+
 ### v20.15.2
 
 - Fixed duplicated client types in unions:
