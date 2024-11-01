@@ -27,7 +27,7 @@ export const monitor = (
 
   const watch = (socket: Socket) =>
     void (pending
-      ? socket.destroy()
+      ? /* v8 ignore next -- unstable */ socket.destroy()
       : sockets.add(socket.once("close", () => void sockets.delete(socket))));
 
   for (const server of servers)
