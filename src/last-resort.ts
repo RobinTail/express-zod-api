@@ -13,14 +13,9 @@ export const lastResortHandler = ({
   logger,
   response,
 }: LastResortHandlerParams) => {
-  logger.error(`Result handler failure: ${error.message}.`);
+  logger.error("Result Handler failure", error);
   response
     .status(500)
     .type("text/plain")
-    .end(
-      `An error occurred while serving the result: ${error.message}.` +
-        (error.originalError
-          ? `\nOriginal error: ${error.originalError.message}.`
-          : ""),
-    );
+    .end("An error occurred while serving the result.");
 };
