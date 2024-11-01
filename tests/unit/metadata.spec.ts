@@ -67,10 +67,10 @@ describe("Metadata", () => {
     });
 
     test("should avoid non-object examples", () => {
-      const src = z
+      const src = z.string().example("a").example("b");
+      const dest = z
         .object({ items: z.array(z.string()) })
-        .example({ items: ["a", "b", "c"] });
-      const dest = z.string().example("a").example("b");
+        .example({ items: ["e", "f", "g"] });
       const result = copyMeta(src, dest);
       expect(result._def[metaSymbol]?.examples).toEqual(["a", "b"]);
     });
