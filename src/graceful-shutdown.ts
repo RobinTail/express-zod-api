@@ -23,7 +23,7 @@ export const monitor = (
     void (hasResponse(socket)
       ? !socket._httpMessage.headersSent &&
         socket._httpMessage.setHeader("connection", "close")
-      : destroy(socket));
+      : /* v8 ignore next -- unreachable */ destroy(socket));
 
   const watch = (socket: Socket) =>
     void (pending
