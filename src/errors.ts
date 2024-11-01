@@ -38,8 +38,16 @@ export class IOSchemaError extends Error {
 export class OutputValidationError extends IOSchemaError {
   public override name = "OutputValidationError";
 
-  constructor(public readonly originalError: z.ZodError) {
-    super(getMessageFromError(originalError));
+  constructor(public override readonly cause: z.ZodError) {
+    super(getMessageFromError(cause), { cause });
+  }
+
+  /**
+   * @deprecated use the cause property instead
+   * @todo remove in v21
+   * */
+  get originalError() {
+    return this.cause;
   }
 }
 
@@ -47,8 +55,16 @@ export class OutputValidationError extends IOSchemaError {
 export class InputValidationError extends IOSchemaError {
   public override name = "InputValidationError";
 
-  constructor(public readonly originalError: z.ZodError) {
-    super(getMessageFromError(originalError));
+  constructor(public override readonly cause: z.ZodError) {
+    super(getMessageFromError(cause), { cause });
+  }
+
+  /**
+   * @deprecated use the cause property instead
+   * @todo remove in v21
+   * */
+  get originalError() {
+    return this.cause;
   }
 }
 

@@ -55,8 +55,8 @@ describe("Errors", () => {
   });
 
   describe("OutputValidationError", () => {
-    const zodError = new z.ZodError([]);
-    const error = new OutputValidationError(zodError);
+    const cause = new z.ZodError([]);
+    const error = new OutputValidationError(cause);
 
     test("should be an instance of IOSchemaError and Error", () => {
       expect(error).toBeInstanceOf(IOSchemaError);
@@ -67,14 +67,16 @@ describe("Errors", () => {
       expect(error.name).toBe("OutputValidationError");
     });
 
-    test("should have .originalError property matching the one used for constructing", () => {
-      expect(error.originalError).toEqual(zodError);
+    test("should have .cause property matching the one used for constructing", () => {
+      expect(error.cause).toEqual(cause);
+      /** @todo remove in v21 */
+      expect(error.originalError).toEqual(cause);
     });
   });
 
   describe("InputValidationError", () => {
-    const zodError = new z.ZodError([]);
-    const error = new InputValidationError(zodError);
+    const cause = new z.ZodError([]);
+    const error = new InputValidationError(cause);
 
     test("should be an instance of IOSchemaError and Error", () => {
       expect(error).toBeInstanceOf(IOSchemaError);
@@ -85,15 +87,17 @@ describe("Errors", () => {
       expect(error.name).toBe("InputValidationError");
     });
 
-    test("should have .originalError property matching the one used for constructing", () => {
-      expect(error.originalError).toEqual(zodError);
+    test("should have .cause property matching the one used for constructing", () => {
+      expect(error.cause).toEqual(cause);
+      /** @todo remove in v21 */
+      expect(error.originalError).toEqual(cause);
     });
   });
 
   describe.each([new Error("test2"), undefined])(
     "ResultHandlerError",
-    (originalError) => {
-      const error = new ResultHandlerError("test", originalError);
+    (cause) => {
+      const error = new ResultHandlerError("test", cause);
 
       test("should be an instance of Error", () => {
         expect(error).toBeInstanceOf(Error);
@@ -103,8 +107,8 @@ describe("Errors", () => {
         expect(error.name).toBe("ResultHandlerError");
       });
 
-      test(".originalError should be the original error", () => {
-        expect(error.cause).toEqual(originalError);
+      test(".cause should be the original error", () => {
+        expect(error.cause).toEqual(cause);
       });
     },
   );
