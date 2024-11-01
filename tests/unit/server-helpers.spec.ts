@@ -118,8 +118,7 @@ describe("Server helpers", () => {
       expect(spy).toHaveBeenCalledTimes(1);
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getData()).toBe(
-        "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Can not POST /v1/test.",
+        "An error occurred while serving the result.",
       );
     });
   });
