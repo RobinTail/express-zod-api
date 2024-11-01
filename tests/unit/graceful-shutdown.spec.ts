@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import http from "node:http";
 import https from "node:https";
 import { Agent, fetch } from "undici";
@@ -49,8 +50,9 @@ describe("monitor()", () => {
       void fetch(`http://localhost:${port}`, {
         headers: { connection: "close" },
       }).catch(vi.fn());
-      await setTimeout(50);
-      expect(handler).toHaveBeenCalled();
+      await vi.waitFor(() => assert(handler.mock.calls.length === 1), {
+        interval: 30,
+      });
       const pending0 = graceful.shutdown();
       const pending1 = graceful.shutdown();
       expect(pending1).toBe(pending0);

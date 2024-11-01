@@ -29,6 +29,29 @@ export default [
 
 ## Version 20
 
+### v20.15.3
+
+- Merge intersected object types in generated client:
+  - This fixes "empty object" intersection problem for endpoints having middlwares without inputs.
+
+```diff
+- type GetV1UserRetrieveInput = {} & {
++ type GetV1UserRetrieveInput = {
+    /** a numeric string containing the id of the user */
+    id: string;
+  };
+```
+
+### v20.15.2
+
+- Fixed duplicated client types in unions:
+  - When `splitResponse` option is disabled on `Integration` primitive response types could have been duplicated.
+
+```diff
+- type GetV1AvatarSendResponse = string | string;
++ type GetV1AvatarSendResponse = string;
+```
+
 ### v20.15.1
 
 - Deprecating `serializer` property on `Documentation` and `Integration` constructor argument:

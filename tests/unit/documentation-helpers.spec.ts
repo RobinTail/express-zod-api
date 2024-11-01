@@ -297,6 +297,15 @@ describe("Documentation helpers", () => {
       ).toMatchSnapshot();
     });
 
+    test("should NOT flatten object schemas having conflicting props", () => {
+      expect(
+        depictIntersection(
+          z.object({ one: z.number() }).and(z.object({ one: z.string() })),
+          requestCtx,
+        ),
+      ).toMatchSnapshot();
+    });
+
     test("should merge examples deeply", () => {
       expect(
         depictIntersection(

@@ -3,7 +3,7 @@ type Type1 = {
   features: Type1;
 }[];
 
-type GetV1UserRetrieveInput = {} & {
+type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
 };
@@ -29,7 +29,6 @@ type GetV1UserRetrieveResponse =
 
 type PatchV1UserIdInput = {
   key: string;
-} & {
   id: string;
   name: string;
   birthday: string;
@@ -84,7 +83,7 @@ type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendResponse = string | string;
+type GetV1AvatarSendResponse = string;
 
 type GetV1AvatarStreamInput = {
   userId: string;

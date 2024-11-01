@@ -115,6 +115,14 @@ exports[`zod-to-ts > enums > handles 'quoted string' literals 1`] = `""Two Words
 
 exports[`zod-to-ts > enums > handles 'string' literals 1`] = `""apple" | "banana" | "cantaloupe""`;
 
+exports[`zod-to-ts > ez.file(base64) > should depend on variant 1`] = `"string"`;
+
+exports[`zod-to-ts > ez.file(binary) > should depend on variant 1`] = `"string | Buffer"`;
+
+exports[`zod-to-ts > ez.file(buffer) > should depend on variant 1`] = `"Buffer"`;
+
+exports[`zod-to-ts > ez.file(string) > should depend on variant 1`] = `"string"`;
+
 exports[`zod-to-ts > z.array() > outputs correct typescript 1`] = `
 "{
     id: number;
@@ -177,6 +185,12 @@ exports[`zod-to-ts > z.object() > escapes correctly 1`] = `
     "4t"?: any;
     _r?: any;
     "-r"?: any;
+}"
+`;
+
+exports[`zod-to-ts > z.object() > specially handles coercive schema in response 1`] = `
+"{
+    prop: string;
 }"
 `;
 

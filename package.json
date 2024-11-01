@@ -130,7 +130,7 @@
     "@types/semver": "^7.5.8",
     "@types/swagger-ui-express": "^4.1.6",
     "@typescript-eslint/rule-tester": "^8.0.1",
-    "@vitest/coverage-istanbul": "^2.0.3",
+    "@vitest/coverage-v8": "^2.1.4",
     "camelize-ts": "^3.0.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
@@ -155,7 +155,7 @@
     "typescript": "^5.5.2",
     "typescript-eslint": "^8.0.0",
     "undici": "^6.19.8",
-    "vitest": "^2.0.3",
+    "vitest": "^2.1.4",
     "zod": "^3.23.0"
   },
   "keywords": [
