@@ -750,9 +750,7 @@ export const onEach: SchemaHandler<
   OpenAPIContext,
   "each"
 > = (schema: z.ZodTypeAny, { isResponse, prev }) => {
-  if (isReferenceObject(prev)) {
-    return {};
-  }
+  if (isReferenceObject(prev)) return {};
   const { description } = schema;
   const shouldAvoidParsing = schema instanceof z.ZodLazy;
   const hasTypePropertyInDepiction = prev.type !== undefined;
@@ -762,22 +760,16 @@ export const onEach: SchemaHandler<
     hasTypePropertyInDepiction &&
     !isResponseHavingCoercion &&
     schema.isNullable();
-  const examples = shouldAvoidParsing
-    ? []
-    : getExamples({
-        schema,
-        variant: isResponse ? "parsed" : "original",
-        validate: true,
-      });
   const result: SchemaObject = {};
-  if (description) {
-    result.description = description;
-  }
-  if (isActuallyNullable) {
-    result.type = makeNullableType(prev);
-  }
-  if (examples.length) {
-    result.examples = examples.slice();
+  if (description) result.description = description;
+  if (isActuallyNullable) result.type = makeNullableType(prev);
+  if (!shouldAvoidParsing) {
+    const examples = getExamples({
+      schema,
+      variant: isResponse ? "parsed" : "original",
+      validate: true,
+    });
+    if (examples.length) result.examples = examples.slice();
   }
   return result;
 };

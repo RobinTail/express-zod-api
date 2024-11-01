@@ -282,6 +282,38 @@ exports[`Documentation helpers > depictFile() > should set type:string and forma
 }
 `;
 
+exports[`Documentation helpers > depictIntersection() > should NOT flatten object schemas having conflicting props 1`] = `
+{
+  "allOf": [
+    {
+      "properties": {
+        "one": {
+          "format": "double",
+          "maximum": 1.7976931348623157e+308,
+          "minimum": -1.7976931348623157e+308,
+          "type": "number",
+        },
+      },
+      "required": [
+        "one",
+      ],
+      "type": "object",
+    },
+    {
+      "properties": {
+        "one": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "one",
+      ],
+      "type": "object",
+    },
+  ],
+}
+`;
+
 exports[`Documentation helpers > depictIntersection() > should fall back to allOf in other cases 0 1`] = `
 {
   "allOf": [
