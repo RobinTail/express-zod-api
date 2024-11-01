@@ -98,8 +98,7 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
                 messageId: "remove",
                 data: { subject: "property", name: prop.key.name },
                 fix: (fixer) =>
-                  ctx.sourceCode.getTokenAfter(prop)?.value === "," &&
-                  prop.range
+                  ctx.sourceCode.getTokenAfter(prop)?.value === ","
                     ? fixer.removeRange([prop.range[0], prop.range[1] + 1])
                     : fixer.remove(prop),
               });
