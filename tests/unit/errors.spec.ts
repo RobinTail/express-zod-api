@@ -104,7 +104,7 @@ describe("Errors", () => {
       });
 
       test(".originalError should be the original error", () => {
-        expect(error.originalError).toEqual(originalError);
+        expect(error.cause).toEqual(originalError);
       });
     },
   );
