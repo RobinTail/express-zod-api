@@ -10,11 +10,13 @@ const createServerName = "createServer";
 const serverPropName = "server";
 const httpServerPropName = "httpServer";
 const httpsServerPropName = "httpsServer";
+const originalErrorPropName = "originalError";
 
 const changedProps = {
   [serverPropName]: "http",
   [httpServerPropName]: "servers",
   [httpsServerPropName]: "servers",
+  [originalErrorPropName]: "cause",
 };
 
 const movedProps = [
@@ -57,7 +59,26 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
   },
   defaultOptions: [],
   create: (ctx) => ({
-    CallExpression: (node) => {
+    [NT.MemberExpression]: (node) => {
+      if (
+        node.property.type === NT.Identifier &&
+        node.property.name === originalErrorPropName &&
+        node.object.type === NT.Identifier &&
+        node.object.name.match(/err/i) // this is probably an error instance, but we don't do type checking
+      ) {
+        const replacement = changedProps[node.property.name];
+        ctx.report({
+          node: node.property,
+          messageId: "change",
+          data: {
+            subject: "property",
+            from: node.property.name,
+            to: replacement,
+          },
+        });
+      }
+    },
+    [NT.CallExpression]: (node) => {
       if (node.callee.type !== NT.Identifier) return;
       if (
         node.callee.name === createConfigName &&

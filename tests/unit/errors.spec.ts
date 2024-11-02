@@ -69,7 +69,6 @@ describe("Errors", () => {
 
     test("should have .cause property matching the one used for constructing", () => {
       expect(error.cause).toEqual(zodError);
-      expect(error.originalError).toEqual(zodError);
     });
   });
 
@@ -88,7 +87,6 @@ describe("Errors", () => {
 
     test("should have .cause property matching the one used for constructing", () => {
       expect(error.cause).toEqual(zodError);
-      expect(error.originalError).toEqual(zodError);
     });
   });
 

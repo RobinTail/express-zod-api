@@ -24,6 +24,7 @@ tester.run("v21", migration.rules.v21, {
     `createConfig({ http: {} });`,
     `createConfig({ http: { listen: 8090 }, upload: true });`,
     `const { app, servers, logger } = await createServer();`,
+    `const error = new Error(); console.error(error.cause?.message);`,
   ],
   invalid: [
     {
@@ -60,6 +61,15 @@ tester.run("v21", migration.rules.v21, {
         {
           messageId: "change",
           data: { subject: "property", from: "httpsServer", to: "servers" },
+        },
+      ],
+    },
+    {
+      code: `const error = new Error(); console.error(error.originalError?.message);`,
+      errors: [
+        {
+          messageId: "change",
+          data: { subject: "property", from: "originalError", to: "cause" },
         },
       ],
     },

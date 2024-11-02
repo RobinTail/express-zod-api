@@ -41,14 +41,6 @@ export class OutputValidationError extends IOSchemaError {
   constructor(public override readonly cause: z.ZodError) {
     super(getMessageFromError(cause), { cause });
   }
-
-  /**
-   * @deprecated use the cause property instead
-   * @todo remove in v21
-   * */
-  public get originalError() {
-    return this.cause;
-  }
 }
 
 /** @desc An error of validating the input sources against the Middleware or Endpoint input schema */
@@ -57,14 +49,6 @@ export class InputValidationError extends IOSchemaError {
 
   constructor(public override readonly cause: z.ZodError) {
     super(getMessageFromError(cause), { cause });
-  }
-
-  /**
-   * @deprecated use the cause property instead
-   * @todo remove in v21
-   * */
-  public get originalError() {
-    return this.cause;
   }
 }
 
