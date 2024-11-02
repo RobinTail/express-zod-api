@@ -25,7 +25,7 @@ describe("Errors", () => {
     const error = new DocumentationError({
       message: "test",
       path: "/v1/testPath",
-      method: "get" as const,
+      method: "get",
       isResponse: true,
     });
 
@@ -33,8 +33,14 @@ describe("Errors", () => {
       expect(error).toBeInstanceOf(Error);
     });
 
-    test("should include more details into the message", () => {
-      expect(error.message).toMatchSnapshot();
+    test("should have the message as assigned", () => {
+      expect(error.message).toBe("test");
+    });
+
+    test("should have the .cause property with details", () => {
+      expect(error.cause).toBe(
+        "Response schema of an Endpoint assigned to GET method of /v1/testPath path.",
+      );
     });
 
     test("should have the name matching its class", () => {

@@ -1,6 +1,6 @@
 import { ReferenceObject } from "openapi3-ts/oas31";
 import { z } from "zod";
-import { DocumentationError, ez } from "../../src";
+import { ez } from "../../src";
 import {
   OpenAPIContext,
   depictAny,
@@ -240,13 +240,9 @@ describe("Documentation helpers", () => {
       expect(depictUpload(ez.upload(), requestCtx)).toMatchSnapshot();
     });
     test("should throw when using in response", () => {
-      try {
-        depictUpload(ez.upload(), responseCtx);
-        expect.fail("Should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
+      expect(() =>
+        depictUpload(ez.upload(), responseCtx),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 
@@ -711,13 +707,9 @@ describe("Documentation helpers", () => {
       expect(depictDateIn(ez.dateIn(), requestCtx)).toMatchSnapshot();
     });
     test("should throw when ZodDateIn in response", () => {
-      try {
-        depictDateIn(ez.dateIn(), responseCtx);
-        expect.fail("should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
+      expect(() =>
+        depictDateIn(ez.dateIn(), responseCtx),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 
@@ -726,13 +718,9 @@ describe("Documentation helpers", () => {
       expect(depictDateOut(ez.dateOut(), responseCtx)).toMatchSnapshot();
     });
     test("should throw when ZodDateOut in request", () => {
-      try {
-        depictDateOut(ez.dateOut(), requestCtx);
-        expect.fail("should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
+      expect(() =>
+        depictDateOut(ez.dateOut(), requestCtx),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 
@@ -740,13 +728,7 @@ describe("Documentation helpers", () => {
     test.each([responseCtx, requestCtx])(
       "should throw clear error %#",
       (ctx) => {
-        try {
-          depictDate(z.date(), ctx);
-          expect.fail("should not be here");
-        } catch (e) {
-          expect(e).toBeInstanceOf(DocumentationError);
-          expect(e).toMatchSnapshot();
-        }
+        expect(() => depictDate(z.date(), ctx)).toThrowErrorMatchingSnapshot();
       },
     );
   });
