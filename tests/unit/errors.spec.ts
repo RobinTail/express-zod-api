@@ -86,7 +86,7 @@ describe("Errors", () => {
       expect(error.name).toBe("InputValidationError");
     });
 
-    test("should have .originalError property matching the one used for constructing", () => {
+    test("should have .cause property matching the one used for constructing", () => {
       expect(error.cause).toEqual(zodError);
       expect(error.originalError).toEqual(zodError);
     });
