@@ -9,7 +9,7 @@
   - Those error classes are publicly exposed for developers making custom Result Handlers.
 
 ```diff
-  const error = new OutputValidationError(new z.ZodError([]));
+  const error = new InputValidationError(new z.ZodError([]));
 - logger.error(error.originalError.message);
 + logger.error(error.cause.message);
 ```
