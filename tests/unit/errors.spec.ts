@@ -94,8 +94,8 @@ describe("Errors", () => {
 
   describe.each([new Error("test2"), undefined])(
     "ResultHandlerError",
-    (originalError) => {
-      const error = new ResultHandlerError("test", originalError);
+    (cause) => {
+      const error = new ResultHandlerError("test", cause);
 
       test("should be an instance of Error", () => {
         expect(error).toBeInstanceOf(Error);
@@ -106,7 +106,7 @@ describe("Errors", () => {
       });
 
       test(".cause should be the original error", () => {
-        expect(error.cause).toEqual(originalError);
+        expect(error.cause).toEqual(cause);
       });
     },
   );
