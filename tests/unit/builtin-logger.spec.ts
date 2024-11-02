@@ -62,8 +62,10 @@ describe("BuiltinLogger", () => {
       },
     );
 
-    test("should handle error meta including cause", () => {
-      const error = new Error("something", { cause: new Error("anything") });
+    test("should handle error including composite cause", () => {
+      const error = new Error("something", {
+        cause: { one: new Error("anything"), two: new Error("whatever") },
+      });
       const { logger, logSpy } = makeLogger({ level: "warn", color: false });
       logger.error("Failure", error);
       expect(logSpy).toHaveBeenCalledOnce();
@@ -73,7 +75,10 @@ describe("BuiltinLogger", () => {
         ),
       );
       expect(logSpy).toHaveBeenCalledWith(
-        expect.stringMatching(/\[cause]: Error: anything/),
+        expect.stringMatching(/\[cause]: \{ one: Error: anything/),
+      );
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/two: Error: whatever/),
       );
     });
 
