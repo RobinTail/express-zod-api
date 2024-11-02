@@ -1,4 +1,5 @@
 import createHttpError from "http-errors";
+import { range } from "ramda";
 import {
   combinations,
   defaultInputSources,
@@ -9,12 +10,13 @@ import {
   getStatusCodeFromError,
   hasCoercion,
   isCustomHeader,
+  logServerError,
   makeCleanId,
   makeErrorFromAnything,
 } from "../../src/common-helpers";
 import { InputValidationError } from "../../src";
 import { z } from "zod";
-import { makeRequestMock } from "../../src/testing";
+import { makeLoggerMock, makeRequestMock } from "../../src/testing";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
@@ -394,5 +396,30 @@ describe("Common Helpers", () => {
         expect(makeCleanId(...args)).toMatchSnapshot();
       },
     );
+  });
+
+  describe("logServerError()", () => {
+    test.each(range(100, 599))("should handle error %i", (statusCode) => {
+      const error = new Error("test");
+      const logger = makeLoggerMock();
+      const request = makeRequestMock({ url: "https://example.com" });
+      logServerError({
+        error,
+        logger,
+        request,
+        statusCode,
+        input: { test: 123 },
+      });
+      expect(logger._getLogs().error).toEqual(
+        statusCode >= 500
+          ? [
+              [
+                "Server side error",
+                { error, payload: { test: 123 }, url: "https://example.com" },
+              ],
+            ]
+          : [],
+      );
+    });
   });
 });
