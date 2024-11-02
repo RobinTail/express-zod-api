@@ -67,7 +67,8 @@ describe("Errors", () => {
       expect(error.name).toBe("OutputValidationError");
     });
 
-    test("should have .originalError property matching the one used for constructing", () => {
+    test("should have .cause property matching the one used for constructing", () => {
+      expect(error.cause).toEqual(zodError);
       expect(error.originalError).toEqual(zodError);
     });
   });
@@ -85,15 +86,16 @@ describe("Errors", () => {
       expect(error.name).toBe("InputValidationError");
     });
 
-    test("should have .originalError property matching the one used for constructing", () => {
+    test("should have .cause property matching the one used for constructing", () => {
+      expect(error.cause).toEqual(zodError);
       expect(error.originalError).toEqual(zodError);
     });
   });
 
   describe.each([new Error("test2"), undefined])(
     "ResultHandlerError",
-    (originalError) => {
-      const error = new ResultHandlerError("test", originalError);
+    (cause) => {
+      const error = new ResultHandlerError("test", cause);
 
       test("should be an instance of Error", () => {
         expect(error).toBeInstanceOf(Error);
@@ -103,8 +105,8 @@ describe("Errors", () => {
         expect(error.name).toBe("ResultHandlerError");
       });
 
-      test(".originalError should be the original error", () => {
-        expect(error.originalError).toEqual(originalError);
+      test(".cause should be the original error", () => {
+        expect(error.cause).toEqual(cause);
       });
     },
   );

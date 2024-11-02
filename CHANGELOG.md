@@ -29,6 +29,18 @@ export default [
 
 ## Version 20
 
+### v20.16.0
+
+- Deprecating `originalError` property on both `InputValidationError` and `OutputValidationError`:
+  - Use `cause` property instead;
+  - Those error classes are publicly exposed for developers making custom Result Handlers.
+
+```diff
+  const error = new InputValidationError(new z.ZodError([]));
+- logger.error(error.originalError.message);
++ logger.error(error.cause.message);
+```
+
 ### v20.15.3
 
 - Merge intersected object types in generated client:

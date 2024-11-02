@@ -1,3 +1,4 @@
+import { ResultHandlerError } from "../../src/errors";
 import { lastResortHandler } from "../../src/last-resort";
 import { makeLoggerMock, makeResponseMock } from "../../src/testing";
 
@@ -12,7 +13,10 @@ describe("Last Resort Handler", () => {
     lastResortHandler({
       logger: loggerMock,
       response: responseMock,
-      error: new Error("something went wrong"),
+      error: new ResultHandlerError(
+        "something went wrong",
+        new Error("what exactly"),
+      ),
     });
     expect(loggerMock._getLogs().error).toEqual([
       ["Result handler failure: something went wrong."],
@@ -23,7 +27,7 @@ describe("Last Resort Handler", () => {
       "text/plain",
     );
     expect(responseMock._getData()).toBe(
-      "An error occurred while serving the result: something went wrong.",
+      "An error occurred while serving the result: something went wrong.\nOriginal error: what exactly.",
     );
   });
 });

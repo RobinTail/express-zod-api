@@ -854,7 +854,7 @@ origins of errors that could happen in runtime and be handled the following way:
 - Ones related to `Endpoint` execution — handled by a `ResultHandler` assigned to the `EndpointsFactory` produced it:
   - Proprietary classes (available to you for your custom handling):
     - `InputValidationError` — when request payload does not match the `input` schema of the endpoint.
-      The default response status code is `400`;
+      The default response status code is `400`, `cause` property contains the original `ZodError`;
     - `OutputValidationError` — when returns of the endpoint's `handler` does not match its `output` schema (`500`);
   - Errors thrown within endpoint's `handler`:
     - `HttpError`, made by `createHttpError()` method of `http-errors` (required peer dependency). The default response
