@@ -76,7 +76,7 @@ export class ResultHandlerError extends Error {
   constructor(
     public override readonly cause: Error,
     /** @desc The error being processed by ResultHandler when it failed */
-    public readonly processed?: Error,
+    public readonly handled?: Error,
   ) {
     super(getMessageFromError(cause), { cause });
   }

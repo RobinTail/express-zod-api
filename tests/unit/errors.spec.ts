@@ -100,8 +100,8 @@ describe("Errors", () => {
 
   describe.each([new Error("test2"), undefined])(
     "ResultHandlerError",
-    (processed) => {
-      const error = new ResultHandlerError(new Error("test"), processed);
+    (handled) => {
+      const error = new ResultHandlerError(new Error("test"), handled);
 
       test("should be an instance of Error", () => {
         expect(error).toBeInstanceOf(Error);
@@ -115,8 +115,8 @@ describe("Errors", () => {
         expect(error.cause).toEqual(new Error("test"));
       });
 
-      test(".processed should be the processed error", () => {
-        expect(error.processed).toEqual(processed);
+      test(".handled should be the error handled by ResultHandler", () => {
+        expect(error.handled).toEqual(handled);
       });
     },
   );

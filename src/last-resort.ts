@@ -19,8 +19,6 @@ export const lastResortHandler = ({
     .type("text/plain")
     .end(
       `An error occurred while serving the result: ${error.message}.` +
-        (error.processed
-          ? `\nOriginal error: ${error.processed.message}.`
-          : ""),
+        (error.handled ? `\nOriginal error: ${error.handled.message}.` : ""),
     );
 };
