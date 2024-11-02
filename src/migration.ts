@@ -64,7 +64,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
         node.property.type === NT.Identifier &&
         node.property.name === originalErrorPropName &&
         node.object.type === NT.Identifier &&
-        node.object.name.match(/err/i) // this is most likely an error instance
+        node.object.name.match(/err/i) // this is probably an error instance, but we don't do type checking
       ) {
         const replacement = changedProps[node.property.name];
         ctx.report({
@@ -75,7 +75,6 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
             from: node.property.name,
             to: replacement,
           },
-          fix: (fixer) => fixer.replaceText(node.property, replacement),
         });
       }
     },

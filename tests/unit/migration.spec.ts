@@ -66,7 +66,6 @@ tester.run("v21", migration.rules.v21, {
     },
     {
       code: `const error = new Error(); console.error(error.originalError?.message);`,
-      output: `const error = new Error(); console.error(error.cause?.message);`,
       errors: [
         {
           messageId: "change",
