@@ -98,7 +98,8 @@ export const logInternalError = ({
   statusCode: number;
 }) => {
   if (statusCode === 500) {
-    logger.error(`Internal server error\n${error.stack}\n`, {
+    logger.error("Internal server error", {
+      error,
       url: request.url,
       payload: input,
     });

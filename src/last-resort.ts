@@ -13,7 +13,7 @@ export const lastResortHandler = ({
   logger,
   response,
 }: LastResortHandlerParams) => {
-  logger.error(`Result handler failure: ${error.message}.`);
+  logger.error("Result handler failure", error);
   response
     .status(500)
     .type("text/plain")

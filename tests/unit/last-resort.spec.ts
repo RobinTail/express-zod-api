@@ -10,16 +10,13 @@ describe("Last Resort Handler", () => {
   test("should log the supplied error and respond with plain text", () => {
     const responseMock = makeResponseMock();
     const loggerMock = makeLoggerMock();
-    lastResortHandler({
-      logger: loggerMock,
-      response: responseMock,
-      error: new ResultHandlerError(
-        new Error("something went wrong"),
-        new Error("what went wrong before"),
-      ),
-    });
+    const error = new ResultHandlerError(
+      new Error("something went wrong"),
+      new Error("what went wrong before"),
+    );
+    lastResortHandler({ error, logger: loggerMock, response: responseMock });
     expect(loggerMock._getLogs().error).toEqual([
-      ["Result handler failure: something went wrong."],
+      ["Result handler failure", error],
     ]);
     expect(responseMock._getStatusCode()).toBe(500);
     expect(responseMock._getHeaders()).toHaveProperty(
