@@ -305,7 +305,7 @@ export class Endpoint<
         response,
         error: new ResultHandlerError(
           `Failed to respond to ${request.method} ${request.path}`,
-          makeErrorFromAnything(e),
+          { occurred: makeErrorFromAnything(e), processed: error ?? undefined },
         ),
       });
     }

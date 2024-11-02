@@ -10,10 +10,10 @@ describe("Last Resort Handler", () => {
   test("should log the supplied error and respond with plain text", () => {
     const responseMock = makeResponseMock();
     const loggerMock = makeLoggerMock();
-    const error = new ResultHandlerError(
-      "Failure happened",
-      new Error("something went wrong"),
-    );
+    const error = new ResultHandlerError("Failure happened", {
+      occurred: new Error("something went wrong"),
+      processed: new Error("originally handled"),
+    });
     lastResortHandler({
       logger: loggerMock,
       response: responseMock,

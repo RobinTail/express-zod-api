@@ -94,24 +94,25 @@ describe("Errors", () => {
     });
   });
 
-  describe.each([new Error("test2"), undefined])(
-    "ResultHandlerError",
-    (cause) => {
-      const error = new ResultHandlerError("test", cause);
+  describe.each([
+    { occurred: new Error("thrown"), processed: new Error("handled") },
+    {},
+    undefined,
+  ])("ResultHandlerError", (cause) => {
+    const error = new ResultHandlerError("test", cause);
 
-      test("should be an instance of Error", () => {
-        expect(error).toBeInstanceOf(Error);
-      });
+    test("should be an instance of Error", () => {
+      expect(error).toBeInstanceOf(Error);
+    });
 
-      test("should have the name matching its class", () => {
-        expect(error.name).toBe("ResultHandlerError");
-      });
+    test("should have the name matching its class", () => {
+      expect(error.name).toBe("ResultHandlerError");
+    });
 
-      test(".cause should be the original error", () => {
-        expect(error.cause).toEqual(cause);
-      });
-    },
-  );
+    test(".cause should be the original error", () => {
+      expect(error.cause).toEqual(cause);
+    });
+  });
 
   describe("MissingPeerError", () => {
     const error = new MissingPeerError("compression");

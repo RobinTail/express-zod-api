@@ -60,6 +60,7 @@ export const createNotFoundHandler =
   async (request, response) => {
     const action = `${request.method} ${request.path}`;
     const logger = getChildLogger(request);
+    const error = createHttpError(404, `Can not ${action}`);
     try {
       errorHandler.execute({
         config,
@@ -69,7 +70,7 @@ export const createNotFoundHandler =
         input: null,
         output: null,
         options: {},
-        error: createHttpError(404, `Can not ${action}`),
+        error,
       });
     } catch (e) {
       lastResortHandler({
@@ -77,7 +78,7 @@ export const createNotFoundHandler =
         logger,
         error: new ResultHandlerError(
           `Error handler failed to process ${action}`,
-          makeErrorFromAnything(e),
+          { occurred: makeErrorFromAnything(e), processed: error },
         ),
       });
     }
