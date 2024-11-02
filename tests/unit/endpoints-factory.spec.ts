@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import createHttpError, { HttpError } from "http-errors";
+import createHttpError from "http-errors";
 import {
   EndpointsFactory,
   Middleware,
@@ -198,18 +198,12 @@ describe("EndpointsFactory", () => {
           next(new Error("This one has failed"));
         });
         const newFactory = factory[method](middleware);
-        try {
-          await testMiddleware({
+        await expect(() =>
+          testMiddleware({
             middleware: newFactory["middlewares"][0],
-          });
-          expect.fail("Should not be here");
-        } catch (e) {
-          expect(middleware).toHaveBeenCalledTimes(1);
-          expect(e).toBeInstanceOf(Error);
-          if (e instanceof Error) {
-            expect(e.message).toBe("This one has failed");
-          }
-        }
+          }),
+        ).rejects.toThrowError("This one has failed");
+        expect(middleware).toHaveBeenCalledTimes(1);
       });
 
       test("Should transform errors", async () => {
@@ -220,19 +214,12 @@ describe("EndpointsFactory", () => {
         const newFactory = factory[method](middleware, {
           transformer: (err) => createHttpError(401, err.message),
         });
-        try {
-          await testMiddleware({
+        await expect(() =>
+          testMiddleware({
             middleware: newFactory["middlewares"][0],
-          });
-          expect.fail("Should not be here");
-        } catch (e) {
-          expect(middleware).toHaveBeenCalledTimes(1);
-          expect(e).toBeInstanceOf(HttpError);
-          if (e instanceof HttpError) {
-            expect(e.status).toBe(401);
-            expect(e.message).toBe("This one has failed");
-          }
-        }
+          }),
+        ).rejects.toThrowErrorMatchingSnapshot();
+        expect(middleware).toHaveBeenCalledTimes(1);
       });
     },
   );
