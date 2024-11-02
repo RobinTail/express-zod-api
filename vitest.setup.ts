@@ -16,7 +16,7 @@ const errorSerializer = {
   test: (subject: unknown) =>
     subject instanceof Error && subject.cause !== undefined,
   serialize: ({ name, message, cause }: Error) =>
-    `[${name}: ${message} (${cause})]`,
+    `[${name}: ${message}\ncause: ${cause}]`,
 };
 
 /**

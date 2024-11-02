@@ -12,6 +12,7 @@ export class RoutingError extends Error {
  * */
 export class DocumentationError extends Error {
   public override name = "DocumentationError";
+  public override readonly cause: string;
 
   constructor({
     message,
@@ -22,10 +23,10 @@ export class DocumentationError extends Error {
     OpenAPIContext,
     "path" | "method" | "isResponse"
   >) {
-    const finalMessage = `${message}\nCaused by ${
-      isResponse ? "response" : "input"
+    super(message);
+    this.cause = `${
+      isResponse ? "Response" : "Input"
     } schema of an Endpoint assigned to ${method.toUpperCase()} method of ${path} path.`;
-    super(finalMessage);
   }
 }
 
