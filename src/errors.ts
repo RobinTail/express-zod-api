@@ -74,10 +74,11 @@ export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";
 
   constructor(
-    message: string,
-    public override readonly cause?: Error,
+    public override readonly cause: Error,
+    /** @desc The error being processed by ResultHandler when it failed */
+    public readonly processed?: Error,
   ) {
-    super(message, { cause });
+    super(getMessageFromError(cause), { cause });
   }
 }
 

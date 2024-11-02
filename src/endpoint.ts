@@ -301,7 +301,7 @@ export class Endpoint<
         logger,
         response,
         error: new ResultHandlerError(
-          makeErrorFromAnything(e).message,
+          makeErrorFromAnything(e),
           error || undefined,
         ),
       });

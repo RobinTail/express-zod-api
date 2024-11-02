@@ -14,7 +14,7 @@ describe("Last Resort Handler", () => {
       logger: loggerMock,
       response: responseMock,
       error: new ResultHandlerError(
-        "something went wrong",
+        new Error("something went wrong"),
         new Error("what exactly"),
       ),
     });

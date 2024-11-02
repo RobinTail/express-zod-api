@@ -70,7 +70,7 @@ export const createNotFoundHandler =
       lastResortHandler({
         response,
         logger,
-        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
+        error: new ResultHandlerError(makeErrorFromAnything(e), error),
       });
     }
   };
