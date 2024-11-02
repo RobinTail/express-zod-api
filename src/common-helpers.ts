@@ -84,7 +84,7 @@ export const getStatusCodeFromError = (error: Error): number => {
   return 500;
 };
 
-export const logInternalError = ({
+export const logServerError = ({
   logger,
   request,
   input,
@@ -97,8 +97,8 @@ export const logInternalError = ({
   error: Error;
   statusCode: number;
 }) => {
-  if (statusCode === 500) {
-    logger.error("Internal server error", {
+  if (statusCode >= 500) {
+    logger.error("Server side error", {
       error,
       url: request.url,
       payload: input,

@@ -11,7 +11,7 @@ import {
   getMessageFromError,
   getStatusCodeFromError,
   isObject,
-  logInternalError,
+  logServerError,
 } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
@@ -123,7 +123,7 @@ export const defaultResultHandler = new ResultHandler({
       return;
     }
     const statusCode = getStatusCodeFromError(error);
-    logInternalError({ logger, statusCode, request, error, input });
+    logServerError({ logger, statusCode, request, error, input });
     response.status(statusCode).json({
       status: "error",
       error: { message: getMessageFromError(error) },
@@ -160,7 +160,7 @@ export const arrayResultHandler = new ResultHandler({
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const statusCode = getStatusCodeFromError(error);
-      logInternalError({ logger, statusCode, request, error, input });
+      logServerError({ logger, statusCode, request, error, input });
       response.status(statusCode).type("text/plain").send(error.message);
       return;
     }
