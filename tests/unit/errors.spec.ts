@@ -55,8 +55,8 @@ describe("Errors", () => {
   });
 
   describe("OutputValidationError", () => {
-    const cause = new z.ZodError([]);
-    const error = new OutputValidationError(cause);
+    const zodError = new z.ZodError([]);
+    const error = new OutputValidationError(zodError);
 
     test("should be an instance of IOSchemaError and Error", () => {
       expect(error).toBeInstanceOf(IOSchemaError);
@@ -68,15 +68,14 @@ describe("Errors", () => {
     });
 
     test("should have .cause property matching the one used for constructing", () => {
-      expect(error.cause).toEqual(cause);
-      /** @todo remove in v21 */
-      expect(error.originalError).toEqual(cause);
+      expect(error.cause).toEqual(zodError);
+      expect(error.originalError).toEqual(zodError);
     });
   });
 
   describe("InputValidationError", () => {
-    const cause = new z.ZodError([]);
-    const error = new InputValidationError(cause);
+    const zodError = new z.ZodError([]);
+    const error = new InputValidationError(zodError);
 
     test("should be an instance of IOSchemaError and Error", () => {
       expect(error).toBeInstanceOf(IOSchemaError);
@@ -88,9 +87,8 @@ describe("Errors", () => {
     });
 
     test("should have .cause property matching the one used for constructing", () => {
-      expect(error.cause).toEqual(cause);
-      /** @todo remove in v21 */
-      expect(error.originalError).toEqual(cause);
+      expect(error.cause).toEqual(zodError);
+      expect(error.originalError).toEqual(zodError);
     });
   });
 

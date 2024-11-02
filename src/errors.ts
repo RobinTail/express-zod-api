@@ -46,7 +46,7 @@ export class OutputValidationError extends IOSchemaError {
    * @deprecated use the cause property instead
    * @todo remove in v21
    * */
-  get originalError() {
+  public get originalError() {
     return this.cause;
   }
 }
@@ -63,7 +63,7 @@ export class InputValidationError extends IOSchemaError {
    * @deprecated use the cause property instead
    * @todo remove in v21
    * */
-  get originalError() {
+  public get originalError() {
     return this.cause;
   }
 }
