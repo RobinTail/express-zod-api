@@ -49,7 +49,7 @@ describe("ResultHandler", () => {
         }).getPositiveResponse(z.object({})),
       ).toThrow(
         new ResultHandlerError(
-          "At least one positive response schema required.",
+          new Error("At least one positive response schema required."),
         ),
       );
       expect(() =>
@@ -60,7 +60,7 @@ describe("ResultHandler", () => {
         }).getNegativeResponse(),
       ).toThrow(
         new ResultHandlerError(
-          "At least one negative response schema required.",
+          new Error("At least one negative response schema required."),
         ),
       );
     });

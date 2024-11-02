@@ -14,8 +14,8 @@ describe("Last Resort Handler", () => {
       logger: loggerMock,
       response: responseMock,
       error: new ResultHandlerError(
-        "something went wrong",
-        new Error("what exactly"),
+        new Error("something went wrong"),
+        new Error("what went wrong before"),
       ),
     });
     expect(loggerMock._getLogs().error).toEqual([
@@ -27,7 +27,7 @@ describe("Last Resort Handler", () => {
       "text/plain",
     );
     expect(responseMock._getData()).toBe(
-      "An error occurred while serving the result: something went wrong.\nOriginal error: what exactly.",
+      "An error occurred while serving the result: something went wrong.\nOriginal error: what went wrong before.",
     );
   });
 });

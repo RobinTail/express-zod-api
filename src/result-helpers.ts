@@ -27,7 +27,7 @@ export const normalize = <A extends unknown[]>(
     assert(
       subject.length,
       new ResultHandlerError(
-        `At least one ${features.variant} response schema required.`,
+        new Error(`At least one ${features.variant} response schema required.`),
       ),
     );
   }
