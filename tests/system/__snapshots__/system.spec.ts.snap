@@ -45,7 +45,7 @@ exports[`App > Protocol > Should fail when missing content type header 1`] = `
 exports[`App > Validation > Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error 1`] = `
 {
   "error": {
-    "message": "Expected number, received string",
+    "message": "Internal server error",
   },
   "status": "error",
 }
@@ -63,7 +63,7 @@ exports[`App > Validation > Should fail on handler input type mismatch 1`] = `
 exports[`App > Validation > Should fail on handler output type mismatch 1`] = `
 {
   "error": {
-    "message": "output/anything: Number must be greater than 0",
+    "message": "Internal server error",
   },
   "status": "error",
 }

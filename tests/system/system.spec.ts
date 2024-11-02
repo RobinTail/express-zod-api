@@ -130,6 +130,7 @@ describe("App", async () => {
         },
         cors: false,
         startupLogo: true,
+        hideInternalErrors: true,
         gracefulShutdown: { events: ["FAKE"] },
         logger,
         childLoggerProvider: ({ parent }) =>

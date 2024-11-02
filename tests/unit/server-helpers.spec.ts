@@ -108,7 +108,7 @@ describe("Server helpers", () => {
       const handler = createNotFoundHandler({
         errorHandler,
         getChildLogger: () => makeLoggerMock(),
-        config: {} as CommonConfig,
+        config: { hideInternalErrors: true } as CommonConfig,
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({

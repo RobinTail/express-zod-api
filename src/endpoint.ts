@@ -301,6 +301,7 @@ export class Endpoint<
       });
     } catch (e) {
       lastResortHandler({
+        config,
         logger,
         response,
         error: new ResultHandlerError(

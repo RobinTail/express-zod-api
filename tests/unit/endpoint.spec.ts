@@ -256,13 +256,14 @@ describe("Endpoint", () => {
       const { loggerMock, responseMock, requestMock } = await testEndpoint({
         endpoint,
         requestProps: { path: "/some" },
+        configProps: { hideInternalErrors: true },
       });
       expect(loggerMock._getLogs().error).toEqual([
         ["Result Handler failure", new Error("Failed to respond to GET /some")],
       ]);
       expect(spy).toHaveBeenCalledWith({
         error: null,
-        config: { cors: false, logger: loggerMock },
+        config: { cors: false, logger: loggerMock, hideInternalErrors: true },
         logger: loggerMock,
         input: {},
         options: {},
@@ -485,6 +486,7 @@ describe("Endpoint", () => {
       const { loggerMock, responseMock } = await testEndpoint({
         endpoint,
         requestProps: { path: "/some" },
+        configProps: { hideInternalErrors: true },
       });
       expect(loggerMock._getLogs().error).toEqual([
         ["Result Handler failure", new Error("Failed to respond to GET /some")],

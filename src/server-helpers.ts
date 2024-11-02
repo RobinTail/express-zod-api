@@ -74,6 +74,7 @@ export const createNotFoundHandler =
       });
     } catch (e) {
       lastResortHandler({
+        config,
         response,
         logger,
         error: new ResultHandlerError(
