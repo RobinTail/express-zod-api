@@ -14,6 +14,7 @@
     - Properties `httpServer` and `httpsServer` are removed;
     - Added `servers` property — array containing those server instances in the same order.
 - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
+- The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
