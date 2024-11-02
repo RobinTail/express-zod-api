@@ -96,7 +96,7 @@ describe("ResultHandler", () => {
       });
       expect(loggerMock._getLogs().error).toEqual([
         [
-          "Internal server error",
+          "Server side error",
           {
             error,
             payload: { something: 453 },
