@@ -74,6 +74,7 @@ export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";
 
   constructor(
+    /** @desc The error thrown from ResultHandler */
     public override readonly cause: Error,
     /** @desc The error being processed by ResultHandler when it failed */
     public readonly handled?: Error,
