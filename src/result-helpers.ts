@@ -84,7 +84,7 @@ export const ensureHttpError = (error: Error): HttpError =>
     : createHttpError(
         error instanceof InputValidationError ? 400 : 500,
         getMessageFromError(error),
-        { cause: error.cause },
+        { cause: error.cause || error },
       );
 
 export const getPublicErrorMessage = (error: HttpError): string =>

@@ -1,6 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Result helpers > ensureHttpError() > should handle Error: basic 1`] = `[InternalServerError: basic]`;
+exports[`Result helpers > ensureHttpError() > should handle Error: basic 1`] = `
+[InternalServerError: basic
+cause: [Error: basic]]
+`;
 
 exports[`Result helpers > ensureHttpError() > should handle InputValidationError: Expected string, received number 1`] = `
 [BadRequestError: Expected string, received number
