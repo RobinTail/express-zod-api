@@ -81,6 +81,8 @@ export const getStatusCodeFromError = (error: Error): number => {
   return error instanceof InputValidationError ? 400 : 500;
 };
 
+export const isServerSideIssue = (statusCode: number) => statusCode >= 500;
+
 export const logServerError = ({
   logger,
   request,
@@ -93,15 +95,13 @@ export const logServerError = ({
   input: FlatObject | null;
   error: Error;
   statusCode: number;
-}) => {
-  if (statusCode >= 500) {
-    logger.error("Server side error", {
-      error,
-      url: request.url,
-      payload: input,
-    });
-  }
-};
+}) =>
+  isServerSideIssue(statusCode) &&
+  logger.error("Server side error", {
+    error,
+    url: request.url,
+    payload: input,
+  });
 
 export const getExamples = <
   T extends z.ZodTypeAny,
