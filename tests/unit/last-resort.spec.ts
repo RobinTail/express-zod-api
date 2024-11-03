@@ -10,7 +10,10 @@ describe("Last Resort Handler", () => {
   });
 
   describe.each(["development", "production"])("%s mode", (mode) => {
-    beforeAll(() => vi.stubEnv("NODE_ENV", mode));
+    beforeAll(() => {
+      vi.stubEnv("TSUP_STATIC", mode);
+      vi.stubEnv("NODE_ENV", mode);
+    });
     afterAll(() => vi.unstubAllEnvs());
 
     test.each([

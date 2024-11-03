@@ -78,7 +78,10 @@ describe("Result helpers", () => {
   describe.each(["development", "production"])(
     "getPublicErrorMessage() in %s mode",
     (mode) => {
-      beforeAll(() => vi.stubEnv("NODE_ENV", mode));
+      beforeAll(() => {
+        vi.stubEnv("TSUP_STATIC", mode);
+        vi.stubEnv("NODE_ENV", mode);
+      });
       afterAll(() => vi.unstubAllEnvs());
 
       test("should return actual message for 400", () => {

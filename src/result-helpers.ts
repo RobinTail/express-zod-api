@@ -1,6 +1,7 @@
 import { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import assert from "node:assert/strict";
+import { memoizeWith } from "ramda";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { FlatObject, getMessageFromError } from "./common-helpers";
@@ -87,7 +88,12 @@ export const ensureHttpError = (error: Error): HttpError =>
         { cause: error.cause || error },
       );
 
+const isProduction = memoizeWith(
+  () => process.env.TSUP_STATIC as string, // dynamic in tests, but static in build
+  () => process.env.NODE_ENV === "production",
+);
+
 export const getPublicErrorMessage = (error: HttpError): string =>
-  process.env.NODE_ENV === "production" && !error.expose
+  isProduction() && !error.expose
     ? createHttpError(error.statusCode).message // default message for that code
     : error.message;
