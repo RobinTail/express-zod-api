@@ -806,18 +806,8 @@ The `defaultResultHandler` sets the HTTP status code and ensures the following t
 
 ```typescript
 type DefaultResponse<OUT> =
-  | {
-      // Positive response
-      status: "success";
-      data: OUT;
-    }
-  | {
-      // or Negative response
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | { status: "success"; data: OUT } // Positive response
+  | { status: "error"; error: { message: string } }; // or Negative response
 ```
 
 You can create your own result handler by using this example as a template:
@@ -826,7 +816,7 @@ You can create your own result handler by using this example as a template:
 import { z } from "zod";
 import {
   ResultHandler,
-  getStatusCodeFromError,
+  ensureHttpError,
   getMessageFromError,
 } from "express-zod-api";
 
@@ -837,12 +827,12 @@ const yourResultHandler = new ResultHandler({
   }),
   negative: z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
-    if (!error) {
+    if (error) {
+      const { statusCode } = ensureHttpError(error);
+      const message = getMessageFromError(error);
       // your implementation
       return;
     }
-    const statusCode = getStatusCodeFromError(error);
-    const message = getMessageFromError(error);
     // your implementation
   },
 });
