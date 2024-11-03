@@ -2,6 +2,11 @@
 
 ## Version 20
 
+### v20.17.0
+
+- Added `cause` property to `DocumentationError`;
+- Log all server side errors (status codes `>= 500`) and in full (not just the `message`).
+
 ### v20.16.0
 
 - Deprecating `originalError` property on both `InputValidationError` and `OutputValidationError`:
