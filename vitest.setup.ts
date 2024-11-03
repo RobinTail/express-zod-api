@@ -1,3 +1,4 @@
+import type { NewPlugin } from "@vitest/pretty-format";
 import { isHttpError } from "http-errors";
 
 /** Takes statusCode into account */
@@ -12,11 +13,19 @@ const compareHttpErrors = (a: unknown, b: unknown) => {
 };
 
 /** Takes cause into account */
-const errorSerializer = {
-  test: (subject: unknown) =>
-    subject instanceof Error && subject.cause !== undefined,
-  serialize: ({ name, message, cause }: Error) =>
-    `[${name}: ${message}\ncause: ${cause}]`,
+const errorSerializer: NewPlugin = {
+  test: (subject) => subject instanceof Error,
+  serialize: (
+    { name, message, cause }: Error,
+    config,
+    indentation,
+    depth,
+    refs,
+    printer,
+  ) => {
+    const asObject = { message, ...(cause ? { cause } : {}) };
+    return `${name}(${printer(asObject, config, indentation, depth, refs)})`;
+  },
 };
 
 /**
