@@ -1,4 +1,4 @@
-import { Config, NewPlugin, Printer, Refs } from "@vitest/pretty-format";
+import type { NewPlugin } from "@vitest/pretty-format";
 import { isHttpError } from "http-errors";
 
 /** Takes statusCode into account */
