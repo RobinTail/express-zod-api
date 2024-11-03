@@ -3,7 +3,7 @@ import { z } from "zod";
 import { InputValidationError, OutputValidationError } from "../../src";
 import {
   ensureHttpError,
-  exposeErrorMessage,
+  getPublicErrorMessage,
   getStatusCodeFromError,
   logServerError,
 } from "../../src/result-helpers";
@@ -74,7 +74,7 @@ describe("Result helpers", () => {
     });
   });
 
-  describe("exposeErrorMessage()", () => {
+  describe("getPublicErrorMessage()", () => {
     afterAll(() => {
       vi.unstubAllEnvs();
     });
@@ -82,16 +82,16 @@ describe("Result helpers", () => {
       "should handle %s",
       (mode) => {
         vi.stubEnv("NODE_ENV", mode);
-        expect(exposeErrorMessage(createHttpError(400, "invalid inputs"))).toBe(
-          "invalid inputs",
-        );
         expect(
-          exposeErrorMessage(
+          getPublicErrorMessage(createHttpError(400, "invalid inputs")),
+        ).toBe("invalid inputs");
+        expect(
+          getPublicErrorMessage(
             createHttpError(400, "invalid inputs", { expose: false }),
           ),
         ).toBe(mode === "production" ? "Bad Request" : "invalid inputs");
         expect(
-          exposeErrorMessage(
+          getPublicErrorMessage(
             createHttpError(500, "something particual failed"),
           ),
         ).toBe(

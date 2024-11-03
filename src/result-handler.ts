@@ -11,7 +11,7 @@ import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 import {
   ensureHttpError,
-  exposeErrorMessage,
+  getPublicErrorMessage,
   logServerError,
   normalize,
   ResultSchema,
@@ -123,7 +123,7 @@ export const defaultResultHandler = new ResultHandler({
     logServerError(httpError, { logger, request, input });
     response.status(httpError.statusCode).json({
       status: "error",
-      error: { message: exposeErrorMessage(httpError) },
+      error: { message: getPublicErrorMessage(httpError) },
     });
   },
 });
@@ -159,7 +159,7 @@ export const arrayResultHandler = new ResultHandler({
       response
         .status(httpError.statusCode)
         .type("text/plain")
-        .send(exposeErrorMessage(httpError));
+        .send(getPublicErrorMessage(httpError));
       return;
     }
     if (output && "items" in output && Array.isArray(output.items)) {

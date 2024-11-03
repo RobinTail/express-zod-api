@@ -83,7 +83,7 @@ export const ensureHttpError = (error: Error): HttpError =>
         { cause: error.cause },
       );
 
-export const exposeErrorMessage = (error: HttpError): string =>
+export const getPublicErrorMessage = (error: HttpError): string =>
   process.env.NODE_ENV === "production" && !error.expose
     ? createHttpError(error.statusCode).message // default message for that code
     : error.message;
