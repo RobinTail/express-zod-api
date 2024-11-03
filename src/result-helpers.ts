@@ -46,10 +46,6 @@ export const normalize = <A extends unknown[]>(
   );
 };
 
-/** Peformance optimized implementation, 10% faster than clamping */
-export const isServerSideIssue = (error: HttpError) =>
-  ~~(error.statusCode / 100) === 5; // 5XX
-
 export const logServerError = (
   error: HttpError,
   {
