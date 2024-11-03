@@ -864,8 +864,8 @@ the `defaultResultHandler`, however, since much can be customized, you should be
 origins of errors that could happen in runtime and be handled the following way:
 
 - Ones related to `Endpoint` execution — handled by a `ResultHandler` assigned to the `EndpointsFactory` produced it:
-  - Proprietary classes (available to you for your custom handling):
-    - `InputValidationError` — when request payload does not match the `input` schema of the endpoint.
+  - The following proprietary classes are available to you for customizing error handling in your `ResultHandler`:
+    - `InputValidationError` — when request payload does not match the `input` schema of the endpoint or middleware.
       The default response status code is `400`, `cause` property contains the original `ZodError`;
     - `OutputValidationError` — when returns of the endpoint's `handler` does not match its `output` schema (`500`);
   - Errors thrown within endpoint's `handler`:
@@ -877,7 +877,7 @@ origins of errors that could happen in runtime and be handled the following way:
     `400` for parsing, `404` for routing, `config.upload.limitError.statusCode` for upload issues, or `500` for others.
   - `ResultHandler` must handle possible `error` and avoid throwing its own errors, otherwise:
 - Ones related to `ResultHandler` execution — handled by `LastResortHandler`:
-  - Response status code is always `500` and the response itself is a plain text containing original `error.message`.
+  - Response status code is always `500` and the response itself is a plain text.
 
 ## Non-object response
 
