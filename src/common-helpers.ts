@@ -56,6 +56,8 @@ export const getInput = (
     .reduce<FlatObject>((agg, obj) => ({ ...agg, ...obj }), {});
 };
 
+export const isProduction = () => process.env.NODE_ENV === "production";
+
 export const ensureError = (subject: unknown): Error =>
   subject instanceof Error ? subject : new Error(String(subject));
 

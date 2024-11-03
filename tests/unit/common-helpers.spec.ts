@@ -13,6 +13,7 @@ import {
   logServerError,
   makeCleanId,
   ensureError,
+  isProduction,
 } from "../../src/common-helpers";
 import { InputValidationError } from "../../src";
 import { z } from "zod";
@@ -394,6 +395,19 @@ describe("Common Helpers", () => {
       "should generate valid identifier from the supplied strings %#",
       (...args) => {
         expect(makeCleanId(...args)).toMatchSnapshot();
+      },
+    );
+  });
+
+  describe("isProduction()", () => {
+    afterAll(() => {
+      vi.unstubAllEnvs();
+    });
+    test.each([undefined, "development", "production"])(
+      "should handle %s",
+      (mode) => {
+        vi.stubEnv("NODE_ENV", mode);
+        expect(isProduction()).toBe(mode === "production");
       },
     );
   });
