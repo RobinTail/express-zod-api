@@ -74,6 +74,10 @@ export const getStatusCodeFromError = (error: Error): number => {
   return error instanceof InputValidationError ? 400 : 500;
 };
 
+/**
+ * @example InputValidationError —> BadRequest(400)
+ * @example Error —> InternalServerError(500)
+ * */
 export const ensureHttpError = (error: Error): HttpError =>
   isHttpError(error)
     ? error
