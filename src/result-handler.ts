@@ -15,7 +15,8 @@ import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 import {
-  getStatusCodeFromError,
+  ensureHttpError,
+  exposeErrorMessage,
   logServerError,
   normalize,
   ResultSchema,
@@ -125,11 +126,11 @@ export const defaultResultHandler = new ResultHandler({
         .json({ status: "success", data: output });
       return;
     }
-    const statusCode = getStatusCodeFromError(error);
-    logServerError({ logger, statusCode, request, error, input });
-    response.status(statusCode).json({
+    const httpError = ensureHttpError(error);
+    logServerError(httpError, { logger, request, input });
+    response.status(httpError.statusCode).json({
       status: "error",
-      error: { message: getMessageFromError(error) },
+      error: { message: exposeErrorMessage(httpError) },
     });
   },
 });
@@ -162,18 +163,18 @@ export const arrayResultHandler = new ResultHandler({
     .example(getMessageFromError(new Error("Sample error message"))),
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
-      const statusCode = getStatusCodeFromError(error);
-      logServerError({ logger, statusCode, request, error, input });
-      response.status(statusCode).type("text/plain").send(error.message);
+      const httpError = ensureHttpError(error);
+      logServerError(httpError, { logger, request, input });
+      response
+        .status(httpError.statusCode)
+        .type("text/plain")
+        .send(exposeErrorMessage(httpError));
       return;
     }
     if (output && "items" in output && Array.isArray(output.items)) {
       response.status(defaultStatusCodes.positive).json(output.items);
-    } else {
-      response
-        .status(500)
-        .type("text/plain")
-        .send("Property 'items' is missing in the endpoint output");
+      return;
     }
+    throw new Error("Property 'items' is missing in the endpoint output");
   },
 });

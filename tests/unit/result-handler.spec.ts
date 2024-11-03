@@ -98,7 +98,7 @@ describe("ResultHandler", () => {
         [
           "Server side error",
           {
-            error,
+            error: createHttpError(500, error),
             payload: { something: 453 },
             url: "http://something/v1/anything",
           },
@@ -229,25 +229,19 @@ describe("ResultHandler", () => {
       ["element", "_def", "typeName"],
       "ZodAny",
     );
-    arrayResultHandler.execute({
-      error: null,
-      input: { something: 453 },
-      output: { anything: 118 },
-      options: {},
-      request: requestMock,
-      response: responseMock,
-      logger: loggerMock,
-    });
-    expect(loggerMock._getLogs().error).toHaveLength(0);
-    expect(responseMock._getStatusCode()).toBe(500);
-    expect(responseMock._getHeaders()).toHaveProperty(
-      "content-type",
-      "text/plain",
+    expect(() =>
+      arrayResultHandler.execute({
+        error: null,
+        input: { something: 453 },
+        output: { anything: 118 },
+        options: {},
+        request: requestMock,
+        response: responseMock,
+        logger: loggerMock,
+      }),
+    ).toThrowError(
+      // delegated to LastResortHandler, having same format
+      new Error("Property 'items' is missing in the endpoint output"),
     );
-    expect(
-      responseMock._isJSON()
-        ? responseMock._getJSONData()
-        : responseMock._getData(),
-    ).toMatchSnapshot();
   });
 });

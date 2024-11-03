@@ -11,10 +11,10 @@ import { makeLoggerMock, makeRequestMock } from "../../src/testing";
 
 describe("Result helpers", () => {
   describe("isServerSideIssue()", () => {
-    test.each(range(100, 999))(
+    test.each(range(400, 599))(
       "should be true when %i is 5XX",
       (statusCode) => {
-        expect(isServerSideIssue(statusCode)).toBe(
+        expect(isServerSideIssue(createHttpError(statusCode))).toBe(
           statusCode >= 500 && statusCode < 600,
         );
       },
@@ -23,16 +23,10 @@ describe("Result helpers", () => {
 
   describe("logServerError()", () => {
     test("should log server side error", () => {
-      const error = new Error("test");
+      const error = createHttpError(501, "test");
       const logger = makeLoggerMock();
       const request = makeRequestMock({ url: "https://example.com" });
-      logServerError({
-        error,
-        logger,
-        request,
-        statusCode: 501,
-        input: { test: 123 },
-      });
+      logServerError(error, { logger, request, input: { test: 123 } });
       expect(logger._getLogs().error).toEqual([
         [
           "Server side error",

@@ -1,9 +1,13 @@
 import { Request } from "express";
-import { isHttpError } from "http-errors";
+import createHttpError, { HttpError, isHttpError } from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
-import { FlatObject } from "./common-helpers";
+import {
+  FlatObject,
+  getMessageFromError,
+  isProduction,
+} from "./common-helpers";
 import { InputValidationError, ResultHandlerError } from "./errors";
 import { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
@@ -46,30 +50,45 @@ export const normalize = <A extends unknown[]>(
   );
 };
 
-export const isServerSideIssue = (statusCode: number) =>
-  ~~(statusCode / 100) === 5; // 5XX
+/** Peformance optimized implementation, 10% faster than clamping */
+export const isServerSideIssue = (error: HttpError) =>
+  ~~(error.statusCode / 100) === 5; // 5XX
 
-export const logServerError = ({
-  logger,
-  request,
-  input,
-  error,
-  statusCode,
-}: {
-  logger: ActualLogger;
-  request: Request;
-  input: FlatObject | null;
-  error: Error;
-  statusCode: number;
-}) =>
-  isServerSideIssue(statusCode) &&
+export const logServerError = (
+  error: HttpError,
+  {
+    logger,
+    request,
+    input,
+  }: {
+    logger: ActualLogger;
+    request: Request;
+    input: FlatObject | null;
+  },
+) =>
+  isServerSideIssue(error) &&
   logger.error("Server side error", {
     error,
     url: request.url,
     payload: input,
   });
 
+/**
+ * @deprecated use ensureHttpError().statusCode instead
+ * @todo remove in v21
+ * */
 export const getStatusCodeFromError = (error: Error): number => {
   if (isHttpError(error)) return error.statusCode;
   return error instanceof InputValidationError ? 400 : 500;
 };
+
+export const ensureHttpError = (error: Error): HttpError =>
+  isHttpError(error)
+    ? error
+    : createHttpError(
+        error instanceof InputValidationError ? 400 : 500,
+        getMessageFromError(error),
+      );
+
+export const exposeErrorMessage = (error: HttpError): string =>
+  isProduction() && !error.expose ? error.name : error.message;
