@@ -46,7 +46,8 @@ export const normalize = <A extends unknown[]>(
   );
 };
 
-export const isServerSideIssue = (statusCode: number) => statusCode >= 500;
+export const isServerSideIssue = (statusCode: number) =>
+  ~~(statusCode / 100) === 5; // 5XX
 
 export const logServerError = ({
   logger,

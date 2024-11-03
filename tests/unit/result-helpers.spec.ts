@@ -11,10 +11,12 @@ import { makeLoggerMock, makeRequestMock } from "../../src/testing";
 
 describe("Result helpers", () => {
   describe("isServerSideIssue()", () => {
-    test.each(range(100, 599))(
-      "should be true when %i >= 500",
+    test.each(range(100, 999))(
+      "should be true when %i is 5XX",
       (statusCode) => {
-        expect(isServerSideIssue(statusCode)).toBe(statusCode >= 500);
+        expect(isServerSideIssue(statusCode)).toBe(
+          statusCode >= 500 && statusCode < 600,
+        );
       },
     );
   });
