@@ -105,5 +105,3 @@ exports[`ResultHandler > 'defaultResultHandler' > should generate negative respo
   ],
 }
 `;
-
-exports[`ResultHandler > arrayResultHandler should fail when there is no items prop in the output 1`] = `"Property 'items' is missing in the endpoint output"`;
