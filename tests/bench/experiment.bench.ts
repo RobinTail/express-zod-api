@@ -1,18 +1,14 @@
+import createHttpError from "http-errors";
 import { bench } from "vitest";
 
-describe("Experiment %s", () => {
-  const map = new WeakMap();
-  const set = new WeakSet();
-  const obj = {};
+describe("Experiment for isServerSideIssue()", () => {
+  const error = createHttpError(501);
 
-  bench("WeakMap.has()", () => {
-    map.has({});
+  bench("bitwise", () => {
+    return void (~~(error.statusCode / 100) === 5);
   });
 
-  bench("WeakSet.has()", () => {
-    set.has({});
+  bench("clamp", () => {
+    return void (error.statusCode >= 500 && error.statusCode < 600);
   });
-
-  bench("control: in", () => void ("test" in obj));
-  bench("control: hasOwn", () => void Object.hasOwn(obj, "test"));
 });
