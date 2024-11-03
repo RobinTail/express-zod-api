@@ -75,13 +75,8 @@ export const getMessageFromError = (error: Error): string => {
 };
 
 export const getStatusCodeFromError = (error: Error): number => {
-  if (isHttpError(error)) {
-    return error.statusCode;
-  }
-  if (error instanceof InputValidationError) {
-    return 400;
-  }
-  return 500;
+  if (isHttpError(error)) return error.statusCode;
+  return error instanceof InputValidationError ? 400 : 500;
 };
 
 export const logServerError = ({
