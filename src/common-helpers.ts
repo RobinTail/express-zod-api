@@ -3,11 +3,10 @@ import { isHttpError } from "http-errors";
 import { pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
+import { contentTypes } from "./content-type";
 import { InputValidationError, OutputValidationError } from "./errors";
-import { ActualLogger } from "./logger-helpers";
 import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
-import { contentTypes } from "./content-type";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = Record<string, never>;
@@ -80,28 +79,6 @@ export const getStatusCodeFromError = (error: Error): number => {
   if (isHttpError(error)) return error.statusCode;
   return error instanceof InputValidationError ? 400 : 500;
 };
-
-export const isServerSideIssue = (statusCode: number) => statusCode >= 500;
-
-export const logServerError = ({
-  logger,
-  request,
-  input,
-  error,
-  statusCode,
-}: {
-  logger: ActualLogger;
-  request: Request;
-  input: FlatObject | null;
-  error: Error;
-  statusCode: number;
-}) =>
-  isServerSideIssue(statusCode) &&
-  logger.error("Server side error", {
-    error,
-    url: request.url,
-    payload: input,
-  });
 
 export const getExamples = <
   T extends z.ZodTypeAny,

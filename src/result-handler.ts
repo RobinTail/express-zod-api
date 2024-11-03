@@ -11,12 +11,11 @@ import {
   getMessageFromError,
   getStatusCodeFromError,
   isObject,
-  logServerError,
 } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
-import { normalize, ResultSchema } from "./result-helpers";
+import { logServerError, normalize, ResultSchema } from "./result-helpers";
 
 type Handler<RES = unknown> = (params: {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */

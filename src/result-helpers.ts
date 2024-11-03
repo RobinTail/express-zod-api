@@ -1,7 +1,10 @@
+import { Request } from "express";
 import assert from "node:assert/strict";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
+import { FlatObject } from "./common-helpers";
 import { ResultHandlerError } from "./errors";
+import { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
 
 export type ResultSchema<R extends Result> =
@@ -41,3 +44,25 @@ export const normalize = <A extends unknown[]>(
     }),
   );
 };
+
+export const isServerSideIssue = (statusCode: number) => statusCode >= 500;
+
+export const logServerError = ({
+  logger,
+  request,
+  input,
+  error,
+  statusCode,
+}: {
+  logger: ActualLogger;
+  request: Request;
+  input: FlatObject | null;
+  error: Error;
+  statusCode: number;
+}) =>
+  isServerSideIssue(statusCode) &&
+  logger.error("Server side error", {
+    error,
+    url: request.url,
+    payload: input,
+  });
