@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Result helpers > ensureHttpError() > should handle Error: basic 1`] = `[InternalServerError: basic]`;
+
+exports[`Result helpers > ensureHttpError() > should handle InputValidationError: Expected string, received number 1`] = `
+[BadRequestError: Expected string, received number
+cause: [ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "number",
+    "path": [],
+    "message": "Expected string, received number"
+  }
+]]]
+`;
+
+exports[`Result helpers > ensureHttpError() > should handle NotFoundError: Not really found 1`] = `[NotFoundError: Not really found]`;
+
+exports[`Result helpers > ensureHttpError() > should handle OutputValidationError: Expected string, received number 1`] = `
+[InternalServerError: output: Expected string, received number
+cause: [ZodError: [
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "number",
+    "path": [],
+    "message": "Expected string, received number"
+  }
+]]]
+`;
