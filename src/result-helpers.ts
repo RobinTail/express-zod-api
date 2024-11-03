@@ -62,7 +62,7 @@ export const logServerError = (
     input: FlatObject | null;
   },
 ) =>
-  isServerSideIssue(error) &&
+  !error.expose &&
   logger.error("Server side error", {
     error,
     url: request.url,

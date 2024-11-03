@@ -1,28 +1,15 @@
 import createHttpError from "http-errors";
-import { range } from "ramda";
 import { z } from "zod";
 import { InputValidationError, OutputValidationError } from "../../src";
 import {
   ensureHttpError,
   exposeErrorMessage,
   getStatusCodeFromError,
-  isServerSideIssue,
   logServerError,
 } from "../../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../../src/testing";
 
 describe("Result helpers", () => {
-  describe("isServerSideIssue()", () => {
-    test.each(range(400, 599))(
-      "should be true when %i is 5XX",
-      (statusCode) => {
-        expect(isServerSideIssue(createHttpError(statusCode))).toBe(
-          statusCode >= 500 && statusCode < 600,
-        );
-      },
-    );
-  });
-
   describe("logServerError()", () => {
     test("should log server side error", () => {
       const error = createHttpError(501, "test");
@@ -98,6 +85,11 @@ describe("Result helpers", () => {
         expect(exposeErrorMessage(createHttpError(400, "invalid inputs"))).toBe(
           "invalid inputs",
         );
+        expect(
+          exposeErrorMessage(
+            createHttpError(400, "invalid inputs", { expose: false }),
+          ),
+        ).toBe(mode === "production" ? "Bad Request" : "invalid inputs");
         expect(
           exposeErrorMessage(
             createHttpError(500, "something particual failed"),
