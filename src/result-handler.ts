@@ -5,12 +5,7 @@ import {
   defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
-import {
-  FlatObject,
-  getExamples,
-  getMessageFromError,
-  isObject,
-} from "./common-helpers";
+import { FlatObject, getExamples, isObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
@@ -115,9 +110,7 @@ export const defaultResultHandler = new ResultHandler({
     })
     .example({
       status: "error",
-      error: {
-        message: getMessageFromError(new Error("Sample error message")),
-      },
+      error: { message: "Sample error message" },
     }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (!error) {
@@ -158,9 +151,7 @@ export const arrayResultHandler = new ResultHandler({
       responseSchema,
     );
   },
-  negative: z
-    .string()
-    .example(getMessageFromError(new Error("Sample error message"))),
+  negative: z.string().example("Sample error message"),
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const httpError = ensureHttpError(error);
