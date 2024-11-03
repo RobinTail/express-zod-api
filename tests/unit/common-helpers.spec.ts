@@ -1,5 +1,5 @@
+import "../../src/zod-plugin"; // required for this test
 import createHttpError from "http-errors";
-import { range } from "ramda";
 import {
   combinations,
   defaultInputSources,
@@ -7,17 +7,14 @@ import {
   getExamples,
   getInput,
   getMessageFromError,
-  getStatusCodeFromError,
   hasCoercion,
   isCustomHeader,
   makeCleanId,
   ensureError,
   isProduction,
 } from "../../src/common-helpers";
-import { InputValidationError } from "../../src";
 import { z } from "zod";
-import { isServerSideIssue, logServerError } from "../../src/result-helpers";
-import { makeLoggerMock, makeRequestMock } from "../../src/testing";
+import { makeRequestMock } from "../../src/testing";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
@@ -186,44 +183,6 @@ describe("Common Helpers", () => {
       expect(
         getMessageFromError(new Error("something went wrong")),
       ).toMatchSnapshot();
-    });
-  });
-
-  describe("getStatusCodeFromError()", () => {
-    test("should get status code from HttpError", () => {
-      expect(
-        getStatusCodeFromError(createHttpError(403, "Access denied")),
-      ).toEqual(403);
-    });
-
-    test("should return 400 for InputValidationError", () => {
-      const error = new InputValidationError(
-        new z.ZodError([
-          {
-            code: "invalid_type",
-            path: ["user", "id"],
-            message: "expected number, got string",
-            expected: "number",
-            received: "string",
-          },
-        ]),
-      );
-      expect(getStatusCodeFromError(error)).toEqual(400);
-    });
-
-    test.each([
-      new Error("something went wrong"),
-      new z.ZodError([
-        {
-          code: "invalid_type",
-          path: ["user", "id"],
-          message: "expected number, got string",
-          expected: "number",
-          received: "string",
-        },
-      ]),
-    ])("should return 500 for other errors %#", (error) => {
-      expect(getStatusCodeFromError(error)).toEqual(500);
     });
   });
 

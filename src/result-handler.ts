@@ -9,13 +9,17 @@ import {
   FlatObject,
   getExamples,
   getMessageFromError,
-  getStatusCodeFromError,
   isObject,
 } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
-import { logServerError, normalize, ResultSchema } from "./result-helpers";
+import {
+  getStatusCodeFromError,
+  logServerError,
+  normalize,
+  ResultSchema,
+} from "./result-helpers";
 
 type Handler<RES = unknown> = (params: {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */

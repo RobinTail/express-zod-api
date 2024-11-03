@@ -1,10 +1,9 @@
 import { Request } from "express";
-import { isHttpError } from "http-errors";
 import { pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
-import { InputValidationError, OutputValidationError } from "./errors";
+import { OutputValidationError } from "./errors";
 import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 
@@ -73,11 +72,6 @@ export const getMessageFromError = (error: Error): string => {
     return `output${hasFirstField ? "/" : ": "}${error.message}`;
   }
   return error.message;
-};
-
-export const getStatusCodeFromError = (error: Error): number => {
-  if (isHttpError(error)) return error.statusCode;
-  return error instanceof InputValidationError ? 400 : 500;
 };
 
 export const getExamples = <

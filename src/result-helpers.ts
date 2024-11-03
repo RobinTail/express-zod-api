@@ -1,9 +1,10 @@
 import { Request } from "express";
+import { isHttpError } from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { FlatObject } from "./common-helpers";
-import { ResultHandlerError } from "./errors";
+import { InputValidationError, ResultHandlerError } from "./errors";
 import { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
 
@@ -66,3 +67,8 @@ export const logServerError = ({
     url: request.url,
     payload: input,
   });
+
+export const getStatusCodeFromError = (error: Error): number => {
+  if (isHttpError(error)) return error.statusCode;
+  return error instanceof InputValidationError ? 400 : 500;
+};
