@@ -3,11 +3,7 @@ import createHttpError, { HttpError, isHttpError } from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
-import {
-  FlatObject,
-  getMessageFromError,
-  isProduction,
-} from "./common-helpers";
+import { FlatObject, getMessageFromError } from "./common-helpers";
 import { InputValidationError, ResultHandlerError } from "./errors";
 import { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
@@ -92,4 +88,6 @@ export const ensureHttpError = (error: Error): HttpError =>
       );
 
 export const exposeErrorMessage = (error: HttpError): string =>
-  isProduction() && !error.expose ? error.name : error.message;
+  process.env.NODE_ENV === "production" && !error.expose
+    ? createHttpError(error.statusCode).message // default message for that code
+    : error.message;

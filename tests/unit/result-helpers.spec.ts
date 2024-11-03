@@ -4,6 +4,7 @@ import { z } from "zod";
 import { InputValidationError, OutputValidationError } from "../../src";
 import {
   ensureHttpError,
+  exposeErrorMessage,
   getStatusCodeFromError,
   isServerSideIssue,
   logServerError,
@@ -84,5 +85,29 @@ describe("Result helpers", () => {
     ])("should handle %s", (error) => {
       expect(ensureHttpError(error)).toMatchSnapshot();
     });
+  });
+
+  describe("exposeErrorMessage()", () => {
+    afterAll(() => {
+      vi.unstubAllEnvs();
+    });
+    test.each([undefined, "development", "production"])(
+      "should handle %s",
+      (mode) => {
+        vi.stubEnv("NODE_ENV", mode);
+        expect(exposeErrorMessage(createHttpError(400, "invalid inputs"))).toBe(
+          "invalid inputs",
+        );
+        expect(
+          exposeErrorMessage(
+            createHttpError(500, "something particual failed"),
+          ),
+        ).toBe(
+          mode === "production"
+            ? "Internal Server Error"
+            : "something particual failed",
+        );
+      },
+    );
   });
 });

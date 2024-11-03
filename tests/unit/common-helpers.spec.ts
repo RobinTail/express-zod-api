@@ -11,7 +11,6 @@ import {
   isCustomHeader,
   makeCleanId,
   ensureError,
-  isProduction,
 } from "../../src/common-helpers";
 import { z } from "zod";
 import { makeRequestMock } from "../../src/testing";
@@ -354,19 +353,6 @@ describe("Common Helpers", () => {
       "should generate valid identifier from the supplied strings %#",
       (...args) => {
         expect(makeCleanId(...args)).toMatchSnapshot();
-      },
-    );
-  });
-
-  describe("isProduction()", () => {
-    afterAll(() => {
-      vi.unstubAllEnvs();
-    });
-    test.each([undefined, "development", "production"])(
-      "should handle %s",
-      (mode) => {
-        vi.stubEnv("NODE_ENV", mode);
-        expect(isProduction()).toBe(mode === "production");
       },
     );
   });
