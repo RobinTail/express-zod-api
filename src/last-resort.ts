@@ -1,5 +1,5 @@
 import { Response } from "express";
-import createHttpError from "http-errors";
+import createHttpError, { isHttpError } from "http-errors";
 import { ResultHandlerError } from "./errors";
 import { ActualLogger } from "./logger-helpers";
 import { getPublicErrorMessage } from "./result-helpers";
@@ -21,6 +21,7 @@ export const lastResortHandler = ({
       500,
       `An error occurred while serving the result: ${error.message}.` +
         (error.handled ? `\nOriginal error: ${error.handled.message}.` : ""),
+      { expose: isHttpError(error.cause) ? error.cause.expose : false }, // retain the cause exposition setting
     ),
   );
   response.status(500).type("text/plain").end(message);

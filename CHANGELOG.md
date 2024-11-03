@@ -19,8 +19,8 @@
     - You can enforce or disable generalized message on any `HttpError` by setting `expose` property;
     - This feature aims to improve the security.
 - Changes to Last Resort Handler:
-  - In case your custom `ResultHandler` throws an error, that entity takes it for plain text response;
-  - In production mode that error message will be generalized to "Internal Server Error".
+  - Same rules applied in production mode for errors thrown from a custom `ResultHandler`;
+  - In that case the response consists of a plain text error message;
 - More about production mode and how to activate it:
   https://nodejs.org/en/learn/getting-started/nodejs-the-difference-between-development-and-production
 
