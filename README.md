@@ -36,12 +36,13 @@ Start your API server with I/O schema validation and custom middlewares in minut
    3. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    4. [Response customization](#response-customization)
    5. [Error handling](#error-handling)
-   6. [Non-object response](#non-object-response) including file downloads
-   7. [File uploads](#file-uploads)
-   8. [Serving static files](#serving-static-files)
-   9. [Connect to your own express app](#connect-to-your-own-express-app)
-   10. [Testing endpoints](#testing-endpoints)
-   11. [Testing middlewares](#testing-middlewares)
+   6. [Production mode](#production-mode)
+   7. [Non-object response](#non-object-response) including file downloads
+   8. [File uploads](#file-uploads)
+   9. [Serving static files](#serving-static-files)
+   10. [Connect to your own express app](#connect-to-your-own-express-app)
+   11. [Testing endpoints](#testing-endpoints)
+   12. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -878,6 +879,24 @@ origins of errors that could happen in runtime and be handled the following way:
   - `ResultHandler` must handle possible `error` and avoid throwing its own errors, otherwise:
 - Ones related to `ResultHandler` execution — handled by `LastResortHandler`:
   - Response status code is always `500` and the response itself is a plain text.
+
+## Production mode
+
+Consider enabling production mode by setting `NODE_ENV` environment variable to `production` for your deployment:
+
+- Express activates some [performance optimizations](https://expressjs.com/en/advanced/best-practice-performance.html);
+- The `defaultResultHandler` and `LastResortHandler` generalize server side (`5XX`) error messages in responses:
+  - This feature aims to improve the security;
+  - Throwing `new Error("What exactly happened")` from endpoint becomes just `Internal Server Error` in response;
+  - You can control that behavior on `HttpError` using its `expose` option:
+
+```ts
+import createHttpError from "http-errors";
+// NODE_ENV=production
+createHttpError(401, "Token expired", { expose: false }); // —> "Unauthorized"
+createHttpError(500, "Something is broken"); // —> "Internal Server Error"
+createHttpError(501, "We didn't make it yet", { expose: true }); // —> "We didn't make it yet"
+```
 
 ## Non-object response
 
