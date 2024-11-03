@@ -1,14 +1,13 @@
-import createHttpError from "http-errors";
 import { bench } from "vitest";
 
 describe("Experiment for isServerSideIssue()", () => {
-  const error = createHttpError(501);
+  const env = process.env.NODE_ENV;
 
-  bench("bitwise", () => {
-    return void (~~(error.statusCode / 100) === 5);
+  bench("access", () => {
+    return void process.env.NODE_ENV;
   });
 
-  bench("clamp", () => {
-    return void (error.statusCode >= 500 && error.statusCode < 600);
+  bench("cached", () => {
+    return void (env === "production");
   });
 });
