@@ -1,6 +1,8 @@
 import { Response } from "express";
+import createHttpError from "http-errors";
 import { ResultHandlerError } from "./errors";
 import { ActualLogger } from "./logger-helpers";
+import { getPublicErrorMessage } from "./result-helpers";
 
 interface LastResortHandlerParams {
   error: ResultHandlerError;
@@ -14,11 +16,12 @@ export const lastResortHandler = ({
   response,
 }: LastResortHandlerParams) => {
   logger.error("Result handler failure", error);
-  response
-    .status(500)
-    .type("text/plain")
-    .end(
+  const message = getPublicErrorMessage(
+    createHttpError(
+      500,
       `An error occurred while serving the result: ${error.message}.` +
         (error.handled ? `\nOriginal error: ${error.handled.message}.` : ""),
-    );
+    ),
+  );
+  response.status(500).type("text/plain").end(message);
 };

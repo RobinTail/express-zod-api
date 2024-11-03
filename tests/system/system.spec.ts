@@ -272,9 +272,8 @@ describe("App in production mode", async () => {
         "text/plain; charset=utf-8",
       );
       const text = await response.text();
-      expect(text).toBe(
-        "An error occurred while serving the result: I am faulty.",
-      );
+      expect(text).toBe("Internal Server Error");
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
     test("Should treat custom errors in middleware input validations as they are", async () => {
@@ -289,10 +288,8 @@ describe("App in production mode", async () => {
       );
       expect(response.status).toBe(500);
       const text = await response.text();
-      expect(text).toBe(
-        "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Custom error in the Middleware input validation.",
-      );
+      expect(text).toBe("Internal Server Error");
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
     test("Should treat custom errors in endpoint input validations as they are", async () => {
@@ -307,10 +304,8 @@ describe("App in production mode", async () => {
       );
       expect(response.status).toBe(500);
       const text = await response.text();
-      expect(text).toBe(
-        "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Custom error in the Endpoint input validation.",
-      );
+      expect(text).toBe("Internal Server Error");
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
   });
 

@@ -1,5 +1,29 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`App in production mode > Negative > Should call Last Resort Handler in case of faulty ResultHandler 1`] = `
+[
+  "Result handler failure",
+  [ResultHandlerError: I am faulty
+cause: [AssertionError: I am faulty]],
+]
+`;
+
+exports[`App in production mode > Negative > Should treat custom errors in endpoint input validations as they are 1`] = `
+[
+  "Result handler failure",
+  [ResultHandlerError: I am faulty
+cause: [AssertionError: I am faulty]],
+]
+`;
+
+exports[`App in production mode > Negative > Should treat custom errors in middleware input validations as they are 1`] = `
+[
+  "Result handler failure",
+  [ResultHandlerError: I am faulty
+cause: [AssertionError: I am faulty]],
+]
+`;
+
 exports[`App in production mode > Positive > Should compress the response in case it is supported by client 1`] = `
 {
   "data": {

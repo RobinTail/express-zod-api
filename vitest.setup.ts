@@ -12,7 +12,10 @@ const compareHttpErrors = (a: unknown, b: unknown) => {
       : false;
 };
 
-/** Takes cause into account */
+/**
+ * Takes cause into account
+ * @todo add ResultHandlerError handling too
+ * */
 const errorSerializer: NewPlugin = {
   test: (subject) => subject instanceof Error && subject.cause !== undefined,
   serialize: (
