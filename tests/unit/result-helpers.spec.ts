@@ -1,4 +1,5 @@
 import createHttpError from "http-errors";
+import { beforeAll } from "vitest";
 import { z } from "zod";
 import { InputValidationError, OutputValidationError } from "../../src";
 import {
@@ -74,22 +75,34 @@ describe("Result helpers", () => {
     });
   });
 
-  describe("getPublicErrorMessage()", () => {
-    afterAll(() => {
-      vi.unstubAllEnvs();
-    });
-    test.each([undefined, "development", "production"])(
-      "should handle %s",
-      (mode) => {
-        vi.stubEnv("NODE_ENV", mode);
+  describe.each(["development", "production"])(
+    "getPublicErrorMessage() in %s mode",
+    (mode) => {
+      beforeAll(() => vi.stubEnv("NODE_ENV", mode));
+      afterAll(() => vi.unstubAllEnvs());
+
+      test("should return actual message for 400", () => {
         expect(
           getPublicErrorMessage(createHttpError(400, "invalid inputs")),
         ).toBe("invalid inputs");
+      });
+
+      test("should comply exposition prop", () => {
         expect(
           getPublicErrorMessage(
             createHttpError(400, "invalid inputs", { expose: false }),
           ),
         ).toBe(mode === "production" ? "Bad Request" : "invalid inputs");
+        expect(
+          getPublicErrorMessage(
+            createHttpError(500, "something particual failed", {
+              expose: true,
+            }),
+          ),
+        ).toBe("something particual failed");
+      });
+
+      test("should return generalized message for 500", () => {
         expect(
           getPublicErrorMessage(
             createHttpError(500, "something particual failed"),
@@ -99,7 +112,7 @@ describe("Result helpers", () => {
             ? "Internal Server Error"
             : "something particual failed",
         );
-      },
-    );
-  });
+      });
+    },
+  );
 });

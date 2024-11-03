@@ -1,25 +1,24 @@
 import createHttpError, { HttpError } from "http-errors";
+import { beforeAll } from "vitest";
 import { ResultHandlerError } from "../../src/errors";
 import { lastResortHandler } from "../../src/last-resort";
 import { makeLoggerMock, makeResponseMock } from "../../src/testing";
 
 describe("Last Resort Handler", () => {
-  afterAll(() => {
-    vi.unstubAllEnvs();
-  });
-
   test("should be a function", () => {
     expect(typeof lastResortHandler).toBe("function");
   });
 
   describe.each(["development", "production"])("%s mode", (mode) => {
+    beforeAll(() => vi.stubEnv("NODE_ENV", mode));
+    afterAll(() => vi.unstubAllEnvs());
+
     test.each([
       new Error("something went wrong"),
       createHttpError("something went wrong", { expose: true }),
     ])(
       "should log the supplied error and respond with plain text %#",
       (cause) => {
-        vi.stubEnv("NODE_ENV", mode);
         const responseMock = makeResponseMock();
         const loggerMock = makeLoggerMock();
         const error = new ResultHandlerError(
