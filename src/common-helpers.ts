@@ -56,7 +56,7 @@ export const getInput = (
     .reduce<FlatObject>((agg, obj) => ({ ...agg, ...obj }), {});
 };
 
-export const makeErrorFromAnything = (subject: unknown): Error =>
+export const ensureError = (subject: unknown): Error =>
   subject instanceof Error ? subject : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {

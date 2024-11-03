@@ -12,7 +12,7 @@ import {
   isCustomHeader,
   logServerError,
   makeCleanId,
-  makeErrorFromAnything,
+  ensureError,
 } from "../../src/common-helpers";
 import { InputValidationError } from "../../src";
 import { z } from "zod";
@@ -321,7 +321,7 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("makeErrorFromAnything()", () => {
+  describe("ensureError()", () => {
     test.each([
       [new Error("error"), "error"],
       [
@@ -358,7 +358,7 @@ describe("Common Helpers", () => {
       [/regexp/is, "/regexp/is"],
       [[1, 2, 3], "1,2,3"],
     ])("should accept %#", (argument, expected) => {
-      const result = makeErrorFromAnything(argument);
+      const result = ensureError(argument);
       expectTypeOf(result).toEqualTypeOf<Error>();
       expect(result).toBeInstanceOf(Error);
       expect(result).toHaveProperty("message");
