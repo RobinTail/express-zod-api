@@ -18,13 +18,17 @@
     - Server side errors are those having `5XX` status code, or treated that way by `ensureHttpError()`;
     - You can enforce or disable generalized message on any `HttpError` by setting `expose` property;
     - This feature aims to improve the security.
-  - More about production mode and how to activate it:
-    https://nodejs.org/en/learn/getting-started/nodejs-the-difference-between-development-and-production
+- Changes to Last Resort Handler:
+  - In case your custom `ResultHandler` throws an error, that entity takes it for plain text response;
+  - In production mode that error message will be generalized to "Internal Server Error".
+- More about production mode and how to activate it:
+  https://nodejs.org/en/learn/getting-started/nodejs-the-difference-between-development-and-production
 
 ```ts
 import createHttpError from "http-errors";
 
-// NODE_ENV=production, throwing HttpError from Endpoints using defaultResultHandler or defaultEndpointsFactory:
+// NODE_ENV=production
+// Throwing HttpError from Endpoint or Middleware that is using defaultResultHandler or defaultEndpointsFactory:
 createHttpError(500, "Something happened"); // Internal Server Error
 createHttpError(400, "Something happened"); // Something happened
 createHttpError(500, "Something happened", { expose: true }); // Something happened
