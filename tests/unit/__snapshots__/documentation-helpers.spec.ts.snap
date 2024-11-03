@@ -42,13 +42,17 @@ exports[`Documentation helpers > depictCatch() > should pass next depicter 1`] =
 `;
 
 exports[`Documentation helpers > depictDate > should throw clear error 0 1`] = `
-[DocumentationError: Using z.date() within output schema is forbidden. Please use ez.dateOut() instead. Check out the documentation for details.
-cause: "Response schema of an Endpoint assigned to GET method of /v1/user/:id path."]
+DocumentationError({
+  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Using z.date() within output schema is forbidden. Please use ez.dateOut() instead. Check out the documentation for details.",
+})
 `;
 
 exports[`Documentation helpers > depictDate > should throw clear error 1 1`] = `
-[DocumentationError: Using z.date() within input schema is forbidden. Please use ez.dateIn() instead. Check out the documentation for details.
-cause: "Input schema of an Endpoint assigned to GET method of /v1/user/:id path."]
+DocumentationError({
+  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Using z.date() within input schema is forbidden. Please use ez.dateIn() instead. Check out the documentation for details.",
+})
 `;
 
 exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
@@ -64,8 +68,10 @@ exports[`Documentation helpers > depictDateIn > should set type:string, pattern 
 `;
 
 exports[`Documentation helpers > depictDateIn > should throw when ZodDateIn in response 1`] = `
-[DocumentationError: Please use ez.dateOut() for output.
-cause: "Response schema of an Endpoint assigned to GET method of /v1/user/:id path."]
+DocumentationError({
+  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.dateOut() for output.",
+})
 `;
 
 exports[`Documentation helpers > depictDateOut > should set type:string, description and format 1`] = `
@@ -80,8 +86,10 @@ exports[`Documentation helpers > depictDateOut > should set type:string, descrip
 `;
 
 exports[`Documentation helpers > depictDateOut > should throw when ZodDateOut in request 1`] = `
-[DocumentationError: Please use ez.dateIn() for input.
-cause: "Input schema of an Endpoint assigned to GET method of /v1/user/:id path."]
+DocumentationError({
+  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.dateIn() for input.",
+})
 `;
 
 exports[`Documentation helpers > depictDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
@@ -1303,8 +1311,10 @@ exports[`Documentation helpers > depictUpload() > should set format:binary and t
 `;
 
 exports[`Documentation helpers > depictUpload() > should throw when using in response 1`] = `
-[DocumentationError: Please use ez.upload() only for input.
-cause: "Response schema of an Endpoint assigned to GET method of /v1/user/:id path."]
+DocumentationError({
+  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.upload() only for input.",
+})
 `;
 
 exports[`Documentation helpers > excludeExamplesFromDepiction() > should remove example property of supplied object 1`] = `

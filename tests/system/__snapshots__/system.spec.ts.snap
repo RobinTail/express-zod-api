@@ -3,24 +3,36 @@
 exports[`App in production mode > Negative > Should call Last Resort Handler in case of faulty ResultHandler 1`] = `
 [
   "Result handler failure",
-  [ResultHandlerError: I am faulty
-cause: [AssertionError: I am faulty]],
+  ResultHandlerError({
+    "cause": AssertionError({
+      "message": "I am faulty",
+    }),
+    "message": "I am faulty",
+  }),
 ]
 `;
 
 exports[`App in production mode > Negative > Should treat custom errors in endpoint input validations as they are 1`] = `
 [
   "Result handler failure",
-  [ResultHandlerError: I am faulty
-cause: [AssertionError: I am faulty]],
+  ResultHandlerError({
+    "cause": AssertionError({
+      "message": "I am faulty",
+    }),
+    "message": "I am faulty",
+  }),
 ]
 `;
 
 exports[`App in production mode > Negative > Should treat custom errors in middleware input validations as they are 1`] = `
 [
   "Result handler failure",
-  [ResultHandlerError: I am faulty
-cause: [AssertionError: I am faulty]],
+  ResultHandlerError({
+    "cause": AssertionError({
+      "message": "I am faulty",
+    }),
+    "message": "I am faulty",
+  }),
 ]
 `;
 
@@ -79,8 +91,9 @@ exports[`App in production mode > Validation > Problem 787: Should NOT treat Zod
 [
   "Server side error",
   {
-    "error": [InternalServerError: Expected number, received string
-cause: [ZodError: [
+    "error": InternalServerError({
+      "cause": ZodError({
+        "message": "[
   {
     "code": "invalid_type",
     "expected": "number",
@@ -88,7 +101,10 @@ cause: [ZodError: [
     "path": [],
     "message": "Expected number, received string"
   }
-]]],
+]",
+      }),
+      "message": "Expected number, received string",
+    }),
     "payload": {
       "key": "123",
       "something": "internal_zod_error",
@@ -120,8 +136,9 @@ exports[`App in production mode > Validation > Should fail on handler output typ
 [
   "Server side error",
   {
-    "error": [InternalServerError: output/anything: Number must be greater than 0
-cause: [ZodError: [
+    "error": InternalServerError({
+      "cause": ZodError({
+        "message": "[
   {
     "code": "too_small",
     "minimum": 0,
@@ -133,7 +150,10 @@ cause: [ZodError: [
       "anything"
     ]
   }
-]]],
+]",
+      }),
+      "message": "output/anything: Number must be greater than 0",
+    }),
     "payload": {
       "key": "123",
       "something": "gimme fail",

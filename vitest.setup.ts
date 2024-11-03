@@ -17,7 +17,7 @@ const compareHttpErrors = (a: unknown, b: unknown) => {
  * @todo add ResultHandlerError handling too
  * */
 const errorSerializer: NewPlugin = {
-  test: (subject) => subject instanceof Error && subject.cause !== undefined,
+  test: (subject) => subject instanceof Error,
   serialize: (
     { name, message, cause }: Error,
     config,
@@ -25,8 +25,10 @@ const errorSerializer: NewPlugin = {
     depth,
     refs,
     printer,
-  ) =>
-    `[${name}: ${message}\ncause: ${printer(cause, config, indentation, depth, refs)}]`,
+  ) => {
+    const asObject = { message, ...(cause ? { cause } : {}) };
+    return `${name}(${printer(asObject, config, indentation, depth, refs)})`;
+  },
 };
 
 /**

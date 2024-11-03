@@ -251,11 +251,13 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
 `;
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Zod Issue #600: can not intersect object schema with passthrough and transformation 1`] = `
-[ZodError: [
+ZodError({
+  "message": "[
   {
     "code": "invalid_intersection_types",
     "path": [],
     "message": "Intersection results could not be merged"
   }
-]]
+]",
+})
 `;

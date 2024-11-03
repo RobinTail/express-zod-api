@@ -1,7 +1,19 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Routing > initRouting() > Should check if endpoint supports the method it's assigned to within DependsOnMethod 1`] = `[RoutingError: Endpoint assigned to post method of /v1/user must support post method.]`;
+exports[`Routing > initRouting() > Should check if endpoint supports the method it's assigned to within DependsOnMethod 1`] = `
+RoutingError({
+  "message": "Endpoint assigned to post method of /v1/user must support post method.",
+})
+`;
 
-exports[`Routing > initRouting() > Should throw an error in case of slashes in route 1`] = `[RoutingError: The entry 'user/retrieve' must avoid having slashes — use nesting instead.]`;
+exports[`Routing > initRouting() > Should throw an error in case of slashes in route 1`] = `
+RoutingError({
+  "message": "The entry 'user/retrieve' must avoid having slashes — use nesting instead.",
+})
+`;
 
-exports[`Routing > initRouting() > Should throw an error in case of slashes in route 2`] = `[RoutingError: The entry 'v1/user/retrieve' must avoid having slashes — use nesting instead.]`;
+exports[`Routing > initRouting() > Should throw an error in case of slashes in route 2`] = `
+RoutingError({
+  "message": "The entry 'v1/user/retrieve' must avoid having slashes — use nesting instead.",
+})
+`;
