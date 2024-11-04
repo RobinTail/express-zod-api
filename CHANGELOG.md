@@ -4,25 +4,18 @@
 
 ### v20.18.0
 
-- Introducing `ensureHttpError()` method: converts any `Error` into `HttpError`:
-  - Preserves `HttpError` intact;
-  - `InputValidationError` becomes `BadRequest`, status code `400`;
-  - others become `InternalServerError`, having status code `500`.
-- Deprecating `getStatusCodeFromError()` — use the `ensureHttpError().statusCode` instead:
-  - This method was introduced in v9.0.0 and has a similar implementation to the new one.
-- Showing the value of `NODE_ENV` environment variable on startup;
-- Changes to the behavior of `defaultResultHandler` and `defaultEndpointsFactory`:
-  - Generalizing server-side error messages in production mode:
-    - When `NODE_ENV` is set to `production` server-side error messages will be generalized;
-    - Instead of actual message the default one associated with the corresponding `statusCode` used;
-    - Server-side errors are those having `5XX` status code, or treated that way by `ensureHttpError()`;
-    - You can enforce or disable generalized message on any `HttpError` by setting `expose` property;
-    - This feature aims to improve the security.
-- Changes to Last Resort Handler:
-  - Same rules applied in production mode for errors thrown from a custom `ResultHandler`;
-  - In that case the response consists of a plain text error message;
-- More about production mode and how to activate it:
-  https://nodejs.org/en/learn/getting-started/nodejs-the-difference-between-development-and-production
+- Introducing `ensureHttpError()` method that converts any `Error` into `HttpError`:
+  - It converts `InputValidationError` to `BadRequest` (status code `400`) and others to `InternalServerError` (`500`).
+- Deprecating `getStatusCodeFromError()` — use the `ensureHttpError().statusCode` instead.
+- Generalizing server-side error messages in production mode by default:
+  - This feature aims to improve the security of your API by not disclosing the exact causes of errors;
+  - Applies to `defaultResultHandler`, `defaultEndpointsFactory` and Last Resort Handler only;
+  - When `NODE_ENV` is set to `production` (displayed on startup);
+  - Instead of actual message the default one associated with the corresponding `statusCode` used;
+  - Server-side errors are those having status code `5XX`, or treated that way by `ensureHttpError()`;
+  - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option;
+  - More about production mode and how to activate it:
+    https://nodejs.org/en/learn/getting-started/nodejs-the-difference-between-development-and-production
 
 ```ts
 import createHttpError from "http-errors";
