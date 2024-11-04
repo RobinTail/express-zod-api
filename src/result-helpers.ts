@@ -59,10 +59,8 @@ export const logServerError = (
  * @deprecated use ensureHttpError().statusCode instead
  * @todo remove in v21
  * */
-export const getStatusCodeFromError = (error: Error): number => {
-  if (isHttpError(error)) return error.statusCode;
-  return error instanceof InputValidationError ? 400 : 500;
-};
+export const getStatusCodeFromError = (error: Error): number =>
+  ensureHttpError(error).statusCode;
 
 /**
  * @example InputValidationError —> BadRequest(400)
