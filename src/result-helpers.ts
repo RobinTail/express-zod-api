@@ -56,13 +56,6 @@ export const logServerError = (
   !error.expose && logger.error("Server side error", { error, url, payload });
 
 /**
- * @deprecated use ensureHttpError().statusCode instead
- * @todo remove in v21
- * */
-export const getStatusCodeFromError = (error: Error): number =>
-  ensureHttpError(error).statusCode;
-
-/**
  * @example InputValidationError —> BadRequest(400)
  * @example Error —> InternalServerError(500)
  * */
