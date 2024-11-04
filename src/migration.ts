@@ -182,6 +182,22 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
           }
         }
       }
+      if (node.callee.name === getStatusCodeFromErrorMethod) {
+        const replacement = changedMethods[node.callee.name];
+        ctx.report({
+          node: node.callee,
+          messageId: "change",
+          data: {
+            subject: "method",
+            from: node.callee.name,
+            to: replacement,
+          },
+          fix: (fixer) => [
+            fixer.replaceText(node.callee, replacement),
+            fixer.insertTextAfter(node, ".statusCode"),
+          ],
+        });
+      }
     },
   }),
 });

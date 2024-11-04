@@ -25,6 +25,7 @@ describe("Migration", () => {
       `const { app, servers, logger } = await createServer();`,
       `console.error(error.cause?.message);`,
       `import { ensureHttpError } from "express-zod-api";`,
+      `ensureHttpError(error).statusCode;`,
     ],
     invalid: [
       {
@@ -81,6 +82,20 @@ describe("Migration", () => {
             messageId: "change",
             data: {
               subject: "import",
+              from: "getStatusCodeFromError",
+              to: "ensureHttpError",
+            },
+          },
+        ],
+      },
+      {
+        code: `getStatusCodeFromError(error);`,
+        output: `ensureHttpError(error).statusCode;`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "method",
               from: "getStatusCodeFromError",
               to: "ensureHttpError",
             },
