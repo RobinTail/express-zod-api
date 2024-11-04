@@ -190,7 +190,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
           data: {
             subject: "method",
             from: node.callee.name,
-            to: replacement,
+            to: `${replacement}().statusCode`,
           },
           fix: (fixer) => [
             fixer.replaceText(node.callee, replacement),

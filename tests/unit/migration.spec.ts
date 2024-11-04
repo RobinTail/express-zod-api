@@ -97,7 +97,7 @@ describe("Migration", () => {
             data: {
               subject: "method",
               from: "getStatusCodeFromError",
-              to: "ensureHttpError",
+              to: "ensureHttpError().statusCode",
             },
           },
         ],
