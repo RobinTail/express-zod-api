@@ -24,6 +24,7 @@ type Handler<RES = unknown> = (params: {
   output: FlatObject | null;
   /** can be empty: check presence of the required property using "in" operator */
   options: FlatObject;
+  /** @todo consider moving to HttpError in v21 */
   error: Error | null;
   request: Request;
   response: Response<RES>;
@@ -113,18 +114,17 @@ export const defaultResultHandler = new ResultHandler({
       error: { message: "Sample error message" },
     }),
   handler: ({ error, input, output, request, response, logger }) => {
-    if (!error) {
-      response
-        .status(defaultStatusCodes.positive)
-        .json({ status: "success", data: output });
-      return;
+    if (error) {
+      const httpError = ensureHttpError(error);
+      logServerError(httpError, { logger, request, input });
+      return void response.status(httpError.statusCode).json({
+        status: "error",
+        error: { message: getPublicErrorMessage(httpError) },
+      });
     }
-    const httpError = ensureHttpError(error);
-    logServerError(httpError, { logger, request, input });
-    response.status(httpError.statusCode).json({
-      status: "error",
-      error: { message: getPublicErrorMessage(httpError) },
-    });
+    response
+      .status(defaultStatusCodes.positive)
+      .json({ status: "success", data: output });
   },
 });
 
@@ -156,15 +156,15 @@ export const arrayResultHandler = new ResultHandler({
     if (error) {
       const httpError = ensureHttpError(error);
       logServerError(httpError, { logger, request, input });
-      response
+      return void response
         .status(httpError.statusCode)
         .type("text/plain")
         .send(getPublicErrorMessage(httpError));
-      return;
     }
     if (output && "items" in output && Array.isArray(output.items)) {
-      response.status(defaultStatusCodes.positive).json(output.items);
-      return;
+      return void response
+        .status(defaultStatusCodes.positive)
+        .json(output.items);
     }
     throw new Error("Property 'items' is missing in the endpoint output");
   },
