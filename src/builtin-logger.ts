@@ -59,7 +59,7 @@ export class BuiltinLogger implements AbstractLogger {
   };
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
-  public constructor(protected config: BuiltinLoggerConfig) {
+  public constructor(protected config: BuiltinLoggerConfig = {}) {
     const {
       color: hasColor = new Ansis().isSupported(),
       level = isProduction() ? "warn" : "debug",
