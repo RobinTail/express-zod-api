@@ -830,10 +830,9 @@ const yourResultHandler = new ResultHandler({
     if (error) {
       const { statusCode } = ensureHttpError(error);
       const message = getMessageFromError(error);
-      // your implementation
-      return;
+      return void response.status(statusCode).json({ error: message });
     }
-    // your implementation
+    response.status(200).json({ data: output });
   },
 });
 ```
