@@ -8,7 +8,7 @@ import { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
-import { makeErrorFromAnything } from "./common-helpers";
+import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
 
 type EquippedRequest = Request<
@@ -38,7 +38,7 @@ export const createParserFailureHandler =
     return errorHandler.execute({
       error: isHttpError(error)
         ? error
-        : createHttpError(400, makeErrorFromAnything(error).message),
+        : createHttpError(400, ensureError(error).message),
       request,
       response,
       input: null,
@@ -70,7 +70,7 @@ export const createNotFoundHandler =
       lastResortHandler({
         response,
         logger,
-        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
+        error: new ResultHandlerError(ensureError(e), error),
       });
     }
   };

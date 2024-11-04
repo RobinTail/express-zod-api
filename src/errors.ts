@@ -12,6 +12,7 @@ export class RoutingError extends Error {
  * */
 export class DocumentationError extends Error {
   public override name = "DocumentationError";
+  public override readonly cause: string;
 
   constructor({
     message,
@@ -22,10 +23,10 @@ export class DocumentationError extends Error {
     OpenAPIContext,
     "path" | "method" | "isResponse"
   >) {
-    const finalMessage = `${message}\nCaused by ${
-      isResponse ? "response" : "input"
+    super(message);
+    this.cause = `${
+      isResponse ? "Response" : "Input"
     } schema of an Endpoint assigned to ${method.toUpperCase()} method of ${path} path.`;
-    super(finalMessage);
   }
 }
 
@@ -38,8 +39,16 @@ export class IOSchemaError extends Error {
 export class OutputValidationError extends IOSchemaError {
   public override name = "OutputValidationError";
 
-  constructor(public readonly originalError: z.ZodError) {
-    super(getMessageFromError(originalError));
+  constructor(public override readonly cause: z.ZodError) {
+    super(getMessageFromError(cause), { cause });
+  }
+
+  /**
+   * @deprecated use the cause property instead
+   * @todo remove in v21
+   * */
+  public get originalError() {
+    return this.cause;
   }
 }
 
@@ -47,8 +56,16 @@ export class OutputValidationError extends IOSchemaError {
 export class InputValidationError extends IOSchemaError {
   public override name = "InputValidationError";
 
-  constructor(public readonly originalError: z.ZodError) {
-    super(getMessageFromError(originalError));
+  constructor(public override readonly cause: z.ZodError) {
+    super(getMessageFromError(cause), { cause });
+  }
+
+  /**
+   * @deprecated use the cause property instead
+   * @todo remove in v21
+   * */
+  public get originalError() {
+    return this.cause;
   }
 }
 
@@ -57,10 +74,12 @@ export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";
 
   constructor(
-    message: string,
-    public readonly originalError?: Error,
+    /** @desc The error thrown from ResultHandler */
+    public override readonly cause: Error,
+    /** @desc The error being processed by ResultHandler when it failed */
+    public readonly handled?: Error,
   ) {
-    super(message);
+    super(getMessageFromError(cause), { cause });
   }
 }
 

@@ -25,7 +25,7 @@ describe("Errors", () => {
     const error = new DocumentationError({
       message: "test",
       path: "/v1/testPath",
-      method: "get" as const,
+      method: "get",
       isResponse: true,
     });
 
@@ -33,8 +33,14 @@ describe("Errors", () => {
       expect(error).toBeInstanceOf(Error);
     });
 
-    test("should include more details into the message", () => {
-      expect(error.message).toMatchSnapshot();
+    test("should have the message as assigned", () => {
+      expect(error.message).toBe("test");
+    });
+
+    test("should have the .cause property with details", () => {
+      expect(error.cause).toBe(
+        "Response schema of an Endpoint assigned to GET method of /v1/testPath path.",
+      );
     });
 
     test("should have the name matching its class", () => {
@@ -67,7 +73,8 @@ describe("Errors", () => {
       expect(error.name).toBe("OutputValidationError");
     });
 
-    test("should have .originalError property matching the one used for constructing", () => {
+    test("should have .cause property matching the one used for constructing", () => {
+      expect(error.cause).toEqual(zodError);
       expect(error.originalError).toEqual(zodError);
     });
   });
@@ -85,15 +92,16 @@ describe("Errors", () => {
       expect(error.name).toBe("InputValidationError");
     });
 
-    test("should have .originalError property matching the one used for constructing", () => {
+    test("should have .cause property matching the one used for constructing", () => {
+      expect(error.cause).toEqual(zodError);
       expect(error.originalError).toEqual(zodError);
     });
   });
 
   describe.each([new Error("test2"), undefined])(
     "ResultHandlerError",
-    (originalError) => {
-      const error = new ResultHandlerError("test", originalError);
+    (handled) => {
+      const error = new ResultHandlerError(new Error("test"), handled);
 
       test("should be an instance of Error", () => {
         expect(error).toBeInstanceOf(Error);
@@ -103,8 +111,12 @@ describe("Errors", () => {
         expect(error.name).toBe("ResultHandlerError");
       });
 
-      test(".originalError should be the original error", () => {
-        expect(error.originalError).toEqual(originalError);
+      test(".cause should be the originally thrown error", () => {
+        expect(error.cause).toEqual(new Error("test"));
+      });
+
+      test(".handled should be the error handled by ResultHandler", () => {
+        expect(error.handled).toEqual(handled);
       });
     },
   );

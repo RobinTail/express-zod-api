@@ -2,6 +2,48 @@
 
 ## Version 20
 
+### v20.18.0
+
+- Introducing `ensureHttpError()` method that converts any `Error` into `HttpError`:
+  - It converts `InputValidationError` to `BadRequest` (status code `400`) and others to `InternalServerError` (`500`).
+- Deprecating `getStatusCodeFromError()` — use the `ensureHttpError().statusCode` instead.
+- Generalizing server-side error messages in production mode by default:
+  - This feature aims to improve the security of your API by not disclosing the exact causes of errors;
+  - Applies to `defaultResultHandler`, `defaultEndpointsFactory` and Last Resort Handler only;
+  - When `NODE_ENV` is set to `production` (displayed on startup);
+  - Instead of actual message the default one associated with the corresponding `statusCode` used;
+  - Server-side errors are those having status code `5XX`, or treated that way by `ensureHttpError()`;
+  - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option;
+  - More about production mode and how to activate it:
+    https://nodejs.org/en/learn/getting-started/nodejs-the-difference-between-development-and-production
+
+```ts
+import createHttpError from "http-errors";
+// NODE_ENV=production
+// Throwing HttpError from Endpoint or Middleware that is using defaultResultHandler or defaultEndpointsFactory:
+createHttpError(401, "Token expired"); // —> "Token expired"
+createHttpError(401, "Token expired", { expose: false }); // —> "Unauthorized"
+createHttpError(500, "Something is broken"); // —> "Internal Server Error"
+createHttpError(501, "We didn't make it yet", { expose: true }); // —> "We didn't make it yet"
+```
+
+### v20.17.0
+
+- Added `cause` property to `DocumentationError`;
+- Log all server side errors (status codes `>= 500`) and in full (not just the `message`).
+
+### v20.16.0
+
+- Deprecating `originalError` property on both `InputValidationError` and `OutputValidationError`:
+  - Use `cause` property instead;
+  - Those error classes are publicly exposed for developers making custom Result Handlers.
+
+```diff
+  const error = new InputValidationError(new z.ZodError([]));
+- logger.error(error.originalError.message);
++ logger.error(error.cause.message);
+```
+
 ### v20.15.3
 
 - Merge intersected object types in generated client:

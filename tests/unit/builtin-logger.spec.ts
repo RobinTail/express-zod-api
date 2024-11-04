@@ -76,6 +76,21 @@ describe("BuiltinLogger", () => {
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
+    test("should handle error including cause", () => {
+      const error = new Error("something", { cause: new Error("anything") });
+      const { logger, logSpy } = makeLogger({ level: "warn", color: false });
+      logger.error("Failure", error);
+      expect(logSpy).toHaveBeenCalledOnce();
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(
+          /2022-01-01T00:00:00\.000Z error: Failure \{ Error: something/,
+        ),
+      );
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/\[cause]: Error: anything/),
+      );
+    });
+
     test.each(["debug", "warn"] as const)(
       "Should handle circular references within subject %#",
       (level) => {
