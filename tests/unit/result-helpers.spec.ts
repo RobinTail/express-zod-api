@@ -16,7 +16,7 @@ describe("Result helpers", () => {
       const error = createHttpError(501, "test");
       const logger = makeLoggerMock();
       const request = makeRequestMock({ url: "https://example.com" });
-      logServerError(error, { logger, request, input: { test: 123 } });
+      logServerError(error, logger, request, { test: 123 });
       expect(logger._getLogs().error).toEqual([
         [
           "Server side error",

@@ -116,7 +116,7 @@ export const defaultResultHandler = new ResultHandler({
   handler: ({ error, input, output, request, response, logger }) => {
     if (error) {
       const httpError = ensureHttpError(error);
-      logServerError(httpError, { logger, request, input });
+      logServerError(httpError, logger, request, input);
       return void response.status(httpError.statusCode).json({
         status: "error",
         error: { message: getPublicErrorMessage(httpError) },
@@ -155,7 +155,7 @@ export const arrayResultHandler = new ResultHandler({
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const httpError = ensureHttpError(error);
-      logServerError(httpError, { logger, request, input });
+      logServerError(httpError, logger, request, input);
       return void response
         .status(httpError.statusCode)
         .type("text/plain")

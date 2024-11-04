@@ -49,22 +49,11 @@ export const normalize = <A extends unknown[]>(
 
 export const logServerError = (
   error: HttpError,
-  {
-    logger,
-    request,
-    input,
-  }: {
-    logger: ActualLogger;
-    request: Request;
-    input: FlatObject | null;
-  },
+  logger: ActualLogger,
+  { url }: Request,
+  payload: FlatObject | null,
 ) =>
-  !error.expose &&
-  logger.error("Server side error", {
-    error,
-    url: request.url,
-    payload: input,
-  });
+  !error.expose && logger.error("Server side error", { error, url, payload });
 
 /**
  * @deprecated use ensureHttpError().statusCode instead
