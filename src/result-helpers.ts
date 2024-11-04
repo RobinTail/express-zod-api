@@ -5,6 +5,7 @@ import { memoizeWith } from "ramda";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { FlatObject, getMessageFromError } from "./common-helpers";
+import { CommonConfig } from "./config-type";
 import { InputValidationError, ResultHandlerError } from "./errors";
 import { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
@@ -58,15 +59,16 @@ export const logServerError = (
 /**
  * @example InputValidationError —> BadRequest(400)
  * @example Error —> InternalServerError(500)
- * @todo make it configurable?
  * */
-export const ensureHttpError = (error: Error): HttpError => {
-  if (isHttpError(error)) return error;
-  return createHttpError(
+export const ensureHttpError = (
+  error: Error,
+  getStatusCode: CommonConfig["getStatusCode"] = () =>
     error instanceof InputValidationError ? 400 : 500,
-    getMessageFromError(error),
-    { cause: error.cause || error },
-  );
+): HttpError => {
+  if (isHttpError(error)) return error;
+  return createHttpError(getStatusCode(error), getMessageFromError(error), {
+    cause: error.cause || error,
+  });
 };
 
 const isProduction = memoizeWith(

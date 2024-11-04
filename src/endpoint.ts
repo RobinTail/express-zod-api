@@ -278,6 +278,7 @@ export class Endpoint<
     input,
     output,
     options,
+    config: { getStatusCode },
   }: {
     error: Error | null;
     request: Request;
@@ -286,8 +287,9 @@ export class Endpoint<
     input: FlatObject;
     output: FlatObject | null;
     options: Partial<OPT>;
+    config: CommonConfig;
   }) {
-    const httpError = error && ensureHttpError(error);
+    const httpError = error && ensureHttpError(error, getStatusCode);
     try {
       await this.#resultHandler.execute({
         error: httpError,
@@ -348,13 +350,8 @@ export class Endpoint<
         logger,
         options,
       });
-      if (response.writableEnded) {
-        return;
-      }
-      if (method === "options") {
-        response.status(200).end();
-        return;
-      }
+      if (response.writableEnded) return;
+      if (method === "options") return void response.status(200).end();
       output = await this.#parseOutput(
         await this.#parseAndRunHandler({
           input,
@@ -373,6 +370,7 @@ export class Endpoint<
       error,
       logger,
       options,
+      config,
     });
   }
 }

@@ -49,6 +49,12 @@ export interface CommonConfig<TAG extends string = string> {
    */
   errorHandler?: AbstractResultHandler;
   /**
+   * @desc Interprets an error into a status code for HttpError handled by a ResultHandler
+   * @default error instanceof InputValidationError ? 400 : 500
+   * @todo naming
+   * */
+  getStatusCode?: (error: Error) => number;
+  /**
    * @desc Built-in logger configuration or an instance of any compatible logger.
    * @example { level: "debug", color: true }
    * */
