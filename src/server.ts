@@ -25,7 +25,7 @@ const makeCommonEntities = (config: CommonConfig) => {
   const errorHandler = config.errorHandler || defaultResultHandler;
   const rootLogger = isLoggerInstance(config.logger)
     ? config.logger
-    : new BuiltinLogger(config.logger);
+    : new BuiltinLogger(config.logger || {});
   rootLogger.debug("Running", {
     build: process.env.TSUP_BUILD || "from sources",
     env: process.env.NODE_ENV || "development",

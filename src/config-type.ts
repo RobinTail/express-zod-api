@@ -51,8 +51,9 @@ export interface CommonConfig<TAG extends string = string> {
   /**
    * @desc Built-in logger configuration or an instance of any compatible logger.
    * @example { level: "debug", color: true }
+   * @default {}
    * */
-  logger: BuiltinLoggerConfig | AbstractLogger;
+  logger?: BuiltinLoggerConfig | AbstractLogger;
   /**
    * @desc A child logger returned by this function can override the logger in all handlers for each request
    * @example ({ parent }) => parent.child({ requestId: uuid() })

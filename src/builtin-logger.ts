@@ -1,7 +1,7 @@
 import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
 import { inspect } from "node:util";
 import { performance } from "node:perf_hooks";
-import type { FlatObject } from "./common-helpers";
+import { FlatObject, isProduction } from "./common-helpers";
 import {
   AbstractLogger,
   formatDuration,
@@ -17,8 +17,9 @@ export interface BuiltinLoggerConfig {
   /**
    * @desc The minimal severity to log or "silent" to disable logging
    * @example "debug" also enables pretty output for inspected entities
+   * @default "warn" when NODE_ENV=production and "debug" otherwise
    * */
-  level: "silent" | "warn" | "info" | "debug";
+  level?: "silent" | "warn" | "info" | "debug";
   /**
    * @desc Enables colors on printed severity and inspected entities
    * @default Ansis::isSupported()
@@ -49,6 +50,7 @@ interface ProfilerOptions {
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
   protected hasColor: boolean;
+  protected level: NonNullable<BuiltinLoggerConfig["level"]>;
   protected readonly styles: Record<Severity, Ansis> = {
     debug: blue,
     info: green,
@@ -58,7 +60,11 @@ export class BuiltinLogger implements AbstractLogger {
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   public constructor(protected config: BuiltinLoggerConfig) {
-    const { color: hasColor = new Ansis().isSupported() } = config;
+    const {
+      color: hasColor = new Ansis().isSupported(),
+      level = isProduction() ? "warn" : "debug",
+    } = config;
+    this.level = level;
     this.hasColor = hasColor;
   }
 
@@ -67,13 +73,13 @@ export class BuiltinLogger implements AbstractLogger {
     return inspect(subject, {
       depth,
       colors: this.hasColor,
-      breakLength: this.config.level === "debug" ? 80 : Infinity,
-      compact: this.config.level === "debug" ? 3 : true,
+      breakLength: this.level === "debug" ? 80 : Infinity,
+      compact: this.level === "debug" ? 3 : true,
     });
   }
 
   protected print(method: Severity, message: string, meta?: unknown) {
-    if (this.config.level === "silent" || isHidden(method, this.config.level)) {
+    if (this.level === "silent" || isHidden(method, this.level)) {
       return;
     }
     const { requestId, ...ctx } = this.config.ctx || {};
