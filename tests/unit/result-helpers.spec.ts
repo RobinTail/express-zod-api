@@ -1,5 +1,4 @@
 import createHttpError from "http-errors";
-import { beforeAll } from "vitest";
 import { z } from "zod";
 import { InputValidationError, OutputValidationError } from "../../src";
 import {
