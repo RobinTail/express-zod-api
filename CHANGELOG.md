@@ -12,10 +12,10 @@
   - This method was introduced in v9.0.0 and has a similar implementation to the new one.
 - Showing the value of `NODE_ENV` environment variable on startup;
 - Changes to the behavior of `defaultResultHandler` and `defaultEndpointsFactory`:
-  - Generalizing server side error messages in production mode:
-    - When `NODE_ENV` is set to `production` server side error messages will be generalized;
+  - Generalizing server-side error messages in production mode:
+    - When `NODE_ENV` is set to `production` server-side error messages will be generalized;
     - Instead of actual message the default one associated with the corresponding `statusCode` used;
-    - Server side errors are those having `5XX` status code, or treated that way by `ensureHttpError()`;
+    - Server-side errors are those having `5XX` status code, or treated that way by `ensureHttpError()`;
     - You can enforce or disable generalized message on any `HttpError` by setting `expose` property;
     - This feature aims to improve the security.
 - Changes to Last Resort Handler:

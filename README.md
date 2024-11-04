@@ -874,10 +874,10 @@ origins of errors that could happen in runtime and be handled the following way:
 Consider enabling production mode by setting `NODE_ENV` environment variable to `production` for your deployment:
 
 - Express activates some [performance optimizations](https://expressjs.com/en/advanced/best-practice-performance.html);
-- The `defaultResultHandler` and `LastResortHandler` generalize server side (`5XX`) error messages in responses:
-  - This feature aims to improve the security;
-  - Throwing `new Error("What exactly happened")` from endpoint becomes just `Internal Server Error` in response;
-  - You can control that behavior on `HttpError` using its `expose` option:
+- The `defaultResultHandler`, `defaultEndpointsFactory` and `LastResortHandler` generalize server-side error messages
+  in negative responses in order to improve the security of your API by not disclosing the exact causes of errors:
+  - Throwing errors that have or imply `5XX` status codes become just `Internal Server Error` message in response;
+  - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option:
 
 ```ts
 import createHttpError from "http-errors";
