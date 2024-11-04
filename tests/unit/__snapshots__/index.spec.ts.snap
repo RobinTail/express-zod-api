@@ -68,8 +68,6 @@ exports[`Index Entrypoint > exports > getExamples should have certain value 1`] 
 
 exports[`Index Entrypoint > exports > getMessageFromError should have certain value 1`] = `[Function]`;
 
-exports[`Index Entrypoint > exports > getStatusCodeFromError should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint > exports > should have certain entities exposed 1`] = `
 [
   "createConfig",
@@ -78,7 +76,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "arrayEndpointsFactory",
   "getExamples",
   "getMessageFromError",
-  "getStatusCodeFromError",
   "ensureHttpError",
   "BuiltinLogger",
   "Middleware",

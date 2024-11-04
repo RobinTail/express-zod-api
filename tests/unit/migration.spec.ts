@@ -16,62 +16,92 @@ describe("Migration", () => {
     expect(migration.rules).toHaveProperty(`v${version.split(".")[0]}`);
     expect(migration).toMatchSnapshot();
   });
-});
 
-tester.run("v21", migration.rules.v21, {
-  valid: [
-    `(() => {})()`,
-    `createConfig({ http: {} });`,
-    `createConfig({ http: { listen: 8090 }, upload: true });`,
-    `const { app, servers, logger } = await createServer();`,
-    `const error = new Error(); console.error(error.cause?.message);`,
-  ],
-  invalid: [
-    {
-      code: `createConfig({ server: {} });`,
-      output: `createConfig({ http: {} });`,
-      errors: [
-        {
-          messageId: "change",
-          data: { subject: "property", from: "server", to: "http" },
-        },
-      ],
-    },
-    {
-      code: `createConfig({ http: { listen: 8090, upload: true } });`,
-      output: `createConfig({ http: { listen: 8090,  }, upload: true });`,
-      errors: [
-        {
-          messageId: "move",
-          data: {
-            subject: "upload",
-            from: "http",
-            to: "the top level of createConfig argument",
+  tester.run("v21", migration.rules.v21, {
+    valid: [
+      `(() => {})()`,
+      `createConfig({ http: {} });`,
+      `createConfig({ http: { listen: 8090 }, upload: true });`,
+      `const { app, servers, logger } = await createServer();`,
+      `console.error(error.cause?.message);`,
+      `import { ensureHttpError } from "express-zod-api";`,
+      `ensureHttpError(error).statusCode;`,
+    ],
+    invalid: [
+      {
+        code: `createConfig({ server: {} });`,
+        output: `createConfig({ http: {} });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "server", to: "http" },
           },
-        },
-      ],
-    },
-    {
-      code: `const { app, httpServer, httpsServer, logger } = await createServer();`,
-      errors: [
-        {
-          messageId: "change",
-          data: { subject: "property", from: "httpServer", to: "servers" },
-        },
-        {
-          messageId: "change",
-          data: { subject: "property", from: "httpsServer", to: "servers" },
-        },
-      ],
-    },
-    {
-      code: `const error = new Error(); console.error(error.originalError?.message);`,
-      errors: [
-        {
-          messageId: "change",
-          data: { subject: "property", from: "originalError", to: "cause" },
-        },
-      ],
-    },
-  ],
+        ],
+      },
+      {
+        code: `createConfig({ http: { listen: 8090, upload: true } });`,
+        output: `createConfig({ http: { listen: 8090,  }, upload: true });`,
+        errors: [
+          {
+            messageId: "move",
+            data: {
+              subject: "upload",
+              from: "http",
+              to: "the top level of createConfig argument",
+            },
+          },
+        ],
+      },
+      {
+        code: `const { app, httpServer, httpsServer, logger } = await createServer();`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "httpServer", to: "servers" },
+          },
+          {
+            messageId: "change",
+            data: { subject: "property", from: "httpsServer", to: "servers" },
+          },
+        ],
+      },
+      {
+        code: `console.error(error.originalError?.message);`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "originalError", to: "cause" },
+          },
+        ],
+      },
+      {
+        code: `import { getStatusCodeFromError } from "express-zod-api";`,
+        output: `import { ensureHttpError } from "express-zod-api";`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "import",
+              from: "getStatusCodeFromError",
+              to: "ensureHttpError",
+            },
+          },
+        ],
+      },
+      {
+        code: `getStatusCodeFromError(error);`,
+        output: `ensureHttpError(error).statusCode;`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "method",
+              from: "getStatusCodeFromError",
+              to: "ensureHttpError().statusCode",
+            },
+          },
+        ],
+      },
+    ],
+  });
 });

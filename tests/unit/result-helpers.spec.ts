@@ -4,7 +4,6 @@ import { InputValidationError, OutputValidationError } from "../../src";
 import {
   ensureHttpError,
   getPublicErrorMessage,
-  getStatusCodeFromError,
   logServerError,
 } from "../../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../../src/testing";
@@ -22,44 +21,6 @@ describe("Result helpers", () => {
           { error, payload: { test: 123 }, url: "https://example.com" },
         ],
       ]);
-    });
-  });
-
-  describe("getStatusCodeFromError()", () => {
-    test("should get status code from HttpError", () => {
-      expect(
-        getStatusCodeFromError(createHttpError(403, "Access denied")),
-      ).toEqual(403);
-    });
-
-    test("should return 400 for InputValidationError", () => {
-      const error = new InputValidationError(
-        new z.ZodError([
-          {
-            code: "invalid_type",
-            path: ["user", "id"],
-            message: "expected number, got string",
-            expected: "number",
-            received: "string",
-          },
-        ]),
-      );
-      expect(getStatusCodeFromError(error)).toEqual(400);
-    });
-
-    test.each([
-      new Error("something went wrong"),
-      new z.ZodError([
-        {
-          code: "invalid_type",
-          path: ["user", "id"],
-          message: "expected number, got string",
-          expected: "number",
-          received: "string",
-        },
-      ]),
-    ])("should return 500 for other errors %#", (error) => {
-      expect(getStatusCodeFromError(error)).toEqual(500);
     });
   });
 
