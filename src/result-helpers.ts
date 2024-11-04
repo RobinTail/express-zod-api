@@ -68,14 +68,14 @@ export const getStatusCodeFromError = (error: Error): number => {
  * @example InputValidationError —> BadRequest(400)
  * @example Error —> InternalServerError(500)
  * */
-export const ensureHttpError = (error: Error): HttpError =>
-  isHttpError(error)
-    ? error
-    : createHttpError(
-        error instanceof InputValidationError ? 400 : 500,
-        getMessageFromError(error),
-        { cause: error.cause || error },
-      );
+export const ensureHttpError = (error: Error): HttpError => {
+  if (isHttpError(error)) return error;
+  return createHttpError(
+    error instanceof InputValidationError ? 400 : 500,
+    getMessageFromError(error),
+    { cause: error.cause || error },
+  );
+};
 
 const isProduction = memoizeWith(
   () => process.env.TSUP_STATIC as string, // dynamic in tests, but static in build
