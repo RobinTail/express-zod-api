@@ -4,7 +4,6 @@ import {
   ResultHandler,
   defaultResultHandler,
   ez,
-  ensureHttpError,
 } from "../src";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
@@ -95,17 +94,16 @@ export const statusDependingFactory = new EndpointsFactory({
     ],
     handler: ({ error, response, output }) => {
       if (error) {
-        const httpError = ensureHttpError(error);
         const doesExist =
-          httpError.statusCode === 409 &&
-          "id" in httpError &&
-          typeof httpError.id === "number";
+          error.statusCode === 409 &&
+          "id" in error &&
+          typeof error.id === "number";
         return void response
-          .status(httpError.statusCode)
+          .status(error.statusCode)
           .json(
             doesExist
-              ? { status: "exists", id: httpError.id }
-              : { status: "error", reason: httpError.message },
+              ? { status: "exists", id: error.id }
+              : { status: "error", reason: error.message },
           );
       }
       response.status(201).json({ status: "created", data: output });

@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { HttpError } from "http-errors";
 import { z } from "zod";
 import {
   ApiResponse,
@@ -10,7 +11,6 @@ import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 import {
-  ensureHttpError,
   getPublicErrorMessage,
   logServerError,
   normalize,
@@ -24,8 +24,7 @@ type Handler<RES = unknown> = (params: {
   output: FlatObject | null;
   /** can be empty: check presence of the required property using "in" operator */
   options: FlatObject;
-  /** @todo consider moving to HttpError in v21 */
-  error: Error | null;
+  error: HttpError | null;
   request: Request;
   response: Response<RES>;
   logger: ActualLogger;
@@ -115,11 +114,10 @@ export const defaultResultHandler = new ResultHandler({
     }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (error) {
-      const httpError = ensureHttpError(error);
-      logServerError(httpError, logger, request, input);
-      return void response.status(httpError.statusCode).json({
+      logServerError(error, logger, request, input);
+      return void response.status(error.statusCode).json({
         status: "error",
-        error: { message: getPublicErrorMessage(httpError) },
+        error: { message: getPublicErrorMessage(error) },
       });
     }
     response
@@ -154,12 +152,11 @@ export const arrayResultHandler = new ResultHandler({
   negative: z.string().example("Sample error message"),
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
-      const httpError = ensureHttpError(error);
-      logServerError(httpError, logger, request, input);
+      logServerError(error, logger, request, input);
       return void response
-        .status(httpError.statusCode)
+        .status(error.statusCode)
         .type("text/plain")
-        .send(getPublicErrorMessage(httpError));
+        .send(getPublicErrorMessage(error));
     }
     if (output && "items" in output && Array.isArray(output.items)) {
       return void response

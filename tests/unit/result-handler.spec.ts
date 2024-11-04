@@ -6,6 +6,7 @@ import {
   arrayResultHandler,
   defaultResultHandler,
   ResultHandler,
+  ensureHttpError,
 } from "../../src";
 import { ResultHandlerError } from "../../src/errors";
 import { metaSymbol } from "../../src/metadata";
@@ -84,7 +85,7 @@ describe("ResultHandler", () => {
     test("Should handle generic error", () => {
       const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock();
-      const error = new Error("Some error");
+      const error = createHttpError(500, "Some error");
       subject.execute({
         error,
         input: { something: 453 },
@@ -98,7 +99,7 @@ describe("ResultHandler", () => {
         [
           "Server side error",
           {
-            error: createHttpError(500, error),
+            error,
             payload: { something: 453 },
             url: "http://something/v1/anything",
           },
@@ -120,16 +121,18 @@ describe("ResultHandler", () => {
       const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock();
       subject.execute({
-        error: new InputValidationError(
-          new z.ZodError([
-            {
-              code: "invalid_type",
-              message: "Expected string, got number",
-              path: ["something"],
-              expected: "string",
-              received: "number",
-            },
-          ]),
+        error: ensureHttpError(
+          new InputValidationError(
+            new z.ZodError([
+              {
+                code: "invalid_type",
+                message: "Expected string, got number",
+                path: ["something"],
+                expected: "string",
+                received: "number",
+              },
+            ]),
+          ),
         ),
         input: { something: 453 },
         output: { anything: 118 },

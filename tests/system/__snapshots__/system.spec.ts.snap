@@ -19,7 +19,10 @@ exports[`App in production mode > Negative > Should treat custom errors in endpo
     "cause": AssertionError({
       "message": "I am faulty",
     }),
-    "handled": AssertionError({
+    "handled": InternalServerError({
+      "cause": AssertionError({
+        "message": "Custom error in the Endpoint input validation",
+      }),
       "message": "Custom error in the Endpoint input validation",
     }),
     "message": "I am faulty",
@@ -34,7 +37,10 @@ exports[`App in production mode > Negative > Should treat custom errors in middl
     "cause": AssertionError({
       "message": "I am faulty",
     }),
-    "handled": AssertionError({
+    "handled": InternalServerError({
+      "cause": AssertionError({
+        "message": "Custom error in the Middleware input validation",
+      }),
       "message": "Custom error in the Middleware input validation",
     }),
     "message": "I am faulty",

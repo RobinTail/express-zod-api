@@ -1,3 +1,4 @@
+import { HttpError } from "http-errors";
 import { z } from "zod";
 import { getMessageFromError } from "./common-helpers";
 import { OpenAPIContext } from "./documentation-helpers";
@@ -61,7 +62,7 @@ export class ResultHandlerError extends Error {
     /** @desc The error thrown from ResultHandler */
     public override readonly cause: Error,
     /** @desc The error being processed by ResultHandler when it failed */
-    public readonly handled?: Error,
+    public readonly handled?: HttpError,
   ) {
     super(getMessageFromError(cause), { cause });
   }

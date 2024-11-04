@@ -58,6 +58,7 @@ export const logServerError = (
 /**
  * @example InputValidationError —> BadRequest(400)
  * @example Error —> InternalServerError(500)
+ * @todo make it configurable?
  * */
 export const ensureHttpError = (error: Error): HttpError => {
   if (isHttpError(error)) return error;

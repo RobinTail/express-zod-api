@@ -22,6 +22,7 @@ import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType, contentTypes } from "./content-type";
 import { AbstractResultHandler } from "./result-handler";
+import { ensureHttpError } from "./result-helpers";
 import { Security } from "./security";
 
 export type Handler<IN, OUT, OPT> = (params: {
@@ -286,9 +287,10 @@ export class Endpoint<
     output: FlatObject | null;
     options: Partial<OPT>;
   }) {
+    const httpError = error && ensureHttpError(error);
     try {
       await this.#resultHandler.execute({
-        error,
+        error: httpError,
         output,
         request,
         response,
@@ -300,7 +302,7 @@ export class Endpoint<
       lastResortHandler({
         logger,
         response,
-        error: new ResultHandlerError(ensureError(e), error || undefined),
+        error: new ResultHandlerError(ensureError(e), httpError || undefined),
       });
     }
   }

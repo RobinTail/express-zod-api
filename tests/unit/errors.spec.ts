@@ -1,3 +1,4 @@
+import createHttpError from "http-errors";
 import { z } from "zod";
 import { DocumentationError, RoutingError } from "../../src";
 import {
@@ -96,7 +97,7 @@ describe("Errors", () => {
     });
   });
 
-  describe.each([new Error("test2"), undefined])(
+  describe.each([createHttpError(500, "test2"), undefined])(
     "ResultHandlerError",
     (handled) => {
       const error = new ResultHandlerError(new Error("test"), handled);

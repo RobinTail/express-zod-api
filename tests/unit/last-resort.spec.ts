@@ -25,7 +25,7 @@ describe("Last Resort Handler", () => {
         const loggerMock = makeLoggerMock();
         const error = new ResultHandlerError(
           cause,
-          new Error("what went wrong before"),
+          createHttpError(500, "what went wrong before"),
         );
         lastResortHandler({
           error,
