@@ -1,5 +1,4 @@
 import createHttpError, { HttpError } from "http-errors";
-import { beforeAll } from "vitest";
 import { ResultHandlerError } from "../../src/errors";
 import { lastResortHandler } from "../../src/last-resort";
 import { makeLoggerMock, makeResponseMock } from "../../src/testing";
