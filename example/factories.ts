@@ -96,16 +96,17 @@ export const statusDependingFactory = new EndpointsFactory({
     handler: ({ error, response, output }) => {
       if (error) {
         const httpError = ensureHttpError(error);
-        response
+        const doesExist =
+          httpError.statusCode === 409 &&
+          "id" in httpError &&
+          typeof httpError.id === "number";
+        return void response
           .status(httpError.statusCode)
           .json(
-            httpError.statusCode === 409 &&
-              "id" in httpError &&
-              typeof httpError.id === "number"
+            doesExist
               ? { status: "exists", id: httpError.id }
               : { status: "error", reason: httpError.message },
           );
-        return;
       }
       response.status(201).json({ status: "created", data: output });
     },
