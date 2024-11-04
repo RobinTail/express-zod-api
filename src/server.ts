@@ -31,7 +31,10 @@ const makeCommonEntities = (config: CommonConfig) => {
   const rootLogger = isLoggerInstance(config.logger)
     ? config.logger
     : new BuiltinLogger(config.logger);
-  rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
+  rootLogger.debug("Running", {
+    build: process.env.TSUP_BUILD || "from sources",
+    env: process.env.NODE_ENV || "development",
+  });
   installDeprecationListener(rootLogger);
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
   const getChildLogger = makeChildLoggerExtractor(rootLogger);

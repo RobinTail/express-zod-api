@@ -6,7 +6,7 @@ import {
   FlatObject,
   getActualMethod,
   getInput,
-  makeErrorFromAnything,
+  ensureError,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import {
@@ -300,10 +300,7 @@ export class Endpoint<
       lastResortHandler({
         logger,
         response,
-        error: new ResultHandlerError(
-          makeErrorFromAnything(e).message,
-          error || undefined,
-        ),
+        error: new ResultHandlerError(ensureError(e), error || undefined),
       });
     }
   }
@@ -364,7 +361,7 @@ export class Endpoint<
         }),
       );
     } catch (e) {
-      error = makeErrorFromAnything(e);
+      error = ensureError(e);
     }
     await this.#handleResult({
       input,

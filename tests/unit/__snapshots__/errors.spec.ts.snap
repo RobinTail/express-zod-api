@@ -1,6 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`Errors > DocumentationError > should include more details into the message 1`] = `
-"test
-Caused by response schema of an Endpoint assigned to GET method of /v1/testPath path."
-`;

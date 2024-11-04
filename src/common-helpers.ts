@@ -1,13 +1,11 @@
 import { Request } from "express";
-import { isHttpError } from "http-errors";
 import { pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
-import { InputValidationError, OutputValidationError } from "./errors";
-import { ActualLogger } from "./logger-helpers";
+import { contentTypes } from "./content-type";
+import { OutputValidationError } from "./errors";
 import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
-import { contentTypes } from "./content-type";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = Record<string, never>;
@@ -56,7 +54,7 @@ export const getInput = (
     .reduce<FlatObject>((agg, obj) => ({ ...agg, ...obj }), {});
 };
 
-export const makeErrorFromAnything = (subject: unknown): Error =>
+export const ensureError = (subject: unknown): Error =>
   subject instanceof Error ? subject : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
@@ -72,37 +70,6 @@ export const getMessageFromError = (error: Error): string => {
     return `output${hasFirstField ? "/" : ": "}${error.message}`;
   }
   return error.message;
-};
-
-export const getStatusCodeFromError = (error: Error): number => {
-  if (isHttpError(error)) {
-    return error.statusCode;
-  }
-  if (error instanceof InputValidationError) {
-    return 400;
-  }
-  return 500;
-};
-
-export const logInternalError = ({
-  logger,
-  request,
-  input,
-  error,
-  statusCode,
-}: {
-  logger: ActualLogger;
-  request: Request;
-  input: FlatObject | null;
-  error: Error;
-  statusCode: number;
-}) => {
-  if (statusCode === 500) {
-    logger.error(`Internal server error\n${error.stack}\n`, {
-      url: request.url,
-      payload: input,
-    });
-  }
 };
 
 export const getExamples = <
