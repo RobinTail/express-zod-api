@@ -26,13 +26,12 @@
 
 ```ts
 import createHttpError from "http-errors";
-
 // NODE_ENV=production
 // Throwing HttpError from Endpoint or Middleware that is using defaultResultHandler or defaultEndpointsFactory:
-createHttpError(500, "Something happened"); // Internal Server Error
-createHttpError(400, "Something happened"); // Something happened
-createHttpError(500, "Something happened", { expose: true }); // Something happened
-createHttpError(400, "Something happened", { expose: false }); // Bad Request
+createHttpError(401, "Token expired"); // —> "Token expired"
+createHttpError(401, "Token expired", { expose: false }); // —> "Unauthorized"
+createHttpError(500, "Something is broken"); // —> "Internal Server Error"
+createHttpError(501, "We didn't make it yet", { expose: true }); // —> "We didn't make it yet"
 ```
 
 ### v20.17.0

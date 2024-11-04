@@ -882,6 +882,8 @@ Consider enabling production mode by setting `NODE_ENV` environment variable to 
 ```ts
 import createHttpError from "http-errors";
 // NODE_ENV=production
+// Throwing HttpError from Endpoint or Middleware that is using defaultResultHandler or defaultEndpointsFactory:
+createHttpError(401, "Token expired"); // —> "Token expired"
 createHttpError(401, "Token expired", { expose: false }); // —> "Unauthorized"
 createHttpError(500, "Something is broken"); // —> "Internal Server Error"
 createHttpError(501, "We didn't make it yet", { expose: true }); // —> "We didn't make it yet"
