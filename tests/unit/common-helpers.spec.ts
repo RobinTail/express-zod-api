@@ -1,5 +1,5 @@
+import "../../src/zod-plugin"; // required for this test
 import createHttpError from "http-errors";
-import { range } from "ramda";
 import {
   combinations,
   defaultInputSources,
@@ -7,16 +7,13 @@ import {
   getExamples,
   getInput,
   getMessageFromError,
-  getStatusCodeFromError,
   hasCoercion,
   isCustomHeader,
-  logServerError,
   makeCleanId,
-  makeErrorFromAnything,
+  ensureError,
 } from "../../src/common-helpers";
-import { InputValidationError } from "../../src";
 import { z } from "zod";
-import { makeLoggerMock, makeRequestMock } from "../../src/testing";
+import { makeRequestMock } from "../../src/testing";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
@@ -188,44 +185,6 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("getStatusCodeFromError()", () => {
-    test("should get status code from HttpError", () => {
-      expect(
-        getStatusCodeFromError(createHttpError(403, "Access denied")),
-      ).toEqual(403);
-    });
-
-    test("should return 400 for InputValidationError", () => {
-      const error = new InputValidationError(
-        new z.ZodError([
-          {
-            code: "invalid_type",
-            path: ["user", "id"],
-            message: "expected number, got string",
-            expected: "number",
-            received: "string",
-          },
-        ]),
-      );
-      expect(getStatusCodeFromError(error)).toEqual(400);
-    });
-
-    test.each([
-      new Error("something went wrong"),
-      new z.ZodError([
-        {
-          code: "invalid_type",
-          path: ["user", "id"],
-          message: "expected number, got string",
-          expected: "number",
-          received: "string",
-        },
-      ]),
-    ])("should return 500 for other errors %#", (error) => {
-      expect(getStatusCodeFromError(error)).toEqual(500);
-    });
-  });
-
   describe("getExamples()", () => {
     test("should return an empty array in case examples are not set", () => {
       expect(getExamples({ schema: z.string(), variant: "parsed" })).toEqual(
@@ -321,7 +280,7 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("makeErrorFromAnything()", () => {
+  describe("ensureError()", () => {
     test.each([
       [new Error("error"), "error"],
       [
@@ -358,7 +317,7 @@ describe("Common Helpers", () => {
       [/regexp/is, "/regexp/is"],
       [[1, 2, 3], "1,2,3"],
     ])("should accept %#", (argument, expected) => {
-      const result = makeErrorFromAnything(argument);
+      const result = ensureError(argument);
       expectTypeOf(result).toEqualTypeOf<Error>();
       expect(result).toBeInstanceOf(Error);
       expect(result).toHaveProperty("message");
@@ -396,30 +355,5 @@ describe("Common Helpers", () => {
         expect(makeCleanId(...args)).toMatchSnapshot();
       },
     );
-  });
-
-  describe("logServerError()", () => {
-    test.each(range(100, 599))("should handle error %i", (statusCode) => {
-      const error = new Error("test");
-      const logger = makeLoggerMock();
-      const request = makeRequestMock({ url: "https://example.com" });
-      logServerError({
-        error,
-        logger,
-        request,
-        statusCode,
-        input: { test: 123 },
-      });
-      expect(logger._getLogs().error).toEqual(
-        statusCode >= 500
-          ? [
-              [
-                "Server side error",
-                { error, payload: { test: 123 }, url: "https://example.com" },
-              ],
-            ]
-          : [],
-      );
-    });
   });
 });

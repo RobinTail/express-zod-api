@@ -1,5 +1,6 @@
 import type { NewPlugin } from "@vitest/pretty-format";
 import { isHttpError } from "http-errors";
+import { ResultHandlerError } from "./src/errors";
 
 /** Takes statusCode into account */
 const compareHttpErrors = (a: unknown, b: unknown) => {
@@ -12,18 +13,17 @@ const compareHttpErrors = (a: unknown, b: unknown) => {
       : false;
 };
 
-/** Takes cause into account */
+/** Takes cause and certain props of custom errors into account */
 const errorSerializer: NewPlugin = {
   test: (subject) => subject instanceof Error,
-  serialize: (
-    { name, message, cause }: Error,
-    config,
-    indentation,
-    depth,
-    refs,
-    printer,
-  ) => {
-    const asObject = { message, ...(cause ? { cause } : {}) };
+  serialize: (error: Error, config, indentation, depth, refs, printer) => {
+    const { name, message, cause } = error;
+    const { handled } = error instanceof ResultHandlerError ? error : {};
+    const asObject = {
+      message,
+      ...(cause ? { cause } : {}),
+      ...(handled ? { handled } : {}),
+    };
     return `${name}(${printer(asObject, config, indentation, depth, refs)})`;
   },
 };

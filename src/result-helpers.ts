@@ -1,7 +1,12 @@
+import { Request } from "express";
+import createHttpError, { HttpError, isHttpError } from "http-errors";
 import assert from "node:assert/strict";
+import { memoizeWith } from "ramda";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
-import { ResultHandlerError } from "./errors";
+import { FlatObject, getMessageFromError } from "./common-helpers";
+import { InputValidationError, ResultHandlerError } from "./errors";
+import { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
 
 export type ResultSchema<R extends Result> =
@@ -41,3 +46,41 @@ export const normalize = <A extends unknown[]>(
     }),
   );
 };
+
+export const logServerError = (
+  error: HttpError,
+  logger: ActualLogger,
+  { url }: Request,
+  payload: FlatObject | null,
+) =>
+  !error.expose && logger.error("Server side error", { error, url, payload });
+
+/**
+ * @deprecated use ensureHttpError().statusCode instead
+ * @todo remove in v21
+ * */
+export const getStatusCodeFromError = (error: Error): number =>
+  ensureHttpError(error).statusCode;
+
+/**
+ * @example InputValidationError —> BadRequest(400)
+ * @example Error —> InternalServerError(500)
+ * */
+export const ensureHttpError = (error: Error): HttpError => {
+  if (isHttpError(error)) return error;
+  return createHttpError(
+    error instanceof InputValidationError ? 400 : 500,
+    getMessageFromError(error),
+    { cause: error.cause || error },
+  );
+};
+
+const isProduction = memoizeWith(
+  () => process.env.TSUP_STATIC as string, // dynamic in tests, but static in build
+  () => process.env.NODE_ENV === "production",
+);
+
+export const getPublicErrorMessage = (error: HttpError): string =>
+  isProduction() && !error.expose
+    ? createHttpError(error.statusCode).message // default message for that code
+    : error.message;

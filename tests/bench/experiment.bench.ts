@@ -1,18 +1,13 @@
 import { bench } from "vitest";
 
-describe("Experiment %s", () => {
-  const map = new WeakMap();
-  const set = new WeakSet();
-  const obj = {};
+describe("Experiment for isServerSideIssue()", () => {
+  const env = process.env.NODE_ENV;
 
-  bench("WeakMap.has()", () => {
-    map.has({});
+  bench("access", () => {
+    return void process.env.NODE_ENV;
   });
 
-  bench("WeakSet.has()", () => {
-    set.has({});
+  bench("cached", () => {
+    return void (env === "production");
   });
-
-  bench("control: in", () => void ("test" in obj));
-  bench("control: hasOwn", () => void Object.hasOwn(obj, "test"));
 });
