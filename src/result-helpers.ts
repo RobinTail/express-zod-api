@@ -59,6 +59,8 @@ export const logServerError = (
 /**
  * @example InputValidationError —> BadRequest(400)
  * @example Error —> InternalServerError(500)
+ * @todo remove from index
+ * @todo remove from migration
  * */
 export const ensureHttpError = (
   error: Error,
