@@ -613,7 +613,7 @@ your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Customizing logger
 
-By default, library uses a simple built-in console logger, that you can configure this way (these are defaults):
+A simple built-in console logger is used by default with the following options that you can configure:
 
 ```typescript
 import { createConfig } from "express-zod-api";
