@@ -19,7 +19,6 @@ export const config = createConfig({
     app.use("/docs", ui.serve, ui.setup(documentation));
   },
   cors: true,
-  logger: { level: "debug", color: true },
   tags: {
     users: "Everything about the users",
     files: "Everything about the files processing",

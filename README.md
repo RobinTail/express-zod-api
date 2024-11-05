@@ -185,7 +185,6 @@ const config = createConfig({
     listen: 8090, // port, UNIX socket or options
   },
   cors: true,
-  logger: { level: "debug", color: true },
 });
 ```
 
@@ -604,8 +603,20 @@ your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Customizing logger
 
-If the simple console output of the built-in logger is not enough for you, you can connect any other compatible one.
-It must support at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
+A simple built-in console logger is used by default with the following options that you can configure:
+
+```typescript
+import { createConfig } from "express-zod-api";
+const config = createConfig({
+  logger: {
+    level: "debug", // or "warn" in production mode
+    color: undefined, // detects automatically, boolean
+    depth: 2, // controls how deeply entities should be inspected
+  },
+});
+```
+
+You can also replace it with a one having at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
 Winston and Pino support is well known. Here is an example configuring `pino` logger with `pino-pretty` extension:
 
 ```typescript
@@ -643,7 +654,6 @@ declare module "express-zod-api" {
 }
 
 const config = createConfig({
-  logger: { level: "debug", color: true },
   childLoggerProvider: ({ parent, request }) =>
     parent.child({ requestId: randomUUID() }),
 });
@@ -658,11 +668,10 @@ invoke the returned callback. The default severity of those measurements is `deb
 ```typescript
 import { createConfig, BuiltinLogger } from "express-zod-api";
 
-// This enables the .profile() method on "logger":
+// This enables the .profile() method on built-in logger:
 declare module "express-zod-api" {
   interface LoggerOverrides extends BuiltinLogger {}
 }
-const config = createConfig({ logger: { level: "debug", color: true } });
 
 // Inside a handler of Endpoint, Middleware or ResultHandler:
 const done = logger.profile("expensive operation");
