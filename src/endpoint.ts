@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import createHttpError from "http-errors";
+import createHttpError, { HttpError } from "http-errors";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { hasRaw, hasUpload } from "./deep-checks";
@@ -292,21 +292,18 @@ export class Endpoint<
     input,
     output,
     options,
-    config: { getStatusCode },
   }: {
-    error: Error | null;
+    error: HttpError | null;
     request: Request;
     response: Response;
     logger: ActualLogger;
     input: FlatObject;
     output: FlatObject | null;
     options: Partial<OPT>;
-    config: CommonConfig;
   }) {
-    const httpError = error && ensureHttpError(error, getStatusCode);
     try {
       await this.#resultHandler.execute({
-        error: httpError,
+        error,
         output,
         request,
         response,
@@ -318,7 +315,7 @@ export class Endpoint<
       lastResortHandler({
         logger,
         response,
-        error: new ResultHandlerError(ensureError(e), httpError || undefined),
+        error: new ResultHandlerError(ensureError(e), error || undefined),
       });
     }
   }
@@ -339,7 +336,7 @@ export class Endpoint<
     const method = getActualMethod(request);
     const options: Partial<OPT> = {};
     let output: FlatObject | null = null;
-    let error: Error | null = null;
+    let error: HttpError | null = null;
     if (config.cors) {
       let headers = this.#getDefaultCorsHeaders(siblingMethods);
       if (typeof config.cors === "function") {
@@ -374,7 +371,7 @@ export class Endpoint<
         }),
       );
     } catch (e) {
-      error = ensureError(e);
+      error = ensureHttpError(ensureError(e));
     }
     await this.#handleResult({
       input,
@@ -384,7 +381,6 @@ export class Endpoint<
       error,
       logger,
       options,
-      config,
     });
   }
 }
