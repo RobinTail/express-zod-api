@@ -51,7 +51,9 @@ describe("BuiltinLogger", () => {
         vi.stubEnv("TSUP_STATIC", mode);
         vi.stubEnv("NODE_ENV", mode);
         const { logger } = makeLogger();
-        expect(logger["level"]).toBe(mode === "production" ? "warn" : "debug");
+        expect(logger["config"]["level"]).toBe(
+          mode === "production" ? "warn" : "debug",
+        );
       },
     );
 

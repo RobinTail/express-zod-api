@@ -49,8 +49,7 @@ interface ProfilerOptions {
 
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
-  protected readonly hasColor: boolean;
-  protected readonly level: NonNullable<BuiltinLoggerConfig["level"]>;
+  protected readonly config: Required<BuiltinLoggerConfig>;
   protected readonly styles: Record<Severity, Ansis> = {
     debug: blue,
     info: green,
@@ -59,36 +58,41 @@ export class BuiltinLogger implements AbstractLogger {
   };
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
-  public constructor(protected config: BuiltinLoggerConfig = {}) {
+  public constructor(config: BuiltinLoggerConfig = {}) {
     const {
-      color: hasColor = new Ansis().isSupported(),
+      color = new Ansis().isSupported(),
       level = isProduction() ? "warn" : "debug",
+      depth = 2,
+      ctx = {},
     } = config;
-    this.level = level;
-    this.hasColor = hasColor;
+    this.config = { color, level, depth, ctx };
   }
 
   protected prettyPrint(subject: unknown) {
-    const { depth = 2 } = this.config;
+    const { depth, color: colors, level } = this.config;
     return inspect(subject, {
       depth,
-      colors: this.hasColor,
-      breakLength: this.level === "debug" ? 80 : Infinity,
-      compact: this.level === "debug" ? 3 : true,
+      colors,
+      breakLength: level === "debug" ? 80 : Infinity,
+      compact: level === "debug" ? 3 : true,
     });
   }
 
   protected print(method: Severity, message: string, meta?: unknown) {
-    if (this.level === "silent" || isHidden(method, this.level)) {
+    const {
+      level,
+      ctx: { requestId, ...ctx },
+      color: hasColor,
+    } = this.config;
+    if (level === "silent" || isHidden(method, level)) {
       return;
     }
-    const { requestId, ...ctx } = this.config.ctx || {};
     const output: string[] = [new Date().toISOString()];
     if (requestId) {
-      output.push(this.hasColor ? cyanBright(requestId) : requestId);
+      output.push(hasColor ? cyanBright(requestId) : requestId);
     }
     output.push(
-      this.hasColor ? `${this.styles[method](method)}:` : `${method}:`,
+      hasColor ? `${this.styles[method](method)}:` : `${method}:`,
       message,
     );
     if (meta !== undefined) {
