@@ -51,7 +51,7 @@ describe("Logger helpers", () => {
   });
 
   describe("isLoggerInstance()", () => {
-    test.each<BuiltinLoggerConfig>([
+    test.each<Partial<BuiltinLoggerConfig>>([
       { level: "silent" },
       { level: "debug", color: false },
       { level: "info", color: true },

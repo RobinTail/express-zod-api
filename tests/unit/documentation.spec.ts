@@ -556,12 +556,15 @@ describe("Documentation", () => {
     test.each([
       z.undefined(),
       z.map(z.any(), z.any()),
+      z.set(z.any()),
       z.function(),
       z.promise(z.any()),
+      z.nan(),
+      z.symbol(),
       z.unknown(),
       z.never(),
       z.void(),
-    ])("should throw on unsupported types", (zodType) => {
+    ])("should throw on unsupported types %#", (zodType) => {
       expect(
         () =>
           new Documentation({

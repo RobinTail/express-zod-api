@@ -11,11 +11,7 @@ import { keys, pluck } from "ramda";
 import { z } from "zod";
 import { defaultStatusCodes } from "./api-response";
 import { DocumentationError } from "./errors";
-import {
-  defaultInputSources,
-  defaultSerializer,
-  makeCleanId,
-} from "./common-helpers";
+import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
@@ -64,11 +60,6 @@ interface DocumentationParams {
   /** @default inline */
   composition?: "inline" | "components";
   /**
-   * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
-   * @default JSON.stringify() + SHA1 hash as a hex digest
-   * */
-  serializer?: (schema: z.ZodTypeAny) => string;
-  /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
@@ -81,19 +72,23 @@ export class Documentation extends OpenApiBuilder {
   protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   protected lastOperationIdSuffixes = new Map<string, number>();
   protected responseVariants = keys(defaultStatusCodes);
+  protected references = new Map<z.ZodTypeAny, string>();
 
   protected makeRef(
-    name: string,
-    schema: SchemaObject | ReferenceObject,
+    schema: z.ZodTypeAny,
+    subject:
+      | SchemaObject
+      | ReferenceObject
+      | (() => SchemaObject | ReferenceObject),
+    name = this.references.get(schema),
   ): ReferenceObject {
-    this.addSchema(name, schema);
-    return this.getRef(name)!;
-  }
-
-  protected getRef(name: string): ReferenceObject | undefined {
-    return name in (this.rootDoc.components?.schemas || {})
-      ? { $ref: `#/components/schemas/${name}` }
-      : undefined;
+    if (!name) {
+      name = `Schema${this.references.size + 1}`;
+      this.references.set(schema, name);
+      if (typeof subject === "function") subject = subject();
+    }
+    if (typeof subject === "object") this.addSchema(name, subject);
+    return { $ref: `#/components/schemas/${name}` };
   }
 
   protected ensureUniqOperationId(
@@ -147,7 +142,6 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     hasSummaryFromDescription = true,
     composition = "inline",
-    serializer = defaultSerializer,
   }: DocumentationParams) {
     super();
     this.addInfo({ title, version });
@@ -165,9 +159,7 @@ export class Documentation extends OpenApiBuilder {
         method,
         endpoint,
         composition,
-        serializer,
         brandHandling,
-        getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),
       };
       const [shortDesc, description] = (["short", "long"] as const).map(

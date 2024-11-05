@@ -1,7 +1,15 @@
+import { Request } from "express";
+import createHttpError, { HttpError, isHttpError } from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
-import { ResultHandlerError } from "./errors";
+import {
+  FlatObject,
+  getMessageFromError,
+  isProduction,
+} from "./common-helpers";
+import { InputValidationError, ResultHandlerError } from "./errors";
+import { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
 
 export type ResultSchema<R extends Result> =
@@ -27,7 +35,7 @@ export const normalize = <A extends unknown[]>(
     assert(
       subject.length,
       new ResultHandlerError(
-        `At least one ${features.variant} response schema required.`,
+        new Error(`At least one ${features.variant} response schema required.`),
       ),
     );
   }
@@ -41,3 +49,29 @@ export const normalize = <A extends unknown[]>(
     }),
   );
 };
+
+export const logServerError = (
+  error: HttpError,
+  logger: ActualLogger,
+  { url }: Request,
+  payload: FlatObject | null,
+) =>
+  !error.expose && logger.error("Server side error", { error, url, payload });
+
+/**
+ * @example InputValidationError —> BadRequest(400)
+ * @example Error —> InternalServerError(500)
+ * */
+export const ensureHttpError = (error: Error): HttpError => {
+  if (isHttpError(error)) return error;
+  return createHttpError(
+    error instanceof InputValidationError ? 400 : 500,
+    getMessageFromError(error),
+    { cause: error.cause || error },
+  );
+};
+
+export const getPublicErrorMessage = (error: HttpError): string =>
+  isProduction() && !error.expose
+    ? createHttpError(error.statusCode).message // default message for that code
+    : error.message;

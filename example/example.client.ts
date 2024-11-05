@@ -1,9 +1,9 @@
-type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
+type Type1 = {
   title: string;
-  features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+  features: Type1;
 }[];
 
-type GetV1UserRetrieveInput = {} & {
+type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
 };
@@ -16,7 +16,7 @@ type GetV1UserRetrieveResponse =
         name: string;
         features: {
           title: string;
-          features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+          features: Type1;
         }[];
       };
     }
@@ -29,7 +29,6 @@ type GetV1UserRetrieveResponse =
 
 type PatchV1UserIdInput = {
   key: string;
-} & {
   id: string;
   name: string;
   birthday: string;
@@ -84,7 +83,7 @@ type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendResponse = string | string;
+type GetV1AvatarSendResponse = string;
 
 type GetV1AvatarStreamInput = {
   userId: string;

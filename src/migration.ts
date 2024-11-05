@@ -4,17 +4,25 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils";
+import { name as importName } from "../package.json";
 
 const createConfigName = "createConfig";
 const createServerName = "createServer";
 const serverPropName = "server";
 const httpServerPropName = "httpServer";
 const httpsServerPropName = "httpsServer";
+const originalErrorPropName = "originalError";
+const getStatusCodeFromErrorMethod = "getStatusCodeFromError";
 
 const changedProps = {
   [serverPropName]: "http",
   [httpServerPropName]: "servers",
   [httpsServerPropName]: "servers",
+  [originalErrorPropName]: "cause",
+};
+
+const changedMethods = {
+  [getStatusCodeFromErrorMethod]: "ensureHttpError",
 };
 
 const movedProps = [
@@ -57,7 +65,50 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
   },
   defaultOptions: [],
   create: (ctx) => ({
-    CallExpression: (node) => {
+    [NT.ImportDeclaration]: (node) => {
+      if (node.source.value === importName) {
+        for (const spec of node.specifiers) {
+          if (
+            spec.type === "ImportSpecifier" &&
+            spec.imported.type === "Identifier" &&
+            spec.imported.name in changedMethods
+          ) {
+            const replacement =
+              changedMethods[spec.imported.name as keyof typeof changedMethods];
+            ctx.report({
+              node: spec.imported,
+              messageId: "change",
+              data: {
+                subject: "import",
+                from: spec.imported.name,
+                to: replacement,
+              },
+              fix: (fixer) => fixer.replaceText(spec, replacement),
+            });
+          }
+        }
+      }
+    },
+    [NT.MemberExpression]: (node) => {
+      if (
+        node.property.type === NT.Identifier &&
+        node.property.name === originalErrorPropName &&
+        node.object.type === NT.Identifier &&
+        node.object.name.match(/err/i) // this is probably an error instance, but we don't do type checking
+      ) {
+        const replacement = changedProps[node.property.name];
+        ctx.report({
+          node: node.property,
+          messageId: "change",
+          data: {
+            subject: "property",
+            from: node.property.name,
+            to: replacement,
+          },
+        });
+      }
+    },
+    [NT.CallExpression]: (node) => {
       if (node.callee.type !== NT.Identifier) return;
       if (
         node.callee.name === createConfigName &&
@@ -130,6 +181,22 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
             });
           }
         }
+      }
+      if (node.callee.name === getStatusCodeFromErrorMethod) {
+        const replacement = changedMethods[node.callee.name];
+        ctx.report({
+          node: node.callee,
+          messageId: "change",
+          data: {
+            subject: "method",
+            from: node.callee.name,
+            to: `${replacement}().statusCode`,
+          },
+          fix: (fixer) => [
+            fixer.replaceText(node.callee, replacement),
+            fixer.insertTextAfter(node, ".statusCode"),
+          ],
+        });
       }
     },
   }),

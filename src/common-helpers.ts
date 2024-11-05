@@ -1,14 +1,11 @@
 import { Request } from "express";
-import { isHttpError } from "http-errors";
-import { createHash } from "node:crypto";
-import { pickBy, xprod } from "ramda";
+import { memoizeWith, pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
-import { InputValidationError, OutputValidationError } from "./errors";
-import { ActualLogger } from "./logger-helpers";
+import { contentTypes } from "./content-type";
+import { OutputValidationError } from "./errors";
 import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
-import { contentTypes } from "./content-type";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = Record<string, never>;
@@ -57,7 +54,7 @@ export const getInput = (
     .reduce<FlatObject>((agg, obj) => ({ ...agg, ...obj }), {});
 };
 
-export const makeErrorFromAnything = (subject: unknown): Error =>
+export const ensureError = (subject: unknown): Error =>
   subject instanceof Error ? subject : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
@@ -69,41 +66,10 @@ export const getMessageFromError = (error: Error): string => {
       .join("; ");
   }
   if (error instanceof OutputValidationError) {
-    const hasFirstField = error.originalError.issues[0]?.path.length > 0;
+    const hasFirstField = error.cause.issues[0]?.path.length > 0;
     return `output${hasFirstField ? "/" : ": "}${error.message}`;
   }
   return error.message;
-};
-
-export const getStatusCodeFromError = (error: Error): number => {
-  if (isHttpError(error)) {
-    return error.statusCode;
-  }
-  if (error instanceof InputValidationError) {
-    return 400;
-  }
-  return 500;
-};
-
-export const logInternalError = ({
-  logger,
-  request,
-  input,
-  error,
-  statusCode,
-}: {
-  logger: ActualLogger;
-  request: Request;
-  input: FlatObject | null;
-  error: Error;
-  statusCode: number;
-}) => {
-  if (statusCode === 500) {
-    logger.error(`Internal server error\n${error.stack}\n`, {
-      url: request.url,
-      payload: input,
-    });
-  }
 };
 
 export const getExamples = <
@@ -170,9 +136,6 @@ export const makeCleanId = (...args: string[]) =>
     .map(ucFirst)
     .join("");
 
-export const defaultSerializer = (schema: z.ZodTypeAny): string =>
-  createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
-
 export const tryToTransform = <T>(
   schema: z.ZodEffects<z.ZodTypeAny, T>,
   sample: T,
@@ -187,3 +150,8 @@ export const tryToTransform = <T>(
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
 export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
+
+export const isProduction = memoizeWith(
+  () => process.env.TSUP_STATIC as string, // dynamic in tests, but static in build
+  () => process.env.NODE_ENV === "production",
+);

@@ -36,12 +36,13 @@ Start your API server with I/O schema validation and custom middlewares in minut
    3. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    4. [Response customization](#response-customization)
    5. [Error handling](#error-handling)
-   6. [Non-object response](#non-object-response) including file downloads
-   7. [File uploads](#file-uploads)
-   8. [Serving static files](#serving-static-files)
-   9. [Connect to your own express app](#connect-to-your-own-express-app)
-   10. [Testing endpoints](#testing-endpoints)
-   11. [Testing middlewares](#testing-middlewares)
+   6. [Production mode](#production-mode)
+   7. [Non-object response](#non-object-response) including file downloads
+   8. [File uploads](#file-uploads)
+   9. [Serving static files](#serving-static-files)
+   10. [Connect to your own express app](#connect-to-your-own-express-app)
+   11. [Testing endpoints](#testing-endpoints)
+   12. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -83,9 +84,13 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the library by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/t1nky.png" alt="@t1nky" width="50px" />](https://github.com/t1nky)
 [<img src="https://github.com/Tomtec331.png" alt="@Tomtec331" width="50px" />](https://github.com/Tomtec331)
+[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
 [<img src="https://github.com/boarush.png" alt="@boarush" width="50px" />](https://github.com/boarush)
+[<img src="https://github.com/shawncarr.png" alt="@shawncarr" width="50px" />](https://github.com/shawncarr)
+[<img src="https://github.com/ben-xD.png" alt="@ben-xD" width="50px" />](https://github.com/ben-xD)
 [<img src="https://github.com/daniel-white.png" alt="@daniel-white" width="50px" />](https://github.com/daniel-white)
 [<img src="https://github.com/kotsmile.png" alt="@kotsmile" width="50px" />](https://github.com/kotsmile)
 [<img src="https://github.com/arlyon.png" alt="@arlyon" width="50px" />](https://github.com/arlyon)
@@ -93,10 +98,10 @@ These people contributed to the improvement of the library by reporting bugs, ma
 [<img src="https://github.com/danclaytondev.png" alt="@danclaytondev" width="50px" />](https://github.com/danclaytondev)
 [<img src="https://github.com/huyhoang160593.png" alt="@huyhoang160593" width="50px" />](https://github.com/huyhoang160593)
 [<img src="https://github.com/sarahssharkey.png" alt="@sarahssharkey" width="50px" />](https://github.com/sarahssharkey)
-[<img src="https://github.com/shawncarr.png" alt="@shawncarr" width="50px" />](https://github.com/shawncarr)
+[<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
+[<img src="https://github.com/master-chu.png" alt="@master-chu" width="50px" />](https://github.com/master-chu)
 [<img src="https://github.com/alindsay55661.png" alt="@alindsay55661" width="50px" />](https://github.com/alindsay55661)
 [<img src="https://github.com/john-schmitz.png" alt="@john-schmitz" width="50px" />](https://github.com/john-schmitz)
-[<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
 [<img src="https://github.com/miki725.png" alt="@miki725" width="50px" />](https://github.com/miki725)
 [<img src="https://github.com/dev-m1-macbook.png" alt="@dev-m1-macbook" width="50px" />](https://github.com/dev-m1-macbook)
 [<img src="https://github.com/McMerph.png" alt="@McMerph" width="50px" />](https://github.com/McMerph)
@@ -107,7 +112,14 @@ These people contributed to the improvement of the library by reporting bugs, ma
 [<img src="https://github.com/lazylace37.png" alt="@lazylace37" width="50px" />](https://github.com/lazylace37)
 [<img src="https://github.com/leosuncin.png" alt="@leosuncin" width="50px" />](https://github.com/leosuncin)
 [<img src="https://github.com/kirdk.png" alt="@kirdk" width="50px" />](https://github.com/kirdk)
+[<img src="https://github.com/johngeorgewright.png" alt="@johngeorgewright" width="50px" />](https://github.com/johngeorgewright)
+[<img src="https://github.com/ssteuteville.png" alt="@ssteuteville" width="50px" />](https://github.com/ssteuteville)
 [<img src="https://github.com/rayzr522.png" alt="@rayzr522" width="50px" />](https://github.com/rayzr522)
+[<img src="https://github.com/HardCoreQual.png" alt="@HardCoreQual" width="50px" />](https://github.com/HardCoreQual)
+[<img src="https://github.com/hellovai.png" alt="@hellovai" width="50px" />](https://github.com/hellovai)
+[<img src="https://github.com/Isaac-Leonard.png" alt="@Isaac-Leonard" width="50px" />](https://github.com/Isaac-Leonard)
+[<img src="https://github.com/digimuza.png" alt="@digimuza" width="50px" />](https://github.com/digimuza)
+[<img src="https://github.com/glitch452.png" alt="@glitch452" width="50px" />](https://github.com/glitch452)
 
 # How it works
 
@@ -173,7 +185,6 @@ const config = createConfig({
     listen: 8090, // port, UNIX socket or options
   },
   cors: true,
-  logger: { level: "debug", color: true },
 });
 ```
 
@@ -592,8 +603,20 @@ your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Customizing logger
 
-If the simple console output of the built-in logger is not enough for you, you can connect any other compatible one.
-It must support at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
+A simple built-in console logger is used by default with the following options that you can configure:
+
+```typescript
+import { createConfig } from "express-zod-api";
+const config = createConfig({
+  logger: {
+    level: "debug", // or "warn" in production mode
+    color: undefined, // detects automatically, boolean
+    depth: 2, // controls how deeply entities should be inspected
+  },
+});
+```
+
+You can also replace it with a one having at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
 Winston and Pino support is well known. Here is an example configuring `pino` logger with `pino-pretty` extension:
 
 ```typescript
@@ -631,7 +654,6 @@ declare module "express-zod-api" {
 }
 
 const config = createConfig({
-  logger: { level: "debug", color: true },
   childLoggerProvider: ({ parent, request }) =>
     parent.child({ requestId: randomUUID() }),
 });
@@ -646,11 +668,10 @@ invoke the returned callback. The default severity of those measurements is `deb
 ```typescript
 import { createConfig, BuiltinLogger } from "express-zod-api";
 
-// This enables the .profile() method on "logger":
+// This enables the .profile() method on built-in logger:
 declare module "express-zod-api" {
   interface LoggerOverrides extends BuiltinLogger {}
 }
-const config = createConfig({ logger: { level: "debug", color: true } });
 
 // Inside a handler of Endpoint, Middleware or ResultHandler:
 const done = logger.profile("expensive operation");
@@ -782,18 +803,8 @@ The `defaultResultHandler` sets the HTTP status code and ensures the following t
 
 ```typescript
 type DefaultResponse<OUT> =
-  | {
-      // Positive response
-      status: "success";
-      data: OUT;
-    }
-  | {
-      // or Negative response
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | { status: "success"; data: OUT } // Positive response
+  | { status: "error"; error: { message: string } }; // or Negative response
 ```
 
 You can create your own result handler by using this example as a template:
@@ -802,7 +813,7 @@ You can create your own result handler by using this example as a template:
 import { z } from "zod";
 import {
   ResultHandler,
-  getStatusCodeFromError,
+  ensureHttpError,
   getMessageFromError,
 } from "express-zod-api";
 
@@ -813,13 +824,12 @@ const yourResultHandler = new ResultHandler({
   }),
   negative: z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
-    if (!error) {
-      // your implementation
-      return;
+    if (error) {
+      const { statusCode } = ensureHttpError(error);
+      const message = getMessageFromError(error);
+      return void response.status(statusCode).json({ error: message });
     }
-    const statusCode = getStatusCodeFromError(error);
-    const message = getMessageFromError(error);
-    // your implementation
+    response.status(200).json({ data: output });
   },
 });
 ```
@@ -841,9 +851,9 @@ the `defaultResultHandler`, however, since much can be customized, you should be
 origins of errors that could happen in runtime and be handled the following way:
 
 - Ones related to `Endpoint` execution — handled by a `ResultHandler` assigned to the `EndpointsFactory` produced it:
-  - Proprietary classes (available to you for your custom handling):
-    - `InputValidationError` — when request payload does not match the `input` schema of the endpoint.
-      The default response status code is `400`;
+  - The following proprietary classes are available to you for customizing error handling in your `ResultHandler`:
+    - `InputValidationError` — when request payload does not match the `input` schema of the endpoint or middleware.
+      The default response status code is `400`, `cause` property contains the original `ZodError`;
     - `OutputValidationError` — when returns of the endpoint's `handler` does not match its `output` schema (`500`);
   - Errors thrown within endpoint's `handler`:
     - `HttpError`, made by `createHttpError()` method of `http-errors` (required peer dependency). The default response
@@ -854,7 +864,27 @@ origins of errors that could happen in runtime and be handled the following way:
     `400` for parsing, `404` for routing, `config.upload.limitError.statusCode` for upload issues, or `500` for others.
   - `ResultHandler` must handle possible `error` and avoid throwing its own errors, otherwise:
 - Ones related to `ResultHandler` execution — handled by `LastResortHandler`:
-  - Response status code is always `500` and the response itself is a plain text containing original `error.message`.
+  - Response status code is always `500` and the response itself is a plain text.
+
+## Production mode
+
+Consider enabling production mode by setting `NODE_ENV` environment variable to `production` for your deployment:
+
+- Express activates some [performance optimizations](https://expressjs.com/en/advanced/best-practice-performance.html);
+- The `defaultResultHandler`, `defaultEndpointsFactory` and `LastResortHandler` generalize server-side error messages
+  in negative responses in order to improve the security of your API by not disclosing the exact causes of errors:
+  - Throwing errors that have or imply `5XX` status codes become just `Internal Server Error` message in response;
+  - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option:
+
+```ts
+import createHttpError from "http-errors";
+// NODE_ENV=production
+// Throwing HttpError from Endpoint or Middleware that is using defaultResultHandler or defaultEndpointsFactory:
+createHttpError(401, "Token expired"); // —> "Token expired"
+createHttpError(401, "Token expired", { expose: false }); // —> "Unauthorized"
+createHttpError(500, "Something is broken"); // —> "Internal Server Error"
+createHttpError(501, "We didn't make it yet", { expose: true }); // —> "We didn't make it yet"
+```
 
 ## Non-object response
 
@@ -1330,7 +1360,7 @@ const ruleForDocs: Depicter = (
 
 const ruleForClient: Producer = (
   schema: typeof myBrandedSchema, // you should assign type yourself
-  { next, isResponse, serializer }, // handle a nested schema using next()
+  { next, isResponse }, // handle a nested schema using next()
 ) => ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
 
 new Documentation({

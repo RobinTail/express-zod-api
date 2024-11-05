@@ -72,11 +72,13 @@ import { UploadSchema, ezUploadBrand } from "./upload-schema";
 
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
-  serializer: (schema: z.ZodTypeAny) => string;
-  getRef: (name: string) => ReferenceObject | undefined;
   makeRef: (
-    name: string,
-    schema: SchemaObject | ReferenceObject,
+    schema: z.ZodTypeAny,
+    subject:
+      | SchemaObject
+      | ReferenceObject
+      | (() => SchemaObject | ReferenceObject),
+    name?: string,
   ) => ReferenceObject;
   path: string;
   method: Method;
@@ -88,10 +90,7 @@ export type Depicter = SchemaHandler<
 >;
 
 interface ReqResHandlingProps<S extends z.ZodTypeAny>
-  extends Pick<
-    OpenAPIContext,
-    "serializer" | "getRef" | "makeRef" | "path" | "method"
-  > {
+  extends Pick<OpenAPIContext, "makeRef" | "path" | "method"> {
   schema: S;
   composition: "inline" | "components";
   description?: string;
@@ -583,18 +582,9 @@ export const depictBranded: Depicter = (
 ) => next(schema.unwrap());
 
 export const depictLazy: Depicter = (
-  { schema }: z.ZodLazy<z.ZodTypeAny>,
-  { next, serializer: serialize, getRef, makeRef },
-): ReferenceObject => {
-  const hash = serialize(schema);
-  return (
-    getRef(hash) ||
-    (() => {
-      makeRef(hash, {}); // make empty ref first
-      return makeRef(hash, next(schema)); // update
-    })()
-  );
-};
+  lazy: z.ZodLazy<z.ZodTypeAny>,
+  { next, makeRef },
+): ReferenceObject => makeRef(lazy, () => next(lazy.schema));
 
 export const depictRaw: Depicter = (schema: RawSchema, { next }) =>
   next(schema.unwrap().shape.raw);
@@ -662,8 +652,6 @@ export const depictRequestParams = ({
   method,
   schema,
   inputSources,
-  serializer,
-  getRef,
   makeRef,
   composition,
   brandHandling,
@@ -702,18 +690,11 @@ export const depictRequestParams = ({
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: {
-        isResponse: false,
-        serializer,
-        getRef,
-        makeRef,
-        path,
-        method,
-      },
+      ctx: { isResponse: false, makeRef, path, method },
     });
     const result =
       composition === "components"
-        ? makeRef(makeCleanId(description, name), depicted)
+        ? makeRef(shape[name], depicted, makeCleanId(description, name))
         : depicted;
     return {
       name,
@@ -769,9 +750,7 @@ export const onEach: SchemaHandler<
   OpenAPIContext,
   "each"
 > = (schema: z.ZodTypeAny, { isResponse, prev }) => {
-  if (isReferenceObject(prev)) {
-    return {};
-  }
+  if (isReferenceObject(prev)) return {};
   const { description } = schema;
   const shouldAvoidParsing = schema instanceof z.ZodLazy;
   const hasTypePropertyInDepiction = prev.type !== undefined;
@@ -781,22 +760,16 @@ export const onEach: SchemaHandler<
     hasTypePropertyInDepiction &&
     !isResponseHavingCoercion &&
     schema.isNullable();
-  const examples = shouldAvoidParsing
-    ? []
-    : getExamples({
-        schema,
-        variant: isResponse ? "parsed" : "original",
-        validate: true,
-      });
   const result: SchemaObject = {};
-  if (description) {
-    result.description = description;
-  }
-  if (isActuallyNullable) {
-    result.type = makeNullableType(prev);
-  }
-  if (examples.length) {
-    result.examples = examples.slice();
+  if (description) result.description = description;
+  if (isActuallyNullable) result.type = makeNullableType(prev);
+  if (!shouldAvoidParsing) {
+    const examples = getExamples({
+      schema,
+      variant: isResponse ? "parsed" : "original",
+      validate: true,
+    });
+    if (examples.length) result.examples = examples.slice();
   }
   return result;
 };
@@ -854,8 +827,6 @@ export const depictResponse = ({
   schema,
   mimeTypes,
   variant,
-  serializer,
-  getRef,
   makeRef,
   composition,
   hasMultipleStatusCodes,
@@ -875,20 +846,13 @@ export const depictResponse = ({
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: {
-        isResponse: true,
-        serializer,
-        getRef,
-        makeRef,
-        path,
-        method,
-      },
+      ctx: { isResponse: true, makeRef, path, method },
     }),
   );
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(makeCleanId(description), depictedSchema)
+        ? makeRef(schema, depictedSchema, makeCleanId(description))
         : depictedSchema,
     examples: depictExamples(schema, true),
   };
@@ -1003,8 +967,6 @@ export const depictBody = ({
   path,
   schema,
   mimeTypes,
-  serializer,
-  getRef,
   makeRef,
   composition,
   brandHandling,
@@ -1020,14 +982,7 @@ export const depictBody = ({
         rules: { ...brandHandling, ...depicters },
         onEach,
         onMissing,
-        ctx: {
-          isResponse: false,
-          serializer,
-          getRef,
-          makeRef,
-          path,
-          method,
-        },
+        ctx: { isResponse: false, makeRef, path, method },
       }),
       paramNames,
     ),
@@ -1035,7 +990,7 @@ export const depictBody = ({
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(makeCleanId(description), bodyDepiction)
+        ? makeRef(schema, bodyDepiction, makeCleanId(description))
         : bodyDepiction,
     examples: depictExamples(schema, false, paramNames),
   };

@@ -1,6 +1,7 @@
 import { fileUploadMock } from "../express-mock";
 import { metaSymbol } from "../../src/metadata";
 import {
+  createLoggingMiddleware,
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadFailureHandler,
@@ -11,7 +12,7 @@ import {
   installDeprecationListener,
   installTerminationListener,
 } from "../../src/server-helpers";
-import { defaultResultHandler, ResultHandler } from "../../src";
+import { CommonConfig, defaultResultHandler, ResultHandler } from "../../src";
 import { Request } from "express";
 import {
   makeLoggerMock,
@@ -233,6 +234,31 @@ describe("Server helpers", () => {
       expect(requestMock.body).toEqual({ raw: buffer });
       expect(nextMock).toHaveBeenCalled();
     });
+  });
+
+  describe("createLoggingMiddleware", () => {
+    const rootLogger = makeLoggerMock();
+    const child = makeLoggerMock({ isChild: true });
+    test.each([undefined, () => child, async () => child])(
+      "should make RequestHandler writing logger to res.locals %#",
+      async (childLoggerProvider) => {
+        const config = { childLoggerProvider } as CommonConfig;
+        const handler = createLoggingMiddleware({ rootLogger, config });
+        expect(typeof handler).toBe("function");
+        const nextMock = vi.fn();
+        const response = makeResponseMock();
+        const request = makeRequestMock({ path: "/test" });
+        request.res = response;
+        await handler(request, response, nextMock);
+        expect(nextMock).toHaveBeenCalled();
+        expect(
+          (childLoggerProvider ? child : rootLogger)._getLogs().debug.pop(),
+        ).toEqual(["GET: /test"]);
+        expect(request.res).toHaveProperty("locals", {
+          [metaSymbol]: { logger: childLoggerProvider ? child : rootLogger },
+        });
+      },
+    );
   });
 
   describe("makeChildLoggerExtractor()", () => {

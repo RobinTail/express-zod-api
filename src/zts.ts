@@ -3,16 +3,17 @@ import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
-import { FileSchema, ezFileBrand } from "./file-schema";
+import { ezFileBrand, FileSchema } from "./file-schema";
 import { ProprietaryBrand } from "./proprietary-schemas";
-import { RawSchema, ezRawBrand } from "./raw-schema";
+import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
+  addJsDocComment,
+  isPrimitive,
   LiteralType,
+  makePropertyIdentifier,
   Producer,
   ZTSContext,
-  addJsDocComment,
-  makePropertyIdentifier,
 } from "./zts-helpers";
 
 const { factory: f } = ts;
@@ -84,7 +85,14 @@ const onSomeUnion: Producer = (
     | z.ZodUnion<z.ZodUnionOptions>
     | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>,
   { next },
-) => f.createUnionTypeNode(options.map(next));
+) => {
+  const nodes = new Map<ts.TypeNode | ts.KeywordTypeSyntaxKind, ts.TypeNode>();
+  for (const option of options) {
+    const node = next(option);
+    nodes.set(isPrimitive(node) ? node.kind : node, node);
+  }
+  return f.createUnionTypeNode(Array.from(nodes.values()));
+};
 
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
@@ -163,9 +171,15 @@ const onRecord: Producer = (
   );
 
 const onIntersection: Producer = (
-  { _def }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
+  { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
   { next },
-) => f.createIntersectionTypeNode([_def.left, _def.right].map(next));
+) => {
+  const nodes = [left, right].map(next);
+  const areObjects = nodes.every(ts.isTypeLiteralNode);
+  return areObjects
+    ? f.createTypeLiteralNode(nodes.flatMap(({ members }) => members))
+    : f.createIntersectionTypeNode(nodes);
+};
 
 const onDefault: Producer = ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
   next(_def.innerType);
@@ -193,19 +207,8 @@ const onPipeline: Producer = (
 
 const onNull: Producer = () => f.createLiteralTypeNode(f.createNull());
 
-const onLazy: Producer = (
-  { schema }: z.ZodLazy<z.ZodTypeAny>,
-  { getAlias, makeAlias, next, serializer: serialize },
-) => {
-  const name = `Type${serialize(schema)}`;
-  return (
-    getAlias(name) ||
-    (() => {
-      makeAlias(name, f.createLiteralTypeNode(f.createNull())); // make empty type first
-      return makeAlias(name, next(schema)); // update
-    })()
-  );
-};
+const onLazy: Producer = (lazy: z.ZodLazy<z.ZodTypeAny>, { makeAlias, next }) =>
+  makeAlias(lazy, () => next(lazy.schema));
 
 const onFile: Producer = (schema: FileSchema) => {
   const subject = schema.unwrap();

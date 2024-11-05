@@ -31,7 +31,10 @@ const makeCommonEntities = (config: CommonConfig) => {
   const rootLogger = isLoggerInstance(config.logger)
     ? config.logger
     : new BuiltinLogger(config.logger);
-  rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
+  rootLogger.debug("Running", {
+    build: process.env.TSUP_BUILD || "from sources",
+    env: process.env.NODE_ENV || "development",
+  });
   installDeprecationListener(rootLogger);
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
   const getChildLogger = makeChildLoggerExtractor(rootLogger);
@@ -52,6 +55,7 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
     makeCommonEntities(config);
   initRouting({
     app: config.app.use(loggingMiddleware),
+    rootLogger,
     routing,
     getChildLogger,
     config,
@@ -93,7 +97,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       getChildLogger,
     });
   }
-  initRouting({ app, routing, getChildLogger, config, parsers });
+  initRouting({ app, routing, rootLogger, getChildLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
   const makeStarter =
