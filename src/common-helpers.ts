@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { pickBy, xprod } from "ramda";
+import { memoizeWith, pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -150,3 +150,8 @@ export const tryToTransform = <T>(
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
 export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
+
+export const isProduction = memoizeWith(
+  () => process.env.TSUP_STATIC as string, // dynamic in tests, but static in build
+  () => process.env.NODE_ENV === "production",
+);
