@@ -51,7 +51,6 @@ export interface CommonConfig<TAG extends string = string> {
   /**
    * @desc Built-in logger configuration or an instance of any compatible logger.
    * @example { level: "debug", color: true }
-   * @default {}
    * */
   logger?: BuiltinLoggerConfig | AbstractLogger;
   /**
