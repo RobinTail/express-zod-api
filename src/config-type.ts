@@ -51,6 +51,7 @@ export interface CommonConfig<TAG extends string = string> {
   /**
    * @desc Built-in logger configuration or an instance of any compatible logger.
    * @example { level: "debug", color: true }
+   * @default { level: NODE_ENV === "production" ? "warn" : "debug", color: isSupported(), depth: 2 }
    * */
   logger?: Partial<BuiltinLoggerConfig> | AbstractLogger;
   /**

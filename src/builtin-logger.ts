@@ -17,17 +17,12 @@ export interface BuiltinLoggerConfig {
   /**
    * @desc The minimal severity to log or "silent" to disable logging
    * @example "debug" also enables pretty output for inspected entities
-   * @default "debug", or "warn" when NODE_ENV=production
    * */
   level: "silent" | "warn" | "info" | "debug";
-  /**
-   * @desc Enables colors on printed severity and inspected entities
-   * @default Ansis::isSupported()
-   * */
+  /** @desc Enables colors on printed severity and inspected entities */
   color: boolean;
   /**
    * @desc Control how deeply entities should be inspected
-   * @default 2
    * @example null
    * @example Infinity
    * */
