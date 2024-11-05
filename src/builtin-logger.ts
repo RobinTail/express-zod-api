@@ -79,23 +79,15 @@ export class BuiltinLogger implements AbstractLogger {
       ctx: { requestId, ...ctx },
       color: hasColor,
     } = this.config;
-    if (level === "silent" || isHidden(method, level)) {
-      return;
-    }
+    if (level === "silent" || isHidden(method, level)) return;
     const output: string[] = [new Date().toISOString()];
-    if (requestId) {
-      output.push(hasColor ? cyanBright(requestId) : requestId);
-    }
+    if (requestId) output.push(hasColor ? cyanBright(requestId) : requestId);
     output.push(
       hasColor ? `${this.styles[method](method)}:` : `${method}:`,
       message,
     );
-    if (meta !== undefined) {
-      output.push(this.prettyPrint(meta));
-    }
-    if (Object.keys(ctx).length > 0) {
-      output.push(this.prettyPrint(ctx));
-    }
+    if (meta !== undefined) output.push(this.prettyPrint(meta));
+    if (Object.keys(ctx).length > 0) output.push(this.prettyPrint(ctx));
     console.log(output.join(" "));
   }
 
