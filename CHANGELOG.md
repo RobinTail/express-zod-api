@@ -6,7 +6,10 @@
 
 - Configuring built-in logger made optional:
   - Built-in logger configuration option `level` made optional as well as the `logger` option for `createConfig()`;
-  - Using `debug` level by default, or `warn` when `NODE_ENV=production`;
+  - Using `debug` level by default, or `warn` when `NODE_ENV=production`.
+- Fixed performance issue on `BuiltinLogger` when its `color` option is not set in config:
+  - `.child()` method is 50x times faster now by only detecting the color support once;
+  - Color autodetection was introduced in v18.3.0.
 
 ### v20.18.0
 
