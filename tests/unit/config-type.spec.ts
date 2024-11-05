@@ -29,7 +29,6 @@ describe("ConfigType", () => {
       const argument = {
         app: vi.fn() as unknown as IRouter,
         cors: true,
-        logger: { level: "silent" as const },
       };
       const config = createConfig(argument);
       expect(config).toEqual(argument);
