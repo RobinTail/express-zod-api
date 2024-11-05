@@ -49,8 +49,8 @@ interface ProfilerOptions {
 
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
-  protected hasColor: boolean;
-  protected level: NonNullable<BuiltinLoggerConfig["level"]>;
+  protected readonly hasColor: boolean;
+  protected readonly level: NonNullable<BuiltinLoggerConfig["level"]>;
   protected readonly styles: Record<Severity, Ansis> = {
     debug: blue,
     info: green,

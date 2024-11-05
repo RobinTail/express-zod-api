@@ -16,13 +16,15 @@ describe("BuiltinLogger", () => {
     vi.useRealTimers();
   });
 
-  const makeLogger = (props: BuiltinLoggerConfig) => {
-    const logger = new BuiltinLogger({ ...props });
+  const makeLogger = (props?: BuiltinLoggerConfig) => {
+    const logger = new BuiltinLogger(props);
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     return { logger, logSpy };
   };
 
   describe("constructor()", () => {
+    afterEach(() => vi.unstubAllEnvs());
+
     test("Should create silent logger", () => {
       const { logger, logSpy } = makeLogger({ level: "silent" });
       logger.error("test");
@@ -42,6 +44,16 @@ describe("BuiltinLogger", () => {
       logger.warn("testing warn message");
       expect(logSpy).toHaveBeenCalledTimes(1);
     });
+
+    test.each(["development", "production"])(
+      "Level can be omitted and depends on env",
+      (mode) => {
+        vi.stubEnv("TSUP_STATIC", mode);
+        vi.stubEnv("NODE_ENV", mode);
+        const { logger } = makeLogger();
+        expect(logger["level"]).toBe(mode === "production" ? "warn" : "debug");
+      },
+    );
 
     test.each(["debug", "info", "warn", "error"] as const)(
       "Should create debug logger %#",
