@@ -1,0 +1,20 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Middleware > .execute() > should validate the supplied input or throw an BadRequestError 1`] = `
+BadRequestError({
+  "cause": ZodError({
+    "message": "[
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "number",
+    "path": [
+      "test"
+    ],
+    "message": "Expected string, received number"
+  }
+]",
+  }),
+  "message": "test: Expected string, received number",
+})
+`;

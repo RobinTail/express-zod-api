@@ -35,7 +35,7 @@ describe("Middleware", () => {
   });
 
   describe(".execute()", () => {
-    test("should validate the supplied input or throw an InputValidationError", async () => {
+    test("should validate the supplied input or throw an BadRequestError", async () => {
       const mw = new Middleware({
         input: z.object({ test: z.string() }),
         handler: vi.fn<any>(),
@@ -48,7 +48,7 @@ describe("Middleware", () => {
           request: makeRequestMock(),
           response: makeResponseMock(),
         }),
-      ).rejects.toThrow(InputValidationError);
+      ).rejects.toThrowErrorMatchingSnapshot();
     });
 
     test("should call the handler and return its output", async () => {

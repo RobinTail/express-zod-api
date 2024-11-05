@@ -1,9 +1,15 @@
 import { NextFunction, Request, Response } from "express";
+import createHttpError from "http-errors";
 import { z } from "zod";
-import { EmptyObject, FlatObject } from "./common-helpers";
-import { InputValidationError } from "./errors";
+import {
+  EmptyObject,
+  ensureError,
+  FlatObject,
+  getMessageFromError,
+} from "./common-helpers";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
+import { ensureHttpError } from "./result-helpers";
 import { Security } from "./security";
 import { ActualLogger } from "./logger-helpers";
 
@@ -64,7 +70,10 @@ export class Middleware<
     return this.#schema;
   }
 
-  /** @throws InputValidationError */
+  /**
+   * @throws HttpError
+   * @todo configurable code?
+   * */
   public override async execute({
     input,
     ...rest
@@ -78,8 +87,10 @@ export class Middleware<
     try {
       const validInput = (await this.#schema.parseAsync(input)) as z.output<IN>;
       return this.#handler({ ...rest, input: validInput });
-    } catch (e) {
-      throw e instanceof z.ZodError ? new InputValidationError(e) : e;
+    } catch (cause) {
+      throw cause instanceof z.ZodError
+        ? createHttpError(400, getMessageFromError(cause), { cause })
+        : ensureHttpError(ensureError(cause));
     }
   }
 }

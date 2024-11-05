@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import createHttpError from "http-errors";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { hasRaw, hasUpload } from "./deep-checks";
@@ -7,13 +8,10 @@ import {
   getActualMethod,
   getInput,
   ensureError,
+  getMessageFromError,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import {
-  InputValidationError,
-  OutputValidationError,
-  ResultHandlerError,
-} from "./errors";
+import { OutputValidationError, ResultHandlerError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
@@ -246,6 +244,10 @@ export class Endpoint<
     }
   }
 
+  /**
+   * @throws HttpError
+   * @todo configurable code
+   * */
   async #parseAndRunHandler({
     input,
     options,
@@ -260,8 +262,10 @@ export class Endpoint<
       finalInput = (await this.#schemas.input.parseAsync(
         input,
       )) as z.output<IN>;
-    } catch (e) {
-      throw e instanceof z.ZodError ? new InputValidationError(e) : e;
+    } catch (cause) {
+      throw cause instanceof z.ZodError
+        ? createHttpError(400, getMessageFromError(cause), { cause })
+        : ensureHttpError(ensureError(cause));
     }
     return this.#handler({
       input: finalInput,

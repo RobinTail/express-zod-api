@@ -45,7 +45,10 @@ export class OutputValidationError extends IOSchemaError {
   }
 }
 
-/** @desc An error of validating the input sources against the Middleware or Endpoint input schema */
+/**
+ * @desc An error of validating the input sources against the Middleware or Endpoint input schema
+ * @todo remove
+ * */
 export class InputValidationError extends IOSchemaError {
   public override name = "InputValidationError";
 
