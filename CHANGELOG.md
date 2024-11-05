@@ -8,12 +8,6 @@
   - Built-in logger configuration option `level` made optional;
   - Using `debug` level by default, or `warn` when `NODE_ENV=production`;
 
-```diff
-  createConfig({
--   logger: { level: "debug" }
-  });
-```
-
 ### v20.18.0
 
 - Introducing `ensureHttpError()` method that converts any `Error` into `HttpError`:
