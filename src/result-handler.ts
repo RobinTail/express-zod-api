@@ -24,7 +24,6 @@ type Handler<RES = unknown> = (params: {
   output: FlatObject | null;
   /** can be empty: check presence of the required property using "in" operator */
   options: FlatObject;
-  /** @todo consider moving to HttpError in v21 */
   error: Error | null;
   request: Request;
   response: Response<RES>;
