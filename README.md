@@ -619,9 +619,9 @@ By default, library uses a simple built-in console logger, that you can configur
 import { createConfig } from "express-zod-api";
 const config = createConfig({
   logger: {
-    level: "debug", // or "warn" in production mode,
-    color: true,
-    depth: 2,
+    level: "debug", // or "warn" in production mode
+    color: undefined, // detects automatically, boolean
+    depth: 2, // controls how deeply entities should be inspected
   },
 });
 ```
