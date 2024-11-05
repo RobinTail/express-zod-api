@@ -9,10 +9,13 @@ InternalServerError({
 })
 `;
 
-exports[`Result helpers > ensureHttpError() > should handle InputValidationError: Expected string, received number 1`] = `
-BadRequestError({
-  "cause": ZodError({
-    "message": "[
+exports[`Result helpers > ensureHttpError() > should handle NotFoundError: Not really found 1`] = `
+NotFoundError({
+  "message": "Not really found",
+})
+`;
+
+exports[`Result helpers > ensureHttpError() > should handle ZodError: [
   {
     "code": "invalid_type",
     "expected": "string",
@@ -20,19 +23,7 @@ BadRequestError({
     "path": [],
     "message": "Expected string, received number"
   }
-]",
-  }),
-  "message": "Expected string, received number",
-})
-`;
-
-exports[`Result helpers > ensureHttpError() > should handle NotFoundError: Not really found 1`] = `
-NotFoundError({
-  "message": "Not really found",
-})
-`;
-
-exports[`Result helpers > ensureHttpError() > should handle OutputValidationError: Expected string, received number 1`] = `
+] { issues: [ { code: 'invalid_type', expected: 'string', received: 'number', path: [], message: 'Expected string, received number' } ], addIssue: [Function], addIssues: [Function] } 1`] = `
 InternalServerError({
   "cause": ZodError({
     "message": "[
@@ -45,6 +36,6 @@ InternalServerError({
   }
 ]",
   }),
-  "message": "output: Expected string, received number",
+  "message": "Expected string, received number",
 })
 `;

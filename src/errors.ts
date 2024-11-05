@@ -36,7 +36,10 @@ export class IOSchemaError extends Error {
   public override name = "IOSchemaError";
 }
 
-/** @desc An error of validating the Endpoint handler's returns against the Endpoint output schema */
+/**
+ * @desc An error of validating the Endpoint handler's returns against the Endpoint output schema
+ * @todo remove
+ * */
 export class OutputValidationError extends IOSchemaError {
   public override name = "OutputValidationError";
 

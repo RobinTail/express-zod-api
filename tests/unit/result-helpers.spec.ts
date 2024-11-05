@@ -1,6 +1,5 @@
 import createHttpError from "http-errors";
 import { z } from "zod";
-import { InputValidationError, OutputValidationError } from "../../src";
 import {
   ensureHttpError,
   getPublicErrorMessage,
@@ -28,8 +27,7 @@ describe("Result helpers", () => {
     test.each([
       new Error("basic"),
       createHttpError(404, "Not really found"),
-      new InputValidationError(z.string().safeParse(123).error!),
-      new OutputValidationError(z.string().safeParse(123).error!),
+      z.string().safeParse(123).error!,
     ])("should handle %s", (error) => {
       expect(ensureHttpError(error)).toMatchSnapshot();
     });

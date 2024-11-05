@@ -11,7 +11,7 @@ import {
   getMessageFromError,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { OutputValidationError, ResultHandlerError } from "./errors";
+import { ResultHandlerError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
@@ -203,11 +203,21 @@ export class Endpoint<
     };
   }
 
+  /**
+   * @throws HttpError
+   * @todo configurable code
+   * */
   async #parseOutput(output: z.input<OUT>) {
     try {
       return (await this.#schemas.output.parseAsync(output)) as FlatObject;
-    } catch (e) {
-      throw e instanceof z.ZodError ? new OutputValidationError(e) : e;
+    } catch (cause) {
+      throw cause instanceof z.ZodError
+        ? createHttpError(
+            500,
+            `output${cause.issues[0]?.path.length ? "/" : ": "}${getMessageFromError(cause)}`,
+            { cause },
+          )
+        : ensureHttpError(ensureError(cause));
     }
   }
 

@@ -3,7 +3,6 @@ import { pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
-import { OutputValidationError } from "./errors";
 import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 
@@ -64,10 +63,6 @@ export const getMessageFromError = (error: Error): string => {
         (path.length ? [path.join("/")] : []).concat(message).join(": "),
       )
       .join("; ");
-  }
-  if (error instanceof OutputValidationError) {
-    const hasFirstField = error.cause.issues[0]?.path.length > 0;
-    return `output${hasFirstField ? "/" : ": "}${error.message}`;
   }
   return error.message;
 };
