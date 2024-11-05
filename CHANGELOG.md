@@ -5,7 +5,7 @@
 ### v20.19.0
 
 - Configuring built-in logger made optional:
-  - Built-in logger configuration option `level` made optional;
+  - Built-in logger configuration option `level` made optional as well as the `logger` option for `createConfig()`;
   - Using `debug` level by default, or `warn` when `NODE_ENV=production`;
 
 ### v20.18.0
