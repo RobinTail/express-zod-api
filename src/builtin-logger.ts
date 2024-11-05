@@ -17,7 +17,7 @@ export interface BuiltinLoggerConfig {
   /**
    * @desc The minimal severity to log or "silent" to disable logging
    * @example "debug" also enables pretty output for inspected entities
-   * @default "warn" when NODE_ENV=production and "debug" otherwise
+   * @default "debug", or "warn" when NODE_ENV=production
    * */
   level?: "silent" | "warn" | "info" | "debug";
   /**
