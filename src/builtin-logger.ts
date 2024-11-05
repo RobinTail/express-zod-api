@@ -19,24 +19,24 @@ export interface BuiltinLoggerConfig {
    * @example "debug" also enables pretty output for inspected entities
    * @default "debug", or "warn" when NODE_ENV=production
    * */
-  level?: "silent" | "warn" | "info" | "debug";
+  level: "silent" | "warn" | "info" | "debug";
   /**
    * @desc Enables colors on printed severity and inspected entities
    * @default Ansis::isSupported()
    * */
-  color?: boolean;
+  color: boolean;
   /**
    * @desc Control how deeply entities should be inspected
    * @default 2
    * @example null
    * @example Infinity
    * */
-  depth?: number | null;
+  depth: number | null;
   /**
    * @desc Context: the metadata applicable for each logged entry, used by .child() method
    * @see childLoggerProvider
    * */
-  ctx?: Context;
+  ctx: Context;
 }
 
 interface ProfilerOptions {
@@ -49,7 +49,7 @@ interface ProfilerOptions {
 
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
-  protected readonly config: Required<BuiltinLoggerConfig>;
+  protected readonly config: BuiltinLoggerConfig;
   protected readonly styles: Record<Severity, Ansis> = {
     debug: blue,
     info: green,
@@ -58,7 +58,7 @@ export class BuiltinLogger implements AbstractLogger {
   };
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
-  public constructor(config: BuiltinLoggerConfig = {}) {
+  public constructor(config: Partial<BuiltinLoggerConfig> = {}) {
     const {
       color = new Ansis().isSupported(),
       level = isProduction() ? "warn" : "debug",

@@ -16,7 +16,7 @@ describe("BuiltinLogger", () => {
     vi.useRealTimers();
   });
 
-  const makeLogger = (props?: BuiltinLoggerConfig) => {
+  const makeLogger = (props?: Partial<BuiltinLoggerConfig>) => {
     const logger = new BuiltinLogger(props);
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     return { logger, logSpy };
