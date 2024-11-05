@@ -19,13 +19,7 @@ export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";
 export { createServer, attachRouting } from "./server";
 export { Documentation } from "./documentation";
-export {
-  DocumentationError,
-  RoutingError,
-  OutputValidationError,
-  InputValidationError,
-  MissingPeerError,
-} from "./errors";
+export { DocumentationError, RoutingError, MissingPeerError } from "./errors";
 export { testEndpoint, testMiddleware } from "./testing";
 export { Integration } from "./integration";
 

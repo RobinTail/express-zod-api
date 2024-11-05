@@ -2,11 +2,10 @@ import { Response } from "express";
 import createHttpError from "http-errors";
 import { z } from "zod";
 import {
-  InputValidationError,
   arrayResultHandler,
   defaultResultHandler,
+  getMessageFromError,
   ResultHandler,
-  ensureHttpError,
 } from "../../src";
 import { ResultHandlerError } from "../../src/errors";
 import { metaSymbol } from "../../src/metadata";
@@ -121,8 +120,9 @@ describe("ResultHandler", () => {
       const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock();
       subject.execute({
-        error: ensureHttpError(
-          new InputValidationError(
+        error: createHttpError(
+          400,
+          getMessageFromError(
             new z.ZodError([
               {
                 code: "invalid_type",

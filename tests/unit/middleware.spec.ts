@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { InputValidationError, Middleware } from "../../src";
+import { Middleware } from "../../src";
 import { AbstractMiddleware } from "../../src/middleware";
 import {
   makeLoggerMock,

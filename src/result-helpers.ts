@@ -6,7 +6,7 @@ import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { FlatObject, getMessageFromError } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { InputValidationError, ResultHandlerError } from "./errors";
+import { ResultHandlerError } from "./errors";
 import { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
 
@@ -61,11 +61,11 @@ export const logServerError = (
  * @example Error —> InternalServerError(500)
  * @todo remove from index
  * @todo remove from migration
+ * @todo reuse?
  * */
 export const ensureHttpError = (
   error: Error,
-  getStatusCode: CommonConfig["getStatusCode"] = () =>
-    error instanceof InputValidationError ? 400 : 500,
+  getStatusCode: CommonConfig["getStatusCode"] = () => 500,
 ): HttpError => {
   if (isHttpError(error)) return error;
   return createHttpError(getStatusCode(error), getMessageFromError(error), {

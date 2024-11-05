@@ -1,5 +1,4 @@
 import { HttpError } from "http-errors";
-import { z } from "zod";
 import { getMessageFromError } from "./common-helpers";
 import { OpenAPIContext } from "./documentation-helpers";
 
@@ -34,30 +33,6 @@ export class DocumentationError extends Error {
 /** @desc An error related to the input and output schemas declaration */
 export class IOSchemaError extends Error {
   public override name = "IOSchemaError";
-}
-
-/**
- * @desc An error of validating the Endpoint handler's returns against the Endpoint output schema
- * @todo remove
- * */
-export class OutputValidationError extends IOSchemaError {
-  public override name = "OutputValidationError";
-
-  constructor(public override readonly cause: z.ZodError) {
-    super(getMessageFromError(cause), { cause });
-  }
-}
-
-/**
- * @desc An error of validating the input sources against the Middleware or Endpoint input schema
- * @todo remove
- * */
-export class InputValidationError extends IOSchemaError {
-  public override name = "InputValidationError";
-
-  constructor(public override readonly cause: z.ZodError) {
-    super(getMessageFromError(cause), { cause });
-  }
 }
 
 /** @desc An error related to the execution or incorrect configuration of ResultHandler */
