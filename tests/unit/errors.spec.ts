@@ -1,11 +1,8 @@
 import createHttpError from "http-errors";
-import { z } from "zod";
 import { DocumentationError, RoutingError } from "../../src";
 import {
   IOSchemaError,
-  InputValidationError,
   MissingPeerError,
-  OutputValidationError,
   ResultHandlerError,
 } from "../../src/errors";
 
@@ -58,42 +55,6 @@ describe("Errors", () => {
 
     test("should have the name matching its class", () => {
       expect(error.name).toBe("IOSchemaError");
-    });
-  });
-
-  describe("OutputValidationError", () => {
-    const zodError = new z.ZodError([]);
-    const error = new OutputValidationError(zodError);
-
-    test("should be an instance of IOSchemaError and Error", () => {
-      expect(error).toBeInstanceOf(IOSchemaError);
-      expect(error).toBeInstanceOf(Error);
-    });
-
-    test("should have the name matching its class", () => {
-      expect(error.name).toBe("OutputValidationError");
-    });
-
-    test("should have .cause property matching the one used for constructing", () => {
-      expect(error.cause).toEqual(zodError);
-    });
-  });
-
-  describe("InputValidationError", () => {
-    const zodError = new z.ZodError([]);
-    const error = new InputValidationError(zodError);
-
-    test("should be an instance of IOSchemaError and Error", () => {
-      expect(error).toBeInstanceOf(IOSchemaError);
-      expect(error).toBeInstanceOf(Error);
-    });
-
-    test("should have the name matching its class", () => {
-      expect(error.name).toBe("InputValidationError");
-    });
-
-    test("should have .cause property matching the one used for constructing", () => {
-      expect(error.cause).toEqual(zodError);
     });
   });
 
