@@ -130,7 +130,7 @@ export const testMiddleware = async <
   /** @desc The aggregated output from previously executed middlewares */
   options?: FlatObject;
   /** @desc Enables transforming possible middleware errors into response, so that testMiddlware does not throw */
-  errorHandler?: (params: { error: Error; response: Response }) => void;
+  errorHandler?: (error: Error, response: Response) => void;
 }) => {
   const { requestMock, responseMock, loggerMock, configMock } =
     makeTestingMocks(rest);
@@ -146,7 +146,7 @@ export const testMiddleware = async <
     return { requestMock, responseMock, loggerMock, output };
   } catch (error) {
     if (!errorHandler) throw error;
-    errorHandler({ response: responseMock, error: ensureError(error) });
+    errorHandler(ensureError(error), responseMock);
     return { requestMock, responseMock, loggerMock, output: {} };
   }
 };
