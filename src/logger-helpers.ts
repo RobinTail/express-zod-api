@@ -1,3 +1,4 @@
+import { memoizeWith } from "ramda";
 import { isObject } from "./common-helpers";
 
 const severity = {
@@ -42,7 +43,7 @@ type TimeUnit =
   | "second"
   | "minute";
 
-export const makeNumberFormat = (unit: TimeUnit, fraction = 0) =>
+const _makeNumberFormat = (unit: TimeUnit, fraction = 0) =>
   Intl.NumberFormat(undefined, {
     useGrouping: false,
     minimumFractionDigits: 0,
@@ -51,3 +52,7 @@ export const makeNumberFormat = (unit: TimeUnit, fraction = 0) =>
     unitDisplay: "long",
     unit,
   });
+export const makeNumberFormat = memoizeWith(
+  (unit, fraction) => `${unit}${fraction}`,
+  _makeNumberFormat,
+);
