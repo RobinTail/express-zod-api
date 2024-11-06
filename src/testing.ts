@@ -129,6 +129,7 @@ export const testMiddleware = async <
   middleware: AbstractMiddleware;
   /** @desc The aggregated output from previously executed middlewares */
   options?: FlatObject;
+  /** @desc Enables transforming possible middleware errors into response, so that testMiddlware does not throw */
   onError?: (params: {
     error: Error;
     responseMock: ReturnType<typeof makeResponseMock>;
@@ -148,7 +149,7 @@ export const testMiddleware = async <
     return { requestMock, responseMock, loggerMock, output };
   } catch (error) {
     if (!onError) throw error;
-    onError({ responseMock, error: ensureError(error) });
+    await onError({ responseMock, error: ensureError(error) });
     return { requestMock, responseMock, loggerMock, output: {} };
   }
 };
