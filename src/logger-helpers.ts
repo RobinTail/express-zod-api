@@ -56,3 +56,12 @@ export const makeNumberFormat = memoizeWith(
   (unit, fraction) => `${unit}${fraction}`,
   _makeNumberFormat,
 );
+
+export const formatDuration = (ms: number) => {
+  if (ms < 1e-6) return makeNumberFormat("nanosecond", 3).format(ms / 1e-6);
+  if (ms < 1e-3) return makeNumberFormat("nanosecond").format(ms / 1e-6);
+  if (ms < 1) return makeNumberFormat("microsecond").format(ms / 1e-3);
+  if (ms < 1e3) return makeNumberFormat("millisecond").format(ms);
+  if (ms < 6e4) return makeNumberFormat("second", 2).format(ms / 1e3);
+  return makeNumberFormat("minute", 2).format(ms / 6e4);
+};

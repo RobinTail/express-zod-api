@@ -4,8 +4,8 @@ import { performance } from "node:perf_hooks";
 import { FlatObject, isProduction } from "./common-helpers";
 import {
   AbstractLogger,
+  formatDuration,
   isHidden,
-  makeNumberFormat,
   Severity,
 } from "./logger-helpers";
 
@@ -44,12 +44,6 @@ interface ProfilerOptions {
 
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
-  protected readonly picoFormat = makeNumberFormat("nanosecond", 3);
-  protected readonly nanoFormat = makeNumberFormat("nanosecond");
-  protected readonly microFormat = makeNumberFormat("microsecond");
-  protected readonly milliFormat = makeNumberFormat("millisecond");
-  protected readonly secondsFormat = makeNumberFormat("second", 2);
-  protected readonly minutesFormat = makeNumberFormat("minute", 2);
   protected readonly config: BuiltinLoggerConfig;
   protected readonly styles: Record<Severity, Ansis> = {
     debug: blue,
@@ -117,15 +111,6 @@ export class BuiltinLogger implements AbstractLogger {
     return new BuiltinLogger({ ...this.config, ctx });
   }
 
-  protected formatDuration = (ms: number) => {
-    if (ms < 1e-6) return this.picoFormat.format(ms / 1e-6);
-    if (ms < 1e-3) return this.nanoFormat.format(ms / 1e-6);
-    if (ms < 1) return this.microFormat.format(ms / 1e-3);
-    if (ms < 1e3) return this.milliFormat.format(ms);
-    if (ms < 6e4) return this.secondsFormat.format(ms / 1e3);
-    return this.minutesFormat.format(ms / 6e4);
-  };
-
   /** @desc Measures the duration until you invoke the returned callback */
   public profile(message: string): () => void;
   public profile(options: ProfilerOptions): () => void;
@@ -136,7 +121,7 @@ export class BuiltinLogger implements AbstractLogger {
       const {
         message,
         severity = "debug",
-        formatter = this.formatDuration.bind(this),
+        formatter = formatDuration,
       } = typeof subject === "object" ? subject : { message: subject };
       this.print(
         typeof severity === "function" ? severity(duration) : severity,
