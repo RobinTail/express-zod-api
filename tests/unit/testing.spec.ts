@@ -79,8 +79,7 @@ describe("Testing", () => {
 
     test("Issue #2153: should optionally catch errors to enable usual returns", async () => {
       const { output, loggerMock, responseMock } = await testMiddleware({
-        errorHandler: ({ error, responseMock }) =>
-          void responseMock.end(error.message),
+        errorHandler: ({ error, response }) => response.end(error.message),
         middleware: new Middleware({
           input: z.object({}),
           handler: async ({ logger }) => {
