@@ -7,22 +7,22 @@ describe("Experiment for builtin logger", () => {
   const logger = new BuiltinLogger();
 
   bench("fixed 2", () => {
-    return void fixed("second", 2);
+    fixed("second", 2);
   });
 
   bench("fixed 1", () => {
-    return void fixed("second");
+    fixed("second");
   });
 
   bench("generic 2", () => {
-    return void generic("second", 2);
+    generic("second", 2);
   });
 
   bench("generic 1", () => {
-    return void generic("second");
+    generic("second");
   });
 
   bench(".child", () => {
-    return void logger.child({});
+    logger.child({});
   });
 });
