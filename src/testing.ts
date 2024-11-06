@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { FlatObject, getInput } from "./common-helpers";
+import { ensureError, FlatObject, getInput } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
 import {
@@ -122,22 +122,33 @@ export const testMiddleware = async <
 >({
   middleware,
   options = {},
+  onError,
   ...rest
 }: TestingProps<REQ, LOG> & {
   /** @desc The middleware to test */
   middleware: AbstractMiddleware;
   /** @desc The aggregated output from previously executed middlewares */
   options?: FlatObject;
+  onError?: (params: {
+    error: Error;
+    responseMock: ReturnType<typeof makeResponseMock>;
+  }) => void | Promise<void>;
 }) => {
   const { requestMock, responseMock, loggerMock, configMock } =
     makeTestingMocks(rest);
   const input = getInput(requestMock, configMock.inputSources);
-  const output = await middleware.execute({
-    request: requestMock,
-    response: responseMock,
-    logger: loggerMock,
-    input,
-    options,
-  });
-  return { requestMock, responseMock, loggerMock, output };
+  try {
+    const output = await middleware.execute({
+      request: requestMock,
+      response: responseMock,
+      logger: loggerMock,
+      input,
+      options,
+    });
+    return { requestMock, responseMock, loggerMock, output };
+  } catch (error) {
+    if (!onError) throw error;
+    onError({ responseMock, error: ensureError(error) });
+    return { requestMock, responseMock, loggerMock, output: {} };
+  }
 };
