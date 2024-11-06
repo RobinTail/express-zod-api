@@ -14,6 +14,7 @@ import {
   RequestOptions,
   createResponse,
   ResponseOptions,
+  MockResponse,
 } from "node-mocks-http";
 import { AbstractMiddleware } from "./middleware";
 
@@ -122,7 +123,7 @@ export const testMiddleware = async <
 >({
   middleware,
   options = {},
-  onError,
+  errorHandler,
   ...rest
 }: TestingProps<REQ, LOG> & {
   /** @desc The middleware to test */
@@ -130,9 +131,9 @@ export const testMiddleware = async <
   /** @desc The aggregated output from previously executed middlewares */
   options?: FlatObject;
   /** @desc Enables transforming possible middleware errors into response, so that testMiddlware does not throw */
-  onError?: (params: {
+  errorHandler?: (params: {
     error: Error;
-    responseMock: ReturnType<typeof makeResponseMock>;
+    responseMock: MockResponse<Response>;
   }) => void | Promise<void>;
 }) => {
   const { requestMock, responseMock, loggerMock, configMock } =
@@ -148,8 +149,8 @@ export const testMiddleware = async <
     });
     return { requestMock, responseMock, loggerMock, output };
   } catch (error) {
-    if (!onError) throw error;
-    await onError({ responseMock, error: ensureError(error) });
+    if (!errorHandler) throw error;
+    await errorHandler({ responseMock, error: ensureError(error) });
     return { requestMock, responseMock, loggerMock, output: {} };
   }
 };
