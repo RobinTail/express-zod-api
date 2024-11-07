@@ -33,11 +33,8 @@ describe("Index Entrypoint", () => {
 
     test.each(entities)("%s should have certain value", (entry) => {
       const entity = entrypoint[entry as keyof typeof entrypoint];
-      if (entity === undefined) {
-        expect(entity).toBeUndefined();
-      } else {
-        expect(entity).toMatchSnapshot();
-      }
+      if (entity === undefined) expect(entity).toBeUndefined();
+      else expect(entity).toMatchSnapshot();
     });
 
     test("Convenience types should be exposed", () => {

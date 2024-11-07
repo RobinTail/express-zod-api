@@ -39,24 +39,18 @@ describe("Experiment for builtin logger", () => {
       if (
         this.config.level === "silent" ||
         isHidden(method, this.config.level!)
-      ) {
+      )
         return;
-      }
       const { requestId, ...ctx } = this.config.ctx || {};
       const output: string[] = [new Date().toISOString()];
-      if (requestId) {
+      if (requestId)
         output.push(this.hasColor ? cyanBright(requestId) : requestId);
-      }
       output.push(
         this.hasColor ? `${this.styles[method](method)}:` : `${method}:`,
         message,
       );
-      if (meta !== undefined) {
-        output.push(this.prettyPrint(meta));
-      }
-      if (Object.keys(ctx).length > 0) {
-        output.push(this.prettyPrint(ctx));
-      }
+      if (meta !== undefined) output.push(this.prettyPrint(meta));
+      if (Object.keys(ctx).length > 0) output.push(this.prettyPrint(ctx));
       console.log(output.join(" "));
     }
 

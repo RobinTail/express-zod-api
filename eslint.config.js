@@ -30,6 +30,7 @@ export default [
     name: "globally/enabled",
     rules: {
       "unicorn/prefer-node-protocol": "error",
+      curly: ["warn", "multi-or-nest", "consistent"],
     },
   },
   {

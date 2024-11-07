@@ -149,9 +149,8 @@ export class Endpoint<
   public override getSchema(variant: "output"): OUT;
   public override getSchema(variant: ResponseVariant): z.ZodTypeAny;
   public override getSchema(variant: IOVariant | ResponseVariant) {
-    if (variant === "input" || variant === "output") {
+    if (variant === "input" || variant === "output")
       return this.#schemas[variant];
-    }
     return this.getResponses(variant)
       .map(({ schema }) => schema)
       .reduce((agg, schema) => agg.or(schema));
@@ -228,9 +227,7 @@ export class Endpoint<
     options: Partial<OPT>;
   }) {
     for (const mw of this.#middlewares) {
-      if (method === "options" && !(mw instanceof ExpressMiddleware)) {
-        continue;
-      }
+      if (method === "options" && !(mw instanceof ExpressMiddleware)) continue;
       Object.assign(
         options,
         await mw.execute({ input, options, request, response, logger }),
@@ -332,9 +329,7 @@ export class Endpoint<
           defaultHeaders: headers,
         });
       }
-      for (const key in headers) {
-        response.set(key, headers[key]);
-      }
+      for (const key in headers) response.set(key, headers[key]);
     }
     const input = getInput(request, config.inputSources);
     try {
@@ -346,13 +341,8 @@ export class Endpoint<
         logger,
         options,
       });
-      if (response.writableEnded) {
-        return;
-      }
-      if (method === "options") {
-        response.status(200).end();
-        return;
-      }
+      if (response.writableEnded) return;
+      if (method === "options") return void response.status(200).end();
       output = await this.#parseOutput(
         await this.#parseAndRunHandler({
           input,

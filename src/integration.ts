@@ -284,9 +284,8 @@ export class Integration {
       const propName = quoteProp(method, path);
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
       for (const face of this.interfaces) {
-        if (face.kind in rest) {
+        if (face.kind in rest)
           face.props.push(makeInterfaceProp(propName, rest[face.kind]!));
-        }
       }
       if (variant !== "types") {
         if (isJson) {
@@ -308,13 +307,10 @@ export class Integration {
     }
 
     // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    for (const { id, props } of this.interfaces) {
+    for (const { id, props } of this.interfaces)
       this.program.push(makePublicExtendedInterface(id, extenderClause, props));
-    }
 
-    if (variant === "types") {
-      return;
-    }
+    if (variant === "types") return;
 
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
     const jsonEndpointsConst = f.createVariableStatement(

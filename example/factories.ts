@@ -32,11 +32,9 @@ export const fileSendingEndpointsFactory = new EndpointsFactory({
         response.status(400).send(error.message);
         return;
       }
-      if (output && "data" in output && typeof output.data === "string") {
+      if (output && "data" in output && typeof output.data === "string")
         response.type("svg").send(output.data);
-      } else {
-        response.status(400).send("Data is missing");
-      }
+      else response.status(400).send("Data is missing");
     },
   }),
 });
@@ -52,15 +50,9 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
         response.status(400).send(error.message);
         return;
       }
-      if (
-        output &&
-        "filename" in output &&
-        typeof output.filename === "string"
-      ) {
+      if (output && "filename" in output && typeof output.filename === "string")
         createReadStream(output.filename).pipe(response.type(output.filename));
-      } else {
-        response.status(400).send("Filename is missing");
-      }
+      else response.status(400).send("Filename is missing");
     },
   }),
 });

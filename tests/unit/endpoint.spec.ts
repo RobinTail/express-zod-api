@@ -530,9 +530,9 @@ describe("Endpoint", () => {
         })
         .refine(
           (data) => {
-            if (data.type === "type1") {
+            // @todo ternary?
+            if (data.type === "type1")
               return "type1Attribute" in data.dynamicValue;
-            }
             return "type2Attribute" in data.dynamicValue;
           },
           {

@@ -18,6 +18,7 @@ export interface ZTSContext extends FlatObject {
 
 export type Producer = SchemaHandler<ts.TypeNode, ZTSContext>;
 
+// @todo should it return?
 export const addJsDocComment = (node: ts.Node, text: string) => {
   ts.addSyntheticLeadingComment(
     node,
@@ -59,10 +60,9 @@ export const printNode = (
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
+// @todo ternary?
 export const makePropertyIdentifier = (name: string) => {
-  if (safePropRegex.test(name)) {
-    return f.createIdentifier(name);
-  }
+  if (safePropRegex.test(name)) return f.createIdentifier(name);
   return f.createStringLiteral(name);
 };
 

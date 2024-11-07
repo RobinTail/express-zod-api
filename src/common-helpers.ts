@@ -41,9 +41,7 @@ export const getInput = (
   userDefined: CommonConfig["inputSources"] = {},
 ): FlatObject => {
   const method = getActualMethod(req);
-  if (method === "options") {
-    return {};
-  }
+  if (method === "options") return {};
   return (
     userDefined[method] ||
     defaultInputSources[method] ||
@@ -95,15 +93,12 @@ export const getExamples = <
   validate?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
   const examples = schema._def[metaSymbol]?.examples || [];
-  if (!validate && variant === "original") {
-    return examples;
-  }
+  if (!validate && variant === "original") return examples;
   const result: Array<z.input<T> | z.output<T>> = [];
   for (const example of examples) {
     const parsedExample = schema.safeParse(example);
-    if (parsedExample.success) {
+    if (parsedExample.success)
       result.push(variant === "parsed" ? parsedExample.data : example);
-    }
   }
   return result;
 };
