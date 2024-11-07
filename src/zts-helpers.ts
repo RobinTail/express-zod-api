@@ -60,11 +60,10 @@ export const printNode = (
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
-// @todo ternary?
-export const makePropertyIdentifier = (name: string) => {
-  if (safePropRegex.test(name)) return f.createIdentifier(name);
-  return f.createStringLiteral(name);
-};
+export const makePropertyIdentifier = (name: string) =>
+  safePropRegex.test(name)
+    ? f.createIdentifier(name)
+    : f.createStringLiteral(name);
 
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,

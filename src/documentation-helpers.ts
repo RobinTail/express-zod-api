@@ -516,11 +516,10 @@ const makeSample = (depicted: SchemaObject) => {
   return samples?.[firstType];
 };
 
-// @todo ternary?
+// @todo use Set?
 const makeNullableType = (prev: SchemaObject): SchemaObjectType[] => {
   const current = typeof prev.type === "string" ? [prev.type] : prev.type || [];
-  if (current.includes("null")) return current;
-  return current.concat("null");
+  return current.includes("null") ? current : current.concat("null");
 };
 
 export const depictEffect: Depicter = (

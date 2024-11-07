@@ -423,9 +423,9 @@ describe("Example", async () => {
               : { "Content-Type": "application/json" },
           body: method === "get" ? undefined : JSON.stringify(params),
         });
-        // @todo ternary?
-        if (`${method} ${path}` in jsonEndpoints) return response.json();
-        return response.text();
+        return response[
+          `${method} ${path}` in jsonEndpoints ? "json" : "text"
+        ]();
       };
 
     const client = new ExpressZodAPIClient(

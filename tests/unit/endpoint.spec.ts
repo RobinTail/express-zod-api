@@ -529,12 +529,10 @@ describe("Endpoint", () => {
           emitOutputValidationFailure: z.boolean().optional(),
         })
         .refine(
-          (data) => {
-            // @todo ternary?
-            if (data.type === "type1")
-              return "type1Attribute" in data.dynamicValue;
-            return "type2Attribute" in data.dynamicValue;
-          },
+          (data) =>
+            data.type === "type1"
+              ? "type1Attribute" in data.dynamicValue
+              : "type2Attribute" in data.dynamicValue,
           {
             message: "type1Attribute is required if type is type1",
             path: ["dynamicValue"],
