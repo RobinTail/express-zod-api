@@ -28,10 +28,7 @@ export const fileSendingEndpointsFactory = new EndpointsFactory({
     positive: { schema: z.string(), mimeType: "image/svg+xml" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
-      if (error) {
-        response.status(400).send(error.message);
-        return;
-      }
+      if (error) return void response.status(400).send(error.message);
       if (output && "data" in output && typeof output.data === "string")
         response.type("svg").send(output.data);
       else response.status(400).send("Data is missing");
@@ -46,10 +43,7 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
     positive: { schema: ez.file("buffer"), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
-      if (error) {
-        response.status(400).send(error.message);
-        return;
-      }
+      if (error) return void response.status(400).send(error.message);
       if (output && "filename" in output && typeof output.filename === "string")
         createReadStream(output.filename).pipe(response.type(output.filename));
       else response.status(400).send("Filename is missing");
