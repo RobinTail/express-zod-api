@@ -18,15 +18,13 @@ export interface ZTSContext extends FlatObject {
 
 export type Producer = SchemaHandler<ts.TypeNode, ZTSContext>;
 
-// @todo should it return?
-export const addJsDocComment = (node: ts.Node, text: string) => {
+export const addJsDocComment = <T extends ts.Node>(node: T, text: string) =>
   ts.addSyntheticLeadingComment(
     node,
     ts.SyntaxKind.MultiLineCommentTrivia,
     `* ${text} `,
     true,
   );
-};
 
 export const createTypeAlias = (
   node: ts.TypeNode,
@@ -39,8 +37,7 @@ export const createTypeAlias = (
     undefined,
     node,
   );
-  if (comment) addJsDocComment(typeAlias, comment);
-  return typeAlias;
+  return comment ? addJsDocComment(typeAlias, comment) : typeAlias;
 };
 
 export const printNode = (
