@@ -2434,8 +2434,7 @@ paths:
                     type: object
                     properties:
                       "null":
-                        type:
-                          - "null"
+                        type: "null"
                       dateOut:
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string

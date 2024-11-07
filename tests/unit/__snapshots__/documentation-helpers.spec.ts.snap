@@ -570,9 +570,7 @@ exports[`Documentation helpers > depictNullable() > should only add null type on
 
 exports[`Documentation helpers > depictNullable() > should only add null type once 1 1`] = `
 {
-  "type": [
-    "null",
-  ],
+  "type": "null",
 }
 `;
 
