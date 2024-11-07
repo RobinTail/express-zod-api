@@ -1071,7 +1071,7 @@ test("should respond successfully", async () => {
 
 Middlewares can also be tested individually using the `testMiddleware()` method. You can also pass `options` collected
 from outputs of previous middlewares, if the one being tested somehow depends on them. There is `errorHandler` option
-you can assign a function for transforming a middleware error into response, so that the testing method wouldn't throw.
+for catching a middleware error and transforming into a response to assert in test along with other returned entities.
 
 ```typescript
 import { z } from "zod";
