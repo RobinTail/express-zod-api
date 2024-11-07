@@ -516,10 +516,12 @@ const makeSample = (depicted: SchemaObject) => {
   return samples?.[firstType];
 };
 
-// @todo use Set?
-const makeNullableType = (prev: SchemaObject): SchemaObjectType[] => {
-  const current = typeof prev.type === "string" ? [prev.type] : prev.type || [];
-  return current.includes("null") ? current : current.concat("null");
+const makeNullableType = ({
+  type,
+}: SchemaObject): SchemaObjectType | SchemaObjectType[] => {
+  if (type === "null") return type;
+  if (typeof type === "string") return [type, "null"];
+  return type ? [...new Set(type).add("null")] : "null";
 };
 
 export const depictEffect: Depicter = (
