@@ -40,16 +40,10 @@ export const walkRouting = ({
     const path = `${parentPath || ""}${segment ? `/${segment}` : ""}`;
     if (element instanceof AbstractEndpoint) {
       const methods: (Method | AuxMethod)[] = element.getMethods().slice();
-      if (hasCors) {
-        methods.push("options");
-      }
-      for (const method of methods) {
-        onEndpoint(element, path, method);
-      }
+      if (hasCors) methods.push("options");
+      for (const method of methods) onEndpoint(element, path, method);
     } else if (element instanceof ServeStatic) {
-      if (onStatic) {
-        element.apply(path, onStatic);
-      }
+      if (onStatic) element.apply(path, onStatic);
     } else if (element instanceof DependsOnMethod) {
       for (const [method, endpoint] of element.pairs) {
         assert(

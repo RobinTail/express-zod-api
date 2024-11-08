@@ -74,9 +74,7 @@ describe("ez.file()", () => {
       const schema = ez.file("base64");
       const result = schema.safeParse("~~~~");
       expect(result.success).toBeFalsy();
-      if (!result.success) {
-        expect(result.error.issues).toMatchSnapshot();
-      }
+      if (!result.success) expect(result.error.issues).toMatchSnapshot();
     });
 
     test("should accept string", () => {

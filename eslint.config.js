@@ -29,7 +29,9 @@ export default [
   {
     name: "globally/enabled",
     rules: {
+      curly: ["warn", "multi-or-nest", "consistent"],
       "unicorn/prefer-node-protocol": "error",
+      // "no-restricted-syntax": ["warn", "ReturnStatement[argument=null]"],
     },
   },
   {

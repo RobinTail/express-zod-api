@@ -22,6 +22,7 @@ import {
   makePublicType,
   makeRecord,
   makeTemplateType,
+  makeTernary,
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
@@ -135,6 +136,7 @@ export class Integration {
     searchParamsConst: f.createIdentifier("searchParams"),
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
+    parserConst: f.createIdentifier("parser"),
   } satisfies Record<string, ts.Identifier>;
   protected interfaces: Array<{
     id: ts.Identifier;
@@ -284,9 +286,8 @@ export class Integration {
       const propName = quoteProp(method, path);
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
       for (const face of this.interfaces) {
-        if (face.kind in rest) {
+        if (face.kind in rest)
           face.props.push(makeInterfaceProp(propName, rest[face.kind]!));
-        }
       }
       if (variant !== "types") {
         if (isJson) {
@@ -308,13 +309,10 @@ export class Integration {
     }
 
     // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    for (const { id, props } of this.interfaces) {
+    for (const { id, props } of this.interfaces)
       this.program.push(makePublicExtendedInterface(id, extenderClause, props));
-    }
 
-    if (variant === "types") {
-      return;
-    }
+    if (variant === "types") return;
 
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
     const jsonEndpointsConst = f.createVariableStatement(
@@ -591,29 +589,36 @@ export class Integration {
       ),
     );
 
-    // return response.json(); return response.text();
-    const [returnJsonStatement, returnTextStatement] = ["json", "text"].map(
-      (method) =>
-        f.createReturnStatement(
-          f.createCallExpression(
-            f.createPropertyAccessExpression(this.ids.responseConst, method),
-            undefined,
-            undefined,
+    // const parser = `${method} ${path}` in jsonEndpoints ? "json" : "text";
+    const parserStatement = f.createVariableStatement(
+      undefined,
+      makeConst(
+        this.ids.parserConst,
+        makeTernary(
+          f.createBinaryExpression(
+            f.createTemplateExpression(emptyHeading, [
+              f.createTemplateSpan(this.ids.methodParameter, spacingMiddle),
+              f.createTemplateSpan(this.ids.pathParameter, emptyTail),
+            ]),
+            ts.SyntaxKind.InKeyword,
+            this.ids.jsonEndpointsConst,
           ),
+          f.createStringLiteral("json" satisfies keyof Response),
+          f.createStringLiteral("text" satisfies keyof Response),
         ),
+      ),
     );
 
-    // if (`${method} ${path}` in jsonEndpoints) { ___ }
-    const ifJsonStatement = f.createIfStatement(
-      f.createBinaryExpression(
-        f.createTemplateExpression(emptyHeading, [
-          f.createTemplateSpan(this.ids.methodParameter, spacingMiddle),
-          f.createTemplateSpan(this.ids.pathParameter, emptyTail),
-        ]),
-        ts.SyntaxKind.InKeyword,
-        this.ids.jsonEndpointsConst,
+    // return response[parser]();
+    const returnStatement = f.createReturnStatement(
+      f.createCallExpression(
+        f.createElementAccessExpression(
+          this.ids.responseConst,
+          this.ids.parserConst,
+        ),
+        undefined,
+        [],
       ),
-      f.createBlock([returnJsonStatement]),
     );
 
     // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
@@ -631,8 +636,8 @@ export class Integration {
             hasBodyStatement,
             searchParamsStatement,
             responseStatement,
-            ifJsonStatement,
-            returnTextStatement,
+            parserStatement,
+            returnStatement,
           ]),
           true,
         ),

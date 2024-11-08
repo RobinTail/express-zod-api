@@ -367,13 +367,12 @@ describe("Documentation helpers", () => {
       },
     );
 
-    test.each([
-      z.string().nullable(),
-      z.null().nullable(),
-      z.string().nullable().nullable(),
-    ])("should only add null type once %#", (schema) => {
-      expect(depictNullable(schema, requestCtx)).toMatchSnapshot();
-    });
+    test.each([z.null().nullable(), z.string().nullable().nullable()])(
+      "should not add null type when it's already there %#",
+      (schema) => {
+        expect(depictNullable(schema, requestCtx)).toMatchSnapshot();
+      },
+    );
   });
 
   describe("depictEnum()", () => {
