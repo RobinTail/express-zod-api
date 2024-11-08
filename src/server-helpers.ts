@@ -85,9 +85,7 @@ export const createUploadFailureHandler =
 
 export const createUploadLogger = (
   logger: ActualLogger,
-): Pick<Console, "log"> => ({
-  log: logger.debug.bind(logger),
-});
+): Pick<Console, "log"> => ({ log: logger.debug.bind(logger) });
 
 export const createUploadParsers = async ({
   getChildLogger,
