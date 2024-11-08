@@ -268,12 +268,7 @@ export class Endpoint<
 
   async #handleResult({
     error,
-    request,
-    response,
-    logger,
-    input,
-    output,
-    options,
+    ...rest
   }: {
     error: Error | null;
     request: Request;
@@ -284,19 +279,10 @@ export class Endpoint<
     options: Partial<OPT>;
   }) {
     try {
-      await this.#resultHandler.execute({
-        error,
-        output,
-        request,
-        response,
-        logger,
-        input,
-        options,
-      });
+      await this.#resultHandler.execute({ ...rest, error });
     } catch (e) {
       lastResortHandler({
-        logger,
-        response,
+        ...rest,
         error: new ResultHandlerError(ensureError(e), error || undefined),
       });
     }
