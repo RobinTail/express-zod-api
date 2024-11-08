@@ -423,10 +423,8 @@ describe("Example", async () => {
               : { "Content-Type": "application/json" },
           body: method === "get" ? undefined : JSON.stringify(params),
         });
-        if (`${method} ${path}` in jsonEndpoints) {
-          return response.json();
-        }
-        return response.text();
+        const parser = `${method} ${path}` in jsonEndpoints ? "json" : "text";
+        return response[parser]();
       };
 
     const client = new ExpressZodAPIClient(

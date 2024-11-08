@@ -60,10 +60,9 @@ const onObject: Producer = (
         : undefined,
       next(value),
     );
-    if (value.description) {
-      addJsDocComment(propertySignature, value.description);
-    }
-    return propertySignature;
+    return value.description
+      ? addJsDocComment(propertySignature, value.description)
+      : propertySignature;
   });
   return f.createTypeLiteralNode(members);
 };

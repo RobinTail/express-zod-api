@@ -204,9 +204,8 @@ const tryFlattenIntersection = (
       right.properties || {},
     );
   }
-  if (left.required || right.required) {
+  if (left.required || right.required)
     flat.required = union(left.required || [], right.required || []);
-  }
   if (left.examples || right.examples) {
     flat.examples = combinations(
       left.examples || [],
@@ -244,9 +243,7 @@ export const depictNullable: Depicter = (
   { next },
 ) => {
   const nested = next(schema.unwrap());
-  if (isSchemaObject(nested)) {
-    nested.type = makeNullableType(nested);
-  }
+  if (isSchemaObject(nested)) nested.type = makeNullableType(nested);
   return nested;
 };
 
@@ -289,12 +286,8 @@ export const depictObject: Depicter = (
       : prop.isOptional();
   const required = keys.filter((key) => !isOptionalProp(schema.shape[key]));
   const result: SchemaObject = { type: "object" };
-  if (keys.length) {
-    result.properties = depictObjectProperties(schema, next);
-  }
-  if (required.length) {
-    result.required = required;
-  }
+  if (keys.length) result.properties = depictObjectProperties(schema, next);
+  if (required.length) result.required = required;
   return result;
 };
 
@@ -409,12 +402,8 @@ export const depictArray: Depicter = (
   { next },
 ) => {
   const result: SchemaObject = { type: "array", items: next(element) };
-  if (minLength) {
-    result.minItems = minLength.value;
-  }
-  if (maxLength) {
-    result.maxItems = maxLength.value;
-  }
+  if (minLength) result.minItems = minLength.value;
+  if (maxLength) result.maxItems = maxLength.value;
   return result;
 };
 
@@ -475,15 +464,9 @@ export const depictString: Depicter = ({
       break;
     }
   }
-  if (minLength !== null) {
-    result.minLength = minLength;
-  }
-  if (maxLength !== null) {
-    result.maxLength = maxLength;
-  }
-  if (regex) {
-    result.pattern = regex.source;
-  }
+  if (minLength !== null) result.minLength = minLength;
+  if (maxLength !== null) result.maxLength = maxLength;
+  if (regex) result.pattern = regex.source;
   return result;
 };
 
@@ -514,16 +497,10 @@ export const depictNumber: Depicter = ({
     type: isInt ? "integer" : "number",
     format: isInt ? "int64" : "double",
   };
-  if (isMinInclusive) {
-    result.minimum = minimum;
-  } else {
-    result.exclusiveMinimum = minimum;
-  }
-  if (isMaxInclusive) {
-    result.maximum = maximum;
-  } else {
-    result.exclusiveMaximum = maximum;
-  }
+  if (isMinInclusive) result.minimum = minimum;
+  else result.exclusiveMinimum = minimum;
+  if (isMaxInclusive) result.maximum = maximum;
+  else result.exclusiveMaximum = maximum;
   return result;
 };
 
@@ -539,12 +516,12 @@ const makeSample = (depicted: SchemaObject) => {
   return samples?.[firstType];
 };
 
-const makeNullableType = (prev: SchemaObject): SchemaObjectType[] => {
-  const current = typeof prev.type === "string" ? [prev.type] : prev.type || [];
-  if (current.includes("null")) {
-    return current;
-  }
-  return current.concat("null");
+const makeNullableType = ({
+  type,
+}: SchemaObject): SchemaObjectType | SchemaObjectType[] => {
+  if (type === "null") return type;
+  if (typeof type === "string") return [type, "null"];
+  return type ? [...new Set(type).add("null")] : "null";
 };
 
 export const depictEffect: Depicter = (
@@ -555,11 +532,9 @@ export const depictEffect: Depicter = (
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
     const outputType = tryToTransform(schema, makeSample(input));
-    if (outputType && ["number", "string", "boolean"].includes(outputType)) {
+    if (outputType && ["number", "string", "boolean"].includes(outputType))
       return { type: outputType as "number" | "string" | "boolean" };
-    } else {
-      return next(z.any());
-    }
+    else return next(z.any());
   }
   if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
     const { type: inputType, ...rest } = input;
@@ -624,12 +599,9 @@ export const depictParamExamples = (
 export const extractObjectSchema = (
   subject: IOSchema,
 ): z.ZodObject<z.ZodRawShape> => {
-  if (subject instanceof z.ZodObject) {
-    return subject;
-  }
-  if (subject instanceof z.ZodBranded) {
+  if (subject instanceof z.ZodObject) return subject;
+  if (subject instanceof z.ZodBranded)
     return extractObjectSchema(subject.unwrap());
-  }
   if (
     subject instanceof z.ZodUnion ||
     subject instanceof z.ZodDiscriminatedUnion
@@ -790,19 +762,13 @@ export const excludeParamsFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
   names: string[],
 ): SchemaObject | ReferenceObject => {
-  if (isReferenceObject(depicted)) {
-    return depicted;
-  }
+  if (isReferenceObject(depicted)) return depicted;
   const copy = { ...depicted };
-  if (copy.properties) {
-    copy.properties = omit(names, copy.properties);
-  }
-  if (copy.examples) {
+  if (copy.properties) copy.properties = omit(names, copy.properties);
+  if (copy.examples)
     copy.examples = copy.examples.map((entry) => omit(names, entry));
-  }
-  if (copy.required) {
+  if (copy.required)
     copy.required = copy.required.filter((name) => !names.includes(name));
-  }
   if (copy.allOf) {
     copy.allOf = copy.allOf.map((entry) =>
       excludeParamsFromDepiction(entry, names),
@@ -875,9 +841,7 @@ const depictBearerSecurity: SecurityHelper<"bearer"> = ({
     type: "http",
     scheme: "bearer",
   };
-  if (bearerFormat) {
-    result.bearerFormat = bearerFormat;
-  }
+  if (bearerFormat) result.bearerFormat = bearerFormat;
   return result;
 };
 const depictInputSecurity: SecurityHelper<"input"> = (
@@ -956,9 +920,7 @@ export const depictSecurityRefs = (
           : { [entry.name]: entry.scopes },
     );
   }
-  if ("and" in container) {
-    return depictSecurityRefs(andToOr(container));
-  }
+  if ("and" in container) return depictSecurityRefs(andToOr(container));
   return depictSecurityRefs({ or: [container] });
 };
 
@@ -1006,9 +968,8 @@ export const depictTags = <TAG extends string>(
       name: tag,
       description: typeof def === "string" ? def : def.description,
     };
-    if (typeof def === "object" && def.url) {
+    if (typeof def === "object" && def.url)
       result.externalDocs = { url: def.url };
-    }
     return result;
   });
 
