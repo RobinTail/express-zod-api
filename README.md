@@ -1208,10 +1208,9 @@ createConfig({
 
 If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server, the
 capabilities of this framework and the HTTP protocol itself would not be enough in this case. I have developed an
-additional pluggable library, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and
-capabilities, but uses the websocket transport and Socket.IO protocol for that purpose. Check out an example of the
-synergy between two libraries on handling the incoming `subscribe` and `unsubscribe` events in order to emit
-(broadcast) the `time` event every second with a current time in its payload:
+additional websocket operating framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar
+principles and capabilities. Check out an example of the synergy between two frameworks on handling subscription events
+in order to emit (broadcast) the `time` event every second with a current time in its payload:
 
 https://github.com/RobinTail/zod-sockets#subscriptions
 
