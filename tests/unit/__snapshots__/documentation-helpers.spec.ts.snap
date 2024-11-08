@@ -559,24 +559,13 @@ exports[`Documentation helpers > depictNullable() > should add null to the type 
 }
 `;
 
-exports[`Documentation helpers > depictNullable() > should only add null type once 0 1`] = `
+exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 0 1`] = `
 {
-  "type": [
-    "string",
-    "null",
-  ],
+  "type": "null",
 }
 `;
 
-exports[`Documentation helpers > depictNullable() > should only add null type once 1 1`] = `
-{
-  "type": [
-    "null",
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictNullable() > should only add null type once 2 1`] = `
+exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 1 1`] = `
 {
   "type": [
     "string",

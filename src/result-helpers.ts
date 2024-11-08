@@ -25,12 +25,9 @@ export const normalize = <A extends unknown[]>(
     mimeTypes: [string, ...string[]];
   },
 ): NormalizedResponse[] => {
-  if (typeof subject === "function") {
+  if (typeof subject === "function")
     return normalize(subject(...features.arguments), features);
-  }
-  if (subject instanceof z.ZodType) {
-    return [{ ...features, schema: subject }];
-  }
+  if (subject instanceof z.ZodType) return [{ ...features, schema: subject }];
   if (Array.isArray(subject)) {
     assert(
       subject.length,

@@ -90,9 +90,7 @@ describe("App in production mode", async () => {
         options: { user, permissions, method },
       }) => {
         // Problem 787: should lead to ZodError that is NOT considered as the IOSchema validation error
-        if (something === "internal_zod_error") {
-          z.number().parse("");
-        }
+        if (something === "internal_zod_error") z.number().parse("");
         return {
           anything: something === "joke" ? 300 : -100500,
           doubleKey: key.repeat(2),

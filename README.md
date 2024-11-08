@@ -1053,9 +1053,9 @@ test("should respond successfully", async () => {
 
 ## Testing middlewares
 
-Middlewares can also be tested individually, [similar to endpoints](#testing-endpoints), but using the
-`testMiddleware()` method. There is also an ability to pass `options` collected from outputs of previous middlewares,
-if the one being tested somehow depends on them.
+Middlewares can also be tested individually using the `testMiddleware()` method. You can also pass `options` collected
+from outputs of previous middlewares, if the one being tested somehow depends on them. There is `errorHandler` option
+for catching a middleware error and transforming into a response to assert in test along with other returned entities.
 
 ```typescript
 import { z } from "zod";
@@ -1073,6 +1073,7 @@ const { output, responseMock, loggerMock } = await testMiddleware({
   middleware,
   requestProps: { method: "POST", body: { test: "something" } },
   options: { prev: "accumulated" }, // responseOptions, configProps, loggerProps
+  // errorHandler: (error, response) => response.end(error.message),
 });
 expect(loggerMock._getLogs().error).toHaveLength(0);
 expect(output).toEqual({ collectedOptions: ["prev"], testLength: 9 });
