@@ -530,9 +530,8 @@ describe("Endpoint", () => {
         })
         .refine(
           (data) =>
-            data.type === "type1"
-              ? "type1Attribute" in data.dynamicValue
-              : "type2Attribute" in data.dynamicValue,
+            (data.type === "type1" ? "type1Attribute" : "type2Attribute") in
+            data.dynamicValue,
           {
             message: "type1Attribute is required if type is type1",
             path: ["dynamicValue"],
