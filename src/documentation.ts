@@ -123,9 +123,8 @@ export class Documentation extends OpenApiBuilder {
       if (
         serializedSubject ===
         JSON.stringify(this.rootDoc.components?.securitySchemes?.[name])
-      ) {
+      )
         return name;
-      }
     }
     const nextId = (this.lastSecuritySchemaIds.get(subject.type) || 0) + 1;
     this.lastSecuritySchemaIds.set(subject.type, nextId);
@@ -145,9 +144,8 @@ export class Documentation extends OpenApiBuilder {
   }: DocumentationParams) {
     super();
     this.addInfo({ title, version });
-    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
+    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
       this.addServer({ url });
-    }
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
       endpoint,
       path,

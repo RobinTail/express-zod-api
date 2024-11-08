@@ -23,9 +23,7 @@ export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
   src: A,
   dest: B,
 ): B => {
-  if (!(metaSymbol in src._def)) {
-    return dest;
-  }
+  if (!(metaSymbol in src._def)) return dest;
   const result = cloneSchema(dest);
   result._def[metaSymbol].examples = combinations(
     result._def[metaSymbol].examples,

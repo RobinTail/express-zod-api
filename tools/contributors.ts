@@ -5,9 +5,7 @@ const changelog = await readFile("CHANGELOG.md", "utf8");
 const readme = await readFile("README.md", "utf8");
 
 const links = changelog.matchAll(/\(https:\/\/github\.com\/([-\w]+)\)/g);
-for (const link of links) {
-  users.add(link[1]);
-}
+for (const link of links) users.add(link[1]);
 
 const markdown = Array.from(users)
   .map(

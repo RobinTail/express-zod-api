@@ -31,6 +31,35 @@ export default [
 
 ## Version 20
 
+### v20.20.0
+
+- Introducing `errorHandler` option for `testMiddleware()` method:
+  - If your middleware throws an error there was no ability to make assertions other than the thrown error;
+  - New option can be assigned with a function for transforming the error into response, so that `testMiddlware` itself
+    would not throw, enabling usage of all returned entities for mutiple assertions in test;
+  - The feature suggested by [@williamgcampbell](https://github.com/williamgcampbell).
+
+```ts
+import { testMiddleware, Middleware } from "express-zod-api";
+
+const middlware = new Middleware({
+  input: z.object({}),
+  handler: async ({ logger }) => {
+    logger.info("logging something");
+    throw new Error("something went wrong");
+  },
+});
+
+test("a middleware throws, but it writes log as well", async () => {
+  const { loggerMock, responseMock } = await testMiddleware({
+    errorHandler: (error, response) => response.end(error.message),
+    middleware,
+  });
+  expect(loggerMock._getLogs().info).toEqual([["logging something"]]);
+  expect(responseMock._getData()).toBe("something went wrong");
+});
+```
+
 ### v20.19.0
 
 - Configuring built-in logger made optional:

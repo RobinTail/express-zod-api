@@ -206,3 +206,16 @@ export const makeObjectKeysReducer = (
   );
 
 export const quoteProp = (...parts: [Method, string]) => `"${parts.join(" ")}"`;
+
+export const makeTernary = (
+  condition: ts.Expression,
+  positive: ts.Expression,
+  negative: ts.Expression,
+) =>
+  f.createConditionalExpression(
+    condition,
+    f.createToken(ts.SyntaxKind.QuestionToken),
+    positive,
+    f.createToken(ts.SyntaxKind.ColonToken),
+    negative,
+  );
