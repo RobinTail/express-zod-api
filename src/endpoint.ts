@@ -213,11 +213,10 @@ export class Endpoint<
 
   async #runMiddlewares({
     method,
-    input,
-    request,
-    response,
     logger,
     options,
+    response,
+    ...rest
   }: {
     method: Method | AuxMethod;
     input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
@@ -230,7 +229,7 @@ export class Endpoint<
       if (method === "options" && !(mw instanceof ExpressMiddleware)) continue;
       Object.assign(
         options,
-        await mw.execute({ input, options, request, response, logger }),
+        await mw.execute({ ...rest, options, response, logger }),
       );
       if (response.writableEnded) {
         logger.warn(
