@@ -244,8 +244,7 @@ export class Endpoint<
 
   async #parseAndRunHandler({
     input,
-    options,
-    logger,
+    ...rest
   }: {
     input: Readonly<FlatObject>;
     options: OPT;
@@ -259,11 +258,7 @@ export class Endpoint<
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
-    return this.#handler({
-      input: finalInput,
-      options,
-      logger,
-    });
+    return this.#handler({ ...rest, input: finalInput });
   }
 
   async #handleResult({
