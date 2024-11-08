@@ -525,7 +525,7 @@ provides your endpoint handler or middleware with a `Date`. It supports the foll
 2021-12-31
 ```
 
-`ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
+`ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHandler` with a `string` representation in ISO
 format for the response transmission. Consider the following simplified example for better understanding:
 
 ```typescript
