@@ -159,6 +159,9 @@
     "vitest": "^2.1.4",
     "zod": "^3.23.0"
   },
+  "resolutions": {
+    "**/@scarf/scarf": "npm:empty-npm-package@1.0.0"
+  },
   "keywords": [
     "nodejs",
     "api",
