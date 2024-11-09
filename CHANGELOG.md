@@ -2,6 +2,12 @@
 
 ## Version 20
 
+### v20.20.1
+
+- Minor code style refactoring and performance tuning;
+- The software is redefined as a framework;
+  - Thanks to [@JonParton](https://github.com/JonParton) for contribution to the documentation.
+
 ### v20.20.0
 
 - Introducing `errorHandler` option for `testMiddleware()` method:
