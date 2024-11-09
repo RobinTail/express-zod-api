@@ -49,7 +49,7 @@ export const getInput = (
   )
     .filter((src) => (src === "files" ? areFilesAvailable(req) : true))
     .map((src) => (src === "headers" ? getCustomHeaders(req[src]) : req[src]))
-    .reduce<FlatObject>((agg, obj) => ({ ...agg, ...obj }), {});
+    .reduce<FlatObject>((agg, obj) => Object.assign(agg, obj), {});
 };
 
 export const ensureError = (subject: unknown): Error =>
