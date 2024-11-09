@@ -31,6 +31,12 @@ export default [
 
 ## Version 20
 
+### v20.20.1
+
+- Minor code style refactoring and performance tuning;
+- The software is redefined as a framework;
+  - Thanks to [@JonParton](https://github.com/JonParton) for contribution to the documentation.
+
 ### v20.20.0
 
 - Introducing `errorHandler` option for `testMiddleware()` method:
@@ -441,7 +447,7 @@ z.object({ user_id: z.string() })
   - This can enable having `snake_case` API parameters while keeping `camelCase` naming in your implementation;
   - You can `.transform()` the entire `input` schema into another object, using a well-typed mapping library;
   - You can do the same with the `output` schema, but that would not be enough for generating a valid documentation;
-  - The library offers a new `.remap()` method on the `z.object()` schema that applies a `.pipe()` to transformation;
+  - The framework offers a new `.remap()` method on the `z.object()` schema that applies a `.pipe()` to transformation;
     - Currently `.remap()` requires an assignment of all the object props explicitly, but it may be improved later;
   - Find more details [in the documentation](README.md#top-level-transformations-and-mapping);
   - The feature suggested by [Peter Rottmann](https://github.com/rottmann).
@@ -616,7 +622,7 @@ const config = createConfig({
 
 - Feature: customizable handling rules for your branded schemas in Documentation and Integration:
   - You can make your schemas special by branding them using `.brand()` method;
-  - The library (being a Zod Plugin as well) distinguishes the branded schemas in runtime;
+  - The framework (being a Zod Plugin as well) distinguishes the branded schemas in runtime;
   - The constructors of `Documentation` and `Integration` now accept new property `brandHandling` (object);
   - Its keys should be the brands you want to handle in a special way;
   - Its values are functions having your schema as the first argument and a context in the second place;
@@ -860,10 +866,9 @@ const labeledDefaultSchema = withMeta(
 
 - Supporting Node 22;
 - Featuring `zod-sockets` for implementing subscriptions on your API:
-  - I have developed an additional pluggable library, Zod Sockets, which has similar principles and capabilities, but
-    uses the websocket transport and Socket.IO protocol, so that the user of a client application could subscribe to
-    subsequent updates initiated by the server;
-  - Check out an [example of the synergy between two libraries](https://github.com/RobinTail/zod-sockets#subscriptions)
+  - I have developed an additional websocket operating framework, Zod Sockets, which has similar principles and
+    capabilities, so that the user could subscribe to subsequent updates initiated by the server;
+  - Check out an [example of the synergy between two frameworks](https://github.com/RobinTail/zod-sockets#subscriptions)
     and the [Demo Chat application](https://github.com/RobinTail/chat);
   - The feature suggested by [@ben-xD](https://github.com/ben-xD).
 
@@ -1954,7 +1959,7 @@ after:
 
 ### v11.7.0
 
-- Good news for array lovers and those struggling with migrating legacy APIs to use this library.
+- Good news for array lovers and those struggling with migrating legacy APIs to use this framework.
 - New feature: `arrayResultHandler` (and corresponding `arrayEndpointsFactory`).
   - Please avoid using them for new projects: responding with array is a bad practice keeping your endpoints from
     evolving without breaking changes.

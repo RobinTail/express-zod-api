@@ -1,7 +1,7 @@
 {
   "name": "express-zod-api",
   "version": "21.0.0-beta.0",
-  "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
+  "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -24,6 +24,7 @@
     "build:docs": "tsx example/generate-documentation.ts",
     "build:client": "tsx example/generate-client.ts",
     "build:license": "tsx tools/license.ts",
+    "build:contrib": "tsx tools/contributors.ts",
     "pretest": "tsc --noEmit",
     "test": "vitest run --coverage tests/unit tests/system",
     "posttest": "make-coverage-badge --output-path coverage.svg",
@@ -157,6 +158,9 @@
     "undici": "^6.19.8",
     "vitest": "^2.1.4",
     "zod": "^3.23.0"
+  },
+  "resolutions": {
+    "**/@scarf/scarf": "npm:empty-npm-package@1.0.0"
   },
   "keywords": [
     "nodejs",
