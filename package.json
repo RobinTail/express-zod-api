@@ -35,7 +35,7 @@
     "bench": "vitest bench --run tests/bench",
     "lint": "eslint && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
-    "cleanup": "rm -rf tests/**/node_modules coverage",
+    "cleanup": "rm -rf tests/**/node_modules",
     "precommit": "yarn lint && yarn test && yarn build && git add example/example.* LICENSE coverage.svg",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
     "postversion": "git push && git push --tags",
