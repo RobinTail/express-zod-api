@@ -33,7 +33,7 @@
     "bench": "vitest bench --run tests/bench",
     "lint": "eslint && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
-    "precommit": "yarn lint && yarn test && yarn build && git add example/example.* LICENSE coverage.svg",
+    "precommit": "yarn lint && yarn test && yarn build && git add *.md example/example.* LICENSE coverage.svg",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
     "postversion": "git push && git push --tags",
     "install_hooks": "husky"
