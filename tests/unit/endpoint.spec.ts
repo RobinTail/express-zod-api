@@ -251,7 +251,7 @@ describe("Endpoint", () => {
         endpoint,
       });
       expect(loggerMock._getLogs().error).toEqual([
-        ["Result handler failure: Something unexpected happened."],
+        ["Result handler failure", new Error("Something unexpected happened")],
       ]);
       expect(spy).toHaveBeenCalledWith({
         error: null,
@@ -472,7 +472,7 @@ describe("Endpoint", () => {
       });
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
       expect(loggerMock._getLogs().error).toEqual([
-        ["Result handler failure: Something unexpected happened."],
+        ["Result handler failure", new Error("Something unexpected happened")],
       ]);
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getData()).toBe(
@@ -518,12 +518,9 @@ describe("Endpoint", () => {
           emitOutputValidationFailure: z.boolean().optional(),
         })
         .refine(
-          (data) => {
-            if (data.type === "type1") {
-              return "type1Attribute" in data.dynamicValue;
-            }
-            return "type2Attribute" in data.dynamicValue;
-          },
+          (data) =>
+            (data.type === "type1" ? "type1Attribute" : "type2Attribute") in
+            data.dynamicValue,
           {
             message: "type1Attribute is required if type is type1",
             path: ["dynamicValue"],

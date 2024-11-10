@@ -80,10 +80,8 @@ export const exampleImplementation: Implementation = async (
     headers: hasBody ? { "Content-Type": "application/json" } : undefined,
     body: hasBody ? JSON.stringify(params) : undefined,
   });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
+  const parser = \`\${method} \${path}\` in jsonEndpoints ? "json" : "text";
+  return response[parser]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
@@ -171,10 +169,8 @@ export const exampleImplementation: Implementation = async (
     headers: hasBody ? { "Content-Type": "application/json" } : undefined,
     body: hasBody ? JSON.stringify(params) : undefined,
   });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
+  const parser = \`\${method} \${path}\` in jsonEndpoints ? "json" : "text";
+  return response[parser]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
@@ -262,10 +258,8 @@ export const exampleImplementation: Implementation = async (
     headers: hasBody ? { "Content-Type": "application/json" } : undefined,
     body: hasBody ? JSON.stringify(params) : undefined,
   });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
+  const parser = \`\${method} \${path}\` in jsonEndpoints ? "json" : "text";
+  return response[parser]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
@@ -365,10 +359,8 @@ export const exampleImplementation: Implementation = async (
     headers: hasBody ? { "Content-Type": "application/json" } : undefined,
     body: hasBody ? JSON.stringify(params) : undefined,
   });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
+  const parser = \`\${method} \${path}\` in jsonEndpoints ? "json" : "text";
+  return response[parser]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
@@ -430,7 +422,7 @@ exports[`Integration > Should generate a client for example API 1`] = `
   features: Type1;
 }[];
 
-type GetV1UserRetrieveInput = {} & {
+type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
 };
@@ -456,7 +448,6 @@ type GetV1UserRetrieveResponse =
 
 type PatchV1UserIdInput = {
   key: string;
-} & {
   id: string;
   name: string;
   birthday: string;
@@ -511,7 +502,7 @@ type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendResponse = string | string;
+type GetV1AvatarSendResponse = string;
 
 type GetV1AvatarStreamInput = {
   userId: string;
@@ -656,10 +647,8 @@ export const exampleImplementation: Implementation = async (
     headers: hasBody ? { "Content-Type": "application/json" } : undefined,
     body: hasBody ? JSON.stringify(params) : undefined,
   });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
+  const parser = \`\${method} \${path}\` in jsonEndpoints ? "json" : "text";
+  return response[parser]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });
@@ -673,7 +662,7 @@ exports[`Integration > Should generate a types for example API 1`] = `
   features: Type1;
 }[];
 
-type GetV1UserRetrieveInput = {} & {
+type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
 };
@@ -699,7 +688,6 @@ type GetV1UserRetrieveResponse =
 
 type PatchV1UserIdInput = {
   key: string;
-} & {
   id: string;
   name: string;
   birthday: string;
@@ -754,7 +742,7 @@ type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendResponse = string | string;
+type GetV1AvatarSendResponse = string;
 
 type GetV1AvatarStreamInput = {
   userId: string;
@@ -967,10 +955,8 @@ export const exampleImplementation: Implementation = async (
     headers: hasBody ? { "Content-Type": "application/json" } : undefined,
     body: hasBody ? JSON.stringify(params) : undefined,
   });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
+  const parser = \`\${method} \${path}\` in jsonEndpoints ? "json" : "text";
+  return response[parser]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
 client.provide("get", "/v1/user/retrieve", { id: "10" });

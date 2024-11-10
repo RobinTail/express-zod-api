@@ -1,7 +1,7 @@
 {
   "name": "express-zod-api",
-  "version": "20.15.1",
-  "description": "A Typescript library to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
+  "version": "20.20.1",
+  "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -17,13 +17,12 @@
   "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
     "start": "tsx example/index.ts",
-    "build": "yarn build:compile && yarn build:tests && yarn build:assets",
-    "build:compile": "tsup && attw --pack",
-    "build:tests": "yarn cleanup && tsx tools/make-tests.ts",
-    "build:assets": "yarn build:docs && yarn build:client && yarn build:license",
+    "prebuild": "yarn build:docs && yarn build:client && yarn build:md",
+    "build": "tsup && attw --pack",
+    "postbuild": "tsx tools/make-tests.ts",
     "build:docs": "tsx example/generate-documentation.ts",
     "build:client": "tsx example/generate-client.ts",
-    "build:license": "tsx tools/license.ts",
+    "build:md": "tsx tools/contributors.ts && tsx tools/license.ts",
     "pretest": "tsc --noEmit",
     "test": "vitest run --coverage tests/unit tests/system",
     "posttest": "make-coverage-badge --output-path coverage.svg",
@@ -34,8 +33,7 @@
     "bench": "vitest bench --run tests/bench",
     "lint": "eslint && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
-    "cleanup": "rm -rf tests/**/node_modules coverage",
-    "precommit": "yarn lint && yarn test && yarn build && git add example/example.* LICENSE coverage.svg",
+    "precommit": "yarn lint && yarn test && yarn build && git add *.md example/example.* LICENSE coverage.svg",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
     "postversion": "git push && git push --tags",
     "install_hooks": "husky"
@@ -130,7 +128,7 @@
     "@types/semver": "^7.5.8",
     "@types/swagger-ui-express": "^4.1.6",
     "@typescript-eslint/rule-tester": "^8.0.1",
-    "@vitest/coverage-istanbul": "^2.0.3",
+    "@vitest/coverage-v8": "^2.1.4",
     "camelize-ts": "^3.0.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
@@ -155,8 +153,11 @@
     "typescript": "^5.5.2",
     "typescript-eslint": "^8.0.0",
     "undici": "^6.19.8",
-    "vitest": "^2.0.3",
+    "vitest": "^2.1.4",
     "zod": "^3.23.0"
+  },
+  "resolutions": {
+    "**/@scarf/scarf": "npm:empty-npm-package@1.0.0"
   },
   "keywords": [
     "nodejs",

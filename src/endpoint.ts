@@ -6,7 +6,7 @@ import {
   FlatObject,
   getActualMethod,
   getInput,
-  makeErrorFromAnything,
+  ensureError,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import {
@@ -149,9 +149,8 @@ export class Endpoint<
   public override getSchema(variant: "output"): OUT;
   public override getSchema(variant: ResponseVariant): z.ZodTypeAny;
   public override getSchema(variant: IOVariant | ResponseVariant) {
-    if (variant === "input" || variant === "output") {
+    if (variant === "input" || variant === "output")
       return this.#schemas[variant];
-    }
     return this.getResponses(variant)
       .map(({ schema }) => schema)
       .reduce((agg, schema) => agg.or(schema));
@@ -214,11 +213,10 @@ export class Endpoint<
 
   async #runMiddlewares({
     method,
-    input,
-    request,
-    response,
     logger,
     options,
+    response,
+    ...rest
   }: {
     method: Method | AuxMethod;
     input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
@@ -228,12 +226,10 @@ export class Endpoint<
     options: Partial<OPT>;
   }) {
     for (const mw of this.#middlewares) {
-      if (method === "options" && !(mw instanceof ExpressMiddleware)) {
-        continue;
-      }
+      if (method === "options" && !(mw instanceof ExpressMiddleware)) continue;
       Object.assign(
         options,
-        await mw.execute({ input, options, request, response, logger }),
+        await mw.execute({ ...rest, options, response, logger }),
       );
       if (response.writableEnded) {
         logger.warn(
@@ -247,8 +243,7 @@ export class Endpoint<
 
   async #parseAndRunHandler({
     input,
-    options,
-    logger,
+    ...rest
   }: {
     input: Readonly<FlatObject>;
     options: OPT;
@@ -262,21 +257,12 @@ export class Endpoint<
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
-    return this.#handler({
-      input: finalInput,
-      options,
-      logger,
-    });
+    return this.#handler({ ...rest, input: finalInput });
   }
 
   async #handleResult({
     error,
-    request,
-    response,
-    logger,
-    input,
-    output,
-    options,
+    ...rest
   }: {
     error: Error | null;
     request: Request;
@@ -287,23 +273,11 @@ export class Endpoint<
     options: Partial<OPT>;
   }) {
     try {
-      await this.#resultHandler.execute({
-        error,
-        output,
-        request,
-        response,
-        logger,
-        input,
-        options,
-      });
+      await this.#resultHandler.execute({ ...rest, error });
     } catch (e) {
       lastResortHandler({
-        logger,
-        response,
-        error: new ResultHandlerError(
-          makeErrorFromAnything(e).message,
-          error || undefined,
-        ),
+        ...rest,
+        error: new ResultHandlerError(ensureError(e), error || undefined),
       });
     }
   }
@@ -335,9 +309,7 @@ export class Endpoint<
           defaultHeaders: headers,
         });
       }
-      for (const key in headers) {
-        response.set(key, headers[key]);
-      }
+      for (const key in headers) response.set(key, headers[key]);
     }
     const input = getInput(request, config.inputSources);
     try {
@@ -349,13 +321,8 @@ export class Endpoint<
         logger,
         options,
       });
-      if (response.writableEnded) {
-        return;
-      }
-      if (method === "options") {
-        response.status(200).end();
-        return;
-      }
+      if (response.writableEnded) return;
+      if (method === "options") return void response.status(200).end();
       output = await this.#parseOutput(
         await this.#parseAndRunHandler({
           input,
@@ -364,7 +331,7 @@ export class Endpoint<
         }),
       );
     } catch (e) {
-      error = makeErrorFromAnything(e);
+      error = ensureError(e);
     }
     await this.#handleResult({
       input,

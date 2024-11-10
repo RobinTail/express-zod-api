@@ -2,6 +2,115 @@
 
 ## Version 20
 
+### v20.20.1
+
+- Minor code style refactoring and performance tuning;
+- The software is redefined as a framework;
+  - Thanks to [@JonParton](https://github.com/JonParton) for contribution to the documentation.
+
+### v20.20.0
+
+- Introducing `errorHandler` option for `testMiddleware()` method:
+  - If your middleware throws an error there was no ability to make assertions other than the thrown error;
+  - New option can be assigned with a function for transforming the error into response, so that `testMiddlware` itself
+    would not throw, enabling usage of all returned entities for mutiple assertions in test;
+  - The feature suggested by [@williamgcampbell](https://github.com/williamgcampbell).
+
+```ts
+import { testMiddleware, Middleware } from "express-zod-api";
+
+const middlware = new Middleware({
+  input: z.object({}),
+  handler: async ({ logger }) => {
+    logger.info("logging something");
+    throw new Error("something went wrong");
+  },
+});
+
+test("a middleware throws, but it writes log as well", async () => {
+  const { loggerMock, responseMock } = await testMiddleware({
+    errorHandler: (error, response) => response.end(error.message),
+    middleware,
+  });
+  expect(loggerMock._getLogs().info).toEqual([["logging something"]]);
+  expect(responseMock._getData()).toBe("something went wrong");
+});
+```
+
+### v20.19.0
+
+- Configuring built-in logger made optional:
+  - Built-in logger configuration option `level` made optional as well as the `logger` option for `createConfig()`;
+  - Using `debug` level by default, or `warn` when `NODE_ENV=production`.
+- Fixed performance issue on `BuiltinLogger` when its `color` option is not set in config:
+  - `.child()` method is 50x times faster now by only detecting the color support once;
+  - Color autodetection was introduced in v18.3.0.
+
+### v20.18.0
+
+- Introducing `ensureHttpError()` method that converts any `Error` into `HttpError`:
+  - It converts `InputValidationError` to `BadRequest` (status code `400`) and others to `InternalServerError` (`500`).
+- Deprecating `getStatusCodeFromError()` — use the `ensureHttpError().statusCode` instead.
+- Generalizing server-side error messages in production mode by default:
+  - This feature aims to improve the security of your API by not disclosing the exact causes of errors;
+  - Applies to `defaultResultHandler`, `defaultEndpointsFactory` and Last Resort Handler only;
+  - When `NODE_ENV` is set to `production` (displayed on startup);
+  - Instead of actual message the default one associated with the corresponding `statusCode` used;
+  - Server-side errors are those having status code `5XX`, or treated that way by `ensureHttpError()`;
+  - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option;
+  - More about production mode and how to activate it:
+    https://nodejs.org/en/learn/getting-started/nodejs-the-difference-between-development-and-production
+
+```ts
+import createHttpError from "http-errors";
+// NODE_ENV=production
+// Throwing HttpError from Endpoint or Middleware that is using defaultResultHandler or defaultEndpointsFactory:
+createHttpError(401, "Token expired"); // —> "Token expired"
+createHttpError(401, "Token expired", { expose: false }); // —> "Unauthorized"
+createHttpError(500, "Something is broken"); // —> "Internal Server Error"
+createHttpError(501, "We didn't make it yet", { expose: true }); // —> "We didn't make it yet"
+```
+
+### v20.17.0
+
+- Added `cause` property to `DocumentationError`;
+- Log all server side errors (status codes `>= 500`) and in full (not just the `message`).
+
+### v20.16.0
+
+- Deprecating `originalError` property on both `InputValidationError` and `OutputValidationError`:
+  - Use `cause` property instead;
+  - Those error classes are publicly exposed for developers making custom Result Handlers.
+
+```diff
+  const error = new InputValidationError(new z.ZodError([]));
+- logger.error(error.originalError.message);
++ logger.error(error.cause.message);
+```
+
+### v20.15.3
+
+- Merge intersected object types in generated client:
+  - This fixes "empty object" intersection problem for endpoints having middlwares without inputs.
+
+```diff
+- type GetV1UserRetrieveInput = {} & {
++ type GetV1UserRetrieveInput = {
+    /** a numeric string containing the id of the user */
+    id: string;
+  };
+```
+
+### v20.15.2
+
+- Fixed duplicated client types in unions:
+  - When `splitResponse` option is disabled on `Integration` primitive response types could have been duplicated.
+
+```diff
+- type GetV1AvatarSendResponse = string | string;
++ type GetV1AvatarSendResponse = string;
+```
+
 ### v20.15.1
 
 - Deprecating `serializer` property on `Documentation` and `Integration` constructor argument:
@@ -309,7 +418,7 @@ z.object({ user_id: z.string() })
   - This can enable having `snake_case` API parameters while keeping `camelCase` naming in your implementation;
   - You can `.transform()` the entire `input` schema into another object, using a well-typed mapping library;
   - You can do the same with the `output` schema, but that would not be enough for generating a valid documentation;
-  - The library offers a new `.remap()` method on the `z.object()` schema that applies a `.pipe()` to transformation;
+  - The framework offers a new `.remap()` method on the `z.object()` schema that applies a `.pipe()` to transformation;
     - Currently `.remap()` requires an assignment of all the object props explicitly, but it may be improved later;
   - Find more details [in the documentation](README.md#top-level-transformations-and-mapping);
   - The feature suggested by [Peter Rottmann](https://github.com/rottmann).
@@ -484,7 +593,7 @@ const config = createConfig({
 
 - Feature: customizable handling rules for your branded schemas in Documentation and Integration:
   - You can make your schemas special by branding them using `.brand()` method;
-  - The library (being a Zod Plugin as well) distinguishes the branded schemas in runtime;
+  - The framework (being a Zod Plugin as well) distinguishes the branded schemas in runtime;
   - The constructors of `Documentation` and `Integration` now accept new property `brandHandling` (object);
   - Its keys should be the brands you want to handle in a special way;
   - Its values are functions having your schema as the first argument and a context in the second place;
@@ -728,10 +837,9 @@ const labeledDefaultSchema = withMeta(
 
 - Supporting Node 22;
 - Featuring `zod-sockets` for implementing subscriptions on your API:
-  - I have developed an additional pluggable library, Zod Sockets, which has similar principles and capabilities, but
-    uses the websocket transport and Socket.IO protocol, so that the user of a client application could subscribe to
-    subsequent updates initiated by the server;
-  - Check out an [example of the synergy between two libraries](https://github.com/RobinTail/zod-sockets#subscriptions)
+  - I have developed an additional websocket operating framework, Zod Sockets, which has similar principles and
+    capabilities, so that the user could subscribe to subsequent updates initiated by the server;
+  - Check out an [example of the synergy between two frameworks](https://github.com/RobinTail/zod-sockets#subscriptions)
     and the [Demo Chat application](https://github.com/RobinTail/chat);
   - The feature suggested by [@ben-xD](https://github.com/ben-xD).
 
@@ -1822,7 +1930,7 @@ after:
 
 ### v11.7.0
 
-- Good news for array lovers and those struggling with migrating legacy APIs to use this library.
+- Good news for array lovers and those struggling with migrating legacy APIs to use this framework.
 - New feature: `arrayResultHandler` (and corresponding `arrayEndpointsFactory`).
   - Please avoid using them for new projects: responding with array is a bad practice keeping your endpoints from
     evolving without breaking changes.

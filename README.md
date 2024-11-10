@@ -36,12 +36,13 @@ Start your API server with I/O schema validation and custom middlewares in minut
    3. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    4. [Response customization](#response-customization)
    5. [Error handling](#error-handling)
-   6. [Non-object response](#non-object-response) including file downloads
-   7. [File uploads](#file-uploads)
-   8. [Serving static files](#serving-static-files)
-   9. [Connect to your own express app](#connect-to-your-own-express-app)
-   10. [Testing endpoints](#testing-endpoints)
-   11. [Testing middlewares](#testing-middlewares)
+   6. [Production mode](#production-mode)
+   7. [Non-object response](#non-object-response) including file downloads
+   8. [File uploads](#file-uploads)
+   9. [Serving static files](#serving-static-files)
+   10. [Connect to your own express app](#connect-to-your-own-express-app)
+   11. [Testing endpoints](#testing-endpoints)
+   12. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -64,7 +65,7 @@ You can find the release notes and migration guides in [Changelog](CHANGELOG.md)
 
 # Overview
 
-I made this library because of the often repetitive tasks of starting a web server APIs with the need to validate input
+I made this framework because of the often repetitive tasks of starting a web server APIs with the need to validate input
 data. It integrates and provides the capabilities of popular web server, logging, validation and documenting solutions.
 Therefore, many basic tasks can be accomplished faster and easier, in particular:
 
@@ -81,11 +82,12 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 ## Contributors
 
-These people contributed to the improvement of the library by reporting bugs, making changes and suggesting ideas:
+These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/JonParton.png" alt="@JonParton" width="50px" />](https://github.com/JonParton)
+[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/t1nky.png" alt="@t1nky" width="50px" />](https://github.com/t1nky)
 [<img src="https://github.com/Tomtec331.png" alt="@Tomtec331" width="50px" />](https://github.com/Tomtec331)
-[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
 [<img src="https://github.com/boarush.png" alt="@boarush" width="50px" />](https://github.com/boarush)
 [<img src="https://github.com/shawncarr.png" alt="@shawncarr" width="50px" />](https://github.com/shawncarr)
@@ -151,7 +153,7 @@ Much can be customized to fit your needs.
 
 ## Installation
 
-Install the library, its peer dependencies and type assistance packages using your favorite
+Install the framework, its peer dependencies and type assistance packages using your favorite
 [package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/).
 
 ```shell
@@ -184,7 +186,6 @@ const config = createConfig({
     listen: 8090, // port, UNIX socket or options
   },
   cors: true,
-  logger: { level: "debug", color: true },
 });
 ```
 
@@ -361,8 +362,8 @@ const resultHandlerWithCleanup = new ResultHandler({
 There are two ways of connecting the native express middlewares depending on their nature and your objective.
 
 In case it's a middleware establishing and serving its own routes, or somehow globally modifying the behaviour, or
-being an additional request parser (like `cookie-parser`), use the `beforeRouting` option.
-However, it might be better to avoid `cors` here — [the library handles it on its own](#cross-origin-resource-sharing).
+being an additional request parser (like `cookie-parser`), use the `beforeRouting` option. However, it might be better
+to avoid `cors` here — [the framework handles it on its own](#cross-origin-resource-sharing).
 
 ```typescript
 import { createConfig } from "express-zod-api";
@@ -465,7 +466,7 @@ implementation itself requires camel case for internal naming. In order to facil
 different naming standards you can `.transform()` the entire `input` schema into another object using a well-typed
 mapping library, such as [camelize-ts](https://www.npmjs.com/package/camelize-ts). However, that approach would not be
 enough for the `output` schema if you're also aiming to [generate a valid documentation](#creating-a-documentation),
-because the transformations themselves do not contain schemas. Addressing this case, the library offers the `.remap()`
+because the transformations themselves do not contain schemas. Addressing this case, the framework offers the `.remap()`
 method of the object schema, a part of the [Zod plugin](#zod-plugin), which under the hood, in addition to the
 transformation, also `.pipe()` the transformed object into a new object schema.
 Here is a recommended solution: it is important to use shallow transformations only.
@@ -510,7 +511,7 @@ which in turn calls
 It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
 confusion with original method ~~z.date()~~ that should not be used within IO schemas of your API.
 
-In order to solve this problem, the library provides two custom methods for dealing with dates: `ez.dateIn()` and
+In order to solve this problem, the framework provides two custom methods for dealing with dates: `ez.dateIn()` and
 `ez.dateOut()` for using within input and output schemas accordingly.
 
 `ez.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
@@ -523,7 +524,7 @@ provides your endpoint handler or middleware with a `Date`. It supports the foll
 2021-12-31
 ```
 
-`ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
+`ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHandler` with a `string` representation in ISO
 format for the response transmission. Consider the following simplified example for better understanding:
 
 ```typescript
@@ -611,8 +612,20 @@ your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Customizing logger
 
-If the simple console output of the built-in logger is not enough for you, you can connect any other compatible one.
-It must support at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
+A simple built-in console logger is used by default with the following options that you can configure:
+
+```typescript
+import { createConfig } from "express-zod-api";
+const config = createConfig({
+  logger: {
+    level: "debug", // or "warn" in production mode
+    color: undefined, // detects automatically, boolean
+    depth: 2, // controls how deeply entities should be inspected
+  },
+});
+```
+
+You can also replace it with a one having at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
 Winston and Pino support is well known. Here is an example configuring `pino` logger with `pino-pretty` extension:
 
 ```typescript
@@ -650,7 +663,6 @@ declare module "express-zod-api" {
 }
 
 const config = createConfig({
-  logger: { level: "debug", color: true },
   childLoggerProvider: ({ parent, request }) =>
     parent.child({ requestId: randomUUID() }),
 });
@@ -658,18 +670,17 @@ const config = createConfig({
 
 ## Profiling
 
-For debugging and performance testing purposes the library offers a simple `.profile()` method on the built-in logger.
+For debugging and performance testing purposes the framework offers a simple `.profile()` method on the built-in logger.
 It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
 invoke the returned callback. The default severity of those measurements is `debug`.
 
 ```typescript
 import { createConfig, BuiltinLogger } from "express-zod-api";
 
-// This enables the .profile() method on "logger":
+// This enables the .profile() method on built-in logger:
 declare module "express-zod-api" {
   interface LoggerOverrides extends BuiltinLogger {}
 }
-const config = createConfig({ logger: { level: "debug", color: true } });
 
 // Inside a handler of Endpoint, Middleware or ResultHandler:
 const done = logger.profile("expensive operation");
@@ -803,18 +814,8 @@ The `defaultResultHandler` sets the HTTP status code and ensures the following t
 
 ```typescript
 type DefaultResponse<OUT> =
-  | {
-      // Positive response
-      status: "success";
-      data: OUT;
-    }
-  | {
-      // or Negative response
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | { status: "success"; data: OUT } // Positive response
+  | { status: "error"; error: { message: string } }; // or Negative response
 ```
 
 You can create your own result handler by using this example as a template:
@@ -823,7 +824,7 @@ You can create your own result handler by using this example as a template:
 import { z } from "zod";
 import {
   ResultHandler,
-  getStatusCodeFromError,
+  ensureHttpError,
   getMessageFromError,
 } from "express-zod-api";
 
@@ -834,13 +835,12 @@ const yourResultHandler = new ResultHandler({
   }),
   negative: z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
-    if (!error) {
-      // your implementation
-      return;
+    if (error) {
+      const { statusCode } = ensureHttpError(error);
+      const message = getMessageFromError(error);
+      return void response.status(statusCode).json({ error: message });
     }
-    const statusCode = getStatusCodeFromError(error);
-    const message = getMessageFromError(error);
-    // your implementation
+    response.status(200).json({ data: output });
   },
 });
 ```
@@ -862,9 +862,9 @@ the `defaultResultHandler`, however, since much can be customized, you should be
 origins of errors that could happen in runtime and be handled the following way:
 
 - Ones related to `Endpoint` execution — handled by a `ResultHandler` assigned to the `EndpointsFactory` produced it:
-  - Proprietary classes (available to you for your custom handling):
-    - `InputValidationError` — when request payload does not match the `input` schema of the endpoint.
-      The default response status code is `400`;
+  - The following proprietary classes are available to you for customizing error handling in your `ResultHandler`:
+    - `InputValidationError` — when request payload does not match the `input` schema of the endpoint or middleware.
+      The default response status code is `400`, `cause` property contains the original `ZodError`;
     - `OutputValidationError` — when returns of the endpoint's `handler` does not match its `output` schema (`500`);
   - Errors thrown within endpoint's `handler`:
     - `HttpError`, made by `createHttpError()` method of `http-errors` (required peer dependency). The default response
@@ -875,7 +875,27 @@ origins of errors that could happen in runtime and be handled the following way:
     `400` for parsing, `404` for routing, `config.upload.limitError.statusCode` for upload issues, or `500` for others.
   - `ResultHandler` must handle possible `error` and avoid throwing its own errors, otherwise:
 - Ones related to `ResultHandler` execution — handled by `LastResortHandler`:
-  - Response status code is always `500` and the response itself is a plain text containing original `error.message`.
+  - Response status code is always `500` and the response itself is a plain text.
+
+## Production mode
+
+Consider enabling production mode by setting `NODE_ENV` environment variable to `production` for your deployment:
+
+- Express activates some [performance optimizations](https://expressjs.com/en/advanced/best-practice-performance.html);
+- The `defaultResultHandler`, `defaultEndpointsFactory` and `LastResortHandler` generalize server-side error messages
+  in negative responses in order to improve the security of your API by not disclosing the exact causes of errors:
+  - Throwing errors that have or imply `5XX` status codes become just `Internal Server Error` message in response;
+  - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option:
+
+```ts
+import createHttpError from "http-errors";
+// NODE_ENV=production
+// Throwing HttpError from Endpoint or Middleware that is using defaultResultHandler or defaultEndpointsFactory:
+createHttpError(401, "Token expired"); // —> "Token expired"
+createHttpError(401, "Token expired", { expose: false }); // —> "Unauthorized"
+createHttpError(500, "Something is broken"); // —> "Internal Server Error"
+createHttpError(501, "We didn't make it yet", { expose: true }); // —> "We didn't make it yet"
+```
 
 ## Non-object response
 
@@ -995,7 +1015,7 @@ const routing: Routing = {
 
 ## Connect to your own express app
 
-If you already have your own configured express application, or you find the library settings not enough, you can
+If you already have your own configured express application, or you find the framework settings not enough, you can
 connect the endpoints to your app or any express router using the `attachRouting()` method:
 
 ```typescript
@@ -1023,7 +1043,7 @@ then consider using the `beforeRouting` [option in config instead](#using-native
 ## Testing endpoints
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
-assert the expectations on status, headers and payload. The library provides a special method `testEndpoint` that
+assert the expectations on status, headers and payload. The framework provides a special method `testEndpoint` that
 makes mocking easier. Under the hood, request and response object are mocked using the
 [node-mocks-http](https://www.npmjs.com/package/node-mocks-http) library, therefore you can utilize its API for
 settings additional properties and asserting expectation using the provided getters, such as `._getStatusCode()`.
@@ -1048,9 +1068,9 @@ test("should respond successfully", async () => {
 
 ## Testing middlewares
 
-Middlewares can also be tested individually, [similar to endpoints](#testing-endpoints), but using the
-`testMiddleware()` method. There is also an ability to pass `options` collected from outputs of previous middlewares,
-if the one being tested somehow depends on them.
+Middlewares can also be tested individually using the `testMiddleware()` method. You can also pass `options` collected
+from outputs of previous middlewares, if the one being tested somehow depends on them. There is `errorHandler` option
+for catching a middleware error and transforming into a response to assert in test along with other returned entities.
 
 ```typescript
 import { z } from "zod";
@@ -1068,6 +1088,7 @@ const { output, responseMock, loggerMock } = await testMiddleware({
   middleware,
   requestProps: { method: "POST", body: { test: "something" } },
   options: { prev: "accumulated" }, // responseOptions, configProps, loggerProps
+  // errorHandler: (error, response) => response.end(error.message),
 });
 expect(loggerMock._getLogs().error).toHaveLength(0);
 expect(output).toEqual({ collectedOptions: ["prev"], testLength: 9 });
@@ -1110,7 +1131,7 @@ new ResultHandler({
 
 Please avoid doing this in new projects: responding with array is a bad practice keeping your endpoints from evolving
 in backward compatible way (without making breaking changes). Nevertheless, for the purpose of easier migration of
-legacy APIs to this library consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
+legacy APIs to this framework consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
 or implement your own ones in a similar way.
 The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
 assigned to that property is used as the response. This approach also supports examples, as well as documentation and
@@ -1185,11 +1206,10 @@ createConfig({
 ## Subscriptions
 
 If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server, the
-capabilities of this library and the HTTP protocol itself would not be enough in this case. I have developed an
-additional pluggable library, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and
-capabilities, but uses the websocket transport and Socket.IO protocol for that purpose. Check out an example of the
-synergy between two libraries on handling the incoming `subscribe` and `unsubscribe` events in order to emit
-(broadcast) the `time` event every second with a current time in its payload:
+capabilities of this framework and the HTTP protocol itself would not be enough in this case. I have developed an
+additional websocket operating framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar
+principles and capabilities. Check out an example of the synergy between two frameworks on handling subscription events
+in order to emit (broadcast) the `time` event every second with a current time in its payload:
 
 https://github.com/RobinTail/zod-sockets#subscriptions
 
@@ -1328,7 +1348,7 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 ## Customizable brands handling
 
 You can customize handling rules for your schemas in Documentation and Integration. Use the `.brand()` method on your
-schema to make it special and distinguishable for the library in runtime. Using symbols is recommended for branding.
+schema to make it special and distinguishable for the framework in runtime. Using symbols is recommended for branding.
 After that utilize the `brandHandling` feature of both constructors to declare your custom implementation. In case you
 need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
 
@@ -1376,7 +1396,7 @@ should be aware of them.
 
 ## Coercive schema of Zod
 
-Despite being supported by the library, `z.coerce.*` schema
+Despite being supported by the framework, `z.coerce.*` schema
 [does not work intuitively](https://github.com/RobinTail/express-zod-api/issues/759).
 Please be aware that `z.coerce.number()` and `z.number({ coerce: true })` (being typed not well) still will NOT allow
 you to assign anything but number. Moreover, coercive schemas are not fail-safe and their methods `.isOptional()` and

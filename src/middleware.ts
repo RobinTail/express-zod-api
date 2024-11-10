@@ -107,9 +107,7 @@ export class ExpressMiddleware<
       handler: async ({ request, response }) =>
         new Promise<OUT>((resolve, reject) => {
           const next = (err?: unknown) => {
-            if (err && err instanceof Error) {
-              return reject(transformer(err));
-            }
+            if (err && err instanceof Error) return reject(transformer(err));
             resolve(provider(request as R, response as S));
           };
           nativeMw(request as R, response as S, next)?.catch(next);

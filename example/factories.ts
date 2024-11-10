@@ -4,7 +4,7 @@ import {
   ResultHandler,
   defaultResultHandler,
   ez,
-  getStatusCodeFromError,
+  ensureHttpError,
 } from "../src";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
@@ -28,15 +28,10 @@ export const fileSendingEndpointsFactory = new EndpointsFactory({
     positive: { schema: z.string(), mimeType: "image/svg+xml" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
-      if (error) {
-        response.status(400).send(error.message);
-        return;
-      }
-      if (output && "data" in output && typeof output.data === "string") {
+      if (error) return void response.status(400).send(error.message);
+      if (output && "data" in output && typeof output.data === "string")
         response.type("svg").send(output.data);
-      } else {
-        response.status(400).send("Data is missing");
-      }
+      else response.status(400).send("Data is missing");
     },
   }),
 });
@@ -48,19 +43,10 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
     positive: { schema: ez.file("buffer"), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
-      if (error) {
-        response.status(400).send(error.message);
-        return;
-      }
-      if (
-        output &&
-        "filename" in output &&
-        typeof output.filename === "string"
-      ) {
+      if (error) return void response.status(400).send(error.message);
+      if (output && "filename" in output && typeof output.filename === "string")
         createReadStream(output.filename).pipe(response.type(output.filename));
-      } else {
-        response.status(400).send("Filename is missing");
-      }
+      else response.status(400).send("Filename is missing");
     },
   }),
 });
@@ -95,16 +81,18 @@ export const statusDependingFactory = new EndpointsFactory({
     ],
     handler: ({ error, response, output }) => {
       if (error) {
-        const code = getStatusCodeFromError(error);
-        response.status(code).json(
-          code === 409 && "id" in error && typeof error.id === "number"
-            ? {
-                status: "exists",
-                id: error.id,
-              }
-            : { status: "error", reason: error.message },
-        );
-        return;
+        const httpError = ensureHttpError(error);
+        const doesExist =
+          httpError.statusCode === 409 &&
+          "id" in httpError &&
+          typeof httpError.id === "number";
+        return void response
+          .status(httpError.statusCode)
+          .json(
+            doesExist
+              ? { status: "exists", id: httpError.id }
+              : { status: "error", reason: httpError.message },
+          );
       }
       response.status(201).json({ status: "created", data: output });
     },

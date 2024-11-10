@@ -1,18 +1,13 @@
 import { bench } from "vitest";
 
-describe("Experiment %s", () => {
-  const map = new WeakMap();
-  const set = new WeakSet();
-  const obj = {};
+const objects = [{ a: 1 }, { b: 2 }, { c: 3, a: 2 }];
 
-  bench("WeakMap.has()", () => {
-    map.has({});
+describe("Experiment for reducer", () => {
+  bench("current", () => {
+    objects.reduce((agg, obj) => ({ ...agg, ...obj }), {});
   });
 
-  bench("WeakSet.has()", () => {
-    set.has({});
+  bench("featured", () => {
+    objects.reduce((agg, obj) => Object.assign(agg, obj), {});
   });
-
-  bench("control: in", () => void ("test" in obj));
-  bench("control: hasOwn", () => void Object.hasOwn(obj, "test"));
 });

@@ -8,7 +8,7 @@ import { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
-import { makeErrorFromAnything } from "./common-helpers";
+import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
 
 type EquippedRequest = Request<
@@ -32,13 +32,11 @@ export const createParserFailureHandler =
     getChildLogger,
   }: HandlerCreatorParams): ErrorRequestHandler =>
   async (error, request, response, next) => {
-    if (!error) {
-      return next();
-    }
+    if (!error) return next();
     return errorHandler.execute({
       error: isHttpError(error)
         ? error
-        : createHttpError(400, makeErrorFromAnything(error).message),
+        : createHttpError(400, ensureError(error).message),
       request,
       response,
       input: null,
@@ -70,7 +68,7 @@ export const createNotFoundHandler =
       lastResortHandler({
         response,
         logger,
-        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
+        error: new ResultHandlerError(ensureError(e), error),
       });
     }
   };
@@ -81,17 +79,13 @@ export const createUploadFailureHandler =
     const failedFile = Object.values(req?.files || [])
       .flat()
       .find(({ truncated }) => truncated);
-    if (failedFile) {
-      return next(error);
-    }
+    if (failedFile) return next(error);
     next();
   };
 
 export const createUploadLogger = (
   logger: ActualLogger,
-): Pick<Console, "log"> => ({
-  log: logger.debug.bind(logger),
-});
+): Pick<Console, "log"> => ({ log: logger.debug.bind(logger) });
 
 export const createUploadParsers = async ({
   getChildLogger,
@@ -120,16 +114,12 @@ export const createUploadParsers = async ({
       logger: createUploadLogger(logger),
     })(request, response, next);
   });
-  if (limitError) {
-    parsers.push(createUploadFailureHandler(limitError));
-  }
+  if (limitError) parsers.push(createUploadFailureHandler(limitError));
   return parsers;
 };
 
 export const moveRaw: RequestHandler = (req, {}, next) => {
-  if (Buffer.isBuffer(req.body)) {
-    req.body = { raw: req.body };
-  }
+  if (Buffer.isBuffer(req.body)) req.body = { raw: req.body };
   next();
 };
 
@@ -147,9 +137,8 @@ export const createLoggingMiddleware =
       ? await config.childLoggerProvider({ request, parent: rootLogger })
       : rootLogger;
     logger.debug(`${request.method}: ${request.path}`);
-    if (request.res) {
+    if (request.res)
       (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
-    }
     next();
   };
 

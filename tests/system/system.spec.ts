@@ -13,11 +13,14 @@ import {
 import { givePort } from "../helpers";
 import { setTimeout } from "node:timers/promises";
 
-describe("App", async () => {
+describe("App in production mode", async () => {
+  vi.stubEnv("TSUP_STATIC", "production");
+  vi.stubEnv("NODE_ENV", "production");
   const port = givePort();
   const logger = new BuiltinLogger({ level: "silent" });
   const infoMethod = vi.spyOn(logger, "info");
   const warnMethod = vi.spyOn(logger, "warn");
+  const errorMethod = vi.spyOn(logger, "error");
   const corsedEndpoint = new EndpointsFactory(defaultResultHandler)
     .use(
       cors({
@@ -84,9 +87,7 @@ describe("App", async () => {
         options: { user, permissions, method },
       }) => {
         // Problem 787: should lead to ZodError that is NOT considered as the IOSchema validation error
-        if (something === "internal_zod_error") {
-          z.number().parse("");
-        }
+        if (something === "internal_zod_error") z.number().parse("");
         return {
           anything: something === "joke" ? 300 : -100500,
           doubleKey: key.repeat(2),
@@ -149,6 +150,7 @@ describe("App", async () => {
     // this approach works better than .close() callback
     await vi.waitFor(() => assert(!server.listening), { timeout: 1e4 });
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
   });
 
   describe("Positive", () => {
@@ -266,9 +268,8 @@ describe("App", async () => {
         "text/plain; charset=utf-8",
       );
       const text = await response.text();
-      expect(text).toBe(
-        "An error occurred while serving the result: I am faulty.",
-      );
+      expect(text).toBe("Internal Server Error");
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
     test("Should treat custom errors in middleware input validations as they are", async () => {
@@ -283,10 +284,8 @@ describe("App", async () => {
       );
       expect(response.status).toBe(500);
       const text = await response.text();
-      expect(text).toBe(
-        "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Custom error in the Middleware input validation.",
-      );
+      expect(text).toBe("Internal Server Error");
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
     test("Should treat custom errors in endpoint input validations as they are", async () => {
@@ -301,10 +300,8 @@ describe("App", async () => {
       );
       expect(response.status).toBe(500);
       const text = await response.text();
-      expect(text).toBe(
-        "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Custom error in the Endpoint input validation.",
-      );
+      expect(text).toBe("Internal Server Error");
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
   });
 
@@ -423,6 +420,7 @@ describe("App", async () => {
       expect(response.status).toBe(500);
       const json = await response.json();
       expect(json).toMatchSnapshot();
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
     test("Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error", async () => {
@@ -439,6 +437,7 @@ describe("App", async () => {
       expect(response.status).toBe(500);
       const json = await response.json();
       expect(json).toMatchSnapshot();
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
   });
 

@@ -1,6 +1,6 @@
 import { ReferenceObject } from "openapi3-ts/oas31";
 import { z } from "zod";
-import { DocumentationError, ez } from "../../src";
+import { ez } from "../../src";
 import {
   OpenAPIContext,
   depictAny,
@@ -240,13 +240,9 @@ describe("Documentation helpers", () => {
       expect(depictUpload(ez.upload(), requestCtx)).toMatchSnapshot();
     });
     test("should throw when using in response", () => {
-      try {
-        depictUpload(ez.upload(), responseCtx);
-        expect.fail("Should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
+      expect(() =>
+        depictUpload(ez.upload(), responseCtx),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 
@@ -292,6 +288,15 @@ describe("Documentation helpers", () => {
       expect(
         depictIntersection(
           z.object({ one: z.number() }).and(z.object({ two: z.number() })),
+          requestCtx,
+        ),
+      ).toMatchSnapshot();
+    });
+
+    test("should NOT flatten object schemas having conflicting props", () => {
+      expect(
+        depictIntersection(
+          z.object({ one: z.number() }).and(z.object({ one: z.string() })),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -362,13 +367,12 @@ describe("Documentation helpers", () => {
       },
     );
 
-    test.each([
-      z.string().nullable(),
-      z.null().nullable(),
-      z.string().nullable().nullable(),
-    ])("should only add null type once %#", (schema) => {
-      expect(depictNullable(schema, requestCtx)).toMatchSnapshot();
-    });
+    test.each([z.null().nullable(), z.string().nullable().nullable()])(
+      "should not add null type when it's already there %#",
+      (schema) => {
+        expect(depictNullable(schema, requestCtx)).toMatchSnapshot();
+      },
+    );
   });
 
   describe("depictEnum()", () => {
@@ -702,13 +706,9 @@ describe("Documentation helpers", () => {
       expect(depictDateIn(ez.dateIn(), requestCtx)).toMatchSnapshot();
     });
     test("should throw when ZodDateIn in response", () => {
-      try {
-        depictDateIn(ez.dateIn(), responseCtx);
-        expect.fail("should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
+      expect(() =>
+        depictDateIn(ez.dateIn(), responseCtx),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 
@@ -717,13 +717,9 @@ describe("Documentation helpers", () => {
       expect(depictDateOut(ez.dateOut(), responseCtx)).toMatchSnapshot();
     });
     test("should throw when ZodDateOut in request", () => {
-      try {
-        depictDateOut(ez.dateOut(), requestCtx);
-        expect.fail("should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
+      expect(() =>
+        depictDateOut(ez.dateOut(), requestCtx),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 
@@ -731,13 +727,7 @@ describe("Documentation helpers", () => {
     test.each([responseCtx, requestCtx])(
       "should throw clear error %#",
       (ctx) => {
-        try {
-          depictDate(z.date(), ctx);
-          expect.fail("should not be here");
-        } catch (e) {
-          expect(e).toBeInstanceOf(DocumentationError);
-          expect(e).toMatchSnapshot();
-        }
+        expect(() => depictDate(z.date(), ctx)).toThrowErrorMatchingSnapshot();
       },
     );
   });
