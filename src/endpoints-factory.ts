@@ -116,7 +116,7 @@ export class EndpointsFactory<
 
   public build<
     BOUT extends IOSchema,
-    BIN extends IOSchema = z.ZodObject<EmptyObject>,
+    BIN extends IOSchema = z.ZodObject<EmptyObject, "strip">,
   >({
     input = z.object({}) as BIN,
     handler,
