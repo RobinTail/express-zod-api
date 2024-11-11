@@ -49,7 +49,6 @@ describe("Documentation", () => {
           v1: {
             deleteSomething: defaultEndpointsFactory.build({
               methods: ["delete"],
-              input: z.object({}),
               output: z.object({
                 whatever: z.number(),
               }),
@@ -302,7 +301,6 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
-              input: z.object({}),
               output: z.object({
                 simple: z.record(z.number().int()),
                 stringy: z.record(z.string().regex(/[A-Z]+/), z.boolean()),
@@ -620,12 +618,10 @@ describe("Documentation", () => {
             },
           ],
         },
-        input: z.object({}),
         handler: vi.fn<any>(),
       });
       const mw3 = new Middleware({
         security: { type: "bearer", format: "JWT" },
-        input: z.object({}),
         handler: vi.fn<any>(),
       });
       const spec = new Documentation({
@@ -646,14 +642,12 @@ describe("Documentation", () => {
             setSomething: defaultEndpointsFactory.addMiddleware(mw2).build({
               scope: "write",
               method: "post",
-              input: z.object({}),
               output: z.object({}),
               handler: async () => ({}),
             }),
             updateSomething: defaultEndpointsFactory.addMiddleware(mw3).build({
               scopes: ["this should be omitted"],
               method: "put",
-              input: z.object({}),
               output: z.object({}),
               handler: async () => ({}),
             }),
@@ -675,14 +669,12 @@ describe("Documentation", () => {
               thing: defaultEndpointsFactory.build({
                 description: "thing is the path segment",
                 method: "get",
-                input: z.object({}),
                 output: z.object({}),
                 handler: async () => ({}),
               }),
               ":thing": defaultEndpointsFactory.build({
                 description: "thing is the path parameter",
                 method: "get",
-                input: z.object({}),
                 output: z.object({}),
                 handler: async () => ({}),
               }),
@@ -707,7 +699,6 @@ describe("Documentation", () => {
                 description: "thing is the path segment",
                 method: "get",
                 operationId,
-                input: z.object({}),
                 output: z.object({}),
                 handler: async () => ({}),
               }),
@@ -733,7 +724,6 @@ describe("Documentation", () => {
                 description: "thing is the path segment",
                 methods: ["get", "post"],
                 operationId: (method) => `${method}${operationId}`,
-                input: z.object({}),
                 output: z.object({}),
                 handler: async () => ({}),
               }),
@@ -767,7 +757,6 @@ describe("Documentation", () => {
                     description: "thing is the path segment",
                     method: "get",
                     operationId,
-                    input: z.object({}),
                     output: z.object({}),
                     handler: async () => ({}),
                   }),
@@ -777,7 +766,6 @@ describe("Documentation", () => {
                     description: "thing is the path segment",
                     method: "get",
                     operationId,
-                    input: z.object({}),
                     output: z.object({}),
                     handler: async () => ({}),
                   }),
@@ -812,7 +800,6 @@ describe("Documentation", () => {
           v1: {
             getSomething: factory.build({
               method: "get",
-              input: z.object({}),
               output: z.object({}),
               handler: async () => ({}),
             }),

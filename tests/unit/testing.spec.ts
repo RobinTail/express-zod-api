@@ -12,7 +12,6 @@ describe("Testing", () => {
     test("Should test an endpoint", async () => {
       const endpoint = defaultEndpointsFactory
         .addMiddleware({
-          input: z.object({}),
           handler: async ({ response }) => {
             response
               .setHeader("X-Some", "header")
@@ -23,7 +22,6 @@ describe("Testing", () => {
         })
         .build({
           method: "get",
-          input: z.object({}),
           output: z.object({}),
           handler: async () => ({}),
         });

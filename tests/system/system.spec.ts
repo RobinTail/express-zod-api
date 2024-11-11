@@ -31,7 +31,6 @@ describe("App in production mode", async () => {
     )
     .build({
       method: "get",
-      input: z.object({}),
       output: z.object({ corsDone: z.boolean() }),
       handler: async ({ options: { corsDone } }) => ({ corsDone }),
     });
@@ -74,7 +73,6 @@ describe("App in production mode", async () => {
       handler: async () => ({ user: { id: 354 } }),
     })
     .addMiddleware({
-      input: z.object({}),
       handler: async ({ request, options: { user } }) => ({
         method: request.method.toLowerCase() as Method,
         permissions: user.id === 354 ? ["any"] : [],
@@ -101,7 +99,6 @@ describe("App in production mode", async () => {
     });
   const longEndpoint = new EndpointsFactory(defaultResultHandler).build({
     method: "get",
-    input: z.object({}),
     output: z.object({}),
     handler: async () => setTimeout(5000, {}),
   });
