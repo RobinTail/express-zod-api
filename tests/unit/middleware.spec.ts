@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { InputValidationError, Middleware } from "../../src";
 import { EmptyObject } from "../../src/common-helpers";
-import { AbstractMiddleware } from "../../src/middleware";
+import { AbstractMiddleware, ExpressMiddleware } from "../../src/middleware";
 import {
   makeLoggerMock,
   makeRequestMock,
@@ -80,5 +80,13 @@ describe("Middleware", () => {
         response: responseMock,
       });
     });
+  });
+});
+
+describe("ExpressMiddleware", () => {
+  test("should inherit from Middleware", () => {
+    const mw = new ExpressMiddleware(vi.fn());
+    expect(mw).toBeInstanceOf(Middleware);
+    expectTypeOf(mw.getSchema()._output).toEqualTypeOf<EmptyObject>();
   });
 });
