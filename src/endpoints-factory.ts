@@ -17,12 +17,12 @@ import {
 } from "./result-handler";
 
 type BuildProps<
+  IN extends IOSchema,
   OUT extends IOSchema,
   MIN extends IOSchema<"strip">,
   OPT extends FlatObject,
   SCO extends string,
   TAG extends string,
-  IN extends IOSchema = z.ZodObject<EmptyObject>,
 > = {
   input?: IN;
   output: OUT;
@@ -114,7 +114,10 @@ export class EndpointsFactory<
     );
   }
 
-  public build<BIN extends IOSchema, BOUT extends IOSchema>({
+  public build<
+    BOUT extends IOSchema,
+    BIN extends IOSchema = z.ZodObject<EmptyObject>,
+  >({
     input = z.object({}) as BIN,
     handler,
     output: outputSchema,
@@ -122,7 +125,7 @@ export class EndpointsFactory<
     shortDescription,
     operationId,
     ...rest
-  }: BuildProps<BOUT, IN, OUT, SCO, TAG, BIN>): Endpoint<
+  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
     z.ZodIntersection<IN, BIN>,
     BOUT,
     OUT,
