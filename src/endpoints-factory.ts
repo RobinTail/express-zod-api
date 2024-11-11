@@ -73,9 +73,9 @@ export class EndpointsFactory<
   }
 
   public addMiddleware<
-    AIN extends IOSchema<"strip">,
     AOUT extends FlatObject,
     ASCO extends string,
+    AIN extends IOSchema<"strip"> = z.ZodObject<EmptyObject, "strip">,
   >(
     subject:
       | Middleware<OUT, AOUT, ASCO, AIN>
