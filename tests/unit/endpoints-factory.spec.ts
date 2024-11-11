@@ -71,17 +71,19 @@ describe("EndpointsFactory", () => {
         );
     });
 
-    test("Should accept creation props", () => {
-      defaultEndpointsFactory
-        .addMiddleware({
-          handler: async () => ({ test: "fist option" }),
-        })
-        .addMiddleware({
-          handler: async ({ options }) => {
-            expectTypeOf(options.test).toEqualTypeOf<string>();
-            return { second: `another option, ${options.test}` };
-          },
-        });
+    test("Should accept creation props without input schema", () => {
+      const factory = defaultEndpointsFactory.addMiddleware({
+        handler: async () => ({ test: "fist option" }),
+      });
+      expectTypeOf(factory).toMatchTypeOf<
+        EndpointsFactory<
+          z.ZodIntersection<
+            z.ZodObject<EmptyObject, "strip">,
+            z.ZodObject<EmptyObject, "strip">
+          >,
+          EmptyObject & { test: string }
+        >
+      >();
     });
   });
 
