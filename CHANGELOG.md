@@ -31,6 +31,14 @@ export default [
 
 ## Version 20
 
+### v20.21.0
+
+- Feat: input schema made optional:
+  - The `input` property can be now omitted on the argument of the following methods:
+    `Middlware::constructor`, `EndpointsFactory::build()`, `EndpointsFactory::addMiddleware()`;
+  - When the input schema is not specified `z.object({})` is used;
+  - This feature aims to simplify the implementation for Endpoints and Middlwares having no inputs.
+
 ### v20.20.1
 
 - Minor code style refactoring and performance tuning;

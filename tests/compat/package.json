@@ -10,6 +10,7 @@
     "typescript": "~5.1.0"
   },
   "scripts": {
+    "preinstall": "rm -rf node_modules",
     "pretest": "echo 'createConfig({ server: { listen: 8090, upload: true, beforeRouting: () => {}, } });' > sample.ts",
     "test": "eslint --fix && vitest --run && rm sample.ts"
   }

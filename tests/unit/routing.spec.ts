@@ -42,19 +42,16 @@ describe("Routing", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
         methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const postEndpoint = factory.build({
         methods: ["post"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const getAndPostEndpoint = factory.build({
         methods: ["get", "post"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -120,19 +117,16 @@ describe("Routing", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
         methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const postEndpoint = factory.build({
         methods: ["post"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const putAndPatchEndpoint = factory.build({
         methods: ["put", "patch"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -172,7 +166,6 @@ describe("Routing", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const putAndPatchEndpoint = factory.build({
         methods: ["put", "patch"],
-        input: z.object({}),
         output: z.object({}),
         handler: vi.fn(),
       });
@@ -259,7 +252,6 @@ describe("Routing", () => {
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -287,7 +279,6 @@ describe("Routing", () => {
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -319,7 +310,6 @@ describe("Routing", () => {
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
