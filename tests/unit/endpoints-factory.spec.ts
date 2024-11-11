@@ -92,6 +92,12 @@ describe("EndpointsFactory", () => {
         option1: "some value",
         option2: "other value",
       }));
+      expectTypeOf(newFactory).toEqualTypeOf<
+        EndpointsFactory<
+          z.ZodObject<EmptyObject, "strip">,
+          EmptyObject & { option1: string; option2: string }
+        >
+      >();
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"].length).toBe(1);
