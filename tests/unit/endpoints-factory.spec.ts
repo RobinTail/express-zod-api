@@ -5,9 +5,9 @@ import {
   Middleware,
   defaultEndpointsFactory,
   ResultHandler,
+  testMiddleware,
 } from "../../src";
 import { Endpoint } from "../../src/endpoint";
-import { testMiddleware } from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
 
