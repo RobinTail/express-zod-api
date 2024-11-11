@@ -242,7 +242,7 @@ describe("EndpointsFactory", () => {
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toStrictEqual(["get"]);
+      expect(endpoint.getMethods()).toBeUndefined();
       expect(
         serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();

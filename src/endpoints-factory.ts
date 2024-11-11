@@ -133,7 +133,9 @@ export class EndpointsFactory<
     const methods =
       "methods" in rest && rest.methods
         ? rest.methods
-        : [("method" in rest && rest.method) || "get"];
+        : "method" in rest && rest.method
+          ? [rest.method]
+          : undefined;
     const getOperationId =
       typeof operationId === "function" ? operationId : () => operationId;
     const scopes =

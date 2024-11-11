@@ -45,7 +45,7 @@ export abstract class AbstractEndpoint {
   public abstract getDescription(
     variant: DescriptionVariant,
   ): string | undefined;
-  public abstract getMethods(): ReadonlyArray<Method>;
+  public abstract getMethods(): ReadonlyArray<Method> | undefined;
   public abstract getSchema(variant: IOVariant): IOSchema;
   public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
   public abstract getMimeTypes(variant: MimeVariant): ReadonlyArray<string>;
@@ -67,7 +67,7 @@ export class Endpoint<
   TAG extends string,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods: ReadonlyArray<Method>;
+  readonly #methods?: ReadonlyArray<Method>;
   readonly #middlewares: AbstractMiddleware[];
   readonly #mimeTypes: Record<MimeVariant, ReadonlyArray<string>>;
   readonly #responses: Record<
@@ -103,7 +103,7 @@ export class Endpoint<
     description?: string;
     shortDescription?: string;
     getOperationId?: (method: Method) => string | undefined;
-    methods: Method[];
+    methods?: Method[];
     scopes?: SCO[];
     tags?: TAG[];
   }) {
@@ -190,8 +190,11 @@ export class Endpoint<
     return this.#getOperationId(method);
   }
 
+  // @todo too aware of defaults, cors should be probably moved to routing/walker as a middleware
   #getDefaultCorsHeaders(siblingMethods: Method[]): Record<string, string> {
-    const accessMethods = (this.#methods as Array<Method | AuxMethod>)
+    const accessMethods = (
+      (this.#methods || ["get"]) as Array<Method | AuxMethod>
+    )
       .concat(siblingMethods)
       .concat("options")
       .join(", ")
