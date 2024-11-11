@@ -7,6 +7,7 @@ import {
   ResultHandler,
   testMiddleware,
 } from "../../src";
+import { EmptyObject } from "../../src/common-helpers";
 import { Endpoint } from "../../src/endpoint";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
@@ -343,6 +344,18 @@ describe("EndpointsFactory", () => {
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<
         { s: string } & ({ n1: number } | { n2: number })
       >();
+    });
+
+    test("should create an endpoint without input schema", () => {
+      const factory = new EndpointsFactory(resultHandlerMock);
+      const endpoint = factory.build({
+        method: "get",
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      expectTypeOf(
+        endpoint.getSchema("input")._output,
+      ).toEqualTypeOf<EmptyObject>();
     });
   });
 });
