@@ -8,7 +8,6 @@ import { arrayRespondingFactory } from "../factories";
 export const listUsersEndpoint = arrayRespondingFactory.build({
   method: "get",
   tag: "users",
-  input: z.object({}),
   output: z
     .object({
       // the arrayResultHandler will take the "items" prop as the response
