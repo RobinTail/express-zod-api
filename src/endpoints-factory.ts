@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { EmptyObject, FlatObject } from "./common-helpers";
+import { EmptyObject, EmptySchema, FlatObject } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
 import { IOSchema, getFinalEndpointInputSchema } from "./io-schema";
@@ -35,7 +35,7 @@ type BuildProps<
   ({ tags?: TAG[] } | { tag?: TAG });
 
 export class EndpointsFactory<
-  IN extends IOSchema<"strip"> = z.ZodObject<EmptyObject, "strip">,
+  IN extends IOSchema<"strip"> = EmptySchema,
   OUT extends FlatObject = EmptyObject,
   SCO extends string = string,
   TAG extends string = string,
@@ -75,7 +75,7 @@ export class EndpointsFactory<
   public addMiddleware<
     AOUT extends FlatObject,
     ASCO extends string,
-    AIN extends IOSchema<"strip"> = z.ZodObject<EmptyObject, "strip">,
+    AIN extends IOSchema<"strip"> = EmptySchema,
   >(
     subject:
       | Middleware<OUT, AOUT, ASCO, AIN>
@@ -114,10 +114,7 @@ export class EndpointsFactory<
     );
   }
 
-  public build<
-    BOUT extends IOSchema,
-    BIN extends IOSchema = z.ZodObject<EmptyObject, "strip">,
-  >({
+  public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
     input = z.object({}) as BIN,
     handler,
     output: outputSchema,

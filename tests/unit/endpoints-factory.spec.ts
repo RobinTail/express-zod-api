@@ -7,7 +7,7 @@ import {
   ResultHandler,
   testMiddleware,
 } from "../../src";
-import { EmptyObject } from "../../src/common-helpers";
+import { EmptyObject, EmptySchema } from "../../src/common-helpers";
 import { Endpoint } from "../../src/endpoint";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
@@ -77,10 +77,7 @@ describe("EndpointsFactory", () => {
       });
       expectTypeOf(factory).toMatchTypeOf<
         EndpointsFactory<
-          z.ZodIntersection<
-            z.ZodObject<EmptyObject, "strip">,
-            z.ZodObject<EmptyObject, "strip">
-          >,
+          z.ZodIntersection<EmptySchema, EmptySchema>,
           EmptyObject & { test: string }
         >
       >();
@@ -96,7 +93,7 @@ describe("EndpointsFactory", () => {
       }));
       expectTypeOf(newFactory).toEqualTypeOf<
         EndpointsFactory<
-          z.ZodObject<EmptyObject, "strip">,
+          EmptySchema,
           EmptyObject & { option1: string; option2: string }
         >
       >();

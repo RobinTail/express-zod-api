@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { EmptyObject, FlatObject } from "./common-helpers";
+import { EmptySchema, FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
@@ -31,7 +31,7 @@ export class Middleware<
   OPT extends FlatObject,
   OUT extends FlatObject,
   SCO extends string,
-  IN extends IOSchema<"strip"> = z.ZodObject<EmptyObject, "strip">,
+  IN extends IOSchema<"strip"> = EmptySchema,
 > extends AbstractMiddleware {
   readonly #schema: IN;
   readonly #security?: LogicalContainer<
