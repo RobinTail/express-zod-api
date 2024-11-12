@@ -116,17 +116,14 @@ describe("Routing", () => {
       };
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
-        methods: ["get"],
         output: z.object({}),
         handler: handlerMock,
       });
       const postEndpoint = factory.build({
-        methods: ["post"],
         output: z.object({}),
         handler: handlerMock,
       });
       const putAndPatchEndpoint = factory.build({
-        methods: ["put", "patch"],
         output: z.object({}),
         handler: handlerMock,
       });
@@ -205,13 +202,11 @@ describe("Routing", () => {
         handler,
       });
       const postEndpoint = factory.build({
-        method: "post",
         input,
         output,
         handler,
       });
       const putAndPatchEndpoint = factory.build({
-        methods: ["put", "patch"],
         input,
         output,
         handler,
