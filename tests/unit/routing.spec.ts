@@ -190,7 +190,10 @@ describe("Routing", () => {
     test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
       const handler = vi.fn(async () => ({}));
       const configMock = {
-        cors: true,
+        cors: (params: { defaultHeaders: Record<string, string> }) => ({
+          ...params.defaultHeaders,
+          "X-Custom-Header": "Testing",
+        }),
         startupLogo: false,
       };
       const factory = new EndpointsFactory(defaultResultHandler);
@@ -235,10 +238,13 @@ describe("Routing", () => {
       const responseMock = makeResponseMock();
       await fn(requestMock, responseMock);
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(responseMock._getHeaders()).toHaveProperty(
-        "access-control-allow-methods",
-        "GET, POST, PUT, PATCH, OPTIONS",
-      );
+      expect(responseMock._getHeaders()).toEqual({
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET, POST, PUT, PATCH, OPTIONS",
+        "access-control-allow-headers": "content-type",
+        "content-type": "application/json",
+        "x-custom-header": "Testing",
+      });
     });
 
     test("Should accept parameters", () => {
