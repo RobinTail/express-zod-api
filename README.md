@@ -772,7 +772,7 @@ const getUserEndpoint = endpointsFactory.build({
 
 Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
 It can also be the same Endpoint that handles multiple methods as well. The `method` and `methods` property can be
-omitted when in `EndpointsFactory::build()` so that the method determination could be delegated to the `Routing`.
+omitted for `EndpointsFactory::build()` so that the method determination would be delegated to the `Routing`.
 
 ```typescript
 import { DependsOnMethod } from "express-zod-api";
