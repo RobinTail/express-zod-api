@@ -26,21 +26,21 @@ describe("DependsOnMethod", () => {
     ]);
   });
 
-  test("should accept an endpoint with additional methods", () => {
-    const endpoint = new EndpointsFactory(defaultResultHandler).build({
-      methods: ["get", "post"],
-      output: z.object({}),
-      handler: async () => ({}),
-    });
-    const instance = new DependsOnMethod({
-      get: endpoint,
-      post: endpoint,
-    });
-    expect(instance.entries).toEqual([
-      ["get", expect.any(AbstractEndpoint), ["post"]],
-      ["post", expect.any(AbstractEndpoint), ["get"]],
-    ]);
-  });
+  test.each([{ methods: ["get", "post"] } as const, {}])(
+    "should accept an endpoint capable to handle multiple methods %#",
+    (inc) => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        ...inc,
+        output: z.object({}),
+        handler: async () => ({}),
+      });
+      const instance = new DependsOnMethod({ get: endpoint, post: endpoint });
+      expect(instance.entries).toEqual([
+        ["get", expect.any(AbstractEndpoint), ["post"]],
+        ["post", expect.any(AbstractEndpoint), ["get"]],
+      ]);
+    },
+  );
 
   test("should reject empty assignments", () => {
     const instance = new DependsOnMethod({
