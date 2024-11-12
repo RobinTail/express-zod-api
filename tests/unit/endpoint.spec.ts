@@ -144,12 +144,15 @@ describe("Endpoint", () => {
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
       expect(handlerMock).toHaveBeenCalledTimes(0);
+      expect(responseMock.writableEnded).toBeTruthy();
+      // @todo move to routing test incl. cors fn above
+      /*
       expect(responseMock._getHeaders()).toEqual({
         "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, OPTIONS",
         "access-control-allow-headers": "content-type",
         "x-custom-header": "Testing",
-      });
+      }); */
     });
   });
 

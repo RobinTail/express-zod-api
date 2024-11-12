@@ -31,9 +31,9 @@ export const initRouting = ({
   parsers?: Parsers;
 }) => {
   const verified = new WeakSet<AbstractEndpoint>();
+  const optioned = new Set<string>();
   walkRouting({
     routing,
-    hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
       const requestType = endpoint.getRequestType();
       if (!verified.has(endpoint)) {
@@ -61,18 +61,38 @@ export const initRouting = ({
         }
         verified.add(endpoint);
       }
-      app[method](
-        path,
-        ...(parsers?.[requestType] || []),
-        async (request, response) =>
-          endpoint.execute({
-            request,
-            response,
-            logger: getChildLogger(request),
-            config,
-            siblingMethods,
-          }),
-      );
+      const accessMethods = [method]
+        .concat(siblingMethods || [])
+        .concat("options")
+        .join(", ")
+        .toUpperCase();
+      const defaultHeaders: Record<string, string> = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": accessMethods,
+        "Access-Control-Allow-Headers": "content-type",
+      };
+      const matchingParsers = parsers?.[requestType] || [];
+      const handler: RequestHandler = async (request, response) => {
+        const logger = getChildLogger(request);
+        if (config.cors) {
+          const headers =
+            typeof config.cors === "function"
+              ? await config.cors({
+                  request,
+                  endpoint,
+                  logger,
+                  defaultHeaders,
+                })
+              : defaultHeaders;
+          for (const key in headers) response.set(key, headers[key]);
+        }
+        return endpoint.execute({ request, response, logger, config });
+      };
+      app[method](path, ...matchingParsers, handler);
+      if (config.cors && !optioned.has(path)) {
+        app.options(path, ...matchingParsers, handler);
+        optioned.add(path);
+      }
     },
     onStatic: (path, handler) => {
       app.use(path, handler);

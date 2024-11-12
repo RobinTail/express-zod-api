@@ -40,7 +40,6 @@ export abstract class AbstractEndpoint {
     response: Response;
     logger: ActualLogger;
     config: CommonConfig;
-    siblingMethods?: ReadonlyArray<Method>;
   }): Promise<void>;
   public abstract getDescription(
     variant: DescriptionVariant,
@@ -190,22 +189,6 @@ export class Endpoint<
     return this.#getOperationId(method);
   }
 
-  // @todo too aware of defaults, cors should be probably moved to routing/walker as a middleware
-  #getDefaultCorsHeaders(siblingMethods: Method[]): Record<string, string> {
-    const accessMethods = (
-      (this.#methods || ["get"]) as Array<Method | AuxMethod>
-    )
-      .concat(siblingMethods)
-      .concat("options")
-      .join(", ")
-      .toUpperCase();
-    return {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": accessMethods,
-      "Access-Control-Allow-Headers": "content-type",
-    };
-  }
-
   async #parseOutput(output: z.input<OUT>) {
     try {
       return (await this.#schemas.output.parseAsync(output)) as FlatObject;
@@ -290,30 +273,16 @@ export class Endpoint<
     response,
     logger,
     config,
-    siblingMethods = [],
   }: {
     request: Request;
     response: Response;
     logger: ActualLogger;
     config: CommonConfig;
-    siblingMethods?: Method[];
   }) {
     const method = getActualMethod(request);
     const options: Partial<OPT> = {};
     let output: FlatObject | null = null;
     let error: Error | null = null;
-    if (config.cors) {
-      let headers = this.#getDefaultCorsHeaders(siblingMethods);
-      if (typeof config.cors === "function") {
-        headers = await config.cors({
-          request,
-          logger,
-          endpoint: this,
-          defaultHeaders: headers,
-        });
-      }
-      for (const key in headers) response.set(key, headers[key]);
-    }
     const input = getInput(request, config.inputSources);
     try {
       await this.#runMiddlewares({
