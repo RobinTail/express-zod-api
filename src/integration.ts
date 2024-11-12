@@ -215,22 +215,20 @@ export class Integration {
           );
         }
         this.program.push(createTypeAlias(genericResponse, genericResponseId));
-        if (method !== "options") {
-          this.paths.push(path);
-          this.registry.set(
-            { method, path },
-            {
-              input: inputId,
-              positive: positiveResponseId,
-              negative: negativeResponseId,
-              response: genericResponseId,
-              isJson: endpoint
-                .getMimeTypes("positive")
-                .includes(contentTypes.json),
-              tags: endpoint.getTags(),
-            },
-          );
-        }
+        this.paths.push(path);
+        this.registry.set(
+          { method, path },
+          {
+            input: inputId,
+            positive: positiveResponseId,
+            negative: negativeResponseId,
+            response: genericResponseId,
+            isJson: endpoint
+              .getMimeTypes("positive")
+              .includes(contentTypes.json),
+            tags: endpoint.getTags(),
+          },
+        );
       },
     });
 

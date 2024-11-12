@@ -149,9 +149,8 @@ export class Documentation extends OpenApiBuilder {
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
       endpoint,
       path,
-      _method,
+      method,
     ) => {
-      const method = _method as Method;
       const commons = {
         path,
         method,

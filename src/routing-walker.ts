@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
-import { AuxMethod, Method } from "./method";
+import { Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
 
@@ -13,8 +13,7 @@ export interface RoutingWalkerParams {
   onEndpoint: (
     endpoint: AbstractEndpoint,
     path: string,
-    // @todo just Method
-    method: Method | AuxMethod,
+    method: Method,
     siblingMethods?: ReadonlyArray<Method>,
   ) => void;
   onStatic?: (path: string, handler: StaticHandler) => void;
@@ -40,9 +39,7 @@ export const walkRouting = ({
     );
     const path = `${parentPath || ""}${segment ? `/${segment}` : ""}`;
     if (element instanceof AbstractEndpoint) {
-      const methods: (Method | AuxMethod)[] = element.getMethods()?.slice() || [
-        fallbackMethod,
-      ];
+      const methods = element.getMethods()?.slice() || [fallbackMethod];
       for (const method of methods) onEndpoint(element, path, method);
     } else if (element instanceof ServeStatic) {
       if (onStatic) element.apply(path, onStatic);

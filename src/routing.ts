@@ -5,6 +5,7 @@ import { assertJsonCompatible } from "./deep-checks";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { ActualLogger } from "./logger-helpers";
+import { AuxMethod, Method } from "./method";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { ChildLoggerExtractor } from "./server-helpers";
@@ -61,7 +62,7 @@ export const initRouting = ({
         }
         verified.add(endpoint);
       }
-      const accessMethods = [method]
+      const accessMethods = ([method] as Array<Method | AuxMethod>)
         .concat(siblingMethods || [])
         .concat("options")
         .join(", ")
