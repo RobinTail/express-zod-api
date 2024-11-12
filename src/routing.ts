@@ -35,6 +35,7 @@ export const initRouting = ({
   const corsedPaths = new Set<string>();
   walkRouting({
     routing,
+    onStatic: (path, handler) => void app.use(path, handler),
     onEndpoint: (endpoint, path, method, siblingMethods) => {
       const requestType = endpoint.getRequestType();
       if (!verified.has(endpoint)) {
@@ -89,9 +90,6 @@ export const initRouting = ({
         corsedPaths.add(path);
       }
       app[method](path, ...matchingParsers, handler);
-    },
-    onStatic: (path, handler) => {
-      app.use(path, handler);
     },
   });
 };
