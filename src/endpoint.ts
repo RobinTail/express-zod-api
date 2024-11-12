@@ -40,12 +40,11 @@ export abstract class AbstractEndpoint {
     response: Response;
     logger: ActualLogger;
     config: CommonConfig;
-    siblingMethods?: ReadonlyArray<Method>;
   }): Promise<void>;
   public abstract getDescription(
     variant: DescriptionVariant,
   ): string | undefined;
-  public abstract getMethods(): ReadonlyArray<Method>;
+  public abstract getMethods(): ReadonlyArray<Method> | undefined;
   public abstract getSchema(variant: IOVariant): IOSchema;
   public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
   public abstract getMimeTypes(variant: MimeVariant): ReadonlyArray<string>;
@@ -67,7 +66,7 @@ export class Endpoint<
   TAG extends string,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods: ReadonlyArray<Method>;
+  readonly #methods?: ReadonlyArray<Method>;
   readonly #middlewares: AbstractMiddleware[];
   readonly #mimeTypes: Record<MimeVariant, ReadonlyArray<string>>;
   readonly #responses: Record<
@@ -103,7 +102,7 @@ export class Endpoint<
     description?: string;
     shortDescription?: string;
     getOperationId?: (method: Method) => string | undefined;
-    methods: Method[];
+    methods?: Method[];
     scopes?: SCO[];
     tags?: TAG[];
   }) {
@@ -190,19 +189,6 @@ export class Endpoint<
     return this.#getOperationId(method);
   }
 
-  #getDefaultCorsHeaders(siblingMethods: Method[]): Record<string, string> {
-    const accessMethods = (this.#methods as Array<Method | AuxMethod>)
-      .concat(siblingMethods)
-      .concat("options")
-      .join(", ")
-      .toUpperCase();
-    return {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": accessMethods,
-      "Access-Control-Allow-Headers": "content-type",
-    };
-  }
-
   async #parseOutput(output: z.input<OUT>) {
     try {
       return (await this.#schemas.output.parseAsync(output)) as FlatObject;
@@ -287,30 +273,16 @@ export class Endpoint<
     response,
     logger,
     config,
-    siblingMethods = [],
   }: {
     request: Request;
     response: Response;
     logger: ActualLogger;
     config: CommonConfig;
-    siblingMethods?: Method[];
   }) {
     const method = getActualMethod(request);
     const options: Partial<OPT> = {};
     let output: FlatObject | null = null;
     let error: Error | null = null;
-    if (config.cors) {
-      let headers = this.#getDefaultCorsHeaders(siblingMethods);
-      if (typeof config.cors === "function") {
-        headers = await config.cors({
-          request,
-          logger,
-          endpoint: this,
-          defaultHeaders: headers,
-        });
-      }
-      for (const key in headers) response.set(key, headers[key]);
-    }
     const input = getInput(request, config.inputSources);
     try {
       await this.#runMiddlewares({

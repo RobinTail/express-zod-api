@@ -12,10 +12,18 @@
       `jsonParser`, `upload`, `compression`, `rawParser` and `beforeRouting`.
   - The object resolved from the `createServer()` method changed:
     - Properties `httpServer` and `httpsServer` are removed;
-    - Added `servers` property — array containing those server instances in the same order.
+    - Added `servers` property instead — array containing those server instances in the same order.
 - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
 - The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
 - The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
+- Specifying `method` or `methods` for `EndpointsFactory::build()` made optional and when it's omitted:
+  - If the endpoint is assigned to a route using `DependsOnMethod` instance, the corresponding method is used;
+  - Otherwise `GET` method is implied by default.
+- Other potentially breaking changes:
+  - The optional property `methods` of `EndpointsFactory::build()` must be non-empty array when used;
+  - The `Endpoint::getMethods()` method may now return `undefined`;
+  - The `testEndpoint()` method can no longer test CORS headers — that function moved to `Routing` traverse;
+  - Public properties `pairs`, `firstEndpoint` and `siblingMethods` of `DependsOnMethod` replaced with `entries`.
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js

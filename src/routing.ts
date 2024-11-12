@@ -5,6 +5,7 @@ import { assertJsonCompatible } from "./deep-checks";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { ActualLogger } from "./logger-helpers";
+import { AuxMethod, Method } from "./method";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { ChildLoggerExtractor } from "./server-helpers";
@@ -31,9 +32,10 @@ export const initRouting = ({
   parsers?: Parsers;
 }) => {
   const verified = new WeakSet<AbstractEndpoint>();
+  const corsedPaths = new Set<string>();
   walkRouting({
     routing,
-    hasCors: !!config.cors,
+    onStatic: (path, handler) => void app.use(path, handler),
     onEndpoint: (endpoint, path, method, siblingMethods) => {
       const requestType = endpoint.getRequestType();
       if (!verified.has(endpoint)) {
@@ -61,21 +63,33 @@ export const initRouting = ({
         }
         verified.add(endpoint);
       }
-      app[method](
-        path,
-        ...(parsers?.[requestType] || []),
-        async (request, response) =>
-          endpoint.execute({
-            request,
-            response,
-            logger: getChildLogger(request),
-            config,
-            siblingMethods,
-          }),
-      );
-    },
-    onStatic: (path, handler) => {
-      app.use(path, handler);
+      const accessMethods: Array<Method | AuxMethod> = [
+        method,
+        ...(siblingMethods || []),
+        "options",
+      ];
+      const defaultHeaders: Record<string, string> = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": accessMethods.join(", ").toUpperCase(),
+        "Access-Control-Allow-Headers": "content-type",
+      };
+      const matchingParsers = parsers?.[requestType] || [];
+      const handler: RequestHandler = async (request, response) => {
+        const logger = getChildLogger(request);
+        if (config.cors) {
+          const headers =
+            typeof config.cors === "function"
+              ? await config.cors({ request, endpoint, logger, defaultHeaders })
+              : defaultHeaders;
+          for (const key in headers) response.set(key, headers[key]);
+        }
+        return endpoint.execute({ request, response, logger, config });
+      };
+      if (config.cors && !corsedPaths.has(path)) {
+        app.options(path, ...matchingParsers, handler);
+        corsedPaths.add(path);
+      }
+      app[method](path, ...matchingParsers, handler);
     },
   });
 };

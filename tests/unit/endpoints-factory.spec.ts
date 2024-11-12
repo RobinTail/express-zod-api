@@ -237,13 +237,12 @@ describe("EndpointsFactory", () => {
       );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
-        method: "get",
         input: z.object({ s: z.string() }),
         output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toStrictEqual(["get"]);
+      expect(endpoint.getMethods()).toBeUndefined();
       expect(
         serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();
@@ -272,7 +271,6 @@ describe("EndpointsFactory", () => {
         middleware,
       );
       const endpoint = factory.build({
-        method: "get",
         input: z.object({ i: z.string() }),
         output: z.object({ o: z.boolean() }),
         handler: vi.fn(),

@@ -126,31 +126,17 @@ describe("Endpoint", () => {
     test("should close the stream on OPTIONS request", async () => {
       const handlerMock = vi.fn();
       const endpoint = defaultEndpointsFactory.build({
-        method: "get",
         output: z.object({}),
         handler: handlerMock,
       });
       const { responseMock, loggerMock } = await testEndpoint({
         endpoint,
-        requestProps: {
-          method: "OPTIONS",
-        },
-        configProps: {
-          cors: ({ defaultHeaders }) => ({
-            ...defaultHeaders,
-            "X-Custom-Header": "Testing",
-          }),
-        },
+        requestProps: { method: "OPTIONS" },
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
       expect(handlerMock).toHaveBeenCalledTimes(0);
-      expect(responseMock._getHeaders()).toEqual({
-        "access-control-allow-origin": "*",
-        "access-control-allow-methods": "GET, OPTIONS",
-        "access-control-allow-headers": "content-type",
-        "x-custom-header": "Testing",
-      });
+      expect(responseMock.writableEnded).toBeTruthy();
     });
   });
 
@@ -241,10 +227,7 @@ describe("Endpoint", () => {
       const spy = vi.spyOn(resultHandler, "execute");
       const factory = new EndpointsFactory(resultHandler);
       const endpoint = factory.build({
-        method: "get",
-        output: z.object({
-          test: z.string(),
-        }),
+        output: z.object({ test: z.string() }),
         handler: async () => ({ test: "OK" }),
       });
       const { loggerMock, responseMock, requestMock } = await testEndpoint({
@@ -285,7 +268,6 @@ describe("Endpoint", () => {
           something: z.number(),
         });
         const endpoint = factory.build({
-          method: "get",
           input,
           output,
           handler: vi.fn(),
@@ -301,7 +283,6 @@ describe("Endpoint", () => {
       (variant) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
-          method: "get",
           output: z.object({ something: z.number() }),
           handler: vi.fn(),
         });
@@ -318,7 +299,6 @@ describe("Endpoint", () => {
       (variant) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
-          method: "get",
           output: z.object({ something: z.number() }),
           handler: vi.fn(),
         });
@@ -337,7 +317,6 @@ describe("Endpoint", () => {
       ({ input, expected }) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
-          method: "get",
           input,
           output: z.object({}),
           handler: vi.fn(),
@@ -464,10 +443,7 @@ describe("Endpoint", () => {
         }),
       );
       const endpoint = factory.build({
-        method: "get",
-        output: z.object({
-          test: z.string(),
-        }),
+        output: z.object({ test: z.string() }),
         handler: async () => ({ test: "OK" }),
       });
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
@@ -661,7 +637,6 @@ describe("Endpoint", () => {
       const endpoint = defaultEndpointsFactory
         .addMiddleware(dateInputMiddleware)
         .build({
-          method: "get",
           output: z.object({}),
           handler: async ({ input: { middleware_date_input }, logger }) => {
             logger.debug(
