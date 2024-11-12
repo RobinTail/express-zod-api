@@ -1160,7 +1160,7 @@ export const config = createConfig({
 
 - **Breaking changes**:
   - `DependsOnMethod::endpoints` removed;
-  - Refinment methods of `ez.file()` removed;
+  - Refinement methods of `ez.file()` removed;
   - Minimum version of `vitest` supported is 1.0.4.
 - How to migrate confidently:
   - If you're using refinement methods of `ez.file()`:
