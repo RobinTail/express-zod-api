@@ -6,8 +6,6 @@ import { Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
 
-const fallbackMethod: Method = "get";
-
 export interface RoutingWalkerParams {
   routing: Routing;
   onEndpoint: (
@@ -39,7 +37,7 @@ export const walkRouting = ({
     );
     const path = `${parentPath || ""}${segment ? `/${segment}` : ""}`;
     if (element instanceof AbstractEndpoint) {
-      const methods = element.getMethods()?.slice() || [fallbackMethod];
+      const methods = element.getMethods() || ["get"];
       for (const method of methods) onEndpoint(element, path, method);
     } else if (element instanceof ServeStatic) {
       if (onStatic) element.apply(path, onStatic);
