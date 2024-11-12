@@ -4,13 +4,13 @@ import {
   EndpointsFactory,
   defaultResultHandler,
 } from "../../src";
+import { AbstractEndpoint } from "../../src/endpoint";
 
 describe("DependsOnMethod", () => {
   test("should accept empty object", () => {
     const instance = new DependsOnMethod({});
     expect(instance).toBeInstanceOf(DependsOnMethod);
-    expect(instance.siblingMethods).toEqual([]);
-    expect(instance.pairs).toEqual([]);
+    expect(instance.entries).toEqual([]);
   });
 
   test("should accept an endpoint with a corresponding method", () => {
@@ -21,9 +21,9 @@ describe("DependsOnMethod", () => {
         handler: async () => ({}),
       }),
     });
-    expect(instance).toBeInstanceOf(DependsOnMethod);
-    expect(instance.siblingMethods).toEqual([]);
-    expect(instance.pairs).toHaveLength(1);
+    expect(instance.entries).toEqual([
+      ["post", expect.any(AbstractEndpoint), []],
+    ]);
   });
 
   test("should accept an endpoint with additional methods", () => {
@@ -36,9 +36,10 @@ describe("DependsOnMethod", () => {
       get: endpoint,
       post: endpoint,
     });
-    expect(instance).toBeInstanceOf(DependsOnMethod);
-    expect(instance.siblingMethods).toEqual(["post"]);
-    expect(instance.pairs).toHaveLength(2);
+    expect(instance.entries).toEqual([
+      ["get", expect.any(AbstractEndpoint), ["post"]],
+      ["post", expect.any(AbstractEndpoint), ["get"]],
+    ]);
   });
 
   test("should reject empty assignments", () => {
@@ -46,7 +47,6 @@ describe("DependsOnMethod", () => {
       get: undefined,
       post: undefined,
     });
-    expect(instance.pairs).toEqual([]);
-    expect(instance.siblingMethods).toEqual([]);
+    expect(instance.entries).toEqual([]);
   });
 });

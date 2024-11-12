@@ -42,7 +42,7 @@ export const walkRouting = ({
     } else if (element instanceof ServeStatic) {
       if (onStatic) element.apply(path, onStatic);
     } else if (element instanceof DependsOnMethod) {
-      for (const [method, endpoint] of element.pairs) {
+      for (const [method, endpoint, siblingMethods] of element.entries) {
         const supportedMethods = endpoint.getMethods();
         assert(
           !supportedMethods || supportedMethods.includes(method),
@@ -50,7 +50,7 @@ export const walkRouting = ({
             `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
           ),
         );
-        onEndpoint(endpoint, path, method, element.siblingMethods);
+        onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
       walkRouting({ onEndpoint, onStatic, routing: element, parentPath: path });
