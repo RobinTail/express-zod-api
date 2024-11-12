@@ -78,12 +78,7 @@ export const initRouting = ({
         if (config.cors) {
           const headers =
             typeof config.cors === "function"
-              ? await config.cors({
-                  request,
-                  endpoint,
-                  logger,
-                  defaultHeaders,
-                })
+              ? await config.cors({ request, endpoint, logger, defaultHeaders })
               : defaultHeaders;
           for (const key in headers) response.set(key, headers[key]);
         }
