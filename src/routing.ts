@@ -62,14 +62,14 @@ export const initRouting = ({
         }
         verified.add(endpoint);
       }
-      const accessMethods = ([method] as Array<Method | AuxMethod>)
-        .concat(siblingMethods || [])
-        .concat("options")
-        .join(", ")
-        .toUpperCase();
+      const accessMethods: Array<Method | AuxMethod> = [
+        method,
+        ...(siblingMethods || []),
+        "options",
+      ];
       const defaultHeaders: Record<string, string> = {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": accessMethods,
+        "Access-Control-Allow-Methods": accessMethods.join(", ").toUpperCase(),
         "Access-Control-Allow-Headers": "content-type",
       };
       const matchingParsers = parsers?.[requestType] || [];
