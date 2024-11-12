@@ -18,7 +18,9 @@
 - The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
 - Specifying `method` or `methods` for `EndpointsFactory::build()` made optional and when it's omitted:
   - If the endpoint is assigned to a route using `DependsOnMethod` instance, the corresponding method is used;
-  - Otherwise `GET` method is implied by default.
+  - Otherwise `GET` method is implied by default;
+  - The `Endpoint::getMethods()` method may now return `undefined`;
+  - The `testEndpoint()` method can no longer test CORS headers — that function moved to `Routing` traverse.
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
