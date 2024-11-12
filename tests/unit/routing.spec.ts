@@ -42,19 +42,16 @@ describe("Routing", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
         methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const postEndpoint = factory.build({
         methods: ["post"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const getAndPostEndpoint = factory.build({
         methods: ["get", "post"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -119,20 +116,14 @@ describe("Routing", () => {
       };
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
-        methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const postEndpoint = factory.build({
-        methods: ["post"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const putAndPatchEndpoint = factory.build({
-        methods: ["put", "patch"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -172,7 +163,6 @@ describe("Routing", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const putAndPatchEndpoint = factory.build({
         methods: ["put", "patch"],
-        input: z.object({}),
         output: z.object({}),
         handler: vi.fn(),
       });
@@ -200,26 +190,26 @@ describe("Routing", () => {
     test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
       const handler = vi.fn(async () => ({}));
       const configMock = {
-        cors: true,
+        cors: (params: { defaultHeaders: Record<string, string> }) => ({
+          ...params.defaultHeaders,
+          "X-Custom-Header": "Testing",
+        }),
         startupLogo: false,
       };
       const factory = new EndpointsFactory(defaultResultHandler);
       const input = z.object({});
       const output = z.object({});
       const getEndpoint = factory.build({
-        method: "get",
         input,
         output,
         handler,
       });
       const postEndpoint = factory.build({
-        method: "post",
         input,
         output,
         handler,
       });
       const putAndPatchEndpoint = factory.build({
-        methods: ["put", "patch"],
         input,
         output,
         handler,
@@ -248,10 +238,13 @@ describe("Routing", () => {
       const responseMock = makeResponseMock();
       await fn(requestMock, responseMock);
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(responseMock._getHeaders()).toHaveProperty(
-        "access-control-allow-methods",
-        "GET, POST, PUT, PATCH, OPTIONS",
-      );
+      expect(responseMock._getHeaders()).toEqual({
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET, POST, PUT, PATCH, OPTIONS",
+        "access-control-allow-headers": "content-type",
+        "content-type": "application/json",
+        "x-custom-header": "Testing",
+      });
     });
 
     test("Should accept parameters", () => {
@@ -259,7 +252,6 @@ describe("Routing", () => {
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -287,7 +279,6 @@ describe("Routing", () => {
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -319,7 +310,6 @@ describe("Routing", () => {
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -418,7 +408,6 @@ describe("Routing", () => {
       [z.never(), z.tuple([ez.file()]).rest(z.nan())],
     ])("should warn about JSON incompatible schemas %#", (input, output) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
-        method: "get",
         input: z.object({ input }),
         output: z.object({ output }),
         handler: vi.fn(),

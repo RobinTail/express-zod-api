@@ -5,9 +5,10 @@ import {
   Middleware,
   defaultEndpointsFactory,
   ResultHandler,
+  testMiddleware,
 } from "../../src";
+import { EmptyObject, EmptySchema } from "../../src/common-helpers";
 import { Endpoint } from "../../src/endpoint";
-import { testMiddleware } from "../../src/testing";
 import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
 
@@ -57,13 +58,11 @@ describe("EndpointsFactory", () => {
       defaultEndpointsFactory
         .addMiddleware(
           new Middleware({
-            input: z.object({}),
             handler: async () => ({ test: "fist option" }),
           }),
         )
         .addMiddleware(
           new Middleware({
-            input: z.object({}),
             handler: async ({ options }) => {
               expectTypeOf(options.test).toEqualTypeOf<string>();
               return { second: `another option, ${options.test}` };
@@ -72,19 +71,16 @@ describe("EndpointsFactory", () => {
         );
     });
 
-    test("Should accept creation props", () => {
-      defaultEndpointsFactory
-        .addMiddleware({
-          input: z.object({}),
-          handler: async () => ({ test: "fist option" }),
-        })
-        .addMiddleware({
-          input: z.object({}),
-          handler: async ({ options }) => {
-            expectTypeOf(options.test).toEqualTypeOf<string>();
-            return { second: `another option, ${options.test}` };
-          },
-        });
+    test("Should accept creation props without input schema", () => {
+      const factory = defaultEndpointsFactory.addMiddleware({
+        handler: async () => ({ test: "fist option" }),
+      });
+      expectTypeOf(factory).toMatchTypeOf<
+        EndpointsFactory<
+          z.ZodIntersection<EmptySchema, EmptySchema>,
+          EmptyObject & { test: string }
+        >
+      >();
     });
   });
 
@@ -95,6 +91,12 @@ describe("EndpointsFactory", () => {
         option1: "some value",
         option2: "other value",
       }));
+      expectTypeOf(newFactory).toEqualTypeOf<
+        EndpointsFactory<
+          EmptySchema,
+          EmptyObject & { option1: string; option2: string }
+        >
+      >();
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"].length).toBe(1);
@@ -235,13 +237,12 @@ describe("EndpointsFactory", () => {
       );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
-        method: "get",
         input: z.object({ s: z.string() }),
         output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toStrictEqual(["get"]);
+      expect(endpoint.getMethods()).toBeUndefined();
       expect(
         serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();
@@ -270,7 +271,6 @@ describe("EndpointsFactory", () => {
         middleware,
       );
       const endpoint = factory.build({
-        method: "get",
         input: z.object({ i: z.string() }),
         output: z.object({ o: z.boolean() }),
         handler: vi.fn(),
@@ -347,6 +347,18 @@ describe("EndpointsFactory", () => {
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<
         { s: string } & ({ n1: number } | { n2: number })
       >();
+    });
+
+    test("should create an endpoint without input schema", () => {
+      const factory = new EndpointsFactory(resultHandlerMock);
+      const endpoint = factory.build({
+        method: "get",
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      expectTypeOf(
+        endpoint.getSchema("input")._output,
+      ).toEqualTypeOf<EmptyObject>();
     });
   });
 });

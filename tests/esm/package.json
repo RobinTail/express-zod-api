@@ -5,5 +5,8 @@
   "type": "module",
   "dependencies": {
     "express-zod-api": "link:../.."
+  },
+  "scripts": {
+    "preinstall": "rm -rf node_modules"
   }
 }

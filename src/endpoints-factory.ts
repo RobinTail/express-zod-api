@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { EmptyObject, FlatObject } from "./common-helpers";
+import { EmptyObject, EmptySchema, FlatObject } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { Endpoint, Handler } from "./endpoint";
 import { IOSchema, getFinalEndpointInputSchema } from "./io-schema";
@@ -24,18 +24,18 @@ type BuildProps<
   SCO extends string,
   TAG extends string,
 > = {
-  input: IN;
+  input?: IN;
   output: OUT;
   handler: Handler<z.output<z.ZodIntersection<MIN, IN>>, z.input<OUT>, OPT>;
   description?: string;
   shortDescription?: string;
   operationId?: string | ((method: Method) => string);
-} & ({ method: Method } | { methods: Method[] }) &
+} & ({ method?: Method } | { methods?: [Method, ...Method[]] }) &
   ({ scopes?: SCO[] } | { scope?: SCO }) &
   ({ tags?: TAG[] } | { tag?: TAG });
 
 export class EndpointsFactory<
-  IN extends IOSchema<"strip"> = z.ZodObject<EmptyObject, "strip">,
+  IN extends IOSchema<"strip"> = EmptySchema,
   OUT extends FlatObject = EmptyObject,
   SCO extends string = string,
   TAG extends string = string,
@@ -73,13 +73,13 @@ export class EndpointsFactory<
   }
 
   public addMiddleware<
-    AIN extends IOSchema<"strip">,
     AOUT extends FlatObject,
     ASCO extends string,
+    AIN extends IOSchema<"strip"> = EmptySchema,
   >(
     subject:
-      | Middleware<AIN, OUT, AOUT, ASCO>
-      | ConstructorParameters<typeof Middleware<AIN, OUT, AOUT, ASCO>>[0],
+      | Middleware<OUT, AOUT, ASCO, AIN>
+      | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
     return EndpointsFactory.#create<
       z.ZodIntersection<IN, AIN>,
@@ -109,18 +109,13 @@ export class EndpointsFactory<
 
   public addOptions<AOUT extends FlatObject>(getOptions: () => Promise<AOUT>) {
     return EndpointsFactory.#create<IN, OUT & AOUT, SCO, TAG>(
-      this.middlewares.concat(
-        new Middleware({
-          input: z.object({}),
-          handler: getOptions,
-        }),
-      ),
+      this.middlewares.concat(new Middleware({ handler: getOptions })),
       this.resultHandler,
     );
   }
 
-  public build<BIN extends IOSchema, BOUT extends IOSchema>({
-    input,
+  public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
+    input = z.object({}) as BIN,
     handler,
     output: outputSchema,
     description,
@@ -135,7 +130,10 @@ export class EndpointsFactory<
     TAG
   > {
     const { middlewares, resultHandler } = this;
-    const methods = "methods" in rest ? rest.methods : [rest.method];
+    const methods =
+      "method" in rest && rest.method
+        ? [rest.method]
+        : ("methods" in rest && rest.methods) || undefined;
     const getOperationId =
       typeof operationId === "function" ? operationId : () => operationId;
     const scopes =

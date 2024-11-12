@@ -65,7 +65,7 @@ You can find the release notes and migration guides in [Changelog](CHANGELOG.md)
 
 # Overview
 
-I made this library because of the often repetitive tasks of starting a web server APIs with the need to validate input
+I made this framework because of the often repetitive tasks of starting a web server APIs with the need to validate input
 data. It integrates and provides the capabilities of popular web server, logging, validation and documenting solutions.
 Therefore, many basic tasks can be accomplished faster and easier, in particular:
 
@@ -82,11 +82,12 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 ## Contributors
 
-These people contributed to the improvement of the library by reporting bugs, making changes and suggesting ideas:
+These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/JonParton.png" alt="@JonParton" width="50px" />](https://github.com/JonParton)
+[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/t1nky.png" alt="@t1nky" width="50px" />](https://github.com/t1nky)
 [<img src="https://github.com/Tomtec331.png" alt="@Tomtec331" width="50px" />](https://github.com/Tomtec331)
-[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
 [<img src="https://github.com/boarush.png" alt="@boarush" width="50px" />](https://github.com/boarush)
 [<img src="https://github.com/shawncarr.png" alt="@shawncarr" width="50px" />](https://github.com/shawncarr)
@@ -152,7 +153,7 @@ Much can be customized to fit your needs.
 
 ## Installation
 
-Install the library, its peer dependencies and type assistance packages using your favorite
+Install the framework, its peer dependencies and type assistance packages using your favorite
 [package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/).
 
 ```shell
@@ -205,9 +206,8 @@ The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supp
 import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
-  method: "get", // or methods: ["get", "post", ...]
+  // method: "get" (default) or methods: ["get", "post", ...]
   input: z.object({
-    // for empty input use z.object({})
     name: z.string().optional(),
   }),
   output: z.object({
@@ -320,7 +320,6 @@ import { defaultEndpointsFactory } from "express-zod-api";
 const factory = defaultEndpointsFactory
   .addMiddleware(authMiddleware) // add Middleware instance or use shorter syntax:
   .addMiddleware({
-    input: z.object({}),
     handler: async ({ options: { user } }) => ({}), // options.user from authMiddleware
   });
 ```
@@ -363,8 +362,8 @@ const resultHandlerWithCleanup = new ResultHandler({
 There are two ways of connecting the native express middlewares depending on their nature and your objective.
 
 In case it's a middleware establishing and serving its own routes, or somehow globally modifying the behaviour, or
-being an additional request parser (like `cookie-parser`), use the `beforeRouting` option.
-However, it might be better to avoid `cors` here — [the library handles it on its own](#cross-origin-resource-sharing).
+being an additional request parser (like `cookie-parser`), use the `beforeRouting` option. However, it might be better
+to avoid `cors` here — [the framework handles it on its own](#cross-origin-resource-sharing).
 
 ```typescript
 import { createConfig } from "express-zod-api";
@@ -443,7 +442,6 @@ arrays of numbers.
 import { z } from "zod";
 
 const getUserEndpoint = endpointsFactory.build({
-  method: "get",
   input: z.object({
     id: z.string().transform((id) => parseInt(id, 10)),
     ids: z
@@ -464,7 +462,7 @@ implementation itself requires camel case for internal naming. In order to facil
 different naming standards you can `.transform()` the entire `input` schema into another object using a well-typed
 mapping library, such as [camelize-ts](https://www.npmjs.com/package/camelize-ts). However, that approach would not be
 enough for the `output` schema if you're also aiming to [generate a valid documentation](#creating-a-documentation),
-because the transformations themselves do not contain schemas. Addressing this case, the library offers the `.remap()`
+because the transformations themselves do not contain schemas. Addressing this case, the framework offers the `.remap()`
 method of the object schema, a part of the [Zod plugin](#zod-plugin), which under the hood, in addition to the
 transformation, also `.pipe()` the transformed object into a new object schema.
 Here is a recommended solution: it is important to use shallow transformations only.
@@ -475,7 +473,6 @@ import snakify from "snakify-ts";
 import { z } from "zod";
 
 const endpoint = endpointsFactory.build({
-  method: "get",
   input: z
     .object({ user_id: z.string() })
     .transform((inputs) => camelize(inputs, /* shallow: */ true)),
@@ -509,7 +506,7 @@ which in turn calls
 It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
 confusion with original method ~~z.date()~~ that should not be used within IO schemas of your API.
 
-In order to solve this problem, the library provides two custom methods for dealing with dates: `ez.dateIn()` and
+In order to solve this problem, the framework provides two custom methods for dealing with dates: `ez.dateIn()` and
 `ez.dateOut()` for using within input and output schemas accordingly.
 
 `ez.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
@@ -522,7 +519,7 @@ provides your endpoint handler or middleware with a `Date`. It supports the foll
 2021-12-31
 ```
 
-`ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
+`ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHandler` with a `string` representation in ISO
 format for the response transmission. Consider the following simplified example for better understanding:
 
 ```typescript
@@ -661,7 +658,7 @@ const config = createConfig({
 
 ## Profiling
 
-For debugging and performance testing purposes the library offers a simple `.profile()` method on the built-in logger.
+For debugging and performance testing purposes the framework offers a simple `.profile()` method on the built-in logger.
 It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
 invoke the returned callback. The default severity of those measurements is `debug`.
 
@@ -756,7 +753,6 @@ You then need to specify these parameters in the endpoint input schema in the us
 
 ```typescript
 const getUserEndpoint = endpointsFactory.build({
-  method: "get",
   input: z.object({
     // id is the route path param, always string
     id: z.string().transform((value) => parseInt(value, 10)),
@@ -775,7 +771,8 @@ const getUserEndpoint = endpointsFactory.build({
 ## Multiple schemas for one route
 
 Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
-It can also be the same Endpoint that handles multiple methods as well.
+It can also be the same Endpoint that handles multiple methods as well. The `method` and `methods` properties can be
+omitted for `EndpointsFactory::build()` so that the method determination would be delegated to the `Routing`.
 
 ```typescript
 import { DependsOnMethod } from "express-zod-api";
@@ -785,10 +782,10 @@ import { DependsOnMethod } from "express-zod-api";
 const routing: Routing = {
   v1: {
     user: new DependsOnMethod({
-      get: yourEndpointA,
-      delete: yourEndpointA,
-      post: yourEndpointB,
-      patch: yourEndpointB,
+      get: endpointA,
+      delete: endpointA,
+      post: endpointB,
+      patch: endpointB,
     }),
   },
 };
@@ -1000,7 +997,7 @@ const routing: Routing = {
 
 ## Connect to your own express app
 
-If you already have your own configured express application, or you find the library settings not enough, you can
+If you already have your own configured express application, or you find the framework settings not enough, you can
 connect the endpoints to your app or any express router using the `attachRouting()` method:
 
 ```typescript
@@ -1028,7 +1025,7 @@ then consider using the `beforeRouting` [option in config instead](#using-native
 ## Testing endpoints
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
-assert the expectations on status, headers and payload. The library provides a special method `testEndpoint` that
+assert the expectations on status, headers and payload. The framework provides a special method `testEndpoint` that
 makes mocking easier. Under the hood, request and response object are mocked using the
 [node-mocks-http](https://www.npmjs.com/package/node-mocks-http) library, therefore you can utilize its API for
 settings additional properties and asserting expectation using the provided getters, such as `._getStatusCode()`.
@@ -1116,7 +1113,7 @@ new ResultHandler({
 
 Please avoid doing this in new projects: responding with array is a bad practice keeping your endpoints from evolving
 in backward compatible way (without making breaking changes). Nevertheless, for the purpose of easier migration of
-legacy APIs to this library consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
+legacy APIs to this framework consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
 or implement your own ones in a similar way.
 The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
 assigned to that property is used as the response. This approach also supports examples, as well as documentation and
@@ -1141,7 +1138,6 @@ createConfig({
 });
 
 defaultEndpointsFactory.build({
-  method: "get",
   input: z.object({
     "x-request-id": z.string(), // this one is from request.headers
     id: z.string(), // this one is from request.query
@@ -1191,11 +1187,10 @@ createConfig({
 ## Subscriptions
 
 If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server, the
-capabilities of this library and the HTTP protocol itself would not be enough in this case. I have developed an
-additional pluggable library, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and
-capabilities, but uses the websocket transport and Socket.IO protocol for that purpose. Check out an example of the
-synergy between two libraries on handling the incoming `subscribe` and `unsubscribe` events in order to emit
-(broadcast) the `time` event every second with a current time in its payload:
+capabilities of this framework and the HTTP protocol itself would not be enough in this case. I have developed an
+additional websocket operating framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar
+principles and capabilities. Check out an example of the synergy between two frameworks on handling subscription events
+in order to emit (broadcast) the `time` event every second with a current time in its payload:
 
 https://github.com/RobinTail/zod-sockets#subscriptions
 
@@ -1334,7 +1329,7 @@ const exampleEndpoint = taggedEndpointsFactory.build({
 ## Customizable brands handling
 
 You can customize handling rules for your schemas in Documentation and Integration. Use the `.brand()` method on your
-schema to make it special and distinguishable for the library in runtime. Using symbols is recommended for branding.
+schema to make it special and distinguishable for the framework in runtime. Using symbols is recommended for branding.
 After that utilize the `brandHandling` feature of both constructors to declare your custom implementation. In case you
 need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
 
@@ -1382,7 +1377,7 @@ should be aware of them.
 
 ## Coercive schema of Zod
 
-Despite being supported by the library, `z.coerce.*` schema
+Despite being supported by the framework, `z.coerce.*` schema
 [does not work intuitively](https://github.com/RobinTail/express-zod-api/issues/759).
 Please be aware that `z.coerce.number()` and `z.number({ coerce: true })` (being typed not well) still will NOT allow
 you to assign anything but number. Moreover, coercive schemas are not fail-safe and their methods `.isOptional()` and
