@@ -30,7 +30,7 @@ type BuildProps<
   description?: string;
   shortDescription?: string;
   operationId?: string | ((method: Method) => string);
-} & ({ method?: Method } | { methods?: Method[] }) &
+} & ({ method?: Method } | { methods?: [Method, ...Method[]] }) &
   ({ scopes?: SCO[] } | { scope?: SCO }) &
   ({ tags?: TAG[] } | { tag?: TAG });
 
