@@ -32,7 +32,7 @@ export const initRouting = ({
   parsers?: Parsers;
 }) => {
   const verified = new WeakSet<AbstractEndpoint>();
-  const optioned = new Set<string>();
+  const corsedPaths = new Set<string>();
   walkRouting({
     routing,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
@@ -89,11 +89,11 @@ export const initRouting = ({
         }
         return endpoint.execute({ request, response, logger, config });
       };
-      app[method](path, ...matchingParsers, handler);
-      if (config.cors && !optioned.has(path)) {
+      if (config.cors && !corsedPaths.has(path)) {
         app.options(path, ...matchingParsers, handler);
-        optioned.add(path);
+        corsedPaths.add(path);
       }
+      app[method](path, ...matchingParsers, handler);
     },
     onStatic: (path, handler) => {
       app.use(path, handler);
