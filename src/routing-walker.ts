@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { toPairs } from "ramda";
-import { number } from "zod";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
@@ -60,13 +59,21 @@ export const walkRouting = ({
   }
 };
 
-// @todo ensure trim()
+const makePairs = (subject: Routing, parent?: string) => {
+  const pairs = toPairs(subject);
+  return pairs.map(([segment, item]) => {
+    const trimmed = segment.trim();
+    return [`${parent || ""}${trimmed ? `/${trimmed}` : ""}`, item] as const;
+  });
+};
+
+// @todo ensure no slashes
 export const walkRouting2 = ({
   routing,
   onEndpoint,
   onStatic,
 }: RoutingWalkerParams) => {
-  const stack = toPairs(routing);
+  const stack = makePairs(routing);
   while (stack.length) {
     const [path, element] = stack.pop()!;
     if (element instanceof AbstractEndpoint) {
@@ -86,12 +93,7 @@ export const walkRouting2 = ({
         onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
-      const pairs = toPairs(element);
-      const prefixed = pairs.map<(typeof pairs)[number]>(([segment, item]) => [
-        `${path}/${segment}`,
-        item,
-      ]);
-      stack.push(...prefixed);
+      stack.push(...makePairs(element, path));
     }
   }
 };
