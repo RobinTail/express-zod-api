@@ -67,10 +67,9 @@ describe("Routing", () => {
       const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => rootLogger,
+        getLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
-        rootLogger,
       });
       expect(appMock.get).toHaveBeenCalledTimes(2);
       expect(appMock.post).toHaveBeenCalledTimes(2);
@@ -98,10 +97,9 @@ describe("Routing", () => {
       const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => rootLogger,
+        getLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
-        rootLogger,
       });
       expect(staticMock).toHaveBeenCalledWith(__dirname, { dotfiles: "deny" });
       expect(appMock.use).toHaveBeenCalledTimes(1);
@@ -140,10 +138,9 @@ describe("Routing", () => {
       const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => rootLogger,
+        getLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
-        rootLogger,
       });
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.post).toHaveBeenCalledTimes(1);
@@ -179,10 +176,9 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          getChildLogger: () => rootLogger,
+          getLogger: () => rootLogger,
           config: configMock as CommonConfig,
           routing,
-          rootLogger,
         }),
       ).toThrowErrorMatchingSnapshot();
     });
@@ -225,10 +221,9 @@ describe("Routing", () => {
       const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => rootLogger,
+        getLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
-        rootLogger,
       });
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/hello");
@@ -265,10 +260,9 @@ describe("Routing", () => {
       const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => rootLogger,
+        getLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
-        rootLogger,
       });
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
@@ -295,10 +289,9 @@ describe("Routing", () => {
       const rootLogger = new BuiltinLogger({ level: "silent" });
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => rootLogger,
+        getLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing,
-        rootLogger,
       });
       expect(appMock.get).toHaveBeenCalledTimes(2);
       expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
@@ -316,9 +309,8 @@ describe("Routing", () => {
       const rootLogger = new BuiltinLogger({ level: "silent" });
       expect(() =>
         initRouting({
-          rootLogger,
           app: appMock as unknown as IRouter,
-          getChildLogger: () => rootLogger,
+          getLogger: () => rootLogger,
           config: configMock as CommonConfig,
           routing: {
             v1: {
@@ -329,9 +321,8 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
       expect(() =>
         initRouting({
-          rootLogger,
           app: appMock as unknown as IRouter,
-          getChildLogger: () => rootLogger,
+          getLogger: () => rootLogger,
           config: configMock as CommonConfig,
           routing: {
             "v1/user/retrieve": endpointMock,
@@ -362,12 +353,10 @@ describe("Routing", () => {
           },
         },
       };
-      const rootLogger = makeLoggerMock();
-      const childLogger = makeLoggerMock();
+      const getLoggerMock = vi.fn(() => makeLoggerMock());
       initRouting({
-        rootLogger,
         app: appMock as unknown as IRouter,
-        getChildLogger: () => childLogger,
+        getLogger: getLoggerMock,
         config: configMock as CommonConfig,
         routing,
       });
@@ -380,15 +369,16 @@ describe("Routing", () => {
       const responseMock = makeResponseMock();
       const nextMock = vi.fn();
       await routeHandler(requestMock, responseMock, nextMock);
+      expect(getLoggerMock).toHaveBeenCalledWith(requestMock);
       expect(nextMock).toHaveBeenCalledTimes(0);
       expect(handlerMock).toHaveBeenCalledTimes(1);
-      expect(childLogger._getLogs().error).toHaveLength(0);
+      expect(
+        getLoggerMock.mock.results.pop()!.value._getLogs().error,
+      ).toHaveLength(0);
       expect(handlerMock).toHaveBeenCalledWith({
-        input: {
-          test: 123,
-        },
+        input: { test: 123 },
         options: {},
-        logger: childLogger,
+        logger: getLoggerMock.mock.results.pop()!.value,
       });
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getJSONData()).toEqual({
@@ -415,9 +405,8 @@ describe("Routing", () => {
       const configMock = { cors: false, startupLogo: false };
       const rootLogger = makeLoggerMock();
       initRouting({
-        rootLogger,
         app: appMock as unknown as IRouter,
-        getChildLogger: () => rootLogger,
+        getLogger: () => rootLogger,
         config: configMock as CommonConfig,
         routing: { path: endpoint },
       });

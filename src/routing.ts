@@ -4,11 +4,10 @@ import { ContentType, contentTypes } from "./content-type";
 import { assertJsonCompatible } from "./deep-checks";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
-import { ActualLogger } from "./logger-helpers";
 import { AuxMethod, Method } from "./method";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
-import { ChildLoggerExtractor } from "./server-helpers";
+import { LoggerProvider } from "./server-helpers";
 
 export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
@@ -18,15 +17,13 @@ export type Parsers = Record<ContentType, RequestHandler[]>;
 
 export const initRouting = ({
   app,
-  rootLogger,
-  getChildLogger,
+  getLogger,
   config,
   routing,
   parsers,
 }: {
   app: IRouter;
-  rootLogger: ActualLogger;
-  getChildLogger: ChildLoggerExtractor;
+  getLogger: LoggerProvider;
   config: CommonConfig;
   routing: Routing;
   parsers?: Parsers;
@@ -43,7 +40,7 @@ export const initRouting = ({
           try {
             assertJsonCompatible(endpoint.getSchema("input"), "in");
           } catch (reason) {
-            rootLogger.warn(
+            getLogger().warn(
               "The final input schema of the endpoint contains an unsupported JSON payload type.",
               { path, method, reason },
             );
@@ -54,7 +51,7 @@ export const initRouting = ({
             try {
               assertJsonCompatible(endpoint.getSchema(variant), "out");
             } catch (reason) {
-              rootLogger.warn(
+              getLogger().warn(
                 `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
                 { path, method, reason },
               );
@@ -75,7 +72,7 @@ export const initRouting = ({
       };
       const matchingParsers = parsers?.[requestType] || [];
       const handler: RequestHandler = async (request, response) => {
-        const logger = getChildLogger(request);
+        const logger = getLogger(request);
         if (config.cors) {
           const headers =
             typeof config.cors === "function"

@@ -19,18 +19,15 @@ type EquippedRequest = Request<
   { [metaSymbol]?: { logger: ActualLogger } }
 >;
 
-export type ChildLoggerExtractor = (request: Request) => ActualLogger;
+export type LoggerProvider = (request?: Request) => ActualLogger;
 
 interface HandlerCreatorParams {
   errorHandler: AbstractResultHandler;
-  getChildLogger: ChildLoggerExtractor;
+  getLogger: LoggerProvider;
 }
 
 export const createParserFailureHandler =
-  ({
-    errorHandler,
-    getChildLogger,
-  }: HandlerCreatorParams): ErrorRequestHandler =>
+  ({ errorHandler, getLogger }: HandlerCreatorParams): ErrorRequestHandler =>
   async (error, request, response, next) => {
     if (!error) return next();
     return errorHandler.execute({
@@ -42,18 +39,18 @@ export const createParserFailureHandler =
       input: null,
       output: null,
       options: {},
-      logger: getChildLogger(request),
+      logger: getLogger(request),
     });
   };
 
 export const createNotFoundHandler =
-  ({ errorHandler, getChildLogger }: HandlerCreatorParams): RequestHandler =>
+  ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
   async (request, response) => {
     const error = createHttpError(
       404,
       `Can not ${request.method} ${request.path}`,
     );
-    const logger = getChildLogger(request);
+    const logger = getLogger(request);
     try {
       errorHandler.execute({
         request,
@@ -88,10 +85,10 @@ export const createUploadLogger = (
 ): Pick<Console, "log"> => ({ log: logger.debug.bind(logger) });
 
 export const createUploadParsers = async ({
-  getChildLogger,
+  getLogger,
   config,
 }: {
-  getChildLogger: ChildLoggerExtractor;
+  getLogger: LoggerProvider;
   config: ServerConfig;
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
@@ -100,7 +97,7 @@ export const createUploadParsers = async ({
   };
   const parsers: RequestHandler[] = [];
   parsers.push(async (request, response, next) => {
-    const logger = getChildLogger(request);
+    const logger = getLogger(request);
     try {
       await beforeUpload?.({ request, logger });
     } catch (error) {
@@ -142,10 +139,11 @@ export const createLoggingMiddleware =
     next();
   };
 
-export const makeChildLoggerExtractor =
-  (fallback: ActualLogger): ChildLoggerExtractor =>
+export const makeLoggerProvider =
+  (fallback: ActualLogger): LoggerProvider =>
   (request) =>
-    (request as EquippedRequest).res?.locals[metaSymbol]?.logger || fallback;
+    (request && (request as EquippedRequest).res?.locals[metaSymbol]?.logger) ||
+    fallback;
 
 export const installDeprecationListener = (logger: ActualLogger) =>
   process.on("deprecation", ({ message, namespace, name, stack }) =>

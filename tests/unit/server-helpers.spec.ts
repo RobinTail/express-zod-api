@@ -7,7 +7,7 @@ import {
   createUploadFailureHandler,
   createUploadLogger,
   createUploadParsers,
-  makeChildLoggerExtractor,
+  makeLoggerProvider,
   moveRaw,
   installDeprecationListener,
   installTerminationListener,
@@ -26,7 +26,7 @@ describe("Server helpers", () => {
     test("the handler should call next if there is no error", () => {
       const handler = createParserFailureHandler({
         errorHandler: defaultResultHandler,
-        getChildLogger: () => makeLoggerMock(),
+        getLogger: () => makeLoggerMock(),
       });
       const next = vi.fn();
       handler(undefined, makeRequestMock(), makeResponseMock(), next);
@@ -47,7 +47,7 @@ describe("Server helpers", () => {
         const spy = vi.spyOn(errorHandler, "execute");
         const handler = createParserFailureHandler({
           errorHandler,
-          getChildLogger: () => makeLoggerMock(),
+          getLogger: () => makeLoggerMock(),
         });
         await handler(
           error,
@@ -73,7 +73,7 @@ describe("Server helpers", () => {
       const spy = vi.spyOn(errorHandler, "execute");
       const handler = createNotFoundHandler({
         errorHandler,
-        getChildLogger: () => makeLoggerMock(),
+        getLogger: () => makeLoggerMock(),
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -104,7 +104,7 @@ describe("Server helpers", () => {
       const spy = vi.spyOn(errorHandler, "execute");
       const handler = createNotFoundHandler({
         errorHandler,
-        getChildLogger: () => makeLoggerMock(),
+        getLogger: () => makeLoggerMock(),
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -176,7 +176,7 @@ describe("Server helpers", () => {
         cors: false,
         logger: { level: "silent" },
       },
-      getChildLogger: () => loggerMock,
+      getLogger: () => loggerMock,
     });
     const requestMock = makeRequestMock();
     const responseMock = makeResponseMock();
@@ -263,7 +263,7 @@ describe("Server helpers", () => {
 
   describe("makeChildLoggerExtractor()", () => {
     const rootLogger = makeLoggerMock();
-    const getChildLogger = makeChildLoggerExtractor(rootLogger);
+    const getChildLogger = makeLoggerProvider(rootLogger);
 
     test("should extract child logger from request", () => {
       const request = makeRequestMock({

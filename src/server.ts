@@ -18,7 +18,7 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadParsers,
-  makeChildLoggerExtractor,
+  makeLoggerProvider,
   installDeprecationListener,
   moveRaw,
   installTerminationListener,
@@ -37,8 +37,8 @@ const makeCommonEntities = (config: CommonConfig) => {
   });
   installDeprecationListener(rootLogger);
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
-  const getChildLogger = makeChildLoggerExtractor(rootLogger);
-  const commons = { getChildLogger, errorHandler };
+  const getLogger = makeLoggerProvider(rootLogger);
+  const commons = { getLogger, errorHandler };
   const notFoundHandler = createNotFoundHandler(commons);
   const parserFailureHandler = createParserFailureHandler(commons);
   return {
@@ -51,13 +51,12 @@ const makeCommonEntities = (config: CommonConfig) => {
 };
 
 export const attachRouting = (config: AppConfig, routing: Routing) => {
-  const { rootLogger, getChildLogger, notFoundHandler, loggingMiddleware } =
+  const { rootLogger, getLogger, notFoundHandler, loggingMiddleware } =
     makeCommonEntities(config);
   initRouting({
     app: config.app.use(loggingMiddleware),
-    rootLogger,
     routing,
-    getChildLogger,
+    getLogger,
     config,
   });
   return { notFoundHandler, logger: rootLogger };
@@ -66,7 +65,7 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
 export const createServer = async (config: ServerConfig, routing: Routing) => {
   const {
     rootLogger,
-    getChildLogger,
+    getLogger,
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
@@ -86,18 +85,12 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     json: [config.jsonParser || express.json()],
     raw: [config.rawParser || express.raw(), moveRaw],
     upload: config.upload
-      ? await createUploadParsers({ config, getChildLogger })
+      ? await createUploadParsers({ config, getLogger })
       : [],
   };
 
-  if (config.beforeRouting) {
-    await config.beforeRouting({
-      app,
-      logger: rootLogger,
-      getChildLogger,
-    });
-  }
-  initRouting({ app, routing, rootLogger, getChildLogger, config, parsers });
+  if (config.beforeRouting) await config.beforeRouting({ app, getLogger });
+  initRouting({ app, routing, getLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
   const makeStarter =
