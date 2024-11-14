@@ -7,7 +7,7 @@ import {
   createUploadFailureHandler,
   createUploadLogger,
   createUploadParsers,
-  makeLoggerProvider,
+  makeGetLogger,
   moveRaw,
   installDeprecationListener,
   installTerminationListener,
@@ -261,9 +261,9 @@ describe("Server helpers", () => {
     );
   });
 
-  describe("makeChildLoggerExtractor()", () => {
+  describe("makeGetLogger()", () => {
     const rootLogger = makeLoggerMock();
-    const getChildLogger = makeLoggerProvider(rootLogger);
+    const getLogger = makeGetLogger(rootLogger);
 
     test("should extract child logger from request", () => {
       const request = makeRequestMock({
@@ -273,13 +273,15 @@ describe("Server helpers", () => {
           },
         },
       });
-      expect(getChildLogger(request)).toHaveProperty("isChild", true);
+      expect(getLogger(request)).toHaveProperty("isChild", true);
     });
 
-    test("should fall back to root", () => {
-      const request = makeRequestMock();
-      expect(getChildLogger(request)).toEqual(rootLogger);
-    });
+    test.each([makeRequestMock(), undefined])(
+      "should fall back to root %#",
+      (request) => {
+        expect(getLogger(request)).toEqual(rootLogger);
+      },
+    );
   });
 
   describe("installDeprecationListener()", () => {

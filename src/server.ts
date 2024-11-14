@@ -18,7 +18,7 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadParsers,
-  makeLoggerProvider,
+  makeGetLogger,
   installDeprecationListener,
   moveRaw,
   installTerminationListener,
@@ -37,7 +37,7 @@ const makeCommonEntities = (config: CommonConfig) => {
   });
   installDeprecationListener(rootLogger);
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
-  const getLogger = makeLoggerProvider(rootLogger);
+  const getLogger = makeGetLogger(rootLogger);
   const commons = { getLogger, errorHandler };
   const notFoundHandler = createNotFoundHandler(commons);
   const parserFailureHandler = createParserFailureHandler(commons);

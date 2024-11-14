@@ -140,7 +140,7 @@ export const createLoggingMiddleware =
     next();
   };
 
-export const makeLoggerProvider =
+export const makeGetLogger =
   (fallback: ActualLogger): GetLogger =>
   (request) =>
     (request && (request as EquippedRequest).res?.locals[metaSymbol]?.logger) ||
