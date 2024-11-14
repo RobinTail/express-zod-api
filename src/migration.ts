@@ -164,33 +164,6 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
               });
             }
           }
-          const beforeRoutingProp = argument.properties.find(
-            propByName(beforeRoutingPropName),
-          );
-          if (
-            beforeRoutingProp &&
-            beforeRoutingProp.value.type === NT.ArrowFunctionExpression &&
-            beforeRoutingProp.value.params.length === 1 &&
-            beforeRoutingProp.value.params[0].type === NT.ObjectPattern
-          ) {
-            const changable =
-              beforeRoutingProp.value.params[0].properties.filter(
-                propByName([loggerPropName, getChildLoggerPropName] as const),
-              );
-            for (const prop of changable) {
-              const replacement = changedProps[prop.key.name];
-              ctx.report({
-                node: prop,
-                messageId: "change",
-                data: {
-                  subject: "property",
-                  from: prop.key.name,
-                  to: replacement,
-                },
-                fix: (fixer) => fixer.replaceText(prop, replacement),
-              });
-            }
-          }
         }
       }
       if (node.callee.name === createServerName) {
@@ -231,6 +204,41 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
         });
       }
     },
+    [`${NT.Property}[key.name="${beforeRoutingPropName}"] ${NT.ArrowFunctionExpression} ${NT.Identifier}[name="${loggerPropName}"]`]:
+      (node: TSESTree.Identifier) => {
+        const { parent } = node;
+        const isProp = isPropWithId(parent);
+        if (isProp && parent.value === node) return; // not for renames
+        const replacement = `${changedProps[node.name as keyof typeof changedProps]}${isProp ? "" : "()"}`;
+        ctx.report({
+          node,
+          messageId: "change",
+          data: {
+            subject: isProp ? "property" : "const",
+            from: node.name,
+            to: replacement,
+          },
+          fix: (fixer) => fixer.replaceText(node, replacement),
+        });
+      },
+    [`${NT.Property}[key.name="${beforeRoutingPropName}"] ${NT.ArrowFunctionExpression} ${NT.Identifier}[name="${getChildLoggerPropName}"]`]:
+      (node: TSESTree.Identifier) => {
+        const { parent } = node;
+        const isProp = isPropWithId(parent);
+        if (isProp && parent.value === node) return; // not for renames
+        const replacement =
+          changedProps[node.name as keyof typeof changedProps];
+        ctx.report({
+          node,
+          messageId: "change",
+          data: {
+            subject: isProp ? "property" : "method",
+            from: node.name,
+            to: replacement,
+          },
+          fix: (fixer) => fixer.replaceText(node, replacement),
+        });
+      },
   }),
 });
 
