@@ -112,10 +112,10 @@ describe("App in production mode", async () => {
   const config = createConfig({
     http: { listen: port },
     compression: { threshold: 1 },
-    beforeRouting: ({ app, getChildLogger }) => {
+    beforeRouting: ({ app, getLogger }) => {
       depd("express")("Sample deprecation message");
       app.use((req, {}, next) => {
-        const childLogger = getChildLogger(req);
+        const childLogger = getLogger(req);
         assert("isChild" in childLogger && childLogger.isChild);
         next();
       });

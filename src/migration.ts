@@ -9,16 +9,21 @@ import { name as importName } from "../package.json";
 const createConfigName = "createConfig";
 const createServerName = "createServer";
 const serverPropName = "server";
+const beforeRoutingPropName = "beforeRouting";
 const httpServerPropName = "httpServer";
 const httpsServerPropName = "httpsServer";
 const originalErrorPropName = "originalError";
 const getStatusCodeFromErrorMethod = "getStatusCodeFromError";
+const loggerPropName = "logger";
+const getChildLoggerPropName = "getChildLogger";
 
 const changedProps = {
   [serverPropName]: "http",
   [httpServerPropName]: "servers",
   [httpsServerPropName]: "servers",
   [originalErrorPropName]: "cause",
+  [loggerPropName]: "getLogger",
+  [getChildLoggerPropName]: "getLogger",
 };
 
 const changedMethods = {
@@ -199,6 +204,41 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
         });
       }
     },
+    [`${NT.Property}[key.name="${beforeRoutingPropName}"] ${NT.ArrowFunctionExpression} ${NT.Identifier}[name="${loggerPropName}"]`]:
+      (node: TSESTree.Identifier) => {
+        const { parent } = node;
+        const isProp = isPropWithId(parent);
+        if (isProp && parent.value === node) return; // not for renames
+        const replacement = `${changedProps[node.name as keyof typeof changedProps]}${isProp ? "" : "()"}`;
+        ctx.report({
+          node,
+          messageId: "change",
+          data: {
+            subject: isProp ? "property" : "const",
+            from: node.name,
+            to: replacement,
+          },
+          fix: (fixer) => fixer.replaceText(node, replacement),
+        });
+      },
+    [`${NT.Property}[key.name="${beforeRoutingPropName}"] ${NT.ArrowFunctionExpression} ${NT.Identifier}[name="${getChildLoggerPropName}"]`]:
+      (node: TSESTree.Identifier) => {
+        const { parent } = node;
+        const isProp = isPropWithId(parent);
+        if (isProp && parent.value === node) return; // not for renames
+        const replacement =
+          changedProps[node.name as keyof typeof changedProps];
+        ctx.report({
+          node,
+          messageId: "change",
+          data: {
+            subject: isProp ? "property" : "method",
+            from: node.name,
+            to: replacement,
+          },
+          fix: (fixer) => fixer.replaceText(node, replacement),
+        });
+      },
   }),
 });
 

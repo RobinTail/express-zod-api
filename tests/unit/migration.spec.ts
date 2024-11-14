@@ -22,6 +22,7 @@ describe("Migration", () => {
       `(() => {})()`,
       `createConfig({ http: {} });`,
       `createConfig({ http: { listen: 8090 }, upload: true });`,
+      `createConfig({ beforeRouting: ({ getLogger }) => { getLogger().warn() } });`,
       `const { app, servers, logger } = await createServer();`,
       `console.error(error.cause?.message);`,
       `import { ensureHttpError } from "express-zod-api";`,
@@ -48,6 +49,50 @@ describe("Migration", () => {
               subject: "upload",
               from: "http",
               to: "the top level of createConfig argument",
+            },
+          },
+        ],
+      },
+      {
+        code: `createConfig({ beforeRouting: ({ logger }) => { logger.warn() } });`,
+        output: `createConfig({ beforeRouting: ({ getLogger }) => { getLogger().warn() } });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "logger",
+              to: "getLogger",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "const",
+              from: "logger",
+              to: "getLogger()",
+            },
+          },
+        ],
+      },
+      {
+        code: `createConfig({ beforeRouting: ({ getChildLogger }) => { getChildLogger(request).warn() } });`,
+        output: `createConfig({ beforeRouting: ({ getLogger }) => { getLogger(request).warn() } });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "getChildLogger",
+              to: "getLogger",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "method",
+              from: "getChildLogger",
+              to: "getLogger",
             },
           },
         ],

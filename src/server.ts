@@ -18,7 +18,7 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadParsers,
-  makeChildLoggerExtractor,
+  makeGetLogger,
   installDeprecationListener,
   moveRaw,
   installTerminationListener,
@@ -28,22 +28,22 @@ import { getStartupLogo } from "./startup-logo";
 const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) console.log(getStartupLogo());
   const errorHandler = config.errorHandler || defaultResultHandler;
-  const rootLogger = isLoggerInstance(config.logger)
+  const logger = isLoggerInstance(config.logger)
     ? config.logger
     : new BuiltinLogger(config.logger);
-  rootLogger.debug("Running", {
+  logger.debug("Running", {
     build: process.env.TSUP_BUILD || "from sources",
     env: process.env.NODE_ENV || "development",
   });
-  installDeprecationListener(rootLogger);
-  const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
-  const getChildLogger = makeChildLoggerExtractor(rootLogger);
-  const commons = { getChildLogger, errorHandler };
+  installDeprecationListener(logger);
+  const loggingMiddleware = createLoggingMiddleware({ logger, config });
+  const getLogger = makeGetLogger(logger);
+  const commons = { getLogger, errorHandler };
   const notFoundHandler = createNotFoundHandler(commons);
   const parserFailureHandler = createParserFailureHandler(commons);
   return {
     ...commons,
-    rootLogger,
+    logger,
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
@@ -51,22 +51,21 @@ const makeCommonEntities = (config: CommonConfig) => {
 };
 
 export const attachRouting = (config: AppConfig, routing: Routing) => {
-  const { rootLogger, getChildLogger, notFoundHandler, loggingMiddleware } =
+  const { logger, getLogger, notFoundHandler, loggingMiddleware } =
     makeCommonEntities(config);
   initRouting({
     app: config.app.use(loggingMiddleware),
-    rootLogger,
     routing,
-    getChildLogger,
+    getLogger,
     config,
   });
-  return { notFoundHandler, logger: rootLogger };
+  return { notFoundHandler, logger };
 };
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
   const {
-    rootLogger,
-    getChildLogger,
+    logger,
+    getLogger,
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
@@ -86,23 +85,17 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     json: [config.jsonParser || express.json()],
     raw: [config.rawParser || express.raw(), moveRaw],
     upload: config.upload
-      ? await createUploadParsers({ config, getChildLogger })
+      ? await createUploadParsers({ config, getLogger })
       : [],
   };
 
-  if (config.beforeRouting) {
-    await config.beforeRouting({
-      app,
-      logger: rootLogger,
-      getChildLogger,
-    });
-  }
-  initRouting({ app, routing, rootLogger, getChildLogger, config, parsers });
+  await config.beforeRouting?.({ app, getLogger });
+  initRouting({ app, routing, getLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
   const makeStarter =
     (server: http.Server | https.Server, subject: HttpConfig["listen"]) => () =>
-      server.listen(subject, () => rootLogger.info("Listening", subject));
+      server.listen(subject, () => logger.info("Listening", subject));
 
   const created: Array<http.Server | https.Server> = [];
   const starters: Array<() => http.Server | https.Server> = [];
@@ -119,15 +112,11 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
 
   if (config.gracefulShutdown) {
     installTerminationListener({
+      logger,
       servers: created,
-      logger: rootLogger,
       options: config.gracefulShutdown === true ? {} : config.gracefulShutdown,
     });
   }
 
-  return {
-    app,
-    logger: rootLogger,
-    servers: starters.map((starter) => starter()),
-  };
+  return { app, logger, servers: starters.map((starter) => starter()) };
 };
