@@ -131,7 +131,7 @@ interface GracefulOptions {
 
 type BeforeRouting = (params: {
   app: IRouter;
-  /** @desc Returns child logger for the given request (if configured) or root logger otherwise */
+  /** @desc Returns child logger for the given request (if configured) or the configured logger otherwise */
   getLogger: GetLogger;
 }) => void | Promise<void>;
 

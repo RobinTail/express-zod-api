@@ -19,7 +19,7 @@ type EquippedRequest = Request<
   { [metaSymbol]?: { logger: ActualLogger } }
 >;
 
-/** @desc Returns child logger for the given request (if configured) or root logger otherwise */
+/** @desc Returns child logger for the given request (if configured) or the configured logger otherwise */
 export type GetLogger = (request?: Request) => ActualLogger;
 
 interface HandlerCreatorParams {
