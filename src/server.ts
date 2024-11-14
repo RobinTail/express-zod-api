@@ -89,7 +89,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       : [],
   };
 
-  if (config.beforeRouting) await config.beforeRouting({ app, getLogger });
+  await config.beforeRouting?.({ app, getLogger });
   initRouting({ app, routing, getLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
