@@ -124,16 +124,16 @@ export const moveRaw: RequestHandler = (req, {}, next) => {
 /** @since v19 prints the actual path of the request, not a configured route, severity decreased to debug level */
 export const createLoggingMiddleware =
   ({
-    rootLogger,
+    logger: parent,
     config,
   }: {
-    rootLogger: ActualLogger;
+    logger: ActualLogger;
     config: CommonConfig;
   }): RequestHandler =>
   async (request, response, next) => {
     const logger = config.childLoggerProvider
-      ? await config.childLoggerProvider({ request, parent: rootLogger })
-      : rootLogger;
+      ? await config.childLoggerProvider({ request, parent })
+      : parent;
     logger.debug(`${request.method}: ${request.path}`);
     if (request.res)
       (request as EquippedRequest).res!.locals[metaSymbol] = { logger };

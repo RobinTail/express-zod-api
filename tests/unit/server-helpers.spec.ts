@@ -237,13 +237,13 @@ describe("Server helpers", () => {
   });
 
   describe("createLoggingMiddleware", () => {
-    const rootLogger = makeLoggerMock();
+    const logger = makeLoggerMock();
     const child = makeLoggerMock({ isChild: true });
     test.each([undefined, () => child, async () => child])(
       "should make RequestHandler writing logger to res.locals %#",
       async (childLoggerProvider) => {
         const config = { childLoggerProvider } as CommonConfig;
-        const handler = createLoggingMiddleware({ rootLogger, config });
+        const handler = createLoggingMiddleware({ logger, config });
         expect(typeof handler).toBe("function");
         const nextMock = vi.fn();
         const response = makeResponseMock();
@@ -252,10 +252,10 @@ describe("Server helpers", () => {
         await handler(request, response, nextMock);
         expect(nextMock).toHaveBeenCalled();
         expect(
-          (childLoggerProvider ? child : rootLogger)._getLogs().debug.pop(),
+          (childLoggerProvider ? child : logger)._getLogs().debug.pop(),
         ).toEqual(["GET: /test"]);
         expect(request.res).toHaveProperty("locals", {
-          [metaSymbol]: { logger: childLoggerProvider ? child : rootLogger },
+          [metaSymbol]: { logger: childLoggerProvider ? child : logger },
         });
       },
     );
