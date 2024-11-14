@@ -1,4 +1,5 @@
 import { bench } from "vitest";
+import { retrieveUserEndpoint } from "../../example/endpoints/retrieve-user";
 import { DependsOnMethod } from "../../src";
 import { walkRouting, walkRouting2 } from "../../src/routing-walker";
 
@@ -12,7 +13,9 @@ const routing = {
               g: {
                 h: {
                   i: {
-                    j: new DependsOnMethod({}),
+                    j: new DependsOnMethod({
+                      post: retrieveUserEndpoint,
+                    }),
                   },
                 },
               },

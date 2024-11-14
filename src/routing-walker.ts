@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import { toPairs } from "ramda";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
@@ -43,12 +42,11 @@ export const walkRouting = ({
     } else if (element instanceof DependsOnMethod) {
       for (const [method, endpoint, siblingMethods] of element.entries) {
         const supportedMethods = endpoint.getMethods();
-        assert(
-          !supportedMethods || supportedMethods.includes(method),
-          new RoutingError(
+        if (supportedMethods && !supportedMethods.includes(method)) {
+          throw new RoutingError(
             `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
-          ),
-        );
+          );
+        }
         onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
@@ -86,12 +84,11 @@ export const walkRouting2 = ({
     } else if (element instanceof DependsOnMethod) {
       for (const [method, endpoint, siblingMethods] of element.entries) {
         const supportedMethods = endpoint.getMethods();
-        assert(
-          !supportedMethods || supportedMethods.includes(method),
-          new RoutingError(
+        if (supportedMethods && !supportedMethods.includes(method)) {
+          throw new RoutingError(
             `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
-          ),
-        );
+          );
+        }
         onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
