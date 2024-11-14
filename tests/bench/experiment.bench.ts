@@ -1,13 +1,31 @@
 import { bench } from "vitest";
+import { DependsOnMethod } from "../../src";
+import { walkRouting } from "../../src/routing-walker";
 
-const objects = [{ a: 1 }, { b: 2 }, { c: 3, a: 2 }];
+const routing = {
+  a: {
+    b: {
+      c: {
+        d: {
+          e: {
+            f: {
+              g: {
+                h: {
+                  i: {
+                    j: new DependsOnMethod({}),
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
 
-describe("Experiment for reducer", () => {
+describe("Experiment for routing walker", () => {
   bench("current", () => {
-    objects.reduce((agg, obj) => ({ ...agg, ...obj }), {});
-  });
-
-  bench("featured", () => {
-    objects.reduce((agg, obj) => Object.assign(agg, obj), {});
+    walkRouting({ routing, onEndpoint: vi.fn() });
   });
 });
