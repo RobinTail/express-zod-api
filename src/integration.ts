@@ -34,7 +34,7 @@ import { Method, methods } from "./method";
 import { contentTypes } from "./content-type";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
-import { walkRouting2 } from "./routing-walker";
+import { walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
 import { ZTSContext, createTypeAlias, printNode } from "./zts-helpers";
@@ -160,7 +160,7 @@ export class Integration {
     splitResponse = false,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
   }: IntegrationParams) {
-    walkRouting2({
+    walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
         const commons = {

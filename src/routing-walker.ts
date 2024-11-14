@@ -18,7 +18,7 @@ export interface RoutingWalkerParams {
   parentPath?: string;
 }
 
-export const walkRouting = ({
+export const _old = ({
   routing,
   onEndpoint,
   onStatic,
@@ -68,7 +68,7 @@ const makePairs = (subject: Routing, parent?: string) => {
   });
 };
 
-export const walkRouting2 = ({
+export const walkRouting = ({
   routing,
   onEndpoint,
   onStatic,

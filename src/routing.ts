@@ -5,7 +5,7 @@ import { assertJsonCompatible } from "./deep-checks";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { AuxMethod, Method } from "./method";
-import { walkRouting2 } from "./routing-walker";
+import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { GetLogger } from "./server-helpers";
 
@@ -30,7 +30,7 @@ export const initRouting = ({
 }) => {
   const verified = new WeakSet<AbstractEndpoint>();
   const corsedPaths = new Set<string>();
-  walkRouting2({
+  walkRouting({
     routing,
     onStatic: (path, handler) => void app.use(path, handler),
     onEndpoint: (endpoint, path, method, siblingMethods) => {
