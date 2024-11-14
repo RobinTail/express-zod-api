@@ -38,3 +38,15 @@ describe("Experiment for routing walker", () => {
     walkRouting2({ routing, onEndpoint: vi.fn() });
   });
 });
+
+describe("stack ops", () => {
+  const arr: number[] = [];
+  bench("shift", () => {
+    arr.push(1);
+    arr.shift();
+  });
+  bench("pop", () => {
+    arr.push(1);
+    arr.pop();
+  });
+});

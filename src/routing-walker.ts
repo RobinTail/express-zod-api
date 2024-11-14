@@ -75,7 +75,7 @@ export const walkRouting2 = ({
 }: RoutingWalkerParams) => {
   const stack = makePairs(routing);
   while (stack.length) {
-    const [path, element] = stack.pop()!;
+    const [path, element] = stack.shift()!;
     if (element instanceof AbstractEndpoint) {
       const methods = element.getMethods() || ["get"];
       for (const method of methods) onEndpoint(element, path, method);

@@ -27,7 +27,7 @@ import {
   reformatParamsInPath,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
-import { RoutingWalkerParams, walkRouting } from "./routing-walker";
+import { RoutingWalkerParams, walkRouting2 } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 
 type Component =
@@ -254,7 +254,7 @@ export class Documentation extends OpenApiBuilder {
         },
       });
     };
-    walkRouting({ routing, onEndpoint });
+    walkRouting2({ routing, onEndpoint });
     this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
   }
 }
