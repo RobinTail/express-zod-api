@@ -9,16 +9,21 @@ import { name as importName } from "../package.json";
 const createConfigName = "createConfig";
 const createServerName = "createServer";
 const serverPropName = "server";
+const beforeRoutingPropName = "beforeRouting";
 const httpServerPropName = "httpServer";
 const httpsServerPropName = "httpsServer";
 const originalErrorPropName = "originalError";
 const getStatusCodeFromErrorMethod = "getStatusCodeFromError";
+const loggerPropName = "logger";
+const getChildLoggerPropName = "getChildLogger";
 
 const changedProps = {
   [serverPropName]: "http",
   [httpServerPropName]: "servers",
   [httpsServerPropName]: "servers",
   [originalErrorPropName]: "cause",
+  [loggerPropName]: "getLogger",
+  [getChildLoggerPropName]: "getLogger",
 };
 
 const changedMethods = {
@@ -156,6 +161,33 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
                     comma?.value === "," ? comma.range[1] : prop.range[1],
                   ]),
                 ],
+              });
+            }
+          }
+          const beforeRoutingProp = argument.properties.find(
+            propByName(beforeRoutingPropName),
+          );
+          if (
+            beforeRoutingProp &&
+            beforeRoutingProp.value.type === NT.ArrowFunctionExpression &&
+            beforeRoutingProp.value.params.length === 1 &&
+            beforeRoutingProp.value.params[0].type === NT.ObjectPattern
+          ) {
+            const changable =
+              beforeRoutingProp.value.params[0].properties.filter(
+                propByName([loggerPropName, getChildLoggerPropName] as const),
+              );
+            for (const prop of changable) {
+              const replacement = changedProps[prop.key.name];
+              ctx.report({
+                node: prop,
+                messageId: "change",
+                data: {
+                  subject: "property",
+                  from: prop.key.name,
+                  to: replacement,
+                },
+                fix: (fixer) => fixer.replaceText(prop, replacement),
               });
             }
           }

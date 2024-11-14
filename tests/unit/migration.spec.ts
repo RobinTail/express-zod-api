@@ -22,6 +22,7 @@ describe("Migration", () => {
       `(() => {})()`,
       `createConfig({ http: {} });`,
       `createConfig({ http: { listen: 8090 }, upload: true });`,
+      `createConfig({ beforeRouting: ({ getLogger }) => {} });`,
       `const { app, servers, logger } = await createServer();`,
       `console.error(error.cause?.message);`,
       `import { ensureHttpError } from "express-zod-api";`,
@@ -48,6 +49,34 @@ describe("Migration", () => {
               subject: "upload",
               from: "http",
               to: "the top level of createConfig argument",
+            },
+          },
+        ],
+      },
+      {
+        code: `createConfig({ beforeRouting: ({ logger }) => {} });`,
+        output: `createConfig({ beforeRouting: ({ getLogger }) => {} });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "logger",
+              to: "getLogger",
+            },
+          },
+        ],
+      },
+      {
+        code: `createConfig({ beforeRouting: ({ getChildLogger }) => {} });`,
+        output: `createConfig({ beforeRouting: ({ getLogger }) => {} });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "getChildLogger",
+              to: "getLogger",
             },
           },
         ],
