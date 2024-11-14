@@ -1,6 +1,6 @@
 import { bench } from "vitest";
 import { DependsOnMethod } from "../../src";
-import { walkRouting } from "../../src/routing-walker";
+import { walkRouting, walkRouting2 } from "../../src/routing-walker";
 
 const routing = {
   a: {
@@ -21,11 +21,17 @@ const routing = {
         },
       },
     },
+    k: { l: {} },
+    m: {},
   },
 };
 
 describe("Experiment for routing walker", () => {
   bench("current", () => {
     walkRouting({ routing, onEndpoint: vi.fn() });
+  });
+
+  bench("featured", () => {
+    walkRouting2({ routing, onEndpoint: vi.fn() });
   });
 });
