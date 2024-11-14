@@ -143,7 +143,7 @@ export const createLoggingMiddleware =
 export const makeGetLogger =
   (fallback: ActualLogger): GetLogger =>
   (request) =>
-    (request && (request as EquippedRequest).res?.locals[metaSymbol]?.logger) ||
+    (request as EquippedRequest | undefined)?.res?.locals[metaSymbol]?.logger ||
     fallback;
 
 export const installDeprecationListener = (logger: ActualLogger) =>
