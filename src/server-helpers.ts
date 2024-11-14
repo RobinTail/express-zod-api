@@ -131,9 +131,8 @@ export const createLoggingMiddleware =
     config: CommonConfig;
   }): RequestHandler =>
   async (request, response, next) => {
-    const logger = config.childLoggerProvider
-      ? await config.childLoggerProvider({ request, parent })
-      : parent;
+    const logger =
+      (await config.childLoggerProvider?.({ request, parent })) || parent;
     logger.debug(`${request.method}: ${request.path}`);
     if (request.res)
       (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
