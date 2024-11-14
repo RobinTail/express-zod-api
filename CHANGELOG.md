@@ -16,6 +16,7 @@
 - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
 - The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
 - The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
+- Both `logger` and `getChildLogger` properties of `beforeRouting` argument are replaced with all-purpose `getLogger`;
 - Specifying `method` or `methods` for `EndpointsFactory::build()` made optional and when it's omitted:
   - If the endpoint is assigned to a route using `DependsOnMethod` instance, the corresponding method is used;
   - Otherwise `GET` method is implied by default.

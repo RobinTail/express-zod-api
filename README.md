@@ -370,9 +370,13 @@ import { createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
 
 const config = createConfig({
-  beforeRouting: ({ app, logger, getChildLogger }) => {
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
     logger.info("Serving the API documentation at https://example.com/docs");
     app.use("/docs", ui.serve, ui.setup(documentation));
+    app.use("/custom", (req, res, next) => {
+      const childLogger = getLogger(req); // if childLoggerProvider is configured
+    });
   },
 });
 ```
