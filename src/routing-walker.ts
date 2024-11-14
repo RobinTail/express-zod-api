@@ -29,13 +29,11 @@ export const walkRouting = ({
     ([key, value]) => [key.trim(), value] as const,
   );
   for (const [segment, element] of pairs) {
-    assert.doesNotMatch(
-      segment,
-      /\//,
-      new RoutingError(
+    if (segment.includes("/")) {
+      throw new RoutingError(
         `The entry '${segment}' must avoid having slashes — use nesting instead.`,
-      ),
-    );
+      );
+    }
     const path = `${parentPath || ""}${segment ? `/${segment}` : ""}`;
     if (element instanceof AbstractEndpoint) {
       const methods = element.getMethods() || ["get"];
