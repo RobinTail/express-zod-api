@@ -62,13 +62,11 @@ export const walkRouting = ({
 const makePairs = (subject: Routing, parent?: string) => {
   const pairs = toPairs(subject);
   return pairs.map(([segment, item]) => {
-    assert.doesNotMatch(
-      segment,
-      /\//,
-      new RoutingError(
+    if (segment.includes("/")) {
+      throw new RoutingError(
         `The entry '${segment}' must avoid having slashes — use nesting instead.`,
-      ),
-    );
+      );
+    }
     const trimmed = segment.trim();
     return [`${parent || ""}${trimmed ? `/${trimmed}` : ""}`, item] as const;
   });
