@@ -8,7 +8,7 @@ import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
 import { AbstractResultHandler } from "./result-handler";
 import { ListenOptions } from "node:net";
-import { LoggerProvider } from "./server-helpers";
+import { GetLogger } from "./server-helpers";
 
 export type InputSource = keyof Pick<
   Request,
@@ -131,8 +131,8 @@ interface GracefulOptions {
 
 type BeforeRouting = (params: {
   app: IRouter;
-  /** @desc Returns a child logger for the given request if childLoggerProvider is configured (otherwise root logger) */
-  getLogger: LoggerProvider;
+  /** @desc Returns child logger for the given request (if configured) or root logger otherwise */
+  getLogger: GetLogger;
 }) => void | Promise<void>;
 
 export interface HttpConfig {

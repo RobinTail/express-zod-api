@@ -7,7 +7,7 @@ import { AbstractEndpoint } from "./endpoint";
 import { AuxMethod, Method } from "./method";
 import { walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
-import { LoggerProvider } from "./server-helpers";
+import { GetLogger } from "./server-helpers";
 
 export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
@@ -23,7 +23,7 @@ export const initRouting = ({
   parsers,
 }: {
   app: IRouter;
-  getLogger: LoggerProvider;
+  getLogger: GetLogger;
   config: CommonConfig;
   routing: Routing;
   parsers?: Parsers;

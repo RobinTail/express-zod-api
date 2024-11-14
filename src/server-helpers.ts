@@ -19,11 +19,12 @@ type EquippedRequest = Request<
   { [metaSymbol]?: { logger: ActualLogger } }
 >;
 
-export type LoggerProvider = (request?: Request) => ActualLogger;
+/** @desc Returns child logger for the given request (if configured) or root logger otherwise */
+export type GetLogger = (request?: Request) => ActualLogger;
 
 interface HandlerCreatorParams {
   errorHandler: AbstractResultHandler;
-  getLogger: LoggerProvider;
+  getLogger: GetLogger;
 }
 
 export const createParserFailureHandler =
@@ -88,7 +89,7 @@ export const createUploadParsers = async ({
   getLogger,
   config,
 }: {
-  getLogger: LoggerProvider;
+  getLogger: GetLogger;
   config: ServerConfig;
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
@@ -140,7 +141,7 @@ export const createLoggingMiddleware =
   };
 
 export const makeLoggerProvider =
-  (fallback: ActualLogger): LoggerProvider =>
+  (fallback: ActualLogger): GetLogger =>
   (request) =>
     (request && (request as EquippedRequest).res?.locals[metaSymbol]?.logger) ||
     fallback;
