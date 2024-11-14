@@ -54,8 +54,8 @@ describe("Migration", () => {
         ],
       },
       {
-        code: `createConfig({ beforeRouting: ({ logger }) => {} });`,
-        output: `createConfig({ beforeRouting: ({ getLogger }) => {} });`,
+        code: `createConfig({ beforeRouting: ({ logger }) => { logger.warn() } });`,
+        output: `createConfig({ beforeRouting: ({ getLogger }) => { getLogger().warn() } });`,
         errors: [
           {
             messageId: "change",
@@ -65,26 +65,6 @@ describe("Migration", () => {
               to: "getLogger",
             },
           },
-        ],
-      },
-      {
-        code: `createConfig({ beforeRouting: ({ getChildLogger }) => {} });`,
-        output: `createConfig({ beforeRouting: ({ getLogger }) => {} });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "getChildLogger",
-              to: "getLogger",
-            },
-          },
-        ],
-      },
-      {
-        code: `createConfig({ beforeRouting: () => { logger.warn() } });`,
-        output: `createConfig({ beforeRouting: () => { getLogger().warn() } });`,
-        errors: [
           {
             messageId: "change",
             data: {
@@ -96,9 +76,17 @@ describe("Migration", () => {
         ],
       },
       {
-        code: `createConfig({ beforeRouting: () => { getChildLogger(request).warn() } });`,
-        output: `createConfig({ beforeRouting: () => { getLogger(request).warn() } });`,
+        code: `createConfig({ beforeRouting: ({ getChildLogger }) => { getChildLogger(request).warn() } });`,
+        output: `createConfig({ beforeRouting: ({ getLogger }) => { getLogger(request).warn() } });`,
         errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "getChildLogger",
+              to: "getLogger",
+            },
+          },
           {
             messageId: "change",
             data: {
