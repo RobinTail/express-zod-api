@@ -6,7 +6,6 @@ import {
 } from "../express-mock";
 import { z } from "zod";
 import {
-  BuiltinLogger,
   DependsOnMethod,
   CommonConfig,
   EndpointsFactory,
@@ -64,10 +63,10 @@ describe("Routing", () => {
           },
         },
       };
-      const rootLogger = new BuiltinLogger({ level: "silent" });
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => rootLogger,
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -94,10 +93,10 @@ describe("Routing", () => {
         cors: true,
         startupLogo: false,
       };
-      const rootLogger = new BuiltinLogger({ level: "silent" });
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => rootLogger,
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -135,10 +134,10 @@ describe("Routing", () => {
           }),
         },
       };
-      const rootLogger = new BuiltinLogger({ level: "silent" });
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => rootLogger,
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -172,11 +171,11 @@ describe("Routing", () => {
           }),
         },
       };
-      const rootLogger = new BuiltinLogger({ level: "silent" });
+      const logger = makeLoggerMock();
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          getLogger: () => rootLogger,
+          getLogger: () => logger,
           config: configMock as CommonConfig,
           routing,
         }),
@@ -218,10 +217,10 @@ describe("Routing", () => {
           patch: putAndPatchEndpoint,
         }),
       };
-      const rootLogger = new BuiltinLogger({ level: "silent" });
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => rootLogger,
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -257,10 +256,10 @@ describe("Routing", () => {
           },
         },
       };
-      const rootLogger = new BuiltinLogger({ level: "silent" });
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => rootLogger,
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -286,10 +285,10 @@ describe("Routing", () => {
           },
         },
       };
-      const rootLogger = new BuiltinLogger({ level: "silent" });
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => rootLogger,
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -306,11 +305,11 @@ describe("Routing", () => {
         output: z.object({}),
         handler: handlerMock,
       });
-      const rootLogger = new BuiltinLogger({ level: "silent" });
+      const logger = makeLoggerMock();
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          getLogger: () => rootLogger,
+          getLogger: () => logger,
           config: configMock as CommonConfig,
           routing: {
             v1: {
@@ -322,7 +321,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          getLogger: () => rootLogger,
+          getLogger: () => logger,
           config: configMock as CommonConfig,
           routing: {
             "v1/user/retrieve": endpointMock,
@@ -403,14 +402,14 @@ describe("Routing", () => {
         handler: vi.fn(),
       });
       const configMock = { cors: false, startupLogo: false };
-      const rootLogger = makeLoggerMock();
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getLogger: () => rootLogger,
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing: { path: endpoint },
       });
-      expect(rootLogger._getLogs().warn).toEqual([
+      expect(logger._getLogs().warn).toEqual([
         [
           "The final input schema of the endpoint contains an unsupported JSON payload type.",
           { method: "get", path: "/path", reason: expect.any(Error) },

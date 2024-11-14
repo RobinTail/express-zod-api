@@ -151,12 +151,12 @@ describe("Server helpers", () => {
   });
 
   describe("createUploadLogger()", () => {
-    const rootLogger = makeLoggerMock();
-    const uploadLogger = createUploadLogger(rootLogger);
+    const logger = makeLoggerMock();
+    const uploadLogger = createUploadLogger(logger);
 
     test("should debug the messages", () => {
       uploadLogger.log("Express-file-upload: Busboy finished parsing request.");
-      expect(rootLogger._getLogs().debug).toEqual([
+      expect(logger._getLogs().debug).toEqual([
         ["Express-file-upload: Busboy finished parsing request."],
       ]);
     });
@@ -262,8 +262,8 @@ describe("Server helpers", () => {
   });
 
   describe("makeGetLogger()", () => {
-    const rootLogger = makeLoggerMock();
-    const getLogger = makeGetLogger(rootLogger);
+    const logger = makeLoggerMock();
+    const getLogger = makeGetLogger(logger);
 
     test("should extract child logger from request", () => {
       const request = makeRequestMock({
@@ -279,7 +279,7 @@ describe("Server helpers", () => {
     test.each([makeRequestMock(), undefined])(
       "should fall back to root %#",
       (request) => {
-        expect(getLogger(request)).toEqual(rootLogger);
+        expect(getLogger(request)).toEqual(logger);
       },
     );
   });
