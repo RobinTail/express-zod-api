@@ -42,13 +42,20 @@ export default [
       "no-restricted-syntax": [
         "warn",
         {
+          // https://github.com/RobinTail/express-zod-api/pull/2169
           selector: "ImportDeclaration[source.value=/assert/]",
           message: "assert is slow, use throw",
         },
         {
+          // https://github.com/RobinTail/express-zod-api/pull/2168
           selector:
             "CallExpression > MemberExpression[object.name='Object'][property.name='entries']",
           message: "Object.entries() is 2x slower than R.toPairs()",
+        },
+        {
+          // https://github.com/RobinTail/express-zod-api/pull/2160
+          selector: "ObjectExpression > SpreadElement ~ SpreadElement",
+          message: "Multiple spreading 1.4x slower than Object.assign()",
         },
       ],
     },
