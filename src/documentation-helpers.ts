@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import {
   ExamplesObject,
   MediaTypeObject,
@@ -136,13 +135,12 @@ export const depictCatch: Depicter = (
 export const depictAny: Depicter = () => ({ format: "any" });
 
 export const depictUpload: Depicter = ({}: UploadSchema, ctx) => {
-  assert(
-    !ctx.isResponse,
-    new DocumentationError({
+  if (ctx.isResponse) {
+    throw new DocumentationError({
       message: "Please use ez.upload() only for input.",
       ...ctx,
-    }),
-  );
+    });
+  }
   return { type: "string", format: "binary" };
 };
 
@@ -177,7 +175,13 @@ export const depictDiscriminatedUnion: Depicter = (
   };
 };
 
-/** @throws AssertionError */
+const propsMerger = (a: unknown, b: unknown) => {
+  if (Array.isArray(a) && Array.isArray(b)) return concat(a, b);
+  if (a === b) return b;
+  throw new Error("Can not flatten properties");
+};
+
+/** @throws Error */
 const tryFlattenIntersection = (
   children: Array<SchemaObject | ReferenceObject>,
 ) => {
@@ -190,16 +194,11 @@ const tryFlattenIntersection = (
           ["type", "properties", "required", "examples"].includes(key),
         ),
     );
-  assert(left && right, "Can not flatten objects");
+  if (!left || !right) throw new Error("Can not flatten objects");
   const flat: SchemaObject = { type: "object" };
   if (left.properties || right.properties) {
     flat.properties = mergeDeepWith(
-      (a, b) =>
-        Array.isArray(a) && Array.isArray(b)
-          ? concat(a, b)
-          : a === b
-            ? b
-            : assert.fail("Can not flatten properties"),
+      propsMerger,
       left.properties || {},
       right.properties || {},
     );
@@ -298,13 +297,12 @@ export const depictObject: Depicter = (
 export const depictNull: Depicter = () => ({ type: "null" });
 
 export const depictDateIn: Depicter = ({}: DateInSchema, ctx) => {
-  assert(
-    !ctx.isResponse,
-    new DocumentationError({
+  if (ctx.isResponse) {
+    throw new DocumentationError({
       message: "Please use ez.dateOut() for output.",
       ...ctx,
-    }),
-  );
+    });
+  }
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
@@ -317,13 +315,12 @@ export const depictDateIn: Depicter = ({}: DateInSchema, ctx) => {
 };
 
 export const depictDateOut: Depicter = ({}: DateOutSchema, ctx) => {
-  assert(
-    ctx.isResponse,
-    new DocumentationError({
+  if (!ctx.isResponse) {
+    throw new DocumentationError({
       message: "Please use ez.dateIn() for input.",
       ...ctx,
-    }),
-  );
+    });
+  }
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
@@ -335,17 +332,16 @@ export const depictDateOut: Depicter = ({}: DateOutSchema, ctx) => {
 };
 
 /** @throws DocumentationError */
-export const depictDate: Depicter = ({}: z.ZodDate, ctx) =>
-  assert.fail(
-    new DocumentationError({
-      message: `Using z.date() within ${
-        ctx.isResponse ? "output" : "input"
-      } schema is forbidden. Please use ez.date${
-        ctx.isResponse ? "Out" : "In"
-      }() instead. Check out the documentation for details.`,
-      ...ctx,
-    }),
-  );
+export const depictDate: Depicter = ({}: z.ZodDate, ctx) => {
+  throw new DocumentationError({
+    message: `Using z.date() within ${
+      ctx.isResponse ? "output" : "input"
+    } schema is forbidden. Please use ez.date${
+      ctx.isResponse ? "Out" : "In"
+    }() instead. Check out the documentation for details.`,
+    ...ctx,
+  });
+};
 
 export const depictBoolean: Depicter = () => ({ type: "boolean" });
 
@@ -750,13 +746,12 @@ export const onMissing: SchemaHandler<
   SchemaObject | ReferenceObject,
   OpenAPIContext,
   "last"
-> = (schema: z.ZodTypeAny, ctx) =>
-  assert.fail(
-    new DocumentationError({
-      message: `Zod type ${schema.constructor.name} is unsupported.`,
-      ...ctx,
-    }),
-  );
+> = (schema: z.ZodTypeAny, ctx) => {
+  throw new DocumentationError({
+    message: `Zod type ${schema.constructor.name} is unsupported.`,
+    ...ctx,
+  });
+};
 
 export const excludeParamsFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
