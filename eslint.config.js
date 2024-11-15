@@ -32,6 +32,19 @@ export default [
       curly: ["warn", "multi-or-nest", "consistent"],
       "unicorn/prefer-node-protocol": "error",
       // "no-restricted-syntax": ["warn", "ReturnStatement[argument=null]"],
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector:
+            "CallExpression[callee.name='assert'] > .arguments[type='NewExpression']",
+          message: "assert(..., new Error) is slow",
+        },
+        {
+          selector:
+            "CallExpression[callee.object.name='assert'] > .arguments[type='NewExpression']",
+          message: "assert.*(..., new Error) is slow",
+        },
+      ],
     },
   },
   {
