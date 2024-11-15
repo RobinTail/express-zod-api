@@ -1,3 +1,4 @@
+import { toPairs } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
@@ -47,7 +48,7 @@ const onObject: Producer = (
     optionalPropStyle: { withQuestionMark: hasQuestionMark },
   },
 ) => {
-  const members = Object.entries(shape).map<ts.TypeElement>(([key, value]) => {
+  const members = toPairs(shape).map<ts.TypeElement>(([key, value]) => {
     const isOptional =
       isResponse && hasCoercion(value)
         ? value instanceof z.ZodOptional
