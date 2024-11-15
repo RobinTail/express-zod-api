@@ -57,6 +57,11 @@ export default [
             "MemberExpression[object.name='process'][property.name='env']",
           message: "Reading process.env is slow and must be memoized",
         },
+        {
+          // https://github.com/RobinTail/express-zod-api/pull/2168
+          selector: "CallExpression > Identifier[name='toPairs']",
+          message: "R.toPairs() is 1.1x slower than Object.entries()",
+        },
       ],
     },
   },
