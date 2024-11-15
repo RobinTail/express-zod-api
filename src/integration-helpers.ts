@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { chain, toPairs } from "ramda";
+import { chain } from "ramda";
 import { Method } from "./method";
 
 export const f = ts.factory;
@@ -57,7 +57,7 @@ export const makeParams = (
 ) =>
   chain(
     ([name, node]) => [makeParam(f.createIdentifier(name), node, mod)],
-    toPairs(params),
+    Object.entries(params),
   );
 
 export const makeRecord = (
@@ -161,7 +161,7 @@ const aggregateDeclarations = chain(([name, id]: [string, ts.Identifier]) => [
   f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
 ]);
 export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
-  aggregateDeclarations(toPairs(params));
+  aggregateDeclarations(Object.entries(params));
 
 export const makeArrowFn = (
   params: ts.Identifier[],
