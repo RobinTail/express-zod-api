@@ -4,7 +4,7 @@
 
 ### v20.21.1
 
-- Performance tuning.
+- Performance tuning: `Routing` traverse made about 12 times faster.
 
 ### v20.21.0
 
