@@ -2,6 +2,10 @@
 
 ## Version 20
 
+### v20.21.1
+
+- Performance tuning.
+
 ### v20.21.0
 
 - Feat: input schema made optional:

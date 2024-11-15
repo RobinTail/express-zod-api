@@ -31,7 +31,6 @@ export default [
     rules: {
       curly: ["warn", "multi-or-nest", "consistent"],
       "unicorn/prefer-node-protocol": "error",
-      // "no-restricted-syntax": ["warn", "ReturnStatement[argument=null]"],
     },
   },
   {
@@ -39,6 +38,14 @@ export default [
     files: ["src/*.ts"],
     rules: {
       "allowed/dependencies": ["error", { typeOnly: ["eslint", "prettier"] }],
+      // "no-restricted-syntax": ["warn", "ReturnStatement[argument=null]"],
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "ImportDeclaration[source.value=/assert/]",
+          message: "assert is slow, use throw",
+        },
+      ],
     },
   },
   {
