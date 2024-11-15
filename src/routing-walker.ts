@@ -1,4 +1,3 @@
-import { toPairs } from "ramda";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
@@ -19,7 +18,7 @@ export interface RoutingWalkerParams {
 }
 
 const makePairs = (subject: Routing, parent?: string) =>
-  toPairs(subject).map(([segment, item]) => {
+  Object.entries(subject).map(([segment, item]) => {
     if (segment.includes("/")) {
       throw new RoutingError(
         `The entry '${segment}' must avoid having slashes — use nesting instead.`,
