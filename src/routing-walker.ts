@@ -18,9 +18,8 @@ export interface RoutingWalkerParams {
   parentPath?: string;
 }
 
-const makePairs = (subject: Routing, parent?: string) => {
-  const pairs = toPairs(subject);
-  return pairs.map(([segment, item]) => {
+const makePairs = (subject: Routing, parent?: string) =>
+  toPairs(subject).map(([segment, item]) => {
     if (segment.includes("/")) {
       throw new RoutingError(
         `The entry '${segment}' must avoid having slashes — use nesting instead.`,
@@ -29,7 +28,6 @@ const makePairs = (subject: Routing, parent?: string) => {
     const trimmed = segment.trim();
     return [`${parent || ""}${trimmed ? `/${trimmed}` : ""}`, item] as const;
   });
-};
 
 export const walkRouting = ({
   routing,
