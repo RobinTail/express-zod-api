@@ -1,7 +1,7 @@
 import { bench } from "vitest";
 import { retrieveUserEndpoint } from "../../example/endpoints/retrieve-user";
 import { DependsOnMethod } from "../../src";
-import { walkRouting, _old } from "../../src/routing-walker";
+import { walkRouting } from "../../src/routing-walker";
 
 const routing = {
   a: {
@@ -30,10 +30,6 @@ const routing = {
 };
 
 describe("Experiment for routing walker", () => {
-  bench("current", () => {
-    _old({ routing, onEndpoint: vi.fn() });
-  });
-
   bench("featured", () => {
     walkRouting({ routing, onEndpoint: vi.fn() });
   });
