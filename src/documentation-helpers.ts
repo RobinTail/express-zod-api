@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import {
   ExamplesObject,
   MediaTypeObject,
@@ -176,7 +175,7 @@ export const depictDiscriminatedUnion: Depicter = (
   };
 };
 
-/** @throws AssertionError */
+/** @throws Error */
 const tryFlattenIntersection = (
   children: Array<SchemaObject | ReferenceObject>,
 ) => {
@@ -189,16 +188,15 @@ const tryFlattenIntersection = (
           ["type", "properties", "required", "examples"].includes(key),
         ),
     );
-  assert(left && right, "Can not flatten objects");
+  if (!left || !right) throw new Error("Can not flatten objects");
   const flat: SchemaObject = { type: "object" };
   if (left.properties || right.properties) {
     flat.properties = mergeDeepWith(
-      (a, b) =>
-        Array.isArray(a) && Array.isArray(b)
-          ? concat(a, b)
-          : a === b
-            ? b
-            : assert.fail("Can not flatten properties"),
+      (a, b) => {
+        if (Array.isArray(a) && Array.isArray(b)) return concat(a, b);
+        if (a === b) return b;
+        throw new Error("Can not flatten properties");
+      },
       left.properties || {},
       right.properties || {},
     );
