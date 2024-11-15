@@ -45,11 +45,6 @@ export default [
           selector: "ImportDeclaration[source.value=/assert/]",
           message: "assert is slow, use throw",
         },
-        {
-          selector:
-            "CallExpression > MemberExpression[object.name='Object'][property.name='entries']",
-          message: "Object.entries() is 2x slower than R.toPairs()",
-        },
       ],
     },
   },
