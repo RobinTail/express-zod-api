@@ -18,6 +18,8 @@
 - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
 - The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
 - The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
+- Both `logger` and `getChildLogger` properties of `beforeRouting` argument are replaced with all-purpose `getLogger`:
+  - It returns the child logger for the given request (if configured) or the configured logger otherwise.
 - Specifying `method` or `methods` for `EndpointsFactory::build()` made optional and when it's omitted:
   - If the endpoint is assigned to a route using `DependsOnMethod` instance, the corresponding method is used;
   - Otherwise `GET` method is implied by default.
@@ -26,6 +28,7 @@
   - The `Endpoint::getMethods()` method may now return `undefined`;
   - The `testEndpoint()` method can no longer test CORS headers — that function moved to `Routing` traverse;
   - Public properties `pairs`, `firstEndpoint` and `siblingMethods` of `DependsOnMethod` replaced with `entries`.
+- Routing traverse improvement: performance +5%, memory consumption -17%.
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
@@ -40,6 +43,10 @@ export default [
 ```
 
 ## Version 20
+
+### v20.21.1
+
+- Performance tuning: `Routing` traverse made about 12 times faster.
 
 ### v20.21.0
 
@@ -1162,7 +1169,7 @@ export const config = createConfig({
 
 - **Breaking changes**:
   - `DependsOnMethod::endpoints` removed;
-  - Refinment methods of `ez.file()` removed;
+  - Refinement methods of `ez.file()` removed;
   - Minimum version of `vitest` supported is 1.0.4.
 - How to migrate confidently:
   - If you're using refinement methods of `ez.file()`:

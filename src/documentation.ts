@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import {
   OpenApiBuilder,
   ReferenceObject,
@@ -71,7 +70,7 @@ interface DocumentationParams {
 export class Documentation extends OpenApiBuilder {
   protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   protected lastOperationIdSuffixes = new Map<string, number>();
-  protected responseVariants = keys(defaultStatusCodes);
+  protected responseVariants = keys(defaultStatusCodes); // eslint-disable-line no-restricted-syntax -- literal
   protected references = new Map<z.ZodTypeAny, string>();
 
   protected makeRef(
@@ -103,14 +102,12 @@ export class Documentation extends OpenApiBuilder {
       return operationId;
     }
     if (userDefined) {
-      assert.fail(
-        new DocumentationError({
-          message: `Duplicated operationId: "${userDefined}"`,
-          method,
-          isResponse: false,
-          path,
-        }),
-      );
+      throw new DocumentationError({
+        message: `Duplicated operationId: "${userDefined}"`,
+        method,
+        isResponse: false,
+        path,
+      });
     }
     lastSuffix++;
     this.lastOperationIdSuffixes.set(operationId, lastSuffix);

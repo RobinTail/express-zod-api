@@ -31,7 +31,6 @@ export default [
     rules: {
       curly: ["warn", "multi-or-nest", "consistent"],
       "unicorn/prefer-node-protocol": "error",
-      // "no-restricted-syntax": ["warn", "ReturnStatement[argument=null]"],
     },
   },
   {
@@ -39,6 +38,32 @@ export default [
     files: ["src/*.ts"],
     rules: {
       "allowed/dependencies": ["error", { typeOnly: ["eslint", "prettier"] }],
+      // "no-restricted-syntax": ["warn", "ReturnStatement[argument=null]"],
+      "no-restricted-syntax": [
+        "warn",
+        {
+          // https://github.com/RobinTail/express-zod-api/pull/2169
+          selector: "ImportDeclaration[source.value=/assert/]",
+          message: "assert is slow, use throw",
+        },
+        {
+          // https://github.com/RobinTail/express-zod-api/pull/2144
+          selector:
+            "MemberExpression[object.name='process'][property.name='env']",
+          message: "Reading process.env is slow and must be memoized",
+        },
+        {
+          // https://github.com/RobinTail/express-zod-api/pull/2168
+          selector: "CallExpression > Identifier[name='toPairs']",
+          message: "R.toPairs() is 1.1x slower than Object.entries()",
+        },
+        {
+          // https://github.com/RobinTail/express-zod-api/pull/2168
+          selector:
+            "CallExpression[callee.name='keys'], CallExpression[callee.name='keysIn']",
+          message: "R.keys() and keysIn() are 1.2x slower than Object.keys()",
+        },
+      ],
     },
   },
   {
@@ -63,7 +88,7 @@ export default [
     files: ["tests/**/*.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-empty-object-type": ["warn"],
+      "@typescript-eslint/no-empty-object-type": "warn",
     },
   },
   {

@@ -141,8 +141,7 @@ describe("Server", () => {
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
       expect(configMock.beforeRouting).toHaveBeenCalledWith({
         app: appMock,
-        logger: customLogger,
-        getChildLogger: expect.any(Function),
+        getLogger: expect.any(Function),
       });
       expect(infoMethod).toHaveBeenCalledTimes(1);
       expect(infoMethod).toHaveBeenCalledWith(`Listening`, { port });
