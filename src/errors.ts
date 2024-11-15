@@ -91,3 +91,10 @@ export class MissingPeerError extends Error {
     );
   }
 }
+
+export function lazyAss(
+  value: boolean,
+  getError: () => Error,
+): asserts value is true {
+  if (!value) throw getError();
+}
