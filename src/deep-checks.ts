@@ -1,4 +1,4 @@
-import { fail } from "node:assert/strict";
+import { fail } from "node:assert/strict"; // eslint-disable-line no-restricted-syntax -- acceptable
 import { z } from "zod";
 import { EmptyObject } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";

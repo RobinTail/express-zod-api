@@ -1,6 +1,5 @@
 import { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
-import assert from "node:assert/strict";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import {
@@ -28,12 +27,9 @@ export const normalize = <A extends unknown[]>(
   if (typeof subject === "function")
     return normalize(subject(...features.arguments), features);
   if (subject instanceof z.ZodType) return [{ ...features, schema: subject }];
-  if (Array.isArray(subject)) {
-    assert(
-      subject.length,
-      new ResultHandlerError(
-        new Error(`At least one ${features.variant} response schema required.`),
-      ),
+  if (Array.isArray(subject) && !subject.length) {
+    throw new ResultHandlerError(
+      new Error(`At least one ${features.variant} response schema required.`),
     );
   }
   return (Array.isArray(subject) ? subject : [subject]).map(
