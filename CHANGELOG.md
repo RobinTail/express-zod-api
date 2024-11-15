@@ -26,6 +26,7 @@
   - The `Endpoint::getMethods()` method may now return `undefined`;
   - The `testEndpoint()` method can no longer test CORS headers — that function moved to `Routing` traverse;
   - Public properties `pairs`, `firstEndpoint` and `siblingMethods` of `DependsOnMethod` replaced with `entries`.
+- Routing traverse improvement: performance +5%, memory consumption -17%.
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
