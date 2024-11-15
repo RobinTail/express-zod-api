@@ -70,7 +70,7 @@ interface DocumentationParams {
 export class Documentation extends OpenApiBuilder {
   protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   protected lastOperationIdSuffixes = new Map<string, number>();
-  protected responseVariants = keys(defaultStatusCodes);
+  protected responseVariants = keys(defaultStatusCodes); // eslint-disable-line no-restricted-syntax -- literal
   protected references = new Map<z.ZodTypeAny, string>();
 
   protected makeRef(
