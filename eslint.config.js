@@ -42,14 +42,8 @@ export default [
       "no-restricted-syntax": [
         "warn",
         {
-          selector:
-            "CallExpression[callee.name='assert'] > .arguments[type='NewExpression']",
-          message: "assert(..., new Error) is slow",
-        },
-        {
-          selector:
-            "CallExpression[callee.object.name='assert'] > .arguments[type='NewExpression']",
-          message: "assert.*(..., new Error) is slow",
+          selector: "ImportDeclaration[source.value=/assert/]",
+          message: "assert is slow, use throw",
         },
       ],
     },
