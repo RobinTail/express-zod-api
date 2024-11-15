@@ -31,6 +31,13 @@ export default [
     rules: {
       curly: ["warn", "multi-or-nest", "consistent"],
       "unicorn/prefer-node-protocol": "error",
+    },
+  },
+  {
+    name: "source/all",
+    files: ["src/*.ts"],
+    rules: {
+      "allowed/dependencies": ["error", { typeOnly: ["eslint", "prettier"] }],
       // "no-restricted-syntax": ["warn", "ReturnStatement[argument=null]"],
       "no-restricted-syntax": [
         "warn",
@@ -45,13 +52,6 @@ export default [
           message: "assert.*(..., new Error) is slow",
         },
       ],
-    },
-  },
-  {
-    name: "source/all",
-    files: ["src/*.ts"],
-    rules: {
-      "allowed/dependencies": ["error", { typeOnly: ["eslint", "prettier"] }],
     },
   },
   {
