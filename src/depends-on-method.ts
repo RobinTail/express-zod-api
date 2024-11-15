@@ -8,7 +8,7 @@ export class DependsOnMethod {
 
   constructor(endpoints: Partial<Record<Method, AbstractEndpoint>>) {
     const entries: Array<(typeof this.entries)[number]> = [];
-    const methods = keys(endpoints);
+    const methods = keys(endpoints); // eslint-disable-line no-restricted-syntax -- liternal type required
     for (const method of methods) {
       const endpoint = endpoints[method];
       if (endpoint)
