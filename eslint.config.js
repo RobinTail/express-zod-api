@@ -62,6 +62,12 @@ export default [
           selector: "CallExpression > Identifier[name='toPairs']",
           message: "R.toPairs() is 1.1x slower than Object.entries()",
         },
+        {
+          // https://github.com/RobinTail/express-zod-api/pull/2168
+          selector:
+            "CallExpression[callee.name='keys'], CallExpression[callee.name='keysIn']",
+          message: "R.keys() and keysIn() are 1.2x slower than Object.keys()",
+        },
       ],
     },
   },
