@@ -47,11 +47,6 @@ export default [
           message: "assert is slow, use throw",
         },
         {
-          // https://github.com/RobinTail/express-zod-api/pull/2160
-          selector: "ObjectExpression > SpreadElement ~ SpreadElement",
-          message: "Multiple spreading 1.4x slower than Object.assign()",
-        },
-        {
           // https://github.com/RobinTail/express-zod-api/pull/2144
           selector:
             "MemberExpression[object.name='process'][property.name='env']",
