@@ -175,6 +175,12 @@ export const depictDiscriminatedUnion: Depicter = (
   };
 };
 
+const propsMerger = (a: unknown, b: unknown) => {
+  if (Array.isArray(a) && Array.isArray(b)) return concat(a, b);
+  if (a === b) return b;
+  throw new Error("Can not flatten properties");
+};
+
 /** @throws Error */
 const tryFlattenIntersection = (
   children: Array<SchemaObject | ReferenceObject>,
@@ -192,11 +198,7 @@ const tryFlattenIntersection = (
   const flat: SchemaObject = { type: "object" };
   if (left.properties || right.properties) {
     flat.properties = mergeDeepWith(
-      (a, b) => {
-        if (Array.isArray(a) && Array.isArray(b)) return concat(a, b);
-        if (a === b) return b;
-        throw new Error("Can not flatten properties");
-      },
+      propsMerger,
       left.properties || {},
       right.properties || {},
     );
