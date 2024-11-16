@@ -422,12 +422,10 @@ describe("Example", async () => {
               : { "Content-Type": "application/json", token: "456" },
           body: method === "get" ? undefined : JSON.stringify(params),
         });
-        const parser = response.headers
+        const isJSON = response.headers
           .get("content-type")
-          ?.startsWith("application/json")
-          ? "json"
-          : "text";
-        return response[parser]();
+          ?.startsWith("application/json");
+        return response[isJSON ? "json" : "text"]();
       };
 
     const client = new ExpressZodAPIClient(
