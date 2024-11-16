@@ -441,5 +441,20 @@ describe("Example", async () => {
         | { status: "error"; error: { message: string } }
       >();
     });
+
+    test("Issue #2177: should handle path params correctly", async () => {
+      const response = await client.provide("patch", "/v1/user/:id", {
+        key: "SomeKey",
+        id: "100500",
+        name: "Alan Turing",
+        birthday: "1912-06-23",
+      });
+      expect(typeof response).toBe("object");
+      expect(response).toMatchSnapshot();
+      expectTypeOf(response).toMatchTypeOf<
+        | { status: "success"; data: { name: string; createdAt: string } }
+        | { status: "error"; error: { message: string } }
+      >();
+    });
   });
 });
