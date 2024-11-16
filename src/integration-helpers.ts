@@ -18,11 +18,9 @@ export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
 
-export const emptyHeading = f.createTemplateHead("");
-
+const emptyHeading = f.createTemplateHead("");
+const spacingMiddle = f.createTemplateMiddle(" ");
 export const emptyTail = f.createTemplateTail("");
-
-export const spacingMiddle = f.createTemplateMiddle(" ");
 
 export const makeTemplateType = (names: Array<ts.Identifier | string>) =>
   f.createTemplateLiteralType(
