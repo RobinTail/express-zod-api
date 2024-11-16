@@ -93,12 +93,12 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   initRouting({ app, routing, getLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
+  const created: Array<http.Server | https.Server> = [];
   const makeStarter =
-    (server: http.Server | https.Server, subject: HttpConfig["listen"]) => () =>
+    (server: (typeof created)[number], subject: HttpConfig["listen"]) => () =>
       server.listen(subject, () => logger.info("Listening", subject));
 
-  const created: Array<http.Server | https.Server> = [];
-  const starters: Array<() => http.Server | https.Server> = [];
+  const starters: Array<ReturnType<typeof makeStarter>> = [];
   if (config.http) {
     const httpServer = http.createServer(app);
     created.push(httpServer);
