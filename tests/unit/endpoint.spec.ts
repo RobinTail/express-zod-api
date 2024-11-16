@@ -328,7 +328,6 @@ describe("Endpoint", () => {
     test("should return undefined if its not defined upon creation", () => {
       expect(
         new Endpoint({
-          methods: ["get"],
           inputSchema: z.object({}),
           outputSchema: z.object({}),
           handler: async () => ({}),
