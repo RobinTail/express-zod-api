@@ -2,6 +2,23 @@
 
 ## Version 20
 
+### v20.21.2
+
+- Fixed the example implementation in the generated client for endpoints using path params:
+  - The choice of parser was made based on the exported `const jsonEndpoints` indexed by `path`;
+  - The actual `path` used for the lookup already contained parameter substitutions so that JSON parser didn't work;
+  - The new example implementation suggests choosing the parser based on the actual `response.headers`;
+  - The issue was found and reported by [@HenriJ](https://github.com/HenriJ).
+
+```diff
+- const parser = `${method} ${path}` in jsonEndpoints ? "json" : "text";
++ const isJSON = response.headers
++   .get("content-type")
++   ?.startsWith("application/json");
+- return response[parser]();
++ return response[isJSON ? "json" : "text"]();
+```
+
 ### v20.21.1
 
 - Performance tuning: `Routing` traverse made about 12 times faster.
