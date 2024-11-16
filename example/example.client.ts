@@ -228,7 +228,11 @@ export const exampleImplementation: Implementation = async (
     headers: hasBody ? { "Content-Type": "application/json" } : undefined,
     body: hasBody ? JSON.stringify(params) : undefined,
   });
-  const parser = `${method} ${path}` in jsonEndpoints ? "json" : "text";
+  const parser = response.headers
+    .get("content-type")
+    ?.startsWith("application/json")
+    ? "json"
+    : "text";
   return response[parser]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);

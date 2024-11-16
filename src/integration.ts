@@ -2,7 +2,6 @@ import ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  emptyHeading,
   emptyTail,
   exportModifier,
   f,
@@ -27,7 +26,6 @@ import {
   parametricIndexNode,
   protectedReadonlyModifier,
   quoteProp,
-  spacingMiddle,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -589,19 +587,31 @@ export class Integration {
       ),
     );
 
-    // const parser = `${method} ${path}` in jsonEndpoints ? "json" : "text";
+    // const parser = response.headers.get("content-type")?.startsWith("application/json") ? "json" : "text"
     const parserStatement = f.createVariableStatement(
       undefined,
       makeConst(
         this.ids.parserConst,
         makeTernary(
-          f.createBinaryExpression(
-            f.createTemplateExpression(emptyHeading, [
-              f.createTemplateSpan(this.ids.methodParameter, spacingMiddle),
-              f.createTemplateSpan(this.ids.pathParameter, emptyTail),
-            ]),
-            ts.SyntaxKind.InKeyword,
-            this.ids.jsonEndpointsConst,
+          f.createCallChain(
+            f.createPropertyAccessChain(
+              f.createCallExpression(
+                f.createPropertyAccessExpression(
+                  f.createPropertyAccessExpression(
+                    this.ids.responseConst,
+                    this.ids.headersProperty,
+                  ),
+                  f.createIdentifier("get" satisfies keyof Headers),
+                ),
+                undefined,
+                [f.createStringLiteral("content-type")],
+              ),
+              f.createToken(ts.SyntaxKind.QuestionDotToken),
+              f.createIdentifier("startsWith" satisfies keyof string),
+            ),
+            undefined,
+            undefined,
+            [f.createStringLiteral(contentTypes.json)],
           ),
           f.createStringLiteral("json" satisfies keyof Response),
           f.createStringLiteral("text" satisfies keyof Response),
