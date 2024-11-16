@@ -15,11 +15,11 @@
   - The object resolved from the `createServer()` method changed:
     - Properties `httpServer` and `httpsServer` are removed;
     - Added `servers` property instead — array containing those server instances in the same order.
+- Both `logger` and `getChildLogger` properties of `beforeRouting` argument are replaced with all-purpose `getLogger`:
+  - For a given request it returns the child logger (if configured) or the configured logger otherwise.
 - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
 - The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
 - The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
-- Both `logger` and `getChildLogger` properties of `beforeRouting` argument are replaced with all-purpose `getLogger`:
-  - It returns the child logger for the given request (if configured) or the configured logger otherwise.
 - Specifying `method` or `methods` for `EndpointsFactory::build()` made optional and when it's omitted:
   - If the endpoint is assigned to a route using `DependsOnMethod` instance, the corresponding method is used;
   - Otherwise `GET` method is implied by default.
@@ -40,6 +40,23 @@ export default [
   { languageOptions: { parser }, plugins: { migration } },
   { files: ["**/*.ts"], rules: { "migration/v21": "error" } },
 ];
+```
+
+```ts
+// The sample of new structure
+const config = createConfig({
+  http: { listen: 80 }, // became optional
+  https: { listen: 443, options: {} },
+  upload: true,
+  compression: true,
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+    app.use((req, res, next) => {
+      const childLogger = getLogger(req);
+    });
+  },
+});
+const { servers } = await createServer(config, {});
 ```
 
 ## Version 20
