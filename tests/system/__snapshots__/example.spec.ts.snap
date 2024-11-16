@@ -1,5 +1,15 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Example > Client > Issue #2177: should handle path params correctly 1`] = `
+{
+  "data": {
+    "createdAt": "2022-01-22T00:00:00.000Z",
+    "name": "Alan Turing",
+  },
+  "status": "success",
+}
+`;
+
 exports[`Example > Client > Should perform the request with a positive response 1`] = `
 {
   "data": {

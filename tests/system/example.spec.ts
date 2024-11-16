@@ -3,7 +3,6 @@ import { createReadStream, readFileSync } from "node:fs";
 import {
   ExpressZodAPIClient,
   Implementation,
-  jsonEndpoints,
 } from "../../example/example.client";
 import { givePort } from "../helpers";
 import { createHash } from "node:crypto";
@@ -420,10 +419,12 @@ describe("Example", async () => {
           headers:
             method === "get"
               ? undefined
-              : { "Content-Type": "application/json" },
+              : { "Content-Type": "application/json", token: "456" },
           body: method === "get" ? undefined : JSON.stringify(params),
         });
-        const parser = `${method} ${path}` in jsonEndpoints ? "json" : "text";
+        const parser = response.headers.get("content-type")?.includes("json")
+          ? "json"
+          : "text";
         return response[parser]();
       };
 
@@ -444,8 +445,8 @@ describe("Example", async () => {
 
     test("Issue #2177: should handle path params correctly", async () => {
       const response = await client.provide("patch", "/v1/user/:id", {
-        key: "SomeKey",
-        id: "100500",
+        key: "123",
+        id: "12",
         name: "Alan Turing",
         birthday: "1912-06-23",
       });
