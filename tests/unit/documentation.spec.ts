@@ -773,7 +773,7 @@ describe("Documentation", () => {
       const resultHandler = new ResultHandler({
         positive: (result) => ({
           schema: z.object({ status: z.literal("OK"), result }),
-          mimeTypes: [contentTypes.json, "text/vnd.yaml"],
+          mimeType: [contentTypes.json, "text/vnd.yaml"],
           statusCode: 201,
         }),
         negative: {

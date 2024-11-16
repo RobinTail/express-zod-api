@@ -17,11 +17,9 @@ export type ResultSchema<R extends Result> =
 /** @throws ResultHandlerError when Result is an empty array */
 export const normalize = <A extends unknown[]>(
   subject: Result | LazyResult<Result, A>,
-  features: {
+  features: Pick<NormalizedResponse, "statusCodes" | "mimeTypes"> & {
     variant: ResponseVariant;
     arguments: A;
-    statusCodes: [number, ...number[]];
-    mimeTypes: [string, ...string[]];
   },
 ): NormalizedResponse[] => {
   if (typeof subject === "function")
@@ -33,12 +31,16 @@ export const normalize = <A extends unknown[]>(
     );
   }
   return (Array.isArray(subject) ? subject : [subject]).map(
-    ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
+    ({ schema, statusCode, mimeType }) => ({
       schema,
-      statusCodes: statusCode
-        ? [statusCode]
-        : statusCodes || features.statusCodes,
-      mimeTypes: mimeType ? [mimeType] : mimeTypes || features.mimeTypes,
+      statusCodes:
+        typeof statusCode === "number"
+          ? [statusCode]
+          : statusCode || features.statusCodes,
+      mimeTypes:
+        typeof mimeType === "string"
+          ? [mimeType]
+          : mimeType || features.mimeTypes,
     }),
   );
 };
