@@ -73,7 +73,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["get"],
               input: z.object({
                 array: z.array(z.number().int().positive()).min(1).max(3),
                 unlimited: z.array(z.boolean()),
@@ -103,7 +102,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["get"],
               input: z.object({
                 optional: z.string().optional(),
                 optDefault: z.string().optional().default("test"),
