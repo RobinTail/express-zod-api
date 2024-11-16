@@ -72,10 +72,8 @@ describe("Endpoint", () => {
           transform: "test",
         }));
       const endpoint = factory.build({
-        methods: ["post"],
-        input: z.object({
-          n: z.number(),
-        }),
+        method: "post",
+        input: z.object({ n: z.number() }),
         output: z.object({
           inc2: z.number(),
           str: z.string(),
@@ -350,7 +348,7 @@ describe("Endpoint", () => {
           handler: async () => ({}),
         })
         .build({
-          methods: ["post"],
+          method: "post",
           input: z.object({
             n: z.number().refine(async (n) => n > 100),
           }),
@@ -389,7 +387,7 @@ describe("Endpoint", () => {
           next();
         })
         .build({
-          methods: ["post"],
+          method: "post",
           input: z.object({
             shouldNotBeThere: z.boolean(),
           }),
@@ -461,7 +459,7 @@ describe("Endpoint", () => {
         handler: async () => assert.fail("Something went wrong"),
       });
       const endpoint = factory.build({
-        methods: ["post"],
+        method: "post",
         output: z.object({}),
         handler: async () => ({}),
       });

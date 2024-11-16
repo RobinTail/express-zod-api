@@ -50,13 +50,9 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            methods: ["get", "post"],
-            input: z.object({
-              n: z.number(),
-            }),
-            output: z.object({
-              b: z.boolean(),
-            }),
+            method: ["get", "post"],
+            input: z.object({ n: z.number() }),
+            output: z.object({ b: z.boolean() }),
             handler: vi.fn(),
           }),
         },
@@ -109,7 +105,7 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: factory.build({
-            methods: ["get", "post"],
+            method: ["get", "post"],
             input: z.object({
               n: z.number(),
             }),
@@ -331,13 +327,9 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            methods: ["get", "post"],
-            input: z.object({
-              n: z.number(),
-            }),
-            output: z.object({
-              b: z.boolean(),
-            }),
+            method: ["get", "post"],
+            input: z.object({ n: z.number() }),
+            output: z.object({ b: z.boolean() }),
             handler: vi.fn(),
           }),
         },
