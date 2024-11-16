@@ -22,7 +22,6 @@ import {
   createServer,
   defaultResultHandler,
   ez,
-  createConfig,
 } from "../../src";
 import express from "express";
 
@@ -62,10 +61,7 @@ describe("Server", () => {
           }),
         },
       };
-      const { servers } = await createServer(
-        createConfig(configMock),
-        routingMock,
-      );
+      const { servers } = await createServer(configMock, routingMock);
       expect(servers).toHaveLength(1);
       expect(servers[0]).toBeTruthy();
       expect(appMock).toBeTruthy();
@@ -202,10 +198,7 @@ describe("Server", () => {
         },
       };
 
-      const { servers } = await createServer(
-        createConfig(configMock),
-        routingMock,
-      );
+      const { servers } = await createServer(configMock, routingMock);
       expect(servers).toHaveLength(1);
       expect(servers[0]).toBeTruthy();
       expect(createHttpsServerSpy).toHaveBeenCalledWith(
@@ -230,7 +223,7 @@ describe("Server", () => {
         startupLogo: false,
         logger: { level: "warn" as const },
       };
-      const { servers } = await createServer(createConfig(configMock), {});
+      const { servers } = await createServer(configMock, {});
       expect(servers).toHaveLength(2);
       expect(servers[0]).toBeTruthy();
       expect(servers[1]).toBeTruthy();
