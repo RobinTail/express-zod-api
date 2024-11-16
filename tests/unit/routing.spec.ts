@@ -40,12 +40,11 @@ describe("Routing", () => {
       };
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
-        methods: ["get"],
         output: z.object({}),
         handler: handlerMock,
       });
       const postEndpoint = factory.build({
-        methods: ["post"],
+        method: "post",
         output: z.object({}),
         handler: handlerMock,
       });
@@ -245,7 +244,6 @@ describe("Routing", () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["get"],
         output: z.object({}),
         handler: handlerMock,
       });
@@ -271,7 +269,6 @@ describe("Routing", () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["get"],
         output: z.object({}),
         handler: handlerMock,
       });
@@ -301,7 +298,6 @@ describe("Routing", () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["get"],
         output: z.object({}),
         handler: handlerMock,
       });
