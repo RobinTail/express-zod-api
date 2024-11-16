@@ -10,7 +10,7 @@ import {
 } from "./graceful-helpers";
 
 export const monitor = (
-  servers: Array<Server>,
+  servers: Server[],
   { timeout = 1e3, logger }: { timeout?: number; logger?: ActualLogger } = {},
 ) => {
   let pending: Promise<PromiseSettledResult<void>[]> | undefined;

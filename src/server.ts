@@ -97,8 +97,8 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   const makeStarter = (server: Server, subject: HttpConfig["listen"]) => () =>
     server.listen(subject, () => logger.info("Listening", subject));
 
-  const created: Array<Server> = [];
-  const starters: Array<ReturnType<typeof makeStarter>> = [];
+  const created: Server[] = [];
+  const starters: ReturnType<typeof makeStarter>[] = [];
   if (config.http) {
     const httpServer = http.createServer(app);
     created.push(httpServer);
