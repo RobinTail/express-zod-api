@@ -17,7 +17,7 @@ export type ResultSchema<R extends Result> =
 /** @throws ResultHandlerError when Result is an empty array */
 export const normalize = <A extends unknown[]>(
   subject: Result | LazyResult<Result, A>,
-  features: Pick<NormalizedResponse, "statusCodes" | "mimeTypes"> & {
+  features: Omit<NormalizedResponse, "schema"> & {
     variant: ResponseVariant;
     arguments: A;
   },
