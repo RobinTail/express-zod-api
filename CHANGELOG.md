@@ -40,6 +40,22 @@ export default [
 ];
 ```
 
+```ts
+// The sample of new structure
+const config = createConfig({
+  https: { listen: 8090 },
+  upload: true,
+  compression: true,
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+    app.use((req, res, next) => {
+      const childLogger = getLogger(req);
+    });
+  },
+});
+const { servers } = await createServer(config, {});
+```
+
 ## Version 20
 
 ### v20.21.1
