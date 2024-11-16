@@ -43,7 +43,8 @@ export default [
 ```ts
 // The sample of new structure
 const config = createConfig({
-  https: { listen: 8090 },
+  http: { listen: 80 }, // became optional
+  https: { listen: 443, options: {} },
   upload: true,
   compression: true,
   beforeRouting: ({ app, getLogger }) => {
