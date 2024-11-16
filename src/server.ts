@@ -2,6 +2,7 @@ import express from "express";
 import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
+import { Server } from "node:net";
 import { BuiltinLogger } from "./builtin-logger";
 import {
   AppConfig,
@@ -93,12 +94,11 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   initRouting({ app, routing, getLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
-  const makeStarter =
-    (server: http.Server | https.Server, subject: HttpConfig["listen"]) => () =>
-      server.listen(subject, () => logger.info("Listening", subject));
+  const makeStarter = (server: Server, subject: HttpConfig["listen"]) => () =>
+    server.listen(subject, () => logger.info("Listening", subject));
 
-  const created: Array<http.Server | https.Server> = [];
-  const starters: Array<() => http.Server | https.Server> = [];
+  const created: Server[] = [];
+  const starters: ReturnType<typeof makeStarter>[] = [];
   if (config.http) {
     const httpServer = http.createServer(app);
     created.push(httpServer);
