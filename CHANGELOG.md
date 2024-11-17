@@ -15,6 +15,8 @@
   - Plural `methods`, `tags` and `scopes` properties replaced with singular `method`, `tag`, `scope` accordingly;
   - The `method` property also made optional and can now be derived from `DependsOnMethod` or imply `GET` by default;
   - When `method` is assigned with an array, it must be non-empty.
+- Breaking changes to `positive` and `negative` propeties of `ResultHandler` constructor argument:
+  - Plural `statusCodes` and `mimeTypes` props within the values are replaced with singular `statusCode` and `mimeType`.
 - Other breaking changes:
   - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
   - The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
