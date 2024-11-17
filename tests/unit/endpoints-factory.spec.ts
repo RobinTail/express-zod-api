@@ -298,13 +298,12 @@ describe("EndpointsFactory", () => {
       );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
-        methods: ["get"],
         input: z.object({ s: z.string() }),
         output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toStrictEqual(["get"]);
+      expect(endpoint.getMethods()).toBeUndefined();
       expect(
         serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();
@@ -331,13 +330,12 @@ describe("EndpointsFactory", () => {
         b: true,
       }));
       const endpoint = factory.build({
-        methods: ["get"],
         input: z.object({ s: z.string() }),
         output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toStrictEqual(["get"]);
+      expect(endpoint.getMethods()).toBeUndefined();
       expect(
         serializeSchemaForTest(endpoint.getSchema("input")),
       ).toMatchSnapshot();

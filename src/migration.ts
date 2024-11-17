@@ -16,6 +16,14 @@ const originalErrorPropName = "originalError";
 const getStatusCodeFromErrorMethod = "getStatusCodeFromError";
 const loggerPropName = "logger";
 const getChildLoggerPropName = "getChildLogger";
+const methodsPropName = "methods";
+const tagsPropName = "tags";
+const scopesPropName = "scopes";
+const statusCodesPropName = "statusCodes";
+const mimeTypesPropName = "mimeTypes";
+const buildMethod = "build";
+const resultHandlerClass = "ResultHandler";
+const handlerMethod = "handler";
 
 const changedProps = {
   [serverPropName]: "http",
@@ -24,6 +32,11 @@ const changedProps = {
   [originalErrorPropName]: "cause",
   [loggerPropName]: "getLogger",
   [getChildLoggerPropName]: "getLogger",
+  [methodsPropName]: "method",
+  [tagsPropName]: "tag",
+  [scopesPropName]: "scope",
+  [statusCodesPropName]: "statusCode",
+  [mimeTypesPropName]: "mimeType",
 };
 
 const changedMethods = {
@@ -37,6 +50,22 @@ const movedProps = [
   "rawParser",
   "beforeRouting",
 ] as const;
+
+const esQueries = {
+  loggerArgument:
+    `${NT.Property}[key.name="${beforeRoutingPropName}"] ` +
+    `${NT.ArrowFunctionExpression} ` +
+    `${NT.Identifier}[name="${loggerPropName}"]`,
+  getChildLoggerArgument:
+    `${NT.Property}[key.name="${beforeRoutingPropName}"] ` +
+    `${NT.ArrowFunctionExpression} ` +
+    `${NT.Identifier}[name="${getChildLoggerPropName}"]`,
+  responseFeatures:
+    `${NT.NewExpression}[callee.name='${resultHandlerClass}'] > ` +
+    `${NT.ObjectExpression} > ` +
+    `${NT.Property}[key.name!='${handlerMethod}'] ` +
+    `${NT.Property}[key.name=/(${statusCodesPropName}|${mimeTypesPropName})/]`,
+};
 
 type PropWithId = TSESTree.Property & {
   key: TSESTree.Identifier;
@@ -74,8 +103,8 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
       if (node.source.value === importName) {
         for (const spec of node.specifiers) {
           if (
-            spec.type === "ImportSpecifier" &&
-            spec.imported.type === "Identifier" &&
+            spec.type === NT.ImportSpecifier &&
+            spec.imported.type === NT.Identifier &&
             spec.imported.name in changedMethods
           ) {
             const replacement =
@@ -114,6 +143,26 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
       }
     },
     [NT.CallExpression]: (node) => {
+      if (
+        node.callee.type === NT.MemberExpression &&
+        node.callee.property.type === NT.Identifier &&
+        node.callee.property.name === buildMethod &&
+        node.arguments.length === 1 &&
+        node.arguments[0].type === NT.ObjectExpression
+      ) {
+        const changed = node.arguments[0].properties.filter(
+          propByName([methodsPropName, tagsPropName, scopesPropName] as const),
+        );
+        for (const prop of changed) {
+          const replacement = changedProps[prop.key.name];
+          ctx.report({
+            node: prop,
+            messageId: "change",
+            data: { subject: "property", from: prop.key.name, to: replacement },
+            fix: (fixer) => fixer.replaceText(prop.key, replacement),
+          });
+        }
+      }
       if (node.callee.type !== NT.Identifier) return;
       if (
         node.callee.name === createConfigName &&
@@ -204,41 +253,49 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
         });
       }
     },
-    [`${NT.Property}[key.name="${beforeRoutingPropName}"] ${NT.ArrowFunctionExpression} ${NT.Identifier}[name="${loggerPropName}"]`]:
-      (node: TSESTree.Identifier) => {
-        const { parent } = node;
-        const isProp = isPropWithId(parent);
-        if (isProp && parent.value === node) return; // not for renames
-        const replacement = `${changedProps[node.name as keyof typeof changedProps]}${isProp ? "" : "()"}`;
-        ctx.report({
-          node,
-          messageId: "change",
-          data: {
-            subject: isProp ? "property" : "const",
-            from: node.name,
-            to: replacement,
-          },
-          fix: (fixer) => fixer.replaceText(node, replacement),
-        });
-      },
-    [`${NT.Property}[key.name="${beforeRoutingPropName}"] ${NT.ArrowFunctionExpression} ${NT.Identifier}[name="${getChildLoggerPropName}"]`]:
-      (node: TSESTree.Identifier) => {
-        const { parent } = node;
-        const isProp = isPropWithId(parent);
-        if (isProp && parent.value === node) return; // not for renames
-        const replacement =
-          changedProps[node.name as keyof typeof changedProps];
-        ctx.report({
-          node,
-          messageId: "change",
-          data: {
-            subject: isProp ? "property" : "method",
-            from: node.name,
-            to: replacement,
-          },
-          fix: (fixer) => fixer.replaceText(node, replacement),
-        });
-      },
+    [esQueries.loggerArgument]: (node: TSESTree.Identifier) => {
+      const { parent } = node;
+      const isProp = isPropWithId(parent);
+      if (isProp && parent.value === node) return; // not for renames
+      const replacement = `${changedProps[node.name as keyof typeof changedProps]}${isProp ? "" : "()"}`;
+      ctx.report({
+        node,
+        messageId: "change",
+        data: {
+          subject: isProp ? "property" : "const",
+          from: node.name,
+          to: replacement,
+        },
+        fix: (fixer) => fixer.replaceText(node, replacement),
+      });
+    },
+    [esQueries.getChildLoggerArgument]: (node: TSESTree.Identifier) => {
+      const { parent } = node;
+      const isProp = isPropWithId(parent);
+      if (isProp && parent.value === node) return; // not for renames
+      const replacement = changedProps[node.name as keyof typeof changedProps];
+      ctx.report({
+        node,
+        messageId: "change",
+        data: {
+          subject: isProp ? "property" : "method",
+          from: node.name,
+          to: replacement,
+        },
+        fix: (fixer) => fixer.replaceText(node, replacement),
+      });
+    },
+    [esQueries.responseFeatures]: (node: TSESTree.Property) => {
+      if (!isPropWithId(node)) return;
+      const replacement =
+        changedProps[node.key.name as keyof typeof changedProps];
+      ctx.report({
+        node,
+        messageId: "change",
+        data: { subject: "property", from: node.key.name, to: replacement },
+        fix: (fixer) => fixer.replaceText(node.key, replacement),
+      });
+    },
   }),
 });
 

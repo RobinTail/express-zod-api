@@ -84,6 +84,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/HenriJ.png" alt="@HenriJ" width="50px" />](https://github.com/HenriJ)
 [<img src="https://github.com/JonParton.png" alt="@JonParton" width="50px" />](https://github.com/JonParton)
 [<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/t1nky.png" alt="@t1nky" width="50px" />](https://github.com/t1nky)
@@ -206,7 +207,7 @@ The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supp
 import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
-  // method: "get" (default) or methods: ["get", "post", ...]
+  // method: "get" (default) or array ["get", "post", ...]
   input: z.object({
     name: z.string().optional(),
   }),
@@ -821,7 +822,7 @@ import {
 const yourResultHandler = new ResultHandler({
   positive: (data) => ({
     schema: z.object({ data }),
-    mimeType: "application/json", // optinal, or mimeTypes for array
+    mimeType: "application/json", // optinal or array
   }),
   negative: z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
@@ -1094,7 +1095,7 @@ import { ResultHandler } from "express-zod-api";
 
 new ResultHandler({
   positive: (data) => ({
-    statusCodes: [201, 202], // created or will be created
+    statusCode: [201, 202], // created or will be created
     schema: z.object({ status: z.literal("created"), data }),
   }),
   negative: [
@@ -1103,7 +1104,7 @@ new ResultHandler({
       schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
     },
     {
-      statusCodes: [400, 500], // validation or internal error
+      statusCode: [400, 500], // validation or internal error
       schema: z.object({ status: z.literal("error"), reason: z.string() }),
     },
   ],
@@ -1326,7 +1327,7 @@ const taggedEndpointsFactory = new EndpointsFactory({
 
 const exampleEndpoint = taggedEndpointsFactory.build({
   // ...
-  tag: "users", // or tags: ["users", "files"]
+  tag: "users", // or array ["users", "files"]
 });
 ```
 
@@ -1404,7 +1405,7 @@ const output = z.object({
 });
 
 endpointsFactory.build({
-  methods,
+  method,
   input,
   output,
   handler: async (): Promise<z.input<typeof output>> => ({

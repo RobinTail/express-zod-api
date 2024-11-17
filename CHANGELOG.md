@@ -1,34 +1,36 @@
 # Changelog
 
+## Version 22
+
+### v22.0.0
+
+- Minimum supported Node versions: 20.9.0 and 22.0.0;
+- `BuiltinLogger::profile()` behavior changed for picoseconds: expressing them through nanoseconds.
+
 ## Version 21
 
 ### v21.0.0
 
 - Minimum supported versions of `express`: 4.21.1 and 5.0.1 (fixed vulnerabilities);
-- Minimum supported Node versions: 20.9.0 and 22.0.0;
-- `BuiltinLogger::profile()` behavior changed for picoseconds: expressing them through nanoseconds;
-- Running HTTP server made optional (can now configure HTTPS only):
-  - Object argument of the `createConfig()` method changed:
-    - The `server` property renamed to `http` and made optional;
-    - Its nested properties moved to the top level of the config object:
-      `jsonParser`, `upload`, `compression`, `rawParser` and `beforeRouting`.
-  - The object resolved from the `createServer()` method changed:
-    - Properties `httpServer` and `httpsServer` are removed;
-    - Added `servers` property instead — array containing those server instances in the same order.
-- Both `logger` and `getChildLogger` properties of `beforeRouting` argument are replaced with all-purpose `getLogger`:
-  - For a given request it returns the child logger (if configured) or the configured logger otherwise.
-- The `serializer` property of `Documentation` and `Integration` constructor argument removed;
-- The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
-- The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
-- Specifying `method` or `methods` for `EndpointsFactory::build()` made optional and when it's omitted:
-  - If the endpoint is assigned to a route using `DependsOnMethod` instance, the corresponding method is used;
-  - Otherwise `GET` method is implied by default.
-- Other potentially breaking changes:
-  - The optional property `methods` of `EndpointsFactory::build()` must be non-empty array when used;
+- Breaking changes to `createConfig()` argument:
+  - The `server` property renamed to `http` and made optional — (can now configure HTTPS only);
+  - These properties moved to the top level: `jsonParser`, `upload`, `compression`, `rawParser` and `beforeRouting`;
+  - Both `logger` and `getChildLogger` arguments of `beforeRouting` function are replaced with all-purpose `getLogger`.
+- Breaking changes to `createServer()` resolved return:
+  - Both `httpServer` and `httpsServer` are combined into single `servers` property (array, same order).
+- Breaking changes to `EndpointsFactory::build()` argument:
+  - Plural `methods`, `tags` and `scopes` properties replaced with singular `method`, `tag`, `scope` accordingly;
+  - The `method` property also made optional and can now be derived from `DependsOnMethod` or imply `GET` by default;
+  - When `method` is assigned with an array, it must be non-empty.
+- Breaking changes to `positive` and `negative` propeties of `ResultHandler` constructor argument:
+  - Plural `statusCodes` and `mimeTypes` props within the values are replaced with singular `statusCode` and `mimeType`.
+- Other breaking changes:
+  - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
+  - The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
+  - The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
   - The `Endpoint::getMethods()` method may now return `undefined`;
   - The `testEndpoint()` method can no longer test CORS headers — that function moved to `Routing` traverse;
   - Public properties `pairs`, `firstEndpoint` and `siblingMethods` of `DependsOnMethod` replaced with `entries`.
-- Routing traverse improvement: performance +5%, memory consumption -17%.
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
@@ -60,6 +62,23 @@ const { servers } = await createServer(config, {});
 ```
 
 ## Version 20
+
+### v20.21.2
+
+- Fixed the example implementation in the generated client for endpoints using path params:
+  - The choice of parser was made based on the exported `const jsonEndpoints` indexed by `path`;
+  - The actual `path` used for the lookup already contained parameter substitutions so that JSON parser didn't work;
+  - The new example implementation suggests choosing the parser based on the actual `response.headers`;
+  - The issue was found and reported by [@HenriJ](https://github.com/HenriJ).
+
+```diff
+- const parser = `${method} ${path}` in jsonEndpoints ? "json" : "text";
++ const isJSON = response.headers
++   .get("content-type")
++   ?.startsWith("application/json");
+- return response[parser]();
++ return response[isJSON ? "json" : "text"]();
+```
 
 ### v20.21.1
 

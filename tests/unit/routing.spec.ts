@@ -40,17 +40,16 @@ describe("Routing", () => {
       };
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
-        methods: ["get"],
         output: z.object({}),
         handler: handlerMock,
       });
       const postEndpoint = factory.build({
-        methods: ["post"],
+        method: "post",
         output: z.object({}),
         handler: handlerMock,
       });
       const getAndPostEndpoint = factory.build({
-        methods: ["get", "post"],
+        method: ["get", "post"],
         output: z.object({}),
         handler: handlerMock,
       });
@@ -158,7 +157,7 @@ describe("Routing", () => {
       const configMock = { cors: true, startupLogo: false };
       const factory = new EndpointsFactory(defaultResultHandler);
       const putAndPatchEndpoint = factory.build({
-        methods: ["put", "patch"],
+        method: ["put", "patch"],
         output: z.object({}),
         handler: vi.fn(),
       });
@@ -245,7 +244,6 @@ describe("Routing", () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["get"],
         output: z.object({}),
         handler: handlerMock,
       });
@@ -271,7 +269,6 @@ describe("Routing", () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["get"],
         output: z.object({}),
         handler: handlerMock,
       });
@@ -301,7 +298,6 @@ describe("Routing", () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["get"],
         output: z.object({}),
         handler: handlerMock,
       });
@@ -336,13 +332,9 @@ describe("Routing", () => {
         .mockImplementationOnce(() => ({ result: true }));
       const configMock = { cors: true, startupLogo: false };
       const setEndpoint = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["post"],
-        input: z.object({
-          test: z.number(),
-        }),
-        output: z.object({
-          result: z.boolean(),
-        }),
+        method: "post",
+        input: z.object({ test: z.number() }),
+        output: z.object({ result: z.boolean() }),
         handler: handlerMock,
       });
       const routing: Routing = {

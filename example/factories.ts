@@ -66,7 +66,7 @@ export const statusDependingFactory = new EndpointsFactory({
   config,
   resultHandler: new ResultHandler({
     positive: (data) => ({
-      statusCodes: [201, 202],
+      statusCode: [201, 202],
       schema: z.object({ status: z.literal("created"), data }),
     }),
     negative: [
@@ -75,7 +75,7 @@ export const statusDependingFactory = new EndpointsFactory({
         schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
       },
       {
-        statusCodes: [400, 500],
+        statusCode: [400, 500],
         schema: z.object({ status: z.literal("error"), reason: z.string() }),
       },
     ],
