@@ -24,6 +24,7 @@ const mimeTypesPropName = "mimeTypes";
 const buildMethod = "build";
 const resultHandlerClass = "ResultHandler";
 const handlerMethod = "handler";
+const ensureHttpErrorMethod = "ensureHttpError";
 
 const changedProps = {
   [serverPropName]: "http",
@@ -37,10 +38,6 @@ const changedProps = {
   [scopesPropName]: "scope",
   [statusCodesPropName]: "statusCode",
   [mimeTypesPropName]: "mimeType",
-};
-
-const changedMethods = {
-  [getStatusCodeFromErrorMethod]: "ensureHttpError",
 };
 
 const movedProps = [
@@ -65,6 +62,9 @@ const esQueries = {
     `${NT.ObjectExpression} > ` +
     `${NT.Property}[key.name!='${handlerMethod}'] ` +
     `${NT.Property}[key.name=/(${statusCodesPropName}|${mimeTypesPropName})/]`,
+  getStatusCodeImport:
+    `${NT.ImportDeclaration}[source.value=${importName}] ` +
+    `${NT.ImportSpecifier}[imported.name='${getStatusCodeFromErrorMethod}']`,
 };
 
 type PropWithId = TSESTree.Property & {
@@ -99,29 +99,19 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
   },
   defaultOptions: [],
   create: (ctx) => ({
-    [NT.ImportDeclaration]: (node) => {
-      if (node.source.value === importName) {
-        for (const spec of node.specifiers) {
-          if (
-            spec.type === NT.ImportSpecifier &&
-            spec.imported.type === NT.Identifier &&
-            spec.imported.name in changedMethods
-          ) {
-            const replacement =
-              changedMethods[spec.imported.name as keyof typeof changedMethods];
-            ctx.report({
-              node: spec.imported,
-              messageId: "change",
-              data: {
-                subject: "import",
-                from: spec.imported.name,
-                to: replacement,
-              },
-              fix: (fixer) => fixer.replaceText(spec, replacement),
-            });
-          }
-        }
-      }
+    [esQueries.getStatusCodeImport]: (
+      node: TSESTree.ImportSpecifier & { imported: TSESTree.Identifier },
+    ) => {
+      ctx.report({
+        node,
+        messageId: "change",
+        data: {
+          subject: "import",
+          from: node.imported.name,
+          to: ensureHttpErrorMethod,
+        },
+        fix: (fixer) => fixer.replaceText(node, ensureHttpErrorMethod),
+      });
     },
     [NT.MemberExpression]: (node) => {
       if (
@@ -237,17 +227,16 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
         }
       }
       if (node.callee.name === getStatusCodeFromErrorMethod) {
-        const replacement = changedMethods[node.callee.name];
         ctx.report({
           node: node.callee,
           messageId: "change",
           data: {
             subject: "method",
             from: node.callee.name,
-            to: `${replacement}().statusCode`,
+            to: `${ensureHttpErrorMethod}().statusCode`,
           },
           fix: (fixer) => [
-            fixer.replaceText(node.callee, replacement),
+            fixer.replaceText(node.callee, ensureHttpErrorMethod),
             fixer.insertTextAfter(node, ".statusCode"),
           ],
         });
