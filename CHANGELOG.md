@@ -11,9 +11,10 @@
   - Both `logger` and `getChildLogger` arguments of `beforeRouting` function are replaced with all-purpose `getLogger`.
 - Breaking changes to `createServer()` resolved return:
   - Both `httpServer` and `httpsServer` are combined into single `servers` property (array, same order).
-- Potentially breaking changes to `EndpointsFactory::build()` argument:
-  - Both `method` and `methods` made optional, can now be derived from `DependsOnMethod` or imply `GET` by default;
-  - When `methods` is used, it must be a non-empty array.
+- Breaking changes to `EndpointsFactory::build()` argument:
+  - Plural `methods`, `tags` and `scopes` properties replaced with singular `method`, `tag`, `scope` accordingly;
+  - The `method` property also made optional and can now be derived from `DependsOnMethod` or imply `GET` by default;
+  - When `method` is assigned with an array, it must be non-empty.
 - Other breaking changes:
   - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
   - The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
