@@ -27,6 +27,9 @@ describe("Migration", () => {
       `console.error(error.cause?.message);`,
       `import { ensureHttpError } from "express-zod-api";`,
       `ensureHttpError(error).statusCode;`,
+      `factory.build({ method: ['get', 'post'] })`,
+      `factory.build({ tag: ['files', 'users'] })`,
+      `factory.build({ scope: ['admin', 'permissions'] })`,
     ],
     invalid: [
       {
@@ -144,6 +147,36 @@ describe("Migration", () => {
               from: "getStatusCodeFromError",
               to: "ensureHttpError().statusCode",
             },
+          },
+        ],
+      },
+      {
+        code: `factory.build({ methods: ['get', 'post'] })`,
+        output: `factory.build({ method: ['get', 'post'] })`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "methods", to: "method" },
+          },
+        ],
+      },
+      {
+        code: `factory.build({ tags: ['files', 'users'] })`,
+        output: `factory.build({ tag: ['files', 'users'] })`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "tags", to: "tag" },
+          },
+        ],
+      },
+      {
+        code: `factory.build({ scopes: ['admin', 'permissions'] })`,
+        output: `factory.build({ scope: ['admin', 'permissions'] })`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "scopes", to: "scope" },
           },
         ],
       },

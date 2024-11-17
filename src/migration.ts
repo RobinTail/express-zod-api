@@ -16,6 +16,12 @@ const originalErrorPropName = "originalError";
 const getStatusCodeFromErrorMethod = "getStatusCodeFromError";
 const loggerPropName = "logger";
 const getChildLoggerPropName = "getChildLogger";
+const methodsPropName = "methods";
+const tagsPropName = "tags";
+const scopesPropName = "scopes";
+const statusCodesPropName = "statusCodes";
+const mimeTypesPropName = "mimeTypes";
+const buildMethod = "build";
 
 const changedProps = {
   [serverPropName]: "http",
@@ -24,6 +30,11 @@ const changedProps = {
   [originalErrorPropName]: "cause",
   [loggerPropName]: "getLogger",
   [getChildLoggerPropName]: "getLogger",
+  [methodsPropName]: "method",
+  [tagsPropName]: "tag",
+  [scopesPropName]: "scope",
+  [statusCodesPropName]: "statusCode",
+  [mimeTypesPropName]: "mimeType",
 };
 
 const changedMethods = {
@@ -114,6 +125,26 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
       }
     },
     [NT.CallExpression]: (node) => {
+      if (
+        node.callee.type === NT.MemberExpression &&
+        node.callee.property.type === NT.Identifier &&
+        node.callee.property.name === buildMethod &&
+        node.arguments.length === 1 &&
+        node.arguments[0].type === NT.ObjectExpression
+      ) {
+        const changed = node.arguments[0].properties.filter(
+          propByName([methodsPropName, tagsPropName, scopesPropName] as const),
+        );
+        for (const prop of changed) {
+          const replacement = changedProps[prop.key.name];
+          ctx.report({
+            node: prop,
+            messageId: "change",
+            data: { subject: "property", from: prop.key.name, to: replacement },
+            fix: (fixer) => fixer.replaceText(prop.key, replacement),
+          });
+        }
+      }
       if (node.callee.type !== NT.Identifier) return;
       if (
         node.callee.name === createConfigName &&
