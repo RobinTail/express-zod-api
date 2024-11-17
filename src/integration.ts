@@ -2,7 +2,6 @@ import ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  emptyHeading,
   emptyTail,
   exportModifier,
   f,
@@ -27,7 +26,6 @@ import {
   parametricIndexNode,
   protectedReadonlyModifier,
   quoteProp,
-  spacingMiddle,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -136,7 +134,7 @@ export class Integration {
     searchParamsConst: f.createIdentifier("searchParams"),
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
-    parserConst: f.createIdentifier("parser"),
+    isJsonConst: f.createIdentifier("isJSON"),
   } satisfies Record<string, ts.Identifier>;
   protected interfaces: Array<{
     id: ts.Identifier;
@@ -589,32 +587,44 @@ export class Integration {
       ),
     );
 
-    // const parser = `${method} ${path}` in jsonEndpoints ? "json" : "text";
+    // const isJSON = response.headers.get("content-type")?.startsWith("application/json");
     const parserStatement = f.createVariableStatement(
       undefined,
       makeConst(
-        this.ids.parserConst,
-        makeTernary(
-          f.createBinaryExpression(
-            f.createTemplateExpression(emptyHeading, [
-              f.createTemplateSpan(this.ids.methodParameter, spacingMiddle),
-              f.createTemplateSpan(this.ids.pathParameter, emptyTail),
-            ]),
-            ts.SyntaxKind.InKeyword,
-            this.ids.jsonEndpointsConst,
+        this.ids.isJsonConst,
+        f.createCallChain(
+          f.createPropertyAccessChain(
+            f.createCallExpression(
+              f.createPropertyAccessExpression(
+                f.createPropertyAccessExpression(
+                  this.ids.responseConst,
+                  this.ids.headersProperty,
+                ),
+                f.createIdentifier("get" satisfies keyof Headers),
+              ),
+              undefined,
+              [f.createStringLiteral("content-type")],
+            ),
+            f.createToken(ts.SyntaxKind.QuestionDotToken),
+            f.createIdentifier("startsWith" satisfies keyof string),
           ),
-          f.createStringLiteral("json" satisfies keyof Response),
-          f.createStringLiteral("text" satisfies keyof Response),
+          undefined,
+          undefined,
+          [f.createStringLiteral(contentTypes.json)],
         ),
       ),
     );
 
-    // return response[parser]();
+    // return response[isJSON ? "json" : "text"]();
     const returnStatement = f.createReturnStatement(
       f.createCallExpression(
         f.createElementAccessExpression(
           this.ids.responseConst,
-          this.ids.parserConst,
+          makeTernary(
+            this.ids.isJsonConst,
+            f.createStringLiteral("json" satisfies keyof Response),
+            f.createStringLiteral("text" satisfies keyof Response),
+          ),
         ),
         undefined,
         [],

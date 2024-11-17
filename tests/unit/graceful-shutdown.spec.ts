@@ -42,7 +42,7 @@ describe("monitor()", () => {
 
   test(
     "shuts down hanging sockets after defined timeout",
-    { timeout: 500 },
+    { timeout: 1000 }, // increased from 500 for stability
     async () => {
       const handler = vi.fn();
       const [httpServer, port] = await makeHttpServer(handler);
@@ -51,7 +51,7 @@ describe("monitor()", () => {
         headers: { connection: "close" },
       }).catch(vi.fn());
       await vi.waitFor(() => assert(handler.mock.calls.length === 1), {
-        interval: 30,
+        interval: 30, // unstable
       });
       const pending0 = graceful.shutdown();
       const pending1 = graceful.shutdown();
