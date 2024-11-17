@@ -270,6 +270,18 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
           fix: (fixer) => fixer.replaceText(node, replacement),
         });
       },
+    [`${NT.NewExpression}[callee.name='ResultHandler'] ${NT.ObjectExpression} > ${NT.Property}[key.name=/(${statusCodesPropName}|${mimeTypesPropName})/]`]:
+      (node: TSESTree.Property) => {
+        if (!isPropWithId(node)) return;
+        const replacement =
+          changedProps[node.key.name as keyof typeof changedProps];
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "property", from: node.key.name, to: replacement },
+          fix: (fixer) => fixer.replaceText(node.key, replacement),
+        });
+      },
   }),
 });
 

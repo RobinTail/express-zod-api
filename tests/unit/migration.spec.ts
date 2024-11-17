@@ -30,6 +30,7 @@ describe("Migration", () => {
       `factory.build({ method: ['get', 'post'] })`,
       `factory.build({ tag: ['files', 'users'] })`,
       `factory.build({ scope: ['admin', 'permissions'] })`,
+      `new ResultHandler({ positive: () => ({ statusCode: [201, 202] }), negative: [{ mimeType: ["application/json"] }] })`,
     ],
     invalid: [
       {
@@ -177,6 +178,28 @@ describe("Migration", () => {
           {
             messageId: "change",
             data: { subject: "property", from: "scopes", to: "scope" },
+          },
+        ],
+      },
+      {
+        code: `new ResultHandler({ positive: () => ({ statusCodes: [201, 202] }), negative: [{ mimeTypes: ["application/json"] }] })`,
+        output: `new ResultHandler({ positive: () => ({ statusCode: [201, 202] }), negative: [{ mimeType: ["application/json"] }] })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "statusCodes",
+              to: "statusCode",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "mimeTypes",
+              to: "mimeType",
+            },
           },
         ],
       },
