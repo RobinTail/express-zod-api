@@ -51,6 +51,22 @@ const movedProps = [
   "beforeRouting",
 ] as const;
 
+const esQueries = {
+  loggerArgument:
+    `${NT.Property}[key.name="${beforeRoutingPropName}"] ` +
+    `${NT.ArrowFunctionExpression} ` +
+    `${NT.Identifier}[name="${loggerPropName}"]`,
+  getChildLoggerArgument:
+    `${NT.Property}[key.name="${beforeRoutingPropName}"] ` +
+    `${NT.ArrowFunctionExpression} ` +
+    `${NT.Identifier}[name="${getChildLoggerPropName}"]`,
+  responseFeatures:
+    `${NT.NewExpression}[callee.name='${resultHandlerClass}'] > ` +
+    `${NT.ObjectExpression} > ` +
+    `${NT.Property}[key.name!='${handlerMethod}'] ` +
+    `${NT.Property}[key.name=/(${statusCodesPropName}|${mimeTypesPropName})/]`,
+};
+
 type PropWithId = TSESTree.Property & {
   key: TSESTree.Identifier;
 };
@@ -87,8 +103,8 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
       if (node.source.value === importName) {
         for (const spec of node.specifiers) {
           if (
-            spec.type === "ImportSpecifier" &&
-            spec.imported.type === "Identifier" &&
+            spec.type === NT.ImportSpecifier &&
+            spec.imported.type === NT.Identifier &&
             spec.imported.name in changedMethods
           ) {
             const replacement =
@@ -237,10 +253,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
         });
       }
     },
-    [`${NT.Property}[key.name="${beforeRoutingPropName}"] ${NT.ArrowFunctionExpression} ` +
-    `${NT.Identifier}[name="${loggerPropName}"]`]: (
-      node: TSESTree.Identifier,
-    ) => {
+    [esQueries.loggerArgument]: (node: TSESTree.Identifier) => {
       const { parent } = node;
       const isProp = isPropWithId(parent);
       if (isProp && parent.value === node) return; // not for renames
@@ -256,10 +269,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
         fix: (fixer) => fixer.replaceText(node, replacement),
       });
     },
-    [`${NT.Property}[key.name="${beforeRoutingPropName}"] ${NT.ArrowFunctionExpression} ` +
-    `${NT.Identifier}[name="${getChildLoggerPropName}"]`]: (
-      node: TSESTree.Identifier,
-    ) => {
+    [esQueries.getChildLoggerArgument]: (node: TSESTree.Identifier) => {
       const { parent } = node;
       const isProp = isPropWithId(parent);
       if (isProp && parent.value === node) return; // not for renames
@@ -275,20 +285,17 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
         fix: (fixer) => fixer.replaceText(node, replacement),
       });
     },
-    [`${NT.NewExpression}[callee.name='${resultHandlerClass}'] > ${NT.ObjectExpression} > ` +
-    `${NT.Property}[key.name!='${handlerMethod}'] ` +
-    `${NT.Property}[key.name=/(${statusCodesPropName}|${mimeTypesPropName})/]`]:
-      (node: TSESTree.Property) => {
-        if (!isPropWithId(node)) return;
-        const replacement =
-          changedProps[node.key.name as keyof typeof changedProps];
-        ctx.report({
-          node,
-          messageId: "change",
-          data: { subject: "property", from: node.key.name, to: replacement },
-          fix: (fixer) => fixer.replaceText(node.key, replacement),
-        });
-      },
+    [esQueries.responseFeatures]: (node: TSESTree.Property) => {
+      if (!isPropWithId(node)) return;
+      const replacement =
+        changedProps[node.key.name as keyof typeof changedProps];
+      ctx.report({
+        node,
+        messageId: "change",
+        data: { subject: "property", from: node.key.name, to: replacement },
+        fix: (fixer) => fixer.replaceText(node.key, replacement),
+      });
+    },
   }),
 });
 
