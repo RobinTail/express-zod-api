@@ -102,8 +102,7 @@ export class Documentation extends OpenApiBuilder {
       return operationId;
     }
     if (userDefined) {
-      throw new DocumentationError({
-        message: `Duplicated operationId: "${userDefined}"`,
+      throw new DocumentationError(`Duplicated operationId: "${userDefined}"`, {
         method,
         isResponse: false,
         path,

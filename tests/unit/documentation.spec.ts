@@ -580,12 +580,14 @@ describe("Documentation", () => {
             serverUrl: "https://example.com",
           }),
       ).toThrow(
-        new DocumentationError({
-          method: "post",
-          path: "/v1/getSomething",
-          isResponse: false,
-          message: `Zod type ${zodType._def.typeName} is unsupported.`,
-        }),
+        new DocumentationError(
+          `Zod type ${zodType._def.typeName} is unsupported.`,
+          {
+            method: "post",
+            path: "/v1/getSomething",
+            isResponse: false,
+          },
+        ),
       );
     });
 
@@ -732,12 +734,14 @@ describe("Documentation", () => {
 
     test("should not be able to specify duplicated operation", () => {
       const operationId = "coolOperationId";
-      const expectedError = new DocumentationError({
-        message: 'Duplicated operationId: "coolOperationId"',
-        isResponse: false,
-        method: "get",
-        path: "/v1/getSomeTwo/thing",
-      });
+      const expectedError = new DocumentationError(
+        'Duplicated operationId: "coolOperationId"',
+        {
+          isResponse: false,
+          method: "get",
+          path: "/v1/getSomeTwo/thing",
+        },
+      );
       expect(
         () =>
           new Documentation({
