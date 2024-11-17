@@ -48,7 +48,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             deleteSomething: defaultEndpointsFactory.build({
-              methods: ["delete"],
+              method: "delete",
               output: z.object({
                 whatever: z.number(),
               }),
@@ -130,7 +130,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["post"],
+              method: "post",
               input: z.object({
                 intersection: z.intersection(
                   z.object({
@@ -174,7 +174,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["post"],
+              method: "post",
               input: z.object({
                 union: z.union([
                   z.object({
@@ -209,7 +209,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["post"],
+              method: "post",
               input: z.discriminatedUnion("type", [
                 z.object({ type: z.literal("a"), a: z.string() }),
                 z.object({ type: z.literal("b"), b: z.string() }),
@@ -241,7 +241,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["post"],
+              method: "post",
               input: z.object({
                 one: z.string(),
                 two: z.number().int().positive(),
@@ -625,7 +625,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.addMiddleware(mw1).build({
-              scopes: ["this should be omitted"],
+              scope: "this should be omitted",
               input: z.object({
                 str: z.string(),
               }),
@@ -641,7 +641,7 @@ describe("Documentation", () => {
               handler: async () => ({}),
             }),
             updateSomething: defaultEndpointsFactory.addMiddleware(mw3).build({
-              scopes: ["this should be omitted"],
+              scope: "this should be omitted",
               method: "put",
               output: z.object({}),
               handler: async () => ({}),
@@ -714,7 +714,7 @@ describe("Documentation", () => {
             getSome: {
               thing: defaultEndpointsFactory.build({
                 description: "thing is the path segment",
-                methods: ["get", "post"],
+                method: ["get", "post"],
                 operationId: (method) => `${method}${operationId}`,
                 output: z.object({}),
                 handler: async () => ({}),
@@ -773,7 +773,7 @@ describe("Documentation", () => {
       const resultHandler = new ResultHandler({
         positive: (result) => ({
           schema: z.object({ status: z.literal("OK"), result }),
-          mimeTypes: [contentTypes.json, "text/vnd.yaml"],
+          mimeType: [contentTypes.json, "text/vnd.yaml"],
           statusCode: 201,
         }),
         negative: {
@@ -812,7 +812,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["get", "post"],
+              method: ["get", "post"],
               input: z.object({
                 arr: z.array(z.string()).min(1),
               }),
