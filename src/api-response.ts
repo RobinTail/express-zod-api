@@ -9,10 +9,7 @@ export type ResponseVariant = keyof typeof defaultStatusCodes;
 
 export interface ApiResponse<S extends z.ZodTypeAny> {
   schema: S;
-  /**
-   * @default 200 for a positive response
-   * @default 400 for a negative response
-   * */
+  /** @default 200 for a positive and 400 for a negative response */
   statusCode?: number | [number, ...number[]];
   /** @default "application/json" */
   mimeType?: string | [string, ...string[]];
