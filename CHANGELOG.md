@@ -5,28 +5,22 @@
 ### v21.0.0
 
 - Minimum supported versions of `express`: 4.21.1 and 5.0.1 (fixed vulnerabilities);
-- Running HTTP server made optional (can now configure HTTPS only):
-  - Object argument of the `createConfig()` method changed:
-    - The `server` property renamed to `http` and made optional;
-    - Its nested properties moved to the top level of the config object:
-      `jsonParser`, `upload`, `compression`, `rawParser` and `beforeRouting`.
-  - The object resolved from the `createServer()` method changed:
-    - Properties `httpServer` and `httpsServer` are removed;
-    - Added `servers` property instead — array containing those server instances in the same order.
-- Both `logger` and `getChildLogger` properties of `beforeRouting` argument are replaced with all-purpose `getLogger`:
-  - For a given request it returns the child logger (if configured) or the configured logger otherwise.
-- The `serializer` property of `Documentation` and `Integration` constructor argument removed;
-- The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
-- The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
-- Specifying `method` or `methods` for `EndpointsFactory::build()` made optional and when it's omitted:
-  - If the endpoint is assigned to a route using `DependsOnMethod` instance, the corresponding method is used;
-  - Otherwise `GET` method is implied by default.
-- Other potentially breaking changes:
-  - The optional property `methods` of `EndpointsFactory::build()` must be non-empty array when used;
+- Breaking changes to `createConfig()` argument:
+  - The `server` property renamed to `http` and made optional — (can now configure HTTPS only);
+  - These properties moved to the top level: `jsonParser`, `upload`, `compression`, `rawParser` and `beforeRouting`;
+  - Both `logger` and `getChildLogger` arguments of `beforeRouting` function are replaced with all-purpose `getLogger`.
+- Breaking changes to `createServer()` resolved return:
+  - Both `httpServer` and `httpsServer` are combined into single `servers` property (array, same order).
+- Potentially breaking changes to `EndpointsFactory::build()` argument:
+  - Both `method` and `methods` made optional, can now be derived from `DependsOnMethod` or imply `GET` by default;
+  - When `methods` is used, it must be a non-empty array.
+- Other breaking changes:
+  - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
+  - The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
+  - The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
   - The `Endpoint::getMethods()` method may now return `undefined`;
   - The `testEndpoint()` method can no longer test CORS headers — that function moved to `Routing` traverse;
   - Public properties `pairs`, `firstEndpoint` and `siblingMethods` of `DependsOnMethod` replaced with `entries`.
-- Routing traverse improvement: performance +5%, memory consumption -17%.
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
