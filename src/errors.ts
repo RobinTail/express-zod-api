@@ -14,15 +14,14 @@ export class DocumentationError extends Error {
   public override name = "DocumentationError";
   public override readonly cause: string;
 
-  constructor({
-    message,
-    method,
-    path,
-    isResponse,
-  }: { message: string } & Pick<
-    OpenAPIContext,
-    "path" | "method" | "isResponse"
-  >) {
+  constructor(
+    message: string,
+    {
+      method,
+      path,
+      isResponse,
+    }: Pick<OpenAPIContext, "path" | "method" | "isResponse">,
+  ) {
     super(message);
     this.cause = `${
       isResponse ? "Response" : "Input"

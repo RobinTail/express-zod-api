@@ -22,8 +22,7 @@ describe("Errors", () => {
   });
 
   describe("DocumentationError", () => {
-    const error = new DocumentationError({
-      message: "test",
+    const error = new DocumentationError("test", {
       path: "/v1/testPath",
       method: "get",
       isResponse: true,
