@@ -32,7 +32,7 @@ type DeleteV1UserIdRemoveInput = {
   id: string;
 };
 
-type DeleteV1UserIdRemoveResponse = any;
+type DeleteV1UserIdRemoveResponse = undefined;
 
 type PatchV1UserIdInput = {
   key: string;

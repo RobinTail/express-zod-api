@@ -173,7 +173,9 @@ export class Integration {
         const positiveResponseId = splitResponse
           ? makeCleanId(method, path, "positive.response")
           : undefined;
-        const positiveSchema = endpoint.getSchema("positive");
+        const positiveSchema = endpoint.getMimeTypes("positive").length
+          ? endpoint.getSchema("positive")
+          : z.undefined();
         const positiveResponse = splitResponse
           ? zodToTs(positiveSchema, {
               brandHandling,
@@ -183,7 +185,9 @@ export class Integration {
         const negativeResponseId = splitResponse
           ? makeCleanId(method, path, "negative.response")
           : undefined;
-        const negativeSchema = endpoint.getSchema("negative");
+        const negativeSchema = endpoint.getMimeTypes("negative").length
+          ? endpoint.getSchema("negative")
+          : z.undefined();
         const negativeResponse = splitResponse
           ? zodToTs(negativeSchema, {
               brandHandling,
