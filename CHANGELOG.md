@@ -12,7 +12,7 @@
 ```ts
 import { Routing } from "express-zod-api";
 
-// Describing both /v1/path and /v1/path/subpath both having endpoints assigned:
+// Describing routes /v1/path and /v1/path/subpath both having endpoints assigned:
 const before: Routing = {
   v1: {
     path: {
