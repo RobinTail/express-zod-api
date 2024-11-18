@@ -748,7 +748,7 @@ createConfig({
 
 ## Nested routes
 
-Suppose you want to assign both `/v1/path` and `/v1/path/subpath` routes to Endpoints:
+Suppose you want to assign both `/v1/path` and `/v1/path/subpath` routes with Endpoints:
 
 ```typescript
 import { Routing } from "express-zod-api";
