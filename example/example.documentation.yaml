@@ -85,139 +85,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-  /v1/user/{id}/remove:
-    delete:
-      operationId: DeleteV1UserIdRemove
-      tags:
-        - users
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: numeric string
-          schema:
-            type: string
-            pattern: \d+
-            description: numeric string
-      responses:
-        "204":
-          description: DELETE /v1/user/:id/remove Positive response
-        "404":
-          description: DELETE /v1/user/:id/remove Negative response
-  /v1/user/{id}:
-    patch:
-      operationId: PatchV1UserId
-      summary: Changes the user record. Example user update endp…
-      description: Changes the user record. Example user update endpoint.
-      tags:
-        - users
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: PATCH /v1/user/:id Parameter
-          schema:
-            type: string
-          examples:
-            example1:
-              value: "12"
-      requestBody:
-        description: PATCH /v1/user/:id Request body
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                key:
-                  type: string
-                  minLength: 1
-                name:
-                  type: string
-                  minLength: 1
-                birthday:
-                  description: YYYY-MM-DDTHH:mm:ss.sssZ
-                  type: string
-                  format: date-time
-                  pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
-                  externalDocs:
-                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-              required:
-                - key
-                - name
-                - birthday
-            examples:
-              example1:
-                value:
-                  key: 1234-5678-90
-                  name: John Doe
-                  birthday: 1963-04-21
-      security:
-        - APIKEY_1: []
-          APIKEY_2: []
-      responses:
-        "200":
-          description: PATCH /v1/user/:id Positive response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      createdAt:
-                        description: YYYY-MM-DDTHH:mm:ss.sssZ
-                        type: string
-                        format: date-time
-                        externalDocs:
-                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                    required:
-                      - name
-                      - createdAt
-                    examples:
-                      - name: John Doe
-                        createdAt: 2021-12-31T00:00:00.000Z
-                required:
-                  - status
-                  - data
-              examples:
-                example1:
-                  value:
-                    status: success
-                    data:
-                      name: John Doe
-                      createdAt: 2021-12-31T00:00:00.000Z
-        "400":
-          description: PATCH /v1/user/:id Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                required:
-                  - status
-                  - error
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
   /v1/user/create:
     post:
       operationId: PostV1UserCreate
@@ -542,6 +409,139 @@ paths:
                   - data
         "400":
           description: POST /v1/avatar/raw Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+  /v1/user/{id}/remove:
+    delete:
+      operationId: DeleteV1UserIdRemove
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: numeric string
+          schema:
+            type: string
+            pattern: \d+
+            description: numeric string
+      responses:
+        "204":
+          description: DELETE /v1/user/:id/remove Positive response
+        "404":
+          description: DELETE /v1/user/:id/remove Negative response
+  /v1/user/{id}:
+    patch:
+      operationId: PatchV1UserId
+      summary: Changes the user record. Example user update endp…
+      description: Changes the user record. Example user update endpoint.
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: PATCH /v1/user/:id Parameter
+          schema:
+            type: string
+          examples:
+            example1:
+              value: "12"
+      requestBody:
+        description: PATCH /v1/user/:id Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                  minLength: 1
+                name:
+                  type: string
+                  minLength: 1
+                birthday:
+                  description: YYYY-MM-DDTHH:mm:ss.sssZ
+                  type: string
+                  format: date-time
+                  pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
+                  externalDocs:
+                    url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+              required:
+                - key
+                - name
+                - birthday
+            examples:
+              example1:
+                value:
+                  key: 1234-5678-90
+                  name: John Doe
+                  birthday: 1963-04-21
+      security:
+        - APIKEY_1: []
+          APIKEY_2: []
+      responses:
+        "200":
+          description: PATCH /v1/user/:id Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      createdAt:
+                        description: YYYY-MM-DDTHH:mm:ss.sssZ
+                        type: string
+                        format: date-time
+                        externalDocs:
+                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                    required:
+                      - name
+                      - createdAt
+                    examples:
+                      - name: John Doe
+                        createdAt: 2021-12-31T00:00:00.000Z
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      name: John Doe
+                      createdAt: 2021-12-31T00:00:00.000Z
+        "400":
+          description: PATCH /v1/user/:id Negative response
           content:
             application/json:
               schema:
