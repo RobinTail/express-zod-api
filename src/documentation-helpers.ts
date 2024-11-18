@@ -391,8 +391,6 @@ export const depictArray: Depicter = (
   return result;
 };
 
-export const depictNever: Depicter = () => ({ not: {} }); // recommended alias
-
 /**
  * @since OAS 3.1 using prefixItems for depicting tuples
  * @since 17.5.0 added rest handling, fixed tuple type
@@ -403,7 +401,7 @@ export const depictTuple: Depicter = (
 ) => ({
   type: "array",
   prefixItems: items.map(next),
-  items: next(rest === null ? z.never() : rest), // does not support items:false
+  items: rest === null ? { not: {} } : next(rest), // does not support items:false
 });
 
 export const depictString: Depicter = ({
@@ -695,7 +693,6 @@ export const depicters: HandlingRules<
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
-  ZodNever: depictNever,
   [ezFileBrand]: depictFile,
   [ezUploadBrand]: depictUpload,
   [ezDateOutBrand]: depictDateOut,
@@ -792,22 +789,27 @@ export const depictResponse = ({
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
-  const depictedSchema = excludeExamplesFromDepiction(
-    walkSchema(schema, {
-      rules: { ...brandHandling, ...depicters },
-      onEach,
-      onMissing,
-      ctx: { isResponse: true, makeRef, path, method },
-    }),
-  );
-  const media: MediaTypeObject = {
+  const depictedSchema = mimeTypes.length
+    ? excludeExamplesFromDepiction(
+        walkSchema(schema, {
+          rules: { ...brandHandling, ...depicters },
+          onEach,
+          onMissing,
+          ctx: { isResponse: true, makeRef, path, method },
+        }),
+      )
+    : undefined;
+  const media: MediaTypeObject | undefined = depictedSchema && {
     schema:
       composition === "components"
         ? makeRef(schema, depictedSchema, makeCleanId(description))
         : depictedSchema,
     examples: depictExamples(schema, true),
   };
-  return { description, content: fromPairs(xprod(mimeTypes, [media])) };
+  return {
+    description,
+    content: media && fromPairs(xprod(mimeTypes, [media])),
+  };
 };
 
 type SecurityHelper<K extends Security["type"]> = (

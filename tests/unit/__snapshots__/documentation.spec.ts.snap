@@ -1254,16 +1254,8 @@ paths:
       responses:
         "204":
           description: DELETE /v1/user/:id/remove Positive response
-          content:
-            text/plain:
-              schema:
-                not: {}
         "404":
           description: DELETE /v1/user/:id/remove Negative response
-          content:
-            text/plain:
-              schema:
-                not: {}
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -1822,16 +1814,8 @@ paths:
       responses:
         "204":
           description: DELETE /v1/user/:id/remove Positive response
-          content:
-            text/plain:
-              schema:
-                $ref: "#/components/schemas/DeleteV1UserIdRemovePositiveResponse"
         "404":
           description: DELETE /v1/user/:id/remove Negative response
-          content:
-            text/plain:
-              schema:
-                $ref: "#/components/schemas/DeleteV1UserIdRemoveNegativeResponse"
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -2148,10 +2132,6 @@ components:
       type: string
       pattern: \\d+
       description: numeric string
-    DeleteV1UserIdRemovePositiveResponse:
-      not: {}
-    DeleteV1UserIdRemoveNegativeResponse:
-      not: {}
     PatchV1UserIdParameterId:
       type: string
     PatchV1UserIdPositiveResponse:

@@ -102,16 +102,8 @@ paths:
       responses:
         "204":
           description: DELETE /v1/user/:id/remove Positive response
-          content:
-            text/plain:
-              schema:
-                not: {}
         "404":
           description: DELETE /v1/user/:id/remove Negative response
-          content:
-            text/plain:
-              schema:
-                not: {}
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
