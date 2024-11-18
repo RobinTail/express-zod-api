@@ -20,7 +20,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     void?: any;
     any?: any;
     unknown?: any;
-    never: never;
+    never: any;
     optionalString?: string | undefined;
     nullablePartialObject: {
         string?: string | undefined;
@@ -90,7 +90,7 @@ exports[`zod-to-ts > PrimitiveSchema > outputs correct typescript 1`] = `
     void?: any;
     any?: any;
     unknown?: any;
-    never: never;
+    never: any;
 }"
 `;
 
