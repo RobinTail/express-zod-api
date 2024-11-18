@@ -790,27 +790,23 @@ export const depictResponse = ({
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
-  const depictedSchema = mimeTypes.length
-    ? excludeExamplesFromDepiction(
-        walkSchema(schema, {
-          rules: { ...brandHandling, ...depicters },
-          onEach,
-          onMissing,
-          ctx: { isResponse: true, makeRef, path, method },
-        }),
-      )
-    : undefined;
-  const media: MediaTypeObject | undefined = depictedSchema && {
+  if (!mimeTypes.length) return { description };
+  const depictedSchema = excludeExamplesFromDepiction(
+    walkSchema(schema, {
+      rules: { ...brandHandling, ...depicters },
+      onEach,
+      onMissing,
+      ctx: { isResponse: true, makeRef, path, method },
+    }),
+  );
+  const media: MediaTypeObject = {
     schema:
       composition === "components"
         ? makeRef(schema, depictedSchema, makeCleanId(description))
         : depictedSchema,
     examples: depictExamples(schema, true),
   };
-  return {
-    description,
-    content: media && fromPairs(xprod(mimeTypes, [media])),
-  };
+  return { description, content: fromPairs(xprod(mimeTypes, [media])) };
 };
 
 type SecurityHelper<K extends Security["type"]> = (
