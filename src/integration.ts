@@ -71,6 +71,11 @@ interface IntegrationParams {
     withUndefined?: boolean;
   };
   /**
+   * @desc The schema to use for responses without body such as 204
+   * @default z.undefined()
+   * */
+  noContent?: z.ZodTypeAny;
+  /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
@@ -157,6 +162,7 @@ export class Integration {
     variant = "client",
     splitResponse = false,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
+    noContent = z.undefined(),
   }: IntegrationParams) {
     walkRouting({
       routing,
@@ -175,7 +181,7 @@ export class Integration {
           : undefined;
         const positiveSchema = endpoint.getMimeTypes("positive").length
           ? endpoint.getSchema("positive")
-          : z.undefined();
+          : noContent;
         const positiveResponse = splitResponse
           ? zodToTs(positiveSchema, {
               brandHandling,
@@ -187,7 +193,7 @@ export class Integration {
           : undefined;
         const negativeSchema = endpoint.getMimeTypes("negative").length
           ? endpoint.getSchema("negative")
-          : z.undefined();
+          : noContent;
         const negativeResponse = splitResponse
           ? zodToTs(negativeSchema, {
               brandHandling,
