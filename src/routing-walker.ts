@@ -52,7 +52,7 @@ export const walkRouting = ({
         onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
-      stack.push(...makePairs(element, path));
+      stack.unshift(...makePairs(element, path));
     }
   }
 };
