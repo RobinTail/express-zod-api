@@ -2,7 +2,6 @@ import { z } from "zod";
 import { defaultEndpointsFactory, DependsOnMethod } from "../../src";
 
 const endpoint = defaultEndpointsFactory.build({
-  method: "get", // @todo remove the line in v21
   output: z.object({}),
   handler: vi.fn(),
 });
