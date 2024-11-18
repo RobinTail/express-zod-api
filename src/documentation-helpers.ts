@@ -401,7 +401,8 @@ export const depictTuple: Depicter = (
 ) => ({
   type: "array",
   prefixItems: items.map(next),
-  items: rest === null ? { not: {} } : next(rest), // does not support items:false
+  // does not appear to support items:false, so not:{} is a recommended alias	  items: rest === null ? { not: {} } : next(rest), // does not support items:false
+  items: rest === null ? { not: {} } : next(rest),
 });
 
 export const depictString: Depicter = ({
