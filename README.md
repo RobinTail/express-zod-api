@@ -287,12 +287,9 @@ const authMiddleware = new Middleware({
   handler: async ({ input: { key }, request, logger }) => {
     logger.debug("Checking the key and token");
     const user = await db.Users.findOne({ key });
-    if (!user) {
-      throw createHttpError(401, "Invalid key");
-    }
-    if (request.headers.token !== user.token) {
+    if (!user) throw createHttpError(401, "Invalid key");
+    if (request.headers.token !== user.token)
       throw createHttpError(401, "Invalid token");
-    }
     return { user }; // provides endpoints with options.user
   },
 });
@@ -304,10 +301,9 @@ By using `.addMiddleware()` method before `.build()` you can connect it to the e
 const yourEndpoint = defaultEndpointsFactory
   .addMiddleware(authMiddleware)
   .build({
-    // ...,
-    handler: async ({ options }) => {
-      // options.user is the user returned by authMiddleware
-    },
+    handler: async ({ options: { user } }) => {
+      // user is the one returned by authMiddleware
+    }, // ...
   });
 ```
 
@@ -321,7 +317,7 @@ import { defaultEndpointsFactory } from "express-zod-api";
 const factory = defaultEndpointsFactory
   .addMiddleware(authMiddleware) // add Middleware instance or use shorter syntax:
   .addMiddleware({
-    handler: async ({ options: { user } }) => ({}), // options.user from authMiddleware
+    handler: async ({ options: { user } }) => ({}), // user from authMiddleware
   });
 ```
 
@@ -535,18 +531,14 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
     userId: z.string(),
-    birthday: ez.dateIn(), // string -> Date
+    birthday: ez.dateIn(), // string -> Date in handler
   }),
   output: z.object({
-    createdAt: ez.dateOut(), // Date -> string
+    createdAt: ez.dateOut(), // Date -> string in response
   }),
-  handler: async ({ input }) => {
-    // input.birthday is Date
-    return {
-      // transmitted as "2022-01-22T00:00:00.000Z"
-      createdAt: new Date("2022-01-22"),
-    };
-  },
+  handler: async ({ input }) => ({
+    createdAt: new Date("2022-01-22"), // 2022-01-22T00:00:00.000Z
+  }),
 });
 ```
 
@@ -564,7 +556,6 @@ That function has several parameters and can be asynchronous.
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  // ... other options
   cors: ({ defaultHeaders, request, endpoint, logger }) => ({
     ...defaultHeaders,
     "Access-Control-Max-Age": "5000",
@@ -590,8 +581,7 @@ const config = createConfig({
       key: fs.readFileSync("privkey.pem", "utf-8"),
     },
     listen: 443, // port, UNIX socket or options
-  },
-  // ... cors, logger, etc
+  }, // ... cors, logger, etc
 });
 
 // 'await' is only needed if you're going to use the returned entities.
@@ -718,14 +708,13 @@ In order to receive a compressed response the client should include the followin
 
 You can customize the list of `request` properties that are combined into `input` that is being validated and available
 to your endpoints and middlewares. The order here matters: each next item in the array has a higher priority than its
-previous sibling.
+previous sibling. The following arrangement is default:
 
 ```typescript
 import { createConfig } from "express-zod-api";
 
 createConfig({
   inputSources: {
-    // the defaults are:
     get: ["query", "params"],
     post: ["body", "params", "files"],
     put: ["body", "params"],
@@ -764,12 +753,8 @@ const getUserEndpoint = endpointsFactory.build({
     // other inputs (in query):
     withExtendedInformation: z.boolean().optional(),
   }),
-  output: z.object({
-    /* ... */
-  }),
-  handler: async ({ input: { id } }) => {
-    // id is the route path param, number
-  },
+  output: z.object({}),
+  handler: async ({ input: { id } }) => ({}), // id is number,
 });
 ```
 
@@ -905,17 +890,12 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
     positive: { schema: ez.file("buffer"), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
-      if (error) {
-        response.status(400).send(error.message);
-        return;
-      }
-      if ("filename" in output) {
+      if (error) return void response.status(400).send(error.message);
+      if ("filename" in output)
         fs.createReadStream(output.filename).pipe(
           response.type(output.filename),
         );
-      } else {
-        response.status(400).send("Filename is missing");
-      }
+      else response.status(400).send("Filename is missing");
     },
   }),
 );
@@ -949,9 +929,7 @@ const config = createConfig({
     limits: { fileSize: 51200 }, // 50 KB
     limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
     beforeUpload: ({ request, logger }) => {
-      if (!canUpload(request)) {
-        throw createHttpError(403, "Not authorized");
-      }
+      if (!canUpload(request)) throw createHttpError(403, "Not authorized");
     },
   },
 });
@@ -1284,9 +1262,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
     .object({
       id: z.number().describe("the ID of the user"),
     })
-    .example({
-      id: 123,
-    }),
+    .example({ id: 123 }),
   // ..., similarly for output and middlewares
 });
 ```
@@ -1309,9 +1285,8 @@ import {
 } from "express-zod-api";
 
 const config = createConfig({
-  // ..., use the simple or the advanced syntax:
   tags: {
-    users: "Everything about the users",
+    users: "Everything about the users", // or advanced syntax:
     files: {
       description: "Everything about the files processing",
       url: "https://example.com",
@@ -1326,7 +1301,6 @@ const taggedEndpointsFactory = new EndpointsFactory({
 });
 
 const exampleEndpoint = taggedEndpointsFactory.build({
-  // ...
   tag: "users", // or array ["users", "files"]
 });
 ```
@@ -1365,12 +1339,10 @@ const ruleForClient: Producer = (
 ) => ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
 
 new Documentation({
-  /* config, routing, title, version */
   brandHandling: { [myBrand]: ruleForDocs },
 });
 
 new Integration({
-  /* routing */
   brandHandling: { [myBrand]: ruleForClient },
 });
 ```
