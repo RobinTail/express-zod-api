@@ -21,6 +21,7 @@ import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType, contentTypes } from "./content-type";
+import { Nesting } from "./nesting";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
 
@@ -34,7 +35,7 @@ type DescriptionVariant = "short" | "long";
 type IOVariant = "input" | "output";
 type MimeVariant = Extract<IOVariant, "input"> | ResponseVariant;
 
-export abstract class AbstractEndpoint {
+export abstract class AbstractEndpoint extends Nesting {
   public abstract execute(params: {
     request: Request;
     response: Response;

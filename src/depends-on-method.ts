@@ -1,13 +1,15 @@
 import { head, tail, toPairs } from "ramda";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
+import { Nesting } from "./nesting";
 
-export class DependsOnMethod {
+export class DependsOnMethod extends Nesting {
   public readonly pairs: ReadonlyArray<[Method, AbstractEndpoint]>;
   public readonly firstEndpoint: AbstractEndpoint | undefined;
   public readonly siblingMethods: ReadonlyArray<Method>;
 
   constructor(endpoints: Partial<Record<Method, AbstractEndpoint>>) {
+    super();
     this.pairs = Object.freeze(
       toPairs(endpoints).filter(
         (pair): pair is [Method, AbstractEndpoint] =>

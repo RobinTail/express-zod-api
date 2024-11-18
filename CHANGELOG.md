@@ -2,6 +2,35 @@
 
 ## Version 20
 
+### v20.22.0
+
+- Featuring a helper to describe nested Routing for already assigned routes:
+  - Suppose you want to describe `Routing` for both `/v1/path` and `/v1/path/subpath` routes having Endpoints attached;
+  - Previously, an empty path segment was proposed for that purpose, but there is more elegant and readable way now;
+  - The `.nest()` method is available both on `Endpoint` and `DependsOnMethod` instances:
+
+```ts
+import { Routing } from "express-zod-api";
+
+// Describing routes /v1/path and /v1/path/subpath both having endpoints assigned:
+const before: Routing = {
+  v1: {
+    path: {
+      "": endpointA,
+      subpath: endpointB,
+    },
+  },
+};
+
+const after: Routing = {
+  v1: {
+    path: endpointA.nest({
+      subpath: endpointB,
+    }),
+  },
+};
+```
+
 ### v20.21.2
 
 - Fixed the example implementation in the generated client for endpoints using path params:
