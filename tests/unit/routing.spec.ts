@@ -275,10 +275,9 @@ describe("Routing", () => {
       const routing: Routing = {
         v1: {
           user: {
-            ":id": {
-              "": endpointMock,
+            ":id": endpointMock.nest({
               " download ": endpointMock,
-            },
+            }),
           },
         },
       };
@@ -290,8 +289,14 @@ describe("Routing", () => {
         routing,
       });
       expect(appMock.get).toHaveBeenCalledTimes(2);
-      expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
-      expect(appMock.get.mock.calls[1][0]).toBe("/v1/user/:id/download");
+      expect(appMock.get).toHaveBeenCalledWith(
+        "/v1/user/:id",
+        expect.any(Function),
+      );
+      expect(appMock.get).toHaveBeenCalledWith(
+        "/v1/user/:id/download",
+        expect.any(Function),
+      );
     });
 
     test("Should throw an error in case of slashes in route", () => {

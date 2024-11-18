@@ -32,17 +32,18 @@ Start your API server with I/O schema validation and custom middlewares in minut
    13. [Enabling compression](#enabling-compression)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
-   2. [Route path params](#route-path-params)
-   3. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   4. [Response customization](#response-customization)
-   5. [Error handling](#error-handling)
-   6. [Production mode](#production-mode)
-   7. [Non-object response](#non-object-response) including file downloads
-   8. [File uploads](#file-uploads)
-   9. [Serving static files](#serving-static-files)
-   10. [Connect to your own express app](#connect-to-your-own-express-app)
-   11. [Testing endpoints](#testing-endpoints)
-   12. [Testing middlewares](#testing-middlewares)
+   2. [Nested routes](#nested-routes)
+   3. [Route path params](#route-path-params)
+   4. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   5. [Response customization](#response-customization)
+   6. [Error handling](#error-handling)
+   7. [Production mode](#production-mode)
+   8. [Non-object response](#non-object-response) including file downloads
+   9. [File uploads](#file-uploads)
+   10. [Serving static files](#serving-static-files)
+   11. [Connect to your own express app](#connect-to-your-own-express-app)
+   12. [Testing endpoints](#testing-endpoints)
+   13. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -724,21 +725,32 @@ createConfig({
 });
 ```
 
-## Route path params
+## Nested routes
 
-You can describe the route of the endpoint using parameters:
+Suppose you want to assign both `/v1/path` and `/v1/path/subpath` routes with Endpoints:
 
 ```typescript
 import { Routing } from "express-zod-api";
 
 const routing: Routing = {
   v1: {
-    user: {
-      // route path /v1/user/:id, where :id is the path param
-      ":id": getUserEndpoint,
-      // use the empty string to represent /v1/user if needed:
-      // "": listAllUsersEndpoint,
-    },
+    path: endpointA.nest({
+      subpath: endpointB,
+    }),
+  },
+};
+```
+
+## Route path params
+
+You can assign your Endpoint to a route like `/v1/user/:id` where `:id` is the path parameter:
+
+```typescript
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  v1: {
+    user: { ":id": getUserEndpoint },
   },
 };
 ```
