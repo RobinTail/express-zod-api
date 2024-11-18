@@ -556,7 +556,6 @@ describe("Documentation", () => {
       z.nan(),
       z.symbol(),
       z.unknown(),
-      z.never(),
       z.void(),
     ])("should throw on unsupported types %#", (zodType) => {
       expect(

@@ -98,3 +98,14 @@ export const statusDependingFactory = new EndpointsFactory({
     },
   }),
 });
+
+export const noContentFactory = new EndpointsFactory({
+  config,
+  resultHandler: new ResultHandler({
+    positive: { statusCode: 204, mimeType: "text/plain", schema: z.never() },
+    negative: { statusCode: 404, mimeType: "text/plain", schema: z.never() },
+    handler: ({ error, response }) => {
+      response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
+    },
+  }),
+});

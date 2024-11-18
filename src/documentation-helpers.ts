@@ -391,6 +391,8 @@ export const depictArray: Depicter = (
   return result;
 };
 
+export const depictNever: Depicter = () => ({ not: {} }); // recommended alias
+
 /**
  * @since OAS 3.1 using prefixItems for depicting tuples
  * @since 17.5.0 added rest handling, fixed tuple type
@@ -401,8 +403,7 @@ export const depictTuple: Depicter = (
 ) => ({
   type: "array",
   prefixItems: items.map(next),
-  // does not appear to support items:false, so not:{} is a recommended alias
-  items: rest === null ? { not: {} } : next(rest),
+  items: next(rest === null ? z.never() : rest), // does not support items:false
 });
 
 export const depictString: Depicter = ({
@@ -694,6 +695,7 @@ export const depicters: HandlingRules<
   ZodPipeline: depictPipeline,
   ZodLazy: depictLazy,
   ZodReadonly: depictReadonly,
+  ZodNever: depictNever,
   [ezFileBrand]: depictFile,
   [ezUploadBrand]: depictUpload,
   [ezDateOutBrand]: depictDateOut,

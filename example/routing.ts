@@ -1,6 +1,7 @@
 import { DependsOnMethod, Routing, ServeStatic } from "../src";
 import { rawAcceptingEndpoint } from "./endpoints/accept-raw";
 import { createUserEndpoint } from "./endpoints/create-user";
+import { deleteUserEndpoint } from "./endpoints/delete-user";
 import { listUsersEndpoint } from "./endpoints/list-users";
 import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
 import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
@@ -17,6 +18,8 @@ export const routing: Routing = {
       // syntax 2: methods are defined within the route (id is the route path param by the way)
       ":id": new DependsOnMethod({
         patch: updateUserEndpoint, // demonstrates authentication
+      }).nest({
+        remove: deleteUserEndpoint, // nested path: /v1/user/:id/remove
       }),
       // demonstrates different response schemas depending on status code
       create: createUserEndpoint,
