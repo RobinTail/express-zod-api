@@ -34,29 +34,29 @@ const makeSchemaSerializer = <
   C extends z.ZodType,
   T extends { new (...args: any[]): C }[],
 >(
-  Classes: T | T[number],
+  subject: T | T[number],
   fn: (subject: C) => object,
-): NewPlugin => ({
-  test: (subject) =>
-    (Array.isArray(Classes) ? Classes : [Classes]).some(
-      (Cls) => subject instanceof Cls,
-    ),
-  serialize: (
-    subject: z.ZodTypeAny,
-    config,
-    indentation,
-    depth,
-    refs,
-    printer,
-  ) =>
-    printer(
-      Object.assign(fn(subject as C), { _type: subject._def.typeName }),
+): NewPlugin => {
+  const classes = Array.isArray(subject) ? subject : [subject];
+  return {
+    test: (subject) => classes.some((Cls) => subject instanceof Cls),
+    serialize: (
+      subject: z.ZodTypeAny,
       config,
       indentation,
       depth,
       refs,
-    ),
-});
+      printer,
+    ) =>
+      printer(
+        Object.assign(fn(subject as C), { _type: subject._def.typeName }),
+        config,
+        indentation,
+        depth,
+        refs,
+      ),
+  };
+};
 
 /**
  * @see https://vitest.dev/api/expect.html#expect-addequalitytesters
