@@ -275,9 +275,11 @@ describe("Endpoint", () => {
         );
       },
     );
+  });
 
+  describe(".getResponses()", () => {
     test.each(["positive", "negative"] as const)(
-      "should return the %s response schema",
+      "should return the %s responses",
       (variant) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
@@ -285,7 +287,10 @@ describe("Endpoint", () => {
           handler: vi.fn(),
         });
         expect(
-          serializeSchemaForTest(endpoint.getSchema(variant)),
+          endpoint.getResponses(variant).map((response) => ({
+            ...response,
+            schema: serializeSchemaForTest(response.schema),
+          })),
         ).toMatchSnapshot();
       },
     );
