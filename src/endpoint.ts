@@ -46,8 +46,17 @@ export abstract class AbstractEndpoint extends Nesting {
     variant: DescriptionVariant,
   ): string | undefined;
   public abstract getMethods(): ReadonlyArray<Method> | undefined;
+  /** @todo check if output one is needed */
   public abstract getSchema(variant: IOVariant): IOSchema;
+  /**
+   * @deprecated use getResponses
+   * @todo remove
+   * */
   public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
+  /**
+   * @deprecated use getRequestType for request or getResponses for response
+   * @todo remove
+   * */
   public abstract getMimeTypes(variant: MimeVariant): ReadonlyArray<string>;
   public abstract getResponses(
     variant: ResponseVariant,
