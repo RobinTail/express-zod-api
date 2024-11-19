@@ -5,10 +5,68 @@ import {
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
+  normalize,
 } from "../../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../../src/testing";
 
 describe("Result helpers", () => {
+  describe("normalize()", () => {
+    const schema = z.string();
+
+    test.each([schema, () => schema])(
+      "should handle a plain schema %#",
+      (subject) => {
+        expect(
+          normalize(subject, {
+            variant: "positive",
+            arguments: [],
+            statusCodes: [200],
+            mimeTypes: ["text/plain"],
+          }),
+        ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
+      },
+    );
+
+    test.each([{ schema }, () => ({ schema })])(
+      "should handle an object %#",
+      (subject) => {
+        expect(
+          normalize(subject, {
+            variant: "positive",
+            arguments: [],
+            statusCodes: [200],
+            mimeTypes: ["text/plain"],
+          }),
+        ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
+      },
+    );
+
+    test.each([[{ schema }], () => [{ schema }]])(
+      "should handle an array of objects %#",
+      (subject) => {
+        expect(
+          normalize(subject, {
+            variant: "positive",
+            arguments: [],
+            statusCodes: [200],
+            mimeTypes: ["text/plain"],
+          }),
+        ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
+      },
+    );
+
+    test("should not mutate the subject when it's a function", () => {
+      const subject = () => schema;
+      normalize(subject, {
+        variant: "positive",
+        arguments: [],
+        statusCodes: [200],
+        mimeTypes: ["text/plain"],
+      });
+      expect(typeof subject).toBe("function");
+    });
+  });
+
   describe("logServerError()", () => {
     test("should log server side error", () => {
       const error = createHttpError(501, "test");
