@@ -30,11 +30,17 @@ const errorSerializer: NewPlugin = {
   },
 };
 
-const makeSchemaSerializer = <T extends z.ZodTypeAny>(
-  Cls: { new (...args: any[]): T },
-  fn: (subject: T) => object,
+const makeSchemaSerializer = <
+  C extends z.ZodType,
+  T extends { new (...args: any[]): C }[],
+>(
+  Classes: T | T[number],
+  fn: (subject: C) => object,
 ): NewPlugin => ({
-  test: (subject) => subject instanceof Cls,
+  test: (subject) =>
+    (Array.isArray(Classes) ? Classes : [Classes]).some(
+      (Cls) => subject instanceof Cls,
+    ),
   serialize: (
     subject: z.ZodTypeAny,
     config,
@@ -44,7 +50,7 @@ const makeSchemaSerializer = <T extends z.ZodTypeAny>(
     printer,
   ) =>
     printer(
-      Object.assign(fn(subject as T), { _type: subject._def.typeName }),
+      Object.assign(fn(subject as C), { _type: subject._def.typeName }),
       config,
       indentation,
       depth,
@@ -91,7 +97,9 @@ expect.addSnapshotSerializer(
     brand: _def[metaSymbol]?.brand,
   })),
 );
-expect.addSnapshotSerializer(makeSchemaSerializer(z.ZodNumber, () => ({})));
-expect.addSnapshotSerializer(makeSchemaSerializer(z.ZodString, () => ({})));
-expect.addSnapshotSerializer(makeSchemaSerializer(z.ZodBoolean, () => ({})));
-expect.addSnapshotSerializer(makeSchemaSerializer(z.ZodNull, () => ({})));
+expect.addSnapshotSerializer(
+  makeSchemaSerializer(
+    [z.ZodNumber, z.ZodString, z.ZodBoolean, z.ZodNull],
+    () => ({}),
+  ),
+);
