@@ -19,7 +19,7 @@ describe("Result helpers", () => {
         expect(
           normalize(subject, {
             variant: "positive",
-            arguments: [],
+            args: [],
             statusCodes: [200],
             mimeTypes: ["text/plain"],
           }),
@@ -33,7 +33,7 @@ describe("Result helpers", () => {
         expect(
           normalize(subject, {
             variant: "positive",
-            arguments: [],
+            args: [],
             statusCodes: [200],
             mimeTypes: ["text/plain"],
           }),
@@ -47,7 +47,7 @@ describe("Result helpers", () => {
         expect(
           normalize(subject, {
             variant: "positive",
-            arguments: [],
+            args: [],
             statusCodes: [200],
             mimeTypes: ["text/plain"],
           }),
@@ -59,7 +59,7 @@ describe("Result helpers", () => {
       const subject = () => schema;
       normalize(subject, {
         variant: "positive",
-        arguments: [],
+        args: [],
         statusCodes: [200],
         mimeTypes: ["text/plain"],
       });
