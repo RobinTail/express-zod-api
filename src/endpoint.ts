@@ -20,7 +20,7 @@ import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
-import { ContentType, contentTypes } from "./content-type";
+import { ContentType } from "./content-type";
 import { Nesting } from "./nesting";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
@@ -33,7 +33,6 @@ export type Handler<IN, OUT, OPT> = (params: {
 
 type DescriptionVariant = "short" | "long";
 type IOVariant = "input" | "output";
-type MimeVariant = Extract<IOVariant, "input"> | ResponseVariant;
 
 export abstract class AbstractEndpoint extends Nesting {
   public abstract execute(params: {
@@ -53,11 +52,6 @@ export abstract class AbstractEndpoint extends Nesting {
    * @todo remove
    * */
   public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
-  /**
-   * @deprecated use getRequestType for request or getResponses for response
-   * @todo remove
-   * */
-  public abstract getMimeTypes(variant: MimeVariant): ReadonlyArray<string>;
   public abstract getResponses(
     variant: ResponseVariant,
   ): ReadonlyArray<NormalizedResponse>;
@@ -78,7 +72,6 @@ export class Endpoint<
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
   readonly #methods?: ReadonlyArray<Method>;
   readonly #middlewares: AbstractMiddleware[];
-  readonly #mimeTypes: Record<MimeVariant, ReadonlyArray<string>>;
   readonly #responses: Record<
     ResponseVariant,
     ReadonlyArray<NormalizedResponse>
@@ -135,15 +128,6 @@ export class Endpoint<
       : hasRaw(inputSchema)
         ? "raw"
         : "json";
-    this.#mimeTypes = {
-      input: Object.freeze([contentTypes[this.#requestType]]),
-      positive: Object.freeze(
-        this.#responses.positive.flatMap(({ mimeTypes }) => mimeTypes),
-      ),
-      negative: Object.freeze(
-        this.#responses.negative.flatMap(({ mimeTypes }) => mimeTypes),
-      ),
-    };
   }
 
   public override getDescription(variant: DescriptionVariant) {
@@ -163,10 +147,6 @@ export class Endpoint<
     return this.getResponses(variant)
       .map(({ schema }) => schema)
       .reduce((agg, schema) => agg.or(schema));
-  }
-
-  public override getMimeTypes(variant: MimeVariant) {
-    return this.#mimeTypes[variant];
   }
 
   public override getRequestType() {
