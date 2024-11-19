@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import {
   appMock,
   expressMock,
@@ -392,30 +393,34 @@ describe("Routing", () => {
       [z.lazy(() => z.void()), ez.raw()],
       [z.promise(z.any()), ez.upload()],
       [z.never(), z.tuple([ez.file()]).rest(z.nan())],
-    ])("should warn about JSON incompatible schemas %#", (input, output) => {
-      const endpoint = new EndpointsFactory(defaultResultHandler).build({
-        input: z.object({ input }),
-        output: z.object({ output }),
-        handler: vi.fn(),
-      });
-      const configMock = { cors: false, startupLogo: false };
-      const logger = makeLoggerMock();
-      initRouting({
-        app: appMock as unknown as IRouter,
-        getLogger: () => logger,
-        config: configMock as CommonConfig,
-        routing: { path: endpoint },
-      });
-      expect(logger._getLogs().warn).toEqual([
-        [
-          "The final input schema of the endpoint contains an unsupported JSON payload type.",
-          { method: "get", path: "/path", reason: expect.any(Error) },
-        ],
-        [
-          "The final positive response schema of the endpoint contains an unsupported JSON payload type.",
-          { method: "get", path: "/path", reason: expect.any(Error) },
-        ],
-      ]);
-    });
+    ])(
+      "should warn about JSON incompatible schemas %#",
+      async (input, output) => {
+        const endpoint = new EndpointsFactory(defaultResultHandler).build({
+          input: z.object({ input }),
+          output: z.object({ output }),
+          handler: vi.fn(),
+        });
+        const configMock = { cors: false, startupLogo: false };
+        const logger = makeLoggerMock();
+        initRouting({
+          app: appMock as unknown as IRouter,
+          getLogger: () => logger,
+          config: configMock as CommonConfig,
+          routing: { path: endpoint },
+        });
+        await vi.waitFor(() => assert(logger._getLogs().warn.length));
+        expect(logger._getLogs().warn).toEqual([
+          [
+            "The final input schema of the endpoint contains an unsupported JSON payload type.",
+            { method: "get", path: "/path", reason: expect.any(Error) },
+          ],
+          [
+            "The final positive response schema of the endpoint contains an unsupported JSON payload type.",
+            { method: "get", path: "/path", reason: expect.any(Error) },
+          ],
+        ]);
+      },
+    );
   });
 });
