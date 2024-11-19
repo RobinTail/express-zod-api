@@ -71,47 +71,40 @@ export const initRouting = ({
   walkRouting({
     routing,
     onStatic: (path, handler) => void app.use(path, handler),
-    onEndpoint: [
-      (endpoint, path, method) =>
-        setImmediate(() =>
-          verifier.verify(endpoint, getLogger(), path, method),
-        ),
-      (endpoint, path, method, siblingMethods) => {
-        const accessMethods: Array<Method | AuxMethod> = [
-          method,
-          ...(siblingMethods || []),
-          "options",
-        ];
-        const defaultHeaders: Record<string, string> = {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": accessMethods
-            .join(", ")
-            .toUpperCase(),
-          "Access-Control-Allow-Headers": "content-type",
-        };
-        const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
-        const handler: RequestHandler = async (request, response) => {
-          const logger = getLogger(request);
-          if (config.cors) {
-            const headers =
-              typeof config.cors === "function"
-                ? await config.cors({
-                    request,
-                    endpoint,
-                    logger,
-                    defaultHeaders,
-                  })
-                : defaultHeaders;
-            for (const key in headers) response.set(key, headers[key]);
-          }
-          return endpoint.execute({ request, response, logger, config });
-        };
-        if (config.cors && !corsedPaths.has(path)) {
-          app.options(path, ...matchingParsers, handler);
-          corsedPaths.add(path);
+    onEndpoint: (endpoint, path, method, siblingMethods) => {
+      setImmediate(() => verifier.verify(endpoint, getLogger(), path, method));
+      const accessMethods: Array<Method | AuxMethod> = [
+        method,
+        ...(siblingMethods || []),
+        "options",
+      ];
+      const defaultHeaders: Record<string, string> = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": accessMethods.join(", ").toUpperCase(),
+        "Access-Control-Allow-Headers": "content-type",
+      };
+      const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
+      const handler: RequestHandler = async (request, response) => {
+        const logger = getLogger(request);
+        if (config.cors) {
+          const headers =
+            typeof config.cors === "function"
+              ? await config.cors({
+                  request,
+                  endpoint,
+                  logger,
+                  defaultHeaders,
+                })
+              : defaultHeaders;
+          for (const key in headers) response.set(key, headers[key]);
         }
-        app[method](path, ...matchingParsers, handler);
-      },
-    ],
+        return endpoint.execute({ request, response, logger, config });
+      };
+      if (config.cors && !corsedPaths.has(path)) {
+        app.options(path, ...matchingParsers, handler);
+        corsedPaths.add(path);
+      }
+      app[method](path, ...matchingParsers, handler);
+    },
   });
 };
