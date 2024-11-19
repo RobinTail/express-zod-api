@@ -54,14 +54,6 @@ export const normalize = <A extends unknown[]>(
   );
 };
 
-export const emptyResponse = (
-  statusCode?: ApiResponse<z.ZodNever>["statusCode"],
-): ApiResponse<z.ZodNever> => ({
-  statusCode,
-  mimeType: null,
-  schema: z.never(),
-});
-
 export const logServerError = (
   error: HttpError,
   logger: ActualLogger,

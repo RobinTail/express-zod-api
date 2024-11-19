@@ -52,8 +52,6 @@ EndpointsFactory {
 
 exports[`Index Entrypoint > exports > defaultResultHandler should have certain value 1`] = `ResultHandler {}`;
 
-exports[`Index Entrypoint > exports > emptyResponse should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint > exports > ensureHttpError should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > ez should have certain value 1`] = `
@@ -79,7 +77,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "getExamples",
   "getMessageFromError",
   "ensureHttpError",
-  "emptyResponse",
   "BuiltinLogger",
   "Middleware",
   "ResultHandler",

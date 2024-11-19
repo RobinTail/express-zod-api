@@ -5,7 +5,6 @@ import {
   defaultResultHandler,
   ez,
   ensureHttpError,
-  emptyResponse,
 } from "../src";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
@@ -103,8 +102,8 @@ export const statusDependingFactory = new EndpointsFactory({
 export const noContentFactory = new EndpointsFactory({
   config,
   resultHandler: new ResultHandler({
-    positive: emptyResponse(204),
-    negative: emptyResponse(404),
+    positive: { statusCode: 204, mimeType: null, schema: z.never() },
+    negative: { statusCode: 404, mimeType: null, schema: z.never() },
     handler: ({ error, response }) => {
       response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
     },
