@@ -21,7 +21,8 @@ import {
 import { getStartupLogo } from "./startup-logo";
 
 const makeCommonEntities = (config: CommonConfig) => {
-  if (config.startupLogo !== false) console.log(getStartupLogo());
+  if (config.startupLogo !== false && process.stdout.columns >= 132)
+    console.log(getStartupLogo());
   const errorHandler = config.errorHandler || defaultResultHandler;
   const rootLogger = isLoggerInstance(config.logger)
     ? config.logger
