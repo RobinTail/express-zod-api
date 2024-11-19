@@ -213,8 +213,7 @@ export class Documentation extends OpenApiBuilder {
             ...commons,
             paramNames: pluck("name", depictedParams),
             schema: endpoint.getSchema("input"),
-            // @todo make it singular
-            mimeTypes: [contentTypes[endpoint.getRequestType()]],
+            mimeType: contentTypes[endpoint.getRequestType()],
             description: descriptions?.requestBody?.call(null, {
               method,
               path,
