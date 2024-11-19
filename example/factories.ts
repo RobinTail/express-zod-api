@@ -99,6 +99,7 @@ export const statusDependingFactory = new EndpointsFactory({
   }),
 });
 
+/** @desc This factory demonstrates response without body, such as 204 No Content */
 export const noContentFactory = new EndpointsFactory({
   config,
   resultHandler: new ResultHandler({
