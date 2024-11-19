@@ -394,7 +394,7 @@ describe("Routing", () => {
       [z.promise(z.any()), ez.upload()],
       [z.never(), z.tuple([ez.file()]).rest(z.nan())],
     ])(
-      "should warn about JSON incompatible schemas %#",
+      "should warn about JSON incompatible schemas async %#",
       async (input, output) => {
         const endpoint = new EndpointsFactory(defaultResultHandler).build({
           input: z.object({ input }),
@@ -409,6 +409,7 @@ describe("Routing", () => {
           config: configMock as CommonConfig,
           routing: { path: endpoint },
         });
+        expect(logger._getLogs().warn).toHaveLength(0);
         await vi.waitFor(() => assert(logger._getLogs().warn.length));
         expect(logger._getLogs().warn).toEqual([
           [
