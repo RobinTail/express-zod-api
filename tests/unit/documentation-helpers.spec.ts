@@ -50,7 +50,6 @@ import {
   reformatParamsInPath,
 } from "../../src/documentation-helpers";
 import { walkSchema } from "../../src/schema-walker";
-import { serializeSchemaForTest } from "../helpers";
 
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
@@ -117,7 +116,7 @@ describe("Documentation helpers", () => {
     test("should pass the object schema through", () => {
       const subject = extractObjectSchema(z.object({ one: z.string() }));
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      expect(subject).toMatchSnapshot();
     });
 
     test("should return object schema for the union of object schemas", () => {
@@ -125,7 +124,7 @@ describe("Documentation helpers", () => {
         z.object({ one: z.string() }).or(z.object({ two: z.number() })),
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      expect(subject).toMatchSnapshot();
     });
 
     test("should return object schema for the intersection of object schemas", () => {
@@ -133,13 +132,13 @@ describe("Documentation helpers", () => {
         z.object({ one: z.string() }).and(z.object({ two: z.number() })),
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      expect(subject).toMatchSnapshot();
     });
 
     test("should support ez.raw()", () => {
       const subject = extractObjectSchema(ez.raw());
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      expect(subject).toMatchSnapshot();
     });
 
     describe("Feature #600: Top level refinements", () => {
@@ -148,7 +147,7 @@ describe("Documentation helpers", () => {
           z.object({ one: z.string() }).refine(() => true),
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
-        expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+        expect(subject).toMatchSnapshot();
       });
     });
 
@@ -158,7 +157,7 @@ describe("Documentation helpers", () => {
           z.object({ one: z.string() }).transform(({ one }) => ({ two: one })),
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
-        expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+        expect(subject).toMatchSnapshot();
       });
     });
   });
