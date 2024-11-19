@@ -222,8 +222,10 @@ export class Integration {
             negative: negativeResponseId,
             response: genericResponseId,
             isJson: endpoint
-              .getMimeTypes("positive")
-              .includes(contentTypes.json),
+              .getResponses("positive")
+              .some((response) =>
+                response.mimeTypes.includes(contentTypes.json),
+              ),
             tags: endpoint.getTags(),
           },
         );
