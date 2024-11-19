@@ -1,8 +1,8 @@
 import { IRouter, RequestHandler } from "express";
 import { CommonConfig } from "./config-type";
-import { ContentType, contentTypes } from "./content-type";
-import { assertJsonCompatible } from "./deep-checks";
+import { ContentType } from "./content-type";
 import { DependsOnMethod } from "./depends-on-method";
+import { Diagnostics } from "./diagnostics";
 import { AbstractEndpoint } from "./endpoint";
 import { AuxMethod, Method } from "./method";
 import { walkRouting } from "./routing-walker";
@@ -14,44 +14,6 @@ export interface Routing {
 }
 
 export type Parsers = Record<ContentType, RequestHandler[]>;
-
-class Verifier {
-  #verified = new WeakSet<AbstractEndpoint>();
-  public verify(
-    endpoint: AbstractEndpoint,
-    logger: ReturnType<GetLogger>,
-    path: string,
-    method: Method,
-  ) {
-    if (!this.#verified.has(endpoint)) {
-      if (endpoint.getRequestType() === "json") {
-        try {
-          assertJsonCompatible(endpoint.getSchema("input"), "in");
-        } catch (reason) {
-          logger.warn(
-            "The final input schema of the endpoint contains an unsupported JSON payload type.",
-            { path, method, reason },
-          );
-        }
-      }
-      for (const variant of ["positive", "negative"] as const) {
-        for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
-          if (mimeTypes.includes(contentTypes.json)) {
-            try {
-              assertJsonCompatible(schema, "out");
-            } catch (reason) {
-              logger.warn(
-                `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
-                { path, method, reason },
-              );
-            }
-          }
-        }
-      }
-      this.#verified.add(endpoint);
-    }
-  }
-}
 
 export const initRouting = ({
   app,
@@ -66,13 +28,13 @@ export const initRouting = ({
   routing: Routing;
   parsers?: Parsers;
 }) => {
-  const verifier = new Verifier();
+  const therapist = new Diagnostics();
   const corsedPaths = new Set<string>();
   walkRouting({
     routing,
     onStatic: (path, handler) => void app.use(path, handler),
     onEndpoint: (endpoint, path, method, siblingMethods) => {
-      setImmediate(() => verifier.verify(endpoint, getLogger(), path, method));
+      setImmediate(() => therapist.verify(endpoint, getLogger(), path, method));
       const accessMethods: Array<Method | AuxMethod> = [
         method,
         ...(siblingMethods || []),
