@@ -45,7 +45,6 @@ export abstract class AbstractEndpoint extends Nesting {
     variant: DescriptionVariant,
   ): string | undefined;
   public abstract getMethods(): ReadonlyArray<Method> | undefined;
-  /** @todo check if output one is needed */
   public abstract getSchema(variant: IOVariant): IOSchema;
   public abstract getResponses(
     variant: ResponseVariant,
