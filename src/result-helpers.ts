@@ -1,7 +1,11 @@
 import { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import { z } from "zod";
-import { NormalizedResponse, ResponseVariant } from "./api-response";
+import {
+  ApiResponse,
+  NormalizedResponse,
+  ResponseVariant,
+} from "./api-response";
 import {
   FlatObject,
   getMessageFromError,
@@ -44,6 +48,10 @@ export const normalize = <A extends unknown[]>(
     }),
   );
 };
+
+export const emptyResponse = (
+  statusCode?: ApiResponse<z.ZodNever>["statusCode"],
+): ApiResponse<z.ZodNever> => ({ statusCode, mimeType: [], schema: z.never() });
 
 export const logServerError = (
   error: HttpError,
