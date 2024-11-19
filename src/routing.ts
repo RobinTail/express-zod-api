@@ -47,14 +47,16 @@ export const initRouting = ({
           }
         }
         for (const variant of ["positive", "negative"] as const) {
-          if (endpoint.getMimeTypes(variant).includes(contentTypes.json)) {
-            try {
-              assertJsonCompatible(endpoint.getSchema(variant), "out");
-            } catch (reason) {
-              getLogger().warn(
-                `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
-                { path, method, reason },
-              );
+          for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
+            if (mimeTypes.includes(contentTypes.json)) {
+              try {
+                assertJsonCompatible(schema, "out");
+              } catch (reason) {
+                getLogger().warn(
+                  `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
+                  { path, method, reason },
+                );
+              }
             }
           }
         }

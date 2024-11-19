@@ -275,9 +275,11 @@ describe("Endpoint", () => {
         );
       },
     );
+  });
 
+  describe(".getResponses()", () => {
     test.each(["positive", "negative"] as const)(
-      "should return the %s response schema",
+      "should return the %s responses",
       (variant) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
@@ -285,22 +287,11 @@ describe("Endpoint", () => {
           handler: vi.fn(),
         });
         expect(
-          serializeSchemaForTest(endpoint.getSchema(variant)),
+          endpoint.getResponses(variant).map((response) => ({
+            ...response,
+            schema: serializeSchemaForTest(response.schema),
+          })),
         ).toMatchSnapshot();
-      },
-    );
-  });
-
-  describe("getMimeTypes()", () => {
-    test.each(["input", "positive", "negative"] as const)(
-      "should return the %s mime types",
-      (variant) => {
-        const factory = new EndpointsFactory(defaultResultHandler);
-        const endpoint = factory.build({
-          output: z.object({ something: z.number() }),
-          handler: vi.fn(),
-        });
-        expect(endpoint.getMimeTypes(variant)).toEqual(["application/json"]);
       },
     );
   });
