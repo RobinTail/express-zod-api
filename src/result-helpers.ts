@@ -25,13 +25,8 @@ export const normalize = <A extends unknown[]>(
   if (typeof subject === "function")
     return normalize(subject(...features.arguments), features);
   if (subject instanceof z.ZodType) {
-    return [
-      {
-        schema: subject,
-        mimeTypes: features.mimeTypes,
-        statusCodes: features.statusCodes,
-      },
-    ];
+    const { mimeTypes, statusCodes } = features;
+    return [{ schema: subject, mimeTypes, statusCodes }];
   }
   if (Array.isArray(subject) && !subject.length) {
     throw new ResultHandlerError(
