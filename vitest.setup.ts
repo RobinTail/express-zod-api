@@ -68,38 +68,25 @@ expect.addEqualityTesters([compareHttpErrors]);
  * @see https://github.com/vitest-dev/vitest/issues/5697
  * @see https://vitest.dev/guide/snapshot.html#custom-serializer
  */
-expect.addSnapshotSerializer(errorSerializer);
-expect.addSnapshotSerializer(
+const serializers = [
+  errorSerializer,
   makeSchemaSerializer(z.ZodObject, ({ shape }) => ({ shape })),
-);
-expect.addSnapshotSerializer(
   makeSchemaSerializer(z.ZodLiteral, ({ value }) => ({ value })),
-);
-expect.addSnapshotSerializer(
   makeSchemaSerializer(z.ZodIntersection, ({ _def: { left, right } }) => ({
     left,
     right,
   })),
-);
-expect.addSnapshotSerializer(
   makeSchemaSerializer(z.ZodUnion, ({ options }) => ({ options })),
-);
-expect.addSnapshotSerializer(
   makeSchemaSerializer(z.ZodEffects, ({ _def: { schema: value } }) => ({
     value,
   })),
-);
-expect.addSnapshotSerializer(
   makeSchemaSerializer(z.ZodOptional, (schema) => ({ value: schema.unwrap() })),
-);
-expect.addSnapshotSerializer(
   makeSchemaSerializer(z.ZodBranded, ({ _def }) => ({
     brand: _def[metaSymbol]?.brand,
   })),
-);
-expect.addSnapshotSerializer(
   makeSchemaSerializer(
     [z.ZodNumber, z.ZodString, z.ZodBoolean, z.ZodNull],
     () => ({}),
   ),
-);
+];
+for (const serializer of serializers) expect.addSnapshotSerializer(serializer);
