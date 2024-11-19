@@ -40,14 +40,7 @@ const makeSchemaSerializer = <
   const classes = Array.isArray(subject) ? subject : [subject];
   return {
     test: (subject) => classes.some((Cls) => subject instanceof Cls),
-    serialize: (
-      subject: z.ZodTypeAny,
-      config,
-      indentation,
-      depth,
-      refs,
-      printer,
-    ) =>
+    serialize: (subject, config, indentation, depth, refs, printer) =>
       printer(
         Object.assign(fn(subject as C), { _type: subject._def.typeName }),
         config,
