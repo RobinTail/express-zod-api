@@ -296,20 +296,6 @@ describe("Endpoint", () => {
     );
   });
 
-  describe("getMimeTypes()", () => {
-    test.each(["input", "positive", "negative"] as const)(
-      "should return the %s mime types",
-      (variant) => {
-        const factory = new EndpointsFactory(defaultResultHandler);
-        const endpoint = factory.build({
-          output: z.object({ something: z.number() }),
-          handler: vi.fn(),
-        });
-        expect(endpoint.getMimeTypes(variant)).toEqual(["application/json"]);
-      },
-    );
-  });
-
   describe("getRequestType()", () => {
     test.each([
       { input: z.object({}), expected: "json" },
