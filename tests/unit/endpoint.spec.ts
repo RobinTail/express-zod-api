@@ -9,7 +9,6 @@ import {
   ResultHandler,
 } from "../../src";
 import { AbstractEndpoint, Endpoint } from "../../src/endpoint";
-import { serializeSchemaForTest } from "../helpers";
 
 describe("Endpoint", () => {
   describe(".getMethods()", () => {
@@ -305,9 +304,7 @@ describe("Endpoint", () => {
           output: z.object({ something: z.number() }),
           handler: vi.fn(),
         });
-        expect(
-          serializeSchemaForTest(endpoint.getSchema(variant)),
-        ).toMatchSnapshot();
+        expect(endpoint.getSchema(variant)).toMatchSnapshot();
       },
     );
   });
