@@ -47,11 +47,6 @@ export abstract class AbstractEndpoint extends Nesting {
   public abstract getMethods(): ReadonlyArray<Method> | undefined;
   /** @todo check if output one is needed */
   public abstract getSchema(variant: IOVariant): IOSchema;
-  /**
-   * @deprecated use getResponses
-   * @todo remove
-   * */
-  public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
   public abstract getResponses(
     variant: ResponseVariant,
   ): ReadonlyArray<NormalizedResponse>;
@@ -140,13 +135,8 @@ export class Endpoint<
 
   public override getSchema(variant: "input"): IN;
   public override getSchema(variant: "output"): OUT;
-  public override getSchema(variant: ResponseVariant): z.ZodTypeAny;
-  public override getSchema(variant: IOVariant | ResponseVariant) {
-    if (variant === "input" || variant === "output")
-      return this.#schemas[variant];
-    return this.getResponses(variant)
-      .map(({ schema }) => schema)
-      .reduce((agg, schema) => agg.or(schema));
+  public override getSchema(variant: IOVariant) {
+    return this.#schemas[variant];
   }
 
   public override getRequestType() {
