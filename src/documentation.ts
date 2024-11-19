@@ -27,7 +27,7 @@ import {
   reformatParamsInPath,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
-import { RoutingWalkerParams, walkRouting } from "./routing-walker";
+import { EndpointHook, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 
 type Component =
@@ -143,11 +143,7 @@ export class Documentation extends OpenApiBuilder {
     this.addInfo({ title, version });
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
       this.addServer({ url });
-    const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
-      endpoint,
-      path,
-      method,
-    ) => {
+    const onEndpoint: EndpointHook = (endpoint, path, method) => {
       const commons = {
         path,
         method,

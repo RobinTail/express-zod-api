@@ -15,6 +15,44 @@ export interface Routing {
 
 export type Parsers = Record<ContentType, RequestHandler[]>;
 
+class Verifier {
+  #verified = new WeakSet<AbstractEndpoint>();
+  public verify(
+    endpoint: AbstractEndpoint,
+    logger: ReturnType<GetLogger>,
+    path: string,
+    method: Method,
+  ) {
+    if (!this.#verified.has(endpoint)) {
+      if (endpoint.getRequestType() === "json") {
+        try {
+          assertJsonCompatible(endpoint.getSchema("input"), "in");
+        } catch (reason) {
+          logger.warn(
+            "The final input schema of the endpoint contains an unsupported JSON payload type.",
+            { path, method, reason },
+          );
+        }
+      }
+      for (const variant of ["positive", "negative"] as const) {
+        for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
+          if (mimeTypes.includes(contentTypes.json)) {
+            try {
+              assertJsonCompatible(schema, "out");
+            } catch (reason) {
+              logger.warn(
+                `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
+                { path, method, reason },
+              );
+            }
+          }
+        }
+      }
+      this.#verified.add(endpoint);
+    }
+  }
+}
+
 export const initRouting = ({
   app,
   getLogger,
@@ -28,67 +66,52 @@ export const initRouting = ({
   routing: Routing;
   parsers?: Parsers;
 }) => {
-  const verified = new WeakSet<AbstractEndpoint>();
+  const verifier = new Verifier();
   const corsedPaths = new Set<string>();
   walkRouting({
     routing,
     onStatic: (path, handler) => void app.use(path, handler),
-    onEndpoint: (endpoint, path, method, siblingMethods) => {
-      const requestType = endpoint.getRequestType();
-      if (!verified.has(endpoint)) {
-        if (requestType === "json") {
-          try {
-            assertJsonCompatible(endpoint.getSchema("input"), "in");
-          } catch (reason) {
-            getLogger().warn(
-              "The final input schema of the endpoint contains an unsupported JSON payload type.",
-              { path, method, reason },
-            );
+    onEndpoint: [
+      (endpoint, path, method) =>
+        setImmediate(() =>
+          verifier.verify(endpoint, getLogger(), path, method),
+        ),
+      (endpoint, path, method, siblingMethods) => {
+        const accessMethods: Array<Method | AuxMethod> = [
+          method,
+          ...(siblingMethods || []),
+          "options",
+        ];
+        const defaultHeaders: Record<string, string> = {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": accessMethods
+            .join(", ")
+            .toUpperCase(),
+          "Access-Control-Allow-Headers": "content-type",
+        };
+        const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
+        const handler: RequestHandler = async (request, response) => {
+          const logger = getLogger(request);
+          if (config.cors) {
+            const headers =
+              typeof config.cors === "function"
+                ? await config.cors({
+                    request,
+                    endpoint,
+                    logger,
+                    defaultHeaders,
+                  })
+                : defaultHeaders;
+            for (const key in headers) response.set(key, headers[key]);
           }
+          return endpoint.execute({ request, response, logger, config });
+        };
+        if (config.cors && !corsedPaths.has(path)) {
+          app.options(path, ...matchingParsers, handler);
+          corsedPaths.add(path);
         }
-        for (const variant of ["positive", "negative"] as const) {
-          for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
-            if (mimeTypes.includes(contentTypes.json)) {
-              try {
-                assertJsonCompatible(schema, "out");
-              } catch (reason) {
-                getLogger().warn(
-                  `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
-                  { path, method, reason },
-                );
-              }
-            }
-          }
-        }
-        verified.add(endpoint);
-      }
-      const accessMethods: Array<Method | AuxMethod> = [
-        method,
-        ...(siblingMethods || []),
-        "options",
-      ];
-      const defaultHeaders: Record<string, string> = {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": accessMethods.join(", ").toUpperCase(),
-        "Access-Control-Allow-Headers": "content-type",
-      };
-      const matchingParsers = parsers?.[requestType] || [];
-      const handler: RequestHandler = async (request, response) => {
-        const logger = getLogger(request);
-        if (config.cors) {
-          const headers =
-            typeof config.cors === "function"
-              ? await config.cors({ request, endpoint, logger, defaultHeaders })
-              : defaultHeaders;
-          for (const key in headers) response.set(key, headers[key]);
-        }
-        return endpoint.execute({ request, response, logger, config });
-      };
-      if (config.cors && !corsedPaths.has(path)) {
-        app.options(path, ...matchingParsers, handler);
-        corsedPaths.add(path);
-      }
-      app[method](path, ...matchingParsers, handler);
-    },
+        app[method](path, ...matchingParsers, handler);
+      },
+    ],
   });
 };
