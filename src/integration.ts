@@ -182,9 +182,7 @@ export class Integration {
           : undefined;
         const positiveSchema = endpoint
           .getResponses("positive")
-          .map(({ schema, mimeTypes }) =>
-            mimeTypes.length ? schema : noContent,
-          )
+          .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
         const positiveResponse = splitResponse
           ? zodToTs(positiveSchema, {
@@ -197,9 +195,7 @@ export class Integration {
           : undefined;
         const negativeSchema = endpoint
           .getResponses("negative")
-          .map(({ schema, mimeTypes }) =>
-            mimeTypes.length ? schema : noContent,
-          )
+          .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
         const negativeResponse = splitResponse
           ? zodToTs(negativeSchema, {
@@ -241,7 +237,7 @@ export class Integration {
             isJson: endpoint
               .getResponses("positive")
               .some((response) =>
-                response.mimeTypes.includes(contentTypes.json),
+                response.mimeTypes?.includes(contentTypes.json),
               ),
             tags: endpoint.getTags(),
           },
