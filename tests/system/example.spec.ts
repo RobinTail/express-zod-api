@@ -422,9 +422,9 @@ describe("Example", async () => {
               : { "Content-Type": "application/json", token: "456" },
           body: method === "get" ? undefined : JSON.stringify(params),
         });
-        const isJSON = response.headers
-          .get("content-type")
-          ?.startsWith("application/json");
+        const contentType = response.headers.get("content-type");
+        if (!contentType) return;
+        const isJSON = contentType.startsWith("application/json");
         return response[isJSON ? "json" : "text"]();
       };
 

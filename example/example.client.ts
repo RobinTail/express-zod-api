@@ -239,9 +239,9 @@ export const exampleImplementation: Implementation = async (
     headers: hasBody ? { "Content-Type": "application/json" } : undefined,
     body: hasBody ? JSON.stringify(params) : undefined,
   });
-  const isJSON = response.headers
-    .get("content-type")
-    ?.startsWith("application/json");
+  const contentType = response.headers.get("content-type");
+  if (!contentType) return;
+  const isJSON = contentType.startsWith("application/json");
   return response[isJSON ? "json" : "text"]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
