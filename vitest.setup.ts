@@ -21,12 +21,12 @@ const errorSerializer: NewPlugin = {
   serialize: (error: Error, config, indentation, depth, refs, printer) => {
     const { name, message, cause } = error;
     const { handled } = error instanceof ResultHandlerError ? error : {};
-    const asObject = {
-      message,
-      ...(cause ? { cause } : {}),
-      ...(handled ? { handled } : {}),
-    };
-    return `${name}(${printer(asObject, config, indentation, depth, refs)})`;
+    const obj = Object.assign(
+      { message },
+      cause && { cause },
+      handled && { handled },
+    );
+    return `${name}(${printer(obj, config, indentation, depth, refs)})`;
   },
 };
 
@@ -40,14 +40,12 @@ const makeSchemaSerializer = <
   const classes = Array.isArray(subject) ? subject : [subject];
   return {
     test: (subject) => classes.some((Cls) => subject instanceof Cls),
-    serialize: (subject, config, indentation, depth, refs, printer) =>
-      printer(
-        Object.assign(fn(subject as C), { _type: subject._def.typeName }),
-        config,
-        indentation,
-        depth,
-        refs,
-      ),
+    serialize: (subject, config, indentation, depth, refs, printer) => {
+      const obj = Object.assign(fn(subject as C), {
+        _type: subject._def.typeName,
+      });
+      return printer(obj, config, indentation, depth, refs);
+    },
   };
 };
 
