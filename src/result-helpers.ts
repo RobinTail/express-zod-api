@@ -1,11 +1,7 @@
 import { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import { z } from "zod";
-import {
-  ApiResponse,
-  NormalizedResponse,
-  ResponseVariant,
-} from "./api-response";
+import { NormalizedResponse, ResponseVariant } from "./api-response";
 import {
   FlatObject,
   getMessageFromError,
@@ -21,21 +17,20 @@ export type ResultSchema<R extends Result> =
 /** @throws ResultHandlerError when Result is an empty array */
 export const normalize = <A extends unknown[]>(
   subject: Result | LazyResult<Result, A>,
-  features: Omit<NormalizedResponse, "schema"> & {
+  {
+    variant,
+    args,
+    ...fallback
+  }: Omit<NormalizedResponse, "schema"> & {
     variant: ResponseVariant;
-    arguments: A;
+    args: A;
   },
 ): NormalizedResponse[] => {
-  if (typeof subject === "function")
-    return normalize(subject(...features.arguments), features);
-  if (subject instanceof z.ZodType) {
-    const { mimeTypes, statusCodes } = features;
-    return [{ schema: subject, mimeTypes, statusCodes }];
-  }
+  if (typeof subject === "function") subject = subject(...args);
+  if (subject instanceof z.ZodType) return [{ schema: subject, ...fallback }];
   if (Array.isArray(subject) && !subject.length) {
-    throw new ResultHandlerError(
-      new Error(`At least one ${features.variant} response schema required.`),
-    );
+    const err = new Error(`At least one ${variant} response schema required.`);
+    throw new ResultHandlerError(err);
   }
   return (Array.isArray(subject) ? subject : [subject]).map(
     ({ schema, statusCode, mimeType }) => ({
@@ -43,12 +38,12 @@ export const normalize = <A extends unknown[]>(
       statusCodes:
         typeof statusCode === "number"
           ? [statusCode]
-          : statusCode || features.statusCodes,
+          : statusCode || fallback.statusCodes,
       mimeTypes:
         typeof mimeType === "string"
           ? [mimeType]
           : mimeType === undefined
-            ? features.mimeTypes
+            ? fallback.mimeTypes
             : mimeType,
     }),
   );
