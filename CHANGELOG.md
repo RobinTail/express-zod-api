@@ -21,8 +21,8 @@
   - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
   - The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
   - The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
-  - The `Endpoint::getMethods()` method may now return `undefined`;
   - The `testEndpoint()` method can no longer test CORS headers — that function moved to `Routing` traverse;
+  - For `Endpoint`: `getMethods()` may return `undefined`, `getMimeTypes()` removed, `getSchema()` variants reduced;
   - Public properties `pairs`, `firstEndpoint` and `siblingMethods` of `DependsOnMethod` replaced with `entries`.
 - Consider the automated migration using the built-in ESLint rule.
 

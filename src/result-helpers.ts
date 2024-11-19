@@ -28,7 +28,10 @@ export const normalize = <A extends unknown[]>(
 ): NormalizedResponse[] => {
   if (typeof subject === "function")
     return normalize(subject(...features.arguments), features);
-  if (subject instanceof z.ZodType) return [{ ...features, schema: subject }];
+  if (subject instanceof z.ZodType) {
+    const { mimeTypes, statusCodes } = features;
+    return [{ schema: subject, mimeTypes, statusCodes }];
+  }
   if (Array.isArray(subject) && !subject.length) {
     throw new ResultHandlerError(
       new Error(`At least one ${features.variant} response schema required.`),

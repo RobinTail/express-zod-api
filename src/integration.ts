@@ -180,9 +180,12 @@ export class Integration {
         const positiveResponseId = splitResponse
           ? makeCleanId(method, path, "positive.response")
           : undefined;
-        const positiveSchema = endpoint.getMimeTypes("positive").length
-          ? endpoint.getSchema("positive")
-          : noContent;
+        const positiveSchema = endpoint
+          .getResponses("positive")
+          .map(({ schema, mimeTypes }) =>
+            mimeTypes.length ? schema : noContent,
+          )
+          .reduce((agg, schema) => agg.or(schema));
         const positiveResponse = splitResponse
           ? zodToTs(positiveSchema, {
               brandHandling,
@@ -192,9 +195,12 @@ export class Integration {
         const negativeResponseId = splitResponse
           ? makeCleanId(method, path, "negative.response")
           : undefined;
-        const negativeSchema = endpoint.getMimeTypes("negative").length
-          ? endpoint.getSchema("negative")
-          : noContent;
+        const negativeSchema = endpoint
+          .getResponses("negative")
+          .map(({ schema, mimeTypes }) =>
+            mimeTypes.length ? schema : noContent,
+          )
+          .reduce((agg, schema) => agg.or(schema));
         const negativeResponse = splitResponse
           ? zodToTs(negativeSchema, {
               brandHandling,
@@ -233,8 +239,10 @@ export class Integration {
             negative: negativeResponseId,
             response: genericResponseId,
             isJson: endpoint
-              .getMimeTypes("positive")
-              .includes(contentTypes.json),
+              .getResponses("positive")
+              .some((response) =>
+                response.mimeTypes.includes(contentTypes.json),
+              ),
             tags: endpoint.getTags(),
           },
         );
