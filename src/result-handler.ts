@@ -74,7 +74,7 @@ export class ResultHandler<
   public override getPositiveResponse(output: IOSchema) {
     return normalize(this.#positive, {
       variant: "positive",
-      arguments: [output],
+      args: [output],
       statusCodes: [defaultStatusCodes.positive],
       mimeTypes: [contentTypes.json],
     });
@@ -83,7 +83,7 @@ export class ResultHandler<
   public override getNegativeResponse() {
     return normalize(this.#negative, {
       variant: "negative",
-      arguments: [],
+      args: [],
       statusCodes: [defaultStatusCodes.negative],
       mimeTypes: [contentTypes.json],
     });
