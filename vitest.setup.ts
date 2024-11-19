@@ -87,9 +87,6 @@ expect.addSnapshotSerializer(
   makeSchemaSerializer(z.ZodOptional, (schema) => ({ value: schema.unwrap() })),
 );
 expect.addSnapshotSerializer(
-  makeSchemaSerializer(z.ZodNullable, (schema) => ({ value: schema.unwrap() })),
-);
-expect.addSnapshotSerializer(
   makeSchemaSerializer(z.ZodBranded, ({ _def }) => ({
     brand: _def[metaSymbol]?.brand,
   })),
