@@ -108,7 +108,7 @@ describe("App in production mode", async () => {
       long: longEndpoint,
     },
   };
-  vi.spyOn(console, "log").mockImplementation(vi.fn()); // mutes logo output
+  vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
   const config = createConfig({
     http: { listen: port },
     compression: { threshold: 1 },

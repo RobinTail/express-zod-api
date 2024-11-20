@@ -15,7 +15,7 @@
   - Plural `methods`, `tags` and `scopes` properties replaced with singular `method`, `tag`, `scope` accordingly;
   - The `method` property also made optional and can now be derived from `DependsOnMethod` or imply `GET` by default;
   - When `method` is assigned with an array, it must be non-empty.
-- Breaking changes to `positive` and `negative` propeties of `ResultHandler` constructor argument:
+- Breaking changes to `positive` and `negative` properties of `ResultHandler` constructor argument:
   - Plural `statusCodes` and `mimeTypes` props within the values are replaced with singular `statusCode` and `mimeType`.
 - Other breaking changes:
   - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
@@ -55,6 +55,12 @@ const { servers } = await createServer(config, {});
 ```
 
 ## Version 20
+
+### v20.22.1
+
+- Avoids startup logo distortion when the terminal is too narrow;
+- Self-diagnosis for potential problems disabled in production mode to ensure faster startup:
+  - Warning about potentially unserializable schema for JSON operating endpoints was introduced in v20.15.0.
 
 ### v20.22.0
 
