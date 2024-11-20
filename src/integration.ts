@@ -15,7 +15,7 @@ import {
   makeParam,
   makeParams,
   makePublicClass,
-  makePublicExtendedInterface,
+  makePublicInterface,
   makePublicLiteralType,
   makePublicReadonlyProp,
   makePublicType,
@@ -261,13 +261,6 @@ export class Integration {
       ),
     );
 
-    // extends Record<MethodPath, any>
-    const extenderClause = [
-      f.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-        makeRecord(this.ids.methodPathType, ts.SyntaxKind.AnyKeyword),
-      ]),
-    ];
-
     this.interfaces.push({
       id: this.ids.inputInterface,
       kind: "input",
@@ -314,9 +307,9 @@ export class Integration {
       }
     }
 
-    // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
+    // export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
     for (const { id, props } of this.interfaces)
-      this.program.push(makePublicExtendedInterface(id, extenderClause, props));
+      this.program.push(makePublicInterface(id, props));
 
     if (variant === "types") return;
 

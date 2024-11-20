@@ -59,13 +59,11 @@ export const makeParams = (
   );
 
 export const makeRecord = (
-  key: ts.Identifier | ts.KeywordTypeSyntaxKind,
+  key: ts.KeywordTypeSyntaxKind,
   value: ts.KeywordTypeSyntaxKind,
 ) =>
   f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
-    typeof key === "number"
-      ? f.createKeywordTypeNode(key)
-      : f.createTypeReferenceNode(key),
+    f.createKeywordTypeNode(key),
     f.createKeywordTypeNode(value),
   ]);
 
@@ -142,16 +140,15 @@ export const makeAnyPromise = () =>
     f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
   ]);
 
-export const makePublicExtendedInterface = (
+export const makePublicInterface = (
   name: ts.Identifier,
-  extender: ts.HeritageClause[],
   props: ts.PropertySignature[],
 ) =>
   f.createInterfaceDeclaration(
     exportModifier,
     name,
     undefined,
-    extender,
+    undefined,
     props,
   );
 
