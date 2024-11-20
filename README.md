@@ -36,14 +36,15 @@ Start your API server with I/O schema validation and custom middlewares in minut
    3. [Route path params](#route-path-params)
    4. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    5. [Response customization](#response-customization)
-   6. [Error handling](#error-handling)
-   7. [Production mode](#production-mode)
-   8. [Non-object response](#non-object-response) including file downloads
-   9. [File uploads](#file-uploads)
-   10. [Serving static files](#serving-static-files)
-   11. [Connect to your own express app](#connect-to-your-own-express-app)
-   12. [Testing endpoints](#testing-endpoints)
-   13. [Testing middlewares](#testing-middlewares)
+   6. [Empty response](#empty-response)
+   7. [Error handling](#error-handling)
+   8. [Production mode](#production-mode)
+   9. [Non-object response](#non-object-response) including file downloads
+   10. [File uploads](#file-uploads)
+   11. [Serving static files](#serving-static-files)
+   12. [Connect to your own express app](#connect-to-your-own-express-app)
+   13. [Testing endpoints](#testing-endpoints)
+   14. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -841,6 +842,18 @@ After creating your custom `ResultHandler` you can use it as an argument for `En
 import { EndpointsFactory } from "express-zod-api";
 
 const endpointsFactory = new EndpointsFactory(yourResultHandler);
+```
+
+## Empty response
+
+For some REST APIs, empty responses are typical: with status code `204` (No Content) and redirects (302). In order to
+describe it set the `mimeType` to `null` and `schema` to `z.never()`:
+
+```typescript
+const resultHandler = new ResultHandler({
+  positive: { statusCode: 204, mimeType: null, schema: z.never() },
+  negative: { statusCode: 404, mimeType: null, schema: z.never() },
+});
 ```
 
 ## Error handling
