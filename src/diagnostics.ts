@@ -12,9 +12,8 @@ export class Diagnostics {
     logger: ActualLogger,
     ctx: FlatObject,
   ): void {
-    const requestType = endpoint.getRequestType();
     if (!this.#verified.has(endpoint)) {
-      if (requestType === "json") {
+      if (endpoint.getRequestType() === "json") {
         try {
           assertJsonCompatible(endpoint.getSchema("input"), "in");
         } catch (reason) {
