@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   EndpointsFactory,
   Method,
+  createConfig,
   createServer,
   defaultResultHandler,
   ResultHandler,
@@ -30,7 +31,6 @@ describe("App in production mode", async () => {
       { provider: () => ({ corsDone: true }) },
     )
     .build({
-      method: "get",
       output: z.object({ corsDone: z.boolean() }),
       handler: async ({ options: { corsDone } }) => ({ corsDone }),
     });
@@ -53,7 +53,6 @@ describe("App in production mode", async () => {
   const faultyEndpoint = new EndpointsFactory(faultyResultHandler)
     .addMiddleware(faultyMiddleware)
     .build({
-      method: "get",
       input: z.object({
         epError: z
           .any()
@@ -79,7 +78,7 @@ describe("App in production mode", async () => {
       }),
     })
     .build({
-      methods: ["get", "post"],
+      method: ["get", "post"],
       input: z.object({ something: z.string() }),
       output: z.object({ anything: z.number().positive() }).passthrough(), // allow excessive keys
       handler: async ({
@@ -98,7 +97,6 @@ describe("App in production mode", async () => {
       },
     });
   const longEndpoint = new EndpointsFactory(defaultResultHandler).build({
-    method: "get",
     output: z.object({}),
     handler: async () => setTimeout(5000, {}),
   });
@@ -110,35 +108,31 @@ describe("App in production mode", async () => {
       long: longEndpoint,
     },
   };
-  vi.spyOn(console, "log").mockImplementation(vi.fn()); // mutes logo output
-  const server = (
-    await createServer(
-      {
-        server: {
-          listen: port,
-          compression: { threshold: 1 },
-          beforeRouting: ({ app, getChildLogger }) => {
-            depd("express")("Sample deprecation message");
-            app.use((req, {}, next) => {
-              const childLogger = getChildLogger(req);
-              assert("isChild" in childLogger && childLogger.isChild);
-              next();
-            });
-          },
-        },
-        cors: false,
-        startupLogo: true,
-        gracefulShutdown: { events: ["FAKE"] },
-        logger,
-        childLoggerProvider: ({ parent }) =>
-          Object.defineProperty(parent, "isChild", { value: true }),
-        inputSources: {
-          post: ["query", "body", "files"],
-        },
-      },
-      routing,
-    )
-  ).httpServer;
+  vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
+  const config = createConfig({
+    http: { listen: port },
+    compression: { threshold: 1 },
+    beforeRouting: ({ app, getLogger }) => {
+      depd("express")("Sample deprecation message");
+      app.use((req, {}, next) => {
+        const childLogger = getLogger(req);
+        assert("isChild" in childLogger && childLogger.isChild);
+        next();
+      });
+    },
+    cors: false,
+    startupLogo: true,
+    gracefulShutdown: { events: ["FAKE"] },
+    logger,
+    childLoggerProvider: ({ parent }) =>
+      Object.defineProperty(parent, "isChild", { value: true }),
+    inputSources: {
+      post: ["query", "body", "files"],
+    },
+  });
+  const {
+    servers: [server],
+  } = await createServer(config, routing);
   await vi.waitFor(() => assert(server.listening), { timeout: 1e4 });
   expect(warnMethod).toHaveBeenCalledWith(
     "DeprecationError (express): Sample deprecation message",

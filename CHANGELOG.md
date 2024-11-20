@@ -1,6 +1,96 @@
 # Changelog
 
+## Version 21
+
+### v21.1.0
+
+- Featuring empty response support:
+  - For some REST APIs, empty responses are typical: with status code `204` (No Content) and redirects (302);
+  - Previously, the framework did not offer a straightforward way to describe such responses, but now there is one;
+  - The `mimeType` property can now be assigned with `null` in `ResultHandler` definition;
+  - Both `Documentation` and `Integration` generators ignore such entries so that the `schema` can be `z.never()`:
+    - The body of such response will not be depicted by `Documentation`;
+    - The type of such response will be described as `undefined` (configurable) by `Integration`.
+
+```ts
+import { z } from "zod";
+import {
+  ResultHandler,
+  ensureHttpError,
+  EndpointsFactory,
+  Integration,
+} from "express-zod-api";
+
+const resultHandler = new ResultHandler({
+  positive: { statusCode: 204, mimeType: null, schema: z.never() },
+  negative: { statusCode: 404, mimeType: null, schema: z.never() },
+  handler: ({ error, response }) => {
+    response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
+  },
+});
+
+new Integration({ noContent: z.undefined() }); // undefined is default
+```
+
+### v21.0.0
+
+- Minimum supported versions of `express`: 4.21.1 and 5.0.1 (fixed vulnerabilities);
+- Breaking changes to `createConfig()` argument:
+  - The `server` property renamed to `http` and made optional — (can now configure HTTPS only);
+  - These properties moved to the top level: `jsonParser`, `upload`, `compression`, `rawParser` and `beforeRouting`;
+  - Both `logger` and `getChildLogger` arguments of `beforeRouting` function are replaced with all-purpose `getLogger`.
+- Breaking changes to `createServer()` resolved return:
+  - Both `httpServer` and `httpsServer` are combined into single `servers` property (array, same order).
+- Breaking changes to `EndpointsFactory::build()` argument:
+  - Plural `methods`, `tags` and `scopes` properties replaced with singular `method`, `tag`, `scope` accordingly;
+  - The `method` property also made optional and can now be derived from `DependsOnMethod` or imply `GET` by default;
+  - When `method` is assigned with an array, it must be non-empty.
+- Breaking changes to `positive` and `negative` properties of `ResultHandler` constructor argument:
+  - Plural `statusCodes` and `mimeTypes` props within the values are replaced with singular `statusCode` and `mimeType`.
+- Other breaking changes:
+  - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
+  - The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
+  - The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
+  - The `testEndpoint()` method can no longer test CORS headers — that function moved to `Routing` traverse;
+  - For `Endpoint`: `getMethods()` may return `undefined`, `getMimeTypes()` removed, `getSchema()` variants reduced;
+  - Public properties `pairs`, `firstEndpoint` and `siblingMethods` of `DependsOnMethod` replaced with `entries`.
+- Consider the automated migration using the built-in ESLint rule.
+
+```js
+// eslint.config.mjs — minimal ESLint 9 config to apply migrations automatically using "eslint --fix"
+import parser from "@typescript-eslint/parser";
+import migration from "express-zod-api/migration";
+
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v21": "error" } },
+];
+```
+
+```ts
+// The sample of new structure
+const config = createConfig({
+  http: { listen: 80 }, // became optional
+  https: { listen: 443, options: {} },
+  upload: true,
+  compression: true,
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+    app.use((req, res, next) => {
+      const childLogger = getLogger(req);
+    });
+  },
+});
+const { servers } = await createServer(config, {});
+```
+
 ## Version 20
+
+### v20.22.1
+
+- Avoids startup logo distortion when the terminal is too narrow;
+- Self-diagnosis for potential problems disabled in production mode to ensure faster startup:
+  - Warning about potentially unserializable schema for JSON operating endpoints was introduced in v20.15.0.
 
 ### v20.22.0
 
@@ -1173,7 +1263,7 @@ export const config = createConfig({
 
 - **Breaking changes**:
   - `DependsOnMethod::endpoints` removed;
-  - Refinment methods of `ez.file()` removed;
+  - Refinement methods of `ez.file()` removed;
   - Minimum version of `vitest` supported is 1.0.4.
 - How to migrate confidently:
   - If you're using refinement methods of `ez.file()`:

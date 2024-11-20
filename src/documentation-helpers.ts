@@ -135,12 +135,8 @@ export const depictCatch: Depicter = (
 export const depictAny: Depicter = () => ({ format: "any" });
 
 export const depictUpload: Depicter = ({}: UploadSchema, ctx) => {
-  if (ctx.isResponse) {
-    throw new DocumentationError({
-      message: "Please use ez.upload() only for input.",
-      ...ctx,
-    });
-  }
+  if (ctx.isResponse)
+    throw new DocumentationError("Please use ez.upload() only for input.", ctx);
   return { type: "string", format: "binary" };
 };
 
@@ -297,12 +293,8 @@ export const depictObject: Depicter = (
 export const depictNull: Depicter = () => ({ type: "null" });
 
 export const depictDateIn: Depicter = ({}: DateInSchema, ctx) => {
-  if (ctx.isResponse) {
-    throw new DocumentationError({
-      message: "Please use ez.dateOut() for output.",
-      ...ctx,
-    });
-  }
+  if (ctx.isResponse)
+    throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
@@ -315,12 +307,8 @@ export const depictDateIn: Depicter = ({}: DateInSchema, ctx) => {
 };
 
 export const depictDateOut: Depicter = ({}: DateOutSchema, ctx) => {
-  if (!ctx.isResponse) {
-    throw new DocumentationError({
-      message: "Please use ez.dateIn() for input.",
-      ...ctx,
-    });
-  }
+  if (!ctx.isResponse)
+    throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
@@ -333,14 +321,14 @@ export const depictDateOut: Depicter = ({}: DateOutSchema, ctx) => {
 
 /** @throws DocumentationError */
 export const depictDate: Depicter = ({}: z.ZodDate, ctx) => {
-  throw new DocumentationError({
-    message: `Using z.date() within ${
+  throw new DocumentationError(
+    `Using z.date() within ${
       ctx.isResponse ? "output" : "input"
     } schema is forbidden. Please use ez.date${
       ctx.isResponse ? "Out" : "In"
     }() instead. Check out the documentation for details.`,
-    ...ctx,
-  });
+    ctx,
+  );
 };
 
 export const depictBoolean: Depicter = () => ({ type: "boolean" });
@@ -747,10 +735,10 @@ export const onMissing: SchemaHandler<
   OpenAPIContext,
   "last"
 > = (schema: z.ZodTypeAny, ctx) => {
-  throw new DocumentationError({
-    message: `Zod type ${schema.constructor.name} is unsupported.`,
-    ...ctx,
-  });
+  throw new DocumentationError(
+    `Zod type ${schema.constructor.name} is unsupported.`,
+    ctx,
+  );
 };
 
 export const excludeParamsFromDepiction = (
@@ -797,11 +785,12 @@ export const depictResponse = ({
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
 }: ReqResHandlingProps<z.ZodTypeAny> & {
-  mimeTypes: ReadonlyArray<string>;
+  mimeTypes: ReadonlyArray<string> | null;
   variant: ResponseVariant;
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
+  if (!mimeTypes) return { description };
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema(schema, {
       rules: { ...brandHandling, ...depicters },
@@ -923,14 +912,14 @@ export const depictBody = ({
   method,
   path,
   schema,
-  mimeTypes,
+  mimeType,
   makeRef,
   composition,
   brandHandling,
   paramNames,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResHandlingProps<IOSchema> & {
-  mimeTypes: ReadonlyArray<string>;
+  mimeType: string;
   paramNames: string[];
 }): RequestBodyObject => {
   const bodyDepiction = excludeExamplesFromDepiction(
@@ -951,7 +940,7 @@ export const depictBody = ({
         : bodyDepiction,
     examples: depictExamples(schema, false, paramNames),
   };
-  return { description, content: fromPairs(xprod(mimeTypes, [media])) };
+  return { description, content: { [mimeType]: media } };
 };
 
 export const depictTags = <TAG extends string>(

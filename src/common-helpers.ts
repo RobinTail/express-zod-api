@@ -148,6 +148,6 @@ export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
 
 export const isProduction = memoizeWith(
-  () => process.env.TSUP_STATIC as string, // dynamic in tests, but static in build
-  () => process.env.NODE_ENV === "production",
+  () => process.env.TSUP_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSUP
+  () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
 );

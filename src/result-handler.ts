@@ -24,7 +24,6 @@ type Handler<RES = unknown> = (params: {
   output: FlatObject | null;
   /** can be empty: check presence of the required property using "in" operator */
   options: FlatObject;
-  /** @todo consider moving to HttpError in v21 */
   error: Error | null;
   request: Request;
   response: Response<RES>;
@@ -75,7 +74,7 @@ export class ResultHandler<
   public override getPositiveResponse(output: IOSchema) {
     return normalize(this.#positive, {
       variant: "positive",
-      arguments: [output],
+      args: [output],
       statusCodes: [defaultStatusCodes.positive],
       mimeTypes: [contentTypes.json],
     });
@@ -84,7 +83,7 @@ export class ResultHandler<
   public override getNegativeResponse() {
     return normalize(this.#negative, {
       variant: "negative",
-      arguments: [],
+      args: [],
       statusCodes: [defaultStatusCodes.negative],
       mimeTypes: [contentTypes.json],
     });

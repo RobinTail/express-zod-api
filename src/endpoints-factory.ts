@@ -30,9 +30,10 @@ type BuildProps<
   description?: string;
   shortDescription?: string;
   operationId?: string | ((method: Method) => string);
-} & ({ method: Method } | { methods: Method[] }) &
-  ({ scopes?: SCO[] } | { scope?: SCO }) &
-  ({ tags?: TAG[] } | { tag?: TAG });
+  method?: Method | [Method, ...Method[]];
+  scope?: SCO | SCO[];
+  tag?: TAG | TAG[];
+};
 
 export class EndpointsFactory<
   IN extends IOSchema<"strip"> = EmptySchema,
@@ -121,7 +122,9 @@ export class EndpointsFactory<
     description,
     shortDescription,
     operationId,
-    ...rest
+    scope,
+    tag,
+    method,
   }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
     z.ZodIntersection<IN, BIN>,
     BOUT,
@@ -130,17 +133,11 @@ export class EndpointsFactory<
     TAG
   > {
     const { middlewares, resultHandler } = this;
-    const methods = "methods" in rest ? rest.methods : [rest.method];
+    const methods = typeof method === "string" ? [method] : method;
     const getOperationId =
       typeof operationId === "function" ? operationId : () => operationId;
-    const scopes =
-      "scopes" in rest
-        ? rest.scopes
-        : "scope" in rest && rest.scope
-          ? [rest.scope]
-          : [];
-    const tags =
-      "tags" in rest ? rest.tags : "tag" in rest && rest.tag ? [rest.tag] : [];
+    const scopes = typeof scope === "string" ? [scope] : scope || [];
+    const tags = typeof tag === "string" ? [tag] : tag || [];
     return new Endpoint({
       handler,
       middlewares,

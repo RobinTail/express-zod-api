@@ -8,7 +8,7 @@ import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
 import { AbstractResultHandler } from "./result-handler";
 import { ListenOptions } from "node:net";
-import { ChildLoggerExtractor } from "./server-helpers";
+import { GetLogger } from "./server-helpers";
 
 export type InputSource = keyof Pick<
   Request,
@@ -131,61 +131,58 @@ interface GracefulOptions {
 
 type BeforeRouting = (params: {
   app: IRouter;
-  /**
-   * @desc Root logger, same for all requests
-   * @todo reconsider the naming in v21
-   * */
-  logger: ActualLogger;
-  /** @desc Returns a child logger if childLoggerProvider is configured (otherwise root logger) */
-  getChildLogger: ChildLoggerExtractor;
+  /** @desc Returns child logger for the given request (if configured) or the configured logger otherwise */
+  getLogger: GetLogger;
 }) => void | Promise<void>;
+
+export interface HttpConfig {
+  /** @desc Port, UNIX socket or custom options. */
+  listen: number | string | ListenOptions;
+}
+
+interface HttpsConfig extends HttpConfig {
+  /** @desc At least "cert" and "key" options required. */
+  options: ServerOptions;
+}
 
 export interface ServerConfig<TAG extends string = string>
   extends CommonConfig<TAG> {
-  /** @desc Server configuration. */
-  server: {
-    /** @desc Port, UNIX socket or custom options. */
-    listen: number | string | ListenOptions;
-    /**
-     * @desc Custom JSON parser.
-     * @default express.json()
-     * @link https://expressjs.com/en/4x/api.html#express.json
-     * */
-    jsonParser?: RequestHandler;
-    /**
-     * @desc Enable or configure uploads handling.
-     * @default undefined
-     * @requires express-fileupload
-     * */
-    upload?: boolean | UploadOptions;
-    /**
-     * @desc Enable or configure response compression.
-     * @default undefined
-     * @requires compression
-     */
-    compression?: boolean | CompressionOptions;
-    /**
-     * @desc Custom raw parser (assigns Buffer to request body)
-     * @default express.raw()
-     * @link https://expressjs.com/en/4x/api.html#express.raw
-     * */
-    rawParser?: RequestHandler;
-    /**
-     * @desc A code to execute before processing the Routing of your API (and before parsing).
-     * @desc This can be a good place for express middlewares establishing their own routes.
-     * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
-     * @default undefined
-     * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
-     * */
-    beforeRouting?: BeforeRouting;
-  };
-  /** @desc Enables HTTPS server as well. */
-  https?: {
-    /** @desc At least "cert" and "key" options required. */
-    options: ServerOptions;
-    /** @desc Port, UNIX socket or custom options. */
-    listen: number | string | ListenOptions;
-  };
+  /** @desc HTTP server configuration. */
+  http?: HttpConfig;
+  /** @desc HTTPS server configuration. */
+  https?: HttpsConfig;
+  /**
+   * @desc Custom JSON parser.
+   * @default express.json()
+   * @link https://expressjs.com/en/4x/api.html#express.json
+   * */
+  jsonParser?: RequestHandler;
+  /**
+   * @desc Enable or configure uploads handling.
+   * @default undefined
+   * @requires express-fileupload
+   * */
+  upload?: boolean | UploadOptions;
+  /**
+   * @desc Enable or configure response compression.
+   * @default undefined
+   * @requires compression
+   */
+  compression?: boolean | CompressionOptions;
+  /**
+   * @desc Custom raw parser (assigns Buffer to request body)
+   * @default express.raw()
+   * @link https://expressjs.com/en/4x/api.html#express.raw
+   * */
+  rawParser?: RequestHandler;
+  /**
+   * @desc A code to execute before processing the Routing of your API (and before parsing).
+   * @desc This can be a good place for express middlewares establishing their own routes.
+   * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
+   * @default undefined
+   * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
+   * */
+  beforeRouting?: BeforeRouting;
   /**
    * @desc Rejects new connections and attempts to finish ongoing ones in the specified time before exit.
    * @default undefined

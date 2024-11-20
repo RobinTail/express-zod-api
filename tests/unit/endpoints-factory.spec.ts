@@ -9,7 +9,6 @@ import {
 } from "../../src";
 import { EmptyObject, EmptySchema } from "../../src/common-helpers";
 import { Endpoint } from "../../src/endpoint";
-import { serializeSchemaForTest } from "../helpers";
 import { z } from "zod";
 
 describe("EndpointsFactory", () => {
@@ -237,19 +236,14 @@ describe("EndpointsFactory", () => {
       );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
-        method: "get",
         input: z.object({ s: z.string() }),
         output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toStrictEqual(["get"]);
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("input")),
-      ).toMatchSnapshot();
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("output")),
-      ).toMatchSnapshot();
+      expect(endpoint.getMethods()).toBeUndefined();
+      expect(endpoint.getSchema("input")).toMatchSnapshot();
+      expect(endpoint.getSchema("output")).toMatchSnapshot();
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
         n: number;
         s: string;
@@ -272,17 +266,12 @@ describe("EndpointsFactory", () => {
         middleware,
       );
       const endpoint = factory.build({
-        method: "get",
         input: z.object({ i: z.string() }),
         output: z.object({ o: z.boolean() }),
         handler: vi.fn(),
       });
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("input")),
-      ).toMatchSnapshot();
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("output")),
-      ).toMatchSnapshot();
+      expect(endpoint.getSchema("input")).toMatchSnapshot();
+      expect(endpoint.getSchema("output")).toMatchSnapshot();
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
         a?: number;
         b?: string;
@@ -300,19 +289,14 @@ describe("EndpointsFactory", () => {
       );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
-        methods: ["get"],
         input: z.object({ s: z.string() }),
         output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toStrictEqual(["get"]);
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("input")),
-      ).toMatchSnapshot();
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("output")),
-      ).toMatchSnapshot();
+      expect(endpoint.getMethods()).toBeUndefined();
+      expect(endpoint.getSchema("input")).toMatchSnapshot();
+      expect(endpoint.getSchema("output")).toMatchSnapshot();
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
         n1: number;
         n2: number;
@@ -333,19 +317,14 @@ describe("EndpointsFactory", () => {
         b: true,
       }));
       const endpoint = factory.build({
-        methods: ["get"],
         input: z.object({ s: z.string() }),
         output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toStrictEqual(["get"]);
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("input")),
-      ).toMatchSnapshot();
-      expect(
-        serializeSchemaForTest(endpoint.getSchema("output")),
-      ).toMatchSnapshot();
+      expect(endpoint.getMethods()).toBeUndefined();
+      expect(endpoint.getSchema("input")).toMatchSnapshot();
+      expect(endpoint.getSchema("output")).toMatchSnapshot();
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<
         { s: string } & ({ n1: number } | { n2: number })
       >();

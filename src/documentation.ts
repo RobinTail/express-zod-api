@@ -9,6 +9,7 @@ import {
 import { keys, pluck } from "ramda";
 import { z } from "zod";
 import { defaultStatusCodes } from "./api-response";
+import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
@@ -59,11 +60,6 @@ interface DocumentationParams {
   /** @default inline */
   composition?: "inline" | "components";
   /**
-   * @deprecated no longer used
-   * @todo remove in v21
-   * */
-  serializer?: (schema: z.ZodTypeAny) => string;
-  /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
@@ -75,7 +71,7 @@ interface DocumentationParams {
 export class Documentation extends OpenApiBuilder {
   protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   protected lastOperationIdSuffixes = new Map<string, number>();
-  protected responseVariants = keys(defaultStatusCodes);
+  protected responseVariants = keys(defaultStatusCodes); // eslint-disable-line no-restricted-syntax -- literal
   protected references = new Map<z.ZodTypeAny, string>();
 
   protected makeRef(
@@ -107,8 +103,7 @@ export class Documentation extends OpenApiBuilder {
       return operationId;
     }
     if (userDefined) {
-      throw new DocumentationError({
-        message: `Duplicated operationId: "${userDefined}"`,
+      throw new DocumentationError(`Duplicated operationId: "${userDefined}"`, {
         method,
         isResponse: false,
         path,
@@ -151,9 +146,8 @@ export class Documentation extends OpenApiBuilder {
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
       endpoint,
       path,
-      _method,
+      method,
     ) => {
-      const method = _method as Method;
       const commons = {
         path,
         method,
@@ -219,7 +213,7 @@ export class Documentation extends OpenApiBuilder {
             ...commons,
             paramNames: pluck("name", depictedParams),
             schema: endpoint.getSchema("input"),
-            mimeTypes: endpoint.getMimeTypes("input"),
+            mimeType: contentTypes[endpoint.getRequestType()],
             description: descriptions?.requestBody?.call(null, {
               method,
               path,

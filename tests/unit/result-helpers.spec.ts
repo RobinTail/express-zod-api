@@ -4,12 +4,69 @@ import { InputValidationError, OutputValidationError } from "../../src";
 import {
   ensureHttpError,
   getPublicErrorMessage,
-  getStatusCodeFromError,
   logServerError,
+  normalize,
 } from "../../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../../src/testing";
 
 describe("Result helpers", () => {
+  describe("normalize()", () => {
+    const schema = z.string();
+
+    test.each([schema, () => schema])(
+      "should handle a plain schema %#",
+      (subject) => {
+        expect(
+          normalize(subject, {
+            variant: "positive",
+            args: [],
+            statusCodes: [200],
+            mimeTypes: ["text/plain"],
+          }),
+        ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
+      },
+    );
+
+    test.each([{ schema }, () => ({ schema })])(
+      "should handle an object %#",
+      (subject) => {
+        expect(
+          normalize(subject, {
+            variant: "positive",
+            args: [],
+            statusCodes: [200],
+            mimeTypes: ["text/plain"],
+          }),
+        ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
+      },
+    );
+
+    test.each([[{ schema }], () => [{ schema }]])(
+      "should handle an array of objects %#",
+      (subject) => {
+        expect(
+          normalize(subject, {
+            variant: "positive",
+            args: [],
+            statusCodes: [200],
+            mimeTypes: ["text/plain"],
+          }),
+        ).toEqual([{ schema, statusCodes: [200], mimeTypes: ["text/plain"] }]);
+      },
+    );
+
+    test("should not mutate the subject when it's a function", () => {
+      const subject = () => schema;
+      normalize(subject, {
+        variant: "positive",
+        args: [],
+        statusCodes: [200],
+        mimeTypes: ["text/plain"],
+      });
+      expect(typeof subject).toBe("function");
+    });
+  });
+
   describe("logServerError()", () => {
     test("should log server side error", () => {
       const error = createHttpError(501, "test");
@@ -22,44 +79,6 @@ describe("Result helpers", () => {
           { error, payload: { test: 123 }, url: "https://example.com" },
         ],
       ]);
-    });
-  });
-
-  describe("getStatusCodeFromError()", () => {
-    test("should get status code from HttpError", () => {
-      expect(
-        getStatusCodeFromError(createHttpError(403, "Access denied")),
-      ).toEqual(403);
-    });
-
-    test("should return 400 for InputValidationError", () => {
-      const error = new InputValidationError(
-        new z.ZodError([
-          {
-            code: "invalid_type",
-            path: ["user", "id"],
-            message: "expected number, got string",
-            expected: "number",
-            received: "string",
-          },
-        ]),
-      );
-      expect(getStatusCodeFromError(error)).toEqual(400);
-    });
-
-    test.each([
-      new Error("something went wrong"),
-      new z.ZodError([
-        {
-          code: "invalid_type",
-          path: ["user", "id"],
-          message: "expected number, got string",
-          expected: "number",
-          received: "string",
-        },
-      ]),
-    ])("should return 500 for other errors %#", (error) => {
-      expect(getStatusCodeFromError(error)).toEqual(500);
     });
   });
 

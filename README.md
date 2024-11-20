@@ -36,14 +36,15 @@ Start your API server with I/O schema validation and custom middlewares in minut
    3. [Route path params](#route-path-params)
    4. [Multiple schemas for one route](#multiple-schemas-for-one-route)
    5. [Response customization](#response-customization)
-   6. [Error handling](#error-handling)
-   7. [Production mode](#production-mode)
-   8. [Non-object response](#non-object-response) including file downloads
-   9. [File uploads](#file-uploads)
-   10. [Serving static files](#serving-static-files)
-   11. [Connect to your own express app](#connect-to-your-own-express-app)
-   12. [Testing endpoints](#testing-endpoints)
-   13. [Testing middlewares](#testing-middlewares)
+   6. [Empty response](#empty-response)
+   7. [Error handling](#error-handling)
+   8. [Production mode](#production-mode)
+   9. [Non-object response](#non-object-response) including file downloads
+   10. [File uploads](#file-uploads)
+   11. [Serving static files](#serving-static-files)
+   12. [Connect to your own express app](#connect-to-your-own-express-app)
+   13. [Testing endpoints](#testing-endpoints)
+   14. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -184,7 +185,7 @@ Create a minimal configuration. _See all available options
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
+  http: {
     listen: 8090, // port, UNIX socket or options
   },
   cors: true,
@@ -208,7 +209,7 @@ The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supp
 import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
-  method: "get", // or methods: ["get", "post", ...]
+  // method: "get" (default) or array ["get", "post", ...]
   input: z.object({
     name: z.string().optional(),
   }),
@@ -288,12 +289,9 @@ const authMiddleware = new Middleware({
   handler: async ({ input: { key }, request, logger }) => {
     logger.debug("Checking the key and token");
     const user = await db.Users.findOne({ key });
-    if (!user) {
-      throw createHttpError(401, "Invalid key");
-    }
-    if (request.headers.token !== user.token) {
+    if (!user) throw createHttpError(401, "Invalid key");
+    if (request.headers.token !== user.token)
       throw createHttpError(401, "Invalid token");
-    }
     return { user }; // provides endpoints with options.user
   },
 });
@@ -305,10 +303,9 @@ By using `.addMiddleware()` method before `.build()` you can connect it to the e
 const yourEndpoint = defaultEndpointsFactory
   .addMiddleware(authMiddleware)
   .build({
-    // ...,
-    handler: async ({ options }) => {
-      // options.user is the user returned by authMiddleware
-    },
+    handler: async ({ options: { user } }) => {
+      // user is the one returned by authMiddleware
+    }, // ...
   });
 ```
 
@@ -322,7 +319,7 @@ import { defaultEndpointsFactory } from "express-zod-api";
 const factory = defaultEndpointsFactory
   .addMiddleware(authMiddleware) // add Middleware instance or use shorter syntax:
   .addMiddleware({
-    handler: async ({ options: { user } }) => ({}), // options.user from authMiddleware
+    handler: async ({ options: { user } }) => ({}), // user from authMiddleware
   });
 ```
 
@@ -372,12 +369,13 @@ import { createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
 
 const config = createConfig({
-  server: {
-    listen: 80,
-    beforeRouting: ({ app, logger, getChildLogger }) => {
-      logger.info("Serving the API documentation at https://example.com/docs");
-      app.use("/docs", ui.serve, ui.setup(documentation));
-    },
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+    logger.info("Serving the API documentation at https://example.com/docs");
+    app.use("/docs", ui.serve, ui.setup(documentation));
+    app.use("/custom", (req, res, next) => {
+      const childLogger = getLogger(req); // if childLoggerProvider is configured
+    });
   },
 });
 ```
@@ -447,7 +445,6 @@ arrays of numbers.
 import { z } from "zod";
 
 const getUserEndpoint = endpointsFactory.build({
-  method: "get",
   input: z.object({
     id: z.string().transform((id) => parseInt(id, 10)),
     ids: z
@@ -479,7 +476,6 @@ import snakify from "snakify-ts";
 import { z } from "zod";
 
 const endpoint = endpointsFactory.build({
-  method: "get",
   input: z
     .object({ user_id: z.string() })
     .transform((inputs) => camelize(inputs, /* shallow: */ true)),
@@ -537,18 +533,14 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
     userId: z.string(),
-    birthday: ez.dateIn(), // string -> Date
+    birthday: ez.dateIn(), // string -> Date in handler
   }),
   output: z.object({
-    createdAt: ez.dateOut(), // Date -> string
+    createdAt: ez.dateOut(), // Date -> string in response
   }),
-  handler: async ({ input }) => {
-    // input.birthday is Date
-    return {
-      // transmitted as "2022-01-22T00:00:00.000Z"
-      createdAt: new Date("2022-01-22"),
-    };
-  },
+  handler: async ({ input }) => ({
+    createdAt: new Date("2022-01-22"), // 2022-01-22T00:00:00.000Z
+  }),
 });
 ```
 
@@ -566,7 +558,6 @@ That function has several parameters and can be asynchronous.
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  // ... other options
   cors: ({ defaultHeaders, request, endpoint, logger }) => ({
     ...defaultHeaders,
     "Access-Control-Max-Age": "5000",
@@ -580,32 +571,24 @@ Please note: If you only want to send specific headers on requests to a specific
 ## Enabling HTTPS
 
 The modern API standard often assumes the use of a secure data transfer protocol, confirmed by a TLS certificate, also
-often called an SSL certificate in habit. When using the `createServer()` method, you can additionally configure and
-run the HTTPS server.
+often called an SSL certificate in habit. This way you can additionally (or solely) configure and run the HTTPS server:
 
 ```typescript
 import { createConfig, createServer } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    listen: 80,
-  },
   https: {
     options: {
       cert: fs.readFileSync("fullchain.pem", "utf-8"),
       key: fs.readFileSync("privkey.pem", "utf-8"),
     },
     listen: 443, // port, UNIX socket or options
-  },
-  // ... cors, logger, etc
+  }, // ... cors, logger, etc
 });
 
 // 'await' is only needed if you're going to use the returned entities.
 // For top level CJS you can wrap you code with (async () => { ... })()
-const { app, httpServer, httpsServer, logger } = await createServer(
-  config,
-  routing,
-);
+const { app, servers, logger } = await createServer(config, routing);
 ```
 
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
@@ -713,10 +696,8 @@ Install the following additional packages: `compression` and `@types/compression
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    /** @link https://www.npmjs.com/package/compression#options */
-    compression: { threshold: "1kb" }, // or true
-  },
+  /** @link https://www.npmjs.com/package/compression#options */
+  compression: { threshold: "1kb" }, // or true
 });
 ```
 
@@ -729,14 +710,13 @@ In order to receive a compressed response the client should include the followin
 
 You can customize the list of `request` properties that are combined into `input` that is being validated and available
 to your endpoints and middlewares. The order here matters: each next item in the array has a higher priority than its
-previous sibling.
+previous sibling. The following arrangement is default:
 
 ```typescript
 import { createConfig } from "express-zod-api";
 
 createConfig({
   inputSources: {
-    // the defaults are:
     get: ["query", "params"],
     post: ["body", "params", "files"],
     put: ["body", "params"],
@@ -780,26 +760,22 @@ You then need to specify these parameters in the endpoint input schema in the us
 
 ```typescript
 const getUserEndpoint = endpointsFactory.build({
-  method: "get",
   input: z.object({
     // id is the route path param, always string
     id: z.string().transform((value) => parseInt(value, 10)),
     // other inputs (in query):
     withExtendedInformation: z.boolean().optional(),
   }),
-  output: z.object({
-    /* ... */
-  }),
-  handler: async ({ input: { id } }) => {
-    // id is the route path param, number
-  },
+  output: z.object({}),
+  handler: async ({ input: { id } }) => ({}), // id is number,
 });
 ```
 
 ## Multiple schemas for one route
 
 Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
-It can also be the same Endpoint that handles multiple methods as well.
+It can also be the same Endpoint that handles multiple methods as well. The `method` and `methods` properties can be
+omitted for `EndpointsFactory::build()` so that the method determination would be delegated to the `Routing`.
 
 ```typescript
 import { DependsOnMethod } from "express-zod-api";
@@ -809,10 +785,10 @@ import { DependsOnMethod } from "express-zod-api";
 const routing: Routing = {
   v1: {
     user: new DependsOnMethod({
-      get: yourEndpointA,
-      delete: yourEndpointA,
-      post: yourEndpointB,
-      patch: yourEndpointB,
+      get: endpointA,
+      delete: endpointA,
+      post: endpointB,
+      patch: endpointB,
     }),
   },
 };
@@ -844,7 +820,7 @@ import {
 const yourResultHandler = new ResultHandler({
   positive: (data) => ({
     schema: z.object({ data }),
-    mimeType: "application/json", // optinal, or mimeTypes for array
+    mimeType: "application/json", // optinal or array
   }),
   negative: z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
@@ -866,6 +842,18 @@ After creating your custom `ResultHandler` you can use it as an argument for `En
 import { EndpointsFactory } from "express-zod-api";
 
 const endpointsFactory = new EndpointsFactory(yourResultHandler);
+```
+
+## Empty response
+
+For some REST APIs, empty responses are typical: with status code `204` (No Content) and redirects (302). In order to
+describe it set the `mimeType` to `null` and `schema` to `z.never()`:
+
+```typescript
+const resultHandler = new ResultHandler({
+  positive: { statusCode: 204, mimeType: null, schema: z.never() },
+  negative: { statusCode: 404, mimeType: null, schema: z.never() },
+});
 ```
 
 ## Error handling
@@ -895,6 +883,7 @@ origins of errors that could happen in runtime and be handled the following way:
 Consider enabling production mode by setting `NODE_ENV` environment variable to `production` for your deployment:
 
 - Express activates some [performance optimizations](https://expressjs.com/en/advanced/best-practice-performance.html);
+- Self-diagnosis for potential problems is disabled to ensure faster startup;
 - The `defaultResultHandler`, `defaultEndpointsFactory` and `LastResortHandler` generalize server-side error messages
   in negative responses in order to improve the security of your API by not disclosing the exact causes of errors:
   - Throwing errors that have or imply `5XX` status codes become just `Internal Server Error` message in response;
@@ -927,17 +916,12 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
     positive: { schema: ez.file("buffer"), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
-      if (error) {
-        response.status(400).send(error.message);
-        return;
-      }
-      if ("filename" in output) {
+      if (error) return void response.status(400).send(error.message);
+      if ("filename" in output)
         fs.createReadStream(output.filename).pipe(
           response.type(output.filename),
         );
-      } else {
-        response.status(400).send("Filename is missing");
-      }
+      else response.status(400).send("Filename is missing");
     },
   }),
 );
@@ -952,9 +936,7 @@ configure file uploads:
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    upload: true, // or options
-  },
+  upload: true, // or options
 });
 ```
 
@@ -969,15 +951,11 @@ upload might look this way:
 import createHttpError from "http-errors";
 
 const config = createConfig({
-  server: {
-    upload: {
-      limits: { fileSize: 51200 }, // 50 KB
-      limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
-      beforeUpload: ({ request, logger }) => {
-        if (!canUpload(request)) {
-          throw createHttpError(403, "Not authorized");
-        }
-      },
+  upload: {
+    limits: { fileSize: 51200 }, // 50 KB
+    limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
+    beforeUpload: ({ request, logger }) => {
+      if (!canUpload(request)) throw createHttpError(403, "Not authorized");
     },
   },
 });
@@ -1121,7 +1099,7 @@ import { ResultHandler } from "express-zod-api";
 
 new ResultHandler({
   positive: (data) => ({
-    statusCodes: [201, 202], // created or will be created
+    statusCode: [201, 202], // created or will be created
     schema: z.object({ status: z.literal("created"), data }),
   }),
   negative: [
@@ -1130,7 +1108,7 @@ new ResultHandler({
       schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
     },
     {
-      statusCodes: [400, 500], // validation or internal error
+      statusCode: [400, 500], // validation or internal error
       schema: z.object({ status: z.literal("error"), reason: z.string() }),
     },
   ],
@@ -1169,7 +1147,6 @@ createConfig({
 });
 
 defaultEndpointsFactory.build({
-  method: "get",
   input: z.object({
     "x-request-id": z.string(), // this one is from request.headers
     id: z.string(), // this one is from request.query
@@ -1311,9 +1288,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
     .object({
       id: z.number().describe("the ID of the user"),
     })
-    .example({
-      id: 123,
-    }),
+    .example({ id: 123 }),
   // ..., similarly for output and middlewares
 });
 ```
@@ -1336,9 +1311,8 @@ import {
 } from "express-zod-api";
 
 const config = createConfig({
-  // ..., use the simple or the advanced syntax:
   tags: {
-    users: "Everything about the users",
+    users: "Everything about the users", // or advanced syntax:
     files: {
       description: "Everything about the files processing",
       url: "https://example.com",
@@ -1353,8 +1327,7 @@ const taggedEndpointsFactory = new EndpointsFactory({
 });
 
 const exampleEndpoint = taggedEndpointsFactory.build({
-  // ...
-  tag: "users", // or tags: ["users", "files"]
+  tag: "users", // or array ["users", "files"]
 });
 ```
 
@@ -1392,12 +1365,10 @@ const ruleForClient: Producer = (
 ) => ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
 
 new Documentation({
-  /* config, routing, title, version */
   brandHandling: { [myBrand]: ruleForDocs },
 });
 
 new Integration({
-  /* routing */
   brandHandling: { [myBrand]: ruleForClient },
 });
 ```
@@ -1432,7 +1403,7 @@ const output = z.object({
 });
 
 endpointsFactory.build({
-  methods,
+  method,
   input,
   output,
   handler: async (): Promise<z.input<typeof output>> => ({

@@ -7,7 +7,7 @@ export {
   arrayEndpointsFactory,
 } from "./endpoints-factory";
 export { getExamples, getMessageFromError } from "./common-helpers";
-export { getStatusCodeFromError, ensureHttpError } from "./result-helpers";
+export { ensureHttpError } from "./result-helpers";
 export { BuiltinLogger } from "./builtin-logger";
 export { Middleware } from "./middleware";
 export {
@@ -42,7 +42,7 @@ export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
 export type { IOSchema } from "./io-schema";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
-export type { ApiResponse } from "./api-response";
+export type { ApiResponse, NormalizedResponse } from "./api-response";
 export type {
   BasicSecurity,
   BearerSecurity,

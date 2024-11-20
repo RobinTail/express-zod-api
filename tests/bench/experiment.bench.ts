@@ -1,37 +1,36 @@
-import assert from "node:assert/strict";
 import { bench } from "vitest";
-import { RoutingError } from "../../src";
+import { retrieveUserEndpoint } from "../../example/endpoints/retrieve-user";
+import { DependsOnMethod } from "../../src";
+import { walkRouting } from "../../src/routing-walker";
 
-describe.each([false, true])("Experiment for errors %s", (ass) => {
-  const notAss = !ass;
+const routing = {
+  a: {
+    b: {
+      c: {
+        d: {
+          e: {
+            f: {
+              g: {
+                h: {
+                  i: {
+                    j: new DependsOnMethod({
+                      post: retrieveUserEndpoint,
+                    }),
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    k: { l: {} },
+    m: {},
+  },
+};
 
-  bench("assert with text", () => {
-    try {
-      assert(ass, "text");
-    } catch {}
-  });
-
-  bench("assert with Error", () => {
-    try {
-      assert(ass, new Error());
-    } catch {}
-  });
-
-  bench("assert with custom error", () => {
-    try {
-      assert(ass, new RoutingError());
-    } catch {}
-  });
-
-  bench("throwing Error", () => {
-    try {
-      if (notAss) throw new Error();
-    } catch {}
-  });
-
-  bench("throwing custom error", () => {
-    try {
-      if (notAss) throw new RoutingError();
-    } catch {}
+describe("Experiment for routing walker", () => {
+  bench("featured", () => {
+    walkRouting({ routing, onEndpoint: vi.fn() });
   });
 });

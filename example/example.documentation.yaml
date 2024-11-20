@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Example API
-  version: 20.21.2
+  version: 21.1.0
 paths:
   /v1/user/retrieve:
     get:
@@ -85,6 +85,25 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/user/{id}/remove:
+    delete:
+      operationId: DeleteV1UserIdRemove
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: numeric string
+          schema:
+            type: string
+            pattern: \d+
+            description: numeric string
+      responses:
+        "204":
+          description: DELETE /v1/user/:id/remove Positive response
+        "404":
+          description: DELETE /v1/user/:id/remove Negative response
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId

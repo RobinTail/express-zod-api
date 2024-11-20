@@ -21,7 +21,7 @@ describe("Documentation", () => {
   const sampleConfig = createConfig({
     cors: true,
     logger: { level: "silent" },
-    server: { listen: givePort() },
+    http: { listen: givePort() },
   });
 
   describe("Basic cases", () => {
@@ -48,7 +48,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             deleteSomething: defaultEndpointsFactory.build({
-              methods: ["delete"],
+              method: "delete",
               output: z.object({
                 whatever: z.number(),
               }),
@@ -73,7 +73,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["get"],
               input: z.object({
                 array: z.array(z.number().int().positive()).min(1).max(3),
                 unlimited: z.array(z.boolean()),
@@ -103,7 +102,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["get"],
               input: z.object({
                 optional: z.string().optional(),
                 optDefault: z.string().optional().default("test"),
@@ -132,7 +130,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["post"],
+              method: "post",
               input: z.object({
                 intersection: z.intersection(
                   z.object({
@@ -176,7 +174,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["post"],
+              method: "post",
               input: z.object({
                 union: z.union([
                   z.object({
@@ -211,7 +209,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["post"],
+              method: "post",
               input: z.discriminatedUnion("type", [
                 z.object({ type: z.literal("a"), a: z.string() }),
                 z.object({ type: z.literal("b"), b: z.string() }),
@@ -243,7 +241,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["post"],
+              method: "post",
               input: z.object({
                 one: z.string(),
                 two: z.number().int().positive(),
@@ -329,7 +327,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              method: "get",
               input: z.object({
                 any: z.any(),
               }),
@@ -489,7 +486,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              method: "get",
               input: z.object({ string, number }),
               output: z.object({ boolean }),
               handler: async () => ({ boolean: [] }),
@@ -584,12 +580,14 @@ describe("Documentation", () => {
             serverUrl: "https://example.com",
           }),
       ).toThrow(
-        new DocumentationError({
-          method: "post",
-          path: "/v1/getSomething",
-          isResponse: false,
-          message: `Zod type ${zodType._def.typeName} is unsupported.`,
-        }),
+        new DocumentationError(
+          `Zod type ${zodType._def.typeName} is unsupported.`,
+          {
+            method: "post",
+            path: "/v1/getSomething",
+            isResponse: false,
+          },
+        ),
       );
     });
 
@@ -629,8 +627,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.addMiddleware(mw1).build({
-              scopes: ["this should be omitted"],
-              method: "get",
+              scope: "this should be omitted",
               input: z.object({
                 str: z.string(),
               }),
@@ -646,7 +643,7 @@ describe("Documentation", () => {
               handler: async () => ({}),
             }),
             updateSomething: defaultEndpointsFactory.addMiddleware(mw3).build({
-              scopes: ["this should be omitted"],
+              scope: "this should be omitted",
               method: "put",
               output: z.object({}),
               handler: async () => ({}),
@@ -668,13 +665,11 @@ describe("Documentation", () => {
             getSome: {
               thing: defaultEndpointsFactory.build({
                 description: "thing is the path segment",
-                method: "get",
                 output: z.object({}),
                 handler: async () => ({}),
               }),
               ":thing": defaultEndpointsFactory.build({
                 description: "thing is the path parameter",
-                method: "get",
                 output: z.object({}),
                 handler: async () => ({}),
               }),
@@ -697,7 +692,6 @@ describe("Documentation", () => {
             getSome: {
               thing: defaultEndpointsFactory.build({
                 description: "thing is the path segment",
-                method: "get",
                 operationId,
                 output: z.object({}),
                 handler: async () => ({}),
@@ -722,7 +716,7 @@ describe("Documentation", () => {
             getSome: {
               thing: defaultEndpointsFactory.build({
                 description: "thing is the path segment",
-                methods: ["get", "post"],
+                method: ["get", "post"],
                 operationId: (method) => `${method}${operationId}`,
                 output: z.object({}),
                 handler: async () => ({}),
@@ -740,12 +734,14 @@ describe("Documentation", () => {
 
     test("should not be able to specify duplicated operation", () => {
       const operationId = "coolOperationId";
-      const expectedError = new DocumentationError({
-        message: 'Duplicated operationId: "coolOperationId"',
-        isResponse: false,
-        method: "get",
-        path: "/v1/getSomeTwo/thing",
-      });
+      const expectedError = new DocumentationError(
+        'Duplicated operationId: "coolOperationId"',
+        {
+          isResponse: false,
+          method: "get",
+          path: "/v1/getSomeTwo/thing",
+        },
+      );
       expect(
         () =>
           new Documentation({
@@ -755,7 +751,6 @@ describe("Documentation", () => {
                 getSome: {
                   thing: defaultEndpointsFactory.build({
                     description: "thing is the path segment",
-                    method: "get",
                     operationId,
                     output: z.object({}),
                     handler: async () => ({}),
@@ -764,7 +759,6 @@ describe("Documentation", () => {
                 getSomeTwo: {
                   thing: defaultEndpointsFactory.build({
                     description: "thing is the path segment",
-                    method: "get",
                     operationId,
                     output: z.object({}),
                     handler: async () => ({}),
@@ -783,7 +777,7 @@ describe("Documentation", () => {
       const resultHandler = new ResultHandler({
         positive: (result) => ({
           schema: z.object({ status: z.literal("OK"), result }),
-          mimeTypes: [contentTypes.json, "text/vnd.yaml"],
+          mimeType: [contentTypes.json, "text/vnd.yaml"],
           statusCode: 201,
         }),
         negative: {
@@ -799,7 +793,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: factory.build({
-              method: "get",
               output: z.object({}),
               handler: async () => ({}),
             }),
@@ -823,7 +816,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              methods: ["get", "post"],
+              method: ["get", "post"],
               input: z.object({
                 arr: z.array(z.string()).min(1),
               }),
@@ -956,7 +949,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             ":name": defaultEndpointsFactory.build({
-              method: "get",
               input: z.object({
                 name: z.literal("John").or(z.literal("Jane")),
                 other: z.boolean(),
@@ -1060,7 +1052,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              method: "get",
               input: z.object({
                 str: z.string().describe("here is the test"),
               }),
@@ -1089,7 +1080,6 @@ describe("Documentation", () => {
         routing: {
           hris: {
             employees: defaultEndpointsFactory.build({
-              method: "get",
               input: z.object({
                 cursor: z
                   .string()
@@ -1117,7 +1107,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              method: "get",
               input: z.object({
                 strNum: z
                   .string()
@@ -1147,7 +1136,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              method: "get",
               input: z
                 .object({
                   strNum: z.string().transform((v) => parseInt(v, 10)),
@@ -1285,7 +1273,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             ":name": defaultEndpointsFactory.build({
-              method: "get",
               input: z.object({
                 name: z.string().brand("CUSTOM"),
                 other: z.boolean().brand("CUSTOM"),
@@ -1319,7 +1306,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             test: defaultEndpointsFactory.build({
-              method: "get",
               input: z
                 .object({ user_id: z.string() })
                 .transform((inputs) => camelize(inputs, true)),
@@ -1345,7 +1331,6 @@ describe("Documentation", () => {
         routing: {
           v1: {
             test: defaultEndpointsFactory.build({
-              method: "get",
               input: z
                 .object({ user_id: z.string(), at: ez.dateIn() })
                 .remap({ user_id: "userId" }), // partial mapping

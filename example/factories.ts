@@ -66,7 +66,7 @@ export const statusDependingFactory = new EndpointsFactory({
   config,
   resultHandler: new ResultHandler({
     positive: (data) => ({
-      statusCodes: [201, 202],
+      statusCode: [201, 202],
       schema: z.object({ status: z.literal("created"), data }),
     }),
     negative: [
@@ -75,7 +75,7 @@ export const statusDependingFactory = new EndpointsFactory({
         schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
       },
       {
-        statusCodes: [400, 500],
+        statusCode: [400, 500],
         schema: z.object({ status: z.literal("error"), reason: z.string() }),
       },
     ],
@@ -95,6 +95,18 @@ export const statusDependingFactory = new EndpointsFactory({
           );
       }
       response.status(201).json({ status: "created", data: output });
+    },
+  }),
+});
+
+/** @desc This factory demonstrates response without body, such as 204 No Content */
+export const noContentFactory = new EndpointsFactory({
+  config,
+  resultHandler: new ResultHandler({
+    positive: { statusCode: 204, mimeType: null, schema: z.never() },
+    negative: { statusCode: 404, mimeType: null, schema: z.never() },
+    handler: ({ error, response }) => {
+      response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
     },
   }),
 });

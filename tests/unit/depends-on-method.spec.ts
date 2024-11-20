@@ -10,9 +10,7 @@ describe("DependsOnMethod", () => {
   test("should accept empty object", () => {
     const instance = new DependsOnMethod({});
     expect(instance).toBeInstanceOf(DependsOnMethod);
-    expect(instance.firstEndpoint).toBeUndefined();
-    expect(instance.siblingMethods).toEqual([]);
-    expect(instance.pairs).toEqual([]);
+    expect(instance.entries).toEqual([]);
   });
 
   test("should accept an endpoint with a corresponding method", () => {
@@ -23,35 +21,32 @@ describe("DependsOnMethod", () => {
         handler: async () => ({}),
       }),
     });
-    expect(instance).toBeInstanceOf(DependsOnMethod);
-    expect(instance.firstEndpoint).toBeInstanceOf(AbstractEndpoint);
-    expect(instance.siblingMethods).toEqual([]);
-    expect(instance.pairs).toHaveLength(1);
+    expect(instance.entries).toEqual([
+      ["post", expect.any(AbstractEndpoint), []],
+    ]);
   });
 
-  test("should accept an endpoint with additional methods", () => {
-    const endpoint = new EndpointsFactory(defaultResultHandler).build({
-      methods: ["get", "post"],
-      output: z.object({}),
-      handler: async () => ({}),
-    });
-    const instance = new DependsOnMethod({
-      get: endpoint,
-      post: endpoint,
-    });
-    expect(instance).toBeInstanceOf(DependsOnMethod);
-    expect(instance.firstEndpoint).toBe(endpoint);
-    expect(instance.siblingMethods).toEqual(["post"]);
-    expect(instance.pairs).toHaveLength(2);
-  });
+  test.each([{ methods: ["get", "post"] } as const, {}])(
+    "should accept an endpoint capable to handle multiple methods %#",
+    (inc) => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        ...inc,
+        output: z.object({}),
+        handler: async () => ({}),
+      });
+      const instance = new DependsOnMethod({ get: endpoint, post: endpoint });
+      expect(instance.entries).toEqual([
+        ["get", expect.any(AbstractEndpoint), ["post"]],
+        ["post", expect.any(AbstractEndpoint), ["get"]],
+      ]);
+    },
+  );
 
   test("should reject empty assignments", () => {
     const instance = new DependsOnMethod({
       get: undefined,
       post: undefined,
     });
-    expect(instance.pairs).toEqual([]);
-    expect(instance.firstEndpoint).toBeUndefined();
-    expect(instance.siblingMethods).toEqual([]);
+    expect(instance.entries).toEqual([]);
   });
 });
