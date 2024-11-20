@@ -20,7 +20,7 @@ import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer, combineContainers } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
-import { ContentType, contentTypes } from "./content-type";
+import { ContentType } from "./content-type";
 import { Nesting } from "./nesting";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
@@ -33,7 +33,6 @@ export type Handler<IN, OUT, OPT> = (params: {
 
 type DescriptionVariant = "short" | "long";
 type IOVariant = "input" | "output";
-type MimeVariant = Extract<IOVariant, "input"> | ResponseVariant;
 
 export abstract class AbstractEndpoint extends Nesting {
   public abstract execute(params: {
@@ -41,15 +40,12 @@ export abstract class AbstractEndpoint extends Nesting {
     response: Response;
     logger: ActualLogger;
     config: CommonConfig;
-    siblingMethods?: ReadonlyArray<Method>;
   }): Promise<void>;
   public abstract getDescription(
     variant: DescriptionVariant,
   ): string | undefined;
-  public abstract getMethods(): ReadonlyArray<Method>;
+  public abstract getMethods(): ReadonlyArray<Method> | undefined;
   public abstract getSchema(variant: IOVariant): IOSchema;
-  public abstract getSchema(variant: ResponseVariant): z.ZodTypeAny;
-  public abstract getMimeTypes(variant: MimeVariant): ReadonlyArray<string>;
   public abstract getResponses(
     variant: ResponseVariant,
   ): ReadonlyArray<NormalizedResponse>;
@@ -68,9 +64,8 @@ export class Endpoint<
   TAG extends string,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods: ReadonlyArray<Method>;
+  readonly #methods?: ReadonlyArray<Method>;
   readonly #middlewares: AbstractMiddleware[];
-  readonly #mimeTypes: Record<MimeVariant, ReadonlyArray<string>>;
   readonly #responses: Record<
     ResponseVariant,
     ReadonlyArray<NormalizedResponse>
@@ -104,7 +99,7 @@ export class Endpoint<
     description?: string;
     shortDescription?: string;
     getOperationId?: (method: Method) => string | undefined;
-    methods: Method[];
+    methods?: Method[];
     scopes?: SCO[];
     tags?: TAG[];
   }) {
@@ -127,15 +122,6 @@ export class Endpoint<
       : hasRaw(inputSchema)
         ? "raw"
         : "json";
-    this.#mimeTypes = {
-      input: Object.freeze([contentTypes[this.#requestType]]),
-      positive: Object.freeze(
-        this.#responses.positive.flatMap(({ mimeTypes }) => mimeTypes),
-      ),
-      negative: Object.freeze(
-        this.#responses.negative.flatMap(({ mimeTypes }) => mimeTypes),
-      ),
-    };
   }
 
   public override getDescription(variant: DescriptionVariant) {
@@ -148,17 +134,8 @@ export class Endpoint<
 
   public override getSchema(variant: "input"): IN;
   public override getSchema(variant: "output"): OUT;
-  public override getSchema(variant: ResponseVariant): z.ZodTypeAny;
-  public override getSchema(variant: IOVariant | ResponseVariant) {
-    if (variant === "input" || variant === "output")
-      return this.#schemas[variant];
-    return this.getResponses(variant)
-      .map(({ schema }) => schema)
-      .reduce((agg, schema) => agg.or(schema));
-  }
-
-  public override getMimeTypes(variant: MimeVariant) {
-    return this.#mimeTypes[variant];
+  public override getSchema(variant: IOVariant) {
+    return this.#schemas[variant];
   }
 
   public override getRequestType() {
@@ -189,19 +166,6 @@ export class Endpoint<
 
   public override getOperationId(method: Method): string | undefined {
     return this.#getOperationId(method);
-  }
-
-  #getDefaultCorsHeaders(siblingMethods: Method[]): Record<string, string> {
-    const accessMethods = (this.#methods as Array<Method | AuxMethod>)
-      .concat(siblingMethods)
-      .concat("options")
-      .join(", ")
-      .toUpperCase();
-    return {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": accessMethods,
-      "Access-Control-Allow-Headers": "content-type",
-    };
   }
 
   async #parseOutput(output: z.input<OUT>) {
@@ -288,30 +252,16 @@ export class Endpoint<
     response,
     logger,
     config,
-    siblingMethods = [],
   }: {
     request: Request;
     response: Response;
     logger: ActualLogger;
     config: CommonConfig;
-    siblingMethods?: Method[];
   }) {
     const method = getActualMethod(request);
     const options: Partial<OPT> = {};
     let output: FlatObject | null = null;
     let error: Error | null = null;
-    if (config.cors) {
-      let headers = this.#getDefaultCorsHeaders(siblingMethods);
-      if (typeof config.cors === "function") {
-        headers = await config.cors({
-          request,
-          logger,
-          endpoint: this,
-          defaultHeaders: headers,
-        });
-      }
-      for (const key in headers) response.set(key, headers[key]);
-    }
     const input = getInput(request, config.inputSources);
     try {
       await this.#runMiddlewares({

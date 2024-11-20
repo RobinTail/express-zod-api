@@ -236,13 +236,12 @@ describe("EndpointsFactory", () => {
       );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
-        method: "get",
         input: z.object({ s: z.string() }),
         output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toStrictEqual(["get"]);
+      expect(endpoint.getMethods()).toBeUndefined();
       expect(endpoint.getSchema("input")).toMatchSnapshot();
       expect(endpoint.getSchema("output")).toMatchSnapshot();
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
@@ -267,7 +266,6 @@ describe("EndpointsFactory", () => {
         middleware,
       );
       const endpoint = factory.build({
-        method: "get",
         input: z.object({ i: z.string() }),
         output: z.object({ o: z.boolean() }),
         handler: vi.fn(),
@@ -291,13 +289,12 @@ describe("EndpointsFactory", () => {
       );
       const handlerMock = vi.fn();
       const endpoint = factory.build({
-        methods: ["get"],
         input: z.object({ s: z.string() }),
         output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toStrictEqual(["get"]);
+      expect(endpoint.getMethods()).toBeUndefined();
       expect(endpoint.getSchema("input")).toMatchSnapshot();
       expect(endpoint.getSchema("output")).toMatchSnapshot();
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
@@ -320,13 +317,12 @@ describe("EndpointsFactory", () => {
         b: true,
       }));
       const endpoint = factory.build({
-        methods: ["get"],
         input: z.object({ s: z.string() }),
         output: z.object({ b: z.boolean() }),
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toStrictEqual(["get"]);
+      expect(endpoint.getMethods()).toBeUndefined();
       expect(endpoint.getSchema("input")).toMatchSnapshot();
       expect(endpoint.getSchema("output")).toMatchSnapshot();
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<

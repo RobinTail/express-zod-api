@@ -82,7 +82,7 @@ const objectMapper = function (
     typeof tool === "function"
       ? tool
       : pipe(
-          toPairs,
+          toPairs, // eslint-disable-line no-restricted-syntax -- strict key type required
           map(([key, value]) => pair(tool[String(key)] || key, value)),
           fromPairs,
         );

@@ -17,28 +17,32 @@ export type ResultSchema<R extends Result> =
 /** @throws ResultHandlerError when Result is an empty array */
 export const normalize = <A extends unknown[]>(
   subject: Result | LazyResult<Result, A>,
-  features: {
+  {
+    variant,
+    args,
+    ...fallback
+  }: Omit<NormalizedResponse, "schema"> & {
     variant: ResponseVariant;
-    arguments: A;
-    statusCodes: [number, ...number[]];
-    mimeTypes: [string, ...string[]];
+    args: A;
   },
 ): NormalizedResponse[] => {
-  if (typeof subject === "function")
-    return normalize(subject(...features.arguments), features);
-  if (subject instanceof z.ZodType) return [{ ...features, schema: subject }];
+  if (typeof subject === "function") subject = subject(...args);
+  if (subject instanceof z.ZodType) return [{ schema: subject, ...fallback }];
   if (Array.isArray(subject) && !subject.length) {
-    throw new ResultHandlerError(
-      new Error(`At least one ${features.variant} response schema required.`),
-    );
+    const err = new Error(`At least one ${variant} response schema required.`);
+    throw new ResultHandlerError(err);
   }
   return (Array.isArray(subject) ? subject : [subject]).map(
-    ({ schema, statusCodes, statusCode, mimeTypes, mimeType }) => ({
+    ({ schema, statusCode, mimeType }) => ({
       schema,
-      statusCodes: statusCode
-        ? [statusCode]
-        : statusCodes || features.statusCodes,
-      mimeTypes: mimeType ? [mimeType] : mimeTypes || features.mimeTypes,
+      statusCodes:
+        typeof statusCode === "number"
+          ? [statusCode]
+          : statusCode || fallback.statusCodes,
+      mimeTypes:
+        typeof mimeType === "string"
+          ? [mimeType]
+          : mimeType || fallback.mimeTypes,
     }),
   );
 };
@@ -50,13 +54,6 @@ export const logServerError = (
   payload: FlatObject | null,
 ) =>
   !error.expose && logger.error("Server side error", { error, url, payload });
-
-/**
- * @deprecated use ensureHttpError().statusCode instead
- * @todo remove in v21
- * */
-export const getStatusCodeFromError = (error: Error): number =>
-  ensureHttpError(error).statusCode;
 
 /**
  * @example InputValidationError —> BadRequest(400)

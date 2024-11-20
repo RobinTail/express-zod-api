@@ -7,28 +7,25 @@ export const defaultStatusCodes = {
 
 export type ResponseVariant = keyof typeof defaultStatusCodes;
 
+/** @public this is the user facing configuration */
 export interface ApiResponse<S extends z.ZodTypeAny> {
   schema: S;
-  /**
-   * @default 200 for a positive response
-   * @default 400 for a negative response
-   * @override statusCodes
-   * */
-  statusCode?: number;
-  /**
-   * @default [200] for positive response
-   * @default [400] for negative response
-   * */
-  statusCodes?: [number, ...number[]];
-  /**
-   * @default "application/json"
-   * @override mimeTypes
-   * */
-  mimeType?: string;
-  /** @default [ "application/json" ] */
-  mimeTypes?: [string, ...string[]];
+  /** @default 200 for a positive and 400 for a negative response */
+  statusCode?: number | [number, ...number[]];
+  /** @default "application/json" */
+  mimeType?: string | [string, ...string[]];
+  /** @deprecated use statusCode */
+  statusCodes?: never;
+  /** @deprecated use mimeType */
+  mimeTypes?: never;
 }
 
-export type NormalizedResponse = Required<
-  Pick<ApiResponse<z.ZodTypeAny>, "schema" | "statusCodes" | "mimeTypes">
->;
+/**
+ * @private This is what the framework entities operate
+ * @see normalize
+ * */
+export interface NormalizedResponse {
+  schema: z.ZodTypeAny;
+  statusCodes: [number, ...number[]];
+  mimeTypes: [string, ...string[]];
+}

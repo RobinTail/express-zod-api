@@ -55,11 +55,6 @@ interface IntegrationParams {
    * */
   splitResponse?: boolean;
   /**
-   * @deprecated no longer used
-   * @todo remove in v21
-   * */
-  serializer?: (schema: z.ZodTypeAny) => string;
-  /**
    * @desc configures the style of object's optional properties
    * @default { withQuestionMark: true, withUndefined: true }
    */
@@ -178,7 +173,10 @@ export class Integration {
         const positiveResponseId = splitResponse
           ? makeCleanId(method, path, "positive.response")
           : undefined;
-        const positiveSchema = endpoint.getSchema("positive");
+        const positiveSchema = endpoint
+          .getResponses("positive")
+          .map(({ schema }) => schema)
+          .reduce((agg, schema) => agg.or(schema));
         const positiveResponse = splitResponse
           ? zodToTs(positiveSchema, {
               brandHandling,
@@ -188,7 +186,10 @@ export class Integration {
         const negativeResponseId = splitResponse
           ? makeCleanId(method, path, "negative.response")
           : undefined;
-        const negativeSchema = endpoint.getSchema("negative");
+        const negativeSchema = endpoint
+          .getResponses("negative")
+          .map(({ schema }) => schema)
+          .reduce((agg, schema) => agg.or(schema));
         const negativeResponse = splitResponse
           ? zodToTs(negativeSchema, {
               brandHandling,
@@ -218,22 +219,22 @@ export class Integration {
           );
         }
         this.program.push(createTypeAlias(genericResponse, genericResponseId));
-        if (method !== "options") {
-          this.paths.push(path);
-          this.registry.set(
-            { method, path },
-            {
-              input: inputId,
-              positive: positiveResponseId,
-              negative: negativeResponseId,
-              response: genericResponseId,
-              isJson: endpoint
-                .getMimeTypes("positive")
-                .includes(contentTypes.json),
-              tags: endpoint.getTags(),
-            },
-          );
-        }
+        this.paths.push(path);
+        this.registry.set(
+          { method, path },
+          {
+            input: inputId,
+            positive: positiveResponseId,
+            negative: negativeResponseId,
+            response: genericResponseId,
+            isJson: endpoint
+              .getResponses("positive")
+              .some((response) =>
+                response.mimeTypes.includes(contentTypes.json),
+              ),
+            tags: endpoint.getTags(),
+          },
+        );
       },
     });
 
