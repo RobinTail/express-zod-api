@@ -416,32 +416,45 @@ export class Integration {
       this.ids.pathParameter,
     );
 
-    // Object.keys(params).reduce((acc, key) => path.indexOf(___) >= 0 ? acc : { ...acc, [key]: params[key as keyof typeof params] }, {})
+    // Object.keys(params).reduce((acc, key) =>
+    //   Object.assign(acc, !path.includes(`:${key}`) && {[key]: params[key as keyof typeof params]} ), {})
     const paramsArgument = makeObjectKeysReducer(
       this.ids.paramsArgument,
-      f.createConditionalExpression(
-        f.createBinaryExpression(
-          f.createCallExpression(
-            f.createPropertyAccessExpression(this.ids.pathParameter, "indexOf"),
-            undefined,
-            [keyParamExpression],
-          ),
-          ts.SyntaxKind.GreaterThanEqualsToken,
-          f.createNumericLiteral(0),
+      f.createCallExpression(
+        f.createPropertyAccessExpression(
+          f.createIdentifier("Object"),
+          f.createIdentifier("assign" satisfies keyof typeof Object),
         ),
         undefined,
-        this.ids.accumulator,
-        undefined,
-        f.createObjectLiteralExpression([
-          f.createSpreadAssignment(this.ids.accumulator),
-          f.createPropertyAssignment(
-            f.createComputedPropertyName(this.ids.keyParameter),
-            f.createElementAccessExpression(
-              this.ids.paramsArgument,
-              keyAsKeyofParams,
+        [
+          this.ids.accumulator,
+          f.createBinaryExpression(
+            f.createPrefixUnaryExpression(
+              ts.SyntaxKind.ExclamationToken,
+              f.createCallExpression(
+                f.createPropertyAccessExpression(
+                  this.ids.pathParameter,
+                  f.createIdentifier("includes" satisfies keyof string),
+                ),
+                undefined,
+                [keyParamExpression],
+              ),
+            ),
+            f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+            f.createObjectLiteralExpression(
+              [
+                f.createPropertyAssignment(
+                  f.createComputedPropertyName(this.ids.keyParameter),
+                  f.createElementAccessExpression(
+                    this.ids.paramsArgument,
+                    keyAsKeyofParams,
+                  ),
+                ),
+              ],
+              false,
             ),
           ),
-        ]),
+        ],
       ),
       f.createObjectLiteralExpression(),
     );

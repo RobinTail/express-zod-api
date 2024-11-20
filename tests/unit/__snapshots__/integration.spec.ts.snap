@@ -63,9 +63,12 @@ export class ExpressZodAPIClient {
       ),
       Object.keys(params).reduce(
         (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0
-            ? acc
-            : { ...acc, [key]: params[key as keyof typeof params] },
+          Object.assign(
+            acc,
+            !path.includes(\`:\${key}\`) && {
+              [key]: params[key as keyof typeof params],
+            },
+          ),
         {},
       ),
     );
@@ -159,9 +162,12 @@ export class ExpressZodAPIClient {
       ),
       Object.keys(params).reduce(
         (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0
-            ? acc
-            : { ...acc, [key]: params[key as keyof typeof params] },
+          Object.assign(
+            acc,
+            !path.includes(\`:\${key}\`) && {
+              [key]: params[key as keyof typeof params],
+            },
+          ),
         {},
       ),
     );
@@ -255,9 +261,12 @@ export class ExpressZodAPIClient {
       ),
       Object.keys(params).reduce(
         (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0
-            ? acc
-            : { ...acc, [key]: params[key as keyof typeof params] },
+          Object.assign(
+            acc,
+            !path.includes(\`:\${key}\`) && {
+              [key]: params[key as keyof typeof params],
+            },
+          ),
         {},
       ),
     );
@@ -363,9 +372,12 @@ export class ExpressZodAPIClient {
       ),
       Object.keys(params).reduce(
         (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0
-            ? acc
-            : { ...acc, [key]: params[key as keyof typeof params] },
+          Object.assign(
+            acc,
+            !path.includes(\`:\${key}\`) && {
+              [key]: params[key as keyof typeof params],
+            },
+          ),
         {},
       ),
     );
@@ -669,9 +681,12 @@ export class ExpressZodAPIClient {
       ),
       Object.keys(params).reduce(
         (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0
-            ? acc
-            : { ...acc, [key]: params[key as keyof typeof params] },
+          Object.assign(
+            acc,
+            !path.includes(\`:\${key}\`) && {
+              [key]: params[key as keyof typeof params],
+            },
+          ),
         {},
       ),
     );
@@ -994,9 +1009,12 @@ export class ExpressZodAPIClient {
       ),
       Object.keys(params).reduce(
         (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0
-            ? acc
-            : { ...acc, [key]: params[key as keyof typeof params] },
+          Object.assign(
+            acc,
+            !path.includes(\`:\${key}\`) && {
+              [key]: params[key as keyof typeof params],
+            },
+          ),
         {},
       ),
     );
