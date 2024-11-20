@@ -785,11 +785,12 @@ export const depictResponse = ({
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
 }: ReqResHandlingProps<z.ZodTypeAny> & {
-  mimeTypes: ReadonlyArray<string>;
+  mimeTypes: ReadonlyArray<string> | null;
   variant: ResponseVariant;
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
+  if (!mimeTypes) return { description };
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema(schema, {
       rules: { ...brandHandling, ...depicters },
@@ -911,14 +912,14 @@ export const depictBody = ({
   method,
   path,
   schema,
-  mimeTypes,
+  mimeType,
   makeRef,
   composition,
   brandHandling,
   paramNames,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResHandlingProps<IOSchema> & {
-  mimeTypes: ReadonlyArray<string>;
+  mimeType: string;
   paramNames: string[];
 }): RequestBodyObject => {
   const bodyDepiction = excludeExamplesFromDepiction(
@@ -939,7 +940,7 @@ export const depictBody = ({
         : bodyDepiction,
     examples: depictExamples(schema, false, paramNames),
   };
-  return { description, content: fromPairs(xprod(mimeTypes, [media])) };
+  return { description, content: { [mimeType]: media } };
 };
 
 export const depictTags = <TAG extends string>(

@@ -27,6 +27,13 @@ type GetV1UserRetrieveResponse =
       };
     };
 
+type DeleteV1UserIdRemoveInput = {
+  /** numeric string */
+  id: string;
+};
+
+type DeleteV1UserIdRemoveResponse = undefined;
+
 type PatchV1UserIdInput = {
   key: string;
   id: string;
@@ -131,6 +138,7 @@ type PostV1AvatarRawResponse =
 
 export type Path =
   | "/v1/user/retrieve"
+  | "/v1/user/:id/remove"
   | "/v1/user/:id"
   | "/v1/user/create"
   | "/v1/user/list"
@@ -145,6 +153,7 @@ export type MethodPath = `${Method} ${Path}`;
 
 export interface Input extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemoveInput;
   "patch /v1/user/:id": PatchV1UserIdInput;
   "post /v1/user/create": PostV1UserCreateInput;
   "get /v1/user/list": GetV1UserListInput;
@@ -156,6 +165,7 @@ export interface Input extends Record<MethodPath, any> {
 
 export interface Response extends Record<MethodPath, any> {
   "get /v1/user/retrieve": GetV1UserRetrieveResponse;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemoveResponse;
   "patch /v1/user/:id": PatchV1UserIdResponse;
   "post /v1/user/create": PostV1UserCreateResponse;
   "get /v1/user/list": GetV1UserListResponse;
@@ -176,6 +186,7 @@ export const jsonEndpoints = {
 
 export const endpointTags = {
   "get /v1/user/retrieve": ["users"],
+  "delete /v1/user/:id/remove": ["users"],
   "patch /v1/user/:id": ["users"],
   "post /v1/user/create": ["users"],
   "get /v1/user/list": ["users"],
@@ -228,9 +239,9 @@ export const exampleImplementation: Implementation = async (
     headers: hasBody ? { "Content-Type": "application/json" } : undefined,
     body: hasBody ? JSON.stringify(params) : undefined,
   });
-  const isJSON = response.headers
-    .get("content-type")
-    ?.startsWith("application/json");
+  const contentType = response.headers.get("content-type");
+  if (!contentType) return;
+  const isJSON = contentType.startsWith("application/json");
   return response[isJSON ? "json" : "text"]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);

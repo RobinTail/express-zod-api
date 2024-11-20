@@ -85,7 +85,7 @@ export default [
   },
   {
     name: "tests/all",
-    files: ["tests/**/*.ts"],
+    files: ["tests/**/*.ts", "vitest.setup.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": "warn",

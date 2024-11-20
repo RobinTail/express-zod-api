@@ -1237,6 +1237,25 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/user/{id}/remove:
+    delete:
+      operationId: DeleteV1UserIdRemove
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: numeric string
+          schema:
+            type: string
+            pattern: \\d+
+            description: numeric string
+      responses:
+        "204":
+          description: DELETE /v1/user/:id/remove Positive response
+        "404":
+          description: DELETE /v1/user/:id/remove Negative response
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -1780,6 +1799,23 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/user/{id}/remove:
+    delete:
+      operationId: DeleteV1UserIdRemove
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: numeric string
+          schema:
+            $ref: "#/components/schemas/DeleteV1UserIdRemoveParameterId"
+      responses:
+        "204":
+          description: DELETE /v1/user/:id/remove Positive response
+        "404":
+          description: DELETE /v1/user/:id/remove Negative response
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -2092,6 +2128,10 @@ components:
       required:
         - status
         - error
+    DeleteV1UserIdRemoveParameterId:
+      type: string
+      pattern: \\d+
+      description: numeric string
     PatchV1UserIdParameterId:
       type: string
     PatchV1UserIdPositiveResponse:

@@ -3,7 +3,6 @@ import { IOSchema, Middleware, ez } from "../../src";
 import { getFinalEndpointInputSchema } from "../../src/io-schema";
 import { metaSymbol } from "../../src/metadata";
 import { AbstractMiddleware } from "../../src/middleware";
-import { serializeSchemaForTest } from "../helpers";
 
 describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {
@@ -155,7 +154,7 @@ describe("I/O Schema and related helpers", () => {
       });
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
       expect(result).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(result)).toMatchSnapshot();
+      expect(result).toMatchSnapshot();
     });
 
     test("Should merge input object schemas", () => {
@@ -178,7 +177,7 @@ describe("I/O Schema and related helpers", () => {
       });
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
       expect(result).toBeInstanceOf(z.ZodIntersection);
-      expect(serializeSchemaForTest(result)).toMatchSnapshot();
+      expect(result).toMatchSnapshot();
     });
 
     test("Should merge union object schemas", () => {
@@ -201,7 +200,7 @@ describe("I/O Schema and related helpers", () => {
         .or(z.object({ six: z.number() }));
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
       expect(result).toBeInstanceOf(z.ZodIntersection);
-      expect(serializeSchemaForTest(result)).toMatchSnapshot();
+      expect(result).toMatchSnapshot();
     });
 
     test("Should merge intersection object schemas", () => {
@@ -224,7 +223,7 @@ describe("I/O Schema and related helpers", () => {
         .and(z.object({ six: z.number() }));
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
       expect(result).toBeInstanceOf(z.ZodIntersection);
-      expect(serializeSchemaForTest(result)).toMatchSnapshot();
+      expect(result).toMatchSnapshot();
     });
 
     test("Zod Issue #600: can not intersect object schema with passthrough and transformation", () => {
@@ -262,7 +261,7 @@ describe("I/O Schema and related helpers", () => {
       });
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
       expect(result).toBeInstanceOf(z.ZodIntersection);
-      expect(serializeSchemaForTest(result)).toMatchSnapshot();
+      expect(result).toMatchSnapshot();
     });
 
     test("Should merge examples in case of using withMeta()", () => {

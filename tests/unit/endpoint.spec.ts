@@ -9,7 +9,6 @@ import {
   ResultHandler,
 } from "../../src";
 import { AbstractEndpoint, Endpoint } from "../../src/endpoint";
-import { serializeSchemaForTest } from "../helpers";
 
 describe("Endpoint", () => {
   describe(".getMethods()", () => {
@@ -275,32 +274,18 @@ describe("Endpoint", () => {
         );
       },
     );
-
-    test.each(["positive", "negative"] as const)(
-      "should return the %s response schema",
-      (variant) => {
-        const factory = new EndpointsFactory(defaultResultHandler);
-        const endpoint = factory.build({
-          output: z.object({ something: z.number() }),
-          handler: vi.fn(),
-        });
-        expect(
-          serializeSchemaForTest(endpoint.getSchema(variant)),
-        ).toMatchSnapshot();
-      },
-    );
   });
 
-  describe("getMimeTypes()", () => {
-    test.each(["input", "positive", "negative"] as const)(
-      "should return the %s mime types",
+  describe(".getResponses()", () => {
+    test.each(["positive", "negative"] as const)(
+      "should return the %s responses",
       (variant) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
           output: z.object({ something: z.number() }),
           handler: vi.fn(),
         });
-        expect(endpoint.getMimeTypes(variant)).toEqual(["application/json"]);
+        expect(endpoint.getResponses(variant)).toMatchSnapshot();
       },
     );
   });

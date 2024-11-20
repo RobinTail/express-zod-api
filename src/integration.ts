@@ -71,6 +71,11 @@ interface IntegrationParams {
     withUndefined?: boolean;
   };
   /**
+   * @desc The schema to use for responses without body such as 204
+   * @default z.undefined()
+   * */
+  noContent?: z.ZodTypeAny;
+  /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
@@ -129,6 +134,7 @@ export class Integration {
     searchParamsConst: f.createIdentifier("searchParams"),
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
+    contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
   } satisfies Record<string, ts.Identifier>;
   protected interfaces: Array<{
@@ -157,6 +163,7 @@ export class Integration {
     variant = "client",
     splitResponse = false,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
+    noContent = z.undefined(),
   }: IntegrationParams) {
     walkRouting({
       routing,
@@ -173,7 +180,10 @@ export class Integration {
         const positiveResponseId = splitResponse
           ? makeCleanId(method, path, "positive.response")
           : undefined;
-        const positiveSchema = endpoint.getSchema("positive");
+        const positiveSchema = endpoint
+          .getResponses("positive")
+          .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
+          .reduce((agg, schema) => agg.or(schema));
         const positiveResponse = splitResponse
           ? zodToTs(positiveSchema, {
               brandHandling,
@@ -183,7 +193,10 @@ export class Integration {
         const negativeResponseId = splitResponse
           ? makeCleanId(method, path, "negative.response")
           : undefined;
-        const negativeSchema = endpoint.getSchema("negative");
+        const negativeSchema = endpoint
+          .getResponses("negative")
+          .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
+          .reduce((agg, schema) => agg.or(schema));
         const negativeResponse = splitResponse
           ? zodToTs(negativeSchema, {
               brandHandling,
@@ -222,8 +235,10 @@ export class Integration {
             negative: negativeResponseId,
             response: genericResponseId,
             isJson: endpoint
-              .getMimeTypes("positive")
-              .includes(contentTypes.json),
+              .getResponses("positive")
+              .some((response) =>
+                response.mimeTypes?.includes(contentTypes.json),
+              ),
             tags: endpoint.getTags(),
           },
         );
@@ -580,25 +595,44 @@ export class Integration {
       ),
     );
 
-    // const isJSON = response.headers.get("content-type")?.startsWith("application/json");
+    // const contentType = response.headers.get("content-type");
+    const contentTypeStatement = f.createVariableStatement(
+      undefined,
+      makeConst(
+        this.ids.contentTypeConst,
+        f.createCallExpression(
+          f.createPropertyAccessExpression(
+            f.createPropertyAccessExpression(
+              this.ids.responseConst,
+              this.ids.headersProperty,
+            ),
+            f.createIdentifier("get" satisfies keyof Headers),
+          ),
+          undefined,
+          [f.createStringLiteral("content-type")],
+        ),
+      ),
+    );
+
+    // if (!contentType) return;
+    const noBodyStatement = f.createIfStatement(
+      f.createPrefixUnaryExpression(
+        ts.SyntaxKind.ExclamationToken,
+        this.ids.contentTypeConst,
+      ),
+      f.createReturnStatement(undefined),
+      undefined,
+    );
+
+    // const isJSON = contentType.startsWith("application/json");
     const parserStatement = f.createVariableStatement(
       undefined,
       makeConst(
         this.ids.isJsonConst,
         f.createCallChain(
           f.createPropertyAccessChain(
-            f.createCallExpression(
-              f.createPropertyAccessExpression(
-                f.createPropertyAccessExpression(
-                  this.ids.responseConst,
-                  this.ids.headersProperty,
-                ),
-                f.createIdentifier("get" satisfies keyof Headers),
-              ),
-              undefined,
-              [f.createStringLiteral("content-type")],
-            ),
-            f.createToken(ts.SyntaxKind.QuestionDotToken),
+            this.ids.contentTypeConst,
+            undefined,
             f.createIdentifier("startsWith" satisfies keyof string),
           ),
           undefined,
@@ -639,6 +673,8 @@ export class Integration {
             hasBodyStatement,
             searchParamsStatement,
             responseStatement,
+            contentTypeStatement,
+            noBodyStatement,
             parserStatement,
             returnStatement,
           ]),

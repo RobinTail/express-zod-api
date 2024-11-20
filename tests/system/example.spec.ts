@@ -241,6 +241,15 @@ describe("Example", async () => {
         expect(json).toMatchSnapshot();
       },
     );
+
+    test("Should handle no content", async () => {
+      const response = await fetch(
+        `http://localhost:${port}/v1/user/50/remove`,
+        { method: "DELETE", headers: { "Content-Type": "application/json" } },
+      );
+      expect(response.status).toBe(204);
+      expect(response.headers.get("content-type")).toBeNull();
+    });
   });
 
   describe("Negative", () => {
@@ -422,9 +431,9 @@ describe("Example", async () => {
               : { "Content-Type": "application/json", token: "456" },
           body: method === "get" ? undefined : JSON.stringify(params),
         });
-        const isJSON = response.headers
-          .get("content-type")
-          ?.startsWith("application/json");
+        const contentType = response.headers.get("content-type");
+        if (!contentType) return;
+        const isJSON = contentType.startsWith("application/json");
         return response[isJSON ? "json" : "text"]();
       };
 
@@ -456,6 +465,14 @@ describe("Example", async () => {
         | { status: "success"; data: { name: string; createdAt: string } }
         | { status: "error"; error: { message: string } }
       >();
+    });
+
+    test("should handle no content (no response body)", async () => {
+      const response = await client.provide("delete", "/v1/user/:id/remove", {
+        id: "12",
+      });
+      expect(response).toBeUndefined();
+      expectTypeOf(response).toBeUndefined();
     });
   });
 });

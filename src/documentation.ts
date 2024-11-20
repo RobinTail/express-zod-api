@@ -9,6 +9,7 @@ import {
 import { keys, pluck } from "ramda";
 import { z } from "zod";
 import { defaultStatusCodes } from "./api-response";
+import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
@@ -212,7 +213,7 @@ export class Documentation extends OpenApiBuilder {
             ...commons,
             paramNames: pluck("name", depictedParams),
             schema: endpoint.getSchema("input"),
-            mimeTypes: endpoint.getMimeTypes("input"),
+            mimeType: contentTypes[endpoint.getRequestType()],
             description: descriptions?.requestBody?.call(null, {
               method,
               path,
