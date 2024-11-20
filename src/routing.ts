@@ -3,6 +3,7 @@ import { CommonConfig } from "./config-type";
 import { ContentType, contentTypes } from "./content-type";
 import { assertJsonCompatible } from "./deep-checks";
 import { DependsOnMethod } from "./depends-on-method";
+import { Diagnostics } from "./diagnostics";
 import { AbstractEndpoint } from "./endpoint";
 import { ActualLogger } from "./logger-helpers";
 import { walkRouting } from "./routing-walker";
@@ -30,40 +31,15 @@ export const initRouting = ({
   routing: Routing;
   parsers?: Parsers;
 }) => {
-  const verified = new WeakSet<AbstractEndpoint>();
+  const doc = new Diagnostics();
   walkRouting({
     routing,
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
-      const requestType = endpoint.getRequestType();
-      if (!verified.has(endpoint)) {
-        if (requestType === "json") {
-          try {
-            assertJsonCompatible(endpoint.getSchema("input"), "in");
-          } catch (reason) {
-            rootLogger.warn(
-              "The final input schema of the endpoint contains an unsupported JSON payload type.",
-              { path, method, reason },
-            );
-          }
-        }
-        for (const variant of ["positive", "negative"] as const) {
-          if (endpoint.getMimeTypes(variant).includes(contentTypes.json)) {
-            try {
-              assertJsonCompatible(endpoint.getSchema(variant), "out");
-            } catch (reason) {
-              rootLogger.warn(
-                `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
-                { path, method, reason },
-              );
-            }
-          }
-        }
-        verified.add(endpoint);
-      }
+      doc.check(endpoint, rootLogger, { path, method });
       app[method](
         path,
-        ...(parsers?.[requestType] || []),
+        ...(parsers?.[endpoint.getRequestType()] || []),
         async (request, response) =>
           endpoint.execute({
             request,
