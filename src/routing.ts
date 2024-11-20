@@ -1,8 +1,9 @@
 import { IRouter, RequestHandler } from "express";
+import { isProduction } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { ContentType, contentTypes } from "./content-type";
-import { assertJsonCompatible } from "./deep-checks";
+import { ContentType } from "./content-type";
 import { DependsOnMethod } from "./depends-on-method";
+import { Diagnostics } from "./diagnostics";
 import { AbstractEndpoint } from "./endpoint";
 import { AuxMethod, Method } from "./method";
 import { walkRouting } from "./routing-walker";
@@ -28,40 +29,13 @@ export const initRouting = ({
   routing: Routing;
   parsers?: Parsers;
 }) => {
-  const verified = new WeakSet<AbstractEndpoint>();
+  const doc = new Diagnostics();
   const corsedPaths = new Set<string>();
   walkRouting({
     routing,
     onStatic: (path, handler) => void app.use(path, handler),
     onEndpoint: (endpoint, path, method, siblingMethods) => {
-      const requestType = endpoint.getRequestType();
-      if (!verified.has(endpoint)) {
-        if (requestType === "json") {
-          try {
-            assertJsonCompatible(endpoint.getSchema("input"), "in");
-          } catch (reason) {
-            getLogger().warn(
-              "The final input schema of the endpoint contains an unsupported JSON payload type.",
-              { path, method, reason },
-            );
-          }
-        }
-        for (const variant of ["positive", "negative"] as const) {
-          for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
-            if (mimeTypes.includes(contentTypes.json)) {
-              try {
-                assertJsonCompatible(schema, "out");
-              } catch (reason) {
-                getLogger().warn(
-                  `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
-                  { path, method, reason },
-                );
-              }
-            }
-          }
-        }
-        verified.add(endpoint);
-      }
+      if (!isProduction()) doc.check(endpoint, getLogger(), { path, method });
       const accessMethods: Array<Method | AuxMethod> = [
         method,
         ...(siblingMethods || []),
@@ -72,7 +46,7 @@ export const initRouting = ({
         "Access-Control-Allow-Methods": accessMethods.join(", ").toUpperCase(),
         "Access-Control-Allow-Headers": "content-type",
       };
-      const matchingParsers = parsers?.[requestType] || [];
+      const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
       const handler: RequestHandler = async (request, response) => {
         const logger = getLogger(request);
         if (config.cors) {

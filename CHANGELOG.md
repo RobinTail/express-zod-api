@@ -56,6 +56,12 @@ const { servers } = await createServer(config, {});
 
 ## Version 20
 
+### v20.22.1
+
+- Avoids startup logo distortion when the terminal is too narrow;
+- Self-diagnosis for potential problems disabled in production mode to ensure faster startup:
+  - Warning about potentially unserializable schema for JSON operating endpoints was introduced in v20.15.0.
+
 ### v20.22.0
 
 - Featuring a helper to describe nested Routing for already assigned routes:
