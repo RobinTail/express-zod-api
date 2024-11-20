@@ -467,6 +467,18 @@ describe("Example", async () => {
       >();
     });
 
+    test("Issue #2182: should handle unlisted combination of path and method", async () => {
+      const response = await client.provide("get", "/v1/user/create", {
+        literally: "anything",
+      });
+      expect(typeof response).toBe("object");
+      expect(response).toHaveProperty(
+        ["error", "message"],
+        "Can not GET /v1/user/create",
+      );
+      expectTypeOf(response).toBeAny();
+    });
+
     test("should handle no content (no response body)", async () => {
       const response = await client.provide("delete", "/v1/user/:id/remove", {
         id: "12",
