@@ -33,7 +33,7 @@ export const makeTemplateType = (names: Array<ts.Identifier | string>) =>
     ),
   );
 
-export const parametricIndexNode = makeTemplateType(["M", "P"]);
+export const parametricIndexNode = makeTemplateType(["M", "P"]); // `${M} ${P}`
 
 export const makeParam = (
   name: ts.Identifier,

@@ -40,8 +40,10 @@ export const endpointTags = { "post /v1/test-with-dashes": [] };
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
+  params: \`\${M} \${P}\` extends keyof Input
+    ? Input[\`\${M} \${P}\`]
+    : Record<string, any>,
+) => \`\${M} \${P}\` extends keyof Response ? Promise<Response[\`\${M} \${P}\`]> : any;
 
 export type Implementation = (
   method: Method,
@@ -131,8 +133,10 @@ export const endpointTags = { "post /v1/test-with-dashes": [] };
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
+  params: \`\${M} \${P}\` extends keyof Input
+    ? Input[\`\${M} \${P}\`]
+    : Record<string, any>,
+) => \`\${M} \${P}\` extends keyof Response ? Promise<Response[\`\${M} \${P}\`]> : any;
 
 export type Implementation = (
   method: Method,
@@ -222,8 +226,10 @@ export const endpointTags = { "post /v1/test-with-dashes": [] };
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
+  params: \`\${M} \${P}\` extends keyof Input
+    ? Input[\`\${M} \${P}\`]
+    : Record<string, any>,
+) => \`\${M} \${P}\` extends keyof Response ? Promise<Response[\`\${M} \${P}\`]> : any;
 
 export type Implementation = (
   method: Method,
@@ -325,8 +331,10 @@ export const endpointTags = { "post /v1/test": [] };
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
+  params: \`\${M} \${P}\` extends keyof Input
+    ? Input[\`\${M} \${P}\`]
+    : Record<string, any>,
+) => \`\${M} \${P}\` extends keyof Response ? Promise<Response[\`\${M} \${P}\`]> : any;
 
 export type Implementation = (
   method: Method,
@@ -626,8 +634,10 @@ export const endpointTags = {
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
+  params: \`\${M} \${P}\` extends keyof Input
+    ? Input[\`\${M} \${P}\`]
+    : Record<string, any>,
+) => \`\${M} \${P}\` extends keyof Response ? Promise<Response[\`\${M} \${P}\`]> : any;
 
 export type Implementation = (
   method: Method,
@@ -946,8 +956,10 @@ export const endpointTags = { "post /v1/test-with-dashes": [] };
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
+  params: \`\${M} \${P}\` extends keyof Input
+    ? Input[\`\${M} \${P}\`]
+    : Record<string, any>,
+) => \`\${M} \${P}\` extends keyof Response ? Promise<Response[\`\${M} \${P}\`]> : any;
 
 export type Implementation = (
   method: Method,

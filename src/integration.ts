@@ -331,8 +331,10 @@ export class Integration {
       ),
     );
 
-    // export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[`${M} ${P}`]) =>
-    // Promise<Response[`${M} ${P}`]>;
+    // export type Provider = <M extends Method, P extends Path>(
+    // method: M, path: P,
+    // params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>
+    // ) => `${M} ${P}` extends keyof Response ? Promise<Response[`${M} ${P}`]> : any;
     const providerType = makePublicType(
       this.ids.providerType,
       f.createFunctionTypeNode(
@@ -343,12 +345,28 @@ export class Integration {
         makeParams({
           method: f.createTypeReferenceNode("M"),
           path: f.createTypeReferenceNode("P"),
-          params: f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.ids.inputInterface),
+          params: f.createConditionalTypeNode(
             parametricIndexNode,
+            f.createTypeOperatorNode(
+              ts.SyntaxKind.KeyOfKeyword,
+              f.createTypeReferenceNode(this.ids.inputInterface),
+            ),
+            f.createIndexedAccessTypeNode(
+              f.createTypeReferenceNode(this.ids.inputInterface),
+              parametricIndexNode,
+            ),
+            makeRecord(ts.SyntaxKind.StringKeyword, ts.SyntaxKind.AnyKeyword), // @todo extract, used in impl.
           ),
         }),
-        makeIndexedPromise(this.ids.responseInterface, parametricIndexNode),
+        f.createConditionalTypeNode(
+          parametricIndexNode,
+          f.createTypeOperatorNode(
+            ts.SyntaxKind.KeyOfKeyword,
+            f.createTypeReferenceNode(this.ids.responseInterface),
+          ),
+          makeIndexedPromise(this.ids.responseInterface, parametricIndexNode),
+          f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword), // @todo config?
+        ),
       ),
     );
 
