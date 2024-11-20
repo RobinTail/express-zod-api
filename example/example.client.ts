@@ -199,7 +199,9 @@ export const endpointTags = {
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
-  params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>,
+  params: `${M} ${P}` extends keyof Input
+    ? Input[`${M} ${P}`]
+    : Record<string, any>,
 ) => `${M} ${P}` extends keyof Response ? Promise<Response[`${M} ${P}`]> : any;
 
 export type Implementation = (
@@ -214,12 +216,18 @@ export class ExpressZodAPIClient {
     this.implementation(
       method,
       Object.keys(params).reduce(
-        (acc, key) => acc.replace(`:${key}`, params[key as keyof typeof params]),
+        (acc, key) =>
+          acc.replace(`:${key}`, params[key as keyof typeof params]),
         path,
       ),
       Object.keys(params).reduce(
         (acc, key) =>
-        Object.assign(acc, !path.includes(`:${key}`) && {[key]: params[key as keyof typeof params]} ),
+          Object.assign(
+            acc,
+            !path.includes(`:${key}`) && {
+              [key]: params[key as keyof typeof params],
+            },
+          ),
         {},
       ),
     );
