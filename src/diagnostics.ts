@@ -6,18 +6,15 @@ import { ActualLogger } from "./logger-helpers";
 
 export class Diagnostics {
   #verified = new WeakSet<AbstractEndpoint>();
+  constructor(protected logger: ActualLogger) {}
 
-  public check(
-    endpoint: AbstractEndpoint,
-    logger: ActualLogger,
-    ctx: FlatObject,
-  ): void {
+  public check(endpoint: AbstractEndpoint, ctx: FlatObject): void {
     if (!this.#verified.has(endpoint)) {
       if (endpoint.getRequestType() === "json") {
         try {
           assertJsonCompatible(endpoint.getSchema("input"), "in");
         } catch (reason) {
-          logger.warn(
+          this.logger.warn(
             "The final input schema of the endpoint contains an unsupported JSON payload type.",
             Object.assign(ctx, { reason }),
           );
@@ -29,7 +26,7 @@ export class Diagnostics {
             try {
               assertJsonCompatible(schema, "out");
             } catch (reason) {
-              logger.warn(
+              this.logger.warn(
                 `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
                 Object.assign(ctx, { reason }),
               );

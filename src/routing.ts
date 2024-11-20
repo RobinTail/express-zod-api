@@ -29,13 +29,13 @@ export const initRouting = ({
   routing: Routing;
   parsers?: Parsers;
 }) => {
-  const doc = new Diagnostics();
+  const doc = new Diagnostics(getLogger());
   const corsedPaths = new Set<string>();
   walkRouting({
     routing,
     onStatic: (path, handler) => void app.use(path, handler),
     onEndpoint: (endpoint, path, method, siblingMethods) => {
-      if (!isProduction()) doc.check(endpoint, getLogger(), { path, method });
+      if (!isProduction()) doc.check(endpoint, { path, method });
       const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
       const handler: RequestHandler = async (request, response) => {
         const logger = getLogger(request);
