@@ -416,7 +416,7 @@ export class Integration {
       this.ids.pathParameter,
     );
 
-    // Object.keys(params).reduce((acc, key) => path.indexOf(___) >= 0 ? acc : { ...acc, [key]: params[key] }, {})
+    // Object.keys(params).reduce((acc, key) => path.indexOf(___) >= 0 ? acc : { ...acc, [key]: params[key as keyof typeof params] }, {})
     const paramsArgument = makeObjectKeysReducer(
       this.ids.paramsArgument,
       f.createConditionalExpression(
@@ -438,7 +438,7 @@ export class Integration {
             f.createComputedPropertyName(this.ids.keyParameter),
             f.createElementAccessExpression(
               this.ids.paramsArgument,
-              this.ids.keyParameter,
+              keyAsKeyofParams,
             ),
           ),
         ]),
