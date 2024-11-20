@@ -151,7 +151,7 @@ export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export type MethodPath = `${Method} ${Path}`;
 
-export interface Input extends Record<MethodPath, any> {
+export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveInput;
   "patch /v1/user/:id": PatchV1UserIdInput;
@@ -163,7 +163,7 @@ export interface Input extends Record<MethodPath, any> {
   "post /v1/avatar/raw": PostV1AvatarRawInput;
 }
 
-export interface Response extends Record<MethodPath, any> {
+export interface Response {
   "get /v1/user/retrieve": GetV1UserRetrieveResponse;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveResponse;
   "patch /v1/user/:id": PatchV1UserIdResponse;
@@ -199,8 +199,8 @@ export const endpointTags = {
 export type Provider = <M extends Method, P extends Path>(
   method: M,
   path: P,
-  params: Input[`${M} ${P}`],
-) => Promise<Response[`${M} ${P}`]>;
+  params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>,
+) => `${M} ${P}` extends keyof Response ? Promise<Response[`${M} ${P}`]> : any;
 
 export type Implementation = (
   method: Method,
@@ -214,12 +214,12 @@ export class ExpressZodAPIClient {
     this.implementation(
       method,
       Object.keys(params).reduce(
-        (acc, key) => acc.replace(`:${key}`, params[key]),
+        (acc, key) => acc.replace(`:${key}`, params[key as keyof typeof params]),
         path,
       ),
       Object.keys(params).reduce(
         (acc, key) =>
-          path.indexOf(`:${key}`) >= 0 ? acc : { ...acc, [key]: params[key] },
+        Object.assign(acc, !path.includes(`:${key}`) && {[key]: params[key as keyof typeof params]} ),
         {},
       ),
     );
