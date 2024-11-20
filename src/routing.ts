@@ -1,4 +1,5 @@
 import { IRouter, RequestHandler } from "express";
+import { isProduction } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { ContentType, contentTypes } from "./content-type";
 import { assertJsonCompatible } from "./deep-checks";
@@ -36,7 +37,7 @@ export const initRouting = ({
     routing,
     hasCors: !!config.cors,
     onEndpoint: (endpoint, path, method, siblingMethods) => {
-      doc.check(endpoint, rootLogger, { path, method });
+      if (!isProduction()) doc.check(endpoint, rootLogger, { path, method });
       app[method](
         path,
         ...(parsers?.[endpoint.getRequestType()] || []),
