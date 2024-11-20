@@ -1,6 +1,8 @@
 import { Ansis, gray, hex, italic, whiteBright } from "ansis";
+import { WriteStream } from "node:tty";
 
-export const getStartupLogo = () => {
+export const printStartupLogo = (stream: WriteStream) => {
+  if (stream.columns < 132) return;
   const proud = italic("Proudly supports transgender community.".padStart(109));
   const slogan = italic(
     "Start your API server with I/O schema validation and custom middlewares in minutes.".padStart(
@@ -38,8 +40,10 @@ ${dedicationMessage}888${slogan}
 ${thanks}
 `;
 
-  return logo
-    .split("\n")
-    .map((line, index) => (colors[index] ? colors[index](line) : line))
-    .join("\n");
+  stream.write(
+    logo
+      .split("\n")
+      .map((line, index) => (colors[index] ? colors[index](line) : line))
+      .join("\n"),
+  );
 };
