@@ -331,6 +331,12 @@ export class Integration {
       ),
     );
 
+    // Record<string, any>
+    const recordStringAny = makeRecord(
+      ts.SyntaxKind.StringKeyword,
+      ts.SyntaxKind.AnyKeyword,
+    );
+
     // export type Provider = <M extends Method, P extends Path>(
     // method: M, path: P,
     // params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>
@@ -355,7 +361,7 @@ export class Integration {
               f.createTypeReferenceNode(this.ids.inputInterface),
               parametricIndexNode,
             ),
-            makeRecord(ts.SyntaxKind.StringKeyword, ts.SyntaxKind.AnyKeyword), // @todo extract, used in impl.
+            recordStringAny,
           ),
         }),
         f.createConditionalTypeNode(
@@ -378,10 +384,7 @@ export class Integration {
         makeParams({
           method: f.createTypeReferenceNode(this.ids.methodType),
           path: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-          params: makeRecord(
-            ts.SyntaxKind.StringKeyword,
-            ts.SyntaxKind.AnyKeyword,
-          ),
+          params: recordStringAny,
         }),
         makeAnyPromise(),
       ),
