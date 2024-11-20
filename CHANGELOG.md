@@ -2,6 +2,36 @@
 
 ## Version 21
 
+### v21.1.0
+
+- Featuring empty response support:
+  - For some REST APIs, empty responses are typical: with status code `204` (No Content) and redirects (302);
+  - Previously, the framework did not offer a straightforward way to describe such responses, but now there is one;
+  - The `mimeType` property can now be assigned with `null` in `ResultHandler` definition;
+  - Both `Documentation` and `Integration` generators ignore such entries so that the `schema` can be `z.never()`:
+    - The body of such response will not be depicted by `Documentation`;
+    - The type of such response will be described as `undefined` (configurable) by `Integration`.
+
+```ts
+import { z } from "zod";
+import {
+  ResultHandler,
+  ensureHttpError,
+  EndpointsFactory,
+  Integration,
+} from "express-zod-api";
+
+const resultHandler = new ResultHandler({
+  positive: { statusCode: 204, mimeType: null, schema: z.never() },
+  negative: { statusCode: 404, mimeType: null, schema: z.never() },
+  handler: ({ error, response }) => {
+    response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
+  },
+});
+
+new Integration({ noContent: z.undefined() }); // undefined is default
+```
+
 ### v21.0.0
 
 - Minimum supported versions of `express`: 4.21.1 and 5.0.1 (fixed vulnerabilities);

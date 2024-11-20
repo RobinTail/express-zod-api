@@ -234,6 +234,7 @@ const producers: HandlingRules<
   ZodBigInt: onPrimitive(ts.SyntaxKind.BigIntKeyword),
   ZodBoolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
   ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
+  ZodUndefined: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
   [ezDateInBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
   [ezDateOutBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNull: onNull,

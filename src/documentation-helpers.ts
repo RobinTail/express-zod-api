@@ -785,11 +785,12 @@ export const depictResponse = ({
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
 }: ReqResHandlingProps<z.ZodTypeAny> & {
-  mimeTypes: ReadonlyArray<string>;
+  mimeTypes: ReadonlyArray<string> | null;
   variant: ResponseVariant;
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
+  if (!mimeTypes) return { description };
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema(schema, {
       rules: { ...brandHandling, ...depicters },

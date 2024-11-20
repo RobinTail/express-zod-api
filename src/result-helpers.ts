@@ -42,7 +42,9 @@ export const normalize = <A extends unknown[]>(
       mimeTypes:
         typeof mimeType === "string"
           ? [mimeType]
-          : mimeType || fallback.mimeTypes,
+          : mimeType === undefined
+            ? fallback.mimeTypes
+            : mimeType,
     }),
   );
 };

@@ -22,7 +22,7 @@ export class Diagnostics {
       }
       for (const variant of ["positive", "negative"] as const) {
         for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
-          if (mimeTypes.includes(contentTypes.json)) {
+          if (mimeTypes?.includes(contentTypes.json)) {
             try {
               assertJsonCompatible(schema, "out");
             } catch (reason) {

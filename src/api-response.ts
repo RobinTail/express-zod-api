@@ -12,8 +12,11 @@ export interface ApiResponse<S extends z.ZodTypeAny> {
   schema: S;
   /** @default 200 for a positive and 400 for a negative response */
   statusCode?: number | [number, ...number[]];
-  /** @default "application/json" */
-  mimeType?: string | [string, ...string[]];
+  /**
+   * @example null is for no content, such as 204 and 302
+   * @default "application/json"
+   * */
+  mimeType?: string | [string, ...string[]] | null;
   /** @deprecated use statusCode */
   statusCodes?: never;
   /** @deprecated use mimeType */
@@ -27,5 +30,5 @@ export interface ApiResponse<S extends z.ZodTypeAny> {
 export interface NormalizedResponse {
   schema: z.ZodTypeAny;
   statusCodes: [number, ...number[]];
-  mimeTypes: [string, ...string[]];
+  mimeTypes: [string, ...string[]] | null;
 }
