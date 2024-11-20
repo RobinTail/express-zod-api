@@ -18,11 +18,10 @@ import {
   moveRaw,
   installTerminationListener,
 } from "./server-helpers";
-import { getStartupLogo } from "./startup-logo";
+import { printStartupLogo } from "./startup-logo";
 
 const makeCommonEntities = (config: CommonConfig) => {
-  if (config.startupLogo !== false && process.stdout.columns >= 132)
-    console.log(getStartupLogo());
+  if (config.startupLogo !== false) printStartupLogo(process.stdout);
   const errorHandler = config.errorHandler || defaultResultHandler;
   const rootLogger = isLoggerInstance(config.logger)
     ? config.logger
