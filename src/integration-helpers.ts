@@ -22,6 +22,15 @@ const emptyHeading = f.createTemplateHead("");
 const spacingMiddle = f.createTemplateMiddle(" ");
 export const emptyTail = f.createTemplateTail("");
 
+// Record<string, any>
+export const recordStringAny = f.createExpressionWithTypeArguments(
+  f.createIdentifier("Record"),
+  [
+    f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+    f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+  ],
+);
+
 export const makeTemplateType = (names: Array<ts.Identifier | string>) =>
   f.createTemplateLiteralType(
     emptyHeading,
@@ -57,15 +66,6 @@ export const makeParams = (
     ([name, node]) => [makeParam(f.createIdentifier(name), node, mod)],
     Object.entries(params),
   );
-
-export const makeRecord = (
-  key: ts.KeywordTypeSyntaxKind,
-  value: ts.KeywordTypeSyntaxKind,
-) =>
-  f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
-    f.createKeywordTypeNode(key),
-    f.createKeywordTypeNode(value),
-  ]);
 
 export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],

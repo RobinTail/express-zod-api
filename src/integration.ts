@@ -19,13 +19,13 @@ import {
   makePublicLiteralType,
   makePublicReadonlyProp,
   makePublicType,
-  makeRecord,
   makeTemplateType,
   makeTernary,
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
   quoteProp,
+  recordStringAny,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -331,15 +331,9 @@ export class Integration {
       ),
     );
 
-    // Record<string, any>
-    const recordStringAny = makeRecord(
-      ts.SyntaxKind.StringKeyword,
-      ts.SyntaxKind.AnyKeyword,
-    );
-
     // export type Provider = <M extends Method, P extends Path>(
-    // method: M, path: P,
-    // params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>
+    //  method: M, path: P,
+    //  params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>
     // ) => `${M} ${P}` extends keyof Response ? Promise<Response[`${M} ${P}`]> : any;
     const providerType = makePublicType(
       this.ids.providerType,
