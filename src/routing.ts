@@ -1,8 +1,7 @@
 import { IRouter, RequestHandler } from "express";
 import { isProduction } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { ContentType, contentTypes } from "./content-type";
-import { assertJsonCompatible } from "./deep-checks";
+import { ContentType } from "./content-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { Diagnostics } from "./diagnostics";
 import { AbstractEndpoint } from "./endpoint";
