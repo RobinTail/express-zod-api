@@ -390,7 +390,16 @@ export class Integration {
       [f.createTemplateSpan(this.ids.keyParameter, emptyTail)],
     );
 
-    // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key]), path)
+    // key as keyof typeof params
+    const keyAsKeyofParams = f.createAsExpression(
+      this.ids.keyParameter,
+      f.createTypeOperatorNode(
+        ts.SyntaxKind.KeyOfKeyword,
+        f.createTypeQueryNode(this.ids.paramsArgument),
+      ),
+    );
+
+    // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key as keyof typeof params]), path)
     const pathArgument = makeObjectKeysReducer(
       this.ids.paramsArgument,
       f.createCallExpression(
@@ -400,7 +409,7 @@ export class Integration {
           keyParamExpression,
           f.createElementAccessExpression(
             this.ids.paramsArgument,
-            this.ids.keyParameter,
+            keyAsKeyofParams,
           ),
         ],
       ),

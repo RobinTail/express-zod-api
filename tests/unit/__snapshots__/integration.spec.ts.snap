@@ -57,7 +57,8 @@ export class ExpressZodAPIClient {
     this.implementation(
       method,
       Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        (acc, key) =>
+          acc.replace(\`:\${key}\`, params[key as keyof typeof params]),
         path,
       ),
       Object.keys(params).reduce(
@@ -150,7 +151,8 @@ export class ExpressZodAPIClient {
     this.implementation(
       method,
       Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        (acc, key) =>
+          acc.replace(\`:\${key}\`, params[key as keyof typeof params]),
         path,
       ),
       Object.keys(params).reduce(
@@ -243,7 +245,8 @@ export class ExpressZodAPIClient {
     this.implementation(
       method,
       Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        (acc, key) =>
+          acc.replace(\`:\${key}\`, params[key as keyof typeof params]),
         path,
       ),
       Object.keys(params).reduce(
@@ -348,7 +351,8 @@ export class ExpressZodAPIClient {
     this.implementation(
       method,
       Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        (acc, key) =>
+          acc.replace(\`:\${key}\`, params[key as keyof typeof params]),
         path,
       ),
       Object.keys(params).reduce(
@@ -651,7 +655,8 @@ export class ExpressZodAPIClient {
     this.implementation(
       method,
       Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        (acc, key) =>
+          acc.replace(\`:\${key}\`, params[key as keyof typeof params]),
         path,
       ),
       Object.keys(params).reduce(
@@ -973,7 +978,8 @@ export class ExpressZodAPIClient {
     this.implementation(
       method,
       Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
+        (acc, key) =>
+          acc.replace(\`:\${key}\`, params[key as keyof typeof params]),
         path,
       ),
       Object.keys(params).reduce(
