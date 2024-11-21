@@ -361,7 +361,7 @@ export class Integration {
         makeConditionalIndexPromise(
           this.ids.responseInterface,
           parametricIndexNode,
-          f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword), // @todo config?
+          f.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword), // @todo configurable
         ),
       ),
     );
