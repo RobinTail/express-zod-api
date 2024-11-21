@@ -202,7 +202,7 @@ export type Provider = <M extends Method, P extends Path>(
   params: `${M} ${P}` extends keyof Input
     ? Input[`${M} ${P}`]
     : Record<string, any>,
-) => `${M} ${P}` extends keyof Response ? Promise<Response[`${M} ${P}`]> : any;
+) => Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : any>;
 
 export type Implementation = (
   method: Method,

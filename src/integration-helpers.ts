@@ -130,9 +130,21 @@ export const makePublicClass = (
     ...props,
   ]);
 
-export const makeIndexedPromise = (type: ts.Identifier, index: ts.TypeNode) =>
+export const makeConditionalIndexPromise = (
+  subject: ts.Identifier,
+  key: ts.TypeNode,
+  fallback: ts.TypeNode,
+) =>
   f.createTypeReferenceNode("Promise", [
-    f.createIndexedAccessTypeNode(f.createTypeReferenceNode(type), index),
+    f.createConditionalTypeNode(
+      key,
+      f.createTypeOperatorNode(
+        ts.SyntaxKind.KeyOfKeyword,
+        f.createTypeReferenceNode(subject),
+      ),
+      f.createIndexedAccessTypeNode(f.createTypeReferenceNode(subject), key),
+      fallback,
+    ),
   ]);
 
 export const makeAnyPromise = () =>

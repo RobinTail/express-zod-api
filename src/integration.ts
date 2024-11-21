@@ -7,9 +7,9 @@ import {
   f,
   makeAnyPromise,
   makeArrowFn,
+  makeConditionalIndexPromise,
   makeConst,
   makeEmptyInitializingConstructor,
-  makeIndexedPromise,
   makeInterfaceProp,
   makeObjectKeysReducer,
   makeParam,
@@ -334,7 +334,7 @@ export class Integration {
     // export type Provider = <M extends Method, P extends Path>(
     //  method: M, path: P,
     //  params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>
-    // ) => `${M} ${P}` extends keyof Response ? Promise<Response[`${M} ${P}`]> : any;
+    // ) => Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : any>
     const providerType = makePublicType(
       this.ids.providerType,
       f.createFunctionTypeNode(
@@ -358,13 +358,9 @@ export class Integration {
             recordStringAny,
           ),
         }),
-        f.createConditionalTypeNode(
+        makeConditionalIndexPromise(
+          this.ids.responseInterface,
           parametricIndexNode,
-          f.createTypeOperatorNode(
-            ts.SyntaxKind.KeyOfKeyword,
-            f.createTypeReferenceNode(this.ids.responseInterface),
-          ),
-          makeIndexedPromise(this.ids.responseInterface, parametricIndexNode),
           f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword), // @todo config?
         ),
       ),
