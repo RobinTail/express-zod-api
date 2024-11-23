@@ -148,6 +148,7 @@
     "prettier": "3.3.3",
     "semver": "^7.6.3",
     "snakify-ts": "^2.3.0",
+    "superjson": "^2.2.1",
     "swagger-ui-express": "^5.0.0",
     "tsup": "^8.0.0",
     "tsx": "^4.6.2",

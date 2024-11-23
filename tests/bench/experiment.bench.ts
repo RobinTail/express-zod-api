@@ -1,7 +1,5 @@
 import { bench } from "vitest";
-import { retrieveUserEndpoint } from "../../example/endpoints/retrieve-user";
-import { DependsOnMethod } from "../../src";
-import { walkRouting } from "../../src/routing-walker";
+import { serialize } from "superjson";
 
 const routing = {
   a: {
@@ -13,9 +11,7 @@ const routing = {
               g: {
                 h: {
                   i: {
-                    j: new DependsOnMethod({
-                      post: retrieveUserEndpoint,
-                    }),
+                    j: new Date(),
                   },
                 },
               },
@@ -29,8 +25,12 @@ const routing = {
   },
 };
 
-describe("Experiment for routing walker", () => {
-  bench("featured", () => {
-    walkRouting({ routing, onEndpoint: vi.fn() });
+describe("Experiment on serialization", () => {
+  bench("JSON.stringify()", () => {
+    JSON.stringify(routing);
+  });
+
+  bench("superjson.serialize()", () => {
+    serialize(routing);
   });
 });
