@@ -1421,28 +1421,25 @@ endpointsFactory.build({
 
 The main difference between the two frameworks is that while they provide almost the same feature set, express-zod-api keeps compatiblity with REST and provides out-of-the box OpenAPI schema generation.
 
-
 Design / DX comparison:
 
-| tRPC  | express-zod-api | Comment |
-| ------------- | ------------- | ------------ |
-| Custom HTTP protocol | :+1: Regular REST  | express-zod-api is great not only for greenfield projects but also for existing ones |
-| Works mainly with mono-repo | :+1: Works as well with mono-repo and multi-repo | See https://github.com/trpc/trpc/discussions/1860 |
-| Third-party REST and OpenAPI compatiblity | :+1: Out-of-the box  | [trpc-openapi](https://github.com/jlalmes/trpc-openapi) does not seem to be maintained anymore |
-| :+1: Automatic rich data serialization/deserialization with superjson | Depends on your client generator | |
-
+| tRPC                                                                  | express-zod-api                                  | Comment                                                                                        |
+| --------------------------------------------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| Custom HTTP protocol                                                  | :+1: Regular REST                                | express-zod-api is great not only for greenfield projects but also for existing ones           |
+| Works mainly with mono-repo                                           | :+1: Works as well with mono-repo and multi-repo | See https://github.com/trpc/trpc/discussions/1860                                              |
+| Third-party REST and OpenAPI compatiblity                             | :+1: Out-of-the box                              | [trpc-openapi](https://github.com/jlalmes/trpc-openapi) does not seem to be maintained anymore |
+| :+1: Automatic rich data serialization/deserialization with superjson | Depends on your client generator                 |                                                                                                |
 
 Here is a mapping of concepts between the two projects for people that would like to migrate:
 
-| tRPC  | express-zod-api | Comment |
-| ------------- | ------------- | ------------ |
-| router  | routing  | |
-| publicProcedure | defaultEndpointsFactory | |
-| Middleware `.use()`  | Middleware `.addMiddleware()`  | Both can be chained while retaining type-safety |
-| Procedure | Endpoint | |
-| Context | N/A | A middleware can be used instead |
-| onError | ResultHandler | |
-
+| tRPC                | express-zod-api               | Comment                                         |
+| ------------------- | ----------------------------- | ----------------------------------------------- |
+| router              | routing                       |                                                 |
+| publicProcedure     | defaultEndpointsFactory       |                                                 |
+| Middleware `.use()` | Middleware `.addMiddleware()` | Both can be chained while retaining type-safety |
+| Procedure           | Endpoint                      |                                                 |
+| Context             | N/A                           | A middleware can be used instead                |
+| onError             | ResultHandler                 |                                                 |
 
 # Your input to my output
 
