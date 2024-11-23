@@ -30,6 +30,12 @@ describe("Experiment on serialization", () => {
     JSON.stringify(routing);
   });
 
+  bench("JSON.stringify() with replacer", () => {
+    JSON.stringify(routing, (_key, value) =>
+      value instanceof Date ? value.toISOString() : value,
+    );
+  });
+
   bench("superjson.serialize()", () => {
     serialize(routing);
   });
