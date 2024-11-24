@@ -18,12 +18,12 @@ import {
   makePublicClass,
   makePublicInterface,
   makePublicLiteralType,
+  makePublicMethod,
   makePublicType,
   makeTernary,
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
-  publicModifier,
   quoteProp,
   recordStringAny,
   restToken,
@@ -343,15 +343,8 @@ export class Integration {
     // public provide<M extends Method, P extends Path>(method: M, path: P,
     //     params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>,
     //   ): Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown>;
-    const providerOverload1 = f.createMethodDeclaration(
-      publicModifier,
-      undefined,
+    const providerOverload1 = makePublicMethod(
       this.ids.provideMethod,
-      undefined,
-      makeTypeParams({
-        M: this.ids.methodType,
-        P: this.ids.pathType,
-      }),
       makeParams({
         method: f.createTypeReferenceNode("M"),
         path: f.createTypeReferenceNode("P"),
@@ -368,23 +361,21 @@ export class Integration {
           recordStringAny,
         ),
       }),
+      undefined, // overload
+      makeTypeParams({
+        M: this.ids.methodType,
+        P: this.ids.pathType,
+      }),
       makeConditionalIndexPromise(
         this.ids.responseInterface,
         parametricIndexNode,
         f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
       ),
-      undefined, // overload
     );
 
     // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]>;
-    const providerOverload2 = f.createMethodDeclaration(
-      publicModifier,
-      undefined,
+    const providerOverload2 = makePublicMethod(
       this.ids.provideMethod,
-      undefined,
-      makeTypeParams({
-        K: this.ids.methodPathType,
-      }),
       makeParams({
         request: f.createTypeReferenceNode("K"),
         params: f.createIndexedAccessTypeNode(
@@ -392,13 +383,16 @@ export class Integration {
           f.createTypeReferenceNode("K"),
         ),
       }),
+      undefined, // overload
+      makeTypeParams({
+        K: this.ids.methodPathType,
+      }),
       f.createTypeReferenceNode(f.createIdentifier("Promise"), [
         f.createIndexedAccessTypeNode(
           f.createTypeReferenceNode(this.ids.responseInterface),
           f.createTypeReferenceNode(f.createIdentifier("K")),
         ),
       ]),
-      undefined, // overload
     );
 
     // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
@@ -439,7 +433,7 @@ export class Integration {
     );
 
     // Object.keys(params).reduce((acc, key) =>
-    //   Object.assign(acc, !path.includes(`:${key}`) && {[key]: params[key as keyof typeof params]} ), {})
+    //   Object.assign(acc, !path.includes(`:${key}`) && {[key]: params[key]} ), {})
     const paramsArgument = makeObjectKeysReducer(
       this.ids.paramsArgument,
       f.createCallExpression(
@@ -496,12 +490,8 @@ export class Integration {
         providerOverload1,
         providerOverload2,
         // public provide(...args: [string, string, Record<string, any>] | [string, Record<string, any>]) {
-        f.createMethodDeclaration(
-          publicModifier,
-          undefined,
+        makePublicMethod(
           this.ids.provideMethod,
-          undefined,
-          undefined,
           makeParams(
             {
               [this.ids.args.text]: f.createUnionTypeNode([
@@ -518,7 +508,6 @@ export class Integration {
             },
             restToken,
           ),
-          undefined,
           f.createBlock([
             f.createVariableStatement(
               undefined,

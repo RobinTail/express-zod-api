@@ -8,7 +8,7 @@ export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
 const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
 
-export const publicModifier = [f.createModifier(ts.SyntaxKind.PublicKeyword)];
+const publicModifier = [f.createModifier(ts.SyntaxKind.PublicKeyword)];
 
 export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ProtectedKeyword),
@@ -114,6 +114,24 @@ export const makePublicLiteralType = (
 
 export const makePublicType = (name: ts.Identifier, value: ts.TypeNode) =>
   f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
+
+export const makePublicMethod = (
+  name: ts.Identifier,
+  params: ts.ParameterDeclaration[],
+  body?: ts.Block,
+  typeParams?: ts.TypeParameterDeclaration[],
+  returnType?: ts.TypeNode,
+) =>
+  f.createMethodDeclaration(
+    publicModifier,
+    undefined,
+    name,
+    undefined,
+    typeParams,
+    params,
+    returnType,
+    body,
+  );
 
 export const makePublicClass = (
   name: ts.Identifier,
