@@ -23,6 +23,7 @@ export type Path = "/v1/test-with-dashes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
+/** @deprecated use 'keyof Input' instead */
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input {
@@ -124,6 +125,7 @@ export type Path = "/v1/test-with-dashes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
+/** @deprecated use 'keyof Input' instead */
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input {
@@ -225,6 +227,7 @@ export type Path = "/v1/test-with-dashes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
+/** @deprecated use 'keyof Input' instead */
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input {
@@ -330,6 +333,7 @@ export type Path = "/v1/test";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
+/** @deprecated use 'keyof Input' instead */
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input {
@@ -444,6 +448,7 @@ export type Path = "/v1/custom";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
+/** @deprecated use 'keyof Input' instead */
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input {
@@ -616,6 +621,7 @@ export type Path =
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
+/** @deprecated use 'keyof Input' instead */
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input {
@@ -879,6 +885,7 @@ export type Path =
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
+/** @deprecated use 'keyof Input' instead */
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input {
@@ -936,6 +943,7 @@ export type Path = "/v1/mtpl";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
+/** @deprecated use 'keyof Input' instead */
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input {
@@ -979,6 +987,7 @@ export type Path = "/v1/test-with-dashes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
+/** @deprecated use 'keyof Input' instead */
 export type MethodPath = \`\${Method} \${Path}\`;
 
 export interface Input {

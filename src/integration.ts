@@ -35,7 +35,12 @@ import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import { ZTSContext, createTypeAlias, printNode } from "./zts-helpers";
+import {
+  ZTSContext,
+  createTypeAlias,
+  printNode,
+  addJsDocComment,
+} from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant;
@@ -109,6 +114,10 @@ export class Integration {
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
+    /**
+     * @deprecated
+     * @todo remove in v22
+     */
     methodPathType: f.createIdentifier("MethodPath"),
     inputInterface: f.createIdentifier("Input"),
     posResponseInterface: f.createIdentifier("PositiveResponse"),
@@ -255,9 +264,12 @@ export class Integration {
 
     // export type MethodPath = `${Method} ${Path}`;
     this.program.push(
-      makePublicType(
-        this.ids.methodPathType,
-        makeTemplateType([this.ids.methodType, this.ids.pathType]),
+      addJsDocComment(
+        makePublicType(
+          this.ids.methodPathType,
+          makeTemplateType([this.ids.methodType, this.ids.pathType]),
+        ),
+        "@deprecated use 'keyof Input' instead",
       ),
     );
 
