@@ -504,6 +504,8 @@ export class Integration {
               this.ids.pathParameter,
               this.ids.paramsArgument,
             ]),
+            // const [method, path, params] =
+            // (args.length === 2 ? [...args[0].split(" "), args[1]] : args) as [Method, Path, Record<string, any>]
             f.createAsExpression(
               f.createParenthesizedExpression(
                 f.createConditionalExpression(
