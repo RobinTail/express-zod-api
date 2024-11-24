@@ -123,10 +123,7 @@ export class Integration {
     responseInterface: f.createIdentifier("Response"),
     jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
     endpointTagsConst: f.createIdentifier("endpointTags"),
-    /**
-     * @deprecated
-     * @todo remove in v22
-     */
+    /** @todo remove in v22 */
     providerType: f.createIdentifier("Provider"),
     implementationType: f.createIdentifier("Implementation"),
     clientClass: f.createIdentifier("ExpressZodAPIClient"),
