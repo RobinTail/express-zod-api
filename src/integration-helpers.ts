@@ -101,10 +101,8 @@ export const makePublicLiteralType = (
   name: ts.Identifier,
   literals: string[],
 ) =>
-  f.createTypeAliasDeclaration(
-    exportModifier,
+  makePublicType(
     name,
-    undefined,
     f.createUnionTypeNode(
       literals.map((option) =>
         f.createLiteralTypeNode(f.createStringLiteral(option)),

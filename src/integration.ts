@@ -518,7 +518,7 @@ export class Integration {
             // (args.length === 2 ? [...args[0].split(" "), args[1]] : args) as [Method, Path, Record<string, any>]
             f.createAsExpression(
               f.createParenthesizedExpression(
-                f.createConditionalExpression(
+                makeTernary(
                   f.createBinaryExpression(
                     f.createPropertyAccessExpression(
                       this.ids.args,
@@ -527,7 +527,6 @@ export class Integration {
                     f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
                     f.createNumericLiteral(2),
                   ),
-                  f.createToken(ts.SyntaxKind.QuestionToken),
                   f.createArrayLiteralExpression([
                     f.createSpreadElement(
                       f.createCallExpression(
@@ -547,7 +546,6 @@ export class Integration {
                       f.createNumericLiteral(1),
                     ),
                   ]),
-                  f.createToken(ts.SyntaxKind.ColonToken),
                   this.ids.args,
                 ),
               ),
@@ -625,16 +623,14 @@ export class Integration {
     // headers: hasBody ? { "Content-Type": "application/json" } : undefined
     const headersProperty = f.createPropertyAssignment(
       this.ids.headersProperty,
-      f.createConditionalExpression(
+      makeTernary(
         this.ids.hasBodyConst,
-        undefined,
         f.createObjectLiteralExpression([
           f.createPropertyAssignment(
             f.createStringLiteral("Content-Type"),
             f.createStringLiteral(contentTypes.json),
           ),
         ]),
-        undefined,
         this.ids.undefinedValue,
       ),
     );
@@ -642,9 +638,8 @@ export class Integration {
     // body: hasBody ? JSON.stringify(params) : undefined
     const bodyProperty = f.createPropertyAssignment(
       this.ids.bodyProperty,
-      f.createConditionalExpression(
+      makeTernary(
         this.ids.hasBodyConst,
-        undefined,
         f.createCallExpression(
           f.createPropertyAccessExpression(
             f.createIdentifier("JSON"),
@@ -653,7 +648,6 @@ export class Integration {
           undefined,
           [this.ids.paramsArgument],
         ),
-        undefined,
         this.ids.undefinedValue,
       ),
     );
@@ -711,11 +705,9 @@ export class Integration {
       undefined,
       makeConst(
         this.ids.searchParamsConst,
-        f.createConditionalExpression(
+        makeTernary(
           this.ids.hasBodyConst,
-          undefined,
           f.createStringLiteral(""),
-          undefined,
           f.createTemplateExpression(f.createTemplateHead("?"), [
             f.createTemplateSpan(
               f.createNewExpression(
