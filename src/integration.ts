@@ -125,6 +125,10 @@ export class Integration {
     responseInterface: f.createIdentifier("Response"),
     jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
     endpointTagsConst: f.createIdentifier("endpointTags"),
+    /**
+     * @deprecated
+     * @todo remove in v22
+     */
     providerType: f.createIdentifier("Provider"),
     implementationType: f.createIdentifier("Implementation"),
     clientClass: f.createIdentifier("ExpressZodAPIClient"),
@@ -343,39 +347,40 @@ export class Integration {
       ),
     );
 
-    // export type Provider = <M extends Method, P extends Path>(
-    //  method: M, path: P,
-    //  params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>
-    // ) => Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown>
-    const providerType = makePublicType(
-      this.ids.providerType,
-      f.createFunctionTypeNode(
-        makeTypeParams({
-          M: this.ids.methodType,
-          P: this.ids.pathType,
-        }),
-        makeParams({
-          method: f.createTypeReferenceNode("M"),
-          path: f.createTypeReferenceNode("P"),
-          params: f.createConditionalTypeNode(
-            parametricIndexNode,
-            f.createTypeOperatorNode(
-              ts.SyntaxKind.KeyOfKeyword,
-              f.createTypeReferenceNode(this.ids.inputInterface),
-            ),
-            f.createIndexedAccessTypeNode(
-              f.createTypeReferenceNode(this.ids.inputInterface),
-              parametricIndexNode,
-            ),
-            recordStringAny,
-          ),
-        }),
-        makeConditionalIndexPromise(
-          this.ids.responseInterface,
+    // public provide<M extends Method, P extends Path>(method: M, path: P,
+    //     params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>,
+    //   ): Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown>;
+    const providerOverload1 = f.createMethodDeclaration(
+      [f.createToken(ts.SyntaxKind.PublicKeyword)],
+      undefined,
+      this.ids.provideMethod,
+      undefined,
+      makeTypeParams({
+        M: this.ids.methodType,
+        P: this.ids.pathType,
+      }),
+      makeParams({
+        method: f.createTypeReferenceNode("M"),
+        path: f.createTypeReferenceNode("P"),
+        params: f.createConditionalTypeNode(
           parametricIndexNode,
-          f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
+          f.createTypeOperatorNode(
+            ts.SyntaxKind.KeyOfKeyword,
+            f.createTypeReferenceNode(this.ids.inputInterface),
+          ),
+          f.createIndexedAccessTypeNode(
+            f.createTypeReferenceNode(this.ids.inputInterface),
+            parametricIndexNode,
+          ),
+          recordStringAny,
         ),
+      }),
+      makeConditionalIndexPromise(
+        this.ids.responseInterface,
+        parametricIndexNode,
+        f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
       ),
+      undefined, // overload
     );
 
     // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
@@ -479,6 +484,7 @@ export class Integration {
         ),
       ]),
       [
+        providerOverload1,
         // public readonly provide: Provider
         makePublicReadonlyProp(
           this.ids.provideMethod,
@@ -507,7 +513,6 @@ export class Integration {
     this.program.push(
       jsonEndpointsConst,
       endpointTagsConst,
-      providerType,
       implementationType,
       clientClass,
     );

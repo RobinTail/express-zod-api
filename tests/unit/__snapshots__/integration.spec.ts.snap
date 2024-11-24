@@ -38,16 +38,6 @@ export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
 
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: \`\${M} \${P}\` extends keyof Input
-    ? Input[\`\${M} \${P}\`]
-    : Record<string, any>,
-) => Promise<
-  \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
->;
-
 export type Implementation = (
   method: Method,
   path: string,
@@ -56,6 +46,15 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
+  public provide<M extends Method, P extends Path>(
+    method: M,
+    path: P,
+    params: \`\${M} \${P}\` extends keyof Input
+      ? Input[\`\${M} \${P}\`]
+      : Record<string, any>,
+  ): Promise<
+    \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
+  >;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
@@ -140,16 +139,6 @@ export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
 
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: \`\${M} \${P}\` extends keyof Input
-    ? Input[\`\${M} \${P}\`]
-    : Record<string, any>,
-) => Promise<
-  \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
->;
-
 export type Implementation = (
   method: Method,
   path: string,
@@ -158,6 +147,15 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
+  public provide<M extends Method, P extends Path>(
+    method: M,
+    path: P,
+    params: \`\${M} \${P}\` extends keyof Input
+      ? Input[\`\${M} \${P}\`]
+      : Record<string, any>,
+  ): Promise<
+    \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
+  >;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
@@ -242,16 +240,6 @@ export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
 
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: \`\${M} \${P}\` extends keyof Input
-    ? Input[\`\${M} \${P}\`]
-    : Record<string, any>,
-) => Promise<
-  \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
->;
-
 export type Implementation = (
   method: Method,
   path: string,
@@ -260,6 +248,15 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
+  public provide<M extends Method, P extends Path>(
+    method: M,
+    path: P,
+    params: \`\${M} \${P}\` extends keyof Input
+      ? Input[\`\${M} \${P}\`]
+      : Record<string, any>,
+  ): Promise<
+    \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
+  >;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
@@ -356,16 +353,6 @@ export const jsonEndpoints = { "post /v1/test": true };
 
 export const endpointTags = { "post /v1/test": [] };
 
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: \`\${M} \${P}\` extends keyof Input
-    ? Input[\`\${M} \${P}\`]
-    : Record<string, any>,
-) => Promise<
-  \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
->;
-
 export type Implementation = (
   method: Method,
   path: string,
@@ -374,6 +361,15 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
+  public provide<M extends Method, P extends Path>(
+    method: M,
+    path: P,
+    params: \`\${M} \${P}\` extends keyof Input
+      ? Input[\`\${M} \${P}\`]
+      : Record<string, any>,
+  ): Promise<
+    \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
+  >;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
@@ -669,16 +665,6 @@ export const endpointTags = {
   "post /v1/avatar/raw": ["files"],
 };
 
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: \`\${M} \${P}\` extends keyof Input
-    ? Input[\`\${M} \${P}\`]
-    : Record<string, any>,
-) => Promise<
-  \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
->;
-
 export type Implementation = (
   method: Method,
   path: string,
@@ -687,6 +673,15 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
+  public provide<M extends Method, P extends Path>(
+    method: M,
+    path: P,
+    params: \`\${M} \${P}\` extends keyof Input
+      ? Input[\`\${M} \${P}\`]
+      : Record<string, any>,
+  ): Promise<
+    \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
+  >;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
@@ -1002,16 +997,6 @@ export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
 
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: \`\${M} \${P}\` extends keyof Input
-    ? Input[\`\${M} \${P}\`]
-    : Record<string, any>,
-) => Promise<
-  \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
->;
-
 export type Implementation = (
   method: Method,
   path: string,
@@ -1020,6 +1005,15 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
+  public provide<M extends Method, P extends Path>(
+    method: M,
+    path: P,
+    params: \`\${M} \${P}\` extends keyof Input
+      ? Input[\`\${M} \${P}\`]
+      : Record<string, any>,
+  ): Promise<
+    \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
+  >;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,

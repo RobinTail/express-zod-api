@@ -123,11 +123,11 @@ export const makePublicReadonlyProp = (
 export const makePublicClass = (
   name: ts.Identifier,
   constructor: ts.ConstructorDeclaration,
-  props: ts.PropertyDeclaration[],
+  statements: Array<ts.PropertyDeclaration | ts.MethodDeclaration>,
 ) =>
   f.createClassDeclaration(exportModifier, name, undefined, undefined, [
     constructor,
-    ...props,
+    ...statements,
   ]);
 
 export const makeConditionalIndexPromise = (
