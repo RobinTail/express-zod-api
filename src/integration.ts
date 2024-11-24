@@ -23,6 +23,7 @@ import {
   makeTernary,
   makeTypeParams,
   parametricIndexNode,
+  propOf,
   protectedReadonlyModifier,
   quoteProp,
   recordStringAny,
@@ -364,7 +365,10 @@ export class Integration {
     const pathArgument = makeObjectKeysReducer(
       this.ids.paramsArgument,
       f.createCallExpression(
-        f.createPropertyAccessExpression(this.ids.accumulator, "replace"),
+        f.createPropertyAccessExpression(
+          this.ids.accumulator,
+          propOf<string>("replace"),
+        ),
         undefined,
         [
           keyParamExpression,
@@ -383,8 +387,8 @@ export class Integration {
       this.ids.paramsArgument,
       f.createCallExpression(
         f.createPropertyAccessExpression(
-          f.createIdentifier("Object"),
-          "assign" satisfies keyof typeof Object,
+          f.createIdentifier(Object.name),
+          propOf<typeof Object>("assign"),
         ),
         undefined,
         [
@@ -395,7 +399,7 @@ export class Integration {
               f.createCallExpression(
                 f.createPropertyAccessExpression(
                   this.ids.pathParameter,
-                  "includes" satisfies keyof string,
+                  propOf<string>("includes"),
                 ),
                 undefined,
                 [keyParamExpression],
@@ -468,7 +472,7 @@ export class Integration {
       makeTypeParams({
         K: this.ids.methodPathType,
       }),
-      f.createTypeReferenceNode("Promise", [
+      f.createTypeReferenceNode(Promise.name, [
         f.createIndexedAccessTypeNode(
           f.createTypeReferenceNode(this.ids.responseInterface),
           f.createTypeReferenceNode("K"),
@@ -482,6 +486,7 @@ export class Integration {
       makeParams(
         {
           [this.ids.args.text]: f.createUnionTypeNode([
+            // @todo remove this variant in v22
             f.createTupleTypeNode([
               f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
               f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
@@ -499,18 +504,21 @@ export class Integration {
         f.createVariableStatement(
           undefined,
           makeConst(
+            // const [method, path, params] =
             makeDeconstruction([
               this.ids.methodParameter,
               this.ids.pathParameter,
               this.ids.paramsArgument,
             ]),
-            // const [method, path, params] =
             // (args.length === 2 ? [...args[0].split(" "), args[1]] : args) as [Method, Path, Record<string, any>]
             f.createAsExpression(
               f.createParenthesizedExpression(
                 f.createConditionalExpression(
                   f.createBinaryExpression(
-                    f.createPropertyAccessExpression(this.ids.args, "length"),
+                    f.createPropertyAccessExpression(
+                      this.ids.args,
+                      propOf<unknown[]>("length"),
+                    ),
                     f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
                     f.createNumericLiteral(2),
                   ),
@@ -523,7 +531,7 @@ export class Integration {
                             this.ids.args,
                             f.createNumericLiteral(0),
                           ),
-                          "split",
+                          propOf<string>("split"),
                         ),
                         undefined,
                         [f.createStringLiteral(" ")],
@@ -587,7 +595,7 @@ export class Integration {
       f.createCallExpression(
         f.createPropertyAccessExpression(
           this.ids.methodParameter,
-          "toUpperCase",
+          propOf<string>("toUpperCase"),
         ),
         undefined,
         undefined,
@@ -620,7 +628,7 @@ export class Integration {
         f.createCallExpression(
           f.createPropertyAccessExpression(
             f.createIdentifier("JSON"),
-            "stringify",
+            propOf<JSON>("stringify"),
           ),
           undefined,
           [this.ids.paramsArgument],
@@ -636,7 +644,7 @@ export class Integration {
       makeConst(
         this.ids.responseConst,
         f.createAwaitExpression(
-          f.createCallExpression(f.createIdentifier("fetch"), undefined, [
+          f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
             f.createTemplateExpression(
               f.createTemplateHead("https://example.com"),
               [
@@ -669,7 +677,7 @@ export class Integration {
                 f.createStringLiteral("get" satisfies Method),
                 f.createStringLiteral("delete" satisfies Method),
               ]),
-              "includes",
+              propOf<string[]>("includes"),
             ),
             undefined,
             [this.ids.methodParameter],
@@ -691,7 +699,7 @@ export class Integration {
           f.createTemplateExpression(f.createTemplateHead("?"), [
             f.createTemplateSpan(
               f.createNewExpression(
-                f.createIdentifier("URLSearchParams"),
+                f.createIdentifier(URLSearchParams.name),
                 undefined,
                 [this.ids.paramsArgument],
               ),
@@ -713,7 +721,7 @@ export class Integration {
               this.ids.responseConst,
               this.ids.headersProperty,
             ),
-            "get" satisfies keyof Headers,
+            propOf<Headers>("get"),
           ),
           undefined,
           [f.createStringLiteral("content-type")],
@@ -740,7 +748,7 @@ export class Integration {
           f.createPropertyAccessChain(
             this.ids.contentTypeConst,
             undefined,
-            "startsWith" satisfies keyof string,
+            propOf<string>("startsWith"),
           ),
           undefined,
           undefined,
@@ -756,8 +764,8 @@ export class Integration {
           this.ids.responseConst,
           makeTernary(
             this.ids.isJsonConst,
-            f.createStringLiteral("json" satisfies keyof Response),
-            f.createStringLiteral("text" satisfies keyof Response),
+            f.createStringLiteral(propOf<Response>("json")),
+            f.createStringLiteral(propOf<Response>("text")),
           ),
         ),
         undefined,

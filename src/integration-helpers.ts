@@ -148,7 +148,7 @@ export const makeConditionalIndexPromise = (
   key: ts.TypeNode,
   fallback: ts.TypeNode,
 ) =>
-  f.createTypeReferenceNode("Promise", [
+  f.createTypeReferenceNode(Promise.name, [
     f.createConditionalTypeNode(
       key,
       f.createTypeOperatorNode(
@@ -161,7 +161,7 @@ export const makeConditionalIndexPromise = (
   ]);
 
 export const makeAnyPromise = () =>
-  f.createTypeReferenceNode("Promise", [
+  f.createTypeReferenceNode(Promise.name, [
     f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
   ]);
 
@@ -205,11 +205,14 @@ export const makeObjectKeysReducer = (
   f.createCallExpression(
     f.createPropertyAccessExpression(
       f.createCallExpression(
-        f.createPropertyAccessExpression(f.createIdentifier("Object"), "keys"),
+        f.createPropertyAccessExpression(
+          f.createIdentifier(Object.name),
+          propOf<typeof Object>("keys"),
+        ),
         undefined,
         [obj],
       ),
-      "reduce",
+      propOf<string[]>("reduce"),
     ),
     undefined,
     [
@@ -226,6 +229,7 @@ export const makeObjectKeysReducer = (
   );
 
 export const quoteProp = (...parts: [Method, string]) => `"${parts.join(" ")}"`;
+export const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
 export const makeTernary = (
   condition: ts.Expression,
