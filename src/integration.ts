@@ -340,61 +340,6 @@ export class Integration {
       ),
     );
 
-    // public provide<M extends Method, P extends Path>(method: M, path: P,
-    //     params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>,
-    //   ): Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown>;
-    const providerOverload1 = makePublicMethod(
-      this.ids.provideMethod,
-      makeParams({
-        method: f.createTypeReferenceNode("M"),
-        path: f.createTypeReferenceNode("P"),
-        params: f.createConditionalTypeNode(
-          parametricIndexNode,
-          f.createTypeOperatorNode(
-            ts.SyntaxKind.KeyOfKeyword,
-            f.createTypeReferenceNode(this.ids.inputInterface),
-          ),
-          f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.ids.inputInterface),
-            parametricIndexNode,
-          ),
-          recordStringAny,
-        ),
-      }),
-      undefined, // overload
-      makeTypeParams({
-        M: this.ids.methodType,
-        P: this.ids.pathType,
-      }),
-      makeConditionalIndexPromise(
-        this.ids.responseInterface,
-        parametricIndexNode,
-        f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
-      ),
-    );
-
-    // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]>;
-    const providerOverload2 = makePublicMethod(
-      this.ids.provideMethod,
-      makeParams({
-        request: f.createTypeReferenceNode("K"),
-        params: f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.inputInterface),
-          f.createTypeReferenceNode("K"),
-        ),
-      }),
-      undefined, // overload
-      makeTypeParams({
-        K: this.ids.methodPathType,
-      }),
-      f.createTypeReferenceNode("Promise", [
-        f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.responseInterface),
-          f.createTypeReferenceNode("K"),
-        ),
-      ]),
-    );
-
     // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
     const implementationType = makePublicType(
       this.ids.implementationType,
@@ -475,6 +420,144 @@ export class Integration {
       f.createObjectLiteralExpression(),
     );
 
+    // public provide<M extends Method, P extends Path>(method: M, path: P,
+    //     params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>,
+    //   ): Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown>;
+    // @todo consider removal in v22
+    const providerOverload1 = makePublicMethod(
+      this.ids.provideMethod,
+      makeParams({
+        method: f.createTypeReferenceNode("M"),
+        path: f.createTypeReferenceNode("P"),
+        params: f.createConditionalTypeNode(
+          parametricIndexNode,
+          f.createTypeOperatorNode(
+            ts.SyntaxKind.KeyOfKeyword,
+            f.createTypeReferenceNode(this.ids.inputInterface),
+          ),
+          f.createIndexedAccessTypeNode(
+            f.createTypeReferenceNode(this.ids.inputInterface),
+            parametricIndexNode,
+          ),
+          recordStringAny,
+        ),
+      }),
+      undefined, // overload
+      makeTypeParams({
+        M: this.ids.methodType,
+        P: this.ids.pathType,
+      }),
+      makeConditionalIndexPromise(
+        this.ids.responseInterface,
+        parametricIndexNode,
+        f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
+      ),
+    );
+
+    // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]>;
+    const providerOverload2 = makePublicMethod(
+      this.ids.provideMethod,
+      makeParams({
+        request: f.createTypeReferenceNode("K"),
+        params: f.createIndexedAccessTypeNode(
+          f.createTypeReferenceNode(this.ids.inputInterface),
+          f.createTypeReferenceNode("K"),
+        ),
+      }),
+      undefined, // overload
+      makeTypeParams({
+        K: this.ids.methodPathType,
+      }),
+      f.createTypeReferenceNode("Promise", [
+        f.createIndexedAccessTypeNode(
+          f.createTypeReferenceNode(this.ids.responseInterface),
+          f.createTypeReferenceNode("K"),
+        ),
+      ]),
+    );
+
+    // public provide(...args: [string, string, Record<string, any>] | [string, Record<string, any>]) {
+    const actualProvider = makePublicMethod(
+      this.ids.provideMethod,
+      makeParams(
+        {
+          [this.ids.args.text]: f.createUnionTypeNode([
+            f.createTupleTypeNode([
+              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              recordStringAny,
+            ]),
+            f.createTupleTypeNode([
+              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              recordStringAny,
+            ]),
+          ]),
+        },
+        restToken,
+      ),
+      f.createBlock([
+        f.createVariableStatement(
+          undefined,
+          makeConst(
+            makeDeconstruction([
+              this.ids.methodParameter,
+              this.ids.pathParameter,
+              this.ids.paramsArgument,
+            ]),
+            f.createAsExpression(
+              f.createParenthesizedExpression(
+                f.createConditionalExpression(
+                  f.createBinaryExpression(
+                    f.createPropertyAccessExpression(this.ids.args, "length"),
+                    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                    f.createNumericLiteral(2),
+                  ),
+                  f.createToken(ts.SyntaxKind.QuestionToken),
+                  f.createArrayLiteralExpression([
+                    f.createSpreadElement(
+                      f.createCallExpression(
+                        f.createPropertyAccessExpression(
+                          f.createElementAccessExpression(
+                            this.ids.args,
+                            f.createNumericLiteral(0),
+                          ),
+                          "split",
+                        ),
+                        undefined,
+                        [f.createStringLiteral(" ")],
+                      ),
+                    ),
+                    f.createElementAccessExpression(
+                      this.ids.args,
+                      f.createNumericLiteral(1),
+                    ),
+                  ]),
+                  f.createToken(ts.SyntaxKind.ColonToken),
+                  this.ids.args,
+                ),
+              ),
+              f.createTupleTypeNode([
+                f.createTypeReferenceNode(this.ids.methodType),
+                f.createTypeReferenceNode(this.ids.pathType),
+                recordStringAny,
+              ]),
+            ),
+          ),
+        ),
+        // return this.implementation(___)
+        f.createReturnStatement(
+          f.createCallExpression(
+            f.createPropertyAccessExpression(
+              f.createThis(),
+              this.ids.implementationArgument,
+            ),
+            undefined,
+            [this.ids.methodParameter, pathArgument, paramsArgument],
+          ),
+        ),
+      ]),
+    );
+
     // export class ExpressZodAPIClient { ___ }
     const clientClass = makePublicClass(
       this.ids.clientClass,
@@ -486,94 +569,7 @@ export class Integration {
           protectedReadonlyModifier,
         ),
       ]),
-      [
-        providerOverload1,
-        providerOverload2,
-        // public provide(...args: [string, string, Record<string, any>] | [string, Record<string, any>]) {
-        makePublicMethod(
-          this.ids.provideMethod,
-          makeParams(
-            {
-              [this.ids.args.text]: f.createUnionTypeNode([
-                f.createTupleTypeNode([
-                  f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                  f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                  recordStringAny,
-                ]),
-                f.createTupleTypeNode([
-                  f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                  recordStringAny,
-                ]),
-              ]),
-            },
-            restToken,
-          ),
-          f.createBlock([
-            f.createVariableStatement(
-              undefined,
-              makeConst(
-                makeDeconstruction([
-                  this.ids.methodParameter,
-                  this.ids.pathParameter,
-                  this.ids.paramsArgument,
-                ]),
-                f.createAsExpression(
-                  f.createParenthesizedExpression(
-                    f.createConditionalExpression(
-                      f.createBinaryExpression(
-                        f.createPropertyAccessExpression(
-                          this.ids.args,
-                          "length",
-                        ),
-                        f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
-                        f.createNumericLiteral(2),
-                      ),
-                      f.createToken(ts.SyntaxKind.QuestionToken),
-                      f.createArrayLiteralExpression([
-                        f.createSpreadElement(
-                          f.createCallExpression(
-                            f.createPropertyAccessExpression(
-                              f.createElementAccessExpression(
-                                this.ids.args,
-                                f.createNumericLiteral(0),
-                              ),
-                              "split",
-                            ),
-                            undefined,
-                            [f.createStringLiteral(" ")],
-                          ),
-                        ),
-                        f.createElementAccessExpression(
-                          this.ids.args,
-                          f.createNumericLiteral(1),
-                        ),
-                      ]),
-                      f.createToken(ts.SyntaxKind.ColonToken),
-                      this.ids.args,
-                    ),
-                  ),
-                  f.createTupleTypeNode([
-                    f.createTypeReferenceNode(this.ids.methodType),
-                    f.createTypeReferenceNode(this.ids.pathType),
-                    recordStringAny,
-                  ]),
-                ),
-              ),
-            ),
-            // return this.implementation(___)
-            f.createReturnStatement(
-              f.createCallExpression(
-                f.createPropertyAccessExpression(
-                  f.createThis(),
-                  this.ids.implementationArgument,
-                ),
-                undefined,
-                [this.ids.methodParameter, pathArgument, paramsArgument],
-              ),
-            ),
-          ]),
-        ),
-      ],
+      [providerOverload1, providerOverload2, actualProvider],
     );
 
     this.program.push(
