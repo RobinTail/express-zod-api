@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
+import { expectTypeOf } from "vitest";
 import {
   ExpressZodAPIClient,
   Implementation,
@@ -452,6 +453,16 @@ describe("Example", async () => {
       >();
     });
 
+    test("Feature #2182: should provide using combined path+method", async () => {
+      const response = await client.provide("get /v1/user/retrieve", {
+        id: "10",
+      });
+      expectTypeOf(response).toMatchTypeOf<
+        | { status: "success"; data: { id: number; name: string } }
+        | { status: "error"; error: { message: string } }
+      >();
+    });
+
     test("Issue #2177: should handle path params correctly", async () => {
       const response = await client.provide("patch", "/v1/user/:id", {
         key: "123",
@@ -468,15 +479,12 @@ describe("Example", async () => {
     });
 
     test("Issue #2182: should deny unlisted combination of path and method", async () => {
-      const response = await client.provide("get", "/v1/user/create", {
-        literally: "anything",
-      });
-      expect(typeof response).toBe("object");
-      expect(response).toHaveProperty(
-        ["error", "message"],
-        "Can not GET /v1/user/create",
-      );
-      expectTypeOf(response).toBeNever();
+      expectTypeOf(client.provide).toBeCallableWith("post /v1/user/create", {});
+      // @ts-expect-error -- can't use .toBeCallableWith with .not, see https://github.com/mmkal/expect-type
+      expectTypeOf(client.provide).toBeCallableWith("get /v1/user/create", {});
+      expectTypeOf(
+        client.provide("get", "/v1/user/create", {}),
+      ).resolves.toBeUnknown();
     });
 
     test("should handle no content (no response body)", async () => {

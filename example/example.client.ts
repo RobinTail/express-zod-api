@@ -149,8 +149,6 @@ export type Path =
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-export type MethodPath = `${Method} ${Path}`;
-
 export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveInput;
@@ -175,6 +173,8 @@ export interface Response {
   "post /v1/avatar/raw": PostV1AvatarRawResponse;
 }
 
+export type MethodPath = keyof Input;
+
 export const jsonEndpoints = {
   "get /v1/user/retrieve": true,
   "patch /v1/user/:id": true,
@@ -196,16 +196,6 @@ export const endpointTags = {
   "post /v1/avatar/raw": ["files"],
 };
 
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: `${M} ${P}` extends keyof Input
-    ? Input[`${M} ${P}`]
-    : Record<string, any>,
-) => Promise<
-  `${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : never
->;
-
 export type Implementation = (
   method: Method,
   path: string,
@@ -214,26 +204,47 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
-  public readonly provide: Provider = async (method, path, params) =>
-    this.implementation(
+  public provide<M extends Method, P extends Path>(
+    method: M,
+    path: P,
+    params: `${M} ${P}` extends keyof Input
+      ? Input[`${M} ${P}`]
+      : Record<string, any>,
+  ): Promise<
+    `${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown
+  >;
+  public provide<K extends MethodPath>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]>;
+  public provide(
+    ...args:
+      | [string, string, Record<string, any>]
+      | [string, Record<string, any>]
+  ) {
+    const [method, path, params] = (
+      args.length === 2 ? [...args[0].split(" "), args[1]] : args
+    ) as [Method, Path, Record<string, any>];
+    return this.implementation(
       method,
       Object.keys(params).reduce(
-        (acc, key) =>
-          acc.replace(`:${key}`, params[key as keyof typeof params]),
+        (acc, key) => acc.replace(`:${key}`, params[key]),
         path,
       ),
       Object.keys(params).reduce(
         (acc, key) =>
           Object.assign(
             acc,
-            !path.includes(`:${key}`) && {
-              [key]: params[key as keyof typeof params],
-            },
+            !path.includes(`:${key}`) && { [key]: params[key] },
           ),
         {},
       ),
     );
+  }
 }
+
+// @todo add:
+// export type Provider = ExpressZodAPIClient["provide"];
 
 // Usage example:
 /*
