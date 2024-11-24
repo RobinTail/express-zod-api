@@ -35,12 +35,7 @@ import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import {
-  ZTSContext,
-  createTypeAlias,
-  printNode,
-  addJsDocComment,
-} from "./zts-helpers";
+import { ZTSContext, createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant;
@@ -114,10 +109,6 @@ export class Integration {
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
-    /**
-     * @deprecated
-     * @todo remove in v22
-     */
     methodPathType: f.createIdentifier("MethodPath"),
     inputInterface: f.createIdentifier("Input"),
     posResponseInterface: f.createIdentifier("PositiveResponse"),
@@ -266,17 +257,6 @@ export class Integration {
     // export type Method = "get" | "post" | "put" | "delete" | "patch";
     this.program.push(makePublicLiteralType(this.ids.methodType, methods));
 
-    // export type MethodPath = `${Method} ${Path}`;
-    this.program.push(
-      addJsDocComment(
-        makePublicType(
-          this.ids.methodPathType,
-          makeTemplateType([this.ids.methodType, this.ids.pathType]),
-        ),
-        "@deprecated use 'keyof Input' instead",
-      ),
-    );
-
     this.interfaces.push({
       id: this.ids.inputInterface,
       kind: "input",
@@ -326,6 +306,17 @@ export class Integration {
     // export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
     for (const { id, props } of this.interfaces)
       this.program.push(makePublicInterface(id, props));
+
+    // export type MethodPath = keyof Input;
+    this.program.push(
+      makePublicType(
+        this.ids.methodPathType,
+        f.createTypeOperatorNode(
+          ts.SyntaxKind.KeyOfKeyword,
+          f.createTypeReferenceNode(this.ids.inputInterface),
+        ),
+      ),
+    );
 
     if (variant === "types") return;
 
@@ -380,6 +371,31 @@ export class Integration {
         parametricIndexNode,
         f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
       ),
+      undefined, // overload
+    );
+
+    // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]>;
+    const providerOverload2 = f.createMethodDeclaration(
+      [f.createToken(ts.SyntaxKind.PublicKeyword)],
+      undefined,
+      this.ids.provideMethod,
+      undefined,
+      makeTypeParams({
+        K: this.ids.methodPathType,
+      }),
+      makeParams({
+        request: f.createTypeReferenceNode("K"),
+        params: f.createIndexedAccessTypeNode(
+          f.createTypeReferenceNode(this.ids.inputInterface),
+          f.createTypeReferenceNode("K"),
+        ),
+      }),
+      f.createTypeReferenceNode(f.createIdentifier("Promise"), [
+        f.createIndexedAccessTypeNode(
+          f.createTypeReferenceNode(this.ids.responseInterface),
+          f.createTypeReferenceNode(f.createIdentifier("K")),
+        ),
+      ]),
       undefined, // overload
     );
 
@@ -485,6 +501,7 @@ export class Integration {
       ]),
       [
         providerOverload1,
+        providerOverload2,
         // public readonly provide: Provider
         makePublicReadonlyProp(
           this.ids.provideMethod,

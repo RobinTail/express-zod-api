@@ -23,9 +23,6 @@ export type Path = "/v1/test-with-dashes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-/** @deprecated use 'keyof Input' instead */
-export type MethodPath = \`\${Method} \${Path}\`;
-
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
@@ -33,6 +30,8 @@ export interface Input {
 export interface Response {
   "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
 }
+
+export type MethodPath = keyof Input;
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
@@ -55,6 +54,10 @@ export class ExpressZodAPIClient {
   ): Promise<
     \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
   >;
+  public provide<K extends MethodPath>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]>;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
@@ -124,9 +127,6 @@ export type Path = "/v1/test-with-dashes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-/** @deprecated use 'keyof Input' instead */
-export type MethodPath = \`\${Method} \${Path}\`;
-
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
@@ -134,6 +134,8 @@ export interface Input {
 export interface Response {
   "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
 }
+
+export type MethodPath = keyof Input;
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
@@ -156,6 +158,10 @@ export class ExpressZodAPIClient {
   ): Promise<
     \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
   >;
+  public provide<K extends MethodPath>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]>;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
@@ -225,9 +231,6 @@ export type Path = "/v1/test-with-dashes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-/** @deprecated use 'keyof Input' instead */
-export type MethodPath = \`\${Method} \${Path}\`;
-
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
@@ -235,6 +238,8 @@ export interface Input {
 export interface Response {
   "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
 }
+
+export type MethodPath = keyof Input;
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
@@ -257,6 +262,10 @@ export class ExpressZodAPIClient {
   ): Promise<
     \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
   >;
+  public provide<K extends MethodPath>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]>;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
@@ -330,9 +339,6 @@ export type Path = "/v1/test";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-/** @deprecated use 'keyof Input' instead */
-export type MethodPath = \`\${Method} \${Path}\`;
-
 export interface Input {
   "post /v1/test": PostV1TestInput;
 }
@@ -348,6 +354,8 @@ export interface NegativeResponse {
 export interface Response {
   "post /v1/test": PostV1TestResponse;
 }
+
+export type MethodPath = keyof Input;
 
 export const jsonEndpoints = { "post /v1/test": true };
 
@@ -370,6 +378,10 @@ export class ExpressZodAPIClient {
   ): Promise<
     \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
   >;
+  public provide<K extends MethodPath>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]>;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
@@ -444,9 +456,6 @@ export type Path = "/v1/custom";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-/** @deprecated use 'keyof Input' instead */
-export type MethodPath = \`\${Method} \${Path}\`;
-
 export interface Input {
   "post /v1/custom": PostV1CustomInput;
 }
@@ -462,6 +471,8 @@ export interface NegativeResponse {
 export interface Response {
   "post /v1/custom": PostV1CustomResponse;
 }
+
+export type MethodPath = keyof Input;
 "
 `;
 
@@ -617,9 +628,6 @@ export type Path =
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-/** @deprecated use 'keyof Input' instead */
-export type MethodPath = \`\${Method} \${Path}\`;
-
 export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveInput;
@@ -643,6 +651,8 @@ export interface Response {
   "post /v1/avatar/upload": PostV1AvatarUploadResponse;
   "post /v1/avatar/raw": PostV1AvatarRawResponse;
 }
+
+export type MethodPath = keyof Input;
 
 export const jsonEndpoints = {
   "get /v1/user/retrieve": true,
@@ -682,6 +692,10 @@ export class ExpressZodAPIClient {
   ): Promise<
     \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
   >;
+  public provide<K extends MethodPath>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]>;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
@@ -880,9 +894,6 @@ export type Path =
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-/** @deprecated use 'keyof Input' instead */
-export type MethodPath = \`\${Method} \${Path}\`;
-
 export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveInput;
@@ -906,6 +917,8 @@ export interface Response {
   "post /v1/avatar/upload": PostV1AvatarUploadResponse;
   "post /v1/avatar/raw": PostV1AvatarRawResponse;
 }
+
+export type MethodPath = keyof Input;
 "
 `;
 
@@ -938,9 +951,6 @@ export type Path = "/v1/mtpl";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-/** @deprecated use 'keyof Input' instead */
-export type MethodPath = \`\${Method} \${Path}\`;
-
 export interface Input {
   "post /v1/mtpl": PostV1MtplInput;
 }
@@ -956,6 +966,8 @@ export interface NegativeResponse {
 export interface Response {
   "post /v1/mtpl": PostV1MtplResponse;
 }
+
+export type MethodPath = keyof Input;
 "
 `;
 
@@ -982,9 +994,6 @@ export type Path = "/v1/test-with-dashes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-/** @deprecated use 'keyof Input' instead */
-export type MethodPath = \`\${Method} \${Path}\`;
-
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
@@ -992,6 +1001,8 @@ export interface Input {
 export interface Response {
   "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
 }
+
+export type MethodPath = keyof Input;
 
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
@@ -1014,6 +1025,10 @@ export class ExpressZodAPIClient {
   ): Promise<
     \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
   >;
+  public provide<K extends MethodPath>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]>;
   public readonly provide: Provider = async (method, path, params) =>
     this.implementation(
       method,
