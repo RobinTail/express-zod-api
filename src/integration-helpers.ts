@@ -31,7 +31,7 @@ export const recordStringAny = f.createExpressionWithTypeArguments(
   ],
 );
 
-export const makeTemplateType = (names: Array<ts.Identifier | string>) =>
+const makeTemplateType = (names: Array<ts.Identifier | string>) =>
   f.createTemplateLiteralType(
     emptyHeading,
     names.map((name, index) =>

@@ -19,7 +19,6 @@ import {
   makePublicLiteralType,
   makePublicReadonlyProp,
   makePublicType,
-  makeTemplateType,
   makeTernary,
   makeTypeParams,
   parametricIndexNode,
