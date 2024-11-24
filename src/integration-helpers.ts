@@ -18,6 +18,8 @@ export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
 
+export const restToken = f.createToken(ts.SyntaxKind.DotDotDotToken);
+
 const emptyHeading = f.createTemplateHead("");
 const spacingMiddle = f.createTemplateMiddle(" ");
 export const emptyTail = f.createTemplateTail("");
@@ -47,11 +49,11 @@ export const parametricIndexNode = makeTemplateType(["M", "P"]); // `${M} ${P}`
 export const makeParam = (
   name: ts.Identifier,
   type?: ts.TypeNode,
-  mod?: ts.Modifier[],
+  features?: ts.Modifier[] | ts.DotDotDotToken,
 ) =>
   f.createParameterDeclaration(
-    mod,
-    undefined,
+    Array.isArray(features) ? features : undefined,
+    Array.isArray(features) ? undefined : features,
     name,
     undefined,
     type,
@@ -60,10 +62,10 @@ export const makeParam = (
 
 export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,
-  mod?: ts.Modifier[],
+  features?: ts.Modifier[] | ts.DotDotDotToken,
 ) =>
   chain(
-    ([name, node]) => [makeParam(f.createIdentifier(name), node, mod)],
+    ([name, node]) => [makeParam(f.createIdentifier(name), node, features)],
     Object.entries(params),
   );
 
@@ -79,8 +81,17 @@ export const makeInterfaceProp = (name: string, ref: string) =>
     f.createTypeReferenceNode(ref),
   );
 
+export const makeDeconstruction = (
+  names: ts.Identifier[],
+): ts.ArrayBindingPattern =>
+  f.createArrayBindingPattern(
+    names.map(
+      (name) => f.createBindingElement(undefined, undefined, name), // can also add default value at last
+    ),
+  );
+
 export const makeConst = (
-  name: ts.Identifier,
+  name: ts.Identifier | ts.ArrayBindingPattern,
   value: ts.Expression,
   type?: ts.TypeNode,
 ) =>
@@ -106,19 +117,6 @@ export const makePublicLiteralType = (
 
 export const makePublicType = (name: ts.Identifier, value: ts.TypeNode) =>
   f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
-
-export const makePublicReadonlyProp = (
-  name: ts.Identifier,
-  type: ts.TypeNode,
-  exp: ts.Expression,
-) =>
-  f.createPropertyDeclaration(
-    publicReadonlyModifier,
-    name,
-    undefined,
-    type,
-    exp,
-  );
 
 export const makePublicClass = (
   name: ts.Identifier,

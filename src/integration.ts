@@ -9,6 +9,7 @@ import {
   makeArrowFn,
   makeConditionalIndexPromise,
   makeConst,
+  makeDeconstruction,
   makeEmptyInitializingConstructor,
   makeInterfaceProp,
   makeObjectKeysReducer,
@@ -17,7 +18,6 @@ import {
   makePublicClass,
   makePublicInterface,
   makePublicLiteralType,
-  makePublicReadonlyProp,
   makePublicType,
   makeTernary,
   makeTypeParams,
@@ -25,6 +25,7 @@ import {
   protectedReadonlyModifier,
   quoteProp,
   recordStringAny,
+  restToken,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -126,6 +127,7 @@ export class Integration {
     pathParameter: f.createIdentifier("path"),
     paramsArgument: f.createIdentifier("params"),
     methodParameter: f.createIdentifier("method"),
+    args: f.createIdentifier("args"),
     accumulator: f.createIdentifier("acc"),
     provideMethod: f.createIdentifier("provide"),
     implementationArgument: f.createIdentifier("implementation"),
@@ -418,15 +420,6 @@ export class Integration {
       [f.createTemplateSpan(this.ids.keyParameter, emptyTail)],
     );
 
-    // key as keyof typeof params
-    const keyAsKeyofParams = f.createAsExpression(
-      this.ids.keyParameter,
-      f.createTypeOperatorNode(
-        ts.SyntaxKind.KeyOfKeyword,
-        f.createTypeQueryNode(this.ids.paramsArgument),
-      ),
-    );
-
     // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key as keyof typeof params]), path)
     const pathArgument = makeObjectKeysReducer(
       this.ids.paramsArgument,
@@ -437,7 +430,7 @@ export class Integration {
           keyParamExpression,
           f.createElementAccessExpression(
             this.ids.paramsArgument,
-            keyAsKeyofParams,
+            this.ids.keyParameter,
           ),
         ],
       ),
@@ -475,7 +468,7 @@ export class Integration {
                   f.createComputedPropertyName(this.ids.keyParameter),
                   f.createElementAccessExpression(
                     this.ids.paramsArgument,
-                    keyAsKeyofParams,
+                    this.ids.keyParameter,
                   ),
                 ),
               ],
@@ -501,27 +494,94 @@ export class Integration {
       [
         providerOverload1,
         providerOverload2,
-        // public readonly provide: Provider
-        makePublicReadonlyProp(
+        // public provide(...args: [string, string, Record<string, any>] | [string, Record<string, any>]) {
+        f.createMethodDeclaration(
+          [f.createToken(ts.SyntaxKind.PublicKeyword)],
+          undefined,
           this.ids.provideMethod,
-          f.createTypeReferenceNode(this.ids.providerType),
-          // = async (method, path, params) => this.implementation(___)
-          makeArrowFn(
-            [
-              this.ids.methodParameter,
-              this.ids.pathParameter,
-              this.ids.paramsArgument,
-            ],
-            f.createCallExpression(
-              f.createPropertyAccessExpression(
-                f.createThis(),
-                this.ids.implementationArgument,
-              ),
-              undefined,
-              [this.ids.methodParameter, pathArgument, paramsArgument],
-            ),
-            true,
+          undefined,
+          undefined,
+          makeParams(
+            {
+              [this.ids.args.text]: f.createUnionTypeNode([
+                f.createTupleTypeNode([
+                  f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                  f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                  recordStringAny,
+                ]),
+                f.createTupleTypeNode([
+                  f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                  recordStringAny,
+                ]),
+              ]),
+            },
+            restToken,
           ),
+          undefined,
+          f.createBlock([
+            f.createVariableStatement(
+              undefined,
+              makeConst(
+                makeDeconstruction([
+                  this.ids.methodParameter,
+                  this.ids.pathParameter,
+                  this.ids.paramsArgument,
+                ]),
+                f.createAsExpression(
+                  f.createParenthesizedExpression(
+                    f.createConditionalExpression(
+                      f.createBinaryExpression(
+                        f.createPropertyAccessExpression(
+                          this.ids.args,
+                          f.createIdentifier("length"),
+                        ),
+                        f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+                        f.createNumericLiteral(2),
+                      ),
+                      f.createToken(ts.SyntaxKind.QuestionToken),
+                      f.createArrayLiteralExpression([
+                        f.createSpreadElement(
+                          f.createCallExpression(
+                            f.createPropertyAccessExpression(
+                              f.createElementAccessExpression(
+                                this.ids.args,
+                                f.createNumericLiteral(0),
+                              ),
+                              f.createIdentifier("split"),
+                            ),
+                            undefined,
+                            [f.createStringLiteral(" ")],
+                          ),
+                        ),
+                        f.createElementAccessExpression(
+                          this.ids.args,
+                          f.createNumericLiteral(1),
+                        ),
+                      ]),
+                      f.createToken(ts.SyntaxKind.ColonToken),
+                      this.ids.args,
+                    ),
+                  ),
+                  f.createTupleTypeNode([
+                    f.createTypeReferenceNode(this.ids.methodType),
+                    f.createTypeReferenceNode(this.ids.pathType),
+                    recordStringAny,
+                  ]),
+                ),
+              ),
+            ),
+            // return this.implementation(___)
+            f.createReturnStatement(
+              f.createCallExpression(
+                f.createPropertyAccessExpression(
+                  f.createThis(),
+                  this.ids.implementationArgument,
+                ),
+                undefined,
+                [this.ids.methodParameter, pathArgument, paramsArgument],
+              ),
+            ),
+          ]),
         ),
       ],
     );
