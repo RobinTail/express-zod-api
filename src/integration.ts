@@ -387,10 +387,10 @@ export class Integration {
       makeTypeParams({
         K: this.ids.methodPathType,
       }),
-      f.createTypeReferenceNode(f.createIdentifier("Promise"), [
+      f.createTypeReferenceNode("Promise", [
         f.createIndexedAccessTypeNode(
           f.createTypeReferenceNode(this.ids.responseInterface),
-          f.createTypeReferenceNode(f.createIdentifier("K")),
+          f.createTypeReferenceNode("K"),
         ),
       ]),
     );
@@ -439,7 +439,7 @@ export class Integration {
       f.createCallExpression(
         f.createPropertyAccessExpression(
           f.createIdentifier("Object"),
-          f.createIdentifier("assign" satisfies keyof typeof Object),
+          "assign" satisfies keyof typeof Object,
         ),
         undefined,
         [
@@ -450,7 +450,7 @@ export class Integration {
               f.createCallExpression(
                 f.createPropertyAccessExpression(
                   this.ids.pathParameter,
-                  f.createIdentifier("includes" satisfies keyof string),
+                  "includes" satisfies keyof string,
                 ),
                 undefined,
                 [keyParamExpression],
@@ -523,7 +523,7 @@ export class Integration {
                       f.createBinaryExpression(
                         f.createPropertyAccessExpression(
                           this.ids.args,
-                          f.createIdentifier("length"),
+                          "length",
                         ),
                         f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
                         f.createNumericLiteral(2),
@@ -537,7 +537,7 @@ export class Integration {
                                 this.ids.args,
                                 f.createNumericLiteral(0),
                               ),
-                              f.createIdentifier("split"),
+                              "split",
                             ),
                             undefined,
                             [f.createStringLiteral(" ")],
@@ -715,7 +715,7 @@ export class Integration {
               this.ids.responseConst,
               this.ids.headersProperty,
             ),
-            f.createIdentifier("get" satisfies keyof Headers),
+            "get" satisfies keyof Headers,
           ),
           undefined,
           [f.createStringLiteral("content-type")],
@@ -742,7 +742,7 @@ export class Integration {
           f.createPropertyAccessChain(
             this.ids.contentTypeConst,
             undefined,
-            f.createIdentifier("startsWith" satisfies keyof string),
+            "startsWith" satisfies keyof string,
           ),
           undefined,
           undefined,
