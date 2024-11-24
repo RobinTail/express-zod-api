@@ -346,7 +346,7 @@ export class Integration {
     // export type Provider = <M extends Method, P extends Path>(
     //  method: M, path: P,
     //  params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>
-    // ) => Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : any>
+    // ) => Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown>
     const providerType = makePublicType(
       this.ids.providerType,
       f.createFunctionTypeNode(
@@ -373,7 +373,7 @@ export class Integration {
         makeConditionalIndexPromise(
           this.ids.responseInterface,
           parametricIndexNode,
-          f.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword), // @todo configurable
+          f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
         ),
       ),
     );
