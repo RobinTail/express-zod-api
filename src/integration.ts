@@ -23,6 +23,7 @@ import {
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
+  publicModifier,
   quoteProp,
   recordStringAny,
   restToken,
@@ -343,7 +344,7 @@ export class Integration {
     //     params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>,
     //   ): Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown>;
     const providerOverload1 = f.createMethodDeclaration(
-      [f.createToken(ts.SyntaxKind.PublicKeyword)],
+      publicModifier,
       undefined,
       this.ids.provideMethod,
       undefined,
@@ -377,7 +378,7 @@ export class Integration {
 
     // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]>;
     const providerOverload2 = f.createMethodDeclaration(
-      [f.createToken(ts.SyntaxKind.PublicKeyword)],
+      publicModifier,
       undefined,
       this.ids.provideMethod,
       undefined,
@@ -496,7 +497,7 @@ export class Integration {
         providerOverload2,
         // public provide(...args: [string, string, Record<string, any>] | [string, Record<string, any>]) {
         f.createMethodDeclaration(
-          [f.createToken(ts.SyntaxKind.PublicKeyword)],
+          publicModifier,
           undefined,
           this.ids.provideMethod,
           undefined,

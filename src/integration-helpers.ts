@@ -8,10 +8,7 @@ export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
 const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
 
-const publicReadonlyModifier = [
-  f.createModifier(ts.SyntaxKind.PublicKeyword),
-  f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
-];
+export const publicModifier = [f.createModifier(ts.SyntaxKind.PublicKeyword)];
 
 export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ProtectedKeyword),
