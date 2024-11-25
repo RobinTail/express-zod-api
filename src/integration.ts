@@ -27,6 +27,7 @@ import {
   recordStringAny,
   makeAnd,
   makeTemplate,
+  makeNew,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -559,10 +560,9 @@ export class Integration {
           this.ids.hasBodyConst,
           f.createStringLiteral(""),
           makeTemplate("?", [
-            f.createNewExpression(
+            makeNew(
               f.createIdentifier(URLSearchParams.name),
-              undefined,
-              [this.ids.paramsArgument],
+              this.ids.paramsArgument,
             ),
           ]),
         ),
@@ -668,9 +668,7 @@ export class Integration {
       undefined,
       makeConst(
         this.ids.clientConst,
-        f.createNewExpression(this.ids.clientClass, undefined, [
-          this.ids.exampleImplementationConst,
-        ]),
+        makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
       ),
     );
 

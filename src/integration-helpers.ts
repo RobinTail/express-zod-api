@@ -244,3 +244,6 @@ export const makeAnd = (left: ts.Expression, right: ts.Expression) =>
     f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
     right,
   );
+
+export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
+  f.createNewExpression(cls, undefined, args);

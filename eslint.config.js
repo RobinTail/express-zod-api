@@ -145,6 +145,10 @@ export default [
           selector: "Identifier[name='createTemplateExpression']",
           message: "use makeTemplate() helper",
         },
+        {
+          selector: "Identifier[name='createNewExpression']",
+          message: "use makeNew() helper",
+        },
       ],
     },
   },
