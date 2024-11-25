@@ -1,6 +1,5 @@
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
-import { expectTypeOf } from "vitest";
 import {
   ExpressZodAPIClient,
   Implementation,
