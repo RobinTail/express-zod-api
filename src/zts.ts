@@ -176,7 +176,8 @@ const onIntersection: Producer = (
   const nodes = [left, right].map(next);
   const areObjects = nodes.every(ts.isTypeLiteralNode);
   return areObjects
-    ? f.createTypeLiteralNode(nodes.flatMap(({ members }) => members))
+    ? // eslint-disable-next-line no-restricted-syntax -- non-standard iterator used for the type of members
+      f.createTypeLiteralNode(nodes.flatMap(({ members }) => members))
     : f.createIntersectionTypeNode(nodes);
 };
 
