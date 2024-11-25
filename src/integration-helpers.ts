@@ -126,11 +126,9 @@ export const makePublicClass = (
     ...statements,
   ]);
 
-export const makePromise = (subject: ts.TypeNode | "any") =>
+export const makePromiseAny = () =>
   f.createTypeReferenceNode(Promise.name, [
-    subject === "any"
-      ? f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
-      : subject,
+    f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
   ]);
 
 export const makePublicInterface = (

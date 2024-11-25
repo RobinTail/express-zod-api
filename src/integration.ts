@@ -5,7 +5,7 @@ import {
   emptyTail,
   exportModifier,
   f,
-  makePromise,
+  makePromiseAny,
   makeArrowFn,
   makeConst,
   makeDeconstruction,
@@ -353,7 +353,7 @@ export class Integration {
           ),
           [this.ids.paramsArgument.text]: recordStringAny,
         }),
-        makePromise("any"),
+        makePromiseAny(),
       ),
     );
 
