@@ -364,7 +364,7 @@ export class Integration {
       [f.createTemplateSpan(this.ids.keyParameter, emptyTail)],
     );
 
-    // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key as keyof typeof params]), path)
+    // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key]), path)
     const pathArgument = makeObjectKeysReducer(
       this.ids.paramsArgument,
       makePropCall(this.ids.accumulator, propOf<string>("replace"), [
