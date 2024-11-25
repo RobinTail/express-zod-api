@@ -126,8 +126,6 @@ export class Integration {
     responseInterface: f.createIdentifier("Response"),
     jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
     endpointTagsConst: f.createIdentifier("endpointTags"),
-    /** @todo remove in v22 */
-    providerType: f.createIdentifier("Provider"),
     implementationType: f.createIdentifier("Implementation"),
     clientClass: f.createIdentifier("ExpressZodAPIClient"),
     keyParameter: f.createIdentifier("key"),
@@ -570,26 +568,11 @@ export class Integration {
       [providerOverload1, providerOverload2, actualProvider],
     );
 
-    // @todo remove in v22
-    const providerType = addJsDocComment(
-      makePublicType(
-        this.ids.providerType,
-        f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.clientClass),
-          f.createLiteralTypeNode(
-            f.createStringLiteral(this.ids.provideMethod.text),
-          ),
-        ),
-      ),
-      "@deprecated will be removed in v22",
-    );
-
     this.program.push(
       jsonEndpointsConst,
       endpointTagsConst,
       implementationType,
       clientClass,
-      providerType,
     );
 
     // method: method.toUpperCase()

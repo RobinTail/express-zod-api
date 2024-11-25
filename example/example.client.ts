@@ -244,9 +244,6 @@ export class ExpressZodAPIClient {
   }
 }
 
-/** @deprecated will be removed in v22 */
-export type Provider = ExpressZodAPIClient["provide"];
-
 // Usage example:
 /*
 export const exampleImplementation: Implementation = async (
