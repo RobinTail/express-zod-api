@@ -520,7 +520,7 @@ export class Integration {
                     ),
                     f.createElementAccessExpression(this.ids.args, 1),
                   ]),
-                  this.ids.args,
+                  this.ids.args, // @todo remove this in v22
                 ),
               ),
               f.createTupleTypeNode([
