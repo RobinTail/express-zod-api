@@ -79,7 +79,7 @@ export const makeInterfaceProp = (name: string, ref: string) =>
   );
 
 export const makeDeconstruction = (
-  names: ts.Identifier[],
+  ...names: ts.Identifier[]
 ): ts.ArrayBindingPattern =>
   f.createArrayBindingPattern(
     names.map(

@@ -504,11 +504,11 @@ export class Integration {
           undefined,
           makeConst(
             // const [method, path, params] =
-            makeDeconstruction([
+            makeDeconstruction(
               this.ids.methodParameter,
               this.ids.pathParameter,
               this.ids.paramsArgument,
-            ]),
+            ),
             // (args.length === 2 ? [...args[0].split((/ (.+)/,2), args[1]] : args) as [Method, Path, Record<string, any>]
             f.createAsExpression(
               f.createParenthesizedExpression(
