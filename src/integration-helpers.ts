@@ -257,3 +257,17 @@ export const makePropCall = (
     undefined,
     args,
   );
+
+export const makeAnd = (left: ts.Expression, right: ts.Expression) =>
+  f.createBinaryExpression(
+    left,
+    f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+    right,
+  );
+
+export const makeEqual = (left: ts.Expression, right: ts.Expression) =>
+  f.createBinaryExpression(
+    left,
+    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+    right,
+  );

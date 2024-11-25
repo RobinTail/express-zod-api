@@ -29,6 +29,8 @@ import {
   quoteProp,
   recordStringAny,
   restToken,
+  makeAnd,
+  makeEqual,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -392,14 +394,13 @@ export class Integration {
         propOf<typeof Object>("assign"),
         [
           this.ids.accumulator,
-          f.createBinaryExpression(
+          makeAnd(
             f.createPrefixUnaryExpression(
               ts.SyntaxKind.ExclamationToken,
               makePropCall(this.ids.pathParameter, propOf<string>("includes"), [
                 keyParamExpression,
               ]),
             ),
-            f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
             f.createObjectLiteralExpression(
               [
                 f.createPropertyAssignment(
@@ -513,12 +514,11 @@ export class Integration {
             f.createAsExpression(
               f.createParenthesizedExpression(
                 makeTernary(
-                  f.createBinaryExpression(
+                  makeEqual(
                     f.createPropertyAccessExpression(
                       this.ids.args,
                       propOf<unknown[]>("length"),
                     ),
-                    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
                     f.createNumericLiteral(2),
                   ),
                   f.createArrayLiteralExpression([
