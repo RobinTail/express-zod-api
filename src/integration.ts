@@ -509,7 +509,7 @@ export class Integration {
               this.ids.pathParameter,
               this.ids.paramsArgument,
             ]),
-            // (args.length === 2 ? [...args[0].split(" "), args[1]] : args) as [Method, Path, Record<string, any>]
+            // (args.length === 2 ? [...args[0].split((/ (.+)/,2), args[1]] : args) as [Method, Path, Record<string, any>]
             f.createAsExpression(
               f.createParenthesizedExpression(
                 makeTernary(
@@ -526,7 +526,10 @@ export class Integration {
                       makePropCall(
                         f.createElementAccessExpression(this.ids.args, 0),
                         propOf<string>("split"),
-                        [f.createStringLiteral(" ")],
+                        [
+                          f.createRegularExpressionLiteral("/ (.+)/"), // split once
+                          f.createNumericLiteral(2), // excludes third empty element
+                        ],
                       ),
                     ),
                     f.createElementAccessExpression(this.ids.args, 1),

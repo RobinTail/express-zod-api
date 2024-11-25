@@ -224,7 +224,7 @@ export class ExpressZodAPIClient {
       | [string, Record<string, any>]
   ) {
     const [method, path, params] = (
-      args.length === 2 ? [...args[0].split(" "), args[1]] : args
+      args.length === 2 ? [...args[0].split(/ (.+)/, 2), args[1]] : args
     ) as [Method, Path, Record<string, any>];
     return this.implementation(
       method,
