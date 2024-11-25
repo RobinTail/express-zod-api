@@ -132,6 +132,8 @@ export class Integration {
     pathParameter: f.createIdentifier("path"),
     paramsArgument: f.createIdentifier("params"),
     methodParameter: f.createIdentifier("method"),
+    requestParameter: f.createIdentifier("request"),
+    /** @todo use request and params in v22 */
     args: f.createIdentifier("args"),
     accumulator: f.createIdentifier("acc"),
     provideMethod: f.createIdentifier("provide"),
@@ -350,9 +352,13 @@ export class Integration {
       f.createFunctionTypeNode(
         undefined,
         makeParams({
-          method: f.createTypeReferenceNode(this.ids.methodType),
-          path: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-          params: recordStringAny,
+          [this.ids.methodParameter.text]: f.createTypeReferenceNode(
+            this.ids.methodType,
+          ),
+          [this.ids.pathParameter.text]: f.createKeywordTypeNode(
+            ts.SyntaxKind.StringKeyword,
+          ),
+          [this.ids.paramsArgument.text]: recordStringAny,
         }),
         makePromise("any"),
       ),
@@ -420,9 +426,9 @@ export class Integration {
       makePublicMethod(
         this.ids.provideMethod,
         makeParams({
-          method: f.createTypeReferenceNode("M"),
-          path: f.createTypeReferenceNode("P"),
-          params: f.createConditionalTypeNode(
+          [this.ids.methodParameter.text]: f.createTypeReferenceNode("M"),
+          [this.ids.pathParameter.text]: f.createTypeReferenceNode("P"),
+          [this.ids.paramsArgument.text]: f.createConditionalTypeNode(
             parametricIndexNode,
             f.createTypeOperatorNode(
               ts.SyntaxKind.KeyOfKeyword,
@@ -455,8 +461,8 @@ export class Integration {
     const providerOverload2 = makePublicMethod(
       this.ids.provideMethod,
       makeParams({
-        request: f.createTypeReferenceNode("K"),
-        params: f.createIndexedAccessTypeNode(
+        [this.ids.requestParameter.text]: f.createTypeReferenceNode("K"),
+        [this.ids.paramsArgument.text]: f.createIndexedAccessTypeNode(
           f.createTypeReferenceNode(this.ids.inputInterface),
           f.createTypeReferenceNode("K"),
         ),
