@@ -134,7 +134,7 @@ export const makePublicMethod = (
 export const makePublicClass = (
   name: ts.Identifier,
   constructor: ts.ConstructorDeclaration,
-  statements: Array<ts.PropertyDeclaration | ts.MethodDeclaration>,
+  statements: ts.MethodDeclaration[],
 ) =>
   f.createClassDeclaration(exportModifier, name, undefined, undefined, [
     constructor,
