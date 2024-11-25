@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
   f,
-  makePromiseAny,
+  makePromise,
   makeArrowFn,
   makeConst,
   makeDeconstruction,
@@ -345,7 +345,7 @@ export class Integration {
           ),
           [this.ids.paramsArgument.text]: recordStringAny,
         }),
-        makePromiseAny(),
+        makePromise("any"),
       ),
     );
 
@@ -438,12 +438,12 @@ export class Integration {
         ),
       ]),
       makeTypeParams({ K: this.ids.methodPathType }),
-      f.createTypeReferenceNode(Promise.name, [
+      makePromise(
         f.createIndexedAccessTypeNode(
           f.createTypeReferenceNode(this.ids.responseInterface),
           f.createTypeReferenceNode("K"),
         ),
-      ]),
+      ),
     );
 
     // export class ExpressZodAPIClient { ___ }
