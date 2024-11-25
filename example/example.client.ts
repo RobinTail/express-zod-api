@@ -204,6 +204,7 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
+  /** @deprecated use the overload with 2 arguments instead */
   public provide<M extends Method, P extends Path>(
     method: M,
     path: P,

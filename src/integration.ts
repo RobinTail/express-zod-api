@@ -416,34 +416,37 @@ export class Integration {
     //     params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>,
     //   ): Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown>;
     // @todo consider removal in v22
-    const providerOverload1 = makePublicMethod(
-      this.ids.provideMethod,
-      makeParams({
-        method: f.createTypeReferenceNode("M"),
-        path: f.createTypeReferenceNode("P"),
-        params: f.createConditionalTypeNode(
-          parametricIndexNode,
-          f.createTypeOperatorNode(
-            ts.SyntaxKind.KeyOfKeyword,
-            f.createTypeReferenceNode(this.ids.inputInterface),
-          ),
-          f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.ids.inputInterface),
+    const providerOverload1 = addJsDocComment(
+      makePublicMethod(
+        this.ids.provideMethod,
+        makeParams({
+          method: f.createTypeReferenceNode("M"),
+          path: f.createTypeReferenceNode("P"),
+          params: f.createConditionalTypeNode(
             parametricIndexNode,
+            f.createTypeOperatorNode(
+              ts.SyntaxKind.KeyOfKeyword,
+              f.createTypeReferenceNode(this.ids.inputInterface),
+            ),
+            f.createIndexedAccessTypeNode(
+              f.createTypeReferenceNode(this.ids.inputInterface),
+              parametricIndexNode,
+            ),
+            recordStringAny,
           ),
-          recordStringAny,
+        }),
+        undefined, // overload
+        makeTypeParams({
+          M: this.ids.methodType,
+          P: this.ids.pathType,
+        }),
+        makeConditionalIndexPromise(
+          this.ids.responseInterface,
+          parametricIndexNode,
+          f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
         ),
-      }),
-      undefined, // overload
-      makeTypeParams({
-        M: this.ids.methodType,
-        P: this.ids.pathType,
-      }),
-      makeConditionalIndexPromise(
-        this.ids.responseInterface,
-        parametricIndexNode,
-        f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
       ),
+      "@deprecated use the overload with 2 arguments instead",
     );
 
     // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]>;
