@@ -472,12 +472,12 @@ export class Integration {
       makeTypeParams({
         K: this.ids.methodPathType,
       }),
-      f.createTypeReferenceNode(Promise.name, [
+      makePromise(
         f.createIndexedAccessTypeNode(
           f.createTypeReferenceNode(this.ids.responseInterface),
           f.createTypeReferenceNode("K"),
         ),
-      ]),
+      ),
     );
 
     // public provide(...args: [string, string, Record<string, any>] | [string, Record<string, any>]) {
