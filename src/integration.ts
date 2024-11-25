@@ -5,9 +5,9 @@ import {
   emptyTail,
   exportModifier,
   f,
-  makeAnyPromise,
+  makePromise,
   makeArrowFn,
-  makeConditionalIndexPromise,
+  makeConditionalIndex,
   makeConst,
   makeDeconstruction,
   makeEmptyInitializingConstructor,
@@ -354,7 +354,7 @@ export class Integration {
           path: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
           params: recordStringAny,
         }),
-        makeAnyPromise(),
+        makePromise("any"),
       ),
     );
 
@@ -440,10 +440,12 @@ export class Integration {
           M: this.ids.methodType,
           P: this.ids.pathType,
         }),
-        makeConditionalIndexPromise(
-          this.ids.responseInterface,
-          parametricIndexNode,
-          f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
+        makePromise(
+          makeConditionalIndex(
+            this.ids.responseInterface,
+            parametricIndexNode,
+            f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
+          ),
         ),
       ),
       "@deprecated use the overload with 2 arguments instead",

@@ -141,26 +141,26 @@ export const makePublicClass = (
     ...statements,
   ]);
 
-export const makeConditionalIndexPromise = (
+export const makeConditionalIndex = (
   subject: ts.Identifier,
   key: ts.TypeNode,
   fallback: ts.TypeNode,
 ) =>
-  f.createTypeReferenceNode(Promise.name, [
-    f.createConditionalTypeNode(
-      key,
-      f.createTypeOperatorNode(
-        ts.SyntaxKind.KeyOfKeyword,
-        f.createTypeReferenceNode(subject),
-      ),
-      f.createIndexedAccessTypeNode(f.createTypeReferenceNode(subject), key),
-      fallback,
+  f.createConditionalTypeNode(
+    key,
+    f.createTypeOperatorNode(
+      ts.SyntaxKind.KeyOfKeyword,
+      f.createTypeReferenceNode(subject),
     ),
-  ]);
+    f.createIndexedAccessTypeNode(f.createTypeReferenceNode(subject), key),
+    fallback,
+  );
 
-export const makeAnyPromise = () =>
+export const makePromise = (subject: ts.TypeNode | "any") =>
   f.createTypeReferenceNode(Promise.name, [
-    f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+    subject === "any"
+      ? f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+      : subject,
   ]);
 
 export const makePublicInterface = (
