@@ -7,7 +7,6 @@ import {
   f,
   makePromise,
   makeArrowFn,
-  makeConditionalIndex,
   makeConst,
   makeDeconstruction,
   makeEmptyInitializingConstructor,
@@ -23,7 +22,6 @@ import {
   makePublicType,
   makeTernary,
   makeTypeParams,
-  parametricIndexNode,
   propOf,
   protectedReadonlyModifier,
   quoteProp,
@@ -40,12 +38,7 @@ import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import {
-  ZTSContext,
-  createTypeAlias,
-  printNode,
-  addJsDocComment,
-} from "./zts-helpers";
+import { ZTSContext, createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant;
@@ -417,45 +410,6 @@ export class Integration {
       f.createObjectLiteralExpression(),
     );
 
-    // public provide<M extends Method, P extends Path>(method: M, path: P,
-    //     params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>,
-    //   ): Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown>;
-    // @todo consider removal in v22
-    const providerOverload1 = addJsDocComment(
-      makePublicMethod(
-        this.ids.provideMethod,
-        makeParams({
-          [this.ids.methodParameter.text]: f.createTypeReferenceNode("M"),
-          [this.ids.pathParameter.text]: f.createTypeReferenceNode("P"),
-          [this.ids.paramsArgument.text]: f.createConditionalTypeNode(
-            parametricIndexNode,
-            f.createTypeOperatorNode(
-              ts.SyntaxKind.KeyOfKeyword,
-              f.createTypeReferenceNode(this.ids.inputInterface),
-            ),
-            f.createIndexedAccessTypeNode(
-              f.createTypeReferenceNode(this.ids.inputInterface),
-              parametricIndexNode,
-            ),
-            recordStringAny,
-          ),
-        }),
-        undefined, // overload
-        makeTypeParams({
-          M: this.ids.methodType,
-          P: this.ids.pathType,
-        }),
-        makePromise(
-          makeConditionalIndex(
-            this.ids.responseInterface,
-            parametricIndexNode,
-            f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
-          ),
-        ),
-      ),
-      "@deprecated use the overload with 2 arguments instead",
-    );
-
     // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]>;
     const providerOverload2 = makePublicMethod(
       this.ids.provideMethod,
@@ -565,7 +519,7 @@ export class Integration {
           protectedReadonlyModifier,
         ),
       ]),
-      [providerOverload1, providerOverload2, actualProvider],
+      [providerOverload2, actualProvider],
     );
 
     this.program.push(

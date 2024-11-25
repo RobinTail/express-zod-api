@@ -204,16 +204,6 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
-  /** @deprecated use the overload with 2 arguments instead */
-  public provide<M extends Method, P extends Path>(
-    method: M,
-    path: P,
-    params: `${M} ${P}` extends keyof Input
-      ? Input[`${M} ${P}`]
-      : Record<string, any>,
-  ): Promise<
-    `${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown
-  >;
   public provide<K extends MethodPath>(
     request: K,
     params: Input[K],

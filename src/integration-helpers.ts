@@ -17,8 +17,6 @@ export const protectedReadonlyModifier = [
 
 export const restToken = f.createToken(ts.SyntaxKind.DotDotDotToken);
 
-const emptyHeading = f.createTemplateHead("");
-const spacingMiddle = f.createTemplateMiddle(" ");
 export const emptyTail = f.createTemplateTail("");
 
 // Record<string, any>
@@ -29,19 +27,6 @@ export const recordStringAny = f.createExpressionWithTypeArguments(
     f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
   ],
 );
-
-const makeTemplateType = (names: Array<ts.Identifier | string>) =>
-  f.createTemplateLiteralType(
-    emptyHeading,
-    names.map((name, index) =>
-      f.createTemplateLiteralTypeSpan(
-        f.createTypeReferenceNode(name),
-        index === names.length - 1 ? emptyTail : spacingMiddle,
-      ),
-    ),
-  );
-
-export const parametricIndexNode = makeTemplateType(["M", "P"]); // `${M} ${P}`
 
 export const makeParam = (
   name: ts.Identifier,
@@ -140,21 +125,6 @@ export const makePublicClass = (
     constructor,
     ...statements,
   ]);
-
-export const makeConditionalIndex = (
-  subject: ts.Identifier,
-  key: ts.TypeNode,
-  fallback: ts.TypeNode,
-) =>
-  f.createConditionalTypeNode(
-    key,
-    f.createTypeOperatorNode(
-      ts.SyntaxKind.KeyOfKeyword,
-      f.createTypeReferenceNode(subject),
-    ),
-    f.createIndexedAccessTypeNode(f.createTypeReferenceNode(subject), key),
-    fallback,
-  );
 
 export const makePromise = (subject: ts.TypeNode | "any") =>
   f.createTypeReferenceNode(Promise.name, [

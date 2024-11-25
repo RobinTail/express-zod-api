@@ -442,7 +442,7 @@ describe("Example", async () => {
     );
 
     test("Should perform the request with a positive response", async () => {
-      const response = await client.provide("get", "/v1/user/retrieve", {
+      const response = await client.provide("get /v1/user/retrieve", {
         id: "10",
       });
       expect(response).toMatchSnapshot();
@@ -452,18 +452,8 @@ describe("Example", async () => {
       >();
     });
 
-    test("Feature #2182: should provide using combined path+method", async () => {
-      const response = await client.provide("get /v1/user/retrieve", {
-        id: "10",
-      });
-      expectTypeOf(response).toMatchTypeOf<
-        | { status: "success"; data: { id: number; name: string } }
-        | { status: "error"; error: { message: string } }
-      >();
-    });
-
     test("Issue #2177: should handle path params correctly", async () => {
-      const response = await client.provide("patch", "/v1/user/:id", {
+      const response = await client.provide("patch /v1/user/:id", {
         key: "123",
         id: "12",
         name: "Alan Turing",
@@ -481,13 +471,10 @@ describe("Example", async () => {
       expectTypeOf(client.provide).toBeCallableWith("post /v1/user/create", {});
       // @ts-expect-error -- can't use .toBeCallableWith with .not, see https://github.com/mmkal/expect-type
       expectTypeOf(client.provide).toBeCallableWith("get /v1/user/create", {});
-      expectTypeOf(
-        client.provide("get", "/v1/user/create", {}),
-      ).resolves.toBeUnknown();
     });
 
     test("should handle no content (no response body)", async () => {
-      const response = await client.provide("delete", "/v1/user/:id/remove", {
+      const response = await client.provide("delete /v1/user/:id/remove", {
         id: "12",
       });
       expect(response).toBeUndefined();
