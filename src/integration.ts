@@ -26,9 +26,7 @@ import {
   protectedReadonlyModifier,
   quoteProp,
   recordStringAny,
-  restToken,
   makeAnd,
-  makeEqual,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -126,8 +124,6 @@ export class Integration {
     paramsArgument: f.createIdentifier("params"),
     methodParameter: f.createIdentifier("method"),
     requestParameter: f.createIdentifier("request"),
-    /** @todo use request and params in v22 */
-    args: f.createIdentifier("args"),
     accumulator: f.createIdentifier("acc"),
     provideMethod: f.createIdentifier("provide"),
     implementationArgument: f.createIdentifier("implementation"),
@@ -369,7 +365,7 @@ export class Integration {
       makePropCall(this.ids.accumulator, propOf<string>("replace"), [
         keyParamExpression,
         f.createElementAccessExpression(
-          this.ids.paramsArgument,
+          f.createAsExpression(this.ids.paramsArgument, recordStringAny),
           this.ids.keyParameter,
         ),
       ]),
@@ -397,7 +393,10 @@ export class Integration {
                 f.createPropertyAssignment(
                   f.createComputedPropertyName(this.ids.keyParameter),
                   f.createElementAccessExpression(
-                    this.ids.paramsArgument,
+                    f.createAsExpression(
+                      this.ids.paramsArgument,
+                      recordStringAny,
+                    ),
                     this.ids.keyParameter,
                   ),
                 ),
@@ -410,8 +409,8 @@ export class Integration {
       f.createObjectLiteralExpression(),
     );
 
-    // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]>;
-    const providerOverload2 = makePublicMethod(
+    // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]> {
+    const providerMethod = makePublicMethod(
       this.ids.provideMethod,
       makeParams({
         [this.ids.requestParameter.text]: f.createTypeReferenceNode("K"),
@@ -420,38 +419,6 @@ export class Integration {
           f.createTypeReferenceNode("K"),
         ),
       }),
-      undefined, // overload
-      makeTypeParams({
-        K: this.ids.methodPathType,
-      }),
-      f.createTypeReferenceNode(Promise.name, [
-        f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.responseInterface),
-          f.createTypeReferenceNode("K"),
-        ),
-      ]),
-    );
-
-    // public provide(...args: [string, string, Record<string, any>] | [string, Record<string, any>]) {
-    const actualProvider = makePublicMethod(
-      this.ids.provideMethod,
-      makeParams(
-        {
-          [this.ids.args.text]: f.createUnionTypeNode([
-            // @todo remove this variant in v22
-            f.createTupleTypeNode([
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              recordStringAny,
-            ]),
-            f.createTupleTypeNode([
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              recordStringAny,
-            ]),
-          ]),
-        },
-        restToken,
-      ),
       f.createBlock([
         f.createVariableStatement(
           undefined,
@@ -460,39 +427,16 @@ export class Integration {
             makeDeconstruction(
               this.ids.methodParameter,
               this.ids.pathParameter,
-              this.ids.paramsArgument,
             ),
             // (args.length === 2 ? [...args[0].split((/ (.+)/,2), args[1]] : args) as [Method, Path, Record<string, any>]
             f.createAsExpression(
-              f.createParenthesizedExpression(
-                makeTernary(
-                  makeEqual(
-                    f.createPropertyAccessExpression(
-                      this.ids.args,
-                      propOf<unknown[]>("length"),
-                    ),
-                    f.createNumericLiteral(2),
-                  ),
-                  f.createArrayLiteralExpression([
-                    f.createSpreadElement(
-                      makePropCall(
-                        f.createElementAccessExpression(this.ids.args, 0),
-                        propOf<string>("split"),
-                        [
-                          f.createRegularExpressionLiteral("/ (.+)/"), // split once
-                          f.createNumericLiteral(2), // excludes third empty element
-                        ],
-                      ),
-                    ),
-                    f.createElementAccessExpression(this.ids.args, 1),
-                  ]),
-                  this.ids.args, // @todo remove this in v22
-                ),
-              ),
+              makePropCall(this.ids.requestParameter, propOf<string>("split"), [
+                f.createRegularExpressionLiteral("/ (.+)/"), // split once
+                f.createNumericLiteral(2), // excludes third empty element
+              ]),
               f.createTupleTypeNode([
                 f.createTypeReferenceNode(this.ids.methodType),
                 f.createTypeReferenceNode(this.ids.pathType),
-                recordStringAny,
               ]),
             ),
           ),
@@ -504,6 +448,13 @@ export class Integration {
             pathArgument,
             paramsArgument,
           ]),
+        ),
+      ]),
+      makeTypeParams({ K: this.ids.methodPathType }),
+      f.createTypeReferenceNode(Promise.name, [
+        f.createIndexedAccessTypeNode(
+          f.createTypeReferenceNode(this.ids.responseInterface),
+          f.createTypeReferenceNode("K"),
         ),
       ]),
     );
@@ -519,7 +470,7 @@ export class Integration {
           protectedReadonlyModifier,
         ),
       ]),
-      [providerOverload2, actualProvider],
+      [providerMethod],
     );
 
     this.program.push(

@@ -15,8 +15,6 @@ export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
 
-export const restToken = f.createToken(ts.SyntaxKind.DotDotDotToken);
-
 export const emptyTail = f.createTemplateTail("");
 
 // Record<string, any>
@@ -31,11 +29,11 @@ export const recordStringAny = f.createExpressionWithTypeArguments(
 export const makeParam = (
   name: ts.Identifier,
   type?: ts.TypeNode,
-  features?: ts.Modifier[] | ts.DotDotDotToken,
+  mod?: ts.Modifier[],
 ) =>
   f.createParameterDeclaration(
-    Array.isArray(features) ? features : undefined,
-    Array.isArray(features) ? undefined : features,
+    mod,
+    undefined,
     name,
     undefined,
     type,
@@ -44,10 +42,10 @@ export const makeParam = (
 
 export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,
-  features?: ts.Modifier[] | ts.DotDotDotToken,
+  mod?: ts.Modifier[],
 ) =>
   chain(
-    ([name, node]) => [makeParam(f.createIdentifier(name), node, features)],
+    ([name, node]) => [makeParam(f.createIdentifier(name), node, mod)],
     Object.entries(params),
   );
 
@@ -230,12 +228,5 @@ export const makeAnd = (left: ts.Expression, right: ts.Expression) =>
   f.createBinaryExpression(
     left,
     f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
-    right,
-  );
-
-export const makeEqual = (left: ts.Expression, right: ts.Expression) =>
-  f.createBinaryExpression(
-    left,
-    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
     right,
   );

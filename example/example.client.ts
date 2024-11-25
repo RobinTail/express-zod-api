@@ -207,26 +207,22 @@ export class ExpressZodAPIClient {
   public provide<K extends MethodPath>(
     request: K,
     params: Input[K],
-  ): Promise<Response[K]>;
-  public provide(
-    ...args:
-      | [string, string, Record<string, any>]
-      | [string, Record<string, any>]
-  ) {
-    const [method, path, params] = (
-      args.length === 2 ? [...args[0].split(/ (.+)/, 2), args[1]] : args
-    ) as [Method, Path, Record<string, any>];
+  ): Promise<Response[K]> {
+    const [method, path] = request.split(/ (.+)/, 2) as [Method, Path];
     return this.implementation(
       method,
       Object.keys(params).reduce(
-        (acc, key) => acc.replace(`:${key}`, params[key]),
+        (acc, key) =>
+          acc.replace(`:${key}`, (params as Record<string, any>)[key]),
         path,
       ),
       Object.keys(params).reduce(
         (acc, key) =>
           Object.assign(
             acc,
-            !path.includes(`:${key}`) && { [key]: params[key] },
+            !path.includes(`:${key}`) && {
+              [key]: (params as Record<string, any>)[key],
+            },
           ),
         {},
       ),
