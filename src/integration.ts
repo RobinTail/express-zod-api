@@ -2,7 +2,6 @@ import ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  emptyTail,
   exportModifier,
   f,
   makePromiseAny,
@@ -27,6 +26,7 @@ import {
   quoteProp,
   recordStringAny,
   makeAnd,
+  makeTemplate,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -354,10 +354,7 @@ export class Integration {
     );
 
     // `:${key}`
-    const keyParamExpression = f.createTemplateExpression(
-      f.createTemplateHead(":"),
-      [f.createTemplateSpan(this.ids.keyParameter, emptyTail)],
-    );
+    const keyParamExpression = makeTemplate(":", [this.ids.keyParameter]);
 
     // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key]), path)
     const pathArgument = makeObjectKeysReducer(
@@ -520,15 +517,10 @@ export class Integration {
         this.ids.responseConst,
         f.createAwaitExpression(
           f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
-            f.createTemplateExpression(
-              f.createTemplateHead("https://example.com"),
-              [
-                f.createTemplateSpan(
-                  this.ids.pathParameter,
-                  f.createTemplateMiddle(""),
-                ),
-                f.createTemplateSpan(this.ids.searchParamsConst, emptyTail),
-              ],
+            makeTemplate(
+              "https://example.com",
+              [this.ids.pathParameter],
+              [this.ids.searchParamsConst],
             ),
             f.createObjectLiteralExpression([
               methodProperty,
@@ -566,14 +558,11 @@ export class Integration {
         makeTernary(
           this.ids.hasBodyConst,
           f.createStringLiteral(""),
-          f.createTemplateExpression(f.createTemplateHead("?"), [
-            f.createTemplateSpan(
-              f.createNewExpression(
-                f.createIdentifier(URLSearchParams.name),
-                undefined,
-                [this.ids.paramsArgument],
-              ),
-              emptyTail,
+          makeTemplate("?", [
+            f.createNewExpression(
+              f.createIdentifier(URLSearchParams.name),
+              undefined,
+              [this.ids.paramsArgument],
             ),
           ]),
         ),

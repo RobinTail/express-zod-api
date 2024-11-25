@@ -15,7 +15,21 @@ export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
 
-export const emptyTail = f.createTemplateTail("");
+export const makeTemplate = (
+  head: string,
+  ...rest: ([ts.Expression] | [ts.Expression, string])[]
+) =>
+  f.createTemplateExpression(
+    f.createTemplateHead(head),
+    rest.map(([id, str = ""], idx) =>
+      f.createTemplateSpan(
+        id,
+        idx === rest.length - 1
+          ? f.createTemplateTail(str)
+          : f.createTemplateMiddle(str),
+      ),
+    ),
+  );
 
 // Record<string, any>
 export const recordStringAny = f.createExpressionWithTypeArguments(

@@ -141,6 +141,10 @@ export default [
           selector: "Identifier[name='EqualsEqualsEqualsToken']",
           message: "use makeEqual() helper",
         },
+        {
+          selector: "Identifier[name='createTemplateExpression']",
+          message: "use makeTemplate() helper",
+        },
       ],
     },
   },
