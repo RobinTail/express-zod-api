@@ -513,18 +513,12 @@ export class Integration {
                   f.createArrayLiteralExpression([
                     f.createSpreadElement(
                       makePropCall(
-                        f.createElementAccessExpression(
-                          this.ids.args,
-                          f.createNumericLiteral(0),
-                        ),
+                        f.createElementAccessExpression(this.ids.args, 0),
                         propOf<string>("split"),
                         [f.createStringLiteral(" ")],
                       ),
                     ),
-                    f.createElementAccessExpression(
-                      this.ids.args,
-                      f.createNumericLiteral(1),
-                    ),
+                    f.createElementAccessExpression(this.ids.args, 1),
                   ]),
                   this.ids.args,
                 ),
