@@ -1,6 +1,5 @@
 import ts from "typescript";
 import { z } from "zod";
-import { Path } from "../example/example.client";
 import { ResponseVariant } from "./api-response";
 import {
   emptyTail,
