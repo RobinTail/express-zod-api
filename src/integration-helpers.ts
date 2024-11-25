@@ -243,12 +243,17 @@ export const makeTernary = (
   );
 
 export const makePropCall = (
-  parent: ts.Expression,
+  parent: ts.Expression | [ts.Expression, ts.Identifier],
   child: ts.Identifier | string,
   args?: ts.Expression[],
 ) =>
   f.createCallExpression(
-    f.createPropertyAccessExpression(parent, child),
+    f.createPropertyAccessExpression(
+      Array.isArray(parent)
+        ? f.createPropertyAccessExpression(...parent)
+        : parent,
+      child,
+    ),
     undefined,
     args,
   );

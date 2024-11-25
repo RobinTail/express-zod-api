@@ -690,10 +690,7 @@ export class Integration {
       makeConst(
         this.ids.contentTypeConst,
         makePropCall(
-          f.createPropertyAccessExpression(
-            this.ids.responseConst,
-            this.ids.headersProperty,
-          ),
+          [this.ids.responseConst, this.ids.headersProperty],
           propOf<Headers>("get"),
           [f.createStringLiteral("content-type")],
         ),
