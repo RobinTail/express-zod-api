@@ -4,7 +4,7 @@ import { Method } from "./method";
 
 export const f = ts.factory;
 
-export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
+const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
 const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
 
@@ -87,11 +87,14 @@ export const makeDeconstruction = (
 export const makeConst = (
   name: ts.Identifier | ts.ArrayBindingPattern,
   value: ts.Expression,
-  type?: ts.TypeNode,
+  { type, expose }: { type?: ts.TypeNode; expose?: true } = {},
 ) =>
-  f.createVariableDeclarationList(
-    [f.createVariableDeclaration(name, undefined, type, value)],
-    ts.NodeFlags.Const,
+  f.createVariableStatement(
+    expose && exportModifier,
+    f.createVariableDeclarationList(
+      [f.createVariableDeclaration(name, undefined, type, value)],
+      ts.NodeFlags.Const,
+    ),
   );
 
 export const makePublicLiteralType = (

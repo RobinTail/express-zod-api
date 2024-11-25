@@ -2,7 +2,6 @@ import ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  exportModifier,
   f,
   makePromiseAny,
   makeArrowFn,
@@ -319,21 +318,17 @@ export class Integration {
     if (variant === "types") return;
 
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
-    const jsonEndpointsConst = f.createVariableStatement(
-      exportModifier,
-      makeConst(
-        this.ids.jsonEndpointsConst,
-        f.createObjectLiteralExpression(jsonEndpoints),
-      ),
+    const jsonEndpointsConst = makeConst(
+      this.ids.jsonEndpointsConst,
+      f.createObjectLiteralExpression(jsonEndpoints),
+      { expose: true },
     );
 
     // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
-    const endpointTagsConst = f.createVariableStatement(
-      exportModifier,
-      makeConst(
-        this.ids.endpointTagsConst,
-        f.createObjectLiteralExpression(endpointTags),
-      ),
+    const endpointTagsConst = makeConst(
+      this.ids.endpointTagsConst,
+      f.createObjectLiteralExpression(endpointTags),
+      { expose: true },
     );
 
     // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
@@ -418,25 +413,19 @@ export class Integration {
         ),
       }),
       f.createBlock([
-        f.createVariableStatement(
-          undefined,
-          makeConst(
-            // const [method, path, params] =
-            makeDeconstruction(
-              this.ids.methodParameter,
-              this.ids.pathParameter,
-            ),
-            // request.split(/ (.+)/, 2) as [Method, Path];
-            f.createAsExpression(
-              makePropCall(this.ids.requestParameter, propOf<string>("split"), [
-                f.createRegularExpressionLiteral("/ (.+)/"), // split once
-                f.createNumericLiteral(2), // excludes third empty element
-              ]),
-              f.createTupleTypeNode([
-                f.createTypeReferenceNode(this.ids.methodType),
-                f.createTypeReferenceNode(this.ids.pathType),
-              ]),
-            ),
+        makeConst(
+          // const [method, path, params] =
+          makeDeconstruction(this.ids.methodParameter, this.ids.pathParameter),
+          // request.split(/ (.+)/, 2) as [Method, Path];
+          f.createAsExpression(
+            makePropCall(this.ids.requestParameter, propOf<string>("split"), [
+              f.createRegularExpressionLiteral("/ (.+)/"), // split once
+              f.createNumericLiteral(2), // excludes third empty element
+            ]),
+            f.createTupleTypeNode([
+              f.createTypeReferenceNode(this.ids.methodType),
+              f.createTypeReferenceNode(this.ids.pathType),
+            ]),
           ),
         ),
         // return this.implementation(___)
@@ -512,73 +501,61 @@ export class Integration {
     );
 
     // const response = await fetch(`https://example.com${path}${searchParams}`, { ___ });
-    const responseStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.responseConst,
-        f.createAwaitExpression(
-          f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
-            makeTemplate(
-              "https://example.com",
-              [this.ids.pathParameter],
-              [this.ids.searchParamsConst],
-            ),
-            f.createObjectLiteralExpression([
-              methodProperty,
-              headersProperty,
-              bodyProperty,
-            ]),
+    const responseStatement = makeConst(
+      this.ids.responseConst,
+      f.createAwaitExpression(
+        f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
+          makeTemplate(
+            "https://example.com",
+            [this.ids.pathParameter],
+            [this.ids.searchParamsConst],
+          ),
+          f.createObjectLiteralExpression([
+            methodProperty,
+            headersProperty,
+            bodyProperty,
           ]),
-        ),
+        ]),
       ),
     );
 
     // const hasBody = !["get", "delete"].includes(method);
-    const hasBodyStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.hasBodyConst,
-        f.createLogicalNot(
-          makePropCall(
-            f.createArrayLiteralExpression([
-              f.createStringLiteral("get" satisfies Method),
-              f.createStringLiteral("delete" satisfies Method),
-            ]),
-            propOf<string[]>("includes"),
-            [this.ids.methodParameter],
-          ),
+    const hasBodyStatement = makeConst(
+      this.ids.hasBodyConst,
+      f.createLogicalNot(
+        makePropCall(
+          f.createArrayLiteralExpression([
+            f.createStringLiteral("get" satisfies Method),
+            f.createStringLiteral("delete" satisfies Method),
+          ]),
+          propOf<string[]>("includes"),
+          [this.ids.methodParameter],
         ),
       ),
     );
 
     // const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-    const searchParamsStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.searchParamsConst,
-        makeTernary(
-          this.ids.hasBodyConst,
-          f.createStringLiteral(""),
-          makeTemplate("?", [
-            makeNew(
-              f.createIdentifier(URLSearchParams.name),
-              this.ids.paramsArgument,
-            ),
-          ]),
-        ),
+    const searchParamsStatement = makeConst(
+      this.ids.searchParamsConst,
+      makeTernary(
+        this.ids.hasBodyConst,
+        f.createStringLiteral(""),
+        makeTemplate("?", [
+          makeNew(
+            f.createIdentifier(URLSearchParams.name),
+            this.ids.paramsArgument,
+          ),
+        ]),
       ),
     );
 
     // const contentType = response.headers.get("content-type");
-    const contentTypeStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.contentTypeConst,
-        makePropCall(
-          [this.ids.responseConst, this.ids.headersProperty],
-          propOf<Headers>("get"),
-          [f.createStringLiteral("content-type")],
-        ),
+    const contentTypeStatement = makeConst(
+      this.ids.contentTypeConst,
+      makePropCall(
+        [this.ids.responseConst, this.ids.headersProperty],
+        propOf<Headers>("get"),
+        [f.createStringLiteral("content-type")],
       ),
     );
 
@@ -593,20 +570,17 @@ export class Integration {
     );
 
     // const isJSON = contentType.startsWith("application/json");
-    const parserStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.isJsonConst,
-        f.createCallChain(
-          f.createPropertyAccessChain(
-            this.ids.contentTypeConst,
-            undefined,
-            propOf<string>("startsWith"),
-          ),
+    const parserStatement = makeConst(
+      this.ids.isJsonConst,
+      f.createCallChain(
+        f.createPropertyAccessChain(
+          this.ids.contentTypeConst,
           undefined,
-          undefined,
-          [f.createStringLiteral(contentTypes.json)],
+          propOf<string>("startsWith"),
         ),
+        undefined,
+        undefined,
+        [f.createStringLiteral(contentTypes.json)],
       ),
     );
 
@@ -627,29 +601,29 @@ export class Integration {
     );
 
     // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
-    const exampleImplStatement = f.createVariableStatement(
-      exportModifier,
-      makeConst(
-        this.ids.exampleImplementationConst,
-        makeArrowFn(
-          [
-            this.ids.methodParameter,
-            this.ids.pathParameter,
-            this.ids.paramsArgument,
-          ],
-          f.createBlock([
-            hasBodyStatement,
-            searchParamsStatement,
-            responseStatement,
-            contentTypeStatement,
-            noBodyStatement,
-            parserStatement,
-            returnStatement,
-          ]),
-          true,
-        ),
-        f.createTypeReferenceNode(this.ids.implementationType),
+    const exampleImplStatement = makeConst(
+      this.ids.exampleImplementationConst,
+      makeArrowFn(
+        [
+          this.ids.methodParameter,
+          this.ids.pathParameter,
+          this.ids.paramsArgument,
+        ],
+        f.createBlock([
+          hasBodyStatement,
+          searchParamsStatement,
+          responseStatement,
+          contentTypeStatement,
+          noBodyStatement,
+          parserStatement,
+          returnStatement,
+        ]),
+        true,
       ),
+      {
+        expose: true,
+        type: f.createTypeReferenceNode(this.ids.implementationType),
+      },
     );
 
     // client.provide("get", "/v1/user/retrieve", { id: "10" });
@@ -664,12 +638,9 @@ export class Integration {
     );
 
     // const client = new ExpressZodAPIClient(exampleImplementation);
-    const clientInstanceStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.clientConst,
-        makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
-      ),
+    const clientInstanceStatement = makeConst(
+      this.ids.clientConst,
+      makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
     );
 
     this.usage.push(

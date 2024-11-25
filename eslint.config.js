@@ -108,7 +108,7 @@ export default [
           message: "use makePublicType() or makePublicLiteralType() helpers",
         },
         {
-          selector: "Identifier[name='createVariableDeclarationList']",
+          selector: "Identifier[name='createVariableStatement']",
           message: "use makeConst() helper",
         },
         {
