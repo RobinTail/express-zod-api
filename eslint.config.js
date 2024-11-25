@@ -127,6 +127,12 @@ export default [
           selector: "Identifier[name='createParameterDeclaration']",
           message: "use makeParam() or makeParams() helpers",
         },
+        {
+          selector:
+            "CallExpression[callee.property.name='createCallExpression']" +
+            "[arguments.0.callee.property.name='createPropertyAccessExpression']",
+          message: "use makePropCall() helper",
+        },
       ],
     },
   },
