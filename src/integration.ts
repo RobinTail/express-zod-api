@@ -1,5 +1,6 @@
 import ts from "typescript";
 import { z } from "zod";
+import { Path } from "../example/example.client";
 import { ResponseVariant } from "./api-response";
 import {
   emptyTail,
@@ -428,7 +429,7 @@ export class Integration {
               this.ids.methodParameter,
               this.ids.pathParameter,
             ),
-            // (args.length === 2 ? [...args[0].split((/ (.+)/,2), args[1]] : args) as [Method, Path, Record<string, any>]
+            // request.split(/ (.+)/, 2) as [Method, Path];
             f.createAsExpression(
               makePropCall(this.ids.requestParameter, propOf<string>("split"), [
                 f.createRegularExpressionLiteral("/ (.+)/"), // split once
