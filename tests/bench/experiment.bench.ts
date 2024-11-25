@@ -1,4 +1,4 @@
-import { chain, map, pipe, join } from "ramda";
+import { chain } from "ramda";
 import { bench } from "vitest";
 import { ucFirst } from "../../src/common-helpers";
 
@@ -12,15 +12,15 @@ export const current = (...args: string[]) =>
     .map(ucFirst)
     .join("");
 
-export const feat = (...args: string[]) =>
-  pipe(
-    chain((entry: string) => entry.split(/[^A-Z0-9]/gi)),
-    chain((entry) =>
+export const feat = (...args: string[]) => {
+  const byAlpha = chain((entry) => entry.split(/[^A-Z0-9]/gi), args);
+  const byWord = chain(
+    (entry) =>
       entry.replaceAll(/[A-Z]+/g, (beginning) => `/${beginning}`).split("/"),
-    ),
-    map(ucFirst),
-    join(""),
-  )(args);
+    byAlpha,
+  );
+  return byWord.map(ucFirst).join("");
+};
 
 describe("Experiment on flatMap", () => {
   const subj = ["v1", "test/jest", "something anything"];
