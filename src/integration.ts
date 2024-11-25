@@ -15,6 +15,7 @@ import {
   makeObjectKeysReducer,
   makeParam,
   makeParams,
+  makePropCall,
   makePublicClass,
   makePublicInterface,
   makePublicLiteralType,
@@ -366,20 +367,13 @@ export class Integration {
     // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key as keyof typeof params]), path)
     const pathArgument = makeObjectKeysReducer(
       this.ids.paramsArgument,
-      f.createCallExpression(
-        f.createPropertyAccessExpression(
-          this.ids.accumulator,
-          propOf<string>("replace"),
+      makePropCall(this.ids.accumulator, propOf<string>("replace"), [
+        keyParamExpression,
+        f.createElementAccessExpression(
+          this.ids.paramsArgument,
+          this.ids.keyParameter,
         ),
-        undefined,
-        [
-          keyParamExpression,
-          f.createElementAccessExpression(
-            this.ids.paramsArgument,
-            this.ids.keyParameter,
-          ),
-        ],
-      ),
+      ]),
       this.ids.pathParameter,
     );
 
@@ -387,25 +381,17 @@ export class Integration {
     //   Object.assign(acc, !path.includes(`:${key}`) && {[key]: params[key]} ), {})
     const paramsArgument = makeObjectKeysReducer(
       this.ids.paramsArgument,
-      f.createCallExpression(
-        f.createPropertyAccessExpression(
-          f.createIdentifier(Object.name),
-          propOf<typeof Object>("assign"),
-        ),
-        undefined,
+      makePropCall(
+        f.createIdentifier(Object.name),
+        propOf<typeof Object>("assign"),
         [
           this.ids.accumulator,
           f.createBinaryExpression(
             f.createPrefixUnaryExpression(
               ts.SyntaxKind.ExclamationToken,
-              f.createCallExpression(
-                f.createPropertyAccessExpression(
-                  this.ids.pathParameter,
-                  propOf<string>("includes"),
-                ),
-                undefined,
-                [keyParamExpression],
-              ),
+              makePropCall(this.ids.pathParameter, propOf<string>("includes"), [
+                keyParamExpression,
+              ]),
             ),
             f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
             f.createObjectLiteralExpression(
@@ -526,15 +512,12 @@ export class Integration {
                   ),
                   f.createArrayLiteralExpression([
                     f.createSpreadElement(
-                      f.createCallExpression(
-                        f.createPropertyAccessExpression(
-                          f.createElementAccessExpression(
-                            this.ids.args,
-                            f.createNumericLiteral(0),
-                          ),
-                          propOf<string>("split"),
+                      makePropCall(
+                        f.createElementAccessExpression(
+                          this.ids.args,
+                          f.createNumericLiteral(0),
                         ),
-                        undefined,
+                        propOf<string>("split"),
                         [f.createStringLiteral(" ")],
                       ),
                     ),
@@ -556,14 +539,11 @@ export class Integration {
         ),
         // return this.implementation(___)
         f.createReturnStatement(
-          f.createCallExpression(
-            f.createPropertyAccessExpression(
-              f.createThis(),
-              this.ids.implementationArgument,
-            ),
-            undefined,
-            [this.ids.methodParameter, pathArgument, paramsArgument],
-          ),
+          makePropCall(f.createThis(), this.ids.implementationArgument, [
+            this.ids.methodParameter,
+            pathArgument,
+            paramsArgument,
+          ]),
         ),
       ]),
     );
@@ -607,14 +587,7 @@ export class Integration {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
       this.ids.methodParameter,
-      f.createCallExpression(
-        f.createPropertyAccessExpression(
-          this.ids.methodParameter,
-          propOf<string>("toUpperCase"),
-        ),
-        undefined,
-        undefined,
-      ),
+      makePropCall(this.ids.methodParameter, propOf<string>("toUpperCase")),
     );
 
     // headers: hasBody ? { "Content-Type": "application/json" } : undefined
@@ -637,14 +610,9 @@ export class Integration {
       this.ids.bodyProperty,
       makeTernary(
         this.ids.hasBodyConst,
-        f.createCallExpression(
-          f.createPropertyAccessExpression(
-            f.createIdentifier("JSON"),
-            propOf<JSON>("stringify"),
-          ),
-          undefined,
-          [this.ids.paramsArgument],
-        ),
+        makePropCall(f.createIdentifier("JSON"), propOf<JSON>("stringify"), [
+          this.ids.paramsArgument,
+        ]),
         this.ids.undefinedValue,
       ),
     );
@@ -682,15 +650,12 @@ export class Integration {
       makeConst(
         this.ids.hasBodyConst,
         f.createLogicalNot(
-          f.createCallExpression(
-            f.createPropertyAccessExpression(
-              f.createArrayLiteralExpression([
-                f.createStringLiteral("get" satisfies Method),
-                f.createStringLiteral("delete" satisfies Method),
-              ]),
-              propOf<string[]>("includes"),
-            ),
-            undefined,
+          makePropCall(
+            f.createArrayLiteralExpression([
+              f.createStringLiteral("get" satisfies Method),
+              f.createStringLiteral("delete" satisfies Method),
+            ]),
+            propOf<string[]>("includes"),
             [this.ids.methodParameter],
           ),
         ),
@@ -724,15 +689,12 @@ export class Integration {
       undefined,
       makeConst(
         this.ids.contentTypeConst,
-        f.createCallExpression(
+        makePropCall(
           f.createPropertyAccessExpression(
-            f.createPropertyAccessExpression(
-              this.ids.responseConst,
-              this.ids.headersProperty,
-            ),
-            propOf<Headers>("get"),
+            this.ids.responseConst,
+            this.ids.headersProperty,
           ),
-          undefined,
+          propOf<Headers>("get"),
           [f.createStringLiteral("content-type")],
         ),
       ),
@@ -810,20 +772,13 @@ export class Integration {
 
     // client.provide("get", "/v1/user/retrieve", { id: "10" });
     const provideCallingStatement = f.createExpressionStatement(
-      f.createCallExpression(
-        f.createPropertyAccessExpression(
-          this.ids.clientConst,
-          this.ids.provideMethod,
-        ),
-        undefined,
-        [
-          f.createStringLiteral("get" satisfies Method),
-          f.createStringLiteral("/v1/user/retrieve"),
-          f.createObjectLiteralExpression([
-            f.createPropertyAssignment("id", f.createStringLiteral("10")),
-          ]),
-        ],
-      ),
+      makePropCall(this.ids.clientConst, this.ids.provideMethod, [
+        f.createStringLiteral("get" satisfies Method),
+        f.createStringLiteral("/v1/user/retrieve"),
+        f.createObjectLiteralExpression([
+          f.createPropertyAssignment("id", f.createStringLiteral("10")),
+        ]),
+      ]),
     );
 
     // const client = new ExpressZodAPIClient(exampleImplementation);

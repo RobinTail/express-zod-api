@@ -241,3 +241,14 @@ export const makeTernary = (
     f.createToken(ts.SyntaxKind.ColonToken),
     negative,
   );
+
+export const makePropCall = (
+  parent: ts.Expression,
+  child: ts.Identifier | string,
+  args?: ts.Expression[],
+) =>
+  f.createCallExpression(
+    f.createPropertyAccessExpression(parent, child),
+    undefined,
+    args,
+  );
