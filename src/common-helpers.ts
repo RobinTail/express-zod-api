@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { memoizeWith, pickBy, xprod } from "ramda";
+import { chain, join, map, memoizeWith, pickBy, pipe, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -123,14 +123,14 @@ export const ucFirst = (subject: string) =>
   subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
 
 export const makeCleanId = (...args: string[]) =>
-  args
-    .flatMap((entry) => entry.split(/[^A-Z0-9]/gi)) // split by non-alphanumeric characters
-    .flatMap((entry) =>
-      // split by sequences of capitalized letters
+  pipe(
+    chain((entry: string) => entry.split(/[^A-Z0-9]/gi)),
+    chain((entry) =>
       entry.replaceAll(/[A-Z]+/g, (beginning) => `/${beginning}`).split("/"),
-    )
-    .map(ucFirst)
-    .join("");
+    ),
+    map(ucFirst),
+    join(""),
+  )(args);
 
 export const tryToTransform = <T>(
   schema: z.ZodEffects<z.ZodTypeAny, T>,
