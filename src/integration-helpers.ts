@@ -1,5 +1,4 @@
 import ts from "typescript";
-import { chain } from "ramda";
 import { Method } from "./method";
 
 export const f = ts.factory;
@@ -58,9 +57,8 @@ export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,
   mod?: ts.Modifier[],
 ) =>
-  chain(
-    ([name, node]) => [makeParam(f.createIdentifier(name), node, mod)],
-    Object.entries(params),
+  Object.entries(params).map(([name, node]) =>
+    makeParam(f.createIdentifier(name), node, mod),
   );
 
 export const makeEmptyInitializingConstructor = (
@@ -160,11 +158,10 @@ export const makePublicInterface = (
     props,
   );
 
-const aggregateDeclarations = chain(([name, id]: [string, ts.Identifier]) => [
-  f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
-]);
 export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
-  aggregateDeclarations(Object.entries(params));
+  Object.entries(params).map(([name, id]) =>
+    f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
+  );
 
 export const makeArrowFn = (
   params: ts.Identifier[],
