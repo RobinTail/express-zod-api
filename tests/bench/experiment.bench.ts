@@ -1,3 +1,5 @@
+import { chain, prop } from "ramda";
+import ts from "typescript";
 import { bench } from "vitest";
 import { BuiltinLogger } from "../../src";
 

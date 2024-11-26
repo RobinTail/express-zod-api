@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { memoizeWith, pickBy, xprod } from "ramda";
+import { chain, memoizeWith, pickBy, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -122,15 +122,15 @@ export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
 export const ucFirst = (subject: string) =>
   subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
 
-export const makeCleanId = (...args: string[]) =>
-  args
-    .flatMap((entry) => entry.split(/[^A-Z0-9]/gi)) // split by non-alphanumeric characters
-    .flatMap((entry) =>
-      // split by sequences of capitalized letters
+export const makeCleanId = (...args: string[]) => {
+  const byAlpha = chain((entry) => entry.split(/[^A-Z0-9]/gi), args);
+  const byWord = chain(
+    (entry) =>
       entry.replaceAll(/[A-Z]+/g, (beginning) => `/${beginning}`).split("/"),
-    )
-    .map(ucFirst)
-    .join("");
+    byAlpha,
+  );
+  return byWord.map(ucFirst).join("");
+};
 
 export const tryToTransform = <T>(
   schema: z.ZodEffects<z.ZodTypeAny, T>,
