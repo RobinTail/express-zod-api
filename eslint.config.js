@@ -63,6 +63,11 @@ export default [
             "CallExpression[callee.name='keys'], CallExpression[callee.name='keysIn']",
           message: "R.keys() and keysIn() are 1.2x slower than Object.keys()",
         },
+        {
+          // https://github.com/RobinTail/express-zod-api/pull/2209
+          selector: "CallExpression[callee.property.name='flatMap']",
+          message: "flatMap() is about 1.3x slower than R.chain()",
+        },
       ],
     },
   },
