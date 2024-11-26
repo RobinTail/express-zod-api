@@ -6,7 +6,31 @@ import prettierRules from "eslint-plugin-prettier/recommended";
 import unicornPlugin from "eslint-plugin-unicorn";
 import allowedDepsPlugin from "eslint-plugin-allowed-dependencies";
 
-export default [
+const peformanceConcerns = [
+  {
+    selector: "ImportDeclaration[source.value=/assert/]", // #2169
+    message: "assert is slow, use throw",
+  },
+  {
+    selector: "MemberExpression[object.name='process'][property.name='env']", // #2144
+    message: "Reading process.env is slow and must be memoized",
+  },
+  {
+    selector: "CallExpression > Identifier[name='toPairs']", // #2168
+    message: "R.toPairs() is 1.1x slower than Object.entries()",
+  },
+  {
+    selector:
+      "CallExpression[callee.name='keys'], CallExpression[callee.name='keysIn']", // #2168
+    message: "R.keys() and keysIn() are 1.2x slower than Object.keys()",
+  },
+  {
+    selector: "CallExpression[callee.property.name='flatMap']", // #2209
+    message: "flatMap() is about 1.3x slower than R.chain()",
+  },
+];
+
+export default tsPlugin.config(
   {
     languageOptions: { globals: globals.node },
     plugins: {
@@ -15,7 +39,7 @@ export default [
     },
   },
   jsPlugin.configs.recommended,
-  ...tsPlugin.configs.recommended,
+  tsPlugin.configs.recommended,
   prettierOverrides,
   prettierRules,
   { name: "globally/ignored", ignores: ["dist/", "coverage/", "migration/"] },
@@ -38,32 +62,7 @@ export default [
     files: ["src/*.ts"],
     rules: {
       "allowed/dependencies": ["error", { typeOnly: ["eslint", "prettier"] }],
-      // "no-restricted-syntax": ["warn", "ReturnStatement[argument=null]"],
-      "no-restricted-syntax": [
-        "warn",
-        {
-          // https://github.com/RobinTail/express-zod-api/pull/2169
-          selector: "ImportDeclaration[source.value=/assert/]",
-          message: "assert is slow, use throw",
-        },
-        {
-          // https://github.com/RobinTail/express-zod-api/pull/2144
-          selector:
-            "MemberExpression[object.name='process'][property.name='env']",
-          message: "Reading process.env is slow and must be memoized",
-        },
-        {
-          // https://github.com/RobinTail/express-zod-api/pull/2168
-          selector: "CallExpression > Identifier[name='toPairs']",
-          message: "R.toPairs() is 1.1x slower than Object.entries()",
-        },
-        {
-          // https://github.com/RobinTail/express-zod-api/pull/2168
-          selector:
-            "CallExpression[callee.name='keys'], CallExpression[callee.name='keysIn']",
-          message: "R.keys() and keysIn() are 1.2x slower than Object.keys()",
-        },
-      ],
+      "no-restricted-syntax": ["warn", ...peformanceConcerns],
     },
   },
   {
@@ -182,4 +181,4 @@ export default [
       ],
     },
   },
-];
+);
