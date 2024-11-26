@@ -1,36 +1,28 @@
 import { bench } from "vitest";
-import { retrieveUserEndpoint } from "../../example/endpoints/retrieve-user";
-import { DependsOnMethod } from "../../src";
-import { walkRouting } from "../../src/routing-walker";
+import { BuiltinLogger } from "../../src";
 
-const routing = {
-  a: {
-    b: {
-      c: {
-        d: {
-          e: {
-            f: {
-              g: {
-                h: {
-                  i: {
-                    j: new DependsOnMethod({
-                      post: retrieveUserEndpoint,
-                    }),
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    k: { l: {} },
-    m: {},
-  },
-};
+describe("Experiment for builtin logger", () => {
+  const fixed = (a: string, b?: number) => `${a}${b}`;
+  const generic = (...args: unknown[]) => args.join();
+  const logger = new BuiltinLogger();
 
-describe("Experiment for routing walker", () => {
-  bench("featured", () => {
-    walkRouting({ routing, onEndpoint: vi.fn() });
+  bench("fixed 2", () => {
+    fixed("second", 2);
+  });
+
+  bench("fixed 1", () => {
+    fixed("second");
+  });
+
+  bench("generic 2", () => {
+    generic("second", 2);
+  });
+
+  bench("generic 1", () => {
+    generic("second");
+  });
+
+  bench(".child", () => {
+    logger.child({});
   });
 });
