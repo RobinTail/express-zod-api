@@ -1,35 +1,39 @@
-import { chain } from "ramda";
+import { chain, prop } from "ramda";
+import ts from "typescript";
 import { bench } from "vitest";
-import { ucFirst } from "../../src/common-helpers";
+import { f } from "../../src/integration-helpers";
 
-export const current = (...args: string[]) =>
-  args
-    .flatMap((entry) => entry.split(/[^A-Z0-9]/gi)) // split by non-alphanumeric characters
-    .flatMap((entry) =>
-      // split by sequences of capitalized letters
-      entry.replaceAll(/[A-Z]+/g, (beginning) => `/${beginning}`).split("/"),
-    )
-    .map(ucFirst)
-    .join("");
+export const current = (nodes: ts.TypeLiteralNode[]) =>
+  f.createTypeLiteralNode(nodes.flatMap(({ members }) => members));
 
-export const feat = (...args: string[]) => {
-  const byAlpha = chain((entry) => entry.split(/[^A-Z0-9]/gi), args);
-  const byWord = chain(
-    (entry) =>
-      entry.replaceAll(/[A-Z]+/g, (beginning) => `/${beginning}`).split("/"),
-    byAlpha,
-  );
-  return byWord.map(ucFirst).join("");
-};
+export const feat = (nodes: ts.TypeLiteralNode[]) =>
+  f.createTypeLiteralNode(chain(prop("members"), nodes));
 
 describe("Experiment on flatMap", () => {
-  const subj = ["v1", "test/jest", "something anything"];
+  const subj = [
+    f.createTypeLiteralNode([
+      f.createPropertySignature(
+        undefined,
+        "test1",
+        undefined,
+        f.createTypeReferenceNode("test1"),
+      ),
+    ]),
+    f.createTypeLiteralNode([
+      f.createPropertySignature(
+        undefined,
+        "test2",
+        undefined,
+        f.createTypeReferenceNode("test2"),
+      ),
+    ]),
+  ];
 
-  bench("current", () => {
-    current(...subj);
+  bench("flatMap", () => {
+    current(subj);
   });
 
-  bench("featured", () => {
-    feat(...subj);
+  bench("chain+prop", () => {
+    feat(subj);
   });
 });
