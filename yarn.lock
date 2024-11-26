@@ -944,10 +944,10 @@
     "@typescript-eslint/types" "8.16.0"
     eslint-visitor-keys "^4.2.0"
 
-"@vitest/coverage-v8@^2.1.5":
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/@vitest/coverage-v8/-/coverage-v8-2.1.5.tgz#74ef3bf6737f9897a54af22f820d90e85883ff83"
-  integrity sha512-/RoopB7XGW7UEkUndRXF87A9CwkoZAJW01pj8/3pgmDVsjMH2IKy6H1A38po9tmUlwhSyYs0az82rbKd9Yaynw==
+"@vitest/coverage-v8@^2.1.6":
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/@vitest/coverage-v8/-/coverage-v8-2.1.6.tgz#cdf43a628a460b9ac1bc2de72540830fa29fe7a1"
+  integrity sha512-qItJVYDbG3MUFO68dOZUz+rWlqe9LMzotERXFXKg25s2A/kSVsyS9O0yNGrITfBd943GsnBeQZkBUu7Pc+zVeA==
   dependencies:
     "@ampproject/remapping" "^2.3.0"
     "@bcoe/v8-coverage" "^0.2.3"
@@ -3545,7 +3545,7 @@ vite-node@2.1.6:
   optionalDependencies:
     fsevents "~2.3.3"
 
-vitest@^2.1.5:
+vitest@^2.1.6:
   version "2.1.6"
   resolved "https://registry.yarnpkg.com/vitest/-/vitest-2.1.6.tgz#44d661c6b3f3a3a0c597143f78d27215ee4666cc"
   integrity sha512-isUCkvPL30J4c5O5hgONeFRsDmlw6kzFEdLQHLezmDdKQHy8Ke/B/dgdTMEgU0vm+iZ0TjW8GuK83DiahBoKWQ==
