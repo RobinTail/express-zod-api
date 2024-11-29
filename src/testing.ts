@@ -14,16 +14,17 @@ import {
   RequestOptions,
   createResponse,
   ResponseOptions,
+  MockRequest,
 } from "node-mocks-http";
 import { AbstractMiddleware } from "./middleware";
 
-export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
-  const mock = createRequest<Request>({
+export const makeRequestMock = <REQ extends RequestOptions>(
+  props?: REQ,
+): MockRequest<Request & REQ> =>
+  createRequest<Request & REQ>({
     ...props,
     headers: { "content-type": contentTypes.json, ...props?.headers },
   });
-  return mock as typeof mock & REQ;
-};
 
 export const makeResponseMock = (opt?: ResponseOptions) =>
   createResponse<Response>(opt);
@@ -113,7 +114,11 @@ export const testEndpoint = async <
     config: configMock as CommonConfig,
     logger: loggerMock as ActualLogger,
   });
-  return { requestMock, responseMock, loggerMock };
+  return {
+    requestMock: requestMock as MockRequest<Request & REQ>,
+    responseMock,
+    loggerMock,
+  };
 };
 
 export const testMiddleware = async <
@@ -143,10 +148,20 @@ export const testMiddleware = async <
       input,
       options,
     });
-    return { requestMock, responseMock, loggerMock, output };
+    return {
+      requestMock: requestMock as MockRequest<Request & REQ>,
+      responseMock,
+      loggerMock,
+      output,
+    };
   } catch (error) {
     if (!errorHandler) throw error;
     errorHandler(ensureError(error), responseMock);
-    return { requestMock, responseMock, loggerMock, output: {} };
+    return {
+      requestMock: requestMock as MockRequest<Request & REQ>,
+      responseMock,
+      loggerMock,
+      output: {},
+    };
   }
 };
