@@ -75,6 +75,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^2.1.6
         version: 2.1.6(vitest@2.1.6(@types/node@22.7.4))
+      '@vitest/pretty-format':
+        specifier: ^2.1.6
+        version: 2.1.6
       camelize-ts:
         specifier: ^3.0.0
         version: 3.0.0
