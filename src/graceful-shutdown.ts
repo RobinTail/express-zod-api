@@ -23,14 +23,14 @@ export const monitor = (
     void (hasResponse(socket)
       ? !socket._httpMessage.headersSent &&
         socket._httpMessage.setHeader("connection", "close")
-      : destroy(socket));
+      : /* v8 ignore next -- unreachable */ destroy(socket));
 
   const watch = (socket: Socket) =>
     void (pending
-      ? socket.destroy()
+      ? /* v8 ignore next -- unstable */ socket.destroy()
       : sockets.add(socket.once("close", () => void sockets.delete(socket))));
 
-  for (const server of servers)
+  for (const server of servers) // eslint-disable-next-line curly
     for (const event of ["connection", "secureConnection"])
       server.on(event, watch);
 

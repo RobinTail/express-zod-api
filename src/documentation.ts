@@ -1,4 +1,3 @@
-import assert from "node:assert/strict";
 import {
   OpenApiBuilder,
   ReferenceObject,
@@ -7,14 +6,12 @@ import {
   SecuritySchemeObject,
   SecuritySchemeType,
 } from "openapi3-ts/oas31";
-import { pluck } from "ramda";
+import { keys, pluck } from "ramda";
 import { z } from "zod";
+import { defaultStatusCodes } from "./api-response";
+import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import {
-  defaultInputSources,
-  defaultSerializer,
-  makeCleanId,
-} from "./common-helpers";
+import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
@@ -63,11 +60,6 @@ interface DocumentationParams {
   /** @default inline */
   composition?: "inline" | "components";
   /**
-   * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
-   * @default JSON.stringify() + SHA1 hash as a hex digest
-   * */
-  serializer?: (schema: z.ZodTypeAny) => string;
-  /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
@@ -79,19 +71,24 @@ interface DocumentationParams {
 export class Documentation extends OpenApiBuilder {
   protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   protected lastOperationIdSuffixes = new Map<string, number>();
+  protected responseVariants = keys(defaultStatusCodes); // eslint-disable-line no-restricted-syntax -- literal
+  protected references = new Map<z.ZodTypeAny, string>();
 
   protected makeRef(
-    name: string,
-    schema: SchemaObject | ReferenceObject,
+    schema: z.ZodTypeAny,
+    subject:
+      | SchemaObject
+      | ReferenceObject
+      | (() => SchemaObject | ReferenceObject),
+    name = this.references.get(schema),
   ): ReferenceObject {
-    this.addSchema(name, schema);
-    return this.getRef(name)!;
-  }
-
-  protected getRef(name: string): ReferenceObject | undefined {
-    return name in (this.rootDoc.components?.schemas || {})
-      ? { $ref: `#/components/schemas/${name}` }
-      : undefined;
+    if (!name) {
+      name = `Schema${this.references.size + 1}`;
+      this.references.set(schema, name);
+      if (typeof subject === "function") subject = subject();
+    }
+    if (typeof subject === "object") this.addSchema(name, subject);
+    return { $ref: `#/components/schemas/${name}` };
   }
 
   protected ensureUniqOperationId(
@@ -106,14 +103,11 @@ export class Documentation extends OpenApiBuilder {
       return operationId;
     }
     if (userDefined) {
-      assert.fail(
-        new DocumentationError({
-          message: `Duplicated operationId: "${userDefined}"`,
-          method,
-          isResponse: false,
-          path,
-        }),
-      );
+      throw new DocumentationError(`Duplicated operationId: "${userDefined}"`, {
+        method,
+        isResponse: false,
+        path,
+      });
     }
     lastSuffix++;
     this.lastOperationIdSuffixes.set(operationId, lastSuffix);
@@ -126,9 +120,8 @@ export class Documentation extends OpenApiBuilder {
       if (
         serializedSubject ===
         JSON.stringify(this.rootDoc.components?.securitySchemes?.[name])
-      ) {
+      )
         return name;
-      }
     }
     const nextId = (this.lastSecuritySchemaIds.get(subject.type) || 0) + 1;
     this.lastSecuritySchemaIds.set(subject.type, nextId);
@@ -145,27 +138,22 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     hasSummaryFromDescription = true,
     composition = "inline",
-    serializer = defaultSerializer,
   }: DocumentationParams) {
     super();
     this.addInfo({ title, version });
-    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl) {
+    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
       this.addServer({ url });
-    }
     const onEndpoint: RoutingWalkerParams["onEndpoint"] = (
       endpoint,
       path,
-      _method,
+      method,
     ) => {
-      const method = _method as Method;
       const commons = {
         path,
         method,
         endpoint,
         composition,
-        serializer,
         brandHandling,
-        getRef: this.getRef.bind(this),
         makeRef: this.makeRef.bind(this),
       };
       const [shortDesc, description] = (["short", "long"] as const).map(
@@ -197,7 +185,7 @@ export class Documentation extends OpenApiBuilder {
       });
 
       const responses: ResponsesObject = {};
-      for (const variant of ["positive", "negative"] as const) {
+      for (const variant of this.responseVariants) {
         const apiResponses = endpoint.getResponses(variant);
         for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
@@ -225,7 +213,7 @@ export class Documentation extends OpenApiBuilder {
             ...commons,
             paramNames: pluck("name", depictedParams),
             schema: endpoint.getSchema("input"),
-            mimeTypes: endpoint.getMimeTypes("input"),
+            mimeType: contentTypes[endpoint.getRequestType()],
             description: descriptions?.requestBody?.call(null, {
               method,
               path,

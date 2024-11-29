@@ -1,14 +1,17 @@
 import { z } from "zod";
-import { defaultEndpointsFactory, Middleware, testEndpoint } from "../../src";
+import {
+  defaultEndpointsFactory,
+  Middleware,
+  testEndpoint,
+  testMiddleware,
+} from "../../src";
 import type { Mock } from "vitest";
-import { testMiddleware } from "../../src/testing";
 
 describe("Testing", () => {
   describe("testEndpoint()", () => {
     test("Should test an endpoint", async () => {
       const endpoint = defaultEndpointsFactory
         .addMiddleware({
-          input: z.object({}),
           handler: async ({ response }) => {
             response
               .setHeader("X-Some", "header")
@@ -18,8 +21,6 @@ describe("Testing", () => {
           },
         })
         .build({
-          method: "get",
-          input: z.object({}),
           output: z.object({}),
           handler: async () => ({}),
         });
@@ -71,6 +72,22 @@ describe("Testing", () => {
         optKeys: ["prev"],
         inpLen: 9,
       });
+    });
+
+    test("Issue #2153: should optionally catch errors to enable usual returns", async () => {
+      const { output, loggerMock, responseMock } = await testMiddleware({
+        errorHandler: (error, response) => response.end(error.message),
+        middleware: new Middleware({
+          input: z.object({}),
+          handler: async ({ logger }) => {
+            logger.info("logging something");
+            throw new Error("something went wrong");
+          },
+        }),
+      });
+      expect(output).toEqual({});
+      expect(loggerMock._getLogs().info).toEqual([["logging something"]]);
+      expect(responseMock._getData()).toBe("something went wrong");
     });
   });
 });

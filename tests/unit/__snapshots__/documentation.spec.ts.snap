@@ -1200,7 +1200,7 @@ paths:
                             title:
                               type: string
                             features:
-                              $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                              $ref: "#/components/schemas/Schema1"
                           required:
                             - title
                             - features
@@ -1237,6 +1237,25 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/user/{id}/remove:
+    delete:
+      operationId: DeleteV1UserIdRemove
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: numeric string
+          schema:
+            type: string
+            pattern: \\d+
+            description: numeric string
+      responses:
+        "204":
+          description: DELETE /v1/user/:id/remove Positive response
+        "404":
+          description: DELETE /v1/user/:id/remove Negative response
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -1701,7 +1720,7 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    2048581c137c5b2130eb860e3ae37da196dfc25b:
+    Schema1:
       type: array
       items:
         type: object
@@ -1709,7 +1728,7 @@ components:
           title:
             type: string
           features:
-            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+            $ref: "#/components/schemas/Schema1"
         required:
           - title
           - features
@@ -1780,6 +1799,23 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/user/{id}/remove:
+    delete:
+      operationId: DeleteV1UserIdRemove
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: numeric string
+          schema:
+            $ref: "#/components/schemas/DeleteV1UserIdRemoveParameterId"
+      responses:
+        "204":
+          description: DELETE /v1/user/:id/remove Positive response
+        "404":
+          description: DELETE /v1/user/:id/remove Negative response
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -2029,7 +2065,7 @@ components:
       type: string
       pattern: \\d+
       description: a numeric string containing the id of the user
-    2048581c137c5b2130eb860e3ae37da196dfc25b:
+    Schema1:
       type: array
       items:
         type: object
@@ -2037,7 +2073,7 @@ components:
           title:
             type: string
           features:
-            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+            $ref: "#/components/schemas/Schema1"
         required:
           - title
           - features
@@ -2065,7 +2101,7 @@ components:
                   title:
                     type: string
                   features:
-                    $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - title
                   - features
@@ -2092,6 +2128,10 @@ components:
       required:
         - status
         - error
+    DeleteV1UserIdRemoveParameterId:
+      type: string
+      pattern: \\d+
+      description: numeric string
     PatchV1UserIdParameterId:
       type: string
     PatchV1UserIdPositiveResponse:
@@ -2434,8 +2474,7 @@ paths:
                     type: object
                     properties:
                       "null":
-                        type:
-                          - "null"
+                        type: "null"
                       dateOut:
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string
@@ -2530,7 +2569,7 @@ paths:
                           name:
                             type: string
                           subcategories:
-                            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                            $ref: "#/components/schemas/Schema1"
                         required:
                           - name
                           - subcategories
@@ -2567,7 +2606,7 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    2048581c137c5b2130eb860e3ae37da196dfc25b:
+    Schema1:
       type: array
       items:
         type: object
@@ -2575,7 +2614,7 @@ components:
           name:
             type: string
           subcategories:
-            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+            $ref: "#/components/schemas/Schema1"
         required:
           - name
           - subcategories

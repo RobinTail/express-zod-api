@@ -1,8 +1,13 @@
 import { Request, Response } from "express";
-import { FlatObject, getInput } from "./common-helpers";
+import { ensureError, FlatObject, getInput } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
-import { AbstractLogger, ActualLogger, severity } from "./logger-helpers";
+import {
+  AbstractLogger,
+  ActualLogger,
+  isSeverity,
+  Severity,
+} from "./logger-helpers";
 import { contentTypes } from "./content-type";
 import {
   createRequest,
@@ -24,7 +29,7 @@ export const makeResponseMock = (opt?: ResponseOptions) =>
   createResponse<Response>(opt);
 
 export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
-  const logs: Record<keyof AbstractLogger, unknown[]> = {
+  const logs: Record<Severity, unknown[]> = {
     warn: [],
     error: [],
     info: [],
@@ -35,13 +40,9 @@ export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
       LOG & { _getLogs: () => typeof logs },
     {
       get(target, prop, recv) {
-        if (prop === "_getLogs") {
-          return () => logs;
-        }
-        if (prop in severity) {
-          return (...args: unknown[]) =>
-            logs[prop as keyof AbstractLogger].push(args);
-        }
+        if (prop === "_getLogs") return () => logs;
+        if (isSeverity(prop))
+          return (...args: unknown[]) => logs[prop].push(args);
         return Reflect.get(target, prop, recv);
       },
     },
@@ -121,22 +122,31 @@ export const testMiddleware = async <
 >({
   middleware,
   options = {},
+  errorHandler,
   ...rest
 }: TestingProps<REQ, LOG> & {
   /** @desc The middleware to test */
   middleware: AbstractMiddleware;
   /** @desc The aggregated output from previously executed middlewares */
   options?: FlatObject;
+  /** @desc Enables transforming possible middleware errors into response, so that testMiddlware does not throw */
+  errorHandler?: (error: Error, response: Response) => void;
 }) => {
   const { requestMock, responseMock, loggerMock, configMock } =
     makeTestingMocks(rest);
   const input = getInput(requestMock, configMock.inputSources);
-  const output = await middleware.execute({
-    request: requestMock,
-    response: responseMock,
-    logger: loggerMock,
-    input,
-    options,
-  });
-  return { requestMock, responseMock, loggerMock, output };
+  try {
+    const output = await middleware.execute({
+      request: requestMock,
+      response: responseMock,
+      logger: loggerMock,
+      input,
+      options,
+    });
+    return { requestMock, responseMock, loggerMock, output };
+  } catch (error) {
+    if (!errorHandler) throw error;
+    errorHandler(ensureError(error), responseMock);
+    return { requestMock, responseMock, loggerMock, output: {} };
+  }
 };

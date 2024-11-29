@@ -3,7 +3,12 @@ import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
 import { BuiltinLogger } from "./builtin-logger";
-import { AppConfig, CommonConfig, ServerConfig } from "./config-type";
+import {
+  AppConfig,
+  CommonConfig,
+  HttpConfig,
+  ServerConfig,
+} from "./config-type";
 import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
@@ -13,29 +18,32 @@ import {
   createNotFoundHandler,
   createParserFailureHandler,
   createUploadParsers,
-  makeChildLoggerExtractor,
+  makeGetLogger,
   installDeprecationListener,
   moveRaw,
   installTerminationListener,
 } from "./server-helpers";
-import { getStartupLogo } from "./startup-logo";
+import { printStartupLogo } from "./startup-logo";
 
 const makeCommonEntities = (config: CommonConfig) => {
-  if (config.startupLogo !== false) console.log(getStartupLogo());
+  if (config.startupLogo !== false) printStartupLogo(process.stdout);
   const errorHandler = config.errorHandler || defaultResultHandler;
-  const rootLogger = isLoggerInstance(config.logger)
+  const logger = isLoggerInstance(config.logger)
     ? config.logger
     : new BuiltinLogger(config.logger);
-  rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
-  installDeprecationListener(rootLogger);
-  const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
-  const getChildLogger = makeChildLoggerExtractor(rootLogger);
-  const commons = { getChildLogger, errorHandler };
+  logger.debug("Running", {
+    build: process.env.TSUP_BUILD || "from sources", // eslint-disable-line no-restricted-syntax -- substituted by TSUP
+    env: process.env.NODE_ENV || "development", // eslint-disable-line no-restricted-syntax -- intentionally for debug
+  });
+  installDeprecationListener(logger);
+  const loggingMiddleware = createLoggingMiddleware({ logger, config });
+  const getLogger = makeGetLogger(logger);
+  const commons = { getLogger, errorHandler };
   const notFoundHandler = createNotFoundHandler(commons);
   const parserFailureHandler = createParserFailureHandler(commons);
   return {
     ...commons,
-    rootLogger,
+    logger,
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
@@ -43,77 +51,72 @@ const makeCommonEntities = (config: CommonConfig) => {
 };
 
 export const attachRouting = (config: AppConfig, routing: Routing) => {
-  const { rootLogger, getChildLogger, notFoundHandler, loggingMiddleware } =
+  const { logger, getLogger, notFoundHandler, loggingMiddleware } =
     makeCommonEntities(config);
   initRouting({
     app: config.app.use(loggingMiddleware),
     routing,
-    getChildLogger,
+    getLogger,
     config,
   });
-  return { notFoundHandler, logger: rootLogger };
+  return { notFoundHandler, logger };
 };
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
   const {
-    rootLogger,
-    getChildLogger,
+    logger,
+    getLogger,
     notFoundHandler,
     parserFailureHandler,
     loggingMiddleware,
   } = makeCommonEntities(config);
   const app = express().disable("x-powered-by").use(loggingMiddleware);
 
-  if (config.server.compression) {
+  if (config.compression) {
     const compressor = await loadPeer<typeof compression>("compression");
     app.use(
       compressor(
-        typeof config.server.compression === "object"
-          ? config.server.compression
-          : undefined,
+        typeof config.compression === "object" ? config.compression : undefined,
       ),
     );
   }
 
   const parsers: Parsers = {
-    json: [config.server.jsonParser || express.json()],
-    raw: [config.server.rawParser || express.raw(), moveRaw],
-    upload: config.server.upload
-      ? await createUploadParsers({ config, getChildLogger })
+    json: [config.jsonParser || express.json()],
+    raw: [config.rawParser || express.raw(), moveRaw],
+    upload: config.upload
+      ? await createUploadParsers({ config, getLogger })
       : [],
   };
 
-  if (config.server.beforeRouting) {
-    await config.server.beforeRouting({
-      app,
-      logger: rootLogger,
-      getChildLogger,
-    });
-  }
-  initRouting({ app, routing, getChildLogger, config, parsers });
+  await config.beforeRouting?.({ app, getLogger });
+  initRouting({ app, routing, getLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
-  const starter = <T extends http.Server | https.Server>(
-    server: T,
-    subject?: typeof config.server.listen,
-  ) => server.listen(subject, () => rootLogger.info("Listening", subject)) as T;
+  const created: Array<http.Server | https.Server> = [];
+  const makeStarter =
+    (server: (typeof created)[number], subject: HttpConfig["listen"]) => () =>
+      server.listen(subject, () => logger.info("Listening", subject));
 
-  const httpServer = http.createServer(app);
-  const httpsServer =
-    config.https && https.createServer(config.https.options, app);
+  const starters: Array<ReturnType<typeof makeStarter>> = [];
+  if (config.http) {
+    const httpServer = http.createServer(app);
+    created.push(httpServer);
+    starters.push(makeStarter(httpServer, config.http.listen));
+  }
+  if (config.https) {
+    const httpsServer = https.createServer(config.https.options, app);
+    created.push(httpsServer);
+    starters.push(makeStarter(httpsServer, config.https.listen));
+  }
 
   if (config.gracefulShutdown) {
     installTerminationListener({
-      servers: [httpServer].concat(httpsServer || []),
-      logger: rootLogger,
+      logger,
+      servers: created,
       options: config.gracefulShutdown === true ? {} : config.gracefulShutdown,
     });
   }
 
-  return {
-    app,
-    logger: rootLogger,
-    httpServer: starter(httpServer, config.server.listen),
-    httpsServer: httpsServer && starter(httpsServer, config.https?.listen),
-  };
+  return { app, logger, servers: starters.map((starter) => starter()) };
 };

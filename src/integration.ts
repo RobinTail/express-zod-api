@@ -1,7 +1,7 @@
 import ts from "typescript";
 import { z } from "zod";
+import { ResponseVariant } from "./api-response";
 import {
-  emptyHeading,
   emptyTail,
   exportModifier,
   f,
@@ -21,13 +21,13 @@ import {
   makePublicType,
   makeRecord,
   makeTemplateType,
+  makeTernary,
   makeTypeParams,
   parametricIndexNode,
   protectedReadonlyModifier,
   quoteProp,
-  spacingMiddle,
 } from "./integration-helpers";
-import { defaultSerializer, makeCleanId } from "./common-helpers";
+import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
 import { contentTypes } from "./content-type";
 import { loadPeer } from "./peer-helpers";
@@ -38,7 +38,7 @@ import { zodToTs } from "./zts";
 import { ZTSContext, createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
-type IOKind = "input" | "response" | "positive" | "negative";
+type IOKind = "input" | "response" | ResponseVariant;
 
 interface IntegrationParams {
   routing: Routing;
@@ -55,11 +55,6 @@ interface IntegrationParams {
    * */
   splitResponse?: boolean;
   /**
-   * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
-   * @default JSON.stringify() + SHA1 hash as a hex digest
-   * */
-  serializer?: (schema: z.ZodTypeAny) => string;
-  /**
    * @desc configures the style of object's optional properties
    * @default { withQuestionMark: true, withUndefined: true }
    */
@@ -75,6 +70,11 @@ interface IntegrationParams {
      */
     withUndefined?: boolean;
   };
+  /**
+   * @desc The schema to use for responses without body such as 204
+   * @default z.undefined()
+   * */
+  noContent?: z.ZodTypeAny;
   /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
@@ -105,7 +105,7 @@ export class Integration {
     }
   >();
   protected paths: string[] = [];
-  protected aliases = new Map<string, ts.TypeAliasDeclaration>();
+  protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
@@ -134,6 +134,8 @@ export class Integration {
     searchParamsConst: f.createIdentifier("searchParams"),
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
+    contentTypeConst: f.createIdentifier("contentType"),
+    isJsonConst: f.createIdentifier("isJSON"),
   } satisfies Record<string, ts.Identifier>;
   protected interfaces: Array<{
     id: ts.Identifier;
@@ -141,29 +143,32 @@ export class Integration {
     props: ts.PropertySignature[];
   }> = [];
 
-  protected getAlias(name: string): ts.TypeReferenceNode | undefined {
-    return this.aliases.has(name) ? f.createTypeReferenceNode(name) : undefined;
-  }
-
-  protected makeAlias(name: string, type: ts.TypeNode): ts.TypeReferenceNode {
-    this.aliases.set(name, createTypeAlias(type, name));
-    return this.getAlias(name)!;
+  protected makeAlias(
+    schema: z.ZodTypeAny,
+    produce: () => ts.TypeNode,
+  ): ts.TypeReferenceNode {
+    let name = this.aliases.get(schema)?.name?.text;
+    if (!name) {
+      name = `Type${this.aliases.size + 1}`;
+      const temp = f.createLiteralTypeNode(f.createNull());
+      this.aliases.set(schema, createTypeAlias(temp, name));
+      this.aliases.set(schema, createTypeAlias(produce(), name));
+    }
+    return f.createTypeReferenceNode(name);
   }
 
   public constructor({
     routing,
     brandHandling,
     variant = "client",
-    serializer = defaultSerializer,
     splitResponse = false,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
+    noContent = z.undefined(),
   }: IntegrationParams) {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
         const commons = {
-          serializer,
-          getAlias: this.getAlias.bind(this),
           makeAlias: this.makeAlias.bind(this),
           optionalPropStyle,
         };
@@ -175,7 +180,10 @@ export class Integration {
         const positiveResponseId = splitResponse
           ? makeCleanId(method, path, "positive.response")
           : undefined;
-        const positiveSchema = endpoint.getSchema("positive");
+        const positiveSchema = endpoint
+          .getResponses("positive")
+          .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
+          .reduce((agg, schema) => agg.or(schema));
         const positiveResponse = splitResponse
           ? zodToTs(positiveSchema, {
               brandHandling,
@@ -185,7 +193,10 @@ export class Integration {
         const negativeResponseId = splitResponse
           ? makeCleanId(method, path, "negative.response")
           : undefined;
-        const negativeSchema = endpoint.getSchema("negative");
+        const negativeSchema = endpoint
+          .getResponses("negative")
+          .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
+          .reduce((agg, schema) => agg.or(schema));
         const negativeResponse = splitResponse
           ? zodToTs(negativeSchema, {
               brandHandling,
@@ -215,22 +226,22 @@ export class Integration {
           );
         }
         this.program.push(createTypeAlias(genericResponse, genericResponseId));
-        if (method !== "options") {
-          this.paths.push(path);
-          this.registry.set(
-            { method, path },
-            {
-              input: inputId,
-              positive: positiveResponseId,
-              negative: negativeResponseId,
-              response: genericResponseId,
-              isJson: endpoint
-                .getMimeTypes("positive")
-                .includes(contentTypes.json),
-              tags: endpoint.getTags(),
-            },
-          );
-        }
+        this.paths.push(path);
+        this.registry.set(
+          { method, path },
+          {
+            input: inputId,
+            positive: positiveResponseId,
+            negative: negativeResponseId,
+            response: genericResponseId,
+            isJson: endpoint
+              .getResponses("positive")
+              .some((response) =>
+                response.mimeTypes?.includes(contentTypes.json),
+              ),
+            tags: endpoint.getTags(),
+          },
+        );
       },
     });
 
@@ -281,9 +292,8 @@ export class Integration {
       const propName = quoteProp(method, path);
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
       for (const face of this.interfaces) {
-        if (face.kind in rest) {
+        if (face.kind in rest)
           face.props.push(makeInterfaceProp(propName, rest[face.kind]!));
-        }
       }
       if (variant !== "types") {
         if (isJson) {
@@ -305,13 +315,10 @@ export class Integration {
     }
 
     // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    for (const { id, props } of this.interfaces) {
+    for (const { id, props } of this.interfaces)
       this.program.push(makePublicExtendedInterface(id, extenderClause, props));
-    }
 
-    if (variant === "types") {
-      return;
-    }
+    if (variant === "types") return;
 
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
     const jsonEndpointsConst = f.createVariableStatement(
@@ -588,29 +595,67 @@ export class Integration {
       ),
     );
 
-    // return response.json(); return response.text();
-    const [returnJsonStatement, returnTextStatement] = ["json", "text"].map(
-      (method) =>
-        f.createReturnStatement(
-          f.createCallExpression(
-            f.createPropertyAccessExpression(this.ids.responseConst, method),
-            undefined,
-            undefined,
+    // const contentType = response.headers.get("content-type");
+    const contentTypeStatement = f.createVariableStatement(
+      undefined,
+      makeConst(
+        this.ids.contentTypeConst,
+        f.createCallExpression(
+          f.createPropertyAccessExpression(
+            f.createPropertyAccessExpression(
+              this.ids.responseConst,
+              this.ids.headersProperty,
+            ),
+            f.createIdentifier("get" satisfies keyof Headers),
           ),
+          undefined,
+          [f.createStringLiteral("content-type")],
         ),
+      ),
     );
 
-    // if (`${method} ${path}` in jsonEndpoints) { ___ }
-    const ifJsonStatement = f.createIfStatement(
-      f.createBinaryExpression(
-        f.createTemplateExpression(emptyHeading, [
-          f.createTemplateSpan(this.ids.methodParameter, spacingMiddle),
-          f.createTemplateSpan(this.ids.pathParameter, emptyTail),
-        ]),
-        ts.SyntaxKind.InKeyword,
-        this.ids.jsonEndpointsConst,
+    // if (!contentType) return;
+    const noBodyStatement = f.createIfStatement(
+      f.createPrefixUnaryExpression(
+        ts.SyntaxKind.ExclamationToken,
+        this.ids.contentTypeConst,
       ),
-      f.createBlock([returnJsonStatement]),
+      f.createReturnStatement(undefined),
+      undefined,
+    );
+
+    // const isJSON = contentType.startsWith("application/json");
+    const parserStatement = f.createVariableStatement(
+      undefined,
+      makeConst(
+        this.ids.isJsonConst,
+        f.createCallChain(
+          f.createPropertyAccessChain(
+            this.ids.contentTypeConst,
+            undefined,
+            f.createIdentifier("startsWith" satisfies keyof string),
+          ),
+          undefined,
+          undefined,
+          [f.createStringLiteral(contentTypes.json)],
+        ),
+      ),
+    );
+
+    // return response[isJSON ? "json" : "text"]();
+    const returnStatement = f.createReturnStatement(
+      f.createCallExpression(
+        f.createElementAccessExpression(
+          this.ids.responseConst,
+          makeTernary(
+            this.ids.isJsonConst,
+            f.createStringLiteral("json" satisfies keyof Response),
+            f.createStringLiteral("text" satisfies keyof Response),
+          ),
+        ),
+        undefined,
+        [],
+      ),
     );
 
     // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
@@ -628,8 +673,10 @@ export class Integration {
             hasBodyStatement,
             searchParamsStatement,
             responseStatement,
-            ifJsonStatement,
-            returnTextStatement,
+            contentTypeStatement,
+            noBodyStatement,
+            parserStatement,
+            returnStatement,
           ]),
           true,
         ),

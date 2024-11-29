@@ -3,7 +3,6 @@ import { createReadStream, readFileSync } from "node:fs";
 import {
   ExpressZodAPIClient,
   Implementation,
-  jsonEndpoints,
 } from "../../example/example.client";
 import { givePort } from "../helpers";
 import { createHash } from "node:crypto";
@@ -242,6 +241,15 @@ describe("Example", async () => {
         expect(json).toMatchSnapshot();
       },
     );
+
+    test("Should handle no content", async () => {
+      const response = await fetch(
+        `http://localhost:${port}/v1/user/50/remove`,
+        { method: "DELETE", headers: { "Content-Type": "application/json" } },
+      );
+      expect(response.status).toBe(204);
+      expect(response.headers.get("content-type")).toBeNull();
+    });
   });
 
   describe("Negative", () => {
@@ -420,13 +428,13 @@ describe("Example", async () => {
           headers:
             method === "get"
               ? undefined
-              : { "Content-Type": "application/json" },
+              : { "Content-Type": "application/json", token: "456" },
           body: method === "get" ? undefined : JSON.stringify(params),
         });
-        if (`${method} ${path}` in jsonEndpoints) {
-          return response.json();
-        }
-        return response.text();
+        const contentType = response.headers.get("content-type");
+        if (!contentType) return;
+        const isJSON = contentType.startsWith("application/json");
+        return response[isJSON ? "json" : "text"]();
       };
 
     const client = new ExpressZodAPIClient(
@@ -442,6 +450,29 @@ describe("Example", async () => {
         | { status: "success"; data: { id: number; name: string } }
         | { status: "error"; error: { message: string } }
       >();
+    });
+
+    test("Issue #2177: should handle path params correctly", async () => {
+      const response = await client.provide("patch", "/v1/user/:id", {
+        key: "123",
+        id: "12",
+        name: "Alan Turing",
+        birthday: "1912-06-23",
+      });
+      expect(typeof response).toBe("object");
+      expect(response).toMatchSnapshot();
+      expectTypeOf(response).toMatchTypeOf<
+        | { status: "success"; data: { name: string; createdAt: string } }
+        | { status: "error"; error: { message: string } }
+      >();
+    });
+
+    test("should handle no content (no response body)", async () => {
+      const response = await client.provide("delete", "/v1/user/:id/remove", {
+        id: "12",
+      });
+      expect(response).toBeUndefined();
+      expectTypeOf(response).toBeUndefined();
     });
   });
 });

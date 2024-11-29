@@ -1,41 +1,61 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Endpoint > .getSchema() > should return the negative response schema 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "error": {
+exports[`Endpoint > .getResponses() > should return the negative responses 1`] = `
+[
+  {
+    "mimeTypes": [
+      "application/json",
+    ],
+    "schema": {
       "_type": "ZodObject",
       "shape": {
-        "message": {
-          "_type": "ZodString",
+        "error": {
+          "_type": "ZodObject",
+          "shape": {
+            "message": {
+              "_type": "ZodString",
+            },
+          },
+        },
+        "status": {
+          "_type": "ZodLiteral",
+          "value": "error",
         },
       },
     },
-    "status": {
-      "_type": "ZodLiteral",
-      "value": "error",
-    },
+    "statusCodes": [
+      400,
+    ],
   },
-}
+]
 `;
 
-exports[`Endpoint > .getSchema() > should return the positive response schema 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "data": {
+exports[`Endpoint > .getResponses() > should return the positive responses 1`] = `
+[
+  {
+    "mimeTypes": [
+      "application/json",
+    ],
+    "schema": {
       "_type": "ZodObject",
       "shape": {
-        "something": {
-          "_type": "ZodNumber",
+        "data": {
+          "_type": "ZodObject",
+          "shape": {
+            "something": {
+              "_type": "ZodNumber",
+            },
+          },
+        },
+        "status": {
+          "_type": "ZodLiteral",
+          "value": "success",
         },
       },
     },
-    "status": {
-      "_type": "ZodLiteral",
-      "value": "success",
-    },
+    "statusCodes": [
+      200,
+    ],
   },
-}
+]
 `;

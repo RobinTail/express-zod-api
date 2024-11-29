@@ -1,5 +1,4 @@
 import ts from "typescript";
-import { chain, toPairs } from "ramda";
 import { Method } from "./method";
 
 export const f = ts.factory;
@@ -18,11 +17,9 @@ export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
 
-export const emptyHeading = f.createTemplateHead("");
-
+const emptyHeading = f.createTemplateHead("");
+const spacingMiddle = f.createTemplateMiddle(" ");
 export const emptyTail = f.createTemplateTail("");
-
-export const spacingMiddle = f.createTemplateMiddle(" ");
 
 export const makeTemplateType = (names: Array<ts.Identifier | string>) =>
   f.createTemplateLiteralType(
@@ -55,9 +52,8 @@ export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,
   mod?: ts.Modifier[],
 ) =>
-  chain(
-    ([name, node]) => [makeParam(f.createIdentifier(name), node, mod)],
-    toPairs(params),
+  Object.entries(params).map(([name, node]) =>
+    makeParam(f.createIdentifier(name), node, mod),
   );
 
 export const makeRecord = (
@@ -157,11 +153,10 @@ export const makePublicExtendedInterface = (
     props,
   );
 
-const aggregateDeclarations = chain(([name, id]: [string, ts.Identifier]) => [
-  f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
-]);
 export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
-  aggregateDeclarations(toPairs(params));
+  Object.entries(params).map(([name, id]) =>
+    f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
+  );
 
 export const makeArrowFn = (
   params: ts.Identifier[],
@@ -206,3 +201,16 @@ export const makeObjectKeysReducer = (
   );
 
 export const quoteProp = (...parts: [Method, string]) => `"${parts.join(" ")}"`;
+
+export const makeTernary = (
+  condition: ts.Expression,
+  positive: ts.Expression,
+  negative: ts.Expression,
+) =>
+  f.createConditionalExpression(
+    condition,
+    f.createToken(ts.SyntaxKind.QuestionToken),
+    positive,
+    f.createToken(ts.SyntaxKind.ColonToken),
+    negative,
+  );

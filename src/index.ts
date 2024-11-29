@@ -6,11 +6,8 @@ export {
   defaultEndpointsFactory,
   arrayEndpointsFactory,
 } from "./endpoints-factory";
-export {
-  getExamples,
-  getMessageFromError,
-  getStatusCodeFromError,
-} from "./common-helpers";
+export { getExamples, getMessageFromError } from "./common-helpers";
+export { ensureHttpError } from "./result-helpers";
 export { BuiltinLogger } from "./builtin-logger";
 export { Middleware } from "./middleware";
 export {
@@ -29,7 +26,7 @@ export {
   InputValidationError,
   MissingPeerError,
 } from "./errors";
-export { testEndpoint } from "./testing";
+export { testEndpoint, testMiddleware } from "./testing";
 export { Integration } from "./integration";
 
 export { ez } from "./proprietary-schemas";
@@ -45,7 +42,7 @@ export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
 export type { IOSchema } from "./io-schema";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
-export type { ApiResponse } from "./api-response";
+export type { ApiResponse, NormalizedResponse } from "./api-response";
 export type {
   BasicSecurity,
   BearerSecurity,

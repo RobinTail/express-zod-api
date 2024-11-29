@@ -2,9 +2,8 @@ import { z } from "zod";
 import { fileStreamingEndpointsFactory } from "../factories";
 
 export const streamAvatarEndpoint = fileStreamingEndpointsFactory.build({
-  method: "get",
   shortDescription: "Streams a file content.",
-  tags: ["users", "files"],
+  tag: ["users", "files"],
   input: z.object({
     userId: z
       .string()

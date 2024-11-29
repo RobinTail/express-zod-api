@@ -9,38 +9,35 @@ export type LiteralType = string | number | boolean;
 
 export interface ZTSContext extends FlatObject {
   isResponse: boolean;
-  getAlias: (name: string) => ts.TypeReferenceNode | undefined;
-  makeAlias: (name: string, type: ts.TypeNode) => ts.TypeReferenceNode;
-  serializer: (schema: z.ZodTypeAny) => string;
+  makeAlias: (
+    schema: z.ZodTypeAny,
+    produce: () => ts.TypeNode,
+  ) => ts.TypeReferenceNode;
   optionalPropStyle: { withQuestionMark?: boolean; withUndefined?: boolean };
 }
 
 export type Producer = SchemaHandler<ts.TypeNode, ZTSContext>;
 
-export const addJsDocComment = (node: ts.Node, text: string) => {
+export const addJsDocComment = <T extends ts.Node>(node: T, text: string) =>
   ts.addSyntheticLeadingComment(
     node,
     ts.SyntaxKind.MultiLineCommentTrivia,
     `* ${text} `,
     true,
   );
-};
 
 export const createTypeAlias = (
   node: ts.TypeNode,
-  identifier: string,
+  name: string,
   comment?: string,
 ) => {
   const typeAlias = f.createTypeAliasDeclaration(
     undefined,
-    f.createIdentifier(identifier),
+    f.createIdentifier(name),
     undefined,
     node,
   );
-  if (comment) {
-    addJsDocComment(typeAlias, comment);
-  }
-  return typeAlias;
+  return comment ? addJsDocComment(typeAlias, comment) : typeAlias;
 };
 
 export const printNode = (
@@ -60,9 +57,24 @@ export const printNode = (
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
-export const makePropertyIdentifier = (name: string) => {
-  if (safePropRegex.test(name)) {
-    return f.createIdentifier(name);
-  }
-  return f.createStringLiteral(name);
-};
+export const makePropertyIdentifier = (name: string) =>
+  safePropRegex.test(name)
+    ? f.createIdentifier(name)
+    : f.createStringLiteral(name);
+
+const primitives: ts.KeywordTypeSyntaxKind[] = [
+  ts.SyntaxKind.AnyKeyword,
+  ts.SyntaxKind.BigIntKeyword,
+  ts.SyntaxKind.BooleanKeyword,
+  ts.SyntaxKind.NeverKeyword,
+  ts.SyntaxKind.NumberKeyword,
+  ts.SyntaxKind.ObjectKeyword,
+  ts.SyntaxKind.StringKeyword,
+  ts.SyntaxKind.SymbolKeyword,
+  ts.SyntaxKind.UndefinedKeyword,
+  ts.SyntaxKind.UnknownKeyword,
+  ts.SyntaxKind.VoidKeyword,
+];
+
+export const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
+  (primitives as ts.SyntaxKind[]).includes(node.kind);

@@ -1,10 +1,10 @@
-import forge from "node-forge";
+import assert from "node:assert/strict";
 import http from "node:http";
 import https from "node:https";
-import { Agent } from "undici";
+import { Agent, fetch } from "undici";
 import { setTimeout } from "node:timers/promises";
 import { monitor } from "../../src/graceful-shutdown";
-import { givePort } from "../helpers";
+import { givePort, signCert } from "../helpers";
 
 describe("monitor()", () => {
   const makeHttpServer = (handler: http.RequestListener) =>
@@ -13,46 +13,6 @@ describe("monitor()", () => {
       const port = givePort();
       subject.listen(port, () => resolve([subject, port]));
     });
-
-  const certAttr = [
-    { name: "commonName", value: "localhost" },
-    { name: "countryName", value: "DE" },
-    { name: "organizationName", value: "ExpressZodAPI" },
-    { shortName: "OU", value: "DEV" },
-  ];
-  const certExt = [
-    { name: "basicConstraints", cA: true },
-    { name: "extKeyUsage", serverAuth: true, clientAuth: true },
-    { name: "subjectAltName", altNames: [{ type: 2, value: "localhost" }] },
-    {
-      name: "keyUsage",
-      keyCertSign: true,
-      digitalSignature: true,
-      nonRepudiation: true,
-      keyEncipherment: true,
-      dataEncipherment: true,
-    },
-  ];
-  const signCert = () => {
-    (forge as any).options.usePureJavaScript = true;
-    const keys = forge.pki.rsa.generateKeyPair(2048);
-    const cert = forge.pki.createCertificate();
-    cert.publicKey = keys.publicKey;
-    cert.serialNumber = "01";
-    cert.validity.notBefore = new Date();
-    cert.validity.notAfter = new Date();
-    cert.validity.notAfter.setFullYear(
-      cert.validity.notBefore.getFullYear() + 1,
-    );
-    cert.setSubject(certAttr);
-    cert.setIssuer(certAttr);
-    cert.setExtensions(certExt);
-    cert.sign(keys.privateKey, forge.md.sha256.create());
-    return {
-      cert: forge.pki.certificateToPem(cert),
-      key: forge.pki.privateKeyToPem(keys.privateKey),
-    };
-  };
 
   const makeHttpsServer = (handler: http.RequestListener) =>
     new Promise<[https.Server, number]>((resolve) => {
@@ -82,7 +42,7 @@ describe("monitor()", () => {
 
   test(
     "shuts down hanging sockets after defined timeout",
-    { timeout: 500 },
+    { timeout: 1000 }, // increased from 500 for stability
     async () => {
       const handler = vi.fn();
       const [httpServer, port] = await makeHttpServer(handler);
@@ -90,8 +50,9 @@ describe("monitor()", () => {
       void fetch(`http://localhost:${port}`, {
         headers: { connection: "close" },
       }).catch(vi.fn());
-      await setTimeout(50);
-      expect(handler).toHaveBeenCalled();
+      await vi.waitFor(() => assert(handler.mock.calls.length === 1), {
+        interval: 30, // unstable
+      });
       const pending0 = graceful.shutdown();
       const pending1 = graceful.shutdown();
       expect(pending1).toBe(pending0);

@@ -5,26 +5,20 @@ import { readFile } from "node:fs/promises";
 import createHttpError from "http-errors";
 
 export const config = createConfig({
-  server: {
-    listen: 8090,
-    upload: {
-      limits: { fileSize: 51200 },
-      limitError: createHttpError(413, "The file is too large"), // affects uploadAvatarEndpoint
-    },
-    compression: true, // affects sendAvatarEndpoint
-    beforeRouting: async ({ app }) => {
-      // third-party middlewares serving their own routes or establishing their own routing besides the API
-      const documentation = yaml.parse(
-        await readFile("example/example.documentation.yaml", "utf-8"),
-      );
-      app.use("/docs", ui.serve, ui.setup(documentation));
-    },
+  http: { listen: 8090 },
+  upload: {
+    limits: { fileSize: 51200 },
+    limitError: createHttpError(413, "The file is too large"), // affects uploadAvatarEndpoint
+  },
+  compression: true, // affects sendAvatarEndpoint
+  beforeRouting: async ({ app }) => {
+    // third-party middlewares serving their own routes or establishing their own routing besides the API
+    const documentation = yaml.parse(
+      await readFile("example/example.documentation.yaml", "utf-8"),
+    );
+    app.use("/docs", ui.serve, ui.setup(documentation));
   },
   cors: true,
-  logger: {
-    level: "debug",
-    color: true,
-  },
   tags: {
     users: "Everything about the users",
     files: "Everything about the files processing",

@@ -30,7 +30,6 @@ export const authMiddleware = new Middleware({
 });
 
 export const methodProviderMiddleware = new Middleware({
-  input: z.object({}),
   handler: async ({ request }) => ({
     method: request.method.toLowerCase() as Method,
   }),

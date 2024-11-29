@@ -1,28 +1,39 @@
-import http from "node:http";
-import { Socket } from "node:net";
+import { chain, prop } from "ramda";
+import ts from "typescript";
 import { bench } from "vitest";
-import { hasHttpServer } from "../../src/graceful-helpers";
+import { f } from "../../src/integration-helpers";
 
-const comparable = (
-  socket: Socket,
-): socket is typeof socket & { server: http.Server } =>
-  "server" in socket &&
-  typeof socket.server === "object" &&
-  socket.server !== null &&
-  "close" in socket.server &&
-  typeof socket.server.close === "function";
+export const current = (nodes: ts.TypeLiteralNode[]) =>
+  f.createTypeLiteralNode(nodes.flatMap(({ members }) => members));
 
-describe("Experiment %s", () => {
-  const a = new Socket();
-  const b = { server: http.createServer() };
+export const feat = (nodes: ts.TypeLiteralNode[]) =>
+  f.createTypeLiteralNode(chain(prop("members"), nodes));
 
-  bench("original", () => {
-    hasHttpServer(a);
-    hasHttpServer(b as unknown as Socket);
+describe("Experiment on flatMap", () => {
+  const subj = [
+    f.createTypeLiteralNode([
+      f.createPropertySignature(
+        undefined,
+        "test1",
+        undefined,
+        f.createTypeReferenceNode("test1"),
+      ),
+    ]),
+    f.createTypeLiteralNode([
+      f.createPropertySignature(
+        undefined,
+        "test2",
+        undefined,
+        f.createTypeReferenceNode("test2"),
+      ),
+    ]),
+  ];
+
+  bench("flatMap", () => {
+    current(subj);
   });
 
-  bench("featured", () => {
-    comparable(a);
-    comparable(b as unknown as Socket);
+  bench("chain+prop", () => {
+    feat(subj);
   });
 });

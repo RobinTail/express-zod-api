@@ -6,13 +6,13 @@ import {
 } from "../express-mock";
 import { z } from "zod";
 import {
-  BuiltinLogger,
   DependsOnMethod,
   CommonConfig,
   EndpointsFactory,
   Routing,
   ServeStatic,
   defaultResultHandler,
+  ez,
 } from "../../src";
 import {
   makeLoggerMock,
@@ -40,20 +40,16 @@ describe("Routing", () => {
       };
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
-        methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const postEndpoint = factory.build({
-        methods: ["post"],
-        input: z.object({}),
+        method: "post",
         output: z.object({}),
         handler: handlerMock,
       });
       const getAndPostEndpoint = factory.build({
-        methods: ["get", "post"],
-        input: z.object({}),
+        method: ["get", "post"],
         output: z.object({}),
         handler: handlerMock,
       });
@@ -66,9 +62,10 @@ describe("Routing", () => {
           },
         },
       };
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -95,9 +92,10 @@ describe("Routing", () => {
         cors: true,
         startupLogo: false,
       };
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -114,20 +112,14 @@ describe("Routing", () => {
       };
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
-        methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const postEndpoint = factory.build({
-        methods: ["post"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const putAndPatchEndpoint = factory.build({
-        methods: ["put", "patch"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -141,9 +133,10 @@ describe("Routing", () => {
           }),
         },
       };
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -164,8 +157,7 @@ describe("Routing", () => {
       const configMock = { cors: true, startupLogo: false };
       const factory = new EndpointsFactory(defaultResultHandler);
       const putAndPatchEndpoint = factory.build({
-        methods: ["put", "patch"],
-        input: z.object({}),
+        method: ["put", "patch"],
         output: z.object({}),
         handler: vi.fn(),
       });
@@ -178,10 +170,11 @@ describe("Routing", () => {
           }),
         },
       };
+      const logger = makeLoggerMock();
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+          getLogger: () => logger,
           config: configMock as CommonConfig,
           routing,
         }),
@@ -191,26 +184,26 @@ describe("Routing", () => {
     test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
       const handler = vi.fn(async () => ({}));
       const configMock = {
-        cors: true,
+        cors: (params: { defaultHeaders: Record<string, string> }) => ({
+          ...params.defaultHeaders,
+          "X-Custom-Header": "Testing",
+        }),
         startupLogo: false,
       };
       const factory = new EndpointsFactory(defaultResultHandler);
       const input = z.object({});
       const output = z.object({});
       const getEndpoint = factory.build({
-        method: "get",
         input,
         output,
         handler,
       });
       const postEndpoint = factory.build({
-        method: "post",
         input,
         output,
         handler,
       });
       const putAndPatchEndpoint = factory.build({
-        methods: ["put", "patch"],
         input,
         output,
         handler,
@@ -223,9 +216,10 @@ describe("Routing", () => {
           patch: putAndPatchEndpoint,
         }),
       };
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -237,18 +231,19 @@ describe("Routing", () => {
       const responseMock = makeResponseMock();
       await fn(requestMock, responseMock);
       expect(responseMock._getStatusCode()).toBe(200);
-      expect(responseMock._getHeaders()).toHaveProperty(
-        "access-control-allow-methods",
-        "GET, POST, PUT, PATCH, OPTIONS",
-      );
+      expect(responseMock._getHeaders()).toEqual({
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET, POST, PUT, PATCH, OPTIONS",
+        "access-control-allow-headers": "content-type",
+        "content-type": "application/json",
+        "x-custom-header": "Testing",
+      });
     });
 
     test("Should accept parameters", () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -259,9 +254,10 @@ describe("Routing", () => {
           },
         },
       };
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
@@ -273,45 +269,48 @@ describe("Routing", () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const routing: Routing = {
         v1: {
           user: {
-            ":id": {
-              "": endpointMock,
+            ":id": endpointMock.nest({
               " download ": endpointMock,
-            },
+            }),
           },
         },
       };
+      const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+        getLogger: () => logger,
         config: configMock as CommonConfig,
         routing,
       });
       expect(appMock.get).toHaveBeenCalledTimes(2);
-      expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/:id");
-      expect(appMock.get.mock.calls[1][0]).toBe("/v1/user/:id/download");
+      expect(appMock.get).toHaveBeenCalledWith(
+        "/v1/user/:id",
+        expect.any(Function),
+      );
+      expect(appMock.get).toHaveBeenCalledWith(
+        "/v1/user/:id/download",
+        expect.any(Function),
+      );
     });
 
     test("Should throw an error in case of slashes in route", () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["get"],
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
+      const logger = makeLoggerMock();
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+          getLogger: () => logger,
           config: configMock as CommonConfig,
           routing: {
             v1: {
@@ -323,7 +322,7 @@ describe("Routing", () => {
       expect(() =>
         initRouting({
           app: appMock as unknown as IRouter,
-          getChildLogger: () => new BuiltinLogger({ level: "silent" }),
+          getLogger: () => logger,
           config: configMock as CommonConfig,
           routing: {
             "v1/user/retrieve": endpointMock,
@@ -338,13 +337,9 @@ describe("Routing", () => {
         .mockImplementationOnce(() => ({ result: true }));
       const configMock = { cors: true, startupLogo: false };
       const setEndpoint = new EndpointsFactory(defaultResultHandler).build({
-        methods: ["post"],
-        input: z.object({
-          test: z.number(),
-        }),
-        output: z.object({
-          result: z.boolean(),
-        }),
+        method: "post",
+        input: z.object({ test: z.number() }),
+        output: z.object({ result: z.boolean() }),
         handler: handlerMock,
       });
       const routing: Routing = {
@@ -354,10 +349,10 @@ describe("Routing", () => {
           },
         },
       };
-      const loggerMock = makeLoggerMock();
+      const getLoggerMock = vi.fn(() => makeLoggerMock());
       initRouting({
         app: appMock as unknown as IRouter,
-        getChildLogger: () => loggerMock,
+        getLogger: getLoggerMock,
         config: configMock as CommonConfig,
         routing,
       });
@@ -370,21 +365,57 @@ describe("Routing", () => {
       const responseMock = makeResponseMock();
       const nextMock = vi.fn();
       await routeHandler(requestMock, responseMock, nextMock);
+      expect(getLoggerMock).toHaveBeenCalledWith(requestMock);
       expect(nextMock).toHaveBeenCalledTimes(0);
       expect(handlerMock).toHaveBeenCalledTimes(1);
-      expect(loggerMock._getLogs().error).toHaveLength(0);
+      expect(
+        getLoggerMock.mock.results.pop()!.value._getLogs().error,
+      ).toHaveLength(0);
       expect(handlerMock).toHaveBeenCalledWith({
-        input: {
-          test: 123,
-        },
+        input: { test: 123 },
         options: {},
-        logger: loggerMock,
+        logger: getLoggerMock.mock.results.pop()!.value,
       });
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getJSONData()).toEqual({
         status: "success",
         data: { result: true },
       });
+    });
+
+    test.each([
+      [z.bigint(), z.set(z.string())],
+      [z.nan(), z.map(z.string(), z.boolean())],
+      [z.date().pipe(z.string()), z.symbol().catch(Symbol("test"))],
+      [z.function().transform(() => "test"), z.tuple([z.function()])],
+      [ez.dateOut(), ez.dateIn()],
+      [z.lazy(() => z.void()), ez.raw()],
+      [z.promise(z.any()), ez.upload()],
+      [z.never(), z.tuple([ez.file()]).rest(z.nan())],
+    ])("should warn about JSON incompatible schemas %#", (input, output) => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        input: z.object({ input }),
+        output: z.object({ output }),
+        handler: vi.fn(),
+      });
+      const configMock = { cors: false, startupLogo: false };
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: configMock as CommonConfig,
+        routing: { path: endpoint },
+      });
+      expect(logger._getLogs().warn).toEqual([
+        [
+          "The final input schema of the endpoint contains an unsupported JSON payload type.",
+          { method: "get", path: "/path", reason: expect.any(Error) },
+        ],
+        [
+          "The final positive response schema of the endpoint contains an unsupported JSON payload type.",
+          { method: "get", path: "/path", reason: expect.any(Error) },
+        ],
+      ]);
     });
   });
 });

@@ -1,6 +1,299 @@
 # Changelog
 
+## Version 21
+
+### v21.1.0
+
+- Featuring empty response support:
+  - For some REST APIs, empty responses are typical: with status code `204` (No Content) and redirects (302);
+  - Previously, the framework did not offer a straightforward way to describe such responses, but now there is one;
+  - The `mimeType` property can now be assigned with `null` in `ResultHandler` definition;
+  - Both `Documentation` and `Integration` generators ignore such entries so that the `schema` can be `z.never()`:
+    - The body of such response will not be depicted by `Documentation`;
+    - The type of such response will be described as `undefined` (configurable) by `Integration`.
+
+```ts
+import { z } from "zod";
+import {
+  ResultHandler,
+  ensureHttpError,
+  EndpointsFactory,
+  Integration,
+} from "express-zod-api";
+
+const resultHandler = new ResultHandler({
+  positive: { statusCode: 204, mimeType: null, schema: z.never() },
+  negative: { statusCode: 404, mimeType: null, schema: z.never() },
+  handler: ({ error, response }) => {
+    response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
+  },
+});
+
+new Integration({ noContent: z.undefined() }); // undefined is default
+```
+
+### v21.0.0
+
+- Minimum supported versions of `express`: 4.21.1 and 5.0.1 (fixed vulnerabilities);
+- Breaking changes to `createConfig()` argument:
+  - The `server` property renamed to `http` and made optional — (can now configure HTTPS only);
+  - These properties moved to the top level: `jsonParser`, `upload`, `compression`, `rawParser` and `beforeRouting`;
+  - Both `logger` and `getChildLogger` arguments of `beforeRouting` function are replaced with all-purpose `getLogger`.
+- Breaking changes to `createServer()` resolved return:
+  - Both `httpServer` and `httpsServer` are combined into single `servers` property (array, same order).
+- Breaking changes to `EndpointsFactory::build()` argument:
+  - Plural `methods`, `tags` and `scopes` properties replaced with singular `method`, `tag`, `scope` accordingly;
+  - The `method` property also made optional and can now be derived from `DependsOnMethod` or imply `GET` by default;
+  - When `method` is assigned with an array, it must be non-empty.
+- Breaking changes to `positive` and `negative` properties of `ResultHandler` constructor argument:
+  - Plural `statusCodes` and `mimeTypes` props within the values are replaced with singular `statusCode` and `mimeType`.
+- Other breaking changes:
+  - The `serializer` property of `Documentation` and `Integration` constructor argument removed;
+  - The `originalError` property of `InputValidationError` and `OutputValidationError` removed (use `cause` instead);
+  - The `getStatusCodeFromError()` method removed (use the `ensureHttpError().statusCode` instead);
+  - The `testEndpoint()` method can no longer test CORS headers — that function moved to `Routing` traverse;
+  - For `Endpoint`: `getMethods()` may return `undefined`, `getMimeTypes()` removed, `getSchema()` variants reduced;
+  - Public properties `pairs`, `firstEndpoint` and `siblingMethods` of `DependsOnMethod` replaced with `entries`.
+- Consider the automated migration using the built-in ESLint rule.
+
+```js
+// eslint.config.mjs — minimal ESLint 9 config to apply migrations automatically using "eslint --fix"
+import parser from "@typescript-eslint/parser";
+import migration from "express-zod-api/migration";
+
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v21": "error" } },
+];
+```
+
+```ts
+// The sample of new structure
+const config = createConfig({
+  http: { listen: 80 }, // became optional
+  https: { listen: 443, options: {} },
+  upload: true,
+  compression: true,
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+    app.use((req, res, next) => {
+      const childLogger = getLogger(req);
+    });
+  },
+});
+const { servers } = await createServer(config, {});
+```
+
 ## Version 20
+
+### v20.22.1
+
+- Avoids startup logo distortion when the terminal is too narrow;
+- Self-diagnosis for potential problems disabled in production mode to ensure faster startup:
+  - Warning about potentially unserializable schema for JSON operating endpoints was introduced in v20.15.0.
+
+### v20.22.0
+
+- Featuring a helper to describe nested Routing for already assigned routes:
+  - Suppose you want to describe `Routing` for both `/v1/path` and `/v1/path/subpath` routes having Endpoints attached;
+  - Previously, an empty path segment was proposed for that purpose, but there is more elegant and readable way now;
+  - The `.nest()` method is available both on `Endpoint` and `DependsOnMethod` instances:
+
+```ts
+import { Routing } from "express-zod-api";
+
+// Describing routes /v1/path and /v1/path/subpath both having endpoints assigned:
+const before: Routing = {
+  v1: {
+    path: {
+      "": endpointA,
+      subpath: endpointB,
+    },
+  },
+};
+
+const after: Routing = {
+  v1: {
+    path: endpointA.nest({
+      subpath: endpointB,
+    }),
+  },
+};
+```
+
+### v20.21.2
+
+- Fixed the example implementation in the generated client for endpoints using path params:
+  - The choice of parser was made based on the exported `const jsonEndpoints` indexed by `path`;
+  - The actual `path` used for the lookup already contained parameter substitutions so that JSON parser didn't work;
+  - The new example implementation suggests choosing the parser based on the actual `response.headers`;
+  - The issue was found and reported by [@HenriJ](https://github.com/HenriJ).
+
+```diff
+- const parser = `${method} ${path}` in jsonEndpoints ? "json" : "text";
++ const isJSON = response.headers
++   .get("content-type")
++   ?.startsWith("application/json");
+- return response[parser]();
++ return response[isJSON ? "json" : "text"]();
+```
+
+### v20.21.1
+
+- Performance tuning: `Routing` traverse made about 12 times faster.
+
+### v20.21.0
+
+- Feat: input schema made optional:
+  - The `input` property can be now omitted on the argument of the following methods:
+    `Middlware::constructor`, `EndpointsFactory::build()`, `EndpointsFactory::addMiddleware()`;
+  - When the input schema is not specified `z.object({})` is used;
+  - This feature aims to simplify the implementation for Endpoints and Middlwares having no inputs.
+
+### v20.20.1
+
+- Minor code style refactoring and performance tuning;
+- The software is redefined as a framework;
+  - Thanks to [@JonParton](https://github.com/JonParton) for contribution to the documentation.
+
+### v20.20.0
+
+- Introducing `errorHandler` option for `testMiddleware()` method:
+  - If your middleware throws an error there was no ability to make assertions other than the thrown error;
+  - New option can be assigned with a function for transforming the error into response, so that `testMiddlware` itself
+    would not throw, enabling usage of all returned entities for mutiple assertions in test;
+  - The feature suggested by [@williamgcampbell](https://github.com/williamgcampbell).
+
+```ts
+import { testMiddleware, Middleware } from "express-zod-api";
+
+const middlware = new Middleware({
+  input: z.object({}),
+  handler: async ({ logger }) => {
+    logger.info("logging something");
+    throw new Error("something went wrong");
+  },
+});
+
+test("a middleware throws, but it writes log as well", async () => {
+  const { loggerMock, responseMock } = await testMiddleware({
+    errorHandler: (error, response) => response.end(error.message),
+    middleware,
+  });
+  expect(loggerMock._getLogs().info).toEqual([["logging something"]]);
+  expect(responseMock._getData()).toBe("something went wrong");
+});
+```
+
+### v20.19.0
+
+- Configuring built-in logger made optional:
+  - Built-in logger configuration option `level` made optional as well as the `logger` option for `createConfig()`;
+  - Using `debug` level by default, or `warn` when `NODE_ENV=production`.
+- Fixed performance issue on `BuiltinLogger` when its `color` option is not set in config:
+  - `.child()` method is 50x times faster now by only detecting the color support once;
+  - Color autodetection was introduced in v18.3.0.
+
+### v20.18.0
+
+- Introducing `ensureHttpError()` method that converts any `Error` into `HttpError`:
+  - It converts `InputValidationError` to `BadRequest` (status code `400`) and others to `InternalServerError` (`500`).
+- Deprecating `getStatusCodeFromError()` — use the `ensureHttpError().statusCode` instead.
+- Generalizing server-side error messages in production mode by default:
+  - This feature aims to improve the security of your API by not disclosing the exact causes of errors;
+  - Applies to `defaultResultHandler`, `defaultEndpointsFactory` and Last Resort Handler only;
+  - When `NODE_ENV` is set to `production` (displayed on startup);
+  - Instead of actual message the default one associated with the corresponding `statusCode` used;
+  - Server-side errors are those having status code `5XX`, or treated that way by `ensureHttpError()`;
+  - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option;
+  - More about production mode and how to activate it:
+    https://nodejs.org/en/learn/getting-started/nodejs-the-difference-between-development-and-production
+
+```ts
+import createHttpError from "http-errors";
+// NODE_ENV=production
+// Throwing HttpError from Endpoint or Middleware that is using defaultResultHandler or defaultEndpointsFactory:
+createHttpError(401, "Token expired"); // —> "Token expired"
+createHttpError(401, "Token expired", { expose: false }); // —> "Unauthorized"
+createHttpError(500, "Something is broken"); // —> "Internal Server Error"
+createHttpError(501, "We didn't make it yet", { expose: true }); // —> "We didn't make it yet"
+```
+
+### v20.17.0
+
+- Added `cause` property to `DocumentationError`;
+- Log all server side errors (status codes `>= 500`) and in full (not just the `message`).
+
+### v20.16.0
+
+- Deprecating `originalError` property on both `InputValidationError` and `OutputValidationError`:
+  - Use `cause` property instead;
+  - Those error classes are publicly exposed for developers making custom Result Handlers.
+
+```diff
+  const error = new InputValidationError(new z.ZodError([]));
+- logger.error(error.originalError.message);
++ logger.error(error.cause.message);
+```
+
+### v20.15.3
+
+- Merge intersected object types in generated client:
+  - This fixes "empty object" intersection problem for endpoints having middlwares without inputs.
+
+```diff
+- type GetV1UserRetrieveInput = {} & {
++ type GetV1UserRetrieveInput = {
+    /** a numeric string containing the id of the user */
+    id: string;
+  };
+```
+
+### v20.15.2
+
+- Fixed duplicated client types in unions:
+  - When `splitResponse` option is disabled on `Integration` primitive response types could have been duplicated.
+
+```diff
+- type GetV1AvatarSendResponse = string | string;
++ type GetV1AvatarSendResponse = string;
+```
+
+### v20.15.1
+
+- Deprecating `serializer` property on `Documentation` and `Integration` constructor argument:
+  - That property was introduced in v9.3.0 and utilized for comparing schemas in order to handle possible circular
+    references within `z.lazy()`;
+  - The property is no longer in use and will be removed in version 21.
+
+### v20.15.0
+
+- Feat: warn about potentially unserializable schema used for JSON operating endpoints:
+  - This version will warn you if you're using a schema that might not work in request or response, in particular:
+    - Generally unserializable objects: `z.map()`, `z.set()`, `z.bigint()`;
+    - JSON incompatible entities: `z.never()`, `z.void()`, `z.promise()`, `z.symbol()`, `z.nan()`;
+    - Non-revivable in request: `z.date()`;
+    - Incorrectly used in request: `ez.dateOut()`;
+    - Incorrectly used in response: `ez.dateIn()`, `ez.upload()`, `ez.raw()`;
+  - The feature suggested by [@t1nky](https://github.com/t1nky).
+
+### v20.14.3
+
+- Fixed: missing export of `testMiddleware`:
+  - The feature introduced in v20.4.0 but was not available;
+  - The issue reported by [@Tomtec331](https://github.com/Tomtec331).
+
+### v20.14.2
+
+- Documentation: promoting Express 5 as the recommended version for new projects;
+- Minor refactoring: response variant constraints, inverted definition of `AbstractLogger` type;
+- There is now an opportunity to support the project with sponsorship: https://github.com/sponsors/RobinTail
+
+### v20.14.1
+
+- `node-mocks-http` version is `^1.16.1`:
+  - This deduplicates the `@types/express` dependency to the version installed in your project;
+  - This fix is an addition to the support of Express 5 (v20.10.0) and its types (v20.14.0).
 
 ### v20.14.0
 
@@ -65,7 +358,8 @@ createConfig({
 - Feat: providing child logger to `beforeRouting()` hook:
   - The function assigned to config property `server.beforeRouting` now accepts additional argument `getChildLogger()`;
   - The featured method accepts `request` and returns a child logger if `childLoggerProvider()` is configured;
-  - Otherwise, it returns the root logger (same for all requests, same as the `logger` argument).
+  - Otherwise, it returns the root logger (same for all requests, same as the `logger` argument);
+  - The feature suggested by [@williamgcampbell](https://github.com/williamgcampbell).
 
 ```ts
 import { createConfig } from "express-zod-api";
@@ -185,7 +479,8 @@ declare module "express-zod-api" {
 - Feat: middleware testing helper: `testMiddleware()`, similar to `testEndpoint()`:
   - There is also an ability to pass `options` collected from outputs of previous middlewares, if the one being tested
     somehow depends on them.
-  - The method returns: `Promise<{ output, requestMock, responseMock, loggerMock }>`.
+  - The method returns: `Promise<{ output, requestMock, responseMock, loggerMock }>`;
+  - Export fixed in v20.14.3.
 
 ```typescript
 import { z } from "zod";
@@ -271,7 +566,7 @@ z.object({ user_id: z.string() })
   - This can enable having `snake_case` API parameters while keeping `camelCase` naming in your implementation;
   - You can `.transform()` the entire `input` schema into another object, using a well-typed mapping library;
   - You can do the same with the `output` schema, but that would not be enough for generating a valid documentation;
-  - The library offers a new `.remap()` method on the `z.object()` schema that applies a `.pipe()` to transformation;
+  - The framework offers a new `.remap()` method on the `z.object()` schema that applies a `.pipe()` to transformation;
     - Currently `.remap()` requires an assignment of all the object props explicitly, but it may be improved later;
   - Find more details [in the documentation](README.md#top-level-transformations-and-mapping);
   - The feature suggested by [Peter Rottmann](https://github.com/rottmann).
@@ -446,11 +741,12 @@ const config = createConfig({
 
 - Feature: customizable handling rules for your branded schemas in Documentation and Integration:
   - You can make your schemas special by branding them using `.brand()` method;
-  - The library (being a Zod Plugin as well) distinguishes the branded schemas in runtime;
+  - The framework (being a Zod Plugin as well) distinguishes the branded schemas in runtime;
   - The constructors of `Documentation` and `Integration` now accept new property `brandHandling` (object);
   - Its keys should be the brands you want to handle in a special way;
   - Its values are functions having your schema as the first argument and a context in the second place;
-  - In case you need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
+  - In case you need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`;
+  - The feature suggested by [@shawncarr](https://github.com/shawncarr).
 
 ```ts
 import ts from "typescript";
@@ -689,11 +985,11 @@ const labeledDefaultSchema = withMeta(
 
 - Supporting Node 22;
 - Featuring `zod-sockets` for implementing subscriptions on your API:
-  - I have developed an additional pluggable library, Zod Sockets, which has similar principles and capabilities, but
-    uses the websocket transport and Socket.IO protocol, so that the user of a client application could subscribe to
-    subsequent updates initiated by the server.
-  - Check out an [example of the synergy between two libraries](https://github.com/RobinTail/zod-sockets#subscriptions)
-    and the [Demo Chat application](https://github.com/RobinTail/chat).
+  - I have developed an additional websocket operating framework, Zod Sockets, which has similar principles and
+    capabilities, so that the user could subscribe to subsequent updates initiated by the server;
+  - Check out an [example of the synergy between two frameworks](https://github.com/RobinTail/zod-sockets#subscriptions)
+    and the [Demo Chat application](https://github.com/RobinTail/chat);
+  - The feature suggested by [@ben-xD](https://github.com/ben-xD).
 
 ### v18.1.0
 
@@ -967,7 +1263,7 @@ export const config = createConfig({
 
 - **Breaking changes**:
   - `DependsOnMethod::endpoints` removed;
-  - Refinment methods of `ez.file()` removed;
+  - Refinement methods of `ez.file()` removed;
   - Minimum version of `vitest` supported is 1.0.4.
 - How to migrate confidently:
   - If you're using refinement methods of `ez.file()`:
@@ -1352,7 +1648,8 @@ securitySchemes:
     class when the `prettier` package is installed (detects automatically).
     - Ability to supply your own typescript formatting function into that new method.
   - Ability to split the response types (to positive and negative ones) when generating the client or API types.
-    - Featuring the `splitResponse` option of the `Integration` class constructor.
+    - Featuring the `splitResponse` option of the `Integration` class constructor;
+    - The feature suggested by [@shawncarr](https://github.com/shawncarr).
 - How to migrate:
   - If you are using `successfulResponseDescription` option of `Documentation` constructor:
     - Replace it with `descriptions/positiveResponse` assigned with the string returning function;
@@ -1446,7 +1743,8 @@ operationId:
   - Read the migration guide below.
 - Features:
   - Supporting any logger having `debug()`, `warn()`, `info()` and `error()` methods;
-    - Package `winston` is now optional.
+    - Package `winston` is now optional;
+    - The feature suggested by [@bobgubko](https://github.com/bobgubko).
   - Supporting any testing framework having a function mocking method for `testEndpoint()`:
     - Both `jest` and `vitest` are supported automatically;
     - With most modern Node.js you can also use the integrated `node:test` module.
@@ -1557,8 +1855,9 @@ logger.info("Listening", 8090);
   - Explore its additional options [in Express.js documentation](https://expressjs.com/en/4x/api.html#express.raw).
 - When the feature is enabled, the raw data is placed into `request.body.raw` property, being `Buffer`.
 - The proprietary schema `ez.file()` is now equipped with two additional refinements:
-  - `.string()` — for parsing string data, default for backward compatibility.
-  - `.buffer()` — for parsing `Buffer` and to accept the incoming raw data.
+  - `.string()` — for parsing string data, default for backward compatibility;
+  - `.buffer()` — for parsing `Buffer` and to accept the incoming raw data;
+  - The feature suggested by [@master-chu](https://github.com/master-chu).
 - In order to define an input schemas of endpoints and middlewares, a new shorthand schema exposed for your convenience:
   - `ez.raw()` — which is the same as `z.object({ raw: ez.file().buffer() })`.
   - Thus, the raw data becomes available to a handler as `input.raw` property.
@@ -1779,7 +2078,7 @@ after:
 
 ### v11.7.0
 
-- Good news for array lovers and those struggling with migrating legacy APIs to use this library.
+- Good news for array lovers and those struggling with migrating legacy APIs to use this framework.
 - New feature: `arrayResultHandler` (and corresponding `arrayEndpointsFactory`).
   - Please avoid using them for new projects: responding with array is a bad practice keeping your endpoints from
     evolving without breaking changes.
@@ -2013,7 +2312,7 @@ new Client({
 
 ### v10.1.3
 
-- Fixed issue #929, found and reported by [@shroudedcode](https://github.com/shroudedcode).
+- Fixed issue #929, found and reported by [@niklashigi](https://github.com/niklashigi).
   - Customized description of request parameters have not been depicted correctly when generating the documentation.
 
 ### v10.1.2
@@ -2141,7 +2440,8 @@ new OpenAPI({
 ### v9.3.1
 
 - Hotfix for the feature #856
-  - `$ref` is equipped with the required prefix: `#/components/schemas/`.
+  - `$ref` is equipped with the required prefix: `#/components/schemas/`;
+  - The issue reported by [@TheWisestOne](https://github.com/TheWisestOne).
 
 ```yaml
 before:
@@ -2465,7 +2765,7 @@ output/anything: Number must be greater than 0
 ### v8.4.3
 
 - The regular expression used for validating `z.dateIn()` made easier
-  by [@shroudedcode](https://github.com/shroudedcode).
+  by [@niklashigi](https://github.com/niklashigi).
 
 ```typescript
 const before = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/;
@@ -2544,7 +2844,7 @@ z.object({}).transform(() => []); // never[] inherits Array inherits Object, {} 
 
 ### v8.3.3
 
-- Fixed the bug #672 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+- Fixed the bug #672 found and reported by [@niklashigi](https://github.com/niklashigi).
   - Preserving the custom description of `z.dateIn()` and `z.dateOut()` schemas when generating OpenAPI documentation.
 
 ```yaml
@@ -2557,7 +2857,7 @@ after:
 
 ### v8.3.2
 
-- Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+- Fixed the bug #673 found and reported by [@niklashigi](https://github.com/niklashigi).
   - Preventing double parsing of incoming data by input schemas of middlewares containing transformations.
   - The bug caused inability of using any transforming schema in middlewares.
   - In particular, but not limited with: using `z.dateIn()` in middlewares.
@@ -2571,11 +2871,13 @@ after:
 ### v8.3.0
 
 - Feature #600: Top level refinements.
-  - Starting this version you can use the `.refine()` method on the `z.object()` of the input schema.
+  - Starting this version you can use the `.refine()` method on the `z.object()` of the input schema;
   - This feature might be useful, for example, when you have multiple optional properties on the top level, but at
-    least one of them has to be specified.
-  - Currently, only the refinements of `z.object()` are supported.
-    - You can not combine it with `z.union()`, `z.intersetion()`, `z.discriminatedUnion()`, `.or()`, `.and()` yet.
+    least one of them has to be specified;
+  - Currently, only the refinements of `z.object()` are supported:
+    - You can not combine it with `z.union()`, `z.intersetion()`, `z.discriminatedUnion()`, `.or()`, `.and()` yet;
+  - The feature suggested by [@johngeorgewright](https://github.com/johngeorgewright)
+    and [ssteuteville](https://github.com/ssteuteville).
 
 ```typescript
 // example
@@ -2623,13 +2925,14 @@ const exampleEndpoint = yourEndpointsFactory.build({
 
 - Feature #571: tagging the endpoints.
   - Good news dear community! You can now tag your endpoints using the new properties of the `.build()` method
-    of the `EndpointsFactory`.
-  - For your convenience and for the sake of Semantics, there are singular and plural properties: `tag` and `tags`.
+    of the `EndpointsFactory`;
+  - For your convenience and for the sake of Semantics, there are singular and plural properties: `tag` and `tags`;
   - By default, these properties allow any string, so in order to enforce restrictions and achieve the consistency
     across all endpoints, the possible tags should be declared in the configuration first and also a brand
-    new `EndpointsFactory` instantiation approach is required.
-  - The configuration has got a new `tags` property for declaring possible tags and their descriptions.
-  - Tags are an important part of the generated documentation for the OpenAPI standard.
+    new `EndpointsFactory` instantiation approach is required;
+  - The configuration has got a new `tags` property for declaring possible tags and their descriptions;
+  - Tags are an important part of the generated documentation for the OpenAPI standard;
+  - The feature suggested by [@TheWisestOne](https://github.com/TheWisestOne).
 - The property `scopes` (introduced in v7.9.0) has got its singular variation `scope`.
 
 ```typescript
@@ -2707,7 +3010,7 @@ const routing: Routing = {
 ### v7.9.3
 
 - This version contains a cherry-picked fix made in v8.3.2.
-- Fixed the bug #673 found and reported by [@shroudedcode](https://github.com/shroudedcode).
+- Fixed the bug #673 found and reported by [@niklashigi](https://github.com/niklashigi).
   - Preventing double parsing of incoming data by input schemas of middlewares containing transformations.
   - The bug caused inability of using any transforming schema in middlewares.
   - In particular, but not limited with: using `z.dateIn()` in middlewares.
@@ -2898,10 +3201,11 @@ const myFactory = defaultEndpointsFactory.addExpressMiddleware(
 
 ### v7.5.0
 
-- Feature #503: configurable CORS headers.
-  - The configuration options `cors` now accepts a function that returns custom headers.
-  - The function may be asynchronous.
-  - Setting `cors: true` implies the default headers.
+- Feature #503: configurable CORS headers:
+  - The configuration options `cors` now accepts a function that returns custom headers;
+  - The function may be asynchronous;
+  - Setting `cors: true` implies the default headers;
+  - The feature suggested by [@HardCoreQual](https://github.com/HardCoreQual).
 
 ```typescript
 import { createConfig } from "express-zod-api";
@@ -3021,15 +3325,16 @@ interface After {
 
 ### v6.1.0
 
-- Feature #403: API Client Generator.
-  - A new way of informing the frontend about the I/O types of endpoints.
-  - The new approach offers automatic generation of a client based on routing to a typescript file.
+- Feature #403: API Client Generator:
+  - A new way of informing the frontend about the I/O types of endpoints;
+  - The new approach offers automatic generation of a client based on routing to a typescript file;
   - The generated client is flexibly configurable on the frontend side using an implementation function that
-    directly makes requests to an endpoint using the libraries and methods of your choice.
-  - The client asserts the type of request parameters and response.
-  - Path params are excluded from `params` after being substituted.
-  - The client now accepts a function parameter of `Implementation` type.
-  - Its parameter `path` now contains substituted path params.
+    directly makes requests to an endpoint using the libraries and methods of your choice;
+  - The client asserts the type of request parameters and response;
+  - Path params are excluded from `params` after being substituted;
+  - The client now accepts a function parameter of `Implementation` type;
+  - Its parameter `path` now contains substituted path params;
+  - The feature suggested by [@hellovai](https://github.com/hellovai).
 
 ```typescript
 // example client-generator.ts
@@ -3296,9 +3601,10 @@ const config = createConfig({
 
 ### v5.2.0
 
-- Feature #254: the ability to configure routes for serving static files.
-  - Use `new ServeStatic()` with the same arguments as `express.static()`.
+- Feature #254: the ability to configure routes for serving static files:
+  - Use `new ServeStatic()` with the same arguments as `express.static()`;
   - You can find the documentation on these arguments here: http://expressjs.com/en/4x/api.html#express.static
+  - The feature suggested by [@Isaac-Leonard](https://github.com/Isaac-Leonard).
 
 ```typescript
 import { Routing, ServeStatic } from "express-zod-api";
@@ -3505,16 +3811,17 @@ const newInputSourcesByDefault: InputSources = {
 
 ### v2.10.0
 
-- Feature #165. You can add examples to the generated documentation.
-  - Introducing new method `withMeta()`. You can wrap any Zod schema in it, for example: `withMeta(z.string())`.
+- Feature #165. You can add examples to the generated documentation:
+  - Introducing new method `withMeta()`. You can wrap any Zod schema in it, for example: `withMeta(z.string())`;
   - `withMeta()` provides you with additional methods for generated documentation. At the moment there is one so far:
-    `withMeta().example()`.
-  - You can use `.example()` multiple times for specifying several examples for your schema.
-  - You can specify example for the whole IO schema or just for a one of its properties.
+    `withMeta().example()`;
+  - You can use `.example()` multiple times for specifying several examples for your schema;
+  - You can specify example for the whole IO schema or just for a one of its properties;
   - `withMeta()` can be used within Endpoint and Middleware as well. Their input examples will be merged for the
-    generated documentation.
-  - Check out the example of the generated documentation in the `example` folder.
-  - Notice: `withMeta()` mutates its argument.
+    generated documentation;
+  - Check out the example of the generated documentation in the `example` folder;
+  - Notice: `withMeta()` mutates its argument;
+  - The feature suggested by [@digimuza](https://github.com/digimuza).
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
@@ -4062,7 +4369,8 @@ const myResultHandlerV2 = createResultHandler({
 
 ### v1.2.0
 
-- Ability to specify the endpoint description and [export it to the Swagger / OpenAPI specification](https://github.com/RobinTail/express-zod-api#swagger--openapi-specification).
+- Ability to specify the endpoint description and export it to the Swagger / OpenAPI specification:
+  - The feature suggested by [@glitch452](https://github.com/glitch452).
 
 ```typescript
 // example

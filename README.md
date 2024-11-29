@@ -13,18 +13,9 @@
 
 Start your API server with I/O schema validation and custom middlewares in minutes.
 
-1. [Why and what is it for](#why-and-what-is-it-for)
+1. [Overview](#overview)
 2. [How it works](#how-it-works)
-   1. [Technologies](#technologies)
-   2. [Concept](#concept)
-3. [Quick start](#quick-start) — Fast Track
-   1. [Installation](#installation)
-   2. [Set up config](#set-up-config)
-   3. [Create an endpoints factory](#create-an-endpoints-factory)
-   4. [Create your first endpoint](#create-your-first-endpoint)
-   5. [Set up routing](#set-up-routing)
-   6. [Create your server](#create-your-server)
-   7. [Try it](#try-it)
+3. [Quick start](#quick-start) — **Fast Track**
 4. [Basic features](#basic-features)
    1. [Middlewares](#middlewares)
    2. [Options](#options)
@@ -41,16 +32,19 @@ Start your API server with I/O schema validation and custom middlewares in minut
    13. [Enabling compression](#enabling-compression)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
-   2. [Route path params](#route-path-params)
-   3. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   4. [Response customization](#response-customization)
-   5. [Error handling](#error-handling)
-   6. [Non-object response](#non-object-response) including file downloads
-   7. [File uploads](#file-uploads)
-   8. [Serving static files](#serving-static-files)
-   9. [Connect to your own express app](#connect-to-your-own-express-app)
-   10. [Testing endpoints](#testing-endpoints)
-   11. [Testing middlewares](#testing-middlewares)
+   2. [Nested routes](#nested-routes)
+   3. [Route path params](#route-path-params)
+   4. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   5. [Response customization](#response-customization)
+   6. [Empty response](#empty-response)
+   7. [Error handling](#error-handling)
+   8. [Production mode](#production-mode)
+   9. [Non-object response](#non-object-response) including file downloads
+   10. [File uploads](#file-uploads)
+   11. [Serving static files](#serving-static-files)
+   12. [Connect to your own express app](#connect-to-your-own-express-app)
+   13. [Testing endpoints](#testing-endpoints)
+   14. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -71,9 +65,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
 
 You can find the release notes and migration guides in [Changelog](CHANGELOG.md).
 
-# Why and what is it for
+# Overview
 
-I made this library because of the often repetitive tasks of starting a web server APIs with the need to validate input
+I made this framework because of the often repetitive tasks of starting a web server APIs with the need to validate input
 data. It integrates and provides the capabilities of popular web server, logging, validation and documenting solutions.
 Therefore, many basic tasks can be accomplished faster and easier, in particular:
 
@@ -88,7 +82,62 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
   field names when you implement the client for your API.
 - You can generate your API documentation in OpenAPI 3.1 and JSON Schema compatible format.
 
+## Contributors
+
+These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
+
+[<img src="https://github.com/HenriJ.png" alt="@HenriJ" width="50px" />](https://github.com/HenriJ)
+[<img src="https://github.com/JonParton.png" alt="@JonParton" width="50px" />](https://github.com/JonParton)
+[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
+[<img src="https://github.com/t1nky.png" alt="@t1nky" width="50px" />](https://github.com/t1nky)
+[<img src="https://github.com/Tomtec331.png" alt="@Tomtec331" width="50px" />](https://github.com/Tomtec331)
+[<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
+[<img src="https://github.com/boarush.png" alt="@boarush" width="50px" />](https://github.com/boarush)
+[<img src="https://github.com/shawncarr.png" alt="@shawncarr" width="50px" />](https://github.com/shawncarr)
+[<img src="https://github.com/ben-xD.png" alt="@ben-xD" width="50px" />](https://github.com/ben-xD)
+[<img src="https://github.com/daniel-white.png" alt="@daniel-white" width="50px" />](https://github.com/daniel-white)
+[<img src="https://github.com/kotsmile.png" alt="@kotsmile" width="50px" />](https://github.com/kotsmile)
+[<img src="https://github.com/arlyon.png" alt="@arlyon" width="50px" />](https://github.com/arlyon)
+[<img src="https://github.com/elee1766.png" alt="@elee1766" width="50px" />](https://github.com/elee1766)
+[<img src="https://github.com/danclaytondev.png" alt="@danclaytondev" width="50px" />](https://github.com/danclaytondev)
+[<img src="https://github.com/huyhoang160593.png" alt="@huyhoang160593" width="50px" />](https://github.com/huyhoang160593)
+[<img src="https://github.com/sarahssharkey.png" alt="@sarahssharkey" width="50px" />](https://github.com/sarahssharkey)
+[<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
+[<img src="https://github.com/master-chu.png" alt="@master-chu" width="50px" />](https://github.com/master-chu)
+[<img src="https://github.com/alindsay55661.png" alt="@alindsay55661" width="50px" />](https://github.com/alindsay55661)
+[<img src="https://github.com/john-schmitz.png" alt="@john-schmitz" width="50px" />](https://github.com/john-schmitz)
+[<img src="https://github.com/miki725.png" alt="@miki725" width="50px" />](https://github.com/miki725)
+[<img src="https://github.com/dev-m1-macbook.png" alt="@dev-m1-macbook" width="50px" />](https://github.com/dev-m1-macbook)
+[<img src="https://github.com/McMerph.png" alt="@McMerph" width="50px" />](https://github.com/McMerph)
+[<img src="https://github.com/niklashigi.png" alt="@niklashigi" width="50px" />](https://github.com/niklashigi)
+[<img src="https://github.com/maxcohn.png" alt="@maxcohn" width="50px" />](https://github.com/maxcohn)
+[<img src="https://github.com/VideoSystemsTech.png" alt="@VideoSystemsTech" width="50px" />](https://github.com/VideoSystemsTech)
+[<img src="https://github.com/TheWisestOne.png" alt="@TheWisestOne" width="50px" />](https://github.com/TheWisestOne)
+[<img src="https://github.com/lazylace37.png" alt="@lazylace37" width="50px" />](https://github.com/lazylace37)
+[<img src="https://github.com/leosuncin.png" alt="@leosuncin" width="50px" />](https://github.com/leosuncin)
+[<img src="https://github.com/kirdk.png" alt="@kirdk" width="50px" />](https://github.com/kirdk)
+[<img src="https://github.com/johngeorgewright.png" alt="@johngeorgewright" width="50px" />](https://github.com/johngeorgewright)
+[<img src="https://github.com/ssteuteville.png" alt="@ssteuteville" width="50px" />](https://github.com/ssteuteville)
+[<img src="https://github.com/rayzr522.png" alt="@rayzr522" width="50px" />](https://github.com/rayzr522)
+[<img src="https://github.com/HardCoreQual.png" alt="@HardCoreQual" width="50px" />](https://github.com/HardCoreQual)
+[<img src="https://github.com/hellovai.png" alt="@hellovai" width="50px" />](https://github.com/hellovai)
+[<img src="https://github.com/Isaac-Leonard.png" alt="@Isaac-Leonard" width="50px" />](https://github.com/Isaac-Leonard)
+[<img src="https://github.com/digimuza.png" alt="@digimuza" width="50px" />](https://github.com/digimuza)
+[<img src="https://github.com/glitch452.png" alt="@glitch452" width="50px" />](https://github.com/glitch452)
+
 # How it works
+
+## Concept
+
+The API operates object schemas for input and output validation.
+The object being validated is the combination of certain `request` properties.
+It is available to the endpoint handler as the `input` parameter.
+Middlewares have access to all `request` properties, they can provide endpoints with `options`.
+The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is
+responsible for transmitting consistent responses containing the `output` or possible error.
+Much can be customized to fit your needs.
+
+![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
 
 ## Technologies
 
@@ -103,34 +152,17 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - File uploads — [Express-FileUpload](https://github.com/richardgirges/express-fileupload)
   (based on [Busboy](https://github.com/mscdex/busboy)).
 
-## Concept
-
-The API operates object schemas for input and output validation.
-The object being validated is the combination of certain `request` properties.
-It is available to the endpoint handler as the `input` parameter.
-Middlewares have access to all `request` properties, they can provide endpoints with `options`.
-The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is
-responsible for transmitting consistent responses containing the `output` or possible error.
-Much can be customized to fit your needs.
-
-![Dataflow](https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg)
-
 # Quick start
 
 ## Installation
 
-Run one of the following commands to install the library, its peer dependencies and packages for types assistance.
+Install the framework, its peer dependencies and type assistance packages using your favorite
+[package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/).
 
 ```shell
-yarn add express-zod-api express zod typescript http-errors
-yarn add --dev @types/express @types/node @types/http-errors
-```
-
-or
-
-```shell
-npm install express-zod-api express zod typescript http-errors
-npm install -D @types/express @types/node @types/http-errors
+# example for yarn and express 5 (recommended):
+yarn add express-zod-api express@^5 zod typescript http-errors
+yarn add -D @types/express@^5 @types/node @types/http-errors
 ```
 
 Ensure having the following options in your `tsconfig.json` file in order to make it work as expected:
@@ -153,11 +185,10 @@ Create a minimal configuration. _See all available options
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
+  http: {
     listen: 8090, // port, UNIX socket or options
   },
   cors: true,
-  logger: { level: "debug", color: true },
 });
 ```
 
@@ -178,9 +209,8 @@ The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supp
 import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
-  method: "get", // or methods: ["get", "post", ...]
+  // method: "get" (default) or array ["get", "post", ...]
   input: z.object({
-    // for empty input use z.object({})
     name: z.string().optional(),
   }),
   output: z.object({
@@ -259,12 +289,9 @@ const authMiddleware = new Middleware({
   handler: async ({ input: { key }, request, logger }) => {
     logger.debug("Checking the key and token");
     const user = await db.Users.findOne({ key });
-    if (!user) {
-      throw createHttpError(401, "Invalid key");
-    }
-    if (request.headers.token !== user.token) {
+    if (!user) throw createHttpError(401, "Invalid key");
+    if (request.headers.token !== user.token)
       throw createHttpError(401, "Invalid token");
-    }
     return { user }; // provides endpoints with options.user
   },
 });
@@ -276,10 +303,9 @@ By using `.addMiddleware()` method before `.build()` you can connect it to the e
 const yourEndpoint = defaultEndpointsFactory
   .addMiddleware(authMiddleware)
   .build({
-    // ...,
-    handler: async ({ options }) => {
-      // options.user is the user returned by authMiddleware
-    },
+    handler: async ({ options: { user } }) => {
+      // user is the one returned by authMiddleware
+    }, // ...
   });
 ```
 
@@ -293,8 +319,7 @@ import { defaultEndpointsFactory } from "express-zod-api";
 const factory = defaultEndpointsFactory
   .addMiddleware(authMiddleware) // add Middleware instance or use shorter syntax:
   .addMiddleware({
-    input: z.object({}),
-    handler: async ({ options: { user } }) => ({}), // options.user from authMiddleware
+    handler: async ({ options: { user } }) => ({}), // user from authMiddleware
   });
 ```
 
@@ -336,20 +361,21 @@ const resultHandlerWithCleanup = new ResultHandler({
 There are two ways of connecting the native express middlewares depending on their nature and your objective.
 
 In case it's a middleware establishing and serving its own routes, or somehow globally modifying the behaviour, or
-being an additional request parser (like `cookie-parser`), use the `beforeRouting` option.
-However, it might be better to avoid `cors` here — [the library handles it on its own](#cross-origin-resource-sharing).
+being an additional request parser (like `cookie-parser`), use the `beforeRouting` option. However, it might be better
+to avoid `cors` here — [the framework handles it on its own](#cross-origin-resource-sharing).
 
 ```typescript
 import { createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
 
 const config = createConfig({
-  server: {
-    listen: 80,
-    beforeRouting: ({ app, logger, getChildLogger }) => {
-      logger.info("Serving the API documentation at https://example.com/docs");
-      app.use("/docs", ui.serve, ui.setup(documentation));
-    },
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+    logger.info("Serving the API documentation at https://example.com/docs");
+    app.use("/docs", ui.serve, ui.setup(documentation));
+    app.use("/custom", (req, res, next) => {
+      const childLogger = getLogger(req); // if childLoggerProvider is configured
+    });
   },
 });
 ```
@@ -419,7 +445,6 @@ arrays of numbers.
 import { z } from "zod";
 
 const getUserEndpoint = endpointsFactory.build({
-  method: "get",
   input: z.object({
     id: z.string().transform((id) => parseInt(id, 10)),
     ids: z
@@ -440,7 +465,7 @@ implementation itself requires camel case for internal naming. In order to facil
 different naming standards you can `.transform()` the entire `input` schema into another object using a well-typed
 mapping library, such as [camelize-ts](https://www.npmjs.com/package/camelize-ts). However, that approach would not be
 enough for the `output` schema if you're also aiming to [generate a valid documentation](#creating-a-documentation),
-because the transformations themselves do not contain schemas. Addressing this case, the library offers the `.remap()`
+because the transformations themselves do not contain schemas. Addressing this case, the framework offers the `.remap()`
 method of the object schema, a part of the [Zod plugin](#zod-plugin), which under the hood, in addition to the
 transformation, also `.pipe()` the transformed object into a new object schema.
 Here is a recommended solution: it is important to use shallow transformations only.
@@ -451,7 +476,6 @@ import snakify from "snakify-ts";
 import { z } from "zod";
 
 const endpoint = endpointsFactory.build({
-  method: "get",
   input: z
     .object({ user_id: z.string() })
     .transform((inputs) => camelize(inputs, /* shallow: */ true)),
@@ -485,7 +509,7 @@ which in turn calls
 It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
 confusion with original method ~~z.date()~~ that should not be used within IO schemas of your API.
 
-In order to solve this problem, the library provides two custom methods for dealing with dates: `ez.dateIn()` and
+In order to solve this problem, the framework provides two custom methods for dealing with dates: `ez.dateIn()` and
 `ez.dateOut()` for using within input and output schemas accordingly.
 
 `ez.dateIn()` is a transforming schema that accepts an ISO `string` representation of a `Date`, validates it, and
@@ -498,7 +522,7 @@ provides your endpoint handler or middleware with a `Date`. It supports the foll
 2021-12-31
 ```
 
-`ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
+`ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHandler` with a `string` representation in ISO
 format for the response transmission. Consider the following simplified example for better understanding:
 
 ```typescript
@@ -509,18 +533,14 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
     userId: z.string(),
-    birthday: ez.dateIn(), // string -> Date
+    birthday: ez.dateIn(), // string -> Date in handler
   }),
   output: z.object({
-    createdAt: ez.dateOut(), // Date -> string
+    createdAt: ez.dateOut(), // Date -> string in response
   }),
-  handler: async ({ input }) => {
-    // input.birthday is Date
-    return {
-      // transmitted as "2022-01-22T00:00:00.000Z"
-      createdAt: new Date("2022-01-22"),
-    };
-  },
+  handler: async ({ input }) => ({
+    createdAt: new Date("2022-01-22"), // 2022-01-22T00:00:00.000Z
+  }),
 });
 ```
 
@@ -538,7 +558,6 @@ That function has several parameters and can be asynchronous.
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  // ... other options
   cors: ({ defaultHeaders, request, endpoint, logger }) => ({
     ...defaultHeaders,
     "Access-Control-Max-Age": "5000",
@@ -552,32 +571,24 @@ Please note: If you only want to send specific headers on requests to a specific
 ## Enabling HTTPS
 
 The modern API standard often assumes the use of a secure data transfer protocol, confirmed by a TLS certificate, also
-often called an SSL certificate in habit. When using the `createServer()` method, you can additionally configure and
-run the HTTPS server.
+often called an SSL certificate in habit. This way you can additionally (or solely) configure and run the HTTPS server:
 
 ```typescript
 import { createConfig, createServer } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    listen: 80,
-  },
   https: {
     options: {
       cert: fs.readFileSync("fullchain.pem", "utf-8"),
       key: fs.readFileSync("privkey.pem", "utf-8"),
     },
     listen: 443, // port, UNIX socket or options
-  },
-  // ... cors, logger, etc
+  }, // ... cors, logger, etc
 });
 
 // 'await' is only needed if you're going to use the returned entities.
 // For top level CJS you can wrap you code with (async () => { ... })()
-const { app, httpServer, httpsServer, logger } = await createServer(
-  config,
-  routing,
-);
+const { app, servers, logger } = await createServer(config, routing);
 ```
 
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
@@ -586,8 +597,20 @@ your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Customizing logger
 
-If the simple console output of the built-in logger is not enough for you, you can connect any other compatible one.
-It must support at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
+A simple built-in console logger is used by default with the following options that you can configure:
+
+```typescript
+import { createConfig } from "express-zod-api";
+const config = createConfig({
+  logger: {
+    level: "debug", // or "warn" in production mode
+    color: undefined, // detects automatically, boolean
+    depth: 2, // controls how deeply entities should be inspected
+  },
+});
+```
+
+You can also replace it with a one having at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
 Winston and Pino support is well known. Here is an example configuring `pino` logger with `pino-pretty` extension:
 
 ```typescript
@@ -625,7 +648,6 @@ declare module "express-zod-api" {
 }
 
 const config = createConfig({
-  logger: { level: "debug", color: true },
   childLoggerProvider: ({ parent, request }) =>
     parent.child({ requestId: randomUUID() }),
 });
@@ -633,18 +655,17 @@ const config = createConfig({
 
 ## Profiling
 
-For debugging and performance testing purposes the library offers a simple `.profile()` method on the built-in logger.
+For debugging and performance testing purposes the framework offers a simple `.profile()` method on the built-in logger.
 It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
 invoke the returned callback. The default severity of those measurements is `debug`.
 
 ```typescript
 import { createConfig, BuiltinLogger } from "express-zod-api";
 
-// This enables the .profile() method on "logger":
+// This enables the .profile() method on built-in logger:
 declare module "express-zod-api" {
   interface LoggerOverrides extends BuiltinLogger {}
 }
-const config = createConfig({ logger: { level: "debug", color: true } });
 
 // Inside a handler of Endpoint, Middleware or ResultHandler:
 const done = logger.profile("expensive operation");
@@ -675,10 +696,8 @@ Install the following additional packages: `compression` and `@types/compression
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    /** @link https://www.npmjs.com/package/compression#options */
-    compression: { threshold: "1kb" }, // or true
-  },
+  /** @link https://www.npmjs.com/package/compression#options */
+  compression: { threshold: "1kb" }, // or true
 });
 ```
 
@@ -691,14 +710,13 @@ In order to receive a compressed response the client should include the followin
 
 You can customize the list of `request` properties that are combined into `input` that is being validated and available
 to your endpoints and middlewares. The order here matters: each next item in the array has a higher priority than its
-previous sibling.
+previous sibling. The following arrangement is default:
 
 ```typescript
 import { createConfig } from "express-zod-api";
 
 createConfig({
   inputSources: {
-    // the defaults are:
     get: ["query", "params"],
     post: ["body", "params", "files"],
     put: ["body", "params"],
@@ -708,21 +726,32 @@ createConfig({
 });
 ```
 
-## Route path params
+## Nested routes
 
-You can describe the route of the endpoint using parameters:
+Suppose you want to assign both `/v1/path` and `/v1/path/subpath` routes with Endpoints:
 
 ```typescript
 import { Routing } from "express-zod-api";
 
 const routing: Routing = {
   v1: {
-    user: {
-      // route path /v1/user/:id, where :id is the path param
-      ":id": getUserEndpoint,
-      // use the empty string to represent /v1/user if needed:
-      // "": listAllUsersEndpoint,
-    },
+    path: endpointA.nest({
+      subpath: endpointB,
+    }),
+  },
+};
+```
+
+## Route path params
+
+You can assign your Endpoint to a route like `/v1/user/:id` where `:id` is the path parameter:
+
+```typescript
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  v1: {
+    user: { ":id": getUserEndpoint },
   },
 };
 ```
@@ -731,26 +760,22 @@ You then need to specify these parameters in the endpoint input schema in the us
 
 ```typescript
 const getUserEndpoint = endpointsFactory.build({
-  method: "get",
   input: z.object({
     // id is the route path param, always string
     id: z.string().transform((value) => parseInt(value, 10)),
     // other inputs (in query):
     withExtendedInformation: z.boolean().optional(),
   }),
-  output: z.object({
-    /* ... */
-  }),
-  handler: async ({ input: { id } }) => {
-    // id is the route path param, number
-  },
+  output: z.object({}),
+  handler: async ({ input: { id } }) => ({}), // id is number,
 });
 ```
 
 ## Multiple schemas for one route
 
 Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
-It can also be the same Endpoint that handles multiple methods as well.
+It can also be the same Endpoint that handles multiple methods as well. The `method` and `methods` properties can be
+omitted for `EndpointsFactory::build()` so that the method determination would be delegated to the `Routing`.
 
 ```typescript
 import { DependsOnMethod } from "express-zod-api";
@@ -760,10 +785,10 @@ import { DependsOnMethod } from "express-zod-api";
 const routing: Routing = {
   v1: {
     user: new DependsOnMethod({
-      get: yourEndpointA,
-      delete: yourEndpointA,
-      post: yourEndpointB,
-      patch: yourEndpointB,
+      get: endpointA,
+      delete: endpointA,
+      post: endpointB,
+      patch: endpointB,
     }),
   },
 };
@@ -778,18 +803,8 @@ The `defaultResultHandler` sets the HTTP status code and ensures the following t
 
 ```typescript
 type DefaultResponse<OUT> =
-  | {
-      // Positive response
-      status: "success";
-      data: OUT;
-    }
-  | {
-      // or Negative response
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | { status: "success"; data: OUT } // Positive response
+  | { status: "error"; error: { message: string } }; // or Negative response
 ```
 
 You can create your own result handler by using this example as a template:
@@ -798,24 +813,23 @@ You can create your own result handler by using this example as a template:
 import { z } from "zod";
 import {
   ResultHandler,
-  getStatusCodeFromError,
+  ensureHttpError,
   getMessageFromError,
 } from "express-zod-api";
 
 const yourResultHandler = new ResultHandler({
   positive: (data) => ({
     schema: z.object({ data }),
-    mimeType: "application/json", // optinal, or mimeTypes for array
+    mimeType: "application/json", // optinal or array
   }),
   negative: z.object({ error: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
-    if (!error) {
-      // your implementation
-      return;
+    if (error) {
+      const { statusCode } = ensureHttpError(error);
+      const message = getMessageFromError(error);
+      return void response.status(statusCode).json({ error: message });
     }
-    const statusCode = getStatusCodeFromError(error);
-    const message = getMessageFromError(error);
-    // your implementation
+    response.status(200).json({ data: output });
   },
 });
 ```
@@ -830,6 +844,18 @@ import { EndpointsFactory } from "express-zod-api";
 const endpointsFactory = new EndpointsFactory(yourResultHandler);
 ```
 
+## Empty response
+
+For some REST APIs, empty responses are typical: with status code `204` (No Content) and redirects (302). In order to
+describe it set the `mimeType` to `null` and `schema` to `z.never()`:
+
+```typescript
+const resultHandler = new ResultHandler({
+  positive: { statusCode: 204, mimeType: null, schema: z.never() },
+  negative: { statusCode: 404, mimeType: null, schema: z.never() },
+});
+```
+
 ## Error handling
 
 `ResultHandler` is designed to be the entity responsible for centralized error handling. By default, that center is
@@ -837,9 +863,9 @@ the `defaultResultHandler`, however, since much can be customized, you should be
 origins of errors that could happen in runtime and be handled the following way:
 
 - Ones related to `Endpoint` execution — handled by a `ResultHandler` assigned to the `EndpointsFactory` produced it:
-  - Proprietary classes (available to you for your custom handling):
-    - `InputValidationError` — when request payload does not match the `input` schema of the endpoint.
-      The default response status code is `400`;
+  - The following proprietary classes are available to you for customizing error handling in your `ResultHandler`:
+    - `InputValidationError` — when request payload does not match the `input` schema of the endpoint or middleware.
+      The default response status code is `400`, `cause` property contains the original `ZodError`;
     - `OutputValidationError` — when returns of the endpoint's `handler` does not match its `output` schema (`500`);
   - Errors thrown within endpoint's `handler`:
     - `HttpError`, made by `createHttpError()` method of `http-errors` (required peer dependency). The default response
@@ -850,7 +876,28 @@ origins of errors that could happen in runtime and be handled the following way:
     `400` for parsing, `404` for routing, `config.upload.limitError.statusCode` for upload issues, or `500` for others.
   - `ResultHandler` must handle possible `error` and avoid throwing its own errors, otherwise:
 - Ones related to `ResultHandler` execution — handled by `LastResortHandler`:
-  - Response status code is always `500` and the response itself is a plain text containing original `error.message`.
+  - Response status code is always `500` and the response itself is a plain text.
+
+## Production mode
+
+Consider enabling production mode by setting `NODE_ENV` environment variable to `production` for your deployment:
+
+- Express activates some [performance optimizations](https://expressjs.com/en/advanced/best-practice-performance.html);
+- Self-diagnosis for potential problems is disabled to ensure faster startup;
+- The `defaultResultHandler`, `defaultEndpointsFactory` and `LastResortHandler` generalize server-side error messages
+  in negative responses in order to improve the security of your API by not disclosing the exact causes of errors:
+  - Throwing errors that have or imply `5XX` status codes become just `Internal Server Error` message in response;
+  - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option:
+
+```ts
+import createHttpError from "http-errors";
+// NODE_ENV=production
+// Throwing HttpError from Endpoint or Middleware that is using defaultResultHandler or defaultEndpointsFactory:
+createHttpError(401, "Token expired"); // —> "Token expired"
+createHttpError(401, "Token expired", { expose: false }); // —> "Unauthorized"
+createHttpError(500, "Something is broken"); // —> "Internal Server Error"
+createHttpError(501, "We didn't make it yet", { expose: true }); // —> "We didn't make it yet"
+```
 
 ## Non-object response
 
@@ -869,17 +916,12 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
     positive: { schema: ez.file("buffer"), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
-      if (error) {
-        response.status(400).send(error.message);
-        return;
-      }
-      if ("filename" in output) {
+      if (error) return void response.status(400).send(error.message);
+      if ("filename" in output)
         fs.createReadStream(output.filename).pipe(
           response.type(output.filename),
         );
-      } else {
-        response.status(400).send("Filename is missing");
-      }
+      else response.status(400).send("Filename is missing");
     },
   }),
 );
@@ -894,9 +936,7 @@ configure file uploads:
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  server: {
-    upload: true, // or options
-  },
+  upload: true, // or options
 });
 ```
 
@@ -911,15 +951,11 @@ upload might look this way:
 import createHttpError from "http-errors";
 
 const config = createConfig({
-  server: {
-    upload: {
-      limits: { fileSize: 51200 }, // 50 KB
-      limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
-      beforeUpload: ({ request, logger }) => {
-        if (!canUpload(request)) {
-          throw createHttpError(403, "Not authorized");
-        }
-      },
+  upload: {
+    limits: { fileSize: 51200 }, // 50 KB
+    limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
+    beforeUpload: ({ request, logger }) => {
+      if (!canUpload(request)) throw createHttpError(403, "Not authorized");
     },
   },
 });
@@ -970,7 +1006,7 @@ const routing: Routing = {
 
 ## Connect to your own express app
 
-If you already have your own configured express application, or you find the library settings not enough, you can
+If you already have your own configured express application, or you find the framework settings not enough, you can
 connect the endpoints to your app or any express router using the `attachRouting()` method:
 
 ```typescript
@@ -998,7 +1034,7 @@ then consider using the `beforeRouting` [option in config instead](#using-native
 ## Testing endpoints
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
-assert the expectations on status, headers and payload. The library provides a special method `testEndpoint` that
+assert the expectations on status, headers and payload. The framework provides a special method `testEndpoint` that
 makes mocking easier. Under the hood, request and response object are mocked using the
 [node-mocks-http](https://www.npmjs.com/package/node-mocks-http) library, therefore you can utilize its API for
 settings additional properties and asserting expectation using the provided getters, such as `._getStatusCode()`.
@@ -1023,9 +1059,9 @@ test("should respond successfully", async () => {
 
 ## Testing middlewares
 
-Middlewares can also be tested individually, [similar to endpoints](#testing-endpoints), but using the
-`testMiddleware()` method. There is also an ability to pass `options` collected from outputs of previous middlewares,
-if the one being tested somehow depends on them.
+Middlewares can also be tested individually using the `testMiddleware()` method. You can also pass `options` collected
+from outputs of previous middlewares, if the one being tested somehow depends on them. There is `errorHandler` option
+for catching a middleware error and transforming into a response to assert in test along with other returned entities.
 
 ```typescript
 import { z } from "zod";
@@ -1043,6 +1079,7 @@ const { output, responseMock, loggerMock } = await testMiddleware({
   middleware,
   requestProps: { method: "POST", body: { test: "something" } },
   options: { prev: "accumulated" }, // responseOptions, configProps, loggerProps
+  // errorHandler: (error, response) => response.end(error.message),
 });
 expect(loggerMock._getLogs().error).toHaveLength(0);
 expect(output).toEqual({ collectedOptions: ["prev"], testLength: 9 });
@@ -1062,7 +1099,7 @@ import { ResultHandler } from "express-zod-api";
 
 new ResultHandler({
   positive: (data) => ({
-    statusCodes: [201, 202], // created or will be created
+    statusCode: [201, 202], // created or will be created
     schema: z.object({ status: z.literal("created"), data }),
   }),
   negative: [
@@ -1071,7 +1108,7 @@ new ResultHandler({
       schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
     },
     {
-      statusCodes: [400, 500], // validation or internal error
+      statusCode: [400, 500], // validation or internal error
       schema: z.object({ status: z.literal("error"), reason: z.string() }),
     },
   ],
@@ -1085,7 +1122,7 @@ new ResultHandler({
 
 Please avoid doing this in new projects: responding with array is a bad practice keeping your endpoints from evolving
 in backward compatible way (without making breaking changes). Nevertheless, for the purpose of easier migration of
-legacy APIs to this library consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
+legacy APIs to this framework consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
 or implement your own ones in a similar way.
 The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
 assigned to that property is used as the response. This approach also supports examples, as well as documentation and
@@ -1110,7 +1147,6 @@ createConfig({
 });
 
 defaultEndpointsFactory.build({
-  method: "get",
   input: z.object({
     "x-request-id": z.string(), // this one is from request.headers
     id: z.string(), // this one is from request.query
@@ -1160,11 +1196,10 @@ createConfig({
 ## Subscriptions
 
 If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server, the
-capabilities of this library and the HTTP protocol itself would not be enough in this case. I have developed an
-additional pluggable library, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and
-capabilities, but uses the websocket transport and Socket.IO protocol for that purpose. Check out an example of the
-synergy between two libraries on handling the incoming `subscribe` and `unsubscribe` events in order to emit
-(broadcast) the `time` event every second with a current time in its payload:
+capabilities of this framework and the HTTP protocol itself would not be enough in this case. I have developed an
+additional websocket operating framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar
+principles and capabilities. Check out an example of the synergy between two frameworks on handling subscription events
+in order to emit (broadcast) the `time` event every second with a current time in its payload:
 
 https://github.com/RobinTail/zod-sockets#subscriptions
 
@@ -1253,9 +1288,7 @@ const exampleEndpoint = defaultEndpointsFactory.build({
     .object({
       id: z.number().describe("the ID of the user"),
     })
-    .example({
-      id: 123,
-    }),
+    .example({ id: 123 }),
   // ..., similarly for output and middlewares
 });
 ```
@@ -1278,9 +1311,8 @@ import {
 } from "express-zod-api";
 
 const config = createConfig({
-  // ..., use the simple or the advanced syntax:
   tags: {
-    users: "Everything about the users",
+    users: "Everything about the users", // or advanced syntax:
     files: {
       description: "Everything about the files processing",
       url: "https://example.com",
@@ -1295,15 +1327,14 @@ const taggedEndpointsFactory = new EndpointsFactory({
 });
 
 const exampleEndpoint = taggedEndpointsFactory.build({
-  // ...
-  tag: "users", // or tags: ["users", "files"]
+  tag: "users", // or array ["users", "files"]
 });
 ```
 
 ## Customizable brands handling
 
 You can customize handling rules for your schemas in Documentation and Integration. Use the `.brand()` method on your
-schema to make it special and distinguishable for the library in runtime. Using symbols is recommended for branding.
+schema to make it special and distinguishable for the framework in runtime. Using symbols is recommended for branding.
 After that utilize the `brandHandling` feature of both constructors to declare your custom implementation. In case you
 need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
 
@@ -1330,16 +1361,14 @@ const ruleForDocs: Depicter = (
 
 const ruleForClient: Producer = (
   schema: typeof myBrandedSchema, // you should assign type yourself
-  { next, isResponse, serializer }, // handle a nested schema using next()
+  { next, isResponse }, // handle a nested schema using next()
 ) => ts.factory.createKeywordTypeNode(ts.SyntaxKind.BooleanKeyword);
 
 new Documentation({
-  /* config, routing, title, version */
   brandHandling: { [myBrand]: ruleForDocs },
 });
 
 new Integration({
-  /* routing */
   brandHandling: { [myBrand]: ruleForClient },
 });
 ```
@@ -1351,7 +1380,7 @@ should be aware of them.
 
 ## Coercive schema of Zod
 
-Despite being supported by the library, `z.coerce.*` schema
+Despite being supported by the framework, `z.coerce.*` schema
 [does not work intuitively](https://github.com/RobinTail/express-zod-api/issues/759).
 Please be aware that `z.coerce.number()` and `z.number({ coerce: true })` (being typed not well) still will NOT allow
 you to assign anything but number. Moreover, coercive schemas are not fail-safe and their methods `.isOptional()` and
@@ -1374,7 +1403,7 @@ const output = z.object({
 });
 
 endpointsFactory.build({
-  methods,
+  method,
   input,
   output,
   handler: async (): Promise<z.input<typeof output>> => ({

@@ -10,6 +10,7 @@
     "example",
     "tests/unit",
     "tests/system",
+    "tests/oas",
     "tests/bench",
     "tests/*.ts",
     "tools",

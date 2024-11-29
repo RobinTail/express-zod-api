@@ -16,148 +16,193 @@ describe("Migration", () => {
     expect(migration.rules).toHaveProperty(`v${version.split(".")[0]}`);
     expect(migration).toMatchSnapshot();
   });
-});
 
-tester.run("v20", migration.rules.v20, {
-  valid: [
-    { code: `import { BuiltinLogger } from "express-zod-api"` },
-    { code: `import { ResultHandler } from "express-zod-api"` },
-    { code: `import { Middleware } from "express-zod-api"` },
-    { code: `new BuiltinLogger({})` },
-    { code: `new ResultHandler({ positive: {}, negative: {} })` },
-    { code: `new Middleware({ handler: {} })` },
-    { code: `testEndpoint({})` },
-  ],
-  invalid: [
-    {
-      code: `import { createLogger } from "express-zod-api"`,
-      output: `import { BuiltinLogger } from "express-zod-api"`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "import",
-            from: "createLogger",
-            to: "BuiltinLogger",
+  tester.run("v21", migration.rules.v21, {
+    valid: [
+      `(() => {})()`,
+      `createConfig({ http: {} });`,
+      `createConfig({ http: { listen: 8090 }, upload: true });`,
+      `createConfig({ beforeRouting: ({ getLogger }) => { getLogger().warn() } });`,
+      `const { app, servers, logger } = await createServer();`,
+      `console.error(error.cause?.message);`,
+      `import { ensureHttpError } from "express-zod-api";`,
+      `ensureHttpError(error).statusCode;`,
+      `factory.build({ method: ['get', 'post'] })`,
+      `factory.build({ tag: ['files', 'users'] })`,
+      `factory.build({ scope: ['admin', 'permissions'] })`,
+      `new ResultHandler({ positive: () => ({ statusCode: [201, 202] }), negative: [{ mimeType: ["application/json"] }] })`,
+    ],
+    invalid: [
+      {
+        code: `createConfig({ server: {} });`,
+        output: `createConfig({ http: {} });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "server", to: "http" },
           },
-        },
-      ],
-    },
-    {
-      code: `import { createResultHandler } from "express-zod-api"`,
-      output: `import { ResultHandler } from "express-zod-api"`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "import",
-            from: "createResultHandler",
-            to: "ResultHandler",
+        ],
+      },
+      {
+        code: `createConfig({ http: { listen: 8090, upload: true } });`,
+        output: `createConfig({ http: { listen: 8090,  }, upload: true });`,
+        errors: [
+          {
+            messageId: "move",
+            data: {
+              subject: "upload",
+              from: "http",
+              to: "the top level of createConfig argument",
+            },
           },
-        },
-      ],
-    },
-    {
-      code: `import { createMiddleware } from "express-zod-api"`,
-      output: `import { Middleware } from "express-zod-api"`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "import",
-            from: "createMiddleware",
-            to: "Middleware",
+        ],
+      },
+      {
+        code: `createConfig({ beforeRouting: ({ logger }) => { logger.warn() } });`,
+        output: `createConfig({ beforeRouting: ({ getLogger }) => { getLogger().warn() } });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "logger",
+              to: "getLogger",
+            },
           },
-        },
-      ],
-    },
-    {
-      code: `createLogger({})`,
-      output: `new BuiltinLogger({})`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "call",
-            from: "createLogger",
-            to: "new BuiltinLogger",
+          {
+            messageId: "change",
+            data: {
+              subject: "const",
+              from: "logger",
+              to: "getLogger()",
+            },
           },
-        },
-      ],
-    },
-    {
-      code: `createResultHandler({})`,
-      output: `new ResultHandler({})`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "call",
-            from: "createResultHandler",
-            to: "new ResultHandler",
+        ],
+      },
+      {
+        code: `createConfig({ beforeRouting: ({ getChildLogger }) => { getChildLogger(request).warn() } });`,
+        output: `createConfig({ beforeRouting: ({ getLogger }) => { getLogger(request).warn() } });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "getChildLogger",
+              to: "getLogger",
+            },
           },
-        },
-      ],
-    },
-    {
-      code: `new ResultHandler({ getPositiveResponse: {}, getNegativeResponse: {} })`,
-      output: `new ResultHandler({ positive: {}, negative: {} })`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "property",
-            from: "getPositiveResponse",
-            to: "positive",
+          {
+            messageId: "change",
+            data: {
+              subject: "method",
+              from: "getChildLogger",
+              to: "getLogger",
+            },
           },
-        },
-        {
-          messageId: "change",
-          data: {
-            subject: "property",
-            from: "getNegativeResponse",
-            to: "negative",
+        ],
+      },
+      {
+        code: `const { app, httpServer, httpsServer, logger } = await createServer();`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "httpServer", to: "servers" },
           },
-        },
-      ],
-    },
-    {
-      code: `new Middleware({ middleware: {} })`,
-      output: `new Middleware({ handler: {} })`,
-      errors: [
-        {
-          messageId: "change",
-          data: { subject: "property", from: "middleware", to: "handler" },
-        },
-      ],
-    },
-    {
-      code: `testEndpoint({ fnMethod: {}, responseProps: {} })`,
-      output: `testEndpoint({  responseOptions: {} })`,
-      errors: [
-        {
-          messageId: "remove",
-          data: { subject: "property", name: "fnMethod" },
-        },
-        {
-          messageId: "change",
-          data: {
-            subject: "property",
-            from: "responseProps",
-            to: "responseOptions",
+          {
+            messageId: "change",
+            data: { subject: "property", from: "httpsServer", to: "servers" },
           },
-        },
-      ],
-    },
-    {
-      code: `interface MockOverrides extends Mock {}`,
-      output: ``,
-      errors: [
-        {
-          messageId: "remove",
-          data: { subject: "augmentation", name: "MockOverrides" },
-        },
-      ],
-    },
-  ],
+        ],
+      },
+      {
+        code: `console.error(error.originalError?.message);`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "originalError", to: "cause" },
+          },
+        ],
+      },
+      {
+        code: `import { getStatusCodeFromError } from "express-zod-api";`,
+        output: `import { ensureHttpError } from "express-zod-api";`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "import",
+              from: "getStatusCodeFromError",
+              to: "ensureHttpError",
+            },
+          },
+        ],
+      },
+      {
+        code: `getStatusCodeFromError(error);`,
+        output: `ensureHttpError(error).statusCode;`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "method",
+              from: "getStatusCodeFromError",
+              to: "ensureHttpError().statusCode",
+            },
+          },
+        ],
+      },
+      {
+        code: `factory.build({ methods: ['get', 'post'] })`,
+        output: `factory.build({ method: ['get', 'post'] })`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "methods", to: "method" },
+          },
+        ],
+      },
+      {
+        code: `factory.build({ tags: ['files', 'users'] })`,
+        output: `factory.build({ tag: ['files', 'users'] })`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "tags", to: "tag" },
+          },
+        ],
+      },
+      {
+        code: `factory.build({ scopes: ['admin', 'permissions'] })`,
+        output: `factory.build({ scope: ['admin', 'permissions'] })`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "scopes", to: "scope" },
+          },
+        ],
+      },
+      {
+        code: `new ResultHandler({ positive: () => ({ statusCodes: [201, 202] }), negative: [{ mimeTypes: ["application/json"] }] })`,
+        output: `new ResultHandler({ positive: () => ({ statusCode: [201, 202] }), negative: [{ mimeType: ["application/json"] }] })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "statusCodes",
+              to: "statusCode",
+            },
+          },
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "mimeTypes",
+              to: "mimeType",
+            },
+          },
+        ],
+      },
+    ],
+  });
 });

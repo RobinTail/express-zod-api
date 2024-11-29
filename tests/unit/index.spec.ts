@@ -33,11 +33,7 @@ describe("Index Entrypoint", () => {
 
     test.each(entities)("%s should have certain value", (entry) => {
       const entity = entrypoint[entry as keyof typeof entrypoint];
-      if (entity === undefined) {
-        expect(entity).toBeUndefined();
-      } else {
-        expect(entity).toMatchSnapshot();
-      }
+      if (entity !== undefined) expect(entity).toMatchSnapshot();
     });
 
     test("Convenience types should be exposed", () => {
@@ -65,7 +61,7 @@ describe("Index Entrypoint", () => {
         logger: { level: "silent" };
       }>().toMatchTypeOf<AppConfig>();
       expectTypeOf<{
-        server: { listen: 8090 };
+        http: { listen: 8090 };
         logger: { level: "silent" };
         cors: false;
       }>().toMatchTypeOf<ServerConfig>();
