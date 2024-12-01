@@ -11,6 +11,7 @@
 
 ### v21.2.0
 
+- Minor performance adjustments;
 - Introducing stricter overload for the generated `ExpressZodAPIClient::provide()` method:
   - The method can now also accept two arguments: space-separated method with path and parameters;
   - Using this overload provides strict constraints on the first argument so that undeclared routes can not be used;
