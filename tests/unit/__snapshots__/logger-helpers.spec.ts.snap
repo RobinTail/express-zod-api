@@ -1,10 +1,10 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Logger helpers > formatDuration() > 0 should format 1e-9 ms 1`] = `"1 picosecond"`;
+exports[`Logger helpers > formatDuration() > 0 should format 1e-9 ms 1`] = `"0.001 nanoseconds"`;
 
-exports[`Logger helpers > formatDuration() > 1 should format 1e-8 ms 1`] = `"10 picoseconds"`;
+exports[`Logger helpers > formatDuration() > 1 should format 1e-8 ms 1`] = `"0.01 nanoseconds"`;
 
-exports[`Logger helpers > formatDuration() > 2 should format 1e-7 ms 1`] = `"100 picoseconds"`;
+exports[`Logger helpers > formatDuration() > 2 should format 1e-7 ms 1`] = `"0.1 nanoseconds"`;
 
 exports[`Logger helpers > formatDuration() > 3 should format 0.000001 ms 1`] = `"1 nanosecond"`;
 

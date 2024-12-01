@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 22
+
+### v22.0.0
+
+- Minimum supported Node versions: 20.9.0 and 22.0.0;
+- `BuiltinLogger::profile()` behavior changed for picoseconds: expressing them through nanoseconds.
+
 ## Version 21
 
 ### v21.2.0

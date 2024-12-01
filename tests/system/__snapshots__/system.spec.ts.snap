@@ -69,7 +69,7 @@ exports[`App in production mode > Protocol > Should fail on invalid method 1`] =
 exports[`App in production mode > Protocol > Should fail on malformed body 1`] = `
 {
   "error": {
-    "message": StringMatching /\\(Unexpected end of JSON input\\|Unterminated string in JSON at position 25\\)/,
+    "message": StringMatching /Unterminated string in JSON at position 25/,
   },
   "status": "error",
 }
