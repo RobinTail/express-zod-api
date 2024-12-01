@@ -195,14 +195,40 @@ export class Integration {
           path,
           "positive.response",
         );
-        const positiveSchema = endpoint
+
+        // @todo name
+        const posByCodeId = f.createIdentifier(
+          makeCleanId(method, path, "positive.response.codes"),
+        );
+        for (const [idx, { schema, mimeTypes, statusCodes }] of endpoint
           .getResponses("positive")
-          .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
-          .reduce((agg, schema) => agg.or(schema));
-        const positiveResponse = zodToTs(positiveSchema, {
-          brandHandling,
-          ctx: { ...commons, isResponse: true },
-        });
+          .entries()) {
+          // @todo name
+          const ttt = zodToTs(mimeTypes ? schema : noContent, {
+            brandHandling,
+            ctx: { ...commons, isResponse: true },
+          });
+          // @todo name
+          const tttId = makeCleanId(method, path, "positive.variant", `${idx}`);
+          this.program.push(createTypeAlias(ttt, tttId));
+          // @todo name
+          const bycode = makePublicInterface(
+            posByCodeId,
+            statusCodes.map((statusCode) =>
+              makeInterfaceProp(statusCode, tttId),
+            ),
+          );
+          this.program.push(bycode);
+        }
+
+        const positiveResponse = f.createIndexedAccessTypeNode(
+          f.createTypeReferenceNode(posByCodeId),
+          // @todo reuse helper in v22
+          f.createTypeOperatorNode(
+            ts.SyntaxKind.KeyOfKeyword,
+            f.createTypeReferenceNode(posByCodeId),
+          ),
+        );
         const negativeResponseId = makeCleanId(
           method,
           path,
