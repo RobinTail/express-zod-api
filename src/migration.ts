@@ -1,72 +1,12 @@
 import {
   ESLintUtils,
-  AST_NODE_TYPES as NT,
+  // AST_NODE_TYPES as NT,
   type TSESLint,
-  type TSESTree,
+  // type TSESTree,
 } from "@typescript-eslint/utils";
-import { name as importName } from "../package.json";
+// import { name as importName } from "../package.json";
 
-const createConfigName = "createConfig";
-const createServerName = "createServer";
-const serverPropName = "server";
-const beforeRoutingPropName = "beforeRouting";
-const httpServerPropName = "httpServer";
-const httpsServerPropName = "httpsServer";
-const originalErrorPropName = "originalError";
-const getStatusCodeFromErrorMethod = "getStatusCodeFromError";
-const loggerPropName = "logger";
-const getChildLoggerPropName = "getChildLogger";
-const methodsPropName = "methods";
-const tagsPropName = "tags";
-const scopesPropName = "scopes";
-const statusCodesPropName = "statusCodes";
-const mimeTypesPropName = "mimeTypes";
-const buildMethod = "build";
-const resultHandlerClass = "ResultHandler";
-const handlerMethod = "handler";
-
-const changedProps = {
-  [serverPropName]: "http",
-  [httpServerPropName]: "servers",
-  [httpsServerPropName]: "servers",
-  [originalErrorPropName]: "cause",
-  [loggerPropName]: "getLogger",
-  [getChildLoggerPropName]: "getLogger",
-  [methodsPropName]: "method",
-  [tagsPropName]: "tag",
-  [scopesPropName]: "scope",
-  [statusCodesPropName]: "statusCode",
-  [mimeTypesPropName]: "mimeType",
-};
-
-const changedMethods = {
-  [getStatusCodeFromErrorMethod]: "ensureHttpError",
-};
-
-const movedProps = [
-  "jsonParser",
-  "upload",
-  "compression",
-  "rawParser",
-  "beforeRouting",
-] as const;
-
-const esQueries = {
-  loggerArgument:
-    `${NT.Property}[key.name="${beforeRoutingPropName}"] ` +
-    `${NT.ArrowFunctionExpression} ` +
-    `${NT.Identifier}[name="${loggerPropName}"]`,
-  getChildLoggerArgument:
-    `${NT.Property}[key.name="${beforeRoutingPropName}"] ` +
-    `${NT.ArrowFunctionExpression} ` +
-    `${NT.Identifier}[name="${getChildLoggerPropName}"]`,
-  responseFeatures:
-    `${NT.NewExpression}[callee.name='${resultHandlerClass}'] > ` +
-    `${NT.ObjectExpression} > ` +
-    `${NT.Property}[key.name!='${handlerMethod}'] ` +
-    `${NT.Property}[key.name=/(${statusCodesPropName}|${mimeTypesPropName})/]`,
-};
-
+/*
 type PropWithId = TSESTree.Property & {
   key: TSESTree.Identifier;
 };
@@ -86,8 +26,9 @@ const propByName =
     (Array.isArray(subject)
       ? subject.includes(entry.key.name)
       : entry.key.name === subject);
+*/
 
-const v21 = ESLintUtils.RuleCreator.withoutDocs({
+const v22 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     fixable: "code",
@@ -98,205 +39,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
     },
   },
   defaultOptions: [],
-  create: (ctx) => ({
-    [NT.ImportDeclaration]: (node) => {
-      if (node.source.value === importName) {
-        for (const spec of node.specifiers) {
-          if (
-            spec.type === NT.ImportSpecifier &&
-            spec.imported.type === NT.Identifier &&
-            spec.imported.name in changedMethods
-          ) {
-            const replacement =
-              changedMethods[spec.imported.name as keyof typeof changedMethods];
-            ctx.report({
-              node: spec.imported,
-              messageId: "change",
-              data: {
-                subject: "import",
-                from: spec.imported.name,
-                to: replacement,
-              },
-              fix: (fixer) => fixer.replaceText(spec, replacement),
-            });
-          }
-        }
-      }
-    },
-    [NT.MemberExpression]: (node) => {
-      if (
-        node.property.type === NT.Identifier &&
-        node.property.name === originalErrorPropName &&
-        node.object.type === NT.Identifier &&
-        node.object.name.match(/err/i) // this is probably an error instance, but we don't do type checking
-      ) {
-        const replacement = changedProps[node.property.name];
-        ctx.report({
-          node: node.property,
-          messageId: "change",
-          data: {
-            subject: "property",
-            from: node.property.name,
-            to: replacement,
-          },
-        });
-      }
-    },
-    [NT.CallExpression]: (node) => {
-      if (
-        node.callee.type === NT.MemberExpression &&
-        node.callee.property.type === NT.Identifier &&
-        node.callee.property.name === buildMethod &&
-        node.arguments.length === 1 &&
-        node.arguments[0].type === NT.ObjectExpression
-      ) {
-        const changed = node.arguments[0].properties.filter(
-          propByName([methodsPropName, tagsPropName, scopesPropName] as const),
-        );
-        for (const prop of changed) {
-          const replacement = changedProps[prop.key.name];
-          ctx.report({
-            node: prop,
-            messageId: "change",
-            data: { subject: "property", from: prop.key.name, to: replacement },
-            fix: (fixer) => fixer.replaceText(prop.key, replacement),
-          });
-        }
-      }
-      if (node.callee.type !== NT.Identifier) return;
-      if (
-        node.callee.name === createConfigName &&
-        node.arguments.length === 1
-      ) {
-        const argument = node.arguments[0];
-        if (argument.type === NT.ObjectExpression) {
-          const serverProp = argument.properties.find(
-            propByName(serverPropName),
-          );
-          if (serverProp) {
-            const replacement = changedProps[serverProp.key.name];
-            ctx.report({
-              node: serverProp,
-              messageId: "change",
-              data: {
-                subject: "property",
-                from: serverProp.key.name,
-                to: replacement,
-              },
-              fix: (fixer) => fixer.replaceText(serverProp.key, replacement),
-            });
-          }
-          const httpProp = argument.properties.find(
-            propByName(changedProps.server),
-          );
-          if (httpProp && httpProp.value.type === NT.ObjectExpression) {
-            const nested = httpProp.value.properties;
-            const movable = nested.filter(propByName(movedProps));
-            for (const prop of movable) {
-              const propText = ctx.sourceCode.text.slice(...prop.range);
-              const comma = ctx.sourceCode.getTokenAfter(prop);
-              ctx.report({
-                node: httpProp,
-                messageId: "move",
-                data: {
-                  subject: isPropWithId(prop) ? prop.key.name : "the property",
-                  from: httpProp.key.name,
-                  to: `the top level of ${node.callee.name} argument`,
-                },
-                fix: (fixer) => [
-                  fixer.insertTextAfter(httpProp, `, ${propText}`),
-                  fixer.removeRange([
-                    prop.range[0],
-                    comma?.value === "," ? comma.range[1] : prop.range[1],
-                  ]),
-                ],
-              });
-            }
-          }
-        }
-      }
-      if (node.callee.name === createServerName) {
-        const assignment = ctx.sourceCode
-          .getAncestors(node)
-          .findLast(isAssignment);
-        if (assignment) {
-          const removable = assignment.id.properties.filter(
-            propByName([httpServerPropName, httpsServerPropName] as const),
-          );
-          for (const prop of removable) {
-            ctx.report({
-              node: prop,
-              messageId: "change",
-              data: {
-                subject: "property",
-                from: prop.key.name,
-                to: changedProps[prop.key.name],
-              },
-            });
-          }
-        }
-      }
-      if (node.callee.name === getStatusCodeFromErrorMethod) {
-        const replacement = changedMethods[node.callee.name];
-        ctx.report({
-          node: node.callee,
-          messageId: "change",
-          data: {
-            subject: "method",
-            from: node.callee.name,
-            to: `${replacement}().statusCode`,
-          },
-          fix: (fixer) => [
-            fixer.replaceText(node.callee, replacement),
-            fixer.insertTextAfter(node, ".statusCode"),
-          ],
-        });
-      }
-    },
-    [esQueries.loggerArgument]: (node: TSESTree.Identifier) => {
-      const { parent } = node;
-      const isProp = isPropWithId(parent);
-      if (isProp && parent.value === node) return; // not for renames
-      const replacement = `${changedProps[node.name as keyof typeof changedProps]}${isProp ? "" : "()"}`;
-      ctx.report({
-        node,
-        messageId: "change",
-        data: {
-          subject: isProp ? "property" : "const",
-          from: node.name,
-          to: replacement,
-        },
-        fix: (fixer) => fixer.replaceText(node, replacement),
-      });
-    },
-    [esQueries.getChildLoggerArgument]: (node: TSESTree.Identifier) => {
-      const { parent } = node;
-      const isProp = isPropWithId(parent);
-      if (isProp && parent.value === node) return; // not for renames
-      const replacement = changedProps[node.name as keyof typeof changedProps];
-      ctx.report({
-        node,
-        messageId: "change",
-        data: {
-          subject: isProp ? "property" : "method",
-          from: node.name,
-          to: replacement,
-        },
-        fix: (fixer) => fixer.replaceText(node, replacement),
-      });
-    },
-    [esQueries.responseFeatures]: (node: TSESTree.Property) => {
-      if (!isPropWithId(node)) return;
-      const replacement =
-        changedProps[node.key.name as keyof typeof changedProps];
-      ctx.report({
-        node,
-        messageId: "change",
-        data: { subject: "property", from: node.key.name, to: replacement },
-        fix: (fixer) => fixer.replaceText(node.key, replacement),
-      });
-    },
-  }),
+  create: () => ({}),
 });
 
 /**
@@ -312,5 +55,5 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
  *          ];
  * */
 export default {
-  rules: { v21 },
+  rules: { v22 },
 } satisfies TSESLint.Linter.Plugin;
