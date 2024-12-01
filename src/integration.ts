@@ -1,6 +1,6 @@
 import ts from "typescript";
 import { z } from "zod";
-import { ResponseVariant } from "./api-response";
+import { NormalizedResponse, ResponseVariant } from "./api-response";
 import {
   emptyTail,
   exportModifier,
@@ -171,6 +171,27 @@ export class Integration {
     return f.createTypeReferenceNode(name);
   }
 
+  protected splitResponse(
+    prefix: string,
+    responses: ReadonlyArray<NormalizedResponse>,
+    fallback: z.ZodType,
+    ctx: Parameters<typeof zodToTs>[1],
+  ) {
+    const variants: ts.TypeAliasDeclaration[] = [];
+    const props: ts.PropertySignature[] = [];
+    for (const [
+      idx,
+      { schema, mimeTypes, statusCodes },
+    ] of responses.entries()) {
+      const variant = zodToTs(mimeTypes ? schema : fallback, ctx);
+      const variantId = makeCleanId(prefix, "variant", `${idx}`);
+      variants.push(createTypeAlias(variant, variantId));
+      for (const statusCode of statusCodes)
+        props.push(makeInterfaceProp(statusCode, variantId));
+    }
+    return [props, variants] as const;
+  }
+
   public constructor({
     routing,
     brandHandling,
@@ -190,36 +211,25 @@ export class Integration {
           ctx: { ...commons, isResponse: false },
         });
 
-        // @todo name
-        const posByCodeId = f.createIdentifier(
+        const [positiveProps, positiveDeclarations] = this.splitResponse(
+          `${method}.${path}.positive`,
+          endpoint.getResponses("positive"),
+          noContent,
+          { brandHandling, ctx: { ...commons, isResponse: true } },
+        );
+        const positiveVariantsId = f.createIdentifier(
           makeCleanId(method, path, "positive.response.codes"),
         );
-        // @todo name
-        const posCodes: ts.PropertySignature[] = [];
-        for (const [idx, { schema, mimeTypes, statusCodes }] of endpoint
-          .getResponses("positive")
-          .entries()) {
-          // @todo name
-          const ttt = zodToTs(mimeTypes ? schema : noContent, {
-            brandHandling,
-            ctx: { ...commons, isResponse: true },
-          });
-          // @todo name
-          const tttId = makeCleanId(method, path, "positive.variant", `${idx}`);
-          this.program.push(createTypeAlias(ttt, tttId));
-          for (const statusCode of statusCodes)
-            posCodes.push(makeInterfaceProp(statusCode, tttId));
-        }
-        // @todo name
-        const bycode = makePublicInterface(posByCodeId, posCodes);
-        this.program.push(bycode);
-
+        const positiveVariants = makePublicInterface(
+          positiveVariantsId,
+          positiveProps,
+        );
         const positiveResponse = f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(posByCodeId),
+          f.createTypeReferenceNode(positiveVariantsId),
           // @todo reuse helper in v22
           f.createTypeOperatorNode(
             ts.SyntaxKind.KeyOfKeyword,
-            f.createTypeReferenceNode(posByCodeId),
+            f.createTypeReferenceNode(positiveVariantsId),
           ),
         );
         const negativeSchema = endpoint
@@ -244,6 +254,8 @@ export class Integration {
         ]);
         this.program.push(
           createTypeAlias(input, inputId),
+          ...positiveDeclarations,
+          positiveVariants,
           createTypeAlias(positiveResponse, positiveResponseId),
           createTypeAlias(negativeResponse, negativeResponseId),
           createTypeAlias(genericResponse, genericResponseId),
