@@ -222,16 +222,12 @@ export class Integration {
           f.createTypeReferenceNode(negativeResponseId),
         ]);
         this.program.push(createTypeAlias(input, inputId));
-        if (positiveResponse && positiveResponseId) {
-          this.program.push(
-            createTypeAlias(positiveResponse, positiveResponseId),
-          );
-        }
-        if (negativeResponse && negativeResponseId) {
-          this.program.push(
-            createTypeAlias(negativeResponse, negativeResponseId),
-          );
-        }
+        this.program.push(
+          createTypeAlias(positiveResponse, positiveResponseId),
+        );
+        this.program.push(
+          createTypeAlias(negativeResponse, negativeResponseId),
+        );
         this.program.push(createTypeAlias(genericResponse, genericResponseId));
         this.paths.push(path);
         this.registry.set(
