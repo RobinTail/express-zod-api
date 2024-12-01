@@ -775,11 +775,10 @@ export class Integration {
       ),
     );
 
-    // client.provide("get", "/v1/user/retrieve", { id: "10" });
+    // client.provide("get /v1/user/retrieve", { id: "10" });
     const provideCallingStatement = f.createExpressionStatement(
       makePropCall(this.ids.clientConst, this.ids.provideMethod, [
-        f.createStringLiteral("get" satisfies Method),
-        f.createStringLiteral("/v1/user/retrieve"),
+        f.createStringLiteral(`${"get" satisfies Method} /v1/user/retrieve`),
         f.createObjectLiteralExpression([
           f.createPropertyAssignment("id", f.createStringLiteral("10")),
         ]),

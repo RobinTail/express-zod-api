@@ -9,6 +9,10 @@
 
 ## Version 21
 
+### v21.2.1
+
+- Fixed `provide()` method usage example in the code of the generated client.
+
 ### v21.2.0
 
 - Minor performance adjustments;
