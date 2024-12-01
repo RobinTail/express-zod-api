@@ -2,6 +2,23 @@
 
 ## Version 21
 
+### v21.2.0
+
+- Introducing stricter overload for the generated `ExpressZodAPIClient::provide()` method:
+  - The method can now also accept two arguments: space-separated method with path and parameters;
+  - Using this overload provides strict constraints on the first argument so that undeclared routes can not be used;
+  - This design is inspired by the OctoKit and aims to prevent the misuse by throwing a Typescript error.
+- Using `ExpressZodAPIClient::provide()` with three arguments is deprecated:
+  - The return type when using undeclared routes corrected to `unknown`.
+- The `Provider` type of the generated client is deprecated;
+- The type of the following generated client entities is corrected so that it became limited to the listed routes:
+  - `Input`, `Response`, `PositiveResponse`, `NegativeResponse`, `MethodPath`.
+
+```diff
+- client.provide("get", "/v1/user/retrieve", { id: "10" }); // deprecated
++ client.provide("get /v1/user/retrieve", { id: "10" }); // featured
+```
+
 ### v21.1.0
 
 - Featuring empty response support:

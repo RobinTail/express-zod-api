@@ -7,21 +7,29 @@ export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
 const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
 
-const publicReadonlyModifier = [
-  f.createModifier(ts.SyntaxKind.PublicKeyword),
-  f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
-];
+const publicModifier = [f.createModifier(ts.SyntaxKind.PublicKeyword)];
 
 export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ProtectedKeyword),
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
 
+export const restToken = f.createToken(ts.SyntaxKind.DotDotDotToken);
+
 const emptyHeading = f.createTemplateHead("");
 const spacingMiddle = f.createTemplateMiddle(" ");
 export const emptyTail = f.createTemplateTail("");
 
-export const makeTemplateType = (names: Array<ts.Identifier | string>) =>
+// Record<string, any>
+export const recordStringAny = f.createExpressionWithTypeArguments(
+  f.createIdentifier("Record"),
+  [
+    f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+    f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+  ],
+);
+
+const makeTemplateType = (names: Array<ts.Identifier | string>) =>
   f.createTemplateLiteralType(
     emptyHeading,
     names.map((name, index) =>
@@ -32,16 +40,16 @@ export const makeTemplateType = (names: Array<ts.Identifier | string>) =>
     ),
   );
 
-export const parametricIndexNode = makeTemplateType(["M", "P"]);
+export const parametricIndexNode = makeTemplateType(["M", "P"]); // `${M} ${P}`
 
 export const makeParam = (
   name: ts.Identifier,
   type?: ts.TypeNode,
-  mod?: ts.Modifier[],
+  features?: ts.Modifier[] | ts.DotDotDotToken,
 ) =>
   f.createParameterDeclaration(
-    mod,
-    undefined,
+    Array.isArray(features) ? features : undefined,
+    Array.isArray(features) ? undefined : features,
     name,
     undefined,
     type,
@@ -50,22 +58,11 @@ export const makeParam = (
 
 export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,
-  mod?: ts.Modifier[],
+  features?: ts.Modifier[] | ts.DotDotDotToken,
 ) =>
   Object.entries(params).map(([name, node]) =>
-    makeParam(f.createIdentifier(name), node, mod),
+    makeParam(f.createIdentifier(name), node, features),
   );
-
-export const makeRecord = (
-  key: ts.Identifier | ts.KeywordTypeSyntaxKind,
-  value: ts.KeywordTypeSyntaxKind,
-) =>
-  f.createExpressionWithTypeArguments(f.createIdentifier("Record"), [
-    typeof key === "number"
-      ? f.createKeywordTypeNode(key)
-      : f.createTypeReferenceNode(key),
-    f.createKeywordTypeNode(value),
-  ]);
 
 export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],
@@ -79,8 +76,17 @@ export const makeInterfaceProp = (name: string, ref: string) =>
     f.createTypeReferenceNode(ref),
   );
 
+export const makeDeconstruction = (
+  ...names: ts.Identifier[]
+): ts.ArrayBindingPattern =>
+  f.createArrayBindingPattern(
+    names.map(
+      (name) => f.createBindingElement(undefined, undefined, name), // can also add default value at last
+    ),
+  );
+
 export const makeConst = (
-  name: ts.Identifier,
+  name: ts.Identifier | ts.ArrayBindingPattern,
   value: ts.Expression,
   type?: ts.TypeNode,
 ) =>
@@ -93,10 +99,8 @@ export const makePublicLiteralType = (
   name: ts.Identifier,
   literals: string[],
 ) =>
-  f.createTypeAliasDeclaration(
-    exportModifier,
+  makePublicType(
     name,
-    undefined,
     f.createUnionTypeNode(
       literals.map((option) =>
         f.createLiteralTypeNode(f.createStringLiteral(option)),
@@ -107,49 +111,65 @@ export const makePublicLiteralType = (
 export const makePublicType = (name: ts.Identifier, value: ts.TypeNode) =>
   f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
 
-export const makePublicReadonlyProp = (
+export const makePublicMethod = (
   name: ts.Identifier,
-  type: ts.TypeNode,
-  exp: ts.Expression,
+  params: ts.ParameterDeclaration[],
+  body?: ts.Block,
+  typeParams?: ts.TypeParameterDeclaration[],
+  returnType?: ts.TypeNode,
 ) =>
-  f.createPropertyDeclaration(
-    publicReadonlyModifier,
+  f.createMethodDeclaration(
+    publicModifier,
+    undefined,
     name,
     undefined,
-    type,
-    exp,
+    typeParams,
+    params,
+    returnType,
+    body,
   );
 
 export const makePublicClass = (
   name: ts.Identifier,
   constructor: ts.ConstructorDeclaration,
-  props: ts.PropertyDeclaration[],
+  statements: ts.MethodDeclaration[],
 ) =>
   f.createClassDeclaration(exportModifier, name, undefined, undefined, [
     constructor,
-    ...props,
+    ...statements,
   ]);
 
-export const makeIndexedPromise = (type: ts.Identifier, index: ts.TypeNode) =>
-  f.createTypeReferenceNode("Promise", [
-    f.createIndexedAccessTypeNode(f.createTypeReferenceNode(type), index),
+export const makeConditionalIndex = (
+  subject: ts.Identifier,
+  key: ts.TypeNode,
+  fallback: ts.TypeNode,
+) =>
+  f.createConditionalTypeNode(
+    key,
+    f.createTypeOperatorNode(
+      ts.SyntaxKind.KeyOfKeyword,
+      f.createTypeReferenceNode(subject),
+    ),
+    f.createIndexedAccessTypeNode(f.createTypeReferenceNode(subject), key),
+    fallback,
+  );
+
+export const makePromise = (subject: ts.TypeNode | "any") =>
+  f.createTypeReferenceNode(Promise.name, [
+    subject === "any"
+      ? f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+      : subject,
   ]);
 
-export const makeAnyPromise = () =>
-  f.createTypeReferenceNode("Promise", [
-    f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-  ]);
-
-export const makePublicExtendedInterface = (
+export const makePublicInterface = (
   name: ts.Identifier,
-  extender: ts.HeritageClause[],
   props: ts.PropertySignature[],
 ) =>
   f.createInterfaceDeclaration(
     exportModifier,
     name,
     undefined,
-    extender,
+    undefined,
     props,
   );
 
@@ -180,11 +200,14 @@ export const makeObjectKeysReducer = (
   f.createCallExpression(
     f.createPropertyAccessExpression(
       f.createCallExpression(
-        f.createPropertyAccessExpression(f.createIdentifier("Object"), "keys"),
+        f.createPropertyAccessExpression(
+          f.createIdentifier(Object.name),
+          propOf<typeof Object>("keys"),
+        ),
         undefined,
         [obj],
       ),
-      "reduce",
+      propOf<string[]>("reduce"),
     ),
     undefined,
     [
@@ -201,6 +224,7 @@ export const makeObjectKeysReducer = (
   );
 
 export const quoteProp = (...parts: [Method, string]) => `"${parts.join(" ")}"`;
+export const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
 export const makeTernary = (
   condition: ts.Expression,
@@ -213,4 +237,34 @@ export const makeTernary = (
     positive,
     f.createToken(ts.SyntaxKind.ColonToken),
     negative,
+  );
+
+export const makePropCall = (
+  parent: ts.Expression | [ts.Expression, ts.Identifier],
+  child: ts.Identifier | string,
+  args?: ts.Expression[],
+) =>
+  f.createCallExpression(
+    f.createPropertyAccessExpression(
+      Array.isArray(parent)
+        ? f.createPropertyAccessExpression(...parent)
+        : parent,
+      child,
+    ),
+    undefined,
+    args,
+  );
+
+export const makeAnd = (left: ts.Expression, right: ts.Expression) =>
+  f.createBinaryExpression(
+    left,
+    f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+    right,
+  );
+
+export const makeEqual = (left: ts.Expression, right: ts.Expression) =>
+  f.createBinaryExpression(
+    left,
+    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+    right,
   );
