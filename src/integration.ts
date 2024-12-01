@@ -178,33 +178,23 @@ export class Integration {
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
   }: IntegrationParams) {
+    const commons = { makeAlias: this.makeAlias.bind(this), optionalPropStyle };
+    const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
+    const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
-        const commons = {
-          makeAlias: this.makeAlias.bind(this),
-          optionalPropStyle,
-        };
-        const input = zodToTs(endpoint.getSchema("input"), {
-          brandHandling,
-          ctx: { ...commons, isResponse: false },
-        });
+        const input = zodToTs(endpoint.getSchema("input"), ctxIn);
         const positiveSchema = endpoint
           .getResponses("positive")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const positiveResponse = zodToTs(positiveSchema, {
-          brandHandling,
-          ctx: { ...commons, isResponse: true },
-        });
+        const positiveResponse = zodToTs(positiveSchema, ctxOut);
         const negativeSchema = endpoint
           .getResponses("negative")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const negativeResponse = zodToTs(negativeSchema, {
-          brandHandling,
-          ctx: { ...commons, isResponse: true },
-        });
+        const negativeResponse = zodToTs(negativeSchema, ctxOut);
         const [
           inputId,
           positiveResponseId,
