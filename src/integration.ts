@@ -194,6 +194,8 @@ export class Integration {
         const posByCodeId = f.createIdentifier(
           makeCleanId(method, path, "positive.response.codes"),
         );
+        // @todo name
+        const posCodes: ts.PropertySignature[] = [];
         for (const [idx, { schema, mimeTypes, statusCodes }] of endpoint
           .getResponses("positive")
           .entries()) {
@@ -205,15 +207,12 @@ export class Integration {
           // @todo name
           const tttId = makeCleanId(method, path, "positive.variant", `${idx}`);
           this.program.push(createTypeAlias(ttt, tttId));
-          // @todo name
-          const bycode = makePublicInterface(
-            posByCodeId,
-            statusCodes.map((statusCode) =>
-              makeInterfaceProp(statusCode, tttId),
-            ),
-          );
-          this.program.push(bycode);
+          for (const statusCode of statusCodes)
+            posCodes.push(makeInterfaceProp(statusCode, tttId));
         }
+        // @todo name
+        const bycode = makePublicInterface(posByCodeId, posCodes);
+        this.program.push(bycode);
 
         const positiveResponse = f.createIndexedAccessTypeNode(
           f.createTypeReferenceNode(posByCodeId),
