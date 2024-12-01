@@ -2,12 +2,9 @@ import ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  emptyTail,
-  exportModifier,
   f,
   makePromise,
   makeArrowFn,
-  makeConditionalIndex,
   makeConst,
   makeDeconstruction,
   makeEmptyInitializingConstructor,
@@ -23,14 +20,13 @@ import {
   makePublicType,
   makeTernary,
   makeTypeParams,
-  parametricIndexNode,
   propOf,
   protectedReadonlyModifier,
   quoteProp,
   recordStringAny,
-  restToken,
   makeAnd,
-  makeEqual,
+  makeTemplate,
+  makeNew,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -40,12 +36,7 @@ import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import {
-  ZTSContext,
-  createTypeAlias,
-  printNode,
-  addJsDocComment,
-} from "./zts-helpers";
+import { ZTSContext, createTypeAlias, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant;
@@ -126,8 +117,6 @@ export class Integration {
     responseInterface: f.createIdentifier("Response"),
     jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
     endpointTagsConst: f.createIdentifier("endpointTags"),
-    /** @todo remove in v22 */
-    providerType: f.createIdentifier("Provider"),
     implementationType: f.createIdentifier("Implementation"),
     clientClass: f.createIdentifier("ExpressZodAPIClient"),
     keyParameter: f.createIdentifier("key"),
@@ -135,8 +124,6 @@ export class Integration {
     paramsArgument: f.createIdentifier("params"),
     methodParameter: f.createIdentifier("method"),
     requestParameter: f.createIdentifier("request"),
-    /** @todo use request and params in v22 */
-    args: f.createIdentifier("args"),
     accumulator: f.createIdentifier("acc"),
     provideMethod: f.createIdentifier("provide"),
     implementationArgument: f.createIdentifier("implementation"),
@@ -331,21 +318,17 @@ export class Integration {
     if (variant === "types") return;
 
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
-    const jsonEndpointsConst = f.createVariableStatement(
-      exportModifier,
-      makeConst(
-        this.ids.jsonEndpointsConst,
-        f.createObjectLiteralExpression(jsonEndpoints),
-      ),
+    const jsonEndpointsConst = makeConst(
+      this.ids.jsonEndpointsConst,
+      f.createObjectLiteralExpression(jsonEndpoints),
+      { expose: true },
     );
 
     // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
-    const endpointTagsConst = f.createVariableStatement(
-      exportModifier,
-      makeConst(
-        this.ids.endpointTagsConst,
-        f.createObjectLiteralExpression(endpointTags),
-      ),
+    const endpointTagsConst = makeConst(
+      this.ids.endpointTagsConst,
+      f.createObjectLiteralExpression(endpointTags),
+      { expose: true },
     );
 
     // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
@@ -367,10 +350,7 @@ export class Integration {
     );
 
     // `:${key}`
-    const keyParamExpression = f.createTemplateExpression(
-      f.createTemplateHead(":"),
-      [f.createTemplateSpan(this.ids.keyParameter, emptyTail)],
-    );
+    const keyParamExpression = makeTemplate(":", [this.ids.keyParameter]);
 
     // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key]), path)
     const pathArgument = makeObjectKeysReducer(
@@ -378,7 +358,7 @@ export class Integration {
       makePropCall(this.ids.accumulator, propOf<string>("replace"), [
         keyParamExpression,
         f.createElementAccessExpression(
-          this.ids.paramsArgument,
+          f.createAsExpression(this.ids.paramsArgument, recordStringAny),
           this.ids.keyParameter,
         ),
       ]),
@@ -406,7 +386,10 @@ export class Integration {
                 f.createPropertyAssignment(
                   f.createComputedPropertyName(this.ids.keyParameter),
                   f.createElementAccessExpression(
-                    this.ids.paramsArgument,
+                    f.createAsExpression(
+                      this.ids.paramsArgument,
+                      recordStringAny,
+                    ),
                     this.ids.keyParameter,
                   ),
                 ),
@@ -419,47 +402,8 @@ export class Integration {
       f.createObjectLiteralExpression(),
     );
 
-    // public provide<M extends Method, P extends Path>(method: M, path: P,
-    //     params: `${M} ${P}` extends keyof Input ? Input[`${M} ${P}`] : Record<string, any>,
-    //   ): Promise<`${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown>;
-    // @todo consider removal in v22
-    const providerOverload1 = addJsDocComment(
-      makePublicMethod(
-        this.ids.provideMethod,
-        makeParams({
-          [this.ids.methodParameter.text]: f.createTypeReferenceNode("M"),
-          [this.ids.pathParameter.text]: f.createTypeReferenceNode("P"),
-          [this.ids.paramsArgument.text]: f.createConditionalTypeNode(
-            parametricIndexNode,
-            f.createTypeOperatorNode(
-              ts.SyntaxKind.KeyOfKeyword,
-              f.createTypeReferenceNode(this.ids.inputInterface),
-            ),
-            f.createIndexedAccessTypeNode(
-              f.createTypeReferenceNode(this.ids.inputInterface),
-              parametricIndexNode,
-            ),
-            recordStringAny,
-          ),
-        }),
-        undefined, // overload
-        makeTypeParams({
-          M: this.ids.methodType,
-          P: this.ids.pathType,
-        }),
-        makePromise(
-          makeConditionalIndex(
-            this.ids.responseInterface,
-            parametricIndexNode,
-            f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
-          ),
-        ),
-      ),
-      "@deprecated use the overload with 2 arguments instead",
-    );
-
-    // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]>;
-    const providerOverload2 = makePublicMethod(
+    // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]> {
+    const providerMethod = makePublicMethod(
       this.ids.provideMethod,
       makeParams({
         [this.ids.requestParameter.text]: f.createTypeReferenceNode("K"),
@@ -468,81 +412,20 @@ export class Integration {
           f.createTypeReferenceNode("K"),
         ),
       }),
-      undefined, // overload
-      makeTypeParams({
-        K: this.ids.methodPathType,
-      }),
-      makePromise(
-        f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.responseInterface),
-          f.createTypeReferenceNode("K"),
-        ),
-      ),
-    );
-
-    // public provide(...args: [string, string, Record<string, any>] | [string, Record<string, any>]) {
-    const actualProvider = makePublicMethod(
-      this.ids.provideMethod,
-      makeParams(
-        {
-          [this.ids.args.text]: f.createUnionTypeNode([
-            // @todo remove this variant in v22
-            f.createTupleTypeNode([
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              recordStringAny,
-            ]),
-            f.createTupleTypeNode([
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              recordStringAny,
-            ]),
-          ]),
-        },
-        restToken,
-      ),
       f.createBlock([
-        f.createVariableStatement(
-          undefined,
-          makeConst(
-            // const [method, path, params] =
-            makeDeconstruction(
-              this.ids.methodParameter,
-              this.ids.pathParameter,
-              this.ids.paramsArgument,
-            ),
-            // (args.length === 2 ? [...args[0].split((/ (.+)/,2), args[1]] : args) as [Method, Path, Record<string, any>]
-            f.createAsExpression(
-              f.createParenthesizedExpression(
-                makeTernary(
-                  makeEqual(
-                    f.createPropertyAccessExpression(
-                      this.ids.args,
-                      propOf<unknown[]>("length"),
-                    ),
-                    f.createNumericLiteral(2),
-                  ),
-                  f.createArrayLiteralExpression([
-                    f.createSpreadElement(
-                      makePropCall(
-                        f.createElementAccessExpression(this.ids.args, 0),
-                        propOf<string>("split"),
-                        [
-                          f.createRegularExpressionLiteral("/ (.+)/"), // split once
-                          f.createNumericLiteral(2), // excludes third empty element
-                        ],
-                      ),
-                    ),
-                    f.createElementAccessExpression(this.ids.args, 1),
-                  ]),
-                  this.ids.args, // @todo remove this in v22
-                ),
-              ),
-              f.createTupleTypeNode([
-                f.createTypeReferenceNode(this.ids.methodType),
-                f.createTypeReferenceNode(this.ids.pathType),
-                recordStringAny,
-              ]),
-            ),
+        makeConst(
+          // const [method, path, params] =
+          makeDeconstruction(this.ids.methodParameter, this.ids.pathParameter),
+          // request.split(/ (.+)/, 2) as [Method, Path];
+          f.createAsExpression(
+            makePropCall(this.ids.requestParameter, propOf<string>("split"), [
+              f.createRegularExpressionLiteral("/ (.+)/"), // split once
+              f.createNumericLiteral(2), // excludes third empty element
+            ]),
+            f.createTupleTypeNode([
+              f.createTypeReferenceNode(this.ids.methodType),
+              f.createTypeReferenceNode(this.ids.pathType),
+            ]),
           ),
         ),
         // return this.implementation(___)
@@ -554,6 +437,13 @@ export class Integration {
           ]),
         ),
       ]),
+      makeTypeParams({ K: this.ids.methodPathType }),
+      makePromise(
+        f.createIndexedAccessTypeNode(
+          f.createTypeReferenceNode(this.ids.responseInterface),
+          f.createTypeReferenceNode("K"),
+        ),
+      ),
     );
 
     // export class ExpressZodAPIClient { ___ }
@@ -567,21 +457,7 @@ export class Integration {
           protectedReadonlyModifier,
         ),
       ]),
-      [providerOverload1, providerOverload2, actualProvider],
-    );
-
-    // @todo remove in v22
-    const providerType = addJsDocComment(
-      makePublicType(
-        this.ids.providerType,
-        f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.clientClass),
-          f.createLiteralTypeNode(
-            f.createStringLiteral(this.ids.provideMethod.text),
-          ),
-        ),
-      ),
-      "@deprecated will be removed in v22",
+      [providerMethod],
     );
 
     this.program.push(
@@ -589,7 +465,6 @@ export class Integration {
       endpointTagsConst,
       implementationType,
       clientClass,
-      providerType,
     );
 
     // method: method.toUpperCase()
@@ -626,82 +501,61 @@ export class Integration {
     );
 
     // const response = await fetch(`https://example.com${path}${searchParams}`, { ___ });
-    const responseStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.responseConst,
-        f.createAwaitExpression(
-          f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
-            f.createTemplateExpression(
-              f.createTemplateHead("https://example.com"),
-              [
-                f.createTemplateSpan(
-                  this.ids.pathParameter,
-                  f.createTemplateMiddle(""),
-                ),
-                f.createTemplateSpan(this.ids.searchParamsConst, emptyTail),
-              ],
-            ),
-            f.createObjectLiteralExpression([
-              methodProperty,
-              headersProperty,
-              bodyProperty,
-            ]),
+    const responseStatement = makeConst(
+      this.ids.responseConst,
+      f.createAwaitExpression(
+        f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
+          makeTemplate(
+            "https://example.com",
+            [this.ids.pathParameter],
+            [this.ids.searchParamsConst],
+          ),
+          f.createObjectLiteralExpression([
+            methodProperty,
+            headersProperty,
+            bodyProperty,
           ]),
-        ),
+        ]),
       ),
     );
 
     // const hasBody = !["get", "delete"].includes(method);
-    const hasBodyStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.hasBodyConst,
-        f.createLogicalNot(
-          makePropCall(
-            f.createArrayLiteralExpression([
-              f.createStringLiteral("get" satisfies Method),
-              f.createStringLiteral("delete" satisfies Method),
-            ]),
-            propOf<string[]>("includes"),
-            [this.ids.methodParameter],
-          ),
+    const hasBodyStatement = makeConst(
+      this.ids.hasBodyConst,
+      f.createLogicalNot(
+        makePropCall(
+          f.createArrayLiteralExpression([
+            f.createStringLiteral("get" satisfies Method),
+            f.createStringLiteral("delete" satisfies Method),
+          ]),
+          propOf<string[]>("includes"),
+          [this.ids.methodParameter],
         ),
       ),
     );
 
     // const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-    const searchParamsStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.searchParamsConst,
-        makeTernary(
-          this.ids.hasBodyConst,
-          f.createStringLiteral(""),
-          f.createTemplateExpression(f.createTemplateHead("?"), [
-            f.createTemplateSpan(
-              f.createNewExpression(
-                f.createIdentifier(URLSearchParams.name),
-                undefined,
-                [this.ids.paramsArgument],
-              ),
-              emptyTail,
-            ),
-          ]),
-        ),
+    const searchParamsStatement = makeConst(
+      this.ids.searchParamsConst,
+      makeTernary(
+        this.ids.hasBodyConst,
+        f.createStringLiteral(""),
+        makeTemplate("?", [
+          makeNew(
+            f.createIdentifier(URLSearchParams.name),
+            this.ids.paramsArgument,
+          ),
+        ]),
       ),
     );
 
     // const contentType = response.headers.get("content-type");
-    const contentTypeStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.contentTypeConst,
-        makePropCall(
-          [this.ids.responseConst, this.ids.headersProperty],
-          propOf<Headers>("get"),
-          [f.createStringLiteral("content-type")],
-        ),
+    const contentTypeStatement = makeConst(
+      this.ids.contentTypeConst,
+      makePropCall(
+        [this.ids.responseConst, this.ids.headersProperty],
+        propOf<Headers>("get"),
+        [f.createStringLiteral("content-type")],
       ),
     );
 
@@ -716,20 +570,17 @@ export class Integration {
     );
 
     // const isJSON = contentType.startsWith("application/json");
-    const parserStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.isJsonConst,
-        f.createCallChain(
-          f.createPropertyAccessChain(
-            this.ids.contentTypeConst,
-            undefined,
-            propOf<string>("startsWith"),
-          ),
+    const parserStatement = makeConst(
+      this.ids.isJsonConst,
+      f.createCallChain(
+        f.createPropertyAccessChain(
+          this.ids.contentTypeConst,
           undefined,
-          undefined,
-          [f.createStringLiteral(contentTypes.json)],
+          propOf<string>("startsWith"),
         ),
+        undefined,
+        undefined,
+        [f.createStringLiteral(contentTypes.json)],
       ),
     );
 
@@ -750,29 +601,29 @@ export class Integration {
     );
 
     // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
-    const exampleImplStatement = f.createVariableStatement(
-      exportModifier,
-      makeConst(
-        this.ids.exampleImplementationConst,
-        makeArrowFn(
-          [
-            this.ids.methodParameter,
-            this.ids.pathParameter,
-            this.ids.paramsArgument,
-          ],
-          f.createBlock([
-            hasBodyStatement,
-            searchParamsStatement,
-            responseStatement,
-            contentTypeStatement,
-            noBodyStatement,
-            parserStatement,
-            returnStatement,
-          ]),
-          true,
-        ),
-        f.createTypeReferenceNode(this.ids.implementationType),
+    const exampleImplStatement = makeConst(
+      this.ids.exampleImplementationConst,
+      makeArrowFn(
+        [
+          this.ids.methodParameter,
+          this.ids.pathParameter,
+          this.ids.paramsArgument,
+        ],
+        f.createBlock([
+          hasBodyStatement,
+          searchParamsStatement,
+          responseStatement,
+          contentTypeStatement,
+          noBodyStatement,
+          parserStatement,
+          returnStatement,
+        ]),
+        true,
       ),
+      {
+        expose: true,
+        type: f.createTypeReferenceNode(this.ids.implementationType),
+      },
     );
 
     // client.provide("get /v1/user/retrieve", { id: "10" });
@@ -786,14 +637,9 @@ export class Integration {
     );
 
     // const client = new ExpressZodAPIClient(exampleImplementation);
-    const clientInstanceStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.clientConst,
-        f.createNewExpression(this.ids.clientClass, undefined, [
-          this.ids.exampleImplementationConst,
-        ]),
-      ),
+    const clientInstanceStatement = makeConst(
+      this.ids.clientConst,
+      makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
     );
 
     this.usage.push(

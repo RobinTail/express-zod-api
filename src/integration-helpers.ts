@@ -3,7 +3,7 @@ import { Method } from "./method";
 
 export const f = ts.factory;
 
-export const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
+const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
 const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
 
@@ -14,11 +14,21 @@ export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
 
-export const restToken = f.createToken(ts.SyntaxKind.DotDotDotToken);
-
-const emptyHeading = f.createTemplateHead("");
-const spacingMiddle = f.createTemplateMiddle(" ");
-export const emptyTail = f.createTemplateTail("");
+export const makeTemplate = (
+  head: string,
+  ...rest: ([ts.Expression] | [ts.Expression, string])[]
+) =>
+  f.createTemplateExpression(
+    f.createTemplateHead(head),
+    rest.map(([id, str = ""], idx) =>
+      f.createTemplateSpan(
+        id,
+        idx === rest.length - 1
+          ? f.createTemplateTail(str)
+          : f.createTemplateMiddle(str),
+      ),
+    ),
+  );
 
 // Record<string, any>
 export const recordStringAny = f.createExpressionWithTypeArguments(
@@ -29,27 +39,14 @@ export const recordStringAny = f.createExpressionWithTypeArguments(
   ],
 );
 
-const makeTemplateType = (names: Array<ts.Identifier | string>) =>
-  f.createTemplateLiteralType(
-    emptyHeading,
-    names.map((name, index) =>
-      f.createTemplateLiteralTypeSpan(
-        f.createTypeReferenceNode(name),
-        index === names.length - 1 ? emptyTail : spacingMiddle,
-      ),
-    ),
-  );
-
-export const parametricIndexNode = makeTemplateType(["M", "P"]); // `${M} ${P}`
-
 export const makeParam = (
   name: ts.Identifier,
   type?: ts.TypeNode,
-  features?: ts.Modifier[] | ts.DotDotDotToken,
+  mod?: ts.Modifier[],
 ) =>
   f.createParameterDeclaration(
-    Array.isArray(features) ? features : undefined,
-    Array.isArray(features) ? undefined : features,
+    mod,
+    undefined,
     name,
     undefined,
     type,
@@ -58,10 +55,10 @@ export const makeParam = (
 
 export const makeParams = (
   params: Record<string, ts.TypeNode | undefined>,
-  features?: ts.Modifier[] | ts.DotDotDotToken,
+  mod?: ts.Modifier[],
 ) =>
   Object.entries(params).map(([name, node]) =>
-    makeParam(f.createIdentifier(name), node, features),
+    makeParam(f.createIdentifier(name), node, mod),
   );
 
 export const makeEmptyInitializingConstructor = (
@@ -88,11 +85,14 @@ export const makeDeconstruction = (
 export const makeConst = (
   name: ts.Identifier | ts.ArrayBindingPattern,
   value: ts.Expression,
-  type?: ts.TypeNode,
+  { type, expose }: { type?: ts.TypeNode; expose?: true } = {},
 ) =>
-  f.createVariableDeclarationList(
-    [f.createVariableDeclaration(name, undefined, type, value)],
-    ts.NodeFlags.Const,
+  f.createVariableStatement(
+    expose && exportModifier,
+    f.createVariableDeclarationList(
+      [f.createVariableDeclaration(name, undefined, type, value)],
+      ts.NodeFlags.Const,
+    ),
   );
 
 export const makePublicLiteralType = (
@@ -138,21 +138,6 @@ export const makePublicClass = (
     constructor,
     ...statements,
   ]);
-
-export const makeConditionalIndex = (
-  subject: ts.Identifier,
-  key: ts.TypeNode,
-  fallback: ts.TypeNode,
-) =>
-  f.createConditionalTypeNode(
-    key,
-    f.createTypeOperatorNode(
-      ts.SyntaxKind.KeyOfKeyword,
-      f.createTypeReferenceNode(subject),
-    ),
-    f.createIndexedAccessTypeNode(f.createTypeReferenceNode(subject), key),
-    fallback,
-  );
 
 export const makePromise = (subject: ts.TypeNode | "any") =>
   f.createTypeReferenceNode(Promise.name, [
@@ -262,9 +247,5 @@ export const makeAnd = (left: ts.Expression, right: ts.Expression) =>
     right,
   );
 
-export const makeEqual = (left: ts.Expression, right: ts.Expression) =>
-  f.createBinaryExpression(
-    left,
-    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
-    right,
-  );
+export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
+  f.createNewExpression(cls, undefined, args);

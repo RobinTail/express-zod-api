@@ -18,7 +18,22 @@ describe("Migration", () => {
   });
 
   tester.run("v22", migration.rules.v22, {
-    valid: [``],
-    invalid: [],
+    valid: [`client.provide("get /v1/test", {id: 10});`],
+    invalid: [
+      {
+        code: `client.provide("get", "/v1/test", {id: 10});`,
+        output: `client.provide("get /v1/test", {id: 10});`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "arguments",
+              from: `"get", "/v1/test"`,
+              to: `"get /v1/test"`,
+            },
+          },
+        ],
+      },
+    ],
   });
 });
