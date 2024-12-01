@@ -60,8 +60,8 @@ interface IntegrationParams {
    * */
   variant?: "types" | "client";
   /**
-   * @desc Declares positive and negative response types separately and provides them within additional dictionaries
-   * @default false
+   * @todo remove in v22
+   * @deprecated
    * */
   splitResponse?: boolean;
   /**
@@ -175,7 +175,6 @@ export class Integration {
     routing,
     brandHandling,
     variant = "client",
-    splitResponse = false,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
   }: IntegrationParams) {
@@ -191,43 +190,37 @@ export class Integration {
           brandHandling,
           ctx: { ...commons, isResponse: false },
         });
-        const positiveResponseId = splitResponse
-          ? makeCleanId(method, path, "positive.response")
-          : undefined;
+        const positiveResponseId = makeCleanId(
+          method,
+          path,
+          "positive.response",
+        );
         const positiveSchema = endpoint
           .getResponses("positive")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const positiveResponse = splitResponse
-          ? zodToTs(positiveSchema, {
-              brandHandling,
-              ctx: { ...commons, isResponse: true },
-            })
-          : undefined;
-        const negativeResponseId = splitResponse
-          ? makeCleanId(method, path, "negative.response")
-          : undefined;
+        const positiveResponse = zodToTs(positiveSchema, {
+          brandHandling,
+          ctx: { ...commons, isResponse: true },
+        });
+        const negativeResponseId = makeCleanId(
+          method,
+          path,
+          "negative.response",
+        );
         const negativeSchema = endpoint
           .getResponses("negative")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const negativeResponse = splitResponse
-          ? zodToTs(negativeSchema, {
-              brandHandling,
-              ctx: { ...commons, isResponse: true },
-            })
-          : undefined;
+        const negativeResponse = zodToTs(negativeSchema, {
+          brandHandling,
+          ctx: { ...commons, isResponse: true },
+        });
         const genericResponseId = makeCleanId(method, path, "response");
-        const genericResponse =
-          positiveResponseId && negativeResponseId
-            ? f.createUnionTypeNode([
-                f.createTypeReferenceNode(positiveResponseId),
-                f.createTypeReferenceNode(negativeResponseId),
-              ])
-            : zodToTs(positiveSchema.or(negativeSchema), {
-                brandHandling,
-                ctx: { ...commons, isResponse: true },
-              });
+        const genericResponse = f.createUnionTypeNode([
+          f.createTypeReferenceNode(positiveResponseId),
+          f.createTypeReferenceNode(negativeResponseId),
+        ]);
         this.program.push(createTypeAlias(input, inputId));
         if (positiveResponse && positiveResponseId) {
           this.program.push(
@@ -267,22 +260,20 @@ export class Integration {
     // export type Method = "get" | "post" | "put" | "delete" | "patch";
     this.program.push(makePublicLiteralType(this.ids.methodType, methods));
 
-    this.interfaces.push({
-      id: this.ids.inputInterface,
-      kind: "input",
-      props: [],
-    });
-    if (splitResponse) {
-      this.interfaces.push(
-        { id: this.ids.posResponseInterface, kind: "positive", props: [] },
-        { id: this.ids.negResponseInterface, kind: "negative", props: [] },
-      );
-    }
-    this.interfaces.push({
-      id: this.ids.responseInterface,
-      kind: "response",
-      props: [],
-    });
+    this.interfaces.push(
+      {
+        id: this.ids.inputInterface,
+        kind: "input",
+        props: [],
+      },
+      { id: this.ids.posResponseInterface, kind: "positive", props: [] },
+      { id: this.ids.negResponseInterface, kind: "negative", props: [] },
+      {
+        id: this.ids.responseInterface,
+        kind: "response",
+        props: [],
+      },
+    );
 
     // Single walk through the registry for making properties for the next three objects
     const jsonEndpoints: ts.PropertyAssignment[] = [];
