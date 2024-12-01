@@ -20,12 +20,12 @@ type GetV1UserRetrievePositiveVariant0 = {
   };
 };
 
-export interface GetV1UserRetrievePositiveResponseCodes {
+export interface GetV1UserRetrievePositiveResponseVariants {
   200: GetV1UserRetrievePositiveVariant0;
 }
 
 type GetV1UserRetrievePositiveResponse =
-  GetV1UserRetrievePositiveResponseCodes[keyof GetV1UserRetrievePositiveResponseCodes];
+  GetV1UserRetrievePositiveResponseVariants[keyof GetV1UserRetrievePositiveResponseVariants];
 
 type GetV1UserRetrieveNegativeResponse = {
   status: "error";
@@ -45,12 +45,12 @@ type DeleteV1UserIdRemoveInput = {
 
 type DeleteV1UserIdRemovePositiveVariant0 = undefined;
 
-export interface DeleteV1UserIdRemovePositiveResponseCodes {
+export interface DeleteV1UserIdRemovePositiveResponseVariants {
   204: DeleteV1UserIdRemovePositiveVariant0;
 }
 
 type DeleteV1UserIdRemovePositiveResponse =
-  DeleteV1UserIdRemovePositiveResponseCodes[keyof DeleteV1UserIdRemovePositiveResponseCodes];
+  DeleteV1UserIdRemovePositiveResponseVariants[keyof DeleteV1UserIdRemovePositiveResponseVariants];
 
 type DeleteV1UserIdRemoveNegativeResponse = undefined;
 
@@ -73,12 +73,12 @@ type PatchV1UserIdPositiveVariant0 = {
   };
 };
 
-export interface PatchV1UserIdPositiveResponseCodes {
+export interface PatchV1UserIdPositiveResponseVariants {
   200: PatchV1UserIdPositiveVariant0;
 }
 
 type PatchV1UserIdPositiveResponse =
-  PatchV1UserIdPositiveResponseCodes[keyof PatchV1UserIdPositiveResponseCodes];
+  PatchV1UserIdPositiveResponseVariants[keyof PatchV1UserIdPositiveResponseVariants];
 
 type PatchV1UserIdNegativeResponse = {
   status: "error";
@@ -102,13 +102,13 @@ type PostV1UserCreatePositiveVariant0 = {
   };
 };
 
-export interface PostV1UserCreatePositiveResponseCodes {
+export interface PostV1UserCreatePositiveResponseVariants {
   201: PostV1UserCreatePositiveVariant0;
   202: PostV1UserCreatePositiveVariant0;
 }
 
 type PostV1UserCreatePositiveResponse =
-  PostV1UserCreatePositiveResponseCodes[keyof PostV1UserCreatePositiveResponseCodes];
+  PostV1UserCreatePositiveResponseVariants[keyof PostV1UserCreatePositiveResponseVariants];
 
 type PostV1UserCreateNegativeResponse =
   | {
@@ -130,12 +130,12 @@ type GetV1UserListPositiveVariant0 = {
   name: string;
 }[];
 
-export interface GetV1UserListPositiveResponseCodes {
+export interface GetV1UserListPositiveResponseVariants {
   200: GetV1UserListPositiveVariant0;
 }
 
 type GetV1UserListPositiveResponse =
-  GetV1UserListPositiveResponseCodes[keyof GetV1UserListPositiveResponseCodes];
+  GetV1UserListPositiveResponseVariants[keyof GetV1UserListPositiveResponseVariants];
 
 type GetV1UserListNegativeResponse = string;
 
@@ -149,12 +149,12 @@ type GetV1AvatarSendInput = {
 
 type GetV1AvatarSendPositiveVariant0 = string;
 
-export interface GetV1AvatarSendPositiveResponseCodes {
+export interface GetV1AvatarSendPositiveResponseVariants {
   200: GetV1AvatarSendPositiveVariant0;
 }
 
 type GetV1AvatarSendPositiveResponse =
-  GetV1AvatarSendPositiveResponseCodes[keyof GetV1AvatarSendPositiveResponseCodes];
+  GetV1AvatarSendPositiveResponseVariants[keyof GetV1AvatarSendPositiveResponseVariants];
 
 type GetV1AvatarSendNegativeResponse = string;
 
@@ -168,12 +168,12 @@ type GetV1AvatarStreamInput = {
 
 type GetV1AvatarStreamPositiveVariant0 = Buffer;
 
-export interface GetV1AvatarStreamPositiveResponseCodes {
+export interface GetV1AvatarStreamPositiveResponseVariants {
   200: GetV1AvatarStreamPositiveVariant0;
 }
 
 type GetV1AvatarStreamPositiveResponse =
-  GetV1AvatarStreamPositiveResponseCodes[keyof GetV1AvatarStreamPositiveResponseCodes];
+  GetV1AvatarStreamPositiveResponseVariants[keyof GetV1AvatarStreamPositiveResponseVariants];
 
 type GetV1AvatarStreamNegativeResponse = string;
 
@@ -196,12 +196,12 @@ type PostV1AvatarUploadPositiveVariant0 = {
   };
 };
 
-export interface PostV1AvatarUploadPositiveResponseCodes {
+export interface PostV1AvatarUploadPositiveResponseVariants {
   200: PostV1AvatarUploadPositiveVariant0;
 }
 
 type PostV1AvatarUploadPositiveResponse =
-  PostV1AvatarUploadPositiveResponseCodes[keyof PostV1AvatarUploadPositiveResponseCodes];
+  PostV1AvatarUploadPositiveResponseVariants[keyof PostV1AvatarUploadPositiveResponseVariants];
 
 type PostV1AvatarUploadNegativeResponse = {
   status: "error";
@@ -223,12 +223,12 @@ type PostV1AvatarRawPositiveVariant0 = {
   };
 };
 
-export interface PostV1AvatarRawPositiveResponseCodes {
+export interface PostV1AvatarRawPositiveResponseVariants {
   200: PostV1AvatarRawPositiveVariant0;
 }
 
 type PostV1AvatarRawPositiveResponse =
-  PostV1AvatarRawPositiveResponseCodes[keyof PostV1AvatarRawPositiveResponseCodes];
+  PostV1AvatarRawPositiveResponseVariants[keyof PostV1AvatarRawPositiveResponseVariants];
 
 type PostV1AvatarRawNegativeResponse = {
   status: "error";
