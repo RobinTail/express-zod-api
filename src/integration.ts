@@ -205,18 +205,14 @@ export class Integration {
           brandHandling,
           ctx: { ...commons, isResponse: true },
         });
-        const inputId = makeCleanId(method, path, "input");
-        const positiveResponseId = makeCleanId(
-          method,
-          path,
-          "positive.response",
+        const [
+          inputId,
+          positiveResponseId,
+          negativeResponseId,
+          genericResponseId,
+        ] = ["input", "positive.response", "negative.response", "response"].map(
+          (name) => makeCleanId(method, path, name),
         );
-        const negativeResponseId = makeCleanId(
-          method,
-          path,
-          "negative.response",
-        );
-        const genericResponseId = makeCleanId(method, path, "response");
         const genericResponse = f.createUnionTypeNode([
           f.createTypeReferenceNode(positiveResponseId),
           f.createTypeReferenceNode(negativeResponseId),
