@@ -1,32 +1,26 @@
 import {
   ESLintUtils,
-  // AST_NODE_TYPES as NT,
+  AST_NODE_TYPES as NT,
   type TSESLint,
-  // type TSESTree,
+  type TSESTree,
 } from "@typescript-eslint/utils";
-// import { name as importName } from "../package.json";
+import { Method, methods } from "./method";
 
-/*
-type PropWithId = TSESTree.Property & {
-  key: TSESTree.Identifier;
+interface Queries {
+  provide: TSESTree.CallExpression & {
+    arguments: [
+      TSESTree.Literal & { value: Method },
+      TSESTree.Literal,
+      TSESTree.ObjectExpression,
+    ];
+  };
+}
+
+const queries: Record<keyof Queries, string> = {
+  provide:
+    `${NT.CallExpression}[callee.property.name='provide'][arguments.length=3]` +
+    `:has(${NT.Literal}[value=/^${methods.join("|")}$/] + ${NT.Literal} + ${NT.ObjectExpression})`,
 };
-
-const isPropWithId = (subject: TSESTree.Node): subject is PropWithId =>
-  subject.type === NT.Property && subject.key.type === NT.Identifier;
-
-const isAssignment = (
-  parent: TSESTree.Node,
-): parent is TSESTree.VariableDeclarator & { id: TSESTree.ObjectPattern } =>
-  parent.type === NT.VariableDeclarator && parent.id.type === NT.ObjectPattern;
-
-const propByName =
-  <T extends string>(subject: T | ReadonlyArray<T>) =>
-  (entry: TSESTree.Node): entry is PropWithId & { key: { name: T } } =>
-    isPropWithId(entry) &&
-    (Array.isArray(subject)
-      ? subject.includes(entry.key.name)
-      : entry.key.name === subject);
-*/
 
 const v22 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
@@ -39,7 +33,25 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
     },
   },
   defaultOptions: [],
-  create: () => ({}),
+  create: (ctx) => ({
+    [queries.provide]: (node: Queries["provide"]) => {
+      const {
+        arguments: [method, path],
+      } = node;
+      const request = `"${method.value} ${path.value}"`;
+      ctx.report({
+        messageId: "change",
+        node,
+        data: {
+          subject: "arguments",
+          from: `"${method.value}", "${path.value}"`,
+          to: request,
+        },
+        fix: (fixer) =>
+          fixer.replaceTextRange([method.range[0], path.range[1]], request),
+      });
+    },
+  }),
 });
 
 /**
