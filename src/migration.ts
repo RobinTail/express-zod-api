@@ -16,11 +16,18 @@ interface Queries {
   };
 }
 
-const queries: Record<keyof Queries, string> = {
+type Query = keyof Queries;
+
+const queries: Record<Query, string> = {
   provide:
     `${NT.CallExpression}[callee.property.name='provide'][arguments.length=3]` +
     `:has(${NT.Literal}[value=/^${methods.join("|")}$/] + ${NT.Literal} + ${NT.ObjectExpression})`,
 };
+
+const makeQuery = <K extends Query>(
+  key: K,
+  fn: (node: Queries[K]) => void,
+) => ({ [queries[key]]: fn });
 
 const v22 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
@@ -34,7 +41,7 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
   },
   defaultOptions: [],
   create: (ctx) => ({
-    [queries.provide]: (node: Queries["provide"]) => {
+    ...makeQuery("provide", (node) => {
       const {
         arguments: [method, path],
       } = node;
@@ -50,7 +57,7 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
         fix: (fixer) =>
           fixer.replaceTextRange([method.range[0], path.range[1]], request),
       });
-    },
+    }),
   }),
 });
 
