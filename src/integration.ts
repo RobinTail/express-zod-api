@@ -184,6 +184,14 @@ export class Integration {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
+        const [
+          inputId,
+          positiveResponseId,
+          negativeResponseId,
+          genericResponseId,
+        ] = ["input", "positive.response", "negative.response", "response"].map(
+          (name) => makeCleanId(method, path, name),
+        );
         const input = zodToTs(endpoint.getSchema("input"), ctxIn);
         const positiveSchema = endpoint
           .getResponses("positive")
@@ -195,14 +203,6 @@ export class Integration {
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
         const negativeResponse = zodToTs(negativeSchema, ctxOut);
-        const [
-          inputId,
-          positiveResponseId,
-          negativeResponseId,
-          genericResponseId,
-        ] = ["input", "positive.response", "negative.response", "response"].map(
-          (name) => makeCleanId(method, path, name),
-        );
         const genericResponse = f.createUnionTypeNode([
           f.createTypeReferenceNode(positiveResponseId),
           f.createTypeReferenceNode(negativeResponseId),
