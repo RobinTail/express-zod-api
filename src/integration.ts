@@ -1,6 +1,7 @@
 import ts from "typescript";
 import { z } from "zod";
-import { NormalizedResponse, ResponseVariant } from "./api-response";
+import { ResponseVariant } from "./api-response";
+import { AbstractEndpoint } from "./endpoint";
 import {
   emptyTail,
   exportModifier,
@@ -172,19 +173,20 @@ export class Integration {
   }
 
   protected splitResponse(
-    prefix: string,
-    responses: ReadonlyArray<NormalizedResponse>,
+    method: Method,
+    path: string,
+    kind: ResponseVariant,
+    endpoint: AbstractEndpoint,
     fallback: z.ZodType,
     ctx: Parameters<typeof zodToTs>[1],
   ) {
     const variants: ts.TypeAliasDeclaration[] = [];
     const props: ts.PropertySignature[] = [];
-    for (const [
-      idx,
-      { schema, mimeTypes, statusCodes },
-    ] of responses.entries()) {
+    for (const [idx, { schema, mimeTypes, statusCodes }] of endpoint
+      .getResponses(kind)
+      .entries()) {
       const variant = zodToTs(mimeTypes ? schema : fallback, ctx);
-      const variantId = makeCleanId(prefix, "variant", `${idx}`);
+      const variantId = makeCleanId(method, path, kind, "variant", `${idx}`);
       variants.push(createTypeAlias(variant, variantId));
       for (const statusCode of statusCodes)
         props.push(makeInterfaceProp(statusCode, variantId));
@@ -212,8 +214,10 @@ export class Integration {
         });
 
         const [positiveProps, positiveDeclarations] = this.splitResponse(
-          `${method}.${path}.positive`,
-          endpoint.getResponses("positive"),
+          method,
+          path,
+          "positive",
+          endpoint,
           noContent,
           { brandHandling, ctx: { ...commons, isResponse: true } },
         );
