@@ -73,6 +73,77 @@ export default tsPlugin.config(
     },
   },
   {
+    name: "source/integration",
+    files: ["src/integration.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "Identifier[name='createConditionalExpression']",
+          message: "use makeTernary() helper",
+        },
+        {
+          selector: "Identifier[name='createArrowFunction']",
+          message: "use makeArrowFn() helper",
+        },
+        {
+          selector: "Identifier[name='createTypeParameterDeclaration']",
+          message: "use makeTypeParams() helper",
+        },
+        {
+          selector: "Identifier[name='createInterfaceDeclaration']",
+          message: "use makePublicInterface() helper",
+        },
+        {
+          selector: "Identifier[name='createClassDeclaration']",
+          message: "use makePublicClass() helper",
+        },
+        {
+          selector: "Identifier[name='createMethodDeclaration']",
+          message: "use makePublicMethod() helper",
+        },
+        {
+          selector: "Identifier[name='createTypeAliasDeclaration']",
+          message: "use makePublicType() or makePublicLiteralType() helpers",
+        },
+        {
+          selector: "Identifier[name='createVariableDeclarationList']",
+          message: "use makeConst() helper",
+        },
+        {
+          selector: "Identifier[name='createArrayBindingPattern']",
+          message: "use makeDeconstruction() helper",
+        },
+        {
+          selector: "Identifier[name='createPropertySignature']",
+          message: "use makeInterfaceProp() helper",
+        },
+        {
+          selector: "Identifier[name='createConstructorDeclaration']",
+          message: "use makeEmptyInitializingConstructor() helper",
+        },
+        {
+          selector: "Identifier[name='createParameterDeclaration']",
+          message: "use makeParam() or makeParams() helpers",
+        },
+        {
+          selector:
+            "CallExpression[callee.property.name='createCallExpression']" +
+            "[arguments.0.callee.property.name='createPropertyAccessExpression']",
+          message: "use makePropCall() helper",
+        },
+        {
+          selector: "Identifier[name='AmpersandAmpersandToken']",
+          message: "use makeAnd() helper",
+        },
+        {
+          selector: "Identifier[name='EqualsEqualsEqualsToken']",
+          message: "use makeEqual() helper",
+        },
+      ],
+    },
+  },
+  {
     name: "source/migration",
     files: ["src/migration.ts"],
     rules: {
