@@ -250,5 +250,5 @@ export const exampleImplementation: Implementation = async (
   return response[isJSON ? "json" : "text"]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
+client.provide("get /v1/user/retrieve", { id: "10" });
 */
