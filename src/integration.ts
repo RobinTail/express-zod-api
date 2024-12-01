@@ -185,16 +185,10 @@ export class Integration {
           makeAlias: this.makeAlias.bind(this),
           optionalPropStyle,
         };
-        const inputId = makeCleanId(method, path, "input");
         const input = zodToTs(endpoint.getSchema("input"), {
           brandHandling,
           ctx: { ...commons, isResponse: false },
         });
-        const positiveResponseId = makeCleanId(
-          method,
-          path,
-          "positive.response",
-        );
         const positiveSchema = endpoint
           .getResponses("positive")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
@@ -203,11 +197,6 @@ export class Integration {
           brandHandling,
           ctx: { ...commons, isResponse: true },
         });
-        const negativeResponseId = makeCleanId(
-          method,
-          path,
-          "negative.response",
-        );
         const negativeSchema = endpoint
           .getResponses("negative")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
@@ -216,19 +205,28 @@ export class Integration {
           brandHandling,
           ctx: { ...commons, isResponse: true },
         });
+        const inputId = makeCleanId(method, path, "input");
+        const positiveResponseId = makeCleanId(
+          method,
+          path,
+          "positive.response",
+        );
+        const negativeResponseId = makeCleanId(
+          method,
+          path,
+          "negative.response",
+        );
         const genericResponseId = makeCleanId(method, path, "response");
         const genericResponse = f.createUnionTypeNode([
           f.createTypeReferenceNode(positiveResponseId),
           f.createTypeReferenceNode(negativeResponseId),
         ]);
-        this.program.push(createTypeAlias(input, inputId));
         this.program.push(
+          createTypeAlias(input, inputId),
           createTypeAlias(positiveResponse, positiveResponseId),
-        );
-        this.program.push(
           createTypeAlias(negativeResponse, negativeResponseId),
+          createTypeAlias(genericResponse, genericResponseId),
         );
-        this.program.push(createTypeAlias(genericResponse, genericResponseId));
         this.paths.push(path);
         this.registry.set(
           { method, path },
