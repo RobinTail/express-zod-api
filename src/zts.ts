@@ -1,3 +1,4 @@
+import { chain, prop } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
@@ -176,7 +177,7 @@ const onIntersection: Producer = (
   const nodes = [left, right].map(next);
   const areObjects = nodes.every(ts.isTypeLiteralNode);
   return areObjects
-    ? f.createTypeLiteralNode(nodes.flatMap(({ members }) => members))
+    ? f.createTypeLiteralNode(chain(prop("members"), nodes)) // similar to flattened pluck()
     : f.createIntersectionTypeNode(nodes);
 };
 
