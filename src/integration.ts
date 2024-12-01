@@ -208,7 +208,7 @@ export class Integration {
       routing,
       onEndpoint: (endpoint, path, method) => {
         const input = zodToTs(endpoint.getSchema("input"), ctxIn);
-        const [positiveProps, positiveDeclarations] = this.splitResponse(
+        const [positiveProps, positiveVariants] = this.splitResponse(
           method,
           path,
           "positive",
@@ -219,7 +219,7 @@ export class Integration {
         const positiveVariantsId = f.createIdentifier(
           makeCleanId(method, path, "positive.response.variants"),
         );
-        const positiveVariants = makePublicInterface(
+        const positiveDict = makePublicInterface(
           positiveVariantsId,
           positiveProps,
         );
@@ -250,8 +250,8 @@ export class Integration {
         ]);
         this.program.push(
           createTypeAlias(input, inputId),
-          ...positiveDeclarations,
-          positiveVariants,
+          ...positiveVariants,
+          positiveDict,
           createTypeAlias(positiveResponse, positiveResponseId),
           createTypeAlias(negativeResponse, negativeResponseId),
           createTypeAlias(genericResponse, genericResponseId),
