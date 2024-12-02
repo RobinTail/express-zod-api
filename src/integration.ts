@@ -234,11 +234,7 @@ export class Integration {
         );
         const positiveResponse = f.createIndexedAccessTypeNode(
           f.createTypeReferenceNode(positiveVariantsId),
-          // @todo reuse helper in v22
-          f.createTypeOperatorNode(
-            ts.SyntaxKind.KeyOfKeyword,
-            f.createTypeReferenceNode(positiveVariantsId),
-          ),
+          makeKeyOf(positiveVariantsId),
         );
         const negativeSchema = endpoint
           .getResponses("negative")
