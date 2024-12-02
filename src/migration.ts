@@ -14,6 +14,7 @@ interface Queries {
       TSESTree.ObjectExpression,
     ];
   };
+  splitResponse: TSESTree.Property & { key: TSESTree.Identifier };
 }
 
 type Query = keyof Queries;
@@ -22,6 +23,7 @@ const queries: Record<Query, string> = {
   provide:
     `${NT.CallExpression}[callee.property.name='provide'][arguments.length=3]` +
     `:has(${NT.Literal}[value=/^${methods.join("|")}$/] + ${NT.Literal} + ${NT.ObjectExpression})`,
+  splitResponse: `${NT.NewExpression}[callee.name='Integration'] > ${NT.ObjectExpression} > ${NT.Property}[key.name='splitResponse']`,
 };
 
 const makeQuery = <K extends Query>(
@@ -36,7 +38,7 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
     schema: [],
     messages: {
       change: "Change {{subject}} {{from}} to {{to}}.",
-      move: "Move {{subject}} from {{from}} to {{to}}.",
+      remove: "Remove {{subject}} {{name}}.",
     },
   },
   defaultOptions: [],
@@ -56,6 +58,14 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
         },
         fix: (fixer) =>
           fixer.replaceTextRange([method.range[0], path.range[1]], request),
+      });
+    }),
+    ...makeQuery("splitResponse", (node) => {
+      ctx.report({
+        messageId: "remove",
+        node,
+        data: { subject: "property", name: node.key.name },
+        fix: (fixer) => fixer.remove(node),
       });
     }),
   }),

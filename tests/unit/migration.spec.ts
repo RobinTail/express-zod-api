@@ -18,7 +18,10 @@ describe("Migration", () => {
   });
 
   tester.run("v22", migration.rules.v22, {
-    valid: [`client.provide("get /v1/test", {id: 10});`],
+    valid: [
+      `client.provide("get /v1/test", {id: 10});`,
+      `new Integration({ routing });`,
+    ],
     invalid: [
       {
         code: `client.provide("get", "/v1/test", {id: 10});`,
@@ -31,6 +34,16 @@ describe("Migration", () => {
               from: `"get", "/v1/test"`,
               to: `"get /v1/test"`,
             },
+          },
+        ],
+      },
+      {
+        code: `new Integration({ routing, splitResponse: true });`,
+        output: `new Integration({ routing,  });`,
+        errors: [
+          {
+            messageId: "remove",
+            data: { subject: "property", name: "splitResponse" },
           },
         ],
       },
