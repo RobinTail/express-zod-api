@@ -139,6 +139,12 @@ export const makePublicClass = (
     ...statements,
   ]);
 
+export const makeKeyOf = (id: ts.Identifier) =>
+  f.createTypeOperatorNode(
+    ts.SyntaxKind.KeyOfKeyword,
+    f.createTypeReferenceNode(id),
+  );
+
 export const makeConditionalIndex = (
   subject: ts.Identifier,
   key: ts.TypeNode,
@@ -146,10 +152,7 @@ export const makeConditionalIndex = (
 ) =>
   f.createConditionalTypeNode(
     key,
-    f.createTypeOperatorNode(
-      ts.SyntaxKind.KeyOfKeyword,
-      f.createTypeReferenceNode(subject),
-    ),
+    makeKeyOf(subject),
     f.createIndexedAccessTypeNode(f.createTypeReferenceNode(subject), key),
     fallback,
   );
