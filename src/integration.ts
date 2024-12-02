@@ -224,7 +224,7 @@ export class Integration {
               path,
               responseVariant,
               "variant",
-              `${idx}`,
+              `${idx + 1}`,
             );
             variants.push(createTypeAlias(variant, variantId));
             for (const statusCode of statusCodes)
