@@ -1,7 +1,9 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Integration > Feature #945: should have configurable treatment of optionals 0 1`] = `
-"type PostV1TestWithDashesInput = {
+"export type SomeOf<T> = T[keyof T];
+
+type PostV1TestWithDashesInput = {
   opt?: string;
 };
 
@@ -17,7 +19,7 @@ export interface PostV1TestWithDashesPositiveResponseVariants {
 }
 
 type PostV1TestWithDashesPositiveResponse =
-  PostV1TestWithDashesPositiveResponseVariants[keyof PostV1TestWithDashesPositiveResponseVariants];
+  SomeOf<PostV1TestWithDashesPositiveResponseVariants>;
 
 type PostV1TestWithDashesNegativeResponse = {
   status: "error";
@@ -133,7 +135,9 @@ client.provide("get /v1/user/retrieve", { id: "10" });
 `;
 
 exports[`Integration > Feature #945: should have configurable treatment of optionals 1 1`] = `
-"type PostV1TestWithDashesInput = {
+"export type SomeOf<T> = T[keyof T];
+
+type PostV1TestWithDashesInput = {
   opt: string | undefined;
 };
 
@@ -149,7 +153,7 @@ export interface PostV1TestWithDashesPositiveResponseVariants {
 }
 
 type PostV1TestWithDashesPositiveResponse =
-  PostV1TestWithDashesPositiveResponseVariants[keyof PostV1TestWithDashesPositiveResponseVariants];
+  SomeOf<PostV1TestWithDashesPositiveResponseVariants>;
 
 type PostV1TestWithDashesNegativeResponse = {
   status: "error";
@@ -265,7 +269,9 @@ client.provide("get /v1/user/retrieve", { id: "10" });
 `;
 
 exports[`Integration > Feature #945: should have configurable treatment of optionals 2 1`] = `
-"type PostV1TestWithDashesInput = {
+"export type SomeOf<T> = T[keyof T];
+
+type PostV1TestWithDashesInput = {
   opt: string;
 };
 
@@ -281,7 +287,7 @@ export interface PostV1TestWithDashesPositiveResponseVariants {
 }
 
 type PostV1TestWithDashesPositiveResponse =
-  PostV1TestWithDashesPositiveResponseVariants[keyof PostV1TestWithDashesPositiveResponseVariants];
+  SomeOf<PostV1TestWithDashesPositiveResponseVariants>;
 
 type PostV1TestWithDashesNegativeResponse = {
   status: "error";
@@ -397,7 +403,9 @@ client.provide("get /v1/user/retrieve", { id: "10" });
 `;
 
 exports[`Integration > Feature #1470: Custom brands > should by handled accordingly 1`] = `
-"type PostV1CustomInput = {
+"export type SomeOf<T> = T[keyof T];
+
+type PostV1CustomInput = {
   string: boolean;
   regular: string;
 };
@@ -414,7 +422,7 @@ export interface PostV1CustomPositiveResponseVariants {
 }
 
 type PostV1CustomPositiveResponse =
-  PostV1CustomPositiveResponseVariants[keyof PostV1CustomPositiveResponseVariants];
+  SomeOf<PostV1CustomPositiveResponseVariants>;
 
 type PostV1CustomNegativeResponse = {
   status: "error";
@@ -457,6 +465,8 @@ exports[`Integration > Should generate a client for example API 1`] = `
   features: Type1;
 }[];
 
+export type SomeOf<T> = T[keyof T];
+
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
@@ -479,7 +489,7 @@ export interface GetV1UserRetrievePositiveResponseVariants {
 }
 
 type GetV1UserRetrievePositiveResponse =
-  GetV1UserRetrievePositiveResponseVariants[keyof GetV1UserRetrievePositiveResponseVariants];
+  SomeOf<GetV1UserRetrievePositiveResponseVariants>;
 
 type GetV1UserRetrieveNegativeResponse = {
   status: "error";
@@ -504,7 +514,7 @@ export interface DeleteV1UserIdRemovePositiveResponseVariants {
 }
 
 type DeleteV1UserIdRemovePositiveResponse =
-  DeleteV1UserIdRemovePositiveResponseVariants[keyof DeleteV1UserIdRemovePositiveResponseVariants];
+  SomeOf<DeleteV1UserIdRemovePositiveResponseVariants>;
 
 type DeleteV1UserIdRemoveNegativeResponse = undefined;
 
@@ -532,7 +542,7 @@ export interface PatchV1UserIdPositiveResponseVariants {
 }
 
 type PatchV1UserIdPositiveResponse =
-  PatchV1UserIdPositiveResponseVariants[keyof PatchV1UserIdPositiveResponseVariants];
+  SomeOf<PatchV1UserIdPositiveResponseVariants>;
 
 type PatchV1UserIdNegativeResponse = {
   status: "error";
@@ -562,7 +572,7 @@ export interface PostV1UserCreatePositiveResponseVariants {
 }
 
 type PostV1UserCreatePositiveResponse =
-  PostV1UserCreatePositiveResponseVariants[keyof PostV1UserCreatePositiveResponseVariants];
+  SomeOf<PostV1UserCreatePositiveResponseVariants>;
 
 type PostV1UserCreateNegativeResponse =
   | {
@@ -589,7 +599,7 @@ export interface GetV1UserListPositiveResponseVariants {
 }
 
 type GetV1UserListPositiveResponse =
-  GetV1UserListPositiveResponseVariants[keyof GetV1UserListPositiveResponseVariants];
+  SomeOf<GetV1UserListPositiveResponseVariants>;
 
 type GetV1UserListNegativeResponse = string;
 
@@ -608,7 +618,7 @@ export interface GetV1AvatarSendPositiveResponseVariants {
 }
 
 type GetV1AvatarSendPositiveResponse =
-  GetV1AvatarSendPositiveResponseVariants[keyof GetV1AvatarSendPositiveResponseVariants];
+  SomeOf<GetV1AvatarSendPositiveResponseVariants>;
 
 type GetV1AvatarSendNegativeResponse = string;
 
@@ -627,7 +637,7 @@ export interface GetV1AvatarStreamPositiveResponseVariants {
 }
 
 type GetV1AvatarStreamPositiveResponse =
-  GetV1AvatarStreamPositiveResponseVariants[keyof GetV1AvatarStreamPositiveResponseVariants];
+  SomeOf<GetV1AvatarStreamPositiveResponseVariants>;
 
 type GetV1AvatarStreamNegativeResponse = string;
 
@@ -655,7 +665,7 @@ export interface PostV1AvatarUploadPositiveResponseVariants {
 }
 
 type PostV1AvatarUploadPositiveResponse =
-  PostV1AvatarUploadPositiveResponseVariants[keyof PostV1AvatarUploadPositiveResponseVariants];
+  SomeOf<PostV1AvatarUploadPositiveResponseVariants>;
 
 type PostV1AvatarUploadNegativeResponse = {
   status: "error";
@@ -682,7 +692,7 @@ export interface PostV1AvatarRawPositiveResponseVariants {
 }
 
 type PostV1AvatarRawPositiveResponse =
-  PostV1AvatarRawPositiveResponseVariants[keyof PostV1AvatarRawPositiveResponseVariants];
+  SomeOf<PostV1AvatarRawPositiveResponseVariants>;
 
 type PostV1AvatarRawNegativeResponse = {
   status: "error";
@@ -861,6 +871,8 @@ exports[`Integration > Should generate a types for example API 1`] = `
   features: Type1;
 }[];
 
+export type SomeOf<T> = T[keyof T];
+
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
@@ -883,7 +895,7 @@ export interface GetV1UserRetrievePositiveResponseVariants {
 }
 
 type GetV1UserRetrievePositiveResponse =
-  GetV1UserRetrievePositiveResponseVariants[keyof GetV1UserRetrievePositiveResponseVariants];
+  SomeOf<GetV1UserRetrievePositiveResponseVariants>;
 
 type GetV1UserRetrieveNegativeResponse = {
   status: "error";
@@ -908,7 +920,7 @@ export interface DeleteV1UserIdRemovePositiveResponseVariants {
 }
 
 type DeleteV1UserIdRemovePositiveResponse =
-  DeleteV1UserIdRemovePositiveResponseVariants[keyof DeleteV1UserIdRemovePositiveResponseVariants];
+  SomeOf<DeleteV1UserIdRemovePositiveResponseVariants>;
 
 type DeleteV1UserIdRemoveNegativeResponse = undefined;
 
@@ -936,7 +948,7 @@ export interface PatchV1UserIdPositiveResponseVariants {
 }
 
 type PatchV1UserIdPositiveResponse =
-  PatchV1UserIdPositiveResponseVariants[keyof PatchV1UserIdPositiveResponseVariants];
+  SomeOf<PatchV1UserIdPositiveResponseVariants>;
 
 type PatchV1UserIdNegativeResponse = {
   status: "error";
@@ -966,7 +978,7 @@ export interface PostV1UserCreatePositiveResponseVariants {
 }
 
 type PostV1UserCreatePositiveResponse =
-  PostV1UserCreatePositiveResponseVariants[keyof PostV1UserCreatePositiveResponseVariants];
+  SomeOf<PostV1UserCreatePositiveResponseVariants>;
 
 type PostV1UserCreateNegativeResponse =
   | {
@@ -993,7 +1005,7 @@ export interface GetV1UserListPositiveResponseVariants {
 }
 
 type GetV1UserListPositiveResponse =
-  GetV1UserListPositiveResponseVariants[keyof GetV1UserListPositiveResponseVariants];
+  SomeOf<GetV1UserListPositiveResponseVariants>;
 
 type GetV1UserListNegativeResponse = string;
 
@@ -1012,7 +1024,7 @@ export interface GetV1AvatarSendPositiveResponseVariants {
 }
 
 type GetV1AvatarSendPositiveResponse =
-  GetV1AvatarSendPositiveResponseVariants[keyof GetV1AvatarSendPositiveResponseVariants];
+  SomeOf<GetV1AvatarSendPositiveResponseVariants>;
 
 type GetV1AvatarSendNegativeResponse = string;
 
@@ -1031,7 +1043,7 @@ export interface GetV1AvatarStreamPositiveResponseVariants {
 }
 
 type GetV1AvatarStreamPositiveResponse =
-  GetV1AvatarStreamPositiveResponseVariants[keyof GetV1AvatarStreamPositiveResponseVariants];
+  SomeOf<GetV1AvatarStreamPositiveResponseVariants>;
 
 type GetV1AvatarStreamNegativeResponse = string;
 
@@ -1059,7 +1071,7 @@ export interface PostV1AvatarUploadPositiveResponseVariants {
 }
 
 type PostV1AvatarUploadPositiveResponse =
-  PostV1AvatarUploadPositiveResponseVariants[keyof PostV1AvatarUploadPositiveResponseVariants];
+  SomeOf<PostV1AvatarUploadPositiveResponseVariants>;
 
 type PostV1AvatarUploadNegativeResponse = {
   status: "error";
@@ -1086,7 +1098,7 @@ export interface PostV1AvatarRawPositiveResponseVariants {
 }
 
 type PostV1AvatarRawPositiveResponse =
-  PostV1AvatarRawPositiveResponseVariants[keyof PostV1AvatarRawPositiveResponseVariants];
+  SomeOf<PostV1AvatarRawPositiveResponseVariants>;
 
 type PostV1AvatarRawNegativeResponse = {
   status: "error";
@@ -1165,7 +1177,9 @@ export type MethodPath = keyof Input;
 `;
 
 exports[`Integration > Should support multiple response schemas depending on status code 1`] = `
-"type PostV1MtplInput = {
+"export type SomeOf<T> = T[keyof T];
+
+type PostV1MtplInput = {
   test: number;
 };
 
@@ -1188,8 +1202,7 @@ export interface PostV1MtplPositiveResponseVariants {
   201: PostV1MtplPositiveVariant1;
 }
 
-type PostV1MtplPositiveResponse =
-  PostV1MtplPositiveResponseVariants[keyof PostV1MtplPositiveResponseVariants];
+type PostV1MtplPositiveResponse = SomeOf<PostV1MtplPositiveResponseVariants>;
 
 type PostV1MtplNegativeResponse = "error" | "failure";
 
@@ -1222,7 +1235,9 @@ export type MethodPath = keyof Input;
 `;
 
 exports[`Integration > Should treat optionals the same way as z.infer() by default 1`] = `
-"type PostV1TestWithDashesInput = {
+"export type SomeOf<T> = T[keyof T];
+
+type PostV1TestWithDashesInput = {
   opt?: string | undefined;
 };
 
@@ -1238,7 +1253,7 @@ export interface PostV1TestWithDashesPositiveResponseVariants {
 }
 
 type PostV1TestWithDashesPositiveResponse =
-  PostV1TestWithDashesPositiveResponseVariants[keyof PostV1TestWithDashesPositiveResponseVariants];
+  SomeOf<PostV1TestWithDashesPositiveResponseVariants>;
 
 type PostV1TestWithDashesNegativeResponse = {
   status: "error";

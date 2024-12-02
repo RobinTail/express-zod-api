@@ -108,8 +108,17 @@ export const makePublicLiteralType = (
     ),
   );
 
-export const makePublicType = (name: ts.Identifier, value: ts.TypeNode) =>
-  f.createTypeAliasDeclaration(exportModifier, name, undefined, value);
+export const makePublicType = (
+  name: ts.Identifier,
+  value: ts.TypeNode,
+  params?: Parameters<typeof makeTypeParams>[0],
+) =>
+  f.createTypeAliasDeclaration(
+    exportModifier,
+    name,
+    params && makeTypeParams(params),
+    value,
+  );
 
 export const makePublicMethod = (
   name: ts.Identifier,
@@ -139,7 +148,7 @@ export const makePublicClass = (
     ...statements,
   ]);
 
-export const makeKeyOf = (id: ts.Identifier) =>
+export const makeKeyOf = (id: ts.Identifier | string) =>
   f.createTypeOperatorNode(
     ts.SyntaxKind.KeyOfKeyword,
     f.createTypeReferenceNode(id),
@@ -176,9 +185,15 @@ export const makePublicInterface = (
     props,
   );
 
-export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
+export const makeTypeParams = (
+  params: Partial<Record<string, ts.Identifier>>,
+) =>
   Object.entries(params).map(([name, id]) =>
-    f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
+    f.createTypeParameterDeclaration(
+      [],
+      name,
+      id && f.createTypeReferenceNode(id),
+    ),
   );
 
 export const makeArrowFn = (

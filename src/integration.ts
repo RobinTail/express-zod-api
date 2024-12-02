@@ -152,6 +152,7 @@ export class Integration {
     clientConst: f.createIdentifier("client"),
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
+    someOfType: f.createIdentifier("SomeOf"),
   } satisfies Record<string, ts.Identifier>;
   protected interfaces: Array<{
     id: ts.Identifier;
@@ -205,6 +206,19 @@ export class Integration {
     const commons = { makeAlias: this.makeAlias.bind(this), optionalPropStyle };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
+
+    // type SomeOf<T> = T[keyof T];
+    this.program.push(
+      makePublicType(
+        this.ids.someOfType,
+        f.createIndexedAccessTypeNode(
+          f.createTypeReferenceNode("T"),
+          makeKeyOf("T"),
+        ),
+        { T: undefined },
+      ),
+    );
+
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
@@ -232,9 +246,9 @@ export class Integration {
           positiveVariantsId,
           positiveProps,
         );
-        const positiveResponse = f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(positiveVariantsId),
-          makeKeyOf(positiveVariantsId),
+        const positiveResponse = f.createTypeReferenceNode(
+          this.ids.someOfType,
+          [f.createTypeReferenceNode(positiveVariantsId)],
         );
         const negativeSchema = endpoint
           .getResponses("negative")
