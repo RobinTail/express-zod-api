@@ -1,6 +1,7 @@
+import { keys } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { ResponseVariant } from "./api-response";
+import { defaultStatusCodes, ResponseVariant } from "./api-response";
 import { AbstractEndpoint } from "./endpoint";
 import {
   emptyTail,
@@ -118,6 +119,7 @@ export class Integration {
   >();
   protected paths: string[] = [];
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
+  protected responseVariants = keys(defaultStatusCodes);
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
@@ -231,42 +233,41 @@ export class Integration {
           (name) => makeCleanId(method, path, name),
         );
         const input = zodToTs(endpoint.getSchema("input"), ctxIn);
-        const [positiveProps, positiveVariants] = this.splitResponse(
-          method,
-          path,
-          "positive",
-          endpoint,
-          noContent,
-          ctxOut,
-        );
-        const positiveVariantsId = f.createIdentifier(
-          makeCleanId(method, path, "positive.response.variants"),
-        );
-        const positiveDict = makePublicInterface(
-          positiveVariantsId,
-          positiveProps,
-        );
-        const positiveResponse = f.createTypeReferenceNode(
-          this.ids.someOfType,
-          [f.createTypeReferenceNode(positiveVariantsId)],
-        );
-        const negativeSchema = endpoint
-          .getResponses("negative")
-          .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
-          .reduce((agg, schema) => agg.or(schema));
-        const negativeResponse = zodToTs(negativeSchema, ctxOut);
+        this.program.push(createTypeAlias(input, inputId));
+
+        // @todo name
+        for (const rv of this.responseVariants) {
+          // @todo maybe no need to the method
+          const [props, variants] = this.splitResponse(
+            method,
+            path,
+            rv,
+            endpoint,
+            noContent,
+            ctxOut,
+          );
+          const variantsTypeId = f.createIdentifier(
+            makeCleanId(method, path, rv, "response.variants"),
+          );
+          const dict = makePublicInterface(variantsTypeId, props);
+          const whole = f.createTypeReferenceNode(this.ids.someOfType, [
+            f.createTypeReferenceNode(variantsTypeId),
+          ]);
+          this.program.push(
+            ...variants,
+            dict,
+            createTypeAlias(
+              whole,
+              rv === "positive" ? positiveResponseId : negativeResponseId, // @todo fix this nonsense
+            ),
+          );
+        }
+
         const genericResponse = f.createUnionTypeNode([
           f.createTypeReferenceNode(positiveResponseId),
           f.createTypeReferenceNode(negativeResponseId),
         ]);
-        this.program.push(
-          createTypeAlias(input, inputId),
-          ...positiveVariants,
-          positiveDict,
-          createTypeAlias(positiveResponse, positiveResponseId),
-          createTypeAlias(negativeResponse, negativeResponseId),
-          createTypeAlias(genericResponse, genericResponseId),
-        );
+        this.program.push(createTypeAlias(genericResponse, genericResponseId));
         this.paths.push(path);
         this.registry.set(
           { method, path },
