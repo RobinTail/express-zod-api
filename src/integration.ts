@@ -31,6 +31,7 @@ import {
   restToken,
   makeAnd,
   makeEqual,
+  makeKeyOf,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -292,10 +293,7 @@ export class Integration {
     this.program.push(
       makePublicType(
         this.ids.methodPathType,
-        f.createTypeOperatorNode(
-          ts.SyntaxKind.KeyOfKeyword,
-          f.createTypeReferenceNode(this.ids.inputInterface),
-        ),
+        makeKeyOf(this.ids.inputInterface),
       ),
     );
 
@@ -402,10 +400,7 @@ export class Integration {
           [this.ids.pathParameter.text]: f.createTypeReferenceNode("P"),
           [this.ids.paramsArgument.text]: f.createConditionalTypeNode(
             parametricIndexNode,
-            f.createTypeOperatorNode(
-              ts.SyntaxKind.KeyOfKeyword,
-              f.createTypeReferenceNode(this.ids.inputInterface),
-            ),
+            makeKeyOf(this.ids.inputInterface),
             f.createIndexedAccessTypeNode(
               f.createTypeReferenceNode(this.ids.inputInterface),
               parametricIndexNode,
