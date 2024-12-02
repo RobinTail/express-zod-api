@@ -2,6 +2,13 @@
 
 ## Version 21
 
+### v21.3.0
+
+- Fixed `provide()` method usage example in the code of the generated client;
+- Always splitting the response in the generated client:
+  - This will print the positive and negative response types separately;
+  - The `splitResponse` property on the `Integration` class constructor argument is deprecated.
+
 ### v21.2.0
 
 - Minor performance adjustments;

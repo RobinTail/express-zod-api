@@ -5,19 +5,23 @@ exports[`Integration > Feature #945: should have configurable treatment of optio
   opt?: string;
 };
 
+type PostV1TestWithDashesPositiveResponse = {
+  status: "success";
+  data: {
+    similar?: number;
+  };
+};
+
+type PostV1TestWithDashesNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1TestWithDashesResponse =
-  | {
-      status: "success";
-      data: {
-        similar?: number;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1TestWithDashesPositiveResponse
+  | PostV1TestWithDashesNegativeResponse;
 
 export type Path = "/v1/test-with-dashes";
 
@@ -25,6 +29,14 @@ export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponse;
+}
+
+export interface NegativeResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesNegativeResponse;
 }
 
 export interface Response {
@@ -108,7 +120,7 @@ export const exampleImplementation: Implementation = async (
   return response[isJSON ? "json" : "text"]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
+client.provide("get /v1/user/retrieve", { id: "10" });
 */
 "
 `;
@@ -118,19 +130,23 @@ exports[`Integration > Feature #945: should have configurable treatment of optio
   opt: string | undefined;
 };
 
+type PostV1TestWithDashesPositiveResponse = {
+  status: "success";
+  data: {
+    similar: number | undefined;
+  };
+};
+
+type PostV1TestWithDashesNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1TestWithDashesResponse =
-  | {
-      status: "success";
-      data: {
-        similar: number | undefined;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1TestWithDashesPositiveResponse
+  | PostV1TestWithDashesNegativeResponse;
 
 export type Path = "/v1/test-with-dashes";
 
@@ -138,6 +154,14 @@ export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponse;
+}
+
+export interface NegativeResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesNegativeResponse;
 }
 
 export interface Response {
@@ -221,7 +245,7 @@ export const exampleImplementation: Implementation = async (
   return response[isJSON ? "json" : "text"]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
+client.provide("get /v1/user/retrieve", { id: "10" });
 */
 "
 `;
@@ -231,19 +255,23 @@ exports[`Integration > Feature #945: should have configurable treatment of optio
   opt: string;
 };
 
+type PostV1TestWithDashesPositiveResponse = {
+  status: "success";
+  data: {
+    similar: number;
+  };
+};
+
+type PostV1TestWithDashesNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1TestWithDashesResponse =
-  | {
-      status: "success";
-      data: {
-        similar: number;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1TestWithDashesPositiveResponse
+  | PostV1TestWithDashesNegativeResponse;
 
 export type Path = "/v1/test-with-dashes";
 
@@ -251,6 +279,14 @@ export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponse;
+}
+
+export interface NegativeResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesNegativeResponse;
 }
 
 export interface Response {
@@ -334,132 +370,7 @@ export const exampleImplementation: Implementation = async (
   return response[isJSON ? "json" : "text"]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
-*/
-"
-`;
-
-exports[`Integration > Feature #1411: Should split response type on demand 1`] = `
-"type PostV1TestInput = {
-  opt?: string | undefined;
-};
-
-type PostV1TestPositiveResponse = {
-  status: "success";
-  data: {
-    similar?: number | undefined;
-  };
-};
-
-type PostV1TestNegativeResponse = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
-
-type PostV1TestResponse =
-  | PostV1TestPositiveResponse
-  | PostV1TestNegativeResponse;
-
-export type Path = "/v1/test";
-
-export type Method = "get" | "post" | "put" | "delete" | "patch";
-
-export interface Input {
-  "post /v1/test": PostV1TestInput;
-}
-
-export interface PositiveResponse {
-  "post /v1/test": PostV1TestPositiveResponse;
-}
-
-export interface NegativeResponse {
-  "post /v1/test": PostV1TestNegativeResponse;
-}
-
-export interface Response {
-  "post /v1/test": PostV1TestResponse;
-}
-
-export type MethodPath = keyof Input;
-
-export const jsonEndpoints = { "post /v1/test": true };
-
-export const endpointTags = { "post /v1/test": [] };
-
-export type Implementation = (
-  method: Method,
-  path: string,
-  params: Record<string, any>,
-) => Promise<any>;
-
-export class ExpressZodAPIClient {
-  constructor(protected readonly implementation: Implementation) {}
-  /** @deprecated use the overload with 2 arguments instead */
-  public provide<M extends Method, P extends Path>(
-    method: M,
-    path: P,
-    params: \`\${M} \${P}\` extends keyof Input
-      ? Input[\`\${M} \${P}\`]
-      : Record<string, any>,
-  ): Promise<
-    \`\${M} \${P}\` extends keyof Response ? Response[\`\${M} \${P}\`] : unknown
-  >;
-  public provide<K extends MethodPath>(
-    request: K,
-    params: Input[K],
-  ): Promise<Response[K]>;
-  public provide(
-    ...args:
-      | [string, string, Record<string, any>]
-      | [string, Record<string, any>]
-  ) {
-    const [method, path, params] = (
-      args.length === 2 ? [...args[0].split(/ (.+)/, 2), args[1]] : args
-    ) as [Method, Path, Record<string, any>];
-    return this.implementation(
-      method,
-      Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
-        path,
-      ),
-      Object.keys(params).reduce(
-        (acc, key) =>
-          Object.assign(
-            acc,
-            !path.includes(\`:\${key}\`) && { [key]: params[key] },
-          ),
-        {},
-      ),
-    );
-  }
-}
-
-/** @deprecated will be removed in v22 */
-export type Provider = ExpressZodAPIClient["provide"];
-
-// Usage example:
-/*
-export const exampleImplementation: Implementation = async (
-  method,
-  path,
-  params,
-) => {
-  const hasBody = !["get", "delete"].includes(method);
-  const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
-  const response = await fetch(\`https://example.com\${path}\${searchParams}\`, {
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
-  const contentType = response.headers.get("content-type");
-  if (!contentType) return;
-  const isJSON = contentType.startsWith("application/json");
-  return response[isJSON ? "json" : "text"]();
-};
-const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
+client.provide("get /v1/user/retrieve", { id: "10" });
 */
 "
 `;
@@ -523,31 +434,41 @@ type GetV1UserRetrieveInput = {
   id: string;
 };
 
+type GetV1UserRetrievePositiveResponse = {
+  status: "success";
+  data: {
+    id: number;
+    name: string;
+    features: {
+      title: string;
+      features: Type1;
+    }[];
+  };
+};
+
+type GetV1UserRetrieveNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type GetV1UserRetrieveResponse =
-  | {
-      status: "success";
-      data: {
-        id: number;
-        name: string;
-        features: {
-          title: string;
-          features: Type1;
-        }[];
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | GetV1UserRetrievePositiveResponse
+  | GetV1UserRetrieveNegativeResponse;
 
 type DeleteV1UserIdRemoveInput = {
   /** numeric string */
   id: string;
 };
 
-type DeleteV1UserIdRemoveResponse = undefined;
+type DeleteV1UserIdRemovePositiveResponse = undefined;
+
+type DeleteV1UserIdRemoveNegativeResponse = undefined;
+
+type DeleteV1UserIdRemoveResponse =
+  | DeleteV1UserIdRemovePositiveResponse
+  | DeleteV1UserIdRemoveNegativeResponse;
 
 type PatchV1UserIdInput = {
   key: string;
@@ -556,100 +477,131 @@ type PatchV1UserIdInput = {
   birthday: string;
 };
 
+type PatchV1UserIdPositiveResponse = {
+  status: "success";
+  data: {
+    name: string;
+    createdAt: string;
+  };
+};
+
+type PatchV1UserIdNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PatchV1UserIdResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        createdAt: string;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PatchV1UserIdPositiveResponse
+  | PatchV1UserIdNegativeResponse;
 
 type PostV1UserCreateInput = {
   name: string;
 };
 
-type PostV1UserCreateResponse =
+type PostV1UserCreatePositiveResponse = {
+  status: "created";
+  data: {
+    id: number;
+  };
+};
+
+type PostV1UserCreateNegativeResponse =
   | {
-      status: "created";
-      data: {
-        id: number;
-      };
+      status: "exists";
+      id: number;
     }
-  | (
-      | {
-          status: "exists";
-          id: number;
-        }
-      | {
-          status: "error";
-          reason: string;
-        }
-    );
+  | {
+      status: "error";
+      reason: string;
+    };
+
+type PostV1UserCreateResponse =
+  | PostV1UserCreatePositiveResponse
+  | PostV1UserCreateNegativeResponse;
 
 type GetV1UserListInput = {};
 
+type GetV1UserListPositiveResponse = {
+  name: string;
+}[];
+
+type GetV1UserListNegativeResponse = string;
+
 type GetV1UserListResponse =
-  | {
-      name: string;
-    }[]
-  | string;
+  | GetV1UserListPositiveResponse
+  | GetV1UserListNegativeResponse;
 
 type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendResponse = string;
+type GetV1AvatarSendPositiveResponse = string;
+
+type GetV1AvatarSendNegativeResponse = string;
+
+type GetV1AvatarSendResponse =
+  | GetV1AvatarSendPositiveResponse
+  | GetV1AvatarSendNegativeResponse;
 
 type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-type GetV1AvatarStreamResponse = Buffer | string;
+type GetV1AvatarStreamPositiveResponse = Buffer;
+
+type GetV1AvatarStreamNegativeResponse = string;
+
+type GetV1AvatarStreamResponse =
+  | GetV1AvatarStreamPositiveResponse
+  | GetV1AvatarStreamNegativeResponse;
 
 type PostV1AvatarUploadInput = {
   avatar: any;
 };
 
+type PostV1AvatarUploadPositiveResponse = {
+  status: "success";
+  data: {
+    name: string;
+    size: number;
+    mime: string;
+    hash: string;
+    otherInputs: Record<string, any>;
+  };
+};
+
+type PostV1AvatarUploadNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1AvatarUploadResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        size: number;
-        mime: string;
-        hash: string;
-        otherInputs: Record<string, any>;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1AvatarUploadPositiveResponse
+  | PostV1AvatarUploadNegativeResponse;
 
 type PostV1AvatarRawInput = Buffer;
 
+type PostV1AvatarRawPositiveResponse = {
+  status: "success";
+  data: {
+    length: number;
+  };
+};
+
+type PostV1AvatarRawNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1AvatarRawResponse =
-  | {
-      status: "success";
-      data: {
-        length: number;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1AvatarRawPositiveResponse
+  | PostV1AvatarRawNegativeResponse;
 
 export type Path =
   | "/v1/user/retrieve"
@@ -674,6 +626,30 @@ export interface Input {
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
   "post /v1/avatar/raw": PostV1AvatarRawInput;
+}
+
+export interface PositiveResponse {
+  "get /v1/user/retrieve": GetV1UserRetrievePositiveResponse;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemovePositiveResponse;
+  "patch /v1/user/:id": PatchV1UserIdPositiveResponse;
+  "post /v1/user/create": PostV1UserCreatePositiveResponse;
+  "get /v1/user/list": GetV1UserListPositiveResponse;
+  "get /v1/avatar/send": GetV1AvatarSendPositiveResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadPositiveResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawPositiveResponse;
+}
+
+export interface NegativeResponse {
+  "get /v1/user/retrieve": GetV1UserRetrieveNegativeResponse;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemoveNegativeResponse;
+  "patch /v1/user/:id": PatchV1UserIdNegativeResponse;
+  "post /v1/user/create": PostV1UserCreateNegativeResponse;
+  "get /v1/user/list": GetV1UserListNegativeResponse;
+  "get /v1/avatar/send": GetV1AvatarSendNegativeResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamNegativeResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadNegativeResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawNegativeResponse;
 }
 
 export interface Response {
@@ -782,7 +758,7 @@ export const exampleImplementation: Implementation = async (
   return response[isJSON ? "json" : "text"]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
+client.provide("get /v1/user/retrieve", { id: "10" });
 */
 "
 `;
@@ -798,31 +774,41 @@ type GetV1UserRetrieveInput = {
   id: string;
 };
 
+type GetV1UserRetrievePositiveResponse = {
+  status: "success";
+  data: {
+    id: number;
+    name: string;
+    features: {
+      title: string;
+      features: Type1;
+    }[];
+  };
+};
+
+type GetV1UserRetrieveNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type GetV1UserRetrieveResponse =
-  | {
-      status: "success";
-      data: {
-        id: number;
-        name: string;
-        features: {
-          title: string;
-          features: Type1;
-        }[];
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | GetV1UserRetrievePositiveResponse
+  | GetV1UserRetrieveNegativeResponse;
 
 type DeleteV1UserIdRemoveInput = {
   /** numeric string */
   id: string;
 };
 
-type DeleteV1UserIdRemoveResponse = undefined;
+type DeleteV1UserIdRemovePositiveResponse = undefined;
+
+type DeleteV1UserIdRemoveNegativeResponse = undefined;
+
+type DeleteV1UserIdRemoveResponse =
+  | DeleteV1UserIdRemovePositiveResponse
+  | DeleteV1UserIdRemoveNegativeResponse;
 
 type PatchV1UserIdInput = {
   key: string;
@@ -831,100 +817,131 @@ type PatchV1UserIdInput = {
   birthday: string;
 };
 
+type PatchV1UserIdPositiveResponse = {
+  status: "success";
+  data: {
+    name: string;
+    createdAt: string;
+  };
+};
+
+type PatchV1UserIdNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PatchV1UserIdResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        createdAt: string;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PatchV1UserIdPositiveResponse
+  | PatchV1UserIdNegativeResponse;
 
 type PostV1UserCreateInput = {
   name: string;
 };
 
-type PostV1UserCreateResponse =
+type PostV1UserCreatePositiveResponse = {
+  status: "created";
+  data: {
+    id: number;
+  };
+};
+
+type PostV1UserCreateNegativeResponse =
   | {
-      status: "created";
-      data: {
-        id: number;
-      };
+      status: "exists";
+      id: number;
     }
-  | (
-      | {
-          status: "exists";
-          id: number;
-        }
-      | {
-          status: "error";
-          reason: string;
-        }
-    );
+  | {
+      status: "error";
+      reason: string;
+    };
+
+type PostV1UserCreateResponse =
+  | PostV1UserCreatePositiveResponse
+  | PostV1UserCreateNegativeResponse;
 
 type GetV1UserListInput = {};
 
+type GetV1UserListPositiveResponse = {
+  name: string;
+}[];
+
+type GetV1UserListNegativeResponse = string;
+
 type GetV1UserListResponse =
-  | {
-      name: string;
-    }[]
-  | string;
+  | GetV1UserListPositiveResponse
+  | GetV1UserListNegativeResponse;
 
 type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendResponse = string;
+type GetV1AvatarSendPositiveResponse = string;
+
+type GetV1AvatarSendNegativeResponse = string;
+
+type GetV1AvatarSendResponse =
+  | GetV1AvatarSendPositiveResponse
+  | GetV1AvatarSendNegativeResponse;
 
 type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-type GetV1AvatarStreamResponse = Buffer | string;
+type GetV1AvatarStreamPositiveResponse = Buffer;
+
+type GetV1AvatarStreamNegativeResponse = string;
+
+type GetV1AvatarStreamResponse =
+  | GetV1AvatarStreamPositiveResponse
+  | GetV1AvatarStreamNegativeResponse;
 
 type PostV1AvatarUploadInput = {
   avatar: any;
 };
 
+type PostV1AvatarUploadPositiveResponse = {
+  status: "success";
+  data: {
+    name: string;
+    size: number;
+    mime: string;
+    hash: string;
+    otherInputs: Record<string, any>;
+  };
+};
+
+type PostV1AvatarUploadNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1AvatarUploadResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        size: number;
-        mime: string;
-        hash: string;
-        otherInputs: Record<string, any>;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1AvatarUploadPositiveResponse
+  | PostV1AvatarUploadNegativeResponse;
 
 type PostV1AvatarRawInput = Buffer;
 
+type PostV1AvatarRawPositiveResponse = {
+  status: "success";
+  data: {
+    length: number;
+  };
+};
+
+type PostV1AvatarRawNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1AvatarRawResponse =
-  | {
-      status: "success";
-      data: {
-        length: number;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1AvatarRawPositiveResponse
+  | PostV1AvatarRawNegativeResponse;
 
 export type Path =
   | "/v1/user/retrieve"
@@ -949,6 +966,30 @@ export interface Input {
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
   "post /v1/avatar/raw": PostV1AvatarRawInput;
+}
+
+export interface PositiveResponse {
+  "get /v1/user/retrieve": GetV1UserRetrievePositiveResponse;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemovePositiveResponse;
+  "patch /v1/user/:id": PatchV1UserIdPositiveResponse;
+  "post /v1/user/create": PostV1UserCreatePositiveResponse;
+  "get /v1/user/list": GetV1UserListPositiveResponse;
+  "get /v1/avatar/send": GetV1AvatarSendPositiveResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadPositiveResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawPositiveResponse;
+}
+
+export interface NegativeResponse {
+  "get /v1/user/retrieve": GetV1UserRetrieveNegativeResponse;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemoveNegativeResponse;
+  "patch /v1/user/:id": PatchV1UserIdNegativeResponse;
+  "post /v1/user/create": PostV1UserCreateNegativeResponse;
+  "get /v1/user/list": GetV1UserListNegativeResponse;
+  "get /v1/avatar/send": GetV1AvatarSendNegativeResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamNegativeResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadNegativeResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawNegativeResponse;
 }
 
 export interface Response {
@@ -1021,19 +1062,23 @@ exports[`Integration > Should treat optionals the same way as z.infer() by defau
   opt?: string | undefined;
 };
 
+type PostV1TestWithDashesPositiveResponse = {
+  status: "success";
+  data: {
+    similar?: number | undefined;
+  };
+};
+
+type PostV1TestWithDashesNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1TestWithDashesResponse =
-  | {
-      status: "success";
-      data: {
-        similar?: number | undefined;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1TestWithDashesPositiveResponse
+  | PostV1TestWithDashesNegativeResponse;
 
 export type Path = "/v1/test-with-dashes";
 
@@ -1041,6 +1086,14 @@ export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponse;
+}
+
+export interface NegativeResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesNegativeResponse;
 }
 
 export interface Response {
@@ -1124,7 +1177,7 @@ export const exampleImplementation: Implementation = async (
   return response[isJSON ? "json" : "text"]();
 };
 const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
+client.provide("get /v1/user/retrieve", { id: "10" });
 */
 "
 `;
