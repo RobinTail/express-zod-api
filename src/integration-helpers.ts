@@ -139,6 +139,12 @@ export const makePublicClass = (
     ...statements,
   ]);
 
+export const makeKeyOf = (id: ts.Identifier) =>
+  f.createTypeOperatorNode(
+    ts.SyntaxKind.KeyOfKeyword,
+    f.createTypeReferenceNode(id),
+  );
+
 export const makePromise = (subject: ts.TypeNode | "any") =>
   f.createTypeReferenceNode(Promise.name, [
     subject === "any"

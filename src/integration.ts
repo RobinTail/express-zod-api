@@ -27,6 +27,7 @@ import {
   makeAnd,
   makeTemplate,
   makeNew,
+  makeKeyOf,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -274,10 +275,7 @@ export class Integration {
     this.program.push(
       makePublicType(
         this.ids.methodPathType,
-        f.createTypeOperatorNode(
-          ts.SyntaxKind.KeyOfKeyword,
-          f.createTypeReferenceNode(this.ids.inputInterface),
-        ),
+        makeKeyOf(this.ids.inputInterface),
       ),
     );
 
@@ -368,7 +366,7 @@ export class Integration {
       f.createObjectLiteralExpression(),
     );
 
-    // public provide<K extends keyof Input>(request: K, params: Input[K]): Promise<Response[K]> {
+    // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {
     const providerMethod = makePublicMethod(
       this.ids.provideMethod,
       makeParams({
