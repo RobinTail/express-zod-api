@@ -2,7 +2,6 @@ import { keys } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { defaultStatusCodes, ResponseVariant } from "./api-response";
-import { AbstractEndpoint } from "./endpoint";
 import {
   emptyTail,
   exportModifier,
@@ -176,28 +175,6 @@ export class Integration {
     return f.createTypeReferenceNode(name);
   }
 
-  protected splitResponse(
-    method: Method,
-    path: string,
-    kind: ResponseVariant,
-    endpoint: AbstractEndpoint,
-    fallback: z.ZodType,
-    ctx: Parameters<typeof zodToTs>[1],
-  ) {
-    const variants: ts.TypeAliasDeclaration[] = [];
-    const props: ts.PropertySignature[] = [];
-    for (const [idx, { schema, mimeTypes, statusCodes }] of endpoint
-      .getResponses(kind)
-      .entries()) {
-      const variant = zodToTs(mimeTypes ? schema : fallback, ctx);
-      const variantId = makeCleanId(method, path, kind, "variant", `${idx}`);
-      variants.push(createTypeAlias(variant, variantId));
-      for (const statusCode of statusCodes)
-        props.push(makeInterfaceProp(statusCode, variantId));
-    }
-    return [props, variants] as const;
-  }
-
   public constructor({
     routing,
     brandHandling,
@@ -237,15 +214,23 @@ export class Integration {
 
         // @todo name
         for (const rv of this.responseVariants) {
-          // @todo maybe no need to the method
-          const [props, variants] = this.splitResponse(
-            method,
-            path,
-            rv,
-            endpoint,
-            noContent,
-            ctxOut,
-          );
+          const variants: ts.TypeAliasDeclaration[] = [];
+          const props: ts.PropertySignature[] = [];
+          for (const [idx, { schema, mimeTypes, statusCodes }] of endpoint
+            .getResponses(rv)
+            .entries()) {
+            const variant = zodToTs(mimeTypes ? schema : noContent, ctxOut);
+            const variantId = makeCleanId(
+              method,
+              path,
+              rv,
+              "variant",
+              `${idx}`,
+            );
+            variants.push(createTypeAlias(variant, variantId));
+            for (const statusCode of statusCodes)
+              props.push(makeInterfaceProp(statusCode, variantId));
+          }
           const variantsTypeId = f.createIdentifier(
             makeCleanId(method, path, rv, "response.variants"),
           );
