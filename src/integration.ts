@@ -51,11 +51,6 @@ interface IntegrationParams {
    * */
   variant?: "types" | "client";
   /**
-   * @todo remove in v22
-   * @deprecated
-   * */
-  splitResponse?: boolean;
-  /**
    * @desc configures the style of object's optional properties
    * @default { withQuestionMark: true, withUndefined: true }
    */
