@@ -26,9 +26,9 @@ const queries: Record<Query, string> = {
   splitResponse: `${NT.NewExpression}[callee.name='Integration'] > ${NT.ObjectExpression} > ${NT.Property}[key.name='splitResponse']`,
 };
 
-const makeQuery = <K extends Query>(
+const listen = <K extends Query>(
   key: K,
-  fn: (node: Queries[K]) => void,
+  fn: TSESLint.RuleFunction<Queries[K]>,
 ) => ({ [queries[key]]: fn });
 
 const v22 = ESLintUtils.RuleCreator.withoutDocs({
@@ -43,7 +43,7 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
   },
   defaultOptions: [],
   create: (ctx) => ({
-    ...makeQuery("provide", (node) => {
+    ...listen("provide", (node) => {
       const {
         arguments: [method, path],
       } = node;
@@ -60,7 +60,7 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
           fixer.replaceTextRange([method.range[0], path.range[1]], request),
       });
     }),
-    ...makeQuery("splitResponse", (node) => {
+    ...listen("splitResponse", (node) => {
       ctx.report({
         messageId: "remove",
         node,
