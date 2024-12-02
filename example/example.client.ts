@@ -8,31 +8,41 @@ type GetV1UserRetrieveInput = {
   id: string;
 };
 
+type GetV1UserRetrievePositiveResponse = {
+  status: "success";
+  data: {
+    id: number;
+    name: string;
+    features: {
+      title: string;
+      features: Type1;
+    }[];
+  };
+};
+
+type GetV1UserRetrieveNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type GetV1UserRetrieveResponse =
-  | {
-      status: "success";
-      data: {
-        id: number;
-        name: string;
-        features: {
-          title: string;
-          features: Type1;
-        }[];
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | GetV1UserRetrievePositiveResponse
+  | GetV1UserRetrieveNegativeResponse;
 
 type DeleteV1UserIdRemoveInput = {
   /** numeric string */
   id: string;
 };
 
-type DeleteV1UserIdRemoveResponse = undefined;
+type DeleteV1UserIdRemovePositiveResponse = undefined;
+
+type DeleteV1UserIdRemoveNegativeResponse = undefined;
+
+type DeleteV1UserIdRemoveResponse =
+  | DeleteV1UserIdRemovePositiveResponse
+  | DeleteV1UserIdRemoveNegativeResponse;
 
 type PatchV1UserIdInput = {
   key: string;
@@ -41,100 +51,131 @@ type PatchV1UserIdInput = {
   birthday: string;
 };
 
+type PatchV1UserIdPositiveResponse = {
+  status: "success";
+  data: {
+    name: string;
+    createdAt: string;
+  };
+};
+
+type PatchV1UserIdNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PatchV1UserIdResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        createdAt: string;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PatchV1UserIdPositiveResponse
+  | PatchV1UserIdNegativeResponse;
 
 type PostV1UserCreateInput = {
   name: string;
 };
 
-type PostV1UserCreateResponse =
+type PostV1UserCreatePositiveResponse = {
+  status: "created";
+  data: {
+    id: number;
+  };
+};
+
+type PostV1UserCreateNegativeResponse =
   | {
-      status: "created";
-      data: {
-        id: number;
-      };
+      status: "exists";
+      id: number;
     }
-  | (
-      | {
-          status: "exists";
-          id: number;
-        }
-      | {
-          status: "error";
-          reason: string;
-        }
-    );
+  | {
+      status: "error";
+      reason: string;
+    };
+
+type PostV1UserCreateResponse =
+  | PostV1UserCreatePositiveResponse
+  | PostV1UserCreateNegativeResponse;
 
 type GetV1UserListInput = {};
 
+type GetV1UserListPositiveResponse = {
+  name: string;
+}[];
+
+type GetV1UserListNegativeResponse = string;
+
 type GetV1UserListResponse =
-  | {
-      name: string;
-    }[]
-  | string;
+  | GetV1UserListPositiveResponse
+  | GetV1UserListNegativeResponse;
 
 type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendResponse = string;
+type GetV1AvatarSendPositiveResponse = string;
+
+type GetV1AvatarSendNegativeResponse = string;
+
+type GetV1AvatarSendResponse =
+  | GetV1AvatarSendPositiveResponse
+  | GetV1AvatarSendNegativeResponse;
 
 type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-type GetV1AvatarStreamResponse = Buffer | string;
+type GetV1AvatarStreamPositiveResponse = Buffer;
+
+type GetV1AvatarStreamNegativeResponse = string;
+
+type GetV1AvatarStreamResponse =
+  | GetV1AvatarStreamPositiveResponse
+  | GetV1AvatarStreamNegativeResponse;
 
 type PostV1AvatarUploadInput = {
   avatar: any;
 };
 
+type PostV1AvatarUploadPositiveResponse = {
+  status: "success";
+  data: {
+    name: string;
+    size: number;
+    mime: string;
+    hash: string;
+    otherInputs: Record<string, any>;
+  };
+};
+
+type PostV1AvatarUploadNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1AvatarUploadResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        size: number;
-        mime: string;
-        hash: string;
-        otherInputs: Record<string, any>;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1AvatarUploadPositiveResponse
+  | PostV1AvatarUploadNegativeResponse;
 
 type PostV1AvatarRawInput = Buffer;
 
+type PostV1AvatarRawPositiveResponse = {
+  status: "success";
+  data: {
+    length: number;
+  };
+};
+
+type PostV1AvatarRawNegativeResponse = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
 type PostV1AvatarRawResponse =
-  | {
-      status: "success";
-      data: {
-        length: number;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+  | PostV1AvatarRawPositiveResponse
+  | PostV1AvatarRawNegativeResponse;
 
 export type Path =
   | "/v1/user/retrieve"
@@ -159,6 +200,30 @@ export interface Input {
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
   "post /v1/avatar/raw": PostV1AvatarRawInput;
+}
+
+export interface PositiveResponse {
+  "get /v1/user/retrieve": GetV1UserRetrievePositiveResponse;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemovePositiveResponse;
+  "patch /v1/user/:id": PatchV1UserIdPositiveResponse;
+  "post /v1/user/create": PostV1UserCreatePositiveResponse;
+  "get /v1/user/list": GetV1UserListPositiveResponse;
+  "get /v1/avatar/send": GetV1AvatarSendPositiveResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadPositiveResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawPositiveResponse;
+}
+
+export interface NegativeResponse {
+  "get /v1/user/retrieve": GetV1UserRetrieveNegativeResponse;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemoveNegativeResponse;
+  "patch /v1/user/:id": PatchV1UserIdNegativeResponse;
+  "post /v1/user/create": PostV1UserCreateNegativeResponse;
+  "get /v1/user/list": GetV1UserListNegativeResponse;
+  "get /v1/avatar/send": GetV1AvatarSendNegativeResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamNegativeResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadNegativeResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawNegativeResponse;
 }
 
 export interface Response {
