@@ -212,18 +212,17 @@ export class Integration {
         const input = zodToTs(endpoint.getSchema("input"), ctxIn);
         this.program.push(createTypeAlias(input, inputId));
 
-        // @todo name
-        for (const rv of this.responseVariants) {
+        for (const responseVariant of this.responseVariants) {
           const variants: ts.TypeAliasDeclaration[] = [];
           const props: ts.PropertySignature[] = [];
           for (const [idx, { schema, mimeTypes, statusCodes }] of endpoint
-            .getResponses(rv)
+            .getResponses(responseVariant)
             .entries()) {
             const variant = zodToTs(mimeTypes ? schema : noContent, ctxOut);
             const variantId = makeCleanId(
               method,
               path,
-              rv,
+              responseVariant,
               "variant",
               `${idx}`,
             );
@@ -232,7 +231,7 @@ export class Integration {
               props.push(makeInterfaceProp(statusCode, variantId));
           }
           const variantsTypeId = f.createIdentifier(
-            makeCleanId(method, path, rv, "response.variants"),
+            makeCleanId(method, path, responseVariant, "response.variants"),
           );
           const dict = makePublicInterface(variantsTypeId, props);
           const whole = f.createTypeReferenceNode(this.ids.someOfType, [
@@ -243,7 +242,9 @@ export class Integration {
             dict,
             createTypeAlias(
               whole,
-              rv === "positive" ? positiveResponseId : negativeResponseId, // @todo fix this nonsense
+              responseVariant === "positive" // @todo fix this nonsense
+                ? positiveResponseId
+                : negativeResponseId,
             ),
           );
         }
