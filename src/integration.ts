@@ -60,8 +60,8 @@ interface IntegrationParams {
    * */
   variant?: "types" | "client";
   /**
-   * @desc Declares positive and negative response types separately and provides them within additional dictionaries
-   * @default false
+   * @todo remove in v22
+   * @deprecated
    * */
   splitResponse?: boolean;
   /**
@@ -175,71 +175,44 @@ export class Integration {
     routing,
     brandHandling,
     variant = "client",
-    splitResponse = false,
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
   }: IntegrationParams) {
+    const commons = { makeAlias: this.makeAlias.bind(this), optionalPropStyle };
+    const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
+    const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
-        const commons = {
-          makeAlias: this.makeAlias.bind(this),
-          optionalPropStyle,
-        };
-        const inputId = makeCleanId(method, path, "input");
-        const input = zodToTs(endpoint.getSchema("input"), {
-          brandHandling,
-          ctx: { ...commons, isResponse: false },
-        });
-        const positiveResponseId = splitResponse
-          ? makeCleanId(method, path, "positive.response")
-          : undefined;
+        const [
+          inputId,
+          positiveResponseId,
+          negativeResponseId,
+          genericResponseId,
+        ] = ["input", "positive.response", "negative.response", "response"].map(
+          (name) => makeCleanId(method, path, name),
+        );
+        const input = zodToTs(endpoint.getSchema("input"), ctxIn);
         const positiveSchema = endpoint
           .getResponses("positive")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const positiveResponse = splitResponse
-          ? zodToTs(positiveSchema, {
-              brandHandling,
-              ctx: { ...commons, isResponse: true },
-            })
-          : undefined;
-        const negativeResponseId = splitResponse
-          ? makeCleanId(method, path, "negative.response")
-          : undefined;
+        const positiveResponse = zodToTs(positiveSchema, ctxOut);
         const negativeSchema = endpoint
           .getResponses("negative")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const negativeResponse = splitResponse
-          ? zodToTs(negativeSchema, {
-              brandHandling,
-              ctx: { ...commons, isResponse: true },
-            })
-          : undefined;
-        const genericResponseId = makeCleanId(method, path, "response");
-        const genericResponse =
-          positiveResponseId && negativeResponseId
-            ? f.createUnionTypeNode([
-                f.createTypeReferenceNode(positiveResponseId),
-                f.createTypeReferenceNode(negativeResponseId),
-              ])
-            : zodToTs(positiveSchema.or(negativeSchema), {
-                brandHandling,
-                ctx: { ...commons, isResponse: true },
-              });
-        this.program.push(createTypeAlias(input, inputId));
-        if (positiveResponse && positiveResponseId) {
-          this.program.push(
-            createTypeAlias(positiveResponse, positiveResponseId),
-          );
-        }
-        if (negativeResponse && negativeResponseId) {
-          this.program.push(
-            createTypeAlias(negativeResponse, negativeResponseId),
-          );
-        }
-        this.program.push(createTypeAlias(genericResponse, genericResponseId));
+        const negativeResponse = zodToTs(negativeSchema, ctxOut);
+        const genericResponse = f.createUnionTypeNode([
+          f.createTypeReferenceNode(positiveResponseId),
+          f.createTypeReferenceNode(negativeResponseId),
+        ]);
+        this.program.push(
+          createTypeAlias(input, inputId),
+          createTypeAlias(positiveResponse, positiveResponseId),
+          createTypeAlias(negativeResponse, negativeResponseId),
+          createTypeAlias(genericResponse, genericResponseId),
+        );
         this.paths.push(path);
         this.registry.set(
           { method, path },
@@ -267,22 +240,20 @@ export class Integration {
     // export type Method = "get" | "post" | "put" | "delete" | "patch";
     this.program.push(makePublicLiteralType(this.ids.methodType, methods));
 
-    this.interfaces.push({
-      id: this.ids.inputInterface,
-      kind: "input",
-      props: [],
-    });
-    if (splitResponse) {
-      this.interfaces.push(
-        { id: this.ids.posResponseInterface, kind: "positive", props: [] },
-        { id: this.ids.negResponseInterface, kind: "negative", props: [] },
-      );
-    }
-    this.interfaces.push({
-      id: this.ids.responseInterface,
-      kind: "response",
-      props: [],
-    });
+    this.interfaces.push(
+      {
+        id: this.ids.inputInterface,
+        kind: "input",
+        props: [],
+      },
+      { id: this.ids.posResponseInterface, kind: "positive", props: [] },
+      { id: this.ids.negResponseInterface, kind: "negative", props: [] },
+      {
+        id: this.ids.responseInterface,
+        kind: "response",
+        props: [],
+      },
+    );
 
     // Single walk through the registry for making properties for the next three objects
     const jsonEndpoints: ts.PropertyAssignment[] = [];

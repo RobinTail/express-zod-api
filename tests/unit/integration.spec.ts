@@ -62,27 +62,6 @@ describe("Integration", () => {
     },
   );
 
-  test("Feature #1411: Should split response type on demand", async () => {
-    const client = new Integration({
-      splitResponse: true,
-      routing: {
-        v1: {
-          test: defaultEndpointsFactory.build({
-            method: "post",
-            input: z.object({
-              opt: z.string().optional(),
-            }),
-            output: z.object({
-              similar: z.number().optional(),
-            }),
-            handler: async () => ({}),
-          }),
-        },
-      },
-    });
-    expect(await client.printFormatted()).toMatchSnapshot();
-  });
-
   test("Should support multiple response schemas depending on status code", async () => {
     const factory = new EndpointsFactory(
       new ResultHandler({
@@ -104,7 +83,6 @@ describe("Integration", () => {
       }),
     );
     const client = new Integration({
-      splitResponse: true,
       variant: "types",
       routing: {
         v1: {
@@ -127,7 +105,6 @@ describe("Integration", () => {
         { next },
       ) => next(schema.unwrap());
       const client = new Integration({
-        splitResponse: true,
         variant: "types",
         brandHandling: {
           CUSTOM: () =>
