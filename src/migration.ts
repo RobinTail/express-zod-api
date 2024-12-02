@@ -69,14 +69,13 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
             fixer.replaceTextRange([method.range[0], path.range[1]], request),
         });
       },
-      splitResponse: (node) => {
+      splitResponse: (node) =>
         ctx.report({
           messageId: "remove",
           node,
           data: { subject: "property", name: node.key.name },
           fix: (fixer) => fixer.remove(node),
-        });
-      },
+        }),
     }),
 });
 
