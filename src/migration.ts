@@ -17,19 +17,27 @@ interface Queries {
   splitResponse: TSESTree.Property & { key: TSESTree.Identifier };
 }
 
-type Query = keyof Queries;
+type Listener = keyof Queries;
 
-const queries: Record<Query, string> = {
+const queries: Record<Listener, string> = {
   provide:
     `${NT.CallExpression}[callee.property.name='provide'][arguments.length=3]` +
     `:has(${NT.Literal}[value=/^${methods.join("|")}$/] + ${NT.Literal} + ${NT.ObjectExpression})`,
   splitResponse: `${NT.NewExpression}[callee.name='Integration'] > ${NT.ObjectExpression} > ${NT.Property}[key.name='splitResponse']`,
 };
 
-const listen = <K extends Query>(
-  key: K,
-  fn: TSESLint.RuleFunction<Queries[K]>,
-) => ({ [queries[key]]: fn });
+const listen = <
+  S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
+>(
+  subject: S,
+) =>
+  (Object.keys(subject) as Listener[]).reduce<{ [K: string]: S[Listener] }>(
+    (agg, key) =>
+      Object.assign(agg, {
+        [queries[key]]: subject[key],
+      }),
+    {},
+  );
 
 const v22 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
@@ -42,33 +50,34 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
     },
   },
   defaultOptions: [],
-  create: (ctx) => ({
-    ...listen("provide", (node) => {
-      const {
-        arguments: [method, path],
-      } = node;
-      const request = `"${method.value} ${path.value}"`;
-      ctx.report({
-        messageId: "change",
-        node,
-        data: {
-          subject: "arguments",
-          from: `"${method.value}", "${path.value}"`,
-          to: request,
-        },
-        fix: (fixer) =>
-          fixer.replaceTextRange([method.range[0], path.range[1]], request),
-      });
+  create: (ctx) =>
+    listen({
+      provide: (node) => {
+        const {
+          arguments: [method, path],
+        } = node;
+        const request = `"${method.value} ${path.value}"`;
+        ctx.report({
+          messageId: "change",
+          node,
+          data: {
+            subject: "arguments",
+            from: `"${method.value}", "${path.value}"`,
+            to: request,
+          },
+          fix: (fixer) =>
+            fixer.replaceTextRange([method.range[0], path.range[1]], request),
+        });
+      },
+      splitResponse: (node) => {
+        ctx.report({
+          messageId: "remove",
+          node,
+          data: { subject: "property", name: node.key.name },
+          fix: (fixer) => fixer.remove(node),
+        });
+      },
     }),
-    ...listen("splitResponse", (node) => {
-      ctx.report({
-        messageId: "remove",
-        node,
-        data: { subject: "property", name: node.key.name },
-        fix: (fixer) => fixer.remove(node),
-      });
-    }),
-  }),
 });
 
 /**
