@@ -96,7 +96,7 @@ export class Integration {
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
     { method: Method; path: string },
-    Partial<Record<IOKind, string>> & {
+    Record<IOKind, string> & {
       isJson: boolean;
       tags: ReadonlyArray<string>;
     }
@@ -244,10 +244,8 @@ export class Integration {
     for (const [{ method, path }, { isJson, tags, ...rest }] of this.registry) {
       const propName = quoteProp(method, path);
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
-      for (const face of this.interfaces) {
-        if (face.kind in rest)
-          face.props.push(makeInterfaceProp(propName, rest[face.kind]!));
-      }
+      for (const face of this.interfaces)
+        face.props.push(makeInterfaceProp(propName, rest[face.kind]));
       if (variant !== "types") {
         if (isJson) {
           // "get /v1/user/retrieve": true
