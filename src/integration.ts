@@ -110,11 +110,8 @@ export class Integration {
   protected program: ts.Node[] = [];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
-    { method: Method; path: string },
-    Record<IOKind, string> & {
-      isJson: boolean;
-      tags: ReadonlyArray<string>;
-    }
+    ReturnType<typeof quoteProp>, // method+path
+    Record<IOKind, string> & { isJson: boolean; tags: ReadonlyArray<string> }
   >();
   protected paths: string[] = [];
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
@@ -255,21 +252,17 @@ export class Integration {
         ]);
         this.program.push(createTypeAlias(genericResponse, genericResponseId));
         this.paths.push(path);
-        this.registry.set(
-          { method, path },
-          {
-            input: inputId,
-            positive: positiveResponseId,
-            negative: negativeResponseId,
-            response: genericResponseId,
-            isJson: endpoint
-              .getResponses("positive")
-              .some((response) =>
-                response.mimeTypes?.includes(contentTypes.json),
-              ),
-            tags: endpoint.getTags(),
-          },
-        );
+        const isJson = endpoint
+          .getResponses("positive")
+          .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
+        this.registry.set(quoteProp(method, path), {
+          input: inputId,
+          positive: positiveResponseId,
+          negative: negativeResponseId,
+          response: genericResponseId,
+          tags: endpoint.getTags(),
+          isJson,
+        });
       },
     });
 
@@ -299,8 +292,7 @@ export class Integration {
     // Single walk through the registry for making properties for the next three objects
     const jsonEndpoints: ts.PropertyAssignment[] = [];
     const endpointTags: ts.PropertyAssignment[] = [];
-    for (const [{ method, path }, { isJson, tags, ...rest }] of this.registry) {
-      const propName = quoteProp(method, path);
+    for (const [propName, { isJson, tags, ...rest }] of this.registry) {
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
       for (const face of this.interfaces)
         face.props.push(makeInterfaceProp(propName, rest[face.kind]));
