@@ -205,9 +205,8 @@ export class Integration {
           (agg, responseVariant) => {
             const variants: ts.TypeAliasDeclaration[] = [];
             const props: ts.PropertySignature[] = [];
-            for (const [idx, { schema, mimeTypes, statusCodes }] of endpoint
-              .getResponses(responseVariant)
-              .entries()) {
+            const responses = endpoint.getResponses(responseVariant).entries();
+            for (const [idx, { schema, mimeTypes, statusCodes }] of responses) {
               const variantType = makeType(
                 entitle(responseVariant, "variant", `${idx + 1}`),
                 zodToTs(mimeTypes ? schema : noContent, ctxOut),
