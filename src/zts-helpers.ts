@@ -26,6 +26,7 @@ export const addJsDocComment = <T extends ts.Node>(node: T, text: string) =>
     true,
   );
 
+// @todo deduplicate with makePublicType() integration helper
 export const createTypeAlias = (
   node: ts.TypeNode,
   name: string,
