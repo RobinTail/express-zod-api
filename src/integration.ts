@@ -45,7 +45,7 @@ import { zodToTs } from "./zts";
 import { ZTSContext, printNode, addJsDocComment } from "./zts-helpers";
 import type Prettier from "prettier";
 
-type IOKind = "input" | "response" | ResponseVariant;
+type IOKind = "input" | "response" | ResponseVariant | "encoded";
 
 interface IntegrationParams {
   routing: Routing;
@@ -229,28 +229,39 @@ export class Integration {
               ]),
             );
             this.program.push(...variants, dict, whole);
-            return Object.assign(agg, { [responseVariant]: whole });
+            return Object.assign(agg, { [responseVariant]: { whole, dict } });
           },
-          {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
+          {} as Record<
+            ResponseVariant,
+            Record<"whole" | "dict", ts.TypeAliasDeclaration>
+          >,
         );
 
+        const encodedResponse = makeType(
+          entitle("encoded.response"),
+          f.createIntersectionTypeNode([
+            f.createTypeReferenceNode(refs.positive.dict.name.text),
+            f.createTypeReferenceNode(refs.negative.dict.name.text),
+          ]),
+        );
         const genericResponse = makeType(
           entitle("response"),
           f.createUnionTypeNode([
-            f.createTypeReferenceNode(refs.positive.name.text),
-            f.createTypeReferenceNode(refs.negative.name.text),
+            f.createTypeReferenceNode(refs.positive.whole.name.text),
+            f.createTypeReferenceNode(refs.negative.whole.name.text),
           ]),
         );
-        this.program.push(genericResponse);
+        this.program.push(encodedResponse, genericResponse);
         this.paths.push(path);
         const isJson = endpoint
           .getResponses("positive")
           .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
         this.registry.set(quoteProp(method, path), {
           input: input.name.text,
-          positive: refs.positive.name.text,
-          negative: refs.negative.name.text,
+          positive: refs.positive.whole.name.text,
+          negative: refs.negative.whole.name.text,
           response: genericResponse.name.text,
+          encoded: encodedResponse.name.text,
           tags: endpoint.getTags(),
           isJson,
         });

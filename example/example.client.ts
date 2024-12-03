@@ -43,6 +43,10 @@ interface GetV1UserRetrieveNegativeResponseVariants {
 type GetV1UserRetrieveNegativeResponse =
   SomeOf<GetV1UserRetrieveNegativeResponseVariants>;
 
+type GetV1UserRetrieveEncodedResponse =
+  GetV1UserRetrievePositiveResponseVariants &
+    GetV1UserRetrieveNegativeResponseVariants;
+
 type GetV1UserRetrieveResponse =
   | GetV1UserRetrievePositiveResponse
   | GetV1UserRetrieveNegativeResponse;
@@ -69,6 +73,10 @@ interface DeleteV1UserIdRemoveNegativeResponseVariants {
 
 type DeleteV1UserIdRemoveNegativeResponse =
   SomeOf<DeleteV1UserIdRemoveNegativeResponseVariants>;
+
+type DeleteV1UserIdRemoveEncodedResponse =
+  DeleteV1UserIdRemovePositiveResponseVariants &
+    DeleteV1UserIdRemoveNegativeResponseVariants;
 
 type DeleteV1UserIdRemoveResponse =
   | DeleteV1UserIdRemovePositiveResponse
@@ -109,6 +117,9 @@ interface PatchV1UserIdNegativeResponseVariants {
 
 type PatchV1UserIdNegativeResponse =
   SomeOf<PatchV1UserIdNegativeResponseVariants>;
+
+type PatchV1UserIdEncodedResponse = PatchV1UserIdPositiveResponseVariants &
+  PatchV1UserIdNegativeResponseVariants;
 
 type PatchV1UserIdResponse =
   | PatchV1UserIdPositiveResponse
@@ -152,6 +163,10 @@ interface PostV1UserCreateNegativeResponseVariants {
 type PostV1UserCreateNegativeResponse =
   SomeOf<PostV1UserCreateNegativeResponseVariants>;
 
+type PostV1UserCreateEncodedResponse =
+  PostV1UserCreatePositiveResponseVariants &
+    PostV1UserCreateNegativeResponseVariants;
+
 type PostV1UserCreateResponse =
   | PostV1UserCreatePositiveResponse
   | PostV1UserCreateNegativeResponse;
@@ -177,6 +192,9 @@ interface GetV1UserListNegativeResponseVariants {
 
 type GetV1UserListNegativeResponse =
   SomeOf<GetV1UserListNegativeResponseVariants>;
+
+type GetV1UserListEncodedResponse = GetV1UserListPositiveResponseVariants &
+  GetV1UserListNegativeResponseVariants;
 
 type GetV1UserListResponse =
   | GetV1UserListPositiveResponse
@@ -204,6 +222,9 @@ interface GetV1AvatarSendNegativeResponseVariants {
 type GetV1AvatarSendNegativeResponse =
   SomeOf<GetV1AvatarSendNegativeResponseVariants>;
 
+type GetV1AvatarSendEncodedResponse = GetV1AvatarSendPositiveResponseVariants &
+  GetV1AvatarSendNegativeResponseVariants;
+
 type GetV1AvatarSendResponse =
   | GetV1AvatarSendPositiveResponse
   | GetV1AvatarSendNegativeResponse;
@@ -229,6 +250,10 @@ interface GetV1AvatarStreamNegativeResponseVariants {
 
 type GetV1AvatarStreamNegativeResponse =
   SomeOf<GetV1AvatarStreamNegativeResponseVariants>;
+
+type GetV1AvatarStreamEncodedResponse =
+  GetV1AvatarStreamPositiveResponseVariants &
+    GetV1AvatarStreamNegativeResponseVariants;
 
 type GetV1AvatarStreamResponse =
   | GetV1AvatarStreamPositiveResponse
@@ -270,6 +295,10 @@ interface PostV1AvatarUploadNegativeResponseVariants {
 type PostV1AvatarUploadNegativeResponse =
   SomeOf<PostV1AvatarUploadNegativeResponseVariants>;
 
+type PostV1AvatarUploadEncodedResponse =
+  PostV1AvatarUploadPositiveResponseVariants &
+    PostV1AvatarUploadNegativeResponseVariants;
+
 type PostV1AvatarUploadResponse =
   | PostV1AvatarUploadPositiveResponse
   | PostV1AvatarUploadNegativeResponse;
@@ -303,6 +332,9 @@ interface PostV1AvatarRawNegativeResponseVariants {
 
 type PostV1AvatarRawNegativeResponse =
   SomeOf<PostV1AvatarRawNegativeResponseVariants>;
+
+type PostV1AvatarRawEncodedResponse = PostV1AvatarRawPositiveResponseVariants &
+  PostV1AvatarRawNegativeResponseVariants;
 
 type PostV1AvatarRawResponse =
   | PostV1AvatarRawPositiveResponse
