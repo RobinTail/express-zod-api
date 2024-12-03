@@ -198,68 +198,65 @@ export class Integration {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
-        const [
-          inputId,
-          positiveResponseId,
-          negativeResponseId,
-          genericResponseId,
-        ] = ["input", "positive.response", "negative.response", "response"].map(
-          (name) => makeCleanId(method, path, name),
+        const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+        const input = createTypeAlias(
+          zodToTs(endpoint.getSchema("input"), ctxIn),
+          entitle("input"),
         );
-        const input = zodToTs(endpoint.getSchema("input"), ctxIn);
-        this.program.push(createTypeAlias(input, inputId));
+        this.program.push(input);
 
-        for (const responseVariant of this.responseVariants) {
-          const variants: ts.TypeAliasDeclaration[] = [];
-          const props: ts.PropertySignature[] = [];
-          for (const [idx, { schema, mimeTypes, statusCodes }] of endpoint
-            .getResponses(responseVariant)
-            .entries()) {
-            const variant = zodToTs(mimeTypes ? schema : noContent, ctxOut);
-            const variantId = makeCleanId(
-              method,
-              path,
-              responseVariant,
-              "variant",
-              `${idx + 1}`,
+        const refs = this.responseVariants.reduce(
+          (agg, responseVariant) => {
+            const variants: ts.TypeAliasDeclaration[] = [];
+            const props: ts.PropertySignature[] = [];
+            for (const [idx, { schema, mimeTypes, statusCodes }] of endpoint
+              .getResponses(responseVariant)
+              .entries()) {
+              const variantType = createTypeAlias(
+                zodToTs(mimeTypes ? schema : noContent, ctxOut),
+                entitle(responseVariant, "variant", `${idx + 1}`),
+              );
+              variants.push(variantType);
+              for (const statusCode of statusCodes) {
+                props.push(
+                  makeInterfaceProp(statusCode, variantType.name.text),
+                );
+              }
+            }
+            // @todo not public
+            const dict = makePublicInterface(
+              f.createIdentifier(entitle(responseVariant, "response.variants")), // @todo accept string?
+              props,
             );
-            variants.push(createTypeAlias(variant, variantId));
-            for (const statusCode of statusCodes)
-              props.push(makeInterfaceProp(statusCode, variantId));
-          }
-          const variantsTypeId = f.createIdentifier(
-            makeCleanId(method, path, responseVariant, "response.variants"),
-          );
-          const dict = makePublicInterface(variantsTypeId, props); // @todo not public
-          const whole = f.createTypeReferenceNode(this.ids.someOfType, [
-            f.createTypeReferenceNode(variantsTypeId),
-          ]);
-          this.program.push(
-            ...variants,
-            dict,
-            createTypeAlias(
-              whole,
-              responseVariant === "positive" // @todo fix this nonsense
-                ? positiveResponseId
-                : negativeResponseId,
-            ),
-          );
-        }
+            const whole = createTypeAlias(
+              f.createTypeReferenceNode(this.ids.someOfType, [
+                f.createTypeReferenceNode(dict.name.text),
+              ]),
+              entitle(responseVariant, "response"),
+            );
+            this.program.push(...variants, dict, whole);
+            return Object.assign(agg, { [responseVariant]: whole });
+          },
+          {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
+        );
 
-        const genericResponse = f.createUnionTypeNode([
-          f.createTypeReferenceNode(positiveResponseId),
-          f.createTypeReferenceNode(negativeResponseId),
-        ]);
-        this.program.push(createTypeAlias(genericResponse, genericResponseId));
+        const genericResponse = createTypeAlias(
+          f.createUnionTypeNode([
+            f.createTypeReferenceNode(refs.positive.name.text),
+            f.createTypeReferenceNode(refs.negative.name.text),
+          ]),
+          entitle("response"),
+        );
+        this.program.push(genericResponse);
         this.paths.push(path);
         const isJson = endpoint
           .getResponses("positive")
           .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
         this.registry.set(quoteProp(method, path), {
-          input: inputId,
-          positive: positiveResponseId,
-          negative: negativeResponseId,
-          response: genericResponseId,
+          input: input.name.text,
+          positive: refs.positive.name.text,
+          negative: refs.negative.name.text,
+          response: genericResponse.name.text,
           tags: endpoint.getTags(),
           isJson,
         });
