@@ -94,21 +94,6 @@ exports[`zod-to-ts > PrimitiveSchema > outputs correct typescript 1`] = `
 }"
 `;
 
-exports[`zod-to-ts > createTypeAlias() > optionally takes a comment 1`] = `
-"/** A basic user */
-type User = {
-    username: string;
-    age: number;
-};"
-`;
-
-exports[`zod-to-ts > createTypeAlias() > outputs correct typescript 1`] = `
-"type User = {
-    username: string;
-    age: number;
-};"
-`;
-
 exports[`zod-to-ts > enums > handles 'numeric' literals 1`] = `""Red" | "Green" | "Blue" | 0 | 1 | 2"`;
 
 exports[`zod-to-ts > enums > handles 'quoted string' literals 1`] = `""Two Words" | "'Quotes\\"" | "\\\\\\"Escaped\\\\\\"" | 0 | 1 | 2"`;
