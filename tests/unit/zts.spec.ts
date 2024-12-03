@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ez } from "../../src";
 import { f } from "../../src/integration-helpers";
 import { zodToTs } from "../../src/zts";
-import { ZTSContext, createTypeAlias, printNode } from "../../src/zts-helpers";
+import { ZTSContext, printNode } from "../../src/zts-helpers";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: ts.Node) =>
@@ -33,23 +33,6 @@ describe("zod-to-ts", () => {
       });
     },
   );
-
-  describe("createTypeAlias()", () => {
-    const identifier = "User";
-    const node = zodToTs(z.object({ username: z.string(), age: z.number() }), {
-      ctx,
-    });
-
-    test("outputs correct typescript", () => {
-      const typeAlias = createTypeAlias(node, identifier);
-      expect(printNodeTest(typeAlias)).toMatchSnapshot();
-    });
-
-    test("optionally takes a comment", () => {
-      const typeAlias = createTypeAlias(node, identifier, "A basic user");
-      expect(printNodeTest(typeAlias)).toMatchSnapshot();
-    });
-  });
 
   describe("enums", () => {
     // noinspection JSUnusedGlobalSymbols

@@ -1,5 +1,6 @@
 import ts from "typescript";
 import { Method } from "./method";
+import { addJsDocComment } from "./zts-helpers";
 
 export const f = ts.factory;
 
@@ -96,29 +97,40 @@ export const makeConst = (
   );
 
 export const makePublicLiteralType = (
-  name: ts.Identifier,
+  name: ts.Identifier | string,
   literals: string[],
 ) =>
-  makePublicType(
+  makeType(
     name,
     f.createUnionTypeNode(
       literals.map((option) =>
         f.createLiteralTypeNode(f.createStringLiteral(option)),
       ),
     ),
+    { isPublic: true },
   );
 
-export const makePublicType = (
-  name: ts.Identifier,
+export const makeType = (
+  name: ts.Identifier | string,
   value: ts.TypeNode,
-  params?: Parameters<typeof makeTypeParams>[0],
-) =>
-  f.createTypeAliasDeclaration(
-    exportModifier,
+  {
+    isPublic,
+    comment,
+    params,
+  }: {
+    isPublic?: boolean;
+    comment?: string;
+    params?: Parameters<typeof makeTypeParams>[0];
+  } = {},
+) => {
+  const node = f.createTypeAliasDeclaration(
+    isPublic ? exportModifier : undefined,
     name,
     params && makeTypeParams(params),
     value,
   );
+  return comment ? addJsDocComment(node, comment) : node;
+};
 
 export const makePublicMethod = (
   name: ts.Identifier,
