@@ -214,7 +214,8 @@ export const makeObjectKeysReducer = (
     ],
   );
 
-export const quoteProp = (...parts: [Method, string]) => `"${parts.join(" ")}"`;
+export const quoteProp = (...parts: [Method, string]) =>
+  `"${parts.join(" ")}"` as `"${Method} ${string}"`;
 export const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
 export const makeTernary = (
