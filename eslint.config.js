@@ -57,7 +57,7 @@ const tsFactoryConcerns = [
   },
   {
     selector: "Identifier[name='createTypeAliasDeclaration']",
-    message: "use makePublicType() or makePublicLiteralType() helpers",
+    message: "use makeType() or makePublicLiteralType() helpers",
   },
   {
     selector: "Identifier[name='createVariableStatement']",
