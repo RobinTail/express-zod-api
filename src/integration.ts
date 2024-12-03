@@ -18,7 +18,7 @@ import {
   makeParams,
   makePropCall,
   makePublicClass,
-  makePublicInterface,
+  makeInterface,
   makePublicLiteralType,
   makePublicMethod,
   makeType,
@@ -218,8 +218,7 @@ export class Integration {
                 );
               }
             }
-            // @todo not public
-            const dict = makePublicInterface(
+            const dict = makeInterface(
               entitle(responseVariant, "response.variants"),
               props,
             );
@@ -309,7 +308,7 @@ export class Integration {
 
     // export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
     for (const { id, props } of this.interfaces)
-      this.program.push(makePublicInterface(id, props));
+      this.program.push(makeInterface(id, props, { isPublic: true }));
 
     // export type MethodPath = keyof Input;
     this.program.push(

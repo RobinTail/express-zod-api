@@ -185,12 +185,13 @@ export const makePromise = (subject: ts.TypeNode | "any") =>
       : subject,
   ]);
 
-export const makePublicInterface = (
+export const makeInterface = (
   name: ts.Identifier | string,
   props: ts.PropertySignature[],
+  { isPublic }: { isPublic?: boolean } = {},
 ) =>
   f.createInterfaceDeclaration(
-    exportModifier,
+    isPublic ? exportModifier : undefined,
     name,
     undefined,
     undefined,

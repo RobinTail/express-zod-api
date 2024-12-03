@@ -22,7 +22,7 @@ type GetV1UserRetrievePositiveVariant1 = {
   };
 };
 
-export interface GetV1UserRetrievePositiveResponseVariants {
+interface GetV1UserRetrievePositiveResponseVariants {
   200: GetV1UserRetrievePositiveVariant1;
 }
 
@@ -36,7 +36,7 @@ type GetV1UserRetrieveNegativeVariant1 = {
   };
 };
 
-export interface GetV1UserRetrieveNegativeResponseVariants {
+interface GetV1UserRetrieveNegativeResponseVariants {
   400: GetV1UserRetrieveNegativeVariant1;
 }
 
@@ -54,7 +54,7 @@ type DeleteV1UserIdRemoveInput = {
 
 type DeleteV1UserIdRemovePositiveVariant1 = undefined;
 
-export interface DeleteV1UserIdRemovePositiveResponseVariants {
+interface DeleteV1UserIdRemovePositiveResponseVariants {
   204: DeleteV1UserIdRemovePositiveVariant1;
 }
 
@@ -63,7 +63,7 @@ type DeleteV1UserIdRemovePositiveResponse =
 
 type DeleteV1UserIdRemoveNegativeVariant1 = undefined;
 
-export interface DeleteV1UserIdRemoveNegativeResponseVariants {
+interface DeleteV1UserIdRemoveNegativeResponseVariants {
   404: DeleteV1UserIdRemoveNegativeVariant1;
 }
 
@@ -89,7 +89,7 @@ type PatchV1UserIdPositiveVariant1 = {
   };
 };
 
-export interface PatchV1UserIdPositiveResponseVariants {
+interface PatchV1UserIdPositiveResponseVariants {
   200: PatchV1UserIdPositiveVariant1;
 }
 
@@ -103,7 +103,7 @@ type PatchV1UserIdNegativeVariant1 = {
   };
 };
 
-export interface PatchV1UserIdNegativeResponseVariants {
+interface PatchV1UserIdNegativeResponseVariants {
   400: PatchV1UserIdNegativeVariant1;
 }
 
@@ -125,7 +125,7 @@ type PostV1UserCreatePositiveVariant1 = {
   };
 };
 
-export interface PostV1UserCreatePositiveResponseVariants {
+interface PostV1UserCreatePositiveResponseVariants {
   201: PostV1UserCreatePositiveVariant1;
   202: PostV1UserCreatePositiveVariant1;
 }
@@ -143,7 +143,7 @@ type PostV1UserCreateNegativeVariant2 = {
   reason: string;
 };
 
-export interface PostV1UserCreateNegativeResponseVariants {
+interface PostV1UserCreateNegativeResponseVariants {
   409: PostV1UserCreateNegativeVariant1;
   400: PostV1UserCreateNegativeVariant2;
   500: PostV1UserCreateNegativeVariant2;
@@ -162,7 +162,7 @@ type GetV1UserListPositiveVariant1 = {
   name: string;
 }[];
 
-export interface GetV1UserListPositiveResponseVariants {
+interface GetV1UserListPositiveResponseVariants {
   200: GetV1UserListPositiveVariant1;
 }
 
@@ -171,7 +171,7 @@ type GetV1UserListPositiveResponse =
 
 type GetV1UserListNegativeVariant1 = string;
 
-export interface GetV1UserListNegativeResponseVariants {
+interface GetV1UserListNegativeResponseVariants {
   400: GetV1UserListNegativeVariant1;
 }
 
@@ -188,7 +188,7 @@ type GetV1AvatarSendInput = {
 
 type GetV1AvatarSendPositiveVariant1 = string;
 
-export interface GetV1AvatarSendPositiveResponseVariants {
+interface GetV1AvatarSendPositiveResponseVariants {
   200: GetV1AvatarSendPositiveVariant1;
 }
 
@@ -197,7 +197,7 @@ type GetV1AvatarSendPositiveResponse =
 
 type GetV1AvatarSendNegativeVariant1 = string;
 
-export interface GetV1AvatarSendNegativeResponseVariants {
+interface GetV1AvatarSendNegativeResponseVariants {
   400: GetV1AvatarSendNegativeVariant1;
 }
 
@@ -214,7 +214,7 @@ type GetV1AvatarStreamInput = {
 
 type GetV1AvatarStreamPositiveVariant1 = Buffer;
 
-export interface GetV1AvatarStreamPositiveResponseVariants {
+interface GetV1AvatarStreamPositiveResponseVariants {
   200: GetV1AvatarStreamPositiveVariant1;
 }
 
@@ -223,7 +223,7 @@ type GetV1AvatarStreamPositiveResponse =
 
 type GetV1AvatarStreamNegativeVariant1 = string;
 
-export interface GetV1AvatarStreamNegativeResponseVariants {
+interface GetV1AvatarStreamNegativeResponseVariants {
   400: GetV1AvatarStreamNegativeVariant1;
 }
 
@@ -249,7 +249,7 @@ type PostV1AvatarUploadPositiveVariant1 = {
   };
 };
 
-export interface PostV1AvatarUploadPositiveResponseVariants {
+interface PostV1AvatarUploadPositiveResponseVariants {
   200: PostV1AvatarUploadPositiveVariant1;
 }
 
@@ -263,7 +263,7 @@ type PostV1AvatarUploadNegativeVariant1 = {
   };
 };
 
-export interface PostV1AvatarUploadNegativeResponseVariants {
+interface PostV1AvatarUploadNegativeResponseVariants {
   400: PostV1AvatarUploadNegativeVariant1;
 }
 
@@ -283,7 +283,7 @@ type PostV1AvatarRawPositiveVariant1 = {
   };
 };
 
-export interface PostV1AvatarRawPositiveResponseVariants {
+interface PostV1AvatarRawPositiveResponseVariants {
   200: PostV1AvatarRawPositiveVariant1;
 }
 
@@ -297,7 +297,7 @@ type PostV1AvatarRawNegativeVariant1 = {
   };
 };
 
-export interface PostV1AvatarRawNegativeResponseVariants {
+interface PostV1AvatarRawNegativeResponseVariants {
   400: PostV1AvatarRawNegativeVariant1;
 }
 
