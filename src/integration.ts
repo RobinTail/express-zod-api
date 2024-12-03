@@ -182,44 +182,49 @@ export class Integration {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
-        const [
-          inputId,
-          positiveResponseId,
-          negativeResponseId,
-          genericResponseId,
-        ] = ["input", "positive.response", "negative.response", "response"].map(
-          (name) => makeCleanId(method, path, name),
+        const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+        const input = createTypeAlias(
+          zodToTs(endpoint.getSchema("input"), ctxIn),
+          entitle("input"),
         );
-        const input = zodToTs(endpoint.getSchema("input"), ctxIn);
         const positiveSchema = endpoint
           .getResponses("positive")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const positiveResponse = zodToTs(positiveSchema, ctxOut);
+        const positiveResponse = createTypeAlias(
+          zodToTs(positiveSchema, ctxOut),
+          entitle("positive.response"),
+        );
         const negativeSchema = endpoint
           .getResponses("negative")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const negativeResponse = zodToTs(negativeSchema, ctxOut);
-        const genericResponse = f.createUnionTypeNode([
-          f.createTypeReferenceNode(positiveResponseId),
-          f.createTypeReferenceNode(negativeResponseId),
-        ]);
+        const negativeResponse = createTypeAlias(
+          zodToTs(negativeSchema, ctxOut),
+          entitle("negative.response"),
+        );
+        const genericResponse = createTypeAlias(
+          f.createUnionTypeNode([
+            f.createTypeReferenceNode(positiveResponse.name.text),
+            f.createTypeReferenceNode(negativeResponse.name.text),
+          ]),
+          entitle("response"),
+        );
         this.program.push(
-          createTypeAlias(input, inputId),
-          createTypeAlias(positiveResponse, positiveResponseId),
-          createTypeAlias(negativeResponse, negativeResponseId),
-          createTypeAlias(genericResponse, genericResponseId),
+          input,
+          positiveResponse,
+          negativeResponse,
+          genericResponse,
         );
         this.paths.push(path);
         const isJson = endpoint
           .getResponses("positive")
           .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
         this.registry.set(quoteProp(method, path), {
-          input: inputId,
-          positive: positiveResponseId,
-          negative: negativeResponseId,
-          response: genericResponseId,
+          input: input.name.text,
+          positive: positiveResponse.name.text,
+          negative: negativeResponse.name.text,
+          response: genericResponse.name.text,
           tags: endpoint.getTags(),
           isJson,
         });
