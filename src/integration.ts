@@ -230,7 +230,7 @@ export class Integration {
           const variantsTypeId = f.createIdentifier(
             makeCleanId(method, path, responseVariant, "response.variants"),
           );
-          const dict = makePublicInterface(variantsTypeId, props);
+          const dict = makePublicInterface(variantsTypeId, props); // @todo not public
           const whole = f.createTypeReferenceNode(this.ids.someOfType, [
             f.createTypeReferenceNode(variantsTypeId),
           ]);
