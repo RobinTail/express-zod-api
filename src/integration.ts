@@ -212,17 +212,16 @@ export class Integration {
           createTypeAlias(genericResponse, genericResponseId),
         );
         this.paths.push(path);
+        const isJson = endpoint
+          .getResponses("positive")
+          .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
         this.registry.set(quoteProp(method, path), {
           input: inputId,
           positive: positiveResponseId,
           negative: negativeResponseId,
           response: genericResponseId,
-          isJson: endpoint
-            .getResponses("positive")
-            .some((response) =>
-              response.mimeTypes?.includes(contentTypes.json),
-            ),
           tags: endpoint.getTags(),
+          isJson,
         });
       },
     });
