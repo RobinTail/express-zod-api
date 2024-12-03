@@ -118,6 +118,7 @@ export class Integration {
     inputInterface: f.createIdentifier("Input"),
     posResponseInterface: f.createIdentifier("PositiveResponse"),
     negResponseInterface: f.createIdentifier("NegativeResponse"),
+    encResponseInterface: f.createIdentifier("EncodedResponse"),
     responseInterface: f.createIdentifier("Response"),
     jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
     endpointTagsConst: f.createIdentifier("endpointTags"),
@@ -284,6 +285,7 @@ export class Integration {
       },
       { id: this.ids.posResponseInterface, kind: "positive", props: [] },
       { id: this.ids.negResponseInterface, kind: "negative", props: [] },
+      { id: this.ids.encResponseInterface, kind: "encoded", props: [] },
       {
         id: this.ids.responseInterface,
         kind: "response",

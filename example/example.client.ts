@@ -389,6 +389,18 @@ export interface NegativeResponse {
   "post /v1/avatar/raw": PostV1AvatarRawNegativeResponse;
 }
 
+export interface EncodedResponse {
+  "get /v1/user/retrieve": GetV1UserRetrieveEncodedResponse;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemoveEncodedResponse;
+  "patch /v1/user/:id": PatchV1UserIdEncodedResponse;
+  "post /v1/user/create": PostV1UserCreateEncodedResponse;
+  "get /v1/user/list": GetV1UserListEncodedResponse;
+  "get /v1/avatar/send": GetV1AvatarSendEncodedResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamEncodedResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadEncodedResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawEncodedResponse;
+}
+
 export interface Response {
   "get /v1/user/retrieve": GetV1UserRetrieveResponse;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveResponse;
