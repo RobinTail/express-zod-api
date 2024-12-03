@@ -20,7 +20,7 @@ import {
   makePublicInterface,
   makePublicLiteralType,
   makePublicMethod,
-  makePublicType,
+  makeType,
   makeTernary,
   makeTypeParams,
   parametricIndexNode,
@@ -41,12 +41,7 @@ import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import {
-  ZTSContext,
-  createTypeAlias,
-  printNode,
-  addJsDocComment,
-} from "./zts-helpers";
+import { ZTSContext, printNode, addJsDocComment } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant;
@@ -163,8 +158,8 @@ export class Integration {
     if (!name) {
       name = `Type${this.aliases.size + 1}`;
       const temp = f.createLiteralTypeNode(f.createNull());
-      this.aliases.set(schema, createTypeAlias(temp, name));
-      this.aliases.set(schema, createTypeAlias(produce(), name));
+      this.aliases.set(schema, makeType(name, temp));
+      this.aliases.set(schema, makeType(name, produce()));
     }
     return f.createTypeReferenceNode(name);
   }
@@ -183,32 +178,32 @@ export class Integration {
       routing,
       onEndpoint: (endpoint, path, method) => {
         const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
-        const input = createTypeAlias(
-          zodToTs(endpoint.getSchema("input"), ctxIn),
+        const input = makeType(
           entitle("input"),
+          zodToTs(endpoint.getSchema("input"), ctxIn),
         );
         const positiveSchema = endpoint
           .getResponses("positive")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const positiveResponse = createTypeAlias(
-          zodToTs(positiveSchema, ctxOut),
+        const positiveResponse = makeType(
           entitle("positive.response"),
+          zodToTs(positiveSchema, ctxOut),
         );
         const negativeSchema = endpoint
           .getResponses("negative")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const negativeResponse = createTypeAlias(
-          zodToTs(negativeSchema, ctxOut),
+        const negativeResponse = makeType(
           entitle("negative.response"),
+          zodToTs(negativeSchema, ctxOut),
         );
-        const genericResponse = createTypeAlias(
+        const genericResponse = makeType(
+          entitle("response"),
           f.createUnionTypeNode([
             f.createTypeReferenceNode(positiveResponse.name.text),
             f.createTypeReferenceNode(negativeResponse.name.text),
           ]),
-          entitle("response"),
         );
         this.program.push(
           input,
@@ -286,10 +281,9 @@ export class Integration {
 
     // export type MethodPath = keyof Input;
     this.program.push(
-      makePublicType(
-        this.ids.methodPathType,
-        makeKeyOf(this.ids.inputInterface),
-      ),
+      makeType(this.ids.methodPathType, makeKeyOf(this.ids.inputInterface), {
+        isPublic: true,
+      }),
     );
 
     if (variant === "types") return;
@@ -313,7 +307,7 @@ export class Integration {
     );
 
     // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
-    const implementationType = makePublicType(
+    const implementationType = makeType(
       this.ids.implementationType,
       f.createFunctionTypeNode(
         undefined,
@@ -328,6 +322,7 @@ export class Integration {
         }),
         makePromise("any"),
       ),
+      { isPublic: true },
     );
 
     // `:${key}`
@@ -532,17 +527,15 @@ export class Integration {
     );
 
     // @todo remove in v22
-    const providerType = addJsDocComment(
-      makePublicType(
-        this.ids.providerType,
-        f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.clientClass),
-          f.createLiteralTypeNode(
-            f.createStringLiteral(this.ids.provideMethod.text),
-          ),
+    const providerType = makeType(
+      this.ids.providerType,
+      f.createIndexedAccessTypeNode(
+        f.createTypeReferenceNode(this.ids.clientClass),
+        f.createLiteralTypeNode(
+          f.createStringLiteral(this.ids.provideMethod.text),
         ),
       ),
-      "@deprecated will be removed in v22",
+      { isPublic: true, comment: "@deprecated will be removed in v22" },
     );
 
     this.program.push(
