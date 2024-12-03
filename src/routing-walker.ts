@@ -5,14 +5,16 @@ import { Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
 
-export interface RoutingWalkerParams {
+export type OnEndpoint = (
+  endpoint: AbstractEndpoint,
+  path: string,
+  method: Method,
+  siblingMethods?: ReadonlyArray<Method>,
+) => void;
+
+interface RoutingWalkerParams {
   routing: Routing;
-  onEndpoint: (
-    endpoint: AbstractEndpoint,
-    path: string,
-    method: Method,
-    siblingMethods?: ReadonlyArray<Method>,
-  ) => void;
+  onEndpoint: OnEndpoint;
   onStatic?: (path: string, handler: StaticHandler) => void;
   parentPath?: string;
 }
