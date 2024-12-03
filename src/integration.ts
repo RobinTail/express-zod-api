@@ -220,7 +220,7 @@ export class Integration {
             }
             // @todo not public
             const dict = makePublicInterface(
-              f.createIdentifier(entitle(responseVariant, "response.variants")), // @todo accept string?
+              entitle(responseVariant, "response.variants"),
               props,
             );
             const whole = makeType(

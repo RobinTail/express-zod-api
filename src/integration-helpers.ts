@@ -186,7 +186,7 @@ export const makePromise = (subject: ts.TypeNode | "any") =>
   ]);
 
 export const makePublicInterface = (
-  name: ts.Identifier,
+  name: ts.Identifier | string,
   props: ts.PropertySignature[],
 ) =>
   f.createInterfaceDeclaration(
