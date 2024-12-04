@@ -39,7 +39,7 @@ import { Method, methods } from "./method";
 import { contentTypes } from "./content-type";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
-import { walkRouting } from "./routing-walker";
+import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
 import { ZTSContext, printNode, addJsDocComment } from "./zts-helpers";
@@ -191,83 +191,76 @@ export class Integration {
       ),
     );
 
-    walkRouting({
-      routing,
-      onEndpoint: (endpoint, path, method) => {
-        const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
-        const input = makeType(
-          entitle("input"),
-          zodToTs(endpoint.getSchema("input"), ctxIn),
-        );
-        this.program.push(input);
-
-        const refs = this.responseVariants.reduce(
-          (agg, responseVariant) => {
-            const variants: ts.TypeAliasDeclaration[] = [];
-            const props: ts.PropertySignature[] = [];
-            const responses = endpoint.getResponses(responseVariant).entries();
-            for (const [idx, { schema, mimeTypes, statusCodes }] of responses) {
-              const variantType = makeType(
-                entitle(responseVariant, "variant", `${idx + 1}`),
-                zodToTs(mimeTypes ? schema : noContent, ctxOut),
-              );
-              variants.push(variantType);
-              for (const statusCode of statusCodes) {
-                props.push(
-                  makeInterfaceProp(statusCode, variantType.name.text),
-                );
-              }
-            }
-            const dict = makeInterface(
-              entitle(responseVariant, "response.variants"),
-              props,
+    const onEndpoint: OnEndpoint = (endpoint, path, method) => {
+      const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+      const input = makeType(
+        entitle("input"),
+        zodToTs(endpoint.getSchema("input"), ctxIn),
+      );
+      this.program.push(input);
+      const refs = this.responseVariants.reduce(
+        (agg, responseVariant) => {
+          const variants: ts.TypeAliasDeclaration[] = [];
+          const props: ts.PropertySignature[] = [];
+          const responses = endpoint.getResponses(responseVariant).entries();
+          for (const [idx, { schema, mimeTypes, statusCodes }] of responses) {
+            const variantType = makeType(
+              entitle(responseVariant, "variant", `${idx + 1}`),
+              zodToTs(mimeTypes ? schema : noContent, ctxOut),
             );
-            const whole = makeType(
-              entitle(responseVariant, "response"),
-              f.createTypeReferenceNode(this.ids.someOfType, [
-                f.createTypeReferenceNode(dict.name.text),
-              ]),
-            );
-            this.program.push(...variants, dict, whole);
-            return Object.assign(agg, { [responseVariant]: { whole, dict } });
-          },
-          {} as Record<
-            ResponseVariant,
-            Record<"whole" | "dict", ts.TypeAliasDeclaration>
-          >,
-        );
+            variants.push(variantType);
+            for (const statusCode of statusCodes)
+              props.push(makeInterfaceProp(statusCode, variantType.name.text));
+          }
+          const dict = makeInterface(
+            entitle(responseVariant, "response.variants"),
+            props,
+          );
+          const whole = makeType(
+            entitle(responseVariant, "response"),
+            f.createTypeReferenceNode(this.ids.someOfType, [
+              f.createTypeReferenceNode(dict.name.text),
+            ]),
+          );
+          this.program.push(...variants, dict, whole);
+          return Object.assign(agg, { [responseVariant]: { whole, dict } });
+        },
+        {} as Record<
+          ResponseVariant,
+          Record<"whole" | "dict", ts.TypeAliasDeclaration>
+        >,
+      );
 
-        const encodedResponse = makeType(
-          entitle("encoded.response"),
-          f.createIntersectionTypeNode([
-            f.createTypeReferenceNode(refs.positive.dict.name.text),
-            f.createTypeReferenceNode(refs.negative.dict.name.text),
-          ]),
-        );
-        const genericResponse = makeType(
-          entitle("response"),
-          f.createUnionTypeNode([
-            f.createTypeReferenceNode(refs.positive.whole.name.text),
-            f.createTypeReferenceNode(refs.negative.whole.name.text),
-          ]),
-        );
-        this.program.push(encodedResponse, genericResponse);
-        this.paths.push(path);
-        const isJson = endpoint
-          .getResponses("positive")
-          .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
-        this.registry.set(quoteProp(method, path), {
-          input: input.name.text,
-          positive: refs.positive.whole.name.text,
-          negative: refs.negative.whole.name.text,
-          response: genericResponse.name.text,
-          encoded: encodedResponse.name.text,
-          tags: endpoint.getTags(),
-          isJson,
-        });
-      },
-    });
-
+      const encodedResponse = makeType(
+        entitle("encoded.response"),
+        f.createIntersectionTypeNode([
+          f.createTypeReferenceNode(refs.positive.dict.name.text),
+          f.createTypeReferenceNode(refs.negative.dict.name.text),
+        ]),
+      );
+      const genericResponse = makeType(
+        entitle("response"),
+        f.createUnionTypeNode([
+          f.createTypeReferenceNode(refs.positive.whole.name.text),
+          f.createTypeReferenceNode(refs.negative.whole.name.text),
+        ]),
+      );
+      this.program.push(encodedResponse, genericResponse);
+      this.paths.push(path);
+      const isJson = endpoint
+        .getResponses("positive")
+        .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
+      this.registry.set(quoteProp(method, path), {
+        input: input.name.text,
+        positive: refs.positive.whole.name.text,
+        negative: refs.negative.whole.name.text,
+        response: genericResponse.name.text,
+        encoded: encodedResponse.name.text,
+        tags: endpoint.getTags(),
+        isJson,
+      });
+    };
+    walkRouting({ routing, onEndpoint });
     this.program.unshift(...this.aliases.values());
 
     // export type Path = "/v1/user/retrieve" | ___;
