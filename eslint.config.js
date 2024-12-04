@@ -104,7 +104,7 @@ export default tsPlugin.config(
         },
         {
           selector: "Identifier[name='createTypeAliasDeclaration']",
-          message: "use makePublicType() or makePublicLiteralType() helpers",
+          message: "use makeType() or makePublicLiteralType() helpers",
         },
         {
           selector: "Identifier[name='createVariableDeclarationList']",
@@ -139,6 +139,10 @@ export default tsPlugin.config(
         {
           selector: "Identifier[name='EqualsEqualsEqualsToken']",
           message: "use makeEqual() helper",
+        },
+        {
+          selector: "Identifier[name='KeyOfKeyword']",
+          message: "use makeKeyOf() helper",
         },
       ],
     },

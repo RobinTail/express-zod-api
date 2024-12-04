@@ -26,20 +26,6 @@ export const addJsDocComment = <T extends ts.Node>(node: T, text: string) =>
     true,
   );
 
-export const createTypeAlias = (
-  node: ts.TypeNode,
-  name: string,
-  comment?: string,
-) => {
-  const typeAlias = f.createTypeAliasDeclaration(
-    undefined,
-    f.createIdentifier(name),
-    undefined,
-    node,
-  );
-  return comment ? addJsDocComment(typeAlias, comment) : typeAlias;
-};
-
 export const printNode = (
   node: ts.Node,
   printerOptions?: ts.PrinterOptions,

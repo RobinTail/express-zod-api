@@ -20,7 +20,7 @@ import {
   makePublicInterface,
   makePublicLiteralType,
   makePublicMethod,
-  makePublicType,
+  makeType,
   makeTernary,
   makeTypeParams,
   parametricIndexNode,
@@ -31,6 +31,7 @@ import {
   restToken,
   makeAnd,
   makeEqual,
+  makeKeyOf,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -40,12 +41,7 @@ import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import {
-  ZTSContext,
-  createTypeAlias,
-  printNode,
-  addJsDocComment,
-} from "./zts-helpers";
+import { ZTSContext, printNode, addJsDocComment } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant;
@@ -108,11 +104,8 @@ export class Integration {
   protected program: ts.Node[] = [];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
-    { method: Method; path: string },
-    Partial<Record<IOKind, string>> & {
-      isJson: boolean;
-      tags: ReadonlyArray<string>;
-    }
+    ReturnType<typeof quoteProp>, // method+path
+    Record<IOKind, string> & { isJson: boolean; tags: ReadonlyArray<string> }
   >();
   protected paths: string[] = [];
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
@@ -165,8 +158,8 @@ export class Integration {
     if (!name) {
       name = `Type${this.aliases.size + 1}`;
       const temp = f.createLiteralTypeNode(f.createNull());
-      this.aliases.set(schema, createTypeAlias(temp, name));
-      this.aliases.set(schema, createTypeAlias(produce(), name));
+      this.aliases.set(schema, makeType(name, temp));
+      this.aliases.set(schema, makeType(name, produce()));
     }
     return f.createTypeReferenceNode(name);
   }
@@ -184,51 +177,52 @@ export class Integration {
     walkRouting({
       routing,
       onEndpoint: (endpoint, path, method) => {
-        const [
-          inputId,
-          positiveResponseId,
-          negativeResponseId,
-          genericResponseId,
-        ] = ["input", "positive.response", "negative.response", "response"].map(
-          (name) => makeCleanId(method, path, name),
+        const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+        const input = makeType(
+          entitle("input"),
+          zodToTs(endpoint.getSchema("input"), ctxIn),
         );
-        const input = zodToTs(endpoint.getSchema("input"), ctxIn);
         const positiveSchema = endpoint
           .getResponses("positive")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const positiveResponse = zodToTs(positiveSchema, ctxOut);
+        const positiveResponse = makeType(
+          entitle("positive.response"),
+          zodToTs(positiveSchema, ctxOut),
+        );
         const negativeSchema = endpoint
           .getResponses("negative")
           .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
           .reduce((agg, schema) => agg.or(schema));
-        const negativeResponse = zodToTs(negativeSchema, ctxOut);
-        const genericResponse = f.createUnionTypeNode([
-          f.createTypeReferenceNode(positiveResponseId),
-          f.createTypeReferenceNode(negativeResponseId),
-        ]);
+        const negativeResponse = makeType(
+          entitle("negative.response"),
+          zodToTs(negativeSchema, ctxOut),
+        );
+        const genericResponse = makeType(
+          entitle("response"),
+          f.createUnionTypeNode([
+            f.createTypeReferenceNode(positiveResponse.name.text),
+            f.createTypeReferenceNode(negativeResponse.name.text),
+          ]),
+        );
         this.program.push(
-          createTypeAlias(input, inputId),
-          createTypeAlias(positiveResponse, positiveResponseId),
-          createTypeAlias(negativeResponse, negativeResponseId),
-          createTypeAlias(genericResponse, genericResponseId),
+          input,
+          positiveResponse,
+          negativeResponse,
+          genericResponse,
         );
         this.paths.push(path);
-        this.registry.set(
-          { method, path },
-          {
-            input: inputId,
-            positive: positiveResponseId,
-            negative: negativeResponseId,
-            response: genericResponseId,
-            isJson: endpoint
-              .getResponses("positive")
-              .some((response) =>
-                response.mimeTypes?.includes(contentTypes.json),
-              ),
-            tags: endpoint.getTags(),
-          },
-        );
+        const isJson = endpoint
+          .getResponses("positive")
+          .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
+        this.registry.set(quoteProp(method, path), {
+          input: input.name.text,
+          positive: positiveResponse.name.text,
+          negative: negativeResponse.name.text,
+          response: genericResponse.name.text,
+          tags: endpoint.getTags(),
+          isJson,
+        });
       },
     });
 
@@ -258,13 +252,10 @@ export class Integration {
     // Single walk through the registry for making properties for the next three objects
     const jsonEndpoints: ts.PropertyAssignment[] = [];
     const endpointTags: ts.PropertyAssignment[] = [];
-    for (const [{ method, path }, { isJson, tags, ...rest }] of this.registry) {
-      const propName = quoteProp(method, path);
+    for (const [propName, { isJson, tags, ...rest }] of this.registry) {
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
-      for (const face of this.interfaces) {
-        if (face.kind in rest)
-          face.props.push(makeInterfaceProp(propName, rest[face.kind]!));
-      }
+      for (const face of this.interfaces)
+        face.props.push(makeInterfaceProp(propName, rest[face.kind]));
       if (variant !== "types") {
         if (isJson) {
           // "get /v1/user/retrieve": true
@@ -290,13 +281,9 @@ export class Integration {
 
     // export type MethodPath = keyof Input;
     this.program.push(
-      makePublicType(
-        this.ids.methodPathType,
-        f.createTypeOperatorNode(
-          ts.SyntaxKind.KeyOfKeyword,
-          f.createTypeReferenceNode(this.ids.inputInterface),
-        ),
-      ),
+      makeType(this.ids.methodPathType, makeKeyOf(this.ids.inputInterface), {
+        isPublic: true,
+      }),
     );
 
     if (variant === "types") return;
@@ -320,7 +307,7 @@ export class Integration {
     );
 
     // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
-    const implementationType = makePublicType(
+    const implementationType = makeType(
       this.ids.implementationType,
       f.createFunctionTypeNode(
         undefined,
@@ -335,6 +322,7 @@ export class Integration {
         }),
         makePromise("any"),
       ),
+      { isPublic: true },
     );
 
     // `:${key}`
@@ -402,10 +390,7 @@ export class Integration {
           [this.ids.pathParameter.text]: f.createTypeReferenceNode("P"),
           [this.ids.paramsArgument.text]: f.createConditionalTypeNode(
             parametricIndexNode,
-            f.createTypeOperatorNode(
-              ts.SyntaxKind.KeyOfKeyword,
-              f.createTypeReferenceNode(this.ids.inputInterface),
-            ),
+            makeKeyOf(this.ids.inputInterface),
             f.createIndexedAccessTypeNode(
               f.createTypeReferenceNode(this.ids.inputInterface),
               parametricIndexNode,
@@ -542,17 +527,15 @@ export class Integration {
     );
 
     // @todo remove in v22
-    const providerType = addJsDocComment(
-      makePublicType(
-        this.ids.providerType,
-        f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.clientClass),
-          f.createLiteralTypeNode(
-            f.createStringLiteral(this.ids.provideMethod.text),
-          ),
+    const providerType = makeType(
+      this.ids.providerType,
+      f.createIndexedAccessTypeNode(
+        f.createTypeReferenceNode(this.ids.clientClass),
+        f.createLiteralTypeNode(
+          f.createStringLiteral(this.ids.provideMethod.text),
         ),
       ),
-      "@deprecated will be removed in v22",
+      { isPublic: true, comment: "@deprecated will be removed in v22" },
     );
 
     this.program.push(
