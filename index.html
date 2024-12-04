@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script language="javascript" type="text/javascript">
+      const evtSource = new EventSource("http://localhost:8090/v1/events/time");
+      evtSource.onopen = console.info.bind(console);
+      evtSource.onerror = console.error.bind(console);
+      evtSource.onmessage = console.log.bind(console);
+      evtSource.addEventListener("time", console.info.bind(console));
+    </script>
+  </head>
+  <body></body>
+</html>

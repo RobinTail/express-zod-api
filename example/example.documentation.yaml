@@ -566,6 +566,36 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/events/time:
+    get:
+      operationId: GetV1EventsTime
+      responses:
+        "200":
+          description: GET /v1/events/time Positive response
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                  event:
+                    type: string
+                  id:
+                    type: string
+                  retry:
+                    type: integer
+                    format: int64
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
+                required:
+                  - data
+        "400":
+          description: GET /v1/events/time Negative response
+          content:
+            application/json:
+              schema:
+                type: string
 components:
   schemas:
     Schema1:
