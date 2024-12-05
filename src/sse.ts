@@ -40,5 +40,6 @@ export const sseResultHandler = new ResultHandler({
       response.write(`event: time\ndata: ${Date.now()}\n\n`, "utf-8");
       response.flush();
     }
+    response.end();
   },
 });
