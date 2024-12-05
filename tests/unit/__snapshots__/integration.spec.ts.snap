@@ -606,15 +606,15 @@ type PostV1AvatarRawResponse =
 type GetV1EventsTimeInput = {};
 
 type GetV1EventsTimePositiveResponse = {
-  event: string;
-  data?: any;
+  data: number;
+  event: "time";
   id?: string | undefined;
   retry?: number | undefined;
 };
 
 type GetV1EventsTimeNegativeResponse = {
-  event: string;
-  data?: any;
+  data: string;
+  event: "error";
   id?: string | undefined;
   retry?: number | undefined;
 };
@@ -972,15 +972,15 @@ type PostV1AvatarRawResponse =
 type GetV1EventsTimeInput = {};
 
 type GetV1EventsTimePositiveResponse = {
-  event: string;
-  data?: any;
+  data: number;
+  event: "time";
   id?: string | undefined;
   retry?: number | undefined;
 };
 
 type GetV1EventsTimeNegativeResponse = {
-  event: string;
-  data?: any;
+  data: string;
+  event: "error";
   id?: string | undefined;
   retry?: number | undefined;
 };

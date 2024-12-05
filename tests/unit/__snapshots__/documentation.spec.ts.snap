@@ -1729,10 +1729,14 @@ paths:
               schema:
                 type: object
                 properties:
+                  data:
+                    type: integer
+                    format: int64
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
                   event:
                     type: string
-                  data:
-                    format: any
+                    const: time
                   id:
                     type: string
                   retry:
@@ -1741,6 +1745,7 @@ paths:
                     exclusiveMinimum: 0
                     maximum: 9007199254740991
                 required:
+                  - data
                   - event
         "400":
           description: GET /v1/events/time Negative response
@@ -1749,10 +1754,11 @@ paths:
               schema:
                 type: object
                 properties:
+                  data:
+                    type: string
                   event:
                     type: string
-                  data:
-                    format: any
+                    const: error
                   id:
                     type: string
                   retry:
@@ -1761,6 +1767,7 @@ paths:
                     exclusiveMinimum: 0
                     maximum: 9007199254740991
                 required:
+                  - data
                   - event
 components:
   schemas:
@@ -2462,10 +2469,14 @@ components:
     GetV1EventsTimePositiveResponse:
       type: object
       properties:
+        data:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+          maximum: 9007199254740991
         event:
           type: string
-        data:
-          format: any
+          const: time
         id:
           type: string
         retry:
@@ -2474,14 +2485,16 @@ components:
           exclusiveMinimum: 0
           maximum: 9007199254740991
       required:
+        - data
         - event
     GetV1EventsTimeNegativeResponse:
       type: object
       properties:
+        data:
+          type: string
         event:
           type: string
-        data:
-          format: any
+          const: error
         id:
           type: string
         retry:
@@ -2490,6 +2503,7 @@ components:
           exclusiveMinimum: 0
           maximum: 9007199254740991
       required:
+        - data
         - event
   responses: {}
   parameters: {}
