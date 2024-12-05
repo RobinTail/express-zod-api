@@ -6,7 +6,6 @@ import {
   ez,
   ensureHttpError,
 } from "../src";
-import { unstable_createEventStream } from "../src/sse";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 import { createReadStream } from "node:fs";
@@ -110,8 +109,4 @@ export const noContentFactory = new EndpointsFactory({
       response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
     },
   }),
-});
-
-export const sseFactory = unstable_createEventStream({
-  time: z.number().int().positive(),
 });

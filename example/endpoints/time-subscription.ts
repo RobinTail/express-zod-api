@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { sseFactory } from "../factories";
+import { unstable_createEventStream } from "../../src/sse";
 import { setTimeout } from "node:timers/promises";
 
-export const subscriptionEndpoint = sseFactory.build({
-  output: z.object({}),
+export const subscriptionEndpoint = unstable_createEventStream({
+  events: { time: z.number().int().positive() },
   handler: async ({ options: { emit, isClosed }, logger }) => {
     while (!isClosed()) {
       logger.debug("emitting");
@@ -11,6 +11,5 @@ export const subscriptionEndpoint = sseFactory.build({
       await setTimeout(1000);
     }
     logger.debug("closed");
-    return {};
   },
 });

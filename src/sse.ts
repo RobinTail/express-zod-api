@@ -1,5 +1,7 @@
 import { z } from "zod";
+import { EmptyObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
+import { Handler } from "./endpoint";
 import { EndpointsFactory } from "./endpoints-factory";
 import { Middleware } from "./middleware";
 import { ResultHandler } from "./result-handler";
@@ -10,6 +12,11 @@ import {
 } from "./result-helpers";
 
 type EventsMap = Record<string, z.ZodTypeAny>;
+
+interface Emitter<E extends EventsMap> {
+  isClosed: () => boolean;
+  emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => void;
+}
 
 const createEventStreamMiddleware = <E extends EventsMap>(events: E) =>
   new Middleware({
@@ -66,7 +73,19 @@ const makeResultHandler = <E extends EventsMap>(events: E) =>
     },
   });
 
-export const unstable_createEventStream = <E extends EventsMap>(events: E) =>
-  new EndpointsFactory(makeResultHandler(events)).addMiddleware(
-    createEventStreamMiddleware(events),
-  );
+export const unstable_createEventStream = <E extends EventsMap>({
+  events,
+  handler,
+}: {
+  events: E;
+  handler: Handler<EmptyObject, void, Emitter<E>>;
+}) =>
+  new EndpointsFactory(makeResultHandler(events))
+    .addMiddleware(createEventStreamMiddleware(events))
+    .build({
+      output: z.object({}),
+      handler: async (params) => {
+        await handler(params);
+        return {};
+      },
+    });
