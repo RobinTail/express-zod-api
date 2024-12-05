@@ -1729,10 +1729,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  data:
-                    type: object
                   event:
                     type: string
+                  data:
+                    format: any
                   id:
                     type: string
                   retry:
@@ -1741,13 +1741,27 @@ paths:
                     exclusiveMinimum: 0
                     maximum: 9007199254740991
                 required:
-                  - data
+                  - event
         "400":
           description: GET /v1/events/time Negative response
           content:
-            application/json:
+            text/event-stream:
               schema:
-                type: string
+                type: object
+                properties:
+                  event:
+                    type: string
+                  data:
+                    format: any
+                  id:
+                    type: string
+                  retry:
+                    type: integer
+                    format: int64
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
+                required:
+                  - event
 components:
   schemas:
     Schema1:
@@ -2102,7 +2116,7 @@ paths:
         "400":
           description: GET /v1/events/time Negative response
           content:
-            application/json:
+            text/event-stream:
               schema:
                 $ref: "#/components/schemas/GetV1EventsTimeNegativeResponse"
 components:
@@ -2448,10 +2462,10 @@ components:
     GetV1EventsTimePositiveResponse:
       type: object
       properties:
-        data:
-          type: object
         event:
           type: string
+        data:
+          format: any
         id:
           type: string
         retry:
@@ -2460,9 +2474,23 @@ components:
           exclusiveMinimum: 0
           maximum: 9007199254740991
       required:
-        - data
+        - event
     GetV1EventsTimeNegativeResponse:
-      type: string
+      type: object
+      properties:
+        event:
+          type: string
+        data:
+          format: any
+        id:
+          type: string
+        retry:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+          maximum: 9007199254740991
+      required:
+        - event
   responses: {}
   parameters: {}
   examples: {}

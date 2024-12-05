@@ -180,13 +180,18 @@ type PostV1AvatarRawResponse =
 type GetV1EventsTimeInput = {};
 
 type GetV1EventsTimePositiveResponse = {
-  data: {};
-  event?: string | undefined;
+  event: string;
+  data?: any;
   id?: string | undefined;
   retry?: number | undefined;
 };
 
-type GetV1EventsTimeNegativeResponse = string;
+type GetV1EventsTimeNegativeResponse = {
+  event: string;
+  data?: any;
+  id?: string | undefined;
+  retry?: number | undefined;
+};
 
 type GetV1EventsTimeResponse =
   | GetV1EventsTimePositiveResponse

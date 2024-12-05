@@ -6,7 +6,7 @@ import {
   ez,
   ensureHttpError,
 } from "../src";
-import { sseResultHandler } from "../src/sse";
+import { createEventStreamMiddleware, sseResultHandler } from "../src/sse";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 import { createReadStream } from "node:fs";
@@ -115,4 +115,6 @@ export const noContentFactory = new EndpointsFactory({
 export const sseFactory = new EndpointsFactory({
   config,
   resultHandler: sseResultHandler,
-});
+}).addMiddleware(
+  createEventStreamMiddleware({ time: z.number().int().positive() }),
+);
