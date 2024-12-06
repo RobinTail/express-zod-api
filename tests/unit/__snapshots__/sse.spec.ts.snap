@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SSE > makeEventSchema() > should make a valid schema of SSE event 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "data": {
+      "_type": "ZodString",
+    },
+    "event": {
+      "_type": "ZodLiteral",
+      "value": "test",
+    },
+    "id": {
+      "_type": "ZodOptional",
+      "value": {
+        "_type": "ZodString",
+      },
+    },
+    "retry": {
+      "_type": "ZodOptional",
+      "value": {
+        "_type": "ZodNumber",
+      },
+    },
+  },
+}
+`;

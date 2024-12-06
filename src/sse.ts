@@ -20,7 +20,7 @@ interface Emitter<E extends EventsMap> extends FlatObject {
   emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => void;
 }
 
-const makeEventSchema = (event: string, data: z.ZodTypeAny) =>
+export const makeEventSchema = (event: string, data: z.ZodTypeAny) =>
   z.object({
     data,
     event: z.literal(event),
