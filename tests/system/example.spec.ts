@@ -437,7 +437,10 @@ describe("Example", async () => {
         `http://localhost:${port}/v1/events/time?trigger=failure`,
       );
       expect(response.status).toBe(500);
-      await expect(response.text()).resolves.toMatchSnapshot();
+      expect(response.headers.get("content-type")).toBe(
+        "text/plain; charset=utf-8",
+      );
+      await expect(response.text()).resolves.toBe("Intentional failure");
     });
   });
 

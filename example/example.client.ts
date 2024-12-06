@@ -188,12 +188,7 @@ type GetV1EventsTimePositiveResponse = {
   retry?: number | undefined;
 };
 
-type GetV1EventsTimeNegativeResponse = {
-  data: string;
-  event: "error";
-  id?: string | undefined;
-  retry?: number | undefined;
-};
+type GetV1EventsTimeNegativeResponse = string;
 
 type GetV1EventsTimeResponse =
   | GetV1EventsTimePositiveResponse

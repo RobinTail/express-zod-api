@@ -66,9 +66,8 @@ const makeMiddleware = <E extends EventsMap>(events: E) =>
       },
   });
 
-const makeResultHandler = <E extends EventsMap>(events: E) => {
-  const negativeSchema = z.string();
-  return new ResultHandler({
+const makeResultHandler = <E extends EventsMap>(events: E) =>
+  new ResultHandler({
     positive: {
       mimeType: contentTypes.sse,
       schema: Object.entries(events)
@@ -77,23 +76,17 @@ const makeResultHandler = <E extends EventsMap>(events: E) => {
         )
         .reduce((agg, schema) => agg.or(schema)),
     },
-    negative: {
-      mimeType: contentTypes.sse,
-      schema: makeEventSchema("error", negativeSchema),
-    },
+    negative: { mimeType: "text/plain", schema: z.string() },
     handler: async ({ response, error, logger, request, input }) => {
       if (!error) return void response.end();
       const httpError = ensureHttpError(error);
       logServerError(httpError, logger, request, input);
-      const output = formatEvent(
-        { error: negativeSchema },
-        "error",
-        getPublicErrorMessage(httpError),
-      );
-      response.status(httpError.statusCode).end(output);
+      response
+        .status(httpError.statusCode)
+        .type("text/plain")
+        .end(getPublicErrorMessage(httpError));
     },
   });
-};
 
 export const unstable_createEventStream = <
   E extends EventsMap,

@@ -1757,25 +1757,9 @@ paths:
         "400":
           description: GET /v1/events/time Negative response
           content:
-            text/event-stream:
+            text/plain:
               schema:
-                type: object
-                properties:
-                  data:
-                    type: string
-                  event:
-                    type: string
-                    const: error
-                  id:
-                    type: string
-                  retry:
-                    type: integer
-                    format: int64
-                    exclusiveMinimum: 0
-                    maximum: 9007199254740991
-                required:
-                  - data
-                  - event
+                type: string
 components:
   schemas:
     Schema1:
@@ -2137,7 +2121,7 @@ paths:
         "400":
           description: GET /v1/events/time Negative response
           content:
-            text/event-stream:
+            text/plain:
               schema:
                 $ref: "#/components/schemas/GetV1EventsTimeNegativeResponse"
 components:
@@ -2504,23 +2488,7 @@ components:
         - data
         - event
     GetV1EventsTimeNegativeResponse:
-      type: object
-      properties:
-        data:
-          type: string
-        event:
-          type: string
-          const: error
-        id:
-          type: string
-        retry:
-          type: integer
-          format: int64
-          exclusiveMinimum: 0
-          maximum: 9007199254740991
-      required:
-        - data
-        - event
+      type: string
   responses: {}
   parameters: {}
   examples: {}
