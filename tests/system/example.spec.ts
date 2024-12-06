@@ -256,15 +256,15 @@ describe("Example", async () => {
     test("Should emit SSE (server sent events)", async () => {
       const source = new EventSource(`http://localhost:${port}/v1/events/time`);
       const stack: unknown[] = [];
-      source.addEventListener("time", (evt) =>
-        stack.push((evt as MessageEvent).data),
-      );
+      const onTime = (evt: Event) => stack.push((evt as MessageEvent).data);
+      source.addEventListener("time", onTime);
       await vi.waitFor(() => assert(stack.length > 2), { timeout: 5e3 });
       expect(
         stack.every(
           (entry) => typeof entry === "string" && /\d{10,}/.test(entry),
         ),
       );
+      source.removeEventListener("time", onTime);
     });
   });
 

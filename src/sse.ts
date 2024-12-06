@@ -1,3 +1,4 @@
+import { Response } from "express";
 import { z } from "zod";
 import { EmptySchema, FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
@@ -43,22 +44,26 @@ const formatEvent = <E extends EventsMap>(
     )
     .parse({ event, data });
 
+const headersTimeout = 1e4; // 10s to respond with a status code other than 200
+const ensureStream = (response: Response) =>
+  response.headersSent ||
+  response
+    .type(contentTypes.sse)
+    .setHeader("cache-control", "no-cache")
+    .setHeader("connection", "keep-alive")
+    .flushHeaders();
+
 const makeMiddleware = <E extends EventsMap>(events: E) =>
   new Middleware({
-    handler: async ({ response }): Promise<Emitter<E>> => ({
-      isClosed: () => response.writableEnded || response.closed,
-      emit: (event, data) => {
-        if (!response.headersSent) {
-          response
-            .type(contentTypes.sse)
-            .setHeader("cache-control", "no-cache")
-            .setHeader("connection", "keep-alive")
-            .flushHeaders();
-        }
-        response.write(formatEvent(events, event, data), "utf-8");
-        response.flush();
+    handler: async ({ response }): Promise<Emitter<E>> =>
+      setTimeout(() => ensureStream(response), headersTimeout) && {
+        isClosed: () => response.writableEnded || response.closed,
+        emit: (event, data) => {
+          ensureStream(response);
+          response.write(formatEvent(events, event, data), "utf-8");
+          response.flush();
+        },
       },
-    }),
   });
 
 const makeResultHandler = <E extends EventsMap>(events: E) => {
