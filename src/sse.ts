@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EmptyObject } from "./common-helpers";
+import { EmptyObject, FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { Handler } from "./endpoint";
 import { EndpointsFactory } from "./endpoints-factory";
@@ -13,14 +13,14 @@ import {
 
 type EventsMap = Record<string, z.ZodTypeAny>;
 
-interface Emitter<E extends EventsMap> {
+interface Emitter<E extends EventsMap> extends FlatObject {
   isClosed: () => boolean;
   emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => void;
 }
 
 const makeMiddleware = <E extends EventsMap>(events: E) =>
   new Middleware({
-    handler: async ({ response }) => {
+    handler: async ({ response }): Promise<Emitter<E>> => {
       response
         .type(contentTypes.sse)
         .setHeader("cache-control", "no-cache")
@@ -28,7 +28,7 @@ const makeMiddleware = <E extends EventsMap>(events: E) =>
         .flushHeaders();
       return {
         isClosed: () => response.writableEnded || response.closed,
-        emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => {
+        emit: (event, data) => {
           response.write(
             `event: ${String(event)}\ndata: ${JSON.stringify(events[event].parse(data))}\n\n`,
             "utf-8",
