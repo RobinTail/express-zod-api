@@ -1721,6 +1721,13 @@ paths:
   /v1/events/time:
     get:
       operationId: GetV1EventsTime
+      parameters:
+        - name: trigger
+          in: query
+          required: false
+          description: GET /v1/events/time Parameter
+          schema:
+            type: string
       responses:
         "200":
           description: GET /v1/events/time Positive response
@@ -2113,6 +2120,13 @@ paths:
   /v1/events/time:
     get:
       operationId: GetV1EventsTime
+      parameters:
+        - name: trigger
+          in: query
+          required: false
+          description: GET /v1/events/time Parameter
+          schema:
+            $ref: "#/components/schemas/GetV1EventsTimeParameterTrigger"
       responses:
         "200":
           description: GET /v1/events/time Positive response
@@ -2466,6 +2480,8 @@ components:
     PostV1AvatarRawRequestBody:
       type: string
       format: binary
+    GetV1EventsTimeParameterTrigger:
+      type: string
     GetV1EventsTimePositiveResponse:
       type: object
       properties:

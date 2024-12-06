@@ -431,6 +431,13 @@ describe("Example", async () => {
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
+
+    test("Should handle errors for SSE endpoints", async () => {
+      const response = await fetch(
+        `http://localhost:${port}/v1/events/time?trigger=failure`,
+      );
+      await expect(response.text()).resolves.toMatchSnapshot();
+    });
   });
 
   describe("Client", () => {

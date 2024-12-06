@@ -177,7 +177,9 @@ type PostV1AvatarRawResponse =
   | PostV1AvatarRawPositiveResponse
   | PostV1AvatarRawNegativeResponse;
 
-type GetV1EventsTimeInput = {};
+type GetV1EventsTimeInput = {
+  trigger?: string | undefined;
+};
 
 type GetV1EventsTimePositiveResponse = {
   data: number;

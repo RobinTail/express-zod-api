@@ -76,6 +76,13 @@ exports[`Example > Negative > Should fail to upload if the file is too large 1`]
 }
 `;
 
+exports[`Example > Negative > Should handle errors for SSE endpoints 1`] = `
+"event: error
+data: "Intentional failure"
+
+"
+`;
+
 exports[`Example > Negative > Should respond with error to the missing static file request 1`] = `
 {
   "error": {

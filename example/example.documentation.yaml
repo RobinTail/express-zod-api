@@ -569,6 +569,13 @@ paths:
   /v1/events/time:
     get:
       operationId: GetV1EventsTime
+      parameters:
+        - name: trigger
+          in: query
+          required: false
+          description: GET /v1/events/time Parameter
+          schema:
+            type: string
       responses:
         "200":
           description: GET /v1/events/time Positive response

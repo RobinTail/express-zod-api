@@ -3,8 +3,16 @@ import { unstable_createEventStream } from "../../src/sse";
 import { setTimeout } from "node:timers/promises";
 
 export const subscriptionEndpoint = unstable_createEventStream({
+  input: z.object({
+    trigger: z.string().optional(),
+  }),
   events: { time: z.number().int().positive() },
-  handler: async ({ options: { emit, isClosed }, logger }) => {
+  handler: async ({
+    input: { trigger },
+    options: { emit, isClosed },
+    logger,
+  }) => {
+    if (trigger === "failure") throw new Error("Intentional failure");
     while (!isClosed()) {
       logger.debug("emitting");
       emit("time", Date.now());

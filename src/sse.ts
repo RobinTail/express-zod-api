@@ -62,7 +62,7 @@ const makeMiddleware = <E extends EventsMap>(events: E) =>
   });
 
 const makeResultHandler = <E extends EventsMap>(events: E) => {
-  const negativeSchema = makeEventSchema("error", z.string());
+  const negativeSchema = z.string();
   return new ResultHandler({
     positive: {
       mimeType: contentTypes.sse,
@@ -72,7 +72,10 @@ const makeResultHandler = <E extends EventsMap>(events: E) => {
         )
         .reduce((agg, schema) => agg.or(schema)),
     },
-    negative: { mimeType: contentTypes.sse, schema: negativeSchema },
+    negative: {
+      mimeType: contentTypes.sse,
+      schema: makeEventSchema("error", negativeSchema),
+    },
     handler: async ({ response, error, logger, request, input }) => {
       if (error) {
         const httpError = ensureHttpError(error);
