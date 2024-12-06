@@ -18,7 +18,7 @@ interface Emitter<E extends EventsMap> {
   emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => void;
 }
 
-const createEventStreamMiddleware = <E extends EventsMap>(events: E) =>
+const makeMiddleware = <E extends EventsMap>(events: E) =>
   new Middleware({
     handler: async ({ response }) => {
       response
@@ -81,7 +81,7 @@ export const unstable_createEventStream = <E extends EventsMap>({
   handler: Handler<EmptyObject, void, Emitter<E>>;
 }) =>
   new EndpointsFactory(makeResultHandler(events))
-    .addMiddleware(createEventStreamMiddleware(events))
+    .addMiddleware(makeMiddleware(events))
     .build({
       output: z.object({}),
       handler: async (params) => {
