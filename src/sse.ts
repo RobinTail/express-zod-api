@@ -82,17 +82,15 @@ const makeResultHandler = <E extends EventsMap>(events: E) => {
       schema: makeEventSchema("error", negativeSchema),
     },
     handler: async ({ response, error, logger, request, input }) => {
-      if (error) {
-        const httpError = ensureHttpError(error);
-        logServerError(httpError, logger, request, input);
-        const output = formatEvent(
-          { error: negativeSchema },
-          "error",
-          getPublicErrorMessage(httpError),
-        );
-        return void response.status(httpError.statusCode).end(output);
-      }
-      response.end();
+      if (!error) return void response.end();
+      const httpError = ensureHttpError(error);
+      logServerError(httpError, logger, request, input);
+      const output = formatEvent(
+        { error: negativeSchema },
+        "error",
+        getPublicErrorMessage(httpError),
+      );
+      response.status(httpError.statusCode).end(output);
     },
   });
 };
