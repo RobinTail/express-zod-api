@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { EmptyObject, FlatObject } from "./common-helpers";
+import { EmptySchema, FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { Handler } from "./endpoint";
 import { EndpointsFactory } from "./endpoints-factory";
+import { IOSchema } from "./io-schema";
 import { Middleware } from "./middleware";
 import { ResultHandler } from "./result-handler";
 import {
@@ -73,16 +74,22 @@ const makeResultHandler = <E extends EventsMap>(events: E) =>
     },
   });
 
-export const unstable_createEventStream = <E extends EventsMap>({
+export const unstable_createEventStream = <
+  E extends EventsMap,
+  IN extends IOSchema = EmptySchema,
+>({
   events,
+  input,
   handler,
 }: {
   events: E;
-  handler: Handler<EmptyObject, void, Emitter<E>>;
+  input?: IN;
+  handler: Handler<z.output<IN>, void, Emitter<E>>;
 }) =>
   new EndpointsFactory(makeResultHandler(events))
     .addMiddleware(makeMiddleware(events))
     .build({
+      input,
       output: z.object({}),
       handler: async (params) => {
         await handler(params);
