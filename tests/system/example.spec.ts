@@ -1,3 +1,5 @@
+import assert from "node:assert/strict";
+import { EventSource } from "undici";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
 import {
@@ -249,6 +251,20 @@ describe("Example", async () => {
       );
       expect(response.status).toBe(204);
       expect(response.headers.get("content-type")).toBeNull();
+    });
+
+    test("Should emit server side events", async () => {
+      const source = new EventSource(`http://localhost:${port}/v1/events/time`);
+      const stack: unknown[] = [];
+      source.addEventListener("time", (evt) =>
+        stack.push((evt as MessageEvent).data),
+      );
+      await vi.waitFor(() => assert(stack.length > 2), { timeout: 5e3 });
+      expect(
+        stack.every(
+          (entry) => typeof entry === "string" && /\d{10,}/.test(entry),
+        ),
+      );
     });
   });
 
