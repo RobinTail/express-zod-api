@@ -92,7 +92,7 @@ const makeResultHandler = <E extends EventsMap>(events: E) => {
         );
         return void response.status(httpError.statusCode).end(output);
       }
-      response.status(200).end();
+      response.end();
     },
   });
 };
