@@ -45,20 +45,20 @@ const formatEvent = <E extends EventsMap>(
 
 const makeMiddleware = <E extends EventsMap>(events: E) =>
   new Middleware({
-    handler: async ({ response }): Promise<Emitter<E>> => {
-      response
-        .type(contentTypes.sse)
-        .setHeader("cache-control", "no-cache")
-        .setHeader("connection", "keep-alive")
-        .flushHeaders();
-      return {
-        isClosed: () => response.writableEnded || response.closed,
-        emit: (event, data) => {
-          response.write(formatEvent(events, event, data), "utf-8");
-          response.flush();
-        },
-      };
-    },
+    handler: async ({ response }): Promise<Emitter<E>> => ({
+      isClosed: () => response.writableEnded || response.closed,
+      emit: (event, data) => {
+        if (!response.headersSent) {
+          response
+            .type(contentTypes.sse)
+            .setHeader("cache-control", "no-cache")
+            .setHeader("connection", "keep-alive")
+            .flushHeaders();
+        }
+        response.write(formatEvent(events, event, data), "utf-8");
+        response.flush();
+      },
+    }),
   });
 
 const makeResultHandler = <E extends EventsMap>(events: E) => {

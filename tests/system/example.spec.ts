@@ -436,6 +436,7 @@ describe("Example", async () => {
       const response = await fetch(
         `http://localhost:${port}/v1/events/time?trigger=failure`,
       );
+      expect(response.status).toBe(500);
       await expect(response.text()).resolves.toMatchSnapshot();
     });
   });
