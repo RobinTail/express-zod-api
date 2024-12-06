@@ -253,7 +253,7 @@ describe("Example", async () => {
       expect(response.headers.get("content-type")).toBeNull();
     });
 
-    test("Should emit server side events", async () => {
+    test("Should emit SSE (server sent events)", async () => {
       const source = new EventSource(`http://localhost:${port}/v1/events/time`);
       const stack: unknown[] = [];
       source.addEventListener("time", (evt) =>
