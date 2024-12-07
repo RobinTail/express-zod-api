@@ -1,13 +1,23 @@
 import { z } from "zod";
-import { FlatObject, Middleware, testMiddleware } from "../../src";
+import {
+  FlatObject,
+  Middleware,
+  ResultHandler,
+  testMiddleware,
+} from "../../src";
 import {
   Emitter,
   ensureStream,
   formatEvent,
   makeEventSchema,
   makeMiddleware,
+  makeResultHandler,
 } from "../../src/sse";
-import { makeResponseMock } from "../../src/testing";
+import {
+  makeLoggerMock,
+  makeRequestMock,
+  makeResponseMock,
+} from "../../src/testing";
 
 describe("SSE", () => {
   describe("makeEventSchema()", () => {
@@ -61,7 +71,7 @@ describe("SSE", () => {
   });
 
   describe("makeMiddleware()", () => {
-    test("should create an middleware providing options for emission", async () => {
+    test("should create a Middleware providing options for emission", async () => {
       const middleware = makeMiddleware({ test: z.string() });
       expect(middleware).toBeInstanceOf(Middleware);
       expectTypeOf(middleware).toEqualTypeOf<
@@ -82,6 +92,40 @@ describe("SSE", () => {
       expect(responseMock.flush).toHaveBeenCalled();
       responseMock.end();
       expect(isClosed()).toBeTruthy();
+    });
+  });
+
+  describe("makeResultHandler()", () => {
+    test("should create ResultHandler describing possible events and handling generic errors", () => {
+      const resultHandler = makeResultHandler({ test: z.string() });
+      expect(resultHandler).toBeInstanceOf(ResultHandler);
+      expect(resultHandler.getPositiveResponse(z.object({}))).toMatchSnapshot();
+      expect(resultHandler.getNegativeResponse()).toMatchSnapshot();
+      const positiveResponse = makeResponseMock();
+      const commons = {
+        input: {},
+        output: {},
+        options: {},
+        request: makeRequestMock(),
+        logger: makeLoggerMock(),
+      };
+      resultHandler.execute({
+        ...commons,
+        response: positiveResponse,
+        error: null,
+      });
+      expect(positiveResponse.statusCode).toBe(200);
+      expect(positiveResponse._getData()).toBe("");
+      expect(positiveResponse.writableEnded).toBeTruthy();
+      const negativeResponse = makeResponseMock();
+      resultHandler.execute({
+        ...commons,
+        response: negativeResponse,
+        error: new Error("failure"),
+      });
+      expect(negativeResponse.statusCode).toBe(500);
+      expect(negativeResponse._getData()).toBe("failure");
+      expect(negativeResponse.writableEnded).toBeTruthy();
     });
   });
 });

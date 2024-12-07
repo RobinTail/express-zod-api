@@ -66,7 +66,7 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
       },
   });
 
-const makeResultHandler = <E extends EventsMap>(events: E) =>
+export const makeResultHandler = <E extends EventsMap>(events: E) =>
   new ResultHandler({
     positive: {
       mimeType: contentTypes.sse,
