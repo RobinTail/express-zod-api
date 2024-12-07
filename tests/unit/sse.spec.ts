@@ -101,7 +101,10 @@ describe("SSE", () => {
 
   describe("makeResultHandler()", () => {
     test("should create ResultHandler describing possible events and handling generic errors", () => {
-      const resultHandler = makeResultHandler({ test: z.string() });
+      const resultHandler = makeResultHandler({
+        test: z.string(),
+        another: z.number(),
+      });
       expect(resultHandler).toBeInstanceOf(ResultHandler);
       expect(resultHandler.getPositiveResponse(z.object({}))).toMatchSnapshot();
       expect(resultHandler.getNegativeResponse()).toMatchSnapshot();

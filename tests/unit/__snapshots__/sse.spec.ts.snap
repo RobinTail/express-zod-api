@@ -33,29 +33,134 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
     "mimeTypes": [
       "text/event-stream",
     ],
-    "schema": {
-      "_type": "ZodObject",
-      "shape": {
-        "data": {
-          "_type": "ZodString",
-        },
-        "event": {
-          "_type": "ZodLiteral",
-          "value": "test",
-        },
-        "id": {
-          "_type": "ZodOptional",
-          "value": {
-            "_type": "ZodString",
+    "schema": ZodDiscriminatedUnion {
+      "_def": {
+        "discriminator": "event",
+        "options": [
+          {
+            "_type": "ZodObject",
+            "shape": {
+              "data": {
+                "_type": "ZodString",
+              },
+              "event": {
+                "_type": "ZodLiteral",
+                "value": "test",
+              },
+              "id": {
+                "_type": "ZodOptional",
+                "value": {
+                  "_type": "ZodString",
+                },
+              },
+              "retry": {
+                "_type": "ZodOptional",
+                "value": {
+                  "_type": "ZodNumber",
+                },
+              },
+            },
+          },
+          {
+            "_type": "ZodObject",
+            "shape": {
+              "data": {
+                "_type": "ZodNumber",
+              },
+              "event": {
+                "_type": "ZodLiteral",
+                "value": "another",
+              },
+              "id": {
+                "_type": "ZodOptional",
+                "value": {
+                  "_type": "ZodString",
+                },
+              },
+              "retry": {
+                "_type": "ZodOptional",
+                "value": {
+                  "_type": "ZodNumber",
+                },
+              },
+            },
+          },
+        ],
+        "optionsMap": Map {
+          "test" => {
+            "_type": "ZodObject",
+            "shape": {
+              "data": {
+                "_type": "ZodString",
+              },
+              "event": {
+                "_type": "ZodLiteral",
+                "value": "test",
+              },
+              "id": {
+                "_type": "ZodOptional",
+                "value": {
+                  "_type": "ZodString",
+                },
+              },
+              "retry": {
+                "_type": "ZodOptional",
+                "value": {
+                  "_type": "ZodNumber",
+                },
+              },
+            },
+          },
+          "another" => {
+            "_type": "ZodObject",
+            "shape": {
+              "data": {
+                "_type": "ZodNumber",
+              },
+              "event": {
+                "_type": "ZodLiteral",
+                "value": "another",
+              },
+              "id": {
+                "_type": "ZodOptional",
+                "value": {
+                  "_type": "ZodString",
+                },
+              },
+              "retry": {
+                "_type": "ZodOptional",
+                "value": {
+                  "_type": "ZodNumber",
+                },
+              },
+            },
           },
         },
-        "retry": {
-          "_type": "ZodOptional",
-          "value": {
-            "_type": "ZodNumber",
-          },
-        },
+        "typeName": "ZodDiscriminatedUnion",
       },
+      "and": [Function],
+      "array": [Function],
+      "catch": [Function],
+      "default": [Function],
+      "describe": [Function],
+      "isNullable": [Function],
+      "isOptional": [Function],
+      "nullable": [Function],
+      "nullish": [Function],
+      "optional": [Function],
+      "or": [Function],
+      "parse": [Function],
+      "parseAsync": [Function],
+      "pipe": [Function],
+      "promise": [Function],
+      "readonly": [Function],
+      "refine": [Function],
+      "refinement": [Function],
+      "safeParse": [Function],
+      "safeParseAsync": [Function],
+      "spa": [Function],
+      "superRefine": [Function],
+      "transform": [Function],
     },
     "statusCodes": [
       200,
