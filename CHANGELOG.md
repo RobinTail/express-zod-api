@@ -17,13 +17,11 @@ import { setTimeout } from "node:timers/promises";
 export const subscriptionEndpoint = unstable_createEventStream({
   input: z.object({}), // optional input schema
   events: { time: z.number().int().positive() },
-  handler: async ({ options: { emit, isClosed }, logger }) => {
+  handler: async ({ options: { emit, isClosed } }) => {
     while (!isClosed()) {
-      logger.debug("emitting");
       emit("time", Date.now());
       await setTimeout(1000);
     }
-    logger.debug("closed");
   },
 });
 ```
