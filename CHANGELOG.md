@@ -2,6 +2,32 @@
 
 ## Version 21
 
+### v21.4.0
+
+- Feat: Introducing [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events):
+  - Early implementation of event stream is now available using `unstable_createEventStream()` method;
+  - Client application can subscribe to the event stream using `EventSource` class instance;
+  - The functionality is limited: no middlewres yet possible.
+
+```typescript
+import { z } from "zod";
+import { unstable_createEventStream } from "../../src";
+import { setTimeout } from "node:timers/promises";
+
+export const subscriptionEndpoint = unstable_createEventStream({
+  input: z.object({}), // optional
+  events: { time: z.number().int().positive() },
+  handler: async ({ options: { emit, isClosed }, logger }) => {
+    while (!isClosed()) {
+      logger.debug("emitting");
+      emit("time", Date.now());
+      await setTimeout(1000);
+    }
+    logger.debug("closed");
+  },
+});
+```
+
 ### v21.3.0
 
 - Fixed `provide()` method usage example in the code of the generated client;
