@@ -88,6 +88,7 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
     },
   });
 
+/** @desc This feature is in active development and can be changed or removed regardlress of SemVer */
 export const unstable_createEventStream = <
   E extends EventsMap,
   IN extends IOSchema = EmptySchema,

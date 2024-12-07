@@ -6,6 +6,7 @@ import {
   ResultHandler,
   testEndpoint,
   testMiddleware,
+  unstable_createEventStream,
 } from "../../src";
 import {
   Emitter,
@@ -14,7 +15,6 @@ import {
   makeEventSchema,
   makeMiddleware,
   makeResultHandler,
-  unstable_createEventStream,
 } from "../../src/sse";
 import {
   makeLoggerMock,
