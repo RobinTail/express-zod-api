@@ -1206,7 +1206,7 @@ import { unstable_createEventStream } from "../../src";
 import { setTimeout } from "node:timers/promises";
 
 export const subscriptionEndpoint = unstable_createEventStream({
-  input: z.object({}), // optional
+  input: z.object({}), // optional input schema
   events: { time: z.number().int().positive() },
   handler: async ({ options: { emit, isClosed }, logger }) => {
     while (!isClosed()) {
