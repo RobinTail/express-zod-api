@@ -1,8 +1,10 @@
+import { expectTypeOf } from "vitest";
 import { z } from "zod";
 import {
   FlatObject,
   Middleware,
   ResultHandler,
+  testEndpoint,
   testMiddleware,
 } from "../../src";
 import {
@@ -12,12 +14,14 @@ import {
   makeEventSchema,
   makeMiddleware,
   makeResultHandler,
+  unstable_createEventStream,
 } from "../../src/sse";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
 } from "../../src/testing";
+import { AbstractEndpoint } from "../../src/endpoint";
 
 describe("SSE", () => {
   describe("makeEventSchema()", () => {
@@ -126,6 +130,25 @@ describe("SSE", () => {
       expect(negativeResponse.statusCode).toBe(500);
       expect(negativeResponse._getData()).toBe("failure");
       expect(negativeResponse.writableEnded).toBeTruthy();
+    });
+  });
+
+  describe("unstable_createEventStream()", () => {
+    test("should combine SSE Middlware with corresponding ResultHandler and return Endpoint", async () => {
+      const endpoint = unstable_createEventStream({
+        events: { test: z.string() },
+        input: z.object({ some: z.string().optional() }),
+        handler: async ({ input, options }) => {
+          expectTypeOf(input).toEqualTypeOf<{ some?: string }>();
+          expectTypeOf(options.emit)
+            .parameter(0)
+            .toEqualTypeOf("test" as const);
+        },
+      });
+      expect(endpoint).toBeInstanceOf(AbstractEndpoint);
+      const { responseMock } = await testEndpoint({ endpoint });
+      expect(responseMock.statusCode).toBe(200);
+      expect(responseMock.writableEnded).toBeTruthy();
     });
   });
 });
