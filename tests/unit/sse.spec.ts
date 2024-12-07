@@ -1,6 +1,12 @@
-import "../../src/zod-plugin"; // required for this test // @todo until import from index
 import { z } from "zod";
-import { ensureStream, formatEvent, makeEventSchema } from "../../src/sse";
+import { FlatObject, Middleware, testMiddleware } from "../../src";
+import {
+  Emitter,
+  ensureStream,
+  formatEvent,
+  makeEventSchema,
+  makeMiddleware,
+} from "../../src/sse";
 import { makeResponseMock } from "../../src/testing";
 
 describe("SSE", () => {
@@ -51,6 +57,31 @@ describe("SSE", () => {
       response.headersSent = true;
       ensureStream(response);
       expect(response._getHeaders()).toEqual({});
+    });
+  });
+
+  describe("makeMiddleware()", () => {
+    test("should create an middleware providing options for emission", async () => {
+      const middleware = makeMiddleware({ test: z.string() });
+      expect(middleware).toBeInstanceOf(Middleware);
+      expectTypeOf(middleware).toEqualTypeOf<
+        Middleware<FlatObject, Emitter<{ test: z.ZodString }>, string>
+      >();
+      const { output, responseMock } = await testMiddleware({ middleware });
+      responseMock.flush = vi.fn();
+      expect(output).toEqual({
+        isClosed: expect.any(Function),
+        emit: expect.any(Function),
+      });
+      const { isClosed, emit } = output as Emitter<{ test: z.ZodString }>;
+      expect(isClosed()).toBeFalsy();
+      emit("test", "something");
+      expect(responseMock._getData()).toBe(
+        `event: test\ndata: "something"\n\n`,
+      );
+      expect(responseMock.flush).toHaveBeenCalled();
+      responseMock.end();
+      expect(isClosed()).toBeTruthy();
     });
   });
 });

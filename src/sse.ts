@@ -15,7 +15,7 @@ import {
 
 type EventsMap = Record<string, z.ZodTypeAny>;
 
-interface Emitter<E extends EventsMap> extends FlatObject {
+export interface Emitter<E extends EventsMap> extends FlatObject {
   isClosed: () => boolean;
   emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => void;
 }
@@ -53,7 +53,7 @@ export const ensureStream = (response: Response) =>
     "cache-control": "no-cache",
   });
 
-const makeMiddleware = <E extends EventsMap>(events: E) =>
+export const makeMiddleware = <E extends EventsMap>(events: E) =>
   new Middleware({
     handler: async ({ response }): Promise<Emitter<E>> =>
       setTimeout(() => ensureStream(response), headersTimeout) && {
