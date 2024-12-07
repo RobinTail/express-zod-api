@@ -1195,13 +1195,32 @@ createConfig({
 
 ## Subscriptions
 
-If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server, the
-capabilities of this framework and the HTTP protocol itself would not be enough in this case. I have developed an
-additional websocket operating framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar
-principles and capabilities. Check out an example of the synergy between two frameworks on handling subscription events
-in order to emit (broadcast) the `time` event every second with a current time in its payload:
+If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server,
+consider [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) stream.
+The feature is currently in active development. The following example demonstrates the implementation emitting the
+`time` event each second.
 
-https://github.com/RobinTail/zod-sockets#subscriptions
+```typescript
+import { z } from "zod";
+import { unstable_createEventStream } from "../../src";
+import { setTimeout } from "node:timers/promises";
+
+export const subscriptionEndpoint = unstable_createEventStream({
+  input: z.object({}), // optional
+  events: { time: z.number().int().positive() },
+  handler: async ({ options: { emit, isClosed }, logger }) => {
+    while (!isClosed()) {
+      logger.debug("emitting");
+      emit("time", Date.now());
+      await setTimeout(1000);
+    }
+    logger.debug("closed");
+  },
+});
+```
+
+If you need more capabilities, such as bidirectional event sending, I have developed an additional websocket operating
+framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and capabilities.
 
 # Integration and Documentation
 

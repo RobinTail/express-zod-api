@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { unstable_createEventStream } from "../../src/sse";
+import { unstable_createEventStream } from "../../src";
 import { setTimeout } from "node:timers/promises";
 
 export const subscriptionEndpoint = unstable_createEventStream({
