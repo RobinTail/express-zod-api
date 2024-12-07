@@ -1,6 +1,7 @@
 import "../../src/zod-plugin"; // required for this test // @todo until import from index
 import { z } from "zod";
-import { formatEvent, makeEventSchema } from "../../src/sse";
+import { ensureStream, formatEvent, makeEventSchema } from "../../src/sse";
+import { makeResponseMock } from "../../src/testing";
 
 describe("SSE", () => {
   describe("makeEventSchema()", () => {
@@ -29,6 +30,27 @@ describe("SSE", () => {
       expect(() =>
         formatEvent({ test: z.string() }, "test", 123),
       ).toThrowError();
+    });
+  });
+
+  describe("ensureStream()", () => {
+    test("should set valid headers if they are not yet sent", () => {
+      const response = makeResponseMock();
+      ensureStream(response);
+      expect(response.statusCode).toBe(200);
+      // @todo enable when this one merged: https://github.com/eugef/node-mocks-http/issues/312
+      // expect(response.headersSent).toBeTruthy();
+      expect(response._getHeaders()).toEqual({
+        connection: "keep-alive",
+        "cache-control": "no-cache",
+        "content-type": "text/event-stream",
+      });
+    });
+    test("should do nothing when headers are already sent", () => {
+      const response = makeResponseMock();
+      response.headersSent = true;
+      ensureStream(response);
+      expect(response._getHeaders()).toEqual({});
     });
   });
 });

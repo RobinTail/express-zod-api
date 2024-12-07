@@ -45,13 +45,13 @@ export const formatEvent = <E extends EventsMap>(
     .parse({ event, data });
 
 const headersTimeout = 1e4; // 10s to respond with a status code other than 200
-const ensureStream = (response: Response) =>
+export const ensureStream = (response: Response) =>
   response.headersSent ||
-  response
-    .type(contentTypes.sse)
-    .setHeader("cache-control", "no-cache")
-    .setHeader("connection", "keep-alive")
-    .flushHeaders();
+  response.writeHead(200, {
+    connection: "keep-alive",
+    "content-type": contentTypes.sse,
+    "cache-control": "no-cache",
+  });
 
 const makeMiddleware = <E extends EventsMap>(events: E) =>
   new Middleware({
