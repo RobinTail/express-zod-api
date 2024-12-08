@@ -11,6 +11,10 @@
 
 ## Version 21
 
+### v21.3.1
+
+- Return type of public methods `getTags()` and `getScopes()` of `Endpoint` corrected to `ReadyonlyArray<string>`.
+
 ### v21.3.0
 
 - Fixed `provide()` method usage example in the code of the generated client;
