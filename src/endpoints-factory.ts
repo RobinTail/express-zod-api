@@ -16,14 +16,14 @@ import {
   defaultResultHandler,
 } from "./result-handler";
 
-type BuildProps<
+interface BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema,
   MIN extends IOSchema<"strip">,
   OPT extends FlatObject,
   SCO extends string,
   TAG extends string,
-> = {
+> {
   input?: IN;
   output: OUT;
   handler: Handler<z.output<z.ZodIntersection<MIN, IN>>, z.input<OUT>, OPT>;
@@ -33,7 +33,7 @@ type BuildProps<
   method?: Method | [Method, ...Method[]];
   scope?: SCO | SCO[];
   tag?: TAG | TAG[];
-};
+}
 
 export class EndpointsFactory<
   IN extends IOSchema<"strip"> = EmptySchema,
@@ -46,6 +46,7 @@ export class EndpointsFactory<
 
   /** @desc Consider using the "config" prop with the "tags" option to enforce constraints on tagging the endpoints */
   constructor(resultHandler: AbstractResultHandler);
+  /** @todo consider migrating tags into augmentation approach in v22 */
   constructor(params: {
     resultHandler: AbstractResultHandler;
     config?: CommonConfig<TAG>;
