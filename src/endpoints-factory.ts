@@ -125,13 +125,7 @@ export class EndpointsFactory<
     scope,
     tag,
     method,
-  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
-    z.ZodIntersection<IN, BIN>,
-    BOUT,
-    OUT,
-    SCO,
-    TAG
-  > {
+  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>) {
     const { middlewares, resultHandler } = this;
     const methods = typeof method === "string" ? [method] : method;
     const getOperationId =
