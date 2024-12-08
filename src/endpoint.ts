@@ -60,8 +60,6 @@ export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
   OPT extends FlatObject,
-  SCO extends string,
-  TAG extends string,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
   readonly #methods?: ReadonlyArray<Method>;
@@ -73,8 +71,8 @@ export class Endpoint<
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   readonly #resultHandler: AbstractResultHandler;
   readonly #schemas: { input: IN; output: OUT };
-  readonly #scopes: ReadonlyArray<SCO>;
-  readonly #tags: ReadonlyArray<TAG>;
+  readonly #scopes: ReadonlyArray<string>;
+  readonly #tags: ReadonlyArray<string>;
   readonly #getOperationId: (method: Method) => string | undefined;
   readonly #requestType: ContentType;
 
@@ -100,8 +98,8 @@ export class Endpoint<
     shortDescription?: string;
     getOperationId?: (method: Method) => string | undefined;
     methods?: Method[];
-    scopes?: SCO[];
-    tags?: TAG[];
+    scopes?: string[];
+    tags?: string[];
   }) {
     super();
     this.#handler = handler;
