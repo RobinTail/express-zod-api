@@ -82,6 +82,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   }
 
   const parsers: Parsers = {
+    sse: [],
     json: [config.jsonParser || express.json()],
     raw: [config.rawParser || express.raw(), moveRaw],
     upload: config.upload

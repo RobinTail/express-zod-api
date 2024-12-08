@@ -95,6 +95,7 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "testEndpoint",
   "testMiddleware",
   "Integration",
+  "unstable_createEventStream",
   "ez",
 ]
 `;
@@ -102,3 +103,5 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
 exports[`Index Entrypoint > exports > testEndpoint should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > testMiddleware should have certain value 1`] = `[Function]`;
+
+exports[`Index Entrypoint > exports > unstable_createEventStream should have certain value 1`] = `[Function]`;

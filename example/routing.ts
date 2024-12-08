@@ -3,6 +3,7 @@ import { rawAcceptingEndpoint } from "./endpoints/accept-raw";
 import { createUserEndpoint } from "./endpoints/create-user";
 import { deleteUserEndpoint } from "./endpoints/delete-user";
 import { listUsersEndpoint } from "./endpoints/list-users";
+import { subscriptionEndpoint } from "./endpoints/time-subscription";
 import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
 import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
 import { sendAvatarEndpoint } from "./endpoints/send-avatar";
@@ -34,6 +35,9 @@ export const routing: Routing = {
       upload: uploadAvatarEndpoint,
       // raw body acceptance example
       raw: rawAcceptingEndpoint,
+    },
+    events: {
+      time: subscriptionEndpoint,
     },
   },
   // path /public serves static files from /example/assets
