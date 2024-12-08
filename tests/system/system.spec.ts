@@ -329,9 +329,7 @@ describe("App in production mode", async () => {
       expect(json).toMatchSnapshot({
         error: {
           message: expect.stringMatching(
-            // @todo revisit when Node 18 dropped
-            // the 2nd option is for Node 20+
-            /(Unexpected end of JSON input|Unterminated string in JSON at position 25)/,
+            /Unterminated string in JSON at position 25/,
           ),
         },
       });
