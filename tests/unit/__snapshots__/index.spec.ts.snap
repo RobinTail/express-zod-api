@@ -10,6 +10,8 @@ exports[`Index Entrypoint > exports > DocumentationError should have certain val
 
 exports[`Index Entrypoint > exports > EndpointsFactory should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint > exports > EventStreamFactory should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint > exports > InputValidationError should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > Integration should have certain value 1`] = `[Function]`;
@@ -95,6 +97,7 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "testEndpoint",
   "testMiddleware",
   "Integration",
+  "EventStreamFactory",
   "ez",
 ]
 `;

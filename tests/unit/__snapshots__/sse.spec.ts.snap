@@ -1,0 +1,111 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SSE > makeEventSchema() > should make a valid schema of SSE event 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "data": {
+      "_type": "ZodString",
+    },
+    "event": {
+      "_type": "ZodLiteral",
+      "value": "test",
+    },
+    "id": {
+      "_type": "ZodOptional",
+      "value": {
+        "_type": "ZodString",
+      },
+    },
+    "retry": {
+      "_type": "ZodOptional",
+      "value": {
+        "_type": "ZodNumber",
+      },
+    },
+  },
+}
+`;
+
+exports[`SSE > makeResultHandler() > should create ResultHandler describing possible events and handling generic errors 1`] = `
+[
+  {
+    "mimeTypes": [
+      "text/event-stream",
+    ],
+    "schema": {
+      "_type": "ZodDiscriminatedUnion",
+      "discriminator": "event",
+      "options": [
+        {
+          "_type": "ZodObject",
+          "shape": {
+            "data": {
+              "_type": "ZodString",
+            },
+            "event": {
+              "_type": "ZodLiteral",
+              "value": "test",
+            },
+            "id": {
+              "_type": "ZodOptional",
+              "value": {
+                "_type": "ZodString",
+              },
+            },
+            "retry": {
+              "_type": "ZodOptional",
+              "value": {
+                "_type": "ZodNumber",
+              },
+            },
+          },
+        },
+        {
+          "_type": "ZodObject",
+          "shape": {
+            "data": {
+              "_type": "ZodNumber",
+            },
+            "event": {
+              "_type": "ZodLiteral",
+              "value": "another",
+            },
+            "id": {
+              "_type": "ZodOptional",
+              "value": {
+                "_type": "ZodString",
+              },
+            },
+            "retry": {
+              "_type": "ZodOptional",
+              "value": {
+                "_type": "ZodNumber",
+              },
+            },
+          },
+        },
+      ],
+    },
+    "statusCodes": [
+      200,
+    ],
+  },
+]
+`;
+
+exports[`SSE > makeResultHandler() > should create ResultHandler describing possible events and handling generic errors 2`] = `
+[
+  {
+    "mimeTypes": [
+      "text/plain",
+    ],
+    "schema": {
+      "_type": "ZodString",
+    },
+    "statusCodes": [
+      400,
+    ],
+  },
+]
+`;
