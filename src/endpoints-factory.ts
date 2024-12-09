@@ -18,7 +18,7 @@ import {
 
 interface BuildProps<
   IN extends IOSchema,
-  OUT extends IOSchema,
+  OUT extends IOSchema | z.ZodVoid,
   MIN extends IOSchema<"strip">,
   OPT extends FlatObject,
   SCO extends string,
@@ -145,6 +145,21 @@ export class EndpointsFactory<
       description,
       shortDescription,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
+    });
+  }
+
+  /** @desc shorthand for returning {} while having output schema z.object({}) */
+  public buildVoid<BIN extends IOSchema = EmptySchema>({
+    handler,
+    ...rest
+  }: Omit<BuildProps<BIN, z.ZodVoid, IN, OUT, SCO, TAG>, "output">) {
+    return this.build({
+      ...rest,
+      output: z.object({}),
+      handler: async (props) => {
+        await handler(props);
+        return {};
+      },
     });
   }
 }
