@@ -5,10 +5,13 @@
 ### v21.5.0
 
 - Feat: Introducing [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events):
-  - Event streams feature is now available using `EventStreamFactory` class;
-  - Client application can subscribe to the event stream using `EventSource` class instance.
+  - Basic implementation of the event streams feature is now available using `EventStreamFactory` class;
+  - The new factory is similar to `EndpointsFactory` including the middlewares support;
+  - Client application can subscribe to the event stream using `EventSource` class instance;
+  - `Documentation` and `Integration` do not have yet a special depiction of such endpoints;
+  - This feature is a lightweight alternative to [Zod Sockets](https://github.com/RobinTail/zod-sockets).
 
-```typescript
+```ts
 import { z } from "zod";
 import { EventStreamFactory } from "express-zod-api";
 import { setTimeout } from "node:timers/promises";
@@ -23,6 +26,13 @@ export const subscriptionEndpoint = EventStreamFactory({
       await setTimeout(1000);
     }
   },
+});
+```
+
+```js
+const source = new EventSource("https://example.com/api/v1/time");
+source.addEventListener("time", (event) => {
+  const data = JSON.parse(event.data); // number
 });
 ```
 

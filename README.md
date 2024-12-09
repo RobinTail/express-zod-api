@@ -1218,6 +1218,13 @@ export const subscriptionEndpoint = EventStreamFactory({
 });
 ```
 
+```js
+const source = new EventSource("https://example.com/api/v1/time");
+source.addEventListener("time", (event) => {
+  const data = JSON.parse(event.data); // number
+});
+```
+
 If you need more capabilities, such as bidirectional event sending, I have developed an additional websocket operating
 framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and capabilities.
 
