@@ -1195,13 +1195,38 @@ createConfig({
 
 ## Subscriptions
 
-If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server, the
-capabilities of this framework and the HTTP protocol itself would not be enough in this case. I have developed an
-additional websocket operating framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar
-principles and capabilities. Check out an example of the synergy between two frameworks on handling subscription events
-in order to emit (broadcast) the `time` event every second with a current time in its payload:
+If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server,
+consider [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) feature.
+Client application can subscribe to the event stream using `EventSource` class instance. The following example
+demonstrates the implementation emitting the `time` event each second.
 
-https://github.com/RobinTail/zod-sockets#subscriptions
+```typescript
+import { z } from "zod";
+import { EventStreamFactory } from "express-zod-api";
+import { setTimeout } from "node:timers/promises";
+
+const subscriptionEndpoint = EventStreamFactory({
+  events: { time: z.number().int().positive() },
+}).buildVoid({
+  input: z.object({}), // optional input schema
+  handler: async ({ options: { emit, isClosed } }) => {
+    while (!isClosed()) {
+      emit("time", Date.now());
+      await setTimeout(1000);
+    }
+  },
+});
+```
+
+```js
+const source = new EventSource("https://example.com/api/v1/time");
+source.addEventListener("time", (event) => {
+  const data = JSON.parse(event.data); // number
+});
+```
+
+If you need more capabilities, such as bidirectional event sending, I have developed an additional websocket operating
+framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and capabilities.
 
 # Integration and Documentation
 
