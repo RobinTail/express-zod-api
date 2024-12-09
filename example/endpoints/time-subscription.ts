@@ -1,12 +1,11 @@
 import { z } from "zod";
-import { unstable_createEventStream } from "../../src";
 import { setTimeout } from "node:timers/promises";
+import { eventsFactory } from "../factories";
 
-export const subscriptionEndpoint = unstable_createEventStream({
+export const subscriptionEndpoint = eventsFactory.buildVoid({
   input: z.object({
     trigger: z.string().optional(),
   }),
-  events: { time: z.number().int().positive() },
   handler: async ({
     input: { trigger },
     options: { emit, isClosed },

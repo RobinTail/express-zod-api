@@ -1,10 +1,9 @@
 import { Response } from "express";
 import { z } from "zod";
 import { EmptySchema, FlatObject } from "./common-helpers";
+import { CommonConfig } from "./config-type";
 import { contentTypes } from "./content-type";
-import { Handler } from "./endpoint";
 import { EndpointsFactory } from "./endpoints-factory";
-import { IOSchema } from "./io-schema";
 import { Middleware } from "./middleware";
 import { ResultHandler } from "./result-handler";
 import {
@@ -93,22 +92,13 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
     },
   });
 
-/**
- * @desc This feature is in active development and can be changed or removed regardlress of SemVer
- * @todo make it adjustable for middlewares
- * */
-export const unstable_createEventStream = <
+/** @desc This feature is in active development and can be changed or removed regardlress of SemVer */
+export class EventStreamFactory<
   E extends EventsMap,
-  IN extends IOSchema = EmptySchema,
->({
-  events,
-  input,
-  handler,
-}: {
-  events: E;
-  input?: IN;
-  handler: Handler<z.output<IN>, void, Emitter<E>>;
-}) =>
-  new EndpointsFactory(makeResultHandler(events))
-    .addMiddleware(makeMiddleware(events))
-    .buildVoid({ input, handler });
+  TAG extends string,
+> extends EndpointsFactory<EmptySchema, Emitter<E>, string, TAG> {
+  constructor({ events, config }: { events: E; config?: CommonConfig<TAG> }) {
+    super({ config, resultHandler: makeResultHandler(events) });
+    this.middlewares = [makeMiddleware(events)];
+  }
+}

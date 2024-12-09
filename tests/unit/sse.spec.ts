@@ -6,7 +6,8 @@ import {
   ResultHandler,
   testEndpoint,
   testMiddleware,
-  unstable_createEventStream,
+  EventStreamFactory,
+  EndpointsFactory,
 } from "../../src";
 import {
   Emitter,
@@ -136,13 +137,20 @@ describe("SSE", () => {
     });
   });
 
-  describe("unstable_createEventStream()", () => {
+  describe("EventStreamFactory()", () => {
+    test("should inherit from EndpointsFactory", () => {
+      expect(new EventStreamFactory({ events: {} })).toBeInstanceOf(
+        EndpointsFactory,
+      );
+    });
+
     test("should combine SSE Middlware with corresponding ResultHandler and return Endpoint", async () => {
-      const endpoint = unstable_createEventStream({
+      const endpoint = new EventStreamFactory({
         events: { test: z.string() },
+      }).buildVoid({
         input: z.object({ some: z.string().optional() }),
         handler: async ({ input, options }) => {
-          expectTypeOf(input).toEqualTypeOf<{ some?: string }>();
+          expectTypeOf(input).toMatchTypeOf<{ some?: string }>();
           expectTypeOf(options.emit)
             .parameter(0)
             .toEqualTypeOf("test" as const);
