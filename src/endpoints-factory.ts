@@ -148,7 +148,7 @@ export class EndpointsFactory<
     });
   }
 
-  public buildEmpty<BIN extends IOSchema = EmptySchema>({
+  public buildVoid<BIN extends IOSchema = EmptySchema>({
     handler,
     ...rest
   }: Omit<BuildProps<BIN, z.ZodVoid, IN, OUT, SCO, TAG>, "output">) {

@@ -618,7 +618,7 @@ describe("Endpoint", () => {
 
       const endpoint = defaultEndpointsFactory
         .addMiddleware(dateInputMiddleware)
-        .buildEmpty({
+        .buildVoid({
           handler: async ({ input: { middleware_date_input }, logger }) =>
             logger.debug(
               "date in endpoint handler",

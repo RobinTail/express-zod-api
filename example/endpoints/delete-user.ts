@@ -4,7 +4,7 @@ import { z } from "zod";
 import { noContentFactory } from "../factories";
 
 /** @desc The endpoint demonstrates no content response established by its factory */
-export const deleteUserEndpoint = noContentFactory.buildEmpty({
+export const deleteUserEndpoint = noContentFactory.buildVoid({
   method: "delete",
   tag: "users",
   input: z.object({
