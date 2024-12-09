@@ -618,15 +618,12 @@ describe("Endpoint", () => {
 
       const endpoint = defaultEndpointsFactory
         .addMiddleware(dateInputMiddleware)
-        .build({
-          output: z.object({}),
-          handler: async ({ input: { middleware_date_input }, logger }) => {
+        .buildEmpty({
+          handler: async ({ input: { middleware_date_input }, logger }) =>
             logger.debug(
               "date in endpoint handler",
               typeof middleware_date_input,
-            );
-            return {};
-          },
+            ),
         });
 
       const { loggerMock, responseMock } = await testEndpoint({
