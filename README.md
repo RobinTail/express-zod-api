@@ -1196,7 +1196,7 @@ createConfig({
 ## Subscriptions
 
 If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server,
-consider [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) stream.
+consider [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) feature.
 Client application can subscribe to the event stream using `EventSource` class instance. The following example
 demonstrates the implementation emitting the `time` event each second.
 
