@@ -68,6 +68,10 @@ const serializers = [
     right,
   })),
   makeSchemaSerializer(z.ZodUnion, ({ options }) => ({ options })),
+  makeSchemaSerializer(
+    z.ZodDiscriminatedUnion,
+    ({ options, discriminator }) => ({ discriminator, options }),
+  ),
   makeSchemaSerializer(z.ZodEffects, ({ _def: { schema: value } }) => ({
     value,
   })),
