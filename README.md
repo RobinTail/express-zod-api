@@ -1202,12 +1202,13 @@ active development. The following example demonstrates the implementation emitti
 
 ```typescript
 import { z } from "zod";
-import { unstable_createEventStream } from "../../src";
+import { EventStreamFactory } from "express-zod-api";
 import { setTimeout } from "node:timers/promises";
 
-export const subscriptionEndpoint = unstable_createEventStream({
-  input: z.object({}), // optional input schema
+export const subscriptionEndpoint = EventStreamFactory({
   events: { time: z.number().int().positive() },
+}).buildVoid({
+  input: z.object({}), // optional input schema
   handler: async ({ options: { emit, isClosed } }) => {
     while (!isClosed()) {
       emit("time", Date.now());

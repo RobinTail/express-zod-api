@@ -11,7 +11,7 @@
 
 ```typescript
 import { z } from "zod";
-import { EventStreamFactory } from "../../src";
+import { EventStreamFactory } from "express-zod-api";
 import { setTimeout } from "node:timers/promises";
 
 export const subscriptionEndpoint = EventStreamFactory({
