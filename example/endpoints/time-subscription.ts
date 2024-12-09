@@ -3,6 +3,7 @@ import { setTimeout } from "node:timers/promises";
 import { eventsFactory } from "../factories";
 
 export const subscriptionEndpoint = eventsFactory.buildVoid({
+  tag: "subscriptions",
   input: z.object({
     trigger: z.string().optional(),
   }),

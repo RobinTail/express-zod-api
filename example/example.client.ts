@@ -281,7 +281,7 @@ export const endpointTags = {
   "get /v1/avatar/stream": ["users", "files"],
   "post /v1/avatar/upload": ["files"],
   "post /v1/avatar/raw": ["files"],
-  "get /v1/events/time": [],
+  "get /v1/events/time": ["subscriptions"],
 };
 
 export type Implementation = (

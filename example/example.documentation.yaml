@@ -569,6 +569,8 @@ paths:
   /v1/events/time:
     get:
       operationId: GetV1EventsTime
+      tags:
+        - subscriptions
       parameters:
         - name: trigger
           in: query
@@ -645,5 +647,7 @@ tags:
     description: Everything about the users
   - name: files
     description: Everything about the files processing
+  - name: subscriptions
+    description: Everything about the subscriptions
 servers:
   - url: https://example.com

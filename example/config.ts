@@ -22,6 +22,7 @@ export const config = createConfig({
   tags: {
     users: "Everything about the users",
     files: "Everything about the files processing",
+    subscriptions: "Everything about the subscriptions",
   },
 });
 
