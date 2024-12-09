@@ -5,6 +5,7 @@ import {
   defaultResultHandler,
   ez,
   ensureHttpError,
+  EventStreamFactory,
 } from "../src";
 import { config } from "./config";
 import { authMiddleware } from "./middlewares";
@@ -109,4 +110,9 @@ export const noContentFactory = new EndpointsFactory({
       response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
     },
   }),
+});
+
+export const eventsFactory = new EventStreamFactory({
+  config,
+  events: { time: z.number().int().positive() },
 });

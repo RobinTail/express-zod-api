@@ -177,6 +177,23 @@ type PostV1AvatarRawResponse =
   | PostV1AvatarRawPositiveResponse
   | PostV1AvatarRawNegativeResponse;
 
+type GetV1EventsTimeInput = {
+  trigger?: string | undefined;
+};
+
+type GetV1EventsTimePositiveResponse = {
+  data: number;
+  event: "time";
+  id?: string | undefined;
+  retry?: number | undefined;
+};
+
+type GetV1EventsTimeNegativeResponse = string;
+
+type GetV1EventsTimeResponse =
+  | GetV1EventsTimePositiveResponse
+  | GetV1EventsTimeNegativeResponse;
+
 export type Path =
   | "/v1/user/retrieve"
   | "/v1/user/:id/remove"
@@ -186,7 +203,8 @@ export type Path =
   | "/v1/avatar/send"
   | "/v1/avatar/stream"
   | "/v1/avatar/upload"
-  | "/v1/avatar/raw";
+  | "/v1/avatar/raw"
+  | "/v1/events/time";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
@@ -200,6 +218,7 @@ export interface Input {
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
   "post /v1/avatar/raw": PostV1AvatarRawInput;
+  "get /v1/events/time": GetV1EventsTimeInput;
 }
 
 export interface PositiveResponse {
@@ -212,6 +231,7 @@ export interface PositiveResponse {
   "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponse;
   "post /v1/avatar/upload": PostV1AvatarUploadPositiveResponse;
   "post /v1/avatar/raw": PostV1AvatarRawPositiveResponse;
+  "get /v1/events/time": GetV1EventsTimePositiveResponse;
 }
 
 export interface NegativeResponse {
@@ -224,6 +244,7 @@ export interface NegativeResponse {
   "get /v1/avatar/stream": GetV1AvatarStreamNegativeResponse;
   "post /v1/avatar/upload": PostV1AvatarUploadNegativeResponse;
   "post /v1/avatar/raw": PostV1AvatarRawNegativeResponse;
+  "get /v1/events/time": GetV1EventsTimeNegativeResponse;
 }
 
 export interface Response {
@@ -236,6 +257,7 @@ export interface Response {
   "get /v1/avatar/stream": GetV1AvatarStreamResponse;
   "post /v1/avatar/upload": PostV1AvatarUploadResponse;
   "post /v1/avatar/raw": PostV1AvatarRawResponse;
+  "get /v1/events/time": GetV1EventsTimeResponse;
 }
 
 export type MethodPath = keyof Input;
@@ -259,6 +281,7 @@ export const endpointTags = {
   "get /v1/avatar/stream": ["users", "files"],
   "post /v1/avatar/upload": ["files"],
   "post /v1/avatar/raw": ["files"],
+  "get /v1/events/time": ["subscriptions"],
 };
 
 export type Implementation = (

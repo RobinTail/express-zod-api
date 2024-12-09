@@ -28,6 +28,7 @@ export {
 } from "./errors";
 export { testEndpoint, testMiddleware } from "./testing";
 export { Integration } from "./integration";
+export { EventStreamFactory } from "./sse";
 
 export { ez } from "./proprietary-schemas";
 
