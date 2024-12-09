@@ -148,6 +148,7 @@ export class EndpointsFactory<
     });
   }
 
+  /** @desc shorthand for returning {} while having output schema z.object({}) */
   public buildVoid<BIN extends IOSchema = EmptySchema>({
     handler,
     ...rest
