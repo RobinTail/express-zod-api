@@ -93,7 +93,10 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
     },
   });
 
-/** @desc This feature is in active development and can be changed or removed regardlress of SemVer */
+/**
+ * @desc This feature is in active development and can be changed or removed regardlress of SemVer
+ * @todo make it adjustable for middlewares
+ * */
 export const unstable_createEventStream = <
   E extends EventsMap,
   IN extends IOSchema = EmptySchema,
@@ -108,11 +111,4 @@ export const unstable_createEventStream = <
 }) =>
   new EndpointsFactory(makeResultHandler(events))
     .addMiddleware(makeMiddleware(events))
-    .build({
-      input,
-      output: z.object({}),
-      handler: async (params) => {
-        await handler(params);
-        return {};
-      },
-    });
+    .buildVoid({ input, handler });
