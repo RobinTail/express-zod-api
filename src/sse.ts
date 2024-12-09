@@ -82,13 +82,17 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
     },
     negative: { mimeType: "text/plain", schema: z.string() },
     handler: async ({ response, error, logger, request, input }) => {
-      if (!error) return void response.end();
-      const httpError = ensureHttpError(error);
-      logServerError(httpError, logger, request, input);
-      response
-        .status(httpError.statusCode)
-        .type("text/plain")
-        .end(getPublicErrorMessage(httpError));
+      if (error) {
+        const httpError = ensureHttpError(error);
+        logServerError(httpError, logger, request, input);
+        if (!response.headersSent) {
+          response
+            .status(httpError.statusCode)
+            .type("text/plain")
+            .write(getPublicErrorMessage(httpError), "utf-8");
+        }
+      }
+      response.end();
     },
   });
 
