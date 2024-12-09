@@ -2,9 +2,22 @@
 
 ## Version 21
 
-### v21.3.1
+### v21.4.0
 
-- Return type of public methods `getTags()` and `getScopes()` of `Endpoint` corrected to `ReadyonlyArray<string>`.
+- Return type of public methods `getTags()` and `getScopes()` of `Endpoint` corrected to `ReadyonlyArray<string>`;
+- Featuring `EndpointsFactory::buildVoid()` method:
+  - It's a shorthand for returning `{}` while having `output` schema `z.object({})`;
+  - When using this method, `handler` may return `void` while retaining the object-based operation internally.
+
+```diff
+- factory.build({
++ factory.buildVoid({
+-   output: z.object({}),
+    handler: async () => {
+-     return {};
+    },
+  });
+```
 
 ### v21.3.0
 
