@@ -5,9 +5,8 @@
 ### v21.5.0
 
 - Feat: Introducing [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events):
-  - Early implementation of event stream is now available using `unstable_createEventStream()` method;
-  - Client application can subscribe to the event stream using `EventSource` class instance;
-  - The functionality is limited: no middlewares possible yet.
+  - Event streams feature is now available using `EventStreamFactory` class;
+  - Client application can subscribe to the event stream using `EventSource` class instance.
 
 ```typescript
 import { z } from "zod";
