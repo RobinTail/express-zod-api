@@ -16,14 +16,14 @@ import {
   defaultResultHandler,
 } from "./result-handler";
 
-type BuildProps<
+interface BuildProps<
   IN extends IOSchema,
-  OUT extends IOSchema,
+  OUT extends IOSchema | z.ZodVoid,
   MIN extends IOSchema<"strip">,
   OPT extends FlatObject,
   SCO extends string,
   TAG extends string,
-> = {
+> {
   input?: IN;
   output: OUT;
   handler: Handler<z.output<z.ZodIntersection<MIN, IN>>, z.input<OUT>, OPT>;
@@ -33,7 +33,7 @@ type BuildProps<
   method?: Method | [Method, ...Method[]];
   scope?: SCO | SCO[];
   tag?: TAG | TAG[];
-};
+}
 
 export class EndpointsFactory<
   IN extends IOSchema<"strip"> = EmptySchema,
@@ -46,6 +46,7 @@ export class EndpointsFactory<
 
   /** @desc Consider using the "config" prop with the "tags" option to enforce constraints on tagging the endpoints */
   constructor(resultHandler: AbstractResultHandler);
+  /** @todo consider migrating tags into augmentation approach in v22 */
   constructor(params: {
     resultHandler: AbstractResultHandler;
     config?: CommonConfig<TAG>;
@@ -125,13 +126,7 @@ export class EndpointsFactory<
     scope,
     tag,
     method,
-  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
-    z.ZodIntersection<IN, BIN>,
-    BOUT,
-    OUT,
-    SCO,
-    TAG
-  > {
+  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>) {
     const { middlewares, resultHandler } = this;
     const methods = typeof method === "string" ? [method] : method;
     const getOperationId =
@@ -150,6 +145,21 @@ export class EndpointsFactory<
       description,
       shortDescription,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
+    });
+  }
+
+  /** @desc shorthand for returning {} while having output schema z.object({}) */
+  public buildVoid<BIN extends IOSchema = EmptySchema>({
+    handler,
+    ...rest
+  }: Omit<BuildProps<BIN, z.ZodVoid, IN, OUT, SCO, TAG>, "output">) {
+    return this.build({
+      ...rest,
+      output: z.object({}),
+      handler: async (props) => {
+        await handler(props);
+        return {};
+      },
     });
   }
 }

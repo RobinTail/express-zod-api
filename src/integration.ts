@@ -38,7 +38,7 @@ import { Method, methods } from "./method";
 import { contentTypes } from "./content-type";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
-import { walkRouting } from "./routing-walker";
+import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
 import { ZTSContext, printNode, addJsDocComment } from "./zts-helpers";
@@ -174,58 +174,55 @@ export class Integration {
     const commons = { makeAlias: this.makeAlias.bind(this), optionalPropStyle };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
-    walkRouting({
-      routing,
-      onEndpoint: (endpoint, path, method) => {
-        const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
-        const input = makeType(
-          entitle("input"),
-          zodToTs(endpoint.getSchema("input"), ctxIn),
-        );
-        const positiveSchema = endpoint
-          .getResponses("positive")
-          .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
-          .reduce((agg, schema) => agg.or(schema));
-        const positiveResponse = makeType(
-          entitle("positive.response"),
-          zodToTs(positiveSchema, ctxOut),
-        );
-        const negativeSchema = endpoint
-          .getResponses("negative")
-          .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
-          .reduce((agg, schema) => agg.or(schema));
-        const negativeResponse = makeType(
-          entitle("negative.response"),
-          zodToTs(negativeSchema, ctxOut),
-        );
-        const genericResponse = makeType(
-          entitle("response"),
-          f.createUnionTypeNode([
-            f.createTypeReferenceNode(positiveResponse.name.text),
-            f.createTypeReferenceNode(negativeResponse.name.text),
-          ]),
-        );
-        this.program.push(
-          input,
-          positiveResponse,
-          negativeResponse,
-          genericResponse,
-        );
-        this.paths.push(path);
-        const isJson = endpoint
-          .getResponses("positive")
-          .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
-        this.registry.set(quoteProp(method, path), {
-          input: input.name.text,
-          positive: positiveResponse.name.text,
-          negative: negativeResponse.name.text,
-          response: genericResponse.name.text,
-          tags: endpoint.getTags(),
-          isJson,
-        });
-      },
-    });
-
+    const onEndpoint: OnEndpoint = (endpoint, path, method) => {
+      const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+      const input = makeType(
+        entitle("input"),
+        zodToTs(endpoint.getSchema("input"), ctxIn),
+      );
+      const positiveSchema = endpoint
+        .getResponses("positive")
+        .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
+        .reduce((agg, schema) => agg.or(schema));
+      const positiveResponse = makeType(
+        entitle("positive.response"),
+        zodToTs(positiveSchema, ctxOut),
+      );
+      const negativeSchema = endpoint
+        .getResponses("negative")
+        .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
+        .reduce((agg, schema) => agg.or(schema));
+      const negativeResponse = makeType(
+        entitle("negative.response"),
+        zodToTs(negativeSchema, ctxOut),
+      );
+      const genericResponse = makeType(
+        entitle("response"),
+        f.createUnionTypeNode([
+          f.createTypeReferenceNode(positiveResponse.name.text),
+          f.createTypeReferenceNode(negativeResponse.name.text),
+        ]),
+      );
+      this.program.push(
+        input,
+        positiveResponse,
+        negativeResponse,
+        genericResponse,
+      );
+      this.paths.push(path);
+      const isJson = endpoint
+        .getResponses("positive")
+        .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
+      this.registry.set(quoteProp(method, path), {
+        input: input.name.text,
+        positive: positiveResponse.name.text,
+        negative: negativeResponse.name.text,
+        response: genericResponse.name.text,
+        tags: endpoint.getTags(),
+        isJson,
+      });
+    };
+    walkRouting({ routing, onEndpoint });
     this.program.unshift(...this.aliases.values());
 
     // export type Path = "/v1/user/retrieve" | ___;

@@ -342,4 +342,15 @@ describe("EndpointsFactory", () => {
       ).toEqualTypeOf<EmptyObject>();
     });
   });
+
+  describe(".buildVoid()", () => {
+    test("Should be a shorthand for empty object output", () => {
+      const factory = new EndpointsFactory(resultHandlerMock);
+      const endpoint = factory.buildVoid({
+        handler: async () => {},
+      });
+      expect(endpoint.getSchema("output")).toMatchSnapshot();
+      expectTypeOf(endpoint.getSchema("output")).toMatchTypeOf<EmptySchema>();
+    });
+  });
 });
