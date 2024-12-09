@@ -14,9 +14,7 @@ export const deleteUserEndpoint = noContentFactory.build({
       .transform((id) => parseInt(id, 10))
       .describe("numeric string"),
   }),
-  output: z.object({}),
   handler: async ({ input: { id } }) => {
     assert(id <= 100, createHttpError(404, "User not found"));
-    return {};
   },
 });

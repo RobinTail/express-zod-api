@@ -18,14 +18,13 @@ import {
 
 interface BuildProps<
   IN extends IOSchema,
-  OUT extends IOSchema,
+  OUT extends IOSchema | z.ZodVoid,
   MIN extends IOSchema<"strip">,
   OPT extends FlatObject,
   SCO extends string,
   TAG extends string,
 > {
   input?: IN;
-  output: OUT;
   handler: Handler<z.output<z.ZodIntersection<MIN, IN>>, z.input<OUT>, OPT>;
   description?: string;
   shortDescription?: string;
@@ -116,27 +115,31 @@ export class EndpointsFactory<
     );
   }
 
+  public build<BIN extends IOSchema = EmptySchema>(
+    props: BuildProps<BIN, z.ZodVoid, IN, OUT, SCO, TAG>,
+  ): Endpoint<z.ZodIntersection<IN, BIN>, EmptySchema, OUT>;
+  public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>(
+    props: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG> & { output: BOUT },
+  ): Endpoint<z.ZodIntersection<IN, BIN>, BOUT, OUT>;
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
     input = z.object({}) as BIN,
+    output,
     handler,
-    output: outputSchema,
     description,
     shortDescription,
     operationId,
     scope,
     tag,
     method,
-  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>) {
+  }: BuildProps<BIN, BOUT | z.ZodVoid, IN, OUT, SCO, TAG> & { output?: BOUT }) {
     const { middlewares, resultHandler } = this;
     const methods = typeof method === "string" ? [method] : method;
     const getOperationId =
       typeof operationId === "function" ? operationId : () => operationId;
     const scopes = typeof scope === "string" ? [scope] : scope || [];
     const tags = typeof tag === "string" ? [tag] : tag || [];
-    return new Endpoint({
-      handler,
+    return new Endpoint<z.ZodIntersection<IN, BIN>, BOUT, OUT>({
       middlewares,
-      outputSchema,
       resultHandler,
       scopes,
       tags,
@@ -145,6 +148,13 @@ export class EndpointsFactory<
       description,
       shortDescription,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
+      outputSchema: output || (z.object({}) as BOUT),
+      handler: output
+        ? handler
+        : async (params) => {
+            await handler(params);
+            return {};
+          },
     });
   }
 }
