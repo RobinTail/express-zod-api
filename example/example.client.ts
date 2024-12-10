@@ -344,14 +344,31 @@ type GetV1EventsTimeInput = {
   trigger?: string | undefined;
 };
 
-type GetV1EventsTimePositiveResponse = {
+type GetV1EventsTimePositiveVariant1 = {
   data: number;
   event: "time";
   id?: string | undefined;
   retry?: number | undefined;
 };
 
-type GetV1EventsTimeNegativeResponse = string;
+interface GetV1EventsTimePositiveResponseVariants {
+  200: GetV1EventsTimePositiveVariant1;
+}
+
+type GetV1EventsTimePositiveResponse =
+  SomeOf<GetV1EventsTimePositiveResponseVariants>;
+
+type GetV1EventsTimeNegativeVariant1 = string;
+
+interface GetV1EventsTimeNegativeResponseVariants {
+  400: GetV1EventsTimeNegativeVariant1;
+}
+
+type GetV1EventsTimeNegativeResponse =
+  SomeOf<GetV1EventsTimeNegativeResponseVariants>;
+
+type GetV1EventsTimeEncodedResponse = GetV1EventsTimePositiveResponseVariants &
+  GetV1EventsTimeNegativeResponseVariants;
 
 type GetV1EventsTimeResponse =
   | GetV1EventsTimePositiveResponse
@@ -420,6 +437,7 @@ export interface EncodedResponse {
   "get /v1/avatar/stream": GetV1AvatarStreamEncodedResponse;
   "post /v1/avatar/upload": PostV1AvatarUploadEncodedResponse;
   "post /v1/avatar/raw": PostV1AvatarRawEncodedResponse;
+  "get /v1/events/time": GetV1EventsTimeEncodedResponse;
 }
 
 export interface Response {
