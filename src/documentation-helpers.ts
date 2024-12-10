@@ -114,9 +114,11 @@ const samples = {
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 const timeRegex = /^\d{2}:\d{2}:\d{2}(\.\d+)?$/;
-const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
-const tzDateTimeRegex =
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)$/;
+
+const getTimestampRegex = (hasOffset?: boolean) =>
+  hasOffset
+    ? /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)$/
+    : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 
 export const getRoutePathParams = (path: string): string[] =>
   path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
@@ -465,13 +467,10 @@ export const depictString: Depicter = ({
     [result.minLength, result.maxLength] = [lenCheck.value, lenCheck.value];
   if (minLength !== null) result.minLength = minLength;
   if (maxLength !== null) result.maxLength = maxLength;
-  if (isDatetime) {
-    result.pattern = datetimeCheck?.offset
-      ? tzDateTimeRegex.source
-      : dateTimeRegex.source;
-  }
   if (isDate) result.pattern = dateRegex.source;
   if (isTime) result.pattern = timeRegex.source;
+  if (isDatetime)
+    result.pattern = getTimestampRegex(datetimeCheck?.offset).source;
   if (regexCheck) result.pattern = regexCheck.regex.source;
   return result;
 };
