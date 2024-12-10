@@ -112,6 +112,13 @@ const samples = {
 
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
+const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+const timeRegex = /^\d{2}:\d{2}:\d{2}(\.\d+)?$/;
+
+const getTimestampRegex = (hasOffset?: boolean) =>
+  hasOffset
+    ? /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)$/
+    : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 
 export const getRoutePathParams = (path: string): string[] =>
   path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
@@ -417,29 +424,37 @@ export const depictString: Depicter = ({
   isIP,
   isEmoji,
   isDatetime,
+  isCIDR,
+  isDate,
+  isTime,
+  isBase64,
+  isNANOID,
+  isBase64url,
+  isDuration,
   _def: { checks },
 }: z.ZodString) => {
   const regexCheck = checks.find((check) => check.kind === "regex");
   const datetimeCheck = checks.find((check) => check.kind === "datetime");
-  const regex = regexCheck
-    ? regexCheck.regex
-    : datetimeCheck
-      ? datetimeCheck.offset
-        ? new RegExp(
-            `^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$`,
-          )
-        : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
-      : undefined;
+  const isJWT = checks.some((check) => check.kind === "jwt");
+  const lenCheck = checks.find((check) => check.kind === "length");
   const result: SchemaObject = { type: "string" };
   const formats: Record<NonNullable<SchemaObject["format"]>, boolean> = {
     "date-time": isDatetime,
+    byte: isBase64,
+    base64url: isBase64url,
+    date: isDate,
+    time: isTime,
+    duration: isDuration,
     email: isEmail,
     url: isURL,
     uuid: isUUID,
     cuid: isCUID,
     cuid2: isCUID2,
     ulid: isULID,
+    nanoid: isNANOID,
+    jwt: isJWT,
     ip: isIP,
+    cidr: isCIDR,
     emoji: isEmoji,
   };
   for (const format in formats) {
@@ -448,9 +463,15 @@ export const depictString: Depicter = ({
       break;
     }
   }
+  if (lenCheck)
+    [result.minLength, result.maxLength] = [lenCheck.value, lenCheck.value];
   if (minLength !== null) result.minLength = minLength;
   if (maxLength !== null) result.maxLength = maxLength;
-  if (regex) result.pattern = regex.source;
+  if (isDate) result.pattern = dateRegex.source;
+  if (isTime) result.pattern = timeRegex.source;
+  if (isDatetime)
+    result.pattern = getTimestampRegex(datetimeCheck?.offset).source;
+  if (regexCheck) result.pattern = regexCheck.regex.source;
   return result;
 };
 
