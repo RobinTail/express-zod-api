@@ -1196,6 +1196,76 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 }
 `;
 
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 7 1`] = `
+{
+  "format": "date",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 8 1`] = `
+{
+  "format": "time",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 9 1`] = `
+{
+  "format": "duration",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 10 1`] = `
+{
+  "format": "cidr",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 11 1`] = `
+{
+  "format": "ip",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 12 1`] = `
+{
+  "format": "jwt",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 13 1`] = `
+{
+  "format": "byte",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 14 1`] = `
+{
+  "format": "base64url",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 15 1`] = `
+{
+  "format": "cuid2",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 16 1`] = `
+{
+  "format": "ulid",
+  "type": "string",
+}
+`;
+
 exports[`Documentation helpers > depictString() > should set type:string 1`] = `
 {
   "type": "string",
