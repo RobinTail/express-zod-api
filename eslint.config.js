@@ -92,7 +92,7 @@ export default tsPlugin.config(
         },
         {
           selector: "Identifier[name='createInterfaceDeclaration']",
-          message: "use makePublicInterface() helper",
+          message: "use makeInterface() helper",
         },
         {
           selector: "Identifier[name='createClassDeclaration']",

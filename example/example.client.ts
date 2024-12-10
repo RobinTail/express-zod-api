@@ -3,12 +3,14 @@ type Type1 = {
   features: Type1;
 }[];
 
+export type SomeOf<T> = T[keyof T];
+
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
 };
 
-type GetV1UserRetrievePositiveResponse = {
+type GetV1UserRetrievePositiveVariant1 = {
   status: "success";
   data: {
     id: number;
@@ -20,12 +22,30 @@ type GetV1UserRetrievePositiveResponse = {
   };
 };
 
-type GetV1UserRetrieveNegativeResponse = {
+interface GetV1UserRetrievePositiveResponseVariants {
+  200: GetV1UserRetrievePositiveVariant1;
+}
+
+type GetV1UserRetrievePositiveResponse =
+  SomeOf<GetV1UserRetrievePositiveResponseVariants>;
+
+type GetV1UserRetrieveNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
   };
 };
+
+interface GetV1UserRetrieveNegativeResponseVariants {
+  400: GetV1UserRetrieveNegativeVariant1;
+}
+
+type GetV1UserRetrieveNegativeResponse =
+  SomeOf<GetV1UserRetrieveNegativeResponseVariants>;
+
+type GetV1UserRetrieveEncodedResponse =
+  GetV1UserRetrievePositiveResponseVariants &
+    GetV1UserRetrieveNegativeResponseVariants;
 
 type GetV1UserRetrieveResponse =
   | GetV1UserRetrievePositiveResponse
@@ -36,9 +56,27 @@ type DeleteV1UserIdRemoveInput = {
   id: string;
 };
 
-type DeleteV1UserIdRemovePositiveResponse = undefined;
+type DeleteV1UserIdRemovePositiveVariant1 = undefined;
 
-type DeleteV1UserIdRemoveNegativeResponse = undefined;
+interface DeleteV1UserIdRemovePositiveResponseVariants {
+  204: DeleteV1UserIdRemovePositiveVariant1;
+}
+
+type DeleteV1UserIdRemovePositiveResponse =
+  SomeOf<DeleteV1UserIdRemovePositiveResponseVariants>;
+
+type DeleteV1UserIdRemoveNegativeVariant1 = undefined;
+
+interface DeleteV1UserIdRemoveNegativeResponseVariants {
+  404: DeleteV1UserIdRemoveNegativeVariant1;
+}
+
+type DeleteV1UserIdRemoveNegativeResponse =
+  SomeOf<DeleteV1UserIdRemoveNegativeResponseVariants>;
+
+type DeleteV1UserIdRemoveEncodedResponse =
+  DeleteV1UserIdRemovePositiveResponseVariants &
+    DeleteV1UserIdRemoveNegativeResponseVariants;
 
 type DeleteV1UserIdRemoveResponse =
   | DeleteV1UserIdRemovePositiveResponse
@@ -51,7 +89,7 @@ type PatchV1UserIdInput = {
   birthday: string;
 };
 
-type PatchV1UserIdPositiveResponse = {
+type PatchV1UserIdPositiveVariant1 = {
   status: "success";
   data: {
     name: string;
@@ -59,12 +97,29 @@ type PatchV1UserIdPositiveResponse = {
   };
 };
 
-type PatchV1UserIdNegativeResponse = {
+interface PatchV1UserIdPositiveResponseVariants {
+  200: PatchV1UserIdPositiveVariant1;
+}
+
+type PatchV1UserIdPositiveResponse =
+  SomeOf<PatchV1UserIdPositiveResponseVariants>;
+
+type PatchV1UserIdNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
   };
 };
+
+interface PatchV1UserIdNegativeResponseVariants {
+  400: PatchV1UserIdNegativeVariant1;
+}
+
+type PatchV1UserIdNegativeResponse =
+  SomeOf<PatchV1UserIdNegativeResponseVariants>;
+
+type PatchV1UserIdEncodedResponse = PatchV1UserIdPositiveResponseVariants &
+  PatchV1UserIdNegativeResponseVariants;
 
 type PatchV1UserIdResponse =
   | PatchV1UserIdPositiveResponse
@@ -74,22 +129,43 @@ type PostV1UserCreateInput = {
   name: string;
 };
 
-type PostV1UserCreatePositiveResponse = {
+type PostV1UserCreatePositiveVariant1 = {
   status: "created";
   data: {
     id: number;
   };
 };
 
+interface PostV1UserCreatePositiveResponseVariants {
+  201: PostV1UserCreatePositiveVariant1;
+  202: PostV1UserCreatePositiveVariant1;
+}
+
+type PostV1UserCreatePositiveResponse =
+  SomeOf<PostV1UserCreatePositiveResponseVariants>;
+
+type PostV1UserCreateNegativeVariant1 = {
+  status: "exists";
+  id: number;
+};
+
+type PostV1UserCreateNegativeVariant2 = {
+  status: "error";
+  reason: string;
+};
+
+interface PostV1UserCreateNegativeResponseVariants {
+  409: PostV1UserCreateNegativeVariant1;
+  400: PostV1UserCreateNegativeVariant2;
+  500: PostV1UserCreateNegativeVariant2;
+}
+
 type PostV1UserCreateNegativeResponse =
-  | {
-      status: "exists";
-      id: number;
-    }
-  | {
-      status: "error";
-      reason: string;
-    };
+  SomeOf<PostV1UserCreateNegativeResponseVariants>;
+
+type PostV1UserCreateEncodedResponse =
+  PostV1UserCreatePositiveResponseVariants &
+    PostV1UserCreateNegativeResponseVariants;
 
 type PostV1UserCreateResponse =
   | PostV1UserCreatePositiveResponse
@@ -97,11 +173,28 @@ type PostV1UserCreateResponse =
 
 type GetV1UserListInput = {};
 
-type GetV1UserListPositiveResponse = {
+type GetV1UserListPositiveVariant1 = {
   name: string;
 }[];
 
-type GetV1UserListNegativeResponse = string;
+interface GetV1UserListPositiveResponseVariants {
+  200: GetV1UserListPositiveVariant1;
+}
+
+type GetV1UserListPositiveResponse =
+  SomeOf<GetV1UserListPositiveResponseVariants>;
+
+type GetV1UserListNegativeVariant1 = string;
+
+interface GetV1UserListNegativeResponseVariants {
+  400: GetV1UserListNegativeVariant1;
+}
+
+type GetV1UserListNegativeResponse =
+  SomeOf<GetV1UserListNegativeResponseVariants>;
+
+type GetV1UserListEncodedResponse = GetV1UserListPositiveResponseVariants &
+  GetV1UserListNegativeResponseVariants;
 
 type GetV1UserListResponse =
   | GetV1UserListPositiveResponse
@@ -111,9 +204,26 @@ type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendPositiveResponse = string;
+type GetV1AvatarSendPositiveVariant1 = string;
 
-type GetV1AvatarSendNegativeResponse = string;
+interface GetV1AvatarSendPositiveResponseVariants {
+  200: GetV1AvatarSendPositiveVariant1;
+}
+
+type GetV1AvatarSendPositiveResponse =
+  SomeOf<GetV1AvatarSendPositiveResponseVariants>;
+
+type GetV1AvatarSendNegativeVariant1 = string;
+
+interface GetV1AvatarSendNegativeResponseVariants {
+  400: GetV1AvatarSendNegativeVariant1;
+}
+
+type GetV1AvatarSendNegativeResponse =
+  SomeOf<GetV1AvatarSendNegativeResponseVariants>;
+
+type GetV1AvatarSendEncodedResponse = GetV1AvatarSendPositiveResponseVariants &
+  GetV1AvatarSendNegativeResponseVariants;
 
 type GetV1AvatarSendResponse =
   | GetV1AvatarSendPositiveResponse
@@ -123,9 +233,27 @@ type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-type GetV1AvatarStreamPositiveResponse = Buffer;
+type GetV1AvatarStreamPositiveVariant1 = Buffer;
 
-type GetV1AvatarStreamNegativeResponse = string;
+interface GetV1AvatarStreamPositiveResponseVariants {
+  200: GetV1AvatarStreamPositiveVariant1;
+}
+
+type GetV1AvatarStreamPositiveResponse =
+  SomeOf<GetV1AvatarStreamPositiveResponseVariants>;
+
+type GetV1AvatarStreamNegativeVariant1 = string;
+
+interface GetV1AvatarStreamNegativeResponseVariants {
+  400: GetV1AvatarStreamNegativeVariant1;
+}
+
+type GetV1AvatarStreamNegativeResponse =
+  SomeOf<GetV1AvatarStreamNegativeResponseVariants>;
+
+type GetV1AvatarStreamEncodedResponse =
+  GetV1AvatarStreamPositiveResponseVariants &
+    GetV1AvatarStreamNegativeResponseVariants;
 
 type GetV1AvatarStreamResponse =
   | GetV1AvatarStreamPositiveResponse
@@ -135,7 +263,7 @@ type PostV1AvatarUploadInput = {
   avatar: any;
 };
 
-type PostV1AvatarUploadPositiveResponse = {
+type PostV1AvatarUploadPositiveVariant1 = {
   status: "success";
   data: {
     name: string;
@@ -146,12 +274,30 @@ type PostV1AvatarUploadPositiveResponse = {
   };
 };
 
-type PostV1AvatarUploadNegativeResponse = {
+interface PostV1AvatarUploadPositiveResponseVariants {
+  200: PostV1AvatarUploadPositiveVariant1;
+}
+
+type PostV1AvatarUploadPositiveResponse =
+  SomeOf<PostV1AvatarUploadPositiveResponseVariants>;
+
+type PostV1AvatarUploadNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
   };
 };
+
+interface PostV1AvatarUploadNegativeResponseVariants {
+  400: PostV1AvatarUploadNegativeVariant1;
+}
+
+type PostV1AvatarUploadNegativeResponse =
+  SomeOf<PostV1AvatarUploadNegativeResponseVariants>;
+
+type PostV1AvatarUploadEncodedResponse =
+  PostV1AvatarUploadPositiveResponseVariants &
+    PostV1AvatarUploadNegativeResponseVariants;
 
 type PostV1AvatarUploadResponse =
   | PostV1AvatarUploadPositiveResponse
@@ -159,19 +305,36 @@ type PostV1AvatarUploadResponse =
 
 type PostV1AvatarRawInput = Buffer;
 
-type PostV1AvatarRawPositiveResponse = {
+type PostV1AvatarRawPositiveVariant1 = {
   status: "success";
   data: {
     length: number;
   };
 };
 
-type PostV1AvatarRawNegativeResponse = {
+interface PostV1AvatarRawPositiveResponseVariants {
+  200: PostV1AvatarRawPositiveVariant1;
+}
+
+type PostV1AvatarRawPositiveResponse =
+  SomeOf<PostV1AvatarRawPositiveResponseVariants>;
+
+type PostV1AvatarRawNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
   };
 };
+
+interface PostV1AvatarRawNegativeResponseVariants {
+  400: PostV1AvatarRawNegativeVariant1;
+}
+
+type PostV1AvatarRawNegativeResponse =
+  SomeOf<PostV1AvatarRawNegativeResponseVariants>;
+
+type PostV1AvatarRawEncodedResponse = PostV1AvatarRawPositiveResponseVariants &
+  PostV1AvatarRawNegativeResponseVariants;
 
 type PostV1AvatarRawResponse =
   | PostV1AvatarRawPositiveResponse
@@ -181,14 +344,31 @@ type GetV1EventsTimeInput = {
   trigger?: string | undefined;
 };
 
-type GetV1EventsTimePositiveResponse = {
+type GetV1EventsTimePositiveVariant1 = {
   data: number;
   event: "time";
   id?: string | undefined;
   retry?: number | undefined;
 };
 
-type GetV1EventsTimeNegativeResponse = string;
+interface GetV1EventsTimePositiveResponseVariants {
+  200: GetV1EventsTimePositiveVariant1;
+}
+
+type GetV1EventsTimePositiveResponse =
+  SomeOf<GetV1EventsTimePositiveResponseVariants>;
+
+type GetV1EventsTimeNegativeVariant1 = string;
+
+interface GetV1EventsTimeNegativeResponseVariants {
+  400: GetV1EventsTimeNegativeVariant1;
+}
+
+type GetV1EventsTimeNegativeResponse =
+  SomeOf<GetV1EventsTimeNegativeResponseVariants>;
+
+type GetV1EventsTimeEncodedResponse = GetV1EventsTimePositiveResponseVariants &
+  GetV1EventsTimeNegativeResponseVariants;
 
 type GetV1EventsTimeResponse =
   | GetV1EventsTimePositiveResponse
@@ -245,6 +425,19 @@ export interface NegativeResponse {
   "post /v1/avatar/upload": PostV1AvatarUploadNegativeResponse;
   "post /v1/avatar/raw": PostV1AvatarRawNegativeResponse;
   "get /v1/events/time": GetV1EventsTimeNegativeResponse;
+}
+
+export interface EncodedResponse {
+  "get /v1/user/retrieve": GetV1UserRetrieveEncodedResponse;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemoveEncodedResponse;
+  "patch /v1/user/:id": PatchV1UserIdEncodedResponse;
+  "post /v1/user/create": PostV1UserCreateEncodedResponse;
+  "get /v1/user/list": GetV1UserListEncodedResponse;
+  "get /v1/avatar/send": GetV1AvatarSendEncodedResponse;
+  "get /v1/avatar/stream": GetV1AvatarStreamEncodedResponse;
+  "post /v1/avatar/upload": PostV1AvatarUploadEncodedResponse;
+  "post /v1/avatar/raw": PostV1AvatarRawEncodedResponse;
+  "get /v1/events/time": GetV1EventsTimeEncodedResponse;
 }
 
 export interface Response {
