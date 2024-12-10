@@ -59,8 +59,7 @@ describe("SSE", () => {
       const response = makeResponseMock();
       ensureStream(response);
       expect(response.statusCode).toBe(200);
-      // @todo enable when this one merged: https://github.com/eugef/node-mocks-http/issues/312
-      // expect(response.headersSent).toBeTruthy();
+      expect(response.headersSent).toBeTruthy();
       expect(response._getHeaders()).toEqual({
         connection: "keep-alive",
         "cache-control": "no-cache",
