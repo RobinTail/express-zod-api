@@ -498,6 +498,16 @@ describe("Documentation helpers", () => {
       z.string().datetime(),
       z.string().datetime({ offset: true }),
       z.string().regex(/^\d+.\d+.\d+$/),
+      z.string().date(),
+      z.string().time(),
+      z.string().duration(),
+      z.string().cidr(),
+      z.string().ip(),
+      z.string().jwt(),
+      z.string().base64(),
+      z.string().base64url(),
+      z.string().cuid2(),
+      z.string().ulid(),
     ])("should set format, pattern and min/maxLength props %#", (schema) => {
       expect(depictString(schema, requestCtx)).toMatchSnapshot();
     });
