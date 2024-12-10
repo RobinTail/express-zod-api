@@ -429,6 +429,7 @@ export const depictString: Depicter = ({
   const regexCheck = checks.find((check) => check.kind === "regex");
   const datetimeCheck = checks.find((check) => check.kind === "datetime");
   const isJWT = checks.some((check) => check.kind === "jwt");
+  const lenCheck = checks.find((check) => check.kind === "length");
   const regex = regexCheck
     ? regexCheck.regex
     : datetimeCheck
@@ -464,6 +465,8 @@ export const depictString: Depicter = ({
       break;
     }
   }
+  if (lenCheck)
+    [result.minLength, result.maxLength] = [lenCheck.value, lenCheck.value];
   if (minLength !== null) result.minLength = minLength;
   if (maxLength !== null) result.maxLength = maxLength;
   if (regex) result.pattern = regex.source;

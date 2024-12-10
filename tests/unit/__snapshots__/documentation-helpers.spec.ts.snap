@@ -1155,6 +1155,8 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 1 1`] = `
 {
   "format": "url",
+  "maxLength": 15,
+  "minLength": 15,
   "type": "string",
 }
 `;
