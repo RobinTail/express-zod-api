@@ -417,10 +417,18 @@ export const depictString: Depicter = ({
   isIP,
   isEmoji,
   isDatetime,
+  isCIDR,
+  isDate,
+  isTime,
+  isBase64,
+  isNANOID,
+  isBase64url,
+  isDuration,
   _def: { checks },
 }: z.ZodString) => {
   const regexCheck = checks.find((check) => check.kind === "regex");
   const datetimeCheck = checks.find((check) => check.kind === "datetime");
+  const isJWT = checks.some((check) => check.kind === "jwt");
   const regex = regexCheck
     ? regexCheck.regex
     : datetimeCheck
@@ -433,13 +441,21 @@ export const depictString: Depicter = ({
   const result: SchemaObject = { type: "string" };
   const formats: Record<NonNullable<SchemaObject["format"]>, boolean> = {
     "date-time": isDatetime,
+    byte: isBase64,
+    base64url: isBase64url,
+    date: isDate,
+    time: isTime,
+    duration: isDuration,
     email: isEmail,
     url: isURL,
     uuid: isUUID,
     cuid: isCUID,
     cuid2: isCUID2,
     ulid: isULID,
+    nanoid: isNANOID,
+    jwt: isJWT,
     ip: isIP,
+    cidr: isCIDR,
     emoji: isEmoji,
   };
   for (const format in formats) {
