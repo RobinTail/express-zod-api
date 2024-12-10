@@ -112,6 +112,9 @@ const samples = {
 
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
+const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+const tzDateTimeRegex =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)$/;
 
 export const getRoutePathParams = (path: string): string[] =>
   path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
@@ -462,9 +465,8 @@ export const depictString: Depicter = ({
   if (maxLength !== null) result.maxLength = maxLength;
   if (datetimeCheck) {
     result.pattern = datetimeCheck.offset
-      ? /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)$/
-          .source
-      : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/.source;
+      ? tzDateTimeRegex.source
+      : dateTimeRegex.source;
   }
   if (regexCheck) result.pattern = regexCheck.regex.source;
   return result;
