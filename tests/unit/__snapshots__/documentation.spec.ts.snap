@@ -1718,6 +1718,50 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/events/time:
+    get:
+      operationId: GetV1EventsTime
+      tags:
+        - subscriptions
+      parameters:
+        - name: trigger
+          in: query
+          required: false
+          description: GET /v1/events/time Parameter
+          schema:
+            type: string
+      responses:
+        "200":
+          description: GET /v1/events/time Positive response
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: integer
+                    format: int64
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
+                  event:
+                    type: string
+                    const: time
+                  id:
+                    type: string
+                  retry:
+                    type: integer
+                    format: int64
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
+                required:
+                  - data
+                  - event
+        "400":
+          description: GET /v1/events/time Negative response
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   schemas:
     Schema1:
@@ -1755,6 +1799,8 @@ tags:
     description: Everything about the users
   - name: files
     description: Everything about the files processing
+  - name: subscriptions
+    description: Everything about the subscriptions
 servers:
   - url: https://example.com
 "
@@ -2059,6 +2105,31 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/events/time:
+    get:
+      operationId: GetV1EventsTime
+      tags:
+        - subscriptions
+      parameters:
+        - name: trigger
+          in: query
+          required: false
+          description: GET /v1/events/time Parameter
+          schema:
+            $ref: "#/components/schemas/GetV1EventsTimeParameterTrigger"
+      responses:
+        "200":
+          description: GET /v1/events/time Positive response
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/GetV1EventsTimePositiveResponse"
+        "400":
+          description: GET /v1/events/time Negative response
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/GetV1EventsTimeNegativeResponse"
 components:
   schemas:
     GetV1UserRetrieveParameterId:
@@ -2399,6 +2470,31 @@ components:
     PostV1AvatarRawRequestBody:
       type: string
       format: binary
+    GetV1EventsTimeParameterTrigger:
+      type: string
+    GetV1EventsTimePositiveResponse:
+      type: object
+      properties:
+        data:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+          maximum: 9007199254740991
+        event:
+          type: string
+          const: time
+        id:
+          type: string
+        retry:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+          maximum: 9007199254740991
+      required:
+        - data
+        - event
+    GetV1EventsTimeNegativeResponse:
+      type: string
   responses: {}
   parameters: {}
   examples: {}
@@ -2422,6 +2518,8 @@ tags:
     description: Everything about the users
   - name: files
     description: Everything about the files processing
+  - name: subscriptions
+    description: Everything about the subscriptions
 servers:
   - url: https://example.com
 "

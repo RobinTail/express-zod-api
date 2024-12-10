@@ -14,7 +14,7 @@ export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
 }
 
-export type Parsers = Record<ContentType, RequestHandler[]>;
+export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
 export const initRouting = ({
   app,

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Example API
-  version: 21.3.0
+  version: 21.6.0
 paths:
   /v1/user/retrieve:
     get:
@@ -566,6 +566,50 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/events/time:
+    get:
+      operationId: GetV1EventsTime
+      tags:
+        - subscriptions
+      parameters:
+        - name: trigger
+          in: query
+          required: false
+          description: GET /v1/events/time Parameter
+          schema:
+            type: string
+      responses:
+        "200":
+          description: GET /v1/events/time Positive response
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: integer
+                    format: int64
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
+                  event:
+                    type: string
+                    const: time
+                  id:
+                    type: string
+                  retry:
+                    type: integer
+                    format: int64
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
+                required:
+                  - data
+                  - event
+        "400":
+          description: GET /v1/events/time Negative response
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   schemas:
     Schema1:
@@ -603,5 +647,7 @@ tags:
     description: Everything about the users
   - name: files
     description: Everything about the files processing
+  - name: subscriptions
+    description: Everything about the subscriptions
 servers:
   - url: https://example.com

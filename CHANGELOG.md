@@ -2,9 +2,63 @@
 
 ## Version 21
 
-### v21.3.1
+### v21.6.0
 
-- Return type of public methods `getTags()` and `getScopes()` of `Endpoint` corrected to `ReadyonlyArray<string>`.
+- Supporting the following `z.string()` formats by the `Documentation` generator:
+  - `base64` (as `byte`), `date`, `time`, `duration`, `nanoid`;
+  - And new formats introduced by Zod 3.24: `jwt`, `base64url`, `cidr`;
+- Fixed missing `minLength` and `maxLength` properties when depicting `z.string().length()` (fixed length strings).
+
+### v21.5.0
+
+- Feat: Introducing [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events):
+  - Basic implementation of the event streams feature is now available using `EventStreamFactory` class;
+  - The new factory is similar to `EndpointsFactory` including the middlewares support;
+  - Client application can subscribe to the event stream using `EventSource` class instance;
+  - `Documentation` and `Integration` do not have yet a special depiction of such endpoints;
+  - This feature is a lightweight alternative to [Zod Sockets](https://github.com/RobinTail/zod-sockets).
+
+```ts
+import { z } from "zod";
+import { EventStreamFactory } from "express-zod-api";
+import { setTimeout } from "node:timers/promises";
+
+const subscriptionEndpoint = EventStreamFactory({
+  events: { time: z.number().int().positive() },
+}).buildVoid({
+  input: z.object({}), // optional input schema
+  handler: async ({ options: { emit, isClosed } }) => {
+    while (!isClosed()) {
+      emit("time", Date.now());
+      await setTimeout(1000);
+    }
+  },
+});
+```
+
+```js
+const source = new EventSource("https://example.com/api/v1/time");
+source.addEventListener("time", (event) => {
+  const data = JSON.parse(event.data); // number
+});
+```
+
+### v21.4.0
+
+- Return type of public methods `getTags()` and `getScopes()` of `Endpoint` corrected to `ReadyonlyArray<string>`;
+- Featuring `EndpointsFactory::buildVoid()` method:
+  - It's a shorthand for returning `{}` while having `output` schema `z.object({})`;
+  - When using this method, `handler` may return `void` while retaining the object-based operation internally.
+
+```diff
+- factory.build({
++ factory.buildVoid({
+-   output: z.object({}),
+    handler: async () => {
+-     return {};
+    },
+  });
+```
 
 ### v21.3.0
 

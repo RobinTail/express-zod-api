@@ -1,3 +1,5 @@
+import assert from "node:assert/strict";
+import { EventSource } from "undici";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
 import {
@@ -250,6 +252,20 @@ describe("Example", async () => {
       expect(response.status).toBe(204);
       expect(response.headers.get("content-type")).toBeNull();
     });
+
+    test("Should emit SSE (server sent events)", async () => {
+      const source = new EventSource(`http://localhost:${port}/v1/events/time`);
+      const stack: unknown[] = [];
+      const onTime = (evt: Event) => stack.push((evt as MessageEvent).data);
+      source.addEventListener("time", onTime);
+      await vi.waitFor(() => assert(stack.length > 2), { timeout: 5e3 });
+      expect(
+        stack.every(
+          (entry) => typeof entry === "string" && /\d{10,}/.test(entry),
+        ),
+      );
+      source.removeEventListener("time", onTime);
+    });
   });
 
   describe("Negative", () => {
@@ -414,6 +430,17 @@ describe("Example", async () => {
       expect(response.status).toBe(413);
       const json = await response.json();
       expect(json).toMatchSnapshot();
+    });
+
+    test("Should handle errors for SSE endpoints", async () => {
+      const response = await fetch(
+        `http://localhost:${port}/v1/events/time?trigger=failure`,
+      );
+      expect(response.status).toBe(500);
+      expect(response.headers.get("content-type")).toBe(
+        "text/plain; charset=utf-8",
+      );
+      await expect(response.text()).resolves.toBe("Intentional failure");
     });
   });
 
