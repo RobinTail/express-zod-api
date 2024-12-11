@@ -33,6 +33,7 @@ import {
   makeAnd,
   makeEqual,
   makeKeyOf,
+  makeSomeOfHelper,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -102,7 +103,8 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration {
-  protected program: ts.Node[] = [];
+  protected someOf = makeSomeOfHelper();
+  protected program: ts.Node[] = [this.someOf];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
     ReturnType<typeof quoteProp>, // method+path
@@ -149,7 +151,6 @@ export class Integration {
     clientConst: f.createIdentifier("client"),
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
-    someOfType: f.createIdentifier("SomeOf"),
   } satisfies Record<string, ts.Identifier>;
   protected interfaces: Array<{
     id: ts.Identifier;
@@ -181,19 +182,6 @@ export class Integration {
     const commons = { makeAlias: this.makeAlias.bind(this), optionalPropStyle };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
-
-    // type SomeOf<T> = T[keyof T];
-    this.program.push(
-      makeType(
-        this.ids.someOfType,
-        f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode("T"),
-          makeKeyOf("T"),
-        ),
-        { isPublic: true, params: { T: undefined } },
-      ),
-    );
-
     const onEndpoint: OnEndpoint = (endpoint, path, method) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
       const input = makeType(
@@ -238,10 +226,10 @@ export class Integration {
       const methodPath = quoteProp(method, path);
       this.registry.set(methodPath, {
         input: f.createTypeReferenceNode(input.name),
-        positive: f.createTypeReferenceNode(this.ids.someOfType, [
+        positive: f.createTypeReferenceNode(this.someOf.name, [
           f.createTypeReferenceNode(refs.positive.name),
         ]),
-        negative: f.createTypeReferenceNode(this.ids.someOfType, [
+        negative: f.createTypeReferenceNode(this.someOf.name, [
           f.createTypeReferenceNode(refs.negative.name),
         ]),
         response: f.createUnionTypeNode([

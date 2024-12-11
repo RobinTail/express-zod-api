@@ -132,6 +132,17 @@ export const makeType = (
   return comment ? addJsDocComment(node, comment) : node;
 };
 
+/** @example type SomeOf<T> = T[keyof T]; */
+export const makeSomeOfHelper = () =>
+  makeType(
+    "SomeOf",
+    f.createIndexedAccessTypeNode(
+      f.createTypeReferenceNode("T"),
+      makeKeyOf("T"),
+    ),
+    { isPublic: true, params: { T: undefined } },
+  );
+
 export const makePublicMethod = (
   name: ts.Identifier,
   params: ts.ParameterDeclaration[],
