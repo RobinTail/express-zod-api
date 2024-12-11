@@ -195,7 +195,7 @@ export class Integration {
         zodToTs(endpoint.getSchema("input"), ctxIn),
       );
       this.program.push(input);
-      const refs = this.responseVariants.reduce(
+      const dictionaries = this.responseVariants.reduce(
         (agg, responseVariant) => {
           const variants: ts.TypeAliasDeclaration[] = [];
           const props: ts.PropertySignature[] = [];
@@ -232,8 +232,8 @@ export class Integration {
       const methodPath = quoteProp(method, path);
       this.registry.set(methodPath, {
         input: f.createTypeReferenceNode(input.name),
-        positive: this.makeSomeOf(refs.positive),
-        negative: this.makeSomeOf(refs.negative),
+        positive: this.makeSomeOf(dictionaries.positive),
+        negative: this.makeSomeOf(dictionaries.negative),
         response: f.createUnionTypeNode([
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.posResponseInterface),
@@ -245,8 +245,8 @@ export class Integration {
           ),
         ]),
         encoded: f.createIntersectionTypeNode([
-          f.createTypeReferenceNode(refs.positive.name),
-          f.createTypeReferenceNode(refs.negative.name),
+          f.createTypeReferenceNode(dictionaries.positive.name),
+          f.createTypeReferenceNode(dictionaries.negative.name),
         ]),
         tags: endpoint.getTags(),
         isJson,
