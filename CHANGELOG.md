@@ -2,6 +2,17 @@
 
 ## Version 21
 
+### v21.6.1
+
+- `node-mocks-http` version is `^1.16.2`.
+
+### v21.6.0
+
+- Supporting the following `z.string()` formats by the `Documentation` generator:
+  - `base64` (as `byte`), `date`, `time`, `duration`, `nanoid`;
+  - And new formats introduced by Zod 3.24: `jwt`, `base64url`, `cidr`;
+- Fixed missing `minLength` and `maxLength` properties when depicting `z.string().length()` (fixed length strings).
+
 ### v21.5.0
 
 - Feat: Introducing [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events):
