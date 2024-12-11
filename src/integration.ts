@@ -197,7 +197,6 @@ export class Integration {
       this.program.push(input);
       const dictionaries = this.responseVariants.reduce(
         (agg, responseVariant) => {
-          const variants: ts.TypeAliasDeclaration[] = [];
           const props: ts.PropertySignature[] = [];
           const responses = endpoint.getResponses(responseVariant).entries();
           for (const [idx, { schema, mimeTypes, statusCodes }] of responses) {
@@ -205,7 +204,7 @@ export class Integration {
               entitle(responseVariant, "variant", `${idx + 1}`),
               zodToTs(mimeTypes ? schema : noContent, ctxOut),
             );
-            variants.push(variantType);
+            this.program.push(variantType);
             for (const statusCode of statusCodes) {
               props.push(
                 makeInterfaceProp(
@@ -219,7 +218,7 @@ export class Integration {
             entitle(responseVariant, "response.variants"),
             props,
           );
-          this.program.push(...variants, dict);
+          this.program.push(dict);
           return Object.assign(agg, { [responseVariant]: dict });
         },
         {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
