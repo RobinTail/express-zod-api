@@ -2,6 +2,10 @@
 
 ## Version 21
 
+### v21.6.1
+
+- `node-mocks-http` version is `^1.16.2`.
+
 ### v21.6.0
 
 - Supporting the following `z.string()` formats by the `Documentation` generator:

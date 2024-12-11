@@ -385,7 +385,7 @@ describe("Documentation", () => {
               method: "post",
               input: z.object({
                 regular: z.string(),
-                min: z.string().min(1),
+                min: z.string().nonempty(),
                 max: z.string().max(15),
                 range: z.string().min(2).max(3),
                 email: z.string().email(),
@@ -404,9 +404,7 @@ describe("Documentation", () => {
                   .regex(/.*@example\.com/is)
                   .max(90),
               }),
-              output: z.object({
-                nonempty: z.string().min(1),
-              }),
+              output: z.object({ nonempty: z.string().nonempty() }),
               handler: vi.fn(),
             }),
           },
@@ -817,15 +815,9 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               method: ["get", "post"],
-              input: z.object({
-                arr: z.array(z.string()).min(1),
-              }),
-              output: z.object({
-                arr: z.array(z.string()).min(1),
-              }),
-              handler: async ({ input }) => ({
-                arr: input.arr,
-              }),
+              input: z.object({ arr: z.array(z.string()).nonempty() }),
+              output: z.object({ arr: z.array(z.string()).nonempty() }),
+              handler: async ({ input }) => ({ arr: input.arr }),
             }),
           },
         },
