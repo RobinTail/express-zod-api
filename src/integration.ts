@@ -172,6 +172,12 @@ export class Integration {
     return f.createTypeReferenceNode(name);
   }
 
+  /** @example SomeOf<_>*/
+  protected makeSomeOf = ({ name }: ts.TypeAliasDeclaration) =>
+    f.createTypeReferenceNode(this.someOf.name, [
+      f.createTypeReferenceNode(name),
+    ]);
+
   public constructor({
     routing,
     brandHandling,
@@ -226,12 +232,8 @@ export class Integration {
       const methodPath = quoteProp(method, path);
       this.registry.set(methodPath, {
         input: f.createTypeReferenceNode(input.name),
-        positive: f.createTypeReferenceNode(this.someOf.name, [
-          f.createTypeReferenceNode(refs.positive.name),
-        ]),
-        negative: f.createTypeReferenceNode(this.someOf.name, [
-          f.createTypeReferenceNode(refs.negative.name),
-        ]),
+        positive: this.makeSomeOf(refs.positive),
+        negative: this.makeSomeOf(refs.negative),
         response: f.createUnionTypeNode([
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.posResponseInterface),
