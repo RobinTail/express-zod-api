@@ -225,46 +225,39 @@ export class Integration {
             entitle(responseVariant, "response.variants"),
             props,
           );
-          const whole = makeType(
-            entitle(responseVariant, "response"),
-            f.createTypeReferenceNode(this.ids.someOfType, [
-              f.createTypeReferenceNode(dict.name.text),
-            ]),
-          );
-          this.program.push(...variants, dict, whole);
-          return Object.assign(agg, { [responseVariant]: { whole, dict } });
+          this.program.push(...variants, dict);
+          return Object.assign(agg, { [responseVariant]: dict });
         },
-        {} as Record<
-          ResponseVariant,
-          Record<"whole" | "dict", ts.TypeAliasDeclaration>
-        >,
+        {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
       );
 
-      const encodedResponse = makeType(
-        entitle("encoded.response"),
-        f.createIntersectionTypeNode([
-          f.createTypeReferenceNode(refs.positive.dict.name.text),
-          f.createTypeReferenceNode(refs.negative.dict.name.text),
-        ]),
-      );
-      const genericResponse = makeType(
-        entitle("response"),
-        f.createUnionTypeNode([
-          f.createTypeReferenceNode(refs.positive.whole.name.text),
-          f.createTypeReferenceNode(refs.negative.whole.name.text),
-        ]),
-      );
-      this.program.push(encodedResponse, genericResponse);
       this.paths.push(path);
       const isJson = endpoint
         .getResponses("positive")
         .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
-      this.registry.set(quoteProp(method, path), {
+      const methodPath = quoteProp(method, path);
+      this.registry.set(methodPath, {
         input: f.createTypeReferenceNode(input.name),
-        positive: f.createTypeReferenceNode(refs.positive.whole.name),
-        negative: f.createTypeReferenceNode(refs.negative.whole.name),
-        response: f.createTypeReferenceNode(genericResponse.name),
-        encoded: f.createTypeReferenceNode(encodedResponse.name),
+        positive: f.createTypeReferenceNode(this.ids.someOfType, [
+          f.createTypeReferenceNode(refs.positive.name),
+        ]),
+        negative: f.createTypeReferenceNode(this.ids.someOfType, [
+          f.createTypeReferenceNode(refs.negative.name),
+        ]),
+        response: f.createUnionTypeNode([
+          f.createIndexedAccessTypeNode(
+            f.createTypeReferenceNode(this.ids.posResponseInterface),
+            f.createTypeReferenceNode(methodPath),
+          ),
+          f.createIndexedAccessTypeNode(
+            f.createTypeReferenceNode(this.ids.negResponseInterface),
+            f.createTypeReferenceNode(methodPath),
+          ),
+        ]),
+        encoded: f.createIntersectionTypeNode([
+          f.createTypeReferenceNode(refs.positive.name),
+          f.createTypeReferenceNode(refs.negative.name),
+        ]),
         tags: endpoint.getTags(),
         isJson,
       });
