@@ -98,7 +98,7 @@ export class Integration {
     ReturnType<typeof quoteProp>, // method+path
     Record<IOKind, string> & { isJson: boolean; tags: ReadonlyArray<string> }
   >();
-  protected paths: string[] = [];
+  protected paths = new Set<string>();
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
   protected ids = {
     pathType: f.createIdentifier("Path"),
@@ -196,7 +196,7 @@ export class Integration {
         negativeResponse,
         genericResponse,
       );
-      this.paths.push(path);
+      this.paths.add(path);
       const isJson = endpoint
         .getResponses("positive")
         .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
@@ -213,7 +213,9 @@ export class Integration {
     this.program.unshift(...this.aliases.values());
 
     // export type Path = "/v1/user/retrieve" | ___;
-    this.program.push(makePublicLiteralType(this.ids.pathType, this.paths));
+    this.program.push(
+      makePublicLiteralType(this.ids.pathType, Array.from(this.paths)),
+    );
 
     // export type Method = "get" | "post" | "put" | "delete" | "patch";
     this.program.push(makePublicLiteralType(this.ids.methodType, methods));
