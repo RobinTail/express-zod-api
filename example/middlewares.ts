@@ -12,7 +12,7 @@ export const authMiddleware = new Middleware({
   },
   input: z
     .object({
-      key: z.string().min(1),
+      key: z.string().nonempty(),
     })
     .example({
       key: "1234-5678-90",
