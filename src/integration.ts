@@ -106,7 +106,10 @@ export class Integration {
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
     ReturnType<typeof quoteProp>, // method+path
-    Record<IOKind, string> & { isJson: boolean; tags: ReadonlyArray<string> }
+    Record<IOKind, ts.TypeNode> & {
+      isJson: boolean;
+      tags: ReadonlyArray<string>;
+    }
   >();
   protected paths: string[] = [];
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
@@ -209,8 +212,14 @@ export class Integration {
               zodToTs(mimeTypes ? schema : noContent, ctxOut),
             );
             variants.push(variantType);
-            for (const statusCode of statusCodes)
-              props.push(makeInterfaceProp(statusCode, variantType.name.text));
+            for (const statusCode of statusCodes) {
+              props.push(
+                makeInterfaceProp(
+                  statusCode,
+                  f.createTypeReferenceNode(variantType.name),
+                ),
+              );
+            }
           }
           const dict = makeInterface(
             entitle(responseVariant, "response.variants"),
@@ -251,11 +260,11 @@ export class Integration {
         .getResponses("positive")
         .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
       this.registry.set(quoteProp(method, path), {
-        input: input.name.text,
-        positive: refs.positive.whole.name.text,
-        negative: refs.negative.whole.name.text,
-        response: genericResponse.name.text,
-        encoded: encodedResponse.name.text,
+        input: f.createTypeReferenceNode(input.name),
+        positive: f.createTypeReferenceNode(refs.positive.whole.name),
+        negative: f.createTypeReferenceNode(refs.negative.whole.name),
+        response: f.createTypeReferenceNode(genericResponse.name),
+        encoded: f.createTypeReferenceNode(encodedResponse.name),
         tags: endpoint.getTags(),
         isJson,
       });
