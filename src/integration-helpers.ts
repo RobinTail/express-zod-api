@@ -140,7 +140,7 @@ export const makeSomeOfHelper = () =>
       f.createTypeReferenceNode("T"),
       makeKeyOf("T"),
     ),
-    { isPublic: true, params: { T: undefined } },
+    { params: { T: undefined } },
   );
 
 export const makePublicMethod = (

@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Integration > Feature #945: should have configurable treatment of optionals 0 1`] = `
-"export type SomeOf<T> = T[keyof T];
+"type SomeOf<T> = T[keyof T];
 
 type PostV1TestWithDashesInput = {
   opt?: string;
@@ -139,7 +139,7 @@ client.provide("get /v1/user/retrieve", { id: "10" });
 `;
 
 exports[`Integration > Feature #945: should have configurable treatment of optionals 1 1`] = `
-"export type SomeOf<T> = T[keyof T];
+"type SomeOf<T> = T[keyof T];
 
 type PostV1TestWithDashesInput = {
   opt: string | undefined;
@@ -277,7 +277,7 @@ client.provide("get /v1/user/retrieve", { id: "10" });
 `;
 
 exports[`Integration > Feature #945: should have configurable treatment of optionals 2 1`] = `
-"export type SomeOf<T> = T[keyof T];
+"type SomeOf<T> = T[keyof T];
 
 type PostV1TestWithDashesInput = {
   opt: string;
@@ -415,7 +415,7 @@ client.provide("get /v1/user/retrieve", { id: "10" });
 `;
 
 exports[`Integration > Feature #1470: Custom brands > should by handled accordingly 1`] = `
-"export type SomeOf<T> = T[keyof T];
+"type SomeOf<T> = T[keyof T];
 
 type PostV1CustomInput = {
   string: boolean;
@@ -481,7 +481,7 @@ exports[`Integration > Should generate a client for example API 1`] = `
   features: Type1;
 }[];
 
-export type SomeOf<T> = T[keyof T];
+type SomeOf<T> = T[keyof T];
 
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
@@ -932,7 +932,7 @@ exports[`Integration > Should generate a types for example API 1`] = `
   features: Type1;
 }[];
 
-export type SomeOf<T> = T[keyof T];
+type SomeOf<T> = T[keyof T];
 
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
@@ -1282,7 +1282,7 @@ export type MethodPath = keyof Input;
 `;
 
 exports[`Integration > Should support multiple response schemas depending on status code 1`] = `
-"export type SomeOf<T> = T[keyof T];
+"type SomeOf<T> = T[keyof T];
 
 type PostV1MtplInput = {
   test: number;
@@ -1348,7 +1348,7 @@ export type MethodPath = keyof Input;
 `;
 
 exports[`Integration > Should treat optionals the same way as z.infer() by default 1`] = `
-"export type SomeOf<T> = T[keyof T];
+"type SomeOf<T> = T[keyof T];
 
 type PostV1TestWithDashesInput = {
   opt?: string | undefined;

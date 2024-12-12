@@ -3,7 +3,7 @@ type Type1 = {
   features: Type1;
 }[];
 
-export type SomeOf<T> = T[keyof T];
+type SomeOf<T> = T[keyof T];
 
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
