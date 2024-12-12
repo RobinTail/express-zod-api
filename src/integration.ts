@@ -1,4 +1,4 @@
-import { keys } from "ramda";
+import { chain, keys } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { defaultStatusCodes, ResponseVariant } from "./api-response";
@@ -197,23 +197,20 @@ export class Integration {
       this.program.push(input);
       const dictionaries = this.responseVariants.reduce(
         (agg, responseVariant) => {
-          const props: ts.PropertySignature[] = [];
-          const responses = endpoint.getResponses(responseVariant).entries();
-          for (const [idx, { schema, mimeTypes, statusCodes }] of responses) {
+          const responses = endpoint.getResponses(responseVariant);
+          const props = chain(([idx, { schema, mimeTypes, statusCodes }]) => {
             const variantType = makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
               zodToTs(mimeTypes ? schema : noContent, ctxOut),
             );
             this.program.push(variantType);
-            for (const statusCode of statusCodes) {
-              props.push(
-                makeInterfaceProp(
-                  statusCode,
-                  f.createTypeReferenceNode(variantType.name),
-                ),
-              );
-            }
-          }
+            return statusCodes.map((code) =>
+              makeInterfaceProp(
+                code,
+                f.createTypeReferenceNode(variantType.name),
+              ),
+            );
+          }, Array.from(responses.entries()));
           const dict = makeInterface(
             entitle(responseVariant, "response.variants"),
             props,
