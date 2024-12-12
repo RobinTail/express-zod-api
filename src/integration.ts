@@ -212,7 +212,7 @@ export class Integration {
             );
           }, Array.from(responses.entries()));
           const dict = makeInterface(
-            entitle(responseVariant, "response.variants"),
+            entitle(responseVariant, "response", "variants"),
             props,
           );
           this.program.push(dict);
