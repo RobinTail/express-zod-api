@@ -103,6 +103,7 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration {
+  protected responseVariants = keys(defaultStatusCodes); // eslint-disable-line no-restricted-syntax -- need literal
   protected someOf = makeSomeOfHelper();
   protected program: ts.Node[] = [this.someOf];
   protected usage: Array<ts.Node | string> = [];
@@ -115,7 +116,6 @@ export class Integration {
   >();
   protected paths = new Set<string>();
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
-  protected responseVariants = keys(defaultStatusCodes);
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),

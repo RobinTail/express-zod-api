@@ -78,6 +78,7 @@ export default tsPlugin.config(
     rules: {
       "no-restricted-syntax": [
         "warn",
+        ...peformanceConcerns,
         {
           selector: "Identifier[name='createConditionalExpression']",
           message: "use makeTernary() helper",
