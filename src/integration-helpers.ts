@@ -69,12 +69,12 @@ export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],
 ) => f.createConstructorDeclaration(undefined, params, f.createBlock([]));
 
-export const makeInterfaceProp = (name: string, ref: string) =>
+export const makeInterfaceProp = (name: string | number, value: ts.TypeNode) =>
   f.createPropertySignature(
     undefined,
-    name,
+    typeof name === "number" ? f.createNumericLiteral(name) : name,
     undefined,
-    f.createTypeReferenceNode(ref),
+    value,
   );
 
 export const makeDeconstruction = (
@@ -113,16 +113,35 @@ export const makePublicLiteralType = (
 export const makeType = (
   name: ts.Identifier | string,
   value: ts.TypeNode,
-  { isPublic, comment }: { isPublic?: boolean; comment?: string } = {},
+  {
+    isPublic,
+    comment,
+    params,
+  }: {
+    isPublic?: boolean;
+    comment?: string;
+    params?: Parameters<typeof makeTypeParams>[0];
+  } = {},
 ) => {
   const node = f.createTypeAliasDeclaration(
     isPublic ? exportModifier : undefined,
     name,
-    undefined,
+    params && makeTypeParams(params),
     value,
   );
   return comment ? addJsDocComment(node, comment) : node;
 };
+
+/** @example type SomeOf<T> = T[keyof T]; */
+export const makeSomeOfHelper = () =>
+  makeType(
+    "SomeOf",
+    f.createIndexedAccessTypeNode(
+      f.createTypeReferenceNode("T"),
+      makeKeyOf("T"),
+    ),
+    { params: { T: undefined } },
+  );
 
 export const makePublicMethod = (
   name: ts.Identifier,
@@ -152,7 +171,7 @@ export const makePublicClass = (
     ...statements,
   ]);
 
-export const makeKeyOf = (id: ts.Identifier) =>
+export const makeKeyOf = (id: ts.Identifier | string) =>
   f.createTypeOperatorNode(
     ts.SyntaxKind.KeyOfKeyword,
     f.createTypeReferenceNode(id),
@@ -177,21 +196,28 @@ export const makePromise = (subject: ts.TypeNode | "any") =>
       : subject,
   ]);
 
-export const makePublicInterface = (
-  name: ts.Identifier,
+export const makeInterface = (
+  name: ts.Identifier | string,
   props: ts.PropertySignature[],
+  { isPublic }: { isPublic?: boolean } = {},
 ) =>
   f.createInterfaceDeclaration(
-    exportModifier,
+    isPublic ? exportModifier : undefined,
     name,
     undefined,
     undefined,
     props,
   );
 
-export const makeTypeParams = (params: Record<string, ts.Identifier>) =>
+export const makeTypeParams = (
+  params: Partial<Record<string, ts.Identifier>>,
+) =>
   Object.entries(params).map(([name, id]) =>
-    f.createTypeParameterDeclaration([], name, f.createTypeReferenceNode(id)),
+    f.createTypeParameterDeclaration(
+      [],
+      name,
+      id && f.createTypeReferenceNode(id),
+    ),
   );
 
 export const makeArrowFn = (

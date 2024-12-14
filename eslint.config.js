@@ -78,6 +78,7 @@ export default tsPlugin.config(
     rules: {
       "no-restricted-syntax": [
         "warn",
+        ...peformanceConcerns,
         {
           selector: "Identifier[name='createConditionalExpression']",
           message: "use makeTernary() helper",
@@ -92,7 +93,7 @@ export default tsPlugin.config(
         },
         {
           selector: "Identifier[name='createInterfaceDeclaration']",
-          message: "use makePublicInterface() helper",
+          message: "use makeInterface() helper",
         },
         {
           selector: "Identifier[name='createClassDeclaration']",
