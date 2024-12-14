@@ -1,6 +1,7 @@
+import { chain, keys } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { ResponseVariant } from "./api-response";
+import { defaultStatusCodes, ResponseVariant } from "./api-response";
 import {
   f,
   makePromise,
@@ -14,7 +15,7 @@ import {
   makeParams,
   makePropCall,
   makePublicClass,
-  makePublicInterface,
+  makeInterface,
   makePublicLiteralType,
   makePublicMethod,
   makeType,
@@ -28,6 +29,7 @@ import {
   makeTemplate,
   makeNew,
   makeKeyOf,
+  makeSomeOfHelper,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -40,7 +42,7 @@ import { zodToTs } from "./zts";
 import { ZTSContext, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
-type IOKind = "input" | "response" | ResponseVariant;
+type IOKind = "input" | "response" | ResponseVariant | "encoded";
 
 interface IntegrationParams {
   routing: Routing;
@@ -92,11 +94,16 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration {
-  protected program: ts.Node[] = [];
+  protected responseVariants = keys(defaultStatusCodes); // eslint-disable-line no-restricted-syntax -- need literal
+  protected someOf = makeSomeOfHelper();
+  protected program: ts.Node[] = [this.someOf];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
     ReturnType<typeof quoteProp>, // method+path
-    Record<IOKind, string> & { isJson: boolean; tags: ReadonlyArray<string> }
+    Record<IOKind, ts.TypeNode> & {
+      isJson: boolean;
+      tags: ReadonlyArray<string>;
+    }
   >();
   protected paths = new Set<string>();
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
@@ -107,6 +114,7 @@ export class Integration {
     inputInterface: f.createIdentifier("Input"),
     posResponseInterface: f.createIdentifier("PositiveResponse"),
     negResponseInterface: f.createIdentifier("NegativeResponse"),
+    encResponseInterface: f.createIdentifier("EncodedResponse"),
     responseInterface: f.createIdentifier("Response"),
     jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
     endpointTagsConst: f.createIdentifier("endpointTags"),
@@ -151,6 +159,12 @@ export class Integration {
     return f.createTypeReferenceNode(name);
   }
 
+  /** @example SomeOf<_>*/
+  protected makeSomeOf = ({ name }: ts.TypeAliasDeclaration) =>
+    f.createTypeReferenceNode(this.someOf.name, [
+      f.createTypeReferenceNode(name),
+    ]);
+
   public constructor({
     routing,
     brandHandling,
@@ -167,44 +181,55 @@ export class Integration {
         entitle("input"),
         zodToTs(endpoint.getSchema("input"), ctxIn),
       );
-      const positiveSchema = endpoint
-        .getResponses("positive")
-        .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
-        .reduce((agg, schema) => agg.or(schema));
-      const positiveResponse = makeType(
-        entitle("positive.response"),
-        zodToTs(positiveSchema, ctxOut),
-      );
-      const negativeSchema = endpoint
-        .getResponses("negative")
-        .map(({ schema, mimeTypes }) => (mimeTypes ? schema : noContent))
-        .reduce((agg, schema) => agg.or(schema));
-      const negativeResponse = makeType(
-        entitle("negative.response"),
-        zodToTs(negativeSchema, ctxOut),
-      );
-      const genericResponse = makeType(
-        entitle("response"),
-        f.createUnionTypeNode([
-          f.createTypeReferenceNode(positiveResponse.name.text),
-          f.createTypeReferenceNode(negativeResponse.name.text),
-        ]),
-      );
-      this.program.push(
-        input,
-        positiveResponse,
-        negativeResponse,
-        genericResponse,
+      this.program.push(input);
+      const dictionaries = this.responseVariants.reduce(
+        (agg, responseVariant) => {
+          const responses = endpoint.getResponses(responseVariant);
+          const props = chain(([idx, { schema, mimeTypes, statusCodes }]) => {
+            const variantType = makeType(
+              entitle(responseVariant, "variant", `${idx + 1}`),
+              zodToTs(mimeTypes ? schema : noContent, ctxOut),
+            );
+            this.program.push(variantType);
+            return statusCodes.map((code) =>
+              makeInterfaceProp(
+                code,
+                f.createTypeReferenceNode(variantType.name),
+              ),
+            );
+          }, Array.from(responses.entries()));
+          const dict = makeInterface(
+            entitle(responseVariant, "response", "variants"),
+            props,
+          );
+          this.program.push(dict);
+          return Object.assign(agg, { [responseVariant]: dict });
+        },
+        {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
       );
       this.paths.add(path);
       const isJson = endpoint
         .getResponses("positive")
         .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
-      this.registry.set(quoteProp(method, path), {
-        input: input.name.text,
-        positive: positiveResponse.name.text,
-        negative: negativeResponse.name.text,
-        response: genericResponse.name.text,
+      const methodPath = quoteProp(method, path);
+      this.registry.set(methodPath, {
+        input: f.createTypeReferenceNode(input.name),
+        positive: this.makeSomeOf(dictionaries.positive),
+        negative: this.makeSomeOf(dictionaries.negative),
+        response: f.createUnionTypeNode([
+          f.createIndexedAccessTypeNode(
+            f.createTypeReferenceNode(this.ids.posResponseInterface),
+            f.createTypeReferenceNode(methodPath),
+          ),
+          f.createIndexedAccessTypeNode(
+            f.createTypeReferenceNode(this.ids.negResponseInterface),
+            f.createTypeReferenceNode(methodPath),
+          ),
+        ]),
+        encoded: f.createIntersectionTypeNode([
+          f.createTypeReferenceNode(dictionaries.positive.name),
+          f.createTypeReferenceNode(dictionaries.negative.name),
+        ]),
         tags: endpoint.getTags(),
         isJson,
       });
@@ -228,6 +253,7 @@ export class Integration {
       },
       { id: this.ids.posResponseInterface, kind: "positive", props: [] },
       { id: this.ids.negResponseInterface, kind: "negative", props: [] },
+      { id: this.ids.encResponseInterface, kind: "encoded", props: [] },
       {
         id: this.ids.responseInterface,
         kind: "response",
@@ -263,7 +289,7 @@ export class Integration {
 
     // export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
     for (const { id, props } of this.interfaces)
-      this.program.push(makePublicInterface(id, props));
+      this.program.push(makeInterface(id, props, { isPublic: true }));
 
     // export type MethodPath = keyof Input;
     this.program.push(

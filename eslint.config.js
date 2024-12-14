@@ -45,7 +45,7 @@ const tsFactoryConcerns = [
   },
   {
     selector: "Identifier[name='createInterfaceDeclaration']",
-    message: "use makePublicInterface() helper",
+    message: "use makeInterface() helper",
   },
   {
     selector: "Identifier[name='createClassDeclaration']",
@@ -153,7 +153,11 @@ export default tsPlugin.config(
     name: "source/integration",
     files: ["src/integration.ts"],
     rules: {
-      "no-restricted-syntax": ["warn", ...tsFactoryConcerns],
+      "no-restricted-syntax": [
+        "warn",
+        ...peformanceConcerns,
+        ...tsFactoryConcerns,
+      ],
     },
   },
   {
