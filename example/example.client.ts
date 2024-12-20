@@ -350,6 +350,7 @@ export interface Response {
 
 export type MethodPath = keyof Input;
 
+/** @deprecated use content-type header of an actual response */
 export const jsonEndpoints = {
   "get /v1/user/retrieve": true,
   "patch /v1/user/:id": true,
