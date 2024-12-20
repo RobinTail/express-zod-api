@@ -125,6 +125,7 @@ export class Integration {
     negResponseInterface: f.createIdentifier("NegativeResponse"),
     encResponseInterface: f.createIdentifier("EncodedResponse"),
     responseInterface: f.createIdentifier("Response"),
+    /** @todo remove in v22 */
     jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
     endpointTagsConst: f.createIdentifier("endpointTags"),
     /** @todo remove in v22 */
@@ -314,12 +315,15 @@ export class Integration {
     if (variant === "types") return;
 
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
-    const jsonEndpointsConst = f.createVariableStatement(
-      exportModifier,
-      makeConst(
-        this.ids.jsonEndpointsConst,
-        f.createObjectLiteralExpression(jsonEndpoints),
+    const jsonEndpointsConst = addJsDocComment(
+      f.createVariableStatement(
+        exportModifier,
+        makeConst(
+          this.ids.jsonEndpointsConst,
+          f.createObjectLiteralExpression(jsonEndpoints),
+        ),
       ),
+      "@deprecated use content-type header of an actual response",
     );
 
     // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
