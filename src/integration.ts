@@ -39,7 +39,7 @@ import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import { ZTSContext, printNode, addJsDocComment } from "./zts-helpers";
+import { ZTSContext, printNode } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -100,10 +100,7 @@ export class Integration {
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
     ReturnType<typeof quoteProp>, // method+path
-    Record<IOKind, ts.TypeNode> & {
-      isJson: boolean;
-      tags: ReadonlyArray<string>;
-    }
+    Record<IOKind, ts.TypeNode> & { tags: ReadonlyArray<string> }
   >();
   protected paths = new Set<string>();
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
@@ -116,8 +113,6 @@ export class Integration {
     negResponseInterface: f.createIdentifier("NegativeResponse"),
     encResponseInterface: f.createIdentifier("EncodedResponse"),
     responseInterface: f.createIdentifier("Response"),
-    /** @todo remove in v22 */
-    jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
     endpointTagsConst: f.createIdentifier("endpointTags"),
     implementationType: f.createIdentifier("Implementation"),
     clientClass: f.createIdentifier("ExpressZodAPIClient"),
@@ -209,9 +204,6 @@ export class Integration {
         {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
       );
       this.paths.add(path);
-      const isJson = endpoint
-        .getResponses("positive")
-        .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
       const methodPath = quoteProp(method, path);
       this.registry.set(methodPath, {
         input: f.createTypeReferenceNode(input.name),
@@ -232,7 +224,6 @@ export class Integration {
           f.createTypeReferenceNode(dictionaries.negative.name),
         ]),
         tags: endpoint.getTags(),
-        isJson,
       });
     };
     walkRouting({ routing, onEndpoint });
@@ -263,19 +254,12 @@ export class Integration {
     );
 
     // Single walk through the registry for making properties for the next three objects
-    const jsonEndpoints: ts.PropertyAssignment[] = [];
     const endpointTags: ts.PropertyAssignment[] = [];
-    for (const [propName, { isJson, tags, ...rest }] of this.registry) {
+    for (const [propName, { tags, ...rest }] of this.registry) {
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
       for (const face of this.interfaces)
         face.props.push(makeInterfaceProp(propName, rest[face.kind]));
       if (variant !== "types") {
-        if (isJson) {
-          // "get /v1/user/retrieve": true
-          jsonEndpoints.push(
-            f.createPropertyAssignment(propName, f.createTrue()),
-          );
-        }
         // "get /v1/user/retrieve": ["users"]
         endpointTags.push(
           f.createPropertyAssignment(
@@ -300,16 +284,6 @@ export class Integration {
     );
 
     if (variant === "types") return;
-
-    // export const jsonEndpoints = { "get /v1/user/retrieve": true }
-    const jsonEndpointsConst = addJsDocComment(
-      makeConst(
-        this.ids.jsonEndpointsConst,
-        f.createObjectLiteralExpression(jsonEndpoints),
-        { expose: true },
-      ),
-      "@deprecated use content-type header of an actual response",
-    );
 
     // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
     const endpointTagsConst = makeConst(
@@ -448,12 +422,7 @@ export class Integration {
       [providerMethod],
     );
 
-    this.program.push(
-      jsonEndpointsConst,
-      endpointTagsConst,
-      implementationType,
-      clientClass,
-    );
+    this.program.push(endpointTagsConst, implementationType, clientClass);
 
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
