@@ -39,7 +39,7 @@ import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import { ZTSContext, printNode } from "./zts-helpers";
+import { ZTSContext, printNode, addJsDocComment } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -116,6 +116,7 @@ export class Integration {
     negResponseInterface: f.createIdentifier("NegativeResponse"),
     encResponseInterface: f.createIdentifier("EncodedResponse"),
     responseInterface: f.createIdentifier("Response"),
+    /** @todo remove in v22 */
     jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
     endpointTagsConst: f.createIdentifier("endpointTags"),
     implementationType: f.createIdentifier("Implementation"),
@@ -301,10 +302,13 @@ export class Integration {
     if (variant === "types") return;
 
     // export const jsonEndpoints = { "get /v1/user/retrieve": true }
-    const jsonEndpointsConst = makeConst(
-      this.ids.jsonEndpointsConst,
-      f.createObjectLiteralExpression(jsonEndpoints),
-      { expose: true },
+    const jsonEndpointsConst = addJsDocComment(
+      makeConst(
+        this.ids.jsonEndpointsConst,
+        f.createObjectLiteralExpression(jsonEndpoints),
+        { expose: true },
+      ),
+      "@deprecated use content-type header of an actual response",
     );
 
     // export const endpointTags = { "get /v1/user/retrieve": ["users"] }

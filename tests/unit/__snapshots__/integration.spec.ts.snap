@@ -58,6 +58,7 @@ export interface Response {
 
 export type MethodPath = keyof Input;
 
+/** @deprecated use content-type header of an actual response */
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
@@ -179,6 +180,7 @@ export interface Response {
 
 export type MethodPath = keyof Input;
 
+/** @deprecated use content-type header of an actual response */
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
@@ -300,6 +302,7 @@ export interface Response {
 
 export type MethodPath = keyof Input;
 
+/** @deprecated use content-type header of an actual response */
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
@@ -777,6 +780,7 @@ export interface Response {
 
 export type MethodPath = keyof Input;
 
+/** @deprecated use content-type header of an actual response */
 export const jsonEndpoints = {
   "get /v1/user/retrieve": true,
   "patch /v1/user/:id": true,
@@ -1337,6 +1341,7 @@ export interface Response {
 
 export type MethodPath = keyof Input;
 
+/** @deprecated use content-type header of an actual response */
 export const jsonEndpoints = { "post /v1/test-with-dashes": true };
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
