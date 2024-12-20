@@ -350,16 +350,6 @@ export interface Response {
 
 export type MethodPath = keyof Input;
 
-/** @deprecated use content-type header of an actual response */
-export const jsonEndpoints = {
-  "get /v1/user/retrieve": true,
-  "patch /v1/user/:id": true,
-  "post /v1/user/create": true,
-  "get /v1/user/list": true,
-  "post /v1/avatar/upload": true,
-  "post /v1/avatar/raw": true,
-};
-
 export const endpointTags = {
   "get /v1/user/retrieve": ["users"],
   "delete /v1/user/:id/remove": ["users"],
