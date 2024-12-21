@@ -350,16 +350,6 @@ export interface Response {
 
 export type MethodPath = keyof Input;
 
-/** @deprecated use content-type header of an actual response */
-export const jsonEndpoints = {
-  "get /v1/user/retrieve": true,
-  "patch /v1/user/:id": true,
-  "post /v1/user/create": true,
-  "get /v1/user/list": true,
-  "post /v1/avatar/upload": true,
-  "post /v1/avatar/raw": true,
-};
-
 export const endpointTags = {
   "get /v1/user/retrieve": ["users"],
   "delete /v1/user/:id/remove": ["users"],
@@ -381,48 +371,31 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
-  /** @deprecated use the overload with 2 arguments instead */
-  public provide<M extends Method, P extends Path>(
-    method: M,
-    path: P,
-    params: `${M} ${P}` extends keyof Input
-      ? Input[`${M} ${P}`]
-      : Record<string, any>,
-  ): Promise<
-    `${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown
-  >;
   public provide<K extends MethodPath>(
     request: K,
     params: Input[K],
-  ): Promise<Response[K]>;
-  public provide(
-    ...args:
-      | [string, string, Record<string, any>]
-      | [string, Record<string, any>]
-  ) {
-    const [method, path, params] = (
-      args.length === 2 ? [...args[0].split(/ (.+)/, 2), args[1]] : args
-    ) as [Method, Path, Record<string, any>];
+  ): Promise<Response[K]> {
+    const [method, path] = request.split(/ (.+)/, 2) as [Method, Path];
     return this.implementation(
       method,
       Object.keys(params).reduce(
-        (acc, key) => acc.replace(`:${key}`, params[key]),
+        (acc, key) =>
+          acc.replace(`:${key}`, (params as Record<string, any>)[key]),
         path,
       ),
       Object.keys(params).reduce(
         (acc, key) =>
           Object.assign(
             acc,
-            !path.includes(`:${key}`) && { [key]: params[key] },
+            !path.includes(`:${key}`) && {
+              [key]: (params as Record<string, any>)[key],
+            },
           ),
         {},
       ),
     );
   }
 }
-
-/** @deprecated will be removed in v22 */
-export type Provider = ExpressZodAPIClient["provide"];
 
 // Usage example:
 /*
