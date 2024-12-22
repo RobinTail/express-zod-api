@@ -4,10 +4,11 @@
 
 | Version | Release |     Supported      |
 | ------: | :------ | :----------------: |
+|  22.x.x | 02.2025 | :white_check_mark: |
 |  21.x.x | 11.2024 | :white_check_mark: |
 |  20.x.x | 06.2024 | :white_check_mark: |
 |  19.x.x | 05.2024 | :white_check_mark: |
-|  18.x.x | 04.2024 | :white_check_mark: |
+|  18.x.x | 04.2024 |        :x:         |
 |  17.x.x | 02.2024 |        :x:         |
 |  16.x.x | 12.2023 |        :x:         |
 |  15.x.x | 12.2023 |        :x:         |
