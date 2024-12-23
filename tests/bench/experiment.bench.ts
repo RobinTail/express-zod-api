@@ -7,11 +7,7 @@ describe("Experiment on memo/thunk", () => {
     isProduction();
   });
 
-  bench("control", () => {
-    return void (process.env.NODE_ENV === "production");
-  });
-
-  const feat = thunkify(() => process.env.NODE_ENV === "production");
+  const feat = thunkify(() => process.env.NODE_ENV === "production")();
 
   bench("feat", () => {
     feat();
