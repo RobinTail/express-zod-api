@@ -48,7 +48,6 @@ describe("BuiltinLogger", () => {
     test.each(["development", "production"])(
       "Level can be omitted and depends on env",
       (mode) => {
-        vi.stubEnv("TSUP_STATIC", mode);
         vi.stubEnv("NODE_ENV", mode);
         const { logger } = makeLogger();
         expect(logger["config"]["level"]).toBe(

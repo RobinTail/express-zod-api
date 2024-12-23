@@ -32,7 +32,6 @@ export default defineConfig([
       }
       options.define = {
         "process.env.TSUP_BUILD": `"v${version} (${format.toUpperCase()})"`,
-        "process.env.TSUP_STATIC": `"static"`, // used by isProduction()
       };
     },
   },

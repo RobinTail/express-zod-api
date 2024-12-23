@@ -97,7 +97,6 @@ describe("Result helpers", () => {
     "getPublicErrorMessage() in %s mode",
     (mode) => {
       beforeAll(() => {
-        vi.stubEnv("TSUP_STATIC", mode);
         vi.stubEnv("NODE_ENV", mode);
       });
       afterAll(() => vi.unstubAllEnvs());

@@ -15,7 +15,6 @@ import { givePort } from "../helpers";
 import { setTimeout } from "node:timers/promises";
 
 describe("App in production mode", async () => {
-  vi.stubEnv("TSUP_STATIC", "production");
   vi.stubEnv("NODE_ENV", "production");
   const port = givePort();
   const logger = new BuiltinLogger({ level: "silent" });

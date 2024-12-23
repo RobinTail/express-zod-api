@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { chain, memoizeWith, pickBy, xprod } from "ramda";
+import { chain, pickBy, thunkify, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -147,7 +147,6 @@ export const tryToTransform = <T>(
 export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
 
-export const isProduction = memoizeWith(
-  () => process.env.TSUP_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSUP
-  () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
-);
+export const isProduction = thunkify(
+  () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- thunkified
+)();
