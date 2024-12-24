@@ -1,32 +1,11 @@
 import { bench } from "vitest";
+import { isProduction } from "../../src/common-helpers";
 
-function lazyWithInternalProp<T>(getter: () => T) {
-  return {
-    __value: undefined as T,
-    get value() {
-      if (this.__value) return this.__value;
-      const value = getter();
-      this.__value = value;
-      return value;
-    },
-  };
-}
-
-function lazyWithScopeProp<T>(getter: () => T): {
-  value: T;
-  __value?: T;
-} {
-  let __value: T;
-  return {
-    get value() {
-      if (__value) return __value;
-      const value = getter();
-      __value = value;
-      return value;
-    },
-  };
-}
-
+/**
+ * @see https://x.com/colinhacks/status/1865002498332795032
+ * @see https://x.com/colinhacks/status/1865143412812664985
+ * @see https://gist.github.com/colinhacks/a8d5772c1078b9285efb2455ab95fadf
+ */
 function lazyWithGetterOverride<T>(getter: () => T): {
   value: T;
 } {
@@ -39,25 +18,16 @@ function lazyWithGetterOverride<T>(getter: () => T): {
   };
 }
 
-const a = lazyWithInternalProp(() => "test");
-const b = lazyWithScopeProp(() => "test");
-const c = lazyWithGetterOverride(() => "test");
+const feat = lazyWithGetterOverride(
+  () => process.env.NODE_ENV === "production",
+);
 
-/**
- * @see https://x.com/colinhacks/status/1865002498332795032
- * @see https://x.com/colinhacks/status/1865143412812664985
- * @see https://gist.github.com/colinhacks/a8d5772c1078b9285efb2455ab95fadf
- */
-describe("AB test: uuid", () => {
-  bench("internal_prop", () => {
-    a.value;
+describe("Experiment: memo vs. getter override", () => {
+  bench("current", () => {
+    isProduction();
   });
 
-  bench("scope_prop", () => {
-    b.value;
-  });
-
-  bench("getter_override", () => {
-    c.value;
+  bench("featured", () => {
+    feat.value;
   });
 });
