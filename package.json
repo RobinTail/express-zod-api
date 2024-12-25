@@ -76,6 +76,7 @@
   },
   "dependencies": {
     "ansis": "^3.2.0",
+    "cors": "^2.8.5",
     "node-mocks-http": "^1.16.2",
     "openapi3-ts": "^4.4.0",
     "ramda": "^0.30.1"
@@ -132,7 +133,6 @@
     "@vitest/coverage-v8": "^2.1.8",
     "camelize-ts": "^3.0.0",
     "compression": "^1.7.4",
-    "cors": "^2.8.5",
     "eslint": "^9.3.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-allowed-dependencies": "^1.0.0",
