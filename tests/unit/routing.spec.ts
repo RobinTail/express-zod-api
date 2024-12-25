@@ -183,13 +183,7 @@ describe("Routing", () => {
 
     test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
       const handler = vi.fn(async () => ({}));
-      const configMock = {
-        cors: (params: { defaultHeaders: Record<string, string> }) => ({
-          ...params.defaultHeaders,
-          "X-Custom-Header": "Testing",
-        }),
-        startupLogo: false,
-      };
+      const configMock = { cors: true, startupLogo: false };
       const factory = new EndpointsFactory(defaultResultHandler);
       const input = z.object({});
       const output = z.object({});
@@ -225,18 +219,16 @@ describe("Routing", () => {
       });
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/hello");
-      const fn = appMock.options.mock.calls[0][1];
-      expect(typeof fn).toBe("function"); // async (req, res) => void
-      const requestMock = makeRequestMock({ method: "PUT" });
+      const fn = appMock.options.mock.calls[0][1]; // cors mw
+      expect(typeof fn).toBe("function"); // async (req, res, next) => void
+      const requestMock = makeRequestMock({ method: "OPTIONS" });
       const responseMock = makeResponseMock();
-      await fn(requestMock, responseMock);
+      await fn(requestMock, responseMock, vi.fn());
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getHeaders()).toEqual({
         "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, POST, PUT, PATCH, OPTIONS",
         "access-control-allow-headers": "content-type",
-        "content-type": "application/json",
-        "x-custom-header": "Testing",
       });
     });
 

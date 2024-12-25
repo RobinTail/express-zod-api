@@ -1,4 +1,5 @@
 import type compression from "compression";
+import { CorsOptions } from "cors";
 import { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
 import { ServerOptions } from "node:https";
@@ -16,14 +17,11 @@ export type InputSource = keyof Pick<
 >;
 export type InputSources = Record<Method, InputSource[]>;
 
-type Headers = Record<string, string>;
-type HeadersProvider = (params: {
-  /** @desc The default headers to be overridden. */
-  defaultHeaders: Headers;
+type CorsConfig = (params: {
   request: Request;
   endpoint: AbstractEndpoint;
   logger: ActualLogger;
-}) => Headers | Promise<Headers>;
+}) => CorsOptions;
 
 export type TagsConfig<TAG extends string> = Record<
   TAG,
@@ -41,7 +39,7 @@ export interface CommonConfig<TAG extends string = string> {
    * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
    * @desc You can override the default CORS headers by setting up a provider function here.
    */
-  cors: boolean | HeadersProvider;
+  cors: boolean | CorsConfig;
   /**
    * @desc The ResultHandler to use for handling routing, parsing and upload errors
    * @default defaultResultHandler
