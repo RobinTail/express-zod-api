@@ -35,10 +35,13 @@ export const initRouting = ({
   const onEndpoint: OnEndpoint = (endpoint, path, method, siblingMethods) => {
     if (!isProduction()) doc.check(endpoint, { path, method });
     const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
-    const handler: RequestHandler = async (request, response) => {
-      const logger = getLogger(request);
-      return endpoint.execute({ request, response, logger, config });
-    };
+    const handler: RequestHandler = async (request, response) =>
+      endpoint.execute({
+        request,
+        response,
+        config,
+        logger: getLogger(request),
+      });
     if (config.cors && !corsedPaths.has(path)) {
       const accessMethods: Array<Method | AuxMethod> = [
         method,
