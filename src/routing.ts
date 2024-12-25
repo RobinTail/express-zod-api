@@ -35,13 +35,17 @@ export const initRouting = ({
   const onEndpoint: OnEndpoint = (endpoint, path, method, siblingMethods) => {
     if (!isProduction()) doc.check(endpoint, { path, method });
     const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
-    const accessMethods: Array<Method | AuxMethod> = [
-      method,
-      ...(siblingMethods || []),
-      "options",
-    ];
-    const methodsLine = accessMethods.join(", ").toUpperCase();
-    if (config.cors) {
+    const handler: RequestHandler = async (request, response) => {
+      const logger = getLogger(request);
+      return endpoint.execute({ request, response, logger, config });
+    };
+    if (config.cors && !corsedPaths.has(path)) {
+      const accessMethods: Array<Method | AuxMethod> = [
+        method,
+        ...(siblingMethods || []),
+        "options",
+      ];
+      const methodsLine = accessMethods.join(", ").toUpperCase();
       matchingParsers.push(
         cors((request, cb) =>
           cb(null, {
@@ -57,12 +61,6 @@ export const initRouting = ({
           }),
         ),
       );
-    }
-    const handler: RequestHandler = async (request, response) => {
-      const logger = getLogger(request);
-      return endpoint.execute({ request, response, logger, config });
-    };
-    if (config.cors && !corsedPaths.has(path)) {
       app.options(path, ...matchingParsers, handler);
       corsedPaths.add(path);
     }
