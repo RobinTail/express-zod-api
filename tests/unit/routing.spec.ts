@@ -349,7 +349,7 @@ describe("Routing", () => {
         routing,
       });
       expect(appMock.post).toHaveBeenCalledTimes(1);
-      const routeHandler = appMock.post.mock.calls[0][1] as RequestHandler;
+      const routeHandler = appMock.post.mock.calls[0][2] as RequestHandler;
       const requestMock = makeRequestMock({
         method: "POST",
         body: { test: 123 },
