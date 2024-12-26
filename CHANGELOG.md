@@ -3136,7 +3136,7 @@ const routing: Routing = {
 
 ### v7.9.2
 
-- Fixed issue #585 found and reported along with a suggested solution by [@rayzr522](https://github.com/rayzr522).
+- Fixed issue #585 reported along with a suggested solution by [@foxfirecodes](https://github.com/foxfirecodes).
   - In case you need to `throw` within an `Endpoint`'s handler or a `Middleware`, consider
     [the best practice](https://eslint.org/docs/latest/rules/no-throw-literal) of only
     throwing an `Error` or a _descendant_ that extends the `Error`.
@@ -3281,7 +3281,7 @@ createMiddleware({
 
 ### v7.6.3
 
-- [@rayzr522](https://github.com/rayzr522) has fixed the resolution of types in the ESM build for the `nodenext` case.
+- [@foxfirecodes](https://github.com/foxfirecodes) fixed the types resolution in the ESM build for the `nodenext` case.
 
 ### v7.6.2
 
