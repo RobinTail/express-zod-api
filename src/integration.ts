@@ -191,9 +191,11 @@ export class Integration {
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint = (endpoint, path, method) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+      const comment = `${method.toUpperCase()} ${path}`;
       const input = makeType(
         entitle("input"),
         zodToTs(endpoint.getSchema("input"), ctxIn),
+        { comment },
       );
       this.program.push(input);
       const dictionaries = this.responseVariants.reduce(
@@ -203,6 +205,7 @@ export class Integration {
             const variantType = makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
               zodToTs(mimeTypes ? schema : noContent, ctxOut),
+              { comment },
             );
             this.program.push(variantType);
             return statusCodes.map((code) =>
@@ -215,6 +218,7 @@ export class Integration {
           const dict = makeInterface(
             entitle(responseVariant, "response", "variants"),
             props,
+            { comment },
           );
           this.program.push(dict);
           return Object.assign(agg, { [responseVariant]: dict });
