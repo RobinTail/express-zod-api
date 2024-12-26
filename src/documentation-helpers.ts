@@ -30,8 +30,8 @@ import {
   omit,
   pipe,
   pluck,
-  range,
   reject,
+  times,
   toLower,
   union,
   when,
@@ -573,7 +573,7 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
   examples.length
     ? fromPairs(
         zip(
-          range(1, examples.length + 1).map((idx) => `example${idx}`),
+          times((idx) => `example${idx + 1}`, examples.length),
           map(objOf("value"), examples),
         ),
       )
