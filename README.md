@@ -118,7 +118,7 @@ These people contributed to the improvement of the framework by reporting bugs, 
 [<img src="https://github.com/kirdk.png" alt="@kirdk" width="50px" />](https://github.com/kirdk)
 [<img src="https://github.com/johngeorgewright.png" alt="@johngeorgewright" width="50px" />](https://github.com/johngeorgewright)
 [<img src="https://github.com/ssteuteville.png" alt="@ssteuteville" width="50px" />](https://github.com/ssteuteville)
-[<img src="https://github.com/rayzr522.png" alt="@rayzr522" width="50px" />](https://github.com/rayzr522)
+[<img src="https://github.com/foxfirecodes.png" alt="@foxfirecodes" width="50px" />](https://github.com/foxfirecodes)
 [<img src="https://github.com/HardCoreQual.png" alt="@HardCoreQual" width="50px" />](https://github.com/HardCoreQual)
 [<img src="https://github.com/hellovai.png" alt="@hellovai" width="50px" />](https://github.com/hellovai)
 [<img src="https://github.com/Isaac-Leonard.png" alt="@Isaac-Leonard" width="50px" />](https://github.com/Isaac-Leonard)
