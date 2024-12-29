@@ -1,4 +1,3 @@
-import { keys } from "ramda";
 import { z } from "zod";
 
 export const defaultStatusCodes = {
@@ -7,7 +6,9 @@ export const defaultStatusCodes = {
 } satisfies Record<string, number>;
 
 export type ResponseVariant = keyof typeof defaultStatusCodes;
-export const responseVariants = keys(defaultStatusCodes); // eslint-disable-line no-restricted-syntax -- acceptable
+export const responseVariants = Object.keys(
+  defaultStatusCodes,
+) as ResponseVariant[];
 
 /** @public this is the user facing configuration */
 export interface ApiResponse<S extends z.ZodTypeAny> {
