@@ -1,7 +1,7 @@
-import { chain, keys } from "ramda";
+import { chain } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { defaultStatusCodes, ResponseVariant } from "./api-response";
+import { ResponseVariant, responseVariants } from "./api-response";
 import {
   f,
   makePromise,
@@ -94,7 +94,6 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration {
-  protected responseVariants = keys(defaultStatusCodes); // eslint-disable-line no-restricted-syntax -- need literal
   protected someOf = makeSomeOfHelper();
   protected program: ts.Node[] = [this.someOf];
   protected usage: Array<ts.Node | string> = [];
@@ -178,7 +177,7 @@ export class Integration {
         zodToTs(endpoint.getSchema("input"), ctxIn),
       );
       this.program.push(input);
-      const dictionaries = this.responseVariants.reduce(
+      const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
           const props = chain(([idx, { schema, mimeTypes, statusCodes }]) => {

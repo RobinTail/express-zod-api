@@ -1,3 +1,4 @@
+import { responseVariants } from "./api-response";
 import { FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { assertJsonCompatible } from "./deep-checks";
@@ -20,7 +21,7 @@ export class Diagnostics {
           );
         }
       }
-      for (const variant of ["positive", "negative"] as const) {
+      for (const variant of responseVariants) {
         for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
           if (mimeTypes?.includes(contentTypes.json)) {
             try {
