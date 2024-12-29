@@ -1,3 +1,5 @@
+import { keys } from "ramda";
+import { defaultStatusCodes } from "./api-response";
 import { FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { assertJsonCompatible } from "./deep-checks";
@@ -20,7 +22,8 @@ export class Diagnostics {
           );
         }
       }
-      for (const variant of ["positive", "negative"] as const) {
+      // eslint-disable-next-line no-restricted-syntax -- acceptable
+      for (const variant of keys(defaultStatusCodes)) {
         for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
           if (mimeTypes?.includes(contentTypes.json)) {
             try {
