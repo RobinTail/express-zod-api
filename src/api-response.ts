@@ -6,6 +6,9 @@ export const defaultStatusCodes = {
 } satisfies Record<string, number>;
 
 export type ResponseVariant = keyof typeof defaultStatusCodes;
+export const responseVariants = Object.keys(
+  defaultStatusCodes,
+) as ResponseVariant[];
 
 /** @public this is the user facing configuration */
 export interface ApiResponse<S extends z.ZodTypeAny> {

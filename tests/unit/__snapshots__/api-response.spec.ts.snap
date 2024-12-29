@@ -6,3 +6,10 @@ exports[`ApiResponse > defaultStatusCodes > should be 200 and 400 1`] = `
   "positive": 200,
 }
 `;
+
+exports[`ApiResponse > responseVariants > should consist of positive and negative 1`] = `
+[
+  "positive",
+  "negative",
+]
+`;
