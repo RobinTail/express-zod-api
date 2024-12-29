@@ -9,9 +9,7 @@ describe("ApiResponse", () => {
 
   describe("responseVariants", () => {
     test("should consist of positive and negative", () => {
-      expect(responseVariants).toHaveLength(2);
-      expect(responseVariants).toContain("positive");
-      expect(responseVariants).toContain("negative");
+      expect(responseVariants).toMatchSnapshot();
     });
   });
 });
