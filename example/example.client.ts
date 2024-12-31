@@ -399,7 +399,10 @@ export interface Response {
     | NegativeResponse["get /v1/events/time"];
 }
 
-export type MethodPath = keyof Input;
+export type Request = keyof Input;
+
+/** @deprecated use Request instead */
+export type MethodPath = Request;
 
 export const endpointTags = {
   "get /v1/user/retrieve": ["users"],
@@ -422,7 +425,7 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
-  public provide<K extends MethodPath>(
+  public provide<K extends Request>(
     request: K,
     params: Input[K],
   ): Promise<Response[K]> {
