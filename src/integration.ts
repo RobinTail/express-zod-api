@@ -228,11 +228,11 @@ export class Integration {
       const isJson = endpoint
         .getResponses("positive")
         .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
-      const methodPath = `${method} ${path}`;
+      const request = `${method} ${path}`;
       const literalIdx = f.createLiteralTypeNode(
-        f.createStringLiteral(methodPath),
+        f.createStringLiteral(request),
       );
-      this.registry.set(methodPath, {
+      this.registry.set(request, {
         input: f.createTypeReferenceNode(input.name),
         positive: this.makeSomeOf(dictionaries.positive),
         negative: this.makeSomeOf(dictionaries.negative),
@@ -284,12 +284,12 @@ export class Integration {
     // Single walk through the registry for making properties for the next three objects
     const jsonEndpoints: ts.PropertyAssignment[] = [];
     const endpointTags: ts.PropertyAssignment[] = [];
-    for (const [propName, { isJson, tags, ...rest }] of this.registry) {
+    for (const [request, { isJson, tags, ...rest }] of this.registry) {
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
       for (const face of this.interfaces)
-        face.props.push(makeInterfaceProp(propName, rest[face.kind]));
+        face.props.push(makeInterfaceProp(request, rest[face.kind]));
       if (variant !== "types") {
-        const literalIdx = makePropertyIdentifier(propName);
+        const literalIdx = makePropertyIdentifier(request);
         if (isJson) {
           // "get /v1/user/retrieve": true
           jsonEndpoints.push(
