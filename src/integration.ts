@@ -229,6 +229,9 @@ export class Integration {
         .getResponses("positive")
         .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
       const methodPath = `${method} ${path}`;
+      const literalIdx = f.createLiteralTypeNode(
+        f.createStringLiteral(methodPath),
+      );
       this.registry.set(methodPath, {
         input: f.createTypeReferenceNode(input.name),
         positive: this.makeSomeOf(dictionaries.positive),
@@ -236,11 +239,11 @@ export class Integration {
         response: f.createUnionTypeNode([
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.posResponseInterface),
-            f.createLiteralTypeNode(f.createStringLiteral(methodPath)),
+            literalIdx,
           ),
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.negResponseInterface),
-            f.createLiteralTypeNode(f.createStringLiteral(methodPath)),
+            literalIdx,
           ),
         ]),
         encoded: f.createIntersectionTypeNode([
@@ -286,19 +289,17 @@ export class Integration {
       for (const face of this.interfaces)
         face.props.push(makeInterfaceProp(propName, rest[face.kind]));
       if (variant !== "types") {
+        const literalIdx = makePropertyIdentifier(propName);
         if (isJson) {
           // "get /v1/user/retrieve": true
           jsonEndpoints.push(
-            f.createPropertyAssignment(
-              makePropertyIdentifier(propName),
-              f.createTrue(),
-            ),
+            f.createPropertyAssignment(literalIdx, f.createTrue()),
           );
         }
         // "get /v1/user/retrieve": ["users"]
         endpointTags.push(
           f.createPropertyAssignment(
-            makePropertyIdentifier(propName),
+            literalIdx,
             f.createArrayLiteralExpression(
               tags.map((tag) => f.createStringLiteral(tag)),
             ),
