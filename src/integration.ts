@@ -27,7 +27,6 @@ import {
   parametricIndexNode,
   propOf,
   protectedReadonlyModifier,
-  quoteProp,
   recordStringAny,
   restToken,
   makeAnd,
@@ -43,7 +42,12 @@ import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import { ZTSContext, printNode, addJsDocComment } from "./zts-helpers";
+import {
+  ZTSContext,
+  printNode,
+  addJsDocComment,
+  makePropertyIdentifier,
+} from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -107,7 +111,7 @@ export class Integration {
   protected program: ts.Node[] = [this.someOf];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
-    ReturnType<typeof quoteProp>, // method+path
+    string, // request (method+path)
     Record<IOKind, ts.TypeNode> & {
       isJson: boolean;
       tags: ReadonlyArray<string>;
@@ -224,19 +228,22 @@ export class Integration {
       const isJson = endpoint
         .getResponses("positive")
         .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
-      const methodPath = quoteProp(method, path);
-      this.registry.set(methodPath, {
+      const request = `${method} ${path}`;
+      const literalIdx = f.createLiteralTypeNode(
+        f.createStringLiteral(request),
+      );
+      this.registry.set(request, {
         input: f.createTypeReferenceNode(input.name),
         positive: this.makeSomeOf(dictionaries.positive),
         negative: this.makeSomeOf(dictionaries.negative),
         response: f.createUnionTypeNode([
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.posResponseInterface),
-            f.createTypeReferenceNode(methodPath),
+            literalIdx,
           ),
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.negResponseInterface),
-            f.createTypeReferenceNode(methodPath),
+            literalIdx,
           ),
         ]),
         encoded: f.createIntersectionTypeNode([
@@ -277,21 +284,22 @@ export class Integration {
     // Single walk through the registry for making properties for the next three objects
     const jsonEndpoints: ts.PropertyAssignment[] = [];
     const endpointTags: ts.PropertyAssignment[] = [];
-    for (const [propName, { isJson, tags, ...rest }] of this.registry) {
+    for (const [request, { isJson, tags, ...rest }] of this.registry) {
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
       for (const face of this.interfaces)
-        face.props.push(makeInterfaceProp(propName, rest[face.kind]));
+        face.props.push(makeInterfaceProp(request, rest[face.kind]));
       if (variant !== "types") {
+        const literalIdx = makePropertyIdentifier(request);
         if (isJson) {
           // "get /v1/user/retrieve": true
           jsonEndpoints.push(
-            f.createPropertyAssignment(propName, f.createTrue()),
+            f.createPropertyAssignment(literalIdx, f.createTrue()),
           );
         }
         // "get /v1/user/retrieve": ["users"]
         endpointTags.push(
           f.createPropertyAssignment(
-            propName,
+            literalIdx,
             f.createArrayLiteralExpression(
               tags.map((tag) => f.createStringLiteral(tag)),
             ),
