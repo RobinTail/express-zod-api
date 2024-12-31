@@ -171,9 +171,11 @@ export class Integration {
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint = (endpoint, path, method) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+      const request = `${method} ${path}`;
       const input = makeType(
         entitle("input"),
         zodToTs(endpoint.getSchema("input"), ctxIn),
+        { comment: request },
       );
       this.program.push(input);
       const dictionaries = responseVariants.reduce(
@@ -183,6 +185,7 @@ export class Integration {
             const variantType = makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
               zodToTs(mimeTypes ? schema : noContent, ctxOut),
+              { comment: request },
             );
             this.program.push(variantType);
             return statusCodes.map((code) =>
@@ -195,6 +198,7 @@ export class Integration {
           const dict = makeInterface(
             entitle(responseVariant, "response", "variants"),
             props,
+            { comment: request },
           );
           this.program.push(dict);
           return Object.assign(agg, { [responseVariant]: dict });
@@ -202,7 +206,6 @@ export class Integration {
         {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
       );
       this.paths.add(path);
-      const request = `${method} ${path}`;
       const literalIdx = f.createLiteralTypeNode(
         f.createStringLiteral(request),
       );
