@@ -27,7 +27,6 @@ import {
   parametricIndexNode,
   propOf,
   protectedReadonlyModifier,
-  quoteProp,
   recordStringAny,
   restToken,
   makeAnd,
@@ -107,7 +106,7 @@ export class Integration {
   protected program: ts.Node[] = [this.someOf];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
-    ReturnType<typeof quoteProp>, // method+path
+    string, // request (method+path)
     Record<IOKind, ts.TypeNode> & {
       isJson: boolean;
       tags: ReadonlyArray<string>;
@@ -224,7 +223,7 @@ export class Integration {
       const isJson = endpoint
         .getResponses("positive")
         .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
-      const methodPath = quoteProp(method, path);
+      const methodPath = `${method} ${path}`;
       this.registry.set(methodPath, {
         input: f.createTypeReferenceNode(input.name),
         positive: this.makeSomeOf(dictionaries.positive),
