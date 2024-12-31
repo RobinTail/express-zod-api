@@ -236,11 +236,11 @@ export class Integration {
         response: f.createUnionTypeNode([
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.posResponseInterface),
-            f.createTypeReferenceNode(methodPath),
+            f.createLiteralTypeNode(f.createStringLiteral(methodPath)),
           ),
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.negResponseInterface),
-            f.createTypeReferenceNode(methodPath),
+            f.createLiteralTypeNode(f.createStringLiteral(methodPath)),
           ),
         ]),
         encoded: f.createIntersectionTypeNode([
