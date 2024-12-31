@@ -106,8 +106,6 @@ export class Integration {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
     requestType: f.createIdentifier("Request"),
-    /** @todo remove in v22 */
-    methodPathType: f.createIdentifier("MethodPath"),
     inputInterface: f.createIdentifier("Input"),
     posResponseInterface: f.createIdentifier("PositiveResponse"),
     negResponseInterface: f.createIdentifier("NegativeResponse"),
@@ -287,14 +285,6 @@ export class Integration {
       makeType(this.ids.requestType, makeKeyOf(this.ids.inputInterface), {
         isPublic: true,
       }),
-    );
-    // export type MethodPath = Request;
-    this.program.push(
-      makeType(
-        this.ids.methodPathType,
-        f.createTypeReferenceNode(this.ids.requestType),
-        { isPublic: true, comment: "@deprecated use Request instead" },
-      ),
     );
 
     if (variant === "types") return;

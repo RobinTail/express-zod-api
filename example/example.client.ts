@@ -401,9 +401,6 @@ export interface Response {
 
 export type Request = keyof Input;
 
-/** @deprecated use Request instead */
-export type MethodPath = Request;
-
 export const endpointTags = {
   "get /v1/user/retrieve": ["users"],
   "delete /v1/user/:id/remove": ["users"],
