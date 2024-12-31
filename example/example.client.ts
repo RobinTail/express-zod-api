@@ -5,13 +5,13 @@ type Type1 = {
 
 type SomeOf<T> = T[keyof T];
 
-/** GET /v1/user/retrieve */
+/** get /v1/user/retrieve */
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
 };
 
-/** GET /v1/user/retrieve */
+/** get /v1/user/retrieve */
 type GetV1UserRetrievePositiveVariant1 = {
   status: "success";
   data: {
@@ -24,12 +24,12 @@ type GetV1UserRetrievePositiveVariant1 = {
   };
 };
 
-/** GET /v1/user/retrieve */
+/** get /v1/user/retrieve */
 interface GetV1UserRetrievePositiveResponseVariants {
   200: GetV1UserRetrievePositiveVariant1;
 }
 
-/** GET /v1/user/retrieve */
+/** get /v1/user/retrieve */
 type GetV1UserRetrieveNegativeVariant1 = {
   status: "error";
   error: {
@@ -37,34 +37,34 @@ type GetV1UserRetrieveNegativeVariant1 = {
   };
 };
 
-/** GET /v1/user/retrieve */
+/** get /v1/user/retrieve */
 interface GetV1UserRetrieveNegativeResponseVariants {
   400: GetV1UserRetrieveNegativeVariant1;
 }
 
-/** DELETE /v1/user/:id/remove */
+/** delete /v1/user/:id/remove */
 type DeleteV1UserIdRemoveInput = {
   /** numeric string */
   id: string;
 };
 
-/** DELETE /v1/user/:id/remove */
+/** delete /v1/user/:id/remove */
 type DeleteV1UserIdRemovePositiveVariant1 = undefined;
 
-/** DELETE /v1/user/:id/remove */
+/** delete /v1/user/:id/remove */
 interface DeleteV1UserIdRemovePositiveResponseVariants {
   204: DeleteV1UserIdRemovePositiveVariant1;
 }
 
-/** DELETE /v1/user/:id/remove */
+/** delete /v1/user/:id/remove */
 type DeleteV1UserIdRemoveNegativeVariant1 = undefined;
 
-/** DELETE /v1/user/:id/remove */
+/** delete /v1/user/:id/remove */
 interface DeleteV1UserIdRemoveNegativeResponseVariants {
   404: DeleteV1UserIdRemoveNegativeVariant1;
 }
 
-/** PATCH /v1/user/:id */
+/** patch /v1/user/:id */
 type PatchV1UserIdInput = {
   key: string;
   id: string;
@@ -72,7 +72,7 @@ type PatchV1UserIdInput = {
   birthday: string;
 };
 
-/** PATCH /v1/user/:id */
+/** patch /v1/user/:id */
 type PatchV1UserIdPositiveVariant1 = {
   status: "success";
   data: {
@@ -81,12 +81,12 @@ type PatchV1UserIdPositiveVariant1 = {
   };
 };
 
-/** PATCH /v1/user/:id */
+/** patch /v1/user/:id */
 interface PatchV1UserIdPositiveResponseVariants {
   200: PatchV1UserIdPositiveVariant1;
 }
 
-/** PATCH /v1/user/:id */
+/** patch /v1/user/:id */
 type PatchV1UserIdNegativeVariant1 = {
   status: "error";
   error: {
@@ -94,17 +94,17 @@ type PatchV1UserIdNegativeVariant1 = {
   };
 };
 
-/** PATCH /v1/user/:id */
+/** patch /v1/user/:id */
 interface PatchV1UserIdNegativeResponseVariants {
   400: PatchV1UserIdNegativeVariant1;
 }
 
-/** POST /v1/user/create */
+/** post /v1/user/create */
 type PostV1UserCreateInput = {
   name: string;
 };
 
-/** POST /v1/user/create */
+/** post /v1/user/create */
 type PostV1UserCreatePositiveVariant1 = {
   status: "created";
   data: {
@@ -112,100 +112,100 @@ type PostV1UserCreatePositiveVariant1 = {
   };
 };
 
-/** POST /v1/user/create */
+/** post /v1/user/create */
 interface PostV1UserCreatePositiveResponseVariants {
   201: PostV1UserCreatePositiveVariant1;
   202: PostV1UserCreatePositiveVariant1;
 }
 
-/** POST /v1/user/create */
+/** post /v1/user/create */
 type PostV1UserCreateNegativeVariant1 = {
   status: "exists";
   id: number;
 };
 
-/** POST /v1/user/create */
+/** post /v1/user/create */
 type PostV1UserCreateNegativeVariant2 = {
   status: "error";
   reason: string;
 };
 
-/** POST /v1/user/create */
+/** post /v1/user/create */
 interface PostV1UserCreateNegativeResponseVariants {
   409: PostV1UserCreateNegativeVariant1;
   400: PostV1UserCreateNegativeVariant2;
   500: PostV1UserCreateNegativeVariant2;
 }
 
-/** GET /v1/user/list */
+/** get /v1/user/list */
 type GetV1UserListInput = {};
 
-/** GET /v1/user/list */
+/** get /v1/user/list */
 type GetV1UserListPositiveVariant1 = {
   name: string;
 }[];
 
-/** GET /v1/user/list */
+/** get /v1/user/list */
 interface GetV1UserListPositiveResponseVariants {
   200: GetV1UserListPositiveVariant1;
 }
 
-/** GET /v1/user/list */
+/** get /v1/user/list */
 type GetV1UserListNegativeVariant1 = string;
 
-/** GET /v1/user/list */
+/** get /v1/user/list */
 interface GetV1UserListNegativeResponseVariants {
   400: GetV1UserListNegativeVariant1;
 }
 
-/** GET /v1/avatar/send */
+/** get /v1/avatar/send */
 type GetV1AvatarSendInput = {
   userId: string;
 };
 
-/** GET /v1/avatar/send */
+/** get /v1/avatar/send */
 type GetV1AvatarSendPositiveVariant1 = string;
 
-/** GET /v1/avatar/send */
+/** get /v1/avatar/send */
 interface GetV1AvatarSendPositiveResponseVariants {
   200: GetV1AvatarSendPositiveVariant1;
 }
 
-/** GET /v1/avatar/send */
+/** get /v1/avatar/send */
 type GetV1AvatarSendNegativeVariant1 = string;
 
-/** GET /v1/avatar/send */
+/** get /v1/avatar/send */
 interface GetV1AvatarSendNegativeResponseVariants {
   400: GetV1AvatarSendNegativeVariant1;
 }
 
-/** GET /v1/avatar/stream */
+/** get /v1/avatar/stream */
 type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-/** GET /v1/avatar/stream */
+/** get /v1/avatar/stream */
 type GetV1AvatarStreamPositiveVariant1 = Buffer;
 
-/** GET /v1/avatar/stream */
+/** get /v1/avatar/stream */
 interface GetV1AvatarStreamPositiveResponseVariants {
   200: GetV1AvatarStreamPositiveVariant1;
 }
 
-/** GET /v1/avatar/stream */
+/** get /v1/avatar/stream */
 type GetV1AvatarStreamNegativeVariant1 = string;
 
-/** GET /v1/avatar/stream */
+/** get /v1/avatar/stream */
 interface GetV1AvatarStreamNegativeResponseVariants {
   400: GetV1AvatarStreamNegativeVariant1;
 }
 
-/** POST /v1/avatar/upload */
+/** post /v1/avatar/upload */
 type PostV1AvatarUploadInput = {
   avatar: any;
 };
 
-/** POST /v1/avatar/upload */
+/** post /v1/avatar/upload */
 type PostV1AvatarUploadPositiveVariant1 = {
   status: "success";
   data: {
@@ -217,12 +217,12 @@ type PostV1AvatarUploadPositiveVariant1 = {
   };
 };
 
-/** POST /v1/avatar/upload */
+/** post /v1/avatar/upload */
 interface PostV1AvatarUploadPositiveResponseVariants {
   200: PostV1AvatarUploadPositiveVariant1;
 }
 
-/** POST /v1/avatar/upload */
+/** post /v1/avatar/upload */
 type PostV1AvatarUploadNegativeVariant1 = {
   status: "error";
   error: {
@@ -230,15 +230,15 @@ type PostV1AvatarUploadNegativeVariant1 = {
   };
 };
 
-/** POST /v1/avatar/upload */
+/** post /v1/avatar/upload */
 interface PostV1AvatarUploadNegativeResponseVariants {
   400: PostV1AvatarUploadNegativeVariant1;
 }
 
-/** POST /v1/avatar/raw */
+/** post /v1/avatar/raw */
 type PostV1AvatarRawInput = Buffer;
 
-/** POST /v1/avatar/raw */
+/** post /v1/avatar/raw */
 type PostV1AvatarRawPositiveVariant1 = {
   status: "success";
   data: {
@@ -246,12 +246,12 @@ type PostV1AvatarRawPositiveVariant1 = {
   };
 };
 
-/** POST /v1/avatar/raw */
+/** post /v1/avatar/raw */
 interface PostV1AvatarRawPositiveResponseVariants {
   200: PostV1AvatarRawPositiveVariant1;
 }
 
-/** POST /v1/avatar/raw */
+/** post /v1/avatar/raw */
 type PostV1AvatarRawNegativeVariant1 = {
   status: "error";
   error: {
@@ -259,17 +259,17 @@ type PostV1AvatarRawNegativeVariant1 = {
   };
 };
 
-/** POST /v1/avatar/raw */
+/** post /v1/avatar/raw */
 interface PostV1AvatarRawNegativeResponseVariants {
   400: PostV1AvatarRawNegativeVariant1;
 }
 
-/** GET /v1/events/time */
+/** get /v1/events/time */
 type GetV1EventsTimeInput = {
   trigger?: string | undefined;
 };
 
-/** GET /v1/events/time */
+/** get /v1/events/time */
 type GetV1EventsTimePositiveVariant1 = {
   data: number;
   event: "time";
@@ -277,15 +277,15 @@ type GetV1EventsTimePositiveVariant1 = {
   retry?: number | undefined;
 };
 
-/** GET /v1/events/time */
+/** get /v1/events/time */
 interface GetV1EventsTimePositiveResponseVariants {
   200: GetV1EventsTimePositiveVariant1;
 }
 
-/** GET /v1/events/time */
+/** get /v1/events/time */
 type GetV1EventsTimeNegativeVariant1 = string;
 
-/** GET /v1/events/time */
+/** get /v1/events/time */
 interface GetV1EventsTimeNegativeResponseVariants {
   400: GetV1EventsTimeNegativeVariant1;
 }
