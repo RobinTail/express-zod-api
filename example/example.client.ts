@@ -399,7 +399,10 @@ export interface Response {
     | NegativeResponse["get /v1/events/time"];
 }
 
-export type MethodPath = keyof Input;
+export type Request = keyof Input;
+
+/** @deprecated use Request instead */
+export type MethodPath = Request;
 
 /** @deprecated use content-type header of an actual response */
 export const jsonEndpoints = {
@@ -442,7 +445,7 @@ export class ExpressZodAPIClient {
   ): Promise<
     `${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown
   >;
-  public provide<K extends MethodPath>(
+  public provide<K extends Request>(
     request: K,
     params: Input[K],
   ): Promise<Response[K]>;
