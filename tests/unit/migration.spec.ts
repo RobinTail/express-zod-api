@@ -21,6 +21,7 @@ describe("Migration", () => {
     valid: [
       `client.provide("get /v1/test", {id: 10});`,
       `new Integration({ routing });`,
+      `import { Request } from "./client.ts";`,
     ],
     invalid: [
       {
@@ -44,6 +45,16 @@ describe("Migration", () => {
           {
             messageId: "remove",
             data: { subject: "property", name: "splitResponse" },
+          },
+        ],
+      },
+      {
+        code: `import { MethodPath } from "./client.ts";`,
+        output: `import { Request } from "./client.ts";`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "type", from: "MethodPath", to: "Request" },
           },
         ],
       },

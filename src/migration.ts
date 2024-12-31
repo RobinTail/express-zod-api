@@ -15,6 +15,7 @@ interface Queries {
     ];
   };
   splitResponse: TSESTree.Property & { key: TSESTree.Identifier };
+  methodPath: TSESTree.ImportSpecifier & { imported: TSESTree.Identifier };
 }
 
 type Listener = keyof Queries;
@@ -24,6 +25,7 @@ const queries: Record<Listener, string> = {
     `${NT.CallExpression}[callee.property.name='provide'][arguments.length=3]` +
     `:has(${NT.Literal}[value=/^${methods.join("|")}$/] + ${NT.Literal} + ${NT.ObjectExpression})`,
   splitResponse: `${NT.NewExpression}[callee.name='Integration'] > ${NT.ObjectExpression} > ${NT.Property}[key.name='splitResponse']`,
+  methodPath: `${NT.ImportDeclaration} > ${NT.ImportSpecifier}[imported.name='MethodPath']`,
 };
 
 const listen = <
@@ -76,6 +78,15 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
           data: { subject: "property", name: node.key.name },
           fix: (fixer) => fixer.remove(node),
         }),
+      methodPath: (node) => {
+        const replacement = "Request";
+        ctx.report({
+          messageId: "change",
+          node: node.imported,
+          data: { subject: "type", from: node.imported.name, to: replacement },
+          fix: (fixer) => fixer.replaceText(node.imported, replacement),
+        });
+      },
     }),
 });
 
