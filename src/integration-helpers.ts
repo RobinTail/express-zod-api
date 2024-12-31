@@ -198,15 +198,17 @@ export const makePromise = (subject: ts.TypeNode | "any") =>
 export const makeInterface = (
   name: ts.Identifier | string,
   props: ts.PropertySignature[],
-  { isPublic }: { isPublic?: boolean } = {},
-) =>
-  f.createInterfaceDeclaration(
+  { isPublic, comment }: { isPublic?: boolean; comment?: string } = {},
+) => {
+  const node = f.createInterfaceDeclaration(
     isPublic ? exportModifier : undefined,
     name,
     undefined,
     undefined,
     props,
   );
+  return comment ? addJsDocComment(node, comment) : node;
+};
 
 export const makeTypeParams = (
   params: Partial<Record<string, ts.Identifier>>,
