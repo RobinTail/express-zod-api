@@ -122,6 +122,8 @@ export class Integration {
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
+    requestType: f.createIdentifier("Request"),
+    /** @todo remove in v22 */
     methodPathType: f.createIdentifier("MethodPath"),
     inputInterface: f.createIdentifier("Input"),
     posResponseInterface: f.createIdentifier("PositiveResponse"),
@@ -315,11 +317,19 @@ export class Integration {
     for (const { id, props } of this.interfaces)
       this.program.push(makeInterface(id, props, { isPublic: true }));
 
-    // export type MethodPath = keyof Input;
+    // export type Request = keyof Input;
     this.program.push(
-      makeType(this.ids.methodPathType, makeKeyOf(this.ids.inputInterface), {
+      makeType(this.ids.requestType, makeKeyOf(this.ids.inputInterface), {
         isPublic: true,
       }),
+    );
+    // export type MethodPath = Request;
+    this.program.push(
+      makeType(
+        this.ids.methodPathType,
+        f.createTypeReferenceNode(this.ids.requestType),
+        { isPublic: true, comment: "@deprecated use Request instead" },
+      ),
     );
 
     if (variant === "types") return;
@@ -464,9 +474,7 @@ export class Integration {
         ),
       }),
       undefined, // overload
-      makeTypeParams({
-        K: this.ids.methodPathType,
-      }),
+      makeTypeParams({ K: this.ids.requestType }),
       makePromise(
         f.createIndexedAccessTypeNode(
           f.createTypeReferenceNode(this.ids.responseInterface),
