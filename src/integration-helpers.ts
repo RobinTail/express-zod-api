@@ -1,6 +1,5 @@
 import ts from "typescript";
-import { Method } from "./method";
-import { addJsDocComment } from "./zts-helpers";
+import { addJsDocComment, makePropertyIdentifier } from "./zts-helpers";
 
 export const f = ts.factory;
 
@@ -69,7 +68,7 @@ export const makeEmptyInitializingConstructor = (
 export const makeInterfaceProp = (name: string | number, value: ts.TypeNode) =>
   f.createPropertySignature(
     undefined,
-    typeof name === "number" ? f.createNumericLiteral(name) : name,
+    makePropertyIdentifier(name),
     undefined,
     value,
   );
@@ -253,8 +252,6 @@ export const makeObjectKeysReducer = (
     ],
   );
 
-export const quoteProp = (...parts: [Method, string]) =>
-  `"${parts.join(" ")}"` as `"${Method} ${string}"`;
 export const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
 export const makeTernary = (

@@ -23,7 +23,6 @@ import {
   makeTypeParams,
   propOf,
   protectedReadonlyModifier,
-  quoteProp,
   recordStringAny,
   makeAnd,
   makeTemplate,
@@ -39,7 +38,7 @@ import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import { ZTSContext, printNode } from "./zts-helpers";
+import { ZTSContext, printNode, makePropertyIdentifier } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -98,7 +97,7 @@ export class Integration {
   protected program: ts.Node[] = [this.someOf];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
-    ReturnType<typeof quoteProp>, // method+path
+    string, // request (method+path)
     Record<IOKind, ts.TypeNode> & { tags: ReadonlyArray<string> }
   >();
   protected paths = new Set<string>();
@@ -203,19 +202,22 @@ export class Integration {
         {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
       );
       this.paths.add(path);
-      const methodPath = quoteProp(method, path);
-      this.registry.set(methodPath, {
+      const request = `${method} ${path}`;
+      const literalIdx = f.createLiteralTypeNode(
+        f.createStringLiteral(request),
+      );
+      this.registry.set(request, {
         input: f.createTypeReferenceNode(input.name),
         positive: this.makeSomeOf(dictionaries.positive),
         negative: this.makeSomeOf(dictionaries.negative),
         response: f.createUnionTypeNode([
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.posResponseInterface),
-            f.createTypeReferenceNode(methodPath),
+            literalIdx,
           ),
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.negResponseInterface),
-            f.createTypeReferenceNode(methodPath),
+            literalIdx,
           ),
         ]),
         encoded: f.createIntersectionTypeNode([
@@ -254,15 +256,15 @@ export class Integration {
 
     // Single walk through the registry for making properties for the next three objects
     const endpointTags: ts.PropertyAssignment[] = [];
-    for (const [propName, { tags, ...rest }] of this.registry) {
+    for (const [request, { tags, ...rest }] of this.registry) {
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
       for (const face of this.interfaces)
-        face.props.push(makeInterfaceProp(propName, rest[face.kind]));
+        face.props.push(makeInterfaceProp(request, rest[face.kind]));
       if (variant !== "types") {
         // "get /v1/user/retrieve": ["users"]
         endpointTags.push(
           f.createPropertyAssignment(
-            propName,
+            makePropertyIdentifier(request),
             f.createArrayLiteralExpression(
               tags.map((tag) => f.createStringLiteral(tag)),
             ),
