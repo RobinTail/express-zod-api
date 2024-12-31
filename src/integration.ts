@@ -42,7 +42,12 @@ import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import { ZTSContext, printNode, addJsDocComment } from "./zts-helpers";
+import {
+  ZTSContext,
+  printNode,
+  addJsDocComment,
+  makePropertyIdentifier,
+} from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -284,13 +289,16 @@ export class Integration {
         if (isJson) {
           // "get /v1/user/retrieve": true
           jsonEndpoints.push(
-            f.createPropertyAssignment(propName, f.createTrue()),
+            f.createPropertyAssignment(
+              makePropertyIdentifier(propName),
+              f.createTrue(),
+            ),
           );
         }
         // "get /v1/user/retrieve": ["users"]
         endpointTags.push(
           f.createPropertyAssignment(
-            propName,
+            makePropertyIdentifier(propName),
             f.createArrayLiteralExpression(
               tags.map((tag) => f.createStringLiteral(tag)),
             ),
