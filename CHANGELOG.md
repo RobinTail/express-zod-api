@@ -7,8 +7,8 @@
 - New `Integration` option: `serverUrl`, string, optional, the API URL for the generated client:
   - Currently used for generating example implementation;
   - Default value remains `https://example.com`;
-  - Can handle it with and without trailing slashes;
-- Using `new URL()` for constructing the final request URL in the example implementation of the generated client.
+- Using `new URL()` for constructing the final request URL in the example implementation of the generated client:
+  - That enables handling `serverUrl` both with and without trailing slash;
 
 ### v21.9.0
 
