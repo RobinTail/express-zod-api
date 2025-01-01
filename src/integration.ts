@@ -62,6 +62,11 @@ interface IntegrationParams {
    * */
   variant?: "types" | "client";
   /**
+   * @desc The API URL (no trailing slash) to use in the generated code
+   * @default https://example.com
+   * */
+  serverUrl?: string;
+  /**
    * @todo remove in v22
    * @deprecated
    * */
@@ -188,6 +193,7 @@ export class Integration {
     routing,
     brandHandling,
     variant = "client",
+    serverUrl = "https://example.com",
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
   }: IntegrationParams) {
@@ -633,16 +639,13 @@ export class Integration {
         this.ids.responseConst,
         f.createAwaitExpression(
           f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
-            f.createTemplateExpression(
-              f.createTemplateHead("https://example.com"),
-              [
-                f.createTemplateSpan(
-                  this.ids.pathParameter,
-                  f.createTemplateMiddle(""),
-                ),
-                f.createTemplateSpan(this.ids.searchParamsConst, emptyTail),
-              ],
-            ),
+            f.createTemplateExpression(f.createTemplateHead(serverUrl), [
+              f.createTemplateSpan(
+                this.ids.pathParameter,
+                f.createTemplateMiddle(""),
+              ),
+              f.createTemplateSpan(this.ids.searchParamsConst, emptyTail),
+            ]),
             f.createObjectLiteralExpression([
               methodProperty,
               headersProperty,
