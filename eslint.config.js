@@ -30,6 +30,75 @@ const peformanceConcerns = [
   },
 ];
 
+const tsFactoryConcerns = [
+  {
+    selector: "Identifier[name='createConditionalExpression']",
+    message: "use makeTernary() helper",
+  },
+  {
+    selector: "Identifier[name='createArrowFunction']",
+    message: "use makeArrowFn() helper",
+  },
+  {
+    selector: "Identifier[name='createTypeParameterDeclaration']",
+    message: "use makeTypeParams() helper",
+  },
+  {
+    selector: "Identifier[name='createInterfaceDeclaration']",
+    message: "use makeInterface() helper",
+  },
+  {
+    selector: "Identifier[name='createClassDeclaration']",
+    message: "use makePublicClass() helper",
+  },
+  {
+    selector: "Identifier[name='createMethodDeclaration']",
+    message: "use makePublicMethod() helper",
+  },
+  {
+    selector: "Identifier[name='createTypeAliasDeclaration']",
+    message: "use makeType() or makePublicLiteralType() helpers",
+  },
+  {
+    selector: "Identifier[name='createVariableDeclarationList']",
+    message: "use makeConst() helper",
+  },
+  {
+    selector: "Identifier[name='createArrayBindingPattern']",
+    message: "use makeDeconstruction() helper",
+  },
+  {
+    selector: "Identifier[name='createPropertySignature']",
+    message: "use makeInterfaceProp() helper",
+  },
+  {
+    selector: "Identifier[name='createConstructorDeclaration']",
+    message: "use makeEmptyInitializingConstructor() helper",
+  },
+  {
+    selector: "Identifier[name='createParameterDeclaration']",
+    message: "use makeParam() or makeParams() helpers",
+  },
+  {
+    selector:
+      "CallExpression[callee.property.name='createCallExpression']" +
+      "[arguments.0.callee.property.name='createPropertyAccessExpression']",
+    message: "use makePropCall() helper",
+  },
+  {
+    selector: "Identifier[name='AmpersandAmpersandToken']",
+    message: "use makeAnd() helper",
+  },
+  {
+    selector: "Identifier[name='EqualsEqualsEqualsToken']",
+    message: "use makeEqual() helper",
+  },
+  {
+    selector: "Identifier[name='KeyOfKeyword']",
+    message: "use makeKeyOf() helper",
+  },
+];
+
 export default tsPlugin.config(
   {
     languageOptions: { globals: globals.node },
@@ -79,72 +148,7 @@ export default tsPlugin.config(
       "no-restricted-syntax": [
         "warn",
         ...peformanceConcerns,
-        {
-          selector: "Identifier[name='createConditionalExpression']",
-          message: "use makeTernary() helper",
-        },
-        {
-          selector: "Identifier[name='createArrowFunction']",
-          message: "use makeArrowFn() helper",
-        },
-        {
-          selector: "Identifier[name='createTypeParameterDeclaration']",
-          message: "use makeTypeParams() helper",
-        },
-        {
-          selector: "Identifier[name='createInterfaceDeclaration']",
-          message: "use makeInterface() helper",
-        },
-        {
-          selector: "Identifier[name='createClassDeclaration']",
-          message: "use makePublicClass() helper",
-        },
-        {
-          selector: "Identifier[name='createMethodDeclaration']",
-          message: "use makePublicMethod() helper",
-        },
-        {
-          selector: "Identifier[name='createTypeAliasDeclaration']",
-          message: "use makeType() or makePublicLiteralType() helpers",
-        },
-        {
-          selector: "Identifier[name='createVariableDeclarationList']",
-          message: "use makeConst() helper",
-        },
-        {
-          selector: "Identifier[name='createArrayBindingPattern']",
-          message: "use makeDeconstruction() helper",
-        },
-        {
-          selector: "Identifier[name='createPropertySignature']",
-          message: "use makeInterfaceProp() helper",
-        },
-        {
-          selector: "Identifier[name='createConstructorDeclaration']",
-          message: "use makeEmptyInitializingConstructor() helper",
-        },
-        {
-          selector: "Identifier[name='createParameterDeclaration']",
-          message: "use makeParam() or makeParams() helpers",
-        },
-        {
-          selector:
-            "CallExpression[callee.property.name='createCallExpression']" +
-            "[arguments.0.callee.property.name='createPropertyAccessExpression']",
-          message: "use makePropCall() helper",
-        },
-        {
-          selector: "Identifier[name='AmpersandAmpersandToken']",
-          message: "use makeAnd() helper",
-        },
-        {
-          selector: "Identifier[name='EqualsEqualsEqualsToken']",
-          message: "use makeEqual() helper",
-        },
-        {
-          selector: "Identifier[name='KeyOfKeyword']",
-          message: "use makeKeyOf() helper",
-        },
+        ...tsFactoryConcerns,
       ],
     },
   },
