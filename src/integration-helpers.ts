@@ -1,6 +1,5 @@
 import ts from "typescript";
-import { Method } from "./method";
-import { addJsDocComment } from "./zts-helpers";
+import { addJsDocComment, makePropertyIdentifier } from "./zts-helpers";
 
 export const f = ts.factory;
 
@@ -72,7 +71,7 @@ export const makeEmptyInitializingConstructor = (
 export const makeInterfaceProp = (name: string | number, value: ts.TypeNode) =>
   f.createPropertySignature(
     undefined,
-    typeof name === "number" ? f.createNumericLiteral(name) : name,
+    makePropertyIdentifier(name),
     undefined,
     value,
   );
@@ -199,15 +198,17 @@ export const makePromise = (subject: ts.TypeNode | "any") =>
 export const makeInterface = (
   name: ts.Identifier | string,
   props: ts.PropertySignature[],
-  { isPublic }: { isPublic?: boolean } = {},
-) =>
-  f.createInterfaceDeclaration(
+  { isPublic, comment }: { isPublic?: boolean; comment?: string } = {},
+) => {
+  const node = f.createInterfaceDeclaration(
     isPublic ? exportModifier : undefined,
     name,
     undefined,
     undefined,
     props,
   );
+  return comment ? addJsDocComment(node, comment) : node;
+};
 
 export const makeTypeParams = (
   params: Partial<Record<string, ts.Identifier>>,
@@ -265,8 +266,6 @@ export const makeObjectKeysReducer = (
     ],
   );
 
-export const quoteProp = (...parts: [Method, string]) =>
-  `"${parts.join(" ")}"` as `"${Method} ${string}"`;
 export const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
 export const makeTernary = (

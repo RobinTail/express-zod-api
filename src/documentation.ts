@@ -6,9 +6,9 @@ import {
   SecuritySchemeObject,
   SecuritySchemeType,
 } from "openapi3-ts/oas31";
-import { keys, pluck } from "ramda";
+import { pluck } from "ramda";
 import { z } from "zod";
-import { defaultStatusCodes } from "./api-response";
+import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { defaultInputSources, makeCleanId } from "./common-helpers";
@@ -71,7 +71,6 @@ interface DocumentationParams {
 export class Documentation extends OpenApiBuilder {
   protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   protected lastOperationIdSuffixes = new Map<string, number>();
-  protected responseVariants = keys(defaultStatusCodes); // eslint-disable-line no-restricted-syntax -- need literal
   protected references = new Map<z.ZodTypeAny, string>();
 
   protected makeRef(
@@ -181,7 +180,7 @@ export class Documentation extends OpenApiBuilder {
       });
 
       const responses: ResponsesObject = {};
-      for (const variant of this.responseVariants) {
+      for (const variant of responseVariants) {
         const apiResponses = endpoint.getResponses(variant);
         for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
