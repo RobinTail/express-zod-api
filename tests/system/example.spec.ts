@@ -448,15 +448,14 @@ describe("Example", async () => {
     const createDefaultImplementation =
       (host: string): Implementation =>
       async (method, path, params) => {
-        const searchParams =
-          method === "get" ? `?${new URLSearchParams(params)}` : "";
-        const response = await fetch(`${host}${path}${searchParams}`, {
+        const hasBody = !["get", "delete"].includes(method);
+        const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
+        const response = await fetch(new URL(`${path}${searchParams}`, host), {
           method: method.toUpperCase(),
-          headers:
-            method === "get"
-              ? undefined
-              : { "Content-Type": "application/json", token: "456" },
-          body: method === "get" ? undefined : JSON.stringify(params),
+          headers: hasBody
+            ? { "Content-Type": "application/json", token: "456" }
+            : undefined,
+          body: hasBody ? JSON.stringify(params) : undefined,
         });
         const contentType = response.headers.get("content-type");
         if (!contentType) return;

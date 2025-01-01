@@ -53,6 +53,11 @@ interface IntegrationParams {
    * */
   variant?: "types" | "client";
   /**
+   * @desc The API URL to use in the generated code
+   * @default https://example.com
+   * */
+  serverUrl?: string;
+  /**
    * @desc configures the style of object's optional properties
    * @default { withQuestionMark: true, withUndefined: true }
    */
@@ -163,6 +168,7 @@ export class Integration {
     routing,
     brandHandling,
     variant = "client",
+    serverUrl = "https://example.com",
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
   }: IntegrationParams) {
@@ -461,15 +467,19 @@ export class Integration {
       ),
     );
 
-    // const response = await fetch(`https://example.com${path}${searchParams}`, { ___ });
+    // const response = await fetch(new URL(`${path}${searchParams}`, "https://example.com"), { ___ });
     const responseStatement = makeConst(
       this.ids.responseConst,
       f.createAwaitExpression(
         f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
-          makeTemplate(
-            "https://example.com",
-            [this.ids.pathParameter],
-            [this.ids.searchParamsConst],
+          makeNew(
+            f.createIdentifier(URL.name),
+            makeTemplate(
+              "",
+              [this.ids.pathParameter],
+              [this.ids.searchParamsConst],
+            ),
+            f.createStringLiteral(serverUrl),
           ),
           f.createObjectLiteralExpression([
             methodProperty,
