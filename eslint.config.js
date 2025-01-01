@@ -94,16 +94,16 @@ const tsFactoryConcerns = [
     message: "use makeEqual() helper",
   },
   {
+    selector: "Identifier[name='KeyOfKeyword']",
+    message: "use makeKeyOf() helper",
+  },
+  {
     selector: "Identifier[name='createTemplateExpression']",
     message: "use makeTemplate() helper",
   },
   {
     selector: "Identifier[name='createNewExpression']",
     message: "use makeNew() helper",
-  },
-  {
-    selector: "Identifier[name='KeyOfKeyword']",
-    message: "use makeKeyOf() helper",
   },
 ];
 
