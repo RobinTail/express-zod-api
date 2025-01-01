@@ -62,7 +62,7 @@ interface IntegrationParams {
    * */
   variant?: "types" | "client";
   /**
-   * @desc The API URL (no trailing slash) to use in the generated code
+   * @desc The API URL to use in the generated code
    * @default https://example.com
    * */
   serverUrl?: string;
@@ -632,19 +632,22 @@ export class Integration {
       ),
     );
 
-    // const response = await fetch(`https://example.com${path}${searchParams}`, { ___ });
+    // const response = await fetch(new URL(`${path}${searchParams}`, "https://example.com"), { ___ });
     const responseStatement = f.createVariableStatement(
       undefined,
       makeConst(
         this.ids.responseConst,
         f.createAwaitExpression(
           f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
-            f.createTemplateExpression(f.createTemplateHead(serverUrl), [
-              f.createTemplateSpan(
-                this.ids.pathParameter,
-                f.createTemplateMiddle(""),
-              ),
-              f.createTemplateSpan(this.ids.searchParamsConst, emptyTail),
+            f.createNewExpression(f.createIdentifier(URL.name), undefined, [
+              f.createTemplateExpression(f.createTemplateHead(""), [
+                f.createTemplateSpan(
+                  this.ids.pathParameter,
+                  f.createTemplateMiddle(""),
+                ),
+                f.createTemplateSpan(this.ids.searchParamsConst, emptyTail),
+              ]),
+              f.createStringLiteral(serverUrl),
             ]),
             f.createObjectLiteralExpression([
               methodProperty,
