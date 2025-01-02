@@ -435,12 +435,9 @@ export class Integration {
             this.ids.pathParameter,
             f.createAsExpression(
               f.createElementAccessExpression(
-                f.createCallExpression(
-                  f.createPropertyAccessExpression(
-                    this.ids.requestParameter,
-                    propOf<string>("split"),
-                  ),
-                  undefined,
+                makePropCall(
+                  this.ids.requestParameter,
+                  propOf<string>("split"),
                   [f.createStringLiteral(" ")],
                 ),
                 f.createNumericLiteral(1),
