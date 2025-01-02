@@ -423,42 +423,29 @@ export class Integration {
     const subscribeMethod = makePublicMethod(
       f.createIdentifier("subscribe"),
       makeParams({
-        request: f.createTypeReferenceNode(f.createIdentifier("K")),
+        request: f.createTypeReferenceNode("K"),
         params: f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(f.createIdentifier("Input")),
-          f.createTypeReferenceNode(f.createIdentifier("K")),
+          f.createTypeReferenceNode(this.ids.inputInterface),
+          f.createTypeReferenceNode("K"),
         ),
       }),
       f.createBlock(
         [
-          f.createVariableStatement(
-            undefined,
-            f.createVariableDeclarationList(
-              [
-                f.createVariableDeclaration(
-                  f.createIdentifier("path"),
-                  undefined,
-                  undefined,
-                  f.createAsExpression(
-                    f.createElementAccessExpression(
-                      f.createCallExpression(
-                        f.createPropertyAccessExpression(
-                          f.createIdentifier("request"),
-                          f.createIdentifier("split"),
-                        ),
-                        undefined,
-                        [f.createStringLiteral(" ")],
-                      ),
-                      f.createNumericLiteral("1"),
-                    ),
-                    f.createTypeReferenceNode(
-                      f.createIdentifier("Path"),
-                      undefined,
-                    ),
+          makeConst(
+            this.ids.pathParameter,
+            f.createAsExpression(
+              f.createElementAccessExpression(
+                f.createCallExpression(
+                  f.createPropertyAccessExpression(
+                    f.createIdentifier("request"),
+                    f.createIdentifier("split"),
                   ),
+                  undefined,
+                  [f.createStringLiteral(" ")],
                 ),
-              ],
-              ts.NodeFlags.Const,
+                f.createNumericLiteral("1"),
+              ),
+              f.createTypeReferenceNode(f.createIdentifier("Path"), undefined),
             ),
           ),
           f.createVariableStatement(
