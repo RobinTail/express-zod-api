@@ -448,47 +448,30 @@ export class Integration {
               f.createTypeReferenceNode(f.createIdentifier("Path"), undefined),
             ),
           ),
-          f.createVariableStatement(
-            undefined,
-            f.createVariableDeclarationList(
+          makeConst(
+            f.createIdentifier("source"),
+            f.createNewExpression(
+              f.createIdentifier("EventSource"),
+              undefined,
               [
-                f.createVariableDeclaration(
-                  f.createIdentifier("source"),
-                  undefined,
-                  undefined,
-                  f.createNewExpression(
-                    f.createIdentifier("EventSource"),
-                    undefined,
-                    [
+                f.createNewExpression(f.createIdentifier("URL"), undefined, [
+                  f.createTemplateExpression(f.createTemplateHead("", ""), [
+                    f.createTemplateSpan(
+                      f.createIdentifier("path"),
+                      f.createTemplateMiddle("?", "?"),
+                    ),
+                    f.createTemplateSpan(
                       f.createNewExpression(
-                        f.createIdentifier("URL"),
+                        f.createIdentifier("URLSearchParams"),
                         undefined,
-                        [
-                          f.createTemplateExpression(
-                            f.createTemplateHead("", ""),
-                            [
-                              f.createTemplateSpan(
-                                f.createIdentifier("path"),
-                                f.createTemplateMiddle("?", "?"),
-                              ),
-                              f.createTemplateSpan(
-                                f.createNewExpression(
-                                  f.createIdentifier("URLSearchParams"),
-                                  undefined,
-                                  [f.createIdentifier("params")],
-                                ),
-                                f.createTemplateTail("", ""),
-                              ),
-                            ],
-                          ),
-                          f.createStringLiteral("https://example.com"),
-                        ],
+                        [f.createIdentifier("params")],
                       ),
-                    ],
-                  ),
-                ),
+                      f.createTemplateTail("", ""),
+                    ),
+                  ]),
+                  f.createStringLiteral("https://example.com"),
+                ]),
               ],
-              ts.NodeFlags.Const,
             ),
           ),
           f.createTypeAliasDeclaration(
