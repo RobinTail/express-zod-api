@@ -442,7 +442,7 @@ export class Integration {
                 ),
                 f.createNumericLiteral(1),
               ),
-              f.createTypeReferenceNode(f.createIdentifier("Path"), undefined),
+              f.createTypeReferenceNode(this.ids.pathType),
             ),
           ),
           makeConst(
