@@ -437,13 +437,13 @@ export class Integration {
               f.createElementAccessExpression(
                 f.createCallExpression(
                   f.createPropertyAccessExpression(
-                    f.createIdentifier("request"),
-                    f.createIdentifier("split"),
+                    this.ids.requestParameter,
+                    propOf<string>("split"),
                   ),
                   undefined,
                   [f.createStringLiteral(" ")],
                 ),
-                f.createNumericLiteral("1"),
+                f.createNumericLiteral(1),
               ),
               f.createTypeReferenceNode(f.createIdentifier("Path"), undefined),
             ),
