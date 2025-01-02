@@ -67,18 +67,21 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         expressJsonMock,
+        expect.any(Function), // cors
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledTimes(1);
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/test",
         expressJsonMock,
+        expect.any(Function), // cors
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/test",
         expressJsonMock,
+        expect.any(Function), // cors
         expect.any(Function), // endpoint
       );
       expect(httpListenSpy).toHaveBeenCalledTimes(1);
@@ -141,12 +144,14 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
         configMock.jsonParser,
+        expect.any(Function), // cors
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledTimes(1);
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/test",
         configMock.jsonParser,
+        expect.any(Function), // cors
         expect.any(Function), // endpoint
       );
       expect(appMock.patch).toHaveBeenCalledTimes(1);
@@ -154,18 +159,21 @@ describe("Server", () => {
         "/v1/raw",
         configMock.rawParser,
         moveRaw,
+        expect.any(Function), // cors
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledTimes(2);
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/test",
         configMock.jsonParser,
+        expect.any(Function), // cors
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/raw",
         configMock.rawParser,
         moveRaw,
+        expect.any(Function), // cors
         expect.any(Function), // endpoint
       );
       expect(httpListenSpy).toHaveBeenCalledTimes(1);
@@ -277,6 +285,7 @@ describe("Server", () => {
         "/v1/test",
         expect.any(Function), // uploader with logger
         expect.any(Function), // createUploadFailureHandler()
+        expect.any(Function), // cors
         expect.any(Function), // endpoint
       );
     });
@@ -304,6 +313,7 @@ describe("Server", () => {
         "/v1/test",
         expressRawMock,
         moveRaw,
+        expect.any(Function), // cors
         expect.any(Function), // endpoint
       );
     });
