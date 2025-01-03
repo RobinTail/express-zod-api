@@ -130,6 +130,7 @@ export class Integration {
     requestParameter: f.createIdentifier("request"),
     eventParameter: f.createIdentifier("event"),
     dataParameter: f.createIdentifier("data"),
+    handlerParameter: f.createIdentifier("handler"),
     accumulator: f.createIdentifier("acc"),
     provideMethod: f.createIdentifier("provide"),
     subscribeMethod: f.createIdentifier("subscribe"),
@@ -497,7 +498,7 @@ export class Integration {
                 {
                   [this.ids.eventParameter.text]:
                     f.createTypeReferenceNode("E"),
-                  handler: f.createFunctionTypeNode(
+                  [this.ids.handlerParameter.text]: f.createFunctionTypeNode(
                     undefined,
                     makeParams({
                       [this.ids.dataParameter.text]:
@@ -528,7 +529,7 @@ export class Integration {
                         makeArrowFn(
                           { msg: undefined },
                           f.createCallExpression(
-                            f.createIdentifier("handler"),
+                            this.ids.handlerParameter,
                             undefined,
                             [
                               makePropCall(
