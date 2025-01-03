@@ -583,22 +583,17 @@ export class Integration {
         ),
         f.createReturnStatement(f.createIdentifier("connection")),
       ]),
-      [
-        f.createTypeParameterDeclaration(
-          undefined,
-          f.createIdentifier("K"),
-          f.createIntersectionTypeNode([
-            f.createTypeReferenceNode(f.createIdentifier("Request"), undefined),
-            f.createTemplateLiteralType(f.createTemplateHead("get "), [
-              f.createTemplateLiteralTypeSpan(
-                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                f.createTemplateTail(""),
-              ),
-            ]),
+      makeTypeParams({
+        K: f.createIntersectionTypeNode([
+          f.createTypeReferenceNode(f.createIdentifier("Request"), undefined),
+          f.createTemplateLiteralType(f.createTemplateHead("get "), [
+            f.createTemplateLiteralTypeSpan(
+              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              f.createTemplateTail(""),
+            ),
           ]),
-          undefined,
-        ),
-      ],
+        ]),
+      }),
     );
 
     // export class ExpressZodAPIClient { ___ }
