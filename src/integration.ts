@@ -138,6 +138,7 @@ export class Integration {
     clientConst: f.createIdentifier("client"),
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
+    sourceConst: f.createIdentifier("source"),
     connectionConst: f.createIdentifier("connection"),
   } satisfies Record<string, ts.Identifier>;
   protected interfaces: Array<{
@@ -443,7 +444,7 @@ export class Integration {
           ),
         ),
         makeConst(
-          f.createIdentifier("source"),
+          this.ids.sourceConst,
           makeNew(
             f.createIdentifier("EventSource"),
             makeNew(
@@ -480,7 +481,7 @@ export class Integration {
         makeConst(
           this.ids.connectionConst,
           f.createObjectLiteralExpression([
-            f.createShorthandPropertyAssignment("source"),
+            f.createShorthandPropertyAssignment(this.ids.sourceConst),
             f.createPropertyAssignment(
               f.createIdentifier("on"),
               makeArrowFn(
@@ -507,7 +508,7 @@ export class Integration {
                 f.createBlock([
                   f.createExpressionStatement(
                     makePropCall(
-                      f.createIdentifier("source"),
+                      this.ids.sourceConst,
                       propOf<EventSource>("addEventListener"),
                       [
                         f.createIdentifier("event"),
