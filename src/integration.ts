@@ -485,12 +485,7 @@ export class Integration {
                 f.createTypeReferenceNode(f.createIdentifier("K"), undefined),
               ),
               f.createTypeLiteralNode([
-                f.createPropertySignature(
-                  undefined,
-                  f.createIdentifier("event"),
-                  undefined,
-                  f.createTypeReferenceNode(f.createIdentifier("T"), undefined),
-                ),
+                makeInterfaceProp("event", f.createTypeReferenceNode("T")),
               ]),
             ]),
           ),
