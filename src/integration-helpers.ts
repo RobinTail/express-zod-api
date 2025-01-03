@@ -54,7 +54,7 @@ export const makeParam = (
   );
 
 export const makeParams = (
-  params: Record<string, ts.TypeNode | undefined>,
+  params: Partial<Record<string, ts.TypeNode>>,
   mod?: ts.Modifier[],
 ) =>
   Object.entries(params).map(([name, node]) =>
