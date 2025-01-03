@@ -476,13 +476,10 @@ export class Integration {
                 f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
               ),
             ],
-            f.createTypeReferenceNode(f.createIdentifier("Extract"), [
+            f.createTypeReferenceNode("Extract", [
               f.createIndexedAccessTypeNode(
-                f.createTypeReferenceNode(
-                  f.createIdentifier("PositiveResponse"),
-                  undefined,
-                ),
-                f.createTypeReferenceNode(f.createIdentifier("K"), undefined),
+                f.createTypeReferenceNode(this.ids.posResponseInterface),
+                f.createTypeReferenceNode("K"),
               ),
               f.createTypeLiteralNode([
                 makeInterfaceProp("event", f.createTypeReferenceNode("T")),
