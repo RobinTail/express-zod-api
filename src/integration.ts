@@ -495,7 +495,8 @@ export class Integration {
               f.createIdentifier("on"),
               makeArrowFn(
                 {
-                  event: f.createTypeReferenceNode("E"),
+                  [this.ids.eventParameter.text]:
+                    f.createTypeReferenceNode("E"),
                   handler: f.createFunctionTypeNode(
                     undefined,
                     makeParams({
