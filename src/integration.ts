@@ -479,93 +479,88 @@ export class Integration {
         ),
         makeConst(
           f.createIdentifier("connection"),
-          f.createObjectLiteralExpression(
-            [
-              f.createShorthandPropertyAssignment("source"),
-              f.createPropertyAssignment(
-                f.createIdentifier("on"),
-                makeArrowFn(
-                  {
-                    event: f.createTypeReferenceNode("E"),
-                    handler: f.createFunctionTypeNode(
-                      undefined,
-                      makeParams({
-                        data: f.createIndexedAccessTypeNode(
-                          f.createTypeReferenceNode("Res", [
-                            f.createTypeReferenceNode("E"),
-                          ]),
-                          f.createLiteralTypeNode(
-                            f.createStringLiteral("data"),
-                          ),
-                        ),
-                      }),
-                      f.createUnionTypeNode([
+          f.createObjectLiteralExpression([
+            f.createShorthandPropertyAssignment("source"),
+            f.createPropertyAssignment(
+              f.createIdentifier("on"),
+              makeArrowFn(
+                {
+                  event: f.createTypeReferenceNode("E"),
+                  handler: f.createFunctionTypeNode(
+                    undefined,
+                    makeParams({
+                      data: f.createIndexedAccessTypeNode(
+                        f.createTypeReferenceNode("Res", [
+                          f.createTypeReferenceNode("E"),
+                        ]),
+                        f.createLiteralTypeNode(f.createStringLiteral("data")),
+                      ),
+                    }),
+                    f.createUnionTypeNode([
+                      f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+                      makePromise(
                         f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-                        makePromise(
-                          f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-                        ),
-                      ]),
-                    ),
-                  },
-                  f.createBlock([
-                    f.createExpressionStatement(
-                      makePropCall(
-                        f.createIdentifier("source"),
-                        propOf<EventSource>("addEventListener"),
-                        [
-                          f.createIdentifier("event"),
-                          makeArrowFn(
-                            { msg: undefined },
-                            f.createBlock([
-                              makeConst(
-                                f.createIdentifier("data"),
-                                makePropCall(
-                                  f.createIdentifier("JSON"),
-                                  propOf<JSON>("parse"),
-                                  [
-                                    f.createPropertyAccessExpression(
-                                      f.createParenthesizedExpression(
-                                        f.createAsExpression(
-                                          f.createIdentifier("msg"),
-                                          f.createTypeReferenceNode(
-                                            f.createIdentifier("MessageEvent"),
-                                          ),
+                      ),
+                    ]),
+                  ),
+                },
+                f.createBlock([
+                  f.createExpressionStatement(
+                    makePropCall(
+                      f.createIdentifier("source"),
+                      propOf<EventSource>("addEventListener"),
+                      [
+                        f.createIdentifier("event"),
+                        makeArrowFn(
+                          { msg: undefined },
+                          f.createBlock([
+                            makeConst(
+                              f.createIdentifier("data"),
+                              makePropCall(
+                                f.createIdentifier("JSON"),
+                                propOf<JSON>("parse"),
+                                [
+                                  f.createPropertyAccessExpression(
+                                    f.createParenthesizedExpression(
+                                      f.createAsExpression(
+                                        f.createIdentifier("msg"),
+                                        f.createTypeReferenceNode(
+                                          f.createIdentifier("MessageEvent"),
                                         ),
                                       ),
-                                      f.createIdentifier("data"),
                                     ),
-                                  ],
-                                ),
+                                    f.createIdentifier("data"),
+                                  ),
+                                ],
                               ),
-                              f.createExpressionStatement(
-                                f.createCallExpression(
-                                  f.createIdentifier("handler"),
-                                  undefined,
-                                  [f.createIdentifier("data")],
-                                ),
+                            ),
+                            f.createExpressionStatement(
+                              f.createCallExpression(
+                                f.createIdentifier("handler"),
+                                undefined,
+                                [f.createIdentifier("data")],
                               ),
-                            ]),
-                          ),
-                        ],
-                      ),
+                            ),
+                          ]),
+                        ),
+                      ],
                     ),
-                    f.createReturnStatement(f.createIdentifier("connection")),
-                  ]),
-                  {
-                    typeParams: {
-                      E: f.createIndexedAccessTypeNode(
-                        f.createTypeReferenceNode("Res", [
-                          f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                        ]),
-                        f.createLiteralTypeNode(f.createStringLiteral("event")),
-                      ),
-                    },
+                  ),
+                  f.createReturnStatement(f.createIdentifier("connection")),
+                ]),
+                {
+                  typeParams: {
+                    E: f.createIndexedAccessTypeNode(
+                      f.createTypeReferenceNode("Res", [
+                        f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                      ]),
+                      f.createLiteralTypeNode(f.createStringLiteral("event")),
+                    ),
                   },
-                ),
+                },
               ),
-            ],
-            true,
-          ),
+            ),
+          ]),
         ),
         f.createReturnStatement(f.createIdentifier("connection")),
       ]),
