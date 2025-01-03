@@ -345,8 +345,16 @@ export const makeAnd = (left: ts.Expression, right: ts.Expression) =>
 export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
   f.createNewExpression(cls, undefined, args);
 
-export const makeExtract = (base: ts.TypeNode, narrow: ts.TypeNode) =>
-  f.createTypeReferenceNode("Extract", [base, narrow]);
+export const makeExtract = (
+  base: string | ts.Identifier | ts.TypeNode,
+  narrow: ts.TypeNode,
+) =>
+  f.createTypeReferenceNode("Extract", [
+    typeof base === "string" || ts.isIdentifier(base)
+      ? f.createTypeReferenceNode(base)
+      : base,
+    narrow,
+  ]);
 
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,
