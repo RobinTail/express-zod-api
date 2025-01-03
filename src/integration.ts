@@ -429,202 +429,194 @@ export class Integration {
           f.createTypeReferenceNode("K"),
         ),
       }),
-      f.createBlock(
-        [
-          makeConst(
-            this.ids.pathParameter,
-            f.createAsExpression(
-              f.createElementAccessExpression(
-                makePropCall(
-                  this.ids.requestParameter,
-                  propOf<string>("split"),
-                  [f.createStringLiteral(" ")],
-                ),
-                f.createNumericLiteral(1),
-              ),
-              f.createTypeReferenceNode(this.ids.pathType),
-            ),
-          ),
-          makeConst(
-            f.createIdentifier("source"),
-            makeNew(
-              f.createIdentifier("EventSource"),
-              makeNew(
-                f.createIdentifier(URL.name),
-                makeTemplate(
-                  "",
-                  [this.ids.pathParameter, "?"],
-                  [
-                    makeNew(
-                      f.createIdentifier(URLSearchParams.name),
-                      this.ids.paramsArgument,
-                    ),
-                  ],
-                ),
-                f.createStringLiteral(serverUrl),
-              ),
-            ),
-          ),
-          f.createTypeAliasDeclaration(
-            undefined,
-            f.createIdentifier("Res"),
-            [
-              f.createTypeParameterDeclaration(
-                undefined,
-                f.createIdentifier("T"),
-                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              ),
-            ],
-            f.createTypeReferenceNode("Extract", [
-              f.createIndexedAccessTypeNode(
-                f.createTypeReferenceNode(this.ids.posResponseInterface),
-                f.createTypeReferenceNode("K"),
-              ),
-              f.createTypeLiteralNode([
-                makeInterfaceProp("event", f.createTypeReferenceNode("T")),
+      f.createBlock([
+        makeConst(
+          this.ids.pathParameter,
+          f.createAsExpression(
+            f.createElementAccessExpression(
+              makePropCall(this.ids.requestParameter, propOf<string>("split"), [
+                f.createStringLiteral(" "),
               ]),
-            ]),
+              f.createNumericLiteral(1),
+            ),
+            f.createTypeReferenceNode(this.ids.pathType),
           ),
-          f.createVariableStatement(
-            undefined,
-            f.createVariableDeclarationList(
-              [
-                f.createVariableDeclaration(
-                  f.createIdentifier("connection"),
-                  undefined,
-                  undefined,
-                  f.createObjectLiteralExpression(
-                    [
-                      f.createShorthandPropertyAssignment(
-                        f.createIdentifier("source"),
+        ),
+        makeConst(
+          f.createIdentifier("source"),
+          makeNew(
+            f.createIdentifier("EventSource"),
+            makeNew(
+              f.createIdentifier(URL.name),
+              makeTemplate(
+                "",
+                [this.ids.pathParameter, "?"],
+                [
+                  makeNew(
+                    f.createIdentifier(URLSearchParams.name),
+                    this.ids.paramsArgument,
+                  ),
+                ],
+              ),
+              f.createStringLiteral(serverUrl),
+            ),
+          ),
+        ),
+        f.createTypeAliasDeclaration(
+          undefined,
+          f.createIdentifier("Res"),
+          [
+            f.createTypeParameterDeclaration(
+              undefined,
+              f.createIdentifier("T"),
+              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+            ),
+          ],
+          f.createTypeReferenceNode("Extract", [
+            f.createIndexedAccessTypeNode(
+              f.createTypeReferenceNode(this.ids.posResponseInterface),
+              f.createTypeReferenceNode("K"),
+            ),
+            f.createTypeLiteralNode([
+              makeInterfaceProp("event", f.createTypeReferenceNode("T")),
+            ]),
+          ]),
+        ),
+        f.createVariableStatement(
+          undefined,
+          f.createVariableDeclarationList(
+            [
+              f.createVariableDeclaration(
+                f.createIdentifier("connection"),
+                undefined,
+                undefined,
+                f.createObjectLiteralExpression(
+                  [
+                    f.createShorthandPropertyAssignment(
+                      f.createIdentifier("source"),
+                      undefined,
+                    ),
+                    f.createPropertyAssignment(
+                      f.createIdentifier("on"),
+                      f.createArrowFunction(
                         undefined,
-                      ),
-                      f.createPropertyAssignment(
-                        f.createIdentifier("on"),
-                        f.createArrowFunction(
-                          undefined,
-                          [
-                            f.createTypeParameterDeclaration(
-                              undefined,
-                              f.createIdentifier("E"),
-                              f.createIndexedAccessTypeNode(
-                                f.createTypeReferenceNode(
-                                  f.createIdentifier("Res"),
-                                  undefined,
-                                ),
+                        [
+                          f.createTypeParameterDeclaration(
+                            undefined,
+                            f.createIdentifier("E"),
+                            f.createIndexedAccessTypeNode(
+                              f.createTypeReferenceNode(
+                                f.createIdentifier("Res"),
+                                undefined,
+                              ),
+                              f.createLiteralTypeNode(
+                                f.createStringLiteral("event"),
+                              ),
+                            ),
+                            undefined,
+                          ),
+                        ],
+                        makeParams({
+                          event: f.createTypeReferenceNode("E"),
+                          handler: f.createFunctionTypeNode(
+                            undefined,
+                            makeParams({
+                              data: f.createIndexedAccessTypeNode(
+                                f.createTypeReferenceNode("Res", [
+                                  f.createTypeReferenceNode("E"),
+                                ]),
                                 f.createLiteralTypeNode(
-                                  f.createStringLiteral("event"),
+                                  f.createStringLiteral("data"),
                                 ),
                               ),
-                              undefined,
-                            ),
-                          ],
-                          makeParams({
-                            event: f.createTypeReferenceNode("E"),
-                            handler: f.createFunctionTypeNode(
-                              undefined,
-                              makeParams({
-                                data: f.createIndexedAccessTypeNode(
-                                  f.createTypeReferenceNode("Res", [
-                                    f.createTypeReferenceNode("E"),
-                                  ]),
-                                  f.createLiteralTypeNode(
-                                    f.createStringLiteral("data"),
-                                  ),
-                                ),
-                              }),
-                              f.createUnionTypeNode([
+                            }),
+                            f.createUnionTypeNode([
+                              f.createKeywordTypeNode(
+                                ts.SyntaxKind.VoidKeyword,
+                              ),
+                              makePromise(
                                 f.createKeywordTypeNode(
                                   ts.SyntaxKind.VoidKeyword,
                                 ),
-                                makePromise(
-                                  f.createKeywordTypeNode(
-                                    ts.SyntaxKind.VoidKeyword,
-                                  ),
-                                ),
-                              ]),
-                            ),
-                          }),
-                          undefined,
-                          f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-                          f.createBlock(
-                            [
-                              f.createExpressionStatement(
-                                f.createCallExpression(
-                                  f.createPropertyAccessExpression(
-                                    f.createIdentifier("source"),
-                                    f.createIdentifier("addEventListener"),
-                                  ),
+                              ),
+                            ]),
+                          ),
+                        }),
+                        undefined,
+                        f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+                        f.createBlock([
+                          f.createExpressionStatement(
+                            f.createCallExpression(
+                              f.createPropertyAccessExpression(
+                                f.createIdentifier("source"),
+                                f.createIdentifier("addEventListener"),
+                              ),
+                              undefined,
+                              [
+                                f.createIdentifier("event"),
+                                f.createArrowFunction(
                                   undefined,
-                                  [
-                                    f.createIdentifier("event"),
-                                    f.createArrowFunction(
-                                      undefined,
-                                      undefined,
-                                      makeParams({ msg: undefined }),
-                                      undefined,
-                                      f.createToken(
-                                        ts.SyntaxKind.EqualsGreaterThanToken,
-                                      ),
-                                      f.createBlock(
-                                        [
-                                          makeConst(
-                                            f.createIdentifier("data"),
-                                            makePropCall(
-                                              f.createIdentifier("JSON"),
-                                              propOf<JSON>("parse"),
-                                              [
-                                                f.createPropertyAccessExpression(
-                                                  f.createParenthesizedExpression(
-                                                    f.createAsExpression(
-                                                      f.createIdentifier("msg"),
-                                                      f.createTypeReferenceNode(
-                                                        f.createIdentifier(
-                                                          "MessageEvent",
-                                                        ),
-                                                      ),
+                                  undefined,
+                                  makeParams({ msg: undefined }),
+                                  undefined,
+                                  f.createToken(
+                                    ts.SyntaxKind.EqualsGreaterThanToken,
+                                  ),
+                                  f.createBlock(
+                                    [
+                                      makeConst(
+                                        f.createIdentifier("data"),
+                                        makePropCall(
+                                          f.createIdentifier("JSON"),
+                                          propOf<JSON>("parse"),
+                                          [
+                                            f.createPropertyAccessExpression(
+                                              f.createParenthesizedExpression(
+                                                f.createAsExpression(
+                                                  f.createIdentifier("msg"),
+                                                  f.createTypeReferenceNode(
+                                                    f.createIdentifier(
+                                                      "MessageEvent",
                                                     ),
                                                   ),
-                                                  f.createIdentifier("data"),
                                                 ),
-                                              ],
+                                              ),
+                                              f.createIdentifier("data"),
                                             ),
-                                          ),
-                                          f.createExpressionStatement(
-                                            f.createCallExpression(
-                                              f.createIdentifier("handler"),
-                                              undefined,
-                                              [f.createIdentifier("data")],
-                                            ),
-                                          ),
-                                        ],
-                                        true,
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      f.createExpressionStatement(
+                                        f.createCallExpression(
+                                          f.createIdentifier("handler"),
+                                          undefined,
+                                          [f.createIdentifier("data")],
+                                        ),
+                                      ),
+                                    ],
+                                    true,
+                                  ),
                                 ),
-                              ),
-                              f.createReturnStatement(
-                                f.createIdentifier("connection"),
-                              ),
-                            ],
-                            true,
+                              ],
+                            ),
                           ),
-                        ),
+                          f.createReturnStatement(
+                            f.createIdentifier("connection"),
+                          ),
+                        ]),
                       ),
-                    ],
-                    true,
-                  ),
+                    ),
+                  ],
+                  true,
                 ),
-              ],
-              ts.NodeFlags.Const,
-            ),
+              ),
+            ],
+            ts.NodeFlags.Const,
           ),
-          f.createReturnStatement(f.createIdentifier("connection")),
-        ],
-        true,
-      ),
+        ),
+        f.createReturnStatement(f.createIdentifier("connection")),
+      ]),
       [
         f.createTypeParameterDeclaration(
           undefined,
