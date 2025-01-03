@@ -469,24 +469,6 @@ export class Integration {
             ),
           ),
         ),
-        makeType(
-          "Res",
-          f.createTypeReferenceNode("Extract", [
-            f.createIndexedAccessTypeNode(
-              f.createTypeReferenceNode(this.ids.posResponseInterface),
-              f.createTypeReferenceNode("K"),
-            ),
-            f.createTypeLiteralNode([
-              makeInterfaceProp(
-                propOf<SSEShape>("event"),
-                f.createTypeReferenceNode("T"),
-              ),
-            ]),
-          ]),
-          {
-            params: { T: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword) },
-          },
-        ),
         makeConst(
           this.ids.connectionConst,
           f.createObjectLiteralExpression([
@@ -502,8 +484,17 @@ export class Integration {
                     makeParams({
                       [this.ids.dataParameter.text]:
                         f.createIndexedAccessTypeNode(
-                          f.createTypeReferenceNode("Res", [
-                            f.createTypeReferenceNode("E"),
+                          f.createTypeReferenceNode("Extract", [
+                            f.createTypeReferenceNode("R"),
+                            ts.setEmitFlags(
+                              f.createTypeLiteralNode([
+                                makeInterfaceProp(
+                                  propOf<SSEShape>("event"),
+                                  f.createTypeReferenceNode("E"),
+                                ),
+                              ]),
+                              ts.EmitFlags.SingleLine,
+                            ),
                           ]),
                           f.createLiteralTypeNode(
                             f.createStringLiteral(propOf<SSEShape>("data")),
@@ -559,9 +550,7 @@ export class Integration {
                 {
                   typeParams: {
                     E: f.createIndexedAccessTypeNode(
-                      f.createTypeReferenceNode("Res", [
-                        f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                      ]),
+                      f.createTypeReferenceNode("R"),
                       f.createLiteralTypeNode(
                         f.createStringLiteral(propOf<SSEShape>("event")),
                       ),
@@ -575,7 +564,7 @@ export class Integration {
         f.createReturnStatement(this.ids.connectionConst),
       ]),
       makeTypeParams({
-        K: f.createIntersectionTypeNode([
+        K: f.createTypeReferenceNode("Extract", [
           f.createTypeReferenceNode(this.ids.requestType),
           f.createTemplateLiteralType(f.createTemplateHead("get "), [
             f.createTemplateLiteralTypeSpan(
@@ -583,6 +572,21 @@ export class Integration {
               f.createTemplateTail(""),
             ),
           ]),
+        ]),
+        R: f.createTypeReferenceNode("Extract", [
+          f.createIndexedAccessTypeNode(
+            f.createTypeReferenceNode(this.ids.posResponseInterface),
+            f.createTypeReferenceNode("K"),
+          ),
+          ts.setEmitFlags(
+            f.createTypeLiteralNode([
+              makeInterfaceProp(
+                propOf<SSEShape>("event"),
+                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              ),
+            ]),
+            ts.EmitFlags.SingleLine,
+          ),
         ]),
       }),
     );
