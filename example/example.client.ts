@@ -466,10 +466,9 @@ export class ExpressZodAPIClient {
         event: E,
         handler: (data: Res<E>["data"]) => void | Promise<void>,
       ) => {
-        source.addEventListener(event, (msg) => {
-          const data = JSON.parse((msg as MessageEvent).data);
-          handler(data);
-        });
+        source.addEventListener(event, (msg) =>
+          handler(JSON.parse((msg as MessageEvent).data)),
+        );
         return connection;
       },
     };

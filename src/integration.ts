@@ -520,9 +520,10 @@ export class Integration {
                         this.ids.eventParameter,
                         makeArrowFn(
                           { msg: undefined },
-                          f.createBlock([
-                            makeConst(
-                              f.createIdentifier("data"),
+                          f.createCallExpression(
+                            f.createIdentifier("handler"),
+                            undefined,
+                            [
                               makePropCall(
                                 f.createIdentifier("JSON"),
                                 propOf<JSON>("parse"),
@@ -540,15 +541,8 @@ export class Integration {
                                   ),
                                 ],
                               ),
-                            ),
-                            f.createExpressionStatement(
-                              f.createCallExpression(
-                                f.createIdentifier("handler"),
-                                undefined,
-                                [f.createIdentifier("data")],
-                              ),
-                            ),
-                          ]),
+                            ],
+                          ),
                         ),
                       ],
                     ),
