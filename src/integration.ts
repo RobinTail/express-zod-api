@@ -578,16 +578,7 @@ export class Integration {
                                     f.createArrowFunction(
                                       undefined,
                                       undefined,
-                                      [
-                                        f.createParameterDeclaration(
-                                          undefined,
-                                          undefined,
-                                          f.createIdentifier("msg"),
-                                          undefined,
-                                          undefined,
-                                          undefined,
-                                        ),
-                                      ],
+                                      makeParams({ msg: undefined }),
                                       undefined,
                                       f.createToken(
                                         ts.SyntaxKind.EqualsGreaterThanToken,
