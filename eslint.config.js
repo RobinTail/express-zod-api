@@ -113,6 +113,11 @@ const tsFactoryConcerns = [
     selector: "Literal[value='Extract']",
     message: "use makeExtract() helper",
   },
+  {
+    selector:
+      "CallExpression[callee.property.name='createTypeLiteralNode'] > ArrayExpression[elements.length=1]",
+    message: "use makeOnePropObjType() helper",
+  },
 ];
 
 export default tsPlugin.config(

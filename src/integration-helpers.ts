@@ -73,6 +73,14 @@ export const makeInterfaceProp = (name: string | number, value: ts.TypeNode) =>
     value,
   );
 
+export const makeOnePropObjType = (
+  ...params: Parameters<typeof makeInterfaceProp>
+) =>
+  ts.setEmitFlags(
+    f.createTypeLiteralNode([makeInterfaceProp(...params)]),
+    ts.EmitFlags.SingleLine,
+  );
+
 export const makeDeconstruction = (
   ...names: ts.Identifier[]
 ): ts.ArrayBindingPattern =>
