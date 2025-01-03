@@ -515,7 +515,7 @@ export class Integration {
                     ),
                   }),
                   undefined,
-                  f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+                  undefined,
                   f.createBlock([
                     f.createExpressionStatement(
                       f.createCallExpression(
