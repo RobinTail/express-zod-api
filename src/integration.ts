@@ -487,18 +487,14 @@ export class Integration {
                 f.createIdentifier("on"),
                 f.createArrowFunction(
                   undefined,
-                  [
-                    f.createTypeParameterDeclaration(
-                      undefined,
-                      "E",
-                      f.createIndexedAccessTypeNode(
-                        f.createTypeReferenceNode("Res", [
-                          f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                        ]),
-                        f.createLiteralTypeNode(f.createStringLiteral("event")),
-                      ),
+                  makeTypeParams({
+                    E: f.createIndexedAccessTypeNode(
+                      f.createTypeReferenceNode("Res", [
+                        f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                      ]),
+                      f.createLiteralTypeNode(f.createStringLiteral("event")),
                     ),
-                  ],
+                  }),
                   makeParams({
                     event: f.createTypeReferenceNode("E"),
                     handler: f.createFunctionTypeNode(
