@@ -45,6 +45,7 @@ import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
+type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
 
 interface IntegrationParams {
   routing: Routing;
@@ -477,7 +478,7 @@ export class Integration {
             ),
             f.createTypeLiteralNode([
               makeInterfaceProp(
-                propOf<ReturnType<typeof makeEventSchema>["shape"]>("event"),
+                propOf<SSEShape>("event"),
                 f.createTypeReferenceNode("T"),
               ),
             ]),
@@ -504,11 +505,7 @@ export class Integration {
                             f.createTypeReferenceNode("E"),
                           ]),
                           f.createLiteralTypeNode(
-                            f.createStringLiteral(
-                              propOf<
-                                ReturnType<typeof makeEventSchema>["shape"]
-                              >("data"),
-                            ),
+                            f.createStringLiteral(propOf<SSEShape>("data")),
                           ),
                         ),
                     }),
@@ -546,11 +543,7 @@ export class Integration {
                                         ),
                                       ),
                                     ),
-                                    propOf<
-                                      ReturnType<
-                                        typeof makeEventSchema
-                                      >["shape"]
-                                    >("data"),
+                                    propOf<SSEShape>("data"),
                                   ),
                                 ],
                               ),
@@ -569,11 +562,7 @@ export class Integration {
                         f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
                       ]),
                       f.createLiteralTypeNode(
-                        f.createStringLiteral(
-                          propOf<ReturnType<typeof makeEventSchema>["shape"]>(
-                            "event",
-                          ),
-                        ),
+                        f.createStringLiteral(propOf<SSEShape>("event")),
                       ),
                     ),
                   },
