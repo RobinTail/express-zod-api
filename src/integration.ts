@@ -484,17 +484,8 @@ export class Integration {
               f.createShorthandPropertyAssignment("source"),
               f.createPropertyAssignment(
                 f.createIdentifier("on"),
-                f.createArrowFunction(
-                  undefined,
-                  makeTypeParams({
-                    E: f.createIndexedAccessTypeNode(
-                      f.createTypeReferenceNode("Res", [
-                        f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                      ]),
-                      f.createLiteralTypeNode(f.createStringLiteral("event")),
-                    ),
-                  }),
-                  makeParams({
+                makeArrowFn(
+                  {
                     event: f.createTypeReferenceNode("E"),
                     handler: f.createFunctionTypeNode(
                       undefined,
@@ -515,9 +506,7 @@ export class Integration {
                         ),
                       ]),
                     ),
-                  }),
-                  undefined,
-                  undefined,
+                  },
                   f.createBlock([
                     f.createExpressionStatement(
                       f.createCallExpression(
@@ -574,6 +563,16 @@ export class Integration {
                     ),
                     f.createReturnStatement(f.createIdentifier("connection")),
                   ]),
+                  {
+                    typeParams: {
+                      E: f.createIndexedAccessTypeNode(
+                        f.createTypeReferenceNode("Res", [
+                          f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                        ]),
+                        f.createLiteralTypeNode(f.createStringLiteral("event")),
+                      ),
+                    },
+                  },
                 ),
               ),
             ],
