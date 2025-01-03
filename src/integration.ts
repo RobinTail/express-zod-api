@@ -488,7 +488,7 @@ export class Integration {
                       [this.ids.dataParameter.text]:
                         f.createIndexedAccessTypeNode(
                           makeExtract(
-                            f.createTypeReferenceNode("R"),
+                            "R",
                             makeOnePropObjType(
                               propOf<SSEShape>("event"),
                               f.createTypeReferenceNode("E"),
@@ -563,7 +563,7 @@ export class Integration {
       ]),
       makeTypeParams({
         K: makeExtract(
-          f.createTypeReferenceNode(this.ids.requestType),
+          this.ids.requestType,
           f.createTemplateLiteralType(f.createTemplateHead("get "), [
             f.createTemplateLiteralTypeSpan(
               f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
