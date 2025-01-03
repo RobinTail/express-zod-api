@@ -32,6 +32,7 @@ import {
   makePropertyIdentifier,
   printNode,
   makeExtract,
+  makeOnePropObjType,
 } from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -490,14 +491,9 @@ export class Integration {
                         f.createIndexedAccessTypeNode(
                           makeExtract(
                             f.createTypeReferenceNode("R"),
-                            ts.setEmitFlags(
-                              f.createTypeLiteralNode([
-                                makeInterfaceProp(
-                                  propOf<SSEShape>("event"),
-                                  f.createTypeReferenceNode("E"),
-                                ),
-                              ]),
-                              ts.EmitFlags.SingleLine,
+                            makeOnePropObjType(
+                              propOf<SSEShape>("event"),
+                              f.createTypeReferenceNode("E"),
                             ),
                           ),
                           f.createLiteralTypeNode(
@@ -582,14 +578,9 @@ export class Integration {
             f.createTypeReferenceNode(this.ids.posResponseInterface),
             f.createTypeReferenceNode("K"),
           ),
-          ts.setEmitFlags(
-            f.createTypeLiteralNode([
-              makeInterfaceProp(
-                propOf<SSEShape>("event"),
-                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              ),
-            ]),
-            ts.EmitFlags.SingleLine,
+          makeOnePropObjType(
+            propOf<SSEShape>("event"),
+            f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
           ),
         ),
       }),
