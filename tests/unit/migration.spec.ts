@@ -17,189 +17,44 @@ describe("Migration", () => {
     expect(migration).toMatchSnapshot();
   });
 
-  tester.run("v21", migration.rules.v21, {
+  tester.run("v22", migration.rules.v22, {
     valid: [
-      `(() => {})()`,
-      `createConfig({ http: {} });`,
-      `createConfig({ http: { listen: 8090 }, upload: true });`,
-      `createConfig({ beforeRouting: ({ getLogger }) => { getLogger().warn() } });`,
-      `const { app, servers, logger } = await createServer();`,
-      `console.error(error.cause?.message);`,
-      `import { ensureHttpError } from "express-zod-api";`,
-      `ensureHttpError(error).statusCode;`,
-      `factory.build({ method: ['get', 'post'] })`,
-      `factory.build({ tag: ['files', 'users'] })`,
-      `factory.build({ scope: ['admin', 'permissions'] })`,
-      `new ResultHandler({ positive: () => ({ statusCode: [201, 202] }), negative: [{ mimeType: ["application/json"] }] })`,
+      `client.provide("get /v1/test", {id: 10});`,
+      `new Integration({ routing });`,
+      `import { Request } from "./client.ts";`,
     ],
     invalid: [
       {
-        code: `createConfig({ server: {} });`,
-        output: `createConfig({ http: {} });`,
+        code: `client.provide("get", "/v1/test", {id: 10});`,
+        output: `client.provide("get /v1/test", {id: 10});`,
         errors: [
           {
             messageId: "change",
-            data: { subject: "property", from: "server", to: "http" },
-          },
-        ],
-      },
-      {
-        code: `createConfig({ http: { listen: 8090, upload: true } });`,
-        output: `createConfig({ http: { listen: 8090,  }, upload: true });`,
-        errors: [
-          {
-            messageId: "move",
             data: {
-              subject: "upload",
-              from: "http",
-              to: "the top level of createConfig argument",
+              subject: "arguments",
+              from: `"get", "/v1/test"`,
+              to: `"get /v1/test"`,
             },
           },
         ],
       },
       {
-        code: `createConfig({ beforeRouting: ({ logger }) => { logger.warn() } });`,
-        output: `createConfig({ beforeRouting: ({ getLogger }) => { getLogger().warn() } });`,
+        code: `new Integration({ routing, splitResponse: true });`,
+        output: `new Integration({ routing,  });`,
         errors: [
           {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "logger",
-              to: "getLogger",
-            },
-          },
-          {
-            messageId: "change",
-            data: {
-              subject: "const",
-              from: "logger",
-              to: "getLogger()",
-            },
+            messageId: "remove",
+            data: { subject: "property", name: "splitResponse" },
           },
         ],
       },
       {
-        code: `createConfig({ beforeRouting: ({ getChildLogger }) => { getChildLogger(request).warn() } });`,
-        output: `createConfig({ beforeRouting: ({ getLogger }) => { getLogger(request).warn() } });`,
+        code: `import { MethodPath } from "./client.ts";`,
+        output: `import { Request } from "./client.ts";`,
         errors: [
           {
             messageId: "change",
-            data: {
-              subject: "property",
-              from: "getChildLogger",
-              to: "getLogger",
-            },
-          },
-          {
-            messageId: "change",
-            data: {
-              subject: "method",
-              from: "getChildLogger",
-              to: "getLogger",
-            },
-          },
-        ],
-      },
-      {
-        code: `const { app, httpServer, httpsServer, logger } = await createServer();`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "property", from: "httpServer", to: "servers" },
-          },
-          {
-            messageId: "change",
-            data: { subject: "property", from: "httpsServer", to: "servers" },
-          },
-        ],
-      },
-      {
-        code: `console.error(error.originalError?.message);`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "property", from: "originalError", to: "cause" },
-          },
-        ],
-      },
-      {
-        code: `import { getStatusCodeFromError } from "express-zod-api";`,
-        output: `import { ensureHttpError } from "express-zod-api";`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "import",
-              from: "getStatusCodeFromError",
-              to: "ensureHttpError",
-            },
-          },
-        ],
-      },
-      {
-        code: `getStatusCodeFromError(error);`,
-        output: `ensureHttpError(error).statusCode;`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "method",
-              from: "getStatusCodeFromError",
-              to: "ensureHttpError().statusCode",
-            },
-          },
-        ],
-      },
-      {
-        code: `factory.build({ methods: ['get', 'post'] })`,
-        output: `factory.build({ method: ['get', 'post'] })`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "property", from: "methods", to: "method" },
-          },
-        ],
-      },
-      {
-        code: `factory.build({ tags: ['files', 'users'] })`,
-        output: `factory.build({ tag: ['files', 'users'] })`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "property", from: "tags", to: "tag" },
-          },
-        ],
-      },
-      {
-        code: `factory.build({ scopes: ['admin', 'permissions'] })`,
-        output: `factory.build({ scope: ['admin', 'permissions'] })`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "property", from: "scopes", to: "scope" },
-          },
-        ],
-      },
-      {
-        code: `new ResultHandler({ positive: () => ({ statusCodes: [201, 202] }), negative: [{ mimeTypes: ["application/json"] }] })`,
-        output: `new ResultHandler({ positive: () => ({ statusCode: [201, 202] }), negative: [{ mimeType: ["application/json"] }] })`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "statusCodes",
-              to: "statusCode",
-            },
-          },
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "mimeTypes",
-              to: "mimeType",
-            },
+            data: { subject: "type", from: "MethodPath", to: "Request" },
           },
         ],
       },

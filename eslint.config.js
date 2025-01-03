@@ -60,7 +60,7 @@ const tsFactoryConcerns = [
     message: "use makeType() or makePublicLiteralType() helpers",
   },
   {
-    selector: "Identifier[name='createVariableDeclarationList']",
+    selector: "Identifier[name='createVariableStatement']",
     message: "use makeConst() helper",
   },
   {
@@ -96,6 +96,18 @@ const tsFactoryConcerns = [
   {
     selector: "Identifier[name='KeyOfKeyword']",
     message: "use makeKeyOf() helper",
+  },
+  {
+    selector: "Identifier[name='createTemplateExpression']",
+    message: "use makeTemplate() helper",
+  },
+  {
+    selector: "Identifier[name='createNewExpression']",
+    message: "use makeNew() helper",
+  },
+  {
+    selector: "Literal[value='Promise']",
+    message: "use makePromise() helper",
   },
 ];
 
