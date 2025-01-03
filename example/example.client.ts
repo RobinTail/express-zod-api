@@ -446,25 +446,21 @@ export class ExpressZodAPIClient {
       ),
     );
   }
-  public subscribe<K extends Request & `get ${string}`>(
-    request: K,
-    params: Input[K],
-  ) {
+  public subscribe<
+    K extends Extract<Request, `get ${string}`>,
+    R extends Extract<PositiveResponse[K], { event: string }>,
+  >(request: K, params: Input[K]) {
     const path = request.split(" ")[1] as Path;
     const source = new EventSource(
       new URL(`${path}?${new URLSearchParams(params)}`, "https://example.com"),
     );
-    type Res<T extends string> = Extract<
-      PositiveResponse[K],
-      {
-        event: T;
-      }
-    >;
     const connection = {
       source,
-      on: <E extends Res<string>["event"]>(
+      on: <E extends R["event"]>(
         event: E,
-        handler: (data: Res<E>["data"]) => void | Promise<void>,
+        handler: (
+          data: Extract<R, { event: E }>["data"],
+        ) => void | Promise<void>,
       ) => {
         source.addEventListener(event, (msg) =>
           handler(JSON.parse((msg as MessageEvent).data)),
