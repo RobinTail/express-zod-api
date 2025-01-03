@@ -462,12 +462,8 @@ export class Integration {
             ),
           ),
         ),
-        f.createTypeAliasDeclaration(
-          undefined,
-          f.createIdentifier("Res"),
-          makeTypeParams({
-            T: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-          }),
+        makeType(
+          "Res",
           f.createTypeReferenceNode("Extract", [
             f.createIndexedAccessTypeNode(
               f.createTypeReferenceNode(this.ids.posResponseInterface),
@@ -477,6 +473,9 @@ export class Integration {
               makeInterfaceProp("event", f.createTypeReferenceNode("T")),
             ]),
           ]),
+          {
+            params: { T: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword) },
+          },
         ),
         makeConst(
           f.createIdentifier("connection"),
