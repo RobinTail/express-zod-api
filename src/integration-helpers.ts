@@ -65,12 +65,17 @@ export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],
 ) => f.createConstructorDeclaration(undefined, params, f.createBlock([]));
 
-export const makeInterfaceProp = (name: string | number, value: ts.TypeNode) =>
+export const makeInterfaceProp = (
+  name: string | number,
+  value: ts.TypeNode | ts.Identifier | string,
+) =>
   f.createPropertySignature(
     undefined,
     makePropertyIdentifier(name),
     undefined,
-    value,
+    typeof value === "string" || ts.isIdentifier(value)
+      ? f.createTypeReferenceNode(value)
+      : value,
   );
 
 export const makeOnePropObjType = (
