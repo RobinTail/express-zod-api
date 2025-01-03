@@ -487,11 +487,14 @@ export const exampleImplementation: Implementation = async (
 ) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-  const response = await fetch(`https://example.com${path}${searchParams}`, {
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
+  const response = await fetch(
+    new URL(`${path}${searchParams}`, "https://example.com"),
+    {
+      method: method.toUpperCase(),
+      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+      body: hasBody ? JSON.stringify(params) : undefined,
+    },
+  );
   const contentType = response.headers.get("content-type");
   if (!contentType) return;
   const isJSON = contentType.startsWith("application/json");
