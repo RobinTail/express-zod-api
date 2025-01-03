@@ -131,6 +131,7 @@ export class Integration {
     eventParameter: f.createIdentifier("event"),
     dataParameter: f.createIdentifier("data"),
     handlerParameter: f.createIdentifier("handler"),
+    msgParameter: f.createIdentifier("msg"),
     accumulator: f.createIdentifier("acc"),
     provideMethod: f.createIdentifier("provide"),
     subscribeMethod: f.createIdentifier("subscribe"),
@@ -527,7 +528,7 @@ export class Integration {
                       [
                         this.ids.eventParameter,
                         makeArrowFn(
-                          { msg: undefined },
+                          [this.ids.msgParameter],
                           f.createCallExpression(
                             this.ids.handlerParameter,
                             undefined,
@@ -539,7 +540,7 @@ export class Integration {
                                   f.createPropertyAccessExpression(
                                     f.createParenthesizedExpression(
                                       f.createAsExpression(
-                                        f.createIdentifier("msg"),
+                                        this.ids.msgParameter,
                                         f.createTypeReferenceNode(
                                           f.createIdentifier(MessageEvent.name),
                                         ),
