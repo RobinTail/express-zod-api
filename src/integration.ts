@@ -209,10 +209,7 @@ export class Integration {
             );
             this.program.push(variantType);
             return statusCodes.map((code) =>
-              makeInterfaceProp(
-                code,
-                f.createTypeReferenceNode(variantType.name),
-              ),
+              makeInterfaceProp(code, variantType.name),
             );
           }, Array.from(responses.entries()));
           const dict = makeInterface(
@@ -491,10 +488,7 @@ export class Integration {
                         f.createIndexedAccessTypeNode(
                           makeExtract(
                             "R",
-                            makeOnePropObjType(
-                              propOf<SSEShape>("event"),
-                              f.createTypeReferenceNode("E"),
-                            ),
+                            makeOnePropObjType(propOf<SSEShape>("event"), "E"),
                           ),
                           f.createLiteralTypeNode(
                             f.createStringLiteral(propOf<SSEShape>("data")),

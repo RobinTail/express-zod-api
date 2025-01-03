@@ -97,14 +97,16 @@ export const makeEmptyInitializingConstructor = (
 
 export const makeInterfaceProp = (
   name: string | number,
-  value: ts.TypeNode,
+  value: ts.TypeNode | ts.Identifier | string,
   { isOptional }: { isOptional?: boolean } = {},
 ) =>
   f.createPropertySignature(
     undefined,
     makePropertyIdentifier(name),
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-    value,
+    typeof value === "string" || ts.isIdentifier(value)
+      ? f.createTypeReferenceNode(value)
+      : value,
   );
 
 export const makeOnePropObjType = (
