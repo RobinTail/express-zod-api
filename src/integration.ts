@@ -128,6 +128,7 @@ export class Integration {
     methodParameter: f.createIdentifier("method"),
     requestParameter: f.createIdentifier("request"),
     eventParameter: f.createIdentifier("event"),
+    dataParameter: f.createIdentifier("data"),
     accumulator: f.createIdentifier("acc"),
     provideMethod: f.createIdentifier("provide"),
     subscribeMethod: f.createIdentifier("subscribe"),
@@ -497,12 +498,19 @@ export class Integration {
                   handler: f.createFunctionTypeNode(
                     undefined,
                     makeParams({
-                      data: f.createIndexedAccessTypeNode(
-                        f.createTypeReferenceNode("Res", [
-                          f.createTypeReferenceNode("E"),
-                        ]),
-                        f.createLiteralTypeNode(f.createStringLiteral("data")),
-                      ),
+                      [this.ids.dataParameter.text]:
+                        f.createIndexedAccessTypeNode(
+                          f.createTypeReferenceNode("Res", [
+                            f.createTypeReferenceNode("E"),
+                          ]),
+                          f.createLiteralTypeNode(
+                            f.createStringLiteral(
+                              propOf<
+                                ReturnType<typeof makeEventSchema>["shape"]
+                              >("data"),
+                            ),
+                          ),
+                        ),
                     }),
                     f.createUnionTypeNode([
                       f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
@@ -538,7 +546,11 @@ export class Integration {
                                         ),
                                       ),
                                     ),
-                                    f.createIdentifier("data"),
+                                    propOf<
+                                      ReturnType<
+                                        typeof makeEventSchema
+                                      >["shape"]
+                                    >("data"),
                                   ),
                                 ],
                               ),
