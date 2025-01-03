@@ -39,6 +39,7 @@ import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
+import type { makeEventSchema } from "./sse";
 import { zodToTs } from "./zts";
 import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
@@ -475,7 +476,7 @@ export class Integration {
             ),
             f.createTypeLiteralNode([
               makeInterfaceProp(
-                this.ids.eventParameter.text,
+                propOf<ReturnType<typeof makeEventSchema>["shape"]>("event"),
                 f.createTypeReferenceNode("T"),
               ),
             ]),
@@ -556,7 +557,11 @@ export class Integration {
                         f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
                       ]),
                       f.createLiteralTypeNode(
-                        f.createStringLiteral(this.ids.eventParameter.text),
+                        f.createStringLiteral(
+                          propOf<ReturnType<typeof makeEventSchema>["shape"]>(
+                            "event",
+                          ),
+                        ),
                       ),
                     ),
                   },
