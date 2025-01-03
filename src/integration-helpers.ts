@@ -210,7 +210,7 @@ export const makeTypeParams = (
   );
 
 export const makeArrowFn = (
-  params: ts.Identifier[],
+  params: ts.Identifier[] | Parameters<typeof makeParams>[0],
   body: ts.ConciseBody,
   {
     isAsync,
@@ -220,7 +220,9 @@ export const makeArrowFn = (
   f.createArrowFunction(
     isAsync ? asyncModifier : undefined,
     typeParams && makeTypeParams(typeParams),
-    params.map((key) => makeParam(key)),
+    Array.isArray(params)
+      ? params.map((key) => makeParam(key))
+      : makeParams(params),
     undefined,
     undefined,
     body,
