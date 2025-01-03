@@ -452,19 +452,16 @@ export class Integration {
               undefined,
               [
                 f.createNewExpression(f.createIdentifier(URL.name), undefined, [
-                  f.createTemplateExpression(f.createTemplateHead(""), [
-                    f.createTemplateSpan(
-                      this.ids.pathParameter,
-                      f.createTemplateMiddle("?"),
-                    ),
-                    f.createTemplateSpan(
+                  makeTemplate(
+                    "",
+                    [this.ids.pathParameter, "?"],
+                    [
                       makeNew(
                         f.createIdentifier(URLSearchParams.name),
                         this.ids.paramsArgument,
                       ),
-                      f.createTemplateTail(""),
-                    ),
-                  ]),
+                    ],
+                  ),
                   f.createStringLiteral(serverUrl),
                 ]),
               ],
