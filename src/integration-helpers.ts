@@ -215,7 +215,10 @@ export const makeArrowFn = (
   {
     isAsync,
     typeParams,
-  }: { isAsync?: boolean; typeParams?: Parameters<typeof makeTypeParams>[0] },
+  }: {
+    isAsync?: boolean;
+    typeParams?: Parameters<typeof makeTypeParams>[0];
+  } = {},
 ) =>
   f.createArrowFunction(
     isAsync ? asyncModifier : undefined,
