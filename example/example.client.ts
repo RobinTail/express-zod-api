@@ -454,7 +454,7 @@ export class ExpressZodAPIClient {
     const source = new EventSource(
       new URL(`${path}?${new URLSearchParams(params)}`, "https://example.com"),
     );
-    type Res<T extends string = string> = Extract<
+    type Res<T extends string> = Extract<
       PositiveResponse[K],
       {
         event: T;
@@ -462,7 +462,7 @@ export class ExpressZodAPIClient {
     >;
     const connection = {
       source,
-      on: <E extends Res["event"]>(
+      on: <E extends Res<string>["event"]>(
         event: E,
         handler: (data: Res<E>["data"]) => void | Promise<void>,
       ) => {
