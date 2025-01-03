@@ -451,22 +451,21 @@ export class Integration {
               f.createIdentifier("EventSource"),
               undefined,
               [
-                f.createNewExpression(f.createIdentifier("URL"), undefined, [
-                  f.createTemplateExpression(f.createTemplateHead("", ""), [
+                f.createNewExpression(f.createIdentifier(URL.name), undefined, [
+                  f.createTemplateExpression(f.createTemplateHead(""), [
                     f.createTemplateSpan(
-                      f.createIdentifier("path"),
-                      f.createTemplateMiddle("?", "?"),
+                      this.ids.pathParameter,
+                      f.createTemplateMiddle("?"),
                     ),
                     f.createTemplateSpan(
-                      f.createNewExpression(
-                        f.createIdentifier("URLSearchParams"),
-                        undefined,
-                        [f.createIdentifier("params")],
+                      makeNew(
+                        f.createIdentifier(URLSearchParams.name),
+                        this.ids.paramsArgument,
                       ),
-                      f.createTemplateTail("", ""),
+                      f.createTemplateTail(""),
                     ),
                   ]),
-                  f.createStringLiteral("https://example.com"),
+                  f.createStringLiteral(serverUrl),
                 ]),
               ],
             ),
