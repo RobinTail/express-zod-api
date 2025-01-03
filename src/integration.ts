@@ -447,25 +447,22 @@ export class Integration {
           ),
           makeConst(
             f.createIdentifier("source"),
-            f.createNewExpression(
+            makeNew(
               f.createIdentifier("EventSource"),
-              undefined,
-              [
-                makeNew(
-                  f.createIdentifier(URL.name),
-                  makeTemplate(
-                    "",
-                    [this.ids.pathParameter, "?"],
-                    [
-                      makeNew(
-                        f.createIdentifier(URLSearchParams.name),
-                        this.ids.paramsArgument,
-                      ),
-                    ],
-                  ),
-                  f.createStringLiteral(serverUrl),
+              makeNew(
+                f.createIdentifier(URL.name),
+                makeTemplate(
+                  "",
+                  [this.ids.pathParameter, "?"],
+                  [
+                    makeNew(
+                      f.createIdentifier(URLSearchParams.name),
+                      this.ids.paramsArgument,
+                    ),
+                  ],
                 ),
-              ],
+                f.createStringLiteral(serverUrl),
+              ),
             ),
           ),
           f.createTypeAliasDeclaration(
