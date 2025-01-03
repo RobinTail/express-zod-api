@@ -517,12 +517,8 @@ export class Integration {
                         undefined,
                         [
                           f.createIdentifier("event"),
-                          f.createArrowFunction(
-                            undefined,
-                            undefined,
-                            makeParams({ msg: undefined }),
-                            undefined,
-                            f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+                          makeArrowFn(
+                            { msg: undefined },
                             f.createBlock(
                               [
                                 makeConst(
