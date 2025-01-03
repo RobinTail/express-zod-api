@@ -764,7 +764,7 @@ export class Integration {
           parserStatement,
           returnStatement,
         ]),
-        true,
+        { isAsync: true },
       ),
       {
         expose: true,
