@@ -585,48 +585,30 @@ export class Integration {
                                       ),
                                       f.createBlock(
                                         [
-                                          f.createVariableStatement(
-                                            undefined,
-                                            f.createVariableDeclarationList(
+                                          makeConst(
+                                            f.createIdentifier("data"),
+                                            f.createCallExpression(
+                                              f.createPropertyAccessExpression(
+                                                f.createIdentifier("JSON"),
+                                                f.createIdentifier("parse"),
+                                              ),
+                                              undefined,
                                               [
-                                                f.createVariableDeclaration(
-                                                  f.createIdentifier("data"),
-                                                  undefined,
-                                                  undefined,
-                                                  f.createCallExpression(
-                                                    f.createPropertyAccessExpression(
-                                                      f.createIdentifier(
-                                                        "JSON",
-                                                      ),
-                                                      f.createIdentifier(
-                                                        "parse",
+                                                f.createPropertyAccessExpression(
+                                                  f.createParenthesizedExpression(
+                                                    f.createAsExpression(
+                                                      f.createIdentifier("msg"),
+                                                      f.createTypeReferenceNode(
+                                                        f.createIdentifier(
+                                                          "MessageEvent",
+                                                        ),
+                                                        undefined,
                                                       ),
                                                     ),
-                                                    undefined,
-                                                    [
-                                                      f.createPropertyAccessExpression(
-                                                        f.createParenthesizedExpression(
-                                                          f.createAsExpression(
-                                                            f.createIdentifier(
-                                                              "msg",
-                                                            ),
-                                                            f.createTypeReferenceNode(
-                                                              f.createIdentifier(
-                                                                "MessageEvent",
-                                                              ),
-                                                              undefined,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        f.createIdentifier(
-                                                          "data",
-                                                        ),
-                                                      ),
-                                                    ],
                                                   ),
+                                                  f.createIdentifier("data"),
                                                 ),
                                               ],
-                                              ts.NodeFlags.Const,
                                             ),
                                           ),
                                           f.createExpressionStatement(
