@@ -523,65 +523,48 @@ export class Integration {
                               undefined,
                             ),
                           ],
-                          [
-                            f.createParameterDeclaration(
+                          makeParams({
+                            event: f.createTypeReferenceNode("E"),
+                            handler: f.createFunctionTypeNode(
                               undefined,
-                              undefined,
-                              f.createIdentifier("event"),
-                              undefined,
-                              f.createTypeReferenceNode(
-                                f.createIdentifier("E"),
-                                undefined,
-                              ),
-                              undefined,
-                            ),
-                            f.createParameterDeclaration(
-                              undefined,
-                              undefined,
-                              f.createIdentifier("handler"),
-                              undefined,
-                              f.createFunctionTypeNode(
-                                undefined,
-                                [
-                                  f.createParameterDeclaration(
-                                    undefined,
-                                    undefined,
-                                    f.createIdentifier("data"),
-                                    undefined,
-                                    f.createIndexedAccessTypeNode(
-                                      f.createTypeReferenceNode(
-                                        f.createIdentifier("Res"),
-                                        [
-                                          f.createTypeReferenceNode(
-                                            f.createIdentifier("E"),
-                                            undefined,
-                                          ),
-                                        ],
-                                      ),
-                                      f.createLiteralTypeNode(
-                                        f.createStringLiteral("data"),
-                                      ),
+                              [
+                                f.createParameterDeclaration(
+                                  undefined,
+                                  undefined,
+                                  f.createIdentifier("data"),
+                                  undefined,
+                                  f.createIndexedAccessTypeNode(
+                                    f.createTypeReferenceNode(
+                                      f.createIdentifier("Res"),
+                                      [
+                                        f.createTypeReferenceNode(
+                                          f.createIdentifier("E"),
+                                          undefined,
+                                        ),
+                                      ],
                                     ),
-                                    undefined,
+                                    f.createLiteralTypeNode(
+                                      f.createStringLiteral("data"),
+                                    ),
                                   ),
-                                ],
-                                f.createUnionTypeNode([
-                                  f.createKeywordTypeNode(
-                                    ts.SyntaxKind.VoidKeyword,
-                                  ),
-                                  f.createTypeReferenceNode(
-                                    f.createIdentifier("Promise"),
-                                    [
-                                      f.createKeywordTypeNode(
-                                        ts.SyntaxKind.VoidKeyword,
-                                      ),
-                                    ],
-                                  ),
-                                ]),
-                              ),
-                              undefined,
+                                  undefined,
+                                ),
+                              ],
+                              f.createUnionTypeNode([
+                                f.createKeywordTypeNode(
+                                  ts.SyntaxKind.VoidKeyword,
+                                ),
+                                f.createTypeReferenceNode(
+                                  f.createIdentifier("Promise"),
+                                  [
+                                    f.createKeywordTypeNode(
+                                      ts.SyntaxKind.VoidKeyword,
+                                    ),
+                                  ],
+                                ),
+                              ]),
                             ),
-                          ],
+                          }),
                           undefined,
                           f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
                           f.createBlock(
