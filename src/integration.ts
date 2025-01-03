@@ -449,7 +449,8 @@ export class Integration {
               f.createIdentifier("EventSource"),
               undefined,
               [
-                f.createNewExpression(f.createIdentifier(URL.name), undefined, [
+                makeNew(
+                  f.createIdentifier(URL.name),
                   makeTemplate(
                     "",
                     [this.ids.pathParameter, "?"],
@@ -461,7 +462,7 @@ export class Integration {
                     ],
                   ),
                   f.createStringLiteral(serverUrl),
-                ]),
+                ),
               ],
             ),
           ),
