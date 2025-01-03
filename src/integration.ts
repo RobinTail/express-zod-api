@@ -31,6 +31,7 @@ import {
   makeSomeOfHelper,
   makePropertyIdentifier,
   printNode,
+  makeExtract,
 } from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -486,7 +487,7 @@ export class Integration {
                     makeParams({
                       [this.ids.dataParameter.text]:
                         f.createIndexedAccessTypeNode(
-                          f.createTypeReferenceNode("Extract", [
+                          makeExtract(
                             f.createTypeReferenceNode("R"),
                             ts.setEmitFlags(
                               f.createTypeLiteralNode([
@@ -497,7 +498,7 @@ export class Integration {
                               ]),
                               ts.EmitFlags.SingleLine,
                             ),
-                          ]),
+                          ),
                           f.createLiteralTypeNode(
                             f.createStringLiteral(propOf<SSEShape>("data")),
                           ),
@@ -566,7 +567,7 @@ export class Integration {
         f.createReturnStatement(this.ids.connectionConst),
       ]),
       makeTypeParams({
-        K: f.createTypeReferenceNode("Extract", [
+        K: makeExtract(
           f.createTypeReferenceNode(this.ids.requestType),
           f.createTemplateLiteralType(f.createTemplateHead("get "), [
             f.createTemplateLiteralTypeSpan(
@@ -574,8 +575,8 @@ export class Integration {
               f.createTemplateTail(""),
             ),
           ]),
-        ]),
-        R: f.createTypeReferenceNode("Extract", [
+        ),
+        R: makeExtract(
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.posResponseInterface),
             f.createTypeReferenceNode("K"),
@@ -589,7 +590,7 @@ export class Integration {
             ]),
             ts.EmitFlags.SingleLine,
           ),
-        ]),
+        ),
       }),
     );
 

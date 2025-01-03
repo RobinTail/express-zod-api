@@ -337,6 +337,9 @@ export const makeAnd = (left: ts.Expression, right: ts.Expression) =>
 export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
   f.createNewExpression(cls, undefined, args);
 
+export const makeExtract = (base: ts.TypeNode, narrow: ts.TypeNode) =>
+  f.createTypeReferenceNode("Extract", [base, narrow]);
+
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,
   ts.SyntaxKind.BigIntKeyword,
