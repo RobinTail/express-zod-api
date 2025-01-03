@@ -509,50 +509,42 @@ export class Integration {
                   },
                   f.createBlock([
                     f.createExpressionStatement(
-                      f.createCallExpression(
-                        f.createPropertyAccessExpression(
-                          f.createIdentifier("source"),
-                          f.createIdentifier("addEventListener"),
-                        ),
-                        undefined,
+                      makePropCall(
+                        f.createIdentifier("source"),
+                        propOf<EventSource>("addEventListener"),
                         [
                           f.createIdentifier("event"),
                           makeArrowFn(
                             { msg: undefined },
-                            f.createBlock(
-                              [
-                                makeConst(
-                                  f.createIdentifier("data"),
-                                  makePropCall(
-                                    f.createIdentifier("JSON"),
-                                    propOf<JSON>("parse"),
-                                    [
-                                      f.createPropertyAccessExpression(
-                                        f.createParenthesizedExpression(
-                                          f.createAsExpression(
-                                            f.createIdentifier("msg"),
-                                            f.createTypeReferenceNode(
-                                              f.createIdentifier(
-                                                "MessageEvent",
-                                              ),
-                                            ),
+                            f.createBlock([
+                              makeConst(
+                                f.createIdentifier("data"),
+                                makePropCall(
+                                  f.createIdentifier("JSON"),
+                                  propOf<JSON>("parse"),
+                                  [
+                                    f.createPropertyAccessExpression(
+                                      f.createParenthesizedExpression(
+                                        f.createAsExpression(
+                                          f.createIdentifier("msg"),
+                                          f.createTypeReferenceNode(
+                                            f.createIdentifier("MessageEvent"),
                                           ),
                                         ),
-                                        f.createIdentifier("data"),
                                       ),
-                                    ],
-                                  ),
+                                      f.createIdentifier("data"),
+                                    ),
+                                  ],
                                 ),
-                                f.createExpressionStatement(
-                                  f.createCallExpression(
-                                    f.createIdentifier("handler"),
-                                    undefined,
-                                    [f.createIdentifier("data")],
-                                  ),
+                              ),
+                              f.createExpressionStatement(
+                                f.createCallExpression(
+                                  f.createIdentifier("handler"),
+                                  undefined,
+                                  [f.createIdentifier("data")],
                                 ),
-                              ],
-                              true,
-                            ),
+                              ),
+                            ]),
                           ),
                         ],
                       ),
