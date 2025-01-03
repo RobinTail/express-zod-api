@@ -128,6 +128,7 @@ export class Integration {
     requestParameter: f.createIdentifier("request"),
     accumulator: f.createIdentifier("acc"),
     provideMethod: f.createIdentifier("provide"),
+    subscribeMethod: f.createIdentifier("subscribe"),
     implementationArgument: f.createIdentifier("implementation"),
     headersProperty: f.createIdentifier("headers"),
     hasBodyConst: f.createIdentifier("hasBody"),
@@ -421,7 +422,7 @@ export class Integration {
     );
 
     const subscribeMethod = makePublicMethod(
-      f.createIdentifier("subscribe"),
+      this.ids.subscribeMethod,
       makeParams({
         request: f.createTypeReferenceNode("K"),
         params: f.createIndexedAccessTypeNode(
