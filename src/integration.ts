@@ -585,7 +585,7 @@ export class Integration {
       ]),
       makeTypeParams({
         K: f.createIntersectionTypeNode([
-          f.createTypeReferenceNode(f.createIdentifier("Request"), undefined),
+          f.createTypeReferenceNode(this.ids.requestType),
           f.createTemplateLiteralType(f.createTemplateHead("get "), [
             f.createTemplateLiteralTypeSpan(
               f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
