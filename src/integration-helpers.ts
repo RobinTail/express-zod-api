@@ -54,7 +54,7 @@ export const makeParam = (
   );
 
 export const makeParams = (
-  params: Record<string, ts.TypeNode | undefined>,
+  params: Partial<Record<string, ts.TypeNode>>,
   mod?: ts.Modifier[],
 ) =>
   Object.entries(params).map(([name, node]) =>
@@ -199,13 +199,13 @@ export const makeInterface = (
 };
 
 export const makeTypeParams = (
-  params: Partial<Record<string, ts.Identifier>>,
+  params: Partial<Record<string, ts.Identifier | ts.TypeNode>>,
 ) =>
-  Object.entries(params).map(([name, id]) =>
+  Object.entries(params).map(([name, val]) =>
     f.createTypeParameterDeclaration(
       [],
       name,
-      id && f.createTypeReferenceNode(id),
+      val && ts.isIdentifier(val) ? f.createTypeReferenceNode(val) : val,
     ),
   );
 
