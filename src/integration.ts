@@ -463,14 +463,9 @@ export class Integration {
         f.createTypeAliasDeclaration(
           undefined,
           f.createIdentifier("Res"),
-          [
-            f.createTypeParameterDeclaration(
-              undefined,
-              f.createIdentifier("T"),
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-            ),
-          ],
+          makeTypeParams({
+            T: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+          }),
           f.createTypeReferenceNode("Extract", [
             f.createIndexedAccessTypeNode(
               f.createTypeReferenceNode(this.ids.posResponseInterface),
@@ -495,7 +490,9 @@ export class Integration {
                       undefined,
                       "E",
                       f.createIndexedAccessTypeNode(
-                        f.createTypeReferenceNode("Res"),
+                        f.createTypeReferenceNode("Res", [
+                          f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                        ]),
                         f.createLiteralTypeNode(f.createStringLiteral("event")),
                       ),
                     ),
