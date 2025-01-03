@@ -65,12 +65,25 @@ export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],
 ) => f.createConstructorDeclaration(undefined, params, f.createBlock([]));
 
-export const makeInterfaceProp = (name: string | number, value: ts.TypeNode) =>
+export const makeInterfaceProp = (
+  name: string | number,
+  value: ts.TypeNode | ts.Identifier | string,
+) =>
   f.createPropertySignature(
     undefined,
     makePropertyIdentifier(name),
     undefined,
-    value,
+    typeof value === "string" || ts.isIdentifier(value)
+      ? f.createTypeReferenceNode(value)
+      : value,
+  );
+
+export const makeOnePropObjType = (
+  ...params: Parameters<typeof makeInterfaceProp>
+) =>
+  ts.setEmitFlags(
+    f.createTypeLiteralNode([makeInterfaceProp(...params)]),
+    ts.EmitFlags.SingleLine,
   );
 
 export const makeDeconstruction = (
@@ -210,7 +223,7 @@ export const makeTypeParams = (
   );
 
 export const makeArrowFn = (
-  params: ts.Identifier[],
+  params: ts.Identifier[] | Parameters<typeof makeParams>[0],
   body: ts.ConciseBody,
   {
     isAsync,
@@ -223,7 +236,9 @@ export const makeArrowFn = (
   f.createArrowFunction(
     isAsync ? asyncModifier : undefined,
     typeParams && makeTypeParams(typeParams),
-    params.map((key) => makeParam(key)),
+    Array.isArray(params)
+      ? params.map((key) => makeParam(key))
+      : makeParams(params),
     undefined,
     undefined,
     body,
@@ -300,3 +315,14 @@ export const makeAnd = (left: ts.Expression, right: ts.Expression) =>
 
 export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
   f.createNewExpression(cls, undefined, args);
+
+export const makeExtract = (
+  base: string | ts.Identifier | ts.TypeNode,
+  narrow: ts.TypeNode,
+) =>
+  f.createTypeReferenceNode("Extract", [
+    typeof base === "string" || ts.isIdentifier(base)
+      ? f.createTypeReferenceNode(base)
+      : base,
+    narrow,
+  ]);

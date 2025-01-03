@@ -29,6 +29,8 @@ import {
   makeNew,
   makeKeyOf,
   makeSomeOfHelper,
+  makeExtract,
+  makeOnePropObjType,
 } from "./integration-helpers";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -37,11 +39,13 @@ import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
+import type { makeEventSchema } from "./sse";
 import { zodToTs } from "./zts";
 import { ZTSContext, printNode, makePropertyIdentifier } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
+type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
 
 interface IntegrationParams {
   routing: Routing;
@@ -124,8 +128,14 @@ export class Integration {
     paramsArgument: f.createIdentifier("params"),
     methodParameter: f.createIdentifier("method"),
     requestParameter: f.createIdentifier("request"),
+    eventParameter: f.createIdentifier("event"),
+    dataParameter: f.createIdentifier("data"),
+    handlerParameter: f.createIdentifier("handler"),
+    msgParameter: f.createIdentifier("msg"),
     accumulator: f.createIdentifier("acc"),
     provideMethod: f.createIdentifier("provide"),
+    subscribeMethod: f.createIdentifier("subscribe"),
+    onMethod: f.createIdentifier("on"),
     implementationArgument: f.createIdentifier("implementation"),
     headersProperty: f.createIdentifier("headers"),
     hasBodyConst: f.createIdentifier("hasBody"),
@@ -137,6 +147,8 @@ export class Integration {
     clientConst: f.createIdentifier("client"),
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
+    sourceConst: f.createIdentifier("source"),
+    connectionConst: f.createIdentifier("connection"),
   } satisfies Record<string, ts.Identifier>;
   protected interfaces: Array<{
     id: ts.Identifier;
@@ -195,10 +207,7 @@ export class Integration {
             );
             this.program.push(variantType);
             return statusCodes.map((code) =>
-              makeInterfaceProp(
-                code,
-                f.createTypeReferenceNode(variantType.name),
-              ),
+              makeInterfaceProp(code, variantType.name),
             );
           }, Array.from(responses.entries()));
           const dict = makeInterface(
@@ -418,6 +427,157 @@ export class Integration {
       ),
     );
 
+    const subscribeMethod = makePublicMethod(
+      this.ids.subscribeMethod,
+      makeParams({
+        request: f.createTypeReferenceNode("K"),
+        params: f.createIndexedAccessTypeNode(
+          f.createTypeReferenceNode(this.ids.inputInterface),
+          f.createTypeReferenceNode("K"),
+        ),
+      }),
+      f.createBlock([
+        makeConst(
+          this.ids.pathParameter,
+          f.createAsExpression(
+            f.createElementAccessExpression(
+              makePropCall(this.ids.requestParameter, propOf<string>("split"), [
+                f.createStringLiteral(" "),
+              ]),
+              f.createNumericLiteral(1),
+            ),
+            f.createTypeReferenceNode(this.ids.pathType),
+          ),
+        ),
+        makeConst(
+          this.ids.sourceConst,
+          makeNew(
+            f.createIdentifier("EventSource"),
+            makeNew(
+              f.createIdentifier(URL.name),
+              makeTemplate(
+                "",
+                [this.ids.pathParameter, "?"],
+                [
+                  makeNew(
+                    f.createIdentifier(URLSearchParams.name),
+                    this.ids.paramsArgument,
+                  ),
+                ],
+              ),
+              f.createStringLiteral(serverUrl),
+            ),
+          ),
+        ),
+        makeConst(
+          this.ids.connectionConst,
+          f.createObjectLiteralExpression([
+            f.createShorthandPropertyAssignment(this.ids.sourceConst),
+            f.createPropertyAssignment(
+              this.ids.onMethod,
+              makeArrowFn(
+                {
+                  [this.ids.eventParameter.text]:
+                    f.createTypeReferenceNode("E"),
+                  [this.ids.handlerParameter.text]: f.createFunctionTypeNode(
+                    undefined,
+                    makeParams({
+                      [this.ids.dataParameter.text]:
+                        f.createIndexedAccessTypeNode(
+                          makeExtract(
+                            "R",
+                            makeOnePropObjType(propOf<SSEShape>("event"), "E"),
+                          ),
+                          f.createLiteralTypeNode(
+                            f.createStringLiteral(propOf<SSEShape>("data")),
+                          ),
+                        ),
+                    }),
+                    f.createUnionTypeNode([
+                      f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+                      makePromise(
+                        f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+                      ),
+                    ]),
+                  ),
+                },
+                f.createBlock([
+                  f.createExpressionStatement(
+                    makePropCall(
+                      this.ids.sourceConst,
+                      propOf<EventSource>("addEventListener"),
+                      [
+                        this.ids.eventParameter,
+                        makeArrowFn(
+                          [this.ids.msgParameter],
+                          f.createCallExpression(
+                            this.ids.handlerParameter,
+                            undefined,
+                            [
+                              makePropCall(
+                                f.createIdentifier("JSON"),
+                                propOf<JSON>("parse"),
+                                [
+                                  f.createPropertyAccessExpression(
+                                    f.createParenthesizedExpression(
+                                      f.createAsExpression(
+                                        this.ids.msgParameter,
+                                        f.createTypeReferenceNode(
+                                          f.createIdentifier(MessageEvent.name),
+                                        ),
+                                      ),
+                                    ),
+                                    propOf<SSEShape>("data"),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  f.createReturnStatement(this.ids.connectionConst),
+                ]),
+                {
+                  typeParams: {
+                    E: f.createIndexedAccessTypeNode(
+                      f.createTypeReferenceNode("R"),
+                      f.createLiteralTypeNode(
+                        f.createStringLiteral(propOf<SSEShape>("event")),
+                      ),
+                    ),
+                  },
+                },
+              ),
+            ),
+          ]),
+        ),
+        f.createReturnStatement(this.ids.connectionConst),
+      ]),
+      makeTypeParams({
+        K: makeExtract(
+          this.ids.requestType,
+          f.createTemplateLiteralType(f.createTemplateHead("get "), [
+            f.createTemplateLiteralTypeSpan(
+              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              f.createTemplateTail(""),
+            ),
+          ]),
+        ),
+        R: makeExtract(
+          f.createIndexedAccessTypeNode(
+            f.createTypeReferenceNode(this.ids.posResponseInterface),
+            f.createTypeReferenceNode("K"),
+          ),
+          makeOnePropObjType(
+            propOf<SSEShape>("event"),
+            f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+          ),
+        ),
+      }),
+    );
+
     // export class ExpressZodAPIClient { ___ }
     const clientClass = makePublicClass(
       this.ids.clientClass,
@@ -429,7 +589,7 @@ export class Integration {
           protectedReadonlyModifier,
         ),
       ]),
-      [providerMethod],
+      [providerMethod, subscribeMethod],
     );
 
     this.program.push(endpointTagsConst, implementationType, clientClass);
