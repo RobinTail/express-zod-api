@@ -487,10 +487,7 @@ export class Integration {
           f.createIdentifier("connection"),
           f.createObjectLiteralExpression(
             [
-              f.createShorthandPropertyAssignment(
-                f.createIdentifier("source"),
-                undefined,
-              ),
+              f.createShorthandPropertyAssignment("source"),
               f.createPropertyAssignment(
                 f.createIdentifier("on"),
                 f.createArrowFunction(
@@ -498,15 +495,11 @@ export class Integration {
                   [
                     f.createTypeParameterDeclaration(
                       undefined,
-                      f.createIdentifier("E"),
+                      "E",
                       f.createIndexedAccessTypeNode(
-                        f.createTypeReferenceNode(
-                          f.createIdentifier("Res"),
-                          undefined,
-                        ),
+                        f.createTypeReferenceNode("Res"),
                         f.createLiteralTypeNode(f.createStringLiteral("event")),
                       ),
-                      undefined,
                     ),
                   ],
                   makeParams({
