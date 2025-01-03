@@ -105,6 +105,10 @@ const tsFactoryConcerns = [
     selector: "Identifier[name='createNewExpression']",
     message: "use makeNew() helper",
   },
+  {
+    selector: "Literal[value='Promise']",
+    message: "use makePromise() helper",
+  },
 ];
 
 export default tsPlugin.config(
