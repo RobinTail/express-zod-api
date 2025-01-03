@@ -585,12 +585,9 @@ export class Integration {
                                         [
                                           makeConst(
                                             f.createIdentifier("data"),
-                                            f.createCallExpression(
-                                              f.createPropertyAccessExpression(
-                                                f.createIdentifier("JSON"),
-                                                f.createIdentifier("parse"),
-                                              ),
-                                              undefined,
+                                            makePropCall(
+                                              f.createIdentifier("JSON"),
+                                              propOf<JSON>("parse"),
                                               [
                                                 f.createPropertyAccessExpression(
                                                   f.createParenthesizedExpression(
@@ -600,7 +597,6 @@ export class Integration {
                                                         f.createIdentifier(
                                                           "MessageEvent",
                                                         ),
-                                                        undefined,
                                                       ),
                                                     ),
                                                   ),
