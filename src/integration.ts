@@ -126,6 +126,7 @@ export class Integration {
     paramsArgument: f.createIdentifier("params"),
     methodParameter: f.createIdentifier("method"),
     requestParameter: f.createIdentifier("request"),
+    eventParameter: f.createIdentifier("event"),
     accumulator: f.createIdentifier("acc"),
     provideMethod: f.createIdentifier("provide"),
     subscribeMethod: f.createIdentifier("subscribe"),
@@ -473,7 +474,10 @@ export class Integration {
               f.createTypeReferenceNode("K"),
             ),
             f.createTypeLiteralNode([
-              makeInterfaceProp("event", f.createTypeReferenceNode("T")),
+              makeInterfaceProp(
+                this.ids.eventParameter.text,
+                f.createTypeReferenceNode("T"),
+              ),
             ]),
           ]),
           {
@@ -513,7 +517,7 @@ export class Integration {
                       this.ids.sourceConst,
                       propOf<EventSource>("addEventListener"),
                       [
-                        f.createIdentifier("event"),
+                        this.ids.eventParameter,
                         makeArrowFn(
                           { msg: undefined },
                           f.createBlock([
@@ -557,7 +561,9 @@ export class Integration {
                       f.createTypeReferenceNode("Res", [
                         f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
                       ]),
-                      f.createLiteralTypeNode(f.createStringLiteral("event")),
+                      f.createLiteralTypeNode(
+                        f.createStringLiteral(this.ids.eventParameter.text),
+                      ),
                     ),
                   },
                 },
