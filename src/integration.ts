@@ -138,6 +138,7 @@ export class Integration {
     clientConst: f.createIdentifier("client"),
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
+    connectionConst: f.createIdentifier("connection"),
   } satisfies Record<string, ts.Identifier>;
   protected interfaces: Array<{
     id: ts.Identifier;
@@ -477,7 +478,7 @@ export class Integration {
           },
         ),
         makeConst(
-          f.createIdentifier("connection"),
+          this.ids.connectionConst,
           f.createObjectLiteralExpression([
             f.createShorthandPropertyAssignment("source"),
             f.createPropertyAssignment(
@@ -545,7 +546,7 @@ export class Integration {
                       ],
                     ),
                   ),
-                  f.createReturnStatement(f.createIdentifier("connection")),
+                  f.createReturnStatement(this.ids.connectionConst),
                 ]),
                 {
                   typeParams: {
@@ -561,7 +562,7 @@ export class Integration {
             ),
           ]),
         ),
-        f.createReturnStatement(f.createIdentifier("connection")),
+        f.createReturnStatement(this.ids.connectionConst),
       ]),
       makeTypeParams({
         K: f.createIntersectionTypeNode([
