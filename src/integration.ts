@@ -136,6 +136,7 @@ export class Integration {
     accumulator: f.createIdentifier("acc"),
     provideMethod: f.createIdentifier("provide"),
     subscribeMethod: f.createIdentifier("subscribe"),
+    onMethod: f.createIdentifier("on"),
     implementationArgument: f.createIdentifier("implementation"),
     headersProperty: f.createIdentifier("headers"),
     hasBodyConst: f.createIdentifier("hasBody"),
@@ -477,7 +478,7 @@ export class Integration {
           f.createObjectLiteralExpression([
             f.createShorthandPropertyAssignment(this.ids.sourceConst),
             f.createPropertyAssignment(
-              f.createIdentifier("on"),
+              this.ids.onMethod,
               makeArrowFn(
                 {
                   [this.ids.eventParameter.text]:
