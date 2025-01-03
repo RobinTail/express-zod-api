@@ -541,7 +541,7 @@ export class Integration {
                                       f.createAsExpression(
                                         f.createIdentifier("msg"),
                                         f.createTypeReferenceNode(
-                                          f.createIdentifier("MessageEvent"),
+                                          f.createIdentifier(MessageEvent.name),
                                         ),
                                       ),
                                     ),
