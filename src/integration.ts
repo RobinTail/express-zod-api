@@ -536,11 +536,11 @@ export class Integration {
                                 f.createKeywordTypeNode(
                                   ts.SyntaxKind.VoidKeyword,
                                 ),
-                                f.createTypeReferenceNode("Promise", [
+                                makePromise(
                                   f.createKeywordTypeNode(
                                     ts.SyntaxKind.VoidKeyword,
                                   ),
-                                ]),
+                                ),
                               ]),
                             ),
                           }),
