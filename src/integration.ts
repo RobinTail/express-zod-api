@@ -524,41 +524,25 @@ export class Integration {
                             event: f.createTypeReferenceNode("E"),
                             handler: f.createFunctionTypeNode(
                               undefined,
-                              [
-                                f.createParameterDeclaration(
-                                  undefined,
-                                  undefined,
-                                  f.createIdentifier("data"),
-                                  undefined,
-                                  f.createIndexedAccessTypeNode(
-                                    f.createTypeReferenceNode(
-                                      f.createIdentifier("Res"),
-                                      [
-                                        f.createTypeReferenceNode(
-                                          f.createIdentifier("E"),
-                                          undefined,
-                                        ),
-                                      ],
-                                    ),
-                                    f.createLiteralTypeNode(
-                                      f.createStringLiteral("data"),
-                                    ),
+                              makeParams({
+                                data: f.createIndexedAccessTypeNode(
+                                  f.createTypeReferenceNode("Res", [
+                                    f.createTypeReferenceNode("E"),
+                                  ]),
+                                  f.createLiteralTypeNode(
+                                    f.createStringLiteral("data"),
                                   ),
-                                  undefined,
                                 ),
-                              ],
+                              }),
                               f.createUnionTypeNode([
                                 f.createKeywordTypeNode(
                                   ts.SyntaxKind.VoidKeyword,
                                 ),
-                                f.createTypeReferenceNode(
-                                  f.createIdentifier("Promise"),
-                                  [
-                                    f.createKeywordTypeNode(
-                                      ts.SyntaxKind.VoidKeyword,
-                                    ),
-                                  ],
-                                ),
+                                f.createTypeReferenceNode("Promise", [
+                                  f.createKeywordTypeNode(
+                                    ts.SyntaxKind.VoidKeyword,
+                                  ),
+                                ]),
                               ]),
                             ),
                           }),
