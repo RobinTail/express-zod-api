@@ -109,6 +109,10 @@ const tsFactoryConcerns = [
     selector: "Literal[value='Promise']",
     message: "use makePromise() helper",
   },
+  {
+    selector: "Literal[value='Extract']",
+    message: "use makeExtract() helper",
+  },
 ];
 
 export default tsPlugin.config(
