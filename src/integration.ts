@@ -785,16 +785,7 @@ export class Integration {
           f.createArrowFunction(
             undefined,
             undefined,
-            [
-              f.createParameterDeclaration(
-                undefined,
-                undefined,
-                f.createIdentifier("time"),
-                undefined,
-                undefined,
-                undefined,
-              ),
-            ],
+            makeParams({ time: undefined }),
             undefined,
             f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
             f.createBlock([], false),
