@@ -770,6 +770,46 @@ export class Integration {
       ]),
     );
 
+    const subscribeCallingStatement = f.createExpressionStatement(
+      f.createCallExpression(
+        f.createPropertyAccessExpression(
+          f.createCallExpression(
+            f.createPropertyAccessExpression(
+              f.createIdentifier("client"),
+              f.createIdentifier("subscribe"),
+            ),
+            undefined,
+            [
+              f.createStringLiteral("get /v1/events/time"),
+              f.createObjectLiteralExpression([], false),
+            ],
+          ),
+          f.createIdentifier("on"),
+        ),
+        undefined,
+        [
+          f.createStringLiteral("time"),
+          f.createArrowFunction(
+            undefined,
+            undefined,
+            [
+              f.createParameterDeclaration(
+                undefined,
+                undefined,
+                f.createIdentifier("time"),
+                undefined,
+                undefined,
+                undefined,
+              ),
+            ],
+            undefined,
+            f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+            f.createBlock([], false),
+          ),
+        ],
+      ),
+    );
+
     // const client = new ExpressZodAPIClient(exampleImplementation);
     const clientInstanceStatement = makeConst(
       this.ids.clientConst,
@@ -780,6 +820,7 @@ export class Integration {
       exampleImplStatement,
       clientInstanceStatement,
       provideCallingStatement,
+      subscribeCallingStatement,
     );
   }
 
