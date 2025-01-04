@@ -450,7 +450,7 @@ export class ExpressZodAPIClient {
     K extends Extract<Request, `get ${string}`>,
     R extends Extract<PositiveResponse[K], { event: string }>,
   >(request: K, params: Input[K]) {
-    const path = request.split(" ")[1] as Path;
+    const path = request.split(/ (.+)/, 2)[1] as Path;
     const source = new EventSource(
       new URL(`${path}?${new URLSearchParams(params)}`, "https://example.com"),
     );

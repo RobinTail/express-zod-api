@@ -444,7 +444,8 @@ export class Integration {
           f.createAsExpression(
             f.createElementAccessExpression(
               makePropCall(this.ids.requestParameter, propOf<string>("split"), [
-                f.createStringLiteral(" "),
+                f.createRegularExpressionLiteral("/ (.+)/"), // split once
+                f.createNumericLiteral(2), // excludes third empty element
               ]),
               f.createNumericLiteral(1),
             ),
