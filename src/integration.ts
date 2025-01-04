@@ -770,6 +770,7 @@ export class Integration {
       ]),
     );
 
+    // client.subscribe("get /v1/events/time", {}).on("time", (time) => {});
     const subscribeCallingStatement = f.createExpressionStatement(
       makePropCall(
         makePropCall(this.ids.clientConst, this.ids.subscribeMethod, [
