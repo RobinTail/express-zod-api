@@ -782,14 +782,7 @@ export class Integration {
         undefined,
         [
           f.createStringLiteral("time"),
-          f.createArrowFunction(
-            undefined,
-            undefined,
-            makeParams({ time: undefined }),
-            undefined,
-            f.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-            f.createBlock([], false),
-          ),
+          makeArrowFn({ time: undefined }, f.createBlock([])),
         ],
       ),
     );
