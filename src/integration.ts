@@ -773,17 +773,10 @@ export class Integration {
     const subscribeCallingStatement = f.createExpressionStatement(
       f.createCallExpression(
         f.createPropertyAccessExpression(
-          f.createCallExpression(
-            f.createPropertyAccessExpression(
-              f.createIdentifier("client"),
-              f.createIdentifier("subscribe"),
-            ),
-            undefined,
-            [
-              f.createStringLiteral("get /v1/events/time"),
-              f.createObjectLiteralExpression([], false),
-            ],
-          ),
+          makePropCall(this.ids.clientConst, this.ids.subscribeMethod, [
+            f.createStringLiteral(`${"get" satisfies Method} /v1/events/time`),
+            f.createObjectLiteralExpression(),
+          ]),
           f.createIdentifier("on"),
         ),
         undefined,
