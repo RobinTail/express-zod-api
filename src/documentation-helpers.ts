@@ -49,6 +49,7 @@ import {
   makeCleanId,
   tryToTransform,
   ucFirst,
+  Tag,
 } from "./common-helpers";
 import { InputSource } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
@@ -965,7 +966,7 @@ export const depictBody = ({
 };
 
 export const depictTags = (
-  tags: Partial<Record<string, string | { description: string; url?: string }>>,
+  tags: Partial<Record<Tag, string | { description: string; url?: string }>>,
 ) =>
   Object.entries(tags).reduce<TagObject[]>((agg, [tag, def]) => {
     if (!def) return agg;

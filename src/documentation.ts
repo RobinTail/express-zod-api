@@ -11,7 +11,7 @@ import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import { defaultInputSources, makeCleanId, Tag } from "./common-helpers";
+import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
@@ -69,8 +69,9 @@ interface DocumentationParams {
   /**
    * @desc Extended description of tags used in endpoints. For enforcing constraints:
    * @see TagOverrides
+   * @example { users: "About users", files: { description: "About files", url: "https://example.com" } }
    * */
-  tags?: Partial<Record<Tag, string | { description: string; url?: string }>>;
+  tags?: Parameters<typeof depictTags>[0];
 }
 
 export class Documentation extends OpenApiBuilder {
