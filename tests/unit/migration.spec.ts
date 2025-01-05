@@ -22,6 +22,7 @@ describe("Migration", () => {
       `client.provide("get /v1/test", {id: 10});`,
       `new Integration({ routing });`,
       `import { Request } from "./client.ts";`,
+      `createConfig({ cors: true })`,
     ],
     invalid: [
       {
@@ -56,6 +57,13 @@ describe("Migration", () => {
             messageId: "change",
             data: { subject: "type", from: "MethodPath", to: "Request" },
           },
+        ],
+      },
+      {
+        code: `createConfig({ tags: { users: "" } })`,
+        output: `createConfig({  })`,
+        errors: [
+          { messageId: "remove", data: { subject: "property", name: "tags" } },
         ],
       },
     ],
