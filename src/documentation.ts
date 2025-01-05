@@ -70,7 +70,7 @@ interface DocumentationParams {
    * @desc Extended description of tags used in endpoints. For enforcing constraints:
    * @see TagOverrides
    * */
-  tags?: Record<Tag, string | { description: string; url?: string }>;
+  tags?: Partial<Record<Tag, string | { description: string; url?: string }>>;
 }
 
 export class Documentation extends OpenApiBuilder {
@@ -253,6 +253,6 @@ export class Documentation extends OpenApiBuilder {
       });
     };
     walkRouting({ routing, onEndpoint });
-    this.rootDoc.tags = tags ? depictTags(tags) : [];
+    if (tags) this.rootDoc.tags = depictTags(tags);
   }
 }

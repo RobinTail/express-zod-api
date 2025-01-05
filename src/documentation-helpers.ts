@@ -965,18 +965,18 @@ export const depictBody = ({
 };
 
 export const depictTags = (
-  tags: Record<string, string | { description: string; url?: string }>,
-): TagObject[] =>
-  Object.keys(tags).map((tag) => {
-    const def = tags[tag];
-    const result: TagObject = {
+  tags: Partial<Record<string, string | { description: string; url?: string }>>,
+) =>
+  Object.entries(tags).reduce<TagObject[]>((agg, [tag, def]) => {
+    if (!def) return agg;
+    const entry: TagObject = {
       name: tag,
       description: typeof def === "string" ? def : def.description,
     };
     if (typeof def === "object" && def.url)
-      result.externalDocs = { url: def.url };
-    return result;
-  });
+      entry.externalDocs = { url: def.url };
+    return agg.concat(entry);
+  }, []);
 
 export const ensureShortDescription = (description: string) =>
   description.length <= shortDescriptionLimit
