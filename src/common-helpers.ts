@@ -19,7 +19,7 @@ export type FlatObject = Record<string, unknown>;
  * */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation
 export interface TagOverrides extends FlatObject {}
-export type Tag = keyof TagOverrides;
+export type Tag = string & keyof TagOverrides;
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
