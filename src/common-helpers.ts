@@ -17,7 +17,8 @@ export type FlatObject = Record<string, unknown>;
  * @example declare module "express-zod-api" { interface TagOverrides { users: unknown } }
  * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  * */
-export interface TagOverrides {} // eslint-disable-line @typescript-eslint/no-empty-object-type -- for augmentation
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation
+export interface TagOverrides extends FlatObject {}
 export type Tag = keyof TagOverrides;
 
 const areFilesAvailable = (request: Request): boolean => {
