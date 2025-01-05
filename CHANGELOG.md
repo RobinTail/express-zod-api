@@ -11,6 +11,10 @@
   - The overload of `ExpressZodAPIClient::provide()` having 3 arguments and the `Provider` type are removed;
   - The public `jsonEndpoints` const is removed — use the `content-type` header of an actual response instead;
   - The public type `MethodPath` is removed — use the `Request` type instead.
+- The approach on tagging endpoints changed:
+  - The `tags` property moved from the argument of `createConfig()` to `Documentation::constructor()`;
+  - The overload of `EndpointsFactory::constructor()` accepting `config` property is removed;
+  - Tags should be declared as the keys of the augmented interface `TagOverrides` instead;
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
@@ -22,6 +26,33 @@ export default [
   { languageOptions: { parser }, plugins: { migration } },
   { files: ["**/*.ts"], rules: { "migration/v22": "error" } },
 ];
+```
+
+```ts
+// new tagging approach
+import { defaultEndpointsFactory, Documentation } from "express-zod-api";
+
+// Add similar declaration once, somewhere in your code, preferably near config
+declare module "express-zod-api" {
+  interface TagOverrides {
+    users: unknown;
+    files: unknown;
+    subscriptions: unknown;
+  }
+}
+
+// Use the declared tags for endpoints
+const exampleEndpoint = defaultEndpointsFactory.build({
+  tag: "users", // or array ["users", "files"]
+});
+
+// Add extended description of the tags to Documentation (optional)
+new Documentation({
+  tags: {
+    users: "All about users",
+    files: { description: "All about files", url: "https://example.com" },
+  },
+});
 ```
 
 ## Version 21
