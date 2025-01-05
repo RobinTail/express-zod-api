@@ -96,7 +96,6 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
     },
   });
 
-/** @desc This feature is in active development and can be changed or removed regardlress of SemVer */
 export class EventStreamFactory<
   E extends EventsMap,
   TAG extends string,
