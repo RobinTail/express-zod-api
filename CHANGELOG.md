@@ -29,6 +29,26 @@ export default [
 ];
 ```
 
+```diff
+  createConfig({
+-   tags: {},
+  });
+
+  new Documentation({
++   tags: {},
+  });
+
+  new EndpointsFactory(
+-   { config, resultHandler: new ResultHandler() }
++   new ResultHandler()
+  );
+
+  new EventStreamFactory({
+-   config,
+    events: {},
+  });
+```
+
 ```ts
 // new tagging approach
 import { defaultEndpointsFactory, Documentation } from "express-zod-api";
@@ -41,11 +61,6 @@ declare module "express-zod-api" {
     subscriptions: unknown;
   }
 }
-
-// Use the declared tags for endpoints
-const exampleEndpoint = defaultEndpointsFactory.build({
-  tag: "users", // or array ["users", "files"]
-});
 
 // Add extended description of the tags to Documentation (optional)
 new Documentation({
