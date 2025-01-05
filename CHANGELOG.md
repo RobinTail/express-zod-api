@@ -14,7 +14,7 @@
 - The approach on tagging endpoints changed:
   - The `tags` property moved from the argument of `createConfig()` to `Documentation::constructor()`;
   - The overload of `EndpointsFactory::constructor()` accepting `config` property is removed;
-  - The `config` property of the `EventStreamFactory::constructor()` argument is removed;
+  - The argument of `EventStreamFactory::constructor()` is now the events map (formerly assigned to `events` property);
   - Tags should be declared as the keys of the augmented interface `TagOverrides` instead;
 - Consider the automated migration using the built-in ESLint rule.
 
@@ -43,10 +43,10 @@ export default [
 +   new ResultHandler()
   );
 
-  new EventStreamFactory({
--   config,
-    events: {},
-  });
+  new EventStreamFactory(
+-   { config, events: {} }
++   {} // events map only
+  );
 ```
 
 ```ts

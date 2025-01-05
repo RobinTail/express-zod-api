@@ -1206,7 +1206,7 @@ import { EventStreamFactory } from "express-zod-api";
 import { setTimeout } from "node:timers/promises";
 
 const subscriptionEndpoint = EventStreamFactory({
-  events: { time: z.number().int().positive() },
+  time: z.number().int().positive(),
 }).buildVoid({
   input: z.object({}), // optional input schema
   handler: async ({ options: { emit, isClosed } }) => {
