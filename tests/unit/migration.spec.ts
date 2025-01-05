@@ -22,6 +22,10 @@ describe("Migration", () => {
       `client.provide("get /v1/test", {id: 10});`,
       `new Integration({ routing });`,
       `import { Request } from "./client.ts";`,
+      `createConfig({ cors: true });`,
+      `new Documentation();`,
+      `new EndpointsFactory(new ResultHandler());`,
+      `new EventStreamFactory({});`,
     ],
     invalid: [
       {
@@ -55,6 +59,51 @@ describe("Migration", () => {
           {
             messageId: "change",
             data: { subject: "type", from: "MethodPath", to: "Request" },
+          },
+        ],
+      },
+      {
+        code: `createConfig({ tags: { users: "" } });`,
+        output:
+          `createConfig({  });\n` +
+          `// Declaring tag constraints\n` +
+          `declare module "express-zod-api" {\n` +
+          `  interface TagOverrides {\n` +
+          `    "users": unknown,\n` +
+          `  }\n` +
+          `}`,
+        errors: [
+          { messageId: "remove", data: { subject: "property", name: "tags" } },
+        ],
+      },
+      {
+        code: `new Documentation({ config });`,
+        output: `new Documentation({ tags: { /* move from createConfig() argument if any */ }, config });`,
+        errors: [
+          { messageId: "add", data: { subject: "tags", to: "Documentation" } },
+        ],
+      },
+      {
+        code: `new EndpointsFactory({config, resultHandler: new ResultHandler() });`,
+        output: `new EndpointsFactory(new ResultHandler());`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "argument",
+              from: "object",
+              to: "ResultHandler instance",
+            },
+          },
+        ],
+      },
+      {
+        code: `new EventStreamFactory({ config, events: { some } });`,
+        output: `new EventStreamFactory({ some });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "argument", from: "object", to: "events map" },
           },
         ],
       },

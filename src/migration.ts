@@ -5,6 +5,7 @@ import {
   type TSESTree,
 } from "@typescript-eslint/utils";
 import { Method, methods } from "./method";
+import { name as self } from "../package.json";
 
 interface Queries {
   provide: TSESTree.CallExpression & {
@@ -16,6 +17,13 @@ interface Queries {
   };
   splitResponse: TSESTree.Property & { key: TSESTree.Identifier };
   methodPath: TSESTree.ImportSpecifier & { imported: TSESTree.Identifier };
+  createConfig: TSESTree.Property & {
+    key: TSESTree.Identifier;
+    value: TSESTree.ObjectExpression;
+  };
+  newDocs: TSESTree.ObjectExpression;
+  newFactory: TSESTree.Property & { key: TSESTree.Identifier };
+  newSSE: TSESTree.Property & { key: TSESTree.Identifier };
 }
 
 type Listener = keyof Queries;
@@ -28,6 +36,18 @@ const queries: Record<Listener, string> = {
     `${NT.NewExpression}[callee.name='Integration'] > ` +
     `${NT.ObjectExpression} > ${NT.Property}[key.name='splitResponse']`,
   methodPath: `${NT.ImportDeclaration} > ${NT.ImportSpecifier}[imported.name='MethodPath']`,
+  createConfig:
+    `${NT.CallExpression}[callee.name='createConfig'] > ${NT.ObjectExpression} > ` +
+    `${NT.Property}[key.name='tags'][value.type='ObjectExpression']`,
+  newDocs:
+    `${NT.NewExpression}[callee.name='Documentation'] > ` +
+    `${NT.ObjectExpression}[properties.length>0]:not(:has(>Property[key.name='tags']))`,
+  newFactory:
+    `${NT.NewExpression}[callee.name='EndpointsFactory'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='resultHandler']`,
+  newSSE:
+    `${NT.NewExpression}[callee.name='EventStreamFactory'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='events']`,
 };
 
 const listen = <
@@ -49,6 +69,7 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
     fixable: "code",
     schema: [],
     messages: {
+      add: `Add {{subject}} to {{to}}`,
       change: "Change {{subject}} {{from}} to {{to}}.",
       remove: "Remove {{subject}} {{name}}.",
     },
@@ -89,6 +110,57 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
           fix: (fixer) => fixer.replaceText(node.imported, replacement),
         });
       },
+      createConfig: (node) => {
+        const props = node.value.properties
+          .filter(
+            (prop): prop is TSESTree.Property & { key: TSESTree.Identifier } =>
+              "key" in prop && "name" in prop.key,
+          )
+          .map((prop) => `    "${prop.key.name}": unknown,\n`);
+        ctx.report({
+          messageId: "remove",
+          node,
+          data: { subject: "property", name: node.key.name },
+          fix: (fixer) => [
+            fixer.remove(node),
+            fixer.insertTextAfter(
+              ctx.sourceCode.ast,
+              `\n// Declaring tag constraints\ndeclare module "${self}" {\n  interface TagOverrides {\n${props}  }\n}`,
+            ),
+          ],
+        });
+      },
+      newDocs: (node) =>
+        ctx.report({
+          messageId: "add",
+          node,
+          data: { subject: "tags", to: "Documentation" },
+          fix: (fixer) =>
+            fixer.insertTextBefore(
+              node.properties[0],
+              "tags: { /* move from createConfig() argument if any */ }, ",
+            ),
+        }),
+      newFactory: (node) =>
+        ctx.report({
+          messageId: "change",
+          node: node.parent,
+          data: {
+            subject: "argument",
+            from: "object",
+            to: "ResultHandler instance",
+          },
+          fix: (fixer) =>
+            fixer.replaceText(node.parent, ctx.sourceCode.getText(node.value)),
+        }),
+      newSSE: (node) =>
+        ctx.report({
+          messageId: "change",
+          node: node.parent,
+          data: { subject: "argument", from: "object", to: "events map" },
+          fix: (fixer) =>
+            fixer.replaceText(node.parent, ctx.sourceCode.getText(node.value)),
+        }),
     }),
 });
 

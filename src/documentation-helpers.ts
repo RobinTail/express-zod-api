@@ -49,8 +49,9 @@ import {
   makeCleanId,
   tryToTransform,
   ucFirst,
+  Tag,
 } from "./common-helpers";
-import { InputSource, TagsConfig } from "./config-type";
+import { InputSource } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
@@ -964,19 +965,19 @@ export const depictBody = ({
   return { description, content: { [mimeType]: media } };
 };
 
-export const depictTags = <TAG extends string>(
-  tags: TagsConfig<TAG>,
-): TagObject[] =>
-  (Object.keys(tags) as TAG[]).map((tag) => {
-    const def = tags[tag];
-    const result: TagObject = {
+export const depictTags = (
+  tags: Partial<Record<Tag, string | { description: string; url?: string }>>,
+) =>
+  Object.entries(tags).reduce<TagObject[]>((agg, [tag, def]) => {
+    if (!def) return agg;
+    const entry: TagObject = {
       name: tag,
       description: typeof def === "string" ? def : def.description,
     };
     if (typeof def === "object" && def.url)
-      result.externalDocs = { url: def.url };
-    return result;
-  });
+      entry.externalDocs = { url: def.url };
+    return agg.concat(entry);
+  }, []);
 
 export const ensureShortDescription = (description: string) =>
   description.length <= shortDescriptionLimit

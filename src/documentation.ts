@@ -66,6 +66,12 @@ interface DocumentationParams {
    * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => ({ type: "object" })
    */
   brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
+  /**
+   * @desc Extended description of tags used in endpoints. For enforcing constraints:
+   * @see TagOverrides
+   * @example { users: "About users", files: { description: "About files", url: "https://example.com" } }
+   * */
+  tags?: Parameters<typeof depictTags>[0];
 }
 
 export class Documentation extends OpenApiBuilder {
@@ -135,6 +141,7 @@ export class Documentation extends OpenApiBuilder {
     serverUrl,
     descriptions,
     brandHandling,
+    tags,
     hasSummaryFromDescription = true,
     composition = "inline",
   }: DocumentationParams) {
@@ -247,6 +254,6 @@ export class Documentation extends OpenApiBuilder {
       });
     };
     walkRouting({ routing, onEndpoint });
-    this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
+    if (tags) this.rootDoc.tags = depictTags(tags);
   }
 }
