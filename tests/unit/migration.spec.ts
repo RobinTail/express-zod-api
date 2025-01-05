@@ -22,7 +22,7 @@ describe("Migration", () => {
       `client.provide("get /v1/test", {id: 10});`,
       `new Integration({ routing });`,
       `import { Request } from "./client.ts";`,
-      `createConfig({ cors: true })`,
+      `createConfig({ cors: true });`,
     ],
     invalid: [
       {
@@ -60,8 +60,15 @@ describe("Migration", () => {
         ],
       },
       {
-        code: `createConfig({ tags: { users: "" } })`,
-        output: `createConfig({  })`,
+        code: `createConfig({ tags: { users: "" } });`,
+        output:
+          `createConfig({  });\n` +
+          `// Declaring tag constraints\n` +
+          `declare module "express-zod-api" {\n` +
+          `  interface TagOverrides {\n` +
+          `    "users": unknown,\n` +
+          `  }\n` +
+          `}`,
         errors: [
           { messageId: "remove", data: { subject: "property", name: "tags" } },
         ],
