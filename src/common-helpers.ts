@@ -12,14 +12,17 @@ export type EmptyObject = Record<string, never>;
 export type EmptySchema = z.ZodObject<EmptyObject, "strip">;
 export type FlatObject = Record<string, unknown>;
 
+/** @link https://stackoverflow.com/a/65492934 */
+type NoNever<T, F> = [T] extends [never] ? F : T;
+
 /**
  * @desc Using module augmentation approach you can specify tags as the keys of this interface
  * @example declare module "express-zod-api" { interface TagOverrides { users: unknown } }
  * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  * */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation
-export interface TagOverrides extends FlatObject {}
-export type Tag = Extract<keyof TagOverrides, string>;
+export interface TagOverrides {}
+export type Tag = NoNever<keyof TagOverrides, string>;
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
