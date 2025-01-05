@@ -14,6 +14,7 @@
 - The approach on tagging endpoints changed:
   - The `tags` property moved from the argument of `createConfig()` to `Documentation::constructor()`;
   - The overload of `EndpointsFactory::constructor()` accepting `config` property is removed;
+  - The `config` property of the `EventStreamFactory::constructor()` argument is removed;
   - Tags should be declared as the keys of the augmented interface `TagOverrides` instead;
 - Consider the automated migration using the built-in ESLint rule.
 

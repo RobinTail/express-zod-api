@@ -25,6 +25,7 @@ describe("Migration", () => {
       `createConfig({ cors: true });`,
       `new Documentation();`,
       `new EndpointsFactory(new ResultHandler());`,
+      `new EventStreamFactory({ events: {} });`,
     ],
     invalid: [
       {
@@ -93,6 +94,16 @@ describe("Migration", () => {
               from: "object",
               to: "ResultHandler instance",
             },
+          },
+        ],
+      },
+      {
+        code: `new EventStreamFactory({ config });`,
+        output: `new EventStreamFactory({  });`,
+        errors: [
+          {
+            messageId: "remove",
+            data: { subject: "property", name: "config" },
           },
         ],
       },

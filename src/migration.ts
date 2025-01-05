@@ -23,6 +23,7 @@ interface Queries {
   };
   newDocs: TSESTree.ObjectExpression;
   newFactory: TSESTree.Property & { key: TSESTree.Identifier };
+  newSSE: TSESTree.Property & { key: TSESTree.Identifier };
 }
 
 type Listener = keyof Queries;
@@ -44,6 +45,9 @@ const queries: Record<Listener, string> = {
   newFactory:
     `${NT.NewExpression}[callee.name='EndpointsFactory'] > ` +
     `${NT.ObjectExpression} > ${NT.Property}[key.name='resultHandler']`,
+  newSSE:
+    `${NT.NewExpression}[callee.name='EventStreamFactory'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='config']`,
 };
 
 const listen = <
@@ -145,6 +149,13 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
           },
           fix: (fixer) =>
             fixer.replaceText(node.parent, ctx.sourceCode.getText(node.value)),
+        }),
+      newSSE: (node) =>
+        ctx.report({
+          messageId: "remove",
+          node,
+          data: { subject: "property", name: node.key.name },
+          fix: (fixer) => fixer.remove(node),
         }),
     }),
 });
