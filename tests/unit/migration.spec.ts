@@ -23,6 +23,7 @@ describe("Migration", () => {
       `new Integration({ routing });`,
       `import { Request } from "./client.ts";`,
       `createConfig({ cors: true });`,
+      `new Documentation();`,
     ],
     invalid: [
       {
@@ -71,6 +72,13 @@ describe("Migration", () => {
           `}`,
         errors: [
           { messageId: "remove", data: { subject: "property", name: "tags" } },
+        ],
+      },
+      {
+        code: `new Documentation({ config });`,
+        output: `new Documentation({ tags: {}, config });`,
+        errors: [
+          { messageId: "add", data: { subject: "tags", to: "Documentation" } },
         ],
       },
     ],

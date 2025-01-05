@@ -21,6 +21,7 @@ interface Queries {
     key: TSESTree.Identifier;
     value: TSESTree.ObjectExpression;
   };
+  newDocs: TSESTree.ObjectExpression;
 }
 
 type Listener = keyof Queries;
@@ -34,6 +35,9 @@ const queries: Record<Listener, string> = {
   createConfig:
     `${NT.CallExpression}[callee.name='createConfig'] > ${NT.ObjectExpression} > ` +
     `${NT.Property}[key.name='tags'][value.type='ObjectExpression']`,
+  newDocs:
+    `${NT.NewExpression}[callee.name='Documentation'] > ` +
+    `${NT.ObjectExpression}[properties.length>0]:not(:has(>Property[key.name='tags']))`,
 };
 
 const listen = <
@@ -55,6 +59,7 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
     fixable: "code",
     schema: [],
     messages: {
+      add: `Add {{subject}} to {{to}}`,
       change: "Change {{subject}} {{from}} to {{to}}.",
       remove: "Remove {{subject}} {{name}}.",
     },
@@ -115,6 +120,14 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
           ],
         });
       },
+      newDocs: (node) =>
+        ctx.report({
+          messageId: "add",
+          node,
+          data: { subject: "tags", to: "Documentation" },
+          fix: (fixer) =>
+            fixer.insertTextBefore(node.properties[0], "tags: {}, "),
+        }),
     }),
 });
 
