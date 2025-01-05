@@ -12,6 +12,14 @@ export type EmptyObject = Record<string, never>;
 export type EmptySchema = z.ZodObject<EmptyObject, "strip">;
 export type FlatObject = Record<string, unknown>;
 
+/**
+ * @desc Using module augmentation approach you can specify tags as the keys of this interface
+ * @example declare module "express-zod-api" { interface TagOverrides { users: unknown } }
+ * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
+ * */
+export interface TagOverrides {} // eslint-disable-line @typescript-eslint/no-empty-object-type -- for augmentation
+export type Tag = keyof TagOverrides;
+
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
   const isUpload = contentType.toLowerCase().startsWith(contentTypes.upload);

@@ -36,9 +36,12 @@ export { ez } from "./proprietary-schemas";
 export type { Depicter } from "./documentation-helpers";
 export type { Producer } from "./zts-helpers";
 
+// Interfaces exposed for augmentation
+export type { LoggerOverrides } from "./logger-helpers";
+export type { TagOverrides } from "./common-helpers";
+
 // Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
 export type { Routing } from "./routing";
-export type { LoggerOverrides } from "./logger-helpers";
 export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
 export type { IOSchema } from "./io-schema";

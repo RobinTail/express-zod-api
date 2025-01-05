@@ -11,7 +11,7 @@ import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import { defaultInputSources, makeCleanId } from "./common-helpers";
+import { defaultInputSources, makeCleanId, Tag } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
@@ -66,8 +66,8 @@ interface DocumentationParams {
    * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => ({ type: "object" })
    */
   brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
-  // @todo replace keys with tag type here
-  tags?: Record<string, string | { description: string; url?: string }>;
+  /** @desc Extended description of tags used in endpoints */
+  tags?: Record<Tag, string | { description: string; url?: string }>;
 }
 
 export class Documentation extends OpenApiBuilder {
