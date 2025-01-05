@@ -47,7 +47,7 @@ const queries: Record<Listener, string> = {
     `${NT.ObjectExpression} > ${NT.Property}[key.name='resultHandler']`,
   newSSE:
     `${NT.NewExpression}[callee.name='EventStreamFactory'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='config']`,
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='events']`,
 };
 
 const listen = <
@@ -155,10 +155,11 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
         }),
       newSSE: (node) =>
         ctx.report({
-          messageId: "remove",
-          node,
-          data: { subject: "property", name: node.key.name },
-          fix: (fixer) => fixer.remove(node),
+          messageId: "change",
+          node: node.parent,
+          data: { subject: "argument", from: "object", to: "events map" },
+          fix: (fixer) =>
+            fixer.replaceText(node.parent, ctx.sourceCode.getText(node.value)),
         }),
     }),
 });

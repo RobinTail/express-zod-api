@@ -25,7 +25,7 @@ describe("Migration", () => {
       `createConfig({ cors: true });`,
       `new Documentation();`,
       `new EndpointsFactory(new ResultHandler());`,
-      `new EventStreamFactory({ events: {} });`,
+      `new EventStreamFactory({});`,
     ],
     invalid: [
       {
@@ -98,12 +98,12 @@ describe("Migration", () => {
         ],
       },
       {
-        code: `new EventStreamFactory({ config });`,
-        output: `new EventStreamFactory({  });`,
+        code: `new EventStreamFactory({ config, events: { some } });`,
+        output: `new EventStreamFactory({ some });`,
         errors: [
           {
-            messageId: "remove",
-            data: { subject: "property", name: "config" },
+            messageId: "change",
+            data: { subject: "argument", from: "object", to: "events map" },
           },
         ],
       },

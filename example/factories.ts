@@ -99,5 +99,5 @@ export const noContentFactory = new EndpointsFactory(
 );
 
 export const eventsFactory = new EventStreamFactory({
-  events: { time: z.number().int().positive() },
+  time: z.number().int().positive(),
 });

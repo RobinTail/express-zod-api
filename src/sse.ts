@@ -99,7 +99,7 @@ export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   EmptySchema,
   Emitter<E>
 > {
-  constructor({ events }: { events: E }) {
+  constructor(events: E) {
     super(makeResultHandler(events));
     this.middlewares = [makeMiddleware(events)];
   }
