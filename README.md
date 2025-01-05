@@ -1322,36 +1322,33 @@ _See the example of the generated documentation
 
 ## Tagging the endpoints
 
-When generating documentation, you may find it necessary to classify endpoints into groups. For this, the
-possibility of tagging endpoints is provided. In order to achieve the consistency of tags across all endpoints, the
-possible tags should be declared in the configuration first and another instantiation approach of the
-`EndpointsFactory` is required. Consider the following example:
+When generating documentation, you may find it necessary to classify endpoints into groups. The possibility of tagging
+endpoints is available for that purpose. In order to establish the constraints on tags across all the endpoints, they
+should be declared as keys of `TagOverrides` interface. Consider the following example:
 
 ```typescript
-import {
-  createConfig,
-  EndpointsFactory,
-  defaultResultHandler,
-} from "express-zod-api";
+import { defaultEndpointsFactory, Documentation } from "express-zod-api";
 
-const config = createConfig({
-  tags: {
-    users: "Everything about the users", // or advanced syntax:
-    files: {
-      description: "Everything about the files processing",
-      url: "https://example.com",
-    },
-  },
-});
+// Add similar declaration once, somewhere in your code, preferably near config
+declare module "express-zod-api" {
+  interface TagOverrides {
+    users: unknown;
+    files: unknown;
+    subscriptions: unknown;
+  }
+}
 
-// instead of defaultEndpointsFactory use the following approach:
-const taggedEndpointsFactory = new EndpointsFactory({
-  resultHandler: defaultResultHandler, // or use your custom one
-  config, // <—— supply your config here
-});
-
-const exampleEndpoint = taggedEndpointsFactory.build({
+// Use the declared tags for endpoints
+const exampleEndpoint = defaultEndpointsFactory.build({
   tag: "users", // or array ["users", "files"]
+});
+
+// Add extended description of the tags to Documentation (optional)
+new Documentation({
+  tags: {
+    users: "All about users",
+    files: { description: "All about files", url: "https://example.com" },
+  },
 });
 ```
 
