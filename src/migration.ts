@@ -24,7 +24,9 @@ const queries: Record<Listener, string> = {
   provide:
     `${NT.CallExpression}[callee.property.name='provide'][arguments.length=3]` +
     `:has(${NT.Literal}[value=/^${methods.join("|")}$/] + ${NT.Literal} + ${NT.ObjectExpression})`,
-  splitResponse: `${NT.NewExpression}[callee.name='Integration'] > ${NT.ObjectExpression} > ${NT.Property}[key.name='splitResponse']`,
+  splitResponse:
+    `${NT.NewExpression}[callee.name='Integration'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='splitResponse']`,
   methodPath: `${NT.ImportDeclaration} > ${NT.ImportSpecifier}[imported.name='MethodPath']`,
 };
 
