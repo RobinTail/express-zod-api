@@ -1,7 +1,7 @@
-import { chain, keys } from "ramda";
+import { chain } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { defaultStatusCodes, ResponseVariant } from "./api-response";
+import { ResponseVariant, responseVariants } from "./api-response";
 import {
   emptyTail,
   exportModifier,
@@ -27,7 +27,6 @@ import {
   parametricIndexNode,
   propOf,
   protectedReadonlyModifier,
-  quoteProp,
   recordStringAny,
   restToken,
   makeAnd,
@@ -43,7 +42,12 @@ import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import { ZTSContext, printNode, addJsDocComment } from "./zts-helpers";
+import {
+  ZTSContext,
+  printNode,
+  addJsDocComment,
+  makePropertyIdentifier,
+} from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -57,6 +61,11 @@ interface IntegrationParams {
    * @default "client"
    * */
   variant?: "types" | "client";
+  /**
+   * @desc The API URL to use in the generated code
+   * @default https://example.com
+   * */
+  serverUrl?: string;
   /**
    * @todo remove in v22
    * @deprecated
@@ -103,12 +112,11 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration {
-  protected responseVariants = keys(defaultStatusCodes); // eslint-disable-line no-restricted-syntax -- need literal
   protected someOf = makeSomeOfHelper();
   protected program: ts.Node[] = [this.someOf];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
-    ReturnType<typeof quoteProp>, // method+path
+    string, // request (method+path)
     Record<IOKind, ts.TypeNode> & {
       isJson: boolean;
       tags: ReadonlyArray<string>;
@@ -119,6 +127,8 @@ export class Integration {
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
+    requestType: f.createIdentifier("Request"),
+    /** @todo remove in v22 */
     methodPathType: f.createIdentifier("MethodPath"),
     inputInterface: f.createIdentifier("Input"),
     posResponseInterface: f.createIdentifier("PositiveResponse"),
@@ -183,6 +193,7 @@ export class Integration {
     routing,
     brandHandling,
     variant = "client",
+    serverUrl = "https://example.com",
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
   }: IntegrationParams) {
@@ -191,18 +202,21 @@ export class Integration {
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint = (endpoint, path, method) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+      const request = `${method} ${path}`;
       const input = makeType(
         entitle("input"),
         zodToTs(endpoint.getSchema("input"), ctxIn),
+        { comment: request },
       );
       this.program.push(input);
-      const dictionaries = this.responseVariants.reduce(
+      const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
           const props = chain(([idx, { schema, mimeTypes, statusCodes }]) => {
             const variantType = makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
               zodToTs(mimeTypes ? schema : noContent, ctxOut),
+              { comment: request },
             );
             this.program.push(variantType);
             return statusCodes.map((code) =>
@@ -215,6 +229,7 @@ export class Integration {
           const dict = makeInterface(
             entitle(responseVariant, "response", "variants"),
             props,
+            { comment: request },
           );
           this.program.push(dict);
           return Object.assign(agg, { [responseVariant]: dict });
@@ -225,19 +240,21 @@ export class Integration {
       const isJson = endpoint
         .getResponses("positive")
         .some(({ mimeTypes }) => mimeTypes?.includes(contentTypes.json));
-      const methodPath = quoteProp(method, path);
-      this.registry.set(methodPath, {
+      const literalIdx = f.createLiteralTypeNode(
+        f.createStringLiteral(request),
+      );
+      this.registry.set(request, {
         input: f.createTypeReferenceNode(input.name),
         positive: this.makeSomeOf(dictionaries.positive),
         negative: this.makeSomeOf(dictionaries.negative),
         response: f.createUnionTypeNode([
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.posResponseInterface),
-            f.createTypeReferenceNode(methodPath),
+            literalIdx,
           ),
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.negResponseInterface),
-            f.createTypeReferenceNode(methodPath),
+            literalIdx,
           ),
         ]),
         encoded: f.createIntersectionTypeNode([
@@ -278,21 +295,22 @@ export class Integration {
     // Single walk through the registry for making properties for the next three objects
     const jsonEndpoints: ts.PropertyAssignment[] = [];
     const endpointTags: ts.PropertyAssignment[] = [];
-    for (const [propName, { isJson, tags, ...rest }] of this.registry) {
+    for (const [request, { isJson, tags, ...rest }] of this.registry) {
       // "get /v1/user/retrieve": GetV1UserRetrieveInput
       for (const face of this.interfaces)
-        face.props.push(makeInterfaceProp(propName, rest[face.kind]));
+        face.props.push(makeInterfaceProp(request, rest[face.kind]));
       if (variant !== "types") {
+        const literalIdx = makePropertyIdentifier(request);
         if (isJson) {
           // "get /v1/user/retrieve": true
           jsonEndpoints.push(
-            f.createPropertyAssignment(propName, f.createTrue()),
+            f.createPropertyAssignment(literalIdx, f.createTrue()),
           );
         }
         // "get /v1/user/retrieve": ["users"]
         endpointTags.push(
           f.createPropertyAssignment(
-            propName,
+            literalIdx,
             f.createArrayLiteralExpression(
               tags.map((tag) => f.createStringLiteral(tag)),
             ),
@@ -305,11 +323,19 @@ export class Integration {
     for (const { id, props } of this.interfaces)
       this.program.push(makeInterface(id, props, { isPublic: true }));
 
-    // export type MethodPath = keyof Input;
+    // export type Request = keyof Input;
     this.program.push(
-      makeType(this.ids.methodPathType, makeKeyOf(this.ids.inputInterface), {
+      makeType(this.ids.requestType, makeKeyOf(this.ids.inputInterface), {
         isPublic: true,
       }),
+    );
+    // export type MethodPath = Request;
+    this.program.push(
+      makeType(
+        this.ids.methodPathType,
+        f.createTypeReferenceNode(this.ids.requestType),
+        { isPublic: true, comment: "@deprecated use Request instead" },
+      ),
     );
 
     if (variant === "types") return;
@@ -454,9 +480,7 @@ export class Integration {
         ),
       }),
       undefined, // overload
-      makeTypeParams({
-        K: this.ids.methodPathType,
-      }),
+      makeTypeParams({ K: this.ids.requestType }),
       makePromise(
         f.createIndexedAccessTypeNode(
           f.createTypeReferenceNode(this.ids.responseInterface),
@@ -608,23 +632,23 @@ export class Integration {
       ),
     );
 
-    // const response = await fetch(`https://example.com${path}${searchParams}`, { ___ });
+    // const response = await fetch(new URL(`${path}${searchParams}`, "https://example.com"), { ___ });
     const responseStatement = f.createVariableStatement(
       undefined,
       makeConst(
         this.ids.responseConst,
         f.createAwaitExpression(
           f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
-            f.createTemplateExpression(
-              f.createTemplateHead("https://example.com"),
-              [
+            f.createNewExpression(f.createIdentifier(URL.name), undefined, [
+              f.createTemplateExpression(f.createTemplateHead(""), [
                 f.createTemplateSpan(
                   this.ids.pathParameter,
                   f.createTemplateMiddle(""),
                 ),
                 f.createTemplateSpan(this.ids.searchParamsConst, emptyTail),
-              ],
-            ),
+              ]),
+              f.createStringLiteral(serverUrl),
+            ]),
             f.createObjectLiteralExpression([
               methodProperty,
               headersProperty,

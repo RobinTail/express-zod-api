@@ -5,11 +5,13 @@ type Type1 = {
 
 type SomeOf<T> = T[keyof T];
 
+/** get /v1/user/retrieve */
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
 };
 
+/** get /v1/user/retrieve */
 type GetV1UserRetrievePositiveVariant1 = {
   status: "success";
   data: {
@@ -22,10 +24,12 @@ type GetV1UserRetrievePositiveVariant1 = {
   };
 };
 
+/** get /v1/user/retrieve */
 interface GetV1UserRetrievePositiveResponseVariants {
   200: GetV1UserRetrievePositiveVariant1;
 }
 
+/** get /v1/user/retrieve */
 type GetV1UserRetrieveNegativeVariant1 = {
   status: "error";
   error: {
@@ -33,27 +37,34 @@ type GetV1UserRetrieveNegativeVariant1 = {
   };
 };
 
+/** get /v1/user/retrieve */
 interface GetV1UserRetrieveNegativeResponseVariants {
   400: GetV1UserRetrieveNegativeVariant1;
 }
 
+/** delete /v1/user/:id/remove */
 type DeleteV1UserIdRemoveInput = {
   /** numeric string */
   id: string;
 };
 
+/** delete /v1/user/:id/remove */
 type DeleteV1UserIdRemovePositiveVariant1 = undefined;
 
+/** delete /v1/user/:id/remove */
 interface DeleteV1UserIdRemovePositiveResponseVariants {
   204: DeleteV1UserIdRemovePositiveVariant1;
 }
 
+/** delete /v1/user/:id/remove */
 type DeleteV1UserIdRemoveNegativeVariant1 = undefined;
 
+/** delete /v1/user/:id/remove */
 interface DeleteV1UserIdRemoveNegativeResponseVariants {
   404: DeleteV1UserIdRemoveNegativeVariant1;
 }
 
+/** patch /v1/user/:id */
 type PatchV1UserIdInput = {
   key: string;
   id: string;
@@ -61,6 +72,7 @@ type PatchV1UserIdInput = {
   birthday: string;
 };
 
+/** patch /v1/user/:id */
 type PatchV1UserIdPositiveVariant1 = {
   status: "success";
   data: {
@@ -69,10 +81,12 @@ type PatchV1UserIdPositiveVariant1 = {
   };
 };
 
+/** patch /v1/user/:id */
 interface PatchV1UserIdPositiveResponseVariants {
   200: PatchV1UserIdPositiveVariant1;
 }
 
+/** patch /v1/user/:id */
 type PatchV1UserIdNegativeVariant1 = {
   status: "error";
   error: {
@@ -80,14 +94,17 @@ type PatchV1UserIdNegativeVariant1 = {
   };
 };
 
+/** patch /v1/user/:id */
 interface PatchV1UserIdNegativeResponseVariants {
   400: PatchV1UserIdNegativeVariant1;
 }
 
+/** post /v1/user/create */
 type PostV1UserCreateInput = {
   name: string;
 };
 
+/** post /v1/user/create */
 type PostV1UserCreatePositiveVariant1 = {
   status: "created";
   data: {
@@ -95,79 +112,100 @@ type PostV1UserCreatePositiveVariant1 = {
   };
 };
 
+/** post /v1/user/create */
 interface PostV1UserCreatePositiveResponseVariants {
   201: PostV1UserCreatePositiveVariant1;
   202: PostV1UserCreatePositiveVariant1;
 }
 
+/** post /v1/user/create */
 type PostV1UserCreateNegativeVariant1 = {
   status: "exists";
   id: number;
 };
 
+/** post /v1/user/create */
 type PostV1UserCreateNegativeVariant2 = {
   status: "error";
   reason: string;
 };
 
+/** post /v1/user/create */
 interface PostV1UserCreateNegativeResponseVariants {
   409: PostV1UserCreateNegativeVariant1;
   400: PostV1UserCreateNegativeVariant2;
   500: PostV1UserCreateNegativeVariant2;
 }
 
+/** get /v1/user/list */
 type GetV1UserListInput = {};
 
+/** get /v1/user/list */
 type GetV1UserListPositiveVariant1 = {
   name: string;
 }[];
 
+/** get /v1/user/list */
 interface GetV1UserListPositiveResponseVariants {
   200: GetV1UserListPositiveVariant1;
 }
 
+/** get /v1/user/list */
 type GetV1UserListNegativeVariant1 = string;
 
+/** get /v1/user/list */
 interface GetV1UserListNegativeResponseVariants {
   400: GetV1UserListNegativeVariant1;
 }
 
+/** get /v1/avatar/send */
 type GetV1AvatarSendInput = {
   userId: string;
 };
 
+/** get /v1/avatar/send */
 type GetV1AvatarSendPositiveVariant1 = string;
 
+/** get /v1/avatar/send */
 interface GetV1AvatarSendPositiveResponseVariants {
   200: GetV1AvatarSendPositiveVariant1;
 }
 
+/** get /v1/avatar/send */
 type GetV1AvatarSendNegativeVariant1 = string;
 
+/** get /v1/avatar/send */
 interface GetV1AvatarSendNegativeResponseVariants {
   400: GetV1AvatarSendNegativeVariant1;
 }
 
+/** get /v1/avatar/stream */
 type GetV1AvatarStreamInput = {
   userId: string;
 };
 
+/** get /v1/avatar/stream */
 type GetV1AvatarStreamPositiveVariant1 = Buffer;
 
+/** get /v1/avatar/stream */
 interface GetV1AvatarStreamPositiveResponseVariants {
   200: GetV1AvatarStreamPositiveVariant1;
 }
 
+/** get /v1/avatar/stream */
 type GetV1AvatarStreamNegativeVariant1 = string;
 
+/** get /v1/avatar/stream */
 interface GetV1AvatarStreamNegativeResponseVariants {
   400: GetV1AvatarStreamNegativeVariant1;
 }
 
+/** post /v1/avatar/upload */
 type PostV1AvatarUploadInput = {
   avatar: any;
 };
 
+/** post /v1/avatar/upload */
 type PostV1AvatarUploadPositiveVariant1 = {
   status: "success";
   data: {
@@ -179,10 +217,12 @@ type PostV1AvatarUploadPositiveVariant1 = {
   };
 };
 
+/** post /v1/avatar/upload */
 interface PostV1AvatarUploadPositiveResponseVariants {
   200: PostV1AvatarUploadPositiveVariant1;
 }
 
+/** post /v1/avatar/upload */
 type PostV1AvatarUploadNegativeVariant1 = {
   status: "error";
   error: {
@@ -190,12 +230,15 @@ type PostV1AvatarUploadNegativeVariant1 = {
   };
 };
 
+/** post /v1/avatar/upload */
 interface PostV1AvatarUploadNegativeResponseVariants {
   400: PostV1AvatarUploadNegativeVariant1;
 }
 
+/** post /v1/avatar/raw */
 type PostV1AvatarRawInput = Buffer;
 
+/** post /v1/avatar/raw */
 type PostV1AvatarRawPositiveVariant1 = {
   status: "success";
   data: {
@@ -203,10 +246,12 @@ type PostV1AvatarRawPositiveVariant1 = {
   };
 };
 
+/** post /v1/avatar/raw */
 interface PostV1AvatarRawPositiveResponseVariants {
   200: PostV1AvatarRawPositiveVariant1;
 }
 
+/** post /v1/avatar/raw */
 type PostV1AvatarRawNegativeVariant1 = {
   status: "error";
   error: {
@@ -214,14 +259,17 @@ type PostV1AvatarRawNegativeVariant1 = {
   };
 };
 
+/** post /v1/avatar/raw */
 interface PostV1AvatarRawNegativeResponseVariants {
   400: PostV1AvatarRawNegativeVariant1;
 }
 
+/** get /v1/events/time */
 type GetV1EventsTimeInput = {
   trigger?: string | undefined;
 };
 
+/** get /v1/events/time */
 type GetV1EventsTimePositiveVariant1 = {
   data: number;
   event: "time";
@@ -229,12 +277,15 @@ type GetV1EventsTimePositiveVariant1 = {
   retry?: number | undefined;
 };
 
+/** get /v1/events/time */
 interface GetV1EventsTimePositiveResponseVariants {
   200: GetV1EventsTimePositiveVariant1;
 }
 
+/** get /v1/events/time */
 type GetV1EventsTimeNegativeVariant1 = string;
 
+/** get /v1/events/time */
 interface GetV1EventsTimeNegativeResponseVariants {
   400: GetV1EventsTimeNegativeVariant1;
 }
@@ -348,7 +399,10 @@ export interface Response {
     | NegativeResponse["get /v1/events/time"];
 }
 
-export type MethodPath = keyof Input;
+export type Request = keyof Input;
+
+/** @deprecated use Request instead */
+export type MethodPath = Request;
 
 /** @deprecated use content-type header of an actual response */
 export const jsonEndpoints = {
@@ -391,7 +445,7 @@ export class ExpressZodAPIClient {
   ): Promise<
     `${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown
   >;
-  public provide<K extends MethodPath>(
+  public provide<K extends Request>(
     request: K,
     params: Input[K],
   ): Promise<Response[K]>;
@@ -433,11 +487,14 @@ export const exampleImplementation: Implementation = async (
 ) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-  const response = await fetch(`https://example.com${path}${searchParams}`, {
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
+  const response = await fetch(
+    new URL(`${path}${searchParams}`, "https://example.com"),
+    {
+      method: method.toUpperCase(),
+      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+      body: hasBody ? JSON.stringify(params) : undefined,
+    },
+  );
   const contentType = response.headers.get("content-type");
   if (!contentType) return;
   const isJSON = contentType.startsWith("application/json");
