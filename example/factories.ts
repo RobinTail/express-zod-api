@@ -53,7 +53,7 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
 });
 
 /**
- * @desc This endpoint demonstrates the ability to respond with array.
+ * @desc This factory demonstrates the ability to respond with array.
  * @deprecated Avoid doing this in new projects. This feature is only for easier migration of legacy APIs.
  * @alias arrayEndpointsFactory
  */
