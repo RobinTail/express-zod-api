@@ -66,7 +66,10 @@ interface DocumentationParams {
    * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => ({ type: "object" })
    */
   brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
-  /** @desc Extended description of tags used in endpoints */
+  /**
+   * @desc Extended description of tags used in endpoints. For enforcing constraints:
+   * @see TagOverrides
+   * */
   tags?: Record<Tag, string | { description: string; url?: string }>;
 }
 
