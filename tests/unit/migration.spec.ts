@@ -24,6 +24,7 @@ describe("Migration", () => {
       `import { Request } from "./client.ts";`,
       `createConfig({ cors: true });`,
       `new Documentation();`,
+      `new EndpointsFactory(new ResultHandler());`,
     ],
     invalid: [
       {
@@ -79,6 +80,20 @@ describe("Migration", () => {
         output: `new Documentation({ tags: {}, config });`,
         errors: [
           { messageId: "add", data: { subject: "tags", to: "Documentation" } },
+        ],
+      },
+      {
+        code: `new EndpointsFactory({config, resultHandler: new ResultHandler() });`,
+        output: `new EndpointsFactory(new ResultHandler());`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "argument",
+              from: "object",
+              to: "ResultHandler instance",
+            },
+          },
         ],
       },
     ],
