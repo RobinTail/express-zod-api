@@ -66,6 +66,8 @@ interface DocumentationParams {
    * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => ({ type: "object" })
    */
   brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
+  // @todo replace keys with tag type here
+  tags?: Record<string, string | { description: string; url?: string }>;
 }
 
 export class Documentation extends OpenApiBuilder {
@@ -135,6 +137,7 @@ export class Documentation extends OpenApiBuilder {
     serverUrl,
     descriptions,
     brandHandling,
+    tags,
     hasSummaryFromDescription = true,
     composition = "inline",
   }: DocumentationParams) {
@@ -247,6 +250,6 @@ export class Documentation extends OpenApiBuilder {
       });
     };
     walkRouting({ routing, onEndpoint });
-    this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
+    this.rootDoc.tags = tags ? depictTags(tags) : [];
   }
 }

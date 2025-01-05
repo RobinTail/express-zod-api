@@ -50,7 +50,7 @@ import {
   tryToTransform,
   ucFirst,
 } from "./common-helpers";
-import { InputSource, TagsConfig } from "./config-type";
+import { InputSource } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
@@ -964,10 +964,10 @@ export const depictBody = ({
   return { description, content: { [mimeType]: media } };
 };
 
-export const depictTags = <TAG extends string>(
-  tags: TagsConfig<TAG>,
+export const depictTags = (
+  tags: Record<string, string | { description: string; url?: string }>,
 ): TagObject[] =>
-  (Object.keys(tags) as TAG[]).map((tag) => {
+  Object.keys(tags).map((tag) => {
     const def = tags[tag];
     const result: TagObject = {
       name: tag,
