@@ -78,7 +78,7 @@ describe("Migration", () => {
       },
       {
         code: `new Documentation({ config });`,
-        output: `new Documentation({ tags: {}, config });`,
+        output: `new Documentation({ tags: { /* move from createConfig() argument if any */ }, config });`,
         errors: [
           { messageId: "add", data: { subject: "tags", to: "Documentation" } },
         ],

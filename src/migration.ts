@@ -136,7 +136,10 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
           node,
           data: { subject: "tags", to: "Documentation" },
           fix: (fixer) =>
-            fixer.insertTextBefore(node.properties[0], "tags: {}, "),
+            fixer.insertTextBefore(
+              node.properties[0],
+              "tags: { /* move from createConfig() argument if any */ }, ",
+            ),
         }),
       newFactory: (node) =>
         ctx.report({
