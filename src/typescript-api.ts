@@ -1,5 +1,4 @@
 import ts from "typescript";
-import { addJsDocComment, makePropertyIdentifier } from "./zts-helpers";
 
 export const f = ts.factory;
 
@@ -13,6 +12,37 @@ export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ProtectedKeyword),
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
+
+export const addJsDocComment = <T extends ts.Node>(node: T, text: string) =>
+  ts.addSyntheticLeadingComment(
+    node,
+    ts.SyntaxKind.MultiLineCommentTrivia,
+    `* ${text} `,
+    true,
+  );
+
+export const printNode = (
+  node: ts.Node,
+  printerOptions?: ts.PrinterOptions,
+) => {
+  const sourceFile = ts.createSourceFile(
+    "print.ts",
+    "",
+    ts.ScriptTarget.Latest,
+    false,
+    ts.ScriptKind.TS,
+  );
+  const printer = ts.createPrinter(printerOptions);
+  return printer.printNode(ts.EmitHint.Unspecified, node, sourceFile);
+};
+
+const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+export const makePropertyIdentifier = (name: string | number) =>
+  typeof name === "number"
+    ? f.createNumericLiteral(name)
+    : safePropRegex.test(name)
+      ? f.createIdentifier(name)
+      : f.createStringLiteral(name);
 
 export const makeTemplate = (
   head: string,
@@ -65,11 +95,15 @@ export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],
 ) => f.createConstructorDeclaration(undefined, params, f.createBlock([]));
 
-export const makeInterfaceProp = (name: string | number, value: ts.TypeNode) =>
+export const makeInterfaceProp = (
+  name: string | number,
+  value: ts.TypeNode,
+  { isOptional }: { isOptional?: boolean } = {},
+) =>
   f.createPropertySignature(
     undefined,
     makePropertyIdentifier(name),
-    undefined,
+    isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     value,
   );
 
@@ -300,3 +334,19 @@ export const makeAnd = (left: ts.Expression, right: ts.Expression) =>
 
 export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
   f.createNewExpression(cls, undefined, args);
+
+const primitives: ts.KeywordTypeSyntaxKind[] = [
+  ts.SyntaxKind.AnyKeyword,
+  ts.SyntaxKind.BigIntKeyword,
+  ts.SyntaxKind.BooleanKeyword,
+  ts.SyntaxKind.NeverKeyword,
+  ts.SyntaxKind.NumberKeyword,
+  ts.SyntaxKind.ObjectKeyword,
+  ts.SyntaxKind.StringKeyword,
+  ts.SyntaxKind.SymbolKeyword,
+  ts.SyntaxKind.UndefinedKeyword,
+  ts.SyntaxKind.UnknownKeyword,
+  ts.SyntaxKind.VoidKeyword,
+];
+export const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
+  (primitives as ts.SyntaxKind[]).includes(node.kind);

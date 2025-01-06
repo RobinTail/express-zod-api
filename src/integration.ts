@@ -29,7 +29,9 @@ import {
   makeNew,
   makeKeyOf,
   makeSomeOfHelper,
-} from "./integration-helpers";
+  makePropertyIdentifier,
+  printNode,
+} from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
 import { contentTypes } from "./content-type";
@@ -38,7 +40,7 @@ import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import { ZTSContext, printNode, makePropertyIdentifier } from "./zts-helpers";
+import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
