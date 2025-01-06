@@ -8,8 +8,12 @@ import { ezFileBrand, FileSchema } from "./file-schema";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
-import { addJsDocComment, makePropertyIdentifier } from "./typescript-api";
-import { isPrimitive, LiteralType, Producer, ZTSContext } from "./zts-helpers";
+import {
+  addJsDocComment,
+  isPrimitive,
+  makePropertyIdentifier,
+} from "./typescript-api";
+import { LiteralType, Producer, ZTSContext } from "./zts-helpers";
 
 const { factory: f } = ts;
 
