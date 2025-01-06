@@ -1,5 +1,4 @@
 import ts from "typescript";
-import { addJsDocComment, makePropertyIdentifier } from "./zts-helpers";
 
 export const f = ts.factory;
 
@@ -13,6 +12,37 @@ export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ProtectedKeyword),
   f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
 ];
+
+export const addJsDocComment = <T extends ts.Node>(node: T, text: string) =>
+  ts.addSyntheticLeadingComment(
+    node,
+    ts.SyntaxKind.MultiLineCommentTrivia,
+    `* ${text} `,
+    true,
+  );
+
+export const printNode = (
+  node: ts.Node,
+  printerOptions?: ts.PrinterOptions,
+) => {
+  const sourceFile = ts.createSourceFile(
+    "print.ts",
+    "",
+    ts.ScriptTarget.Latest,
+    false,
+    ts.ScriptKind.TS,
+  );
+  const printer = ts.createPrinter(printerOptions);
+  return printer.printNode(ts.EmitHint.Unspecified, node, sourceFile);
+};
+
+const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+export const makePropertyIdentifier = (name: string | number) =>
+  typeof name === "number"
+    ? f.createNumericLiteral(name)
+    : safePropRegex.test(name)
+      ? f.createIdentifier(name)
+      : f.createStringLiteral(name);
 
 export const makeTemplate = (
   head: string,
