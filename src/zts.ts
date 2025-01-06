@@ -11,7 +11,7 @@ import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   addJsDocComment,
   isPrimitive,
-  makePropertyIdentifier,
+  makeInterfaceProp,
 } from "./typescript-api";
 import { LiteralType, Producer, ZTSContext } from "./zts-helpers";
 
@@ -51,14 +51,9 @@ const onObject: Producer = (
       isResponse && hasCoercion(value)
         ? value instanceof z.ZodOptional
         : value.isOptional();
-    const propertySignature = f.createPropertySignature(
-      undefined,
-      makePropertyIdentifier(key),
-      isOptional && hasQuestionMark
-        ? f.createToken(ts.SyntaxKind.QuestionToken)
-        : undefined,
-      next(value),
-    );
+    const propertySignature = makeInterfaceProp(key, next(value), {
+      isOptional: isOptional && hasQuestionMark,
+    });
     return value.description
       ? addJsDocComment(propertySignature, value.description)
       : propertySignature;

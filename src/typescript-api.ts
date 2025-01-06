@@ -95,11 +95,15 @@ export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],
 ) => f.createConstructorDeclaration(undefined, params, f.createBlock([]));
 
-export const makeInterfaceProp = (name: string | number, value: ts.TypeNode) =>
+export const makeInterfaceProp = (
+  name: string | number,
+  value: ts.TypeNode,
+  { isOptional }: { isOptional?: boolean } = {},
+) =>
   f.createPropertySignature(
     undefined,
     makePropertyIdentifier(name),
-    undefined,
+    isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     value,
   );
 
