@@ -17,10 +17,9 @@ import {
   makePublicClass,
   makeInterface,
   makePublicLiteralType,
-  makePublicMethod,
+  makeMethod,
   makeType,
   makeTernary,
-  makeTypeParams,
   propOf,
   protectedReadonlyModifier,
   recordStringAny,
@@ -377,7 +376,7 @@ export class Integration {
     );
 
     // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {
-    const providerMethod = makePublicMethod(
+    const providerMethod = makeMethod(
       this.ids.provideMethod,
       makeParams({
         [this.ids.requestParameter.text]: f.createTypeReferenceNode("K"),
@@ -411,13 +410,16 @@ export class Integration {
           ]),
         ),
       ]),
-      makeTypeParams({ K: this.ids.requestType }),
-      makePromise(
-        f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.responseInterface),
-          f.createTypeReferenceNode("K"),
+      {
+        expose: true,
+        typeParams: { K: this.ids.requestType },
+        returns: makePromise(
+          f.createIndexedAccessTypeNode(
+            f.createTypeReferenceNode(this.ids.responseInterface),
+            f.createTypeReferenceNode("K"),
+          ),
         ),
-      ),
+      },
     );
 
     // export class ExpressZodAPIClient { ___ }
