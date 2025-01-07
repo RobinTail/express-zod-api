@@ -1,15 +1,15 @@
 import { Response } from "express";
 import { z } from "zod";
-import { EmptySchema, FlatObject } from "./common-helpers";
-import { contentTypes } from "./content-type";
-import { EndpointsFactory } from "./endpoints-factory";
-import { Middleware } from "./middleware";
-import { ResultHandler } from "./result-handler";
+import { EmptySchema, FlatObject } from "./common-helpers.ts";
+import { contentTypes } from "./content-type.ts";
+import { EndpointsFactory } from "./endpoints-factory.ts";
+import { Middleware } from "./middleware.ts";
+import { ResultHandler } from "./result-handler.ts";
 import {
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
-} from "./result-helpers";
+} from "./result-helpers.ts";
 
 type EventsMap = Record<string, z.ZodTypeAny>;
 

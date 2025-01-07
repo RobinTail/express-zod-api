@@ -1,7 +1,7 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { statusDependingFactory } from "../factories";
+import { statusDependingFactory } from "../factories.ts";
 
 /** @desc depending on the thrown error, the custom result handler of the factory responds slightly differently */
 export const createUserEndpoint = statusDependingFactory.build({

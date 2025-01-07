@@ -1,15 +1,15 @@
 import type fileUpload from "express-fileupload";
-import { metaSymbol } from "./metadata";
-import { loadPeer } from "./peer-helpers";
-import { AbstractResultHandler } from "./result-handler";
-import { ActualLogger } from "./logger-helpers";
-import { CommonConfig, ServerConfig } from "./config-type";
+import { metaSymbol } from "./metadata.ts";
+import { loadPeer } from "./peer-helpers.ts";
+import { AbstractResultHandler } from "./result-handler.ts";
+import { ActualLogger } from "./logger-helpers.ts";
+import { CommonConfig, ServerConfig } from "./config-type.ts";
 import { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError, { isHttpError } from "http-errors";
-import { lastResortHandler } from "./last-resort";
-import { ResultHandlerError } from "./errors";
-import { ensureError } from "./common-helpers";
-import { monitor } from "./graceful-shutdown";
+import { lastResortHandler } from "./last-resort.ts";
+import { ResultHandlerError } from "./errors.ts";
+import { ensureError } from "./common-helpers.ts";
+import { monitor } from "./graceful-shutdown.ts";
 
 type EquippedRequest = Request<
   unknown,

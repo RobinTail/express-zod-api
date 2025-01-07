@@ -4,18 +4,18 @@ import {
   ApiResponse,
   defaultStatusCodes,
   NormalizedResponse,
-} from "./api-response";
-import { FlatObject, getExamples, isObject } from "./common-helpers";
-import { contentTypes } from "./content-type";
-import { IOSchema } from "./io-schema";
-import { ActualLogger } from "./logger-helpers";
+} from "./api-response.ts";
+import { FlatObject, getExamples, isObject } from "./common-helpers.ts";
+import { contentTypes } from "./content-type.ts";
+import { IOSchema } from "./io-schema.ts";
+import { ActualLogger } from "./logger-helpers.ts";
 import {
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
   normalize,
   ResultSchema,
-} from "./result-helpers";
+} from "./result-helpers.ts";
 
 type Handler<RES = unknown> = (params: {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */

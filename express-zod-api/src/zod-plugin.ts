@@ -9,9 +9,9 @@
  * */
 import * as R from "ramda";
 import { z } from "zod";
-import { FlatObject } from "./common-helpers";
-import { cloneSchema, Metadata, metaSymbol } from "./metadata";
-import { Intact, Remap } from "./mapping-helpers";
+import { FlatObject } from "./common-helpers.ts";
+import { cloneSchema, Metadata, metaSymbol } from "./metadata.ts";
+import { Intact, Remap } from "./mapping-helpers.ts";
 
 declare module "zod" {
   interface ZodTypeDef {

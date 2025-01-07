@@ -1,29 +1,29 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { NormalizedResponse, ResponseVariant } from "./api-response";
-import { hasRaw, hasUpload } from "./deep-checks";
+import { NormalizedResponse, ResponseVariant } from "./api-response.ts";
+import { hasRaw, hasUpload } from "./deep-checks.ts";
 import {
   FlatObject,
   getActualMethod,
   getInput,
   ensureError,
-} from "./common-helpers";
-import { CommonConfig } from "./config-type";
+} from "./common-helpers.ts";
+import { CommonConfig } from "./config-type.ts";
 import {
   InputValidationError,
   OutputValidationError,
   ResultHandlerError,
-} from "./errors";
-import { IOSchema } from "./io-schema";
-import { lastResortHandler } from "./last-resort";
-import { ActualLogger } from "./logger-helpers";
-import { LogicalContainer } from "./logical-container";
-import { AuxMethod, Method } from "./method";
-import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
-import { ContentType } from "./content-type";
-import { Routable } from "./routable";
-import { AbstractResultHandler } from "./result-handler";
-import { Security } from "./security";
+} from "./errors.ts";
+import { IOSchema } from "./io-schema.ts";
+import { lastResortHandler } from "./last-resort.ts";
+import { ActualLogger } from "./logger-helpers.ts";
+import { LogicalContainer } from "./logical-container.ts";
+import { AuxMethod, Method } from "./method.ts";
+import { AbstractMiddleware, ExpressMiddleware } from "./middleware.ts";
+import { ContentType } from "./content-type.ts";
+import { Routable } from "./routable.ts";
+import { AbstractResultHandler } from "./result-handler.ts";
+import { Security } from "./security.ts";
 
 export type Handler<IN, OUT, OPT> = (params: {
   input: IN;

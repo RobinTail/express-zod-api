@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { EmptySchema, FlatObject } from "./common-helpers";
-import { InputValidationError } from "./errors";
-import { IOSchema } from "./io-schema";
-import { LogicalContainer } from "./logical-container";
-import { Security } from "./security";
-import { ActualLogger } from "./logger-helpers";
+import { EmptySchema, FlatObject } from "./common-helpers.ts";
+import { InputValidationError } from "./errors.ts";
+import { IOSchema } from "./io-schema.ts";
+import { LogicalContainer } from "./logical-container.ts";
+import { Security } from "./security.ts";
+import { ActualLogger } from "./logger-helpers.ts";
 
 type Handler<IN, OPT, OUT> = (params: {
   input: IN;

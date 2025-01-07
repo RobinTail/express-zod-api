@@ -1,9 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "module": "ES2022",
-    "moduleResolution": "Bundler",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   },
   "include": [
     "src",

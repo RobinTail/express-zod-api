@@ -1,15 +1,15 @@
 import { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import { z } from "zod";
-import { NormalizedResponse, ResponseVariant } from "./api-response";
+import { NormalizedResponse, ResponseVariant } from "./api-response.ts";
 import {
   FlatObject,
   getMessageFromError,
   isProduction,
-} from "./common-helpers";
-import { InputValidationError, ResultHandlerError } from "./errors";
-import { ActualLogger } from "./logger-helpers";
-import type { LazyResult, Result } from "./result-handler";
+} from "./common-helpers.ts";
+import { InputValidationError, ResultHandlerError } from "./errors.ts";
+import { ActualLogger } from "./logger-helpers.ts";
+import type { LazyResult, Result } from "./result-handler.ts";
 
 export type ResultSchema<R extends Result> =
   R extends Result<infer S> ? S : never;

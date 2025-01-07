@@ -1,15 +1,19 @@
 import { fail } from "node:assert/strict"; // eslint-disable-line no-restricted-syntax -- acceptable
 import { z } from "zod";
-import { EmptyObject } from "./common-helpers";
-import { ezDateInBrand } from "./date-in-schema";
-import { ezDateOutBrand } from "./date-out-schema";
-import { ezFileBrand } from "./file-schema";
-import { IOSchema } from "./io-schema";
-import { metaSymbol } from "./metadata";
-import { ProprietaryBrand } from "./proprietary-schemas";
-import { ezRawBrand } from "./raw-schema";
-import { HandlingRules, NextHandlerInc, SchemaHandler } from "./schema-walker";
-import { ezUploadBrand } from "./upload-schema";
+import { EmptyObject } from "./common-helpers.ts";
+import { ezDateInBrand } from "./date-in-schema.ts";
+import { ezDateOutBrand } from "./date-out-schema.ts";
+import { ezFileBrand } from "./file-schema.ts";
+import { IOSchema } from "./io-schema.ts";
+import { metaSymbol } from "./metadata.ts";
+import { ProprietaryBrand } from "./proprietary-schemas.ts";
+import { ezRawBrand } from "./raw-schema.ts";
+import {
+  HandlingRules,
+  NextHandlerInc,
+  SchemaHandler,
+} from "./schema-walker.ts";
+import { ezUploadBrand } from "./upload-schema.ts";
 
 /** @desc Check is a schema handling rule returning boolean */
 type Check = SchemaHandler<boolean>;

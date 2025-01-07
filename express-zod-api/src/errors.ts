@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { getMessageFromError } from "./common-helpers";
-import { OpenAPIContext } from "./documentation-helpers";
+import { getMessageFromError } from "./common-helpers.ts";
+import { OpenAPIContext } from "./documentation-helpers.ts";
 
 /** @desc An error related to the wrong Routing declaration */
 export class RoutingError extends Error {

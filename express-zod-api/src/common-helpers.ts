@@ -1,11 +1,11 @@
 import { Request } from "express";
 import * as R from "ramda";
 import { z } from "zod";
-import { CommonConfig, InputSource, InputSources } from "./config-type";
-import { contentTypes } from "./content-type";
-import { OutputValidationError } from "./errors";
-import { metaSymbol } from "./metadata";
-import { AuxMethod, Method } from "./method";
+import { CommonConfig, InputSource, InputSources } from "./config-type.ts";
+import { contentTypes } from "./content-type.ts";
+import { OutputValidationError } from "./errors.ts";
+import { metaSymbol } from "./metadata.ts";
+import { AuxMethod, Method } from "./method.ts";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = Record<string, never>;
