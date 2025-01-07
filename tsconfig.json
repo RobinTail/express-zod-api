@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "module": "NodeNext",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
   },
