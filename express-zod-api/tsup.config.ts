@@ -1,8 +1,8 @@
 import { defineConfig, Options } from "tsup";
-import { version, engines, name } from "./package.json";
+import manifest from "./package.json" with { type: "json" };
 import semver from "semver";
 
-const minNode = semver.minVersion(engines.node)!;
+const minNode = semver.minVersion(manifest.engines.node)!;
 
 const commons: Options = {
   format: ["cjs", "esm"],
@@ -18,7 +18,7 @@ const commons: Options = {
 export default defineConfig([
   {
     ...commons,
-    name,
+    name: manifest.name,
     entry: ["src/index.ts"],
     esbuildOptions: (options, { format }) => {
       options.supported = options.supported || {};
@@ -31,14 +31,14 @@ export default defineConfig([
         options.supported["dynamic-import"] = false;
       }
       options.define = {
-        "process.env.TSUP_BUILD": `"v${version} (${format.toUpperCase()})"`,
+        "process.env.TSUP_BUILD": `"v${manifest.version} (${format.toUpperCase()})"`,
         "process.env.TSUP_STATIC": `"static"`, // used by isProduction()
       };
     },
   },
   {
     ...commons,
-    name: "./migration".padStart(name.length),
+    name: "./migration".padStart(manifest.name.length),
     entry: { index: "src/migration.ts" },
     outDir: "migration",
     /**
