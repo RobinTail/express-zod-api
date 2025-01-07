@@ -422,11 +422,14 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
+  public parseRequest(request: string) {
+    return request.split(/ (.+)/, 2) as [Method, Path];
+  }
   public provide<K extends Request>(
     request: K,
     params: Input[K],
   ): Promise<Response[K]> {
-    const [method, path] = request.split(/ (.+)/, 2) as [Method, Path];
+    const [method, path] = this.parseRequest(request);
     return this.implementation(
       method,
       Object.keys(params).reduce(
@@ -450,7 +453,7 @@ export class ExpressZodAPIClient {
     K extends Extract<Request, `get ${string}`>,
     R extends Extract<PositiveResponse[K], { event: string }>,
   >(request: K, params: Input[K]) {
-    const path = request.split(/ (.+)/, 2)[1] as Path;
+    const path = this.parseRequest(request)[1];
     const source = new EventSource(
       new URL(`${path}?${new URLSearchParams(params)}`, "https://example.com"),
     );

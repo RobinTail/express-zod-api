@@ -136,6 +136,7 @@ export class Integration {
     handlerParameter: f.createIdentifier("handler"),
     msgParameter: f.createIdentifier("msg"),
     accumulator: f.createIdentifier("acc"),
+    parseRequestMethod: f.createIdentifier("parseRequest"),
     provideMethod: f.createIdentifier("provide"),
     subscribeMethod: f.createIdentifier("subscribe"),
     onMethod: f.createIdentifier("on"),
@@ -382,6 +383,32 @@ export class Integration {
       f.createObjectLiteralExpression(),
     );
 
+    // public parseRequest(request: string) { return request.split(/ (.+)/, 2) as [Method, Path] }
+    // @todo make private
+    const parseRequestMethod = makePublicMethod(
+      this.ids.parseRequestMethod,
+      makeParams({
+        [this.ids.requestParameter.text]: f.createKeywordTypeNode(
+          ts.SyntaxKind.StringKeyword,
+        ),
+      }),
+      f.createBlock([
+        f.createReturnStatement(
+          // request.split(/ (.+)/, 2) as [Method, Path];
+          f.createAsExpression(
+            makePropCall(this.ids.requestParameter, propOf<string>("split"), [
+              f.createRegularExpressionLiteral("/ (.+)/"), // split once
+              f.createNumericLiteral(2), // excludes third empty element
+            ]),
+            f.createTupleTypeNode([
+              ensureTypeNode(this.ids.methodType),
+              ensureTypeNode(this.ids.pathType),
+            ]),
+          ),
+        ),
+      ]),
+    );
+
     // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {
     const providerMethod = makePublicMethod(
       this.ids.provideMethod,
@@ -394,19 +421,11 @@ export class Integration {
       }),
       f.createBlock([
         makeConst(
-          // const [method, path, params] =
+          // const [method, path] = this.parseRequest(request);
           makeDeconstruction(this.ids.methodParameter, this.ids.pathParameter),
-          // request.split(/ (.+)/, 2) as [Method, Path];
-          f.createAsExpression(
-            makePropCall(this.ids.requestParameter, propOf<string>("split"), [
-              f.createRegularExpressionLiteral("/ (.+)/"), // split once
-              f.createNumericLiteral(2), // excludes third empty element
-            ]),
-            f.createTupleTypeNode([
-              ensureTypeNode(this.ids.methodType),
-              ensureTypeNode(this.ids.pathType),
-            ]),
-          ),
+          makePropCall(f.createThis(), this.ids.parseRequestMethod, [
+            this.ids.requestParameter,
+          ]),
         ),
         // return this.implementation(___)
         f.createReturnStatement(
@@ -438,15 +457,11 @@ export class Integration {
       f.createBlock([
         makeConst(
           this.ids.pathParameter,
-          f.createAsExpression(
-            f.createElementAccessExpression(
-              makePropCall(this.ids.requestParameter, propOf<string>("split"), [
-                f.createRegularExpressionLiteral("/ (.+)/"), // split once
-                f.createNumericLiteral(2), // excludes third empty element
-              ]),
-              f.createNumericLiteral(1),
-            ),
-            ensureTypeNode(this.ids.pathType),
+          f.createElementAccessExpression(
+            makePropCall(f.createThis(), this.ids.parseRequestMethod, [
+              this.ids.requestParameter,
+            ]),
+            f.createNumericLiteral(1),
           ),
         ),
         makeConst(
@@ -586,7 +601,7 @@ export class Integration {
           protectedReadonlyModifier,
         ),
       ]),
-      [providerMethod, subscribeMethod],
+      [parseRequestMethod, providerMethod, subscribeMethod],
     );
 
     this.program.push(endpointTagsConst, implementationType, clientClass);
