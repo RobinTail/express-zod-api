@@ -285,12 +285,12 @@ export class Integration {
 
     // export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
     for (const { id, props } of this.interfaces)
-      this.program.push(makeInterface(id, props, { isPublic: true }));
+      this.program.push(makeInterface(id, props, { expose: true }));
 
     // export type Request = keyof Input;
     this.program.push(
       makeType(this.ids.requestType, makeKeyOf(this.ids.inputInterface), {
-        isPublic: true,
+        expose: true,
       }),
     );
 
@@ -319,7 +319,7 @@ export class Integration {
         }),
         makePromise("any"),
       ),
-      { isPublic: true },
+      { expose: true },
     );
 
     // `:${key}`
