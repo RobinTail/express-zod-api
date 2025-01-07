@@ -140,24 +140,24 @@ export const makePublicLiteralType = (
         f.createLiteralTypeNode(f.createStringLiteral(option)),
       ),
     ),
-    { isPublic: true },
+    { expose: true },
   );
 
 export const makeType = (
   name: ts.Identifier | string,
   value: ts.TypeNode,
   {
-    isPublic,
+    expose,
     comment,
     params,
   }: {
-    isPublic?: boolean;
+    expose?: boolean;
     comment?: string;
     params?: Parameters<typeof makeTypeParams>[0];
   } = {},
 ) => {
   const node = f.createTypeAliasDeclaration(
-    isPublic ? exportModifier : undefined,
+    expose ? exportModifier : undefined,
     name,
     params && makeTypeParams(params),
     value,
@@ -179,18 +179,23 @@ export const makeSomeOfHelper = () =>
 export const makePublicMethod = (
   name: ts.Identifier,
   params: ts.ParameterDeclaration[],
-  body?: ts.Block,
-  typeParams?: ts.TypeParameterDeclaration[],
-  returnType?: ts.TypeNode,
+  body: ts.Block,
+  {
+    typeParams,
+    returns,
+  }: {
+    typeParams?: Parameters<typeof makeTypeParams>[0];
+    returns?: ts.TypeNode;
+  } = {},
 ) =>
   f.createMethodDeclaration(
     publicModifier,
     undefined,
     name,
     undefined,
-    typeParams,
+    typeParams && makeTypeParams(typeParams),
     params,
-    returnType,
+    returns,
     body,
   );
 
@@ -220,10 +225,10 @@ export const makePromise = (subject: ts.TypeNode | "any") =>
 export const makeInterface = (
   name: ts.Identifier | string,
   props: ts.PropertySignature[],
-  { isPublic, comment }: { isPublic?: boolean; comment?: string } = {},
+  { expose, comment }: { expose?: boolean; comment?: string } = {},
 ) => {
   const node = f.createInterfaceDeclaration(
-    isPublic ? exportModifier : undefined,
+    expose ? exportModifier : undefined,
     name,
     undefined,
     undefined,
