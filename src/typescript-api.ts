@@ -176,22 +176,20 @@ export const makeSomeOfHelper = () =>
     { params: { T: undefined } },
   );
 
-export const makeMethod = (
+export const makePublicMethod = (
   name: ts.Identifier,
   params: ts.ParameterDeclaration[],
   body: ts.Block,
   {
     typeParams,
     returns,
-    expose,
   }: {
     typeParams?: Parameters<typeof makeTypeParams>[0];
     returns?: ts.TypeNode;
-    expose?: boolean;
   } = {},
 ) =>
   f.createMethodDeclaration(
-    expose ? publicModifier : undefined,
+    publicModifier,
     undefined,
     name,
     undefined,

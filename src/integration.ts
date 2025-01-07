@@ -17,7 +17,7 @@ import {
   makePublicClass,
   makeInterface,
   makePublicLiteralType,
-  makeMethod,
+  makePublicMethod,
   makeType,
   makeTernary,
   propOf,
@@ -376,7 +376,7 @@ export class Integration {
     );
 
     // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {
-    const providerMethod = makeMethod(
+    const providerMethod = makePublicMethod(
       this.ids.provideMethod,
       makeParams({
         [this.ids.requestParameter.text]: f.createTypeReferenceNode("K"),
@@ -411,7 +411,6 @@ export class Integration {
         ),
       ]),
       {
-        expose: true,
         typeParams: { K: this.ids.requestType },
         returns: makePromise(
           f.createIndexedAccessTypeNode(
