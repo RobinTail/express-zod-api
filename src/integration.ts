@@ -33,6 +33,7 @@ import {
   printNode,
   makeExtract,
   makeOnePropObjType,
+  ensureTypeNode,
 } from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
 import { Method, methods } from "./method";
@@ -161,7 +162,7 @@ export class Integration {
   protected makeAlias(
     schema: z.ZodTypeAny,
     produce: () => ts.TypeNode,
-  ): ts.TypeReferenceNode {
+  ): ts.TypeNode {
     let name = this.aliases.get(schema)?.name?.text;
     if (!name) {
       name = `Type${this.aliases.size + 1}`;
@@ -169,14 +170,12 @@ export class Integration {
       this.aliases.set(schema, makeType(name, temp));
       this.aliases.set(schema, makeType(name, produce()));
     }
-    return f.createTypeReferenceNode(name);
+    return ensureTypeNode(name);
   }
 
   /** @example SomeOf<_>*/
   protected makeSomeOf = ({ name }: ts.TypeAliasDeclaration) =>
-    f.createTypeReferenceNode(this.someOf.name, [
-      f.createTypeReferenceNode(name),
-    ]);
+    f.createTypeReferenceNode(this.someOf.name, [ensureTypeNode(name)]);
 
   public constructor({
     routing,
@@ -227,22 +226,22 @@ export class Integration {
         f.createStringLiteral(request),
       );
       this.registry.set(request, {
-        input: f.createTypeReferenceNode(input.name),
+        input: ensureTypeNode(input.name),
         positive: this.makeSomeOf(dictionaries.positive),
         negative: this.makeSomeOf(dictionaries.negative),
         response: f.createUnionTypeNode([
           f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.ids.posResponseInterface),
+            ensureTypeNode(this.ids.posResponseInterface),
             literalIdx,
           ),
           f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.ids.negResponseInterface),
+            ensureTypeNode(this.ids.negResponseInterface),
             literalIdx,
           ),
         ]),
         encoded: f.createIntersectionTypeNode([
-          f.createTypeReferenceNode(dictionaries.positive.name),
-          f.createTypeReferenceNode(dictionaries.negative.name),
+          ensureTypeNode(dictionaries.positive.name),
+          ensureTypeNode(dictionaries.negative.name),
         ]),
         tags: endpoint.getTags(),
       });
@@ -319,9 +318,7 @@ export class Integration {
       f.createFunctionTypeNode(
         undefined,
         makeParams({
-          [this.ids.methodParameter.text]: f.createTypeReferenceNode(
-            this.ids.methodType,
-          ),
+          [this.ids.methodParameter.text]: ensureTypeNode(this.ids.methodType),
           [this.ids.pathParameter.text]: f.createKeywordTypeNode(
             ts.SyntaxKind.StringKeyword,
           ),
@@ -389,10 +386,10 @@ export class Integration {
     const providerMethod = makePublicMethod(
       this.ids.provideMethod,
       makeParams({
-        [this.ids.requestParameter.text]: f.createTypeReferenceNode("K"),
+        [this.ids.requestParameter.text]: ensureTypeNode("K"),
         [this.ids.paramsArgument.text]: f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.inputInterface),
-          f.createTypeReferenceNode("K"),
+          ensureTypeNode(this.ids.inputInterface),
+          ensureTypeNode("K"),
         ),
       }),
       f.createBlock([
@@ -406,8 +403,8 @@ export class Integration {
               f.createNumericLiteral(2), // excludes third empty element
             ]),
             f.createTupleTypeNode([
-              f.createTypeReferenceNode(this.ids.methodType),
-              f.createTypeReferenceNode(this.ids.pathType),
+              ensureTypeNode(this.ids.methodType),
+              ensureTypeNode(this.ids.pathType),
             ]),
           ),
         ),
@@ -423,8 +420,8 @@ export class Integration {
       makeTypeParams({ K: this.ids.requestType }),
       makePromise(
         f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.responseInterface),
-          f.createTypeReferenceNode("K"),
+          ensureTypeNode(this.ids.responseInterface),
+          ensureTypeNode("K"),
         ),
       ),
     );
@@ -432,10 +429,10 @@ export class Integration {
     const subscribeMethod = makePublicMethod(
       this.ids.subscribeMethod,
       makeParams({
-        request: f.createTypeReferenceNode("K"),
+        request: ensureTypeNode("K"),
         params: f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.inputInterface),
-          f.createTypeReferenceNode("K"),
+          ensureTypeNode(this.ids.inputInterface),
+          ensureTypeNode("K"),
         ),
       }),
       f.createBlock([
@@ -449,7 +446,7 @@ export class Integration {
               ]),
               f.createNumericLiteral(1),
             ),
-            f.createTypeReferenceNode(this.ids.pathType),
+            ensureTypeNode(this.ids.pathType),
           ),
         ),
         makeConst(
@@ -480,8 +477,7 @@ export class Integration {
               this.ids.onMethod,
               makeArrowFn(
                 {
-                  [this.ids.eventParameter.text]:
-                    f.createTypeReferenceNode("E"),
+                  [this.ids.eventParameter.text]: ensureTypeNode("E"),
                   [this.ids.handlerParameter.text]: f.createFunctionTypeNode(
                     undefined,
                     makeParams({
@@ -525,9 +521,7 @@ export class Integration {
                                     f.createParenthesizedExpression(
                                       f.createAsExpression(
                                         this.ids.msgParameter,
-                                        f.createTypeReferenceNode(
-                                          f.createIdentifier(MessageEvent.name),
-                                        ),
+                                        ensureTypeNode(MessageEvent.name),
                                       ),
                                     ),
                                     propOf<SSEShape>("data"),
@@ -545,7 +539,7 @@ export class Integration {
                 {
                   typeParams: {
                     E: f.createIndexedAccessTypeNode(
-                      f.createTypeReferenceNode("R"),
+                      ensureTypeNode("R"),
                       f.createLiteralTypeNode(
                         f.createStringLiteral(propOf<SSEShape>("event")),
                       ),
@@ -570,8 +564,8 @@ export class Integration {
         ),
         R: makeExtract(
           f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.ids.posResponseInterface),
-            f.createTypeReferenceNode("K"),
+            ensureTypeNode(this.ids.posResponseInterface),
+            ensureTypeNode("K"),
           ),
           makeOnePropObjType(
             propOf<SSEShape>("event"),
@@ -588,7 +582,7 @@ export class Integration {
       makeEmptyInitializingConstructor([
         makeParam(
           this.ids.implementationArgument,
-          f.createTypeReferenceNode(this.ids.implementationType),
+          ensureTypeNode(this.ids.implementationType),
           protectedReadonlyModifier,
         ),
       ]),
@@ -756,7 +750,7 @@ export class Integration {
       ),
       {
         expose: true,
-        type: f.createTypeReferenceNode(this.ids.implementationType),
+        type: ensureTypeNode(this.ids.implementationType),
       },
     );
 

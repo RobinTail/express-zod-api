@@ -95,18 +95,23 @@ export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],
 ) => f.createConstructorDeclaration(undefined, params, f.createBlock([]));
 
+export const ensureTypeNode = (
+  subject: ts.TypeNode | ts.Identifier | string,
+): ts.TypeNode =>
+  typeof subject === "string" || ts.isIdentifier(subject)
+    ? f.createTypeReferenceNode(subject)
+    : subject;
+
 export const makeInterfaceProp = (
   name: string | number,
-  value: ts.TypeNode | ts.Identifier | string,
+  value: Parameters<typeof ensureTypeNode>[0],
   { isOptional }: { isOptional?: boolean } = {},
 ) =>
   f.createPropertySignature(
     undefined,
     makePropertyIdentifier(name),
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-    typeof value === "string" || ts.isIdentifier(value)
-      ? f.createTypeReferenceNode(value)
-      : value,
+    ensureTypeNode(value),
   );
 
 export const makeOnePropObjType = (
@@ -179,10 +184,7 @@ export const makeType = (
 export const makeSomeOfHelper = () =>
   makeType(
     "SomeOf",
-    f.createIndexedAccessTypeNode(
-      f.createTypeReferenceNode("T"),
-      makeKeyOf("T"),
-    ),
+    f.createIndexedAccessTypeNode(ensureTypeNode("T"), makeKeyOf("T")),
     { params: { T: undefined } },
   );
 
@@ -214,11 +216,8 @@ export const makePublicClass = (
     ...statements,
   ]);
 
-export const makeKeyOf = (id: ts.Identifier | string) =>
-  f.createTypeOperatorNode(
-    ts.SyntaxKind.KeyOfKeyword,
-    f.createTypeReferenceNode(id),
-  );
+export const makeKeyOf = (subj: Parameters<typeof ensureTypeNode>[0]) =>
+  f.createTypeOperatorNode(ts.SyntaxKind.KeyOfKeyword, ensureTypeNode(subj));
 
 export const makePromise = (subject: ts.TypeNode | "any") =>
   f.createTypeReferenceNode(Promise.name, [
@@ -246,11 +245,7 @@ export const makeTypeParams = (
   params: Partial<Record<string, ts.Identifier | ts.TypeNode>>,
 ) =>
   Object.entries(params).map(([name, val]) =>
-    f.createTypeParameterDeclaration(
-      [],
-      name,
-      val && ts.isIdentifier(val) ? f.createTypeReferenceNode(val) : val,
-    ),
+    f.createTypeParameterDeclaration([], name, val && ensureTypeNode(val)),
   );
 
 export const makeArrowFn = (
@@ -348,15 +343,9 @@ export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
   f.createNewExpression(cls, undefined, args);
 
 export const makeExtract = (
-  base: string | ts.Identifier | ts.TypeNode,
+  base: Parameters<typeof ensureTypeNode>[0],
   narrow: ts.TypeNode,
-) =>
-  f.createTypeReferenceNode("Extract", [
-    typeof base === "string" || ts.isIdentifier(base)
-      ? f.createTypeReferenceNode(base)
-      : base,
-    narrow,
-  ]);
+) => f.createTypeReferenceNode("Extract", [ensureTypeNode(base), narrow]);
 
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,

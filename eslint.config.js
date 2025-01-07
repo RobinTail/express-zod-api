@@ -118,6 +118,11 @@ const tsFactoryConcerns = [
       "CallExpression[callee.property.name='createTypeLiteralNode'] > ArrayExpression[elements.length=1]",
     message: "use makeOnePropObjType() helper",
   },
+  {
+    selector:
+      "CallExpression[callee.property.name='createTypeReferenceNode'][arguments.length=1]",
+    message: "use ensureTypeNode() helper",
+  },
 ];
 
 export default tsPlugin.config(
