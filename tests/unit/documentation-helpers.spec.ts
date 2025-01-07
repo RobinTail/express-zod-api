@@ -1,6 +1,6 @@
 import { ReferenceObject } from "openapi3-ts/oas31";
 import { z } from "zod";
-import { ez } from "../../src";
+import { ez } from "../../src/index.ts";
 import {
   OpenAPIContext,
   depictAny,
@@ -48,8 +48,8 @@ import {
   onEach,
   onMissing,
   reformatParamsInPath,
-} from "../../src/documentation-helpers";
-import { walkSchema } from "../../src/schema-walker";
+} from "../../src/documentation-helpers.ts";
+import { walkSchema } from "../../src/schema-walker.ts";
 
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();

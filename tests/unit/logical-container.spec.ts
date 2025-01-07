@@ -3,7 +3,7 @@ import {
   andToOr,
   combineContainers,
   mapLogicalContainer,
-} from "../../src/logical-container";
+} from "../../src/logical-container.ts";
 
 describe("LogicalContainer", () => {
   describe("mapLogicalContainer()", () => {

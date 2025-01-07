@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import migration from "../../src/migration";
+import migration from "../../src/migration.ts";
 import parser from "@typescript-eslint/parser";
 import { version } from "../../package.json";
 

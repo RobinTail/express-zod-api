@@ -3,8 +3,8 @@ import http from "node:http";
 import https from "node:https";
 import { Agent, fetch } from "undici";
 import { setTimeout } from "node:timers/promises";
-import { monitor } from "../../src/graceful-shutdown";
-import { givePort, signCert } from "../helpers";
+import { monitor } from "../../src/graceful-shutdown.ts";
+import { givePort, signCert } from "../helpers.ts";
 
 describe("monitor()", () => {
   const makeHttpServer = (handler: http.RequestListener) =>
