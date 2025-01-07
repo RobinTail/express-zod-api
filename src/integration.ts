@@ -20,7 +20,6 @@ import {
   makePublicMethod,
   makeType,
   makeTernary,
-  makeTypeParams,
   propOf,
   protectedReadonlyModifier,
   recordStringAny,
@@ -295,12 +294,12 @@ export class Integration {
 
     // export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
     for (const { id, props } of this.interfaces)
-      this.program.push(makeInterface(id, props, { isPublic: true }));
+      this.program.push(makeInterface(id, props, { expose: true }));
 
     // export type Request = keyof Input;
     this.program.push(
       makeType(this.ids.requestType, makeKeyOf(this.ids.inputInterface), {
-        isPublic: true,
+        expose: true,
       }),
     );
 
@@ -327,7 +326,7 @@ export class Integration {
         }),
         makePromise("any"),
       ),
-      { isPublic: true },
+      { expose: true },
     );
 
     // `:${key}`
@@ -436,13 +435,15 @@ export class Integration {
           ]),
         ),
       ]),
-      makeTypeParams({ K: this.ids.requestType }),
-      makePromise(
-        f.createIndexedAccessTypeNode(
-          ensureTypeNode(this.ids.responseInterface),
-          ensureTypeNode("K"),
+      {
+        typeParams: { K: this.ids.requestType },
+        returns: makePromise(
+          f.createIndexedAccessTypeNode(
+            ensureTypeNode(this.ids.responseInterface),
+            ensureTypeNode("K"),
+          ),
         ),
-      ),
+      },
     );
 
     const subscribeMethod = makePublicMethod(
@@ -567,27 +568,29 @@ export class Integration {
         ),
         f.createReturnStatement(this.ids.connectionConst),
       ]),
-      makeTypeParams({
-        K: makeExtract(
-          this.ids.requestType,
-          f.createTemplateLiteralType(f.createTemplateHead("get "), [
-            f.createTemplateLiteralTypeSpan(
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              f.createTemplateTail(""),
+      {
+        typeParams: {
+          K: makeExtract(
+            this.ids.requestType,
+            f.createTemplateLiteralType(f.createTemplateHead("get "), [
+              f.createTemplateLiteralTypeSpan(
+                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                f.createTemplateTail(""),
+              ),
+            ]),
+          ),
+          R: makeExtract(
+            f.createIndexedAccessTypeNode(
+              ensureTypeNode(this.ids.posResponseInterface),
+              ensureTypeNode("K"),
             ),
-          ]),
-        ),
-        R: makeExtract(
-          f.createIndexedAccessTypeNode(
-            ensureTypeNode(this.ids.posResponseInterface),
-            ensureTypeNode("K"),
+            makeOnePropObjType(
+              propOf<SSEShape>("event"),
+              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+            ),
           ),
-          makeOnePropObjType(
-            propOf<SSEShape>("event"),
-            f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-          ),
-        ),
-      }),
+        },
+      },
     );
 
     // export class ExpressZodAPIClient { ___ }
