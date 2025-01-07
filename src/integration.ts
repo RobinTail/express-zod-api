@@ -17,7 +17,7 @@ import {
   makePublicClass,
   makeInterface,
   makePublicLiteralType,
-  makePublicMethod,
+  makeMethod,
   makeType,
   makeTernary,
   propOf,
@@ -383,8 +383,7 @@ export class Integration {
     );
 
     // public parseRequest(request: string) { return request.split(/ (.+)/, 2) as [Method, Path] }
-    // @todo make private
-    const parseRequestMethod = makePublicMethod(
+    const parseRequestMethod = makeMethod(
       this.ids.parseRequestMethod,
       makeParams({
         [this.ids.requestParameter.text]: f.createKeywordTypeNode(
@@ -409,7 +408,7 @@ export class Integration {
     );
 
     // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {
-    const providerMethod = makePublicMethod(
+    const providerMethod = makeMethod(
       this.ids.provideMethod,
       makeParams({
         [this.ids.requestParameter.text]: ensureTypeNode("K"),
@@ -436,6 +435,7 @@ export class Integration {
         ),
       ]),
       {
+        expose: true,
         typeParams: { K: this.ids.requestType },
         returns: makePromise(
           f.createIndexedAccessTypeNode(
@@ -446,7 +446,7 @@ export class Integration {
       },
     );
 
-    const subscribeMethod = makePublicMethod(
+    const subscribeMethod = makeMethod(
       this.ids.subscribeMethod,
       makeParams({
         request: ensureTypeNode("K"),
@@ -569,6 +569,7 @@ export class Integration {
         f.createReturnStatement(this.ids.connectionConst),
       ]),
       {
+        expose: true,
         typeParams: {
           K: makeExtract(
             this.ids.requestType,

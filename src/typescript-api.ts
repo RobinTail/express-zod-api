@@ -6,7 +6,10 @@ const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
 const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
 
-const publicModifier = [f.createModifier(ts.SyntaxKind.PublicKeyword)];
+const accessModifiers = {
+  public: [f.createModifier(ts.SyntaxKind.PublicKeyword)],
+  private: [f.createModifier(ts.SyntaxKind.PrivateKeyword)],
+};
 
 export const protectedReadonlyModifier = [
   f.createModifier(ts.SyntaxKind.ProtectedKeyword),
@@ -188,20 +191,22 @@ export const makeSomeOfHelper = () =>
     { params: { T: undefined } },
   );
 
-export const makePublicMethod = (
+export const makeMethod = (
   name: ts.Identifier,
   params: ts.ParameterDeclaration[],
   body: ts.Block,
   {
     typeParams,
     returns,
+    expose,
   }: {
     typeParams?: Parameters<typeof makeTypeParams>[0];
     returns?: ts.TypeNode;
+    expose?: boolean;
   } = {},
 ) =>
   f.createMethodDeclaration(
-    publicModifier,
+    accessModifiers[expose ? "public" : "private"],
     undefined,
     name,
     undefined,

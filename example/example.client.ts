@@ -422,7 +422,7 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
-  public parseRequest(request: string) {
+  private parseRequest(request: string) {
     return request.split(/ (.+)/, 2) as [Method, Path];
   }
   public provide<K extends Request>(
