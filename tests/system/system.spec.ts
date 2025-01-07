@@ -10,8 +10,8 @@ import {
   ResultHandler,
   BuiltinLogger,
   Middleware,
-} from "../../src";
-import { givePort } from "../helpers";
+} from "../../src/index.ts";
+import { givePort } from "../helpers.ts";
 import { setTimeout } from "node:timers/promises";
 
 describe("App in production mode", async () => {

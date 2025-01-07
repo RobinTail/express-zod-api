@@ -1,7 +1,7 @@
 import { bench } from "vitest";
-import { config } from "../../example/config";
-import { routing } from "../../example/routing";
-import { Documentation } from "../../src";
+import { config } from "../../example/config.ts";
+import { routing } from "../../example/routing.ts";
+import { Documentation } from "../../src/index.ts";
 
 describe.skip("Documentation", () => {
   bench(

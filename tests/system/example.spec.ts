@@ -5,8 +5,8 @@ import { createReadStream, readFileSync } from "node:fs";
 import {
   ExpressZodAPIClient,
   Implementation,
-} from "../../example/example.client";
-import { givePort } from "../helpers";
+} from "../../example/example.client.ts";
+import { givePort } from "../helpers.ts";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 

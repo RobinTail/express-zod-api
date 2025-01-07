@@ -1,6 +1,6 @@
 import { bench } from "vitest";
-import { routing } from "../../example/routing";
-import { Integration } from "../../src";
+import { routing } from "../../example/routing.ts";
+import { Integration } from "../../src/index.ts";
 
 describe.skip("Integration", () => {
   bench(
