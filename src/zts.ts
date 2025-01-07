@@ -1,13 +1,13 @@
 import { chain, prop } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { hasCoercion, tryToTransform } from "./common-helpers";
-import { ezDateInBrand } from "./date-in-schema";
-import { ezDateOutBrand } from "./date-out-schema";
-import { ezFileBrand, FileSchema } from "./file-schema";
-import { ProprietaryBrand } from "./proprietary-schemas";
-import { ezRawBrand, RawSchema } from "./raw-schema";
-import { HandlingRules, walkSchema } from "./schema-walker";
+import { hasCoercion, tryToTransform } from "./common-helpers.ts";
+import { ezDateInBrand } from "./date-in-schema.ts";
+import { ezDateOutBrand } from "./date-out-schema.ts";
+import { ezFileBrand, FileSchema } from "./file-schema.ts";
+import { ProprietaryBrand } from "./proprietary-schemas.ts";
+import { ezRawBrand, RawSchema } from "./raw-schema.ts";
+import { HandlingRules, walkSchema } from "./schema-walker.ts";
 import {
   addJsDocComment,
   isPrimitive,
@@ -15,7 +15,7 @@ import {
   makePropertyIdentifier,
   Producer,
   ZTSContext,
-} from "./zts-helpers";
+} from "./zts-helpers.ts";
 
 const { factory: f } = ts;
 

@@ -1,8 +1,8 @@
 import type { NewPlugin } from "@vitest/pretty-format";
 import { isHttpError } from "http-errors";
 import { z } from "zod";
-import { ResultHandlerError } from "./src/errors";
-import { metaSymbol } from "./src/metadata";
+import { ResultHandlerError } from "./src/errors.ts";
+import { metaSymbol } from "./src/metadata.ts";
 
 /** Takes statusCode into account */
 const compareHttpErrors = (a: unknown, b: unknown) => {

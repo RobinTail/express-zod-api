@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isValidDate } from "./schema-helpers";
+import { isValidDate } from "./schema-helpers.ts";
 
 export const ezDateOutBrand = Symbol("DateOut");
 

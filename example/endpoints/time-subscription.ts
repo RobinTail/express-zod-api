@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { setTimeout } from "node:timers/promises";
-import { eventsFactory } from "../factories";
+import { eventsFactory } from "../factories.ts";
 
 export const subscriptionEndpoint = eventsFactory.buildVoid({
   tag: "subscriptions",

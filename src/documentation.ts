@@ -8,13 +8,13 @@ import {
 } from "openapi3-ts/oas31";
 import { pluck } from "ramda";
 import { z } from "zod";
-import { responseVariants } from "./api-response";
-import { contentTypes } from "./content-type";
-import { DocumentationError } from "./errors";
-import { defaultInputSources, makeCleanId } from "./common-helpers";
-import { CommonConfig } from "./config-type";
-import { mapLogicalContainer } from "./logical-container";
-import { Method } from "./method";
+import { responseVariants } from "./api-response.ts";
+import { contentTypes } from "./content-type.ts";
+import { DocumentationError } from "./errors.ts";
+import { defaultInputSources, makeCleanId } from "./common-helpers.ts";
+import { CommonConfig } from "./config-type.ts";
+import { mapLogicalContainer } from "./logical-container.ts";
+import { Method } from "./method.ts";
 import {
   OpenAPIContext,
   depictBody,
@@ -25,10 +25,10 @@ import {
   depictTags,
   ensureShortDescription,
   reformatParamsInPath,
-} from "./documentation-helpers";
-import { Routing } from "./routing";
-import { OnEndpoint, walkRouting } from "./routing-walker";
-import { HandlingRules } from "./schema-walker";
+} from "./documentation-helpers.ts";
+import { Routing } from "./routing.ts";
+import { OnEndpoint, walkRouting } from "./routing-walker.ts";
+import { HandlingRules } from "./schema-walker.ts";
 
 type Component =
   | "positiveResponse"

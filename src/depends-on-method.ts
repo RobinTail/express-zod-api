@@ -1,7 +1,7 @@
 import { keys, reject, equals } from "ramda";
-import { AbstractEndpoint } from "./endpoint";
-import { Method } from "./method";
-import { Nesting } from "./nesting";
+import { AbstractEndpoint } from "./endpoint.ts";
+import { Method } from "./method.ts";
+import { Nesting } from "./nesting.ts";
 
 export class DependsOnMethod extends Nesting {
   /** @desc [method, endpoint, siblingMethods] */

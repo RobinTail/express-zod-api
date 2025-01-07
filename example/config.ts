@@ -1,4 +1,4 @@
-import { createConfig } from "../src";
+import { createConfig } from "../src/index.ts";
 import ui from "swagger-ui-express";
 import yaml from "yaml";
 import { readFile } from "node:fs/promises";

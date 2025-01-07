@@ -1,7 +1,7 @@
 import ts from "typescript";
 import { z } from "zod";
-import { FlatObject } from "./common-helpers";
-import { SchemaHandler } from "./schema-walker";
+import { FlatObject } from "./common-helpers.ts";
+import { SchemaHandler } from "./schema-walker.ts";
 
 const { factory: f } = ts;
 

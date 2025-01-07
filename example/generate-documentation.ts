@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
-import { Documentation } from "../src";
-import { config } from "./config";
-import { routing } from "./routing";
+import { Documentation } from "../src/index.ts";
+import { config } from "./config.ts";
+import { routing } from "./routing.ts";
 import manifest from "../package.json";
 
 await writeFile(

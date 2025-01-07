@@ -1,7 +1,7 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { Method, Middleware } from "../src";
+import { Method, Middleware } from "../src/index.ts";
 
 export const authMiddleware = new Middleware({
   security: {

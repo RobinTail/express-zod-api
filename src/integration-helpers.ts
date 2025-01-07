@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { addJsDocComment, makePropertyIdentifier } from "./zts-helpers";
+import { addJsDocComment, makePropertyIdentifier } from "./zts-helpers.ts";
 
 export const f = ts.factory;
 

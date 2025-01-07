@@ -1,8 +1,8 @@
 import { Response } from "express";
 import createHttpError, { isHttpError } from "http-errors";
-import { ResultHandlerError } from "./errors";
-import { ActualLogger } from "./logger-helpers";
-import { getPublicErrorMessage } from "./result-helpers";
+import { ResultHandlerError } from "./errors.ts";
+import { ActualLogger } from "./logger-helpers.ts";
+import { getPublicErrorMessage } from "./result-helpers.ts";
 
 interface LastResortHandlerParams {
   error: ResultHandlerError;

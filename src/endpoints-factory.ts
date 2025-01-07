@@ -1,20 +1,20 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { EmptyObject, EmptySchema, FlatObject } from "./common-helpers";
-import { CommonConfig } from "./config-type";
-import { Endpoint, Handler } from "./endpoint";
-import { IOSchema, getFinalEndpointInputSchema } from "./io-schema";
-import { Method } from "./method";
+import { EmptyObject, EmptySchema, FlatObject } from "./common-helpers.ts";
+import { CommonConfig } from "./config-type.ts";
+import { Endpoint, Handler } from "./endpoint.ts";
+import { IOSchema, getFinalEndpointInputSchema } from "./io-schema.ts";
+import { Method } from "./method.ts";
 import {
   AbstractMiddleware,
   ExpressMiddleware,
   Middleware,
-} from "./middleware";
+} from "./middleware.ts";
 import {
   AbstractResultHandler,
   arrayResultHandler,
   defaultResultHandler,
-} from "./result-handler";
+} from "./result-handler.ts";
 
 interface BuildProps<
   IN extends IOSchema,

@@ -1,8 +1,8 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { taggedEndpointsFactory } from "../factories";
-import { methodProviderMiddleware } from "../middlewares";
+import { taggedEndpointsFactory } from "../factories.ts";
+import { methodProviderMiddleware } from "../middlewares.ts";
 
 // Demonstrating circular schemas using z.lazy()
 const baseFeature = z.object({

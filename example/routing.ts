@@ -1,14 +1,14 @@
-import { DependsOnMethod, Routing, ServeStatic } from "../src";
-import { rawAcceptingEndpoint } from "./endpoints/accept-raw";
-import { createUserEndpoint } from "./endpoints/create-user";
-import { deleteUserEndpoint } from "./endpoints/delete-user";
-import { listUsersEndpoint } from "./endpoints/list-users";
-import { subscriptionEndpoint } from "./endpoints/time-subscription";
-import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
-import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
-import { sendAvatarEndpoint } from "./endpoints/send-avatar";
-import { updateUserEndpoint } from "./endpoints/update-user";
-import { streamAvatarEndpoint } from "./endpoints/stream-avatar";
+import { DependsOnMethod, Routing, ServeStatic } from "../src/index.ts";
+import { rawAcceptingEndpoint } from "./endpoints/accept-raw.ts";
+import { createUserEndpoint } from "./endpoints/create-user.ts";
+import { deleteUserEndpoint } from "./endpoints/delete-user.ts";
+import { listUsersEndpoint } from "./endpoints/list-users.ts";
+import { subscriptionEndpoint } from "./endpoints/time-subscription.ts";
+import { uploadAvatarEndpoint } from "./endpoints/upload-avatar.ts";
+import { retrieveUserEndpoint } from "./endpoints/retrieve-user.ts";
+import { sendAvatarEndpoint } from "./endpoints/send-avatar.ts";
+import { updateUserEndpoint } from "./endpoints/update-user.ts";
+import { streamAvatarEndpoint } from "./endpoints/stream-avatar.ts";
 import { join } from "node:path";
 
 export const routing: Routing = {

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ez } from "../../src";
-import { taggedEndpointsFactory } from "../factories";
+import { ez } from "../../src/index.ts";
+import { taggedEndpointsFactory } from "../factories.ts";
 
 export const rawAcceptingEndpoint = taggedEndpointsFactory.build({
   method: "post",
