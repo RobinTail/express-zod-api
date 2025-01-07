@@ -4,7 +4,7 @@ import {
   Middleware,
   testEndpoint,
   testMiddleware,
-} from "../src";
+} from "../src/index.ts";
 import type { Mock } from "vitest";
 
 describe("Testing", () => {

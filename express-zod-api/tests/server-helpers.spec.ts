@@ -1,5 +1,5 @@
-import { fileUploadMock } from "./express-mock";
-import { metaSymbol } from "../src/metadata";
+import { fileUploadMock } from "./express-mock.ts";
+import { metaSymbol } from "../src/metadata.ts";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,
@@ -11,14 +11,18 @@ import {
   moveRaw,
   installDeprecationListener,
   installTerminationListener,
-} from "../src/server-helpers";
-import { CommonConfig, defaultResultHandler, ResultHandler } from "../src";
+} from "../src/server-helpers.ts";
+import {
+  CommonConfig,
+  defaultResultHandler,
+  ResultHandler,
+} from "../src/index.ts";
 import { Request } from "express";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
-} from "../src/testing";
+} from "../src/testing.ts";
 import createHttpError from "http-errors";
 
 describe("Server helpers", () => {

@@ -8,7 +8,7 @@ import {
   testMiddleware,
   EventStreamFactory,
   EndpointsFactory,
-} from "../src";
+} from "../src/index.ts";
 import {
   Emitter,
   ensureStream,
@@ -16,13 +16,13 @@ import {
   makeEventSchema,
   makeMiddleware,
   makeResultHandler,
-} from "../src/sse";
+} from "../src/sse.ts";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
-} from "../src/testing";
-import { AbstractEndpoint } from "../src/endpoint";
+} from "../src/testing.ts";
+import { AbstractEndpoint } from "../src/endpoint.ts";
 
 describe("SSE", () => {
   describe("makeEventSchema()", () => {

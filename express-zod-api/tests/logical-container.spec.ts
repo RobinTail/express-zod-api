@@ -1,4 +1,4 @@
-import { processContainers } from "../src/logical-container";
+import { processContainers } from "../src/logical-container.ts";
 
 describe("LogicalContainer", () => {
   describe("processContainers()", () => {

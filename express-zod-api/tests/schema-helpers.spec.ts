@@ -1,4 +1,4 @@
-import { isValidDate } from "../src/schema-helpers";
+import { isValidDate } from "../src/schema-helpers.ts";
 
 describe("Schema helpers", () => {
   describe("isValidDate()", () => {

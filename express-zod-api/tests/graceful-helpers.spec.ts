@@ -4,9 +4,9 @@ import {
   closeAsync,
   weAreClosed,
   isEncrypted,
-} from "../src/graceful-helpers";
+} from "../src/graceful-helpers.ts";
 import http from "node:http";
-import { makeRequestMock } from "../src/testing";
+import { makeRequestMock } from "../src/testing.ts";
 import { Socket } from "node:net";
 
 describe("Graceful helpers", () => {

@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { IOSchema, Middleware, ez } from "../src";
+import { IOSchema, Middleware, ez } from "../src/index.ts";
 import {
   extractObjectSchema,
   getFinalEndpointInputSchema,
-} from "../src/io-schema";
-import { metaSymbol } from "../src/metadata";
-import { AbstractMiddleware } from "../src/middleware";
+} from "../src/io-schema.ts";
+import { metaSymbol } from "../src/metadata.ts";
+import { AbstractMiddleware } from "../src/middleware.ts";
 
 describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {

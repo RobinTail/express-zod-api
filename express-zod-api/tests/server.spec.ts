@@ -1,17 +1,17 @@
-import { moveRaw } from "../src/server-helpers";
-import { givePort } from "../../tools/ports";
+import { moveRaw } from "../src/server-helpers.ts";
+import { givePort } from "../../tools/ports.ts";
 import {
   appMock,
   compressionMock,
   expressJsonMock,
   expressMock,
   expressRawMock,
-} from "./express-mock";
+} from "./express-mock.ts";
 import {
   createHttpsServerSpy,
   httpListenSpy,
   httpsListenSpy,
-} from "./http-mock";
+} from "./http-mock.ts";
 import { z } from "zod";
 import {
   AppConfig,
@@ -22,7 +22,7 @@ import {
   createServer,
   defaultResultHandler,
   ez,
-} from "../src";
+} from "../src/index.ts";
 import express from "express";
 
 describe("Server", () => {
