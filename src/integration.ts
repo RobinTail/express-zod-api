@@ -357,7 +357,7 @@ export class Integration {
       ]),
     );
 
-    // ...
+    // private substitute(path: string, params: Record<string, any>) { ___ return [path, rest] as const; }
     const substituteMethod = makeMethod(
       this.ids.substituteMethod,
       makeParams({
@@ -480,13 +480,16 @@ export class Integration {
       }),
       f.createBlock([
         makeConst(
-          this.ids.pathParameter,
-          f.createElementAccessExpression(
-            makePropCall(f.createThis(), this.ids.parseRequestMethod, [
-              this.ids.requestParameter,
-            ]),
-            f.createNumericLiteral(1),
-          ),
+          makeDeconstruction(this.ids.pathParameter, this.ids.restConst),
+          makePropCall(f.createThis(), this.ids.substituteMethod, [
+            f.createElementAccessExpression(
+              makePropCall(f.createThis(), this.ids.parseRequestMethod, [
+                this.ids.requestParameter,
+              ]),
+              f.createNumericLiteral(1),
+            ),
+            this.ids.paramsArgument,
+          ]),
         ),
         makeConst(
           this.ids.sourceConst,
@@ -500,7 +503,7 @@ export class Integration {
                 [
                   makeNew(
                     f.createIdentifier(URLSearchParams.name),
-                    this.ids.paramsArgument,
+                    this.ids.restConst,
                   ),
                 ],
               ),
