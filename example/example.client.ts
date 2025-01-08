@@ -425,29 +425,22 @@ export class ExpressZodAPIClient {
   private parseRequest(request: string) {
     return request.split(/ (.+)/, 2) as [Method, Path];
   }
+  private substitute(path: string, params: Record<string, any>) {
+    const rest = { ...params };
+    for (const key in params) {
+      path = path.replace(`:${key}`, () => {
+        delete rest[key];
+        return params[key];
+      });
+    }
+    return [path, rest] as const;
+  }
   public provide<K extends Request>(
     request: K,
     params: Input[K],
   ): Promise<Response[K]> {
     const [method, path] = this.parseRequest(request);
-    return this.implementation(
-      method,
-      Object.keys(params).reduce(
-        (acc, key) =>
-          acc.replace(`:${key}`, (params as Record<string, any>)[key]),
-        path,
-      ),
-      Object.keys(params).reduce(
-        (acc, key) =>
-          Object.assign(
-            acc,
-            !path.includes(`:${key}`) && {
-              [key]: (params as Record<string, any>)[key],
-            },
-          ),
-        {},
-      ),
-    );
+    return this.implementation(method, ...this.substitute(path, params));
   }
   public subscribe<
     K extends Extract<Request, `get ${string}`>,

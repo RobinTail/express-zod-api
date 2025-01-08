@@ -10,7 +10,6 @@ import {
   makeDeconstruction,
   makeEmptyInitializingConstructor,
   makeInterfaceProp,
-  makeObjectKeysReducer,
   makeParam,
   makeParams,
   makePropCall,
@@ -23,7 +22,6 @@ import {
   propOf,
   protectedReadonlyModifier,
   recordStringAny,
-  makeAnd,
   makeTemplate,
   makeNew,
   makeKeyOf,
@@ -136,6 +134,7 @@ export class Integration {
     msgParameter: f.createIdentifier("msg"),
     accumulator: f.createIdentifier("acc"),
     parseRequestMethod: f.createIdentifier("parseRequest"),
+    substituteMethod: f.createIdentifier("substitute"),
     provideMethod: f.createIdentifier("provide"),
     subscribeMethod: f.createIdentifier("subscribe"),
     onMethod: f.createIdentifier("on"),
@@ -145,6 +144,7 @@ export class Integration {
     undefinedValue: f.createIdentifier("undefined"),
     bodyProperty: f.createIdentifier("body"),
     responseConst: f.createIdentifier("response"),
+    restConst: f.createIdentifier("rest"),
     searchParamsConst: f.createIdentifier("searchParams"),
     exampleImplementationConst: f.createIdentifier("exampleImplementation"),
     clientConst: f.createIdentifier("client"),
@@ -332,56 +332,6 @@ export class Integration {
     // `:${key}`
     const keyParamExpression = makeTemplate(":", [this.ids.keyParameter]);
 
-    // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key]), path)
-    const pathArgument = makeObjectKeysReducer(
-      this.ids.paramsArgument,
-      makePropCall(this.ids.accumulator, propOf<string>("replace"), [
-        keyParamExpression,
-        f.createElementAccessExpression(
-          f.createAsExpression(this.ids.paramsArgument, recordStringAny),
-          this.ids.keyParameter,
-        ),
-      ]),
-      this.ids.pathParameter,
-    );
-
-    // Object.keys(params).reduce((acc, key) =>
-    //   Object.assign(acc, !path.includes(`:${key}`) && {[key]: params[key]} ), {})
-    const paramsArgument = makeObjectKeysReducer(
-      this.ids.paramsArgument,
-      makePropCall(
-        f.createIdentifier(Object.name),
-        propOf<typeof Object>("assign"),
-        [
-          this.ids.accumulator,
-          makeAnd(
-            f.createPrefixUnaryExpression(
-              ts.SyntaxKind.ExclamationToken,
-              makePropCall(this.ids.pathParameter, propOf<string>("includes"), [
-                keyParamExpression,
-              ]),
-            ),
-            f.createObjectLiteralExpression(
-              [
-                f.createPropertyAssignment(
-                  f.createComputedPropertyName(this.ids.keyParameter),
-                  f.createElementAccessExpression(
-                    f.createAsExpression(
-                      this.ids.paramsArgument,
-                      recordStringAny,
-                    ),
-                    this.ids.keyParameter,
-                  ),
-                ),
-              ],
-              false,
-            ),
-          ),
-        ],
-      ),
-      f.createObjectLiteralExpression(),
-    );
-
     // public parseRequest(request: string) { return request.split(/ (.+)/, 2) as [Method, Path] }
     const parseRequestMethod = makeMethod(
       this.ids.parseRequestMethod,
@@ -402,6 +352,75 @@ export class Integration {
               ensureTypeNode(this.ids.methodType),
               ensureTypeNode(this.ids.pathType),
             ]),
+          ),
+        ),
+      ]),
+    );
+
+    // ...
+    const substituteMethod = makeMethod(
+      this.ids.substituteMethod,
+      makeParams({
+        [this.ids.pathParameter.text]: f.createKeywordTypeNode(
+          ts.SyntaxKind.StringKeyword,
+        ),
+        [this.ids.paramsArgument.text]: recordStringAny,
+      }),
+      f.createBlock([
+        makeConst(
+          this.ids.restConst,
+          f.createObjectLiteralExpression([
+            f.createSpreadAssignment(this.ids.paramsArgument),
+          ]),
+        ),
+        f.createForInStatement(
+          f.createVariableDeclarationList(
+            [f.createVariableDeclaration(this.ids.keyParameter)],
+            ts.NodeFlags.Const,
+          ),
+          this.ids.paramsArgument,
+          f.createBlock([
+            f.createExpressionStatement(
+              f.createBinaryExpression(
+                this.ids.pathParameter,
+                f.createToken(ts.SyntaxKind.EqualsToken),
+                makePropCall(
+                  this.ids.pathParameter,
+                  propOf<string>("replace"),
+                  [
+                    keyParamExpression,
+                    makeArrowFn(
+                      [],
+                      f.createBlock([
+                        f.createExpressionStatement(
+                          f.createDeleteExpression(
+                            f.createElementAccessExpression(
+                              f.createIdentifier("rest"),
+                              this.ids.keyParameter,
+                            ),
+                          ),
+                        ),
+                        f.createReturnStatement(
+                          f.createElementAccessExpression(
+                            this.ids.paramsArgument,
+                            this.ids.keyParameter,
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ]),
+        ),
+        f.createReturnStatement(
+          f.createAsExpression(
+            f.createArrayLiteralExpression(
+              [this.ids.pathParameter, this.ids.restConst],
+              false,
+            ),
+            ensureTypeNode(f.createIdentifier("const")),
           ),
         ),
       ]),
@@ -429,8 +448,12 @@ export class Integration {
         f.createReturnStatement(
           makePropCall(f.createThis(), this.ids.implementationArgument, [
             this.ids.methodParameter,
-            pathArgument,
-            paramsArgument,
+            f.createSpreadElement(
+              makePropCall(f.createThis(), this.ids.substituteMethod, [
+                this.ids.pathParameter,
+                this.ids.paramsArgument,
+              ]),
+            ),
           ]),
         ),
       ]),
@@ -605,7 +628,7 @@ export class Integration {
           protectedReadonlyModifier,
         ),
       ]),
-      [parseRequestMethod, providerMethod, subscribeMethod],
+      [parseRequestMethod, substituteMethod, providerMethod, subscribeMethod],
     );
 
     this.program.push(endpointTagsConst, implementationType, clientClass);

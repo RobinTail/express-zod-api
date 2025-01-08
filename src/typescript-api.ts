@@ -280,37 +280,6 @@ export const makeArrowFn = (
     body,
   );
 
-export const makeObjectKeysReducer = (
-  obj: ts.Identifier,
-  exp: ts.Expression,
-  initial: ts.Expression,
-) =>
-  f.createCallExpression(
-    f.createPropertyAccessExpression(
-      f.createCallExpression(
-        f.createPropertyAccessExpression(
-          f.createIdentifier(Object.name),
-          propOf<typeof Object>("keys"),
-        ),
-        undefined,
-        [obj],
-      ),
-      propOf<string[]>("reduce"),
-    ),
-    undefined,
-    [
-      f.createArrowFunction(
-        undefined,
-        undefined,
-        makeParams({ acc: undefined, key: undefined }),
-        undefined,
-        undefined,
-        exp,
-      ),
-      initial,
-    ],
-  );
-
 export const propOf = <T>(name: keyof NoInfer<T>) => name as string;
 
 export const makeTernary = (
@@ -340,13 +309,6 @@ export const makePropCall = (
     ),
     undefined,
     args,
-  );
-
-export const makeAnd = (left: ts.Expression, right: ts.Expression) =>
-  f.createBinaryExpression(
-    left,
-    f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
-    right,
   );
 
 export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
