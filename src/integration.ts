@@ -416,10 +416,10 @@ export class Integration {
         ),
         f.createReturnStatement(
           f.createAsExpression(
-            f.createArrayLiteralExpression(
-              [this.ids.pathParameter, this.ids.restConst],
-              false,
-            ),
+            f.createArrayLiteralExpression([
+              this.ids.pathParameter,
+              this.ids.restConst,
+            ]),
             ensureTypeNode(f.createIdentifier("const")),
           ),
         ),
