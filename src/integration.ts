@@ -20,7 +20,7 @@ import {
   makeType,
   makeTernary,
   propOf,
-  protectedReadonlyModifier,
+  accessModifiers,
   recordStringAny,
   makeTemplate,
   makeNew,
@@ -628,7 +628,7 @@ export class Integration {
         makeParam(
           this.ids.implementationArgument,
           ensureTypeNode(this.ids.implementationType),
-          protectedReadonlyModifier,
+          accessModifiers.protectedReadonly,
         ),
       ]),
       [parseRequestMethod, substituteMethod, providerMethod, subscribeMethod],

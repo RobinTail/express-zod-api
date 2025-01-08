@@ -6,15 +6,14 @@ const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
 const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
 
-const accessModifiers = {
+export const accessModifiers = {
   public: [f.createModifier(ts.SyntaxKind.PublicKeyword)],
   private: [f.createModifier(ts.SyntaxKind.PrivateKeyword)],
+  protectedReadonly: [
+    f.createModifier(ts.SyntaxKind.ProtectedKeyword),
+    f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
+  ],
 };
-
-export const protectedReadonlyModifier = [
-  f.createModifier(ts.SyntaxKind.ProtectedKeyword),
-  f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
-];
 
 export const addJsDocComment = <T extends ts.Node>(node: T, text: string) =>
   ts.addSyntheticLeadingComment(
