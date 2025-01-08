@@ -420,7 +420,7 @@ export class Integration {
               this.ids.pathParameter,
               this.ids.restConst,
             ]),
-            ensureTypeNode(f.createIdentifier("const")),
+            ensureTypeNode("const"),
           ),
         ),
       ]),
