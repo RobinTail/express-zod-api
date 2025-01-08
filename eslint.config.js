@@ -86,10 +86,6 @@ const tsFactoryConcerns = [
     message: "use makePropCall() helper",
   },
   {
-    selector: "Identifier[name='AmpersandAmpersandToken']",
-    message: "use makeAnd() helper",
-  },
-  {
     selector: "Identifier[name='EqualsEqualsEqualsToken']",
     message: "use makeEqual() helper",
   },
