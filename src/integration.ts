@@ -539,23 +539,15 @@ export class Integration {
         ts.SyntaxKind.ExclamationToken,
         this.ids.contentTypeConst,
       ),
-      f.createReturnStatement(undefined),
-      undefined,
+      f.createReturnStatement(),
     );
 
     // const isJSON = contentType.startsWith("application/json");
-    const parserStatement = makeConst(
+    const isJsonConst = makeConst(
       this.ids.isJsonConst,
-      f.createCallChain(
-        f.createPropertyAccessChain(
-          this.ids.contentTypeConst,
-          undefined,
-          propOf<string>("startsWith"),
-        ),
-        undefined,
-        undefined,
-        [f.createStringLiteral(contentTypes.json)],
-      ),
+      makePropCall(this.ids.contentTypeConst, propOf<string>("startsWith"), [
+        f.createStringLiteral(contentTypes.json),
+      ]),
     );
 
     // return response[isJSON ? "json" : "text"]();
@@ -589,7 +581,7 @@ export class Integration {
           responseStatement,
           contentTypeStatement,
           noBodyStatement,
-          parserStatement,
+          isJsonConst,
           returnStatement,
         ]),
         { isAsync: true },
