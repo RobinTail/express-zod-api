@@ -1009,9 +1009,9 @@ ansi-styles@^6.1.0:
   integrity sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==
 
 ansis@^3.2.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/ansis/-/ansis-3.6.0.tgz#f4d8437fb27659bf5a6adca90135801919dee764"
-  integrity sha512-8KluYVZM+vx19f5rInhdEBdIAjvBp7ASzyF/DoStcDpMJ3JOM55ybvUcs9nMRVP8XN2K3ABBdO7zCXezvrT0pg==
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/ansis/-/ansis-3.7.0.tgz#dbcb7e498fceabece0bcaf4282d4b6501933fb22"
+  integrity sha512-lud1KyRm52SoYXgaJjiyn0aEQahailFhT4OhgrbS9qmWWkA1qaAv0QLKD2KrLBtSlBEnBLxNxhxQ+JbeI5C7Sg==
 
 any-promise@^1.0.0:
   version "1.3.0"
