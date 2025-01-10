@@ -130,6 +130,7 @@ describe("BuiltinLogger", () => {
         color,
       });
       const child = parent.child(ctx);
+      expect(child.ctx).toEqual(ctx);
       child.info("Here is some message", { more: "information" });
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
