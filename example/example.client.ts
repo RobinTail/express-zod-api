@@ -414,6 +414,20 @@ export const endpointTags = {
   "get /v1/events/time": ["subscriptions"],
 };
 
+const parseRequest = (request: string) =>
+  request.split(/ (.+)/, 2) as [Method, Path];
+
+const substitute = (path: string, params: Record<string, any>) => {
+  const rest = { ...params };
+  for (const key in params) {
+    path = path.replace(`:${key}`, () => {
+      delete rest[key];
+      return params[key];
+    });
+  }
+  return [path, rest] as const;
+};
+
 export type Implementation = (
   method: Method,
   path: string,
@@ -422,51 +436,40 @@ export type Implementation = (
 
 export class ExpressZodAPIClient {
   constructor(protected readonly implementation: Implementation) {}
-  private parseRequest(request: string) {
-    return request.split(/ (.+)/, 2) as [Method, Path];
-  }
-  private substitute(path: string, params: Record<string, any>) {
-    const rest = { ...params };
-    for (const key in params) {
-      path = path.replace(`:${key}`, () => {
-        delete rest[key];
-        return params[key];
-      });
-    }
-    return [path, rest] as const;
-  }
   public provide<K extends Request>(
     request: K,
     params: Input[K],
   ): Promise<Response[K]> {
-    const [method, path] = this.parseRequest(request);
-    return this.implementation(method, ...this.substitute(path, params));
-  }
-  public subscribe<
-    K extends Extract<Request, `get ${string}`>,
-    R extends Extract<PositiveResponse[K], { event: string }>,
-  >(request: K, params: Input[K]) {
-    const [path, rest] = this.substitute(this.parseRequest(request)[1], params);
-    const source = new EventSource(
-      new URL(`${path}?${new URLSearchParams(rest)}`, "https://example.com"),
-    );
-    const connection = {
-      source,
-      on: <E extends R["event"]>(
-        event: E,
-        handler: (
-          data: Extract<R, { event: E }>["data"],
-        ) => void | Promise<void>,
-      ) => {
-        source.addEventListener(event, (msg) =>
-          handler(JSON.parse((msg as MessageEvent).data)),
-        );
-        return connection;
-      },
-    };
-    return connection;
+    const [method, path] = parseRequest(request);
+    return this.implementation(method, ...substitute(path, params));
   }
 }
+
+export const subscribe = <
+  K extends Extract<Request, `get ${string}`>,
+  R extends Extract<PositiveResponse[K], { event: string }>,
+>(
+  request: K,
+  params: Input[K],
+) => {
+  const [path, rest] = substitute(parseRequest(request)[1], params);
+  const source = new EventSource(
+    new URL(`${path}?${new URLSearchParams(rest)}`, "https://example.com"),
+  );
+  const connection = {
+    source,
+    on: <E extends R["event"]>(
+      event: E,
+      handler: (data: Extract<R, { event: E }>["data"]) => void | Promise<void>,
+    ) => {
+      source.addEventListener(event, (msg) =>
+        handler(JSON.parse((msg as MessageEvent).data)),
+      );
+      return connection;
+    },
+  };
+  return connection;
+};
 
 // Usage example:
 /*

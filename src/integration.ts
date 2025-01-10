@@ -16,7 +16,7 @@ import {
   makePublicClass,
   makeInterface,
   makePublicLiteralType,
-  makeMethod,
+  makePublicMethod,
   makeType,
   makeTernary,
   propOf,
@@ -133,10 +133,10 @@ export class Integration {
     handlerParameter: f.createIdentifier("handler"),
     msgParameter: f.createIdentifier("msg"),
     accumulator: f.createIdentifier("acc"),
-    parseRequestMethod: f.createIdentifier("parseRequest"),
-    substituteMethod: f.createIdentifier("substitute"),
+    parseRequestFn: f.createIdentifier("parseRequest"),
+    substituteFn: f.createIdentifier("substitute"),
     provideMethod: f.createIdentifier("provide"),
-    subscribeMethod: f.createIdentifier("subscribe"),
+    subscribeFn: f.createIdentifier("subscribe"),
     onMethod: f.createIdentifier("on"),
     implementationArgument: f.createIdentifier("implementation"),
     headersProperty: f.createIdentifier("headers"),
@@ -332,102 +332,101 @@ export class Integration {
     // `:${key}`
     const keyParamExpression = makeTemplate(":", [this.ids.keyParameter]);
 
-    // public parseRequest(request: string) { return request.split(/ (.+)/, 2) as [Method, Path] }
-    const parseRequestMethod = makeMethod(
-      this.ids.parseRequestMethod,
-      makeParams({
-        [this.ids.requestParameter.text]: f.createKeywordTypeNode(
-          ts.SyntaxKind.StringKeyword,
-        ),
-      }),
-      f.createBlock([
-        f.createReturnStatement(
-          // request.split(/ (.+)/, 2) as [Method, Path];
-          f.createAsExpression(
-            makePropCall(this.ids.requestParameter, propOf<string>("split"), [
-              f.createRegularExpressionLiteral("/ (.+)/"), // split once
-              f.createNumericLiteral(2), // excludes third empty element
-            ]),
-            f.createTupleTypeNode([
-              ensureTypeNode(this.ids.methodType),
-              ensureTypeNode(this.ids.pathType),
-            ]),
+    // const parseRequest = (request: string) => request.split(/ (.+)/, 2) as [Method, Path];
+    const parseRequestFn = makeConst(
+      this.ids.parseRequestFn,
+      makeArrowFn(
+        {
+          [this.ids.requestParameter.text]: f.createKeywordTypeNode(
+            ts.SyntaxKind.StringKeyword,
           ),
-        ),
-      ]),
-    );
-
-    // private substitute(path: string, params: Record<string, any>) { ___ return [path, rest] as const; }
-    const substituteMethod = makeMethod(
-      this.ids.substituteMethod,
-      makeParams({
-        [this.ids.pathParameter.text]: f.createKeywordTypeNode(
-          ts.SyntaxKind.StringKeyword,
-        ),
-        [this.ids.paramsArgument.text]: recordStringAny,
-      }),
-      f.createBlock([
-        makeConst(
-          this.ids.restConst,
-          f.createObjectLiteralExpression([
-            f.createSpreadAssignment(this.ids.paramsArgument),
+        },
+        f.createAsExpression(
+          makePropCall(this.ids.requestParameter, propOf<string>("split"), [
+            f.createRegularExpressionLiteral("/ (.+)/"), // split once
+            f.createNumericLiteral(2), // excludes third empty element
+          ]),
+          f.createTupleTypeNode([
+            ensureTypeNode(this.ids.methodType),
+            ensureTypeNode(this.ids.pathType),
           ]),
         ),
-        f.createForInStatement(
-          f.createVariableDeclarationList(
-            [f.createVariableDeclaration(this.ids.keyParameter)],
-            ts.NodeFlags.Const,
+      ),
+    );
+
+    // const substitute = (path: string, params: Record<string, any>) => { ___ return [path, rest] as const; }
+    const substituteFn = makeConst(
+      this.ids.substituteFn,
+      makeArrowFn(
+        {
+          [this.ids.pathParameter.text]: f.createKeywordTypeNode(
+            ts.SyntaxKind.StringKeyword,
           ),
-          this.ids.paramsArgument,
-          f.createBlock([
-            f.createExpressionStatement(
-              f.createBinaryExpression(
-                this.ids.pathParameter,
-                f.createToken(ts.SyntaxKind.EqualsToken),
-                makePropCall(
+          [this.ids.paramsArgument.text]: recordStringAny,
+        },
+        f.createBlock([
+          makeConst(
+            this.ids.restConst,
+            f.createObjectLiteralExpression([
+              f.createSpreadAssignment(this.ids.paramsArgument),
+            ]),
+          ),
+          f.createForInStatement(
+            f.createVariableDeclarationList(
+              [f.createVariableDeclaration(this.ids.keyParameter)],
+              ts.NodeFlags.Const,
+            ),
+            this.ids.paramsArgument,
+            f.createBlock([
+              f.createExpressionStatement(
+                f.createBinaryExpression(
                   this.ids.pathParameter,
-                  propOf<string>("replace"),
-                  [
-                    keyParamExpression,
-                    makeArrowFn(
-                      [],
-                      f.createBlock([
-                        f.createExpressionStatement(
-                          f.createDeleteExpression(
+                  f.createToken(ts.SyntaxKind.EqualsToken),
+                  makePropCall(
+                    this.ids.pathParameter,
+                    propOf<string>("replace"),
+                    [
+                      keyParamExpression,
+                      makeArrowFn(
+                        [],
+                        f.createBlock([
+                          f.createExpressionStatement(
+                            f.createDeleteExpression(
+                              f.createElementAccessExpression(
+                                f.createIdentifier("rest"),
+                                this.ids.keyParameter,
+                              ),
+                            ),
+                          ),
+                          f.createReturnStatement(
                             f.createElementAccessExpression(
-                              f.createIdentifier("rest"),
+                              this.ids.paramsArgument,
                               this.ids.keyParameter,
                             ),
                           ),
-                        ),
-                        f.createReturnStatement(
-                          f.createElementAccessExpression(
-                            this.ids.paramsArgument,
-                            this.ids.keyParameter,
-                          ),
-                        ),
-                      ]),
-                    ),
-                  ],
+                        ]),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ]),
-        ),
-        f.createReturnStatement(
-          f.createAsExpression(
-            f.createArrayLiteralExpression([
-              this.ids.pathParameter,
-              this.ids.restConst,
             ]),
-            ensureTypeNode("const"),
           ),
-        ),
-      ]),
+          f.createReturnStatement(
+            f.createAsExpression(
+              f.createArrayLiteralExpression([
+                this.ids.pathParameter,
+                this.ids.restConst,
+              ]),
+              ensureTypeNode("const"),
+            ),
+          ),
+        ]),
+      ),
     );
 
     // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {
-    const providerMethod = makeMethod(
+    const providerMethod = makePublicMethod(
       this.ids.provideMethod,
       makeParams({
         [this.ids.requestParameter.text]: ensureTypeNode("K"),
@@ -440,7 +439,7 @@ export class Integration {
         makeConst(
           // const [method, path] = this.parseRequest(request);
           makeDeconstruction(this.ids.methodParameter, this.ids.pathParameter),
-          makePropCall(f.createThis(), this.ids.parseRequestMethod, [
+          f.createCallExpression(this.ids.parseRequestFn, undefined, [
             this.ids.requestParameter,
           ]),
         ),
@@ -449,7 +448,7 @@ export class Integration {
           makePropCall(f.createThis(), this.ids.implementationArgument, [
             this.ids.methodParameter,
             f.createSpreadElement(
-              makePropCall(f.createThis(), this.ids.substituteMethod, [
+              f.createCallExpression(this.ids.substituteFn, undefined, [
                 this.ids.pathParameter,
                 this.ids.paramsArgument,
               ]),
@@ -458,7 +457,6 @@ export class Integration {
         ),
       ]),
       {
-        expose: true,
         typeParams: { K: this.ids.requestType },
         returns: makePromise(
           f.createIndexedAccessTypeNode(
@@ -469,155 +467,160 @@ export class Integration {
       },
     );
 
-    const subscribeMethod = makeMethod(
-      this.ids.subscribeMethod,
-      makeParams({
-        request: ensureTypeNode("K"),
-        params: f.createIndexedAccessTypeNode(
-          ensureTypeNode(this.ids.inputInterface),
-          ensureTypeNode("K"),
-        ),
-      }),
-      f.createBlock([
-        makeConst(
-          makeDeconstruction(this.ids.pathParameter, this.ids.restConst),
-          makePropCall(f.createThis(), this.ids.substituteMethod, [
-            f.createElementAccessExpression(
-              makePropCall(f.createThis(), this.ids.parseRequestMethod, [
-                this.ids.requestParameter,
-              ]),
-              f.createNumericLiteral(1),
-            ),
-            this.ids.paramsArgument,
-          ]),
-        ),
-        makeConst(
-          this.ids.sourceConst,
-          makeNew(
-            f.createIdentifier("EventSource"),
-            makeNew(
-              f.createIdentifier(URL.name),
-              makeTemplate(
-                "",
-                [this.ids.pathParameter, "?"],
-                [
-                  makeNew(
-                    f.createIdentifier(URLSearchParams.name),
-                    this.ids.restConst,
-                  ),
-                ],
+    const subscribeFn = makeConst(
+      this.ids.subscribeFn,
+      makeArrowFn(
+        {
+          request: ensureTypeNode("K"),
+          params: f.createIndexedAccessTypeNode(
+            ensureTypeNode(this.ids.inputInterface),
+            ensureTypeNode("K"),
+          ),
+        },
+        f.createBlock([
+          makeConst(
+            makeDeconstruction(this.ids.pathParameter, this.ids.restConst),
+            f.createCallExpression(this.ids.substituteFn, undefined, [
+              f.createElementAccessExpression(
+                f.createCallExpression(this.ids.parseRequestFn, undefined, [
+                  this.ids.requestParameter,
+                ]),
+                f.createNumericLiteral(1),
               ),
-              f.createStringLiteral(serverUrl),
+              this.ids.paramsArgument,
+            ]),
+          ),
+          makeConst(
+            this.ids.sourceConst,
+            makeNew(
+              f.createIdentifier("EventSource"),
+              makeNew(
+                f.createIdentifier(URL.name),
+                makeTemplate(
+                  "",
+                  [this.ids.pathParameter, "?"],
+                  [
+                    makeNew(
+                      f.createIdentifier(URLSearchParams.name),
+                      this.ids.restConst,
+                    ),
+                  ],
+                ),
+                f.createStringLiteral(serverUrl),
+              ),
             ),
           ),
-        ),
-        makeConst(
-          this.ids.connectionConst,
-          f.createObjectLiteralExpression([
-            f.createShorthandPropertyAssignment(this.ids.sourceConst),
-            f.createPropertyAssignment(
-              this.ids.onMethod,
-              makeArrowFn(
-                {
-                  [this.ids.eventParameter.text]: ensureTypeNode("E"),
-                  [this.ids.handlerParameter.text]: f.createFunctionTypeNode(
-                    undefined,
-                    makeParams({
-                      [this.ids.dataParameter.text]:
-                        f.createIndexedAccessTypeNode(
-                          makeExtract(
-                            "R",
-                            makeOnePropObjType(propOf<SSEShape>("event"), "E"),
-                          ),
-                          f.createLiteralTypeNode(
-                            f.createStringLiteral(propOf<SSEShape>("data")),
-                          ),
-                        ),
-                    }),
-                    f.createUnionTypeNode([
-                      f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-                      makePromise(
-                        f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-                      ),
-                    ]),
-                  ),
-                },
-                f.createBlock([
-                  f.createExpressionStatement(
-                    makePropCall(
-                      this.ids.sourceConst,
-                      propOf<EventSource>("addEventListener"),
-                      [
-                        this.ids.eventParameter,
-                        makeArrowFn(
-                          [this.ids.msgParameter],
-                          f.createCallExpression(
-                            this.ids.handlerParameter,
-                            undefined,
-                            [
-                              makePropCall(
-                                f.createIdentifier("JSON"),
-                                propOf<JSON>("parse"),
-                                [
-                                  f.createPropertyAccessExpression(
-                                    f.createParenthesizedExpression(
-                                      f.createAsExpression(
-                                        this.ids.msgParameter,
-                                        ensureTypeNode(MessageEvent.name),
-                                      ),
-                                    ),
-                                    propOf<SSEShape>("data"),
-                                  ),
-                                ],
+          makeConst(
+            this.ids.connectionConst,
+            f.createObjectLiteralExpression([
+              f.createShorthandPropertyAssignment(this.ids.sourceConst),
+              f.createPropertyAssignment(
+                this.ids.onMethod,
+                makeArrowFn(
+                  {
+                    [this.ids.eventParameter.text]: ensureTypeNode("E"),
+                    [this.ids.handlerParameter.text]: f.createFunctionTypeNode(
+                      undefined,
+                      makeParams({
+                        [this.ids.dataParameter.text]:
+                          f.createIndexedAccessTypeNode(
+                            makeExtract(
+                              "R",
+                              makeOnePropObjType(
+                                propOf<SSEShape>("event"),
+                                "E",
                               ),
-                            ],
+                            ),
+                            f.createLiteralTypeNode(
+                              f.createStringLiteral(propOf<SSEShape>("data")),
+                            ),
                           ),
+                      }),
+                      f.createUnionTypeNode([
+                        f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+                        makePromise(
+                          f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
                         ),
-                      ],
-                    ),
-                  ),
-                  f.createReturnStatement(this.ids.connectionConst),
-                ]),
-                {
-                  typeParams: {
-                    E: f.createIndexedAccessTypeNode(
-                      ensureTypeNode("R"),
-                      f.createLiteralTypeNode(
-                        f.createStringLiteral(propOf<SSEShape>("event")),
-                      ),
+                      ]),
                     ),
                   },
-                },
-              ),
-            ),
-          ]),
-        ),
-        f.createReturnStatement(this.ids.connectionConst),
-      ]),
-      {
-        expose: true,
-        typeParams: {
-          K: makeExtract(
-            this.ids.requestType,
-            f.createTemplateLiteralType(f.createTemplateHead("get "), [
-              f.createTemplateLiteralTypeSpan(
-                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                f.createTemplateTail(""),
+                  f.createBlock([
+                    f.createExpressionStatement(
+                      makePropCall(
+                        this.ids.sourceConst,
+                        propOf<EventSource>("addEventListener"),
+                        [
+                          this.ids.eventParameter,
+                          makeArrowFn(
+                            [this.ids.msgParameter],
+                            f.createCallExpression(
+                              this.ids.handlerParameter,
+                              undefined,
+                              [
+                                makePropCall(
+                                  f.createIdentifier("JSON"),
+                                  propOf<JSON>("parse"),
+                                  [
+                                    f.createPropertyAccessExpression(
+                                      f.createParenthesizedExpression(
+                                        f.createAsExpression(
+                                          this.ids.msgParameter,
+                                          ensureTypeNode(MessageEvent.name),
+                                        ),
+                                      ),
+                                      propOf<SSEShape>("data"),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    f.createReturnStatement(this.ids.connectionConst),
+                  ]),
+                  {
+                    typeParams: {
+                      E: f.createIndexedAccessTypeNode(
+                        ensureTypeNode("R"),
+                        f.createLiteralTypeNode(
+                          f.createStringLiteral(propOf<SSEShape>("event")),
+                        ),
+                      ),
+                    },
+                  },
+                ),
               ),
             ]),
           ),
-          R: makeExtract(
-            f.createIndexedAccessTypeNode(
-              ensureTypeNode(this.ids.posResponseInterface),
-              ensureTypeNode("K"),
+          f.createReturnStatement(this.ids.connectionConst),
+        ]),
+        {
+          typeParams: {
+            K: makeExtract(
+              this.ids.requestType,
+              f.createTemplateLiteralType(f.createTemplateHead("get "), [
+                f.createTemplateLiteralTypeSpan(
+                  f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                  f.createTemplateTail(""),
+                ),
+              ]),
             ),
-            makeOnePropObjType(
-              propOf<SSEShape>("event"),
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+            R: makeExtract(
+              f.createIndexedAccessTypeNode(
+                ensureTypeNode(this.ids.posResponseInterface),
+                ensureTypeNode("K"),
+              ),
+              makeOnePropObjType(
+                propOf<SSEShape>("event"),
+                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              ),
             ),
-          ),
+          },
         },
-      },
+      ),
+      { expose: true },
     );
 
     // export class ExpressZodAPIClient { ___ }
@@ -631,10 +634,17 @@ export class Integration {
           accessModifiers.protectedReadonly,
         ),
       ]),
-      [parseRequestMethod, substituteMethod, providerMethod, subscribeMethod],
+      [providerMethod],
     );
 
-    this.program.push(endpointTagsConst, implementationType, clientClass);
+    this.program.push(
+      endpointTagsConst,
+      parseRequestFn,
+      substituteFn,
+      implementationType,
+      clientClass,
+      subscribeFn,
+    );
 
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
@@ -804,7 +814,7 @@ export class Integration {
     // client.subscribe("get /v1/events/time", {}).on("time", (time) => {});
     const subscribeCallingStatement = f.createExpressionStatement(
       makePropCall(
-        makePropCall(this.ids.clientConst, this.ids.subscribeMethod, [
+        makePropCall(this.ids.clientConst, this.ids.subscribeFn, [
           f.createStringLiteral(`${"get" satisfies Method} /v1/events/time`),
           f.createObjectLiteralExpression(),
         ]),
