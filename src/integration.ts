@@ -2,6 +2,7 @@ import { chain } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant, responseVariants } from "./api-response";
+import { IntegrationBase } from "./integration-base";
 import {
   f,
   makePromise,
@@ -98,7 +99,7 @@ interface FormattedPrintingOptions {
   format?: (program: string) => Promise<string>;
 }
 
-export class Integration {
+export class Integration extends IntegrationBase {
   protected someOf = makeSomeOfHelper();
   protected program: ts.Node[] = [this.someOf];
   protected usage: Array<ts.Node | string> = [];
@@ -108,37 +109,6 @@ export class Integration {
   >();
   protected paths = new Set<string>();
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
-  protected ids = {
-    pathType: f.createIdentifier("Path"),
-    methodType: f.createIdentifier("Method"),
-    requestType: f.createIdentifier("Request"),
-    inputInterface: f.createIdentifier("Input"),
-    posResponseInterface: f.createIdentifier("PositiveResponse"),
-    negResponseInterface: f.createIdentifier("NegativeResponse"),
-    encResponseInterface: f.createIdentifier("EncodedResponse"),
-    responseInterface: f.createIdentifier("Response"),
-    endpointTagsConst: f.createIdentifier("endpointTags"),
-    implementationType: f.createIdentifier("Implementation"),
-    clientClass: f.createIdentifier("ExpressZodAPIClient"),
-    keyParameter: f.createIdentifier("key"),
-    pathParameter: f.createIdentifier("path"),
-    paramsArgument: f.createIdentifier("params"),
-    methodParameter: f.createIdentifier("method"),
-    requestParameter: f.createIdentifier("request"),
-    accumulator: f.createIdentifier("acc"),
-    provideMethod: f.createIdentifier("provide"),
-    implementationArgument: f.createIdentifier("implementation"),
-    headersProperty: f.createIdentifier("headers"),
-    hasBodyConst: f.createIdentifier("hasBody"),
-    undefinedValue: f.createIdentifier("undefined"),
-    bodyProperty: f.createIdentifier("body"),
-    responseConst: f.createIdentifier("response"),
-    searchParamsConst: f.createIdentifier("searchParams"),
-    exampleImplementationConst: f.createIdentifier("exampleImplementation"),
-    clientConst: f.createIdentifier("client"),
-    contentTypeConst: f.createIdentifier("contentType"),
-    isJsonConst: f.createIdentifier("isJSON"),
-  } satisfies Record<string, ts.Identifier>;
   protected interfaces: Array<{
     id: ts.Identifier;
     kind: IOKind;
@@ -179,6 +149,7 @@ export class Integration {
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
   }: IntegrationParams) {
+    super();
     const commons = { makeAlias: this.makeAlias.bind(this), optionalPropStyle };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
