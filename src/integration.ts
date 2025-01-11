@@ -239,36 +239,12 @@ export class Integration extends IntegrationBase {
     for (const { id, props } of this.interfaces)
       this.program.push(makeInterface(id, props, { expose: true }));
 
-    // export type Request = keyof Input;
     this.program.push(this.requestType);
 
     if (variant === "types") return;
 
-    // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
-    const endpointTagsConst = makeConst(
-      this.ids.endpointTagsConst,
-      f.createObjectLiteralExpression(endpointTags),
-      { expose: true },
-    );
-
-    // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
-    const implementationType = makeType(
-      this.ids.implementationType,
-      f.createFunctionTypeNode(
-        undefined,
-        makeParams({
-          [this.ids.methodParameter.text]: f.createTypeReferenceNode(
-            this.ids.methodType,
-          ),
-          [this.ids.pathParameter.text]: f.createKeywordTypeNode(
-            ts.SyntaxKind.StringKeyword,
-          ),
-          [this.ids.paramsArgument.text]: recordStringAny,
-        }),
-        makePromise("any"),
-      ),
-      { expose: true },
-    );
+    const endpointTagsConst = this.makeEndpointTagsConst(endpointTags);
+    const implementationType = this.makeImplementationType();
 
     // `:${key}`
     const keyParamExpression = makeTemplate(":", [this.ids.keyParameter]);

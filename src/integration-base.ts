@@ -1,5 +1,14 @@
 import ts from "typescript";
-import { f, makeKeyOf, makeSomeOfHelper, makeType } from "./typescript-api";
+import {
+  f,
+  makeConst,
+  makeKeyOf,
+  makeParams,
+  makePromise,
+  makeSomeOfHelper,
+  makeType,
+  recordStringAny,
+} from "./typescript-api";
 
 export abstract class IntegrationBase {
   protected ids = {
@@ -36,6 +45,7 @@ export abstract class IntegrationBase {
 
   protected someOfType = makeSomeOfHelper();
 
+  // export type Request = keyof Input;
   protected requestType = makeType(
     this.ids.requestType,
     makeKeyOf(this.ids.inputInterface),
@@ -47,4 +57,32 @@ export abstract class IntegrationBase {
     f.createTypeReferenceNode(this.someOfType.name, [
       f.createTypeReferenceNode(name),
     ]);
+
+  // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
+  protected makeEndpointTagsConst = (endpointTags: ts.PropertyAssignment[]) =>
+    makeConst(
+      this.ids.endpointTagsConst,
+      f.createObjectLiteralExpression(endpointTags),
+      { expose: true },
+    );
+
+  // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
+  protected makeImplementationType = () =>
+    makeType(
+      this.ids.implementationType,
+      f.createFunctionTypeNode(
+        undefined,
+        makeParams({
+          [this.ids.methodParameter.text]: f.createTypeReferenceNode(
+            this.ids.methodType,
+          ),
+          [this.ids.pathParameter.text]: f.createKeywordTypeNode(
+            ts.SyntaxKind.StringKeyword,
+          ),
+          [this.ids.paramsArgument.text]: recordStringAny,
+        }),
+        makePromise("any"),
+      ),
+      { expose: true },
+    );
 }
