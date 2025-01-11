@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 export default defineConfig({
   test: {
     env: {
-      FORCE_COLOR: "1",
+      FORCE_COLOR: "true",
     },
     globals: true,
     pool: "threads",
