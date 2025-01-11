@@ -4,16 +4,20 @@ import {
   makeAnd,
   makeConst,
   makeDeconstruction,
+  makeEmptyInitializingConstructor,
   makeKeyOf,
   makeObjectKeysReducer,
+  makeParam,
   makeParams,
   makePromise,
   makePropCall,
+  makePublicClass,
   makePublicMethod,
   makeSomeOfHelper,
   makeTemplate,
   makeType,
   propOf,
+  protectedReadonlyModifier,
   recordStringAny,
 } from "./typescript-api";
 
@@ -93,7 +97,7 @@ export abstract class IntegrationBase {
       { expose: true },
     );
 
-  protected makeProvider = () => {
+  private makeProvider = () => {
     // `:${key}`
     const keyParamExpression = makeTemplate(":", [this.ids.keyParameter]);
 
@@ -193,4 +197,19 @@ export abstract class IntegrationBase {
       },
     );
   };
+
+  // export class ExpressZodAPIClient { ___ }
+  protected makeClientClass = () =>
+    makePublicClass(
+      this.ids.clientClass,
+      // constructor(protected readonly implementation: Implementation) {}
+      makeEmptyInitializingConstructor([
+        makeParam(
+          this.ids.implementationArgument,
+          f.createTypeReferenceNode(this.ids.implementationType),
+          protectedReadonlyModifier,
+        ),
+      ]),
+      [this.makeProvider()],
+    );
 }

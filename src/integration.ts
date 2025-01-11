@@ -7,17 +7,13 @@ import {
   f,
   makeArrowFn,
   makeConst,
-  makeEmptyInitializingConstructor,
   makeInterfaceProp,
-  makeParam,
   makePropCall,
-  makePublicClass,
   makeInterface,
   makePublicLiteralType,
   makeType,
   makeTernary,
   propOf,
-  protectedReadonlyModifier,
   makeTemplate,
   makeNew,
   makePropertyIdentifier,
@@ -238,21 +234,7 @@ export class Integration extends IntegrationBase {
 
     const endpointTagsConst = this.makeEndpointTagsConst(endpointTags);
     const implementationType = this.makeImplementationType();
-    const providerMethod = this.makeProvider();
-
-    // export class ExpressZodAPIClient { ___ }
-    const clientClass = makePublicClass(
-      this.ids.clientClass,
-      // constructor(protected readonly implementation: Implementation) {}
-      makeEmptyInitializingConstructor([
-        makeParam(
-          this.ids.implementationArgument,
-          f.createTypeReferenceNode(this.ids.implementationType),
-          protectedReadonlyModifier,
-        ),
-      ]),
-      [providerMethod],
-    );
+    const clientClass = this.makeClientClass();
 
     this.program.push(endpointTagsConst, implementationType, clientClass);
 
