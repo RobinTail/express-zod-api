@@ -232,11 +232,11 @@ export class Integration extends IntegrationBase {
 
     if (variant === "types") return;
 
-    const endpointTagsConst = this.makeEndpointTagsConst(endpointTags);
-    const implementationType = this.makeImplementationType();
-    const clientClass = this.makeClientClass();
-
-    this.program.push(endpointTagsConst, implementationType, clientClass);
+    this.program.push(
+      this.makeEndpointTagsConst(endpointTags),
+      this.makeImplementationType(),
+      this.makeClientClass(),
+    );
 
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
