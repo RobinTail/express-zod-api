@@ -17,7 +17,6 @@ import {
   makePropCall,
   makePublicClass,
   makePublicMethod,
-  makeSomeOfHelper,
   makeTemplate,
   makeTernary,
   makeType,
@@ -59,7 +58,15 @@ export abstract class IntegrationBase {
     isJsonConst: f.createIdentifier("isJSON"),
   } satisfies Record<string, ts.Identifier>;
 
-  protected someOfType = makeSomeOfHelper();
+  // type SomeOf<T> = T[keyof T];
+  protected someOfType = makeType(
+    "SomeOf",
+    f.createIndexedAccessTypeNode(
+      f.createTypeReferenceNode("T"),
+      makeKeyOf("T"),
+    ),
+    { params: { T: undefined } },
+  );
 
   // export type Request = keyof Input;
   protected requestType = makeType(
