@@ -5,26 +5,19 @@ import { ResponseVariant, responseVariants } from "./api-response";
 import { IntegrationBase } from "./integration-base";
 import {
   f,
-  makePromise,
   makeArrowFn,
   makeConst,
-  makeDeconstruction,
   makeEmptyInitializingConstructor,
   makeInterfaceProp,
-  makeObjectKeysReducer,
   makeParam,
-  makeParams,
   makePropCall,
   makePublicClass,
   makeInterface,
   makePublicLiteralType,
-  makePublicMethod,
   makeType,
   makeTernary,
   propOf,
   protectedReadonlyModifier,
-  recordStringAny,
-  makeAnd,
   makeTemplate,
   makeNew,
   makePropertyIdentifier,
@@ -245,105 +238,7 @@ export class Integration extends IntegrationBase {
 
     const endpointTagsConst = this.makeEndpointTagsConst(endpointTags);
     const implementationType = this.makeImplementationType();
-
-    // `:${key}`
-    const keyParamExpression = makeTemplate(":", [this.ids.keyParameter]);
-
-    // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key]), path)
-    const pathArgument = makeObjectKeysReducer(
-      this.ids.paramsArgument,
-      makePropCall(this.ids.accumulator, propOf<string>("replace"), [
-        keyParamExpression,
-        f.createElementAccessExpression(
-          f.createAsExpression(this.ids.paramsArgument, recordStringAny),
-          this.ids.keyParameter,
-        ),
-      ]),
-      this.ids.pathParameter,
-    );
-
-    // Object.keys(params).reduce((acc, key) =>
-    //   Object.assign(acc, !path.includes(`:${key}`) && {[key]: params[key]} ), {})
-    const paramsArgument = makeObjectKeysReducer(
-      this.ids.paramsArgument,
-      makePropCall(
-        f.createIdentifier(Object.name),
-        propOf<typeof Object>("assign"),
-        [
-          this.ids.accumulator,
-          makeAnd(
-            f.createPrefixUnaryExpression(
-              ts.SyntaxKind.ExclamationToken,
-              makePropCall(this.ids.pathParameter, propOf<string>("includes"), [
-                keyParamExpression,
-              ]),
-            ),
-            f.createObjectLiteralExpression(
-              [
-                f.createPropertyAssignment(
-                  f.createComputedPropertyName(this.ids.keyParameter),
-                  f.createElementAccessExpression(
-                    f.createAsExpression(
-                      this.ids.paramsArgument,
-                      recordStringAny,
-                    ),
-                    this.ids.keyParameter,
-                  ),
-                ),
-              ],
-              false,
-            ),
-          ),
-        ],
-      ),
-      f.createObjectLiteralExpression(),
-    );
-
-    // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {
-    const providerMethod = makePublicMethod(
-      this.ids.provideMethod,
-      makeParams({
-        [this.ids.requestParameter.text]: f.createTypeReferenceNode("K"),
-        [this.ids.paramsArgument.text]: f.createIndexedAccessTypeNode(
-          f.createTypeReferenceNode(this.ids.inputInterface),
-          f.createTypeReferenceNode("K"),
-        ),
-      }),
-      f.createBlock([
-        makeConst(
-          // const [method, path, params] =
-          makeDeconstruction(this.ids.methodParameter, this.ids.pathParameter),
-          // request.split(/ (.+)/, 2) as [Method, Path];
-          f.createAsExpression(
-            makePropCall(this.ids.requestParameter, propOf<string>("split"), [
-              f.createRegularExpressionLiteral("/ (.+)/"), // split once
-              f.createNumericLiteral(2), // excludes third empty element
-            ]),
-            f.createTupleTypeNode([
-              f.createTypeReferenceNode(this.ids.methodType),
-              f.createTypeReferenceNode(this.ids.pathType),
-            ]),
-          ),
-        ),
-        // return this.implementation(___)
-        f.createReturnStatement(
-          makePropCall(f.createThis(), this.ids.implementationArgument, [
-            this.ids.methodParameter,
-            pathArgument,
-            paramsArgument,
-          ]),
-        ),
-      ]),
-      {
-        typeParams: { K: this.ids.requestType },
-        returns: makePromise(
-          f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.ids.responseInterface),
-            f.createTypeReferenceNode("K"),
-          ),
-        ),
-      },
-    );
+    const providerMethod = this.makeProvider();
 
     // export class ExpressZodAPIClient { ___ }
     const clientClass = makePublicClass(
