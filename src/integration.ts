@@ -28,7 +28,6 @@ import {
   makeTemplate,
   makeNew,
   makeKeyOf,
-  makeSomeOfHelper,
   makePropertyIdentifier,
   printNode,
 } from "./typescript-api";
@@ -100,7 +99,6 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  protected someOf = makeSomeOfHelper();
   protected program: ts.Node[] = [this.someOf];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
@@ -134,12 +132,6 @@ export class Integration extends IntegrationBase {
     }
     return f.createTypeReferenceNode(name);
   }
-
-  /** @example SomeOf<_>*/
-  protected makeSomeOf = ({ name }: ts.TypeAliasDeclaration) =>
-    f.createTypeReferenceNode(this.someOf.name, [
-      f.createTypeReferenceNode(name),
-    ]);
 
   public constructor({
     routing,

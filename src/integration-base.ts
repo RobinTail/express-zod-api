@@ -1,7 +1,8 @@
-import type ts from "typescript";
-import { f } from "./typescript-api";
+import ts from "typescript";
+import { f, makeSomeOfHelper } from "./typescript-api";
 
 export abstract class IntegrationBase {
+  protected someOf = makeSomeOfHelper();
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
@@ -33,4 +34,10 @@ export abstract class IntegrationBase {
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
   } satisfies Record<string, ts.Identifier>;
+
+  /** @example SomeOf<_>*/
+  protected makeSomeOf = ({ name }: ts.TypeAliasDeclaration) =>
+    f.createTypeReferenceNode(this.someOf.name, [
+      f.createTypeReferenceNode(name),
+    ]);
 }
