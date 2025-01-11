@@ -27,7 +27,6 @@ import {
   makeAnd,
   makeTemplate,
   makeNew,
-  makeKeyOf,
   makePropertyIdentifier,
   printNode,
 } from "./typescript-api";
@@ -99,7 +98,7 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  protected program: ts.Node[] = [this.someOf];
+  protected program: ts.Node[] = [this.someOfType];
   protected usage: Array<ts.Node | string> = [];
   protected registry = new Map<
     string, // request (method+path)
@@ -187,8 +186,8 @@ export class Integration extends IntegrationBase {
       );
       this.registry.set(request, {
         input: f.createTypeReferenceNode(input.name),
-        positive: this.makeSomeOf(dictionaries.positive),
-        negative: this.makeSomeOf(dictionaries.negative),
+        positive: this.someOf(dictionaries.positive),
+        negative: this.someOf(dictionaries.negative),
         response: f.createUnionTypeNode([
           f.createIndexedAccessTypeNode(
             f.createTypeReferenceNode(this.ids.posResponseInterface),
@@ -241,11 +240,7 @@ export class Integration extends IntegrationBase {
       this.program.push(makeInterface(id, props, { expose: true }));
 
     // export type Request = keyof Input;
-    this.program.push(
-      makeType(this.ids.requestType, makeKeyOf(this.ids.inputInterface), {
-        expose: true,
-      }),
-    );
+    this.program.push(this.requestType);
 
     if (variant === "types") return;
 
