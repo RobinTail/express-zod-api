@@ -5,23 +5,15 @@ import { ResponseVariant, responseVariants } from "./api-response";
 import { IntegrationBase } from "./integration-base";
 import {
   f,
-  makeArrowFn,
-  makeConst,
   makeInterfaceProp,
-  makePropCall,
   makeInterface,
   makePublicLiteralType,
   makeType,
-  makeTernary,
-  propOf,
-  makeTemplate,
-  makeNew,
   makePropertyIdentifier,
   printNode,
 } from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
-import { Method, methods } from "./method";
-import { contentTypes } from "./content-type";
+import { methods } from "./method";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
@@ -238,28 +230,9 @@ export class Integration extends IntegrationBase {
       this.makeClientClass(),
     );
 
-    const exampleImplStatement = this.makeExampleImplementation(serverUrl);
-
-    // client.provide("get /v1/user/retrieve", { id: "10" });
-    const provideCallingStatement = f.createExpressionStatement(
-      makePropCall(this.ids.clientConst, this.ids.provideMethod, [
-        f.createStringLiteral(`${"get" satisfies Method} /v1/user/retrieve`),
-        f.createObjectLiteralExpression([
-          f.createPropertyAssignment("id", f.createStringLiteral("10")),
-        ]),
-      ]),
-    );
-
-    // const client = new ExpressZodAPIClient(exampleImplementation);
-    const clientInstanceStatement = makeConst(
-      this.ids.clientConst,
-      makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
-    );
-
     this.usage.push(
-      exampleImplStatement,
-      clientInstanceStatement,
-      provideCallingStatement,
+      this.makeExampleImplementation(serverUrl),
+      ...this.makeUsageStatements(),
     );
   }
 
