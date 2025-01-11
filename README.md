@@ -649,7 +649,7 @@ declare module "express-zod-api" {
 
 const config = createConfig({
   childLoggerProvider: ({ parent, request }) =>
-    parent.child({ requestId: randomUUID() }),
+    parent.child({ requestId: randomUUID() }), // accessible at logger.ctx.requestId later
 });
 ```
 
