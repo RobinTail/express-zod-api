@@ -19,8 +19,6 @@ import {
 import { zodToTs } from "./zts";
 import { ZTSContext } from "./zts-helpers";
 
-type IOKind = "input" | "response" | ResponseVariant | "encoded";
-
 interface IntegrationParams {
   routing: Routing;
   /**
@@ -78,18 +76,7 @@ interface FormattedPrintingOptions {
 export class Integration extends IntegrationBase {
   protected program: ts.Node[] = [this.someOfType];
   protected usage: Array<ts.Node | string> = [];
-  protected registry = new Map<string, Record<IOKind, ts.TypeNode>>();
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
-  protected interfaces: Array<{
-    id: ts.Identifier;
-    kind: IOKind;
-  }> = [
-    { id: this.ids.inputInterface, kind: "input" },
-    { id: this.ids.posResponseInterface, kind: "positive" },
-    { id: this.ids.negResponseInterface, kind: "negative" },
-    { id: this.ids.encResponseInterface, kind: "encoded" },
-    { id: this.ids.responseInterface, kind: "response" },
-  ];
 
   protected makeAlias(
     schema: z.ZodTypeAny,
@@ -180,22 +167,12 @@ export class Integration extends IntegrationBase {
     };
     walkRouting({ routing, onEndpoint });
     this.program.unshift(...this.aliases.values());
-    this.program.push(this.makePathType(), this.methodType);
-
-    // export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    for (const { id, kind } of this.interfaces) {
-      this.program.push(
-        makeInterface(
-          id,
-          Array.from(this.registry).map(([request, faces]) =>
-            makeInterfaceProp(request, faces[kind]),
-          ),
-          { expose: true },
-        ),
-      );
-    }
-
-    this.program.push(this.requestType);
+    this.program.push(
+      this.makePathType(),
+      this.methodType,
+      ...this.makePublicInterfaces(),
+      this.requestType,
+    );
 
     if (variant === "types") return;
 

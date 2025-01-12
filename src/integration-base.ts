@@ -1,4 +1,5 @@
 import ts from "typescript";
+import { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
 import { Method, methods } from "./method";
 import {
@@ -8,6 +9,8 @@ import {
   makeConst,
   makeDeconstruction,
   makeEmptyInitializingConstructor,
+  makeInterface,
+  makeInterfaceProp,
   makeKeyOf,
   makeNew,
   makeObjectKeysReducer,
@@ -27,9 +30,13 @@ import {
   recordStringAny,
 } from "./typescript-api";
 
+type IOKind = "input" | "response" | ResponseVariant | "encoded";
+
 export abstract class IntegrationBase {
   protected paths = new Set<string>();
   protected tags = new Map<string, ReadonlyArray<string>>();
+  protected registry = new Map<string, Record<IOKind, ts.TypeNode>>();
+
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
@@ -62,6 +69,17 @@ export abstract class IntegrationBase {
     isJsonConst: f.createIdentifier("isJSON"),
   } satisfies Record<string, ts.Identifier>;
 
+  protected interfaces: Array<{
+    id: ts.Identifier;
+    kind: IOKind;
+  }> = [
+    { id: this.ids.inputInterface, kind: "input" },
+    { id: this.ids.posResponseInterface, kind: "positive" },
+    { id: this.ids.negResponseInterface, kind: "negative" },
+    { id: this.ids.encResponseInterface, kind: "encoded" },
+    { id: this.ids.responseInterface, kind: "response" },
+  ];
+
   protected constructor(private readonly serverUrl: string) {}
 
   // export type Method = "get" | "post" | "put" | "delete" | "patch";
@@ -93,6 +111,18 @@ export abstract class IntegrationBase {
   // export type Path = "/v1/user/retrieve" | ___;
   protected makePathType = () =>
     makePublicLiteralType(this.ids.pathType, Array.from(this.paths));
+
+  // export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
+  protected makePublicInterfaces = () =>
+    this.interfaces.map(({ id, kind }) =>
+      makeInterface(
+        id,
+        Array.from(this.registry).map(([request, faces]) =>
+          makeInterfaceProp(request, faces[kind]),
+        ),
+        { expose: true },
+      ),
+    );
 
   // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
   protected makeEndpointTags = () =>
