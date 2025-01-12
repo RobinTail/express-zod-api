@@ -1,6 +1,6 @@
 import ts from "typescript";
 import { contentTypes } from "./content-type";
-import { Method } from "./method";
+import { Method, methods } from "./method";
 import {
   f,
   makeAnd,
@@ -16,6 +16,7 @@ import {
   makePromise,
   makePropCall,
   makePublicClass,
+  makePublicLiteralType,
   makePublicMethod,
   makeTemplate,
   makeTernary,
@@ -57,6 +58,9 @@ export abstract class IntegrationBase {
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
   } satisfies Record<string, ts.Identifier>;
+
+  // export type Method = "get" | "post" | "put" | "delete" | "patch";
+  protected methodType = makePublicLiteralType(this.ids.methodType, methods);
 
   // type SomeOf<T> = T[keyof T];
   protected someOfType = makeType(

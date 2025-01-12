@@ -13,7 +13,6 @@ import {
   printNode,
 } from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
-import { methods } from "./method";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
@@ -194,8 +193,7 @@ export class Integration extends IntegrationBase {
       makePublicLiteralType(this.ids.pathType, Array.from(this.paths)),
     );
 
-    // export type Method = "get" | "post" | "put" | "delete" | "patch";
-    this.program.push(makePublicLiteralType(this.ids.methodType, methods));
+    this.program.push(this.methodType);
 
     // Single walk through the registry for making properties for the next three objects
     const endpointTags: ts.PropertyAssignment[] = [];
