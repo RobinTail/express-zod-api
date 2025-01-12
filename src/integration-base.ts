@@ -80,8 +80,6 @@ export abstract class IntegrationBase {
     { id: this.ids.responseInterface, kind: "response" },
   ];
 
-  protected constructor(private readonly serverUrl: string) {}
-
   // export type Method = "get" | "post" | "put" | "delete" | "patch";
   protected methodType = makePublicLiteralType(this.ids.methodType, methods);
 
@@ -101,6 +99,8 @@ export abstract class IntegrationBase {
     makeKeyOf(this.ids.inputInterface),
     { expose: true },
   );
+
+  protected constructor(private readonly serverUrl: string) {}
 
   /** @example SomeOf<_>*/
   protected someOf = ({ name }: ts.TypeAliasDeclaration) =>
