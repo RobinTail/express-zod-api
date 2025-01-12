@@ -453,9 +453,11 @@ export class Integration {
       this.ids.bodyProperty,
       makeTernary(
         this.ids.hasBodyConst,
-        makePropCall(f.createIdentifier("JSON"), propOf<JSON>("stringify"), [
-          this.ids.paramsArgument,
-        ]),
+        makePropCall(
+          f.createIdentifier(JSON[Symbol.toStringTag]),
+          propOf<JSON>("stringify"),
+          [this.ids.paramsArgument],
+        ),
         this.ids.undefinedValue,
       ),
     );
