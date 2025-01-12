@@ -1,24 +1,24 @@
+import type Prettier from "prettier";
 import { chain } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant, responseVariants } from "./api-response";
-import { IntegrationBase } from "./integration-base";
-import {
-  f,
-  makeInterfaceProp,
-  makeInterface,
-  makeType,
-  makePropertyIdentifier,
-  printNode,
-} from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
+import { IntegrationBase } from "./integration-base";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
+import {
+  f,
+  makeInterface,
+  makeInterfaceProp,
+  makePropertyIdentifier,
+  makeType,
+  printNode,
+} from "./typescript-api";
 import { zodToTs } from "./zts";
 import { ZTSContext } from "./zts-helpers";
-import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
 
@@ -83,7 +83,6 @@ export class Integration extends IntegrationBase {
     string, // request (method+path)
     Record<IOKind, ts.TypeNode> & { tags: ReadonlyArray<string> }
   >();
-  protected paths = new Set<string>();
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
   protected interfaces: Array<{
     id: ts.Identifier;
@@ -186,7 +185,7 @@ export class Integration extends IntegrationBase {
     };
     walkRouting({ routing, onEndpoint });
     this.program.unshift(...this.aliases.values());
-    this.program.push(this.makePathType(this.paths), this.methodType);
+    this.program.push(this.makePathType(), this.methodType);
 
     // Single walk through the registry for making properties for the next three objects
     const endpointTags: ts.PropertyAssignment[] = [];

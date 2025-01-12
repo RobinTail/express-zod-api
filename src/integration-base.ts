@@ -27,6 +27,7 @@ import {
 } from "./typescript-api";
 
 export abstract class IntegrationBase {
+  protected paths = new Set<string>();
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
@@ -86,8 +87,8 @@ export abstract class IntegrationBase {
     ]);
 
   // export type Path = "/v1/user/retrieve" | ___;
-  protected makePathType = (paths: Set<string>) =>
-    makePublicLiteralType(this.ids.pathType, Array.from(paths));
+  protected makePathType = () =>
+    makePublicLiteralType(this.ids.pathType, Array.from(this.paths));
 
   // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
   protected makeEndpointTagsConst = (endpointTags: ts.PropertyAssignment[]) =>
