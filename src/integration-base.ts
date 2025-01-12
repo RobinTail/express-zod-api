@@ -85,6 +85,10 @@ export abstract class IntegrationBase {
       f.createTypeReferenceNode(name),
     ]);
 
+  // export type Path = "/v1/user/retrieve" | ___;
+  protected makePathType = (paths: Set<string>) =>
+    makePublicLiteralType(this.ids.pathType, Array.from(paths));
+
   // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
   protected makeEndpointTagsConst = (endpointTags: ts.PropertyAssignment[]) =>
     makeConst(

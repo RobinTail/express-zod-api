@@ -7,7 +7,6 @@ import {
   f,
   makeInterfaceProp,
   makeInterface,
-  makePublicLiteralType,
   makeType,
   makePropertyIdentifier,
   printNode,
@@ -187,12 +186,7 @@ export class Integration extends IntegrationBase {
     };
     walkRouting({ routing, onEndpoint });
     this.program.unshift(...this.aliases.values());
-
-    this.program.push(
-      // export type Path = "/v1/user/retrieve" | ___;
-      makePublicLiteralType(this.ids.pathType, Array.from(this.paths)),
-      this.methodType,
-    );
+    this.program.push(this.makePathType(this.paths), this.methodType);
 
     // Single walk through the registry for making properties for the next three objects
     const endpointTags: ts.PropertyAssignment[] = [];
