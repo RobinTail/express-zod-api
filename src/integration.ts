@@ -188,12 +188,11 @@ export class Integration extends IntegrationBase {
     walkRouting({ routing, onEndpoint });
     this.program.unshift(...this.aliases.values());
 
-    // export type Path = "/v1/user/retrieve" | ___;
     this.program.push(
+      // export type Path = "/v1/user/retrieve" | ___;
       makePublicLiteralType(this.ids.pathType, Array.from(this.paths)),
+      this.methodType,
     );
-
-    this.program.push(this.methodType);
 
     // Single walk through the registry for making properties for the next three objects
     const endpointTags: ts.PropertyAssignment[] = [];
