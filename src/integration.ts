@@ -1,23 +1,23 @@
-import type Prettier from "prettier";
 import { chain } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant, responseVariants } from "./api-response";
-import { makeCleanId } from "./common-helpers";
 import { IntegrationBase } from "./integration-base";
+import {
+  f,
+  makeInterfaceProp,
+  makeInterface,
+  makeType,
+  printNode,
+} from "./typescript-api";
+import { makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
-import {
-  f,
-  makeInterface,
-  makeInterfaceProp,
-  makeType,
-  printNode,
-} from "./typescript-api";
 import { zodToTs } from "./zts";
 import { ZTSContext } from "./zts-helpers";
+import type Prettier from "prettier";
 
 interface IntegrationParams {
   routing: Routing;
