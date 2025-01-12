@@ -102,7 +102,7 @@ export abstract class IntegrationBase {
 
   protected constructor(private readonly serverUrl: string) {}
 
-  /** @example SomeOf<_>*/
+  /** @example SomeOf<_> */
   protected someOf = ({ name }: ts.TypeAliasDeclaration) =>
     f.createTypeReferenceNode(this.someOfType.name, [
       f.createTypeReferenceNode(name),
