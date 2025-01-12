@@ -167,7 +167,13 @@ export class Integration {
     id: ts.Identifier;
     kind: IOKind;
     props: ts.PropertySignature[];
-  }> = [];
+  }> = [
+    { id: this.ids.inputInterface, kind: "input", props: [] },
+    { id: this.ids.posResponseInterface, kind: "positive", props: [] },
+    { id: this.ids.negResponseInterface, kind: "negative", props: [] },
+    { id: this.ids.encResponseInterface, kind: "encoded", props: [] },
+    { id: this.ids.responseInterface, kind: "response", props: [] },
+  ];
 
   protected makeAlias(
     schema: z.ZodTypeAny,
@@ -275,22 +281,6 @@ export class Integration {
 
     // export type Method = "get" | "post" | "put" | "delete" | "patch";
     this.program.push(makePublicLiteralType(this.ids.methodType, methods));
-
-    this.interfaces.push(
-      {
-        id: this.ids.inputInterface,
-        kind: "input",
-        props: [],
-      },
-      { id: this.ids.posResponseInterface, kind: "positive", props: [] },
-      { id: this.ids.negResponseInterface, kind: "negative", props: [] },
-      { id: this.ids.encResponseInterface, kind: "encoded", props: [] },
-      {
-        id: this.ids.responseInterface,
-        kind: "response",
-        props: [],
-      },
-    );
 
     // Single walk through the registry for making properties for the next three objects
     const jsonEndpoints: ts.PropertyAssignment[] = [];
@@ -625,9 +615,11 @@ export class Integration {
       this.ids.bodyProperty,
       makeTernary(
         this.ids.hasBodyConst,
-        makePropCall(f.createIdentifier("JSON"), propOf<JSON>("stringify"), [
-          this.ids.paramsArgument,
-        ]),
+        makePropCall(
+          f.createIdentifier(JSON[Symbol.toStringTag]),
+          propOf<JSON>("stringify"),
+          [this.ids.paramsArgument],
+        ),
         this.ids.undefinedValue,
       ),
     );

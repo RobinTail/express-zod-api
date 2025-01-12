@@ -2,6 +2,36 @@
 
 ## Version 21
 
+### v21.11.0
+
+- New public property `ctx` is available on instances of `BuiltinLogger`:
+  - When using the built-in logger and `childLoggerProvider` config option, the `ctx` property contains the argument
+    that was used for creating the child logger using its `.child()` method;
+  - It can be utilized for accessing its `requestId` property for purposes other than logging;
+  - The default value of `ctx` is an empty object (when the instance is not a child logger).
+
+```ts
+import { BuiltinLogger, createConfig, createMiddleware } from "express-zod-api";
+
+// Declaring the logger type in use
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+
+// Configuring child logger provider
+const config = createConfig({
+  childLoggerProvider: ({ parent }) =>
+    parent.child({ requestId: randomUUID() }),
+});
+
+// Accessing child logger context
+createMiddleware({
+  handler: async ({ logger }) => {
+    doSomething(logger.ctx.requestId); // <—
+  },
+});
+```
+
 ### v21.10.0
 
 - New `Integration` option: `serverUrl`, string, optional, the API URL for the generated client:

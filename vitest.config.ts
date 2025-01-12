@@ -4,9 +4,6 @@ import { dirname, join } from "node:path";
 
 export default defineConfig({
   test: {
-    env: {
-      FORCE_COLOR: "1",
-    },
     globals: true,
     pool: "threads",
     testTimeout: 10000,
