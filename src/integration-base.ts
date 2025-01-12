@@ -60,6 +60,8 @@ export abstract class IntegrationBase {
     isJsonConst: f.createIdentifier("isJSON"),
   } satisfies Record<string, ts.Identifier>;
 
+  protected constructor(private readonly serverUrl: string) {}
+
   // export type Method = "get" | "post" | "put" | "delete" | "patch";
   protected methodType = makePublicLiteralType(this.ids.methodType, methods);
 
@@ -235,7 +237,7 @@ export abstract class IntegrationBase {
     );
 
   // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
-  protected makeExampleImplementation = (serverUrl: string) => {
+  protected makeExampleImplementation = () => {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
       this.ids.methodParameter,
@@ -283,7 +285,7 @@ export abstract class IntegrationBase {
               [this.ids.pathParameter],
               [this.ids.searchParamsConst],
             ),
-            f.createStringLiteral(serverUrl),
+            f.createStringLiteral(this.serverUrl),
           ),
           f.createObjectLiteralExpression([
             methodProperty,

@@ -118,7 +118,7 @@ export class Integration extends IntegrationBase {
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
   }: IntegrationParams) {
-    super();
+    super(serverUrl);
     const commons = { makeAlias: this.makeAlias.bind(this), optionalPropStyle };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
@@ -221,7 +221,7 @@ export class Integration extends IntegrationBase {
     );
 
     this.usage.push(
-      this.makeExampleImplementation(serverUrl),
+      this.makeExampleImplementation(),
       ...this.makeUsageStatements(),
     );
   }
