@@ -83,13 +83,12 @@ export class Integration extends IntegrationBase {
   protected interfaces: Array<{
     id: ts.Identifier;
     kind: IOKind;
-    props: ts.PropertySignature[];
   }> = [
-    { id: this.ids.inputInterface, kind: "input", props: [] },
-    { id: this.ids.posResponseInterface, kind: "positive", props: [] },
-    { id: this.ids.negResponseInterface, kind: "negative", props: [] },
-    { id: this.ids.encResponseInterface, kind: "encoded", props: [] },
-    { id: this.ids.responseInterface, kind: "response", props: [] },
+    { id: this.ids.inputInterface, kind: "input" },
+    { id: this.ids.posResponseInterface, kind: "positive" },
+    { id: this.ids.negResponseInterface, kind: "negative" },
+    { id: this.ids.encResponseInterface, kind: "encoded" },
+    { id: this.ids.responseInterface, kind: "response" },
   ];
 
   protected makeAlias(
@@ -183,13 +182,18 @@ export class Integration extends IntegrationBase {
     this.program.unshift(...this.aliases.values());
     this.program.push(this.makePathType(), this.methodType);
 
-    for (const [request, faces] of this.registry)
-      for (const face of this.interfaces) // eslint-disable-line curly
-        face.props.push(makeInterfaceProp(request, faces[face.kind]));
-
     // export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    for (const { id, props } of this.interfaces)
-      this.program.push(makeInterface(id, props, { expose: true }));
+    for (const { id, kind } of this.interfaces) {
+      this.program.push(
+        makeInterface(
+          id,
+          Array.from(this.registry).map(([request, faces]) =>
+            makeInterfaceProp(request, faces[kind]),
+          ),
+          { expose: true },
+        ),
+      );
+    }
 
     this.program.push(this.requestType);
 
