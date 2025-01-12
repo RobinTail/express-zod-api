@@ -15,6 +15,7 @@ import {
   makeParams,
   makePromise,
   makePropCall,
+  makePropertyIdentifier,
   makePublicClass,
   makePublicLiteralType,
   makePublicMethod,
@@ -28,6 +29,7 @@ import {
 
 export abstract class IntegrationBase {
   protected paths = new Set<string>();
+  protected tags = new Map<string, ReadonlyArray<string>>();
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
@@ -93,10 +95,19 @@ export abstract class IntegrationBase {
     makePublicLiteralType(this.ids.pathType, Array.from(this.paths));
 
   // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
-  protected makeEndpointTagsConst = (endpointTags: ts.PropertyAssignment[]) =>
+  protected makeEndpointTags = () =>
     makeConst(
       this.ids.endpointTagsConst,
-      f.createObjectLiteralExpression(endpointTags),
+      f.createObjectLiteralExpression(
+        Array.from(this.tags).map(([request, tags]) =>
+          f.createPropertyAssignment(
+            makePropertyIdentifier(request),
+            f.createArrayLiteralExpression(
+              tags.map((tag) => f.createStringLiteral(tag)),
+            ),
+          ),
+        ),
+      ),
       { expose: true },
     );
 

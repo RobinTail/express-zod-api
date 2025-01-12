@@ -13,7 +13,6 @@ import {
   f,
   makeInterface,
   makeInterfaceProp,
-  makePropertyIdentifier,
   makeType,
   printNode,
 } from "./typescript-api";
@@ -79,10 +78,7 @@ interface FormattedPrintingOptions {
 export class Integration extends IntegrationBase {
   protected program: ts.Node[] = [this.someOfType];
   protected usage: Array<ts.Node | string> = [];
-  protected registry = new Map<
-    string, // request (method+path)
-    Record<IOKind, ts.TypeNode> & { tags: ReadonlyArray<string> }
-  >();
+  protected registry = new Map<string, Record<IOKind, ts.TypeNode>>();
   protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
   protected interfaces: Array<{
     id: ts.Identifier;
@@ -180,31 +176,16 @@ export class Integration extends IntegrationBase {
           f.createTypeReferenceNode(dictionaries.positive.name),
           f.createTypeReferenceNode(dictionaries.negative.name),
         ]),
-        tags: endpoint.getTags(),
       });
+      this.tags.set(request, endpoint.getTags());
     };
     walkRouting({ routing, onEndpoint });
     this.program.unshift(...this.aliases.values());
     this.program.push(this.makePathType(), this.methodType);
 
-    // Single walk through the registry for making properties for the next three objects
-    const endpointTags: ts.PropertyAssignment[] = [];
-    for (const [request, { tags, ...rest }] of this.registry) {
-      // "get /v1/user/retrieve": GetV1UserRetrieveInput
-      for (const face of this.interfaces)
-        face.props.push(makeInterfaceProp(request, rest[face.kind]));
-      if (variant !== "types") {
-        // "get /v1/user/retrieve": ["users"]
-        endpointTags.push(
-          f.createPropertyAssignment(
-            makePropertyIdentifier(request),
-            f.createArrayLiteralExpression(
-              tags.map((tag) => f.createStringLiteral(tag)),
-            ),
-          ),
-        );
-      }
-    }
+    for (const [request, faces] of this.registry)
+      for (const face of this.interfaces) // eslint-disable-line curly
+        face.props.push(makeInterfaceProp(request, faces[face.kind]));
 
     // export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
     for (const { id, props } of this.interfaces)
@@ -215,7 +196,7 @@ export class Integration extends IntegrationBase {
     if (variant === "types") return;
 
     this.program.push(
-      this.makeEndpointTagsConst(endpointTags),
+      this.makeEndpointTags(),
       this.makeImplementationType(),
       this.makeClientClass(),
     );
