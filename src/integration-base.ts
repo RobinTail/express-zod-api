@@ -57,10 +57,8 @@ export abstract class IntegrationBase {
     substituteFn: f.createIdentifier("substitute"),
     provideMethod: f.createIdentifier("provide"),
     implementationArgument: f.createIdentifier("implementation"),
-    headersProperty: f.createIdentifier("headers"),
     hasBodyConst: f.createIdentifier("hasBody"),
     undefinedValue: f.createIdentifier("undefined"),
-    bodyProperty: f.createIdentifier("body"),
     responseConst: f.createIdentifier("response"),
     restConst: f.createIdentifier("rest"),
     searchParamsConst: f.createIdentifier("searchParams"),
@@ -311,13 +309,13 @@ export abstract class IntegrationBase {
   protected makeExampleImplementation = () => {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
-      this.ids.methodParameter,
+      propOf<RequestInit>("method"),
       makePropCall(this.ids.methodParameter, propOf<string>("toUpperCase")),
     );
 
     // headers: hasBody ? { "Content-Type": "application/json" } : undefined
     const headersProperty = f.createPropertyAssignment(
-      this.ids.headersProperty,
+      propOf<RequestInit>("headers"),
       makeTernary(
         this.ids.hasBodyConst,
         f.createObjectLiteralExpression([
@@ -332,7 +330,7 @@ export abstract class IntegrationBase {
 
     // body: hasBody ? JSON.stringify(params) : undefined
     const bodyProperty = f.createPropertyAssignment(
-      this.ids.bodyProperty,
+      propOf<RequestInit>("body"),
       makeTernary(
         this.ids.hasBodyConst,
         makePropCall(
@@ -401,7 +399,7 @@ export abstract class IntegrationBase {
     const contentTypeStatement = makeConst(
       this.ids.contentTypeConst,
       makePropCall(
-        [this.ids.responseConst, this.ids.headersProperty],
+        [this.ids.responseConst, propOf<Response>("headers")],
         propOf<Headers>("get"),
         [f.createStringLiteral("content-type")],
       ),
