@@ -1,4 +1,5 @@
 import ts from "typescript";
+import type { RequestMode } from "undici";
 import { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
 import { Method, methods } from "./method";
@@ -60,10 +61,8 @@ export abstract class IntegrationBase {
     hasSameOriginFn: f.createIdentifier("hasSameOrigin"),
     provideMethod: f.createIdentifier("provide"),
     implementationArgument: f.createIdentifier("implementation"),
-    headersProperty: f.createIdentifier("headers"),
     hasBodyConst: f.createIdentifier("hasBody"),
     undefinedValue: f.createIdentifier("undefined"),
-    bodyProperty: f.createIdentifier("body"),
     responseConst: f.createIdentifier("response"),
     restConst: f.createIdentifier("rest"),
     searchParamsConst: f.createIdentifier("searchParams"),
@@ -272,7 +271,6 @@ export abstract class IntegrationBase {
           ),
         ),
       ),
-      { expose: true }, // @todo remove
     );
 
   // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {}
@@ -337,13 +335,13 @@ export abstract class IntegrationBase {
   protected makeDefaultImplementation = () => {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
-      this.ids.methodParameter,
+      propOf<RequestInit>("method"),
       makePropCall(this.ids.methodParameter, propOf<string>("toUpperCase")),
     );
 
     // headers: hasBody ? { "Content-Type": "application/json" } : undefined
     const headersProperty = f.createPropertyAssignment(
-      this.ids.headersProperty,
+      propOf<RequestInit>("headers"),
       makeTernary(
         this.ids.hasBodyConst,
         f.createObjectLiteralExpression([
@@ -358,7 +356,7 @@ export abstract class IntegrationBase {
 
     // body: hasBody ? JSON.stringify(params) : undefined
     const bodyProperty = f.createPropertyAssignment(
-      this.ids.bodyProperty,
+      propOf<RequestInit>("body"),
       makeTernary(
         this.ids.hasBodyConst,
         makePropCall(
@@ -367,6 +365,18 @@ export abstract class IntegrationBase {
           [this.ids.paramsArgument],
         ),
         this.ids.undefinedValue,
+      ),
+    );
+
+    // mode: hasSameOrigin(url) ? "same-origin" : "cors"
+    const modeProperty = f.createPropertyAssignment(
+      propOf<RequestInit>("mode"),
+      makeTernary(
+        f.createCallExpression(this.ids.hasSameOriginFn, undefined, [
+          this.ids.urlParameter,
+        ]),
+        f.createStringLiteral("same-origin" satisfies RequestMode),
+        f.createStringLiteral("cors" satisfies RequestMode),
       ),
     );
 
@@ -391,6 +401,7 @@ export abstract class IntegrationBase {
         f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
           this.ids.urlParameter,
           f.createObjectLiteralExpression([
+            modeProperty,
             methodProperty,
             headersProperty,
             bodyProperty,
@@ -433,7 +444,7 @@ export abstract class IntegrationBase {
     const contentTypeStatement = makeConst(
       this.ids.contentTypeConst,
       makePropCall(
-        [this.ids.responseConst, this.ids.headersProperty],
+        [this.ids.responseConst, propOf<Response>("headers")],
         propOf<Headers>("get"),
         [f.createStringLiteral("content-type")],
       ),

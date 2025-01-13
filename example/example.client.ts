@@ -428,8 +428,7 @@ const substitute = (path: string, params: Record<string, any>) => {
   return [path, rest] as const;
 };
 
-export const hasSameOrigin = (url: URL) =>
-  window.location.origin === url.origin;
+const hasSameOrigin = (url: URL) => window.location.origin === url.origin;
 
 export type Implementation = (
   method: Method,
@@ -442,6 +441,7 @@ const defaultImplementation: Implementation = async (method, path, params) => {
   const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
   const url = new URL(`${path}${searchParams}`, "https://example.com");
   const response = await fetch(url, {
+    mode: hasSameOrigin(url) ? "same-origin" : "cors",
     method: method.toUpperCase(),
     headers: hasBody ? { "Content-Type": "application/json" } : undefined,
     body: hasBody ? JSON.stringify(params) : undefined,
