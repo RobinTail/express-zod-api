@@ -370,20 +370,26 @@ export abstract class IntegrationBase {
       ),
     );
 
-    // const response = await fetch(new URL(`${path}${searchParams}`, "https://example.com"), { ___ });
+    // const url = new URL(`${path}${searchParams}`, "https://example.com");
+    const urlStatement = makeConst(
+      this.ids.urlParameter,
+      makeNew(
+        f.createIdentifier(URL.name),
+        makeTemplate(
+          "",
+          [this.ids.pathParameter],
+          [this.ids.searchParamsConst],
+        ),
+        f.createStringLiteral(this.serverUrl),
+      ),
+    );
+
+    // const response = await fetch(url, { ___ });
     const responseStatement = makeConst(
       this.ids.responseConst,
       f.createAwaitExpression(
         f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
-          makeNew(
-            f.createIdentifier(URL.name),
-            makeTemplate(
-              "",
-              [this.ids.pathParameter],
-              [this.ids.searchParamsConst],
-            ),
-            f.createStringLiteral(this.serverUrl),
-          ),
+          this.ids.urlParameter,
           f.createObjectLiteralExpression([
             methodProperty,
             headersProperty,
@@ -477,6 +483,7 @@ export abstract class IntegrationBase {
         f.createBlock([
           hasBodyStatement,
           searchParamsStatement,
+          urlStatement,
           responseStatement,
           contentTypeStatement,
           noBodyStatement,
