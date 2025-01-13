@@ -111,6 +111,14 @@ export class BuiltinLogger implements AbstractLogger {
     return new BuiltinLogger({ ...this.config, ctx });
   }
 
+  /**
+   * @desc The argument used for instance created by .child() method
+   * @see ChildLoggerProvider
+   * */
+  public get ctx() {
+    return this.config.ctx;
+  }
+
   /** @desc Measures the duration until you invoke the returned callback */
   public profile(message: string): () => void;
   public profile(options: ProfilerOptions): () => void;
