@@ -460,7 +460,7 @@ export abstract class IntegrationBase {
         ]),
         { isAsync: true },
       ),
-      { expose: true, type: ensureTypeNode(this.ids.implementationType) },
+      { type: ensureTypeNode(this.ids.implementationType) },
     );
   };
 

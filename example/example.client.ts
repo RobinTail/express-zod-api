@@ -434,11 +434,7 @@ export type Implementation = (
   params: Record<string, any>,
 ) => Promise<any>;
 
-export const defaultImplementation: Implementation = async (
-  method,
-  path,
-  params,
-) => {
+const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
   const response = await fetch(
