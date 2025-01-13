@@ -465,11 +465,7 @@ export abstract class IntegrationBase {
   };
 
   protected makeUsageStatements = () => [
-    // const client = new ExpressZodAPIClient(exampleImplementation);
-    makeConst(
-      this.ids.clientConst,
-      makeNew(this.ids.clientClass, this.ids.defaultImplementationConst),
-    ),
+    makeConst(this.ids.clientConst, makeNew(this.ids.clientClass)), // const client = new ExpressZodAPIClient();
     // client.provide("get /v1/user/retrieve", { id: "10" });
     f.createExpressionStatement(
       makePropCall(this.ids.clientConst, this.ids.provideMethod, [

@@ -470,6 +470,6 @@ export class ExpressZodAPIClient {
 
 // Usage example:
 /*
-const client = new ExpressZodAPIClient(defaultImplementation);
+const client = new ExpressZodAPIClient();
 client.provide("get /v1/user/retrieve", { id: "10" });
 */
