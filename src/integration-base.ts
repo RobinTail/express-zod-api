@@ -38,7 +38,6 @@ export abstract class IntegrationBase {
 
   protected ids = {
     pathType: f.createIdentifier("Path"),
-    methodType: f.createIdentifier("Method"),
     inputInterface: f.createIdentifier("Input"),
     posResponseInterface: f.createIdentifier("PositiveResponse"),
     negResponseInterface: f.createIdentifier("NegativeResponse"),
@@ -79,7 +78,7 @@ export abstract class IntegrationBase {
   ];
 
   // export type Method = "get" | "post" | "put" | "delete" | "patch";
-  protected methodType = makePublicLiteralType(this.ids.methodType, methods);
+  protected methodType = makePublicLiteralType("Method", methods);
 
   // type SomeOf<T> = T[keyof T];
   protected someOfType = makeType(
@@ -141,7 +140,7 @@ export abstract class IntegrationBase {
       f.createFunctionTypeNode(
         undefined,
         makeParams({
-          [this.ids.methodParameter.text]: ensureTypeNode(this.ids.methodType),
+          [this.ids.methodParameter.text]: ensureTypeNode(this.methodType.name),
           [this.ids.pathParameter.text]: f.createKeywordTypeNode(
             ts.SyntaxKind.StringKeyword,
           ),
@@ -168,7 +167,7 @@ export abstract class IntegrationBase {
             f.createNumericLiteral(2), // excludes third empty element
           ]),
           f.createTupleTypeNode([
-            ensureTypeNode(this.ids.methodType),
+            ensureTypeNode(this.methodType.name),
             ensureTypeNode(this.ids.pathType),
           ]),
         ),
