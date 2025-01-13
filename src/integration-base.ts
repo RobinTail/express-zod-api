@@ -43,7 +43,6 @@ export abstract class IntegrationBase {
     negResponseInterface: f.createIdentifier("NegativeResponse"),
     encResponseInterface: f.createIdentifier("EncodedResponse"),
     responseInterface: f.createIdentifier("Response"),
-    endpointTagsConst: f.createIdentifier("endpointTags"),
     implementationType: f.createIdentifier("Implementation"),
     clientClass: f.createIdentifier("ExpressZodAPIClient"),
     keyParameter: f.createIdentifier("key"),
@@ -119,7 +118,7 @@ export abstract class IntegrationBase {
   // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
   protected makeEndpointTags = () =>
     makeConst(
-      this.ids.endpointTagsConst,
+      "endpointTags",
       f.createObjectLiteralExpression(
         Array.from(this.tags).map(([request, tags]) =>
           f.createPropertyAssignment(
