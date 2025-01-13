@@ -10,6 +10,7 @@ import {
   makeConst,
   makeDeconstruction,
   makeEmptyInitializingConstructor,
+  makeEqual,
   makeInterface,
   makeInterfaceProp,
   makeKeyOf,
@@ -53,8 +54,10 @@ export abstract class IntegrationBase {
     paramsArgument: f.createIdentifier("params"),
     methodParameter: f.createIdentifier("method"),
     requestParameter: f.createIdentifier("request"),
+    urlParameter: f.createIdentifier("url"),
     parseRequestFn: f.createIdentifier("parseRequest"),
     substituteFn: f.createIdentifier("substitute"),
+    hasSameOriginFn: f.createIdentifier("hasSameOrigin"),
     provideMethod: f.createIdentifier("provide"),
     implementationArgument: f.createIdentifier("implementation"),
     headersProperty: f.createIdentifier("headers"),
@@ -248,6 +251,28 @@ export abstract class IntegrationBase {
           ),
         ]),
       ),
+    );
+
+  protected makeSameOriginFn = () =>
+    makeConst(
+      this.ids.hasSameOriginFn,
+      makeArrowFn(
+        { [this.ids.urlParameter.text]: ensureTypeNode(URL.name) },
+        makeEqual(
+          f.createPropertyAccessExpression(
+            f.createPropertyAccessExpression(
+              f.createIdentifier("window"),
+              "location",
+            ),
+            propOf<URL>("origin"),
+          ),
+          f.createPropertyAccessExpression(
+            this.ids.urlParameter,
+            propOf<URL>("origin"),
+          ),
+        ),
+      ),
+      { expose: true }, // @todo remove
     );
 
   // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {}

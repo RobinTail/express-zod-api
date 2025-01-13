@@ -283,6 +283,13 @@ export const makePropCall = (
     args,
   );
 
+export const makeEqual = (left: ts.Expression, right: ts.Expression) =>
+  f.createBinaryExpression(
+    left,
+    f.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+    right,
+  );
+
 export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
   f.createNewExpression(cls, undefined, args);
 

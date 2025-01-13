@@ -178,6 +178,7 @@ export class Integration extends IntegrationBase {
       this.makeEndpointTags(),
       this.makeParseRequestFn(),
       this.makeSubstituteFn(),
+      this.makeSameOriginFn(),
       this.makeImplementationType(),
       this.makeDefaultImplementation(),
       this.makeClientClass(),

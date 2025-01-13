@@ -428,6 +428,9 @@ const substitute = (path: string, params: Record<string, any>) => {
   return [path, rest] as const;
 };
 
+export const hasSameOrigin = (url: URL) =>
+  window.location.origin === url.origin;
+
 export type Implementation = (
   method: Method,
   path: string,
