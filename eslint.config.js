@@ -86,10 +86,6 @@ const tsFactoryConcerns = [
     message: "use makePropCall() helper",
   },
   {
-    selector: "Identifier[name='AmpersandAmpersandToken']",
-    message: "use makeAnd() helper",
-  },
-  {
     selector: "Identifier[name='EqualsEqualsEqualsToken']",
     message: "use makeEqual() helper",
   },
@@ -108,6 +104,11 @@ const tsFactoryConcerns = [
   {
     selector: "Literal[value='Promise']",
     message: "use makePromise() helper",
+  },
+  {
+    selector:
+      "CallExpression[callee.property.name='createTypeReferenceNode'][arguments.length=1]",
+    message: "use ensureTypeNode() helper",
   },
 ];
 
@@ -155,7 +156,7 @@ export default tsPlugin.config(
   },
   {
     name: "source/integration",
-    files: ["src/integration.ts", "src/zts.ts"],
+    files: ["src/integration.ts", "src/integration-base.ts", "src/zts.ts"],
     rules: {
       "no-restricted-syntax": [
         "warn",

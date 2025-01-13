@@ -6,12 +6,13 @@ const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
 const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
 
-const publicModifier = [f.createModifier(ts.SyntaxKind.PublicKeyword)];
-
-export const protectedReadonlyModifier = [
-  f.createModifier(ts.SyntaxKind.ProtectedKeyword),
-  f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
-];
+export const accessModifiers = {
+  public: [f.createModifier(ts.SyntaxKind.PublicKeyword)],
+  protectedReadonly: [
+    f.createModifier(ts.SyntaxKind.ProtectedKeyword),
+    f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
+  ],
+};
 
 export const addJsDocComment = <T extends ts.Node>(node: T, text: string) =>
   ts.addSyntheticLeadingComment(
@@ -95,16 +96,23 @@ export const makeEmptyInitializingConstructor = (
   params: ts.ParameterDeclaration[],
 ) => f.createConstructorDeclaration(undefined, params, f.createBlock([]));
 
+export const ensureTypeNode = (
+  subject: ts.TypeNode | ts.Identifier | string,
+): ts.TypeNode =>
+  typeof subject === "string" || ts.isIdentifier(subject)
+    ? f.createTypeReferenceNode(subject)
+    : subject;
+
 export const makeInterfaceProp = (
   name: string | number,
-  value: ts.TypeNode,
+  value: Parameters<typeof ensureTypeNode>[0],
   { isOptional }: { isOptional?: boolean } = {},
 ) =>
   f.createPropertySignature(
     undefined,
     makePropertyIdentifier(name),
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-    value,
+    ensureTypeNode(value),
   );
 
 export const makeDeconstruction = (
@@ -178,7 +186,7 @@ export const makePublicMethod = (
   } = {},
 ) =>
   f.createMethodDeclaration(
-    publicModifier,
+    accessModifiers.public,
     undefined,
     name,
     undefined,
@@ -198,11 +206,8 @@ export const makePublicClass = (
     ...statements,
   ]);
 
-export const makeKeyOf = (id: ts.Identifier | string) =>
-  f.createTypeOperatorNode(
-    ts.SyntaxKind.KeyOfKeyword,
-    f.createTypeReferenceNode(id),
-  );
+export const makeKeyOf = (subj: Parameters<typeof ensureTypeNode>[0]) =>
+  f.createTypeOperatorNode(ts.SyntaxKind.KeyOfKeyword, ensureTypeNode(subj));
 
 export const makePromise = (subject: ts.TypeNode | "any") =>
   f.createTypeReferenceNode(Promise.name, [
@@ -230,15 +235,11 @@ export const makeTypeParams = (
   params: Partial<Record<string, ts.Identifier | ts.TypeNode>>,
 ) =>
   Object.entries(params).map(([name, val]) =>
-    f.createTypeParameterDeclaration(
-      [],
-      name,
-      val && ts.isIdentifier(val) ? f.createTypeReferenceNode(val) : val,
-    ),
+    f.createTypeParameterDeclaration([], name, val && ensureTypeNode(val)),
   );
 
 export const makeArrowFn = (
-  params: ts.Identifier[],
+  params: ts.Identifier[] | Parameters<typeof makeParams>[0],
   body: ts.ConciseBody,
   {
     isAsync,
@@ -251,41 +252,12 @@ export const makeArrowFn = (
   f.createArrowFunction(
     isAsync ? asyncModifier : undefined,
     typeParams && makeTypeParams(typeParams),
-    params.map((key) => makeParam(key)),
+    Array.isArray(params)
+      ? params.map((key) => makeParam(key))
+      : makeParams(params),
     undefined,
     undefined,
     body,
-  );
-
-export const makeObjectKeysReducer = (
-  obj: ts.Identifier,
-  exp: ts.Expression,
-  initial: ts.Expression,
-) =>
-  f.createCallExpression(
-    f.createPropertyAccessExpression(
-      f.createCallExpression(
-        f.createPropertyAccessExpression(
-          f.createIdentifier(Object.name),
-          propOf<typeof Object>("keys"),
-        ),
-        undefined,
-        [obj],
-      ),
-      propOf<string[]>("reduce"),
-    ),
-    undefined,
-    [
-      f.createArrowFunction(
-        undefined,
-        undefined,
-        makeParams({ acc: undefined, key: undefined }),
-        undefined,
-        undefined,
-        exp,
-      ),
-      initial,
-    ],
   );
 
 export const propOf = <T>(name: keyof NoInfer<T>) => name as string;
@@ -317,13 +289,6 @@ export const makePropCall = (
     ),
     undefined,
     args,
-  );
-
-export const makeAnd = (left: ts.Expression, right: ts.Expression) =>
-  f.createBinaryExpression(
-    left,
-    f.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
-    right,
   );
 
 export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>

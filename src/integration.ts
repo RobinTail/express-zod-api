@@ -9,6 +9,7 @@ import {
   makeInterface,
   makeType,
   printNode,
+  ensureTypeNode,
 } from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
@@ -81,7 +82,7 @@ export class Integration extends IntegrationBase {
   protected makeAlias(
     schema: z.ZodTypeAny,
     produce: () => ts.TypeNode,
-  ): ts.TypeReferenceNode {
+  ): ts.TypeNode {
     let name = this.aliases.get(schema)?.name?.text;
     if (!name) {
       name = `Type${this.aliases.size + 1}`;
@@ -89,7 +90,7 @@ export class Integration extends IntegrationBase {
       this.aliases.set(schema, makeType(name, temp));
       this.aliases.set(schema, makeType(name, produce()));
     }
-    return f.createTypeReferenceNode(name);
+    return ensureTypeNode(name);
   }
 
   public constructor({
@@ -124,10 +125,7 @@ export class Integration extends IntegrationBase {
             );
             this.program.push(variantType);
             return statusCodes.map((code) =>
-              makeInterfaceProp(
-                code,
-                f.createTypeReferenceNode(variantType.name),
-              ),
+              makeInterfaceProp(code, variantType.name),
             );
           }, Array.from(responses.entries()));
           const dict = makeInterface(
@@ -145,22 +143,22 @@ export class Integration extends IntegrationBase {
         f.createStringLiteral(request),
       );
       this.registry.set(request, {
-        input: f.createTypeReferenceNode(input.name),
+        input: ensureTypeNode(input.name),
         positive: this.someOf(dictionaries.positive),
         negative: this.someOf(dictionaries.negative),
         response: f.createUnionTypeNode([
           f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.ids.posResponseInterface),
+            ensureTypeNode(this.ids.posResponseInterface),
             literalIdx,
           ),
           f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.ids.negResponseInterface),
+            ensureTypeNode(this.ids.negResponseInterface),
             literalIdx,
           ),
         ]),
         encoded: f.createIntersectionTypeNode([
-          f.createTypeReferenceNode(dictionaries.positive.name),
-          f.createTypeReferenceNode(dictionaries.negative.name),
+          ensureTypeNode(dictionaries.positive.name),
+          ensureTypeNode(dictionaries.negative.name),
         ]),
       });
       this.tags.set(request, endpoint.getTags());
@@ -178,6 +176,8 @@ export class Integration extends IntegrationBase {
 
     this.program.push(
       this.makeEndpointTags(),
+      this.makeParseRequestFn(),
+      this.makeSubstituteFn(),
       this.makeImplementationType(),
       this.makeClientClass(),
     );
