@@ -39,7 +39,6 @@ export abstract class IntegrationBase {
   protected ids = {
     pathType: f.createIdentifier("Path"),
     methodType: f.createIdentifier("Method"),
-    requestType: f.createIdentifier("Request"),
     inputInterface: f.createIdentifier("Input"),
     posResponseInterface: f.createIdentifier("PositiveResponse"),
     negResponseInterface: f.createIdentifier("NegativeResponse"),
@@ -91,7 +90,7 @@ export abstract class IntegrationBase {
 
   // export type Request = keyof Input;
   protected requestType = makeType(
-    this.ids.requestType,
+    "Request",
     makeKeyOf(this.ids.inputInterface),
     { expose: true },
   );
@@ -281,7 +280,7 @@ export abstract class IntegrationBase {
         ),
       ]),
       {
-        typeParams: { K: this.ids.requestType },
+        typeParams: { K: this.requestType.name },
         returns: makePromise(
           f.createIndexedAccessTypeNode(
             ensureTypeNode(this.ids.responseInterface),
