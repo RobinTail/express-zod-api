@@ -272,7 +272,7 @@ export const makeTernary = (
   );
 
 export const makePropCall = (
-  parent: ts.Expression | [ts.Expression, ts.Identifier],
+  parent: ts.Expression | [ts.Expression, ts.Identifier | string],
   child: ts.Identifier | string,
   args?: ts.Expression[],
 ) =>
