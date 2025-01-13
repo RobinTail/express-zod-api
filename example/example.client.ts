@@ -428,8 +428,6 @@ const substitute = (path: string, params: Record<string, any>) => {
   return [path, rest] as const;
 };
 
-const hasSameOrigin = (url: URL) => window.location.origin === url.origin;
-
 export type Implementation = (
   method: Method,
   path: string,
@@ -439,13 +437,14 @@ export type Implementation = (
 const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-  const url = new URL(`${path}${searchParams}`, "https://example.com");
-  const response = await fetch(url, {
-    mode: hasSameOrigin(url) ? "same-origin" : "cors",
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
+  const response = await fetch(
+    new URL(`${path}${searchParams}`, "https://example.com"),
+    {
+      method: method.toUpperCase(),
+      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+      body: hasBody ? JSON.stringify(params) : undefined,
+    },
+  );
   const contentType = response.headers.get("content-type");
   if (!contentType) return;
   const isJSON = contentType.startsWith("application/json");
