@@ -87,10 +87,7 @@ export abstract class IntegrationBase {
   // type SomeOf<T> = T[keyof T];
   protected someOfType = makeType(
     "SomeOf",
-    f.createIndexedAccessTypeNode(
-      f.createTypeReferenceNode("T"),
-      makeKeyOf("T"),
-    ),
+    f.createIndexedAccessTypeNode(ensureTypeNode("T"), makeKeyOf("T")),
     { params: { T: undefined } },
   );
 
@@ -105,9 +102,7 @@ export abstract class IntegrationBase {
 
   /** @example SomeOf<_> */
   protected someOf = ({ name }: ts.TypeAliasDeclaration) =>
-    f.createTypeReferenceNode(this.someOfType.name, [
-      f.createTypeReferenceNode(name),
-    ]);
+    f.createTypeReferenceNode(this.someOfType.name, [ensureTypeNode(name)]);
 
   // export type Path = "/v1/user/retrieve" | ___;
   protected makePathType = () =>
@@ -149,9 +144,7 @@ export abstract class IntegrationBase {
       f.createFunctionTypeNode(
         undefined,
         makeParams({
-          [this.ids.methodParameter.text]: f.createTypeReferenceNode(
-            this.ids.methodType,
-          ),
+          [this.ids.methodParameter.text]: ensureTypeNode(this.ids.methodType),
           [this.ids.pathParameter.text]: f.createKeywordTypeNode(
             ts.SyntaxKind.StringKeyword,
           ),
@@ -308,7 +301,7 @@ export abstract class IntegrationBase {
       makeEmptyInitializingConstructor([
         makeParam(
           this.ids.implementationArgument,
-          f.createTypeReferenceNode(this.ids.implementationType),
+          ensureTypeNode(this.ids.implementationType),
           accessModifiers.protectedReadonly,
         ),
       ]),
@@ -467,10 +460,7 @@ export abstract class IntegrationBase {
         ]),
         { isAsync: true },
       ),
-      {
-        expose: true,
-        type: f.createTypeReferenceNode(this.ids.implementationType),
-      },
+      { expose: true, type: ensureTypeNode(this.ids.implementationType) },
     );
   };
 

@@ -156,7 +156,7 @@ export default tsPlugin.config(
   },
   {
     name: "source/integration",
-    files: ["src/integration.ts", "src/zts.ts"],
+    files: ["src/integration.ts", "src/integration-base.ts", "src/zts.ts"],
     rules: {
       "no-restricted-syntax": [
         "warn",
