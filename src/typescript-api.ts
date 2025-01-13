@@ -83,12 +83,9 @@ export const makeParam = (
     undefined,
   );
 
-export const makeParams = (
-  params: Partial<Record<string, ts.TypeNode>>,
-  mod?: ts.Modifier[],
-) =>
+export const makeParams = (params: Partial<Record<string, ts.TypeNode>>) =>
   Object.entries(params).map(([name, type]) =>
-    makeParam(f.createIdentifier(name), { type, mod }),
+    makeParam(f.createIdentifier(name), { type }),
   );
 
 export const makeEmptyInitializingConstructor = (
