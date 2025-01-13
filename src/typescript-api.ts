@@ -72,8 +72,7 @@ export const recordStringAny = f.createExpressionWithTypeArguments(
 
 export const makeParam = (
   name: ts.Identifier,
-  type?: ts.TypeNode,
-  mod?: ts.Modifier[],
+  { type, mod }: { type?: ts.TypeNode; mod?: ts.Modifier[] } = {},
 ) =>
   f.createParameterDeclaration(
     mod,
@@ -88,8 +87,8 @@ export const makeParams = (
   params: Partial<Record<string, ts.TypeNode>>,
   mod?: ts.Modifier[],
 ) =>
-  Object.entries(params).map(([name, node]) =>
-    makeParam(f.createIdentifier(name), node, mod),
+  Object.entries(params).map(([name, type]) =>
+    makeParam(f.createIdentifier(name), { type, mod }),
   );
 
 export const makeEmptyInitializingConstructor = (
