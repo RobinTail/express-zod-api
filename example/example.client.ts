@@ -414,6 +414,20 @@ export const endpointTags = {
   "get /v1/events/time": ["subscriptions"],
 };
 
+const parseRequest = (request: string) =>
+  request.split(/ (.+)/, 2) as [Method, Path];
+
+const substitute = (path: string, params: Record<string, any>) => {
+  const rest = { ...params };
+  for (const key in params) {
+    path = path.replace(`:${key}`, () => {
+      delete rest[key];
+      return params[key];
+    });
+  }
+  return [path, rest] as const;
+};
+
 export type Implementation = (
   method: Method,
   path: string,
@@ -426,25 +440,8 @@ export class ExpressZodAPIClient {
     request: K,
     params: Input[K],
   ): Promise<Response[K]> {
-    const [method, path] = request.split(/ (.+)/, 2) as [Method, Path];
-    return this.implementation(
-      method,
-      Object.keys(params).reduce(
-        (acc, key) =>
-          acc.replace(`:${key}`, (params as Record<string, any>)[key]),
-        path,
-      ),
-      Object.keys(params).reduce(
-        (acc, key) =>
-          Object.assign(
-            acc,
-            !path.includes(`:${key}`) && {
-              [key]: (params as Record<string, any>)[key],
-            },
-          ),
-        {},
-      ),
-    );
+    const [method, path] = parseRequest(request);
+    return this.implementation(method, ...substitute(path, params));
   }
 }
 

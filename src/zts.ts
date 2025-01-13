@@ -10,6 +10,7 @@ import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   addJsDocComment,
+  ensureTypeNode,
   isPrimitive,
   makeInterfaceProp,
 } from "./typescript-api";
@@ -206,7 +207,7 @@ const onLazy: Producer = (lazy: z.ZodLazy<z.ZodTypeAny>, { makeAlias, next }) =>
 const onFile: Producer = (schema: FileSchema) => {
   const subject = schema.unwrap();
   const stringType = f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
-  const bufferType = f.createTypeReferenceNode("Buffer");
+  const bufferType = ensureTypeNode("Buffer");
   const unionType = f.createUnionTypeNode([stringType, bufferType]);
   return subject instanceof z.ZodString
     ? stringType
