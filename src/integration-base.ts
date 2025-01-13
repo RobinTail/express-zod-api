@@ -64,7 +64,7 @@ export abstract class IntegrationBase {
     responseConst: f.createIdentifier("response"),
     restConst: f.createIdentifier("rest"),
     searchParamsConst: f.createIdentifier("searchParams"),
-    exampleImplementationConst: f.createIdentifier("exampleImplementation"),
+    defaultImplementationConst: f.createIdentifier("defaultImplementation"),
     clientConst: f.createIdentifier("client"),
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
@@ -309,7 +309,7 @@ export abstract class IntegrationBase {
     );
 
   // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
-  protected makeExampleImplementation = () => {
+  protected makeDefaultImplementation = () => {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
       this.ids.methodParameter,
@@ -442,7 +442,7 @@ export abstract class IntegrationBase {
     );
 
     return makeConst(
-      this.ids.exampleImplementationConst,
+      this.ids.defaultImplementationConst,
       makeArrowFn(
         [
           this.ids.methodParameter,
@@ -468,7 +468,7 @@ export abstract class IntegrationBase {
     // const client = new ExpressZodAPIClient(exampleImplementation);
     makeConst(
       this.ids.clientConst,
-      makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
+      makeNew(this.ids.clientClass, this.ids.defaultImplementationConst),
     ),
     // client.provide("get /v1/user/retrieve", { id: "10" });
     f.createExpressionStatement(
