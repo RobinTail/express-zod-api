@@ -299,11 +299,10 @@ export abstract class IntegrationBase {
       this.ids.clientClass,
       // constructor(protected readonly implementation: Implementation) {}
       makeEmptyInitializingConstructor([
-        makeParam(
-          this.ids.implementationArgument,
-          ensureTypeNode(this.ids.implementationType),
-          accessModifiers.protectedReadonly,
-        ),
+        makeParam(this.ids.implementationArgument, {
+          type: ensureTypeNode(this.ids.implementationType),
+          mod: accessModifiers.protectedReadonly,
+        }),
       ]),
       [this.makeProvider()],
     );
