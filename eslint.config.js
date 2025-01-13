@@ -106,6 +106,11 @@ const tsFactoryConcerns = [
     message: "use makePromise() helper",
   },
   {
+    selector:
+      "CallExpression[callee.property.name='createTypeReferenceNode'][arguments.length=1]",
+    message: "use ensureTypeNode() helper",
+  },
+  {
     selector: "Literal[value='Extract']",
     message: "use makeExtract() helper",
   },
@@ -113,11 +118,6 @@ const tsFactoryConcerns = [
     selector:
       "CallExpression[callee.property.name='createTypeLiteralNode'] > ArrayExpression[elements.length=1]",
     message: "use makeOnePropObjType() helper",
-  },
-  {
-    selector:
-      "CallExpression[callee.property.name='createTypeReferenceNode'][arguments.length=1]",
-    message: "use ensureTypeNode() helper",
   },
 ];
 
@@ -165,7 +165,7 @@ export default tsPlugin.config(
   },
   {
     name: "source/integration",
-    files: ["src/integration.ts", "src/zts.ts"],
+    files: ["src/integration.ts", "src/integration-base.ts", "src/zts.ts"],
     rules: {
       "no-restricted-syntax": [
         "warn",

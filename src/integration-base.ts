@@ -61,7 +61,6 @@ export abstract class IntegrationBase {
     dataParameter: f.createIdentifier("data"),
     handlerParameter: f.createIdentifier("handler"),
     msgParameter: f.createIdentifier("msg"),
-    accumulator: f.createIdentifier("acc"),
     parseRequestFn: f.createIdentifier("parseRequest"),
     substituteFn: f.createIdentifier("substitute"),
     provideMethod: f.createIdentifier("provide"),
