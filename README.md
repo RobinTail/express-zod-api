@@ -1264,9 +1264,9 @@ Consuming the generated client requires Typescript version 4.1 or higher.
 
 ```typescript
 // example frontend, simple implementation based on fetch()
-import { ExpressZodAPIClient } from "./client.ts"; // the generated file
+import { Client } from "./client.ts"; // the generated file
 
-const client = new ExpressZodAPIClient(async (method, path, params) => {
+const client = new Client(async (method, path, params) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
   const response = await fetch(`https://example.com${path}${searchParams}`, {
