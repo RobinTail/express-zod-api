@@ -9,7 +9,7 @@ import {
   makeArrowFn,
   makeConst,
   makeDeconstruction,
-  makeConstructor,
+  makePublicConstructor,
   makeInterface,
   makeInterfaceProp,
   makeKeyOf,
@@ -285,7 +285,7 @@ export abstract class IntegrationBase {
     makePublicClass(
       this.ids.clientClass,
       // public constructor(protected readonly implementation: Implementation) {}
-      makeConstructor([
+      makePublicConstructor([
         makeParam(this.ids.implementationArgument, {
           type: ensureTypeNode(this.ids.implementationType),
           mod: accessModifiers.protectedReadonly,

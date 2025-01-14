@@ -88,7 +88,7 @@ export const makeParams = (params: Partial<Record<string, ts.TypeNode>>) =>
     makeParam(f.createIdentifier(name), { type }),
   );
 
-export const makeConstructor = (params: ts.ParameterDeclaration[]) =>
+export const makePublicConstructor = (params: ts.ParameterDeclaration[]) =>
   f.createConstructorDeclaration(
     accessModifiers.public,
     params,
