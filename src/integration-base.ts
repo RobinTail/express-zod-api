@@ -313,7 +313,7 @@ export abstract class IntegrationBase {
         {
           request: ensureTypeNode("K"),
           params: f.createIndexedAccessTypeNode(
-            ensureTypeNode(this.ids.inputInterface),
+            ensureTypeNode(this.interfaces.input),
             ensureTypeNode("K"),
           ),
         },
@@ -439,7 +439,7 @@ export abstract class IntegrationBase {
         {
           typeParams: {
             K: makeExtract(
-              this.ids.requestType,
+              this.requestType.name,
               f.createTemplateLiteralType(f.createTemplateHead("get "), [
                 f.createTemplateLiteralTypeSpan(
                   f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
@@ -449,7 +449,7 @@ export abstract class IntegrationBase {
             ),
             R: makeExtract(
               f.createIndexedAccessTypeNode(
-                ensureTypeNode(this.ids.posResponseInterface),
+                ensureTypeNode(this.interfaces.positive),
                 ensureTypeNode("K"),
               ),
               makeOnePropObjType(
