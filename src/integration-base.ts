@@ -38,11 +38,6 @@ export abstract class IntegrationBase {
 
   protected ids = {
     pathType: f.createIdentifier("Path"),
-    inputInterface: f.createIdentifier("Input"),
-    posResponseInterface: f.createIdentifier("PositiveResponse"),
-    negResponseInterface: f.createIdentifier("NegativeResponse"),
-    encResponseInterface: f.createIdentifier("EncodedResponse"),
-    responseInterface: f.createIdentifier("Response"),
     implementationType: f.createIdentifier("Implementation"),
     clientClass: f.createIdentifier("ExpressZodAPIClient"),
     keyParameter: f.createIdentifier("key"),
@@ -65,16 +60,13 @@ export abstract class IntegrationBase {
     isJsonConst: f.createIdentifier("isJSON"),
   } satisfies Record<string, ts.Identifier>;
 
-  protected interfaces: Array<{
-    id: ts.Identifier;
-    kind: IOKind;
-  }> = [
-    { id: this.ids.inputInterface, kind: "input" },
-    { id: this.ids.posResponseInterface, kind: "positive" },
-    { id: this.ids.negResponseInterface, kind: "negative" },
-    { id: this.ids.encResponseInterface, kind: "encoded" },
-    { id: this.ids.responseInterface, kind: "response" },
-  ];
+  protected interfaces: Record<IOKind, ts.Identifier> = {
+    input: f.createIdentifier("Input"),
+    positive: f.createIdentifier("PositiveResponse"),
+    negative: f.createIdentifier("NegativeResponse"),
+    encoded: f.createIdentifier("EncodedResponse"),
+    response: f.createIdentifier("Response"),
+  };
 
   // export type Method = "get" | "post" | "put" | "delete" | "patch";
   protected methodType = makePublicLiteralType("Method", methods);
@@ -89,7 +81,7 @@ export abstract class IntegrationBase {
   // export type Request = keyof Input;
   protected requestType = makeType(
     "Request",
-    makeKeyOf(this.ids.inputInterface),
+    makeKeyOf(this.interfaces.input),
     { expose: true },
   );
 
@@ -105,9 +97,9 @@ export abstract class IntegrationBase {
 
   // export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
   protected makePublicInterfaces = () =>
-    this.interfaces.map(({ id, kind }) =>
+    (Object.keys(this.interfaces) as IOKind[]).map((kind) =>
       makeInterface(
-        id,
+        this.interfaces[kind],
         Array.from(this.registry).map(([request, faces]) =>
           makeInterfaceProp(request, faces[kind]),
         ),
@@ -252,7 +244,7 @@ export abstract class IntegrationBase {
       makeParams({
         [this.ids.requestParameter.text]: ensureTypeNode("K"),
         [this.ids.paramsArgument.text]: f.createIndexedAccessTypeNode(
-          ensureTypeNode(this.ids.inputInterface),
+          ensureTypeNode(this.interfaces.input),
           ensureTypeNode("K"),
         ),
       }),
@@ -281,7 +273,7 @@ export abstract class IntegrationBase {
         typeParams: { K: this.requestType.name },
         returns: makePromise(
           f.createIndexedAccessTypeNode(
-            ensureTypeNode(this.ids.responseInterface),
+            ensureTypeNode(this.interfaces.response),
             ensureTypeNode("K"),
           ),
         ),
