@@ -72,8 +72,7 @@ export const recordStringAny = f.createExpressionWithTypeArguments(
 
 export const makeParam = (
   name: ts.Identifier,
-  type?: ts.TypeNode,
-  mod?: ts.Modifier[],
+  { type, mod }: { type?: ts.TypeNode; mod?: ts.Modifier[] } = {},
 ) =>
   f.createParameterDeclaration(
     mod,
@@ -84,12 +83,9 @@ export const makeParam = (
     undefined,
   );
 
-export const makeParams = (
-  params: Partial<Record<string, ts.TypeNode>>,
-  mod?: ts.Modifier[],
-) =>
-  Object.entries(params).map(([name, node]) =>
-    makeParam(f.createIdentifier(name), node, mod),
+export const makeParams = (params: Partial<Record<string, ts.TypeNode>>) =>
+  Object.entries(params).map(([name, type]) =>
+    makeParam(f.createIdentifier(name), { type }),
   );
 
 export const makeEmptyInitializingConstructor = (
@@ -133,7 +129,7 @@ export const makeDeconstruction = (
   );
 
 export const makeConst = (
-  name: ts.Identifier | ts.ArrayBindingPattern,
+  name: string | ts.Identifier | ts.ArrayBindingPattern,
   value: ts.Expression,
   { type, expose }: { type?: ts.TypeNode; expose?: true } = {},
 ) =>
@@ -284,7 +280,7 @@ export const makeTernary = (
   );
 
 export const makePropCall = (
-  parent: ts.Expression | [ts.Expression, ts.Identifier],
+  parent: ts.Expression | [ts.Expression, ts.Identifier | string],
   child: ts.Identifier | string,
   args?: ts.Expression[],
 ) =>

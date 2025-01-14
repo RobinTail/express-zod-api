@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "22.0.0-beta.2",
+  "version": "22.0.0-beta.3",
   "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {

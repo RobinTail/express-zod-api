@@ -148,11 +148,11 @@ export class Integration extends IntegrationBase {
         negative: this.someOf(dictionaries.negative),
         response: f.createUnionTypeNode([
           f.createIndexedAccessTypeNode(
-            ensureTypeNode(this.ids.posResponseInterface),
+            ensureTypeNode(this.interfaces.positive),
             literalIdx,
           ),
           f.createIndexedAccessTypeNode(
-            ensureTypeNode(this.ids.negResponseInterface),
+            ensureTypeNode(this.interfaces.negative),
             literalIdx,
           ),
         ]),
