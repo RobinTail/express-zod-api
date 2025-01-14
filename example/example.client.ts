@@ -452,7 +452,7 @@ const defaultImplementation: Implementation = async (method, path, params) => {
 };
 
 export class ExpressZodAPIClient {
-  constructor(
+  public constructor(
     protected readonly implementation: Implementation = defaultImplementation,
   ) {}
   public provide<K extends Request>(
