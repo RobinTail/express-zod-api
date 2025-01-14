@@ -451,7 +451,7 @@ const defaultImplementation: Implementation = async (method, path, params) => {
   return response[isJSON ? "json" : "text"]();
 };
 
-export class ExpressZodAPIClient {
+export class Client {
   public constructor(
     protected readonly implementation: Implementation = defaultImplementation,
   ) {}
@@ -466,6 +466,6 @@ export class ExpressZodAPIClient {
 
 // Usage example:
 /*
-const client = new ExpressZodAPIClient();
+const client = new Client();
 client.provide("get /v1/user/retrieve", { id: "10" });
 */

@@ -24,6 +24,7 @@ interface Queries {
   newDocs: TSESTree.ObjectExpression;
   newFactory: TSESTree.Property & { key: TSESTree.Identifier };
   newSSE: TSESTree.Property & { key: TSESTree.Identifier };
+  newClient: TSESTree.NewExpression;
 }
 
 type Listener = keyof Queries;
@@ -48,6 +49,7 @@ const queries: Record<Listener, string> = {
   newSSE:
     `${NT.NewExpression}[callee.name='EventStreamFactory'] > ` +
     `${NT.ObjectExpression} > ${NT.Property}[key.name='events']`,
+  newClient: `${NT.NewExpression}[callee.name='ExpressZodAPIClient']`,
 };
 
 const listen = <
@@ -161,6 +163,19 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
           fix: (fixer) =>
             fixer.replaceText(node.parent, ctx.sourceCode.getText(node.value)),
         }),
+      newClient: (node) => {
+        const replacement = "Client";
+        ctx.report({
+          messageId: "change",
+          node: node.callee,
+          data: {
+            subject: "class",
+            from: "ExpressZodAPIClient",
+            to: replacement,
+          },
+          fix: (fixer) => fixer.replaceText(node.callee, replacement),
+        });
+      },
     }),
 });
 

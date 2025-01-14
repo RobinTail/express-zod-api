@@ -1262,9 +1262,9 @@ makes requests using the libraries and methods of your choice. The default imple
 asserts the type of request parameters and response. Consuming the generated client requires Typescript version 4.1+.
 
 ```typescript
-import { ExpressZodAPIClient, Implementation } from "./client.ts"; // the generated file
+import { Client, Implementation } from "./client.ts"; // the generated file
 
-const client = new ExpressZodAPIClient(/* optional custom Implementation */);
+const client = new Client(/* optional custom Implementation */);
 client.provide("get /v1/user/retrieve", { id: "10" });
 client.provide("post /v1/user/:id", { id: "10" }); // it also substitues path params
 ```
