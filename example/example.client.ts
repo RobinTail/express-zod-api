@@ -434,7 +434,7 @@ export type Implementation = (
   params: Record<string, any>,
 ) => Promise<any>;
 
-export class ExpressZodAPIClient {
+export class Client {
   public constructor(protected readonly implementation: Implementation) {}
   public provide<K extends Request>(
     request: K,
@@ -467,6 +467,6 @@ export const exampleImplementation: Implementation = async (
   const isJSON = contentType.startsWith("application/json");
   return response[isJSON ? "json" : "text"]();
 };
-const client = new ExpressZodAPIClient(exampleImplementation);
+const client = new Client(exampleImplementation);
 client.provide("get /v1/user/retrieve", { id: "10" });
 */

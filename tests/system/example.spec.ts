@@ -2,10 +2,7 @@ import assert from "node:assert/strict";
 import { EventSource } from "undici";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
-import {
-  ExpressZodAPIClient,
-  Implementation,
-} from "../../example/example.client";
+import { Client, Implementation } from "../../example/example.client";
 import { givePort } from "../helpers";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -445,7 +442,7 @@ describe("Example", async () => {
   });
 
   describe("Client", () => {
-    const createDefaultImplementation =
+    const createImplementation =
       (host: string): Implementation =>
       async (method, path, params) => {
         const hasBody = !["get", "delete"].includes(method);
@@ -463,9 +460,7 @@ describe("Example", async () => {
         return response[isJSON ? "json" : "text"]();
       };
 
-    const client = new ExpressZodAPIClient(
-      createDefaultImplementation(`http://localhost:${port}`),
-    );
+    const client = new Client(createImplementation(`http://localhost:${port}`));
 
     test("Should perform the request with a positive response", async () => {
       const response = await client.provide("get /v1/user/retrieve", {
