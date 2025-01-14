@@ -117,7 +117,7 @@ export const makeDeconstruction = (
   );
 
 export const makeConst = (
-  name: ts.Identifier | ts.ArrayBindingPattern,
+  name: string | ts.Identifier | ts.ArrayBindingPattern,
   value: ts.Expression,
   { type, expose }: { type?: ts.TypeNode; expose?: true } = {},
 ) =>
