@@ -43,7 +43,7 @@ export abstract class IntegrationBase {
   protected ids = {
     pathType: f.createIdentifier("Path"),
     implementationType: f.createIdentifier("Implementation"),
-    clientClass: f.createIdentifier("ExpressZodAPIClient"),
+    clientClass: f.createIdentifier("Client"),
     keyParameter: f.createIdentifier("key"),
     pathParameter: f.createIdentifier("path"),
     paramsArgument: f.createIdentifier("params"),
