@@ -435,7 +435,7 @@ export type Implementation = (
 ) => Promise<any>;
 
 export class ExpressZodAPIClient {
-  constructor(protected readonly implementation: Implementation) {}
+  public constructor(protected readonly implementation: Implementation) {}
   public provide<K extends Request>(
     request: K,
     params: Input[K],

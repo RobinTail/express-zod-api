@@ -73,7 +73,7 @@ const tsFactoryConcerns = [
   },
   {
     selector: "Identifier[name='createConstructorDeclaration']",
-    message: "use makeEmptyInitializingConstructor() helper",
+    message: "use makePublicConstructor() helper",
   },
   {
     selector: "Identifier[name='createParameterDeclaration']",
