@@ -26,6 +26,7 @@ describe("Migration", () => {
       `new Documentation();`,
       `new EndpointsFactory(new ResultHandler());`,
       `new EventStreamFactory({});`,
+      `new Client();`,
     ],
     invalid: [
       {
@@ -104,6 +105,20 @@ describe("Migration", () => {
           {
             messageId: "change",
             data: { subject: "argument", from: "object", to: "events map" },
+          },
+        ],
+      },
+      {
+        code: `new ExpressZodAPIClient();`,
+        output: `new Client();`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "class",
+              from: "ExpressZodAPIClient",
+              to: "Client",
+            },
           },
         ],
       },
