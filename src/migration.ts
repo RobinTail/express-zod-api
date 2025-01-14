@@ -24,7 +24,7 @@ interface Queries {
   newDocs: TSESTree.ObjectExpression;
   newFactory: TSESTree.Property & { key: TSESTree.Identifier };
   newSSE: TSESTree.Property & { key: TSESTree.Identifier };
-  newClient: TSESTree.NewExpression & { callee: TSESTree.Identifier };
+  newClient: TSESTree.NewExpression;
 }
 
 type Listener = keyof Queries;
