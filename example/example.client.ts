@@ -491,5 +491,5 @@ export const exampleImplementation: Implementation = async (
 };
 const client = new Client(exampleImplementation);
 client.provide("get /v1/user/retrieve", { id: "10" });
-client.Subscription("get /v1/events/time", {}).on("time", (time) => {});
+new Subscription("get /v1/events/time", {}).on("time", (time) => {});
 */

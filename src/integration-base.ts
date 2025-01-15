@@ -68,7 +68,7 @@ export abstract class IntegrationBase {
     clientConst: f.createIdentifier("client"),
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
-    sourceConst: f.createIdentifier("source"),
+    sourceProp: f.createIdentifier("source"),
     connectionConst: f.createIdentifier("connection"),
   } satisfies Record<string, ts.Identifier>;
 
@@ -311,7 +311,7 @@ export abstract class IntegrationBase {
       [
         f.createPropertyDeclaration(
           accessModifiers.public,
-          this.ids.sourceConst,
+          this.ids.sourceProp,
           undefined,
           ensureTypeNode("EventSource"),
           undefined,
@@ -341,7 +341,7 @@ export abstract class IntegrationBase {
               f.createBinaryExpression(
                 f.createPropertyAccessExpression(
                   f.createThis(),
-                  this.ids.sourceConst,
+                  this.ids.sourceProp,
                 ),
                 f.createToken(ts.SyntaxKind.EqualsToken),
                 makeNew(
@@ -391,7 +391,7 @@ export abstract class IntegrationBase {
           f.createBlock([
             f.createExpressionStatement(
               makePropCall(
-                [f.createThis(), this.ids.sourceConst],
+                [f.createThis(), this.ids.sourceProp],
                 propOf<EventSource>("addEventListener"),
                 [
                   this.ids.eventParameter,
@@ -632,19 +632,18 @@ export abstract class IntegrationBase {
         ]),
       ]),
     ),
-    // client.subscribe("get /v1/events/time", {}).on("time", (time) => {});
-    f.createExpressionStatement(
-      makePropCall(
-        makePropCall(this.ids.clientConst, this.ids.subscriptionClass, [
-          f.createStringLiteral(`${"get" satisfies Method} /v1/events/time`),
-          f.createObjectLiteralExpression(),
-        ]),
-        this.ids.onMethod,
-        [
-          f.createStringLiteral("time"),
-          makeArrowFn({ time: undefined }, f.createBlock([])),
-        ],
+    // new Subscription("get /v1/events/time", {}).on("time", (time) => {});
+    makePropCall(
+      makeNew(
+        this.ids.subscriptionClass,
+        f.createStringLiteral(`${"get" satisfies Method} /v1/events/time`),
+        f.createObjectLiteralExpression(),
       ),
+      this.ids.onMethod,
+      [
+        f.createStringLiteral("time"),
+        makeArrowFn({ time: undefined }, f.createBlock([])),
+      ],
     ),
   ];
 }
