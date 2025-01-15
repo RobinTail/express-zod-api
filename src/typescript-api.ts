@@ -197,13 +197,15 @@ export const makePublicMethod = (
 
 export const makePublicClass = (
   name: ts.Identifier,
-  constructor: ts.ConstructorDeclaration,
-  statements: ts.MethodDeclaration[],
+  statements: ts.ClassElement[],
 ) =>
-  f.createClassDeclaration(exportModifier, name, undefined, undefined, [
-    constructor,
-    ...statements,
-  ]);
+  f.createClassDeclaration(
+    exportModifier,
+    name,
+    undefined,
+    undefined,
+    statements,
+  );
 
 export const makeKeyOf = (subj: Parameters<typeof ensureTypeNode>[0]) =>
   f.createTypeOperatorNode(ts.SyntaxKind.KeyOfKeyword, ensureTypeNode(subj));
