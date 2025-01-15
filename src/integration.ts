@@ -180,7 +180,7 @@ export class Integration extends IntegrationBase {
       this.makeSubstituteFn(),
       this.makeImplementationType(),
       this.makeClientClass(),
-      this.makeSubscribeFn(),
+      this.makeSubscriptionClass(),
     );
 
     this.usage.push(

@@ -88,11 +88,14 @@ export const makeParams = (params: Partial<Record<string, ts.TypeNode>>) =>
     makeParam(f.createIdentifier(name), { type }),
   );
 
-export const makePublicConstructor = (params: ts.ParameterDeclaration[]) =>
+export const makePublicConstructor = (
+  params: ts.ParameterDeclaration[],
+  statements: ts.Statement[] = [],
+) =>
   f.createConstructorDeclaration(
     accessModifiers.public,
     params,
-    f.createBlock([]),
+    f.createBlock(statements),
   );
 
 export const ensureTypeNode = (
@@ -206,11 +209,12 @@ export const makePublicMethod = (
 export const makePublicClass = (
   name: ts.Identifier,
   statements: ts.ClassElement[],
+  { typeParams }: { typeParams?: Parameters<typeof makeTypeParams>[0] } = {},
 ) =>
   f.createClassDeclaration(
     exportModifier,
     name,
-    undefined,
+    typeParams && makeTypeParams(typeParams),
     undefined,
     statements,
   );

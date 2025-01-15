@@ -445,31 +445,27 @@ export class Client {
   }
 }
 
-export const subscribe = <
+export class Subscription<
   K extends Extract<Request, `get ${string}`>,
   R extends Extract<PositiveResponse[K], { event: string }>,
->(
-  request: K,
-  params: Input[K],
-) => {
-  const [path, rest] = substitute(parseRequest(request)[1], params);
-  const source = new EventSource(
-    new URL(`${path}?${new URLSearchParams(rest)}`, "https://example.com"),
-  );
-  const connection = {
-    source,
-    on: <E extends R["event"]>(
-      event: E,
-      handler: (data: Extract<R, { event: E }>["data"]) => void | Promise<void>,
-    ) => {
-      source.addEventListener(event, (msg) =>
-        handler(JSON.parse((msg as MessageEvent).data)),
-      );
-      return connection;
-    },
-  };
-  return connection;
-};
+> {
+  public source: EventSource;
+  public constructor(request: K, params: Input[K]) {
+    const [path, rest] = substitute(parseRequest(request)[1], params);
+    this.source = new EventSource(
+      new URL(`${path}?${new URLSearchParams(rest)}`, "https://example.com"),
+    );
+  }
+  public on<E extends R["event"]>(
+    event: E,
+    handler: (data: Extract<R, { event: E }>["data"]) => void | Promise<void>,
+  ) {
+    this.source.addEventListener(event, (msg) =>
+      handler(JSON.parse((msg as MessageEvent).data)),
+    );
+    return this;
+  }
+}
 
 // Usage example:
 /*
@@ -495,5 +491,5 @@ export const exampleImplementation: Implementation = async (
 };
 const client = new Client(exampleImplementation);
 client.provide("get /v1/user/retrieve", { id: "10" });
-client.subscribe("get /v1/events/time", {}).on("time", (time) => {});
+client.Subscription("get /v1/events/time", {}).on("time", (time) => {});
 */
