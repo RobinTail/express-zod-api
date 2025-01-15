@@ -450,7 +450,7 @@ export abstract class IntegrationBase {
   };
 
   protected makeUsageStatements = () => [
-    // const client = new ExpressZodAPIClient(exampleImplementation);
+    // const client = new Client(exampleImplementation);
     makeConst(
       this.ids.clientConst,
       makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
