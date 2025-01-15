@@ -449,20 +449,18 @@ export abstract class IntegrationBase {
     );
   };
 
-  protected makeUsageStatements = () => [
+  protected makeUsageStatements = (): ts.Node[] => [
     // const client = new Client(exampleImplementation);
     makeConst(
       this.ids.clientConst,
       makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
     ),
     // client.provide("get /v1/user/retrieve", { id: "10" });
-    f.createExpressionStatement(
-      makePropCall(this.ids.clientConst, this.ids.provideMethod, [
-        f.createStringLiteral(`${"get" satisfies Method} /v1/user/retrieve`),
-        f.createObjectLiteralExpression([
-          f.createPropertyAssignment("id", f.createStringLiteral("10")),
-        ]),
+    makePropCall(this.ids.clientConst, this.ids.provideMethod, [
+      f.createStringLiteral(`${"get" satisfies Method} /v1/user/retrieve`),
+      f.createObjectLiteralExpression([
+        f.createPropertyAssignment("id", f.createStringLiteral("10")),
       ]),
-    ),
+    ]),
   ];
 }
