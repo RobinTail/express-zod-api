@@ -282,8 +282,7 @@ export abstract class IntegrationBase {
 
   // export class ExpressZodAPIClient { ___ }
   protected makeClientClass = () =>
-    makePublicClass(
-      this.ids.clientClass,
+    makePublicClass(this.ids.clientClass, [
       // public constructor(protected readonly implementation: Implementation) {}
       makePublicConstructor([
         makeParam(this.ids.implementationArgument, {
@@ -291,8 +290,8 @@ export abstract class IntegrationBase {
           mod: accessModifiers.protectedReadonly,
         }),
       ]),
-      [this.makeProvider()],
-    );
+      this.makeProvider(),
+    ]);
 
   // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
   protected makeExampleImplementation = () => {
