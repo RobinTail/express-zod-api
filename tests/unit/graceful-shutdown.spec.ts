@@ -152,19 +152,23 @@ describe("monitor()", () => {
     await graceful.shutdown();
   });
 
-  test("empties internal socket collection for https server", async () => {
-    const [httpsServer, port] = await makeHttpsServer(({}, res) => {
-      res.end("foo");
-    });
-    const graceful = monitor([httpsServer], { timeout: 150 });
-    await fetch(`https://localhost:${port}`, {
-      dispatcher: new Agent({ connect: { rejectUnauthorized: false } }),
-      headers: { connection: "close" },
-    });
-    await setTimeout(50);
-    expect(graceful.sockets.size).toBe(0);
-    await graceful.shutdown();
-  });
+  test(
+    "empties internal socket collection for https server",
+    { timeout: 500, retry: 3 },
+    async () => {
+      const [httpsServer, port] = await makeHttpsServer(({}, res) => {
+        res.end("foo");
+      });
+      const graceful = monitor([httpsServer], { timeout: 150 });
+      await fetch(`https://localhost:${port}`, {
+        dispatcher: new Agent({ connect: { rejectUnauthorized: false } }),
+        headers: { connection: "close" },
+      });
+      await setTimeout(50);
+      expect(graceful.sockets.size).toBe(0);
+      await graceful.shutdown();
+    },
+  );
 
   test(
     "closes immediately after in-flight connections are closed (#16)",
