@@ -159,7 +159,7 @@ describe("monitor()", () => {
 
     test(
       "empties internal socket collection for https server",
-      { timeout: 500, retry: 3 },
+      { timeout: 500 },
       async () => {
         const graceful = monitor([httpsServer], { timeout: 150 });
         await fetch(`https://localhost:${port}`, {
