@@ -163,7 +163,7 @@ describe("EndpointsFactory", () => {
           testMiddleware({
             middleware: newFactory["middlewares"][0],
           }),
-        ).rejects.toThrow(new Error("Rejected"));
+        ).rejects.toThrowErrorMatchingSnapshot();
         expect(middleware).toHaveBeenCalledTimes(1);
       });
 
