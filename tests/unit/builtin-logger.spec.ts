@@ -9,6 +9,7 @@ describe("BuiltinLogger", () => {
   });
 
   beforeEach(() => {
+    vi.restoreAllMocks(); // vitest 3 .spyOn() reuses existing spy, see makeLogger()
     vi.useFakeTimers({ now: new Date("2022-01-01T00:00:00Z") });
   });
 
