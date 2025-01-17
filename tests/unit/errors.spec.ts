@@ -12,8 +12,9 @@ import {
 describe("Errors", () => {
   describe("environment check", () => {
     test("should distinguish error instances of different classes", () => {
-      const httpErrorr = createHttpError(500, "some message");
-      expect(httpErrorr).not.toEqual(new Error("some message"));
+      expect(createHttpError(500, "some message")).not.toEqual(
+        new Error("some message"),
+      );
     });
 
     test("should distinguish HTTP errors by status code and message", () => {
