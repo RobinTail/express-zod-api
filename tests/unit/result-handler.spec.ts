@@ -94,16 +94,7 @@ describe("ResultHandler", () => {
         logger: loggerMock,
         options: {},
       });
-      expect(loggerMock._getLogs().error).toEqual([
-        [
-          "Server side error",
-          {
-            error: createHttpError(500, error),
-            payload: { something: 453 },
-            url: "http://something/v1/anything",
-          },
-        ],
-      ]);
+      expect(loggerMock._getLogs().error).toMatchSnapshot();
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getHeaders()).toHaveProperty(
         "content-type",
