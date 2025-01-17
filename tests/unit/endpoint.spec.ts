@@ -230,9 +230,7 @@ describe("Endpoint", () => {
       const { loggerMock, responseMock, requestMock } = await testEndpoint({
         endpoint,
       });
-      expect(loggerMock._getLogs().error).toEqual([
-        ["Result handler failure", new Error("Something unexpected happened")],
-      ]);
+      expect(loggerMock._getLogs().error).toMatchSnapshot();
       expect(spy).toHaveBeenCalledWith({
         error: null,
         logger: loggerMock,
@@ -429,9 +427,7 @@ describe("Endpoint", () => {
         handler: async () => ({ test: "OK" }),
       });
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
-      expect(loggerMock._getLogs().error).toEqual([
-        ["Result handler failure", new Error("Something unexpected happened")],
-      ]);
+      expect(loggerMock._getLogs().error).toMatchSnapshot();
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getData()).toBe(
         "An error occurred while serving the result: Something unexpected happened.",
