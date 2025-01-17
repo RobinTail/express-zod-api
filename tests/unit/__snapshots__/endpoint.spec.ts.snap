@@ -1,5 +1,19 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Endpoint > #handleResult > Should handle errors within ResultHandler 1`] = `
+[
+  [
+    "Result handler failure",
+    ResultHandlerError({
+      "cause": AssertionError({
+        "message": "Something unexpected happened",
+      }),
+      "message": "Something unexpected happened",
+    }),
+  ],
+]
+`;
+
 exports[`Endpoint > .getResponses() > should return the negative responses 1`] = `
 [
   {
@@ -57,5 +71,19 @@ exports[`Endpoint > .getResponses() > should return the positive responses 1`] =
       200,
     ],
   },
+]
+`;
+
+exports[`Endpoint > Issue #585: Handling non-Error exceptions > thrown in #handleResult() 1`] = `
+[
+  [
+    "Result handler failure",
+    ResultHandlerError({
+      "cause": AssertionError({
+        "message": "Something unexpected happened",
+      }),
+      "message": "Something unexpected happened",
+    }),
+  ],
 ]
 `;
