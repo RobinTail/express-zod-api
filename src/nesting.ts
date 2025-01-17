@@ -1,4 +1,4 @@
-import { Routing } from "./routing";
+import { Routing } from "./routing.ts";
 
 export abstract class Nesting {
   /** @desc Enables nested routes within the path assigned to the subject */

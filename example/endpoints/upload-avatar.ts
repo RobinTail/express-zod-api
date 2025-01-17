@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { ez } from "../../src";
+import { ez } from "../../src/index.ts";
 import { createHash } from "node:crypto";
-import { taggedEndpointsFactory } from "../factories";
+import { taggedEndpointsFactory } from "../factories.ts";
 
 export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
   method: "post",

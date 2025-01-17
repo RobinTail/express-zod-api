@@ -4,7 +4,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils";
-import { name as importName } from "../package.json";
+import manifest from "../package.json" with { type: "json" };
 
 const createConfigName = "createConfig";
 const createServerName = "createServer";
@@ -100,7 +100,7 @@ const v21 = ESLintUtils.RuleCreator.withoutDocs({
   defaultOptions: [],
   create: (ctx) => ({
     [NT.ImportDeclaration]: (node) => {
-      if (node.source.value === importName) {
+      if (node.source.value === manifest.name) {
         for (const spec of node.specifiers) {
           if (
             spec.type === NT.ImportSpecifier &&

@@ -1,9 +1,9 @@
 import ts from "typescript";
 import { z } from "zod";
-import { ez } from "../../src";
-import { f } from "../../src/integration-helpers";
-import { zodToTs } from "../../src/zts";
-import { ZTSContext, printNode } from "../../src/zts-helpers";
+import { ez } from "../../src/index.ts";
+import { f } from "../../src/integration-helpers.ts";
+import { zodToTs } from "../../src/zts.ts";
+import { ZTSContext, printNode } from "../../src/zts-helpers.ts";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: ts.Node) =>

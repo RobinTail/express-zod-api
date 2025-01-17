@@ -1,6 +1,6 @@
 import { bench } from "vitest";
-import { retrieveUserEndpoint } from "../../example/endpoints/retrieve-user";
-import { testEndpoint } from "../../src";
+import { retrieveUserEndpoint } from "../../example/endpoints/retrieve-user.ts";
+import { testEndpoint } from "../../src/index.ts";
 
 describe.skip("Endpoint", () => {
   bench(

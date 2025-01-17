@@ -6,9 +6,9 @@ import {
   ez,
   ensureHttpError,
   EventStreamFactory,
-} from "../src";
-import { config } from "./config";
-import { authMiddleware } from "./middlewares";
+} from "../src/index.ts";
+import { config } from "./config.ts";
+import { authMiddleware } from "./middlewares.ts";
 import { createReadStream } from "node:fs";
 import { z } from "zod";
 

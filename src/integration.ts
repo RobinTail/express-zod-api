@@ -1,7 +1,7 @@
 import { chain } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { ResponseVariant, responseVariants } from "./api-response";
+import { ResponseVariant, responseVariants } from "./api-response.ts";
 import {
   emptyTail,
   exportModifier,
@@ -33,21 +33,21 @@ import {
   makeEqual,
   makeKeyOf,
   makeSomeOfHelper,
-} from "./integration-helpers";
-import { makeCleanId } from "./common-helpers";
-import { Method, methods } from "./method";
-import { contentTypes } from "./content-type";
-import { loadPeer } from "./peer-helpers";
-import { Routing } from "./routing";
-import { OnEndpoint, walkRouting } from "./routing-walker";
-import { HandlingRules } from "./schema-walker";
-import { zodToTs } from "./zts";
+} from "./integration-helpers.ts";
+import { makeCleanId } from "./common-helpers.ts";
+import { Method, methods } from "./method.ts";
+import { contentTypes } from "./content-type.ts";
+import { loadPeer } from "./peer-helpers.ts";
+import { Routing } from "./routing.ts";
+import { OnEndpoint, walkRouting } from "./routing-walker.ts";
+import { HandlingRules } from "./schema-walker.ts";
+import { zodToTs } from "./zts.ts";
 import {
   ZTSContext,
   printNode,
   addJsDocComment,
   makePropertyIdentifier,
-} from "./zts-helpers";
+} from "./zts-helpers.ts";
 import type Prettier from "prettier";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";

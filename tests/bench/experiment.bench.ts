@@ -1,7 +1,7 @@
 import { chain, prop } from "ramda";
 import ts from "typescript";
 import { bench } from "vitest";
-import { f } from "../../src/integration-helpers";
+import { f } from "../../src/integration-helpers.ts";
 
 export const current = (nodes: ts.TypeLiteralNode[]) =>
   f.createTypeLiteralNode(nodes.flatMap(({ members }) => members));

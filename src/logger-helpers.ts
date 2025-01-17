@@ -1,4 +1,4 @@
-import { isObject } from "./common-helpers";
+import { isObject } from "./common-helpers.ts";
 
 const severity = {
   debug: 10,

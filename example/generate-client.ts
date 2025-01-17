@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises";
-import { Integration } from "../src";
-import { routing } from "./routing";
+import { Integration } from "../src/index.ts";
+import { routing } from "./routing.ts";
 
 await writeFile(
   "example/example.client.ts",

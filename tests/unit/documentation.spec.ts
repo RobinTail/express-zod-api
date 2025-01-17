@@ -1,7 +1,7 @@
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
-import { config as exampleConfig } from "../../example/config";
-import { routing } from "../../example/routing";
+import { config as exampleConfig } from "../../example/config.ts";
+import { routing } from "../../example/routing.ts";
 import {
   Depicter,
   Documentation,
@@ -12,10 +12,10 @@ import {
   defaultEndpointsFactory,
   ez,
   ResultHandler,
-} from "../../src";
-import { contentTypes } from "../../src/content-type";
+} from "../../src/index.ts";
+import { contentTypes } from "../../src/content-type.ts";
 import { z } from "zod";
-import { givePort } from "../helpers";
+import { givePort } from "../helpers.ts";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({

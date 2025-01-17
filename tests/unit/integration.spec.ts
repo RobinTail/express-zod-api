@@ -1,13 +1,13 @@
 import ts from "typescript";
 import { z } from "zod";
-import { routing } from "../../example/routing";
+import { routing } from "../../example/routing.ts";
 import {
   EndpointsFactory,
   Integration,
   Producer,
   defaultEndpointsFactory,
   ResultHandler,
-} from "../../src";
+} from "../../src/index.ts";
 
 describe("Integration", () => {
   test.each(["client", "types"] as const)(

@@ -1,8 +1,8 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { ez } from "../../src";
-import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
+import { ez } from "../../src/index.ts";
+import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories.ts";
 
 export const updateUserEndpoint =
   keyAndTokenAuthenticatedEndpointsFactory.build({

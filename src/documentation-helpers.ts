@@ -39,7 +39,7 @@ import {
   zip,
 } from "ramda";
 import { z } from "zod";
-import { ResponseVariant } from "./api-response";
+import { ResponseVariant } from "./api-response.ts";
 import {
   FlatObject,
   combinations,
@@ -49,25 +49,25 @@ import {
   makeCleanId,
   tryToTransform,
   ucFirst,
-} from "./common-helpers";
-import { InputSource, TagsConfig } from "./config-type";
-import { DateInSchema, ezDateInBrand } from "./date-in-schema";
-import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
-import { DocumentationError } from "./errors";
-import { FileSchema, ezFileBrand } from "./file-schema";
-import { IOSchema } from "./io-schema";
+} from "./common-helpers.ts";
+import { InputSource, TagsConfig } from "./config-type.ts";
+import { DateInSchema, ezDateInBrand } from "./date-in-schema.ts";
+import { DateOutSchema, ezDateOutBrand } from "./date-out-schema.ts";
+import { DocumentationError } from "./errors.ts";
+import { FileSchema, ezFileBrand } from "./file-schema.ts";
+import { IOSchema } from "./io-schema.ts";
 import {
   LogicalContainer,
   andToOr,
   mapLogicalContainer,
-} from "./logical-container";
-import { metaSymbol } from "./metadata";
-import { Method } from "./method";
-import { ProprietaryBrand } from "./proprietary-schemas";
-import { RawSchema, ezRawBrand } from "./raw-schema";
-import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
-import { Security } from "./security";
-import { UploadSchema, ezUploadBrand } from "./upload-schema";
+} from "./logical-container.ts";
+import { metaSymbol } from "./metadata.ts";
+import { Method } from "./method.ts";
+import { ProprietaryBrand } from "./proprietary-schemas.ts";
+import { RawSchema, ezRawBrand } from "./raw-schema.ts";
+import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker.ts";
+import { Security } from "./security.ts";
+import { UploadSchema, ezUploadBrand } from "./upload-schema.ts";
 
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;

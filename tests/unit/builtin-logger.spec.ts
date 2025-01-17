@@ -1,6 +1,9 @@
 import { EventEmitter } from "node:events";
 import { performance } from "node:perf_hooks";
-import { BuiltinLogger, BuiltinLoggerConfig } from "../../src/builtin-logger";
+import {
+  BuiltinLogger,
+  BuiltinLoggerConfig,
+} from "../../src/builtin-logger.ts";
 
 describe("BuiltinLogger", () => {
   beforeAll(() => {

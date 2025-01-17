@@ -1,13 +1,13 @@
 import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
 import { inspect } from "node:util";
 import { performance } from "node:perf_hooks";
-import { FlatObject, isProduction } from "./common-helpers";
+import { FlatObject, isProduction } from "./common-helpers.ts";
 import {
   AbstractLogger,
   formatDuration,
   isHidden,
   Severity,
-} from "./logger-helpers";
+} from "./logger-helpers.ts";
 
 interface Context extends FlatObject {
   requestId?: string;

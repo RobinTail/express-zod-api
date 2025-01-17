@@ -1,5 +1,5 @@
 import { writeFile } from "node:fs/promises";
-import manifest from "../package.json";
+import manifest from "../package.json" with { type: "json" };
 
 const text = `
 MIT License
