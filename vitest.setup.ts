@@ -1,19 +1,7 @@
 import type { NewPlugin } from "@vitest/pretty-format";
-import { isHttpError } from "http-errors";
 import { z } from "zod";
 import { ResultHandlerError } from "./src/errors";
 import { metaSymbol } from "./src/metadata";
-
-/** Takes statusCode into account */
-const compareHttpErrors = (a: unknown, b: unknown) => {
-  const hasCodeA = isHttpError(a);
-  const hasCodeB = isHttpError(b);
-  return hasCodeA && hasCodeB
-    ? a.statusCode === b.statusCode && a.message === b.message
-    : hasCodeA === hasCodeB
-      ? undefined
-      : false;
-};
 
 /** Takes cause and certain props of custom errors into account */
 const errorSerializer: NewPlugin = {
@@ -48,12 +36,6 @@ const makeSchemaSerializer = <
     },
   };
 };
-
-/**
- * @see https://vitest.dev/api/expect.html#expect-addequalitytesters
- * @see https://jestjs.io/docs/expect#expectaddequalitytesterstesters
- * */
-expect.addEqualityTesters([compareHttpErrors]);
 
 /**
  * @see https://github.com/vitest-dev/vitest/issues/5697
