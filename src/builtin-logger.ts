@@ -42,15 +42,16 @@ interface ProfilerOptions {
   formatter?: (ms: number) => string | number;
 }
 
+const styles: Record<Severity, Ansis> = {
+  debug: blue,
+  info: green,
+  warn: hex("#FFA500"),
+  error: red,
+};
+
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
   protected readonly config: BuiltinLoggerConfig;
-  protected readonly styles: Record<Severity, Ansis> = {
-    debug: blue,
-    info: green,
-    warn: hex("#FFA500"),
-    error: red,
-  };
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   public constructor(config: Partial<BuiltinLoggerConfig> = {}) {
@@ -83,7 +84,7 @@ export class BuiltinLogger implements AbstractLogger {
     const output: string[] = [new Date().toISOString()];
     if (requestId) output.push(hasColor ? cyanBright(requestId) : requestId);
     output.push(
-      hasColor ? `${this.styles[method](method)}:` : `${method}:`,
+      hasColor ? `${styles[method](method)}:` : `${method}:`,
       message,
     );
     if (meta !== undefined) output.push(this.prettyPrint(meta));
