@@ -179,13 +179,11 @@ export class Integration extends IntegrationBase {
       this.makeParseRequestFn(),
       this.makeSubstituteFn(),
       this.makeImplementationType(),
+      this.makeDefaultImplementation(),
       this.makeClientClass(),
     );
 
-    this.usage.push(
-      this.makeExampleImplementation(),
-      ...this.makeUsageStatements(),
-    );
+    this.usage.push(...this.makeUsageStatements());
   }
 
   protected printUsage(printerOptions?: ts.PrinterOptions) {

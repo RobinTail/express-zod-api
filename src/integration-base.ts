@@ -54,7 +54,7 @@ export abstract class IntegrationBase {
     responseConst: f.createIdentifier("response"),
     restConst: f.createIdentifier("rest"),
     searchParamsConst: f.createIdentifier("searchParams"),
-    exampleImplementationConst: f.createIdentifier("exampleImplementation"),
+    defaultImplementationConst: f.createIdentifier("defaultImplementation"),
     clientConst: f.createIdentifier("client"),
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
@@ -283,18 +283,19 @@ export abstract class IntegrationBase {
   // export class ExpressZodAPIClient { ___ }
   protected makeClientClass = () =>
     makePublicClass(this.ids.clientClass, [
-      // public constructor(protected readonly implementation: Implementation) {}
+      // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
       makePublicConstructor([
         makeParam(this.ids.implementationArgument, {
           type: ensureTypeNode(this.ids.implementationType),
           mod: accessModifiers.protectedReadonly,
+          init: this.ids.defaultImplementationConst,
         }),
       ]),
       this.makeProvider(),
     ]);
 
   // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
-  protected makeExampleImplementation = () => {
+  protected makeDefaultImplementation = () => {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
       propOf<RequestInit>("method"),
@@ -427,7 +428,7 @@ export abstract class IntegrationBase {
     );
 
     return makeConst(
-      this.ids.exampleImplementationConst,
+      this.ids.defaultImplementationConst,
       makeArrowFn(
         [
           this.ids.methodParameter,
@@ -445,16 +446,12 @@ export abstract class IntegrationBase {
         ]),
         { isAsync: true },
       ),
-      { expose: true, type: ensureTypeNode(this.ids.implementationType) },
+      { type: ensureTypeNode(this.ids.implementationType) },
     );
   };
 
   protected makeUsageStatements = (): ts.Node[] => [
-    // const client = new Client(exampleImplementation);
-    makeConst(
-      this.ids.clientConst,
-      makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
-    ),
+    makeConst(this.ids.clientConst, makeNew(this.ids.clientClass)), // const client = new ExpressZodAPIClient();
     // client.provide("get /v1/user/retrieve", { id: "10" });
     makePropCall(this.ids.clientConst, this.ids.provideMethod, [
       f.createStringLiteral(`${"get" satisfies Method} /v1/user/retrieve`),

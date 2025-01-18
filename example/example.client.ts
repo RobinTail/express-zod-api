@@ -434,24 +434,7 @@ export type Implementation = (
   params: Record<string, any>,
 ) => Promise<any>;
 
-export class Client {
-  public constructor(protected readonly implementation: Implementation) {}
-  public provide<K extends Request>(
-    request: K,
-    params: Input[K],
-  ): Promise<Response[K]> {
-    const [method, path] = parseRequest(request);
-    return this.implementation(method, ...substitute(path, params));
-  }
-}
-
-// Usage example:
-/*
-export const exampleImplementation: Implementation = async (
-  method,
-  path,
-  params,
-) => {
+const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
   const response = await fetch(
@@ -467,6 +450,22 @@ export const exampleImplementation: Implementation = async (
   const isJSON = contentType.startsWith("application/json");
   return response[isJSON ? "json" : "text"]();
 };
-const client = new Client(exampleImplementation);
+
+export class Client {
+  public constructor(
+    protected readonly implementation: Implementation = defaultImplementation,
+  ) {}
+  public provide<K extends Request>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]> {
+    const [method, path] = parseRequest(request);
+    return this.implementation(method, ...substitute(path, params));
+  }
+}
+
+// Usage example:
+/*
+const client = new Client();
 client.provide("get /v1/user/retrieve", { id: "10" });
 */
