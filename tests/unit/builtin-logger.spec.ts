@@ -1,13 +1,7 @@
-import { EventEmitter } from "node:events";
 import { performance } from "node:perf_hooks";
 import { BuiltinLogger, BuiltinLoggerConfig } from "../../src/builtin-logger";
 
 describe("BuiltinLogger", () => {
-  beforeAll(() => {
-    // fix (node:58829) MaxListenersExceededWarning: Possible EventEmitter memory leak
-    EventEmitter.setMaxListeners(15);
-  });
-
   beforeEach(() => {
     vi.restoreAllMocks(); // vitest 3 .spyOn() reuses existing spy, see makeLogger()
     vi.useFakeTimers({ now: new Date("2022-01-01T00:00:00Z") });
