@@ -88,11 +88,14 @@ export const makeParams = (params: Partial<Record<string, ts.TypeNode>>) =>
     makeParam(f.createIdentifier(name), { type }),
   );
 
-export const makePublicConstructor = (params: ts.ParameterDeclaration[]) =>
+export const makePublicConstructor = (
+  params: ts.ParameterDeclaration[],
+  statements: ts.Statement[] = [],
+) =>
   f.createConstructorDeclaration(
     accessModifiers.public,
     params,
-    f.createBlock([]),
+    f.createBlock(statements),
   );
 
 export const ensureTypeNode = (
@@ -112,6 +115,14 @@ export const makeInterfaceProp = (
     makePropertyIdentifier(name),
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     ensureTypeNode(value),
+  );
+
+export const makeOnePropObjType = (
+  ...params: Parameters<typeof makeInterfaceProp>
+) =>
+  ts.setEmitFlags(
+    f.createTypeLiteralNode([makeInterfaceProp(...params)]),
+    ts.EmitFlags.SingleLine,
   );
 
 export const makeDeconstruction = (
@@ -198,11 +209,12 @@ export const makePublicMethod = (
 export const makePublicClass = (
   name: ts.Identifier,
   statements: ts.ClassElement[],
+  { typeParams }: { typeParams?: Parameters<typeof makeTypeParams>[0] } = {},
 ) =>
   f.createClassDeclaration(
     exportModifier,
     name,
-    undefined,
+    typeParams && makeTypeParams(typeParams),
     undefined,
     statements,
   );
@@ -294,6 +306,11 @@ export const makePropCall = (
 
 export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
   f.createNewExpression(cls, undefined, args);
+
+export const makeExtract = (
+  base: Parameters<typeof ensureTypeNode>[0],
+  narrow: ts.TypeNode,
+) => f.createTypeReferenceNode("Extract", [ensureTypeNode(base), narrow]);
 
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,
