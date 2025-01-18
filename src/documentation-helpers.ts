@@ -583,18 +583,12 @@ export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = [],
-): ExamplesObject | undefined => {
-  console.log("depictExamples except", omitProps);
-  return pipe(
+): ExamplesObject | undefined =>
+  pipe(
     getExamples,
-    (ex) => {
-      console.log("result", ex);
-      return ex;
-    },
     map(when((subj) => detectType(subj) === "Object", omit(omitProps))),
     enumerateExamples,
   )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
-};
 
 export const depictParamExamples = (
   schema: z.ZodTypeAny,

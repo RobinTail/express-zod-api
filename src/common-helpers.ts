@@ -94,7 +94,6 @@ export const getExamples = <
   validate?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
   const examples = schema._def[metaSymbol]?.examples || [];
-  console.log("getExamples", schema._def.typeName, examples);
   if (schema instanceof z.ZodObject && !examples.length) {
     examples.push(
       Object.entries(schema.shape as z.ZodRawShape).reduce(
