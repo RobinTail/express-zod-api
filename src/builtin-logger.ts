@@ -1,4 +1,4 @@
-import { Ansis, blue, cyanBright, green, hex, red } from "ansis";
+import ansis from "ansis";
 import { inspect } from "node:util";
 import { performance } from "node:perf_hooks";
 import { FlatObject, isProduction } from "./common-helpers";
@@ -7,6 +7,7 @@ import {
   formatDuration,
   isHidden,
   Severity,
+  styles,
 } from "./logger-helpers";
 
 interface Context extends FlatObject {
@@ -45,21 +46,14 @@ interface ProfilerOptions {
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
   protected readonly config: BuiltinLoggerConfig;
-  protected readonly styles: Record<Severity, Ansis> = {
-    debug: blue,
-    info: green,
-    warn: hex("#FFA500"),
-    error: red,
-  };
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
-  public constructor(config: Partial<BuiltinLoggerConfig> = {}) {
-    const {
-      color = new Ansis().isSupported(),
-      level = isProduction() ? "warn" : "debug",
-      depth = 2,
-      ctx = {},
-    } = config;
+  public constructor({
+    color = ansis.isSupported(),
+    level = isProduction() ? "warn" : "debug",
+    depth = 2,
+    ctx = {},
+  }: Partial<BuiltinLoggerConfig> = {}) {
     this.config = { color, level, depth, ctx };
   }
 
@@ -81,9 +75,9 @@ export class BuiltinLogger implements AbstractLogger {
     } = this.config;
     if (level === "silent" || isHidden(method, level)) return;
     const output: string[] = [new Date().toISOString()];
-    if (requestId) output.push(hasColor ? cyanBright(requestId) : requestId);
+    if (requestId) output.push(hasColor ? styles.ctx(requestId) : requestId);
     output.push(
-      hasColor ? `${this.styles[method](method)}:` : `${method}:`,
+      hasColor ? `${styles[method](method)}:` : `${method}:`,
       message,
     );
     if (meta !== undefined) output.push(this.prettyPrint(meta));
