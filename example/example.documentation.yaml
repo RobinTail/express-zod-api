@@ -120,6 +120,9 @@ paths:
             type: string
             examples:
               - "12"
+          examples:
+            example1:
+              value: "12"
       requestBody:
         description: PATCH /v1/user/:id Request body
         content:
@@ -587,6 +590,8 @@ paths:
           description: GET /v1/events/time Parameter
           schema:
             type: string
+          examples:
+            example1: {}
       responses:
         "200":
           description: GET /v1/events/time Positive response

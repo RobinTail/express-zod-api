@@ -679,7 +679,7 @@ export const depictRequestParams = ({
       required: !shape[name].isOptional(),
       description: depicted.description || description,
       schema: result,
-      examples: depictParamExamples(schema, name),
+      examples: depictParamExamples(z.object(shape), name), // @todo reuse full extracted object insted of shape
     };
   });
 };
