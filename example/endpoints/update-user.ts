@@ -8,33 +8,20 @@ export const updateUserEndpoint =
   keyAndTokenAuthenticatedEndpointsFactory.build({
     tag: "users",
     description: "Changes the user record. Example user update endpoint.",
-    input: z
-      .object({
-        // id is the route path param of /v1/user/:id
-        id: z
-          .string()
-          .transform((value) => parseInt(value, 10))
-          .refine(
-            (value) => value >= 0,
-            "should be greater than or equal to 0",
-          ),
-        name: z.string().nonempty(),
-        birthday: ez.dateIn(),
-      })
-      .example({
-        id: "12",
-        name: "John Doe",
-        birthday: "1963-04-21",
-      }),
-    output: z
-      .object({
-        name: z.string(),
-        createdAt: ez.dateOut(),
-      })
-      .example({
-        name: "John Doe",
-        createdAt: new Date("2021-12-31"),
-      }),
+    input: z.object({
+      // id is the route path param of /v1/user/:id
+      id: z
+        .string()
+        .transform((value) => parseInt(value, 10))
+        .refine((value) => value >= 0, "should be greater than or equal to 0")
+        .example("12"), // @todo support moving up
+      name: z.string().nonempty().example("John Doe"),
+      birthday: ez.dateIn().example("1963-04-21"),
+    }),
+    output: z.object({
+      name: z.string().example("John Doe"),
+      createdAt: ez.dateOut().example(new Date("2021-12-31")),
+    }),
     handler: async ({
       input: { id, name, key },
       options: { token },

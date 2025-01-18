@@ -583,12 +583,18 @@ export const depictExamples = (
   schema: z.ZodTypeAny,
   isResponse: boolean,
   omitProps: string[] = [],
-): ExamplesObject | undefined =>
-  pipe(
+): ExamplesObject | undefined => {
+  console.log("depictExamples except", omitProps);
+  return pipe(
     getExamples,
+    (ex) => {
+      console.log("result", ex);
+      return ex;
+    },
     map(when((subj) => detectType(subj) === "Object", omit(omitProps))),
     enumerateExamples,
   )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
+};
 
 export const depictParamExamples = (
   schema: z.ZodTypeAny,
@@ -959,7 +965,7 @@ export const depictBody = ({
       composition === "components"
         ? makeRef(schema, bodyDepiction, makeCleanId(description))
         : bodyDepiction,
-    examples: depictExamples(schema, false, paramNames),
+    examples: depictExamples(extractObjectSchema(schema), false, paramNames),
   };
   return { description, content: { [mimeType]: media } };
 };

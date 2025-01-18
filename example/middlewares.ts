@@ -10,13 +10,9 @@ export const authMiddleware = new Middleware({
       { type: "header", name: "token" },
     ],
   },
-  input: z
-    .object({
-      key: z.string().nonempty(),
-    })
-    .example({
-      key: "1234-5678-90",
-    }),
+  input: z.object({
+    key: z.string().nonempty().example("1234-5678-90"),
+  }),
   handler: async ({ input: { key }, request, logger }) => {
     logger.debug("Checking the key and token...");
     assert.equal(key, "123", createHttpError(401, "Invalid key"));
