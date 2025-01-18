@@ -48,13 +48,12 @@ export class BuiltinLogger implements AbstractLogger {
   protected readonly config: BuiltinLoggerConfig;
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
-  public constructor(config: Partial<BuiltinLoggerConfig> = {}) {
-    const {
-      color = ansis.isSupported(),
-      level = isProduction() ? "warn" : "debug",
-      depth = 2,
-      ctx = {},
-    } = config;
+  public constructor({
+    color = ansis.isSupported(),
+    level = isProduction() ? "warn" : "debug",
+    depth = 2,
+    ctx = {},
+  }: Partial<BuiltinLoggerConfig> = {}) {
     this.config = { color, level, depth, ctx };
   }
 
