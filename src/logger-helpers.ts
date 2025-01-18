@@ -1,5 +1,14 @@
+import { Ansis, blue, green, hex, red, cyanBright } from "ansis";
 import { memoizeWith } from "ramda";
 import { isObject } from "./common-helpers";
+
+export const styles = {
+  debug: blue,
+  info: green,
+  warn: hex("#FFA500"),
+  error: red,
+  ctx: cyanBright,
+} satisfies Record<string, Ansis>;
 
 const severity = {
   debug: 10,
