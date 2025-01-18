@@ -1794,13 +1794,7 @@ components:
       name: token
   links: {}
   callbacks: {}
-tags:
-  - name: users
-    description: Everything about the users
-  - name: files
-    description: Everything about the files processing
-  - name: subscriptions
-    description: Everything about the subscriptions
+tags: []
 servers:
   - url: https://example.com
 "
@@ -2513,13 +2507,7 @@ components:
       name: token
   links: {}
   callbacks: {}
-tags:
-  - name: users
-    description: Everything about the users
-  - name: files
-    description: Everything about the files processing
-  - name: subscriptions
-    description: Everything about the subscriptions
+tags: []
 servers:
   - url: https://example.com
 "

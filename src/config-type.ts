@@ -25,17 +25,12 @@ type HeadersProvider = (params: {
   logger: ActualLogger;
 }) => Headers | Promise<Headers>;
 
-export type TagsConfig<TAG extends string> = Record<
-  TAG,
-  string | { description: string; url?: string }
->;
-
 type ChildLoggerProvider = (params: {
   request: Request;
   parent: ActualLogger;
 }) => ActualLogger | Promise<ActualLogger>;
 
-export interface CommonConfig<TAG extends string = string> {
+export interface CommonConfig {
   /**
    * @desc Enables cross-origin resource sharing.
    * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
@@ -71,11 +66,6 @@ export interface CommonConfig<TAG extends string = string> {
    * @see defaultInputSources
    */
   inputSources?: Partial<InputSources>;
-  /**
-   * @desc Optional endpoints tagging configuration.
-   * @example: { users: "Everything about the users" }
-   */
-  tags?: TagsConfig<TAG>;
 }
 
 type BeforeUpload = (params: {
@@ -145,8 +135,7 @@ interface HttpsConfig extends HttpConfig {
   options: ServerOptions;
 }
 
-export interface ServerConfig<TAG extends string = string>
-  extends CommonConfig<TAG> {
+export interface ServerConfig extends CommonConfig {
   /** @desc HTTP server configuration. */
   http?: HttpConfig;
   /** @desc HTTPS server configuration. */
@@ -190,18 +179,13 @@ export interface ServerConfig<TAG extends string = string>
   gracefulShutdown?: boolean | GracefulOptions;
 }
 
-export interface AppConfig<TAG extends string = string>
-  extends CommonConfig<TAG> {
+export interface AppConfig extends CommonConfig {
   /** @desc Your custom express app or express router instead. */
   app: IRouter;
 }
 
-export function createConfig<TAG extends string>(
-  config: ServerConfig<TAG>,
-): ServerConfig<TAG>;
-export function createConfig<TAG extends string>(
-  config: AppConfig<TAG>,
-): AppConfig<TAG>;
+export function createConfig(config: ServerConfig): ServerConfig;
+export function createConfig(config: AppConfig): AppConfig;
 export function createConfig(config: AppConfig | ServerConfig) {
   return config;
 }

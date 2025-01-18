@@ -1,39 +1,28 @@
-import { chain, prop } from "ramda";
-import ts from "typescript";
 import { bench } from "vitest";
-import { f } from "../../src/integration-helpers";
+import { BuiltinLogger } from "../../src";
 
-export const current = (nodes: ts.TypeLiteralNode[]) =>
-  f.createTypeLiteralNode(nodes.flatMap(({ members }) => members));
+describe("Experiment for builtin logger", () => {
+  const fixed = (a: string, b?: number) => `${a}${b}`;
+  const generic = (...args: unknown[]) => args.join();
+  const logger = new BuiltinLogger();
 
-export const feat = (nodes: ts.TypeLiteralNode[]) =>
-  f.createTypeLiteralNode(chain(prop("members"), nodes));
-
-describe("Experiment on flatMap", () => {
-  const subj = [
-    f.createTypeLiteralNode([
-      f.createPropertySignature(
-        undefined,
-        "test1",
-        undefined,
-        f.createTypeReferenceNode("test1"),
-      ),
-    ]),
-    f.createTypeLiteralNode([
-      f.createPropertySignature(
-        undefined,
-        "test2",
-        undefined,
-        f.createTypeReferenceNode("test2"),
-      ),
-    ]),
-  ];
-
-  bench("flatMap", () => {
-    current(subj);
+  bench("fixed 2", () => {
+    fixed("second", 2);
   });
 
-  bench("chain+prop", () => {
-    feat(subj);
+  bench("fixed 1", () => {
+    fixed("second");
+  });
+
+  bench("generic 2", () => {
+    generic("second", 2);
+  });
+
+  bench("generic 1", () => {
+    generic("second");
+  });
+
+  bench(".child", () => {
+    logger.child({});
   });
 });

@@ -138,15 +138,11 @@ describe("SSE", () => {
 
   describe("EventStreamFactory()", () => {
     test("should inherit from EndpointsFactory", () => {
-      expect(new EventStreamFactory({ events: {} })).toBeInstanceOf(
-        EndpointsFactory,
-      );
+      expect(new EventStreamFactory({})).toBeInstanceOf(EndpointsFactory);
     });
 
     test("should combine SSE Middlware with corresponding ResultHandler and return Endpoint", async () => {
-      const endpoint = new EventStreamFactory({
-        events: { test: z.string() },
-      }).buildVoid({
+      const endpoint = new EventStreamFactory({ test: z.string() }).buildVoid({
         input: z.object({ some: z.string().optional() }),
         handler: async ({ input, options }) => {
           expectTypeOf(input).toMatchTypeOf<{ some?: string }>();

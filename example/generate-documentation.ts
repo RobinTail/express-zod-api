@@ -12,6 +12,11 @@ await writeFile(
     version: manifest.version,
     title: "Example API",
     serverUrl: "https://example.com",
+    tags: {
+      users: "Everything about the users",
+      files: "Everything about the files processing",
+      subscriptions: "Everything about the subscriptions",
+    },
   }).getSpecAsYaml(),
   "utf-8",
 );

@@ -1,8 +1,7 @@
 import { z } from "zod";
-import { ez } from "../../src";
-import { taggedEndpointsFactory } from "../factories";
+import { defaultEndpointsFactory, ez } from "../../src";
 
-export const rawAcceptingEndpoint = taggedEndpointsFactory.build({
+export const rawAcceptingEndpoint = defaultEndpointsFactory.build({
   method: "post",
   tag: "files",
   input: ez.raw({

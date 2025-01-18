@@ -1,7 +1,7 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { taggedEndpointsFactory } from "../factories";
+import { defaultEndpointsFactory } from "../../src";
 import { methodProviderMiddleware } from "../middlewares";
 
 // Demonstrating circular schemas using z.lazy()
@@ -15,7 +15,7 @@ const feature: z.ZodType<Feature> = baseFeature.extend({
   features: z.lazy(() => feature.array()),
 });
 
-export const retrieveUserEndpoint = taggedEndpointsFactory
+export const retrieveUserEndpoint = defaultEndpointsFactory
   .addMiddleware(methodProviderMiddleware)
   .build({
     tag: "users",

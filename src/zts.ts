@@ -10,12 +10,11 @@ import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
   addJsDocComment,
+  ensureTypeNode,
   isPrimitive,
-  LiteralType,
-  makePropertyIdentifier,
-  Producer,
-  ZTSContext,
-} from "./zts-helpers";
+  makeInterfaceProp,
+} from "./typescript-api";
+import { LiteralType, Producer, ZTSContext } from "./zts-helpers";
 
 const { factory: f } = ts;
 
@@ -53,14 +52,9 @@ const onObject: Producer = (
       isResponse && hasCoercion(value)
         ? value instanceof z.ZodOptional
         : value.isOptional();
-    const propertySignature = f.createPropertySignature(
-      undefined,
-      makePropertyIdentifier(key),
-      isOptional && hasQuestionMark
-        ? f.createToken(ts.SyntaxKind.QuestionToken)
-        : undefined,
-      next(value),
-    );
+    const propertySignature = makeInterfaceProp(key, next(value), {
+      isOptional: isOptional && hasQuestionMark,
+    });
     return value.description
       ? addJsDocComment(propertySignature, value.description)
       : propertySignature;
@@ -213,7 +207,7 @@ const onLazy: Producer = (lazy: z.ZodLazy<z.ZodTypeAny>, { makeAlias, next }) =>
 const onFile: Producer = (schema: FileSchema) => {
   const subject = schema.unwrap();
   const stringType = f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
-  const bufferType = f.createTypeReferenceNode("Buffer");
+  const bufferType = ensureTypeNode("Buffer");
   const unionType = f.createUnionTypeNode([stringType, bufferType]);
   return subject instanceof z.ZodString
     ? stringType

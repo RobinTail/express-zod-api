@@ -1,9 +1,8 @@
 import { z } from "zod";
-import { ez } from "../../src";
+import { defaultEndpointsFactory, ez } from "../../src";
 import { createHash } from "node:crypto";
-import { taggedEndpointsFactory } from "../factories";
 
-export const uploadAvatarEndpoint = taggedEndpointsFactory.build({
+export const uploadAvatarEndpoint = defaultEndpointsFactory.build({
   method: "post",
   tag: "files",
   description: "Handles a file upload.",

@@ -1,7 +1,6 @@
 import { Response } from "express";
 import { z } from "zod";
 import { EmptySchema, FlatObject } from "./common-helpers";
-import { CommonConfig } from "./config-type";
 import { contentTypes } from "./content-type";
 import { EndpointsFactory } from "./endpoints-factory";
 import { Middleware } from "./middleware";
@@ -96,12 +95,12 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
     },
   });
 
-export class EventStreamFactory<
-  E extends EventsMap,
-  TAG extends string,
-> extends EndpointsFactory<EmptySchema, Emitter<E>, string, TAG> {
-  constructor({ events, config }: { events: E; config?: CommonConfig<TAG> }) {
-    super({ config, resultHandler: makeResultHandler(events) });
+export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
+  EmptySchema,
+  Emitter<E>
+> {
+  constructor(events: E) {
+    super(makeResultHandler(events));
     this.middlewares = [makeMiddleware(events)];
   }
 }
