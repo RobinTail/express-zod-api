@@ -74,6 +74,11 @@ new Documentation({
 
 ## Version 21
 
+### v21.11.1
+
+- Common styling methods (coloring) are extracted from the built-in logger instance:
+  - This measure is to reduce memory consumption when using a child logger.
+
 ### v21.11.0
 
 - New public property `ctx` is available on instances of `BuiltinLogger`:
