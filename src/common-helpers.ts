@@ -95,13 +95,16 @@ export const getExamples = <
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
   const examples = schema._def[metaSymbol]?.examples || [];
   if (schema instanceof z.ZodObject && !examples.length) {
-    examples.push(
-      Object.entries(schema.shape as z.ZodRawShape).reduce(
-        (acc, [key, { _def }]) =>
-          Object.assign(acc, { [key]: _def[metaSymbol]?.examples?.[0] }),
-        {},
-      ),
+    const fromProps = Object.entries(schema.shape as z.ZodRawShape).reduce(
+      (acc, [key, { _def }]) => {
+        const propExamples = _def[metaSymbol]?.examples;
+        if (propExamples?.length)
+          Object.assign(acc, { [key]: propExamples[0] });
+        return acc;
+      },
+      {},
     );
+    examples.push(fromProps);
   }
   if (!validate && variant === "original") return examples;
   const result: Array<z.input<T> | z.output<T>> = [];

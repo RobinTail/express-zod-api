@@ -590,8 +590,6 @@ paths:
           description: GET /v1/events/time Parameter
           schema:
             type: string
-          examples:
-            example1: {}
       responses:
         "200":
           description: GET /v1/events/time Positive response
