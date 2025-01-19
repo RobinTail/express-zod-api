@@ -663,7 +663,8 @@ export const depictRequestParams = ({
     );
 
   return parameters.map<ParameterObject>(({ name, location }) => {
-    const depicted = walkSchema(objectSchema.shape[name], {
+    const paramSchema = objectSchema.shape[name];
+    const depicted = walkSchema(paramSchema, {
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
@@ -671,16 +672,12 @@ export const depictRequestParams = ({
     });
     const result =
       composition === "components"
-        ? makeRef(
-            objectSchema.shape[name],
-            depicted,
-            makeCleanId(description, name),
-          )
+        ? makeRef(paramSchema, depicted, makeCleanId(description, name))
         : depicted;
     return {
       name,
       in: location,
-      required: !objectSchema.shape[name].isOptional(),
+      required: !paramSchema.isOptional(),
       description: depicted.description || description,
       schema: result,
       examples: depictParamExamples(objectSchema, name),
