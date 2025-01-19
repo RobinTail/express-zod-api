@@ -14,7 +14,7 @@ export const updateUserEndpoint =
         .string()
         .transform((value) => parseInt(value, 10))
         .refine((value) => value >= 0, "should be greater than or equal to 0")
-        .example("12"), // @todo support moving up
+        .example("12"),
       name: z.string().nonempty().example("John Doe"),
       birthday: ez.dateIn().example("1963-04-21"),
     }),
