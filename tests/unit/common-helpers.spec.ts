@@ -264,6 +264,33 @@ describe("Common Helpers", () => {
         ]);
       },
     );
+    test.each([
+      {
+        schema: z.object({
+          a: z.string().example("one"),
+          b: z.number().example(1),
+        }),
+        pullProps: true,
+        expected: [{ a: "one", b: 1 }],
+      },
+      {
+        schema: z.object({ a: z.string().example("one") }),
+        pullProps: false,
+        expected: [],
+      },
+      {
+        schema: z
+          .object({ a: z.string().example("one"), b: z.number().example(1) })
+          .example({ a: "two", b: 2 }), // higher priority
+        pullProps: true,
+        expected: [{ a: "two", b: 2 }],
+      },
+    ])(
+      "Feature #2324: should pull examples from object props %#",
+      ({ schema, pullProps, expected }) => {
+        expect(getExamples({ schema, pullProps })).toEqual(expected);
+      },
+    );
   });
 
   describe("combinations()", () => {
