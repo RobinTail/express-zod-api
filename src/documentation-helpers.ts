@@ -636,7 +636,7 @@ export const depictRequestParams = ({
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
 }) => {
-  const { shape } = extractObjectSchema(schema);
+  const objectSchema = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
@@ -646,7 +646,7 @@ export const depictRequestParams = ({
   const isHeaderParam = (name: string) =>
     areHeadersEnabled && isCustomHeader(name);
 
-  const parameters = Object.keys(shape)
+  const parameters = Object.keys(objectSchema.shape)
     .map<{ name: string; location?: ParameterLocation }>((name) => ({
       name,
       location: isPathParam(name)
@@ -663,7 +663,7 @@ export const depictRequestParams = ({
     );
 
   return parameters.map<ParameterObject>(({ name, location }) => {
-    const depicted = walkSchema(shape[name], {
+    const depicted = walkSchema(objectSchema.shape[name], {
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
@@ -671,15 +671,19 @@ export const depictRequestParams = ({
     });
     const result =
       composition === "components"
-        ? makeRef(shape[name], depicted, makeCleanId(description, name))
+        ? makeRef(
+            objectSchema.shape[name],
+            depicted,
+            makeCleanId(description, name),
+          )
         : depicted;
     return {
       name,
       in: location,
-      required: !shape[name].isOptional(),
+      required: !objectSchema.shape[name].isOptional(),
       description: depicted.description || description,
       schema: result,
-      examples: depictParamExamples(z.object(shape), name), // @todo reuse full extracted object insted of shape
+      examples: depictParamExamples(objectSchema, name),
     };
   });
 };
