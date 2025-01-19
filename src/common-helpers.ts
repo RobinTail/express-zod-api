@@ -78,6 +78,7 @@ export const getExamples = <
   schema,
   variant = "original",
   validate = variant === "parsed",
+  pullProps = true,
 }: {
   schema: T;
   /**
@@ -92,8 +93,25 @@ export const getExamples = <
    * @default variant === "parsed"
    * */
   validate?: boolean;
+  /**
+   * @desc should pull examples from properties — applicable to ZodObject only
+   * @default true
+   * */
+  pullProps?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
   const examples = schema._def[metaSymbol]?.examples || [];
+  if (!examples.length && pullProps && schema instanceof z.ZodObject) {
+    const fromProps = Object.entries(schema.shape as z.ZodRawShape).reduce(
+      (acc, [key, { _def }]) => {
+        const propExamples = _def[metaSymbol]?.examples;
+        if (propExamples?.length)
+          Object.assign(acc, { [key]: propExamples[0] });
+        return acc;
+      },
+      {},
+    );
+    if (Object.keys(fromProps).length) examples.push(fromProps);
+  }
   if (!validate && variant === "original") return examples;
   const result: Array<z.input<T> | z.output<T>> = [];
   for (const example of examples) {

@@ -134,8 +134,8 @@ export const defaultResultHandler = new ResultHandler({
  * */
 export const arrayResultHandler = new ResultHandler({
   positive: (output) => {
-    // Examples are taken for proxying: no validation needed for this
-    const examples = getExamples({ schema: output });
+    // Examples are taken for pulling down: no validation needed for this, no pulling up
+    const examples = getExamples({ schema: output, pullProps: false });
     const responseSchema =
       "shape" in output &&
       "items" in output.shape &&

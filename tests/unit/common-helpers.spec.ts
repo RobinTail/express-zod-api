@@ -264,6 +264,39 @@ describe("Common Helpers", () => {
         ]);
       },
     );
+
+    describe("Feature #2324: pulling examples up from the object props", () => {
+      test("by default", () => {
+        expect(
+          getExamples({
+            schema: z.object({
+              a: z.string().example("one"),
+              b: z.number().example(1),
+            }),
+          }),
+        ).toEqual([{ a: "one", b: 1 }]);
+      });
+      test("opt out on demand", () => {
+        expect(
+          getExamples({
+            schema: z.object({ a: z.string().example("one") }),
+            pullProps: false,
+          }),
+        ).toEqual([]);
+      });
+      test("only when the object level is empty", () => {
+        expect(
+          getExamples({
+            schema: z
+              .object({
+                a: z.string().example("one"),
+                b: z.number().example(1),
+              })
+              .example({ a: "two", b: 2 }), // higher priority
+          }),
+        ).toEqual([{ a: "two", b: 2 }]);
+      });
+    });
   });
 
   describe("combinations()", () => {

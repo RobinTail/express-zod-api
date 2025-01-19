@@ -7,22 +7,16 @@ import { arrayRespondingFactory } from "../factories";
  * */
 export const listUsersEndpoint = arrayRespondingFactory.build({
   tag: "users",
-  output: z
-    .object({
-      // the arrayResultHandler will take the "items" prop as the response
-      items: z.array(
-        z.object({
-          name: z.string(),
-        }),
-      ),
-    })
-    .example({
-      items: [
+  output: z.object({
+    // the arrayResultHandler will take the "items" prop as the response
+    items: z
+      .array(z.object({ name: z.string() }))
+      .example([
         { name: "Hunter Schafer" },
         { name: "Laverne Cox" },
         { name: "Patti Harrison" },
-      ],
-    }),
+      ]),
+  }),
   handler: async () => ({
     items: [
       { name: "Maria Merian" },
