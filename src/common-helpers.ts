@@ -104,7 +104,7 @@ export const getExamples = <
       },
       {},
     );
-    examples.push(fromProps);
+    if (Object.keys(fromProps).length) examples.push(fromProps);
   }
   if (!validate && variant === "original") return examples;
   const result: Array<z.input<T> | z.output<T>> = [];
