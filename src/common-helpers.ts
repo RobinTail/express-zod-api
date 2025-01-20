@@ -71,6 +71,21 @@ export const getMessageFromError = (error: Error): string => {
   return error.message;
 };
 
+/** Takes the original unvalidated examples from the properties of ZodObject schema shape */
+const pullExampleProps = <T extends z.SomeZodObject>(subject: T): T =>
+  Object.entries(subject.shape).reduce((acc, [key, schema]) => {
+    const examples = getExamples({
+      schema,
+      variant: "original",
+      pullProps: false,
+    });
+    const asObject = examples.reduce<z.SomeZodObject>(
+      (tmp, example) => tmp.example({ [key]: example }),
+      z.object({ [key]: schema }),
+    );
+    return copyMeta(asObject, acc);
+  }, subject);
+
 export const getExamples = <
   T extends z.ZodTypeAny,
   V extends "original" | "parsed" | undefined,
@@ -101,26 +116,11 @@ export const getExamples = <
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
   const examples = schema._def[metaSymbol]?.examples || [];
   if (!examples.length && pullProps && schema instanceof z.ZodObject) {
-    const pulledSchema = Object.entries(schema.shape as z.ZodRawShape).reduce(
-      (acc, [key, propSchema]) => {
-        const propExamples = getExamples({
-          schema: propSchema,
-          variant: "original", // postpones transformation and validation
-          pullProps: false, // no nested pulling
-        });
-        const objectBasedExamples = propExamples.reduce<z.SomeZodObject>(
-          (tmp, example) => tmp.example({ [key]: example }),
-          z.object({ [key]: propSchema }),
-        );
-        return copyMeta(objectBasedExamples, acc);
-      },
-      schema,
-    );
     return getExamples({
-      schema: pulledSchema,
+      schema: pullExampleProps(schema),
+      pullProps: false, // avoid loop
       variant,
       validate,
-      pullProps: false, // avoid loop
     });
   }
   if (!validate && variant === "original") return examples;
