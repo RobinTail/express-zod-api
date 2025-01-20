@@ -4,7 +4,7 @@ import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import { OutputValidationError } from "./errors";
-import { metaSymbol } from "./metadata";
+import { copyMeta, metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
@@ -101,16 +101,27 @@ export const getExamples = <
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
   const examples = schema._def[metaSymbol]?.examples || [];
   if (!examples.length && pullProps && schema instanceof z.ZodObject) {
-    const fromProps = Object.entries(schema.shape as z.ZodRawShape).reduce(
-      (acc, [key, { _def }]) => {
-        const propExamples = _def[metaSymbol]?.examples;
-        if (propExamples?.length)
-          Object.assign(acc, { [key]: propExamples[0] });
-        return acc;
+    const pulledSchema = Object.entries(schema.shape as z.ZodRawShape).reduce(
+      (acc, [key, propSchema]) => {
+        const propExamples = getExamples({
+          schema: propSchema,
+          variant: "original", // postpones transformation and validation
+          pullProps: false, // no nested pulling
+        });
+        const objectBasedExamples = propExamples.reduce<z.SomeZodObject>(
+          (tmp, example) => tmp.example({ [key]: example }),
+          z.object({ [key]: propSchema }),
+        );
+        return copyMeta(objectBasedExamples, acc);
       },
-      {},
+      schema,
     );
-    if (Object.keys(fromProps).length) examples.push(fromProps);
+    return getExamples({
+      schema: pulledSchema,
+      variant,
+      validate,
+      pullProps: false, // avoid loop
+    });
   }
   if (!validate && variant === "original") return examples;
   const result: Array<z.input<T> | z.output<T>> = [];
