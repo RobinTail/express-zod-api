@@ -7,25 +7,24 @@ export const authMiddleware = new Middleware({
   security: {
     and: [
       { type: "input", name: "key" },
-      { type: "header", name: "token" },
+      { type: "header", name: "x-token" },
     ],
   },
   input: z
     .object({
       key: z.string().nonempty(),
+      "x-token": z.string().nonempty(),
     })
+    .remap({ "x-token": "token" })
     .example({
       key: "1234-5678-90",
+      "x-token": "1234567890",
     }),
-  handler: async ({ input: { key }, request, logger }) => {
+  handler: async ({ input: { key, token }, logger }) => {
     logger.debug("Checking the key and token...");
     assert.equal(key, "123", createHttpError(401, "Invalid key"));
-    assert.equal(
-      request.headers.token,
-      "456",
-      createHttpError(401, "Invalid token"),
-    );
-    return { token: request.headers.token };
+    assert.equal(token, "456", createHttpError(401, "Invalid token"));
+    return { token };
   },
 });
 

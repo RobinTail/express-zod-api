@@ -70,7 +70,7 @@ describe("Example", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
         method: "PATCH",
         headers: {
-          token: "456",
+          "x-token": "456",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -320,7 +320,7 @@ describe("Example", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
         method: "PATCH",
         headers: {
-          token: "456",
+          "x-token": "456",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -343,7 +343,7 @@ describe("Example", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
         method: "PATCH",
         headers: {
-          token: "123",
+          "x-token": "123",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -366,7 +366,7 @@ describe("Example", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/-50`, {
         method: "PATCH",
         headers: {
-          token: "456",
+          "x-token": "456",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -384,7 +384,7 @@ describe("Example", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/101`, {
         method: "PATCH",
         headers: {
-          token: "456",
+          "x-token": "456",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -452,9 +452,7 @@ describe("Example", async () => {
         const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
         const response = await fetch(new URL(`${path}${searchParams}`, host), {
           method: method.toUpperCase(),
-          headers: hasBody
-            ? { "Content-Type": "application/json", token: "456" }
-            : undefined,
+          headers: hasBody ? { "Content-Type": "application/json" } : undefined,
           body: hasBody ? JSON.stringify(params) : undefined,
         });
         const contentType = response.headers.get("content-type");
@@ -490,6 +488,7 @@ describe("Example", async () => {
 
     test("Issue #2177: should handle path params correctly", async () => {
       const response = await client.provide("patch", "/v1/user/:id", {
+        "x-token": "456",
         key: "123",
         id: "12",
         name: "Alan Turing",

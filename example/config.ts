@@ -10,6 +10,9 @@ export const config = createConfig({
     limits: { fileSize: 51200 },
     limitError: createHttpError(413, "The file is too large"), // affects uploadAvatarEndpoint
   },
+  inputSources: {
+    patch: ["body", "headers", "params"], // affects updateUserEndpoint using authMiddleware
+  },
   compression: true, // affects sendAvatarEndpoint
   beforeRouting: async ({ app }) => {
     // third-party middlewares serving their own routes or establishing their own routing besides the API

@@ -67,6 +67,7 @@ interface DeleteV1UserIdRemoveNegativeResponseVariants {
 /** patch /v1/user/:id */
 type PatchV1UserIdInput = {
   key: string;
+  "x-token": string;
   id: string;
   name: string;
   birthday: string;

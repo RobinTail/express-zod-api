@@ -112,6 +112,16 @@ paths:
       tags:
         - users
       parameters:
+        - name: x-token
+          in: header
+          required: true
+          description: PATCH /v1/user/:id Parameter
+          schema:
+            type: string
+            minLength: 1
+          examples:
+            example1:
+              value: "1234567890"
         - name: id
           in: path
           required: true
@@ -639,7 +649,7 @@ components:
     APIKEY_2:
       type: apiKey
       in: header
-      name: token
+      name: x-token
   links: {}
   callbacks: {}
 tags:
