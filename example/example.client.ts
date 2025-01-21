@@ -428,20 +428,22 @@ const substitute = (path: string, params: Record<string, any>) => {
   return [path, rest] as const;
 };
 
-export type Implementation = (
+export type Implementation<T = unknown> = (
   method: Method,
   path: string,
   params: Record<string, any>,
+  extra?: T
 ) => Promise<any>;
 
-export class Client {
-  public constructor(protected readonly implementation: Implementation) {}
+export class Client<T> {
+  public constructor(protected readonly implementation: Implementation<T>) {}
   public provide<K extends Request>(
     request: K,
     params: Input[K],
+    extra?: T
   ): Promise<Response[K]> {
     const [method, path] = parseRequest(request);
-    return this.implementation(method, ...substitute(path, params));
+    return this.implementation(method, ...substitute(path, params), extra);
   }
 }
 
