@@ -35,12 +35,8 @@ export const updateUserEndpoint =
         name: "John Doe",
         createdAt: new Date("2021-12-31"),
       }),
-    handler: async ({
-      input: { id, name, key },
-      options: { token },
-      logger,
-    }) => {
-      logger.debug(`id, key and token: ${id}, ${key}, ${token}`);
+    handler: async ({ input: { id, name }, options: { loggedIn }, logger }) => {
+      logger.debug(`changing ${id} by ${loggedIn}`);
       assert(id <= 100, createHttpError(404, "User not found"));
       return {
         createdAt: new Date("2022-01-22"),
