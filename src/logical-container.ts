@@ -1,4 +1,4 @@
-import { chain } from "ramda";
+import { chain, isEmpty, reject } from "ramda";
 import { combinations, isObject } from "./common-helpers";
 
 type LogicalOr<T> = { or: T[] };
@@ -44,5 +44,5 @@ export const processContainers = <T, U>(
     ),
   );
   for (const entry of allOrs) ttt = combinations(ttt, entry, joiner);
-  return ttt;
+  return reject(isEmpty, ttt);
 };

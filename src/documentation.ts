@@ -224,20 +224,18 @@ export class Documentation extends OpenApiBuilder {
 
       const ttt = depictSecurity(endpoint.getSecurity(), inputSources);
 
-      const securityRefs = ttt
-        .filter((sss) => sss.length)
-        .map((sss) =>
-          sss.reduce<Record<string, string[]>>((agg, securitySchema) => {
-            const name = this.ensureUniqSecuritySchemaName(securitySchema);
-            const scopes = ["oauth2", "openIdConnect"].includes(
-              securitySchema.type,
-            )
-              ? endpoint.getScopes().slice()
-              : [];
-            this.addSecurityScheme(name, securitySchema);
-            return Object.assign(agg, { [name]: scopes });
-          }, {}),
-        );
+      const securityRefs = ttt.map((sss) =>
+        sss.reduce<Record<string, string[]>>((agg, securitySchema) => {
+          const name = this.ensureUniqSecuritySchemaName(securitySchema);
+          const scopes = ["oauth2", "openIdConnect"].includes(
+            securitySchema.type,
+          )
+            ? endpoint.getScopes().slice()
+            : [];
+          this.addSecurityScheme(name, securitySchema);
+          return Object.assign(agg, { [name]: scopes });
+        }, {}),
+      );
 
       this.addPath(reformatParamsInPath(path), {
         [method]: {
