@@ -42,17 +42,10 @@ export const processContainers = <T, U>(
   console.log("with ors from ands", ttt);
   const ors = containers.filter((entry) => isLogicalOr(entry));
   const simpleOrs = ors.map((entry) =>
-    entry.or.filter(isSimple).map((v) => [mapper(v)]),
+    entry.or.map((v) => (isSimple(v) ? [mapper(v)] : v.and.flatMap(mapper))),
   );
+  console.log("all ors", simpleOrs);
   for (const entry of simpleOrs) ttt = combinations(ttt, entry, joiner);
-  console.log("with simple ors", ttt);
-  const andsInOrs = ors.flatMap((entry) =>
-    entry.or
-      .filter((entry) => isLogicalAnd(entry))
-      .map((entry) => entry.and.flatMap(mapper)),
-  );
-  console.log("ands in ors", andsInOrs);
-  ttt = combinations(ttt, andsInOrs, joiner);
-  console.log("with ands from ors", ttt);
+  console.log("with all ors", ttt);
   return ttt;
 };
