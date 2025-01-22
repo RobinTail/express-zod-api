@@ -54,5 +54,21 @@ describe("LogicalContainer", () => {
         [6, 8],
       ]);
     });
+
+    test("legacy tests", () => {
+      expect(
+        processContainers([{ and: [1, 2, { or: [3, 4] }] }, 5], mult2),
+      ).toEqual([
+        [10, 2, 4, 6],
+        [10, 2, 4, 8],
+      ]);
+      expect(
+        processContainers([{ or: [1, 2, { and: [3, 4] }] }, 5], mult2),
+      ).toEqual([
+        // @todo this is not correct: [6,8] should be one of the variations, not always persisting
+        [10, 2, 6, 8],
+        [10, 4, 6, 8],
+      ]);
+    });
   });
 });
