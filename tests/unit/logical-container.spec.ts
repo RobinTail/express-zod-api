@@ -15,5 +15,20 @@ describe("LogicalContainer", () => {
         processContainers([{ and: [1, 2] }, { and: [3, 4] }], mult2),
       ).toEqual([[2, 4, 6, 8]]);
     });
+
+    test("should take ORs from ANDs", () => {
+      expect(processContainers([{ and: [{ or: [1, 2] }] }], mult2)).toEqual([
+        [2],
+        [4],
+      ]);
+      expect(
+        processContainers([{ and: [{ or: [1, 2] }, { or: [3, 4] }] }], mult2),
+      ).toEqual([
+        [2, 6],
+        [2, 8],
+        [4, 6],
+        [4, 8],
+      ]);
+    });
   });
 });
