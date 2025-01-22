@@ -22,26 +22,28 @@ export const processContainers = <T, U>(
   containers: LogicalContainer<T>[],
   mapper: (subject: T) => U,
 ): U[][] => {
+  const joiner = ([a, b]: [U[], U[]]) => a.concat(b);
   const simples = containers.filter(isSimple);
   let ttt = [simples.flatMap(mapper)];
+  console.log("took simples", ttt);
   const ands = containers.filter((entry) => isLogicalAnd(entry));
   ttt[0].push(
     ...ands.flatMap((entry) => entry.and.filter(isSimple).map(mapper)),
   );
-  ttt = combinations(
-    ttt,
-    ands.map((entry) =>
-      entry.and
-        .filter((entry) => isLogicalOr(entry))
-        .flatMap((entry) => entry.or.map(mapper)),
-    ),
-    ([a, b]) => a.concat(b),
+  console.log("with simples from ands", ttt);
+  const orsInAnds = ands.flatMap((entry) =>
+    entry.and
+      .filter((entry) => isLogicalOr(entry))
+      .map((entry) => entry.or.map(mapper)),
   );
+  console.log("orsInAnds", orsInAnds);
+  ttt = combinations(ttt, orsInAnds, joiner);
+  console.log("with ors from ands", ttt);
   const ors = containers.filter((entry) => isLogicalOr(entry));
   const simpleOrs = ors.flatMap((entry) =>
     entry.or.filter(isSimple).map((v) => [mapper(v)]),
   );
-  ttt = combinations(ttt, simpleOrs, ([a, b]) => a.concat(b));
+  ttt = combinations(ttt, simpleOrs, joiner);
   ttt = combinations(
     ttt,
     ors.map((entry) =>
@@ -49,7 +51,7 @@ export const processContainers = <T, U>(
         .filter((entry) => isLogicalAnd(entry))
         .flatMap((entry) => entry.and.flatMap(mapper)),
     ),
-    ([a, b]) => a.concat(b),
+    joiner,
   );
   return ttt;
 };
