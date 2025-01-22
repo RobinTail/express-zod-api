@@ -14,6 +14,11 @@ describe("LogicalContainer", () => {
       expect(
         processContainers([{ and: [1, 2] }, { and: [3, 4] }], mult2),
       ).toEqual([[2, 4, 6, 8]]);
+      expect(processContainers([{ and: [] }, 1], mult2)).toEqual([[2]]);
+      expect(processContainers([{ and: [1] }, 2], mult2)).toEqual([[4, 2]]);
+      expect(processContainers([{ and: [1, 2] }, 3], mult2)).toEqual([
+        [6, 2, 4],
+      ]);
     });
 
     test("should take ORs from ANDs", () => {
@@ -71,11 +76,16 @@ describe("LogicalContainer", () => {
         [2],
         [4],
       ]);
+      expect(processContainers([{ or: [] }, 1], mult2)).toEqual([[2]]);
+      expect(processContainers([{ or: [1] }, 2], mult2)).toEqual([[4, 2]]);
     });
 
     test("should take ANDs from ORs", () => {
       expect(processContainers([{ or: [{ and: [1, 2] }] }], mult2)).toEqual([
         [2, 4],
+      ]);
+      expect(processContainers([{ or: [{ and: [1, 2] }] }, 3], mult2)).toEqual([
+        [6, 2, 4],
       ]);
       expect(
         processContainers([{ or: [{ and: [1, 2] }, { and: [3, 4] }] }], mult2),
@@ -83,9 +93,23 @@ describe("LogicalContainer", () => {
         [2, 4],
         [6, 8],
       ]);
+      expect(
+        processContainers(
+          [
+            { or: [{ and: [1, 2] }, { and: [3, 4] }] },
+            { or: [{ and: [5, 6] }, { and: [7, 8] }] },
+          ],
+          mult2,
+        ),
+      ).toEqual([
+        [2, 4, 10, 12],
+        [2, 4, 14, 16],
+        [6, 8, 10, 12],
+        [6, 8, 14, 16],
+      ]);
     });
 
-    test("legacy tests", () => {
+    test("legacy tests and combinations", () => {
       expect(
         processContainers([{ and: [1, 2, { or: [3, 4] }] }, 5], mult2),
       ).toEqual([
@@ -98,6 +122,18 @@ describe("LogicalContainer", () => {
         [10, 2],
         [10, 4],
         [10, 6, 8],
+      ]);
+      expect(
+        processContainers([{ and: [1, 2] }, { or: [3, 4] }], mult2),
+      ).toEqual([
+        [2, 4, 6],
+        [2, 4, 8],
+      ]);
+      expect(
+        processContainers([{ or: [1, 2] }, { and: [3, 4] }], mult2),
+      ).toEqual([
+        [6, 8, 2],
+        [6, 8, 4],
       ]);
     });
   });
