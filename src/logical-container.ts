@@ -27,12 +27,12 @@ export const processContainers = <T, U>(
   const simples = containers.filter(isSimple);
   const ands = containers.filter((entry) => isLogicalAnd(entry));
   const ors = containers.filter((entry) => isLogicalOr(entry));
-  let ttt = [
+  let alts = [
     simples
       .map(mapper)
       .concat(chain((entry) => entry.and.filter(isSimple).map(mapper), ands)),
   ];
-  const allOrs = chain(
+  const alternators = chain(
     (entry) =>
       entry.and
         .filter((entry) => isLogicalOr(entry))
@@ -43,6 +43,6 @@ export const processContainers = <T, U>(
       entry.or.map((v) => (isSimple(v) ? [mapper(v)] : v.and.map(mapper))),
     ),
   );
-  for (const entry of allOrs) ttt = combinations(ttt, entry, joiner);
-  return reject(isEmpty, ttt);
+  for (const entry of alternators) alts = combinations(alts, entry, joiner);
+  return reject(isEmpty, alts);
 };

@@ -222,10 +222,10 @@ export class Documentation extends OpenApiBuilder {
           })
         : undefined;
 
-      const ttt = depictSecurity(endpoint.getSecurity(), inputSources);
+      const securityAlts = depictSecurity(endpoint.getSecurity(), inputSources);
 
-      const securityRefs = ttt.map((sss) =>
-        sss.reduce<Record<string, string[]>>((agg, securitySchema) => {
+      const securityRefs = securityAlts.map((alternative) =>
+        alternative.reduce<Record<string, string[]>>((refs, securitySchema) => {
           const name = this.ensureUniqSecuritySchemaName(securitySchema);
           const scopes = ["oauth2", "openIdConnect"].includes(
             securitySchema.type,
@@ -233,7 +233,7 @@ export class Documentation extends OpenApiBuilder {
             ? endpoint.getScopes().slice()
             : [];
           this.addSecurityScheme(name, securitySchema);
-          return Object.assign(agg, { [name]: scopes });
+          return Object.assign(refs, { [name]: scopes });
         }, {}),
       );
 
