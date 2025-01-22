@@ -18,6 +18,7 @@
   - The overload of `EndpointsFactory::constructor()` accepting `config` property is removed;
   - The argument of `EventStreamFactory::constructor()` is now the events map (formerly assigned to `events` property);
   - Tags should be declared as the keys of the augmented interface `TagOverrides` instead;
+- The public method `Endpoint::getSecurity()` now returns an array;
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
