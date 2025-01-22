@@ -825,18 +825,9 @@ export const depictResponse = ({
   return { description, content: fromPairs(xprod(mimeTypes, [media])) };
 };
 
-type SecurityHelper<K extends Security["type"]> = (
-  security: Extract<Security, { type: K }>,
-  inputSources?: InputSource[],
-) => SecuritySchemeObject;
-
-const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
-  type: "http",
-  scheme: "basic",
-});
-const depictBearerSecurity: SecurityHelper<"bearer"> = ({
+const depictBearerSecurity = ({
   format: bearerFormat,
-}) => {
+}: Extract<Security, { type: "bearer" }>) => {
   const result: SecuritySchemeObject = {
     type: "http",
     scheme: "bearer",
@@ -844,9 +835,9 @@ const depictBearerSecurity: SecurityHelper<"bearer"> = ({
   if (bearerFormat) result.bearerFormat = bearerFormat;
   return result;
 };
-const depictInputSecurity: SecurityHelper<"input"> = (
-  { name },
-  inputSources,
+const depictInputSecurity = (
+  { name }: Extract<Security, { type: "input" }>,
+  inputSources: InputSource[],
 ) => {
   const result: SecuritySchemeObject = {
     type: "apiKey",
@@ -864,24 +855,30 @@ const depictInputSecurity: SecurityHelper<"input"> = (
   }
   return result;
 };
-const depictHeaderSecurity: SecurityHelper<"header"> = ({ name }) => ({
-  type: "apiKey",
+const depictHeaderSecurity = ({
+  name,
+}: Extract<Security, { type: "header" }>) => ({
+  type: "apiKey" as const,
   in: "header",
   name,
 });
-const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
-  type: "apiKey",
+const depictCookieSecurity = ({
+  name,
+}: Extract<Security, { type: "cookie" }>) => ({
+  type: "apiKey" as const,
   in: "cookie",
   name,
 });
-const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
+const depictOpenIdSecurity = ({
   url: openIdConnectUrl,
-}) => ({
-  type: "openIdConnect",
+}: Extract<Security, { type: "openid" }>) => ({
+  type: "openIdConnect" as const,
   openIdConnectUrl,
 });
-const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
-  type: "oauth2",
+const depictOAuth2Security = ({
+  flows = {},
+}: Extract<Security, { type: "oauth2" }>) => ({
+  type: "oauth2" as const,
   flows: map(
     (flow): OAuthFlowObject => ({ ...flow, scopes: flow.scopes || {} }),
     reject(isNil, flows) as Required<typeof flows>,
@@ -890,10 +887,10 @@ const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
 
 export const depictSecurity = (
   containers: LogicalContainer<Security>[],
-  inputSources?: InputSource[],
-) => {
-  const mapper = (subj: Security) => {
-    if (subj.type === "basic") return depictBasicSecurity(subj);
+  inputSources: InputSource[] = [],
+): SecuritySchemeObject[][] => {
+  const mapper = (subj: Security): SecuritySchemeObject => {
+    if (subj.type === "basic") return { type: "http", scheme: "basic" };
     else if (subj.type === "bearer") return depictBearerSecurity(subj);
     else if (subj.type === "input")
       return depictInputSecurity(subj, inputSources);
