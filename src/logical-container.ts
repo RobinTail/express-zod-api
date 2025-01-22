@@ -25,27 +25,21 @@ export const processContainers = <T, U>(
   const joiner = ([a, b]: [U[], U[]]) => a.concat(b);
   const simples = containers.filter(isSimple);
   let ttt = [simples.flatMap(mapper)];
-  console.log("took simples", ttt);
   const ands = containers.filter((entry) => isLogicalAnd(entry));
   const simpleAnds = ands.flatMap((entry) =>
     entry.and.filter(isSimple).map(mapper),
   );
   ttt[0].push(...simpleAnds);
-  console.log("with simples from ands", ttt);
   const orsInAnds = ands.flatMap((entry) =>
     entry.and
       .filter((entry) => isLogicalOr(entry))
       .map((entry) => entry.or.map((v) => [mapper(v)])),
   );
-  console.log("orsInAnds", orsInAnds);
   for (const entry of orsInAnds) ttt = combinations(ttt, entry, joiner);
-  console.log("with ors from ands", ttt);
   const ors = containers.filter((entry) => isLogicalOr(entry));
   const simpleOrs = ors.map((entry) =>
     entry.or.map((v) => (isSimple(v) ? [mapper(v)] : v.and.flatMap(mapper))),
   );
-  console.log("all ors", simpleOrs);
   for (const entry of simpleOrs) ttt = combinations(ttt, entry, joiner);
-  console.log("with all ors", ttt);
   return ttt;
 };
