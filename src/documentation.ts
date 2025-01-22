@@ -13,7 +13,7 @@ import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { mapLogicalContainer } from "./logical-container";
+import { combineContainers, mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
   OpenAPIContext,
@@ -226,7 +226,10 @@ export class Documentation extends OpenApiBuilder {
 
       const securityRefs = depictSecurityRefs(
         mapLogicalContainer(
-          depictSecurity(endpoint.getSecurity(), inputSources),
+          depictSecurity(
+            endpoint.getSecurity().reduce(combineContainers, { and: [] }),
+            inputSources,
+          ),
           (securitySchema) => {
             const name = this.ensureUniqSecuritySchemaName(securitySchema);
             const scopes = ["oauth2", "openIdConnect"].includes(
