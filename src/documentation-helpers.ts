@@ -10,6 +10,7 @@ import {
   SchemaObject,
   SchemaObjectType,
   SecuritySchemeObject,
+  SecurityRequirementObject,
   TagObject,
   isReferenceObject,
   isSchemaObject,
@@ -901,6 +902,21 @@ export const depictSecurity = (
   };
   return processContainers(containers, mapper);
 };
+
+export const depictSecurityRefs = (
+  alternatives: SecuritySchemeObject[][],
+  scopes: string[],
+  entitle: (subject: SecuritySchemeObject) => string,
+): SecurityRequirementObject[] =>
+  alternatives.map((alternative) =>
+    alternative.reduce<SecurityRequirementObject>((refs, securitySchema) => {
+      const name = entitle(securitySchema);
+      const hasScopes = ["oauth2", "openIdConnect"].includes(
+        securitySchema.type,
+      );
+      return Object.assign(refs, { [name]: hasScopes ? scopes : [] });
+    }, {}),
+  );
 
 export const depictBody = ({
   method,

@@ -23,6 +23,7 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
   depictSecurity,
+  depictSecurityRefs,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
@@ -224,17 +225,14 @@ export class Documentation extends OpenApiBuilder {
 
       const securityAlts = depictSecurity(endpoint.getSecurity(), inputSources);
 
-      const securityRefs = securityAlts.map((alternative) =>
-        alternative.reduce<Record<string, string[]>>((refs, securitySchema) => {
+      const securityRefs = depictSecurityRefs(
+        securityAlts,
+        endpoint.getScopes().slice(),
+        (securitySchema) => {
           const name = this.ensureUniqSecuritySchemaName(securitySchema);
-          const scopes = ["oauth2", "openIdConnect"].includes(
-            securitySchema.type,
-          )
-            ? endpoint.getScopes().slice()
-            : [];
           this.addSecurityScheme(name, securitySchema);
-          return Object.assign(refs, { [name]: scopes });
-        }, {}),
+          return name;
+        },
       );
 
       this.addPath(reformatParamsInPath(path), {
