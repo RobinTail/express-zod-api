@@ -223,10 +223,8 @@ export class Documentation extends OpenApiBuilder {
           })
         : undefined;
 
-      const securityAlts = depictSecurity(endpoint.getSecurity(), inputSources);
-
       const securityRefs = depictSecurityRefs(
-        securityAlts,
+        depictSecurity(endpoint.getSecurity(), inputSources),
         endpoint.getScopes().slice(),
         (securitySchema) => {
           const name = this.ensureUniqSecuritySchemaName(securitySchema);
