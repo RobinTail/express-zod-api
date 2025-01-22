@@ -836,11 +836,11 @@ type SecurityHelper<K extends Security["type"]> = (
   inputSources?: InputSource[],
 ) => SecuritySchemeObject;
 
-const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
+export const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
   type: "http",
   scheme: "basic",
 });
-const depictBearerSecurity: SecurityHelper<"bearer"> = ({
+export const depictBearerSecurity: SecurityHelper<"bearer"> = ({
   format: bearerFormat,
 }) => {
   const result: SecuritySchemeObject = {
@@ -850,7 +850,7 @@ const depictBearerSecurity: SecurityHelper<"bearer"> = ({
   if (bearerFormat) result.bearerFormat = bearerFormat;
   return result;
 };
-const depictInputSecurity: SecurityHelper<"input"> = (
+export const depictInputSecurity: SecurityHelper<"input"> = (
   { name },
   inputSources,
 ) => {
@@ -870,23 +870,25 @@ const depictInputSecurity: SecurityHelper<"input"> = (
   }
   return result;
 };
-const depictHeaderSecurity: SecurityHelper<"header"> = ({ name }) => ({
+export const depictHeaderSecurity: SecurityHelper<"header"> = ({ name }) => ({
   type: "apiKey",
   in: "header",
   name,
 });
-const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
+export const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
   type: "apiKey",
   in: "cookie",
   name,
 });
-const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
+export const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
   url: openIdConnectUrl,
 }) => ({
   type: "openIdConnect",
   openIdConnectUrl,
 });
-const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
+export const depictOAuth2Security: SecurityHelper<"oauth2"> = ({
+  flows = {},
+}) => ({
   type: "oauth2",
   flows: map(
     (flow): OAuthFlowObject => ({ ...flow, scopes: flow.scopes || {} }),

@@ -11,24 +11,38 @@ import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import { defaultInputSources, makeCleanId } from "./common-helpers";
+import {
+  combinations,
+  defaultInputSources,
+  makeCleanId,
+} from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { combineContainers, mapLogicalContainer } from "./logical-container";
+import {
+  isLogicalAnd,
+  isLogicalOr,
+  LogicalContainer,
+} from "./logical-container";
 import { Method } from "./method";
 import {
   OpenAPIContext,
   depictBody,
   depictRequestParams,
   depictResponse,
-  depictSecurity,
-  depictSecurityRefs,
   depictTags,
   ensureShortDescription,
   reformatParamsInPath,
+  depictBasicSecurity,
+  depictBearerSecurity,
+  depictInputSecurity,
+  depictHeaderSecurity,
+  depictCookieSecurity,
+  depictOpenIdSecurity,
+  depictOAuth2Security,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
+import { Security } from "./security";
 
 type Component =
   | "positiveResponse"
@@ -224,17 +238,53 @@ export class Documentation extends OpenApiBuilder {
           })
         : undefined;
 
-      const securityRefs = depictSecurityRefs(
-        mapLogicalContainer(
-          depictSecurity(
-            endpoint
-              .getSecurity()
-              .reduce((acc, entry) => combineContainers(acc, entry), {
-                and: [],
-              }),
-            inputSources,
-          ),
-          (securitySchema) => {
+      const containers = endpoint.getSecurity();
+      const mapper = (subj: Security) => {
+        if (subj.type === "basic") return depictBasicSecurity(subj);
+        else if (subj.type === "bearer") return depictBearerSecurity(subj);
+        else if (subj.type === "input")
+          return depictInputSecurity(subj, inputSources);
+        else if (subj.type === "header") return depictHeaderSecurity(subj);
+        else if (subj.type === "cookie") return depictCookieSecurity(subj);
+        else if (subj.type === "openid") return depictOpenIdSecurity(subj);
+        else return depictOAuth2Security(subj);
+      };
+      const isSimple = (entry: LogicalContainer<Security>): entry is Security =>
+        !isLogicalAnd(entry) && !isLogicalOr(entry);
+      const simples = containers.filter(isSimple);
+      let ttt = [simples.flatMap(mapper)];
+      const ands = containers.filter((entry) => isLogicalAnd(entry));
+      ttt[0].push(
+        ...ands.flatMap((entry) => entry.and.filter(isSimple).map(mapper)),
+      );
+      ttt = combinations(
+        ttt,
+        ands.map((entry) =>
+          entry.and
+            .filter((entry) => isLogicalOr(entry))
+            .flatMap((entry) => entry.or.map(mapper)),
+        ),
+        ([a, b]) => a.concat(b),
+      );
+      const ors = containers.filter((entry) => isLogicalOr(entry));
+      const simpleOrs = ors.flatMap((entry) =>
+        entry.or.filter(isSimple).map((v) => [mapper(v)]),
+      );
+      ttt = combinations(ttt, simpleOrs, ([a, b]) => a.concat(b));
+      ttt = combinations(
+        ttt,
+        ors.map((entry) =>
+          entry.or
+            .filter((entry) => isLogicalAnd(entry))
+            .flatMap((entry) => entry.and.flatMap(mapper)),
+        ),
+        ([a, b]) => a.concat(b),
+      );
+
+      const securityRefs = ttt
+        .filter((sss) => sss.length)
+        .map((sss) =>
+          sss.reduce<Record<string, string[]>>((agg, securitySchema) => {
             const name = this.ensureUniqSecuritySchemaName(securitySchema);
             const scopes = ["oauth2", "openIdConnect"].includes(
               securitySchema.type,
@@ -242,10 +292,9 @@ export class Documentation extends OpenApiBuilder {
               ? endpoint.getScopes().slice()
               : [];
             this.addSecurityScheme(name, securitySchema);
-            return { name, scopes };
-          },
-        ),
-      );
+            return Object.assign(agg, { [name]: scopes });
+          }, {}),
+        );
 
       this.addPath(reformatParamsInPath(path), {
         [method]: {

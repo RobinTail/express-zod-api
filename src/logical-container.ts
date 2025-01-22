@@ -9,11 +9,12 @@ export type LogicalContainer<T> =
   | LogicalAnd<T | LogicalOr<T>>
   | T;
 
-const isLogicalOr = (subject: unknown): subject is LogicalOr<unknown> =>
+export const isLogicalOr = (subject: unknown): subject is LogicalOr<unknown> =>
   isObject(subject) && "or" in subject;
 
-const isLogicalAnd = (subject: unknown): subject is LogicalAnd<unknown> =>
-  isObject(subject) && "and" in subject;
+export const isLogicalAnd = (
+  subject: unknown,
+): subject is LogicalAnd<unknown> => isObject(subject) && "and" in subject;
 
 /** @desc combines several LogicalAnds into a one */
 const flattenAnds = <T>(subject: (T | LogicalAnd<T>)[]): LogicalAnd<T> => ({
