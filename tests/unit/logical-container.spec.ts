@@ -1,3 +1,4 @@
+import { identity } from "ramda";
 import { processContainers } from "../../src/logical-container";
 
 describe("LogicalContainer", () => {
@@ -135,6 +136,21 @@ describe("LogicalContainer", () => {
         [6, 8, 2],
         [6, 8, 4],
       ]);
+    });
+
+    test("Issue #816: combining empty LogicalAnd with a flat that is an object", () => {
+      expect(
+        processContainers(
+          [{ and: [] }, { type: "bearer", format: "JWT" }],
+          identity,
+        ),
+      ).toEqual([[{ type: "bearer", format: "JWT" }]]);
+      expect(
+        processContainers(
+          [{ type: "bearer", format: "JWT" }, { and: [] }],
+          identity,
+        ),
+      ).toEqual([[{ type: "bearer", format: "JWT" }]]);
     });
   });
 });
