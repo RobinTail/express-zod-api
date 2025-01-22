@@ -1,3 +1,4 @@
+import { chain } from "ramda";
 import { combinations, isObject } from "./common-helpers";
 
 type LogicalOr<T> = { or: T[] };
@@ -28,22 +29,20 @@ export const processContainers = <T, U>(
   const ors = containers.filter((entry) => isLogicalOr(entry));
   let ttt = [
     simples
-      .flatMap(mapper)
-      .concat(ands.flatMap((entry) => entry.and.filter(isSimple).map(mapper))),
+      .map(mapper)
+      .concat(chain((entry) => entry.and.filter(isSimple).map(mapper), ands)),
   ];
-  const allOrs = ands
-    .flatMap((entry) =>
+  const allOrs = chain(
+    (entry) =>
       entry.and
         .filter((entry) => isLogicalOr(entry))
         .map((entry) => entry.or.map((v) => [mapper(v)])),
-    )
-    .concat(
-      ors.map((entry) =>
-        entry.or.map((v) =>
-          isSimple(v) ? [mapper(v)] : v.and.flatMap(mapper),
-        ),
-      ),
-    );
+    ands,
+  ).concat(
+    ors.map((entry) =>
+      entry.or.map((v) => (isSimple(v) ? [mapper(v)] : v.and.map(mapper))),
+    ),
+  );
   for (const entry of allOrs) ttt = combinations(ttt, entry, joiner);
   return ttt;
 };
