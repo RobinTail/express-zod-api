@@ -24,19 +24,19 @@ export const processContainers = <T, U>(
 ): U[][] => {
   const joiner = ([a, b]: [U[], U[]]) => a.concat(b);
   const simples = containers.filter(isSimple);
-  let ttt = [simples.flatMap(mapper)];
   const ands = containers.filter((entry) => isLogicalAnd(entry));
-  const simpleAnds = ands.flatMap((entry) =>
-    entry.and.filter(isSimple).map(mapper),
-  );
-  ttt[0].push(...simpleAnds);
+  const ors = containers.filter((entry) => isLogicalOr(entry));
+  let ttt = [
+    simples
+      .flatMap(mapper)
+      .concat(ands.flatMap((entry) => entry.and.filter(isSimple).map(mapper))),
+  ];
   const orsInAnds = ands.flatMap((entry) =>
     entry.and
       .filter((entry) => isLogicalOr(entry))
       .map((entry) => entry.or.map((v) => [mapper(v)])),
   );
   for (const entry of orsInAnds) ttt = combinations(ttt, entry, joiner);
-  const ors = containers.filter((entry) => isLogicalOr(entry));
   const simpleOrs = ors.map((entry) =>
     entry.or.map((v) => (isSimple(v) ? [mapper(v)] : v.and.flatMap(mapper))),
   );
