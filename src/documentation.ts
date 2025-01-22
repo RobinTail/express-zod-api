@@ -19,11 +19,11 @@ import {
   depictBody,
   depictRequestParams,
   depictResponse,
+  depictSecurity,
+  depictSecurityRefs,
   depictTags,
   ensureShortDescription,
   reformatParamsInPath,
-  depictSecurity,
-  depictSecurityRefs,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
