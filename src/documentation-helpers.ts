@@ -9,7 +9,6 @@ import {
   ResponseObject,
   SchemaObject,
   SchemaObjectType,
-  SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
   isReferenceObject,
@@ -23,7 +22,6 @@ import {
   has,
   isNil,
   map,
-  mergeAll,
   mergeDeepRight,
   mergeDeepWith,
   objOf,
@@ -57,11 +55,6 @@ import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { FileSchema, ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
-import {
-  LogicalContainer,
-  andToOr,
-  mapLogicalContainer,
-} from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
@@ -895,42 +888,6 @@ export const depictOAuth2Security: SecurityHelper<"oauth2"> = ({
     reject(isNil, flows) as Required<typeof flows>,
   ),
 });
-
-export const depictSecurity = (
-  container: LogicalContainer<Security>,
-  inputSources?: InputSource[],
-): LogicalContainer<SecuritySchemeObject> => {
-  const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
-    basic: depictBasicSecurity,
-    bearer: depictBearerSecurity,
-    input: depictInputSecurity,
-    header: depictHeaderSecurity,
-    cookie: depictCookieSecurity,
-    openid: depictOpenIdSecurity,
-    oauth2: depictOAuth2Security,
-  };
-  return mapLogicalContainer(container, (security) =>
-    (methods[security.type] as SecurityHelper<typeof security.type>)(
-      security,
-      inputSources,
-    ),
-  );
-};
-
-export const depictSecurityRefs = (
-  container: LogicalContainer<{ name: string; scopes: string[] }>,
-): SecurityRequirementObject[] => {
-  if ("or" in container) {
-    return container.or.map(
-      (entry): SecurityRequirementObject =>
-        "and" in entry
-          ? mergeAll(map(({ name, scopes }) => objOf(name, scopes), entry.and))
-          : { [entry.name]: entry.scopes },
-    );
-  }
-  if ("and" in container) return depictSecurityRefs(andToOr(container));
-  return depictSecurityRefs({ or: [container] });
-};
 
 export const depictBody = ({
   method,
