@@ -37,9 +37,9 @@ export const processContainers = <T, U>(
       .map((entry) => entry.or.map((v) => [mapper(v)])),
   );
   for (const entry of orsInAnds) ttt = combinations(ttt, entry, joiner);
-  const simpleOrs = ors.map((entry) =>
+  const orsOnTop = ors.map((entry) =>
     entry.or.map((v) => (isSimple(v) ? [mapper(v)] : v.and.flatMap(mapper))),
   );
-  for (const entry of simpleOrs) ttt = combinations(ttt, entry, joiner);
+  for (const entry of orsOnTop) ttt = combinations(ttt, entry, joiner);
   return ttt;
 };
