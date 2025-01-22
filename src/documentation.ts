@@ -11,17 +11,9 @@ import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import {
-  combinations,
-  defaultInputSources,
-  makeCleanId,
-} from "./common-helpers";
+import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import {
-  isLogicalAnd,
-  isLogicalOr,
-  LogicalContainer,
-} from "./logical-container";
+import { processContainers } from "./logical-container";
 import { Method } from "./method";
 import {
   OpenAPIContext,
@@ -238,7 +230,6 @@ export class Documentation extends OpenApiBuilder {
           })
         : undefined;
 
-      const containers = endpoint.getSecurity();
       const mapper = (subj: Security) => {
         if (subj.type === "basic") return depictBasicSecurity(subj);
         else if (subj.type === "bearer") return depictBearerSecurity(subj);
@@ -249,37 +240,8 @@ export class Documentation extends OpenApiBuilder {
         else if (subj.type === "openid") return depictOpenIdSecurity(subj);
         else return depictOAuth2Security(subj);
       };
-      const isSimple = (entry: LogicalContainer<Security>): entry is Security =>
-        !isLogicalAnd(entry) && !isLogicalOr(entry);
-      const simples = containers.filter(isSimple);
-      let ttt = [simples.flatMap(mapper)];
-      const ands = containers.filter((entry) => isLogicalAnd(entry));
-      ttt[0].push(
-        ...ands.flatMap((entry) => entry.and.filter(isSimple).map(mapper)),
-      );
-      ttt = combinations(
-        ttt,
-        ands.map((entry) =>
-          entry.and
-            .filter((entry) => isLogicalOr(entry))
-            .flatMap((entry) => entry.or.map(mapper)),
-        ),
-        ([a, b]) => a.concat(b),
-      );
-      const ors = containers.filter((entry) => isLogicalOr(entry));
-      const simpleOrs = ors.flatMap((entry) =>
-        entry.or.filter(isSimple).map((v) => [mapper(v)]),
-      );
-      ttt = combinations(ttt, simpleOrs, ([a, b]) => a.concat(b));
-      ttt = combinations(
-        ttt,
-        ors.map((entry) =>
-          entry.or
-            .filter((entry) => isLogicalAnd(entry))
-            .flatMap((entry) => entry.and.flatMap(mapper)),
-        ),
-        ([a, b]) => a.concat(b),
-      );
+
+      const ttt = processContainers(endpoint.getSecurity(), mapper);
 
       const securityRefs = ttt
         .filter((sss) => sss.length)
