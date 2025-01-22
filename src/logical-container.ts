@@ -31,15 +31,19 @@ export const processContainers = <T, U>(
       .flatMap(mapper)
       .concat(ands.flatMap((entry) => entry.and.filter(isSimple).map(mapper))),
   ];
-  const orsInAnds = ands.flatMap((entry) =>
-    entry.and
-      .filter((entry) => isLogicalOr(entry))
-      .map((entry) => entry.or.map((v) => [mapper(v)])),
-  );
-  for (const entry of orsInAnds) ttt = combinations(ttt, entry, joiner);
-  const orsOnTop = ors.map((entry) =>
-    entry.or.map((v) => (isSimple(v) ? [mapper(v)] : v.and.flatMap(mapper))),
-  );
-  for (const entry of orsOnTop) ttt = combinations(ttt, entry, joiner);
+  const allOrs = ands
+    .flatMap((entry) =>
+      entry.and
+        .filter((entry) => isLogicalOr(entry))
+        .map((entry) => entry.or.map((v) => [mapper(v)])),
+    )
+    .concat(
+      ors.map((entry) =>
+        entry.or.map((v) =>
+          isSimple(v) ? [mapper(v)] : v.and.flatMap(mapper),
+        ),
+      ),
+    );
+  for (const entry of allOrs) ttt = combinations(ttt, entry, joiner);
   return ttt;
 };
