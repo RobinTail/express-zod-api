@@ -227,11 +227,7 @@ export class Documentation extends OpenApiBuilder {
       const securityRefs = depictSecurityRefs(
         mapLogicalContainer(
           depictSecurity(
-            endpoint
-              .getSecurity()
-              .reduce((acc, entry) => combineContainers(acc, entry), {
-                and: [],
-              }),
+            endpoint.getSecurity().reduce(combineContainers, { and: [] }),
             inputSources,
           ),
           (securitySchema) => {
