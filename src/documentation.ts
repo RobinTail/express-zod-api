@@ -13,7 +13,6 @@ import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { processContainers } from "./logical-container";
 import { Method } from "./method";
 import {
   OpenAPIContext,
@@ -23,18 +22,11 @@ import {
   depictTags,
   ensureShortDescription,
   reformatParamsInPath,
-  depictBasicSecurity,
-  depictBearerSecurity,
-  depictInputSecurity,
-  depictHeaderSecurity,
-  depictCookieSecurity,
-  depictOpenIdSecurity,
-  depictOAuth2Security,
+  depictSecurity,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
-import { Security } from "./security";
 
 type Component =
   | "positiveResponse"
@@ -230,18 +222,7 @@ export class Documentation extends OpenApiBuilder {
           })
         : undefined;
 
-      const mapper = (subj: Security) => {
-        if (subj.type === "basic") return depictBasicSecurity(subj);
-        else if (subj.type === "bearer") return depictBearerSecurity(subj);
-        else if (subj.type === "input")
-          return depictInputSecurity(subj, inputSources);
-        else if (subj.type === "header") return depictHeaderSecurity(subj);
-        else if (subj.type === "cookie") return depictCookieSecurity(subj);
-        else if (subj.type === "openid") return depictOpenIdSecurity(subj);
-        else return depictOAuth2Security(subj);
-      };
-
-      const ttt = processContainers(endpoint.getSecurity(), mapper);
+      const ttt = depictSecurity(endpoint.getSecurity(), inputSources);
 
       const securityRefs = ttt
         .filter((sss) => sss.length)

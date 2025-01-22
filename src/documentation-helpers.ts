@@ -55,6 +55,7 @@ import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { FileSchema, ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
+import { LogicalContainer, processContainers } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
@@ -829,11 +830,11 @@ type SecurityHelper<K extends Security["type"]> = (
   inputSources?: InputSource[],
 ) => SecuritySchemeObject;
 
-export const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
+const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
   type: "http",
   scheme: "basic",
 });
-export const depictBearerSecurity: SecurityHelper<"bearer"> = ({
+const depictBearerSecurity: SecurityHelper<"bearer"> = ({
   format: bearerFormat,
 }) => {
   const result: SecuritySchemeObject = {
@@ -843,7 +844,7 @@ export const depictBearerSecurity: SecurityHelper<"bearer"> = ({
   if (bearerFormat) result.bearerFormat = bearerFormat;
   return result;
 };
-export const depictInputSecurity: SecurityHelper<"input"> = (
+const depictInputSecurity: SecurityHelper<"input"> = (
   { name },
   inputSources,
 ) => {
@@ -863,31 +864,46 @@ export const depictInputSecurity: SecurityHelper<"input"> = (
   }
   return result;
 };
-export const depictHeaderSecurity: SecurityHelper<"header"> = ({ name }) => ({
+const depictHeaderSecurity: SecurityHelper<"header"> = ({ name }) => ({
   type: "apiKey",
   in: "header",
   name,
 });
-export const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
+const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
   type: "apiKey",
   in: "cookie",
   name,
 });
-export const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
+const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
   url: openIdConnectUrl,
 }) => ({
   type: "openIdConnect",
   openIdConnectUrl,
 });
-export const depictOAuth2Security: SecurityHelper<"oauth2"> = ({
-  flows = {},
-}) => ({
+const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
   type: "oauth2",
   flows: map(
     (flow): OAuthFlowObject => ({ ...flow, scopes: flow.scopes || {} }),
     reject(isNil, flows) as Required<typeof flows>,
   ),
 });
+
+export const depictSecurity = (
+  containers: LogicalContainer<Security>[],
+  inputSources?: InputSource[],
+) => {
+  const mapper = (subj: Security) => {
+    if (subj.type === "basic") return depictBasicSecurity(subj);
+    else if (subj.type === "bearer") return depictBearerSecurity(subj);
+    else if (subj.type === "input")
+      return depictInputSecurity(subj, inputSources);
+    else if (subj.type === "header") return depictHeaderSecurity(subj);
+    else if (subj.type === "cookie") return depictCookieSecurity(subj);
+    else if (subj.type === "openid") return depictOpenIdSecurity(subj);
+    else return depictOAuth2Security(subj);
+  };
+  return processContainers(containers, mapper);
+};
 
 export const depictBody = ({
   method,
