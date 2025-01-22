@@ -30,5 +30,17 @@ describe("LogicalContainer", () => {
         [4, 8],
       ]);
     });
+
+    test("should take simples out of ORs", () => {
+      expect(processContainers([{ or: [1, 2] }], mult2)).toEqual([[2], [4]]);
+      expect(
+        processContainers([{ or: [1, 2] }, { or: [3, 4] }], mult2),
+      ).toEqual([
+        [2, 6],
+        [2, 8],
+        [4, 6],
+        [4, 8],
+      ]);
+    });
   });
 });
