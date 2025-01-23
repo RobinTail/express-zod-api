@@ -6,7 +6,6 @@ import { contentTypes } from "./content-type";
 import { OutputValidationError } from "./errors";
 import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
-import wellKnownHeaders from "./well-known-headers.json";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = Record<string, never>;
@@ -42,9 +41,6 @@ const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
-
-export const isHeader = (name: string): name is `x-${string}` =>
-  name.startsWith("x-") || wellKnownHeaders.includes(name);
 
 export const getInput = (
   req: Request,

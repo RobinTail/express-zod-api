@@ -1,5 +1,7 @@
 import {
   ExamplesObject,
+  isReferenceObject,
+  isSchemaObject,
   MediaTypeObject,
   OAuthFlowObject,
   ParameterLocation,
@@ -12,12 +14,9 @@ import {
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
-  isReferenceObject,
-  isSchemaObject,
 } from "openapi3-ts/oas31";
 import {
   concat,
-  type as detectType,
   filter,
   fromPairs,
   has,
@@ -33,6 +32,7 @@ import {
   reject,
   times,
   toLower,
+  type as detectType,
   union,
   when,
   xprod,
@@ -41,11 +41,10 @@ import {
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  FlatObject,
   combinations,
+  FlatObject,
   getExamples,
   hasCoercion,
-  isHeader,
   makeCleanId,
   tryToTransform,
   ucFirst,
@@ -55,20 +54,21 @@ import { InputSource } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { FileSchema, ezFileBrand } from "./file-schema";
+import { ezFileBrand, FileSchema } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import {
-  LogicalContainer,
   andToOr,
+  LogicalContainer,
   mapLogicalContainer,
 } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
-import { RawSchema, ezRawBrand } from "./raw-schema";
+import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
 import { Security } from "./security";
-import { UploadSchema, ezUploadBrand } from "./upload-schema";
+import { ezUploadBrand, UploadSchema } from "./upload-schema";
+import wellKnownHeaders from "./well-known-headers.json";
 
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
@@ -624,6 +624,9 @@ export const extractObjectSchema = (
     extractObjectSchema(subject._def.right),
   );
 };
+
+export const isHeader = (name: string): name is `x-${string}` =>
+  name.startsWith("x-") || wellKnownHeaders.includes(name);
 
 export const depictRequestParams = ({
   path,

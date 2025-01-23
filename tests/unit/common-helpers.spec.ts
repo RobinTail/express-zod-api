@@ -7,7 +7,6 @@ import {
   getInput,
   getMessageFromError,
   hasCoercion,
-  isHeader,
   makeCleanId,
   ensureError,
 } from "../../src/common-helpers";
@@ -19,19 +18,6 @@ describe("Common Helpers", () => {
     test("should be declared in a certain way", () => {
       expect(defaultInputSources).toMatchSnapshot();
     });
-  });
-
-  describe("isHeader()", () => {
-    test.each([
-      { name: "x-request-id", expected: true },
-      { name: "authorization", expected: true },
-      { name: "unknown", expected: false },
-    ])(
-      "should validate custom and well-known headers %#",
-      ({ name, expected }) => {
-        expect(isHeader(name)).toBe(expected);
-      },
-    );
   });
 
   describe("getInput()", () => {
