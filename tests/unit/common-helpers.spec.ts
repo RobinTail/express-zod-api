@@ -3,7 +3,6 @@ import createHttpError from "http-errors";
 import {
   combinations,
   defaultInputSources,
-  getHeaders,
   getExamples,
   getInput,
   getMessageFromError,
@@ -33,23 +32,6 @@ describe("Common Helpers", () => {
         expect(isHeader(name)).toBe(expected);
       },
     );
-  });
-
-  describe("getHeaders()", () => {
-    test("should reduce the object to the custom headers only", () => {
-      expect(
-        getHeaders({
-          authorization: "Bearer ***",
-          "x-request-id": "test",
-          "x-another": "header",
-          unknown: "header",
-        }),
-      ).toEqual({
-        authorization: "Bearer ***",
-        "x-request-id": "test",
-        "x-another": "header",
-      });
-    });
   });
 
   describe("getInput()", () => {
@@ -148,11 +130,7 @@ describe("Common Helpers", () => {
           makeRequestMock({
             method: "POST",
             body: { a: "body" },
-            headers: {
-              authorization: "Bearer ***",
-              "x-request-id": "test",
-              unknown: "header",
-            },
+            headers: { authorization: "Bearer ***", "x-request-id": "test" },
           }),
           { post: ["body", "headers"] },
         ),

@@ -46,10 +46,6 @@ export const getActualMethod = (request: Request) =>
 export const isHeader = (name: string): name is `x-${string}` =>
   name.startsWith("x-") || wellKnownHeaders.includes(name);
 
-/** @see https://nodejs.org/api/http.html#messageheaders */
-export const getHeaders = (headers: FlatObject): FlatObject =>
-  pickBy((_, key) => isHeader(key), headers); // twice faster than flip()
-
 export const getInput = (
   req: Request,
   userDefined: CommonConfig["inputSources"] = {},
@@ -62,7 +58,7 @@ export const getInput = (
     fallbackInputSource
   )
     .filter((src) => (src === "files" ? areFilesAvailable(req) : true))
-    .map((src) => (src === "headers" ? getHeaders(req[src]) : req[src]))
+    .map((src) => req[src])
     .reduce<FlatObject>((agg, obj) => Object.assign(agg, obj), {});
 };
 
