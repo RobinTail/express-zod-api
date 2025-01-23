@@ -1,7 +1,10 @@
 import { writeFile } from "node:fs/promises";
 import { z } from "zod";
 
-// https://github.com/ladjs/message-headers/blob/master/cron.js
+/**
+ * @link https://www.iana.org/assignments/http-fields/http-fields.xhtml
+ * @example https://github.com/ladjs/message-headers/blob/master/cron.js
+ */
 const csv = await (
   await fetch("https://www.iana.org/assignments/http-fields/field-names.csv")
 ).text();
