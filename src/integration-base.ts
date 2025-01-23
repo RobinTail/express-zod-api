@@ -39,7 +39,6 @@ export abstract class IntegrationBase {
   protected ids = {
     pathType: f.createIdentifier("Path"),
     implementationType: f.createIdentifier("Implementation"),
-    clientClass: f.createIdentifier("Client"),
     keyParameter: f.createIdentifier("key"),
     pathParameter: f.createIdentifier("path"),
     paramsArgument: f.createIdentifier("params"),
@@ -280,9 +279,9 @@ export abstract class IntegrationBase {
       },
     );
 
-  // export class ExpressZodAPIClient { ___ }
-  protected makeClientClass = () =>
-    makePublicClass(this.ids.clientClass, [
+  // export class Client { ___ }
+  protected makeClientClass = (name: string) =>
+    makePublicClass(name, [
       // public constructor(protected readonly implementation: Implementation) {}
       makePublicConstructor([
         makeParam(this.ids.implementationArgument, {
@@ -449,11 +448,14 @@ export abstract class IntegrationBase {
     );
   };
 
-  protected makeUsageStatements = (): ts.Node[] => [
+  protected makeUsageStatements = (className: string): ts.Node[] => [
     // const client = new Client(exampleImplementation);
     makeConst(
       this.ids.clientConst,
-      makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
+      makeNew(
+        f.createIdentifier(className),
+        this.ids.exampleImplementationConst,
+      ),
     ),
     // client.provide("get /v1/user/retrieve", { id: "10" });
     makePropCall(this.ids.clientConst, this.ids.provideMethod, [
