@@ -33,4 +33,8 @@ const headers = lines
 
 console.debug("CRC:", headers.length);
 
-await writeFile("src/headers.json", JSON.stringify(headers), "utf-8");
+await writeFile(
+  "src/well-known-headers.json",
+  JSON.stringify(headers),
+  "utf-8",
+);
