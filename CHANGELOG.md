@@ -40,6 +40,10 @@ export default [
 ```diff
   createConfig({
 -   tags: {},
+    inputSources: {
+-     get: ["query", "headers"] // if you have headers on last place
++     get: ["headers", "query"] // move headers to avoid overwrites
+    }
   });
 
   new Documentation({
