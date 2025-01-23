@@ -29,7 +29,7 @@ const headers = lines
     if (!success) console.debug("excluding", entry);
     return success;
   })
-  .map(({ name }) => name);
+  .map(({ name }) => name.toLowerCase());
 
 console.debug("CRC:", headers.length);
 
