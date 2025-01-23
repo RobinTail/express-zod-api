@@ -1,13 +1,26 @@
-import { writeFile } from "node:fs/promises";
+import { writeFile, stat } from "node:fs/promises";
 import { z } from "zod";
+
+const dest = "src/well-known-headers.json";
+const { mtime } = await stat(dest);
+
+console.info("Current state", mtime);
 
 /**
  * @link https://www.iana.org/assignments/http-fields/http-fields.xhtml
  * @example https://github.com/ladjs/message-headers/blob/master/cron.js
  */
-const csv = await (
-  await fetch("https://www.iana.org/assignments/http-fields/field-names.csv")
-).text();
+const response = await fetch(
+  "https://www.iana.org/assignments/http-fields/field-names.csv",
+);
+const lastMod = response.headers.get("last-modified");
+if (!lastMod)
+  throw new Error("Can not get Last-Modified headers from response");
+const state = new Date(lastMod);
+console.info("Last modified", state);
+if (state <= mtime) process.exit(0);
+
+const csv = await response.text();
 
 const categories = [
   "permanent",
@@ -36,8 +49,4 @@ const headers = lines
 
 console.debug("CRC:", headers.length);
 
-await writeFile(
-  "src/well-known-headers.json",
-  JSON.stringify(headers),
-  "utf-8",
-);
+await writeFile(dest, JSON.stringify(headers), "utf-8");
