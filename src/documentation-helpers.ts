@@ -45,7 +45,7 @@ import {
   combinations,
   getExamples,
   hasCoercion,
-  isCustomHeader,
+  isHeader,
   makeCleanId,
   tryToTransform,
   ucFirst,
@@ -644,8 +644,7 @@ export const depictRequestParams = ({
   const areHeadersEnabled = inputSources.includes("headers");
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
-  const isHeaderParam = (name: string) =>
-    areHeadersEnabled && isCustomHeader(name);
+  const isHeaderParam = (name: string) => areHeadersEnabled && isHeader(name);
 
   const parameters = Object.keys(shape)
     .map<{ name: string; location?: ParameterLocation }>((name) => ({

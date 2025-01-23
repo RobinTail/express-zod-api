@@ -3,12 +3,12 @@ import createHttpError from "http-errors";
 import {
   combinations,
   defaultInputSources,
-  getCustomHeaders,
+  getHeaders,
   getExamples,
   getInput,
   getMessageFromError,
   hasCoercion,
-  isCustomHeader,
+  isHeader,
   makeCleanId,
   ensureError,
 } from "../../src/common-helpers";
@@ -22,24 +22,33 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("isCustomHeader()", () => {
+  describe("isHeader()", () => {
     test.each([
       { name: "x-request-id", expected: true },
-      { name: "authorization", expected: false },
-    ])("should validate those starting with x- %#", ({ name, expected }) => {
-      expect(isCustomHeader(name)).toBe(expected);
-    });
+      { name: "authorization", expected: true },
+      { name: "unknown", expected: false },
+    ])(
+      "should validate custom and well-known headers %#",
+      ({ name, expected }) => {
+        expect(isHeader(name)).toBe(expected);
+      },
+    );
   });
 
-  describe("getCustomHeaders()", () => {
+  describe("getHeaders()", () => {
     test("should reduce the object to the custom headers only", () => {
       expect(
-        getCustomHeaders({
+        getHeaders({
           authorization: "Bearer ***",
           "x-request-id": "test",
           "x-another": "header",
+          unknown: "header",
         }),
-      ).toEqual({ "x-request-id": "test", "x-another": "header" });
+      ).toEqual({
+        authorization: "Bearer ***",
+        "x-request-id": "test",
+        "x-another": "header",
+      });
     });
   });
 
@@ -133,17 +142,26 @@ describe("Common Helpers", () => {
         getInput(makeRequestMock({ method: "OPTIONS" }), undefined),
       ).toEqual({});
     });
-    test("Feature 1180: should include custom headers when enabled", () => {
+    test("Features 1180 and 2337: should include headers when enabled", () => {
       expect(
         getInput(
           makeRequestMock({
             method: "POST",
             body: { a: "body" },
-            headers: { authorization: "Bearer ***", "x-request-id": "test" },
+            headers: {
+              authorization: "Bearer ***",
+              "x-request-id": "test",
+              unknown: "header",
+            },
           }),
           { post: ["body", "headers"] },
         ),
-      ).toEqual({ a: "body", "x-request-id": "test" });
+      ).toEqual({
+        a: "body",
+        authorization: "Bearer ***",
+        "content-type": "application/json",
+        "x-request-id": "test",
+      });
     });
   });
 
