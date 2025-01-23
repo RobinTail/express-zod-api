@@ -6,9 +6,16 @@ const csv = await (
   await fetch("https://www.iana.org/assignments/http-fields/field-names.csv")
 ).text();
 
+const categories = [
+  "permanent",
+  "deprecated",
+  "provisional",
+  "obsoleted",
+] as const;
+
 const schema = z.object({
   name: z.string().regex(/^[\w-]+$/),
-  category: z.enum(["permanent", "deprecated", "provisional", "obsoleted"]),
+  category: z.enum(categories),
 });
 
 const lines = csv.split("\n").slice(1, -1);
@@ -21,7 +28,8 @@ const headers = lines
     const { success } = schema.safeParse(entry);
     if (!success) console.debug("excluding", entry);
     return success;
-  });
+  })
+  .map(({ name }) => name);
 
 console.debug("CRC:", headers.length);
 
