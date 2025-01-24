@@ -1,7 +1,5 @@
 import {
   ExamplesObject,
-  isReferenceObject,
-  isSchemaObject,
   MediaTypeObject,
   OAuthFlowObject,
   ParameterLocation,
@@ -14,9 +12,12 @@ import {
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
+  isReferenceObject,
+  isSchemaObject,
 } from "openapi3-ts/oas31";
 import {
   concat,
+  type as detectType,
   filter,
   fromPairs,
   has,
@@ -32,7 +33,6 @@ import {
   reject,
   times,
   toLower,
-  type as detectType,
   union,
   when,
   xprod,
@@ -41,8 +41,8 @@ import {
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  combinations,
   FlatObject,
+  combinations,
   getExamples,
   hasCoercion,
   makeCleanId,
@@ -54,20 +54,20 @@ import { InputSource } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { ezFileBrand, FileSchema } from "./file-schema";
+import { FileSchema, ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import {
-  andToOr,
   LogicalContainer,
+  andToOr,
   mapLogicalContainer,
 } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
-import { ezRawBrand, RawSchema } from "./raw-schema";
+import { RawSchema, ezRawBrand } from "./raw-schema";
 import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
 import { Security } from "./security";
-import { ezUploadBrand, UploadSchema } from "./upload-schema";
+import { UploadSchema, ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
 
 export interface OpenAPIContext extends FlatObject {
