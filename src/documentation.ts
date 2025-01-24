@@ -70,7 +70,6 @@ interface DocumentationParams {
   /**
    * @desc Ability to configure recognition of headers among other input data
    * @desc Only applicable when "headers" is present within inputSources config option
-   * @default () => null
    * @see defaultIsHeader
    * @link https://www.iana.org/assignments/http-fields/http-fields.xhtml
    * */
@@ -151,8 +150,8 @@ export class Documentation extends OpenApiBuilder {
     descriptions,
     brandHandling,
     tags,
+    isHeader,
     hasSummaryFromDescription = true,
-    isHeader = () => null,
     composition = "inline",
   }: DocumentationParams) {
     super();

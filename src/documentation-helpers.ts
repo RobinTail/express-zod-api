@@ -646,7 +646,7 @@ export const depictRequestParams = ({
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
-  isHeader: IsHeader;
+  isHeader?: IsHeader;
 }) => {
   const { shape } = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
@@ -657,7 +657,7 @@ export const depictRequestParams = ({
     areParamsEnabled && pathParams.includes(name);
   const isHeaderParam = (name: string) =>
     areHeadersEnabled &&
-    (isHeader(name, method, path) ?? defaultIsHeader(name));
+    (isHeader?.(name, method, path) ?? defaultIsHeader(name));
 
   return Object.keys(shape).reduce<ParameterObject[]>((acc, name) => {
     const location = isPathParam(name)
