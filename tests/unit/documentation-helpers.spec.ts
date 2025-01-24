@@ -708,7 +708,7 @@ describe("Documentation helpers", () => {
             test: z.boolean(),
           }),
           inputSources: ["query", "headers", "params"],
-          isHeader: defaultIsHeader,
+          isHeader: () => null, // will use defaultIsHeader
           composition: "inline",
           ...requestCtx,
         }),
