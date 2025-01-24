@@ -18,6 +18,9 @@ export const config = createConfig({
     );
     app.use("/docs", ui.serve, ui.setup(documentation));
   },
+  inputSources: {
+    patch: ["headers", "body", "params"],
+  },
   cors: true,
 });
 

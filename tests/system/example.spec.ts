@@ -449,9 +449,7 @@ describe("Example", async () => {
         const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
         const response = await fetch(new URL(`${path}${searchParams}`, host), {
           method: method.toUpperCase(),
-          headers: hasBody
-            ? { "Content-Type": "application/json", token: "456" }
-            : undefined,
+          headers: hasBody ? { "Content-Type": "application/json" } : undefined,
           body: hasBody ? JSON.stringify(params) : undefined,
         });
         const contentType = response.headers.get("content-type");
@@ -476,6 +474,7 @@ describe("Example", async () => {
     test("Issue #2177: should handle path params correctly", async () => {
       const response = await client.provide("patch /v1/user/:id", {
         key: "123",
+        token: "456",
         id: "12",
         name: "Alan Turing",
         birthday: "1912-06-23",

@@ -17,6 +17,7 @@ await writeFile(
       files: "Everything about the files processing",
       subscriptions: "Everything about the subscriptions",
     },
+    isHeader: (name) => name === "token" || null,
   }).getSpecAsYaml(),
   "utf-8",
 );
