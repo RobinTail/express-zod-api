@@ -54,8 +54,7 @@ export const getInput = (
     fallbackInputSource
   )
     .filter((src) => (src === "files" ? areFilesAvailable(req) : true))
-    .map((src) => req[src])
-    .reduce<FlatObject>((agg, obj) => Object.assign(agg, obj), {});
+    .reduce<FlatObject>((agg, src) => Object.assign(agg, req[src]), {});
 };
 
 export const ensureError = (subject: unknown): Error =>
