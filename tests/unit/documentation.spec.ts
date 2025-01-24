@@ -38,6 +38,7 @@ describe("Documentation", () => {
           title: "Example API",
           serverUrl: "https://example.com",
           composition,
+          isHeader: (name) => name === "token" || null,
         }).getSpecAsYaml();
         expect(spec).toMatchSnapshot();
       },

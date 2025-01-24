@@ -36,11 +36,11 @@ export const updateUserEndpoint =
         createdAt: new Date("2021-12-31"),
       }),
     handler: async ({
-      input: { id, name, key },
-      options: { token },
+      input: { id, name },
+      options: { authorized }, // comes from authMiddleware
       logger,
     }) => {
-      logger.debug(`id, key and token: ${id}, ${key}, ${token}`);
+      logger.debug(`${authorized} is changing user #${id}`);
       assert(id <= 100, createHttpError(404, "User not found"));
       return {
         createdAt: new Date("2022-01-22"),
