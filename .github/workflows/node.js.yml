@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master, v19, v20, v21, make-v22 ]
+    branches: [ master, v19, v20, v21 ]
   pull_request:
-    branches: [ master, v19, v20, v21, make-v22 ]
+    branches: [ master, v19, v20, v21 ]
 
 jobs:
   build:
