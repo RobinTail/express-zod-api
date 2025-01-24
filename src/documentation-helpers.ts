@@ -657,8 +657,8 @@ export const depictRequestParams = ({
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
   const isHeaderParam = (name: string) =>
-    (areHeadersEnabled && isHeader(name, method, path)) ??
-    defaultIsHeader(name);
+    areHeadersEnabled &&
+    (isHeader(name, method, path) ?? defaultIsHeader(name));
 
   const parameters = Object.keys(shape)
     .map<{ name: string; location?: ParameterLocation }>((name) => ({
