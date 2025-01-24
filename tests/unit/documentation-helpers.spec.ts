@@ -45,7 +45,7 @@ import {
   excludeParamsFromDepiction,
   extractObjectSchema,
   getRoutePathParams,
-  isHeader,
+  defaultIsHeader,
   onEach,
   onMissing,
   reformatParamsInPath,
@@ -640,7 +640,7 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("isHeader()", () => {
+  describe("defaultIsHeader()", () => {
     test.each([
       { name: "x-request-id", expected: true },
       { name: "authorization", expected: true },
@@ -648,7 +648,7 @@ describe("Documentation helpers", () => {
     ])(
       "should validate custom and well-known headers %#",
       ({ name, expected }) => {
-        expect(isHeader(name)).toBe(expected);
+        expect(defaultIsHeader(name)).toBe(expected);
       },
     );
   });
@@ -662,6 +662,7 @@ describe("Documentation helpers", () => {
             test: z.boolean(),
           }),
           inputSources: ["query", "params"],
+          isHeader: defaultIsHeader,
           composition: "inline",
           ...requestCtx,
         }),
@@ -676,6 +677,7 @@ describe("Documentation helpers", () => {
             test: z.boolean(),
           }),
           inputSources: ["body", "params"],
+          isHeader: defaultIsHeader,
           composition: "inline",
           ...requestCtx,
         }),
@@ -690,6 +692,7 @@ describe("Documentation helpers", () => {
             test: z.boolean(),
           }),
           inputSources: ["body"],
+          isHeader: defaultIsHeader,
           composition: "inline",
           ...requestCtx,
         }),
@@ -705,6 +708,7 @@ describe("Documentation helpers", () => {
             test: z.boolean(),
           }),
           inputSources: ["query", "headers", "params"],
+          isHeader: defaultIsHeader,
           composition: "inline",
           ...requestCtx,
         }),

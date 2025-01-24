@@ -625,7 +625,7 @@ export const extractObjectSchema = (
   );
 };
 
-export const isHeader = (name: string): name is `x-${string}` =>
+export const defaultIsHeader = (name: string): name is `x-${string}` =>
   name.startsWith("x-") || wellKnownHeaders.includes(name);
 
 export const depictRequestParams = ({
@@ -636,9 +636,11 @@ export const depictRequestParams = ({
   makeRef,
   composition,
   brandHandling,
+  isHeader,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
+  isHeader: (name: string, method: Method, path: string) => boolean;
 }) => {
   const { shape } = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
@@ -647,7 +649,8 @@ export const depictRequestParams = ({
   const areHeadersEnabled = inputSources.includes("headers");
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
-  const isHeaderParam = (name: string) => areHeadersEnabled && isHeader(name);
+  const isHeaderParam = (name: string) =>
+    areHeadersEnabled && isHeader(name, method, path);
 
   const parameters = Object.keys(shape)
     .map<{ name: string; location?: ParameterLocation }>((name) => ({
