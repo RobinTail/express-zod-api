@@ -20,7 +20,6 @@
     "prebuild": "yarn build:docs && yarn build:client && yarn build:md",
     "build": "tsup && attw --pack",
     "postbuild": "tsx tools/make-tests.ts",
-    "build:headers": "tsx tools/headers.ts",
     "build:docs": "tsx example/generate-documentation.ts",
     "build:client": "tsx example/generate-client.ts",
     "build:md": "tsx tools/contributors.ts && tsx tools/license.ts",
