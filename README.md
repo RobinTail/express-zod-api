@@ -32,26 +32,26 @@ Start your API server with I/O schema validation and custom middlewares in minut
    13. [Enabling compression](#enabling-compression)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
-   2. [Nested routes](#nested-routes)
-   3. [Route path params](#route-path-params)
-   4. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   5. [Response customization](#response-customization)
-   6. [Empty response](#empty-response)
-   7. [Error handling](#error-handling)
-   8. [Production mode](#production-mode)
-   9. [Non-object response](#non-object-response) including file downloads
-   10. [File uploads](#file-uploads)
-   11. [Serving static files](#serving-static-files)
-   12. [Connect to your own express app](#connect-to-your-own-express-app)
-   13. [Testing endpoints](#testing-endpoints)
-   14. [Testing middlewares](#testing-middlewares)
+   2. [Headers as input source](#headers-as-input-source)
+   3. [Nested routes](#nested-routes)
+   4. [Route path params](#route-path-params)
+   5. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   6. [Response customization](#response-customization)
+   7. [Empty response](#empty-response)
+   8. [Error handling](#error-handling)
+   9. [Production mode](#production-mode)
+   10. [Non-object response](#non-object-response) including file downloads
+   11. [File uploads](#file-uploads)
+   12. [Serving static files](#serving-static-files)
+   13. [Connect to your own express app](#connect-to-your-own-express-app)
+   14. [Testing endpoints](#testing-endpoints)
+   15. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
-   3. [Headers as input source](#headers-as-input-source)
-   4. [Accepting raw data](#accepting-raw-data)
-   5. [Graceful shutdown](#graceful-shutdown)
-   6. [Subscriptions](#subscriptions)
+   3. [Accepting raw data](#accepting-raw-data)
+   4. [Graceful shutdown](#graceful-shutdown)
+   5. [Subscriptions](#subscriptions)
 7. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [Generating a Frontend Client](#generating-a-frontend-client)
@@ -726,6 +726,31 @@ createConfig({
 });
 ```
 
+## Headers as input source
+
+In a similar way you can enable request headers as the input source. This is an opt-in feature. Please note:
+
+- consider giving `headers` the lowest priority among other `inputSources` to avoid overwrites;
+- the request headers acquired that way are always lowercase when describing their validation schemas.
+
+```typescript
+import { createConfig, defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+createConfig({
+  inputSources: {
+    get: ["headers", "query"], // headers have lowest priority
+  }, // ...
+});
+
+defaultEndpointsFactory.build({
+  input: z.object({
+    "x-request-id": z.string(), // this one is from request.headers
+    id: z.string(), // this one is from request.query
+  }), // ...
+});
+```
+
 ## Nested routes
 
 Suppose you want to assign both `/v1/path` and `/v1/path/subpath` routes with Endpoints:
@@ -1127,32 +1152,6 @@ or implement your own ones in a similar way.
 The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
 assigned to that property is used as the response. This approach also supports examples, as well as documentation and
 client generation. Check out [the example endpoint](/example/endpoints/list-users.ts) for more details.
-
-## Headers as input source
-
-In a similar way you can enable the inclusion of request headers into the input sources. This is an opt-in feature.
-Please note:
-
-- only the custom headers (the ones having `x-` prefix) will be combined into the `input`,
-- the request headers acquired that way are lowercase when describing their validation schemas.
-
-```typescript
-import { createConfig, defaultEndpointsFactory } from "express-zod-api";
-import { z } from "zod";
-
-createConfig({
-  inputSources: {
-    get: ["query", "headers"],
-  }, // ...
-});
-
-defaultEndpointsFactory.build({
-  input: z.object({
-    "x-request-id": z.string(), // this one is from request.headers
-    id: z.string(), // this one is from request.query
-  }), // ...
-});
-```
 
 ## Accepting raw data
 

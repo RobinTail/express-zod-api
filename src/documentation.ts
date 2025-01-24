@@ -24,6 +24,7 @@ import {
   depictTags,
   ensureShortDescription,
   reformatParamsInPath,
+  IsHeader,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
@@ -65,6 +66,13 @@ interface DocumentationParams {
    * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => ({ type: "object" })
    */
   brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
+  /**
+   * @desc Ability to configure recognition of headers among other input data
+   * @desc Only applicable when "headers" is present within inputSources config option
+   * @see defaultIsHeader
+   * @link https://www.iana.org/assignments/http-fields/http-fields.xhtml
+   * */
+  isHeader?: IsHeader;
   /**
    * @desc Extended description of tags used in endpoints. For enforcing constraints:
    * @see TagOverrides
@@ -141,6 +149,7 @@ export class Documentation extends OpenApiBuilder {
     descriptions,
     brandHandling,
     tags,
+    isHeader,
     hasSummaryFromDescription = true,
     composition = "inline",
   }: DocumentationParams) {
@@ -177,6 +186,7 @@ export class Documentation extends OpenApiBuilder {
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
+        isHeader,
         schema: endpoint.getSchema("input"),
         description: descriptions?.requestParameter?.call(null, {
           method,
