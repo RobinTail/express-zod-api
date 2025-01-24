@@ -86,7 +86,7 @@ describe("Example", async () => {
         },
       });
       await vi.waitFor(() =>
-        assert([/v1\/user\/50/, /50, 123, 456/].every(matchOut)),
+        assert([/v1\/user\/50/, /123, 456/, /Jane Doe/, /#50/].every(matchOut)),
       );
       expect(true).toBeTruthy();
     });

@@ -20,10 +20,10 @@ export const authMiddleware = new Middleware({
       token: "1234567890",
     }),
   handler: async ({ input: { key, token }, logger }) => {
-    logger.debug("Checking the key and token...");
+    logger.debug(`Key and token: ${key}, ${token}`);
     assert.equal(key, "123", createHttpError(401, "Invalid key"));
     assert.equal(token, "456", createHttpError(401, "Invalid token"));
-    return { token };
+    return { authorized: "Jane Doe" };
   },
 });
 
