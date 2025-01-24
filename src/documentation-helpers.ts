@@ -2,7 +2,6 @@ import {
   ExamplesObject,
   MediaTypeObject,
   OAuthFlowObject,
-  ParameterLocation,
   ParameterObject,
   ReferenceObject,
   RequestBodyObject,
@@ -660,23 +659,15 @@ export const depictRequestParams = ({
     areHeadersEnabled &&
     (isHeader(name, method, path) ?? defaultIsHeader(name));
 
-  const parameters = Object.keys(shape)
-    .map<{ name: string; location?: ParameterLocation }>((name) => ({
-      name,
-      location: isPathParam(name)
-        ? "path"
-        : isHeaderParam(name)
-          ? "header"
-          : isQueryEnabled
-            ? "query"
-            : undefined,
-    }))
-    .filter(
-      (parameter): parameter is Required<typeof parameter> =>
-        parameter.location !== undefined,
-    );
-
-  return parameters.map<ParameterObject>(({ name, location }) => {
+  return Object.keys(shape).reduce<ParameterObject[]>((acc, name) => {
+    const location = isPathParam(name)
+      ? "path"
+      : isHeaderParam(name)
+        ? "header"
+        : isQueryEnabled
+          ? "query"
+          : undefined;
+    if (!location) return acc;
     const depicted = walkSchema(shape[name], {
       rules: { ...brandHandling, ...depicters },
       onEach,
@@ -687,15 +678,15 @@ export const depictRequestParams = ({
       composition === "components"
         ? makeRef(shape[name], depicted, makeCleanId(description, name))
         : depicted;
-    return {
+    return acc.concat({
       name,
       in: location,
       required: !shape[name].isOptional(),
       description: depicted.description || description,
       schema: result,
       examples: depictParamExamples(schema, name),
-    };
-  });
+    });
+  }, []);
 };
 
 export const depicters: HandlingRules<
