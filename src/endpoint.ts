@@ -17,7 +17,7 @@ import {
 import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
-import { LogicalContainer, combineContainers } from "./logical-container";
+import { LogicalContainer } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
@@ -49,7 +49,7 @@ export abstract class AbstractEndpoint extends Nesting {
   public abstract getResponses(
     variant: ResponseVariant,
   ): ReadonlyArray<NormalizedResponse>;
-  public abstract getSecurity(): LogicalContainer<Security>;
+  public abstract getSecurity(): LogicalContainer<Security>[];
   public abstract getScopes(): ReadonlyArray<string>;
   public abstract getTags(): ReadonlyArray<string>;
   public abstract getOperationId(method: Method): string | undefined;
@@ -145,13 +145,9 @@ export class Endpoint<
   }
 
   public override getSecurity() {
-    return this.#middlewares.reduce<LogicalContainer<Security>>(
-      (acc, middleware) => {
-        const security = middleware.getSecurity();
-        return security ? combineContainers(acc, security) : acc;
-      },
-      { and: [] },
-    );
+    return this.#middlewares
+      .map((middleware) => middleware.getSecurity())
+      .filter((entry) => entry !== undefined);
   }
 
   public override getScopes() {
