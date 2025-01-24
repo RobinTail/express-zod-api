@@ -7,7 +7,7 @@
 - Minimum supported Node versions: 20.9.0 and 22.0.0:
   - Node 18 is no longer supported, its end of life is April 30, 2025.
 - `BuiltinLogger::profile()` behavior changed for picoseconds: expressing them through nanoseconds;
-- Feature: handling all headers as input source (when enabled):
+- Feature: handling ALL headers (not just x-prefixed ones) as input source (when enabled):
   - Behavior changed for `headers` inside `inputSources` config option: all headers are addressed to the `input` object;
   - This change is motivated by the deprecation of `x-` prefixed headers;
   - Since the order inside `inputSources` matters, consider moving `headers` to the first place to avoid overwrites;
