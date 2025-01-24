@@ -69,6 +69,7 @@ interface DocumentationParams {
   brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
   /**
    * @desc Ability to configure recognition of headers among other input data
+   * @desc Only applicable when "headers" is present within inputSources config option
    * @default true for names starting with x- or well-known headers
    * @see defaultIsHeader
    * @link https://www.iana.org/assignments/http-fields/http-fields.xhtml
