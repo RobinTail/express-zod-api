@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "21.11.1",
+  "version": "22.0.0-beta.4",
   "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -72,7 +72,7 @@
     "*.md"
   ],
   "engines": {
-    "node": "^18.18.0 || ^20.9.0 || ^22.0.0 || ^23.0.0"
+    "node": "^20.9.0 || ^22.0.0 || ^23.0.0"
   },
   "dependencies": {
     "ansis": "^3.2.0",
@@ -115,7 +115,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.0",
     "@eslint/eslintrc": "^3",
-    "@tsconfig/node18": "^18.2.1",
+    "@tsconfig/node20": "^20.1.4",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.14",
     "@types/depd": "^1.1.36",
@@ -129,7 +129,7 @@
     "@types/semver": "^7.5.8",
     "@types/swagger-ui-express": "^4.1.6",
     "@typescript-eslint/rule-tester": "^8.15.0",
-    "@vitest/coverage-v8": "^3.0.1",
+    "@vitest/coverage-v8": "^3.0.3",
     "camelize-ts": "^3.0.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
@@ -154,7 +154,7 @@
     "typescript": "^5.5.2",
     "typescript-eslint": "^8.15.0",
     "undici": "^6.19.8",
-    "vitest": "^3.0.1",
+    "vitest": "^3.0.3",
     "zod": "^3.23.0"
   },
   "resolutions": {

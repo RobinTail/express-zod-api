@@ -2,30 +2,22 @@ import {
   EndpointsFactory,
   arrayResultHandler,
   ResultHandler,
-  defaultResultHandler,
   ez,
   ensureHttpError,
   EventStreamFactory,
+  defaultEndpointsFactory,
 } from "../src";
-import { config } from "./config";
 import { authMiddleware } from "./middlewares";
 import { createReadStream } from "node:fs";
 import { z } from "zod";
 
-/** @desc The factory assures the endpoints tagging constraints from config */
-export const taggedEndpointsFactory = new EndpointsFactory({
-  resultHandler: defaultResultHandler,
-  config,
-});
-
-/** @desc This one extends the previous one by enforcing the authentication using the specified middleware */
+/** @desc This factory extends the default one by enforcing the authentication using the specified middleware */
 export const keyAndTokenAuthenticatedEndpointsFactory =
-  taggedEndpointsFactory.addMiddleware(authMiddleware);
+  defaultEndpointsFactory.addMiddleware(authMiddleware);
 
 /** @desc This factory sends the file as string located in the "data" property of the endpoint's output */
-export const fileSendingEndpointsFactory = new EndpointsFactory({
-  config,
-  resultHandler: new ResultHandler({
+export const fileSendingEndpointsFactory = new EndpointsFactory(
+  new ResultHandler({
     positive: { schema: z.string(), mimeType: "image/svg+xml" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
@@ -35,12 +27,11 @@ export const fileSendingEndpointsFactory = new EndpointsFactory({
       else response.status(400).send("Data is missing");
     },
   }),
-});
+);
 
 /** @desc This one streams the file using the "filename" property of the endpoint's output */
-export const fileStreamingEndpointsFactory = new EndpointsFactory({
-  config,
-  resultHandler: new ResultHandler({
+export const fileStreamingEndpointsFactory = new EndpointsFactory(
+  new ResultHandler({
     positive: { schema: ez.file("buffer"), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
@@ -50,22 +41,18 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory({
       else response.status(400).send("Filename is missing");
     },
   }),
-});
+);
 
 /**
  * @desc This factory demonstrates the ability to respond with array.
  * @deprecated Avoid doing this in new projects. This feature is only for easier migration of legacy APIs.
  * @alias arrayEndpointsFactory
  */
-export const arrayRespondingFactory = new EndpointsFactory({
-  config,
-  resultHandler: arrayResultHandler,
-});
+export const arrayRespondingFactory = new EndpointsFactory(arrayResultHandler);
 
 /** @desc The factory demonstrates slightly different response schemas depending on the negative status code */
-export const statusDependingFactory = new EndpointsFactory({
-  config,
-  resultHandler: new ResultHandler({
+export const statusDependingFactory = new EndpointsFactory(
+  new ResultHandler({
     positive: (data) => ({
       statusCode: [201, 202],
       schema: z.object({ status: z.literal("created"), data }),
@@ -98,21 +85,19 @@ export const statusDependingFactory = new EndpointsFactory({
       response.status(201).json({ status: "created", data: output });
     },
   }),
-});
+);
 
 /** @desc This factory demonstrates response without body, such as 204 No Content */
-export const noContentFactory = new EndpointsFactory({
-  config,
-  resultHandler: new ResultHandler({
+export const noContentFactory = new EndpointsFactory(
+  new ResultHandler({
     positive: { statusCode: 204, mimeType: null, schema: z.never() },
     negative: { statusCode: 404, mimeType: null, schema: z.never() },
     handler: ({ error, response }) => {
       response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
     },
   }),
-});
+);
 
 export const eventsFactory = new EventStreamFactory({
-  config,
-  events: { time: z.number().int().positive() },
+  time: z.number().int().positive(),
 });
