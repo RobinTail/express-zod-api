@@ -1,22 +1,21 @@
-import { head, tail, toPairs } from "ramda";
+import { keys, reject, equals } from "ramda";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
+import { Nesting } from "./nesting";
 
-export class DependsOnMethod {
-  public readonly pairs: ReadonlyArray<[Method, AbstractEndpoint]>;
-  public readonly firstEndpoint: AbstractEndpoint | undefined;
-  public readonly siblingMethods: ReadonlyArray<Method>;
+export class DependsOnMethod extends Nesting {
+  /** @desc [method, endpoint, siblingMethods] */
+  public readonly entries: ReadonlyArray<[Method, AbstractEndpoint, Method[]]>;
 
   constructor(endpoints: Partial<Record<Method, AbstractEndpoint>>) {
-    this.pairs = Object.freeze(
-      toPairs(endpoints).filter(
-        (pair): pair is [Method, AbstractEndpoint] =>
-          pair !== undefined && pair[1] !== undefined,
-      ),
-    );
-    this.firstEndpoint = head(this.pairs)?.[1];
-    this.siblingMethods = Object.freeze(
-      tail(this.pairs).map(([method]) => method),
-    );
+    super();
+    const entries: Array<(typeof this.entries)[number]> = [];
+    const methods = keys(endpoints); // eslint-disable-line no-restricted-syntax -- liternal type required
+    for (const method of methods) {
+      const endpoint = endpoints[method];
+      if (endpoint)
+        entries.push([method, endpoint, reject(equals(method), methods)]);
+    }
+    this.entries = Object.freeze(entries);
   }
 }

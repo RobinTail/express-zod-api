@@ -1,9 +1,7 @@
-import assert from "node:assert/strict";
 import {
   ExamplesObject,
   MediaTypeObject,
   OAuthFlowObject,
-  ParameterLocation,
   ParameterObject,
   ReferenceObject,
   RequestBodyObject,
@@ -31,8 +29,8 @@ import {
   omit,
   pipe,
   pluck,
-  range,
   reject,
+  times,
   toLower,
   union,
   when,
@@ -46,12 +44,12 @@ import {
   combinations,
   getExamples,
   hasCoercion,
-  isCustomHeader,
   makeCleanId,
   tryToTransform,
   ucFirst,
+  Tag,
 } from "./common-helpers";
-import { InputSource, TagsConfig } from "./config-type";
+import { InputSource } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
@@ -69,14 +67,17 @@ import { RawSchema, ezRawBrand } from "./raw-schema";
 import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
 import { Security } from "./security";
 import { UploadSchema, ezUploadBrand } from "./upload-schema";
+import wellKnownHeaders from "./well-known-headers.json";
 
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
-  serializer: (schema: z.ZodTypeAny) => string;
-  getRef: (name: string) => ReferenceObject | undefined;
   makeRef: (
-    name: string,
-    schema: SchemaObject | ReferenceObject,
+    schema: z.ZodTypeAny,
+    subject:
+      | SchemaObject
+      | ReferenceObject
+      | (() => SchemaObject | ReferenceObject),
+    name?: string,
   ) => ReferenceObject;
   path: string;
   method: Method;
@@ -87,11 +88,15 @@ export type Depicter = SchemaHandler<
   OpenAPIContext
 >;
 
+/** @desc Using defaultIsHeader when returns null or undefined */
+export type IsHeader = (
+  name: string,
+  method: Method,
+  path: string,
+) => boolean | null | undefined;
+
 interface ReqResHandlingProps<S extends z.ZodTypeAny>
-  extends Pick<
-    OpenAPIContext,
-    "serializer" | "getRef" | "makeRef" | "path" | "method"
-  > {
+  extends Pick<OpenAPIContext, "makeRef" | "path" | "method"> {
   schema: S;
   composition: "inline" | "components";
   description?: string;
@@ -114,6 +119,13 @@ const samples = {
 
 /** @see https://expressjs.com/en/guide/routing.html */
 const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
+const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+const timeRegex = /^\d{2}:\d{2}:\d{2}(\.\d+)?$/;
+
+const getTimestampRegex = (hasOffset?: boolean) =>
+  hasOffset
+    ? /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)$/
+    : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 
 export const getRoutePathParams = (path: string): string[] =>
   path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
@@ -137,13 +149,8 @@ export const depictCatch: Depicter = (
 export const depictAny: Depicter = () => ({ format: "any" });
 
 export const depictUpload: Depicter = ({}: UploadSchema, ctx) => {
-  assert(
-    !ctx.isResponse,
-    new DocumentationError({
-      message: "Please use ez.upload() only for input.",
-      ...ctx,
-    }),
-  );
+  if (ctx.isResponse)
+    throw new DocumentationError("Please use ez.upload() only for input.", ctx);
   return { type: "string", format: "binary" };
 };
 
@@ -178,7 +185,13 @@ export const depictDiscriminatedUnion: Depicter = (
   };
 };
 
-/** @throws AssertionError */
+const propsMerger = (a: unknown, b: unknown) => {
+  if (Array.isArray(a) && Array.isArray(b)) return concat(a, b);
+  if (a === b) return b;
+  throw new Error("Can not flatten properties");
+};
+
+/** @throws Error */
 const tryFlattenIntersection = (
   children: Array<SchemaObject | ReferenceObject>,
 ) => {
@@ -191,23 +204,17 @@ const tryFlattenIntersection = (
           ["type", "properties", "required", "examples"].includes(key),
         ),
     );
-  assert(left && right, "Can not flatten objects");
+  if (!left || !right) throw new Error("Can not flatten objects");
   const flat: SchemaObject = { type: "object" };
   if (left.properties || right.properties) {
     flat.properties = mergeDeepWith(
-      (a, b) =>
-        Array.isArray(a) && Array.isArray(b)
-          ? concat(a, b)
-          : a === b
-            ? b
-            : assert.fail("Can not flatten properties"),
+      propsMerger,
       left.properties || {},
       right.properties || {},
     );
   }
-  if (left.required || right.required) {
+  if (left.required || right.required)
     flat.required = union(left.required || [], right.required || []);
-  }
   if (left.examples || right.examples) {
     flat.examples = combinations(
       left.examples || [],
@@ -245,9 +252,7 @@ export const depictNullable: Depicter = (
   { next },
 ) => {
   const nested = next(schema.unwrap());
-  if (isSchemaObject(nested)) {
-    nested.type = makeNullableType(nested);
-  }
+  if (isSchemaObject(nested)) nested.type = makeNullableType(nested);
   return nested;
 };
 
@@ -290,12 +295,8 @@ export const depictObject: Depicter = (
       : prop.isOptional();
   const required = keys.filter((key) => !isOptionalProp(schema.shape[key]));
   const result: SchemaObject = { type: "object" };
-  if (keys.length) {
-    result.properties = depictObjectProperties(schema, next);
-  }
-  if (required.length) {
-    result.required = required;
-  }
+  if (keys.length) result.properties = depictObjectProperties(schema, next);
+  if (required.length) result.required = required;
   return result;
 };
 
@@ -306,13 +307,8 @@ export const depictObject: Depicter = (
 export const depictNull: Depicter = () => ({ type: "null" });
 
 export const depictDateIn: Depicter = ({}: DateInSchema, ctx) => {
-  assert(
-    !ctx.isResponse,
-    new DocumentationError({
-      message: "Please use ez.dateOut() for output.",
-      ...ctx,
-    }),
-  );
+  if (ctx.isResponse)
+    throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
@@ -325,13 +321,8 @@ export const depictDateIn: Depicter = ({}: DateInSchema, ctx) => {
 };
 
 export const depictDateOut: Depicter = ({}: DateOutSchema, ctx) => {
-  assert(
-    ctx.isResponse,
-    new DocumentationError({
-      message: "Please use ez.dateIn() for input.",
-      ...ctx,
-    }),
-  );
+  if (!ctx.isResponse)
+    throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
@@ -343,17 +334,16 @@ export const depictDateOut: Depicter = ({}: DateOutSchema, ctx) => {
 };
 
 /** @throws DocumentationError */
-export const depictDate: Depicter = ({}: z.ZodDate, ctx) =>
-  assert.fail(
-    new DocumentationError({
-      message: `Using z.date() within ${
-        ctx.isResponse ? "output" : "input"
-      } schema is forbidden. Please use ez.date${
-        ctx.isResponse ? "Out" : "In"
-      }() instead. Check out the documentation for details.`,
-      ...ctx,
-    }),
+export const depictDate: Depicter = ({}: z.ZodDate, ctx) => {
+  throw new DocumentationError(
+    `Using z.date() within ${
+      ctx.isResponse ? "output" : "input"
+    } schema is forbidden. Please use ez.date${
+      ctx.isResponse ? "Out" : "In"
+    }() instead. Check out the documentation for details.`,
+    ctx,
   );
+};
 
 export const depictBoolean: Depicter = () => ({ type: "boolean" });
 
@@ -410,12 +400,8 @@ export const depictArray: Depicter = (
   { next },
 ) => {
   const result: SchemaObject = { type: "array", items: next(element) };
-  if (minLength) {
-    result.minItems = minLength.value;
-  }
-  if (maxLength) {
-    result.maxItems = maxLength.value;
-  }
+  if (minLength) result.minItems = minLength.value;
+  if (maxLength) result.maxItems = maxLength.value;
   return result;
 };
 
@@ -445,29 +431,37 @@ export const depictString: Depicter = ({
   isIP,
   isEmoji,
   isDatetime,
+  isCIDR,
+  isDate,
+  isTime,
+  isBase64,
+  isNANOID,
+  isBase64url,
+  isDuration,
   _def: { checks },
 }: z.ZodString) => {
   const regexCheck = checks.find((check) => check.kind === "regex");
   const datetimeCheck = checks.find((check) => check.kind === "datetime");
-  const regex = regexCheck
-    ? regexCheck.regex
-    : datetimeCheck
-      ? datetimeCheck.offset
-        ? new RegExp(
-            `^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$`,
-          )
-        : new RegExp(`^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$`)
-      : undefined;
+  const isJWT = checks.some((check) => check.kind === "jwt");
+  const lenCheck = checks.find((check) => check.kind === "length");
   const result: SchemaObject = { type: "string" };
   const formats: Record<NonNullable<SchemaObject["format"]>, boolean> = {
     "date-time": isDatetime,
+    byte: isBase64,
+    base64url: isBase64url,
+    date: isDate,
+    time: isTime,
+    duration: isDuration,
     email: isEmail,
     url: isURL,
     uuid: isUUID,
     cuid: isCUID,
     cuid2: isCUID2,
     ulid: isULID,
+    nanoid: isNANOID,
+    jwt: isJWT,
     ip: isIP,
+    cidr: isCIDR,
     emoji: isEmoji,
   };
   for (const format in formats) {
@@ -476,15 +470,15 @@ export const depictString: Depicter = ({
       break;
     }
   }
-  if (minLength !== null) {
-    result.minLength = minLength;
-  }
-  if (maxLength !== null) {
-    result.maxLength = maxLength;
-  }
-  if (regex) {
-    result.pattern = regex.source;
-  }
+  if (lenCheck)
+    [result.minLength, result.maxLength] = [lenCheck.value, lenCheck.value];
+  if (minLength !== null) result.minLength = minLength;
+  if (maxLength !== null) result.maxLength = maxLength;
+  if (isDate) result.pattern = dateRegex.source;
+  if (isTime) result.pattern = timeRegex.source;
+  if (isDatetime)
+    result.pattern = getTimestampRegex(datetimeCheck?.offset).source;
+  if (regexCheck) result.pattern = regexCheck.regex.source;
   return result;
 };
 
@@ -515,16 +509,10 @@ export const depictNumber: Depicter = ({
     type: isInt ? "integer" : "number",
     format: isInt ? "int64" : "double",
   };
-  if (isMinInclusive) {
-    result.minimum = minimum;
-  } else {
-    result.exclusiveMinimum = minimum;
-  }
-  if (isMaxInclusive) {
-    result.maximum = maximum;
-  } else {
-    result.exclusiveMaximum = maximum;
-  }
+  if (isMinInclusive) result.minimum = minimum;
+  else result.exclusiveMinimum = minimum;
+  if (isMaxInclusive) result.maximum = maximum;
+  else result.exclusiveMaximum = maximum;
   return result;
 };
 
@@ -540,12 +528,12 @@ const makeSample = (depicted: SchemaObject) => {
   return samples?.[firstType];
 };
 
-const makeNullableType = (prev: SchemaObject): SchemaObjectType[] => {
-  const current = typeof prev.type === "string" ? [prev.type] : prev.type || [];
-  if (current.includes("null")) {
-    return current;
-  }
-  return current.concat("null");
+const makeNullableType = ({
+  type,
+}: SchemaObject): SchemaObjectType | SchemaObjectType[] => {
+  if (type === "null") return type;
+  if (typeof type === "string") return [type, "null"];
+  return type ? [...new Set(type).add("null")] : "null";
 };
 
 export const depictEffect: Depicter = (
@@ -556,11 +544,9 @@ export const depictEffect: Depicter = (
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
     const outputType = tryToTransform(schema, makeSample(input));
-    if (outputType && ["number", "string", "boolean"].includes(outputType)) {
+    if (outputType && ["number", "string", "boolean"].includes(outputType))
       return { type: outputType as "number" | "string" | "boolean" };
-    } else {
-      return next(z.any());
-    }
+    else return next(z.any());
   }
   if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
     const { type: inputType, ...rest } = input;
@@ -583,18 +569,9 @@ export const depictBranded: Depicter = (
 ) => next(schema.unwrap());
 
 export const depictLazy: Depicter = (
-  { schema }: z.ZodLazy<z.ZodTypeAny>,
-  { next, serializer: serialize, getRef, makeRef },
-): ReferenceObject => {
-  const hash = serialize(schema);
-  return (
-    getRef(hash) ||
-    (() => {
-      makeRef(hash, {}); // make empty ref first
-      return makeRef(hash, next(schema)); // update
-    })()
-  );
-};
+  lazy: z.ZodLazy<z.ZodTypeAny>,
+  { next, makeRef },
+): ReferenceObject => makeRef(lazy, () => next(lazy.schema));
 
 export const depictRaw: Depicter = (schema: RawSchema, { next }) =>
   next(schema.unwrap().shape.raw);
@@ -603,7 +580,7 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
   examples.length
     ? fromPairs(
         zip(
-          range(1, examples.length + 1).map((idx) => `example${idx}`),
+          times((idx) => `example${idx + 1}`, examples.length),
           map(objOf("value"), examples),
         ),
       )
@@ -634,12 +611,9 @@ export const depictParamExamples = (
 export const extractObjectSchema = (
   subject: IOSchema,
 ): z.ZodObject<z.ZodRawShape> => {
-  if (subject instanceof z.ZodObject) {
-    return subject;
-  }
-  if (subject instanceof z.ZodBranded) {
+  if (subject instanceof z.ZodObject) return subject;
+  if (subject instanceof z.ZodBranded)
     return extractObjectSchema(subject.unwrap());
-  }
   if (
     subject instanceof z.ZodUnion ||
     subject instanceof z.ZodDiscriminatedUnion
@@ -657,19 +631,22 @@ export const extractObjectSchema = (
   );
 };
 
+export const defaultIsHeader = (name: string): name is `x-${string}` =>
+  name.startsWith("x-") || wellKnownHeaders.includes(name);
+
 export const depictRequestParams = ({
   path,
   method,
   schema,
   inputSources,
-  serializer,
-  getRef,
   makeRef,
   composition,
   brandHandling,
+  isHeader,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
+  isHeader?: IsHeader;
 }) => {
   const { shape } = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
@@ -679,51 +656,37 @@ export const depictRequestParams = ({
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
   const isHeaderParam = (name: string) =>
-    areHeadersEnabled && isCustomHeader(name);
+    areHeadersEnabled &&
+    (isHeader?.(name, method, path) ?? defaultIsHeader(name));
 
-  const parameters = Object.keys(shape)
-    .map<{ name: string; location?: ParameterLocation }>((name) => ({
-      name,
-      location: isPathParam(name)
-        ? "path"
-        : isHeaderParam(name)
-          ? "header"
-          : isQueryEnabled
-            ? "query"
-            : undefined,
-    }))
-    .filter(
-      (parameter): parameter is Required<typeof parameter> =>
-        parameter.location !== undefined,
-    );
-
-  return parameters.map<ParameterObject>(({ name, location }) => {
+  return Object.keys(shape).reduce<ParameterObject[]>((acc, name) => {
+    const location = isPathParam(name)
+      ? "path"
+      : isHeaderParam(name)
+        ? "header"
+        : isQueryEnabled
+          ? "query"
+          : undefined;
+    if (!location) return acc;
     const depicted = walkSchema(shape[name], {
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: {
-        isResponse: false,
-        serializer,
-        getRef,
-        makeRef,
-        path,
-        method,
-      },
+      ctx: { isResponse: false, makeRef, path, method },
     });
     const result =
       composition === "components"
-        ? makeRef(makeCleanId(description, name), depicted)
+        ? makeRef(shape[name], depicted, makeCleanId(description, name))
         : depicted;
-    return {
+    return acc.concat({
       name,
       in: location,
       required: !shape[name].isOptional(),
       description: depicted.description || description,
       schema: result,
       examples: depictParamExamples(schema, name),
-    };
-  });
+    });
+  }, []);
 };
 
 export const depicters: HandlingRules<
@@ -769,9 +732,7 @@ export const onEach: SchemaHandler<
   OpenAPIContext,
   "each"
 > = (schema: z.ZodTypeAny, { isResponse, prev }) => {
-  if (isReferenceObject(prev)) {
-    return {};
-  }
+  if (isReferenceObject(prev)) return {};
   const { description } = schema;
   const shouldAvoidParsing = schema instanceof z.ZodLazy;
   const hasTypePropertyInDepiction = prev.type !== undefined;
@@ -781,22 +742,16 @@ export const onEach: SchemaHandler<
     hasTypePropertyInDepiction &&
     !isResponseHavingCoercion &&
     schema.isNullable();
-  const examples = shouldAvoidParsing
-    ? []
-    : getExamples({
-        schema,
-        variant: isResponse ? "parsed" : "original",
-        validate: true,
-      });
   const result: SchemaObject = {};
-  if (description) {
-    result.description = description;
-  }
-  if (isActuallyNullable) {
-    result.type = makeNullableType(prev);
-  }
-  if (examples.length) {
-    result.examples = examples.slice();
+  if (description) result.description = description;
+  if (isActuallyNullable) result.type = makeNullableType(prev);
+  if (!shouldAvoidParsing) {
+    const examples = getExamples({
+      schema,
+      variant: isResponse ? "parsed" : "original",
+      validate: true,
+    });
+    if (examples.length) result.examples = examples.slice();
   }
   return result;
 };
@@ -805,31 +760,24 @@ export const onMissing: SchemaHandler<
   SchemaObject | ReferenceObject,
   OpenAPIContext,
   "last"
-> = (schema: z.ZodTypeAny, ctx) =>
-  assert.fail(
-    new DocumentationError({
-      message: `Zod type ${schema.constructor.name} is unsupported.`,
-      ...ctx,
-    }),
+> = (schema: z.ZodTypeAny, ctx) => {
+  throw new DocumentationError(
+    `Zod type ${schema.constructor.name} is unsupported.`,
+    ctx,
   );
+};
 
 export const excludeParamsFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
   names: string[],
 ): SchemaObject | ReferenceObject => {
-  if (isReferenceObject(depicted)) {
-    return depicted;
-  }
+  if (isReferenceObject(depicted)) return depicted;
   const copy = { ...depicted };
-  if (copy.properties) {
-    copy.properties = omit(names, copy.properties);
-  }
-  if (copy.examples) {
+  if (copy.properties) copy.properties = omit(names, copy.properties);
+  if (copy.examples)
     copy.examples = copy.examples.map((entry) => omit(names, entry));
-  }
-  if (copy.required) {
+  if (copy.required)
     copy.required = copy.required.filter((name) => !names.includes(name));
-  }
   if (copy.allOf) {
     copy.allOf = copy.allOf.map((entry) =>
       excludeParamsFromDepiction(entry, names),
@@ -854,8 +802,6 @@ export const depictResponse = ({
   schema,
   mimeTypes,
   variant,
-  serializer,
-  getRef,
   makeRef,
   composition,
   hasMultipleStatusCodes,
@@ -865,30 +811,24 @@ export const depictResponse = ({
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
 }: ReqResHandlingProps<z.ZodTypeAny> & {
-  mimeTypes: ReadonlyArray<string>;
+  mimeTypes: ReadonlyArray<string> | null;
   variant: ResponseVariant;
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
+  if (!mimeTypes) return { description };
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema(schema, {
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: {
-        isResponse: true,
-        serializer,
-        getRef,
-        makeRef,
-        path,
-        method,
-      },
+      ctx: { isResponse: true, makeRef, path, method },
     }),
   );
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(makeCleanId(description), depictedSchema)
+        ? makeRef(schema, depictedSchema, makeCleanId(description))
         : depictedSchema,
     examples: depictExamples(schema, true),
   };
@@ -911,9 +851,7 @@ const depictBearerSecurity: SecurityHelper<"bearer"> = ({
     type: "http",
     scheme: "bearer",
   };
-  if (bearerFormat) {
-    result.bearerFormat = bearerFormat;
-  }
+  if (bearerFormat) result.bearerFormat = bearerFormat;
   return result;
 };
 const depictInputSecurity: SecurityHelper<"input"> = (
@@ -992,9 +930,7 @@ export const depictSecurityRefs = (
           : { [entry.name]: entry.scopes },
     );
   }
-  if ("and" in container) {
-    return depictSecurityRefs(andToOr(container));
-  }
+  if ("and" in container) return depictSecurityRefs(andToOr(container));
   return depictSecurityRefs({ or: [container] });
 };
 
@@ -1002,16 +938,14 @@ export const depictBody = ({
   method,
   path,
   schema,
-  mimeTypes,
-  serializer,
-  getRef,
+  mimeType,
   makeRef,
   composition,
   brandHandling,
   paramNames,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResHandlingProps<IOSchema> & {
-  mimeTypes: ReadonlyArray<string>;
+  mimeType: string;
   paramNames: string[];
 }): RequestBodyObject => {
   const bodyDepiction = excludeExamplesFromDepiction(
@@ -1020,14 +954,7 @@ export const depictBody = ({
         rules: { ...brandHandling, ...depicters },
         onEach,
         onMissing,
-        ctx: {
-          isResponse: false,
-          serializer,
-          getRef,
-          makeRef,
-          path,
-          method,
-        },
+        ctx: { isResponse: false, makeRef, path, method },
       }),
       paramNames,
     ),
@@ -1035,27 +962,26 @@ export const depictBody = ({
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(makeCleanId(description), bodyDepiction)
+        ? makeRef(schema, bodyDepiction, makeCleanId(description))
         : bodyDepiction,
     examples: depictExamples(schema, false, paramNames),
   };
-  return { description, content: fromPairs(xprod(mimeTypes, [media])) };
+  return { description, content: { [mimeType]: media } };
 };
 
-export const depictTags = <TAG extends string>(
-  tags: TagsConfig<TAG>,
-): TagObject[] =>
-  (Object.keys(tags) as TAG[]).map((tag) => {
-    const def = tags[tag];
-    const result: TagObject = {
+export const depictTags = (
+  tags: Partial<Record<Tag, string | { description: string; url?: string }>>,
+) =>
+  Object.entries(tags).reduce<TagObject[]>((agg, [tag, def]) => {
+    if (!def) return agg;
+    const entry: TagObject = {
       name: tag,
       description: typeof def === "string" ? def : def.description,
     };
-    if (typeof def === "object" && def.url) {
-      result.externalDocs = { url: def.url };
-    }
-    return result;
-  });
+    if (typeof def === "object" && def.url)
+      entry.externalDocs = { url: def.url };
+    return agg.concat(entry);
+  }, []);
 
 export const ensureShortDescription = (description: string) =>
   description.length <= shortDescriptionLimit

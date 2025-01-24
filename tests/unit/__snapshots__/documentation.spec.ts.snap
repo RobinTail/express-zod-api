@@ -1200,7 +1200,7 @@ paths:
                             title:
                               type: string
                             features:
-                              $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                              $ref: "#/components/schemas/Schema1"
                           required:
                             - title
                             - features
@@ -1237,6 +1237,25 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/user/{id}/remove:
+    delete:
+      operationId: DeleteV1UserIdRemove
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: numeric string
+          schema:
+            type: string
+            pattern: \\d+
+            description: numeric string
+      responses:
+        "204":
+          description: DELETE /v1/user/:id/remove Positive response
+        "404":
+          description: DELETE /v1/user/:id/remove Negative response
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -1699,9 +1718,53 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/events/time:
+    get:
+      operationId: GetV1EventsTime
+      tags:
+        - subscriptions
+      parameters:
+        - name: trigger
+          in: query
+          required: false
+          description: GET /v1/events/time Parameter
+          schema:
+            type: string
+      responses:
+        "200":
+          description: GET /v1/events/time Positive response
+          content:
+            text/event-stream:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: integer
+                    format: int64
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
+                  event:
+                    type: string
+                    const: time
+                  id:
+                    type: string
+                  retry:
+                    type: integer
+                    format: int64
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
+                required:
+                  - data
+                  - event
+        "400":
+          description: GET /v1/events/time Negative response
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   schemas:
-    2048581c137c5b2130eb860e3ae37da196dfc25b:
+    Schema1:
       type: array
       items:
         type: object
@@ -1709,7 +1772,7 @@ components:
           title:
             type: string
           features:
-            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+            $ref: "#/components/schemas/Schema1"
         required:
           - title
           - features
@@ -1731,11 +1794,7 @@ components:
       name: token
   links: {}
   callbacks: {}
-tags:
-  - name: users
-    description: Everything about the users
-  - name: files
-    description: Everything about the files processing
+tags: []
 servers:
   - url: https://example.com
 "
@@ -1780,6 +1839,23 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/user/{id}/remove:
+    delete:
+      operationId: DeleteV1UserIdRemove
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: numeric string
+          schema:
+            $ref: "#/components/schemas/DeleteV1UserIdRemoveParameterId"
+      responses:
+        "204":
+          description: DELETE /v1/user/:id/remove Positive response
+        "404":
+          description: DELETE /v1/user/:id/remove Negative response
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -2023,13 +2099,38 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v1/events/time:
+    get:
+      operationId: GetV1EventsTime
+      tags:
+        - subscriptions
+      parameters:
+        - name: trigger
+          in: query
+          required: false
+          description: GET /v1/events/time Parameter
+          schema:
+            $ref: "#/components/schemas/GetV1EventsTimeParameterTrigger"
+      responses:
+        "200":
+          description: GET /v1/events/time Positive response
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/GetV1EventsTimePositiveResponse"
+        "400":
+          description: GET /v1/events/time Negative response
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/GetV1EventsTimeNegativeResponse"
 components:
   schemas:
     GetV1UserRetrieveParameterId:
       type: string
       pattern: \\d+
       description: a numeric string containing the id of the user
-    2048581c137c5b2130eb860e3ae37da196dfc25b:
+    Schema1:
       type: array
       items:
         type: object
@@ -2037,7 +2138,7 @@ components:
           title:
             type: string
           features:
-            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+            $ref: "#/components/schemas/Schema1"
         required:
           - title
           - features
@@ -2065,7 +2166,7 @@ components:
                   title:
                     type: string
                   features:
-                    $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - title
                   - features
@@ -2092,6 +2193,10 @@ components:
       required:
         - status
         - error
+    DeleteV1UserIdRemoveParameterId:
+      type: string
+      pattern: \\d+
+      description: numeric string
     PatchV1UserIdParameterId:
       type: string
     PatchV1UserIdPositiveResponse:
@@ -2359,6 +2464,31 @@ components:
     PostV1AvatarRawRequestBody:
       type: string
       format: binary
+    GetV1EventsTimeParameterTrigger:
+      type: string
+    GetV1EventsTimePositiveResponse:
+      type: object
+      properties:
+        data:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+          maximum: 9007199254740991
+        event:
+          type: string
+          const: time
+        id:
+          type: string
+        retry:
+          type: integer
+          format: int64
+          exclusiveMinimum: 0
+          maximum: 9007199254740991
+      required:
+        - data
+        - event
+    GetV1EventsTimeNegativeResponse:
+      type: string
   responses: {}
   parameters: {}
   examples: {}
@@ -2377,11 +2507,7 @@ components:
       name: token
   links: {}
   callbacks: {}
-tags:
-  - name: users
-    description: Everything about the users
-  - name: files
-    description: Everything about the files processing
+tags: []
 servers:
   - url: https://example.com
 "
@@ -2434,8 +2560,7 @@ paths:
                     type: object
                     properties:
                       "null":
-                        type:
-                          - "null"
+                        type: "null"
                       dateOut:
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string
@@ -2530,7 +2655,7 @@ paths:
                           name:
                             type: string
                           subcategories:
-                            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+                            $ref: "#/components/schemas/Schema1"
                         required:
                           - name
                           - subcategories
@@ -2567,7 +2692,7 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    2048581c137c5b2130eb860e3ae37da196dfc25b:
+    Schema1:
       type: array
       items:
         type: object
@@ -2575,7 +2700,7 @@ components:
           name:
             type: string
           subcategories:
-            $ref: "#/components/schemas/2048581c137c5b2130eb860e3ae37da196dfc25b"
+            $ref: "#/components/schemas/Schema1"
         required:
           - name
           - subcategories

@@ -1,332 +1,83 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Integration > Feature #945: should have configurable treatment of optionals 0 1`] = `
-"type PostV1TestWithDashesInput = {
+"type SomeOf<T> = T[keyof T];
+
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesInput = {
   opt?: string;
 };
 
-type PostV1TestWithDashesResponse =
-  | {
-      status: "success";
-      data: {
-        similar?: number;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
-
-export type Path = "/v1/test-with-dashes";
-
-export type Method = "get" | "post" | "put" | "delete" | "patch";
-
-export type MethodPath = \`\${Method} \${Path}\`;
-
-export interface Input extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesInput;
-}
-
-export interface Response extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
-}
-
-export const jsonEndpoints = { "post /v1/test-with-dashes": true };
-
-export const endpointTags = { "post /v1/test-with-dashes": [] };
-
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
-
-export type Implementation = (
-  method: Method,
-  path: string,
-  params: Record<string, any>,
-) => Promise<any>;
-
-export class ExpressZodAPIClient {
-  constructor(protected readonly implementation: Implementation) {}
-  public readonly provide: Provider = async (method, path, params) =>
-    this.implementation(
-      method,
-      Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
-        path,
-      ),
-      Object.keys(params).reduce(
-        (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
-        {},
-      ),
-    );
-}
-
-// Usage example:
-/*
-export const exampleImplementation: Implementation = async (
-  method,
-  path,
-  params,
-) => {
-  const hasBody = !["get", "delete"].includes(method);
-  const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
-  const response = await fetch(\`https://example.com\${path}\${searchParams}\`, {
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
-};
-const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
-*/
-"
-`;
-
-exports[`Integration > Feature #945: should have configurable treatment of optionals 1 1`] = `
-"type PostV1TestWithDashesInput = {
-  opt: string | undefined;
-};
-
-type PostV1TestWithDashesResponse =
-  | {
-      status: "success";
-      data: {
-        similar: number | undefined;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
-
-export type Path = "/v1/test-with-dashes";
-
-export type Method = "get" | "post" | "put" | "delete" | "patch";
-
-export type MethodPath = \`\${Method} \${Path}\`;
-
-export interface Input extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesInput;
-}
-
-export interface Response extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
-}
-
-export const jsonEndpoints = { "post /v1/test-with-dashes": true };
-
-export const endpointTags = { "post /v1/test-with-dashes": [] };
-
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
-
-export type Implementation = (
-  method: Method,
-  path: string,
-  params: Record<string, any>,
-) => Promise<any>;
-
-export class ExpressZodAPIClient {
-  constructor(protected readonly implementation: Implementation) {}
-  public readonly provide: Provider = async (method, path, params) =>
-    this.implementation(
-      method,
-      Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
-        path,
-      ),
-      Object.keys(params).reduce(
-        (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
-        {},
-      ),
-    );
-}
-
-// Usage example:
-/*
-export const exampleImplementation: Implementation = async (
-  method,
-  path,
-  params,
-) => {
-  const hasBody = !["get", "delete"].includes(method);
-  const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
-  const response = await fetch(\`https://example.com\${path}\${searchParams}\`, {
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
-};
-const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
-*/
-"
-`;
-
-exports[`Integration > Feature #945: should have configurable treatment of optionals 2 1`] = `
-"type PostV1TestWithDashesInput = {
-  opt: string;
-};
-
-type PostV1TestWithDashesResponse =
-  | {
-      status: "success";
-      data: {
-        similar: number;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
-
-export type Path = "/v1/test-with-dashes";
-
-export type Method = "get" | "post" | "put" | "delete" | "patch";
-
-export type MethodPath = \`\${Method} \${Path}\`;
-
-export interface Input extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesInput;
-}
-
-export interface Response extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
-}
-
-export const jsonEndpoints = { "post /v1/test-with-dashes": true };
-
-export const endpointTags = { "post /v1/test-with-dashes": [] };
-
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
-
-export type Implementation = (
-  method: Method,
-  path: string,
-  params: Record<string, any>,
-) => Promise<any>;
-
-export class ExpressZodAPIClient {
-  constructor(protected readonly implementation: Implementation) {}
-  public readonly provide: Provider = async (method, path, params) =>
-    this.implementation(
-      method,
-      Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
-        path,
-      ),
-      Object.keys(params).reduce(
-        (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
-        {},
-      ),
-    );
-}
-
-// Usage example:
-/*
-export const exampleImplementation: Implementation = async (
-  method,
-  path,
-  params,
-) => {
-  const hasBody = !["get", "delete"].includes(method);
-  const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
-  const response = await fetch(\`https://example.com\${path}\${searchParams}\`, {
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
-};
-const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
-*/
-"
-`;
-
-exports[`Integration > Feature #1411: Should split response type on demand 1`] = `
-"type PostV1TestInput = {
-  opt?: string | undefined;
-};
-
-type PostV1TestPositiveResponse = {
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesPositiveVariant1 = {
   status: "success";
   data: {
-    similar?: number | undefined;
+    similar?: number;
   };
 };
 
-type PostV1TestNegativeResponse = {
+/** post /v1/test-with-dashes */
+interface PostV1TestWithDashesPositiveResponseVariants {
+  200: PostV1TestWithDashesPositiveVariant1;
+}
+
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
   };
 };
 
-type PostV1TestResponse =
-  | PostV1TestPositiveResponse
-  | PostV1TestNegativeResponse;
+/** post /v1/test-with-dashes */
+interface PostV1TestWithDashesNegativeResponseVariants {
+  400: PostV1TestWithDashesNegativeVariant1;
+}
 
-export type Path = "/v1/test";
+export type Path = "/v1/test-with-dashes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-export type MethodPath = \`\${Method} \${Path}\`;
-
-export interface Input extends Record<MethodPath, any> {
-  "post /v1/test": PostV1TestInput;
+export interface Input {
+  "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
 
-export interface PositiveResponse extends Record<MethodPath, any> {
-  "post /v1/test": PostV1TestPositiveResponse;
+export interface PositiveResponse {
+  "post /v1/test-with-dashes": SomeOf<PostV1TestWithDashesPositiveResponseVariants>;
 }
 
-export interface NegativeResponse extends Record<MethodPath, any> {
-  "post /v1/test": PostV1TestNegativeResponse;
+export interface NegativeResponse {
+  "post /v1/test-with-dashes": SomeOf<PostV1TestWithDashesNegativeResponseVariants>;
 }
 
-export interface Response extends Record<MethodPath, any> {
-  "post /v1/test": PostV1TestResponse;
+export interface EncodedResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponseVariants &
+    PostV1TestWithDashesNegativeResponseVariants;
 }
 
-export const jsonEndpoints = { "post /v1/test": true };
+export interface Response {
+  "post /v1/test-with-dashes":
+    | PositiveResponse["post /v1/test-with-dashes"]
+    | NegativeResponse["post /v1/test-with-dashes"];
+}
 
-export const endpointTags = { "post /v1/test": [] };
+export type Request = keyof Input;
 
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
+export const endpointTags = { "post /v1/test-with-dashes": [] };
+
+const parseRequest = (request: string) =>
+  request.split(/ (.+)/, 2) as [Method, Path];
+
+const substitute = (path: string, params: Record<string, any>) => {
+  const rest = { ...params };
+  for (const key in params) {
+    path = path.replace(\`:\${key}\`, () => {
+      delete rest[key];
+      return params[key];
+    });
+  }
+  return [path, rest] as const;
+};
 
 export type Implementation = (
   method: Method,
@@ -334,21 +85,15 @@ export type Implementation = (
   params: Record<string, any>,
 ) => Promise<any>;
 
-export class ExpressZodAPIClient {
-  constructor(protected readonly implementation: Implementation) {}
-  public readonly provide: Provider = async (method, path, params) =>
-    this.implementation(
-      method,
-      Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
-        path,
-      ),
-      Object.keys(params).reduce(
-        (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
-        {},
-      ),
-    );
+export class Client {
+  public constructor(protected readonly implementation: Implementation) {}
+  public provide<K extends Request>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]> {
+    const [method, path] = parseRequest(request);
+    return this.implementation(method, ...substitute(path, params));
+  }
 }
 
 // Usage example:
@@ -360,219 +105,649 @@ export const exampleImplementation: Implementation = async (
 ) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
-  const response = await fetch(\`https://example.com\${path}\${searchParams}\`, {
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
+  const response = await fetch(
+    new URL(\`\${path}\${searchParams}\`, "https://example.com"),
+    {
+      method: method.toUpperCase(),
+      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+      body: hasBody ? JSON.stringify(params) : undefined,
+    },
+  );
+  const contentType = response.headers.get("content-type");
+  if (!contentType) return;
+  const isJSON = contentType.startsWith("application/json");
+  return response[isJSON ? "json" : "text"]();
 };
-const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
+const client = new Client(exampleImplementation);
+client.provide("get /v1/user/retrieve", { id: "10" });
+*/
+"
+`;
+
+exports[`Integration > Feature #945: should have configurable treatment of optionals 1 1`] = `
+"type SomeOf<T> = T[keyof T];
+
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesInput = {
+  opt: string | undefined;
+};
+
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesPositiveVariant1 = {
+  status: "success";
+  data: {
+    similar: number | undefined;
+  };
+};
+
+/** post /v1/test-with-dashes */
+interface PostV1TestWithDashesPositiveResponseVariants {
+  200: PostV1TestWithDashesPositiveVariant1;
+}
+
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** post /v1/test-with-dashes */
+interface PostV1TestWithDashesNegativeResponseVariants {
+  400: PostV1TestWithDashesNegativeVariant1;
+}
+
+export type Path = "/v1/test-with-dashes";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch";
+
+export interface Input {
+  "post /v1/test-with-dashes": PostV1TestWithDashesInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/test-with-dashes": SomeOf<PostV1TestWithDashesPositiveResponseVariants>;
+}
+
+export interface NegativeResponse {
+  "post /v1/test-with-dashes": SomeOf<PostV1TestWithDashesNegativeResponseVariants>;
+}
+
+export interface EncodedResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponseVariants &
+    PostV1TestWithDashesNegativeResponseVariants;
+}
+
+export interface Response {
+  "post /v1/test-with-dashes":
+    | PositiveResponse["post /v1/test-with-dashes"]
+    | NegativeResponse["post /v1/test-with-dashes"];
+}
+
+export type Request = keyof Input;
+
+export const endpointTags = { "post /v1/test-with-dashes": [] };
+
+const parseRequest = (request: string) =>
+  request.split(/ (.+)/, 2) as [Method, Path];
+
+const substitute = (path: string, params: Record<string, any>) => {
+  const rest = { ...params };
+  for (const key in params) {
+    path = path.replace(\`:\${key}\`, () => {
+      delete rest[key];
+      return params[key];
+    });
+  }
+  return [path, rest] as const;
+};
+
+export type Implementation = (
+  method: Method,
+  path: string,
+  params: Record<string, any>,
+) => Promise<any>;
+
+export class Client {
+  public constructor(protected readonly implementation: Implementation) {}
+  public provide<K extends Request>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]> {
+    const [method, path] = parseRequest(request);
+    return this.implementation(method, ...substitute(path, params));
+  }
+}
+
+// Usage example:
+/*
+export const exampleImplementation: Implementation = async (
+  method,
+  path,
+  params,
+) => {
+  const hasBody = !["get", "delete"].includes(method);
+  const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
+  const response = await fetch(
+    new URL(\`\${path}\${searchParams}\`, "https://example.com"),
+    {
+      method: method.toUpperCase(),
+      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+      body: hasBody ? JSON.stringify(params) : undefined,
+    },
+  );
+  const contentType = response.headers.get("content-type");
+  if (!contentType) return;
+  const isJSON = contentType.startsWith("application/json");
+  return response[isJSON ? "json" : "text"]();
+};
+const client = new Client(exampleImplementation);
+client.provide("get /v1/user/retrieve", { id: "10" });
+*/
+"
+`;
+
+exports[`Integration > Feature #945: should have configurable treatment of optionals 2 1`] = `
+"type SomeOf<T> = T[keyof T];
+
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesInput = {
+  opt: string;
+};
+
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesPositiveVariant1 = {
+  status: "success";
+  data: {
+    similar: number;
+  };
+};
+
+/** post /v1/test-with-dashes */
+interface PostV1TestWithDashesPositiveResponseVariants {
+  200: PostV1TestWithDashesPositiveVariant1;
+}
+
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** post /v1/test-with-dashes */
+interface PostV1TestWithDashesNegativeResponseVariants {
+  400: PostV1TestWithDashesNegativeVariant1;
+}
+
+export type Path = "/v1/test-with-dashes";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch";
+
+export interface Input {
+  "post /v1/test-with-dashes": PostV1TestWithDashesInput;
+}
+
+export interface PositiveResponse {
+  "post /v1/test-with-dashes": SomeOf<PostV1TestWithDashesPositiveResponseVariants>;
+}
+
+export interface NegativeResponse {
+  "post /v1/test-with-dashes": SomeOf<PostV1TestWithDashesNegativeResponseVariants>;
+}
+
+export interface EncodedResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponseVariants &
+    PostV1TestWithDashesNegativeResponseVariants;
+}
+
+export interface Response {
+  "post /v1/test-with-dashes":
+    | PositiveResponse["post /v1/test-with-dashes"]
+    | NegativeResponse["post /v1/test-with-dashes"];
+}
+
+export type Request = keyof Input;
+
+export const endpointTags = { "post /v1/test-with-dashes": [] };
+
+const parseRequest = (request: string) =>
+  request.split(/ (.+)/, 2) as [Method, Path];
+
+const substitute = (path: string, params: Record<string, any>) => {
+  const rest = { ...params };
+  for (const key in params) {
+    path = path.replace(\`:\${key}\`, () => {
+      delete rest[key];
+      return params[key];
+    });
+  }
+  return [path, rest] as const;
+};
+
+export type Implementation = (
+  method: Method,
+  path: string,
+  params: Record<string, any>,
+) => Promise<any>;
+
+export class Client {
+  public constructor(protected readonly implementation: Implementation) {}
+  public provide<K extends Request>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]> {
+    const [method, path] = parseRequest(request);
+    return this.implementation(method, ...substitute(path, params));
+  }
+}
+
+// Usage example:
+/*
+export const exampleImplementation: Implementation = async (
+  method,
+  path,
+  params,
+) => {
+  const hasBody = !["get", "delete"].includes(method);
+  const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
+  const response = await fetch(
+    new URL(\`\${path}\${searchParams}\`, "https://example.com"),
+    {
+      method: method.toUpperCase(),
+      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+      body: hasBody ? JSON.stringify(params) : undefined,
+    },
+  );
+  const contentType = response.headers.get("content-type");
+  if (!contentType) return;
+  const isJSON = contentType.startsWith("application/json");
+  return response[isJSON ? "json" : "text"]();
+};
+const client = new Client(exampleImplementation);
+client.provide("get /v1/user/retrieve", { id: "10" });
 */
 "
 `;
 
 exports[`Integration > Feature #1470: Custom brands > should by handled accordingly 1`] = `
-"type PostV1CustomInput = {
+"type SomeOf<T> = T[keyof T];
+
+/** post /v1/custom */
+type PostV1CustomInput = {
   string: boolean;
   regular: string;
 };
 
-type PostV1CustomPositiveResponse = {
+/** post /v1/custom */
+type PostV1CustomPositiveVariant1 = {
   status: "success";
   data: {
     number: boolean;
   };
 };
 
-type PostV1CustomNegativeResponse = {
+/** post /v1/custom */
+interface PostV1CustomPositiveResponseVariants {
+  200: PostV1CustomPositiveVariant1;
+}
+
+/** post /v1/custom */
+type PostV1CustomNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
   };
 };
 
-type PostV1CustomResponse =
-  | PostV1CustomPositiveResponse
-  | PostV1CustomNegativeResponse;
+/** post /v1/custom */
+interface PostV1CustomNegativeResponseVariants {
+  400: PostV1CustomNegativeVariant1;
+}
 
 export type Path = "/v1/custom";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-export type MethodPath = \`\${Method} \${Path}\`;
-
-export interface Input extends Record<MethodPath, any> {
+export interface Input {
   "post /v1/custom": PostV1CustomInput;
 }
 
-export interface PositiveResponse extends Record<MethodPath, any> {
-  "post /v1/custom": PostV1CustomPositiveResponse;
+export interface PositiveResponse {
+  "post /v1/custom": SomeOf<PostV1CustomPositiveResponseVariants>;
 }
 
-export interface NegativeResponse extends Record<MethodPath, any> {
-  "post /v1/custom": PostV1CustomNegativeResponse;
+export interface NegativeResponse {
+  "post /v1/custom": SomeOf<PostV1CustomNegativeResponseVariants>;
 }
 
-export interface Response extends Record<MethodPath, any> {
-  "post /v1/custom": PostV1CustomResponse;
+export interface EncodedResponse {
+  "post /v1/custom": PostV1CustomPositiveResponseVariants &
+    PostV1CustomNegativeResponseVariants;
 }
+
+export interface Response {
+  "post /v1/custom":
+    | PositiveResponse["post /v1/custom"]
+    | NegativeResponse["post /v1/custom"];
+}
+
+export type Request = keyof Input;
 "
 `;
 
 exports[`Integration > Should generate a client for example API 1`] = `
-"type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
+"type Type1 = {
   title: string;
-  features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+  features: Type1;
 }[];
 
-type GetV1UserRetrieveInput = {} & {
+type SomeOf<T> = T[keyof T];
+
+/** get /v1/user/retrieve */
+type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
 };
 
-type GetV1UserRetrieveResponse =
-  | {
-      status: "success";
-      data: {
-        id: number;
-        name: string;
-        features: {
-          title: string;
-          features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
-        }[];
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+/** get /v1/user/retrieve */
+type GetV1UserRetrievePositiveVariant1 = {
+  status: "success";
+  data: {
+    id: number;
+    name: string;
+    features: {
+      title: string;
+      features: Type1;
+    }[];
+  };
+};
 
+/** get /v1/user/retrieve */
+interface GetV1UserRetrievePositiveResponseVariants {
+  200: GetV1UserRetrievePositiveVariant1;
+}
+
+/** get /v1/user/retrieve */
+type GetV1UserRetrieveNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** get /v1/user/retrieve */
+interface GetV1UserRetrieveNegativeResponseVariants {
+  400: GetV1UserRetrieveNegativeVariant1;
+}
+
+/** delete /v1/user/:id/remove */
+type DeleteV1UserIdRemoveInput = {
+  /** numeric string */
+  id: string;
+};
+
+/** delete /v1/user/:id/remove */
+type DeleteV1UserIdRemovePositiveVariant1 = undefined;
+
+/** delete /v1/user/:id/remove */
+interface DeleteV1UserIdRemovePositiveResponseVariants {
+  204: DeleteV1UserIdRemovePositiveVariant1;
+}
+
+/** delete /v1/user/:id/remove */
+type DeleteV1UserIdRemoveNegativeVariant1 = undefined;
+
+/** delete /v1/user/:id/remove */
+interface DeleteV1UserIdRemoveNegativeResponseVariants {
+  404: DeleteV1UserIdRemoveNegativeVariant1;
+}
+
+/** patch /v1/user/:id */
 type PatchV1UserIdInput = {
   key: string;
-} & {
   id: string;
   name: string;
   birthday: string;
 };
 
-type PatchV1UserIdResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        createdAt: string;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+/** patch /v1/user/:id */
+type PatchV1UserIdPositiveVariant1 = {
+  status: "success";
+  data: {
+    name: string;
+    createdAt: string;
+  };
+};
 
+/** patch /v1/user/:id */
+interface PatchV1UserIdPositiveResponseVariants {
+  200: PatchV1UserIdPositiveVariant1;
+}
+
+/** patch /v1/user/:id */
+type PatchV1UserIdNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** patch /v1/user/:id */
+interface PatchV1UserIdNegativeResponseVariants {
+  400: PatchV1UserIdNegativeVariant1;
+}
+
+/** post /v1/user/create */
 type PostV1UserCreateInput = {
   name: string;
 };
 
-type PostV1UserCreateResponse =
-  | {
-      status: "created";
-      data: {
-        id: number;
-      };
-    }
-  | (
-      | {
-          status: "exists";
-          id: number;
-        }
-      | {
-          status: "error";
-          reason: string;
-        }
-    );
+/** post /v1/user/create */
+type PostV1UserCreatePositiveVariant1 = {
+  status: "created";
+  data: {
+    id: number;
+  };
+};
 
+/** post /v1/user/create */
+interface PostV1UserCreatePositiveResponseVariants {
+  201: PostV1UserCreatePositiveVariant1;
+  202: PostV1UserCreatePositiveVariant1;
+}
+
+/** post /v1/user/create */
+type PostV1UserCreateNegativeVariant1 = {
+  status: "exists";
+  id: number;
+};
+
+/** post /v1/user/create */
+type PostV1UserCreateNegativeVariant2 = {
+  status: "error";
+  reason: string;
+};
+
+/** post /v1/user/create */
+interface PostV1UserCreateNegativeResponseVariants {
+  409: PostV1UserCreateNegativeVariant1;
+  400: PostV1UserCreateNegativeVariant2;
+  500: PostV1UserCreateNegativeVariant2;
+}
+
+/** get /v1/user/list */
 type GetV1UserListInput = {};
 
-type GetV1UserListResponse =
-  | {
-      name: string;
-    }[]
-  | string;
+/** get /v1/user/list */
+type GetV1UserListPositiveVariant1 = {
+  name: string;
+}[];
 
+/** get /v1/user/list */
+interface GetV1UserListPositiveResponseVariants {
+  200: GetV1UserListPositiveVariant1;
+}
+
+/** get /v1/user/list */
+type GetV1UserListNegativeVariant1 = string;
+
+/** get /v1/user/list */
+interface GetV1UserListNegativeResponseVariants {
+  400: GetV1UserListNegativeVariant1;
+}
+
+/** get /v1/avatar/send */
 type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendResponse = string | string;
+/** get /v1/avatar/send */
+type GetV1AvatarSendPositiveVariant1 = string;
 
+/** get /v1/avatar/send */
+interface GetV1AvatarSendPositiveResponseVariants {
+  200: GetV1AvatarSendPositiveVariant1;
+}
+
+/** get /v1/avatar/send */
+type GetV1AvatarSendNegativeVariant1 = string;
+
+/** get /v1/avatar/send */
+interface GetV1AvatarSendNegativeResponseVariants {
+  400: GetV1AvatarSendNegativeVariant1;
+}
+
+/** get /v1/avatar/stream */
 type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-type GetV1AvatarStreamResponse = Buffer | string;
+/** get /v1/avatar/stream */
+type GetV1AvatarStreamPositiveVariant1 = Buffer;
 
+/** get /v1/avatar/stream */
+interface GetV1AvatarStreamPositiveResponseVariants {
+  200: GetV1AvatarStreamPositiveVariant1;
+}
+
+/** get /v1/avatar/stream */
+type GetV1AvatarStreamNegativeVariant1 = string;
+
+/** get /v1/avatar/stream */
+interface GetV1AvatarStreamNegativeResponseVariants {
+  400: GetV1AvatarStreamNegativeVariant1;
+}
+
+/** post /v1/avatar/upload */
 type PostV1AvatarUploadInput = {
   avatar: any;
 };
 
-type PostV1AvatarUploadResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        size: number;
-        mime: string;
-        hash: string;
-        otherInputs: Record<string, any>;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+/** post /v1/avatar/upload */
+type PostV1AvatarUploadPositiveVariant1 = {
+  status: "success";
+  data: {
+    name: string;
+    size: number;
+    mime: string;
+    hash: string;
+    otherInputs: Record<string, any>;
+  };
+};
 
+/** post /v1/avatar/upload */
+interface PostV1AvatarUploadPositiveResponseVariants {
+  200: PostV1AvatarUploadPositiveVariant1;
+}
+
+/** post /v1/avatar/upload */
+type PostV1AvatarUploadNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** post /v1/avatar/upload */
+interface PostV1AvatarUploadNegativeResponseVariants {
+  400: PostV1AvatarUploadNegativeVariant1;
+}
+
+/** post /v1/avatar/raw */
 type PostV1AvatarRawInput = Buffer;
 
-type PostV1AvatarRawResponse =
-  | {
-      status: "success";
-      data: {
-        length: number;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+/** post /v1/avatar/raw */
+type PostV1AvatarRawPositiveVariant1 = {
+  status: "success";
+  data: {
+    length: number;
+  };
+};
+
+/** post /v1/avatar/raw */
+interface PostV1AvatarRawPositiveResponseVariants {
+  200: PostV1AvatarRawPositiveVariant1;
+}
+
+/** post /v1/avatar/raw */
+type PostV1AvatarRawNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** post /v1/avatar/raw */
+interface PostV1AvatarRawNegativeResponseVariants {
+  400: PostV1AvatarRawNegativeVariant1;
+}
+
+/** get /v1/events/time */
+type GetV1EventsTimeInput = {
+  trigger?: string | undefined;
+};
+
+/** get /v1/events/time */
+type GetV1EventsTimePositiveVariant1 = {
+  data: number;
+  event: "time";
+  id?: string | undefined;
+  retry?: number | undefined;
+};
+
+/** get /v1/events/time */
+interface GetV1EventsTimePositiveResponseVariants {
+  200: GetV1EventsTimePositiveVariant1;
+}
+
+/** get /v1/events/time */
+type GetV1EventsTimeNegativeVariant1 = string;
+
+/** get /v1/events/time */
+interface GetV1EventsTimeNegativeResponseVariants {
+  400: GetV1EventsTimeNegativeVariant1;
+}
 
 export type Path =
   | "/v1/user/retrieve"
+  | "/v1/user/:id/remove"
   | "/v1/user/:id"
   | "/v1/user/create"
   | "/v1/user/list"
   | "/v1/avatar/send"
   | "/v1/avatar/stream"
   | "/v1/avatar/upload"
-  | "/v1/avatar/raw";
+  | "/v1/avatar/raw"
+  | "/v1/events/time";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-export type MethodPath = \`\${Method} \${Path}\`;
-
-export interface Input extends Record<MethodPath, any> {
+export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemoveInput;
   "patch /v1/user/:id": PatchV1UserIdInput;
   "post /v1/user/create": PostV1UserCreateInput;
   "get /v1/user/list": GetV1UserListInput;
@@ -580,30 +755,96 @@ export interface Input extends Record<MethodPath, any> {
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
   "post /v1/avatar/raw": PostV1AvatarRawInput;
+  "get /v1/events/time": GetV1EventsTimeInput;
 }
 
-export interface Response extends Record<MethodPath, any> {
-  "get /v1/user/retrieve": GetV1UserRetrieveResponse;
-  "patch /v1/user/:id": PatchV1UserIdResponse;
-  "post /v1/user/create": PostV1UserCreateResponse;
-  "get /v1/user/list": GetV1UserListResponse;
-  "get /v1/avatar/send": GetV1AvatarSendResponse;
-  "get /v1/avatar/stream": GetV1AvatarStreamResponse;
-  "post /v1/avatar/upload": PostV1AvatarUploadResponse;
-  "post /v1/avatar/raw": PostV1AvatarRawResponse;
+export interface PositiveResponse {
+  "get /v1/user/retrieve": SomeOf<GetV1UserRetrievePositiveResponseVariants>;
+  "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemovePositiveResponseVariants>;
+  "patch /v1/user/:id": SomeOf<PatchV1UserIdPositiveResponseVariants>;
+  "post /v1/user/create": SomeOf<PostV1UserCreatePositiveResponseVariants>;
+  "get /v1/user/list": SomeOf<GetV1UserListPositiveResponseVariants>;
+  "get /v1/avatar/send": SomeOf<GetV1AvatarSendPositiveResponseVariants>;
+  "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamPositiveResponseVariants>;
+  "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadPositiveResponseVariants>;
+  "post /v1/avatar/raw": SomeOf<PostV1AvatarRawPositiveResponseVariants>;
+  "get /v1/events/time": SomeOf<GetV1EventsTimePositiveResponseVariants>;
 }
 
-export const jsonEndpoints = {
-  "get /v1/user/retrieve": true,
-  "patch /v1/user/:id": true,
-  "post /v1/user/create": true,
-  "get /v1/user/list": true,
-  "post /v1/avatar/upload": true,
-  "post /v1/avatar/raw": true,
-};
+export interface NegativeResponse {
+  "get /v1/user/retrieve": SomeOf<GetV1UserRetrieveNegativeResponseVariants>;
+  "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemoveNegativeResponseVariants>;
+  "patch /v1/user/:id": SomeOf<PatchV1UserIdNegativeResponseVariants>;
+  "post /v1/user/create": SomeOf<PostV1UserCreateNegativeResponseVariants>;
+  "get /v1/user/list": SomeOf<GetV1UserListNegativeResponseVariants>;
+  "get /v1/avatar/send": SomeOf<GetV1AvatarSendNegativeResponseVariants>;
+  "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamNegativeResponseVariants>;
+  "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadNegativeResponseVariants>;
+  "post /v1/avatar/raw": SomeOf<PostV1AvatarRawNegativeResponseVariants>;
+  "get /v1/events/time": SomeOf<GetV1EventsTimeNegativeResponseVariants>;
+}
+
+export interface EncodedResponse {
+  "get /v1/user/retrieve": GetV1UserRetrievePositiveResponseVariants &
+    GetV1UserRetrieveNegativeResponseVariants;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemovePositiveResponseVariants &
+    DeleteV1UserIdRemoveNegativeResponseVariants;
+  "patch /v1/user/:id": PatchV1UserIdPositiveResponseVariants &
+    PatchV1UserIdNegativeResponseVariants;
+  "post /v1/user/create": PostV1UserCreatePositiveResponseVariants &
+    PostV1UserCreateNegativeResponseVariants;
+  "get /v1/user/list": GetV1UserListPositiveResponseVariants &
+    GetV1UserListNegativeResponseVariants;
+  "get /v1/avatar/send": GetV1AvatarSendPositiveResponseVariants &
+    GetV1AvatarSendNegativeResponseVariants;
+  "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponseVariants &
+    GetV1AvatarStreamNegativeResponseVariants;
+  "post /v1/avatar/upload": PostV1AvatarUploadPositiveResponseVariants &
+    PostV1AvatarUploadNegativeResponseVariants;
+  "post /v1/avatar/raw": PostV1AvatarRawPositiveResponseVariants &
+    PostV1AvatarRawNegativeResponseVariants;
+  "get /v1/events/time": GetV1EventsTimePositiveResponseVariants &
+    GetV1EventsTimeNegativeResponseVariants;
+}
+
+export interface Response {
+  "get /v1/user/retrieve":
+    | PositiveResponse["get /v1/user/retrieve"]
+    | NegativeResponse["get /v1/user/retrieve"];
+  "delete /v1/user/:id/remove":
+    | PositiveResponse["delete /v1/user/:id/remove"]
+    | NegativeResponse["delete /v1/user/:id/remove"];
+  "patch /v1/user/:id":
+    | PositiveResponse["patch /v1/user/:id"]
+    | NegativeResponse["patch /v1/user/:id"];
+  "post /v1/user/create":
+    | PositiveResponse["post /v1/user/create"]
+    | NegativeResponse["post /v1/user/create"];
+  "get /v1/user/list":
+    | PositiveResponse["get /v1/user/list"]
+    | NegativeResponse["get /v1/user/list"];
+  "get /v1/avatar/send":
+    | PositiveResponse["get /v1/avatar/send"]
+    | NegativeResponse["get /v1/avatar/send"];
+  "get /v1/avatar/stream":
+    | PositiveResponse["get /v1/avatar/stream"]
+    | NegativeResponse["get /v1/avatar/stream"];
+  "post /v1/avatar/upload":
+    | PositiveResponse["post /v1/avatar/upload"]
+    | NegativeResponse["post /v1/avatar/upload"];
+  "post /v1/avatar/raw":
+    | PositiveResponse["post /v1/avatar/raw"]
+    | NegativeResponse["post /v1/avatar/raw"];
+  "get /v1/events/time":
+    | PositiveResponse["get /v1/events/time"]
+    | NegativeResponse["get /v1/events/time"];
+}
+
+export type Request = keyof Input;
 
 export const endpointTags = {
   "get /v1/user/retrieve": ["users"],
+  "delete /v1/user/:id/remove": ["users"],
   "patch /v1/user/:id": ["users"],
   "post /v1/user/create": ["users"],
   "get /v1/user/list": ["users"],
@@ -611,13 +852,22 @@ export const endpointTags = {
   "get /v1/avatar/stream": ["users", "files"],
   "post /v1/avatar/upload": ["files"],
   "post /v1/avatar/raw": ["files"],
+  "get /v1/events/time": ["subscriptions"],
 };
 
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
+const parseRequest = (request: string) =>
+  request.split(/ (.+)/, 2) as [Method, Path];
+
+const substitute = (path: string, params: Record<string, any>) => {
+  const rest = { ...params };
+  for (const key in params) {
+    path = path.replace(\`:\${key}\`, () => {
+      delete rest[key];
+      return params[key];
+    });
+  }
+  return [path, rest] as const;
+};
 
 export type Implementation = (
   method: Method,
@@ -625,21 +875,15 @@ export type Implementation = (
   params: Record<string, any>,
 ) => Promise<any>;
 
-export class ExpressZodAPIClient {
-  constructor(protected readonly implementation: Implementation) {}
-  public readonly provide: Provider = async (method, path, params) =>
-    this.implementation(
-      method,
-      Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
-        path,
-      ),
-      Object.keys(params).reduce(
-        (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
-        {},
-      ),
-    );
+export class Client {
+  public constructor(protected readonly implementation: Implementation) {}
+  public provide<K extends Request>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]> {
+    const [method, path] = parseRequest(request);
+    return this.implementation(method, ...substitute(path, params));
+  }
 }
 
 // Usage example:
@@ -651,171 +895,335 @@ export const exampleImplementation: Implementation = async (
 ) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
-  const response = await fetch(\`https://example.com\${path}\${searchParams}\`, {
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
+  const response = await fetch(
+    new URL(\`\${path}\${searchParams}\`, "https://example.com"),
+    {
+      method: method.toUpperCase(),
+      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+      body: hasBody ? JSON.stringify(params) : undefined,
+    },
+  );
+  const contentType = response.headers.get("content-type");
+  if (!contentType) return;
+  const isJSON = contentType.startsWith("application/json");
+  return response[isJSON ? "json" : "text"]();
 };
-const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
+const client = new Client(exampleImplementation);
+client.provide("get /v1/user/retrieve", { id: "10" });
 */
 "
 `;
 
 exports[`Integration > Should generate a types for example API 1`] = `
-"type Type2048581c137c5b2130eb860e3ae37da196dfc25b = {
+"type Type1 = {
   title: string;
-  features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
+  features: Type1;
 }[];
 
-type GetV1UserRetrieveInput = {} & {
+type SomeOf<T> = T[keyof T];
+
+/** get /v1/user/retrieve */
+type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
   id: string;
 };
 
-type GetV1UserRetrieveResponse =
-  | {
-      status: "success";
-      data: {
-        id: number;
-        name: string;
-        features: {
-          title: string;
-          features: Type2048581c137c5b2130eb860e3ae37da196dfc25b;
-        }[];
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+/** get /v1/user/retrieve */
+type GetV1UserRetrievePositiveVariant1 = {
+  status: "success";
+  data: {
+    id: number;
+    name: string;
+    features: {
+      title: string;
+      features: Type1;
+    }[];
+  };
+};
 
+/** get /v1/user/retrieve */
+interface GetV1UserRetrievePositiveResponseVariants {
+  200: GetV1UserRetrievePositiveVariant1;
+}
+
+/** get /v1/user/retrieve */
+type GetV1UserRetrieveNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** get /v1/user/retrieve */
+interface GetV1UserRetrieveNegativeResponseVariants {
+  400: GetV1UserRetrieveNegativeVariant1;
+}
+
+/** delete /v1/user/:id/remove */
+type DeleteV1UserIdRemoveInput = {
+  /** numeric string */
+  id: string;
+};
+
+/** delete /v1/user/:id/remove */
+type DeleteV1UserIdRemovePositiveVariant1 = undefined;
+
+/** delete /v1/user/:id/remove */
+interface DeleteV1UserIdRemovePositiveResponseVariants {
+  204: DeleteV1UserIdRemovePositiveVariant1;
+}
+
+/** delete /v1/user/:id/remove */
+type DeleteV1UserIdRemoveNegativeVariant1 = undefined;
+
+/** delete /v1/user/:id/remove */
+interface DeleteV1UserIdRemoveNegativeResponseVariants {
+  404: DeleteV1UserIdRemoveNegativeVariant1;
+}
+
+/** patch /v1/user/:id */
 type PatchV1UserIdInput = {
   key: string;
-} & {
   id: string;
   name: string;
   birthday: string;
 };
 
-type PatchV1UserIdResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        createdAt: string;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+/** patch /v1/user/:id */
+type PatchV1UserIdPositiveVariant1 = {
+  status: "success";
+  data: {
+    name: string;
+    createdAt: string;
+  };
+};
 
+/** patch /v1/user/:id */
+interface PatchV1UserIdPositiveResponseVariants {
+  200: PatchV1UserIdPositiveVariant1;
+}
+
+/** patch /v1/user/:id */
+type PatchV1UserIdNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** patch /v1/user/:id */
+interface PatchV1UserIdNegativeResponseVariants {
+  400: PatchV1UserIdNegativeVariant1;
+}
+
+/** post /v1/user/create */
 type PostV1UserCreateInput = {
   name: string;
 };
 
-type PostV1UserCreateResponse =
-  | {
-      status: "created";
-      data: {
-        id: number;
-      };
-    }
-  | (
-      | {
-          status: "exists";
-          id: number;
-        }
-      | {
-          status: "error";
-          reason: string;
-        }
-    );
+/** post /v1/user/create */
+type PostV1UserCreatePositiveVariant1 = {
+  status: "created";
+  data: {
+    id: number;
+  };
+};
 
+/** post /v1/user/create */
+interface PostV1UserCreatePositiveResponseVariants {
+  201: PostV1UserCreatePositiveVariant1;
+  202: PostV1UserCreatePositiveVariant1;
+}
+
+/** post /v1/user/create */
+type PostV1UserCreateNegativeVariant1 = {
+  status: "exists";
+  id: number;
+};
+
+/** post /v1/user/create */
+type PostV1UserCreateNegativeVariant2 = {
+  status: "error";
+  reason: string;
+};
+
+/** post /v1/user/create */
+interface PostV1UserCreateNegativeResponseVariants {
+  409: PostV1UserCreateNegativeVariant1;
+  400: PostV1UserCreateNegativeVariant2;
+  500: PostV1UserCreateNegativeVariant2;
+}
+
+/** get /v1/user/list */
 type GetV1UserListInput = {};
 
-type GetV1UserListResponse =
-  | {
-      name: string;
-    }[]
-  | string;
+/** get /v1/user/list */
+type GetV1UserListPositiveVariant1 = {
+  name: string;
+}[];
 
+/** get /v1/user/list */
+interface GetV1UserListPositiveResponseVariants {
+  200: GetV1UserListPositiveVariant1;
+}
+
+/** get /v1/user/list */
+type GetV1UserListNegativeVariant1 = string;
+
+/** get /v1/user/list */
+interface GetV1UserListNegativeResponseVariants {
+  400: GetV1UserListNegativeVariant1;
+}
+
+/** get /v1/avatar/send */
 type GetV1AvatarSendInput = {
   userId: string;
 };
 
-type GetV1AvatarSendResponse = string | string;
+/** get /v1/avatar/send */
+type GetV1AvatarSendPositiveVariant1 = string;
 
+/** get /v1/avatar/send */
+interface GetV1AvatarSendPositiveResponseVariants {
+  200: GetV1AvatarSendPositiveVariant1;
+}
+
+/** get /v1/avatar/send */
+type GetV1AvatarSendNegativeVariant1 = string;
+
+/** get /v1/avatar/send */
+interface GetV1AvatarSendNegativeResponseVariants {
+  400: GetV1AvatarSendNegativeVariant1;
+}
+
+/** get /v1/avatar/stream */
 type GetV1AvatarStreamInput = {
   userId: string;
 };
 
-type GetV1AvatarStreamResponse = Buffer | string;
+/** get /v1/avatar/stream */
+type GetV1AvatarStreamPositiveVariant1 = Buffer;
 
+/** get /v1/avatar/stream */
+interface GetV1AvatarStreamPositiveResponseVariants {
+  200: GetV1AvatarStreamPositiveVariant1;
+}
+
+/** get /v1/avatar/stream */
+type GetV1AvatarStreamNegativeVariant1 = string;
+
+/** get /v1/avatar/stream */
+interface GetV1AvatarStreamNegativeResponseVariants {
+  400: GetV1AvatarStreamNegativeVariant1;
+}
+
+/** post /v1/avatar/upload */
 type PostV1AvatarUploadInput = {
   avatar: any;
 };
 
-type PostV1AvatarUploadResponse =
-  | {
-      status: "success";
-      data: {
-        name: string;
-        size: number;
-        mime: string;
-        hash: string;
-        otherInputs: Record<string, any>;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+/** post /v1/avatar/upload */
+type PostV1AvatarUploadPositiveVariant1 = {
+  status: "success";
+  data: {
+    name: string;
+    size: number;
+    mime: string;
+    hash: string;
+    otherInputs: Record<string, any>;
+  };
+};
 
+/** post /v1/avatar/upload */
+interface PostV1AvatarUploadPositiveResponseVariants {
+  200: PostV1AvatarUploadPositiveVariant1;
+}
+
+/** post /v1/avatar/upload */
+type PostV1AvatarUploadNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** post /v1/avatar/upload */
+interface PostV1AvatarUploadNegativeResponseVariants {
+  400: PostV1AvatarUploadNegativeVariant1;
+}
+
+/** post /v1/avatar/raw */
 type PostV1AvatarRawInput = Buffer;
 
-type PostV1AvatarRawResponse =
-  | {
-      status: "success";
-      data: {
-        length: number;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+/** post /v1/avatar/raw */
+type PostV1AvatarRawPositiveVariant1 = {
+  status: "success";
+  data: {
+    length: number;
+  };
+};
+
+/** post /v1/avatar/raw */
+interface PostV1AvatarRawPositiveResponseVariants {
+  200: PostV1AvatarRawPositiveVariant1;
+}
+
+/** post /v1/avatar/raw */
+type PostV1AvatarRawNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** post /v1/avatar/raw */
+interface PostV1AvatarRawNegativeResponseVariants {
+  400: PostV1AvatarRawNegativeVariant1;
+}
+
+/** get /v1/events/time */
+type GetV1EventsTimeInput = {
+  trigger?: string | undefined;
+};
+
+/** get /v1/events/time */
+type GetV1EventsTimePositiveVariant1 = {
+  data: number;
+  event: "time";
+  id?: string | undefined;
+  retry?: number | undefined;
+};
+
+/** get /v1/events/time */
+interface GetV1EventsTimePositiveResponseVariants {
+  200: GetV1EventsTimePositiveVariant1;
+}
+
+/** get /v1/events/time */
+type GetV1EventsTimeNegativeVariant1 = string;
+
+/** get /v1/events/time */
+interface GetV1EventsTimeNegativeResponseVariants {
+  400: GetV1EventsTimeNegativeVariant1;
+}
 
 export type Path =
   | "/v1/user/retrieve"
+  | "/v1/user/:id/remove"
   | "/v1/user/:id"
   | "/v1/user/create"
   | "/v1/user/list"
   | "/v1/avatar/send"
   | "/v1/avatar/stream"
   | "/v1/avatar/upload"
-  | "/v1/avatar/raw";
+  | "/v1/avatar/raw"
+  | "/v1/events/time";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-export type MethodPath = \`\${Method} \${Path}\`;
-
-export interface Input extends Record<MethodPath, any> {
+export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemoveInput;
   "patch /v1/user/:id": PatchV1UserIdInput;
   "post /v1/user/create": PostV1UserCreateInput;
   "get /v1/user/list": GetV1UserListInput;
@@ -823,112 +1231,246 @@ export interface Input extends Record<MethodPath, any> {
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
   "post /v1/avatar/raw": PostV1AvatarRawInput;
+  "get /v1/events/time": GetV1EventsTimeInput;
 }
 
-export interface Response extends Record<MethodPath, any> {
-  "get /v1/user/retrieve": GetV1UserRetrieveResponse;
-  "patch /v1/user/:id": PatchV1UserIdResponse;
-  "post /v1/user/create": PostV1UserCreateResponse;
-  "get /v1/user/list": GetV1UserListResponse;
-  "get /v1/avatar/send": GetV1AvatarSendResponse;
-  "get /v1/avatar/stream": GetV1AvatarStreamResponse;
-  "post /v1/avatar/upload": PostV1AvatarUploadResponse;
-  "post /v1/avatar/raw": PostV1AvatarRawResponse;
+export interface PositiveResponse {
+  "get /v1/user/retrieve": SomeOf<GetV1UserRetrievePositiveResponseVariants>;
+  "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemovePositiveResponseVariants>;
+  "patch /v1/user/:id": SomeOf<PatchV1UserIdPositiveResponseVariants>;
+  "post /v1/user/create": SomeOf<PostV1UserCreatePositiveResponseVariants>;
+  "get /v1/user/list": SomeOf<GetV1UserListPositiveResponseVariants>;
+  "get /v1/avatar/send": SomeOf<GetV1AvatarSendPositiveResponseVariants>;
+  "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamPositiveResponseVariants>;
+  "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadPositiveResponseVariants>;
+  "post /v1/avatar/raw": SomeOf<PostV1AvatarRawPositiveResponseVariants>;
+  "get /v1/events/time": SomeOf<GetV1EventsTimePositiveResponseVariants>;
 }
+
+export interface NegativeResponse {
+  "get /v1/user/retrieve": SomeOf<GetV1UserRetrieveNegativeResponseVariants>;
+  "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemoveNegativeResponseVariants>;
+  "patch /v1/user/:id": SomeOf<PatchV1UserIdNegativeResponseVariants>;
+  "post /v1/user/create": SomeOf<PostV1UserCreateNegativeResponseVariants>;
+  "get /v1/user/list": SomeOf<GetV1UserListNegativeResponseVariants>;
+  "get /v1/avatar/send": SomeOf<GetV1AvatarSendNegativeResponseVariants>;
+  "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamNegativeResponseVariants>;
+  "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadNegativeResponseVariants>;
+  "post /v1/avatar/raw": SomeOf<PostV1AvatarRawNegativeResponseVariants>;
+  "get /v1/events/time": SomeOf<GetV1EventsTimeNegativeResponseVariants>;
+}
+
+export interface EncodedResponse {
+  "get /v1/user/retrieve": GetV1UserRetrievePositiveResponseVariants &
+    GetV1UserRetrieveNegativeResponseVariants;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemovePositiveResponseVariants &
+    DeleteV1UserIdRemoveNegativeResponseVariants;
+  "patch /v1/user/:id": PatchV1UserIdPositiveResponseVariants &
+    PatchV1UserIdNegativeResponseVariants;
+  "post /v1/user/create": PostV1UserCreatePositiveResponseVariants &
+    PostV1UserCreateNegativeResponseVariants;
+  "get /v1/user/list": GetV1UserListPositiveResponseVariants &
+    GetV1UserListNegativeResponseVariants;
+  "get /v1/avatar/send": GetV1AvatarSendPositiveResponseVariants &
+    GetV1AvatarSendNegativeResponseVariants;
+  "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponseVariants &
+    GetV1AvatarStreamNegativeResponseVariants;
+  "post /v1/avatar/upload": PostV1AvatarUploadPositiveResponseVariants &
+    PostV1AvatarUploadNegativeResponseVariants;
+  "post /v1/avatar/raw": PostV1AvatarRawPositiveResponseVariants &
+    PostV1AvatarRawNegativeResponseVariants;
+  "get /v1/events/time": GetV1EventsTimePositiveResponseVariants &
+    GetV1EventsTimeNegativeResponseVariants;
+}
+
+export interface Response {
+  "get /v1/user/retrieve":
+    | PositiveResponse["get /v1/user/retrieve"]
+    | NegativeResponse["get /v1/user/retrieve"];
+  "delete /v1/user/:id/remove":
+    | PositiveResponse["delete /v1/user/:id/remove"]
+    | NegativeResponse["delete /v1/user/:id/remove"];
+  "patch /v1/user/:id":
+    | PositiveResponse["patch /v1/user/:id"]
+    | NegativeResponse["patch /v1/user/:id"];
+  "post /v1/user/create":
+    | PositiveResponse["post /v1/user/create"]
+    | NegativeResponse["post /v1/user/create"];
+  "get /v1/user/list":
+    | PositiveResponse["get /v1/user/list"]
+    | NegativeResponse["get /v1/user/list"];
+  "get /v1/avatar/send":
+    | PositiveResponse["get /v1/avatar/send"]
+    | NegativeResponse["get /v1/avatar/send"];
+  "get /v1/avatar/stream":
+    | PositiveResponse["get /v1/avatar/stream"]
+    | NegativeResponse["get /v1/avatar/stream"];
+  "post /v1/avatar/upload":
+    | PositiveResponse["post /v1/avatar/upload"]
+    | NegativeResponse["post /v1/avatar/upload"];
+  "post /v1/avatar/raw":
+    | PositiveResponse["post /v1/avatar/raw"]
+    | NegativeResponse["post /v1/avatar/raw"];
+  "get /v1/events/time":
+    | PositiveResponse["get /v1/events/time"]
+    | NegativeResponse["get /v1/events/time"];
+}
+
+export type Request = keyof Input;
 "
 `;
 
 exports[`Integration > Should support multiple response schemas depending on status code 1`] = `
-"type PostV1MtplInput = {
+"type SomeOf<T> = T[keyof T];
+
+/** post /v1/mtpl */
+type PostV1MtplInput = {
   test: number;
 };
 
-type PostV1MtplPositiveResponse =
-  | {
-      status: "ok";
-      data: {
-        payload: string;
-      };
-    }
-  | {
-      status: "kinda";
-      data: {
-        payload: string;
-      };
-    };
+/** post /v1/mtpl */
+type PostV1MtplPositiveVariant1 = {
+  status: "ok";
+  data: {
+    payload: string;
+  };
+};
 
-type PostV1MtplNegativeResponse = "error" | "failure";
+/** post /v1/mtpl */
+type PostV1MtplPositiveVariant2 = {
+  status: "kinda";
+  data: {
+    payload: string;
+  };
+};
 
-type PostV1MtplResponse =
-  | PostV1MtplPositiveResponse
-  | PostV1MtplNegativeResponse;
+/** post /v1/mtpl */
+interface PostV1MtplPositiveResponseVariants {
+  200: PostV1MtplPositiveVariant1;
+  201: PostV1MtplPositiveVariant2;
+}
+
+/** post /v1/mtpl */
+type PostV1MtplNegativeVariant1 = "error";
+
+/** post /v1/mtpl */
+type PostV1MtplNegativeVariant2 = "failure";
+
+/** post /v1/mtpl */
+interface PostV1MtplNegativeResponseVariants {
+  400: PostV1MtplNegativeVariant1;
+  500: PostV1MtplNegativeVariant2;
+}
 
 export type Path = "/v1/mtpl";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-export type MethodPath = \`\${Method} \${Path}\`;
-
-export interface Input extends Record<MethodPath, any> {
+export interface Input {
   "post /v1/mtpl": PostV1MtplInput;
 }
 
-export interface PositiveResponse extends Record<MethodPath, any> {
-  "post /v1/mtpl": PostV1MtplPositiveResponse;
+export interface PositiveResponse {
+  "post /v1/mtpl": SomeOf<PostV1MtplPositiveResponseVariants>;
 }
 
-export interface NegativeResponse extends Record<MethodPath, any> {
-  "post /v1/mtpl": PostV1MtplNegativeResponse;
+export interface NegativeResponse {
+  "post /v1/mtpl": SomeOf<PostV1MtplNegativeResponseVariants>;
 }
 
-export interface Response extends Record<MethodPath, any> {
-  "post /v1/mtpl": PostV1MtplResponse;
+export interface EncodedResponse {
+  "post /v1/mtpl": PostV1MtplPositiveResponseVariants &
+    PostV1MtplNegativeResponseVariants;
 }
+
+export interface Response {
+  "post /v1/mtpl":
+    | PositiveResponse["post /v1/mtpl"]
+    | NegativeResponse["post /v1/mtpl"];
+}
+
+export type Request = keyof Input;
 "
 `;
 
 exports[`Integration > Should treat optionals the same way as z.infer() by default 1`] = `
-"type PostV1TestWithDashesInput = {
+"type SomeOf<T> = T[keyof T];
+
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesInput = {
   opt?: string | undefined;
 };
 
-type PostV1TestWithDashesResponse =
-  | {
-      status: "success";
-      data: {
-        similar?: number | undefined;
-      };
-    }
-  | {
-      status: "error";
-      error: {
-        message: string;
-      };
-    };
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesPositiveVariant1 = {
+  status: "success";
+  data: {
+    similar?: number | undefined;
+  };
+};
+
+/** post /v1/test-with-dashes */
+interface PostV1TestWithDashesPositiveResponseVariants {
+  200: PostV1TestWithDashesPositiveVariant1;
+}
+
+/** post /v1/test-with-dashes */
+type PostV1TestWithDashesNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** post /v1/test-with-dashes */
+interface PostV1TestWithDashesNegativeResponseVariants {
+  400: PostV1TestWithDashesNegativeVariant1;
+}
 
 export type Path = "/v1/test-with-dashes";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
-export type MethodPath = \`\${Method} \${Path}\`;
-
-export interface Input extends Record<MethodPath, any> {
+export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;
 }
 
-export interface Response extends Record<MethodPath, any> {
-  "post /v1/test-with-dashes": PostV1TestWithDashesResponse;
+export interface PositiveResponse {
+  "post /v1/test-with-dashes": SomeOf<PostV1TestWithDashesPositiveResponseVariants>;
 }
 
-export const jsonEndpoints = { "post /v1/test-with-dashes": true };
+export interface NegativeResponse {
+  "post /v1/test-with-dashes": SomeOf<PostV1TestWithDashesNegativeResponseVariants>;
+}
+
+export interface EncodedResponse {
+  "post /v1/test-with-dashes": PostV1TestWithDashesPositiveResponseVariants &
+    PostV1TestWithDashesNegativeResponseVariants;
+}
+
+export interface Response {
+  "post /v1/test-with-dashes":
+    | PositiveResponse["post /v1/test-with-dashes"]
+    | NegativeResponse["post /v1/test-with-dashes"];
+}
+
+export type Request = keyof Input;
 
 export const endpointTags = { "post /v1/test-with-dashes": [] };
 
-export type Provider = <M extends Method, P extends Path>(
-  method: M,
-  path: P,
-  params: Input[\`\${M} \${P}\`],
-) => Promise<Response[\`\${M} \${P}\`]>;
+const parseRequest = (request: string) =>
+  request.split(/ (.+)/, 2) as [Method, Path];
+
+const substitute = (path: string, params: Record<string, any>) => {
+  const rest = { ...params };
+  for (const key in params) {
+    path = path.replace(\`:\${key}\`, () => {
+      delete rest[key];
+      return params[key];
+    });
+  }
+  return [path, rest] as const;
+};
 
 export type Implementation = (
   method: Method,
@@ -936,21 +1478,15 @@ export type Implementation = (
   params: Record<string, any>,
 ) => Promise<any>;
 
-export class ExpressZodAPIClient {
-  constructor(protected readonly implementation: Implementation) {}
-  public readonly provide: Provider = async (method, path, params) =>
-    this.implementation(
-      method,
-      Object.keys(params).reduce(
-        (acc, key) => acc.replace(\`:\${key}\`, params[key]),
-        path,
-      ),
-      Object.keys(params).reduce(
-        (acc, key) =>
-          path.indexOf(\`:\${key}\`) >= 0 ? acc : { ...acc, [key]: params[key] },
-        {},
-      ),
-    );
+export class Client {
+  public constructor(protected readonly implementation: Implementation) {}
+  public provide<K extends Request>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]> {
+    const [method, path] = parseRequest(request);
+    return this.implementation(method, ...substitute(path, params));
+  }
 }
 
 // Usage example:
@@ -962,18 +1498,21 @@ export const exampleImplementation: Implementation = async (
 ) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : \`?\${new URLSearchParams(params)}\`;
-  const response = await fetch(\`https://example.com\${path}\${searchParams}\`, {
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
-  if (\`\${method} \${path}\` in jsonEndpoints) {
-    return response.json();
-  }
-  return response.text();
+  const response = await fetch(
+    new URL(\`\${path}\${searchParams}\`, "https://example.com"),
+    {
+      method: method.toUpperCase(),
+      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+      body: hasBody ? JSON.stringify(params) : undefined,
+    },
+  );
+  const contentType = response.headers.get("content-type");
+  if (!contentType) return;
+  const isJSON = contentType.startsWith("application/json");
+  return response[isJSON ? "json" : "text"]();
 };
-const client = new ExpressZodAPIClient(exampleImplementation);
-client.provide("get", "/v1/user/retrieve", { id: "10" });
+const client = new Client(exampleImplementation);
+client.provide("get /v1/user/retrieve", { id: "10" });
 */
 "
 `;

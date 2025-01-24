@@ -6,11 +6,8 @@ export {
   defaultEndpointsFactory,
   arrayEndpointsFactory,
 } from "./endpoints-factory";
-export {
-  getExamples,
-  getMessageFromError,
-  getStatusCodeFromError,
-} from "./common-helpers";
+export { getExamples, getMessageFromError } from "./common-helpers";
+export { ensureHttpError } from "./result-helpers";
 export { BuiltinLogger } from "./builtin-logger";
 export { Middleware } from "./middleware";
 export {
@@ -31,6 +28,7 @@ export {
 } from "./errors";
 export { testEndpoint, testMiddleware } from "./testing";
 export { Integration } from "./integration";
+export { EventStreamFactory } from "./sse";
 
 export { ez } from "./proprietary-schemas";
 
@@ -38,14 +36,17 @@ export { ez } from "./proprietary-schemas";
 export type { Depicter } from "./documentation-helpers";
 export type { Producer } from "./zts-helpers";
 
+// Interfaces exposed for augmentation
+export type { LoggerOverrides } from "./logger-helpers";
+export type { TagOverrides } from "./common-helpers";
+
 // Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
 export type { Routing } from "./routing";
-export type { LoggerOverrides } from "./logger-helpers";
 export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
 export type { IOSchema } from "./io-schema";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
-export type { ApiResponse } from "./api-response";
+export type { ApiResponse, NormalizedResponse } from "./api-response";
 export type {
   BasicSecurity,
   BearerSecurity,

@@ -1,14 +1,9 @@
-import { EventEmitter } from "node:events";
 import { performance } from "node:perf_hooks";
 import { BuiltinLogger, BuiltinLoggerConfig } from "../../src/builtin-logger";
 
 describe("BuiltinLogger", () => {
-  beforeAll(() => {
-    // fix (node:58829) MaxListenersExceededWarning: Possible EventEmitter memory leak
-    EventEmitter.setMaxListeners(15);
-  });
-
   beforeEach(() => {
+    vi.restoreAllMocks(); // vitest 3 .spyOn() reuses existing spy, see makeLogger()
     vi.useFakeTimers({ now: new Date("2022-01-01T00:00:00Z") });
   });
 
@@ -16,13 +11,15 @@ describe("BuiltinLogger", () => {
     vi.useRealTimers();
   });
 
-  const makeLogger = (props: BuiltinLoggerConfig) => {
-    const logger = new BuiltinLogger({ ...props });
+  const makeLogger = (props?: Partial<BuiltinLoggerConfig>) => {
+    const logger = new BuiltinLogger(props);
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     return { logger, logSpy };
   };
 
   describe("constructor()", () => {
+    afterEach(() => vi.unstubAllEnvs());
+
     test("Should create silent logger", () => {
       const { logger, logSpy } = makeLogger({ level: "silent" });
       logger.error("test");
@@ -42,6 +39,18 @@ describe("BuiltinLogger", () => {
       logger.warn("testing warn message");
       expect(logSpy).toHaveBeenCalledTimes(1);
     });
+
+    test.each(["development", "production"])(
+      "Level can be omitted and depends on env",
+      (mode) => {
+        vi.stubEnv("TSUP_STATIC", mode);
+        vi.stubEnv("NODE_ENV", mode);
+        const { logger } = makeLogger();
+        expect(logger["config"]["level"]).toBe(
+          mode === "production" ? "warn" : "debug",
+        );
+      },
+    );
 
     test.each(["debug", "info", "warn", "error"] as const)(
       "Should create debug logger %#",
@@ -76,6 +85,21 @@ describe("BuiltinLogger", () => {
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
 
+    test("should handle error including cause", () => {
+      const error = new Error("something", { cause: new Error("anything") });
+      const { logger, logSpy } = makeLogger({ level: "warn", color: false });
+      logger.error("Failure", error);
+      expect(logSpy).toHaveBeenCalledOnce();
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(
+          /2022-01-01T00:00:00\.000Z error: Failure \{ Error: something/,
+        ),
+      );
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/\[cause]: Error: anything/),
+      );
+    });
+
     test.each(["debug", "warn"] as const)(
       "Should handle circular references within subject %#",
       (level) => {
@@ -101,6 +125,7 @@ describe("BuiltinLogger", () => {
         color,
       });
       const child = parent.child(ctx);
+      expect(child.ctx).toEqual(ctx);
       child.info("Here is some message", { more: "information" });
       expect(logSpy.mock.calls).toMatchSnapshot();
     });
@@ -117,7 +142,7 @@ describe("BuiltinLogger", () => {
         stop();
         expect(logSpy).toHaveBeenCalledWith(
           expect.stringMatching(
-            /2022-01-01T00:00:00.000Z debug: test '[\d.]+ (pico|micro|milli)?second(s)?'/,
+            /2022-01-01T00:00:00.000Z debug: test '[\d.]+ (nano|micro|milli)?second(s)?'/,
           ),
         );
       },

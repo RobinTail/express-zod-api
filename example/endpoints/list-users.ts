@@ -6,9 +6,7 @@ import { arrayRespondingFactory } from "../factories";
  * Avoid doing this in new projects. This feature is only for easier migration of legacy APIs.
  * */
 export const listUsersEndpoint = arrayRespondingFactory.build({
-  method: "get",
   tag: "users",
-  input: z.object({}),
   output: z
     .object({
       // the arrayResultHandler will take the "items" prop as the response

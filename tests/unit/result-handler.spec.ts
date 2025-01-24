@@ -49,7 +49,7 @@ describe("ResultHandler", () => {
         }).getPositiveResponse(z.object({})),
       ).toThrow(
         new ResultHandlerError(
-          "At least one positive response schema required.",
+          new Error("At least one positive response schema required."),
         ),
       );
       expect(() =>
@@ -60,7 +60,7 @@ describe("ResultHandler", () => {
         }).getNegativeResponse(),
       ).toThrow(
         new ResultHandlerError(
-          "At least one negative response schema required.",
+          new Error("At least one negative response schema required."),
         ),
       );
     });
@@ -84,8 +84,9 @@ describe("ResultHandler", () => {
     test("Should handle generic error", () => {
       const responseMock = makeResponseMock();
       const loggerMock = makeLoggerMock();
+      const error = new Error("Some error");
       subject.execute({
-        error: new Error("Some error"),
+        error,
         input: { something: 453 },
         output: { anything: 118 },
         request: requestMock,
@@ -93,15 +94,7 @@ describe("ResultHandler", () => {
         logger: loggerMock,
         options: {},
       });
-      expect(loggerMock._getLogs().error).toEqual([
-        [
-          expect.stringMatching(/^Internal server error\nError: Some error/),
-          {
-            payload: { something: 453 },
-            url: "http://something/v1/anything",
-          },
-        ],
-      ]);
+      expect(loggerMock._getLogs().error).toMatchSnapshot();
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getHeaders()).toHaveProperty(
         "content-type",
@@ -217,25 +210,29 @@ describe("ResultHandler", () => {
   test("arrayResultHandler should fail when there is no items prop in the output", () => {
     const responseMock = makeResponseMock();
     const loggerMock = makeLoggerMock();
-    arrayResultHandler.execute({
-      error: null,
-      input: { something: 453 },
-      output: { anything: 118 },
-      options: {},
-      request: requestMock,
-      response: responseMock,
-      logger: loggerMock,
-    });
-    expect(loggerMock._getLogs().error).toHaveLength(0);
-    expect(responseMock._getStatusCode()).toBe(500);
-    expect(responseMock._getHeaders()).toHaveProperty(
-      "content-type",
-      "text/plain",
+    const positiveSchema = arrayResultHandler
+      .getPositiveResponse(
+        z.object({ anything: z.number() }).example({ anything: 118 }),
+      )
+      .pop()?.schema;
+    expect(positiveSchema?._def).toHaveProperty("typeName", "ZodArray");
+    expect(positiveSchema).toHaveProperty(
+      ["element", "_def", "typeName"],
+      "ZodAny",
     );
-    expect(
-      responseMock._isJSON()
-        ? responseMock._getJSONData()
-        : responseMock._getData(),
-    ).toMatchSnapshot();
+    expect(() =>
+      arrayResultHandler.execute({
+        error: null,
+        input: { something: 453 },
+        output: { anything: 118 },
+        options: {},
+        request: requestMock,
+        response: responseMock,
+        logger: loggerMock,
+      }),
+    ).toThrowError(
+      // delegated to LastResortHandler, having same format
+      new Error("Property 'items' is missing in the endpoint output"),
+    );
   });
 });

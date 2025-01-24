@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { EmptyObject, FlatObject } from "./common-helpers";
-import { CommonConfig } from "./config-type";
+import { EmptyObject, EmptySchema, FlatObject, Tag } from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
 import { IOSchema, getFinalEndpointInputSchema } from "./io-schema";
 import { Method } from "./method";
@@ -16,76 +15,55 @@ import {
   defaultResultHandler,
 } from "./result-handler";
 
-type BuildProps<
+interface BuildProps<
   IN extends IOSchema,
-  OUT extends IOSchema,
+  OUT extends IOSchema | z.ZodVoid,
   MIN extends IOSchema<"strip">,
   OPT extends FlatObject,
   SCO extends string,
-  TAG extends string,
-> = {
-  input: IN;
+> {
+  input?: IN;
   output: OUT;
   handler: Handler<z.output<z.ZodIntersection<MIN, IN>>, z.input<OUT>, OPT>;
   description?: string;
   shortDescription?: string;
   operationId?: string | ((method: Method) => string);
-} & ({ method: Method } | { methods: Method[] }) &
-  ({ scopes?: SCO[] } | { scope?: SCO }) &
-  ({ tags?: TAG[] } | { tag?: TAG });
+  method?: Method | [Method, ...Method[]];
+  scope?: SCO | SCO[];
+  tag?: Tag | Tag[];
+}
 
 export class EndpointsFactory<
-  IN extends IOSchema<"strip"> = z.ZodObject<EmptyObject, "strip">,
+  IN extends IOSchema<"strip"> = EmptySchema,
   OUT extends FlatObject = EmptyObject,
   SCO extends string = string,
-  TAG extends string = string,
 > {
-  protected resultHandler: AbstractResultHandler;
   protected middlewares: AbstractMiddleware[] = [];
-
-  /** @desc Consider using the "config" prop with the "tags" option to enforce constraints on tagging the endpoints */
-  constructor(resultHandler: AbstractResultHandler);
-  constructor(params: {
-    resultHandler: AbstractResultHandler;
-    config?: CommonConfig<TAG>;
-  });
-  constructor(
-    subject:
-      | AbstractResultHandler
-      | {
-          resultHandler: AbstractResultHandler;
-          config?: CommonConfig<TAG>;
-        },
-  ) {
-    this.resultHandler =
-      "resultHandler" in subject ? subject.resultHandler : subject;
-  }
+  constructor(protected resultHandler: AbstractResultHandler) {}
 
   static #create<
     CIN extends IOSchema<"strip">,
     COUT extends FlatObject,
     CSCO extends string,
-    CTAG extends string,
   >(middlewares: AbstractMiddleware[], resultHandler: AbstractResultHandler) {
-    const factory = new EndpointsFactory<CIN, COUT, CSCO, CTAG>(resultHandler);
+    const factory = new EndpointsFactory<CIN, COUT, CSCO>(resultHandler);
     factory.middlewares = middlewares;
     return factory;
   }
 
   public addMiddleware<
-    AIN extends IOSchema<"strip">,
     AOUT extends FlatObject,
     ASCO extends string,
+    AIN extends IOSchema<"strip"> = EmptySchema,
   >(
     subject:
-      | Middleware<AIN, OUT, AOUT, ASCO>
-      | ConstructorParameters<typeof Middleware<AIN, OUT, AOUT, ASCO>>[0],
+      | Middleware<OUT, AOUT, ASCO, AIN>
+      | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
     return EndpointsFactory.#create<
       z.ZodIntersection<IN, AIN>,
       OUT & AOUT,
-      SCO & ASCO,
-      TAG
+      SCO & ASCO
     >(
       this.middlewares.concat(
         subject instanceof Middleware ? subject : new Middleware(subject),
@@ -101,51 +79,36 @@ export class EndpointsFactory<
     S extends Response,
     AOUT extends FlatObject = EmptyObject,
   >(...params: ConstructorParameters<typeof ExpressMiddleware<R, S, AOUT>>) {
-    return EndpointsFactory.#create<IN, OUT & AOUT, SCO, TAG>(
+    return EndpointsFactory.#create<IN, OUT & AOUT, SCO>(
       this.middlewares.concat(new ExpressMiddleware(...params)),
       this.resultHandler,
     );
   }
 
   public addOptions<AOUT extends FlatObject>(getOptions: () => Promise<AOUT>) {
-    return EndpointsFactory.#create<IN, OUT & AOUT, SCO, TAG>(
-      this.middlewares.concat(
-        new Middleware({
-          input: z.object({}),
-          handler: getOptions,
-        }),
-      ),
+    return EndpointsFactory.#create<IN, OUT & AOUT, SCO>(
+      this.middlewares.concat(new Middleware({ handler: getOptions })),
       this.resultHandler,
     );
   }
 
-  public build<BIN extends IOSchema, BOUT extends IOSchema>({
-    input,
+  public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
+    input = z.object({}) as BIN,
     handler,
     output: outputSchema,
     description,
     shortDescription,
     operationId,
-    ...rest
-  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>): Endpoint<
-    z.ZodIntersection<IN, BIN>,
-    BOUT,
-    OUT,
-    SCO,
-    TAG
-  > {
+    scope,
+    tag,
+    method,
+  }: BuildProps<BIN, BOUT, IN, OUT, SCO>) {
     const { middlewares, resultHandler } = this;
-    const methods = "methods" in rest ? rest.methods : [rest.method];
+    const methods = typeof method === "string" ? [method] : method;
     const getOperationId =
       typeof operationId === "function" ? operationId : () => operationId;
-    const scopes =
-      "scopes" in rest
-        ? rest.scopes
-        : "scope" in rest && rest.scope
-          ? [rest.scope]
-          : [];
-    const tags =
-      "tags" in rest ? rest.tags : "tag" in rest && rest.tag ? [rest.tag] : [];
+    const scopes = typeof scope === "string" ? [scope] : scope || [];
+    const tags = typeof tag === "string" ? [tag] : tag || [];
     return new Endpoint({
       handler,
       middlewares,
@@ -158,6 +121,21 @@ export class EndpointsFactory<
       description,
       shortDescription,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
+    });
+  }
+
+  /** @desc shorthand for returning {} while having output schema z.object({}) */
+  public buildVoid<BIN extends IOSchema = EmptySchema>({
+    handler,
+    ...rest
+  }: Omit<BuildProps<BIN, z.ZodVoid, IN, OUT, SCO>, "output">) {
+    return this.build({
+      ...rest,
+      output: z.object({}),
+      handler: async (props) => {
+        await handler(props);
+        return {};
+      },
     });
   }
 }

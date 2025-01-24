@@ -16,148 +16,112 @@ describe("Migration", () => {
     expect(migration.rules).toHaveProperty(`v${version.split(".")[0]}`);
     expect(migration).toMatchSnapshot();
   });
-});
 
-tester.run("v20", migration.rules.v20, {
-  valid: [
-    { code: `import { BuiltinLogger } from "express-zod-api"` },
-    { code: `import { ResultHandler } from "express-zod-api"` },
-    { code: `import { Middleware } from "express-zod-api"` },
-    { code: `new BuiltinLogger({})` },
-    { code: `new ResultHandler({ positive: {}, negative: {} })` },
-    { code: `new Middleware({ handler: {} })` },
-    { code: `testEndpoint({})` },
-  ],
-  invalid: [
-    {
-      code: `import { createLogger } from "express-zod-api"`,
-      output: `import { BuiltinLogger } from "express-zod-api"`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "import",
-            from: "createLogger",
-            to: "BuiltinLogger",
+  tester.run("v22", migration.rules.v22, {
+    valid: [
+      `client.provide("get /v1/test", {id: 10});`,
+      `new Integration({ routing });`,
+      `import { Request } from "./client.ts";`,
+      `createConfig({ cors: true });`,
+      `new Documentation();`,
+      `new EndpointsFactory(new ResultHandler());`,
+      `new EventStreamFactory({});`,
+      `new Client();`,
+    ],
+    invalid: [
+      {
+        code: `client.provide("get", "/v1/test", {id: 10});`,
+        output: `client.provide("get /v1/test", {id: 10});`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "arguments",
+              from: `"get", "/v1/test"`,
+              to: `"get /v1/test"`,
+            },
           },
-        },
-      ],
-    },
-    {
-      code: `import { createResultHandler } from "express-zod-api"`,
-      output: `import { ResultHandler } from "express-zod-api"`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "import",
-            from: "createResultHandler",
-            to: "ResultHandler",
+        ],
+      },
+      {
+        code: `new Integration({ routing, splitResponse: true });`,
+        output: `new Integration({ routing,  });`,
+        errors: [
+          {
+            messageId: "remove",
+            data: { subject: "property", name: "splitResponse" },
           },
-        },
-      ],
-    },
-    {
-      code: `import { createMiddleware } from "express-zod-api"`,
-      output: `import { Middleware } from "express-zod-api"`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "import",
-            from: "createMiddleware",
-            to: "Middleware",
+        ],
+      },
+      {
+        code: `import { MethodPath } from "./client.ts";`,
+        output: `import { Request } from "./client.ts";`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "type", from: "MethodPath", to: "Request" },
           },
-        },
-      ],
-    },
-    {
-      code: `createLogger({})`,
-      output: `new BuiltinLogger({})`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "call",
-            from: "createLogger",
-            to: "new BuiltinLogger",
+        ],
+      },
+      {
+        code: `createConfig({ tags: { users: "" } });`,
+        output:
+          `createConfig({  });\n` +
+          `// Declaring tag constraints\n` +
+          `declare module "express-zod-api" {\n` +
+          `  interface TagOverrides {\n` +
+          `    "users": unknown,\n` +
+          `  }\n` +
+          `}`,
+        errors: [
+          { messageId: "remove", data: { subject: "property", name: "tags" } },
+        ],
+      },
+      {
+        code: `new Documentation({ config });`,
+        output: `new Documentation({ tags: { /* move from createConfig() argument if any */ }, config });`,
+        errors: [
+          { messageId: "add", data: { subject: "tags", to: "Documentation" } },
+        ],
+      },
+      {
+        code: `new EndpointsFactory({config, resultHandler: new ResultHandler() });`,
+        output: `new EndpointsFactory(new ResultHandler());`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "argument",
+              from: "object",
+              to: "ResultHandler instance",
+            },
           },
-        },
-      ],
-    },
-    {
-      code: `createResultHandler({})`,
-      output: `new ResultHandler({})`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "call",
-            from: "createResultHandler",
-            to: "new ResultHandler",
+        ],
+      },
+      {
+        code: `new EventStreamFactory({ config, events: { some } });`,
+        output: `new EventStreamFactory({ some });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "argument", from: "object", to: "events map" },
           },
-        },
-      ],
-    },
-    {
-      code: `new ResultHandler({ getPositiveResponse: {}, getNegativeResponse: {} })`,
-      output: `new ResultHandler({ positive: {}, negative: {} })`,
-      errors: [
-        {
-          messageId: "change",
-          data: {
-            subject: "property",
-            from: "getPositiveResponse",
-            to: "positive",
+        ],
+      },
+      {
+        code: `new ExpressZodAPIClient();`,
+        output: `new Client();`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "class",
+              from: "ExpressZodAPIClient",
+              to: "Client",
+            },
           },
-        },
-        {
-          messageId: "change",
-          data: {
-            subject: "property",
-            from: "getNegativeResponse",
-            to: "negative",
-          },
-        },
-      ],
-    },
-    {
-      code: `new Middleware({ middleware: {} })`,
-      output: `new Middleware({ handler: {} })`,
-      errors: [
-        {
-          messageId: "change",
-          data: { subject: "property", from: "middleware", to: "handler" },
-        },
-      ],
-    },
-    {
-      code: `testEndpoint({ fnMethod: {}, responseProps: {} })`,
-      output: `testEndpoint({  responseOptions: {} })`,
-      errors: [
-        {
-          messageId: "remove",
-          data: { subject: "property", name: "fnMethod" },
-        },
-        {
-          messageId: "change",
-          data: {
-            subject: "property",
-            from: "responseProps",
-            to: "responseOptions",
-          },
-        },
-      ],
-    },
-    {
-      code: `interface MockOverrides extends Mock {}`,
-      output: ``,
-      errors: [
-        {
-          messageId: "remove",
-          data: { subject: "augmentation", name: "MockOverrides" },
-        },
-      ],
-    },
-  ],
+        ],
+      },
+    ],
+  });
 });

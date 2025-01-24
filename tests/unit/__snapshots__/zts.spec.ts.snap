@@ -8,14 +8,14 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
         string: string;
     }[];
     boolean: boolean;
-    circular: Type118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f;
+    circular: SomeType;
     union: {
         number: number;
     } | "hi";
     enum: "hi" | "bye";
     intersectionWithTransform: (number & bigint) & (number & string);
     date: any;
-    undefined?: any;
+    undefined?: undefined;
     null: null;
     void?: any;
     any?: any;
@@ -60,7 +60,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     optDefaultString?: string | undefined;
     refinedStringWithSomeBullshit: (string | number) & ((bigint | null) | undefined);
     nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
-    lazy: Type51497f7e879bae48c3fbad2fa68050d1e08bbf82;
+    lazy: SomeType;
     discUnion: {
         kind: "circle";
         radius: number;
@@ -85,7 +85,7 @@ exports[`zod-to-ts > PrimitiveSchema > outputs correct typescript 1`] = `
     number: number;
     boolean: boolean;
     date: any;
-    undefined?: any;
+    undefined?: undefined;
     null: null;
     void?: any;
     any?: any;
@@ -94,26 +94,19 @@ exports[`zod-to-ts > PrimitiveSchema > outputs correct typescript 1`] = `
 }"
 `;
 
-exports[`zod-to-ts > createTypeAlias() > optionally takes a comment 1`] = `
-"/** A basic user */
-type User = {
-    username: string;
-    age: number;
-};"
-`;
-
-exports[`zod-to-ts > createTypeAlias() > outputs correct typescript 1`] = `
-"type User = {
-    username: string;
-    age: number;
-};"
-`;
-
 exports[`zod-to-ts > enums > handles 'numeric' literals 1`] = `""Red" | "Green" | "Blue" | 0 | 1 | 2"`;
 
 exports[`zod-to-ts > enums > handles 'quoted string' literals 1`] = `""Two Words" | "'Quotes\\"" | "\\\\\\"Escaped\\\\\\"" | 0 | 1 | 2"`;
 
 exports[`zod-to-ts > enums > handles 'string' literals 1`] = `""apple" | "banana" | "cantaloupe""`;
+
+exports[`zod-to-ts > ez.file(base64) > should depend on variant 1`] = `"string"`;
+
+exports[`zod-to-ts > ez.file(binary) > should depend on variant 1`] = `"string | Buffer"`;
+
+exports[`zod-to-ts > ez.file(buffer) > should depend on variant 1`] = `"Buffer"`;
+
+exports[`zod-to-ts > ez.file(string) > should depend on variant 1`] = `"string"`;
 
 exports[`zod-to-ts > z.array() > outputs correct typescript 1`] = `
 "{
@@ -176,7 +169,13 @@ exports[`zod-to-ts > z.object() > escapes correctly 1`] = `
     $e?: any;
     "4t"?: any;
     _r?: any;
-    "-r"?: any;
+    "-r"?: undefined;
+}"
+`;
+
+exports[`zod-to-ts > z.object() > specially handles coercive schema in response 1`] = `
+"{
+    prop: string;
 }"
 `;
 

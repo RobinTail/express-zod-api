@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   EndpointsFactory,
   Method,
+  createConfig,
   createServer,
   defaultResultHandler,
   ResultHandler,
@@ -13,11 +14,14 @@ import {
 import { givePort } from "../helpers";
 import { setTimeout } from "node:timers/promises";
 
-describe("App", async () => {
+describe("App in production mode", async () => {
+  vi.stubEnv("TSUP_STATIC", "production");
+  vi.stubEnv("NODE_ENV", "production");
   const port = givePort();
   const logger = new BuiltinLogger({ level: "silent" });
   const infoMethod = vi.spyOn(logger, "info");
   const warnMethod = vi.spyOn(logger, "warn");
+  const errorMethod = vi.spyOn(logger, "error");
   const corsedEndpoint = new EndpointsFactory(defaultResultHandler)
     .use(
       cors({
@@ -27,8 +31,6 @@ describe("App", async () => {
       { provider: () => ({ corsDone: true }) },
     )
     .build({
-      method: "get",
-      input: z.object({}),
       output: z.object({ corsDone: z.boolean() }),
       handler: async ({ options: { corsDone } }) => ({ corsDone }),
     });
@@ -51,7 +53,6 @@ describe("App", async () => {
   const faultyEndpoint = new EndpointsFactory(faultyResultHandler)
     .addMiddleware(faultyMiddleware)
     .build({
-      method: "get",
       input: z.object({
         epError: z
           .any()
@@ -71,14 +72,13 @@ describe("App", async () => {
       handler: async () => ({ user: { id: 354 } }),
     })
     .addMiddleware({
-      input: z.object({}),
       handler: async ({ request, options: { user } }) => ({
         method: request.method.toLowerCase() as Method,
         permissions: user.id === 354 ? ["any"] : [],
       }),
     })
     .build({
-      methods: ["get", "post"],
+      method: ["get", "post"],
       input: z.object({ something: z.string() }),
       output: z.object({ anything: z.number().positive() }).passthrough(), // allow excessive keys
       handler: async ({
@@ -86,9 +86,7 @@ describe("App", async () => {
         options: { user, permissions, method },
       }) => {
         // Problem 787: should lead to ZodError that is NOT considered as the IOSchema validation error
-        if (something === "internal_zod_error") {
-          z.number().parse("");
-        }
+        if (something === "internal_zod_error") z.number().parse("");
         return {
           anything: something === "joke" ? 300 : -100500,
           doubleKey: key.repeat(2),
@@ -99,8 +97,6 @@ describe("App", async () => {
       },
     });
   const longEndpoint = new EndpointsFactory(defaultResultHandler).build({
-    method: "get",
-    input: z.object({}),
     output: z.object({}),
     handler: async () => setTimeout(5000, {}),
   });
@@ -112,35 +108,31 @@ describe("App", async () => {
       long: longEndpoint,
     },
   };
-  vi.spyOn(console, "log").mockImplementation(vi.fn()); // mutes logo output
-  const server = (
-    await createServer(
-      {
-        server: {
-          listen: port,
-          compression: { threshold: 1 },
-          beforeRouting: ({ app, getChildLogger }) => {
-            depd("express")("Sample deprecation message");
-            app.use((req, {}, next) => {
-              const childLogger = getChildLogger(req);
-              assert("isChild" in childLogger && childLogger.isChild);
-              next();
-            });
-          },
-        },
-        cors: false,
-        startupLogo: true,
-        gracefulShutdown: { events: ["FAKE"] },
-        logger,
-        childLoggerProvider: ({ parent }) =>
-          Object.defineProperty(parent, "isChild", { value: true }),
-        inputSources: {
-          post: ["query", "body", "files"],
-        },
-      },
-      routing,
-    )
-  ).httpServer;
+  vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
+  const config = createConfig({
+    http: { listen: port },
+    compression: { threshold: 1 },
+    beforeRouting: ({ app, getLogger }) => {
+      depd("express")("Sample deprecation message");
+      app.use((req, {}, next) => {
+        const childLogger = getLogger(req);
+        assert("isChild" in childLogger && childLogger.isChild);
+        next();
+      });
+    },
+    cors: false,
+    startupLogo: true,
+    gracefulShutdown: { events: ["FAKE"] },
+    logger,
+    childLoggerProvider: ({ parent }) =>
+      Object.defineProperty(parent, "isChild", { value: true }),
+    inputSources: {
+      post: ["query", "body", "files"],
+    },
+  });
+  const {
+    servers: [server],
+  } = await createServer(config, routing);
   await vi.waitFor(() => assert(server.listening), { timeout: 1e4 });
   expect(warnMethod).toHaveBeenCalledWith(
     "DeprecationError (express): Sample deprecation message",
@@ -152,6 +144,7 @@ describe("App", async () => {
     // this approach works better than .close() callback
     await vi.waitFor(() => assert(!server.listening), { timeout: 1e4 });
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
   });
 
   describe("Positive", () => {
@@ -269,9 +262,8 @@ describe("App", async () => {
         "text/plain; charset=utf-8",
       );
       const text = await response.text();
-      expect(text).toBe(
-        "An error occurred while serving the result: I am faulty.",
-      );
+      expect(text).toBe("Internal Server Error");
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
     test("Should treat custom errors in middleware input validations as they are", async () => {
@@ -286,10 +278,8 @@ describe("App", async () => {
       );
       expect(response.status).toBe(500);
       const text = await response.text();
-      expect(text).toBe(
-        "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Custom error in the Middleware input validation.",
-      );
+      expect(text).toBe("Internal Server Error");
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
     test("Should treat custom errors in endpoint input validations as they are", async () => {
@@ -304,10 +294,8 @@ describe("App", async () => {
       );
       expect(response.status).toBe(500);
       const text = await response.text();
-      expect(text).toBe(
-        "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Custom error in the Endpoint input validation.",
-      );
+      expect(text).toBe("Internal Server Error");
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
   });
 
@@ -341,9 +329,7 @@ describe("App", async () => {
       expect(json).toMatchSnapshot({
         error: {
           message: expect.stringMatching(
-            // @todo revisit when Node 18 dropped
-            // the 2nd option is for Node 20+
-            /(Unexpected end of JSON input|Unterminated string in JSON at position 25)/,
+            /Unterminated string in JSON at position 25/,
           ),
         },
       });
@@ -426,6 +412,7 @@ describe("App", async () => {
       expect(response.status).toBe(500);
       const json = await response.json();
       expect(json).toMatchSnapshot();
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
     test("Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error", async () => {
@@ -442,6 +429,7 @@ describe("App", async () => {
       expect(response.status).toBe(500);
       const json = await response.json();
       expect(json).toMatchSnapshot();
+      expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
   });
 

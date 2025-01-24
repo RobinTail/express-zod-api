@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { EmptyObject, FlatObject } from "./common-helpers";
+import { EmptySchema, FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
@@ -28,10 +28,10 @@ export abstract class AbstractMiddleware {
 }
 
 export class Middleware<
-  IN extends IOSchema<"strip">,
   OPT extends FlatObject,
   OUT extends FlatObject,
   SCO extends string,
+  IN extends IOSchema<"strip"> = EmptySchema,
 > extends AbstractMiddleware {
   readonly #schema: IN;
   readonly #security?: LogicalContainer<
@@ -40,11 +40,11 @@ export class Middleware<
   readonly #handler: Handler<z.output<IN>, OPT, OUT>;
 
   constructor({
-    input,
+    input = z.object({}) as IN,
     security,
     handler,
   }: {
-    input: IN;
+    input?: IN;
     security?: LogicalContainer<
       Security<Extract<keyof z.input<IN>, string>, SCO>
     >;
@@ -88,12 +88,7 @@ export class ExpressMiddleware<
   R extends Request,
   S extends Response,
   OUT extends FlatObject,
-> extends Middleware<
-  z.ZodObject<EmptyObject, "strip">,
-  FlatObject,
-  OUT,
-  string
-> {
+> extends Middleware<FlatObject, OUT, string> {
   constructor(
     nativeMw: (
       request: R,
@@ -109,13 +104,10 @@ export class ExpressMiddleware<
     } = {},
   ) {
     super({
-      input: z.object({}),
       handler: async ({ request, response }) =>
         new Promise<OUT>((resolve, reject) => {
           const next = (err?: unknown) => {
-            if (err && err instanceof Error) {
-              return reject(transformer(err));
-            }
+            if (err && err instanceof Error) return reject(transformer(err));
             resolve(provider(request as R, response as S));
           };
           nativeMw(request as R, response as S, next)?.catch(next);

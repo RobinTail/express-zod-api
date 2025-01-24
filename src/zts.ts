@@ -1,19 +1,20 @@
+import { chain, prop } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
-import { FileSchema, ezFileBrand } from "./file-schema";
+import { ezFileBrand, FileSchema } from "./file-schema";
 import { ProprietaryBrand } from "./proprietary-schemas";
-import { RawSchema, ezRawBrand } from "./raw-schema";
+import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
-  LiteralType,
-  Producer,
-  ZTSContext,
   addJsDocComment,
-  makePropertyIdentifier,
-} from "./zts-helpers";
+  ensureTypeNode,
+  isPrimitive,
+  makeInterfaceProp,
+} from "./typescript-api";
+import { LiteralType, Producer, ZTSContext } from "./zts-helpers";
 
 const { factory: f } = ts;
 
@@ -51,18 +52,12 @@ const onObject: Producer = (
       isResponse && hasCoercion(value)
         ? value instanceof z.ZodOptional
         : value.isOptional();
-    const propertySignature = f.createPropertySignature(
-      undefined,
-      makePropertyIdentifier(key),
-      isOptional && hasQuestionMark
-        ? f.createToken(ts.SyntaxKind.QuestionToken)
-        : undefined,
-      next(value),
-    );
-    if (value.description) {
-      addJsDocComment(propertySignature, value.description);
-    }
-    return propertySignature;
+    const propertySignature = makeInterfaceProp(key, next(value), {
+      isOptional: isOptional && hasQuestionMark,
+    });
+    return value.description
+      ? addJsDocComment(propertySignature, value.description)
+      : propertySignature;
   });
   return f.createTypeLiteralNode(members);
 };
@@ -84,7 +79,14 @@ const onSomeUnion: Producer = (
     | z.ZodUnion<z.ZodUnionOptions>
     | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>,
   { next },
-) => f.createUnionTypeNode(options.map(next));
+) => {
+  const nodes = new Map<ts.TypeNode | ts.KeywordTypeSyntaxKind, ts.TypeNode>();
+  for (const option of options) {
+    const node = next(option);
+    nodes.set(isPrimitive(node) ? node.kind : node, node);
+  }
+  return f.createUnionTypeNode(Array.from(nodes.values()));
+};
 
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
@@ -163,9 +165,15 @@ const onRecord: Producer = (
   );
 
 const onIntersection: Producer = (
-  { _def }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
+  { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
   { next },
-) => f.createIntersectionTypeNode([_def.left, _def.right].map(next));
+) => {
+  const nodes = [left, right].map(next);
+  const areObjects = nodes.every(ts.isTypeLiteralNode);
+  return areObjects
+    ? f.createTypeLiteralNode(chain(prop("members"), nodes)) // similar to flattened pluck()
+    : f.createIntersectionTypeNode(nodes);
+};
 
 const onDefault: Producer = ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
   next(_def.innerType);
@@ -193,24 +201,13 @@ const onPipeline: Producer = (
 
 const onNull: Producer = () => f.createLiteralTypeNode(f.createNull());
 
-const onLazy: Producer = (
-  { schema }: z.ZodLazy<z.ZodTypeAny>,
-  { getAlias, makeAlias, next, serializer: serialize },
-) => {
-  const name = `Type${serialize(schema)}`;
-  return (
-    getAlias(name) ||
-    (() => {
-      makeAlias(name, f.createLiteralTypeNode(f.createNull())); // make empty type first
-      return makeAlias(name, next(schema)); // update
-    })()
-  );
-};
+const onLazy: Producer = (lazy: z.ZodLazy<z.ZodTypeAny>, { makeAlias, next }) =>
+  makeAlias(lazy, () => next(lazy.schema));
 
 const onFile: Producer = (schema: FileSchema) => {
   const subject = schema.unwrap();
   const stringType = f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
-  const bufferType = f.createTypeReferenceNode("Buffer");
+  const bufferType = ensureTypeNode("Buffer");
   const unionType = f.createUnionTypeNode([stringType, bufferType]);
   return subject instanceof z.ZodString
     ? stringType
@@ -232,6 +229,7 @@ const producers: HandlingRules<
   ZodBigInt: onPrimitive(ts.SyntaxKind.BigIntKeyword),
   ZodBoolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
   ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
+  ZodUndefined: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
   [ezDateInBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
   [ezDateOutBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
   ZodNull: onNull,

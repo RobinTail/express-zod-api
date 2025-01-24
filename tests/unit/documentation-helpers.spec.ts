@@ -1,7 +1,6 @@
-import { ReferenceObject, SchemaObject } from "openapi3-ts/oas31";
+import { ReferenceObject } from "openapi3-ts/oas31";
 import { z } from "zod";
-import { defaultSerializer } from "../../src/common-helpers";
-import { DocumentationError, ez } from "../../src";
+import { ez } from "../../src";
 import {
   OpenAPIContext,
   depictAny,
@@ -46,27 +45,20 @@ import {
   excludeParamsFromDepiction,
   extractObjectSchema,
   getRoutePathParams,
+  defaultIsHeader,
   onEach,
   onMissing,
   reformatParamsInPath,
 } from "../../src/documentation-helpers";
 import { walkSchema } from "../../src/schema-walker";
-import { serializeSchemaForTest } from "../helpers";
 
 describe("Documentation helpers", () => {
-  const getRefMock = vi.fn();
-  const makeRefMock = vi.fn(
-    (name: string, {}: SchemaObject | ReferenceObject): ReferenceObject => ({
-      $ref: `#/components/schemas/${name}`,
-    }),
-  );
+  const makeRefMock = vi.fn();
   const requestCtx = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: false,
-    getRef: getRefMock,
     makeRef: makeRefMock,
-    serializer: defaultSerializer,
     next: (schema: z.ZodTypeAny) =>
       walkSchema(schema, {
         rules: depicters,
@@ -79,9 +71,7 @@ describe("Documentation helpers", () => {
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
-    getRef: getRefMock,
     makeRef: makeRefMock,
-    serializer: defaultSerializer,
     next: (schema: z.ZodTypeAny) =>
       walkSchema(schema, {
         rules: depicters,
@@ -92,7 +82,6 @@ describe("Documentation helpers", () => {
   } satisfies OpenAPIContext;
 
   beforeEach(() => {
-    getRefMock.mockClear();
     makeRefMock.mockClear();
   });
 
@@ -128,7 +117,7 @@ describe("Documentation helpers", () => {
     test("should pass the object schema through", () => {
       const subject = extractObjectSchema(z.object({ one: z.string() }));
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      expect(subject).toMatchSnapshot();
     });
 
     test("should return object schema for the union of object schemas", () => {
@@ -136,7 +125,7 @@ describe("Documentation helpers", () => {
         z.object({ one: z.string() }).or(z.object({ two: z.number() })),
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      expect(subject).toMatchSnapshot();
     });
 
     test("should return object schema for the intersection of object schemas", () => {
@@ -144,13 +133,13 @@ describe("Documentation helpers", () => {
         z.object({ one: z.string() }).and(z.object({ two: z.number() })),
       );
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      expect(subject).toMatchSnapshot();
     });
 
     test("should support ez.raw()", () => {
       const subject = extractObjectSchema(ez.raw());
       expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+      expect(subject).toMatchSnapshot();
     });
 
     describe("Feature #600: Top level refinements", () => {
@@ -159,7 +148,7 @@ describe("Documentation helpers", () => {
           z.object({ one: z.string() }).refine(() => true),
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
-        expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+        expect(subject).toMatchSnapshot();
       });
     });
 
@@ -169,7 +158,7 @@ describe("Documentation helpers", () => {
           z.object({ one: z.string() }).transform(({ one }) => ({ two: one })),
         );
         expect(subject).toBeInstanceOf(z.ZodObject);
-        expect(serializeSchemaForTest(subject)).toMatchSnapshot();
+        expect(subject).toMatchSnapshot();
       });
     });
   });
@@ -251,13 +240,9 @@ describe("Documentation helpers", () => {
       expect(depictUpload(ez.upload(), requestCtx)).toMatchSnapshot();
     });
     test("should throw when using in response", () => {
-      try {
-        depictUpload(ez.upload(), responseCtx);
-        expect.fail("Should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
+      expect(() =>
+        depictUpload(ez.upload(), responseCtx),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 
@@ -303,6 +288,15 @@ describe("Documentation helpers", () => {
       expect(
         depictIntersection(
           z.object({ one: z.number() }).and(z.object({ two: z.number() })),
+          requestCtx,
+        ),
+      ).toMatchSnapshot();
+    });
+
+    test("should NOT flatten object schemas having conflicting props", () => {
+      expect(
+        depictIntersection(
+          z.object({ one: z.number() }).and(z.object({ one: z.string() })),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -373,13 +367,12 @@ describe("Documentation helpers", () => {
       },
     );
 
-    test.each([
-      z.string().nullable(),
-      z.null().nullable(),
-      z.string().nullable().nullable(),
-    ])("should only add null type once %#", (schema) => {
-      expect(depictNullable(schema, requestCtx)).toMatchSnapshot();
-    });
+    test.each([z.null().nullable(), z.string().nullable().nullable()])(
+      "should not add null type when it's already there %#",
+      (schema) => {
+        expect(depictNullable(schema, requestCtx)).toMatchSnapshot();
+      },
+    );
   });
 
   describe("depictEnum()", () => {
@@ -506,6 +499,16 @@ describe("Documentation helpers", () => {
       z.string().datetime(),
       z.string().datetime({ offset: true }),
       z.string().regex(/^\d+.\d+.\d+$/),
+      z.string().date(),
+      z.string().time(),
+      z.string().duration(),
+      z.string().cidr(),
+      z.string().ip(),
+      z.string().jwt(),
+      z.string().base64(),
+      z.string().base64url(),
+      z.string().cuid2(),
+      z.string().ulid(),
     ])("should set format, pattern and min/maxLength props %#", (schema) => {
       expect(depictString(schema, requestCtx)).toMatchSnapshot();
     });
@@ -637,6 +640,19 @@ describe("Documentation helpers", () => {
     });
   });
 
+  describe("defaultIsHeader()", () => {
+    test.each([
+      { name: "x-request-id", expected: true },
+      { name: "authorization", expected: true },
+      { name: "unknown", expected: false },
+    ])(
+      "should validate custom and well-known headers %#",
+      ({ name, expected }) => {
+        expect(defaultIsHeader(name)).toBe(expected);
+      },
+    );
+  });
+
   describe("depictRequestParams()", () => {
     test("should depict query and path params", () => {
       expect(
@@ -713,13 +729,9 @@ describe("Documentation helpers", () => {
       expect(depictDateIn(ez.dateIn(), requestCtx)).toMatchSnapshot();
     });
     test("should throw when ZodDateIn in response", () => {
-      try {
-        depictDateIn(ez.dateIn(), responseCtx);
-        expect.fail("should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
+      expect(() =>
+        depictDateIn(ez.dateIn(), responseCtx),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 
@@ -728,13 +740,9 @@ describe("Documentation helpers", () => {
       expect(depictDateOut(ez.dateOut(), responseCtx)).toMatchSnapshot();
     });
     test("should throw when ZodDateOut in request", () => {
-      try {
-        depictDateOut(ez.dateOut(), requestCtx);
-        expect.fail("should not be here");
-      } catch (e) {
-        expect(e).toBeInstanceOf(DocumentationError);
-        expect(e).toMatchSnapshot();
-      }
+      expect(() =>
+        depictDateOut(ez.dateOut(), requestCtx),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 
@@ -742,13 +750,7 @@ describe("Documentation helpers", () => {
     test.each([responseCtx, requestCtx])(
       "should throw clear error %#",
       (ctx) => {
-        try {
-          depictDate(z.date(), ctx);
-          expect.fail("should not be here");
-        } catch (e) {
-          expect(e).toBeInstanceOf(DocumentationError);
-          expect(e).toMatchSnapshot();
-        }
+        expect(() => depictDate(z.date(), ctx)).toThrowErrorMatchingSnapshot();
       },
     );
   });
@@ -780,38 +782,20 @@ describe("Documentation helpers", () => {
       z.object({ prop: recursiveObject }),
     );
 
-    test.each([
-      {
-        schema: recursiveArray,
-        hash: "6cbbd837811754902ea1e68d3e5c75e36250b880",
-      },
-      {
-        schema: directlyRecursive,
-        hash: "7a225c55e65ab4a2fd3ce390265b255ee6747049",
-      },
-      {
-        schema: recursiveObject,
-        hash: "118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
-      },
-    ])("should handle circular references %#", ({ schema, hash }) => {
-      getRefMock
-        .mockImplementationOnce(() => undefined)
-        .mockImplementationOnce(
-          (name: string): ReferenceObject => ({
-            $ref: `#/components/schemas/${name}`,
+    test.each([recursiveArray, directlyRecursive, recursiveObject])(
+      "should handle circular references %#",
+      (schema) => {
+        makeRefMock.mockImplementationOnce(
+          (): ReferenceObject => ({
+            $ref: "#/components/schemas/SomeSchema",
           }),
         );
-      expect(getRefMock.mock.calls.length).toBe(0);
-      expect(depictLazy(schema, responseCtx)).toMatchSnapshot();
-      expect(getRefMock).toHaveBeenCalledTimes(2);
-      for (const call of getRefMock.mock.calls) {
-        expect(call[0]).toBe(hash);
-      }
-      expect(makeRefMock).toHaveBeenCalledTimes(2);
-      expect(makeRefMock.mock.calls[0]).toEqual([hash, {}]);
-      expect(makeRefMock.mock.calls[1][0]).toBe(hash);
-      expect(makeRefMock.mock.calls[1][1]).toMatchSnapshot();
-    });
+        expect(makeRefMock).not.toHaveBeenCalled();
+        expect(depictLazy(schema, responseCtx)).toMatchSnapshot();
+        expect(makeRefMock).toHaveBeenCalledTimes(1);
+        expect(makeRefMock).toHaveBeenCalledWith(schema, expect.any(Function));
+      },
+    );
   });
 
   describe("depictSecurity()", () => {

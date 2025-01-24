@@ -1,5 +1,17 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`EndpointsFactory > .addExpressMiddleware() > Should handle rejects from async middlewares 1`] = `
+AssertionError({
+  "message": "Rejected",
+})
+`;
+
+exports[`EndpointsFactory > .addExpressMiddleware() > Should transform errors 1`] = `
+UnauthorizedError({
+  "message": "This one has failed",
+})
+`;
+
 exports[`EndpointsFactory > .build() > Should create an endpoint with intersection middleware 1`] = `
 {
   "_type": "ZodIntersection",
@@ -166,4 +178,23 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with union midd
     },
   },
 }
+`;
+
+exports[`EndpointsFactory > .buildVoid() > Should be a shorthand for empty object output 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {},
+}
+`;
+
+exports[`EndpointsFactory > .use() > Should handle rejects from async middlewares 1`] = `
+AssertionError({
+  "message": "Rejected",
+})
+`;
+
+exports[`EndpointsFactory > .use() > Should transform errors 1`] = `
+UnauthorizedError({
+  "message": "This one has failed",
+})
 `;

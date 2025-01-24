@@ -10,7 +10,8 @@
     "typescript": "~5.1.0"
   },
   "scripts": {
-    "pretest": "echo 'import { createLogger } from \"express-zod-api\";' > sample.ts",
+    "preinstall": "rm -rf node_modules",
+    "pretest": "echo 'client.provide(\"get\", \"/v1/test\", {id: 10});' > sample.ts",
     "test": "eslint --fix && vitest --run && rm sample.ts"
   }
 }

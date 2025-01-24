@@ -1,10 +1,8 @@
+import assert from "node:assert/strict";
+import { EventSource } from "undici";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
-import {
-  ExpressZodAPIClient,
-  Implementation,
-  jsonEndpoints,
-} from "../../example/example.client";
+import { Client, Implementation } from "../../example/example.client";
 import { givePort } from "../helpers";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -242,6 +240,29 @@ describe("Example", async () => {
         expect(json).toMatchSnapshot();
       },
     );
+
+    test("Should handle no content", async () => {
+      const response = await fetch(
+        `http://localhost:${port}/v1/user/50/remove`,
+        { method: "DELETE", headers: { "Content-Type": "application/json" } },
+      );
+      expect(response.status).toBe(204);
+      expect(response.headers.get("content-type")).toBeNull();
+    });
+
+    test("Should emit SSE (server sent events)", async () => {
+      const source = new EventSource(`http://localhost:${port}/v1/events/time`);
+      const stack: unknown[] = [];
+      const onTime = (evt: Event) => stack.push((evt as MessageEvent).data);
+      source.addEventListener("time", onTime);
+      await vi.waitFor(() => assert(stack.length > 2), { timeout: 5e3 });
+      expect(
+        stack.every(
+          (entry) => typeof entry === "string" && /\d{10,}/.test(entry),
+        ),
+      );
+      source.removeEventListener("time", onTime);
+    });
   });
 
   describe("Negative", () => {
@@ -407,34 +428,42 @@ describe("Example", async () => {
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
+
+    test("Should handle errors for SSE endpoints", async () => {
+      const response = await fetch(
+        `http://localhost:${port}/v1/events/time?trigger=failure`,
+      );
+      expect(response.status).toBe(500);
+      expect(response.headers.get("content-type")).toBe(
+        "text/plain; charset=utf-8",
+      );
+      await expect(response.text()).resolves.toBe("Intentional failure");
+    });
   });
 
   describe("Client", () => {
-    const createDefaultImplementation =
+    const createImplementation =
       (host: string): Implementation =>
       async (method, path, params) => {
-        const searchParams =
-          method === "get" ? `?${new URLSearchParams(params)}` : "";
-        const response = await fetch(`${host}${path}${searchParams}`, {
+        const hasBody = !["get", "delete"].includes(method);
+        const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
+        const response = await fetch(new URL(`${path}${searchParams}`, host), {
           method: method.toUpperCase(),
-          headers:
-            method === "get"
-              ? undefined
-              : { "Content-Type": "application/json" },
-          body: method === "get" ? undefined : JSON.stringify(params),
+          headers: hasBody
+            ? { "Content-Type": "application/json", token: "456" }
+            : undefined,
+          body: hasBody ? JSON.stringify(params) : undefined,
         });
-        if (`${method} ${path}` in jsonEndpoints) {
-          return response.json();
-        }
-        return response.text();
+        const contentType = response.headers.get("content-type");
+        if (!contentType) return;
+        const isJSON = contentType.startsWith("application/json");
+        return response[isJSON ? "json" : "text"]();
       };
 
-    const client = new ExpressZodAPIClient(
-      createDefaultImplementation(`http://localhost:${port}`),
-    );
+    const client = new Client(createImplementation(`http://localhost:${port}`));
 
     test("Should perform the request with a positive response", async () => {
-      const response = await client.provide("get", "/v1/user/retrieve", {
+      const response = await client.provide("get /v1/user/retrieve", {
         id: "10",
       });
       expect(response).toMatchSnapshot();
@@ -442,6 +471,35 @@ describe("Example", async () => {
         | { status: "success"; data: { id: number; name: string } }
         | { status: "error"; error: { message: string } }
       >();
+    });
+
+    test("Issue #2177: should handle path params correctly", async () => {
+      const response = await client.provide("patch /v1/user/:id", {
+        key: "123",
+        id: "12",
+        name: "Alan Turing",
+        birthday: "1912-06-23",
+      });
+      expect(typeof response).toBe("object");
+      expect(response).toMatchSnapshot();
+      expectTypeOf(response).toMatchTypeOf<
+        | { status: "success"; data: { name: string; createdAt: string } }
+        | { status: "error"; error: { message: string } }
+      >();
+    });
+
+    test("Issue #2182: should deny unlisted combination of path and method", async () => {
+      expectTypeOf(client.provide).toBeCallableWith("post /v1/user/create", {});
+      // @ts-expect-error -- can't use .toBeCallableWith with .not, see https://github.com/mmkal/expect-type
+      expectTypeOf(client.provide).toBeCallableWith("get /v1/user/create", {});
+    });
+
+    test("should handle no content (no response body)", async () => {
+      const response = await client.provide("delete /v1/user/:id/remove", {
+        id: "12",
+      });
+      expect(response).toBeUndefined();
+      expectTypeOf(response).toBeUndefined();
     });
   });
 });

@@ -41,29 +41,25 @@ describe("Server", () => {
   describe("createServer()", () => {
     test("Should create server with minimal config", async () => {
       const port = givePort();
-      const configMock: ServerConfig = {
-        server: {
-          listen: port,
-        },
+      const configMock = {
+        http: { listen: port },
         cors: true,
         startupLogo: false,
-        logger: { level: "warn" },
+        logger: { level: "warn" as const },
       };
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            methods: ["get", "post"],
-            input: z.object({
-              n: z.number(),
-            }),
-            output: z.object({
-              b: z.boolean(),
-            }),
+            method: ["get", "post"],
+            input: z.object({ n: z.number() }),
+            output: z.object({ b: z.boolean() }),
             handler: vi.fn(),
           }),
         },
       };
-      await createServer(configMock, routingMock);
+      const { servers } = await createServer(configMock, routingMock);
+      expect(servers).toHaveLength(1);
+      expect(servers[0]).toBeTruthy();
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
       expect(appMock.use).toHaveBeenCalledTimes(2);
@@ -94,12 +90,10 @@ describe("Server", () => {
       const infoMethod = vi.spyOn(customLogger, "info");
       const port = givePort();
       const configMock = {
-        server: {
-          listen: { port }, // testing Net::ListenOptions
-          jsonParser: vi.fn(),
-          rawParser: vi.fn(),
-          beforeRouting: vi.fn(),
-        },
+        http: { listen: { port } }, // testing Net::ListenOptions
+        jsonParser: vi.fn(),
+        rawParser: vi.fn(),
+        beforeRouting: vi.fn(),
         cors: true,
         startupLogo: false,
         errorHandler: {
@@ -111,7 +105,7 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: factory.build({
-            methods: ["get", "post"],
+            method: ["get", "post"],
             input: z.object({
               n: z.number(),
             }),
@@ -137,41 +131,40 @@ describe("Server", () => {
       expect(appMock).toBeTruthy();
       expect(appMock.use).toHaveBeenCalledTimes(2);
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
-      expect(configMock.server.beforeRouting).toHaveBeenCalledWith({
+      expect(configMock.beforeRouting).toHaveBeenCalledWith({
         app: appMock,
-        logger: customLogger,
-        getChildLogger: expect.any(Function),
+        getLogger: expect.any(Function),
       });
       expect(infoMethod).toHaveBeenCalledTimes(1);
       expect(infoMethod).toHaveBeenCalledWith(`Listening`, { port });
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
-        configMock.server.jsonParser,
+        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledTimes(1);
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/test",
-        configMock.server.jsonParser,
+        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.patch).toHaveBeenCalledTimes(1);
       expect(appMock.patch).toHaveBeenCalledWith(
         "/v1/raw",
-        configMock.server.rawParser,
+        configMock.rawParser,
         moveRaw,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledTimes(2);
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/test",
-        configMock.server.jsonParser,
+        configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/raw",
-        configMock.server.rawParser,
+        configMock.rawParser,
         moveRaw,
         expect.any(Function), // endpoint
       );
@@ -184,31 +177,26 @@ describe("Server", () => {
 
     test("should create a HTTPS server on request", async () => {
       const configMock = {
-        server: { listen: givePort() },
         https: {
           listen: givePort(),
-          options: {
-            cert: "cert",
-            key: "key",
-          },
+          options: { cert: "cert", key: "key" },
         },
         cors: true,
         startupLogo: false,
-        logger: { level: "warn" },
-      } satisfies ServerConfig;
+        logger: { level: "warn" as const },
+      };
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
-            input: z.object({}),
             output: z.object({}),
             handler: vi.fn(),
           }),
         },
       };
 
-      const { httpsServer } = await createServer(configMock, routingMock);
-      expect(httpsServer).toBeTruthy();
+      const { servers } = await createServer(configMock, routingMock);
+      expect(servers).toHaveLength(1);
+      expect(servers[0]).toBeTruthy();
       expect(createHttpsServerSpy).toHaveBeenCalledWith(
         configMock.https.options,
         appMock,
@@ -220,12 +208,27 @@ describe("Server", () => {
       );
     });
 
+    test("should create both HTTP and HTTPS servers", async () => {
+      const configMock = {
+        http: { listen: givePort() },
+        https: {
+          listen: givePort(),
+          options: { cert: "cert", key: "key" },
+        },
+        cors: true,
+        startupLogo: false,
+        logger: { level: "warn" as const },
+      };
+      const { servers } = await createServer(configMock, {});
+      expect(servers).toHaveLength(2);
+      expect(servers[0]).toBeTruthy();
+      expect(servers[1]).toBeTruthy();
+    });
+
     test("should enable compression on request", async () => {
       const configMock = {
-        server: {
-          listen: givePort(),
-          compression: true,
-        },
+        http: { listen: givePort() },
+        compression: true,
         cors: true,
         startupLogo: false,
         logger: { level: "warn" },
@@ -233,8 +236,6 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
-            input: z.object({}),
             output: z.object({}),
             handler: vi.fn(),
           }),
@@ -248,13 +249,11 @@ describe("Server", () => {
 
     test("should enable uploads on request", async () => {
       const configMock = {
-        server: {
-          listen: givePort(),
-          upload: {
-            limits: { fileSize: 1024 },
-            limitError: new Error("Too heavy"),
-            beforeUpload: vi.fn(),
-          },
+        http: { listen: givePort() },
+        upload: {
+          limits: { fileSize: 1024 },
+          limitError: new Error("Too heavy"),
+          beforeUpload: vi.fn(),
         },
         cors: true,
         startupLogo: false,
@@ -263,7 +262,6 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
             input: z.object({
               file: ez.upload(),
             }),
@@ -285,9 +283,7 @@ describe("Server", () => {
 
     test("should enable raw on request", async () => {
       const configMock = {
-        server: {
-          listen: givePort(),
-        },
+        http: { listen: givePort() },
         cors: true,
         startupLogo: false,
         logger: { level: "warn" },
@@ -295,7 +291,6 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            method: "get",
             input: ez.raw(),
             output: z.object({}),
             handler: vi.fn(),
@@ -332,13 +327,9 @@ describe("Server", () => {
       const routingMock = {
         v1: {
           test: new EndpointsFactory(defaultResultHandler).build({
-            methods: ["get", "post"],
-            input: z.object({
-              n: z.number(),
-            }),
-            output: z.object({
-              b: z.boolean(),
-            }),
+            method: ["get", "post"],
+            input: z.object({ n: z.number() }),
+            output: z.object({ b: z.boolean() }),
             handler: vi.fn(),
           }),
         },

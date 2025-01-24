@@ -1,45 +1,24 @@
+import { chain } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { ResponseVariant } from "./api-response";
+import { ResponseVariant, responseVariants } from "./api-response";
+import { IntegrationBase } from "./integration-base";
 import {
-  emptyHeading,
-  emptyTail,
-  exportModifier,
   f,
-  makeAnyPromise,
-  makeArrowFn,
-  makeConst,
-  makeEmptyInitializingConstructor,
-  makeIndexedPromise,
   makeInterfaceProp,
-  makeObjectKeysReducer,
-  makeParam,
-  makeParams,
-  makePublicClass,
-  makePublicExtendedInterface,
-  makePublicLiteralType,
-  makePublicReadonlyProp,
-  makePublicType,
-  makeRecord,
-  makeTemplateType,
-  makeTypeParams,
-  parametricIndexNode,
-  protectedReadonlyModifier,
-  quoteProp,
-  spacingMiddle,
-} from "./integration-helpers";
-import { defaultSerializer, makeCleanId } from "./common-helpers";
-import { Method, methods } from "./method";
-import { contentTypes } from "./content-type";
+  makeInterface,
+  makeType,
+  printNode,
+  ensureTypeNode,
+} from "./typescript-api";
+import { makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
-import { walkRouting } from "./routing-walker";
+import { OnEndpoint, walkRouting } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import { ZTSContext, createTypeAlias, printNode } from "./zts-helpers";
+import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
-
-type IOKind = "input" | "response" | ResponseVariant;
 
 interface IntegrationParams {
   routing: Routing;
@@ -51,15 +30,10 @@ interface IntegrationParams {
    * */
   variant?: "types" | "client";
   /**
-   * @desc Declares positive and negative response types separately and provides them within additional dictionaries
-   * @default false
+   * @desc The API URL to use in the generated code
+   * @default https://example.com
    * */
-  splitResponse?: boolean;
-  /**
-   * @desc Used for comparing schemas wrapped into z.lazy() to limit the recursion
-   * @default JSON.stringify() + SHA1 hash as a hex digest
-   * */
-  serializer?: (schema: z.ZodTypeAny) => string;
+  serverUrl?: string;
   /**
    * @desc configures the style of object's optional properties
    * @default { withQuestionMark: true, withUndefined: true }
@@ -76,6 +50,11 @@ interface IntegrationParams {
      */
     withUndefined?: boolean;
   };
+  /**
+   * @desc The schema to use for responses without body such as 204
+   * @default z.undefined()
+   * */
+  noContent?: z.ZodTypeAny;
   /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
@@ -95,582 +74,117 @@ interface FormattedPrintingOptions {
   format?: (program: string) => Promise<string>;
 }
 
-export class Integration {
-  protected program: ts.Node[] = [];
+export class Integration extends IntegrationBase {
+  protected program: ts.Node[] = [this.someOfType];
   protected usage: Array<ts.Node | string> = [];
-  protected registry = new Map<
-    { method: Method; path: string },
-    Partial<Record<IOKind, string>> & {
-      isJson: boolean;
-      tags: ReadonlyArray<string>;
+  protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
+
+  protected makeAlias(
+    schema: z.ZodTypeAny,
+    produce: () => ts.TypeNode,
+  ): ts.TypeNode {
+    let name = this.aliases.get(schema)?.name?.text;
+    if (!name) {
+      name = `Type${this.aliases.size + 1}`;
+      const temp = f.createLiteralTypeNode(f.createNull());
+      this.aliases.set(schema, makeType(name, temp));
+      this.aliases.set(schema, makeType(name, produce()));
     }
-  >();
-  protected paths: string[] = [];
-  protected aliases = new Map<string, ts.TypeAliasDeclaration>();
-  protected ids = {
-    pathType: f.createIdentifier("Path"),
-    methodType: f.createIdentifier("Method"),
-    methodPathType: f.createIdentifier("MethodPath"),
-    inputInterface: f.createIdentifier("Input"),
-    posResponseInterface: f.createIdentifier("PositiveResponse"),
-    negResponseInterface: f.createIdentifier("NegativeResponse"),
-    responseInterface: f.createIdentifier("Response"),
-    jsonEndpointsConst: f.createIdentifier("jsonEndpoints"),
-    endpointTagsConst: f.createIdentifier("endpointTags"),
-    providerType: f.createIdentifier("Provider"),
-    implementationType: f.createIdentifier("Implementation"),
-    clientClass: f.createIdentifier("ExpressZodAPIClient"),
-    keyParameter: f.createIdentifier("key"),
-    pathParameter: f.createIdentifier("path"),
-    paramsArgument: f.createIdentifier("params"),
-    methodParameter: f.createIdentifier("method"),
-    accumulator: f.createIdentifier("acc"),
-    provideMethod: f.createIdentifier("provide"),
-    implementationArgument: f.createIdentifier("implementation"),
-    headersProperty: f.createIdentifier("headers"),
-    hasBodyConst: f.createIdentifier("hasBody"),
-    undefinedValue: f.createIdentifier("undefined"),
-    bodyProperty: f.createIdentifier("body"),
-    responseConst: f.createIdentifier("response"),
-    searchParamsConst: f.createIdentifier("searchParams"),
-    exampleImplementationConst: f.createIdentifier("exampleImplementation"),
-    clientConst: f.createIdentifier("client"),
-  } satisfies Record<string, ts.Identifier>;
-  protected interfaces: Array<{
-    id: ts.Identifier;
-    kind: IOKind;
-    props: ts.PropertySignature[];
-  }> = [];
-
-  protected getAlias(name: string): ts.TypeReferenceNode | undefined {
-    return this.aliases.has(name) ? f.createTypeReferenceNode(name) : undefined;
-  }
-
-  protected makeAlias(name: string, type: ts.TypeNode): ts.TypeReferenceNode {
-    this.aliases.set(name, createTypeAlias(type, name));
-    return this.getAlias(name)!;
+    return ensureTypeNode(name);
   }
 
   public constructor({
     routing,
     brandHandling,
     variant = "client",
-    serializer = defaultSerializer,
-    splitResponse = false,
+    serverUrl = "https://example.com",
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
+    noContent = z.undefined(),
   }: IntegrationParams) {
-    walkRouting({
-      routing,
-      onEndpoint: (endpoint, path, method) => {
-        const commons = {
-          serializer,
-          getAlias: this.getAlias.bind(this),
-          makeAlias: this.makeAlias.bind(this),
-          optionalPropStyle,
-        };
-        const inputId = makeCleanId(method, path, "input");
-        const input = zodToTs(endpoint.getSchema("input"), {
-          brandHandling,
-          ctx: { ...commons, isResponse: false },
-        });
-        const positiveResponseId = splitResponse
-          ? makeCleanId(method, path, "positive.response")
-          : undefined;
-        const positiveSchema = endpoint.getSchema("positive");
-        const positiveResponse = splitResponse
-          ? zodToTs(positiveSchema, {
-              brandHandling,
-              ctx: { ...commons, isResponse: true },
-            })
-          : undefined;
-        const negativeResponseId = splitResponse
-          ? makeCleanId(method, path, "negative.response")
-          : undefined;
-        const negativeSchema = endpoint.getSchema("negative");
-        const negativeResponse = splitResponse
-          ? zodToTs(negativeSchema, {
-              brandHandling,
-              ctx: { ...commons, isResponse: true },
-            })
-          : undefined;
-        const genericResponseId = makeCleanId(method, path, "response");
-        const genericResponse =
-          positiveResponseId && negativeResponseId
-            ? f.createUnionTypeNode([
-                f.createTypeReferenceNode(positiveResponseId),
-                f.createTypeReferenceNode(negativeResponseId),
-              ])
-            : zodToTs(positiveSchema.or(negativeSchema), {
-                brandHandling,
-                ctx: { ...commons, isResponse: true },
-              });
-        this.program.push(createTypeAlias(input, inputId));
-        if (positiveResponse && positiveResponseId) {
-          this.program.push(
-            createTypeAlias(positiveResponse, positiveResponseId),
-          );
-        }
-        if (negativeResponse && negativeResponseId) {
-          this.program.push(
-            createTypeAlias(negativeResponse, negativeResponseId),
-          );
-        }
-        this.program.push(createTypeAlias(genericResponse, genericResponseId));
-        if (method !== "options") {
-          this.paths.push(path);
-          this.registry.set(
-            { method, path },
-            {
-              input: inputId,
-              positive: positiveResponseId,
-              negative: negativeResponseId,
-              response: genericResponseId,
-              isJson: endpoint
-                .getMimeTypes("positive")
-                .includes(contentTypes.json),
-              tags: endpoint.getTags(),
-            },
-          );
-        }
-      },
-    });
-
-    this.program.unshift(...this.aliases.values());
-
-    // export type Path = "/v1/user/retrieve" | ___;
-    this.program.push(makePublicLiteralType(this.ids.pathType, this.paths));
-
-    // export type Method = "get" | "post" | "put" | "delete" | "patch";
-    this.program.push(makePublicLiteralType(this.ids.methodType, methods));
-
-    // export type MethodPath = `${Method} ${Path}`;
-    this.program.push(
-      makePublicType(
-        this.ids.methodPathType,
-        makeTemplateType([this.ids.methodType, this.ids.pathType]),
-      ),
-    );
-
-    // extends Record<MethodPath, any>
-    const extenderClause = [
-      f.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-        makeRecord(this.ids.methodPathType, ts.SyntaxKind.AnyKeyword),
-      ]),
-    ];
-
-    this.interfaces.push({
-      id: this.ids.inputInterface,
-      kind: "input",
-      props: [],
-    });
-    if (splitResponse) {
-      this.interfaces.push(
-        { id: this.ids.posResponseInterface, kind: "positive", props: [] },
-        { id: this.ids.negResponseInterface, kind: "negative", props: [] },
+    super(serverUrl);
+    const commons = { makeAlias: this.makeAlias.bind(this), optionalPropStyle };
+    const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
+    const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
+    const onEndpoint: OnEndpoint = (endpoint, path, method) => {
+      const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+      const request = `${method} ${path}`;
+      const input = makeType(
+        entitle("input"),
+        zodToTs(endpoint.getSchema("input"), ctxIn),
+        { comment: request },
       );
-    }
-    this.interfaces.push({
-      id: this.ids.responseInterface,
-      kind: "response",
-      props: [],
-    });
-
-    // Single walk through the registry for making properties for the next three objects
-    const jsonEndpoints: ts.PropertyAssignment[] = [];
-    const endpointTags: ts.PropertyAssignment[] = [];
-    for (const [{ method, path }, { isJson, tags, ...rest }] of this.registry) {
-      const propName = quoteProp(method, path);
-      // "get /v1/user/retrieve": GetV1UserRetrieveInput
-      for (const face of this.interfaces) {
-        if (face.kind in rest) {
-          face.props.push(makeInterfaceProp(propName, rest[face.kind]!));
-        }
-      }
-      if (variant !== "types") {
-        if (isJson) {
-          // "get /v1/user/retrieve": true
-          jsonEndpoints.push(
-            f.createPropertyAssignment(propName, f.createTrue()),
+      this.program.push(input);
+      const dictionaries = responseVariants.reduce(
+        (agg, responseVariant) => {
+          const responses = endpoint.getResponses(responseVariant);
+          const props = chain(([idx, { schema, mimeTypes, statusCodes }]) => {
+            const variantType = makeType(
+              entitle(responseVariant, "variant", `${idx + 1}`),
+              zodToTs(mimeTypes ? schema : noContent, ctxOut),
+              { comment: request },
+            );
+            this.program.push(variantType);
+            return statusCodes.map((code) =>
+              makeInterfaceProp(code, variantType.name),
+            );
+          }, Array.from(responses.entries()));
+          const dict = makeInterface(
+            entitle(responseVariant, "response", "variants"),
+            props,
+            { comment: request },
           );
-        }
-        // "get /v1/user/retrieve": ["users"]
-        endpointTags.push(
-          f.createPropertyAssignment(
-            propName,
-            f.createArrayLiteralExpression(
-              tags.map((tag) => f.createStringLiteral(tag)),
-            ),
+          this.program.push(dict);
+          return Object.assign(agg, { [responseVariant]: dict });
+        },
+        {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
+      );
+      this.paths.add(path);
+      const literalIdx = f.createLiteralTypeNode(
+        f.createStringLiteral(request),
+      );
+      this.registry.set(request, {
+        input: ensureTypeNode(input.name),
+        positive: this.someOf(dictionaries.positive),
+        negative: this.someOf(dictionaries.negative),
+        response: f.createUnionTypeNode([
+          f.createIndexedAccessTypeNode(
+            ensureTypeNode(this.interfaces.positive),
+            literalIdx,
           ),
-        );
-      }
-    }
-
-    // export interface Input ___ { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
-    for (const { id, props } of this.interfaces) {
-      this.program.push(makePublicExtendedInterface(id, extenderClause, props));
-    }
-
-    if (variant === "types") {
-      return;
-    }
-
-    // export const jsonEndpoints = { "get /v1/user/retrieve": true }
-    const jsonEndpointsConst = f.createVariableStatement(
-      exportModifier,
-      makeConst(
-        this.ids.jsonEndpointsConst,
-        f.createObjectLiteralExpression(jsonEndpoints),
-      ),
-    );
-
-    // export const endpointTags = { "get /v1/user/retrieve": ["users"] }
-    const endpointTagsConst = f.createVariableStatement(
-      exportModifier,
-      makeConst(
-        this.ids.endpointTagsConst,
-        f.createObjectLiteralExpression(endpointTags),
-      ),
-    );
-
-    // export type Provider = <M extends Method, P extends Path>(method: M, path: P, params: Input[`${M} ${P}`]) =>
-    // Promise<Response[`${M} ${P}`]>;
-    const providerType = makePublicType(
-      this.ids.providerType,
-      f.createFunctionTypeNode(
-        makeTypeParams({
-          M: this.ids.methodType,
-          P: this.ids.pathType,
-        }),
-        makeParams({
-          method: f.createTypeReferenceNode("M"),
-          path: f.createTypeReferenceNode("P"),
-          params: f.createIndexedAccessTypeNode(
-            f.createTypeReferenceNode(this.ids.inputInterface),
-            parametricIndexNode,
-          ),
-        }),
-        makeIndexedPromise(this.ids.responseInterface, parametricIndexNode),
-      ),
-    );
-
-    // export type Implementation = (method: Method, path: string, params: Record<string, any>) => Promise<any>;
-    const implementationType = makePublicType(
-      this.ids.implementationType,
-      f.createFunctionTypeNode(
-        undefined,
-        makeParams({
-          method: f.createTypeReferenceNode(this.ids.methodType),
-          path: f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-          params: makeRecord(
-            ts.SyntaxKind.StringKeyword,
-            ts.SyntaxKind.AnyKeyword,
-          ),
-        }),
-        makeAnyPromise(),
-      ),
-    );
-
-    // `:${key}`
-    const keyParamExpression = f.createTemplateExpression(
-      f.createTemplateHead(":"),
-      [f.createTemplateSpan(this.ids.keyParameter, emptyTail)],
-    );
-
-    // Object.keys(params).reduce((acc, key) => acc.replace(___, params[key]), path)
-    const pathArgument = makeObjectKeysReducer(
-      this.ids.paramsArgument,
-      f.createCallExpression(
-        f.createPropertyAccessExpression(this.ids.accumulator, "replace"),
-        undefined,
-        [
-          keyParamExpression,
-          f.createElementAccessExpression(
-            this.ids.paramsArgument,
-            this.ids.keyParameter,
-          ),
-        ],
-      ),
-      this.ids.pathParameter,
-    );
-
-    // Object.keys(params).reduce((acc, key) => path.indexOf(___) >= 0 ? acc : { ...acc, [key]: params[key] }, {})
-    const paramsArgument = makeObjectKeysReducer(
-      this.ids.paramsArgument,
-      f.createConditionalExpression(
-        f.createBinaryExpression(
-          f.createCallExpression(
-            f.createPropertyAccessExpression(this.ids.pathParameter, "indexOf"),
-            undefined,
-            [keyParamExpression],
-          ),
-          ts.SyntaxKind.GreaterThanEqualsToken,
-          f.createNumericLiteral(0),
-        ),
-        undefined,
-        this.ids.accumulator,
-        undefined,
-        f.createObjectLiteralExpression([
-          f.createSpreadAssignment(this.ids.accumulator),
-          f.createPropertyAssignment(
-            f.createComputedPropertyName(this.ids.keyParameter),
-            f.createElementAccessExpression(
-              this.ids.paramsArgument,
-              this.ids.keyParameter,
-            ),
+          f.createIndexedAccessTypeNode(
+            ensureTypeNode(this.interfaces.negative),
+            literalIdx,
           ),
         ]),
-      ),
-      f.createObjectLiteralExpression(),
+        encoded: f.createIntersectionTypeNode([
+          ensureTypeNode(dictionaries.positive.name),
+          ensureTypeNode(dictionaries.negative.name),
+        ]),
+      });
+      this.tags.set(request, endpoint.getTags());
+    };
+    walkRouting({ routing, onEndpoint });
+    this.program.unshift(...this.aliases.values());
+    this.program.push(
+      this.makePathType(),
+      this.methodType,
+      ...this.makePublicInterfaces(),
+      this.requestType,
     );
 
-    // export class ExpressZodAPIClient { ___ }
-    const clientClass = makePublicClass(
-      this.ids.clientClass,
-      // constructor(protected readonly implementation: Implementation) {}
-      makeEmptyInitializingConstructor([
-        makeParam(
-          this.ids.implementationArgument,
-          f.createTypeReferenceNode(this.ids.implementationType),
-          protectedReadonlyModifier,
-        ),
-      ]),
-      [
-        // public readonly provide: Provider
-        makePublicReadonlyProp(
-          this.ids.provideMethod,
-          f.createTypeReferenceNode(this.ids.providerType),
-          // = async (method, path, params) => this.implementation(___)
-          makeArrowFn(
-            [
-              this.ids.methodParameter,
-              this.ids.pathParameter,
-              this.ids.paramsArgument,
-            ],
-            f.createCallExpression(
-              f.createPropertyAccessExpression(
-                f.createThis(),
-                this.ids.implementationArgument,
-              ),
-              undefined,
-              [this.ids.methodParameter, pathArgument, paramsArgument],
-            ),
-            true,
-          ),
-        ),
-      ],
-    );
+    if (variant === "types") return;
 
     this.program.push(
-      jsonEndpointsConst,
-      endpointTagsConst,
-      providerType,
-      implementationType,
-      clientClass,
-    );
-
-    // method: method.toUpperCase()
-    const methodProperty = f.createPropertyAssignment(
-      this.ids.methodParameter,
-      f.createCallExpression(
-        f.createPropertyAccessExpression(
-          this.ids.methodParameter,
-          "toUpperCase",
-        ),
-        undefined,
-        undefined,
-      ),
-    );
-
-    // headers: hasBody ? { "Content-Type": "application/json" } : undefined
-    const headersProperty = f.createPropertyAssignment(
-      this.ids.headersProperty,
-      f.createConditionalExpression(
-        this.ids.hasBodyConst,
-        undefined,
-        f.createObjectLiteralExpression([
-          f.createPropertyAssignment(
-            f.createStringLiteral("Content-Type"),
-            f.createStringLiteral(contentTypes.json),
-          ),
-        ]),
-        undefined,
-        this.ids.undefinedValue,
-      ),
-    );
-
-    // body: hasBody ? JSON.stringify(params) : undefined
-    const bodyProperty = f.createPropertyAssignment(
-      this.ids.bodyProperty,
-      f.createConditionalExpression(
-        this.ids.hasBodyConst,
-        undefined,
-        f.createCallExpression(
-          f.createPropertyAccessExpression(
-            f.createIdentifier("JSON"),
-            "stringify",
-          ),
-          undefined,
-          [this.ids.paramsArgument],
-        ),
-        undefined,
-        this.ids.undefinedValue,
-      ),
-    );
-
-    // const response = await fetch(`https://example.com${path}${searchParams}`, { ___ });
-    const responseStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.responseConst,
-        f.createAwaitExpression(
-          f.createCallExpression(f.createIdentifier("fetch"), undefined, [
-            f.createTemplateExpression(
-              f.createTemplateHead("https://example.com"),
-              [
-                f.createTemplateSpan(
-                  this.ids.pathParameter,
-                  f.createTemplateMiddle(""),
-                ),
-                f.createTemplateSpan(this.ids.searchParamsConst, emptyTail),
-              ],
-            ),
-            f.createObjectLiteralExpression([
-              methodProperty,
-              headersProperty,
-              bodyProperty,
-            ]),
-          ]),
-        ),
-      ),
-    );
-
-    // const hasBody = !["get", "delete"].includes(method);
-    const hasBodyStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.hasBodyConst,
-        f.createLogicalNot(
-          f.createCallExpression(
-            f.createPropertyAccessExpression(
-              f.createArrayLiteralExpression([
-                f.createStringLiteral("get" satisfies Method),
-                f.createStringLiteral("delete" satisfies Method),
-              ]),
-              "includes",
-            ),
-            undefined,
-            [this.ids.methodParameter],
-          ),
-        ),
-      ),
-    );
-
-    // const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-    const searchParamsStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.searchParamsConst,
-        f.createConditionalExpression(
-          this.ids.hasBodyConst,
-          undefined,
-          f.createStringLiteral(""),
-          undefined,
-          f.createTemplateExpression(f.createTemplateHead("?"), [
-            f.createTemplateSpan(
-              f.createNewExpression(
-                f.createIdentifier("URLSearchParams"),
-                undefined,
-                [this.ids.paramsArgument],
-              ),
-              emptyTail,
-            ),
-          ]),
-        ),
-      ),
-    );
-
-    // return response.json(); return response.text();
-    const [returnJsonStatement, returnTextStatement] = ["json", "text"].map(
-      (method) =>
-        f.createReturnStatement(
-          f.createCallExpression(
-            f.createPropertyAccessExpression(this.ids.responseConst, method),
-            undefined,
-            undefined,
-          ),
-        ),
-    );
-
-    // if (`${method} ${path}` in jsonEndpoints) { ___ }
-    const ifJsonStatement = f.createIfStatement(
-      f.createBinaryExpression(
-        f.createTemplateExpression(emptyHeading, [
-          f.createTemplateSpan(this.ids.methodParameter, spacingMiddle),
-          f.createTemplateSpan(this.ids.pathParameter, emptyTail),
-        ]),
-        ts.SyntaxKind.InKeyword,
-        this.ids.jsonEndpointsConst,
-      ),
-      f.createBlock([returnJsonStatement]),
-    );
-
-    // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
-    const exampleImplStatement = f.createVariableStatement(
-      exportModifier,
-      makeConst(
-        this.ids.exampleImplementationConst,
-        makeArrowFn(
-          [
-            this.ids.methodParameter,
-            this.ids.pathParameter,
-            this.ids.paramsArgument,
-          ],
-          f.createBlock([
-            hasBodyStatement,
-            searchParamsStatement,
-            responseStatement,
-            ifJsonStatement,
-            returnTextStatement,
-          ]),
-          true,
-        ),
-        f.createTypeReferenceNode(this.ids.implementationType),
-      ),
-    );
-
-    // client.provide("get", "/v1/user/retrieve", { id: "10" });
-    const provideCallingStatement = f.createExpressionStatement(
-      f.createCallExpression(
-        f.createPropertyAccessExpression(
-          this.ids.clientConst,
-          this.ids.provideMethod,
-        ),
-        undefined,
-        [
-          f.createStringLiteral("get" satisfies Method),
-          f.createStringLiteral("/v1/user/retrieve"),
-          f.createObjectLiteralExpression([
-            f.createPropertyAssignment("id", f.createStringLiteral("10")),
-          ]),
-        ],
-      ),
-    );
-
-    // const client = new ExpressZodAPIClient(exampleImplementation);
-    const clientInstanceStatement = f.createVariableStatement(
-      undefined,
-      makeConst(
-        this.ids.clientConst,
-        f.createNewExpression(this.ids.clientClass, undefined, [
-          this.ids.exampleImplementationConst,
-        ]),
-      ),
+      this.makeEndpointTags(),
+      this.makeParseRequestFn(),
+      this.makeSubstituteFn(),
+      this.makeImplementationType(),
+      this.makeClientClass(),
     );
 
     this.usage.push(
-      exampleImplStatement,
-      clientInstanceStatement,
-      provideCallingStatement,
+      this.makeExampleImplementation(),
+      ...this.makeUsageStatements(),
     );
   }
 

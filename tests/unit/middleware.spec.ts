@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { InputValidationError, Middleware } from "../../src";
-import { AbstractMiddleware } from "../../src/middleware";
+import { EmptyObject } from "../../src/common-helpers";
+import { AbstractMiddleware, ExpressMiddleware } from "../../src/middleware";
 import {
   makeLoggerMock,
   makeRequestMock,
@@ -9,25 +10,27 @@ import {
 
 describe("Middleware", () => {
   describe("constructor()", () => {
-    test("Should inherit from AbstractMiddleware", () => {
-      const middleware = new Middleware({
-        input: z.object({
-          something: z.number(),
-        }),
-        handler: vi.fn<any>(),
+    test("should inherit from AbstractMiddleware", () => {
+      const mw = new Middleware({
+        input: z.object({ something: z.number() }),
+        handler: vi.fn(),
       });
-      expect(middleware).toBeInstanceOf(AbstractMiddleware);
+      expect(mw).toBeInstanceOf(AbstractMiddleware);
+      expectTypeOf(mw.getSchema()._output).toEqualTypeOf<{
+        something: number;
+      }>();
+    });
+
+    test("should allow to omit input schema", () => {
+      const mw = new Middleware({ handler: vi.fn() });
+      expectTypeOf(mw.getSchema()._output).toEqualTypeOf<EmptyObject>();
     });
 
     describe("#600: Top level refinements", () => {
       test("should allow refinement", () => {
         const mw = new Middleware({
-          input: z
-            .object({
-              something: z.number(),
-            })
-            .refine(() => true),
-          handler: vi.fn<any>(),
+          input: z.object({ something: z.number() }).refine(() => true),
+          handler: vi.fn(),
         });
         expect(mw.getSchema()).toBeInstanceOf(z.ZodEffects);
       });
@@ -77,5 +80,13 @@ describe("Middleware", () => {
         response: responseMock,
       });
     });
+  });
+});
+
+describe("ExpressMiddleware", () => {
+  test("should inherit from Middleware", () => {
+    const mw = new ExpressMiddleware(vi.fn());
+    expect(mw).toBeInstanceOf(Middleware);
+    expectTypeOf(mw.getSchema()._output).toEqualTypeOf<EmptyObject>();
   });
 });

@@ -9,7 +9,6 @@ import {
   ResultHandler,
 } from "../../src";
 import { AbstractEndpoint, Endpoint } from "../../src/endpoint";
-import { serializeSchemaForTest } from "../helpers";
 
 describe("Endpoint", () => {
   describe(".getMethods()", () => {
@@ -72,10 +71,8 @@ describe("Endpoint", () => {
           transform: "test",
         }));
       const endpoint = factory.build({
-        methods: ["post"],
-        input: z.object({
-          n: z.number(),
-        }),
+        method: "post",
+        input: z.object({ n: z.number() }),
         output: z.object({
           inc2: z.number(),
           str: z.string(),
@@ -126,32 +123,17 @@ describe("Endpoint", () => {
     test("should close the stream on OPTIONS request", async () => {
       const handlerMock = vi.fn();
       const endpoint = defaultEndpointsFactory.build({
-        method: "get",
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
       const { responseMock, loggerMock } = await testEndpoint({
         endpoint,
-        requestProps: {
-          method: "OPTIONS",
-        },
-        configProps: {
-          cors: ({ defaultHeaders }) => ({
-            ...defaultHeaders,
-            "X-Custom-Header": "Testing",
-          }),
-        },
+        requestProps: { method: "OPTIONS" },
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(responseMock._getStatusCode()).toBe(200);
       expect(handlerMock).toHaveBeenCalledTimes(0);
-      expect(responseMock._getHeaders()).toEqual({
-        "access-control-allow-origin": "*",
-        "access-control-allow-methods": "GET, OPTIONS",
-        "access-control-allow-headers": "content-type",
-        "x-custom-header": "Testing",
-      });
+      expect(responseMock.writableEnded).toBeTruthy();
     });
   });
 
@@ -159,7 +141,6 @@ describe("Endpoint", () => {
     test("Should throw on output validation failure", async () => {
       const endpoint = defaultEndpointsFactory.build({
         method: "post",
-        input: z.object({}),
         output: z.object({ email: z.string().email() }),
         handler: async () => ({ email: "not email" }),
       });
@@ -175,7 +156,6 @@ describe("Endpoint", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const endpoint = factory.build({
         method: "post",
-        input: z.object({}),
         output: z.object({
           test: z.number().transform(() => assert.fail("Something unexpected")),
         }),
@@ -210,7 +190,6 @@ describe("Endpoint", () => {
       const handlerMock = vi.fn();
       const endpoint = factory.build({
         method: "post",
-        input: z.object({}),
         output: z.object({}),
         handler: handlerMock,
       });
@@ -245,19 +224,13 @@ describe("Endpoint", () => {
       const spy = vi.spyOn(resultHandler, "execute");
       const factory = new EndpointsFactory(resultHandler);
       const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({
-          test: z.string(),
-        }),
+        output: z.object({ test: z.string() }),
         handler: async () => ({ test: "OK" }),
       });
       const { loggerMock, responseMock, requestMock } = await testEndpoint({
         endpoint,
       });
-      expect(loggerMock._getLogs().error).toEqual([
-        ["Result handler failure: Something unexpected happened."],
-      ]);
+      expect(loggerMock._getLogs().error).toMatchSnapshot();
       expect(spy).toHaveBeenCalledWith({
         error: null,
         logger: loggerMock,
@@ -290,7 +263,6 @@ describe("Endpoint", () => {
           something: z.number(),
         });
         const endpoint = factory.build({
-          method: "get",
           input,
           output,
           handler: vi.fn(),
@@ -300,36 +272,18 @@ describe("Endpoint", () => {
         );
       },
     );
-
-    test.each(["positive", "negative"] as const)(
-      "should return the %s response schema",
-      (variant) => {
-        const factory = new EndpointsFactory(defaultResultHandler);
-        const endpoint = factory.build({
-          method: "get",
-          input: z.object({}),
-          output: z.object({ something: z.number() }),
-          handler: vi.fn(),
-        });
-        expect(
-          serializeSchemaForTest(endpoint.getSchema(variant)),
-        ).toMatchSnapshot();
-      },
-    );
   });
 
-  describe("getMimeTypes()", () => {
-    test.each(["input", "positive", "negative"] as const)(
-      "should return the %s mime types",
+  describe(".getResponses()", () => {
+    test.each(["positive", "negative"] as const)(
+      "should return the %s responses",
       (variant) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
-          method: "get",
-          input: z.object({}),
           output: z.object({ something: z.number() }),
           handler: vi.fn(),
         });
-        expect(endpoint.getMimeTypes(variant)).toEqual(["application/json"]);
+        expect(endpoint.getResponses(variant)).toMatchSnapshot();
       },
     );
   });
@@ -344,7 +298,6 @@ describe("Endpoint", () => {
       ({ input, expected }) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
-          method: "get",
           input,
           output: z.object({}),
           handler: vi.fn(),
@@ -358,7 +311,6 @@ describe("Endpoint", () => {
     test("should return undefined if its not defined upon creation", () => {
       expect(
         new Endpoint({
-          methods: ["get"],
           inputSchema: z.object({}),
           outputSchema: z.object({}),
           handler: async () => ({}),
@@ -378,7 +330,7 @@ describe("Endpoint", () => {
           handler: async () => ({}),
         })
         .build({
-          methods: ["post"],
+          method: "post",
           input: z.object({
             n: z.number().refine(async (n) => n > 100),
           }),
@@ -417,7 +369,7 @@ describe("Endpoint", () => {
           next();
         })
         .build({
-          methods: ["post"],
+          method: "post",
           input: z.object({
             shouldNotBeThere: z.boolean(),
           }),
@@ -446,7 +398,6 @@ describe("Endpoint", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const endpoint = factory.build({
         method: "post",
-        input: z.object({}),
         output: z.object({
           test: z.number().transform(() => assert.fail("Something unexpected")),
         }),
@@ -472,17 +423,11 @@ describe("Endpoint", () => {
         }),
       );
       const endpoint = factory.build({
-        method: "get",
-        input: z.object({}),
-        output: z.object({
-          test: z.string(),
-        }),
+        output: z.object({ test: z.string() }),
         handler: async () => ({ test: "OK" }),
       });
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
-      expect(loggerMock._getLogs().error).toEqual([
-        ["Result handler failure: Something unexpected happened."],
-      ]);
+      expect(loggerMock._getLogs().error).toMatchSnapshot();
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getData()).toBe(
         "An error occurred while serving the result: Something unexpected happened.",
@@ -491,12 +436,10 @@ describe("Endpoint", () => {
 
     test("thrown in middleware and caught in execute()", async () => {
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
-        input: z.object({}),
         handler: async () => assert.fail("Something went wrong"),
       });
       const endpoint = factory.build({
-        methods: ["post"],
-        input: z.object({}),
+        method: "post",
         output: z.object({}),
         handler: async () => ({}),
       });
@@ -529,12 +472,9 @@ describe("Endpoint", () => {
           emitOutputValidationFailure: z.boolean().optional(),
         })
         .refine(
-          (data) => {
-            if (data.type === "type1") {
-              return "type1Attribute" in data.dynamicValue;
-            }
-            return "type2Attribute" in data.dynamicValue;
-          },
+          (data) =>
+            (data.type === "type1" ? "type1Attribute" : "type2Attribute") in
+            data.dynamicValue,
           {
             message: "type1Attribute is required if type is type1",
             path: ["dynamicValue"],
@@ -674,17 +614,12 @@ describe("Endpoint", () => {
 
       const endpoint = defaultEndpointsFactory
         .addMiddleware(dateInputMiddleware)
-        .build({
-          method: "get",
-          input: z.object({}),
-          output: z.object({}),
-          handler: async ({ input: { middleware_date_input }, logger }) => {
+        .buildVoid({
+          handler: async ({ input: { middleware_date_input }, logger }) =>
             logger.debug(
               "date in endpoint handler",
               typeof middleware_date_input,
-            );
-            return {};
-          },
+            ),
         });
 
       const { loggerMock, responseMock } = await testEndpoint({

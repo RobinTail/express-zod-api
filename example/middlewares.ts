@@ -12,7 +12,7 @@ export const authMiddleware = new Middleware({
   },
   input: z
     .object({
-      key: z.string().min(1),
+      key: z.string().nonempty(),
     })
     .example({
       key: "1234-5678-90",
@@ -30,7 +30,6 @@ export const authMiddleware = new Middleware({
 });
 
 export const methodProviderMiddleware = new Middleware({
-  input: z.object({}),
   handler: async ({ request }) => ({
     method: request.method.toLowerCase() as Method,
   }),

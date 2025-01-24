@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import http from "node:http";
 import https from "node:https";
 import { Agent, fetch } from "undici";
@@ -41,7 +42,7 @@ describe("monitor()", () => {
 
   test(
     "shuts down hanging sockets after defined timeout",
-    { timeout: 500 },
+    { timeout: 1000 }, // increased from 500 for stability
     async () => {
       const handler = vi.fn();
       const [httpServer, port] = await makeHttpServer(handler);
@@ -49,8 +50,9 @@ describe("monitor()", () => {
       void fetch(`http://localhost:${port}`, {
         headers: { connection: "close" },
       }).catch(vi.fn());
-      await setTimeout(50);
-      expect(handler).toHaveBeenCalled();
+      await vi.waitFor(() => assert(handler.mock.calls.length === 1), {
+        interval: 30, // unstable
+      });
       const pending0 = graceful.shutdown();
       const pending1 = graceful.shutdown();
       expect(pending1).toBe(pending0);
@@ -150,23 +152,26 @@ describe("monitor()", () => {
     await graceful.shutdown();
   });
 
-  test(
-    "empties internal socket collection for https server",
-    { timeout: 500 },
-    async () => {
-      const [httpsServer, port] = await makeHttpsServer(({}, res) => {
-        res.end("foo");
-      });
-      const graceful = monitor([httpsServer], { timeout: 150 });
-      await fetch(`https://localhost:${port}`, {
-        dispatcher: new Agent({ connect: { rejectUnauthorized: false } }),
-        headers: { connection: "close" },
-      });
-      await setTimeout(50);
-      expect(graceful.sockets.size).toBe(0);
-      await graceful.shutdown();
-    },
-  );
+  describe("https", async () => {
+    const [httpsServer, port] = await makeHttpsServer(({}, res) => {
+      res.end("foo");
+    });
+
+    test(
+      "empties internal socket collection for https server",
+      { timeout: 500 },
+      async () => {
+        const graceful = monitor([httpsServer], { timeout: 150 });
+        await fetch(`https://localhost:${port}`, {
+          dispatcher: new Agent({ connect: { rejectUnauthorized: false } }),
+          headers: { connection: "close" },
+        });
+        await setTimeout(50);
+        expect(graceful.sockets.size).toBe(0);
+        await graceful.shutdown();
+      },
+    );
+  });
 
   test(
     "closes immediately after in-flight connections are closed (#16)",

@@ -1,18 +1,28 @@
 import { Request } from "express";
-import { isHttpError } from "http-errors";
-import { createHash } from "node:crypto";
-import { pickBy, xprod } from "ramda";
+import { chain, memoizeWith, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
-import { InputValidationError, OutputValidationError } from "./errors";
-import { ActualLogger } from "./logger-helpers";
+import { contentTypes } from "./content-type";
+import { OutputValidationError } from "./errors";
 import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
-import { contentTypes } from "./content-type";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = Record<string, never>;
+export type EmptySchema = z.ZodObject<EmptyObject, "strip">;
 export type FlatObject = Record<string, unknown>;
+
+/** @link https://stackoverflow.com/a/65492934 */
+type NoNever<T, F> = [T] extends [never] ? F : T;
+
+/**
+ * @desc Using module augmentation approach you can specify tags as the keys of this interface
+ * @example declare module "express-zod-api" { interface TagOverrides { users: unknown } }
+ * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
+ * */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation
+export interface TagOverrides {}
+export type Tag = NoNever<keyof TagOverrides, string>;
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
@@ -32,32 +42,22 @@ const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
 
-export const isCustomHeader = (name: string): name is `x-${string}` =>
-  name.startsWith("x-");
-
-/** @see https://nodejs.org/api/http.html#messageheaders */
-export const getCustomHeaders = (headers: FlatObject): FlatObject =>
-  pickBy((_, key) => isCustomHeader(key), headers); // twice faster than flip()
-
 export const getInput = (
   req: Request,
   userDefined: CommonConfig["inputSources"] = {},
 ): FlatObject => {
   const method = getActualMethod(req);
-  if (method === "options") {
-    return {};
-  }
+  if (method === "options") return {};
   return (
     userDefined[method] ||
     defaultInputSources[method] ||
     fallbackInputSource
   )
     .filter((src) => (src === "files" ? areFilesAvailable(req) : true))
-    .map((src) => (src === "headers" ? getCustomHeaders(req[src]) : req[src]))
-    .reduce<FlatObject>((agg, obj) => ({ ...agg, ...obj }), {});
+    .reduce<FlatObject>((agg, src) => Object.assign(agg, req[src]), {});
 };
 
-export const makeErrorFromAnything = (subject: unknown): Error =>
+export const ensureError = (subject: unknown): Error =>
   subject instanceof Error ? subject : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
@@ -69,41 +69,10 @@ export const getMessageFromError = (error: Error): string => {
       .join("; ");
   }
   if (error instanceof OutputValidationError) {
-    const hasFirstField = error.originalError.issues[0]?.path.length > 0;
+    const hasFirstField = error.cause.issues[0]?.path.length > 0;
     return `output${hasFirstField ? "/" : ": "}${error.message}`;
   }
   return error.message;
-};
-
-export const getStatusCodeFromError = (error: Error): number => {
-  if (isHttpError(error)) {
-    return error.statusCode;
-  }
-  if (error instanceof InputValidationError) {
-    return 400;
-  }
-  return 500;
-};
-
-export const logInternalError = ({
-  logger,
-  request,
-  input,
-  error,
-  statusCode,
-}: {
-  logger: ActualLogger;
-  request: Request;
-  input: FlatObject | null;
-  error: Error;
-  statusCode: number;
-}) => {
-  if (statusCode === 500) {
-    logger.error(`Internal server error\n${error.stack}\n`, {
-      url: request.url,
-      payload: input,
-    });
-  }
 };
 
 export const getExamples = <
@@ -129,15 +98,12 @@ export const getExamples = <
   validate?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
   const examples = schema._def[metaSymbol]?.examples || [];
-  if (!validate && variant === "original") {
-    return examples;
-  }
+  if (!validate && variant === "original") return examples;
   const result: Array<z.input<T> | z.output<T>> = [];
   for (const example of examples) {
     const parsedExample = schema.safeParse(example);
-    if (parsedExample.success) {
+    if (parsedExample.success)
       result.push(variant === "parsed" ? parsedExample.data : example);
-    }
   }
   return result;
 };
@@ -160,18 +126,15 @@ export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
 export const ucFirst = (subject: string) =>
   subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
 
-export const makeCleanId = (...args: string[]) =>
-  args
-    .flatMap((entry) => entry.split(/[^A-Z0-9]/gi)) // split by non-alphanumeric characters
-    .flatMap((entry) =>
-      // split by sequences of capitalized letters
+export const makeCleanId = (...args: string[]) => {
+  const byAlpha = chain((entry) => entry.split(/[^A-Z0-9]/gi), args);
+  const byWord = chain(
+    (entry) =>
       entry.replaceAll(/[A-Z]+/g, (beginning) => `/${beginning}`).split("/"),
-    )
-    .map(ucFirst)
-    .join("");
-
-export const defaultSerializer = (schema: z.ZodTypeAny): string =>
-  createHash("sha1").update(JSON.stringify(schema), "utf8").digest("hex");
+    byAlpha,
+  );
+  return byWord.map(ucFirst).join("");
+};
 
 export const tryToTransform = <T>(
   schema: z.ZodEffects<z.ZodTypeAny, T>,
@@ -187,3 +150,8 @@ export const tryToTransform = <T>(
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
 export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
+
+export const isProduction = memoizeWith(
+  () => process.env.TSUP_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSUP
+  () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
+);

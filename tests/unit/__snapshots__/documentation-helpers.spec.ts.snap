@@ -42,13 +42,17 @@ exports[`Documentation helpers > depictCatch() > should pass next depicter 1`] =
 `;
 
 exports[`Documentation helpers > depictDate > should throw clear error 0 1`] = `
-[DocumentationError: Using z.date() within output schema is forbidden. Please use ez.dateOut() instead. Check out the documentation for details.
-Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
+DocumentationError({
+  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Using z.date() within output schema is forbidden. Please use ez.dateOut() instead. Check out the documentation for details.",
+})
 `;
 
 exports[`Documentation helpers > depictDate > should throw clear error 1 1`] = `
-[DocumentationError: Using z.date() within input schema is forbidden. Please use ez.dateIn() instead. Check out the documentation for details.
-Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
+DocumentationError({
+  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Using z.date() within input schema is forbidden. Please use ez.dateIn() instead. Check out the documentation for details.",
+})
 `;
 
 exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
@@ -64,8 +68,10 @@ exports[`Documentation helpers > depictDateIn > should set type:string, pattern 
 `;
 
 exports[`Documentation helpers > depictDateIn > should throw when ZodDateIn in response 1`] = `
-[DocumentationError: Please use ez.dateOut() for output.
-Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
+DocumentationError({
+  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.dateOut() for output.",
+})
 `;
 
 exports[`Documentation helpers > depictDateOut > should set type:string, description and format 1`] = `
@@ -80,8 +86,10 @@ exports[`Documentation helpers > depictDateOut > should set type:string, descrip
 `;
 
 exports[`Documentation helpers > depictDateOut > should throw when ZodDateOut in request 1`] = `
-[DocumentationError: Please use ez.dateIn() for input.
-Caused by input schema of an Endpoint assigned to GET method of /v1/user/:id path.]
+DocumentationError({
+  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.dateIn() for input.",
+})
 `;
 
 exports[`Documentation helpers > depictDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
@@ -282,6 +290,38 @@ exports[`Documentation helpers > depictFile() > should set type:string and forma
 }
 `;
 
+exports[`Documentation helpers > depictIntersection() > should NOT flatten object schemas having conflicting props 1`] = `
+{
+  "allOf": [
+    {
+      "properties": {
+        "one": {
+          "format": "double",
+          "maximum": 1.7976931348623157e+308,
+          "minimum": -1.7976931348623157e+308,
+          "type": "number",
+        },
+      },
+      "required": [
+        "one",
+      ],
+      "type": "object",
+    },
+    {
+      "properties": {
+        "one": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "one",
+      ],
+      "type": "object",
+    },
+  ],
+}
+`;
+
 exports[`Documentation helpers > depictIntersection() > should fall back to allOf in other cases 0 1`] = `
 {
   "allOf": [
@@ -451,48 +491,19 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
 
 exports[`Documentation helpers > depictLazy > should handle circular references 0 1`] = `
 {
-  "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 0 2`] = `
-{
-  "items": {
-    "$ref": "#/components/schemas/6cbbd837811754902ea1e68d3e5c75e36250b880",
-  },
-  "type": "array",
+  "$ref": "#/components/schemas/SomeSchema",
 }
 `;
 
 exports[`Documentation helpers > depictLazy > should handle circular references 1 1`] = `
 {
-  "$ref": "#/components/schemas/7a225c55e65ab4a2fd3ce390265b255ee6747049",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 1 2`] = `
-{
-  "$ref": "#/components/schemas/7a225c55e65ab4a2fd3ce390265b255ee6747049",
+  "$ref": "#/components/schemas/SomeSchema",
 }
 `;
 
 exports[`Documentation helpers > depictLazy > should handle circular references 2 1`] = `
 {
-  "$ref": "#/components/schemas/118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 2 2`] = `
-{
-  "properties": {
-    "prop": {
-      "$ref": "#/components/schemas/118cb3b11b8a1f3b6b1e60a89f96a8be9da32a0f",
-    },
-  },
-  "required": [
-    "prop",
-  ],
-  "type": "object",
+  "$ref": "#/components/schemas/SomeSchema",
 }
 `;
 
@@ -548,24 +559,13 @@ exports[`Documentation helpers > depictNullable() > should add null to the type 
 }
 `;
 
-exports[`Documentation helpers > depictNullable() > should only add null type once 0 1`] = `
+exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 0 1`] = `
 {
-  "type": [
-    "string",
-    "null",
-  ],
+  "type": "null",
 }
 `;
 
-exports[`Documentation helpers > depictNullable() > should only add null type once 1 1`] = `
-{
-  "type": [
-    "null",
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictNullable() > should only add null type once 2 1`] = `
+exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 1 1`] = `
 {
   "type": [
     "string",
@@ -1155,6 +1155,8 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 1 1`] = `
 {
   "format": "url",
+  "maxLength": 15,
+  "minLength": 15,
   "type": "string",
 }
 `;
@@ -1192,6 +1194,78 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 6 1`] = `
 {
   "pattern": "^\\d+.\\d+.\\d+$",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 7 1`] = `
+{
+  "format": "date",
+  "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 8 1`] = `
+{
+  "format": "time",
+  "pattern": "^\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?$",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 9 1`] = `
+{
+  "format": "duration",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 10 1`] = `
+{
+  "format": "cidr",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 11 1`] = `
+{
+  "format": "ip",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 12 1`] = `
+{
+  "format": "jwt",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 13 1`] = `
+{
+  "format": "byte",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 14 1`] = `
+{
+  "format": "base64url",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 15 1`] = `
+{
+  "format": "cuid2",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 16 1`] = `
+{
+  "format": "ulid",
   "type": "string",
 }
 `;
@@ -1300,8 +1374,10 @@ exports[`Documentation helpers > depictUpload() > should set format:binary and t
 `;
 
 exports[`Documentation helpers > depictUpload() > should throw when using in response 1`] = `
-[DocumentationError: Please use ez.upload() only for input.
-Caused by response schema of an Endpoint assigned to GET method of /v1/user/:id path.]
+DocumentationError({
+  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.upload() only for input.",
+})
 `;
 
 exports[`Documentation helpers > excludeExamplesFromDepiction() > should remove example property of supplied object 1`] = `

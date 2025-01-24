@@ -8,7 +8,7 @@ import { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
-import { makeErrorFromAnything } from "./common-helpers";
+import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
 
 type EquippedRequest = Request<
@@ -19,43 +19,39 @@ type EquippedRequest = Request<
   { [metaSymbol]?: { logger: ActualLogger } }
 >;
 
-export type ChildLoggerExtractor = (request: Request) => ActualLogger;
+/** @desc Returns child logger for the given request (if configured) or the configured logger otherwise */
+export type GetLogger = (request?: Request) => ActualLogger;
 
 interface HandlerCreatorParams {
   errorHandler: AbstractResultHandler;
-  getChildLogger: ChildLoggerExtractor;
+  getLogger: GetLogger;
 }
 
 export const createParserFailureHandler =
-  ({
-    errorHandler,
-    getChildLogger,
-  }: HandlerCreatorParams): ErrorRequestHandler =>
+  ({ errorHandler, getLogger }: HandlerCreatorParams): ErrorRequestHandler =>
   async (error, request, response, next) => {
-    if (!error) {
-      return next();
-    }
+    if (!error) return next();
     return errorHandler.execute({
       error: isHttpError(error)
         ? error
-        : createHttpError(400, makeErrorFromAnything(error).message),
+        : createHttpError(400, ensureError(error).message),
       request,
       response,
       input: null,
       output: null,
       options: {},
-      logger: getChildLogger(request),
+      logger: getLogger(request),
     });
   };
 
 export const createNotFoundHandler =
-  ({ errorHandler, getChildLogger }: HandlerCreatorParams): RequestHandler =>
+  ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
   async (request, response) => {
     const error = createHttpError(
       404,
       `Can not ${request.method} ${request.path}`,
     );
-    const logger = getChildLogger(request);
+    const logger = getLogger(request);
     try {
       errorHandler.execute({
         request,
@@ -70,7 +66,7 @@ export const createNotFoundHandler =
       lastResortHandler({
         response,
         logger,
-        error: new ResultHandlerError(makeErrorFromAnything(e).message, error),
+        error: new ResultHandlerError(ensureError(e), error),
       });
     }
   };
@@ -81,32 +77,28 @@ export const createUploadFailureHandler =
     const failedFile = Object.values(req?.files || [])
       .flat()
       .find(({ truncated }) => truncated);
-    if (failedFile) {
-      return next(error);
-    }
+    if (failedFile) return next(error);
     next();
   };
 
 export const createUploadLogger = (
   logger: ActualLogger,
-): Pick<Console, "log"> => ({
-  log: logger.debug.bind(logger),
-});
+): Pick<Console, "log"> => ({ log: logger.debug.bind(logger) });
 
 export const createUploadParsers = async ({
-  getChildLogger,
+  getLogger,
   config,
 }: {
-  getChildLogger: ChildLoggerExtractor;
+  getLogger: GetLogger;
   config: ServerConfig;
 }): Promise<RequestHandler[]> => {
   const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
   const { limitError, beforeUpload, ...options } = {
-    ...(typeof config.server.upload === "object" && config.server.upload),
+    ...(typeof config.upload === "object" && config.upload),
   };
   const parsers: RequestHandler[] = [];
   parsers.push(async (request, response, next) => {
-    const logger = getChildLogger(request);
+    const logger = getLogger(request);
     try {
       await beforeUpload?.({ request, logger });
     } catch (error) {
@@ -120,43 +112,38 @@ export const createUploadParsers = async ({
       logger: createUploadLogger(logger),
     })(request, response, next);
   });
-  if (limitError) {
-    parsers.push(createUploadFailureHandler(limitError));
-  }
+  if (limitError) parsers.push(createUploadFailureHandler(limitError));
   return parsers;
 };
 
 export const moveRaw: RequestHandler = (req, {}, next) => {
-  if (Buffer.isBuffer(req.body)) {
-    req.body = { raw: req.body };
-  }
+  if (Buffer.isBuffer(req.body)) req.body = { raw: req.body };
   next();
 };
 
 /** @since v19 prints the actual path of the request, not a configured route, severity decreased to debug level */
 export const createLoggingMiddleware =
   ({
-    rootLogger,
+    logger: parent,
     config,
   }: {
-    rootLogger: ActualLogger;
+    logger: ActualLogger;
     config: CommonConfig;
   }): RequestHandler =>
   async (request, response, next) => {
-    const logger = config.childLoggerProvider
-      ? await config.childLoggerProvider({ request, parent: rootLogger })
-      : rootLogger;
+    const logger =
+      (await config.childLoggerProvider?.({ request, parent })) || parent;
     logger.debug(`${request.method}: ${request.path}`);
-    if (request.res) {
+    if (request.res)
       (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
-    }
     next();
   };
 
-export const makeChildLoggerExtractor =
-  (fallback: ActualLogger): ChildLoggerExtractor =>
+export const makeGetLogger =
+  (fallback: ActualLogger): GetLogger =>
   (request) =>
-    (request as EquippedRequest).res?.locals[metaSymbol]?.logger || fallback;
+    (request as EquippedRequest | undefined)?.res?.locals[metaSymbol]?.logger ||
+    fallback;
 
 export const installDeprecationListener = (logger: ActualLogger) =>
   process.on("deprecation", ({ message, namespace, name, stack }) =>

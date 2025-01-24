@@ -29,7 +29,8 @@ exports[`ez.dateIn() > parsing > should handle wrong parsed type 1`] = `
     "message": "Invalid input",
     "path": [],
     "unionErrors": [
-      [ZodError: [
+      ZodError({
+        "message": "[
   {
     "code": "invalid_type",
     "expected": "string",
@@ -37,8 +38,10 @@ exports[`ez.dateIn() > parsing > should handle wrong parsed type 1`] = `
     "path": [],
     "message": "Expected string, received number"
   }
-]],
-      [ZodError: [
+]",
+      }),
+      ZodError({
+        "message": "[
   {
     "code": "invalid_type",
     "expected": "string",
@@ -46,8 +49,10 @@ exports[`ez.dateIn() > parsing > should handle wrong parsed type 1`] = `
     "path": [],
     "message": "Expected string, received number"
   }
-]],
-      [ZodError: [
+]",
+      }),
+      ZodError({
+        "message": "[
   {
     "code": "invalid_type",
     "expected": "string",
@@ -55,7 +60,8 @@ exports[`ez.dateIn() > parsing > should handle wrong parsed type 1`] = `
     "path": [],
     "message": "Expected string, received number"
   }
-]],
+]",
+      }),
     ],
   },
 ]

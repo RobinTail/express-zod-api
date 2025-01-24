@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "preinstall": "rm -rf node_modules",
     "test": "tsc -p tsconfig.json",
     "posttest": "rm *.d.ts"
   },

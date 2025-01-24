@@ -10,6 +10,8 @@ exports[`Index Entrypoint > exports > DocumentationError should have certain val
 
 exports[`Index Entrypoint > exports > EndpointsFactory should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint > exports > EventStreamFactory should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint > exports > InputValidationError should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > Integration should have certain value 1`] = `[Function]`;
@@ -52,6 +54,8 @@ EndpointsFactory {
 
 exports[`Index Entrypoint > exports > defaultResultHandler should have certain value 1`] = `ResultHandler {}`;
 
+exports[`Index Entrypoint > exports > ensureHttpError should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint > exports > ez should have certain value 1`] = `
 {
   "dateIn": [Function],
@@ -66,8 +70,6 @@ exports[`Index Entrypoint > exports > getExamples should have certain value 1`] 
 
 exports[`Index Entrypoint > exports > getMessageFromError should have certain value 1`] = `[Function]`;
 
-exports[`Index Entrypoint > exports > getStatusCodeFromError should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint > exports > should have certain entities exposed 1`] = `
 [
   "createConfig",
@@ -76,7 +78,7 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "arrayEndpointsFactory",
   "getExamples",
   "getMessageFromError",
-  "getStatusCodeFromError",
+  "ensureHttpError",
   "BuiltinLogger",
   "Middleware",
   "ResultHandler",
@@ -95,6 +97,7 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "testEndpoint",
   "testMiddleware",
   "Integration",
+  "EventStreamFactory",
   "ez",
 ]
 `;

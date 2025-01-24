@@ -1,18 +1,15 @@
+import "../../src/zod-plugin"; // required for this test
 import createHttpError from "http-errors";
 import {
   combinations,
   defaultInputSources,
-  getCustomHeaders,
   getExamples,
   getInput,
   getMessageFromError,
-  getStatusCodeFromError,
   hasCoercion,
-  isCustomHeader,
   makeCleanId,
-  makeErrorFromAnything,
+  ensureError,
 } from "../../src/common-helpers";
-import { InputValidationError } from "../../src";
 import { z } from "zod";
 import { makeRequestMock } from "../../src/testing";
 
@@ -20,27 +17,6 @@ describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
     test("should be declared in a certain way", () => {
       expect(defaultInputSources).toMatchSnapshot();
-    });
-  });
-
-  describe("isCustomHeader()", () => {
-    test.each([
-      { name: "x-request-id", expected: true },
-      { name: "authorization", expected: false },
-    ])("should validate those starting with x- %#", ({ name, expected }) => {
-      expect(isCustomHeader(name)).toBe(expected);
-    });
-  });
-
-  describe("getCustomHeaders()", () => {
-    test("should reduce the object to the custom headers only", () => {
-      expect(
-        getCustomHeaders({
-          authorization: "Bearer ***",
-          "x-request-id": "test",
-          "x-another": "header",
-        }),
-      ).toEqual({ "x-request-id": "test", "x-another": "header" });
     });
   });
 
@@ -134,7 +110,7 @@ describe("Common Helpers", () => {
         getInput(makeRequestMock({ method: "OPTIONS" }), undefined),
       ).toEqual({});
     });
-    test("Feature 1180: should include custom headers when enabled", () => {
+    test("Features 1180 and 2337: should include headers when enabled", () => {
       expect(
         getInput(
           makeRequestMock({
@@ -144,7 +120,12 @@ describe("Common Helpers", () => {
           }),
           { post: ["body", "headers"] },
         ),
-      ).toEqual({ a: "body", "x-request-id": "test" });
+      ).toEqual({
+        a: "body",
+        authorization: "Bearer ***",
+        "content-type": "application/json",
+        "x-request-id": "test",
+      });
     });
   });
 
@@ -183,44 +164,6 @@ describe("Common Helpers", () => {
       expect(
         getMessageFromError(new Error("something went wrong")),
       ).toMatchSnapshot();
-    });
-  });
-
-  describe("getStatusCodeFromError()", () => {
-    test("should get status code from HttpError", () => {
-      expect(
-        getStatusCodeFromError(createHttpError(403, "Access denied")),
-      ).toEqual(403);
-    });
-
-    test("should return 400 for InputValidationError", () => {
-      const error = new InputValidationError(
-        new z.ZodError([
-          {
-            code: "invalid_type",
-            path: ["user", "id"],
-            message: "expected number, got string",
-            expected: "number",
-            received: "string",
-          },
-        ]),
-      );
-      expect(getStatusCodeFromError(error)).toEqual(400);
-    });
-
-    test.each([
-      new Error("something went wrong"),
-      new z.ZodError([
-        {
-          code: "invalid_type",
-          path: ["user", "id"],
-          message: "expected number, got string",
-          expected: "number",
-          received: "string",
-        },
-      ]),
-    ])("should return 500 for other errors %#", (error) => {
-      expect(getStatusCodeFromError(error)).toEqual(500);
     });
   });
 
@@ -319,7 +262,7 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("makeErrorFromAnything()", () => {
+  describe("ensureError()", () => {
     test.each([
       [new Error("error"), "error"],
       [
@@ -356,7 +299,7 @@ describe("Common Helpers", () => {
       [/regexp/is, "/regexp/is"],
       [[1, 2, 3], "1,2,3"],
     ])("should accept %#", (argument, expected) => {
-      const result = makeErrorFromAnything(argument);
+      const result = ensureError(argument);
       expectTypeOf(result).toEqualTypeOf<Error>();
       expect(result).toBeInstanceOf(Error);
       expect(result).toHaveProperty("message");

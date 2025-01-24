@@ -1,81 +1,60 @@
-import assert from "node:assert/strict";
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
-import { AuxMethod, Method } from "./method";
+import { Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
 
-export interface RoutingWalkerParams {
+export type OnEndpoint = (
+  endpoint: AbstractEndpoint,
+  path: string,
+  method: Method,
+  siblingMethods?: ReadonlyArray<Method>,
+) => void;
+
+interface RoutingWalkerParams {
   routing: Routing;
-  onEndpoint: (
-    endpoint: AbstractEndpoint,
-    path: string,
-    method: Method | AuxMethod,
-    siblingMethods?: ReadonlyArray<Method>,
-  ) => void;
+  onEndpoint: OnEndpoint;
   onStatic?: (path: string, handler: StaticHandler) => void;
   parentPath?: string;
-  hasCors?: boolean;
 }
+
+const makePairs = (subject: Routing, parent?: string) =>
+  Object.entries(subject).map(([segment, item]) => {
+    if (segment.includes("/")) {
+      throw new RoutingError(
+        `The entry '${segment}' must avoid having slashes — use nesting instead.`,
+      );
+    }
+    const trimmed = segment.trim();
+    return [`${parent || ""}${trimmed ? `/${trimmed}` : ""}`, item] as const;
+  });
 
 export const walkRouting = ({
   routing,
   onEndpoint,
   onStatic,
-  parentPath,
-  hasCors,
 }: RoutingWalkerParams) => {
-  const pairs = Object.entries(routing).map(
-    ([key, value]) => [key.trim(), value] as const,
-  );
-  for (const [segment, element] of pairs) {
-    assert.doesNotMatch(
-      segment,
-      /\//,
-      new RoutingError(
-        `The entry '${segment}' must avoid having slashes — use nesting instead.`,
-      ),
-    );
-    const path = `${parentPath || ""}${segment ? `/${segment}` : ""}`;
+  const stack = makePairs(routing);
+  while (stack.length) {
+    const [path, element] = stack.shift()!;
     if (element instanceof AbstractEndpoint) {
-      const methods: (Method | AuxMethod)[] = element.getMethods().slice();
-      if (hasCors) {
-        methods.push("options");
-      }
-      for (const method of methods) {
-        onEndpoint(element, path, method);
-      }
+      const methods = element.getMethods() || ["get"];
+      for (const method of methods) onEndpoint(element, path, method);
     } else if (element instanceof ServeStatic) {
-      if (onStatic) {
-        element.apply(path, onStatic);
-      }
+      if (onStatic) element.apply(path, onStatic);
     } else if (element instanceof DependsOnMethod) {
-      for (const [method, endpoint] of element.pairs) {
-        assert(
-          endpoint.getMethods().includes(method),
-          new RoutingError(
+      for (const [method, endpoint, siblingMethods] of element.entries) {
+        const supportedMethods = endpoint.getMethods();
+        if (supportedMethods && !supportedMethods.includes(method)) {
+          throw new RoutingError(
             `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
-          ),
-        );
-        onEndpoint(endpoint, path, method);
-      }
-      if (hasCors && element.firstEndpoint) {
-        onEndpoint(
-          element.firstEndpoint,
-          path,
-          "options",
-          element.siblingMethods,
-        );
+          );
+        }
+        onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
-      walkRouting({
-        onEndpoint,
-        onStatic,
-        hasCors,
-        routing: element,
-        parentPath: path,
-      });
+      stack.unshift(...makePairs(element, path));
     }
   }
 };

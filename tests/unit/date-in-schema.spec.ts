@@ -17,9 +17,7 @@ describe("ez.dateIn()", () => {
       const schema = ez.dateIn();
       const result = schema.safeParse(123);
       expect(result.success).toBeFalsy();
-      if (!result.success) {
-        expect(result.error.issues).toMatchSnapshot();
-      }
+      if (!result.success) expect(result.error.issues).toMatchSnapshot();
     });
 
     test.each([
@@ -41,18 +39,14 @@ describe("ez.dateIn()", () => {
       const schema = ez.dateIn();
       const result = schema.safeParse("2022-01-32");
       expect(result.success).toBeFalsy();
-      if (!result.success) {
-        expect(result.error.issues).toMatchSnapshot();
-      }
+      if (!result.success) expect(result.error.issues).toMatchSnapshot();
     });
 
     test("should handle invalid format", () => {
       const schema = ez.dateIn();
       const result = schema.safeParse("12.01.2021");
       expect(result.success).toBeFalsy();
-      if (!result.success) {
-        expect(result.error.issues).toMatchSnapshot();
-      }
+      if (!result.success) expect(result.error.issues).toMatchSnapshot();
     });
   });
 });

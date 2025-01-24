@@ -6,7 +6,6 @@ import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
 
 export const updateUserEndpoint =
   keyAndTokenAuthenticatedEndpointsFactory.build({
-    method: "patch",
     tag: "users",
     description: "Changes the user record. Example user update endpoint.",
     input: z
@@ -19,7 +18,7 @@ export const updateUserEndpoint =
             (value) => value >= 0,
             "should be greater than or equal to 0",
           ),
-        name: z.string().min(1),
+        name: z.string().nonempty(),
         birthday: ez.dateIn(),
       })
       .example({

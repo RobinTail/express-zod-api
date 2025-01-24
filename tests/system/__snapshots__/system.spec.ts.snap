@@ -1,6 +1,48 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`App > Positive > Should compress the response in case it is supported by client 1`] = `
+exports[`App in production mode > Negative > Should call Last Resort Handler in case of faulty ResultHandler 1`] = `
+[
+  "Result handler failure",
+  ResultHandlerError({
+    "cause": AssertionError({
+      "message": "I am faulty",
+    }),
+    "message": "I am faulty",
+  }),
+]
+`;
+
+exports[`App in production mode > Negative > Should treat custom errors in endpoint input validations as they are 1`] = `
+[
+  "Result handler failure",
+  ResultHandlerError({
+    "cause": AssertionError({
+      "message": "I am faulty",
+    }),
+    "handled": AssertionError({
+      "message": "Custom error in the Endpoint input validation",
+    }),
+    "message": "I am faulty",
+  }),
+]
+`;
+
+exports[`App in production mode > Negative > Should treat custom errors in middleware input validations as they are 1`] = `
+[
+  "Result handler failure",
+  ResultHandlerError({
+    "cause": AssertionError({
+      "message": "I am faulty",
+    }),
+    "handled": AssertionError({
+      "message": "Custom error in the Middleware input validation",
+    }),
+    "message": "I am faulty",
+  }),
+]
+`;
+
+exports[`App in production mode > Positive > Should compress the response in case it is supported by client 1`] = `
 {
   "data": {
     "anything": 300,
@@ -15,7 +57,7 @@ exports[`App > Positive > Should compress the response in case it is supported b
 }
 `;
 
-exports[`App > Protocol > Should fail on invalid method 1`] = `
+exports[`App in production mode > Protocol > Should fail on invalid method 1`] = `
 {
   "error": {
     "message": "Can not PUT /v1/test",
@@ -24,16 +66,16 @@ exports[`App > Protocol > Should fail on invalid method 1`] = `
 }
 `;
 
-exports[`App > Protocol > Should fail on malformed body 1`] = `
+exports[`App in production mode > Protocol > Should fail on malformed body 1`] = `
 {
   "error": {
-    "message": StringMatching /\\(Unexpected end of JSON input\\|Unterminated string in JSON at position 25\\)/,
+    "message": StringMatching /Unterminated string in JSON at position 25/,
   },
   "status": "error",
 }
 `;
 
-exports[`App > Protocol > Should fail when missing content type header 1`] = `
+exports[`App in production mode > Protocol > Should fail when missing content type header 1`] = `
 {
   "error": {
     "message": "key: Required",
@@ -42,16 +84,43 @@ exports[`App > Protocol > Should fail when missing content type header 1`] = `
 }
 `;
 
-exports[`App > Validation > Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error 1`] = `
+exports[`App in production mode > Validation > Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error 1`] = `
 {
   "error": {
-    "message": "Expected number, received string",
+    "message": "Internal Server Error",
   },
   "status": "error",
 }
 `;
 
-exports[`App > Validation > Should fail on handler input type mismatch 1`] = `
+exports[`App in production mode > Validation > Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error 2`] = `
+[
+  "Server side error",
+  {
+    "error": InternalServerError({
+      "cause": ZodError({
+        "message": "[
+  {
+    "code": "invalid_type",
+    "expected": "number",
+    "received": "string",
+    "path": [],
+    "message": "Expected number, received string"
+  }
+]",
+      }),
+      "message": "Expected number, received string",
+    }),
+    "payload": {
+      "key": "123",
+      "something": "internal_zod_error",
+    },
+    "url": "/v1/test",
+  },
+]
+`;
+
+exports[`App in production mode > Validation > Should fail on handler input type mismatch 1`] = `
 {
   "error": {
     "message": "something: Expected string, received number",
@@ -60,16 +129,47 @@ exports[`App > Validation > Should fail on handler input type mismatch 1`] = `
 }
 `;
 
-exports[`App > Validation > Should fail on handler output type mismatch 1`] = `
+exports[`App in production mode > Validation > Should fail on handler output type mismatch 1`] = `
 {
   "error": {
-    "message": "output/anything: Number must be greater than 0",
+    "message": "Internal Server Error",
   },
   "status": "error",
 }
 `;
 
-exports[`App > Validation > Should fail on middleware input type mismatch 1`] = `
+exports[`App in production mode > Validation > Should fail on handler output type mismatch 2`] = `
+[
+  "Server side error",
+  {
+    "error": InternalServerError({
+      "cause": ZodError({
+        "message": "[
+  {
+    "code": "too_small",
+    "minimum": 0,
+    "type": "number",
+    "inclusive": false,
+    "exact": false,
+    "message": "Number must be greater than 0",
+    "path": [
+      "anything"
+    ]
+  }
+]",
+      }),
+      "message": "output/anything: Number must be greater than 0",
+    }),
+    "payload": {
+      "key": "123",
+      "something": "gimme fail",
+    },
+    "url": "/v1/test",
+  },
+]
+`;
+
+exports[`App in production mode > Validation > Should fail on middleware input type mismatch 1`] = `
 {
   "error": {
     "message": "key: Expected string, received number",
@@ -78,7 +178,7 @@ exports[`App > Validation > Should fail on middleware input type mismatch 1`] = 
 }
 `;
 
-exports[`App > Validation > Should fail on middleware refinement mismatch 1`] = `
+exports[`App in production mode > Validation > Should fail on middleware refinement mismatch 1`] = `
 {
   "error": {
     "message": "key: Invalid key",

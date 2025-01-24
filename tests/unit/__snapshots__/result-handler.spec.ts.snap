@@ -2,7 +2,27 @@
 
 exports[`ResultHandler > 'arrayResultHandler' > Should handle HTTP error 1`] = `"Something not found"`;
 
-exports[`ResultHandler > 'arrayResultHandler' > Should handle generic error 1`] = `"Some error"`;
+exports[`ResultHandler > 'arrayResultHandler' > Should handle generic error 1`] = `
+[
+  [
+    "Server side error",
+    {
+      "error": InternalServerError({
+        "cause": Error({
+          "message": "Some error",
+        }),
+        "message": "Some error",
+      }),
+      "payload": {
+        "something": 453,
+      },
+      "url": "http://something/v1/anything",
+    },
+  ],
+]
+`;
+
+exports[`ResultHandler > 'arrayResultHandler' > Should handle generic error 2`] = `"Some error"`;
 
 exports[`ResultHandler > 'arrayResultHandler' > Should handle regular response 1`] = `
 [
@@ -44,6 +64,26 @@ exports[`ResultHandler > 'defaultResultHandler' > Should handle HTTP error 1`] =
 `;
 
 exports[`ResultHandler > 'defaultResultHandler' > Should handle generic error 1`] = `
+[
+  [
+    "Server side error",
+    {
+      "error": InternalServerError({
+        "cause": Error({
+          "message": "Some error",
+        }),
+        "message": "Some error",
+      }),
+      "payload": {
+        "something": 453,
+      },
+      "url": "http://something/v1/anything",
+    },
+  ],
+]
+`;
+
+exports[`ResultHandler > 'defaultResultHandler' > Should handle generic error 2`] = `
 {
   "error": {
     "message": "Some error",
@@ -105,5 +145,3 @@ exports[`ResultHandler > 'defaultResultHandler' > should generate negative respo
   ],
 }
 `;
-
-exports[`ResultHandler > arrayResultHandler should fail when there is no items prop in the output 1`] = `"Property 'items' is missing in the endpoint output"`;

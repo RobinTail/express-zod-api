@@ -5,18 +5,17 @@ import {
   defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
-import {
-  FlatObject,
-  getExamples,
-  getMessageFromError,
-  getStatusCodeFromError,
-  isObject,
-  logInternalError,
-} from "./common-helpers";
+import { FlatObject, getExamples, isObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
-import { normalize, ResultSchema } from "./result-helpers";
+import {
+  ensureHttpError,
+  getPublicErrorMessage,
+  logServerError,
+  normalize,
+  ResultSchema,
+} from "./result-helpers";
 
 type Handler<RES = unknown> = (params: {
   /** null in case of failure to parse or to find the matching endpoint (error: not found) */
@@ -75,7 +74,7 @@ export class ResultHandler<
   public override getPositiveResponse(output: IOSchema) {
     return normalize(this.#positive, {
       variant: "positive",
-      arguments: [output],
+      args: [output],
       statusCodes: [defaultStatusCodes.positive],
       mimeTypes: [contentTypes.json],
     });
@@ -84,7 +83,7 @@ export class ResultHandler<
   public override getNegativeResponse() {
     return normalize(this.#negative, {
       variant: "negative",
-      arguments: [],
+      args: [],
       statusCodes: [defaultStatusCodes.negative],
       mimeTypes: [contentTypes.json],
     });
@@ -111,23 +110,20 @@ export const defaultResultHandler = new ResultHandler({
     })
     .example({
       status: "error",
-      error: {
-        message: getMessageFromError(new Error("Sample error message")),
-      },
+      error: { message: "Sample error message" },
     }),
   handler: ({ error, input, output, request, response, logger }) => {
-    if (!error) {
-      response
-        .status(defaultStatusCodes.positive)
-        .json({ status: "success", data: output });
-      return;
+    if (error) {
+      const httpError = ensureHttpError(error);
+      logServerError(httpError, logger, request, input);
+      return void response.status(httpError.statusCode).json({
+        status: "error",
+        error: { message: getPublicErrorMessage(httpError) },
+      });
     }
-    const statusCode = getStatusCodeFromError(error);
-    logInternalError({ logger, statusCode, request, error, input });
-    response.status(statusCode).json({
-      status: "error",
-      error: { message: getMessageFromError(error) },
-    });
+    response
+      .status(defaultStatusCodes.positive)
+      .json({ status: "success", data: output });
   },
 });
 
@@ -154,23 +150,21 @@ export const arrayResultHandler = new ResultHandler({
       responseSchema,
     );
   },
-  negative: z
-    .string()
-    .example(getMessageFromError(new Error("Sample error message"))),
+  negative: z.string().example("Sample error message"),
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
-      const statusCode = getStatusCodeFromError(error);
-      logInternalError({ logger, statusCode, request, error, input });
-      response.status(statusCode).type("text/plain").send(error.message);
-      return;
+      const httpError = ensureHttpError(error);
+      logServerError(httpError, logger, request, input);
+      return void response
+        .status(httpError.statusCode)
+        .type("text/plain")
+        .send(getPublicErrorMessage(httpError));
     }
     if (output && "items" in output && Array.isArray(output.items)) {
-      response.status(defaultStatusCodes.positive).json(output.items);
-    } else {
-      response
-        .status(500)
-        .type("text/plain")
-        .send("Property 'items' is missing in the endpoint output");
+      return void response
+        .status(defaultStatusCodes.positive)
+        .json(output.items);
     }
+    throw new Error("Property 'items' is missing in the endpoint output");
   },
 });

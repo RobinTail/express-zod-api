@@ -8,7 +8,7 @@ import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
 import { AbstractResultHandler } from "./result-handler";
 import { ListenOptions } from "node:net";
-import { ChildLoggerExtractor } from "./server-helpers";
+import { GetLogger } from "./server-helpers";
 
 export type InputSource = keyof Pick<
   Request,
@@ -25,17 +25,12 @@ type HeadersProvider = (params: {
   logger: ActualLogger;
 }) => Headers | Promise<Headers>;
 
-export type TagsConfig<TAG extends string> = Record<
-  TAG,
-  string | { description: string; url?: string }
->;
-
 type ChildLoggerProvider = (params: {
   request: Request;
   parent: ActualLogger;
 }) => ActualLogger | Promise<ActualLogger>;
 
-export interface CommonConfig<TAG extends string = string> {
+export interface CommonConfig {
   /**
    * @desc Enables cross-origin resource sharing.
    * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
@@ -51,8 +46,9 @@ export interface CommonConfig<TAG extends string = string> {
   /**
    * @desc Built-in logger configuration or an instance of any compatible logger.
    * @example { level: "debug", color: true }
+   * @default { level: NODE_ENV === "production" ? "warn" : "debug", color: isSupported(), depth: 2 }
    * */
-  logger: BuiltinLoggerConfig | AbstractLogger;
+  logger?: Partial<BuiltinLoggerConfig> | AbstractLogger;
   /**
    * @desc A child logger returned by this function can override the logger in all handlers for each request
    * @example ({ parent }) => parent.child({ requestId: uuid() })
@@ -70,11 +66,6 @@ export interface CommonConfig<TAG extends string = string> {
    * @see defaultInputSources
    */
   inputSources?: Partial<InputSources>;
-  /**
-   * @desc Optional endpoints tagging configuration.
-   * @example: { users: "Everything about the users" }
-   */
-  tags?: TagsConfig<TAG>;
 }
 
 type BeforeUpload = (params: {
@@ -130,61 +121,57 @@ interface GracefulOptions {
 
 type BeforeRouting = (params: {
   app: IRouter;
-  /**
-   * @desc Root logger, same for all requests
-   * @todo reconsider the naming in v21
-   * */
-  logger: ActualLogger;
-  /** @desc Returns a child logger if childLoggerProvider is configured (otherwise root logger) */
-  getChildLogger: ChildLoggerExtractor;
+  /** @desc Returns child logger for the given request (if configured) or the configured logger otherwise */
+  getLogger: GetLogger;
 }) => void | Promise<void>;
 
-export interface ServerConfig<TAG extends string = string>
-  extends CommonConfig<TAG> {
-  /** @desc Server configuration. */
-  server: {
-    /** @desc Port, UNIX socket or custom options. */
-    listen: number | string | ListenOptions;
-    /**
-     * @desc Custom JSON parser.
-     * @default express.json()
-     * @link https://expressjs.com/en/4x/api.html#express.json
-     * */
-    jsonParser?: RequestHandler;
-    /**
-     * @desc Enable or configure uploads handling.
-     * @default undefined
-     * @requires express-fileupload
-     * */
-    upload?: boolean | UploadOptions;
-    /**
-     * @desc Enable or configure response compression.
-     * @default undefined
-     * @requires compression
-     */
-    compression?: boolean | CompressionOptions;
-    /**
-     * @desc Custom raw parser (assigns Buffer to request body)
-     * @default express.raw()
-     * @link https://expressjs.com/en/4x/api.html#express.raw
-     * */
-    rawParser?: RequestHandler;
-    /**
-     * @desc A code to execute before processing the Routing of your API (and before parsing).
-     * @desc This can be a good place for express middlewares establishing their own routes.
-     * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
-     * @default undefined
-     * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
-     * */
-    beforeRouting?: BeforeRouting;
-  };
-  /** @desc Enables HTTPS server as well. */
-  https?: {
-    /** @desc At least "cert" and "key" options required. */
-    options: ServerOptions;
-    /** @desc Port, UNIX socket or custom options. */
-    listen: number | string | ListenOptions;
-  };
+export interface HttpConfig {
+  /** @desc Port, UNIX socket or custom options. */
+  listen: number | string | ListenOptions;
+}
+
+interface HttpsConfig extends HttpConfig {
+  /** @desc At least "cert" and "key" options required. */
+  options: ServerOptions;
+}
+
+export interface ServerConfig extends CommonConfig {
+  /** @desc HTTP server configuration. */
+  http?: HttpConfig;
+  /** @desc HTTPS server configuration. */
+  https?: HttpsConfig;
+  /**
+   * @desc Custom JSON parser.
+   * @default express.json()
+   * @link https://expressjs.com/en/4x/api.html#express.json
+   * */
+  jsonParser?: RequestHandler;
+  /**
+   * @desc Enable or configure uploads handling.
+   * @default undefined
+   * @requires express-fileupload
+   * */
+  upload?: boolean | UploadOptions;
+  /**
+   * @desc Enable or configure response compression.
+   * @default undefined
+   * @requires compression
+   */
+  compression?: boolean | CompressionOptions;
+  /**
+   * @desc Custom raw parser (assigns Buffer to request body)
+   * @default express.raw()
+   * @link https://expressjs.com/en/4x/api.html#express.raw
+   * */
+  rawParser?: RequestHandler;
+  /**
+   * @desc A code to execute before processing the Routing of your API (and before parsing).
+   * @desc This can be a good place for express middlewares establishing their own routes.
+   * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
+   * @default undefined
+   * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
+   * */
+  beforeRouting?: BeforeRouting;
   /**
    * @desc Rejects new connections and attempts to finish ongoing ones in the specified time before exit.
    * @default undefined
@@ -192,18 +179,13 @@ export interface ServerConfig<TAG extends string = string>
   gracefulShutdown?: boolean | GracefulOptions;
 }
 
-export interface AppConfig<TAG extends string = string>
-  extends CommonConfig<TAG> {
+export interface AppConfig extends CommonConfig {
   /** @desc Your custom express app or express router instead. */
   app: IRouter;
 }
 
-export function createConfig<TAG extends string>(
-  config: ServerConfig<TAG>,
-): ServerConfig<TAG>;
-export function createConfig<TAG extends string>(
-  config: AppConfig<TAG>,
-): AppConfig<TAG>;
+export function createConfig(config: ServerConfig): ServerConfig;
+export function createConfig(config: AppConfig): AppConfig;
 export function createConfig(config: AppConfig | ServerConfig) {
   return config;
 }

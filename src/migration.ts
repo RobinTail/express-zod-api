@@ -1,157 +1,182 @@
-import { ESLintUtils, type TSESLint } from "@typescript-eslint/utils";
-import { name as importName } from "../package.json";
+import {
+  ESLintUtils,
+  AST_NODE_TYPES as NT,
+  type TSESLint,
+  type TSESTree,
+} from "@typescript-eslint/utils";
+import { Method, methods } from "./method";
+import { name as self } from "../package.json";
 
-const testerName = "testEndpoint";
+interface Queries {
+  provide: TSESTree.CallExpression & {
+    arguments: [
+      TSESTree.Literal & { value: Method },
+      TSESTree.Literal,
+      TSESTree.ObjectExpression,
+    ];
+  };
+  splitResponse: TSESTree.Property & { key: TSESTree.Identifier };
+  methodPath: TSESTree.ImportSpecifier & { imported: TSESTree.Identifier };
+  createConfig: TSESTree.Property & {
+    key: TSESTree.Identifier;
+    value: TSESTree.ObjectExpression;
+  };
+  newDocs: TSESTree.ObjectExpression;
+  newFactory: TSESTree.Property & { key: TSESTree.Identifier };
+  newSSE: TSESTree.Property & { key: TSESTree.Identifier };
+  newClient: TSESTree.NewExpression;
+}
 
-const changedMethods = {
-  createLogger: "BuiltinLogger",
-  createResultHandler: "ResultHandler",
-  createMiddleware: "Middleware",
+type Listener = keyof Queries;
+
+const queries: Record<Listener, string> = {
+  provide:
+    `${NT.CallExpression}[callee.property.name='provide'][arguments.length=3]` +
+    `:has(${NT.Literal}[value=/^${methods.join("|")}$/] + ${NT.Literal} + ${NT.ObjectExpression})`,
+  splitResponse:
+    `${NT.NewExpression}[callee.name='Integration'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='splitResponse']`,
+  methodPath: `${NT.ImportDeclaration} > ${NT.ImportSpecifier}[imported.name='MethodPath']`,
+  createConfig:
+    `${NT.CallExpression}[callee.name='createConfig'] > ${NT.ObjectExpression} > ` +
+    `${NT.Property}[key.name='tags'][value.type='ObjectExpression']`,
+  newDocs:
+    `${NT.NewExpression}[callee.name='Documentation'] > ` +
+    `${NT.ObjectExpression}[properties.length>0]:not(:has(>Property[key.name='tags']))`,
+  newFactory:
+    `${NT.NewExpression}[callee.name='EndpointsFactory'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='resultHandler']`,
+  newSSE:
+    `${NT.NewExpression}[callee.name='EventStreamFactory'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='events']`,
+  newClient: `${NT.NewExpression}[callee.name='ExpressZodAPIClient']`,
 };
 
-const changedProps = {
-  getPositiveResponse: "positive",
-  getNegativeResponse: "negative",
-  responseProps: "responseOptions",
-  middleware: "handler",
-};
+const listen = <
+  S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
+>(
+  subject: S,
+) =>
+  (Object.keys(subject) as Listener[]).reduce<{ [K: string]: S[Listener] }>(
+    (agg, key) =>
+      Object.assign(agg, {
+        [queries[key]]: subject[key],
+      }),
+    {},
+  );
 
-const removedProps = { fnMethod: null };
-
-const shouldAct = <T extends Record<string, unknown>>(
-  subject: unknown,
-  scope: T,
-): subject is keyof T => typeof subject === "string" && subject in scope;
-
-const v20 = ESLintUtils.RuleCreator.withoutDocs({
+const v22 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     fixable: "code",
     schema: [],
     messages: {
+      add: `Add {{subject}} to {{to}}`,
       change: "Change {{subject}} {{from}} to {{to}}.",
       remove: "Remove {{subject}} {{name}}.",
     },
   },
   defaultOptions: [],
-  create: (ctx) => ({
-    ImportDeclaration: (node) => {
-      if (node.source.value === importName) {
-        for (const spec of node.specifiers) {
-          if (
-            spec.type === "ImportSpecifier" &&
-            shouldAct(spec.imported.name, changedMethods)
-          ) {
-            const replacement = changedMethods[spec.imported.name];
-            ctx.report({
-              node: spec.imported,
-              messageId: "change",
-              data: {
-                subject: "import",
-                from: spec.imported.name,
-                to: replacement,
-              },
-              fix: (fixer) => fixer.replaceText(spec, replacement),
-            });
-          }
-        }
-      }
-    },
-    CallExpression: (node) => {
-      if (
-        node.callee.type === "Identifier" &&
-        shouldAct(node.callee.name, changedMethods)
-      ) {
-        const replacement = `new ${changedMethods[node.callee.name]}`;
+  create: (ctx) =>
+    listen({
+      provide: (node) => {
+        const {
+          arguments: [method, path],
+        } = node;
+        const request = `"${method.value} ${path.value}"`;
         ctx.report({
-          node: node.callee,
           messageId: "change",
-          data: { subject: "call", from: node.callee.name, to: replacement },
+          node,
+          data: {
+            subject: "arguments",
+            from: `"${method.value}", "${path.value}"`,
+            to: request,
+          },
+          fix: (fixer) =>
+            fixer.replaceTextRange([method.range[0], path.range[1]], request),
+        });
+      },
+      splitResponse: (node) =>
+        ctx.report({
+          messageId: "remove",
+          node,
+          data: { subject: "property", name: node.key.name },
+          fix: (fixer) => fixer.remove(node),
+        }),
+      methodPath: (node) => {
+        const replacement = "Request";
+        ctx.report({
+          messageId: "change",
+          node: node.imported,
+          data: { subject: "type", from: node.imported.name, to: replacement },
+          fix: (fixer) => fixer.replaceText(node.imported, replacement),
+        });
+      },
+      createConfig: (node) => {
+        const props = node.value.properties
+          .filter(
+            (prop): prop is TSESTree.Property & { key: TSESTree.Identifier } =>
+              "key" in prop && "name" in prop.key,
+          )
+          .map((prop) => `    "${prop.key.name}": unknown,\n`);
+        ctx.report({
+          messageId: "remove",
+          node,
+          data: { subject: "property", name: node.key.name },
+          fix: (fixer) => [
+            fixer.remove(node),
+            fixer.insertTextAfter(
+              ctx.sourceCode.ast,
+              `\n// Declaring tag constraints\ndeclare module "${self}" {\n  interface TagOverrides {\n${props}  }\n}`,
+            ),
+          ],
+        });
+      },
+      newDocs: (node) =>
+        ctx.report({
+          messageId: "add",
+          node,
+          data: { subject: "tags", to: "Documentation" },
+          fix: (fixer) =>
+            fixer.insertTextBefore(
+              node.properties[0],
+              "tags: { /* move from createConfig() argument if any */ }, ",
+            ),
+        }),
+      newFactory: (node) =>
+        ctx.report({
+          messageId: "change",
+          node: node.parent,
+          data: {
+            subject: "argument",
+            from: "object",
+            to: "ResultHandler instance",
+          },
+          fix: (fixer) =>
+            fixer.replaceText(node.parent, ctx.sourceCode.getText(node.value)),
+        }),
+      newSSE: (node) =>
+        ctx.report({
+          messageId: "change",
+          node: node.parent,
+          data: { subject: "argument", from: "object", to: "events map" },
+          fix: (fixer) =>
+            fixer.replaceText(node.parent, ctx.sourceCode.getText(node.value)),
+        }),
+      newClient: (node) => {
+        const replacement = "Client";
+        ctx.report({
+          messageId: "change",
+          node: node.callee,
+          data: {
+            subject: "class",
+            from: "ExpressZodAPIClient",
+            to: replacement,
+          },
           fix: (fixer) => fixer.replaceText(node.callee, replacement),
         });
-      }
-      if (
-        node.callee.type === "Identifier" &&
-        node.callee.name === testerName &&
-        node.arguments.length === 1 &&
-        node.arguments[0].type === "ObjectExpression"
-      ) {
-        for (const prop of node.arguments[0].properties) {
-          if (prop.type === "Property" && prop.key.type === "Identifier") {
-            if (shouldAct(prop.key.name, changedProps)) {
-              const replacement = changedProps[prop.key.name];
-              ctx.report({
-                node: prop,
-                messageId: "change",
-                data: {
-                  subject: "property",
-                  from: prop.key.name,
-                  to: replacement,
-                },
-                fix: (fixer) => fixer.replaceText(prop.key, replacement),
-              });
-            }
-            if (shouldAct(prop.key.name, removedProps)) {
-              ctx.report({
-                node: prop,
-                messageId: "remove",
-                data: { subject: "property", name: prop.key.name },
-                fix: (fixer) =>
-                  ctx.sourceCode.getTokenAfter(prop)?.value === "," &&
-                  prop.range
-                    ? fixer.removeRange([prop.range[0], prop.range[1] + 1])
-                    : fixer.remove(prop),
-              });
-            }
-          }
-        }
-      }
-    },
-    NewExpression: (node) => {
-      if (
-        node.callee.type === "Identifier" &&
-        [
-          changedMethods.createResultHandler,
-          changedMethods.createMiddleware,
-        ].includes(node.callee.name) &&
-        node.arguments.length === 1 &&
-        node.arguments[0].type === "ObjectExpression"
-      ) {
-        for (const prop of node.arguments[0].properties) {
-          if (
-            prop.type === "Property" &&
-            prop.key.type === "Identifier" &&
-            shouldAct(prop.key.name, changedProps)
-          ) {
-            const replacement = changedProps[prop.key.name];
-            ctx.report({
-              node: prop,
-              messageId: "change",
-              data: {
-                subject: "property",
-                from: prop.key.name,
-                to: replacement,
-              },
-              fix: (fixer) => fixer.replaceText(prop.key, replacement),
-            });
-          }
-        }
-      }
-    },
-    Identifier: (node) => {
-      if (
-        node.name === "MockOverrides" &&
-        node.parent.type === "TSInterfaceDeclaration"
-      ) {
-        ctx.report({
-          node,
-          messageId: "remove",
-          data: { subject: "augmentation", name: node.name },
-          fix: (fixer) => fixer.remove(node.parent),
-        });
-      }
-    },
-  }),
+      },
+    }),
 });
 
 /**
@@ -163,9 +188,9 @@ const v20 = ESLintUtils.RuleCreator.withoutDocs({
  *          import migration from "express-zod-api/migration";
  *          export default [
  *            { languageOptions: {parser}, plugins: {migration} },
- *            { files: ["**\/*.ts"], rules: { "migration/v20": "error" } }
+ *            { files: ["**\/*.ts"], rules: { "migration/v21": "error" } }
  *          ];
  * */
 export default {
-  rules: { v20 },
+  rules: { v22 },
 } satisfies TSESLint.Linter.Plugin;

@@ -8,7 +8,7 @@ export const createUserEndpoint = statusDependingFactory.build({
   method: "post",
   tag: "users",
   input: z.object({
-    name: z.string().min(1),
+    name: z.string().nonempty(),
   }),
   output: z.object({
     id: z.number().int().positive(),

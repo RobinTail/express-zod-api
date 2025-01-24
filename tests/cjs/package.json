@@ -4,5 +4,8 @@
   "version": "0.0.0",
   "dependencies": {
     "express-zod-api": "link:../.."
+  },
+  "scripts": {
+    "preinstall": "rm -rf node_modules"
   }
 }
