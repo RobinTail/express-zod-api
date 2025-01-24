@@ -2,7 +2,6 @@ import {
   ExamplesObject,
   MediaTypeObject,
   OAuthFlowObject,
-  ParameterLocation,
   ParameterObject,
   ReferenceObject,
   RequestBodyObject,
@@ -45,12 +44,12 @@ import {
   combinations,
   getExamples,
   hasCoercion,
-  isCustomHeader,
   makeCleanId,
   tryToTransform,
   ucFirst,
+  Tag,
 } from "./common-helpers";
-import { InputSource, TagsConfig } from "./config-type";
+import { InputSource } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
@@ -68,6 +67,7 @@ import { RawSchema, ezRawBrand } from "./raw-schema";
 import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
 import { Security } from "./security";
 import { UploadSchema, ezUploadBrand } from "./upload-schema";
+import wellKnownHeaders from "./well-known-headers.json";
 
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
@@ -87,6 +87,13 @@ export type Depicter = SchemaHandler<
   SchemaObject | ReferenceObject,
   OpenAPIContext
 >;
+
+/** @desc Using defaultIsHeader when returns null or undefined */
+export type IsHeader = (
+  name: string,
+  method: Method,
+  path: string,
+) => boolean | null | undefined;
 
 interface ReqResHandlingProps<S extends z.ZodTypeAny>
   extends Pick<OpenAPIContext, "makeRef" | "path" | "method"> {
@@ -624,6 +631,9 @@ export const extractObjectSchema = (
   );
 };
 
+export const defaultIsHeader = (name: string): name is `x-${string}` =>
+  name.startsWith("x-") || wellKnownHeaders.includes(name);
+
 export const depictRequestParams = ({
   path,
   method,
@@ -632,9 +642,11 @@ export const depictRequestParams = ({
   makeRef,
   composition,
   brandHandling,
+  isHeader,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
+  isHeader?: IsHeader;
 }) => {
   const { shape } = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
@@ -644,25 +656,18 @@ export const depictRequestParams = ({
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
   const isHeaderParam = (name: string) =>
-    areHeadersEnabled && isCustomHeader(name);
+    areHeadersEnabled &&
+    (isHeader?.(name, method, path) ?? defaultIsHeader(name));
 
-  const parameters = Object.keys(shape)
-    .map<{ name: string; location?: ParameterLocation }>((name) => ({
-      name,
-      location: isPathParam(name)
-        ? "path"
-        : isHeaderParam(name)
-          ? "header"
-          : isQueryEnabled
-            ? "query"
-            : undefined,
-    }))
-    .filter(
-      (parameter): parameter is Required<typeof parameter> =>
-        parameter.location !== undefined,
-    );
-
-  return parameters.map<ParameterObject>(({ name, location }) => {
+  return Object.keys(shape).reduce<ParameterObject[]>((acc, name) => {
+    const location = isPathParam(name)
+      ? "path"
+      : isHeaderParam(name)
+        ? "header"
+        : isQueryEnabled
+          ? "query"
+          : undefined;
+    if (!location) return acc;
     const depicted = walkSchema(shape[name], {
       rules: { ...brandHandling, ...depicters },
       onEach,
@@ -673,15 +678,15 @@ export const depictRequestParams = ({
       composition === "components"
         ? makeRef(shape[name], depicted, makeCleanId(description, name))
         : depicted;
-    return {
+    return acc.concat({
       name,
       in: location,
       required: !shape[name].isOptional(),
       description: depicted.description || description,
       schema: result,
       examples: depictParamExamples(schema, name),
-    };
-  });
+    });
+  }, []);
 };
 
 export const depicters: HandlingRules<
@@ -964,19 +969,19 @@ export const depictBody = ({
   return { description, content: { [mimeType]: media } };
 };
 
-export const depictTags = <TAG extends string>(
-  tags: TagsConfig<TAG>,
-): TagObject[] =>
-  (Object.keys(tags) as TAG[]).map((tag) => {
-    const def = tags[tag];
-    const result: TagObject = {
+export const depictTags = (
+  tags: Partial<Record<Tag, string | { description: string; url?: string }>>,
+) =>
+  Object.entries(tags).reduce<TagObject[]>((agg, [tag, def]) => {
+    if (!def) return agg;
+    const entry: TagObject = {
       name: tag,
       description: typeof def === "string" ? def : def.description,
     };
     if (typeof def === "object" && def.url)
-      result.externalDocs = { url: def.url };
-    return result;
-  });
+      entry.externalDocs = { url: def.url };
+    return agg.concat(entry);
+  }, []);
 
 export const ensureShortDescription = (description: string) =>
   description.length <= shortDescriptionLimit

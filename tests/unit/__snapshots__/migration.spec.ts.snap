@@ -3,14 +3,15 @@
 exports[`Migration > should consist of one rule being the major version of the package 1`] = `
 {
   "rules": {
-    "v21": {
+    "v22": {
       "create": [Function],
       "defaultOptions": [],
       "meta": {
         "fixable": "code",
         "messages": {
+          "add": "Add {{subject}} to {{to}}",
           "change": "Change {{subject}} {{from}} to {{to}}.",
-          "move": "Move {{subject}} from {{from}} to {{to}}.",
+          "remove": "Remove {{subject}} {{name}}.",
         },
         "schema": [],
         "type": "problem",

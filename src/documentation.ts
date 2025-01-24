@@ -13,7 +13,7 @@ import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { mapLogicalContainer } from "./logical-container";
+import { combineContainers, mapLogicalContainer } from "./logical-container";
 import { Method } from "./method";
 import {
   OpenAPIContext,
@@ -25,6 +25,7 @@ import {
   depictTags,
   ensureShortDescription,
   reformatParamsInPath,
+  IsHeader,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
@@ -66,6 +67,19 @@ interface DocumentationParams {
    * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => ({ type: "object" })
    */
   brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
+  /**
+   * @desc Ability to configure recognition of headers among other input data
+   * @desc Only applicable when "headers" is present within inputSources config option
+   * @see defaultIsHeader
+   * @link https://www.iana.org/assignments/http-fields/http-fields.xhtml
+   * */
+  isHeader?: IsHeader;
+  /**
+   * @desc Extended description of tags used in endpoints. For enforcing constraints:
+   * @see TagOverrides
+   * @example { users: "About users", files: { description: "About files", url: "https://example.com" } }
+   * */
+  tags?: Parameters<typeof depictTags>[0];
 }
 
 export class Documentation extends OpenApiBuilder {
@@ -135,6 +149,8 @@ export class Documentation extends OpenApiBuilder {
     serverUrl,
     descriptions,
     brandHandling,
+    tags,
+    isHeader,
     hasSummaryFromDescription = true,
     composition = "inline",
   }: DocumentationParams) {
@@ -171,6 +187,7 @@ export class Documentation extends OpenApiBuilder {
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
+        isHeader,
         schema: endpoint.getSchema("input"),
         description: descriptions?.requestParameter?.call(null, {
           method,
@@ -219,7 +236,10 @@ export class Documentation extends OpenApiBuilder {
 
       const securityRefs = depictSecurityRefs(
         mapLogicalContainer(
-          depictSecurity(endpoint.getSecurity(), inputSources),
+          depictSecurity(
+            endpoint.getSecurity().reduce(combineContainers, { and: [] }),
+            inputSources,
+          ),
           (securitySchema) => {
             const name = this.ensureUniqSecuritySchemaName(securitySchema);
             const scopes = ["oauth2", "openIdConnect"].includes(
@@ -247,6 +267,6 @@ export class Documentation extends OpenApiBuilder {
       });
     };
     walkRouting({ routing, onEndpoint });
-    this.rootDoc.tags = config.tags ? depictTags(config.tags) : [];
+    if (tags) this.rootDoc.tags = depictTags(tags);
   }
 }

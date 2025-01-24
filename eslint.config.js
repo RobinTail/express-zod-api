@@ -60,7 +60,7 @@ const tsFactoryConcerns = [
     message: "use makeType() or makePublicLiteralType() helpers",
   },
   {
-    selector: "Identifier[name='createVariableDeclarationList']",
+    selector: "Identifier[name='createVariableStatement']",
     message: "use makeConst() helper",
   },
   {
@@ -73,7 +73,7 @@ const tsFactoryConcerns = [
   },
   {
     selector: "Identifier[name='createConstructorDeclaration']",
-    message: "use makeEmptyInitializingConstructor() helper",
+    message: "use makePublicConstructor() helper",
   },
   {
     selector: "Identifier[name='createParameterDeclaration']",
@@ -86,16 +86,25 @@ const tsFactoryConcerns = [
     message: "use makePropCall() helper",
   },
   {
-    selector: "Identifier[name='AmpersandAmpersandToken']",
-    message: "use makeAnd() helper",
-  },
-  {
-    selector: "Identifier[name='EqualsEqualsEqualsToken']",
-    message: "use makeEqual() helper",
-  },
-  {
     selector: "Identifier[name='KeyOfKeyword']",
     message: "use makeKeyOf() helper",
+  },
+  {
+    selector: "Identifier[name='createTemplateExpression']",
+    message: "use makeTemplate() helper",
+  },
+  {
+    selector: "Identifier[name='createNewExpression']",
+    message: "use makeNew() helper",
+  },
+  {
+    selector: "Literal[value='Promise']",
+    message: "use makePromise() helper",
+  },
+  {
+    selector:
+      "CallExpression[callee.property.name='createTypeReferenceNode'][arguments.length=1]",
+    message: "use ensureTypeNode() helper",
   },
 ];
 
@@ -143,7 +152,7 @@ export default tsPlugin.config(
   },
   {
     name: "source/integration",
-    files: ["src/integration.ts"],
+    files: ["src/integration.ts", "src/integration-base.ts", "src/zts.ts"],
     rules: {
       "no-restricted-syntax": [
         "warn",
