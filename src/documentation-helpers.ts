@@ -89,6 +89,13 @@ export type Depicter = SchemaHandler<
   OpenAPIContext
 >;
 
+/** @desc Using defaultIsHeader when returns null or undefined */
+export type IsHeader = (
+  name: string,
+  method: Method,
+  path: string,
+) => boolean | null | undefined;
+
 interface ReqResHandlingProps<S extends z.ZodTypeAny>
   extends Pick<OpenAPIContext, "makeRef" | "path" | "method"> {
   schema: S;
@@ -640,7 +647,7 @@ export const depictRequestParams = ({
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
-  isHeader: (name: string, method: Method, path: string) => boolean;
+  isHeader: IsHeader;
 }) => {
   const { shape } = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
@@ -650,7 +657,8 @@ export const depictRequestParams = ({
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
   const isHeaderParam = (name: string) =>
-    areHeadersEnabled && isHeader(name, method, path);
+    (areHeadersEnabled && isHeader(name, method, path)) ??
+    defaultIsHeader(name);
 
   const parameters = Object.keys(shape)
     .map<{ name: string; location?: ParameterLocation }>((name) => ({

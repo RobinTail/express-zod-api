@@ -26,6 +26,7 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
   defaultIsHeader,
+  IsHeader,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
@@ -74,7 +75,7 @@ interface DocumentationParams {
    * @see defaultIsHeader
    * @link https://www.iana.org/assignments/http-fields/http-fields.xhtml
    * */
-  isHeader?: Parameters<typeof depictRequestParams>[0]["isHeader"];
+  isHeader?: IsHeader;
   /**
    * @desc Extended description of tags used in endpoints. For enforcing constraints:
    * @see TagOverrides
