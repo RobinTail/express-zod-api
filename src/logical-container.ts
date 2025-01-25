@@ -1,4 +1,13 @@
-import { chain, isEmpty, map, partition, prop, reject } from "ramda";
+import {
+  chain,
+  isEmpty,
+  map,
+  partition,
+  prop,
+  reject,
+  filter,
+  concat,
+} from "ramda";
 import { combinations, isObject } from "./common-helpers";
 
 type LogicalOr<T> = { or: T[] };
@@ -23,18 +32,18 @@ export const processContainers = <T, U>(
   containers: LogicalContainer<T>[],
   mapper: (subject: T) => U,
 ): U[][] => {
-  const simples = containers.filter(isSimple);
-  const ands = chain(prop("and"), containers.filter(isLogicalAnd));
+  const simples = filter(isSimple, containers);
+  const ands = chain(prop("and"), filter(isLogicalAnd, containers));
   const [simpleAnds, orsInAnds] = partition(isSimple, ands);
-  const persistent = simples.concat(simpleAnds);
-  const ors = containers.filter(isLogicalOr);
-  const alternators = map(prop("or"), ors.concat(orsInAnds)); // no chain!
+  const persistent = concat(simples, simpleAnds);
+  const ors = filter(isLogicalOr, containers);
+  const alternators = map(prop("or"), concat(ors, orsInAnds)); // no chain!
   return alternators.reduce(
     (acc, entry) =>
       combinations(
         acc,
         map((opt) => map(mapper, isSimple(opt) ? [opt] : opt.and), entry),
-        ([a, b]) => a.concat(b),
+        ([a, b]) => concat(a, b),
       ),
     reject(isEmpty, [map(mapper, persistent)]),
   );
