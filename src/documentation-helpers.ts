@@ -909,7 +909,7 @@ export const depictSecurity = (
 
 export const depictSecurityRefs = (
   alternatives: SecuritySchemeObject[][],
-  scopes: string[],
+  scopes: string[] | ReadonlyArray<string>,
   entitle: (subject: SecuritySchemeObject) => string,
 ): SecurityRequirementObject[] =>
   alternatives.map((alternative) =>

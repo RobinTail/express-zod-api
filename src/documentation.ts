@@ -182,6 +182,8 @@ export class Documentation extends OpenApiBuilder {
         endpoint.getOperationId(method),
       );
 
+      const security = depictSecurity(endpoint.getSecurity(), inputSources);
+
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
@@ -233,8 +235,8 @@ export class Documentation extends OpenApiBuilder {
         : undefined;
 
       const securityRefs = depictSecurityRefs(
-        depictSecurity(endpoint.getSecurity(), inputSources),
-        endpoint.getScopes().slice(),
+        security,
+        endpoint.getScopes(),
         (securitySchema) => {
           const name = this.ensureUniqSecuritySchemaName(securitySchema);
           this.addSecurityScheme(name, securitySchema);
