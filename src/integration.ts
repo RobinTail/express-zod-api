@@ -29,6 +29,8 @@ interface IntegrationParams {
    * @default "client"
    * */
   variant?: "types" | "client";
+  /** @default Client */
+  clientClassName?: string;
   /**
    * @desc The API URL to use in the generated code
    * @default https://example.com
@@ -97,6 +99,7 @@ export class Integration extends IntegrationBase {
     routing,
     brandHandling,
     variant = "client",
+    clientClassName = "Client",
     serverUrl = "https://example.com",
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
@@ -180,10 +183,10 @@ export class Integration extends IntegrationBase {
       this.makeSubstituteFn(),
       this.makeImplementationType(),
       this.makeDefaultImplementation(),
-      this.makeClientClass(),
+      this.makeClientClass(clientClassName),
     );
 
-    this.usage.push(...this.makeUsageStatements());
+    this.usage.push(...this.makeUsageStatements(clientClassName));
   }
 
   protected printUsage(printerOptions?: ts.PrinterOptions) {
