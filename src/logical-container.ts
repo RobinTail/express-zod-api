@@ -1,4 +1,4 @@
-import { chain, isEmpty, reject } from "ramda";
+import { chain, isEmpty, partition, prop, reject } from "ramda";
 import { combinations, isObject } from "./common-helpers";
 
 type LogicalOr<T> = { or: T[] };
@@ -9,10 +9,10 @@ export type LogicalContainer<T> =
   | LogicalAnd<T | LogicalOr<T>>
   | T;
 
-const isLogicalOr = (subject: unknown): subject is LogicalOr<unknown> =>
+const isLogicalOr = <T>(subject: LogicalContainer<T>) =>
   isObject(subject) && "or" in subject;
 
-const isLogicalAnd = (subject: unknown): subject is LogicalAnd<unknown> =>
+const isLogicalAnd = <T>(subject: LogicalContainer<T>) =>
   isObject(subject) && "and" in subject;
 
 const isSimple = <T>(entry: LogicalContainer<T>): entry is T =>
@@ -25,24 +25,17 @@ export const processContainers = <T, U>(
 ): U[][] => {
   const joiner = ([a, b]: [U[], U[]]) => a.concat(b);
   const simples = containers.filter(isSimple);
-  const ands = containers.filter((entry) => isLogicalAnd(entry));
-  const ors = containers.filter((entry) => isLogicalOr(entry));
-  let alts = [
-    simples
-      .map(mapper)
-      .concat(chain((entry) => entry.and.filter(isSimple).map(mapper), ands)),
-  ];
-  const alternators = chain(
-    (entry) =>
-      entry.and
-        .filter((entry) => isLogicalOr(entry))
-        .map((entry) => entry.or.map((v) => [mapper(v)])),
-    ands,
-  ).concat(
-    ors.map((entry) =>
-      entry.or.map((v) => (isSimple(v) ? [mapper(v)] : v.and.map(mapper))),
-    ),
-  );
+  const ands = chain(prop("and"), containers.filter(isLogicalAnd));
+  const [simpleAnds, orsInAnds] = partition(isSimple, ands);
+  const ors = containers.filter(isLogicalOr);
+  let alts = [simples.concat(simpleAnds).map(mapper)];
+  const alternators = orsInAnds
+    .map((entry) => entry.or.map((v) => [mapper(v)]))
+    .concat(
+      ors.map((entry) =>
+        entry.or.map((v) => (isSimple(v) ? [mapper(v)] : v.and.map(mapper))),
+      ),
+    );
   for (const entry of alternators) alts = combinations(alts, entry, joiner);
   return reject(isEmpty, alts);
 };
