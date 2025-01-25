@@ -54,7 +54,6 @@ import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { FileSchema, ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
-import { LogicalContainer, processContainers } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
@@ -626,8 +625,15 @@ export const extractObjectSchema = (
   );
 };
 
-export const defaultIsHeader = (name: string): name is `x-${string}` =>
-  name.startsWith("x-") || wellKnownHeaders.includes(name);
+export const defaultIsHeader = (
+  name: string,
+  security?: Security[][],
+): name is `x-${string}` =>
+  name.startsWith("x-") ||
+  security?.some((alt) =>
+    alt.some((entry) => entry.type === "header" && entry.name === name),
+  ) ||
+  wellKnownHeaders.includes(name);
 
 export const depictRequestParams = ({
   path,
@@ -638,10 +644,12 @@ export const depictRequestParams = ({
   composition,
   brandHandling,
   isHeader,
+  security,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
   isHeader?: IsHeader;
+  security?: Security[][];
 }) => {
   const { shape } = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
@@ -652,7 +660,7 @@ export const depictRequestParams = ({
     areParamsEnabled && pathParams.includes(name);
   const isHeaderParam = (name: string) =>
     areHeadersEnabled &&
-    (isHeader?.(name, method, path) ?? defaultIsHeader(name));
+    (isHeader?.(name, method, path) ?? defaultIsHeader(name, security));
 
   return Object.keys(shape).reduce<ParameterObject[]>((acc, name) => {
     const location = isPathParam(name)
@@ -891,7 +899,7 @@ const depictOAuth2Security = ({
 });
 
 export const depictSecurity = (
-  containers: LogicalContainer<Security>[],
+  alternties: Security[][],
   inputSources: InputSource[] = [],
 ): SecuritySchemeObject[][] => {
   const mapper = (subj: Security): SecuritySchemeObject => {
@@ -904,7 +912,7 @@ export const depictSecurity = (
     else if (subj.type === "openid") return depictOpenIdSecurity(subj);
     else return depictOAuth2Security(subj);
   };
-  return processContainers(containers, mapper);
+  return alternties.map((entries) => entries.map(mapper));
 };
 
 export const depictSecurityRefs = (
