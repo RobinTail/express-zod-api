@@ -76,8 +76,22 @@ export const makeParam = (
     type,
     mod,
     init,
-  }: { type?: ts.TypeNode; mod?: ts.Modifier[]; init?: ts.Expression } = {},
-) => f.createParameterDeclaration(mod, undefined, name, undefined, type, init);
+    optional,
+  }: {
+    type?: ts.TypeNode;
+    mod?: ts.Modifier[];
+    init?: ts.Expression;
+    optional?: boolean;
+  } = {},
+) =>
+  f.createParameterDeclaration(
+    mod,
+    undefined,
+    name,
+    optional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
+    type,
+    init,
+  );
 
 export const makeParams = (params: Partial<Record<string, ts.TypeNode>>) =>
   Object.entries(params).map(([name, type]) =>
@@ -191,11 +205,15 @@ export const makePublicMethod = (
     body,
   );
 
-export const makePublicClass = (name: string, statements: ts.ClassElement[]) =>
+export const makePublicClass = (
+  name: string,
+  statements: ts.ClassElement[],
+  { params }: { params?: Parameters<typeof makeTypeParams>[0] } = {},
+) =>
   f.createClassDeclaration(
     exportModifier,
     name,
-    undefined,
+    params && makeTypeParams(params),
     undefined,
     statements,
   );
@@ -226,11 +244,22 @@ export const makeInterface = (
 };
 
 export const makeTypeParams = (
-  params: Partial<Record<string, ts.Identifier | ts.TypeNode>>,
+  params: Partial<
+    Record<
+      string,
+      ts.Identifier | ts.TypeNode | { type?: ts.TypeNode; init: ts.TypeNode }
+    >
+  >,
 ) =>
-  Object.entries(params).map(([name, val]) =>
-    f.createTypeParameterDeclaration([], name, val && ensureTypeNode(val)),
-  );
+  Object.entries(params).map(([name, val]) => {
+    const { type, init } = val && "init" in val ? val : { type: val };
+    return f.createTypeParameterDeclaration(
+      [],
+      name,
+      type && ensureTypeNode(type),
+      init,
+    );
+  });
 
 export const makeArrowFn = (
   params: ts.Identifier[] | Parameters<typeof makeParams>[0],

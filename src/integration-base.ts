@@ -42,6 +42,7 @@ export abstract class IntegrationBase {
     keyParameter: f.createIdentifier("key"),
     pathParameter: f.createIdentifier("path"),
     paramsArgument: f.createIdentifier("params"),
+    ctxArgument: f.createIdentifier("ctx"),
     methodParameter: f.createIdentifier("method"),
     requestParameter: f.createIdentifier("request"),
     parseRequestFn: f.createIdentifier("parseRequest"),
@@ -135,10 +136,20 @@ export abstract class IntegrationBase {
             ts.SyntaxKind.StringKeyword,
           ),
           [this.ids.paramsArgument.text]: recordStringAny,
-        }),
+        }).concat(
+          makeParam(this.ids.ctxArgument, {
+            optional: true,
+            type: ensureTypeNode("T"),
+          }),
+        ),
         makePromise("any"),
       ),
-      { expose: true },
+      {
+        expose: true,
+        params: {
+          T: { init: f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword) },
+        },
+      },
     );
 
   // const parseRequest = (request: string) => request.split(/ (.+)/, 2) as [Method, Path];
@@ -246,7 +257,12 @@ export abstract class IntegrationBase {
           ensureTypeNode(this.interfaces.input),
           ensureTypeNode("K"),
         ),
-      }),
+      }).concat(
+        makeParam(this.ids.ctxArgument, {
+          optional: true,
+          type: ensureTypeNode("T"),
+        }),
+      ),
       f.createBlock([
         makeConst(
           // const [method, path] = this.parseRequest(request);
@@ -265,6 +281,7 @@ export abstract class IntegrationBase {
                 this.ids.paramsArgument,
               ]),
             ),
+            this.ids.ctxArgument,
           ]),
         ),
       ]),
@@ -281,17 +298,23 @@ export abstract class IntegrationBase {
 
   // export class Client { ___ }
   protected makeClientClass = (name: string) =>
-    makePublicClass(name, [
-      // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
-      makePublicConstructor([
-        makeParam(this.ids.implementationArgument, {
-          type: ensureTypeNode(this.ids.implementationType),
-          mod: accessModifiers.protectedReadonly,
-          init: this.ids.defaultImplementationConst,
-        }),
-      ]),
-      this.makeProvider(),
-    ]);
+    makePublicClass(
+      name,
+      [
+        // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
+        makePublicConstructor([
+          makeParam(this.ids.implementationArgument, {
+            type: f.createTypeReferenceNode(this.ids.implementationType, [
+              ensureTypeNode("T"),
+            ]),
+            mod: accessModifiers.protectedReadonly,
+            init: this.ids.defaultImplementationConst,
+          }),
+        ]),
+        this.makeProvider(),
+      ],
+      { params: { T: undefined } },
+    );
 
   // export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
   protected makeDefaultImplementation = () => {
