@@ -2,6 +2,25 @@
 
 ## Version 22
 
+### v22.1.0
+
+- Feat: ability to configure the generated client class name:
+  - New option `clientClassName` for `Integration::constructor()` argument, default: `Client`.
+- Feat: default implementation for the generated client:
+  - The argument of the generated client class constructor became optional;
+  - The `Implementation` previously suggested as an example (using `fetch`) became the one used by default;
+  - You may no longer need to write the implementation if the default one suits your needs.
+
+```ts
+import { Integration } from "express-zod-api";
+new Integration({ clientClassName: "FancyClient" });
+```
+
+```ts
+import { FancyClient } from "./generated-client.ts";
+const client = new FancyClient(/* optional implementation */);
+```
+
 ### v22.0.0
 
 - Minimum supported Node versions: 20.9.0 and 22.0.0:
