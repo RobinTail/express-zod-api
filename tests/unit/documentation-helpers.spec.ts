@@ -45,6 +45,7 @@ import {
   excludeParamsFromDepiction,
   extractObjectSchema,
   getRoutePathParams,
+  defaultIsHeader,
   onEach,
   onMissing,
   reformatParamsInPath,
@@ -637,6 +638,19 @@ describe("Documentation helpers", () => {
         ),
       ).toMatchSnapshot();
     });
+  });
+
+  describe("defaultIsHeader()", () => {
+    test.each([
+      { name: "x-request-id", expected: true },
+      { name: "authorization", expected: true },
+      { name: "unknown", expected: false },
+    ])(
+      "should validate custom and well-known headers %#",
+      ({ name, expected }) => {
+        expect(defaultIsHeader(name)).toBe(expected);
+      },
+    );
   });
 
   describe("depictRequestParams()", () => {

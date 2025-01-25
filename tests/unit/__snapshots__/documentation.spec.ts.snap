@@ -1264,6 +1264,18 @@ paths:
       tags:
         - users
       parameters:
+        - name: token
+          in: header
+          required: true
+          description: PATCH /v1/user/:id Parameter
+          schema:
+            type: string
+            minLength: 1
+            examples:
+              - "1234567890"
+          examples:
+            example1:
+              value: "1234567890"
         - name: id
           in: path
           required: true
@@ -1806,13 +1818,7 @@ components:
       name: token
   links: {}
   callbacks: {}
-tags:
-  - name: users
-    description: Everything about the users
-  - name: files
-    description: Everything about the files processing
-  - name: subscriptions
-    description: Everything about the subscriptions
+tags: []
 servers:
   - url: https://example.com
 "
@@ -1882,6 +1888,15 @@ paths:
       tags:
         - users
       parameters:
+        - name: token
+          in: header
+          required: true
+          description: PATCH /v1/user/:id Parameter
+          schema:
+            $ref: "#/components/schemas/PatchV1UserIdParameterToken"
+          examples:
+            example1:
+              value: "1234567890"
         - name: id
           in: path
           required: true
@@ -2215,6 +2230,11 @@ components:
       type: string
       pattern: \\d+
       description: numeric string
+    PatchV1UserIdParameterToken:
+      type: string
+      minLength: 1
+      examples:
+        - "1234567890"
     PatchV1UserIdParameterId:
       type: string
       examples:
@@ -2537,13 +2557,7 @@ components:
       name: token
   links: {}
   callbacks: {}
-tags:
-  - name: users
-    description: Everything about the users
-  - name: files
-    description: Everything about the files processing
-  - name: subscriptions
-    description: Everything about the subscriptions
+tags: []
 servers:
   - url: https://example.com
 "

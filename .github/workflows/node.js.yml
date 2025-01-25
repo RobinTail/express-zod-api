@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master, v18, v19, v20 ]
+    branches: [ master, v19, v20, v21 ]
   pull_request:
-    branches: [ master, v18, v19, v20 ]
+    branches: [ master, v19, v20, v21 ]
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [18.18.0, 18.x, 20.9.0, 20.x, 22.0.0, 22.x]
+        node-version: [20.9.0, 20.x, 22.0.0, 22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Get yarn cache dir

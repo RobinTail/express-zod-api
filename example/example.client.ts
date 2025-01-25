@@ -67,6 +67,7 @@ interface DeleteV1UserIdRemoveNegativeResponseVariants {
 /** patch /v1/user/:id */
 type PatchV1UserIdInput = {
   key: string;
+  token: string;
   id: string;
   name: string;
   birthday: string;
@@ -401,19 +402,6 @@ export interface Response {
 
 export type Request = keyof Input;
 
-/** @deprecated use Request instead */
-export type MethodPath = Request;
-
-/** @deprecated use content-type header of an actual response */
-export const jsonEndpoints = {
-  "get /v1/user/retrieve": true,
-  "patch /v1/user/:id": true,
-  "post /v1/user/create": true,
-  "get /v1/user/list": true,
-  "post /v1/avatar/upload": true,
-  "post /v1/avatar/raw": true,
-};
-
 export const endpointTags = {
   "get /v1/user/retrieve": ["users"],
   "delete /v1/user/:id/remove": ["users"],
@@ -427,68 +415,31 @@ export const endpointTags = {
   "get /v1/events/time": ["subscriptions"],
 };
 
+const parseRequest = (request: string) =>
+  request.split(/ (.+)/, 2) as [Method, Path];
+
+const substitute = (path: string, params: Record<string, any>) => {
+  const rest = { ...params };
+  for (const key in params) {
+    path = path.replace(`:${key}`, () => {
+      delete rest[key];
+      return params[key];
+    });
+  }
+  return [path, rest] as const;
+};
+
 export type Implementation = (
   method: Method,
   path: string,
   params: Record<string, any>,
 ) => Promise<any>;
 
-export class ExpressZodAPIClient {
-  constructor(protected readonly implementation: Implementation) {}
-  /** @deprecated use the overload with 2 arguments instead */
-  public provide<M extends Method, P extends Path>(
-    method: M,
-    path: P,
-    params: `${M} ${P}` extends keyof Input
-      ? Input[`${M} ${P}`]
-      : Record<string, any>,
-  ): Promise<
-    `${M} ${P}` extends keyof Response ? Response[`${M} ${P}`] : unknown
-  >;
-  public provide<K extends Request>(
-    request: K,
-    params: Input[K],
-  ): Promise<Response[K]>;
-  public provide(
-    ...args:
-      | [string, string, Record<string, any>]
-      | [string, Record<string, any>]
-  ) {
-    const [method, path, params] = (
-      args.length === 2 ? [...args[0].split(/ (.+)/, 2), args[1]] : args
-    ) as [Method, Path, Record<string, any>];
-    return this.implementation(
-      method,
-      Object.keys(params).reduce(
-        (acc, key) => acc.replace(`:${key}`, params[key]),
-        path,
-      ),
-      Object.keys(params).reduce(
-        (acc, key) =>
-          Object.assign(
-            acc,
-            !path.includes(`:${key}`) && { [key]: params[key] },
-          ),
-        {},
-      ),
-    );
-  }
-}
-
-/** @deprecated will be removed in v22 */
-export type Provider = ExpressZodAPIClient["provide"];
-
-// Usage example:
-/*
-export const exampleImplementation: Implementation = async (
-  method,
-  path,
-  params,
-) => {
+const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
   const response = await fetch(
-    new URL(`${path}${searchParams}`, "https://example.com"),
+    new URL(`${path}${searchParams}`, "http://localhost:8090"),
     {
       method: method.toUpperCase(),
       headers: hasBody ? { "Content-Type": "application/json" } : undefined,
@@ -500,6 +451,22 @@ export const exampleImplementation: Implementation = async (
   const isJSON = contentType.startsWith("application/json");
   return response[isJSON ? "json" : "text"]();
 };
-const client = new ExpressZodAPIClient(exampleImplementation);
+
+export class Client {
+  public constructor(
+    protected readonly implementation: Implementation = defaultImplementation,
+  ) {}
+  public provide<K extends Request>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]> {
+    const [method, path] = parseRequest(request);
+    return this.implementation(method, ...substitute(path, params));
+  }
+}
+
+// Usage example:
+/*
+const client = new Client();
 client.provide("get /v1/user/retrieve", { id: "10" });
 */

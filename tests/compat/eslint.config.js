@@ -3,5 +3,5 @@ import migration from "express-zod-api/migration";
 
 export default [
   { languageOptions: { parser }, plugins: { migration } },
-  { files: ["**/*.ts"], rules: { "migration/v21": "error" } },
+  { files: ["**/*.ts"], rules: { "migration/v22": "error" } },
 ];

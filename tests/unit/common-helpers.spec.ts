@@ -3,12 +3,10 @@ import createHttpError from "http-errors";
 import {
   combinations,
   defaultInputSources,
-  getCustomHeaders,
   getExamples,
   getInput,
   getMessageFromError,
   hasCoercion,
-  isCustomHeader,
   makeCleanId,
   ensureError,
 } from "../../src/common-helpers";
@@ -19,27 +17,6 @@ describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
     test("should be declared in a certain way", () => {
       expect(defaultInputSources).toMatchSnapshot();
-    });
-  });
-
-  describe("isCustomHeader()", () => {
-    test.each([
-      { name: "x-request-id", expected: true },
-      { name: "authorization", expected: false },
-    ])("should validate those starting with x- %#", ({ name, expected }) => {
-      expect(isCustomHeader(name)).toBe(expected);
-    });
-  });
-
-  describe("getCustomHeaders()", () => {
-    test("should reduce the object to the custom headers only", () => {
-      expect(
-        getCustomHeaders({
-          authorization: "Bearer ***",
-          "x-request-id": "test",
-          "x-another": "header",
-        }),
-      ).toEqual({ "x-request-id": "test", "x-another": "header" });
     });
   });
 
@@ -133,7 +110,7 @@ describe("Common Helpers", () => {
         getInput(makeRequestMock({ method: "OPTIONS" }), undefined),
       ).toEqual({});
     });
-    test("Feature 1180: should include custom headers when enabled", () => {
+    test("Features 1180 and 2337: should include headers when enabled", () => {
       expect(
         getInput(
           makeRequestMock({
@@ -143,7 +120,12 @@ describe("Common Helpers", () => {
           }),
           { post: ["body", "headers"] },
         ),
-      ).toEqual({ a: "body", "x-request-id": "test" });
+      ).toEqual({
+        a: "body",
+        authorization: "Bearer ***",
+        "content-type": "application/json",
+        "x-request-id": "test",
+      });
     });
   });
 

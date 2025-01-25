@@ -2,10 +2,7 @@ import assert from "node:assert/strict";
 import { EventSource } from "undici";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
-import {
-  ExpressZodAPIClient,
-  Implementation,
-} from "../../example/example.client";
+import { Client } from "../../example/example.client";
 import { givePort } from "../helpers";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -89,7 +86,7 @@ describe("Example", async () => {
         },
       });
       await vi.waitFor(() =>
-        assert([/v1\/user\/50/, /50, 123, 456/].every(matchOut)),
+        assert([/v1\/user\/50/, /123, 456/, /Jane Doe/, /#50/].every(matchOut)),
       );
       expect(true).toBeTruthy();
     });
@@ -445,30 +442,10 @@ describe("Example", async () => {
   });
 
   describe("Client", () => {
-    const createDefaultImplementation =
-      (host: string): Implementation =>
-      async (method, path, params) => {
-        const hasBody = !["get", "delete"].includes(method);
-        const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-        const response = await fetch(new URL(`${path}${searchParams}`, host), {
-          method: method.toUpperCase(),
-          headers: hasBody
-            ? { "Content-Type": "application/json", token: "456" }
-            : undefined,
-          body: hasBody ? JSON.stringify(params) : undefined,
-        });
-        const contentType = response.headers.get("content-type");
-        if (!contentType) return;
-        const isJSON = contentType.startsWith("application/json");
-        return response[isJSON ? "json" : "text"]();
-      };
-
-    const client = new ExpressZodAPIClient(
-      createDefaultImplementation(`http://localhost:${port}`),
-    );
+    const client = new Client();
 
     test("Should perform the request with a positive response", async () => {
-      const response = await client.provide("get", "/v1/user/retrieve", {
+      const response = await client.provide("get /v1/user/retrieve", {
         id: "10",
       });
       expect(response).toMatchSnapshot();
@@ -478,19 +455,10 @@ describe("Example", async () => {
       >();
     });
 
-    test("Feature #2182: should provide using combined path+method", async () => {
-      const response = await client.provide("get /v1/user/retrieve", {
-        id: "10",
-      });
-      expectTypeOf(response).toMatchTypeOf<
-        | { status: "success"; data: { id: number; name: string } }
-        | { status: "error"; error: { message: string } }
-      >();
-    });
-
     test("Issue #2177: should handle path params correctly", async () => {
-      const response = await client.provide("patch", "/v1/user/:id", {
+      const response = await client.provide("patch /v1/user/:id", {
         key: "123",
+        token: "456",
         id: "12",
         name: "Alan Turing",
         birthday: "1912-06-23",
@@ -507,13 +475,10 @@ describe("Example", async () => {
       expectTypeOf(client.provide).toBeCallableWith("post /v1/user/create", {});
       // @ts-expect-error -- can't use .toBeCallableWith with .not, see https://github.com/mmkal/expect-type
       expectTypeOf(client.provide).toBeCallableWith("get /v1/user/create", {});
-      expectTypeOf(
-        client.provide("get", "/v1/user/create", {}),
-      ).resolves.toBeUnknown();
     });
 
     test("should handle no content (no response body)", async () => {
-      const response = await client.provide("delete", "/v1/user/:id/remove", {
+      const response = await client.provide("delete /v1/user/:id/remove", {
         id: "12",
       });
       expect(response).toBeUndefined();

@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { chain, memoizeWith, pickBy, xprod } from "ramda";
+import { chain, memoizeWith, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -11,6 +11,18 @@ import { AuxMethod, Method } from "./method";
 export type EmptyObject = Record<string, never>;
 export type EmptySchema = z.ZodObject<EmptyObject, "strip">;
 export type FlatObject = Record<string, unknown>;
+
+/** @link https://stackoverflow.com/a/65492934 */
+type NoNever<T, F> = [T] extends [never] ? F : T;
+
+/**
+ * @desc Using module augmentation approach you can specify tags as the keys of this interface
+ * @example declare module "express-zod-api" { interface TagOverrides { users: unknown } }
+ * @link https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
+ * */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation
+export interface TagOverrides {}
+export type Tag = NoNever<keyof TagOverrides, string>;
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
@@ -30,13 +42,6 @@ const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
 
-export const isCustomHeader = (name: string): name is `x-${string}` =>
-  name.startsWith("x-");
-
-/** @see https://nodejs.org/api/http.html#messageheaders */
-export const getCustomHeaders = (headers: FlatObject): FlatObject =>
-  pickBy((_, key) => isCustomHeader(key), headers); // twice faster than flip()
-
 export const getInput = (
   req: Request,
   userDefined: CommonConfig["inputSources"] = {},
@@ -49,8 +54,7 @@ export const getInput = (
     fallbackInputSource
   )
     .filter((src) => (src === "files" ? areFilesAvailable(req) : true))
-    .map((src) => (src === "headers" ? getCustomHeaders(req[src]) : req[src]))
-    .reduce<FlatObject>((agg, obj) => Object.assign(agg, obj), {});
+    .reduce<FlatObject>((agg, src) => Object.assign(agg, req[src]), {});
 };
 
 export const ensureError = (subject: unknown): Error =>

@@ -18,12 +18,10 @@ export const config = createConfig({
     );
     app.use("/docs", ui.serve, ui.setup(documentation));
   },
-  cors: true,
-  tags: {
-    users: "Everything about the users",
-    files: "Everything about the files processing",
-    subscriptions: "Everything about the subscriptions",
+  inputSources: {
+    patch: ["headers", "body", "params"], // affects authMiddleware used by updateUserEndpoint
   },
+  cors: true,
 });
 
 // Uncomment these lines when using a custom logger, for example winston:
@@ -37,5 +35,16 @@ declare module "express-zod-api" {
 /*
 declare module "express-zod-api" {
   interface LoggerOverrides extends BuiltinLogger {}
+}
+*/
+
+// Uncomment these lines for introducing constraints on tags
+/*
+declare module "express-zod-api" {
+  interface TagOverrides {
+    users: unknown;
+    files: unknown;
+    subscriptions: unknown;
+  }
 }
 */

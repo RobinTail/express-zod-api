@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { EmptyObject, EmptySchema, FlatObject } from "./common-helpers";
-import { CommonConfig } from "./config-type";
+import { EmptyObject, EmptySchema, FlatObject, Tag } from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
 import { IOSchema, getFinalEndpointInputSchema } from "./io-schema";
 import { Method } from "./method";
@@ -22,7 +21,6 @@ interface BuildProps<
   MIN extends IOSchema<"strip">,
   OPT extends FlatObject,
   SCO extends string,
-  TAG extends string,
 > {
   input?: IN;
   output: OUT;
@@ -32,44 +30,23 @@ interface BuildProps<
   operationId?: string | ((method: Method) => string);
   method?: Method | [Method, ...Method[]];
   scope?: SCO | SCO[];
-  tag?: TAG | TAG[];
+  tag?: Tag | Tag[];
 }
 
 export class EndpointsFactory<
   IN extends IOSchema<"strip"> = EmptySchema,
   OUT extends FlatObject = EmptyObject,
   SCO extends string = string,
-  TAG extends string = string,
 > {
-  protected resultHandler: AbstractResultHandler;
   protected middlewares: AbstractMiddleware[] = [];
-
-  /** @desc Consider using the "config" prop with the "tags" option to enforce constraints on tagging the endpoints */
-  constructor(resultHandler: AbstractResultHandler);
-  /** @todo consider migrating tags into augmentation approach in v22 */
-  constructor(params: {
-    resultHandler: AbstractResultHandler;
-    config?: CommonConfig<TAG>;
-  });
-  constructor(
-    subject:
-      | AbstractResultHandler
-      | {
-          resultHandler: AbstractResultHandler;
-          config?: CommonConfig<TAG>;
-        },
-  ) {
-    this.resultHandler =
-      "resultHandler" in subject ? subject.resultHandler : subject;
-  }
+  constructor(protected resultHandler: AbstractResultHandler) {}
 
   static #create<
     CIN extends IOSchema<"strip">,
     COUT extends FlatObject,
     CSCO extends string,
-    CTAG extends string,
   >(middlewares: AbstractMiddleware[], resultHandler: AbstractResultHandler) {
-    const factory = new EndpointsFactory<CIN, COUT, CSCO, CTAG>(resultHandler);
+    const factory = new EndpointsFactory<CIN, COUT, CSCO>(resultHandler);
     factory.middlewares = middlewares;
     return factory;
   }
@@ -86,8 +63,7 @@ export class EndpointsFactory<
     return EndpointsFactory.#create<
       z.ZodIntersection<IN, AIN>,
       OUT & AOUT,
-      SCO & ASCO,
-      TAG
+      SCO & ASCO
     >(
       this.middlewares.concat(
         subject instanceof Middleware ? subject : new Middleware(subject),
@@ -103,14 +79,14 @@ export class EndpointsFactory<
     S extends Response,
     AOUT extends FlatObject = EmptyObject,
   >(...params: ConstructorParameters<typeof ExpressMiddleware<R, S, AOUT>>) {
-    return EndpointsFactory.#create<IN, OUT & AOUT, SCO, TAG>(
+    return EndpointsFactory.#create<IN, OUT & AOUT, SCO>(
       this.middlewares.concat(new ExpressMiddleware(...params)),
       this.resultHandler,
     );
   }
 
   public addOptions<AOUT extends FlatObject>(getOptions: () => Promise<AOUT>) {
-    return EndpointsFactory.#create<IN, OUT & AOUT, SCO, TAG>(
+    return EndpointsFactory.#create<IN, OUT & AOUT, SCO>(
       this.middlewares.concat(new Middleware({ handler: getOptions })),
       this.resultHandler,
     );
@@ -126,7 +102,7 @@ export class EndpointsFactory<
     scope,
     tag,
     method,
-  }: BuildProps<BIN, BOUT, IN, OUT, SCO, TAG>) {
+  }: BuildProps<BIN, BOUT, IN, OUT, SCO>) {
     const { middlewares, resultHandler } = this;
     const methods = typeof method === "string" ? [method] : method;
     const getOperationId =
@@ -152,7 +128,7 @@ export class EndpointsFactory<
   public buildVoid<BIN extends IOSchema = EmptySchema>({
     handler,
     ...rest
-  }: Omit<BuildProps<BIN, z.ZodVoid, IN, OUT, SCO, TAG>, "output">) {
+  }: Omit<BuildProps<BIN, z.ZodVoid, IN, OUT, SCO>, "output">) {
     return this.build({
       ...rest,
       output: z.object({}),
