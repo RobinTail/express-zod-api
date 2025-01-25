@@ -133,6 +133,7 @@ export default tsPlugin.config(
     rules: {
       curly: ["warn", "multi-or-nest", "consistent"],
       "unicorn/prefer-node-protocol": "error",
+      "@typescript-eslint/no-shadow": "warn",
     },
   },
   {
