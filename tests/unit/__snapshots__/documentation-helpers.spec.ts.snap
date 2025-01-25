@@ -1083,6 +1083,73 @@ exports[`Documentation helpers > depictSecurity() > should inform on 'alternativ
 ]
 `;
 
+exports[`Documentation helpers > depictSecurityRefs() > should handle alternatives 1`] = `
+[
+  {
+    "apiKey": [],
+    "oauth2": [],
+    "openIdConnect": [],
+  },
+]
+`;
+
+exports[`Documentation helpers > depictSecurityRefs() > should handle alternatives 2`] = `
+[
+  {
+    "apiKey": [],
+    "oauth2": [],
+  },
+  {
+    "apiKey": [],
+    "openIdConnect": [],
+  },
+]
+`;
+
+exports[`Documentation helpers > depictSecurityRefs() > should handle alternatives 3`] = `
+[
+  {
+    "apiKey": [],
+  },
+  {
+    "oauth2": [],
+  },
+  {
+    "openIdConnect": [],
+  },
+]
+`;
+
+exports[`Documentation helpers > depictSecurityRefs() > should handle one alternative 1`] = `
+[
+  {
+    "apiKey": [],
+    "oauth2": [],
+    "openIdConnect": [],
+  },
+]
+`;
+
+exports[`Documentation helpers > depictSecurityRefs() > should populate the scopes 1`] = `
+[
+  {
+    "apiKey": [],
+  },
+  {
+    "oauth2": [
+      "read",
+      "write",
+    ],
+  },
+  {
+    "openIdConnect": [
+      "read",
+      "write",
+    ],
+  },
+]
+`;
+
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 0 1`] = `
 {
   "format": "email",

@@ -1,4 +1,5 @@
 import { ReferenceObject } from "openapi3-ts/oas31";
+import { prop } from "ramda";
 import { z } from "zod";
 import { ez } from "../../src";
 import {
@@ -48,6 +49,7 @@ import {
   onEach,
   onMissing,
   reformatParamsInPath,
+  depictSecurityRefs,
 } from "../../src/documentation-helpers";
 import { walkSchema } from "../../src/schema-walker";
 
@@ -902,6 +904,53 @@ describe("Documentation helpers", () => {
             flows: { password: { tokenUrl: "https://test.url" } },
           },
         ]),
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictSecurityRefs()", () => {
+    test("should handle alternatives", () => {
+      expect(
+        depictSecurityRefs(
+          [[{ type: "apiKey" }, { type: "oauth2" }, { type: "openIdConnect" }]],
+          [],
+          prop("type"),
+        ),
+      ).toMatchSnapshot();
+      expect(
+        depictSecurityRefs(
+          [
+            [{ type: "apiKey" }, { type: "oauth2" }],
+            [{ type: "apiKey" }, { type: "openIdConnect" }],
+          ],
+          [],
+          prop("type"),
+        ),
+      ).toMatchSnapshot();
+      expect(
+        depictSecurityRefs(
+          [
+            [{ type: "apiKey" }],
+            [{ type: "oauth2" }],
+            [{ type: "openIdConnect" }],
+          ],
+          [],
+          prop("type"),
+        ),
+      ).toMatchSnapshot();
+    });
+
+    test("should populate the scopes", () => {
+      expect(
+        depictSecurityRefs(
+          [
+            [{ type: "apiKey" }],
+            [{ type: "oauth2" }],
+            [{ type: "openIdConnect" }],
+          ],
+          ["read", "write"],
+          prop("type"),
+        ),
       ).toMatchSnapshot();
     });
   });
