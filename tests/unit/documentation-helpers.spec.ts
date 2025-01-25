@@ -34,6 +34,7 @@ import {
   depictRecord,
   depictRequestParams,
   depictSecurity,
+  depictSecurityRefs,
   depictString,
   depictTags,
   depictTuple,
@@ -49,7 +50,6 @@ import {
   onEach,
   onMissing,
   reformatParamsInPath,
-  depictSecurityRefs,
 } from "../../src/documentation-helpers";
 import { walkSchema } from "../../src/schema-walker";
 
