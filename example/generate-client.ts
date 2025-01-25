@@ -5,10 +5,9 @@ import { config } from "./config";
 
 await writeFile(
   "example/example.client.ts",
-  // or just: new Integration({ routing }).print(),
   await new Integration({
     routing,
     serverUrl: `http://localhost:${config.http!.listen}`,
-  }).printFormatted(),
+  }).printFormatted(), // or just .print(),
   "utf-8",
 );
