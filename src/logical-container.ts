@@ -29,11 +29,13 @@ export const processContainers = <T, U>(
   const [simpleAnds, orsInAnds] = partition(isSimple, ands);
   const ors = containers.filter(isLogicalOr);
   let alts = [simples.concat(simpleAnds).map(mapper)];
-  const alternators = ors
-    .concat(orsInAnds)
-    .map((entry) =>
-      entry.or.map((v) => (isSimple(v) ? [mapper(v)] : v.and.map(mapper))),
+  const alternators = ors.concat(orsInAnds).map(prop("or")); // no chain!
+  for (const entry of alternators) {
+    alts = combinations(
+      alts,
+      entry.map((v) => (isSimple(v) ? [mapper(v)] : v.and.map(mapper))),
+      joiner,
     );
-  for (const entry of alternators) alts = combinations(alts, entry, joiner);
+  }
   return reject(isEmpty, alts);
 };
