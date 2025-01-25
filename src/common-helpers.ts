@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { chain, memoizeWith, xprod } from "ramda";
+import { chain, isEmpty, memoizeWith, when, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -155,3 +155,6 @@ export const isProduction = memoizeWith(
   () => process.env.TSUP_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSUP
   () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
 );
+
+export const nonEmpty = <T>(subject: T[] | ReadonlyArray<T>) =>
+  subject.length ? subject : undefined;
