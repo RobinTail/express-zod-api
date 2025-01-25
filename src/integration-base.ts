@@ -450,7 +450,7 @@ export abstract class IntegrationBase {
   };
 
   protected makeUsageStatements = (className: string): ts.Node[] => [
-    makeConst(this.ids.clientConst, makeNew(f.createIdentifier(className))), // const client = new ExpressZodAPIClient();
+    makeConst(this.ids.clientConst, makeNew(f.createIdentifier(className))), // const client = new Client();
     // client.provide("get /v1/user/retrieve", { id: "10" });
     makePropCall(this.ids.clientConst, this.ids.provideMethod, [
       f.createStringLiteral(`${"get" satisfies Method} /v1/user/retrieve`),
