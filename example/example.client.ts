@@ -439,7 +439,7 @@ const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
   const response = await fetch(
-    new URL(`${path}${searchParams}`, "https://example.com"),
+    new URL(`${path}${searchParams}`, "http://localhost:8090"),
     {
       method: method.toUpperCase(),
       headers: hasBody ? { "Content-Type": "application/json" } : undefined,
