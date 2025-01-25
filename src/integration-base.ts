@@ -43,8 +43,6 @@ export abstract class IntegrationBase {
   protected ids = {
     pathType: f.createIdentifier("Path"),
     implementationType: f.createIdentifier("Implementation"),
-    clientClass: f.createIdentifier("Client"),
-    subscriptionClass: f.createIdentifier("Subscription"),
     keyParameter: f.createIdentifier("key"),
     pathParameter: f.createIdentifier("path"),
     paramsArgument: f.createIdentifier("params"),
@@ -64,7 +62,7 @@ export abstract class IntegrationBase {
     responseConst: f.createIdentifier("response"),
     restConst: f.createIdentifier("rest"),
     searchParamsConst: f.createIdentifier("searchParams"),
-    exampleImplementationConst: f.createIdentifier("exampleImplementation"),
+    defaultImplementationConst: f.createIdentifier("defaultImplementation"),
     clientConst: f.createIdentifier("client"),
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
@@ -292,22 +290,23 @@ export abstract class IntegrationBase {
       },
     );
 
-  // export class ExpressZodAPIClient { ___ }
-  protected makeClientClass = () =>
-    makePublicClass(this.ids.clientClass, [
-      // public constructor(protected readonly implementation: Implementation) {}
+  // export class Client { ___ }
+  protected makeClientClass = (name: string) =>
+    makePublicClass(name, [
+      // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
       makePublicConstructor([
         makeParam(this.ids.implementationArgument, {
           type: ensureTypeNode(this.ids.implementationType),
           mod: accessModifiers.protectedReadonly,
+          init: this.ids.defaultImplementationConst,
         }),
       ]),
       this.makeProvider(),
     ]);
 
-  protected makeSubscriptionClass = () =>
+  protected makeSubscriptionClass = (name: string) =>
     makePublicClass(
-      this.ids.subscriptionClass,
+      name,
       [
         f.createPropertyDeclaration(
           accessModifiers.public,
@@ -461,8 +460,8 @@ export abstract class IntegrationBase {
       },
     );
 
-  // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
-  protected makeExampleImplementation = () => {
+  // export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
+  protected makeDefaultImplementation = () => {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
       propOf<RequestInit>("method"),
@@ -595,7 +594,7 @@ export abstract class IntegrationBase {
     );
 
     return makeConst(
-      this.ids.exampleImplementationConst,
+      this.ids.defaultImplementationConst,
       makeArrowFn(
         [
           this.ids.methodParameter,
@@ -613,16 +612,18 @@ export abstract class IntegrationBase {
         ]),
         { isAsync: true },
       ),
-      { expose: true, type: ensureTypeNode(this.ids.implementationType) },
+      { type: ensureTypeNode(this.ids.implementationType) },
     );
   };
 
-  protected makeUsageStatements = (): ts.Node[] => [
-    // const client = new Client(exampleImplementation);
+  protected makeUsageStatements = (
+    clientClassName: string,
+    subscriptionClassName: string,
+  ): ts.Node[] => [
     makeConst(
       this.ids.clientConst,
-      makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
-    ),
+      makeNew(f.createIdentifier(clientClassName)),
+    ), // const client = new Client();
     // client.provide("get /v1/user/retrieve", { id: "10" });
     makePropCall(this.ids.clientConst, this.ids.provideMethod, [
       f.createStringLiteral(`${"get" satisfies Method} /v1/user/retrieve`),
@@ -633,7 +634,7 @@ export abstract class IntegrationBase {
     // new Subscription("get /v1/events/time", {}).on("time", (time) => {});
     makePropCall(
       makeNew(
-        this.ids.subscriptionClass,
+        f.createIdentifier(subscriptionClassName),
         f.createStringLiteral(`${"get" satisfies Method} /v1/events/time`),
         f.createObjectLiteralExpression(),
       ),
