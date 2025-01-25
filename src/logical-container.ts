@@ -28,10 +28,9 @@ const isSimple = <T>(entry: LogicalContainer<T>): entry is T =>
   !isLogicalAnd(entry) && !isLogicalOr(entry);
 
 /** @desc returns an array of alternatives: OR[ AND[a,b] , AND[b,c] ] */
-export const processContainers = <T, U>(
+export const processContainers = <T>(
   containers: LogicalContainer<T>[],
-  mapper: (subject: T) => U,
-): U[][] => {
+): T[][] => {
   const simples = filter(isSimple, containers);
   const ands = chain(prop("and"), filter(isLogicalAnd, containers));
   const [simpleAnds, orsInAnds] = partition(isSimple, ands);
@@ -42,9 +41,9 @@ export const processContainers = <T, U>(
     (acc, entry) =>
       combinations(
         acc,
-        map((opt) => map(mapper, isSimple(opt) ? [opt] : opt.and), entry),
+        map((opt) => (isSimple(opt) ? [opt] : opt.and), entry),
         ([a, b]) => concat(a, b),
       ),
-    reject(isEmpty, [map(mapper, persistent)]),
+    reject(isEmpty, [persistent]),
   );
 };
