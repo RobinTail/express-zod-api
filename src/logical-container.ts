@@ -23,7 +23,6 @@ export const processContainers = <T, U>(
   containers: LogicalContainer<T>[],
   mapper: (subject: T) => U,
 ): U[][] => {
-  const joiner = ([a, b]: [U[], U[]]) => a.concat(b);
   const simples = containers.filter(isSimple);
   const ands = chain(prop("and"), containers.filter(isLogicalAnd));
   const [simpleAnds, orsInAnds] = partition(isSimple, ands);
@@ -35,7 +34,7 @@ export const processContainers = <T, U>(
       combinations(
         acc,
         entry.map((v) => (isSimple(v) ? [mapper(v)] : v.and.map(mapper))),
-        joiner,
+        ([a, b]) => a.concat(b),
       ),
     reject(isEmpty, [persistent]),
   );
