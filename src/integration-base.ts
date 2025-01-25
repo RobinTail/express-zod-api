@@ -293,7 +293,7 @@ export abstract class IntegrationBase {
       this.makeProvider(),
     ]);
 
-  // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
+  // export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
   protected makeDefaultImplementation = () => {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
