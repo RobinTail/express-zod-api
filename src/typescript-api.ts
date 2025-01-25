@@ -195,10 +195,7 @@ export const makePublicMethod = (
     body,
   );
 
-export const makePublicClass = (
-  name: ts.Identifier,
-  statements: ts.ClassElement[],
-) =>
+export const makePublicClass = (name: string, statements: ts.ClassElement[]) =>
   f.createClassDeclaration(
     exportModifier,
     name,
