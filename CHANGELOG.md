@@ -2,6 +2,11 @@
 
 ## Version 22
 
+### v22.1.0
+
+- Feat: ability to configure the generated client class name:
+  - New option `clientClassName` for `Integration::constructor()` argument, default: `Client`.
+
 ### v22.0.0
 
 - Minimum supported Node versions: 20.9.0 and 22.0.0:
