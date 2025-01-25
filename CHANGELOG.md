@@ -2,6 +2,32 @@
 
 ## Version 22
 
+### v22.2.0
+
+- Feat: ability to supply extra data to a custom implementation of the generated client:
+  - You can instantiate the client class with an implementation accepting an optional context of your choice;
+  - The public `.provide()` method can now accept an additional argument having the type of that context;
+  - The problem on missing such ability was reported by [@LucWag](https://github.com/LucWag).
+
+```ts
+import { Client } from "./generated-client.ts";
+
+const client = new Client(
+  async (
+    method,
+    path,
+    params,
+    ctx?: { extraHeaders: Record<string, any> },
+  ) => {},
+);
+
+client.provide(
+  "get /v1/user/retrieve",
+  { id: "10" },
+  { extraHeaders: { API_KEY: "123456" } },
+);
+```
+
 ### v22.1.0
 
 - Feat: ability to configure the generated client class name:
