@@ -67,6 +67,7 @@ interface DeleteV1UserIdRemoveNegativeResponseVariants {
 /** patch /v1/user/:id */
 type PatchV1UserIdInput = {
   key: string;
+  token: string;
   id: string;
   name: string;
   birthday: string;
@@ -435,8 +436,27 @@ export type Implementation<T = unknown> = (
   extra?: T
 ) => Promise<any>;
 
+const defaultImplementation: Implementation = async (method, path, params) => {
+  const hasBody = !["get", "delete"].includes(method);
+  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
+  const response = await fetch(
+    new URL(`${path}${searchParams}`, "http://localhost:8090"),
+    {
+      method: method.toUpperCase(),
+      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
+      body: hasBody ? JSON.stringify(params) : undefined,
+    },
+  );
+  const contentType = response.headers.get("content-type");
+  if (!contentType) return;
+  const isJSON = contentType.startsWith("application/json");
+  return response[isJSON ? "json" : "text"]();
+};
+
 export class Client<T> {
-  public constructor(protected readonly implementation: Implementation<T>) {}
+  public constructor(
+    protected readonly implementation: Implementation<T> = defaultImplementation,
+  ) {}
   public provide<K extends Request>(
     request: K,
     params: Input[K],
@@ -449,26 +469,6 @@ export class Client<T> {
 
 // Usage example:
 /*
-export const exampleImplementation: Implementation = async (
-  method,
-  path,
-  params,
-) => {
-  const hasBody = !["get", "delete"].includes(method);
-  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-  const response = await fetch(
-    new URL(`${path}${searchParams}`, "https://example.com"),
-    {
-      method: method.toUpperCase(),
-      headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-      body: hasBody ? JSON.stringify(params) : undefined,
-    },
-  );
-  const contentType = response.headers.get("content-type");
-  if (!contentType) return;
-  const isJSON = contentType.startsWith("application/json");
-  return response[isJSON ? "json" : "text"]();
-};
-const client = new Client(exampleImplementation);
+const client = new Client();
 client.provide("get /v1/user/retrieve", { id: "10" });
 */

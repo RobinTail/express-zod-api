@@ -2,7 +2,10 @@ import { writeFile, stat } from "node:fs/promises";
 import { z } from "zod";
 
 const dest = "src/well-known-headers.json";
-const { mtime } = await stat(dest);
+const { mtime } = await stat(dest).then(
+  (stats) => stats,
+  () => ({ mtime: null }),
+);
 
 console.info("Current state", mtime);
 
@@ -18,7 +21,7 @@ if (!lastMod)
   throw new Error("Can not get Last-Modified headers from response");
 const state = new Date(lastMod);
 console.info("Last modified", state);
-if (state <= mtime) process.exit(0);
+if (mtime && state <= mtime) process.exit(0);
 
 const csv = await response.text();
 
@@ -49,4 +52,4 @@ const headers = lines
 
 console.debug("CRC:", headers.length);
 
-await writeFile(dest, JSON.stringify(headers), "utf-8");
+await writeFile(dest, JSON.stringify(headers, undefined, 2), "utf-8");

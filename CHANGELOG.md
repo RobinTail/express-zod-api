@@ -2,12 +2,31 @@
 
 ## Version 22
 
+### v22.1.0
+
+- Feat: ability to configure the generated client class name:
+  - New option `clientClassName` for `Integration::constructor()` argument, default: `Client`.
+- Feat: default implementation for the generated client:
+  - The argument of the generated client class constructor became optional;
+  - The `Implementation` previously suggested as an example (using `fetch`) became the one used by default;
+  - You may no longer need to write the implementation if the default one suits your needs.
+
+```ts
+import { Integration } from "express-zod-api";
+new Integration({ clientClassName: "FancyClient" });
+```
+
+```ts
+import { FancyClient } from "./generated-client.ts";
+const client = new FancyClient(/* optional implementation */);
+```
+
 ### v22.0.0
 
 - Minimum supported Node versions: 20.9.0 and 22.0.0:
-  - Node 18 is no longer supported, its end of life is April 30, 2025.
+  - Node 18 is no longer supported; its end of life is April 30, 2025.
 - `BuiltinLogger::profile()` behavior changed for picoseconds: expressing them through nanoseconds;
-- Feature: handling all headers as input source (when enabled):
+- Feature: handling all (not just `x-` prefixed) headers as an input source (when enabled):
   - Behavior changed for `headers` inside `inputSources` config option: all headers are addressed to the `input` object;
   - This change is motivated by the deprecation of `x-` prefixed headers;
   - Since the order inside `inputSources` matters, consider moving `headers` to the first place to avoid overwrites;
@@ -19,7 +38,7 @@
   - The overload of the `Client::provide()` having 3 arguments and the `Provider` type are removed;
   - The public `jsonEndpoints` const is removed — use the `content-type` header of an actual response instead;
   - The public type `MethodPath` is removed — use the `Request` type instead.
-- The approach on tagging endpoints changed:
+- The approach to tagging endpoints changed:
   - The `tags` property moved from the argument of `createConfig()` to `Documentation::constructor()`;
   - The overload of `EndpointsFactory::constructor()` accepting `config` property is removed;
   - The argument of `EventStreamFactory::constructor()` is now the events map (formerly assigned to `events` property);
