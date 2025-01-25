@@ -433,7 +433,7 @@ export type Implementation<T = unknown> = (
   method: Method,
   path: string,
   params: Record<string, any>,
-  extra?: T
+  ctx?: T
 ) => Promise<any>;
 
 const defaultImplementation: Implementation = async (method, path, params) => {
@@ -460,10 +460,10 @@ export class Client<T> {
   public provide<K extends Request>(
     request: K,
     params: Input[K],
-    extra?: T
+    ctx?: T
   ): Promise<Response[K]> {
     const [method, path] = parseRequest(request);
-    return this.implementation(method, ...substitute(path, params), extra);
+    return this.implementation(method, ...substitute(path, params), ctx);
   }
 }
 
