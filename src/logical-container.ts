@@ -27,14 +27,17 @@ const isLogicalAnd = <T>(subject: LogicalContainer<T>) =>
 const isSimple = <T>(entry: LogicalContainer<T>): entry is T =>
   !isLogicalAnd(entry) && !isLogicalOr(entry);
 
-/** @desc returns an array of alternatives: OR[ AND[a,b] , AND[b,c] ] */
+type Combination<T> = T[];
+/** @desc OR[ AND[a,b] , AND[b,c] ] */
+export type Alternatives<T> = Array<Combination<T>>;
+
 export const processContainers = <T>(
   containers: LogicalContainer<T>[],
-): T[][] => {
+): Alternatives<T> => {
   const simples = filter(isSimple, containers);
   const ands = chain(prop("and"), filter(isLogicalAnd, containers));
   const [simpleAnds, orsInAnds] = partition(isSimple, ands);
-  const persistent = concat(simples, simpleAnds);
+  const persistent: Combination<T> = concat(simples, simpleAnds);
   const ors = filter(isLogicalOr, containers);
   const alternators = map(prop("or"), concat(ors, orsInAnds)); // no chain!
   return alternators.reduce(

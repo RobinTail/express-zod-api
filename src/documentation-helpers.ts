@@ -54,6 +54,7 @@ import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { FileSchema, ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
+import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
@@ -627,7 +628,7 @@ export const extractObjectSchema = (
 
 export const defaultIsHeader = (
   name: string,
-  security?: Security[][],
+  security?: Alternatives<Security>,
 ): name is `x-${string}` =>
   name.startsWith("x-") ||
   security?.some((alt) =>
@@ -649,7 +650,7 @@ export const depictRequestParams = ({
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
   isHeader?: IsHeader;
-  security?: Security[][];
+  security?: Alternatives<Security>;
 }) => {
   const { shape } = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
@@ -899,9 +900,9 @@ const depictOAuth2Security = ({
 });
 
 export const depictSecurity = (
-  alternties: Security[][],
+  alternatives: Alternatives<Security>,
   inputSources: InputSource[] = [],
-): SecuritySchemeObject[][] => {
+): Alternatives<SecuritySchemeObject> => {
   const mapper = (subj: Security): SecuritySchemeObject => {
     if (subj.type === "basic") return { type: "http", scheme: "basic" };
     else if (subj.type === "bearer") return depictBearerSecurity(subj);
@@ -912,11 +913,11 @@ export const depictSecurity = (
     else if (subj.type === "openid") return depictOpenIdSecurity(subj);
     else return depictOAuth2Security(subj);
   };
-  return alternties.map((entries) => entries.map(mapper));
+  return alternatives.map((entries) => entries.map(mapper));
 };
 
 export const depictSecurityRefs = (
-  alternatives: SecuritySchemeObject[][],
+  alternatives: Alternatives<SecuritySchemeObject>,
   scopes: string[] | ReadonlyArray<string>,
   entitle: (subject: SecuritySchemeObject) => string,
 ): SecurityRequirementObject[] =>
