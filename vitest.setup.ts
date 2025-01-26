@@ -27,10 +27,10 @@ const makeSchemaSerializer = <
 ): NewPlugin => {
   const classes = Array.isArray(subject) ? subject : [subject];
   return {
-    test: (subject) => classes.some((Cls) => subject instanceof Cls),
-    serialize: (subject, config, indentation, depth, refs, printer) => {
-      const obj = Object.assign(fn(subject as C), {
-        _type: subject._def.typeName,
+    test: (entity) => classes.some((Cls) => entity instanceof Cls),
+    serialize: (entity, config, indentation, depth, refs, printer) => {
+      const obj = Object.assign(fn(entity as C), {
+        _type: entity._def.typeName,
       });
       return printer(obj, config, indentation, depth, refs);
     },

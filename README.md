@@ -731,10 +731,11 @@ createConfig({
 In a similar way you can enable request headers as the input source. This is an opt-in feature. Please note:
 
 - consider giving `headers` the lowest priority among other `inputSources` to avoid overwrites;
+- consider handling headers in `Middleware` and declaring them within `security` property to improve `Documentation`;
 - the request headers acquired that way are always lowercase when describing their validation schemas.
 
 ```typescript
-import { createConfig, defaultEndpointsFactory } from "express-zod-api";
+import { createConfig, Middleware } from "express-zod-api";
 import { z } from "zod";
 
 createConfig({
@@ -743,7 +744,12 @@ createConfig({
   }, // ...
 });
 
-defaultEndpointsFactory.build({
+new Middleware({
+  security: { type: "header", name: "token" }, // recommended
+  input: z.object({ token: z.string() }),
+});
+
+factory.build({
   input: z.object({
     "x-request-id": z.string(), // this one is from request.headers
     id: z.string(), // this one is from request.query
