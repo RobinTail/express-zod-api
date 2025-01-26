@@ -631,8 +631,8 @@ export const defaultIsHeader = (
   name: string,
   familiar?: string[],
 ): name is `x-${string}` =>
-  name.startsWith("x-") ||
   familiar?.includes(name) ||
+  name.startsWith("x-") ||
   wellKnownHeaders.includes(name);
 
 export const depictRequestParams = ({
