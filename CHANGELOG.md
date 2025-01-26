@@ -2,7 +2,7 @@
 
 ## Version 22
 
-### v22.2.0
+### v22.3.0
 
 - Feat: ability to supply extra data to a custom implementation of the generated client:
   - You can instantiate the client class with an implementation accepting an optional context of your choice;
@@ -26,6 +26,19 @@ client.provide(
   { id: "10" },
   { extraHeaders: { API_KEY: "123456" } },
 );
+```
+
+### v22.2.0
+
+- Feat: detecting headers from `Middleware::security` declarations:
+  - When `headers` are enabled within `inputSources` of config, the `Documentation` generator can now identify them
+    among other inputs additionally by using the security declarations of middlewares attached to an `Endpoint`;
+  - This approach enables handling of custom headers without `x-` prefix.
+
+```ts
+const authMiddleware = new Middleware({
+  security: { type: "header", name: "token" },
+});
 ```
 
 ### v22.1.1

@@ -11,8 +11,9 @@ import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import { defaultInputSources, makeCleanId } from "./common-helpers";
+import { defaultInputSources, makeCleanId, nonEmpty } from "./common-helpers";
 import { CommonConfig } from "./config-type";
+import { processContainers } from "./logical-container";
 import { Method } from "./method";
 import {
   OpenAPIContext,
@@ -174,7 +175,6 @@ export class Documentation extends OpenApiBuilder {
         : hasSummaryFromDescription && description
           ? ensureShortDescription(description)
           : undefined;
-      const tags = endpoint.getTags();
       const inputSources =
         config.inputSources?.[method] || defaultInputSources[method];
       const operationId = this.ensureUniqOperationId(
@@ -183,10 +183,12 @@ export class Documentation extends OpenApiBuilder {
         endpoint.getOperationId(method),
       );
 
+      const security = processContainers(endpoint.getSecurity());
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         isHeader,
+        security,
         schema: endpoint.getSchema("input"),
         description: descriptions?.requestParameter?.call(null, {
           method,
@@ -234,8 +236,8 @@ export class Documentation extends OpenApiBuilder {
         : undefined;
 
       const securityRefs = depictSecurityRefs(
-        depictSecurity(endpoint.getSecurity(), inputSources),
-        endpoint.getScopes().slice(),
+        depictSecurity(security, inputSources),
+        endpoint.getScopes(),
         (securitySchema) => {
           const name = this.ensureUniqSecuritySchemaName(securitySchema);
           this.addSecurityScheme(name, securitySchema);
@@ -248,10 +250,10 @@ export class Documentation extends OpenApiBuilder {
           operationId,
           summary,
           description,
-          tags: tags.length > 0 ? tags : undefined,
-          parameters: depictedParams.length > 0 ? depictedParams : undefined,
+          tags: nonEmpty(endpoint.getTags()),
+          parameters: nonEmpty(depictedParams),
           requestBody,
-          security: securityRefs.length > 0 ? securityRefs : undefined,
+          security: nonEmpty(securityRefs),
           responses,
         },
       });
