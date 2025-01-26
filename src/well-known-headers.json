@@ -46,6 +46,8 @@
   "configuration-context",
   "connection",
   "content-digest",
+  "content-disposition",
+  "content-encoding",
   "content-id",
   "content-length",
   "content-md5",
