@@ -658,12 +658,10 @@ export const depictRequestParams = ({
   const areHeadersEnabled = inputSources.includes("headers");
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
-  const securityHeaders =
-    security &&
-    chain(
-      filter((entry: Security) => entry.type === "header"),
-      security,
-    ).map(({ name }) => name);
+  const securityHeaders = chain(
+    filter((entry: Security) => entry.type === "header"),
+    security ?? [],
+  ).map(({ name }) => name);
   const isHeaderParam = (name: string) =>
     areHeadersEnabled &&
     (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders));
