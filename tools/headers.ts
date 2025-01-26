@@ -246,29 +246,4 @@ const headers = lines
 
 console.debug("CRC:", headers.length);
 
-/*
-import OpenAI from "openai";
-const openai = new OpenAI({ apiKey: process.env.GPT_TOKEN });
-const completion = await openai.chat.completions.create({
-  model: "gpt-4o-mini",
-  store: true,
-  messages: [
-    {
-      role: "system",
-      content:
-        "You are an expert on the HTTP protocol and are familiar " +
-        "with related RFCs including file transfer and web sockets.",
-    },
-    {
-      role: "user",
-      content:
-        `In the list of the following HTTP headers find those that can only appear in server responses, ` +
-        `accompany with a reference to an RFC or another proof and the header description, summarise your ` +
-        `findings into JSON object-based format having headers as its keys:\n\n${JSON.stringify(headers)}`,
-    },
-  ],
-});
-console.log(completion);
-*/
-
 await writeFile(dest, JSON.stringify(headers, undefined, 2), "utf-8");
