@@ -848,7 +848,7 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 }
 `;
 
-exports[`Documentation helpers > depictRequestParams() > Feature 1180: should depict header params when enabled 1`] = `
+exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344: should depict header params when enabled 1`] = `
 [
   {
     "description": "GET /v1/user/:id Parameter",
@@ -878,6 +878,16 @@ exports[`Documentation helpers > depictRequestParams() > Feature 1180: should de
     "required": true,
     "schema": {
       "type": "boolean",
+    },
+  },
+  {
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
+    "in": "header",
+    "name": "secure",
+    "required": true,
+    "schema": {
+      "type": "string",
     },
   },
 ]
@@ -1115,16 +1125,6 @@ exports[`Documentation helpers > depictSecurityRefs() > should handle alternativ
     "oauth2": [],
   },
   {
-    "openIdConnect": [],
-  },
-]
-`;
-
-exports[`Documentation helpers > depictSecurityRefs() > should handle one alternative 1`] = `
-[
-  {
-    "apiKey": [],
-    "oauth2": [],
     "openIdConnect": [],
   },
 ]

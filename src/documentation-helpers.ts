@@ -16,6 +16,7 @@ import {
 } from "openapi3-ts/oas31";
 import {
   concat,
+  chain,
   type as detectType,
   filter,
   fromPairs,
@@ -54,7 +55,7 @@ import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { FileSchema, ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
-import { LogicalContainer, processContainers } from "./logical-container";
+import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
@@ -626,8 +627,13 @@ export const extractObjectSchema = (
   );
 };
 
-export const defaultIsHeader = (name: string): name is `x-${string}` =>
-  name.startsWith("x-") || wellKnownHeaders.includes(name);
+export const defaultIsHeader = (
+  name: string,
+  familiar?: string[],
+): name is `x-${string}` =>
+  familiar?.includes(name) ||
+  name.startsWith("x-") ||
+  wellKnownHeaders.includes(name);
 
 export const depictRequestParams = ({
   path,
@@ -638,10 +644,12 @@ export const depictRequestParams = ({
   composition,
   brandHandling,
   isHeader,
+  security,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
   isHeader?: IsHeader;
+  security?: Alternatives<Security>;
 }) => {
   const { shape } = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
@@ -650,9 +658,13 @@ export const depictRequestParams = ({
   const areHeadersEnabled = inputSources.includes("headers");
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
+  const securityHeaders = chain(
+    filter((entry: Security) => entry.type === "header"),
+    security ?? [],
+  ).map(({ name }) => name);
   const isHeaderParam = (name: string) =>
     areHeadersEnabled &&
-    (isHeader?.(name, method, path) ?? defaultIsHeader(name));
+    (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders));
 
   return Object.keys(shape).reduce<ParameterObject[]>((acc, name) => {
     const location = isPathParam(name)
@@ -891,9 +903,9 @@ const depictOAuth2Security = ({
 });
 
 export const depictSecurity = (
-  containers: LogicalContainer<Security>[],
+  alternatives: Alternatives<Security>,
   inputSources: InputSource[] = [],
-): SecuritySchemeObject[][] => {
+): Alternatives<SecuritySchemeObject> => {
   const mapper = (subj: Security): SecuritySchemeObject => {
     if (subj.type === "basic") return { type: "http", scheme: "basic" };
     else if (subj.type === "bearer") return depictBearerSecurity(subj);
@@ -904,12 +916,12 @@ export const depictSecurity = (
     else if (subj.type === "openid") return depictOpenIdSecurity(subj);
     else return depictOAuth2Security(subj);
   };
-  return processContainers(containers, mapper);
+  return alternatives.map((entries) => entries.map(mapper));
 };
 
 export const depictSecurityRefs = (
-  alternatives: SecuritySchemeObject[][],
-  scopes: string[],
+  alternatives: Alternatives<SecuritySchemeObject>,
+  scopes: string[] | ReadonlyArray<string>,
   entitle: (subject: SecuritySchemeObject) => string,
 ): SecurityRequirementObject[] =>
   alternatives.map((alternative) =>
