@@ -102,10 +102,8 @@ const responseOnlyHeaders = {
       "Used in redirection responses or to indicate the location of a created resource.",
   },
   "optional-www-authenticate": {
-    proof:
-      "Defined in RFC 8053, Section 3. Allows a server to provide optional authentication mechanisms.",
-    reason:
-      "This header is explicitly used by servers in responses to suggest additional, non-mandatory authentication options.",
+    proof: "Defined in RFC 8053, Section 3.",
+    reason: "Allows a server to provide optional authentication mechanisms.",
   },
   "proxy-authenticate": {
     proof: "Defined in RFC 7235, Section 4.3.",
