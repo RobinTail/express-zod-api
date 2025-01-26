@@ -51,15 +51,6 @@ const responseOnlyHeaders = {
       "Mentioned in early HTTP/1.1 specs (e.g., RFC 2068, Section 14.11). Deprecated, but applies only to server responses.",
     reason: "Specifies the base URL for relative URLs in a document.",
   },
-  "content-disposition": {
-    proof: "Defined in RFC 6266, Section 4.",
-    reason:
-      "Specifies how content is displayed or downloaded, relevant only in responses.",
-  },
-  "content-encoding": {
-    proof: "Defined in RFC 7231, Section 3.1.2.2.",
-    reason: "Indicates compression or encoding applied to the response body.",
-  },
   "content-language": {
     proof: "Defined in RFC 7231, Section 3.1.3.2.",
     reason: "Specifies the language of the response content.",
