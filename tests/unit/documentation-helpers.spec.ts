@@ -647,14 +647,14 @@ describe("Documentation helpers", () => {
       { name: "authorization", expected: true },
       {
         name: "secure",
-        security: [[{ type: "header" as const, name: "secure" }]],
+        securityHeaders: ["secure"],
         expected: true,
       },
       { name: "unknown", expected: false },
     ])(
       "should validate custom, well-known and security headers %#",
-      ({ name, security, expected }) => {
-        expect(defaultIsHeader(name, security)).toBe(expected);
+      ({ name, securityHeaders, expected }) => {
+        expect(defaultIsHeader(name, securityHeaders)).toBe(expected);
       },
     );
   });

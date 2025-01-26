@@ -16,6 +16,7 @@ import {
 } from "openapi3-ts/oas31";
 import {
   concat,
+  chain,
   type as detectType,
   filter,
   fromPairs,
@@ -628,12 +629,10 @@ export const extractObjectSchema = (
 
 export const defaultIsHeader = (
   name: string,
-  security?: Alternatives<Security>,
+  securityHeaders?: string[],
 ): name is `x-${string}` =>
   name.startsWith("x-") ||
-  security?.some((alt) =>
-    alt.some((entry) => entry.type === "header" && entry.name === name),
-  ) ||
+  securityHeaders?.includes(name) ||
   wellKnownHeaders.includes(name);
 
 export const depictRequestParams = ({
@@ -659,9 +658,15 @@ export const depictRequestParams = ({
   const areHeadersEnabled = inputSources.includes("headers");
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
+  const securityHeaders =
+    security &&
+    chain(
+      filter((entry: Security) => entry.type === "header"),
+      security,
+    ).map(({ name }) => name);
   const isHeaderParam = (name: string) =>
     areHeadersEnabled &&
-    (isHeader?.(name, method, path) ?? defaultIsHeader(name, security));
+    (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders));
 
   return Object.keys(shape).reduce<ParameterObject[]>((acc, name) => {
     const location = isPathParam(name)
