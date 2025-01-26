@@ -731,7 +731,7 @@ createConfig({
 In a similar way you can enable request headers as the input source. This is an opt-in feature. Please note:
 
 - consider giving `headers` the lowest priority among other `inputSources` to avoid overwrites;
-- consider handling headers in `Middleware` and declaring them in `security` declaration (improves `Documentation`);
+- consider handling headers in `Middleware` and declaring them within `security` property to improve `Documentation`;
 - the request headers acquired that way are always lowercase when describing their validation schemas.
 
 ```typescript
