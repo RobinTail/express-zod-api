@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { EventSource } from "undici";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
-import { Client } from "../../example/example.client";
+import { Client, Subscription } from "../../example/example.client";
 import { givePort } from "../helpers";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -18,10 +18,15 @@ describe("Example", async () => {
   const port = givePort("example");
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
 
+  beforeAll(() => {
+    vi.stubGlobal("EventSource", EventSource);
+  });
+
   afterAll(async () => {
     example.stdout.removeListener("data", listener);
     example.kill();
     await vi.waitFor(() => assert(example.killed), { timeout: 1e4 });
+    vi.unstubAllGlobals();
   });
 
   afterEach(() => {
@@ -251,17 +256,14 @@ describe("Example", async () => {
     });
 
     test("Should emit SSE (server sent events)", async () => {
-      const source = new EventSource(`http://localhost:${port}/v1/events/time`);
-      const stack: unknown[] = [];
-      const onTime = (evt: Event) => stack.push((evt as MessageEvent).data);
-      source.addEventListener("time", onTime);
-      await vi.waitFor(() => assert(stack.length > 2), { timeout: 5e3 });
-      expect(
-        stack.every(
-          (entry) => typeof entry === "string" && /\d{10,}/.test(entry),
-        ),
+      const stack: number[] = [];
+      const onTime = (data: number) => void stack.push(data);
+      const subscription = new Subscription("get /v1/events/time", {}).on(
+        "time",
+        onTime,
       );
-      source.removeEventListener("time", onTime);
+      await vi.waitFor(() => assert(stack.length > 2), { timeout: 5e3 });
+      subscription.source.close();
     });
   });
 
