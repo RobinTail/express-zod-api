@@ -629,10 +629,10 @@ export const extractObjectSchema = (
 
 export const defaultIsHeader = (
   name: string,
-  securityHeaders?: string[],
+  familiar?: string[],
 ): name is `x-${string}` =>
   name.startsWith("x-") ||
-  securityHeaders?.includes(name) ||
+  familiar?.includes(name) ||
   wellKnownHeaders.includes(name);
 
 export const depictRequestParams = ({
