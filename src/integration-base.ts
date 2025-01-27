@@ -330,18 +330,7 @@ export abstract class IntegrationBase {
         ),
         makeAssignment(
           f.createPropertyAccessExpression(f.createThis(), this.ids.sourceProp),
-          makeNew(
-            f.createIdentifier("EventSource"),
-            makeNew(
-              f.createIdentifier(URL.name),
-              makeTemplate(
-                "",
-                [this.ids.pathParameter],
-                [this.ids.searchParamsConst],
-              ),
-              f.createStringLiteral(this.serverUrl),
-            ),
-          ),
+          makeNew(f.createIdentifier("EventSource"), this.makeFetchURL()),
         ),
       ],
     );
@@ -459,6 +448,13 @@ export abstract class IntegrationBase {
       makeNew(f.createIdentifier(URLSearchParams.name), from),
     ]);
 
+  protected makeFetchURL = () =>
+    makeNew(
+      f.createIdentifier(URL.name),
+      makeTemplate("", [this.ids.pathParameter], [this.ids.searchParamsConst]),
+      f.createStringLiteral(this.serverUrl),
+    );
+
   // export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
   protected makeDefaultImplementation = () => {
     // method: method.toUpperCase()
@@ -501,15 +497,7 @@ export abstract class IntegrationBase {
       this.ids.responseConst,
       f.createAwaitExpression(
         f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
-          makeNew(
-            f.createIdentifier(URL.name),
-            makeTemplate(
-              "",
-              [this.ids.pathParameter],
-              [this.ids.searchParamsConst],
-            ),
-            f.createStringLiteral(this.serverUrl),
-          ),
+          this.makeFetchURL(),
           f.createObjectLiteralExpression([
             methodProperty,
             headersProperty,
