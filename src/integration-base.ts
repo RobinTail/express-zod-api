@@ -324,6 +324,10 @@ export abstract class IntegrationBase {
             this.ids.paramsArgument,
           ]),
         ),
+        makeConst(
+          this.ids.searchParamsConst,
+          this.makeSearchParams(this.ids.restConst),
+        ),
         makeAssignment(
           f.createPropertyAccessExpression(f.createThis(), this.ids.sourceProp),
           makeNew(
@@ -332,13 +336,8 @@ export abstract class IntegrationBase {
               f.createIdentifier(URL.name),
               makeTemplate(
                 "",
-                [this.ids.pathParameter, "?"],
-                [
-                  makeNew(
-                    f.createIdentifier(URLSearchParams.name),
-                    this.ids.restConst,
-                  ),
-                ],
+                [this.ids.pathParameter],
+                [this.ids.searchParamsConst],
               ),
               f.createStringLiteral(this.serverUrl),
             ),
@@ -454,6 +453,12 @@ export abstract class IntegrationBase {
       },
     );
 
+  // `?${new URLSearchParams(____)}`
+  protected makeSearchParams = (from: ts.Expression) =>
+    makeTemplate("?", [
+      makeNew(f.createIdentifier(URLSearchParams.name), from),
+    ]);
+
   // export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
   protected makeDefaultImplementation = () => {
     // method: method.toUpperCase()
@@ -529,18 +534,13 @@ export abstract class IntegrationBase {
       ),
     );
 
-    // const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
+    // const searchParams = hasBody ? "" : ___;
     const searchParamsStatement = makeConst(
       this.ids.searchParamsConst,
       makeTernary(
         this.ids.hasBodyConst,
         f.createStringLiteral(""),
-        makeTemplate("?", [
-          makeNew(
-            f.createIdentifier(URLSearchParams.name),
-            this.ids.paramsArgument,
-          ),
-        ]),
+        this.makeSearchParams(this.ids.paramsArgument),
       ),
     );
 

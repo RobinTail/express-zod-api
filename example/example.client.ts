@@ -472,8 +472,9 @@ export class Subscription<
   public source: EventSource;
   public constructor(request: K, params: Input[K]) {
     const [path, rest] = substitute(parseRequest(request)[1], params);
+    const searchParams = `?${new URLSearchParams(rest)}`;
     this.source = new EventSource(
-      new URL(`${path}?${new URLSearchParams(rest)}`, "http://localhost:8090"),
+      new URL(`${path}${searchParams}`, "http://localhost:8090"),
     );
   }
   public on<E extends R["event"]>(

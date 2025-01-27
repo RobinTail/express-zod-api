@@ -122,8 +122,9 @@ export class Subscription<
   public source: EventSource;
   public constructor(request: K, params: Input[K]) {
     const [path, rest] = substitute(parseRequest(request)[1], params);
+    const searchParams = \`?\${new URLSearchParams(rest)}\`;
     this.source = new EventSource(
-      new URL(\`\${path}?\${new URLSearchParams(rest)}\`, "https://example.com"),
+      new URL(\`\${path}\${searchParams}\`, "https://example.com"),
     );
   }
   public on<E extends R["event"]>(
@@ -268,8 +269,9 @@ export class Subscription<
   public source: EventSource;
   public constructor(request: K, params: Input[K]) {
     const [path, rest] = substitute(parseRequest(request)[1], params);
+    const searchParams = \`?\${new URLSearchParams(rest)}\`;
     this.source = new EventSource(
-      new URL(\`\${path}?\${new URLSearchParams(rest)}\`, "https://example.com"),
+      new URL(\`\${path}\${searchParams}\`, "https://example.com"),
     );
   }
   public on<E extends R["event"]>(
@@ -414,8 +416,9 @@ export class Subscription<
   public source: EventSource;
   public constructor(request: K, params: Input[K]) {
     const [path, rest] = substitute(parseRequest(request)[1], params);
+    const searchParams = \`?\${new URLSearchParams(rest)}\`;
     this.source = new EventSource(
-      new URL(\`\${path}?\${new URLSearchParams(rest)}\`, "https://example.com"),
+      new URL(\`\${path}\${searchParams}\`, "https://example.com"),
     );
   }
   public on<E extends R["event"]>(
@@ -979,8 +982,9 @@ export class Subscription<
   public source: EventSource;
   public constructor(request: K, params: Input[K]) {
     const [path, rest] = substitute(parseRequest(request)[1], params);
+    const searchParams = \`?\${new URLSearchParams(rest)}\`;
     this.source = new EventSource(
-      new URL(\`\${path}?\${new URLSearchParams(rest)}\`, "https://example.com"),
+      new URL(\`\${path}\${searchParams}\`, "https://example.com"),
     );
   }
   public on<E extends R["event"]>(
@@ -1605,8 +1609,9 @@ export class Subscription<
   public source: EventSource;
   public constructor(request: K, params: Input[K]) {
     const [path, rest] = substitute(parseRequest(request)[1], params);
+    const searchParams = \`?\${new URLSearchParams(rest)}\`;
     this.source = new EventSource(
-      new URL(\`\${path}?\${new URLSearchParams(rest)}\`, "https://example.com"),
+      new URL(\`\${path}\${searchParams}\`, "https://example.com"),
     );
   }
   public on<E extends R["event"]>(
