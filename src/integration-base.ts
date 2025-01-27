@@ -31,6 +31,7 @@ import {
   propOf,
   recordStringAny,
   makeAssignment,
+  makePublicProperty,
 } from "./typescript-api";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -562,13 +563,7 @@ export abstract class IntegrationBase {
     makePublicClass(
       name,
       [
-        f.createPropertyDeclaration(
-          accessModifiers.public,
-          this.ids.sourceProp,
-          undefined,
-          ensureTypeNode("EventSource"),
-          undefined,
-        ),
+        makePublicProperty(this.ids.sourceProp, ensureTypeNode("EventSource")),
         this.makeSubscriptionConstructor(),
         this.makeOnMethod(),
       ],

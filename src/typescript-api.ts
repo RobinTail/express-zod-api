@@ -179,6 +179,18 @@ export const makeType = (
   return comment ? addJsDocComment(node, comment) : node;
 };
 
+export const makePublicProperty = (
+  name: string | ts.PropertyName,
+  type: ts.TypeNode,
+) =>
+  f.createPropertyDeclaration(
+    accessModifiers.public,
+    name,
+    undefined,
+    type,
+    undefined,
+  );
+
 export const makePublicMethod = (
   name: ts.Identifier,
   params: ts.ParameterDeclaration[],
