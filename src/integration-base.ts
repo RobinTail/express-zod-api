@@ -30,6 +30,7 @@ import {
   makeType,
   propOf,
   recordStringAny,
+  makeAssignment,
 } from "./typescript-api";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -200,36 +201,33 @@ export abstract class IntegrationBase {
             ),
             this.ids.paramsArgument,
             f.createBlock([
-              f.createExpressionStatement(
-                f.createBinaryExpression(
+              makeAssignment(
+                this.ids.pathParameter,
+                makePropCall(
                   this.ids.pathParameter,
-                  f.createToken(ts.SyntaxKind.EqualsToken),
-                  makePropCall(
-                    this.ids.pathParameter,
-                    propOf<string>("replace"),
-                    [
-                      makeTemplate(":", [this.ids.keyParameter]), // `:${key}`
-                      makeArrowFn(
-                        [],
-                        f.createBlock([
-                          f.createExpressionStatement(
-                            f.createDeleteExpression(
-                              f.createElementAccessExpression(
-                                f.createIdentifier("rest"),
-                                this.ids.keyParameter,
-                              ),
-                            ),
-                          ),
-                          f.createReturnStatement(
+                  propOf<string>("replace"),
+                  [
+                    makeTemplate(":", [this.ids.keyParameter]), // `:${key}`
+                    makeArrowFn(
+                      [],
+                      f.createBlock([
+                        f.createExpressionStatement(
+                          f.createDeleteExpression(
                             f.createElementAccessExpression(
-                              this.ids.paramsArgument,
+                              f.createIdentifier("rest"),
                               this.ids.keyParameter,
                             ),
                           ),
-                        ]),
-                      ),
-                    ],
-                  ),
+                        ),
+                        f.createReturnStatement(
+                          f.createElementAccessExpression(
+                            this.ids.paramsArgument,
+                            this.ids.keyParameter,
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ],
                 ),
               ),
             ]),
@@ -326,29 +324,23 @@ export abstract class IntegrationBase {
             this.ids.paramsArgument,
           ]),
         ),
-        f.createExpressionStatement(
-          f.createBinaryExpression(
-            f.createPropertyAccessExpression(
-              f.createThis(),
-              this.ids.sourceProp,
-            ),
-            f.createToken(ts.SyntaxKind.EqualsToken),
+        makeAssignment(
+          f.createPropertyAccessExpression(f.createThis(), this.ids.sourceProp),
+          makeNew(
+            f.createIdentifier("EventSource"),
             makeNew(
-              f.createIdentifier("EventSource"),
-              makeNew(
-                f.createIdentifier(URL.name),
-                makeTemplate(
-                  "",
-                  [this.ids.pathParameter, "?"],
-                  [
-                    makeNew(
-                      f.createIdentifier(URLSearchParams.name),
-                      this.ids.restConst,
-                    ),
-                  ],
-                ),
-                f.createStringLiteral(this.serverUrl),
+              f.createIdentifier(URL.name),
+              makeTemplate(
+                "",
+                [this.ids.pathParameter, "?"],
+                [
+                  makeNew(
+                    f.createIdentifier(URLSearchParams.name),
+                    this.ids.restConst,
+                  ),
+                ],
               ),
+              f.createStringLiteral(this.serverUrl),
             ),
           ),
         ),

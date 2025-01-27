@@ -308,6 +308,15 @@ export const makeExtract = (
   narrow: ts.TypeNode,
 ) => f.createTypeReferenceNode("Extract", [ensureTypeNode(base), narrow]);
 
+export const makeAssignment = (left: ts.Expression, right: ts.Expression) =>
+  f.createExpressionStatement(
+    f.createBinaryExpression(
+      left,
+      f.createToken(ts.SyntaxKind.EqualsToken),
+      right,
+    ),
+  );
+
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,
   ts.SyntaxKind.BigIntKeyword,

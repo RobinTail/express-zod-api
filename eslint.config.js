@@ -115,6 +115,10 @@ const tsFactoryConcerns = [
       "CallExpression[callee.property.name='createTypeLiteralNode'] > ArrayExpression[elements.length=1]",
     message: "use makeOnePropObjType() helper",
   },
+  {
+    selector: "Identifier[name='EqualsToken']",
+    message: "use makeAssignment() helper",
+  },
 ];
 
 export default tsPlugin.config(
