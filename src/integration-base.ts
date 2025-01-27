@@ -68,7 +68,6 @@ export abstract class IntegrationBase {
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
     sourceProp: f.createIdentifier("source"),
-    connectionConst: f.createIdentifier("connection"),
   } satisfies Record<string, ts.Identifier>;
 
   protected interfaces: Record<IOKind, ts.Identifier> = {
