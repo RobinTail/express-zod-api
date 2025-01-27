@@ -302,146 +302,6 @@ export abstract class IntegrationBase {
       this.makeProvider(),
     ]);
 
-  protected makeSubscriptionConstructor = () =>
-    makePublicConstructor(
-      makeParams({
-        request: ensureTypeNode("K"),
-        params: f.createIndexedAccessTypeNode(
-          ensureTypeNode(this.interfaces.input),
-          ensureTypeNode("K"),
-        ),
-      }),
-      [
-        makeConst(
-          makeDeconstruction(this.ids.pathParameter, this.ids.restConst),
-          f.createCallExpression(this.ids.substituteFn, undefined, [
-            f.createElementAccessExpression(
-              f.createCallExpression(this.ids.parseRequestFn, undefined, [
-                this.ids.requestParameter,
-              ]),
-              f.createNumericLiteral(1),
-            ),
-            this.ids.paramsArgument,
-          ]),
-        ),
-        makeConst(
-          this.ids.searchParamsConst,
-          this.makeSearchParams(this.ids.restConst),
-        ),
-        makeAssignment(
-          f.createPropertyAccessExpression(f.createThis(), this.ids.sourceProp),
-          makeNew(f.createIdentifier("EventSource"), this.makeFetchURL()),
-        ),
-      ],
-    );
-
-  protected makeOnMethod = () =>
-    makePublicMethod(
-      this.ids.onMethod,
-      makeParams({
-        [this.ids.eventParameter.text]: ensureTypeNode("E"),
-        [this.ids.handlerParameter.text]: f.createFunctionTypeNode(
-          undefined,
-          makeParams({
-            [this.ids.dataParameter.text]: f.createIndexedAccessTypeNode(
-              makeExtract(
-                "R",
-                makeOnePropObjType(propOf<SSEShape>("event"), "E"),
-              ),
-              f.createLiteralTypeNode(
-                f.createStringLiteral(propOf<SSEShape>("data")),
-              ),
-            ),
-          }),
-          f.createUnionTypeNode([
-            f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-            makePromise(f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword)),
-          ]),
-        ),
-      }),
-      f.createBlock([
-        f.createExpressionStatement(
-          makePropCall(
-            [f.createThis(), this.ids.sourceProp],
-            propOf<EventSource>("addEventListener"),
-            [
-              this.ids.eventParameter,
-              makeArrowFn(
-                [this.ids.msgParameter],
-                f.createCallExpression(this.ids.handlerParameter, undefined, [
-                  makePropCall(
-                    f.createIdentifier(JSON[Symbol.toStringTag]),
-                    propOf<JSON>("parse"),
-                    [
-                      f.createPropertyAccessExpression(
-                        f.createParenthesizedExpression(
-                          f.createAsExpression(
-                            this.ids.msgParameter,
-                            ensureTypeNode(MessageEvent.name),
-                          ),
-                        ),
-                        propOf<SSEShape>("data"),
-                      ),
-                    ],
-                  ),
-                ]),
-              ),
-            ],
-          ),
-        ),
-        f.createReturnStatement(f.createThis()),
-      ]),
-      {
-        typeParams: {
-          E: f.createIndexedAccessTypeNode(
-            ensureTypeNode("R"),
-            f.createLiteralTypeNode(
-              f.createStringLiteral(propOf<SSEShape>("event")),
-            ),
-          ),
-        },
-      },
-    );
-
-  protected makeSubscriptionClass = (name: string) =>
-    makePublicClass(
-      name,
-      [
-        f.createPropertyDeclaration(
-          accessModifiers.public,
-          this.ids.sourceProp,
-          undefined,
-          ensureTypeNode("EventSource"),
-          undefined,
-        ),
-        this.makeSubscriptionConstructor(),
-        this.makeOnMethod(),
-      ],
-      {
-        typeParams: {
-          K: makeExtract(
-            this.requestType.name,
-            f.createTemplateLiteralType(f.createTemplateHead("get "), [
-              f.createTemplateLiteralTypeSpan(
-                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                f.createTemplateTail(""),
-              ),
-            ]),
-          ),
-          R: makeExtract(
-            f.createIndexedAccessTypeNode(
-              ensureTypeNode(this.interfaces.positive),
-              ensureTypeNode("K"),
-            ),
-            makeOnePropObjType(
-              propOf<SSEShape>("event"),
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-            ),
-          ),
-        },
-      },
-    );
-
   // `?${new URLSearchParams(____)}`
   protected makeSearchParams = (from: ts.Expression) =>
     makeTemplate("?", [
@@ -597,6 +457,146 @@ export abstract class IntegrationBase {
       { type: ensureTypeNode(this.ids.implementationType) },
     );
   };
+
+  protected makeSubscriptionConstructor = () =>
+    makePublicConstructor(
+      makeParams({
+        request: ensureTypeNode("K"),
+        params: f.createIndexedAccessTypeNode(
+          ensureTypeNode(this.interfaces.input),
+          ensureTypeNode("K"),
+        ),
+      }),
+      [
+        makeConst(
+          makeDeconstruction(this.ids.pathParameter, this.ids.restConst),
+          f.createCallExpression(this.ids.substituteFn, undefined, [
+            f.createElementAccessExpression(
+              f.createCallExpression(this.ids.parseRequestFn, undefined, [
+                this.ids.requestParameter,
+              ]),
+              f.createNumericLiteral(1),
+            ),
+            this.ids.paramsArgument,
+          ]),
+        ),
+        makeConst(
+          this.ids.searchParamsConst,
+          this.makeSearchParams(this.ids.restConst),
+        ),
+        makeAssignment(
+          f.createPropertyAccessExpression(f.createThis(), this.ids.sourceProp),
+          makeNew(f.createIdentifier("EventSource"), this.makeFetchURL()),
+        ),
+      ],
+    );
+
+  protected makeOnMethod = () =>
+    makePublicMethod(
+      this.ids.onMethod,
+      makeParams({
+        [this.ids.eventParameter.text]: ensureTypeNode("E"),
+        [this.ids.handlerParameter.text]: f.createFunctionTypeNode(
+          undefined,
+          makeParams({
+            [this.ids.dataParameter.text]: f.createIndexedAccessTypeNode(
+              makeExtract(
+                "R",
+                makeOnePropObjType(propOf<SSEShape>("event"), "E"),
+              ),
+              f.createLiteralTypeNode(
+                f.createStringLiteral(propOf<SSEShape>("data")),
+              ),
+            ),
+          }),
+          f.createUnionTypeNode([
+            f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+            makePromise(f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword)),
+          ]),
+        ),
+      }),
+      f.createBlock([
+        f.createExpressionStatement(
+          makePropCall(
+            [f.createThis(), this.ids.sourceProp],
+            propOf<EventSource>("addEventListener"),
+            [
+              this.ids.eventParameter,
+              makeArrowFn(
+                [this.ids.msgParameter],
+                f.createCallExpression(this.ids.handlerParameter, undefined, [
+                  makePropCall(
+                    f.createIdentifier(JSON[Symbol.toStringTag]),
+                    propOf<JSON>("parse"),
+                    [
+                      f.createPropertyAccessExpression(
+                        f.createParenthesizedExpression(
+                          f.createAsExpression(
+                            this.ids.msgParameter,
+                            ensureTypeNode(MessageEvent.name),
+                          ),
+                        ),
+                        propOf<SSEShape>("data"),
+                      ),
+                    ],
+                  ),
+                ]),
+              ),
+            ],
+          ),
+        ),
+        f.createReturnStatement(f.createThis()),
+      ]),
+      {
+        typeParams: {
+          E: f.createIndexedAccessTypeNode(
+            ensureTypeNode("R"),
+            f.createLiteralTypeNode(
+              f.createStringLiteral(propOf<SSEShape>("event")),
+            ),
+          ),
+        },
+      },
+    );
+
+  protected makeSubscriptionClass = (name: string) =>
+    makePublicClass(
+      name,
+      [
+        f.createPropertyDeclaration(
+          accessModifiers.public,
+          this.ids.sourceProp,
+          undefined,
+          ensureTypeNode("EventSource"),
+          undefined,
+        ),
+        this.makeSubscriptionConstructor(),
+        this.makeOnMethod(),
+      ],
+      {
+        typeParams: {
+          K: makeExtract(
+            this.requestType.name,
+            f.createTemplateLiteralType(f.createTemplateHead("get "), [
+              f.createTemplateLiteralTypeSpan(
+                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                f.createTemplateTail(""),
+              ),
+            ]),
+          ),
+          R: makeExtract(
+            f.createIndexedAccessTypeNode(
+              ensureTypeNode(this.interfaces.positive),
+              ensureTypeNode("K"),
+            ),
+            makeOnePropObjType(
+              propOf<SSEShape>("event"),
+              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+            ),
+          ),
+        },
+      },
+    );
 
   protected makeUsageStatements = (
     clientClassName: string,
