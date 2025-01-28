@@ -491,6 +491,11 @@ export abstract class IntegrationBase {
       ],
     );
 
+  protected makeEventNarrow = (value: Parameters<typeof ensureTypeNode>[0]) =>
+    f.createTypeLiteralNode([
+      makeInterfaceProp(propOf<SSEShape>("event"), value),
+    ]);
+
   protected makeOnMethod = () =>
     makePublicMethod(
       this.ids.onMethod,
@@ -500,14 +505,7 @@ export abstract class IntegrationBase {
           undefined,
           makeParams({
             [this.ids.dataParameter.text]: f.createIndexedAccessTypeNode(
-              makeExtract(
-                "R",
-                makeOneLine(
-                  f.createTypeLiteralNode([
-                    makeInterfaceProp(propOf<SSEShape>("event"), "E"),
-                  ]),
-                ),
-              ),
+              makeExtract("R", makeOneLine(this.makeEventNarrow("E"))),
               f.createLiteralTypeNode(
                 f.createStringLiteral(propOf<SSEShape>("data")),
               ),
@@ -588,12 +586,9 @@ export abstract class IntegrationBase {
               ensureTypeNode("K"),
             ),
             makeOneLine(
-              f.createTypeLiteralNode([
-                makeInterfaceProp(
-                  propOf<SSEShape>("event"),
-                  f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-                ),
-              ]),
+              this.makeEventNarrow(
+                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              ),
             ),
           ),
         },
