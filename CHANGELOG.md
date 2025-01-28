@@ -6,10 +6,10 @@
 
 - Feat: `Subscription` class consuming for Server-sent events:
   - The `Integration` can now also generate a frontend helper class `Subscription` to ease SSE support;
-  - The new class establishes an `EventSource` instance and exposes it as a public `source` property;
+  - The new class establishes an `EventSource` instance and exposes it as the public `source` property;
   - The class also provides the public `on` method for your typed listeners;
   - You can configure the generated class name using `subscriptionClassName` option (default: `Subscription`);
-  - Only when `variant` option is `client` (default);
+  - The feature is only applicable to the `variant` option set to `client` (default).
 
 ```ts
 import { Subscription } from "./client.ts"; // the generated file
