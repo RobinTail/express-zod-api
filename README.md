@@ -1202,8 +1202,9 @@ createConfig({
 
 If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server,
 consider [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) feature.
-Client application can subscribe to the event stream using `EventSource` class instance. The following example
-demonstrates the implementation emitting the `time` event each second.
+Client application can subscribe to the event stream using `EventSource` class instance or the
+[instance of the generated](#generating-a-frontend-client) `Subscription` class. The following example demonstrates
+the implementation emitting the `time` event each second.
 
 ```typescript
 import { z } from "zod";
@@ -1220,13 +1221,6 @@ const subscriptionEndpoint = EventStreamFactory({
       await setTimeout(1000);
     }
   },
-});
-```
-
-```js
-const source = new EventSource("https://example.com/api/v1/time");
-source.addEventListener("time", (event) => {
-  const data = JSON.parse(event.data); // number
 });
 ```
 
@@ -1267,11 +1261,12 @@ makes requests using the libraries and methods of your choice. The default imple
 asserts the type of request parameters and response. Consuming the generated client requires Typescript version 4.1+.
 
 ```typescript
-import { Client, Implementation } from "./client.ts"; // the generated file
+import { Client, Implementation, Subscription } from "./client.ts"; // the generated file
 
 const client = new Client(/* optional custom Implementation */);
 client.provide("get /v1/user/retrieve", { id: "10" });
 client.provide("post /v1/user/:id", { id: "10" }); // it also substitues path params
+new Subscription("get /v1/events/time", {}).on("time", (time) => {}); // Server-sent events (SSE)
 ```
 
 ## Creating a documentation
