@@ -31,6 +31,8 @@ interface IntegrationParams {
   variant?: "types" | "client";
   /** @default Client */
   clientClassName?: string;
+  /** @default Subscription */
+  subscriptionClassName?: string;
   /**
    * @desc The API URL to use in the generated code
    * @default https://example.com
@@ -100,6 +102,7 @@ export class Integration extends IntegrationBase {
     brandHandling,
     variant = "client",
     clientClassName = "Client",
+    subscriptionClassName = "Subscription",
     serverUrl = "https://example.com",
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
@@ -184,9 +187,12 @@ export class Integration extends IntegrationBase {
       this.makeImplementationType(),
       this.makeDefaultImplementation(),
       this.makeClientClass(clientClassName),
+      this.makeSubscriptionClass(subscriptionClassName),
     );
 
-    this.usage.push(...this.makeUsageStatements(clientClassName));
+    this.usage.push(
+      ...this.makeUsageStatements(clientClassName, subscriptionClassName),
+    );
   }
 
   protected printUsage(printerOptions?: ts.PrinterOptions) {
