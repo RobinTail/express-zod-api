@@ -113,13 +113,8 @@ export const makeInterfaceProp = (
     ensureTypeNode(value),
   );
 
-export const makeOnePropObjType = (
-  ...params: Parameters<typeof makeInterfaceProp>
-) =>
-  ts.setEmitFlags(
-    f.createTypeLiteralNode([makeInterfaceProp(...params)]),
-    ts.EmitFlags.SingleLine,
-  );
+export const makeOneLine = (subject: ts.TypeNode) =>
+  ts.setEmitFlags(subject, ts.EmitFlags.SingleLine);
 
 export const makeDeconstruction = (
   ...names: ts.Identifier[]

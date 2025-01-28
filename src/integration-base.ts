@@ -15,7 +15,7 @@ import {
   makeInterfaceProp,
   makeKeyOf,
   makeNew,
-  makeOnePropObjType,
+  makeOneLine,
   makeParam,
   makeParams,
   makePromise,
@@ -502,7 +502,11 @@ export abstract class IntegrationBase {
             [this.ids.dataParameter.text]: f.createIndexedAccessTypeNode(
               makeExtract(
                 "R",
-                makeOnePropObjType(propOf<SSEShape>("event"), "E"),
+                makeOneLine(
+                  f.createTypeLiteralNode([
+                    makeInterfaceProp(propOf<SSEShape>("event"), "E"),
+                  ]),
+                ),
               ),
               f.createLiteralTypeNode(
                 f.createStringLiteral(propOf<SSEShape>("data")),
@@ -583,9 +587,13 @@ export abstract class IntegrationBase {
               ensureTypeNode(this.interfaces.positive),
               ensureTypeNode("K"),
             ),
-            makeOnePropObjType(
-              propOf<SSEShape>("event"),
-              f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+            makeOneLine(
+              f.createTypeLiteralNode([
+                makeInterfaceProp(
+                  propOf<SSEShape>("event"),
+                  f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                ),
+              ]),
             ),
           ),
         },
