@@ -14,7 +14,7 @@
 ```ts
 import { Subscription } from "./client.ts"; // the generated file
 
-new Subscription("get /v1/events/time", {}).on("time", (time) => {});
+new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
 ```
 
 ### v22.2.0

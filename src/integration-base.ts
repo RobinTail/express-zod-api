@@ -607,11 +607,11 @@ export abstract class IntegrationBase {
         f.createPropertyAssignment("id", f.createStringLiteral("10")),
       ]),
     ]),
-    // new Subscription("get /v1/events/time", {}).on("time", (time) => {});
+    // new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
     makePropCall(
       makeNew(
         f.createIdentifier(subscriptionClassName),
-        f.createStringLiteral(`${"get" satisfies Method} /v1/events/time`),
+        f.createStringLiteral(`${"get" satisfies Method} /v1/events/stream`),
         f.createObjectLiteralExpression(),
       ),
       this.ids.onMethod,

@@ -259,7 +259,7 @@ describe("Example", async () => {
     test("Should emit SSE (server sent events)", async () => {
       const stack: number[] = [];
       const onTime = (data: number) => void stack.push(data);
-      const subscription = new Subscription("get /v1/events/time", {}).on(
+      const subscription = new Subscription("get /v1/events/stream", {}).on(
         "time",
         onTime,
       );
@@ -434,7 +434,7 @@ describe("Example", async () => {
 
     test("Should handle errors for SSE endpoints", async () => {
       const response = await fetch(
-        `http://localhost:${port}/v1/events/time?trigger=failure`,
+        `http://localhost:${port}/v1/events/stream?trigger=failure`,
       );
       expect(response.status).toBe(500);
       expect(response.headers.get("content-type")).toBe(
