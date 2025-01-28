@@ -4,7 +4,7 @@
 
 ### v22.3.0
 
-- Feat: `Subscription` class consuming for Server-sent events:
+- Feat: `Subscription` class for consuming Server-sent events:
   - The `Integration` can now also generate a frontend helper class `Subscription` to ease SSE support;
   - The new class establishes an `EventSource` instance and exposes it as the public `source` property;
   - The class also provides the public `on` method for your typed listeners;
