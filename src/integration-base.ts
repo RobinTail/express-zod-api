@@ -214,7 +214,7 @@ export abstract class IntegrationBase {
                         f.createExpressionStatement(
                           f.createDeleteExpression(
                             f.createElementAccessExpression(
-                              f.createIdentifier("rest"),
+                              this.ids.restConst,
                               this.ids.keyParameter,
                             ),
                           ),
