@@ -265,30 +265,30 @@ interface PostV1AvatarRawNegativeResponseVariants {
   400: PostV1AvatarRawNegativeVariant1;
 }
 
-/** get /v1/events/time */
-type GetV1EventsTimeInput = {
+/** get /v1/events/stream */
+type GetV1EventsStreamInput = {
   trigger?: string | undefined;
 };
 
-/** get /v1/events/time */
-type GetV1EventsTimePositiveVariant1 = {
+/** get /v1/events/stream */
+type GetV1EventsStreamPositiveVariant1 = {
   data: number;
   event: "time";
   id?: string | undefined;
   retry?: number | undefined;
 };
 
-/** get /v1/events/time */
-interface GetV1EventsTimePositiveResponseVariants {
-  200: GetV1EventsTimePositiveVariant1;
+/** get /v1/events/stream */
+interface GetV1EventsStreamPositiveResponseVariants {
+  200: GetV1EventsStreamPositiveVariant1;
 }
 
-/** get /v1/events/time */
-type GetV1EventsTimeNegativeVariant1 = string;
+/** get /v1/events/stream */
+type GetV1EventsStreamNegativeVariant1 = string;
 
-/** get /v1/events/time */
-interface GetV1EventsTimeNegativeResponseVariants {
-  400: GetV1EventsTimeNegativeVariant1;
+/** get /v1/events/stream */
+interface GetV1EventsStreamNegativeResponseVariants {
+  400: GetV1EventsStreamNegativeVariant1;
 }
 
 export type Path =
@@ -301,7 +301,7 @@ export type Path =
   | "/v1/avatar/stream"
   | "/v1/avatar/upload"
   | "/v1/avatar/raw"
-  | "/v1/events/time";
+  | "/v1/events/stream";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
@@ -315,7 +315,7 @@ export interface Input {
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
   "post /v1/avatar/raw": PostV1AvatarRawInput;
-  "get /v1/events/time": GetV1EventsTimeInput;
+  "get /v1/events/stream": GetV1EventsStreamInput;
 }
 
 export interface PositiveResponse {
@@ -328,7 +328,7 @@ export interface PositiveResponse {
   "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamPositiveResponseVariants>;
   "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadPositiveResponseVariants>;
   "post /v1/avatar/raw": SomeOf<PostV1AvatarRawPositiveResponseVariants>;
-  "get /v1/events/time": SomeOf<GetV1EventsTimePositiveResponseVariants>;
+  "get /v1/events/stream": SomeOf<GetV1EventsStreamPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
@@ -341,7 +341,7 @@ export interface NegativeResponse {
   "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamNegativeResponseVariants>;
   "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadNegativeResponseVariants>;
   "post /v1/avatar/raw": SomeOf<PostV1AvatarRawNegativeResponseVariants>;
-  "get /v1/events/time": SomeOf<GetV1EventsTimeNegativeResponseVariants>;
+  "get /v1/events/stream": SomeOf<GetV1EventsStreamNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
@@ -363,8 +363,8 @@ export interface EncodedResponse {
     PostV1AvatarUploadNegativeResponseVariants;
   "post /v1/avatar/raw": PostV1AvatarRawPositiveResponseVariants &
     PostV1AvatarRawNegativeResponseVariants;
-  "get /v1/events/time": GetV1EventsTimePositiveResponseVariants &
-    GetV1EventsTimeNegativeResponseVariants;
+  "get /v1/events/stream": GetV1EventsStreamPositiveResponseVariants &
+    GetV1EventsStreamNegativeResponseVariants;
 }
 
 export interface Response {
@@ -395,9 +395,9 @@ export interface Response {
   "post /v1/avatar/raw":
     | PositiveResponse["post /v1/avatar/raw"]
     | NegativeResponse["post /v1/avatar/raw"];
-  "get /v1/events/time":
-    | PositiveResponse["get /v1/events/time"]
-    | NegativeResponse["get /v1/events/time"];
+  "get /v1/events/stream":
+    | PositiveResponse["get /v1/events/stream"]
+    | NegativeResponse["get /v1/events/stream"];
 }
 
 export type Request = keyof Input;
@@ -412,7 +412,7 @@ export const endpointTags = {
   "get /v1/avatar/stream": ["users", "files"],
   "post /v1/avatar/upload": ["files"],
   "post /v1/avatar/raw": ["files"],
-  "get /v1/events/time": ["subscriptions"],
+  "get /v1/events/stream": ["subscriptions"],
 };
 
 const parseRequest = (request: string) =>
@@ -435,28 +435,11 @@ export type Implementation = (
   params: Record<string, any>,
 ) => Promise<any>;
 
-export class Client {
-  public constructor(protected readonly implementation: Implementation) {}
-  public provide<K extends Request>(
-    request: K,
-    params: Input[K],
-  ): Promise<Response[K]> {
-    const [method, path] = parseRequest(request);
-    return this.implementation(method, ...substitute(path, params));
-  }
-}
-
-// Usage example:
-/*
-export const exampleImplementation: Implementation = async (
-  method,
-  path,
-  params,
-) => {
+const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "delete"].includes(method);
   const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
   const response = await fetch(
-    new URL(`${path}${searchParams}`, "https://example.com"),
+    new URL(`${path}${searchParams}`, "http://localhost:8090"),
     {
       method: method.toUpperCase(),
       headers: hasBody ? { "Content-Type": "application/json" } : undefined,
@@ -468,6 +451,46 @@ export const exampleImplementation: Implementation = async (
   const isJSON = contentType.startsWith("application/json");
   return response[isJSON ? "json" : "text"]();
 };
-const client = new Client(exampleImplementation);
+
+export class Client {
+  public constructor(
+    protected readonly implementation: Implementation = defaultImplementation,
+  ) {}
+  public provide<K extends Request>(
+    request: K,
+    params: Input[K],
+  ): Promise<Response[K]> {
+    const [method, path] = parseRequest(request);
+    return this.implementation(method, ...substitute(path, params));
+  }
+}
+
+export class Subscription<
+  K extends Extract<Request, `get ${string}`>,
+  R extends Extract<PositiveResponse[K], { event: string }>,
+> {
+  public source: EventSource;
+  public constructor(request: K, params: Input[K]) {
+    const [path, rest] = substitute(parseRequest(request)[1], params);
+    const searchParams = `?${new URLSearchParams(rest)}`;
+    this.source = new EventSource(
+      new URL(`${path}${searchParams}`, "http://localhost:8090"),
+    );
+  }
+  public on<E extends R["event"]>(
+    event: E,
+    handler: (data: Extract<R, { event: E }>["data"]) => void | Promise<void>,
+  ) {
+    this.source.addEventListener(event, (msg) =>
+      handler(JSON.parse((msg as MessageEvent).data)),
+    );
+    return this;
+  }
+}
+
+// Usage example:
+/*
+const client = new Client();
 client.provide("get /v1/user/retrieve", { id: "10" });
+new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
 */

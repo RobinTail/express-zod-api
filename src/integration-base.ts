@@ -2,6 +2,7 @@ import ts from "typescript";
 import { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
 import { Method, methods } from "./method";
+import type { makeEventSchema } from "./sse";
 import {
   accessModifiers,
   ensureTypeNode,
@@ -9,10 +10,12 @@ import {
   makeArrowFn,
   makeConst,
   makeDeconstruction,
+  makeExtract,
   makeInterface,
   makeInterfaceProp,
   makeKeyOf,
   makeNew,
+  makeOneLine,
   makeParam,
   makeParams,
   makePromise,
@@ -27,9 +30,12 @@ import {
   makeType,
   propOf,
   recordStringAny,
+  makeAssignment,
+  makePublicProperty,
 } from "./typescript-api";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
+type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
 
 export abstract class IntegrationBase {
   protected paths = new Set<string>();
@@ -39,25 +45,30 @@ export abstract class IntegrationBase {
   protected ids = {
     pathType: f.createIdentifier("Path"),
     implementationType: f.createIdentifier("Implementation"),
-    clientClass: f.createIdentifier("Client"),
     keyParameter: f.createIdentifier("key"),
     pathParameter: f.createIdentifier("path"),
     paramsArgument: f.createIdentifier("params"),
     methodParameter: f.createIdentifier("method"),
     requestParameter: f.createIdentifier("request"),
+    eventParameter: f.createIdentifier("event"),
+    dataParameter: f.createIdentifier("data"),
+    handlerParameter: f.createIdentifier("handler"),
+    msgParameter: f.createIdentifier("msg"),
     parseRequestFn: f.createIdentifier("parseRequest"),
     substituteFn: f.createIdentifier("substitute"),
     provideMethod: f.createIdentifier("provide"),
+    onMethod: f.createIdentifier("on"),
     implementationArgument: f.createIdentifier("implementation"),
     hasBodyConst: f.createIdentifier("hasBody"),
     undefinedValue: f.createIdentifier("undefined"),
     responseConst: f.createIdentifier("response"),
     restConst: f.createIdentifier("rest"),
     searchParamsConst: f.createIdentifier("searchParams"),
-    exampleImplementationConst: f.createIdentifier("exampleImplementation"),
+    defaultImplementationConst: f.createIdentifier("defaultImplementation"),
     clientConst: f.createIdentifier("client"),
     contentTypeConst: f.createIdentifier("contentType"),
     isJsonConst: f.createIdentifier("isJSON"),
+    sourceProp: f.createIdentifier("source"),
   } satisfies Record<string, ts.Identifier>;
 
   protected interfaces: Record<IOKind, ts.Identifier> = {
@@ -190,36 +201,33 @@ export abstract class IntegrationBase {
             ),
             this.ids.paramsArgument,
             f.createBlock([
-              f.createExpressionStatement(
-                f.createBinaryExpression(
+              makeAssignment(
+                this.ids.pathParameter,
+                makePropCall(
                   this.ids.pathParameter,
-                  f.createToken(ts.SyntaxKind.EqualsToken),
-                  makePropCall(
-                    this.ids.pathParameter,
-                    propOf<string>("replace"),
-                    [
-                      makeTemplate(":", [this.ids.keyParameter]), // `:${key}`
-                      makeArrowFn(
-                        [],
-                        f.createBlock([
-                          f.createExpressionStatement(
-                            f.createDeleteExpression(
-                              f.createElementAccessExpression(
-                                f.createIdentifier("rest"),
-                                this.ids.keyParameter,
-                              ),
-                            ),
-                          ),
-                          f.createReturnStatement(
+                  propOf<string>("replace"),
+                  [
+                    makeTemplate(":", [this.ids.keyParameter]), // `:${key}`
+                    makeArrowFn(
+                      [],
+                      f.createBlock([
+                        f.createExpressionStatement(
+                          f.createDeleteExpression(
                             f.createElementAccessExpression(
-                              this.ids.paramsArgument,
+                              this.ids.restConst,
                               this.ids.keyParameter,
                             ),
                           ),
-                        ]),
-                      ),
-                    ],
-                  ),
+                        ),
+                        f.createReturnStatement(
+                          f.createElementAccessExpression(
+                            this.ids.paramsArgument,
+                            this.ids.keyParameter,
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ],
                 ),
               ),
             ]),
@@ -280,21 +288,35 @@ export abstract class IntegrationBase {
       },
     );
 
-  // export class ExpressZodAPIClient { ___ }
-  protected makeClientClass = () =>
-    makePublicClass(this.ids.clientClass, [
-      // public constructor(protected readonly implementation: Implementation) {}
+  // export class Client { ___ }
+  protected makeClientClass = (name: string) =>
+    makePublicClass(name, [
+      // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
       makePublicConstructor([
         makeParam(this.ids.implementationArgument, {
           type: ensureTypeNode(this.ids.implementationType),
           mod: accessModifiers.protectedReadonly,
+          init: this.ids.defaultImplementationConst,
         }),
       ]),
       this.makeProvider(),
     ]);
 
-  // export const exampleImplementation: Implementation = async (method,path,params) => { ___ };
-  protected makeExampleImplementation = () => {
+  // `?${new URLSearchParams(____)}`
+  protected makeSearchParams = (from: ts.Expression) =>
+    makeTemplate("?", [
+      makeNew(f.createIdentifier(URLSearchParams.name), from),
+    ]);
+
+  protected makeFetchURL = () =>
+    makeNew(
+      f.createIdentifier(URL.name),
+      makeTemplate("", [this.ids.pathParameter], [this.ids.searchParamsConst]),
+      f.createStringLiteral(this.serverUrl),
+    );
+
+  // export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
+  protected makeDefaultImplementation = () => {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
       propOf<RequestInit>("method"),
@@ -335,15 +357,7 @@ export abstract class IntegrationBase {
       this.ids.responseConst,
       f.createAwaitExpression(
         f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
-          makeNew(
-            f.createIdentifier(URL.name),
-            makeTemplate(
-              "",
-              [this.ids.pathParameter],
-              [this.ids.searchParamsConst],
-            ),
-            f.createStringLiteral(this.serverUrl),
-          ),
+          this.makeFetchURL(),
           f.createObjectLiteralExpression([
             methodProperty,
             headersProperty,
@@ -368,18 +382,13 @@ export abstract class IntegrationBase {
       ),
     );
 
-    // const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
+    // const searchParams = hasBody ? "" : ___;
     const searchParamsStatement = makeConst(
       this.ids.searchParamsConst,
       makeTernary(
         this.ids.hasBodyConst,
         f.createStringLiteral(""),
-        makeTemplate("?", [
-          makeNew(
-            f.createIdentifier(URLSearchParams.name),
-            this.ids.paramsArgument,
-          ),
-        ]),
+        this.makeSearchParams(this.ids.paramsArgument),
       ),
     );
 
@@ -427,7 +436,7 @@ export abstract class IntegrationBase {
     );
 
     return makeConst(
-      this.ids.exampleImplementationConst,
+      this.ids.defaultImplementationConst,
       makeArrowFn(
         [
           this.ids.methodParameter,
@@ -445,16 +454,155 @@ export abstract class IntegrationBase {
         ]),
         { isAsync: true },
       ),
-      { expose: true, type: ensureTypeNode(this.ids.implementationType) },
+      { type: ensureTypeNode(this.ids.implementationType) },
     );
   };
 
-  protected makeUsageStatements = (): ts.Node[] => [
-    // const client = new Client(exampleImplementation);
+  protected makeSubscriptionConstructor = () =>
+    makePublicConstructor(
+      makeParams({
+        request: ensureTypeNode("K"),
+        params: f.createIndexedAccessTypeNode(
+          ensureTypeNode(this.interfaces.input),
+          ensureTypeNode("K"),
+        ),
+      }),
+      [
+        makeConst(
+          makeDeconstruction(this.ids.pathParameter, this.ids.restConst),
+          f.createCallExpression(this.ids.substituteFn, undefined, [
+            f.createElementAccessExpression(
+              f.createCallExpression(this.ids.parseRequestFn, undefined, [
+                this.ids.requestParameter,
+              ]),
+              f.createNumericLiteral(1),
+            ),
+            this.ids.paramsArgument,
+          ]),
+        ),
+        makeConst(
+          this.ids.searchParamsConst,
+          this.makeSearchParams(this.ids.restConst),
+        ),
+        makeAssignment(
+          f.createPropertyAccessExpression(f.createThis(), this.ids.sourceProp),
+          makeNew(f.createIdentifier("EventSource"), this.makeFetchURL()),
+        ),
+      ],
+    );
+
+  protected makeEventNarrow = (value: Parameters<typeof ensureTypeNode>[0]) =>
+    f.createTypeLiteralNode([
+      makeInterfaceProp(propOf<SSEShape>("event"), value),
+    ]);
+
+  protected makeOnMethod = () =>
+    makePublicMethod(
+      this.ids.onMethod,
+      makeParams({
+        [this.ids.eventParameter.text]: ensureTypeNode("E"),
+        [this.ids.handlerParameter.text]: f.createFunctionTypeNode(
+          undefined,
+          makeParams({
+            [this.ids.dataParameter.text]: f.createIndexedAccessTypeNode(
+              makeExtract("R", makeOneLine(this.makeEventNarrow("E"))),
+              f.createLiteralTypeNode(
+                f.createStringLiteral(propOf<SSEShape>("data")),
+              ),
+            ),
+          }),
+          f.createUnionTypeNode([
+            f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
+            makePromise(f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword)),
+          ]),
+        ),
+      }),
+      f.createBlock([
+        f.createExpressionStatement(
+          makePropCall(
+            [f.createThis(), this.ids.sourceProp],
+            propOf<EventSource>("addEventListener"),
+            [
+              this.ids.eventParameter,
+              makeArrowFn(
+                [this.ids.msgParameter],
+                f.createCallExpression(this.ids.handlerParameter, undefined, [
+                  makePropCall(
+                    f.createIdentifier(JSON[Symbol.toStringTag]),
+                    propOf<JSON>("parse"),
+                    [
+                      f.createPropertyAccessExpression(
+                        f.createParenthesizedExpression(
+                          f.createAsExpression(
+                            this.ids.msgParameter,
+                            ensureTypeNode(MessageEvent.name),
+                          ),
+                        ),
+                        propOf<SSEShape>("data"),
+                      ),
+                    ],
+                  ),
+                ]),
+              ),
+            ],
+          ),
+        ),
+        f.createReturnStatement(f.createThis()),
+      ]),
+      {
+        typeParams: {
+          E: f.createIndexedAccessTypeNode(
+            ensureTypeNode("R"),
+            f.createLiteralTypeNode(
+              f.createStringLiteral(propOf<SSEShape>("event")),
+            ),
+          ),
+        },
+      },
+    );
+
+  protected makeSubscriptionClass = (name: string) =>
+    makePublicClass(
+      name,
+      [
+        makePublicProperty(this.ids.sourceProp, ensureTypeNode("EventSource")),
+        this.makeSubscriptionConstructor(),
+        this.makeOnMethod(),
+      ],
+      {
+        typeParams: {
+          K: makeExtract(
+            this.requestType.name,
+            f.createTemplateLiteralType(f.createTemplateHead("get "), [
+              f.createTemplateLiteralTypeSpan(
+                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                f.createTemplateTail(""),
+              ),
+            ]),
+          ),
+          R: makeExtract(
+            f.createIndexedAccessTypeNode(
+              ensureTypeNode(this.interfaces.positive),
+              ensureTypeNode("K"),
+            ),
+            makeOneLine(
+              this.makeEventNarrow(
+                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+              ),
+            ),
+          ),
+        },
+      },
+    );
+
+  protected makeUsageStatements = (
+    clientClassName: string,
+    subscriptionClassName: string,
+  ): ts.Node[] => [
     makeConst(
       this.ids.clientConst,
-      makeNew(this.ids.clientClass, this.ids.exampleImplementationConst),
-    ),
+      makeNew(f.createIdentifier(clientClassName)),
+    ), // const client = new Client();
     // client.provide("get /v1/user/retrieve", { id: "10" });
     makePropCall(this.ids.clientConst, this.ids.provideMethod, [
       f.createStringLiteral(`${"get" satisfies Method} /v1/user/retrieve`),
@@ -462,5 +610,18 @@ export abstract class IntegrationBase {
         f.createPropertyAssignment("id", f.createStringLiteral("10")),
       ]),
     ]),
+    // new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
+    makePropCall(
+      makeNew(
+        f.createIdentifier(subscriptionClassName),
+        f.createStringLiteral(`${"get" satisfies Method} /v1/events/stream`),
+        f.createObjectLiteralExpression(),
+      ),
+      this.ids.onMethod,
+      [
+        f.createStringLiteral("time"),
+        makeArrowFn({ time: undefined }, f.createBlock([])),
+      ],
+    ),
   ];
 }

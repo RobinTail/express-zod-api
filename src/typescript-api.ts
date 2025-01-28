@@ -72,27 +72,26 @@ export const recordStringAny = f.createExpressionWithTypeArguments(
 
 export const makeParam = (
   name: ts.Identifier,
-  { type, mod }: { type?: ts.TypeNode; mod?: ts.Modifier[] } = {},
-) =>
-  f.createParameterDeclaration(
-    mod,
-    undefined,
-    name,
-    undefined,
+  {
     type,
-    undefined,
-  );
+    mod,
+    init,
+  }: { type?: ts.TypeNode; mod?: ts.Modifier[]; init?: ts.Expression } = {},
+) => f.createParameterDeclaration(mod, undefined, name, undefined, type, init);
 
 export const makeParams = (params: Partial<Record<string, ts.TypeNode>>) =>
   Object.entries(params).map(([name, type]) =>
     makeParam(f.createIdentifier(name), { type }),
   );
 
-export const makePublicConstructor = (params: ts.ParameterDeclaration[]) =>
+export const makePublicConstructor = (
+  params: ts.ParameterDeclaration[],
+  statements: ts.Statement[] = [],
+) =>
   f.createConstructorDeclaration(
     accessModifiers.public,
     params,
-    f.createBlock([]),
+    f.createBlock(statements),
   );
 
 export const ensureTypeNode = (
@@ -113,6 +112,9 @@ export const makeInterfaceProp = (
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     ensureTypeNode(value),
   );
+
+export const makeOneLine = (subject: ts.TypeNode) =>
+  ts.setEmitFlags(subject, ts.EmitFlags.SingleLine);
 
 export const makeDeconstruction = (
   ...names: ts.Identifier[]
@@ -172,6 +174,18 @@ export const makeType = (
   return comment ? addJsDocComment(node, comment) : node;
 };
 
+export const makePublicProperty = (
+  name: string | ts.PropertyName,
+  type: ts.TypeNode,
+) =>
+  f.createPropertyDeclaration(
+    accessModifiers.public,
+    name,
+    undefined,
+    type,
+    undefined,
+  );
+
 export const makePublicMethod = (
   name: ts.Identifier,
   params: ts.ParameterDeclaration[],
@@ -196,13 +210,14 @@ export const makePublicMethod = (
   );
 
 export const makePublicClass = (
-  name: ts.Identifier,
+  name: string,
   statements: ts.ClassElement[],
+  { typeParams }: { typeParams?: Parameters<typeof makeTypeParams>[0] } = {},
 ) =>
   f.createClassDeclaration(
     exportModifier,
     name,
-    undefined,
+    typeParams && makeTypeParams(typeParams),
     undefined,
     statements,
   );
@@ -294,6 +309,20 @@ export const makePropCall = (
 
 export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
   f.createNewExpression(cls, undefined, args);
+
+export const makeExtract = (
+  base: Parameters<typeof ensureTypeNode>[0],
+  narrow: ts.TypeNode,
+) => f.createTypeReferenceNode("Extract", [ensureTypeNode(base), narrow]);
+
+export const makeAssignment = (left: ts.Expression, right: ts.Expression) =>
+  f.createExpressionStatement(
+    f.createBinaryExpression(
+      left,
+      f.createToken(ts.SyntaxKind.EqualsToken),
+      right,
+    ),
+  );
 
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,

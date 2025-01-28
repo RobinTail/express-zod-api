@@ -106,6 +106,14 @@ const tsFactoryConcerns = [
       "CallExpression[callee.property.name='createTypeReferenceNode'][arguments.length=1]",
     message: "use ensureTypeNode() helper",
   },
+  {
+    selector: "Literal[value='Extract']",
+    message: "use makeExtract() helper",
+  },
+  {
+    selector: "Identifier[name='EqualsToken']",
+    message: "use makeAssignment() helper",
+  },
 ];
 
 export default tsPlugin.config(
@@ -133,6 +141,7 @@ export default tsPlugin.config(
     rules: {
       curly: ["warn", "multi-or-nest", "consistent"],
       "unicorn/prefer-node-protocol": "error",
+      "@typescript-eslint/no-shadow": "warn",
     },
   },
   {

@@ -731,10 +731,11 @@ createConfig({
 In a similar way you can enable request headers as the input source. This is an opt-in feature. Please note:
 
 - consider giving `headers` the lowest priority among other `inputSources` to avoid overwrites;
+- consider handling headers in `Middleware` and declaring them within `security` property to improve `Documentation`;
 - the request headers acquired that way are always lowercase when describing their validation schemas.
 
 ```typescript
-import { createConfig, defaultEndpointsFactory } from "express-zod-api";
+import { createConfig, Middleware } from "express-zod-api";
 import { z } from "zod";
 
 createConfig({
@@ -743,7 +744,12 @@ createConfig({
   }, // ...
 });
 
-defaultEndpointsFactory.build({
+new Middleware({
+  security: { type: "header", name: "token" }, // recommended
+  input: z.object({ token: z.string() }),
+});
+
+factory.build({
   input: z.object({
     "x-request-id": z.string(), // this one is from request.headers
     id: z.string(), // this one is from request.query
@@ -1196,8 +1202,9 @@ createConfig({
 
 If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server,
 consider [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) feature.
-Client application can subscribe to the event stream using `EventSource` class instance. The following example
-demonstrates the implementation emitting the `time` event each second.
+Client application can subscribe to the event stream using `EventSource` class instance or the
+[instance of the generated](#generating-a-frontend-client) `Subscription` class. The following example demonstrates
+the implementation emitting the `time` event each second.
 
 ```typescript
 import { z } from "zod";
@@ -1214,13 +1221,6 @@ const subscriptionEndpoint = EventStreamFactory({
       await setTimeout(1000);
     }
   },
-});
-```
-
-```js
-const source = new EventSource("https://example.com/api/v1/time");
-source.addEventListener("time", (event) => {
-  const data = JSON.parse(event.data); // number
 });
 ```
 
@@ -1256,28 +1256,17 @@ const prettierFormattedTypescriptCode = await client.printFormatted(); // or jus
 ```
 
 Alternatively, you can supply your own `format` function into that method or use a regular `print()` method instead.
-The generated client is flexibly configurable on the frontend side using an implementation function that
-directly makes requests to an endpoint using the libraries and methods of your choice.
-The client asserts the type of request parameters and response.
-Consuming the generated client requires Typescript version 4.1 or higher.
+The generated client is flexibly configurable on the frontend side for using a custom implementation function that
+makes requests using the libraries and methods of your choice. The default implementation uses `fetch`. The client
+asserts the type of request parameters and response. Consuming the generated client requires Typescript version 4.1+.
 
 ```typescript
-// example frontend, simple implementation based on fetch()
-import { Client } from "./client.ts"; // the generated file
+import { Client, Implementation, Subscription } from "./client.ts"; // the generated file
 
-const client = new Client(async (method, path, params) => {
-  const hasBody = !["get", "delete"].includes(method);
-  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-  const response = await fetch(`https://example.com${path}${searchParams}`, {
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
-  return response.json();
-});
-
+const client = new Client(/* optional custom Implementation */);
 client.provide("get /v1/user/retrieve", { id: "10" });
 client.provide("post /v1/user/:id", { id: "10" }); // it also substitues path params
+new Subscription("get /v1/events/stream", {}).on("time", (time) => {}); // Server-sent events (SSE)
 ```
 
 ## Creating a documentation

@@ -2,6 +2,59 @@
 
 ## Version 22
 
+### v22.3.0
+
+- Feat: `Subscription` class consuming for Server-sent events:
+  - The `Integration` can now also generate a frontend helper class `Subscription` to ease SSE support;
+  - The new class establishes an `EventSource` instance and exposes it as the public `source` property;
+  - The class also provides the public `on` method for your typed listeners;
+  - You can configure the generated class name using `subscriptionClassName` option (default: `Subscription`);
+  - The feature is only applicable to the `variant` option set to `client` (default).
+
+```ts
+import { Subscription } from "./client.ts"; // the generated file
+
+new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
+```
+
+### v22.2.0
+
+- Feat: detecting headers from `Middleware::security` declarations:
+  - When `headers` are enabled within `inputSources` of config, the `Documentation` generator can now identify them
+    among other inputs additionally by using the security declarations of middlewares attached to an `Endpoint`;
+  - This approach enables handling of custom headers without `x-` prefix.
+
+```ts
+const authMiddleware = new Middleware({
+  security: { type: "header", name: "token" },
+});
+```
+
+### v22.1.1
+
+- This version contains an important technical simplification of routines related to processing of `security`
+  declarations of the used `Middleware` when generating API `Documentation`.
+  - No changes to the operation are expected. This refactoring is required for a feature that will be released later.
+
+### v22.1.0
+
+- Feat: ability to configure the generated client class name:
+  - New option `clientClassName` for `Integration::constructor()` argument, default: `Client`.
+- Feat: default implementation for the generated client:
+  - The argument of the generated client class constructor became optional;
+  - The `Implementation` previously suggested as an example (using `fetch`) became the one used by default;
+  - You may no longer need to write the implementation if the default one suits your needs.
+
+```ts
+import { Integration } from "express-zod-api";
+new Integration({ clientClassName: "FancyClient" });
+```
+
+```ts
+import { FancyClient } from "./generated-client.ts";
+const client = new FancyClient(/* optional implementation */);
+```
+
 ### v22.0.0
 
 - Minimum supported Node versions: 20.9.0 and 22.0.0:

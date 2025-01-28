@@ -2,6 +2,7 @@ import { z } from "zod";
 import { setTimeout } from "node:timers/promises";
 import { eventsFactory } from "../factories";
 
+/** @desc The endpoint demonstrates emitting server-sent events (SSE) */
 export const subscriptionEndpoint = eventsFactory.buildVoid({
   tag: "subscriptions",
   input: z.object({
