@@ -35,6 +35,7 @@ import {
   makeIndexed,
   makeMaybeAsync,
   Typeable,
+  makeFnType,
 } from "./typescript-api";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -141,14 +142,13 @@ export abstract class IntegrationBase {
   protected makeImplementationType = () =>
     makeType(
       this.ids.implementationType,
-      f.createFunctionTypeNode(
-        undefined,
-        makeParams({
+      makeFnType(
+        {
           [this.ids.methodParameter.text]: this.methodType.name,
           [this.ids.pathParameter.text]: ts.SyntaxKind.StringKeyword,
           [this.ids.paramsArgument.text]: recordStringAny,
           [this.ids.ctxArgument.text]: { optional: true, type: "T" },
-        }),
+        },
         makePromise(ts.SyntaxKind.AnyKeyword),
       ),
       {
@@ -482,16 +482,15 @@ export abstract class IntegrationBase {
       this.ids.onMethod,
       makeParams({
         [this.ids.eventParameter.text]: "E",
-        [this.ids.handlerParameter.text]: f.createFunctionTypeNode(
-          undefined,
-          makeParams({
+        [this.ids.handlerParameter.text]: makeFnType(
+          {
             [this.ids.dataParameter.text]: makeIndexed(
               makeExtract("R", makeOneLine(this.makeEventNarrow("E"))),
               f.createLiteralTypeNode(
                 f.createStringLiteral(propOf<SSEShape>("data")),
               ),
             ),
-          }),
+          },
           makeMaybeAsync(ts.SyntaxKind.VoidKeyword),
         ),
       }),

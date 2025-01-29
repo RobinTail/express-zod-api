@@ -119,6 +119,10 @@ const tsFactoryConcerns = [
     selector: "Identifier[name='createIndexedAccessTypeNode']",
     message: "use makeIndexed() helper",
   },
+  {
+    selector: "Identifier[name='createFunctionTypeNode']",
+    message: "use makeFnType() helper",
+  },
 ];
 
 export default tsPlugin.config(

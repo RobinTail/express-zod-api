@@ -375,6 +375,16 @@ export const makeIndexed = (subject: Typeable, index: Typeable) =>
 export const makeMaybeAsync = (subj: Typeable) =>
   f.createUnionTypeNode([ensureTypeNode(subj), makePromise(subj)]);
 
+export const makeFnType = (
+  params: Parameters<typeof makeParams>[0],
+  returns: Typeable,
+) =>
+  f.createFunctionTypeNode(
+    undefined,
+    makeParams(params),
+    ensureTypeNode(returns),
+  );
+
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,
   ts.SyntaxKind.BigIntKeyword,
