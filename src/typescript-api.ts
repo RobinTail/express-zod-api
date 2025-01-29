@@ -7,6 +7,10 @@ export type Typeable =
   | string
   | ts.KeywordTypeSyntaxKind;
 
+type TypeParams =
+  | string[]
+  | Partial<Record<string, Typeable | { type?: ts.TypeNode; init: Typeable }>>;
+
 export const f = ts.factory;
 
 const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
@@ -201,11 +205,7 @@ export const makeType = (
     expose,
     comment,
     params,
-  }: {
-    expose?: boolean;
-    comment?: string;
-    params?: Parameters<typeof makeTypeParams>[0];
-  } = {},
+  }: { expose?: boolean; comment?: string; params?: TypeParams } = {},
 ) => {
   const node = f.createTypeAliasDeclaration(
     expose ? exportModifier : undefined,
@@ -235,10 +235,7 @@ export const makePublicMethod = (
   {
     typeParams,
     returns,
-  }: {
-    typeParams?: Parameters<typeof makeTypeParams>[0];
-    returns?: ts.TypeNode;
-  } = {},
+  }: { typeParams?: TypeParams; returns?: ts.TypeNode } = {},
 ) =>
   f.createMethodDeclaration(
     accessModifiers.public,
@@ -254,7 +251,7 @@ export const makePublicMethod = (
 export const makePublicClass = (
   name: string,
   statements: ts.ClassElement[],
-  { typeParams }: { typeParams?: Parameters<typeof makeTypeParams>[0] } = {},
+  { typeParams }: { typeParams?: TypeParams } = {},
 ) =>
   f.createClassDeclaration(
     exportModifier,
