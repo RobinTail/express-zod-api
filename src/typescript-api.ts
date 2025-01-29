@@ -1,4 +1,4 @@
-import { pair } from "ramda";
+import { map, pair } from "ramda";
 import ts from "typescript";
 
 export type Typeable =
@@ -126,10 +126,7 @@ export const ensureTypeNode = (
   typeof subject === "number"
     ? f.createKeywordTypeNode(subject)
     : typeof subject === "string" || ts.isIdentifier(subject)
-      ? f.createTypeReferenceNode(
-          subject,
-          args?.map((entry) => ensureTypeNode(entry)),
-        )
+      ? f.createTypeReferenceNode(subject, args && map(ensureTypeNode, args))
       : subject;
 
 // Record<string, any>
@@ -191,9 +188,7 @@ export const makePublicLiteralType = (
   makeType(
     name,
     f.createUnionTypeNode(
-      literals.map((option) =>
-        f.createLiteralTypeNode(f.createStringLiteral(option)),
-      ),
+      map(f.createLiteralTypeNode, map(f.createStringLiteral, literals)),
     ),
     { expose: true },
   );
@@ -313,9 +308,7 @@ export const makeArrowFn = (
   f.createArrowFunction(
     isAsync ? asyncModifier : undefined,
     undefined,
-    Array.isArray(params)
-      ? params.map((key) => makeParam(key))
-      : makeParams(params),
+    Array.isArray(params) ? map(makeParam, params) : makeParams(params),
     undefined,
     undefined,
     body,
