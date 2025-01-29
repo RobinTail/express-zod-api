@@ -11,6 +11,7 @@ import {
   printNode,
   ensureTypeNode,
   makeIndexed,
+  makeLiteralType,
 } from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
@@ -91,7 +92,7 @@ export class Integration extends IntegrationBase {
     let name = this.aliases.get(schema)?.name?.text;
     if (!name) {
       name = `Type${this.aliases.size + 1}`;
-      const temp = f.createLiteralTypeNode(f.createNull());
+      const temp = makeLiteralType(null);
       this.aliases.set(schema, makeType(name, temp));
       this.aliases.set(schema, makeType(name, produce()));
     }
@@ -146,9 +147,7 @@ export class Integration extends IntegrationBase {
         {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
       );
       this.paths.add(path);
-      const literalIdx = f.createLiteralTypeNode(
-        f.createStringLiteral(request),
-      );
+      const literalIdx = makeLiteralType(request);
       this.registry.set(request, {
         input: ensureTypeNode(input.name),
         positive: this.someOf(dictionaries.positive),

@@ -123,6 +123,10 @@ const tsFactoryConcerns = [
     selector: "Identifier[name='createFunctionTypeNode']",
     message: "use makeFnType() helper",
   },
+  {
+    selector: "Identifier[name='createLiteralTypeNode']",
+    message: "use makeLiteralType() helper",
+  },
 ];
 
 export default tsPlugin.config(

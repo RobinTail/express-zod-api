@@ -185,13 +185,9 @@ export const makePublicLiteralType = (
   name: ts.Identifier | string,
   literals: string[],
 ) =>
-  makeType(
-    name,
-    f.createUnionTypeNode(
-      map(f.createLiteralTypeNode, map(f.createStringLiteral, literals)),
-    ),
-    { expose: true },
-  );
+  makeType(name, f.createUnionTypeNode(map(makeLiteralType, literals)), {
+    expose: true,
+  });
 
 export const makeType = (
   name: ts.Identifier | string,
@@ -376,6 +372,19 @@ export const makeFnType = (
     undefined,
     makeParams(params),
     ensureTypeNode(returns),
+  );
+
+export const makeLiteralType = (subj: string | null | boolean | number) =>
+  f.createLiteralTypeNode(
+    typeof subj === "number"
+      ? f.createNumericLiteral(subj)
+      : typeof subj === "boolean"
+        ? subj
+          ? f.createTrue()
+          : f.createFalse()
+        : subj === null
+          ? f.createNull()
+          : f.createStringLiteral(subj),
   );
 
 const primitives: ts.KeywordTypeSyntaxKind[] = [

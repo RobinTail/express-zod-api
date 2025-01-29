@@ -12,6 +12,7 @@ import {
   ensureTypeNode,
   isPrimitive,
   makeInterfaceProp,
+  makeLiteralType,
 } from "./typescript-api";
 import { LiteralType, Producer, ZTSContext } from "./zts-helpers";
 
@@ -28,15 +29,7 @@ const samples = {
 } satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
 
 const onLiteral: Producer = ({ value }: z.ZodLiteral<LiteralType>) =>
-  f.createLiteralTypeNode(
-    typeof value === "number"
-      ? f.createNumericLiteral(value)
-      : typeof value === "boolean"
-        ? value
-          ? f.createTrue()
-          : f.createFalse()
-        : f.createStringLiteral(value),
-  );
+  makeLiteralType(value);
 
 const onObject: Producer = (
   { shape }: z.ZodObject<z.ZodRawShape>,
@@ -63,11 +56,7 @@ const onArray: Producer = ({ element }: z.ZodArray<z.ZodTypeAny>, { next }) =>
   f.createArrayTypeNode(next(element));
 
 const onEnum: Producer = ({ options }: z.ZodEnum<[string, ...string[]]>) =>
-  f.createUnionTypeNode(
-    options.map((option) =>
-      f.createLiteralTypeNode(f.createStringLiteral(option)),
-    ),
-  );
+  f.createUnionTypeNode(options.map(makeLiteralType));
 
 const onSomeUnion: Producer = (
   {
@@ -113,15 +102,7 @@ const onEffects: Producer = (
 };
 
 const onNativeEnum: Producer = (schema: z.ZodNativeEnum<z.EnumLike>) =>
-  f.createUnionTypeNode(
-    Object.values(schema.enum).map((value) =>
-      f.createLiteralTypeNode(
-        typeof value === "number"
-          ? f.createNumericLiteral(value)
-          : f.createStringLiteral(value),
-      ),
-    ),
-  );
+  f.createUnionTypeNode(Object.values(schema.enum).map(makeLiteralType));
 
 const onOptional: Producer = (
   schema: z.ZodOptional<z.ZodTypeAny>,
@@ -137,10 +118,7 @@ const onOptional: Producer = (
 };
 
 const onNullable: Producer = (schema: z.ZodNullable<z.ZodTypeAny>, { next }) =>
-  f.createUnionTypeNode([
-    next(schema.unwrap()),
-    f.createLiteralTypeNode(f.createNull()),
-  ]);
+  f.createUnionTypeNode([next(schema.unwrap()), makeLiteralType(null)]);
 
 const onTuple: Producer = (
   { items, _def: { rest } }: z.AnyZodTuple,
@@ -196,7 +174,7 @@ const onPipeline: Producer = (
   { next, isResponse },
 ) => next(_def[isResponse ? "out" : "in"]);
 
-const onNull: Producer = () => f.createLiteralTypeNode(f.createNull());
+const onNull: Producer = () => makeLiteralType(null);
 
 const onLazy: Producer = (lazy: z.ZodLazy<z.ZodTypeAny>, { makeAlias, next }) =>
   makeAlias(lazy, () => next(lazy.schema));

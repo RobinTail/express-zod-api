@@ -37,6 +37,7 @@ import {
   makeMaybeAsync,
   Typeable,
   makeFnType,
+  makeLiteralType,
 } from "./typescript-api";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -485,9 +486,7 @@ export abstract class IntegrationBase {
           {
             [this.ids.dataParameter.text]: makeIndexed(
               makeExtract("R", makeOneLine(this.makeEventNarrow("E"))),
-              f.createLiteralTypeNode(
-                f.createStringLiteral(propOf<SSEShape>("data")),
-              ),
+              makeLiteralType(propOf<SSEShape>("data")),
             ),
           },
           makeMaybeAsync(ts.SyntaxKind.VoidKeyword),
@@ -526,12 +525,7 @@ export abstract class IntegrationBase {
       ],
       {
         typeParams: {
-          E: makeIndexed(
-            "R",
-            f.createLiteralTypeNode(
-              f.createStringLiteral(propOf<SSEShape>("event")),
-            ),
-          ),
+          E: makeIndexed("R", makeLiteralType(propOf<SSEShape>("event"))),
         },
       },
     );
