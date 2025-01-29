@@ -38,6 +38,7 @@ import {
   Typeable,
   makeFnType,
   makeLiteralType,
+  literally,
 } from "./typescript-api";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -131,7 +132,7 @@ export abstract class IntegrationBase {
         Array.from(this.tags).map(([request, tags]) =>
           f.createPropertyAssignment(
             makePropertyIdentifier(request),
-            f.createArrayLiteralExpression(map(f.createStringLiteral, tags)),
+            f.createArrayLiteralExpression(map(literally, tags)),
           ),
         ),
       ),
@@ -166,7 +167,7 @@ export abstract class IntegrationBase {
         f.createAsExpression(
           makeCall(this.ids.requestParameter, propOf<string>("split"))(
             f.createRegularExpressionLiteral("/ (.+)/"), // split once
-            f.createNumericLiteral(2), // excludes third empty element
+            literally(2), // excludes third empty element
           ),
           f.createTupleTypeNode([
             ensureTypeNode(this.methodType.name),
@@ -303,7 +304,7 @@ export abstract class IntegrationBase {
     makeNew(
       f.createIdentifier(URL.name),
       makeTemplate("", [this.ids.pathParameter], [this.ids.searchParamsConst]),
-      f.createStringLiteral(this.serverUrl),
+      literally(this.serverUrl),
     );
 
   // export const defaultImplementation: Implementation = async (method,path,params) => { ___ };
@@ -321,8 +322,8 @@ export abstract class IntegrationBase {
         this.ids.hasBodyConst,
         f.createObjectLiteralExpression([
           f.createPropertyAssignment(
-            f.createStringLiteral("Content-Type"),
-            f.createStringLiteral(contentTypes.json),
+            literally("Content-Type"),
+            literally(contentTypes.json),
           ),
         ]),
         this.ids.undefinedValue,
@@ -363,8 +364,8 @@ export abstract class IntegrationBase {
       f.createLogicalNot(
         makeCall(
           f.createArrayLiteralExpression([
-            f.createStringLiteral("get" satisfies Method),
-            f.createStringLiteral("delete" satisfies Method),
+            literally("get" satisfies Method),
+            literally("delete" satisfies Method),
           ]),
           propOf<string[]>("includes"),
         )(this.ids.methodParameter),
@@ -376,7 +377,7 @@ export abstract class IntegrationBase {
       this.ids.searchParamsConst,
       makeTernary(
         this.ids.hasBodyConst,
-        f.createStringLiteral(""),
+        literally(""),
         this.makeSearchParams(this.ids.paramsArgument),
       ),
     );
@@ -388,7 +389,7 @@ export abstract class IntegrationBase {
         this.ids.responseConst,
         propOf<Response>("headers"),
         propOf<Headers>("get"),
-      )(f.createStringLiteral("content-type")),
+      )(literally("content-type")),
     );
 
     // if (!contentType) return;
@@ -406,7 +407,7 @@ export abstract class IntegrationBase {
       makeCall(
         this.ids.contentTypeConst,
         propOf<string>("startsWith"),
-      )(f.createStringLiteral(contentTypes.json)),
+      )(literally(contentTypes.json)),
     );
 
     // return response[isJSON ? "json" : "text"]();
@@ -415,8 +416,8 @@ export abstract class IntegrationBase {
         this.ids.responseConst,
         makeTernary(
           this.ids.isJsonConst,
-          f.createStringLiteral(propOf<Response>("json")),
-          f.createStringLiteral(propOf<Response>("text")),
+          literally(propOf<Response>("json")),
+          literally(propOf<Response>("text")),
         ),
       )(),
     );
@@ -456,7 +457,7 @@ export abstract class IntegrationBase {
           makeCall(this.ids.substituteFn)(
             f.createElementAccessExpression(
               makeCall(this.ids.parseRequestFn)(this.ids.requestParameter),
-              f.createNumericLiteral(1),
+              literally(1),
             ),
             this.ids.paramsArgument,
           ),
@@ -568,19 +569,19 @@ export abstract class IntegrationBase {
     ), // const client = new Client();
     // client.provide("get /v1/user/retrieve", { id: "10" });
     makeCall(this.ids.clientConst, this.ids.provideMethod)(
-      f.createStringLiteral(`${"get" satisfies Method} /v1/user/retrieve`),
+      literally(`${"get" satisfies Method} /v1/user/retrieve`),
       f.createObjectLiteralExpression([
-        f.createPropertyAssignment("id", f.createStringLiteral("10")),
+        f.createPropertyAssignment("id", literally("10")),
       ]),
     ),
     // new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
     makeCall(
       makeNew(
         f.createIdentifier(subscriptionClassName),
-        f.createStringLiteral(`${"get" satisfies Method} /v1/events/stream`),
+        literally(`${"get" satisfies Method} /v1/events/stream`),
         f.createObjectLiteralExpression(),
       ),
       this.ids.onMethod,
-    )(f.createStringLiteral("time"), makeArrowFn(["time"], f.createBlock([]))),
+    )(literally("time"), makeArrowFn(["time"], f.createBlock([]))),
   ];
 }

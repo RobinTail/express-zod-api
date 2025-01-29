@@ -127,6 +127,11 @@ const tsFactoryConcerns = [
     selector: "Identifier[name='createLiteralTypeNode']",
     message: "use makeLiteralType() helper",
   },
+  {
+    selector:
+      "Identifier[name=/^create(NumericLiteral|StringLiteral|True|False|Null)$/]",
+    message: "use literally() helper",
+  },
 ];
 
 export default tsPlugin.config(

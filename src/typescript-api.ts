@@ -50,11 +50,9 @@ export const printNode = (
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 export const makePropertyIdentifier = (name: string | number) =>
-  typeof name === "number"
-    ? f.createNumericLiteral(name)
-    : safePropRegex.test(name)
-      ? f.createIdentifier(name)
-      : f.createStringLiteral(name);
+  typeof name === "string" && safePropRegex.test(name)
+    ? f.createIdentifier(name)
+    : literally(name);
 
 export const makeTemplate = (
   head: string,
@@ -374,18 +372,17 @@ export const makeFnType = (
     ensureTypeNode(returns),
   );
 
-export const makeLiteralType = (subj: string | null | boolean | number) =>
-  f.createLiteralTypeNode(
-    typeof subj === "number"
-      ? f.createNumericLiteral(subj)
-      : typeof subj === "boolean"
-        ? subj
-          ? f.createTrue()
-          : f.createFalse()
-        : subj === null
-          ? f.createNull()
-          : f.createStringLiteral(subj),
-  );
+/* eslint-disable prettier/prettier -- shorter and works better this way than overrides */
+export const literally = <T extends string | null | boolean | number>(subj: T) => (
+  typeof subj === "number" ? f.createNumericLiteral(subj) : typeof subj === "boolean"
+    ? subj ? f.createTrue() : f.createFalse()
+    : subj === null ? f.createNull() : f.createStringLiteral(subj)
+  ) as T extends string ? ts.StringLiteral : T extends number ? ts.NumericLiteral
+    : T extends boolean ? ts.BooleanLiteral : ts.NullLiteral;
+/* eslint-enable prettier/prettier */
+
+export const makeLiteralType = (subj: Parameters<typeof literally>[0]) =>
+  f.createLiteralTypeNode(literally(subj));
 
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,
