@@ -590,9 +590,7 @@ export abstract class IntegrationBase {
               ensureTypeNode(this.interfaces.positive),
               ensureTypeNode("K"),
             ),
-            makeOneLine(
-              this.makeEventNarrow(ensureTypeNode(ts.SyntaxKind.StringKeyword)),
-            ),
+            makeOneLine(this.makeEventNarrow(ts.SyntaxKind.StringKeyword)),
           ),
         },
       },
