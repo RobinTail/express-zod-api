@@ -98,7 +98,7 @@ export const makeParams = (
 ) =>
   Object.entries(params).map(([name, value]) =>
     makeParam(
-      f.createIdentifier(name),
+      name,
       typeof value === "string" ||
         typeof value === "number" ||
         (typeof value === "object" && "kind" in value)
