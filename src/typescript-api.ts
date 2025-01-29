@@ -155,12 +155,22 @@ export const makeDeconstruction = (
 export const makeConst = (
   name: string | ts.Identifier | ts.ArrayBindingPattern,
   value: ts.Expression,
-  { type, expose }: { type?: ts.TypeNode; expose?: true } = {},
+  {
+    type,
+    expose,
+  }: { type?: Parameters<typeof ensureTypeNode>[0]; expose?: true } = {},
 ) =>
   f.createVariableStatement(
     expose && exportModifier,
     f.createVariableDeclarationList(
-      [f.createVariableDeclaration(name, undefined, type, value)],
+      [
+        f.createVariableDeclaration(
+          name,
+          undefined,
+          type ? ensureTypeNode(type) : undefined,
+          value,
+        ),
+      ],
       ts.NodeFlags.Const,
     ),
   );
@@ -203,13 +213,13 @@ export const makeType = (
 
 export const makePublicProperty = (
   name: string | ts.PropertyName,
-  type: ts.TypeNode,
+  type: Parameters<typeof ensureTypeNode>[0],
 ) =>
   f.createPropertyDeclaration(
     accessModifiers.public,
     name,
     undefined,
-    type,
+    ensureTypeNode(type),
     undefined,
   );
 

@@ -459,7 +459,7 @@ export abstract class IntegrationBase {
         ]),
         { isAsync: true },
       ),
-      { type: ensureTypeNode(this.ids.implementationType) },
+      { type: this.ids.implementationType },
     );
   };
 
@@ -570,7 +570,7 @@ export abstract class IntegrationBase {
     makePublicClass(
       name,
       [
-        makePublicProperty(this.ids.sourceProp, ensureTypeNode("EventSource")),
+        makePublicProperty(this.ids.sourceProp, "EventSource"),
         this.makeSubscriptionConstructor(),
         this.makeOnMethod(),
       ],
