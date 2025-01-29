@@ -10,22 +10,22 @@
   - The problem on missing such ability was reported by [@LucWag](https://github.com/LucWag).
 
 ```ts
-import { Client } from "./generated-client.ts";
+import { Client, Implementation } from "./generated-client.ts";
 
-const client = new Client(
-  async (
-    method,
-    path,
-    params,
-    ctx?: { extraHeaders: Record<string, any> },
-  ) => {},
-);
+interface MyCtx {
+  extraKey: string;
+}
 
-client.provide(
-  "get /v1/user/retrieve",
-  { id: "10" },
-  { extraHeaders: { API_KEY: "123456" } },
-);
+const implementation: Implementation<MyCtx> = async (
+  method,
+  path,
+  params,
+  ctx, // ctx is optional MyCtx
+) => {};
+
+const client = new Client(implementation);
+
+client.provide("get /v1/user/retrieve", { id: "10" }, { extraKey: "123456" });
 ```
 
 ### v22.3.1
