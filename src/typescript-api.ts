@@ -93,9 +93,16 @@ export const makeParam = (
     init,
   );
 
-export const makeParams = (params: Partial<Record<string, ts.TypeNode>>) =>
+export const makeParams = (
+  params: Partial<
+    Record<string, ts.TypeNode | Parameters<typeof makeParam>[1]>
+  >,
+) =>
   Object.entries(params).map(([name, type]) =>
-    makeParam(f.createIdentifier(name), { type }),
+    makeParam(
+      f.createIdentifier(name),
+      type && "kind" in type ? { type } : type,
+    ),
   );
 
 export const makePublicConstructor = (

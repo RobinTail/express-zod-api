@@ -148,12 +148,11 @@ export abstract class IntegrationBase {
             ts.SyntaxKind.StringKeyword,
           ),
           [this.ids.paramsArgument.text]: recordStringAny,
-        }).concat(
-          makeParam(this.ids.ctxArgument, {
+          [this.ids.ctxArgument.text]: {
             optional: true,
             type: ensureTypeNode("T"),
-          }),
-        ),
+          },
+        }),
         makePromise("any"),
       ),
       {
@@ -264,12 +263,11 @@ export abstract class IntegrationBase {
           ensureTypeNode(this.interfaces.input),
           ensureTypeNode("K"),
         ),
-      }).concat(
-        makeParam(this.ids.ctxArgument, {
+        [this.ids.ctxArgument.text]: {
           optional: true,
           type: ensureTypeNode("T"),
-        }),
-      ),
+        },
+      }),
       f.createBlock([
         makeConst(
           // const [method, path] = this.parseRequest(request);
