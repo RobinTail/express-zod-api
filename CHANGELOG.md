@@ -2,6 +2,15 @@
 
 ## Version 21
 
+### v21.11.2
+
+- Fixed issue on emitting server-sent events (SSE), introduced in v21.5.0:
+  - Emit SSE failed having disabled `compression` in config due to internal error: `flush is not a function`;
+  - The `.flush()` method of `response` is a feature of `compression` (optional peer dependency);
+  - It is required to call the method when `compression` is enabled;
+  - This version fixes the issue by calling the method conditionally;
+  - This bug was reported by [@bobgubko](https://github.com/bobgubko).
+
 ### v21.11.1
 
 - Common styling methods (coloring) are extracted from the built-in logger instance:
