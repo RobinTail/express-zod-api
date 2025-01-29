@@ -133,11 +133,7 @@ const onTuple: Producer = (
 const onRecord: Producer = (
   { keySchema, valueSchema }: z.ZodRecord<z.ZodTypeAny>,
   { next },
-) =>
-  f.createExpressionWithTypeArguments(
-    f.createIdentifier("Record"),
-    [keySchema, valueSchema].map(next),
-  );
+) => ensureTypeNode("Record", [keySchema, valueSchema].map(next));
 
 const onIntersection: Producer = (
   { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
