@@ -283,18 +283,23 @@ export const makeInterface = (
 };
 
 export const makeTypeParams = (
-  params: Partial<
-    Record<
-      string,
-      | Parameters<typeof ensureTypeNode>[0]
-      | {
-          type?: ts.TypeNode;
-          init: Parameters<typeof ensureTypeNode>[0];
-        }
-    >
-  >,
+  params:
+    | string[]
+    | Partial<
+        Record<
+          string,
+          | Parameters<typeof ensureTypeNode>[0]
+          | {
+              type?: ts.TypeNode;
+              init: Parameters<typeof ensureTypeNode>[0];
+            }
+        >
+      >,
 ) =>
-  Object.entries(params).map(([name, val]) => {
+  (Array.isArray(params)
+    ? params.map((name) => [name, undefined] as const)
+    : Object.entries(params)
+  ).map(([name, val]) => {
     const { type, init } =
       typeof val === "object" && "init" in val ? val : { type: val };
     return f.createTypeParameterDeclaration(

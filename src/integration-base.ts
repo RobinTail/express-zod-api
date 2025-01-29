@@ -87,7 +87,7 @@ export abstract class IntegrationBase {
   protected someOfType = makeType(
     "SomeOf",
     f.createIndexedAccessTypeNode(ensureTypeNode("T"), makeKeyOf("T")),
-    { params: { T: undefined } },
+    { params: ["T"] },
   );
 
   // export type Request = keyof Input;
@@ -304,7 +304,7 @@ export abstract class IntegrationBase {
         ]),
         this.makeProvider(),
       ],
-      { typeParams: { T: undefined } },
+      { typeParams: ["T"] },
     );
 
   // `?${new URLSearchParams(____)}`
