@@ -80,10 +80,8 @@ const tsFactoryConcerns = [
     message: "use makeParam() or makeParams() helpers",
   },
   {
-    selector:
-      "CallExpression[callee.property.name='createCallExpression']" +
-      "[arguments.0.callee.property.name='createPropertyAccessExpression']",
-    message: "use makePropCall() helper",
+    selector: "Identifier[name='createCallExpression']",
+    message: "use makeCall() helper",
   },
   {
     selector: "Identifier[name='KeyOfKeyword']",

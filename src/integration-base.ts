@@ -19,7 +19,7 @@ import {
   makeParam,
   makeParams,
   makePromise,
-  makePropCall,
+  makeCall,
   makePropertyIdentifier,
   makePublicConstructor,
   makePublicClass,
@@ -164,10 +164,10 @@ export abstract class IntegrationBase {
       makeArrowFn(
         { [this.ids.requestParameter.text]: ts.SyntaxKind.StringKeyword },
         f.createAsExpression(
-          makePropCall(this.ids.requestParameter, propOf<string>("split"), [
+          makeCall(this.ids.requestParameter, propOf<string>("split"))(
             f.createRegularExpressionLiteral("/ (.+)/"), // split once
             f.createNumericLiteral(2), // excludes third empty element
-          ]),
+          ),
           f.createTupleTypeNode([
             ensureTypeNode(this.methodType.name),
             ensureTypeNode(this.ids.pathType),
@@ -201,31 +201,27 @@ export abstract class IntegrationBase {
             f.createBlock([
               makeAssignment(
                 this.ids.pathParameter,
-                makePropCall(
-                  this.ids.pathParameter,
-                  propOf<string>("replace"),
-                  [
-                    makeTemplate(":", [this.ids.keyParameter]), // `:${key}`
-                    makeArrowFn(
-                      [],
-                      f.createBlock([
-                        f.createExpressionStatement(
-                          f.createDeleteExpression(
-                            f.createElementAccessExpression(
-                              this.ids.restConst,
-                              this.ids.keyParameter,
-                            ),
-                          ),
-                        ),
-                        f.createReturnStatement(
+                makeCall(this.ids.pathParameter, propOf<string>("replace"))(
+                  makeTemplate(":", [this.ids.keyParameter]), // `:${key}`
+                  makeArrowFn(
+                    [],
+                    f.createBlock([
+                      f.createExpressionStatement(
+                        f.createDeleteExpression(
                           f.createElementAccessExpression(
-                            this.ids.paramsArgument,
+                            this.ids.restConst,
                             this.ids.keyParameter,
                           ),
                         ),
-                      ]),
-                    ),
-                  ],
+                      ),
+                      f.createReturnStatement(
+                        f.createElementAccessExpression(
+                          this.ids.paramsArgument,
+                          this.ids.keyParameter,
+                        ),
+                      ),
+                    ]),
+                  ),
                 ),
               ),
             ]),
@@ -256,22 +252,20 @@ export abstract class IntegrationBase {
         makeConst(
           // const [method, path] = this.parseRequest(request);
           makeDeconstruction(this.ids.methodParameter, this.ids.pathParameter),
-          f.createCallExpression(this.ids.parseRequestFn, undefined, [
-            this.ids.requestParameter,
-          ]),
+          makeCall(this.ids.parseRequestFn)(this.ids.requestParameter),
         ),
         // return this.implementation(___)
         f.createReturnStatement(
-          makePropCall(f.createThis(), this.ids.implementationArgument, [
+          makeCall(f.createThis(), this.ids.implementationArgument)(
             this.ids.methodParameter,
             f.createSpreadElement(
-              f.createCallExpression(this.ids.substituteFn, undefined, [
+              makeCall(this.ids.substituteFn)(
                 this.ids.pathParameter,
                 this.ids.paramsArgument,
-              ]),
+              ),
             ),
             this.ids.ctxArgument,
-          ]),
+          ),
         ),
       ],
       {
@@ -317,7 +311,7 @@ export abstract class IntegrationBase {
     // method: method.toUpperCase()
     const methodProperty = f.createPropertyAssignment(
       propOf<RequestInit>("method"),
-      makePropCall(this.ids.methodParameter, propOf<string>("toUpperCase")),
+      makeCall(this.ids.methodParameter, propOf<string>("toUpperCase"))(),
     );
 
     // headers: hasBody ? { "Content-Type": "application/json" } : undefined
@@ -340,11 +334,10 @@ export abstract class IntegrationBase {
       propOf<RequestInit>("body"),
       makeTernary(
         this.ids.hasBodyConst,
-        makePropCall(
+        makeCall(
           f.createIdentifier(JSON[Symbol.toStringTag]),
           propOf<JSON>("stringify"),
-          [this.ids.paramsArgument],
-        ),
+        )(this.ids.paramsArgument),
         this.ids.undefinedValue,
       ),
     );
@@ -353,14 +346,14 @@ export abstract class IntegrationBase {
     const responseStatement = makeConst(
       this.ids.responseConst,
       f.createAwaitExpression(
-        f.createCallExpression(f.createIdentifier(fetch.name), undefined, [
+        makeCall(f.createIdentifier(fetch.name))(
           this.makeFetchURL(),
           f.createObjectLiteralExpression([
             methodProperty,
             headersProperty,
             bodyProperty,
           ]),
-        ]),
+        ),
       ),
     );
 
@@ -368,14 +361,13 @@ export abstract class IntegrationBase {
     const hasBodyStatement = makeConst(
       this.ids.hasBodyConst,
       f.createLogicalNot(
-        makePropCall(
+        makeCall(
           f.createArrayLiteralExpression([
             f.createStringLiteral("get" satisfies Method),
             f.createStringLiteral("delete" satisfies Method),
           ]),
           propOf<string[]>("includes"),
-          [this.ids.methodParameter],
-        ),
+        )(this.ids.methodParameter),
       ),
     );
 
@@ -392,11 +384,11 @@ export abstract class IntegrationBase {
     // const contentType = response.headers.get("content-type");
     const contentTypeStatement = makeConst(
       this.ids.contentTypeConst,
-      makePropCall(
-        [this.ids.responseConst, propOf<Response>("headers")],
+      makeCall(
+        this.ids.responseConst,
+        propOf<Response>("headers"),
         propOf<Headers>("get"),
-        [f.createStringLiteral("content-type")],
-      ),
+      )(f.createStringLiteral("content-type")),
     );
 
     // if (!contentType) return;
@@ -411,14 +403,15 @@ export abstract class IntegrationBase {
     // const isJSON = contentType.startsWith("application/json");
     const isJsonConst = makeConst(
       this.ids.isJsonConst,
-      makePropCall(this.ids.contentTypeConst, propOf<string>("startsWith"), [
-        f.createStringLiteral(contentTypes.json),
-      ]),
+      makeCall(
+        this.ids.contentTypeConst,
+        propOf<string>("startsWith"),
+      )(f.createStringLiteral(contentTypes.json)),
     );
 
     // return response[isJSON ? "json" : "text"]();
     const returnStatement = f.createReturnStatement(
-      f.createCallExpression(
+      makeCall(
         f.createElementAccessExpression(
           this.ids.responseConst,
           makeTernary(
@@ -427,9 +420,7 @@ export abstract class IntegrationBase {
             f.createStringLiteral(propOf<Response>("text")),
           ),
         ),
-        undefined,
-        [],
-      ),
+      )(),
     );
 
     return makeConst(
@@ -464,15 +455,13 @@ export abstract class IntegrationBase {
       [
         makeConst(
           makeDeconstruction(this.ids.pathParameter, this.ids.restConst),
-          f.createCallExpression(this.ids.substituteFn, undefined, [
+          makeCall(this.ids.substituteFn)(
             f.createElementAccessExpression(
-              f.createCallExpression(this.ids.parseRequestFn, undefined, [
-                this.ids.requestParameter,
-              ]),
+              makeCall(this.ids.parseRequestFn)(this.ids.requestParameter),
               f.createNumericLiteral(1),
             ),
             this.ids.paramsArgument,
-          ]),
+          ),
         ),
         makeConst(
           this.ids.searchParamsConst,
@@ -510,32 +499,31 @@ export abstract class IntegrationBase {
       }),
       [
         f.createExpressionStatement(
-          makePropCall(
-            [f.createThis(), this.ids.sourceProp],
+          makeCall(
+            f.createThis(),
+            this.ids.sourceProp,
             propOf<EventSource>("addEventListener"),
-            [
-              this.ids.eventParameter,
-              makeArrowFn(
-                [this.ids.msgParameter],
-                f.createCallExpression(this.ids.handlerParameter, undefined, [
-                  makePropCall(
-                    f.createIdentifier(JSON[Symbol.toStringTag]),
-                    propOf<JSON>("parse"),
-                    [
-                      f.createPropertyAccessExpression(
-                        f.createParenthesizedExpression(
-                          f.createAsExpression(
-                            this.ids.msgParameter,
-                            ensureTypeNode(MessageEvent.name),
-                          ),
-                        ),
-                        propOf<SSEShape>("data"),
+          )(
+            this.ids.eventParameter,
+            makeArrowFn(
+              [this.ids.msgParameter],
+              makeCall(this.ids.handlerParameter)(
+                makeCall(
+                  f.createIdentifier(JSON[Symbol.toStringTag]),
+                  propOf<JSON>("parse"),
+                )(
+                  f.createPropertyAccessExpression(
+                    f.createParenthesizedExpression(
+                      f.createAsExpression(
+                        this.ids.msgParameter,
+                        ensureTypeNode(MessageEvent.name),
                       ),
-                    ],
+                    ),
+                    propOf<SSEShape>("data"),
                   ),
-                ]),
+                ),
               ),
-            ],
+            ),
           ),
         ),
         f.createReturnStatement(f.createThis()),
@@ -589,21 +577,20 @@ export abstract class IntegrationBase {
       makeNew(f.createIdentifier(clientClassName)),
     ), // const client = new Client();
     // client.provide("get /v1/user/retrieve", { id: "10" });
-    makePropCall(this.ids.clientConst, this.ids.provideMethod, [
+    makeCall(this.ids.clientConst, this.ids.provideMethod)(
       f.createStringLiteral(`${"get" satisfies Method} /v1/user/retrieve`),
       f.createObjectLiteralExpression([
         f.createPropertyAssignment("id", f.createStringLiteral("10")),
       ]),
-    ]),
+    ),
     // new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
-    makePropCall(
+    makeCall(
       makeNew(
         f.createIdentifier(subscriptionClassName),
         f.createStringLiteral(`${"get" satisfies Method} /v1/events/stream`),
         f.createObjectLiteralExpression(),
       ),
       this.ids.onMethod,
-      [f.createStringLiteral("time"), makeArrowFn(["time"], f.createBlock([]))],
-    ),
+    )(f.createStringLiteral("time"), makeArrowFn(["time"], f.createBlock([]))),
   ];
 }
