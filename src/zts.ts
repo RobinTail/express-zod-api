@@ -9,7 +9,6 @@ import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
 import {
-  addJsDocComment,
   ensureTypeNode,
   isPrimitive,
   makeInterfaceProp,
@@ -52,12 +51,10 @@ const onObject: Producer = (
       isResponse && hasCoercion(value)
         ? value instanceof z.ZodOptional
         : value.isOptional();
-    const propertySignature = makeInterfaceProp(key, next(value), {
+    return makeInterfaceProp(key, next(value), {
       isOptional: isOptional && hasQuestionMark,
+      comment: value.description,
     });
-    return value.description
-      ? addJsDocComment(propertySignature, value.description)
-      : propertySignature;
   });
   return f.createTypeLiteralNode(members);
 };

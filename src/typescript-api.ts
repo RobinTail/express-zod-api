@@ -131,14 +131,16 @@ export const recordStringAny = f.createTypeReferenceNode("Record", [
 export const makeInterfaceProp = (
   name: string | number,
   value: Parameters<typeof ensureTypeNode>[0],
-  { isOptional }: { isOptional?: boolean } = {},
-) =>
-  f.createPropertySignature(
+  { isOptional, comment }: { isOptional?: boolean; comment?: string } = {},
+) => {
+  const node = f.createPropertySignature(
     undefined,
     makePropertyIdentifier(name),
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     ensureTypeNode(value),
   );
+  return comment ? addJsDocComment(node, comment) : node;
+};
 
 export const makeOneLine = (subject: ts.TypeNode) =>
   ts.setEmitFlags(subject, ts.EmitFlags.SingleLine);
