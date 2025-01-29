@@ -265,7 +265,9 @@ export const makeTypeParams = (
   params: Partial<
     Record<
       string,
-      ts.Identifier | ts.TypeNode | { type?: ts.TypeNode; init: ts.TypeNode }
+      | ts.Identifier
+      | ts.TypeNode
+      | { type?: ts.TypeNode; init: ts.TypeNode | ts.KeywordTypeSyntaxKind }
     >
   >,
 ) =>
@@ -275,7 +277,7 @@ export const makeTypeParams = (
       [],
       name,
       type && ensureTypeNode(type),
-      init,
+      typeof init === "number" ? f.createKeywordTypeNode(init) : init,
     );
   });
 

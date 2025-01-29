@@ -158,9 +158,7 @@ export abstract class IntegrationBase {
       ),
       {
         expose: true,
-        params: {
-          T: { init: f.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword) },
-        },
+        params: { T: { init: ts.SyntaxKind.UnknownKeyword } },
       },
     );
 
