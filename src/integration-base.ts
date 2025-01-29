@@ -295,14 +295,12 @@ export abstract class IntegrationBase {
 
   // `?${new URLSearchParams(____)}`
   protected makeSearchParams = (from: ts.Expression) =>
-    makeTemplate("?", [
-      makeNew(f.createIdentifier(URLSearchParams.name), from),
-    ]);
+    makeTemplate("?", [makeNew(URLSearchParams.name, from)]);
 
   // new URL(`${path}${searchParams}`, "http:____")
   protected makeFetchURL = () =>
     makeNew(
-      f.createIdentifier(URL.name),
+      URL.name,
       makeTemplate("", [this.ids.pathParameter], [this.ids.searchParamsConst]),
       literally(this.serverUrl),
     );
@@ -468,7 +466,7 @@ export abstract class IntegrationBase {
         ),
         makeAssignment(
           f.createPropertyAccessExpression(f.createThis(), this.ids.sourceProp),
-          makeNew(f.createIdentifier("EventSource"), this.makeFetchURL()),
+          makeNew("EventSource", this.makeFetchURL()),
         ),
       ],
     );
@@ -563,10 +561,7 @@ export abstract class IntegrationBase {
     clientClassName: string,
     subscriptionClassName: string,
   ): ts.Node[] => [
-    makeConst(
-      this.ids.clientConst,
-      makeNew(f.createIdentifier(clientClassName)),
-    ), // const client = new Client();
+    makeConst(this.ids.clientConst, makeNew(clientClassName)), // const client = new Client();
     // client.provide("get /v1/user/retrieve", { id: "10" });
     makeCall(this.ids.clientConst, this.ids.provideMethod)(
       literally(`${"get" satisfies Method} /v1/user/retrieve`),
@@ -577,7 +572,7 @@ export abstract class IntegrationBase {
     // new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
     makeCall(
       makeNew(
-        f.createIdentifier(subscriptionClassName),
+        subscriptionClassName,
         literally(`${"get" satisfies Method} /v1/events/stream`),
         f.createObjectLiteralExpression(),
       ),

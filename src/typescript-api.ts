@@ -341,8 +341,8 @@ export const makeCall =
       args,
     );
 
-export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
-  f.createNewExpression(cls, undefined, args);
+export const makeNew = (cls: string, ...args: ts.Expression[]) =>
+  f.createNewExpression(f.createIdentifier(cls), undefined, args);
 
 export const makeExtract = (base: Typeable, narrow: ts.TypeNode) =>
   ensureTypeNode("Extract", [base, narrow]);
