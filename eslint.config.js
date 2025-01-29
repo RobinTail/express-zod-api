@@ -107,6 +107,10 @@ const tsFactoryConcerns = [
     message: "use ensureTypeNode() helper",
   },
   {
+    selector: "Identifier[name='createKeywordTypeNode']",
+    message: "use ensureTypeNode() helper",
+  },
+  {
     selector: "Literal[value='Extract']",
     message: "use makeExtract() helper",
   },

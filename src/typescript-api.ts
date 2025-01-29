@@ -61,15 +61,6 @@ export const makeTemplate = (
     ),
   );
 
-// Record<string, any>
-export const recordStringAny = f.createExpressionWithTypeArguments(
-  f.createIdentifier("Record"),
-  [
-    f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-    f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-  ],
-);
-
 export const makeParam = (
   name: ts.Identifier,
   {
@@ -116,11 +107,22 @@ export const makePublicConstructor = (
   );
 
 export const ensureTypeNode = (
-  subject: ts.TypeNode | ts.Identifier | string,
+  subject: ts.TypeNode | ts.Identifier | string | ts.KeywordTypeSyntaxKind,
 ): ts.TypeNode =>
-  typeof subject === "string" || ts.isIdentifier(subject)
-    ? f.createTypeReferenceNode(subject)
-    : subject;
+  typeof subject === "number"
+    ? f.createKeywordTypeNode(subject)
+    : typeof subject === "string" || ts.isIdentifier(subject)
+      ? f.createTypeReferenceNode(subject)
+      : subject;
+
+// Record<string, any>
+export const recordStringAny = f.createExpressionWithTypeArguments(
+  f.createIdentifier("Record"), // @todo maybe it should be type reference?
+  [
+    ensureTypeNode(ts.SyntaxKind.StringKeyword),
+    ensureTypeNode(ts.SyntaxKind.AnyKeyword),
+  ],
+);
 
 export const makeInterfaceProp = (
   name: string | number,
@@ -248,9 +250,7 @@ export const makeKeyOf = (subj: Parameters<typeof ensureTypeNode>[0]) =>
 
 export const makePromise = (subject: ts.TypeNode | "any") =>
   f.createTypeReferenceNode(Promise.name, [
-    subject === "any"
-      ? f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
-      : subject,
+    subject === "any" ? ensureTypeNode(ts.SyntaxKind.AnyKeyword) : subject,
   ]);
 
 export const makeInterface = (
@@ -284,7 +284,7 @@ export const makeTypeParams = (
       [],
       name,
       type && ensureTypeNode(type),
-      typeof init === "number" ? f.createKeywordTypeNode(init) : init,
+      init && ensureTypeNode(init),
     );
   });
 

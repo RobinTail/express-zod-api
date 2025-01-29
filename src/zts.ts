@@ -108,7 +108,7 @@ const onEffects: Producer = (
       undefined: ts.SyntaxKind.UndefinedKeyword,
       object: ts.SyntaxKind.ObjectKeyword,
     };
-    return f.createKeywordTypeNode(
+    return ensureTypeNode(
       (outputType && resolutions[outputType]) || ts.SyntaxKind.AnyKeyword,
     );
   }
@@ -134,7 +134,7 @@ const onOptional: Producer = (
   return hasUndefined
     ? f.createUnionTypeNode([
         actualTypeNode,
-        f.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword),
+        ensureTypeNode(ts.SyntaxKind.UndefinedKeyword),
       ])
     : actualTypeNode;
 };
@@ -181,7 +181,7 @@ const onDefault: Producer = ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
 const onPrimitive =
   (syntaxKind: ts.KeywordTypeSyntaxKind): Producer =>
   () =>
-    f.createKeywordTypeNode(syntaxKind);
+    ensureTypeNode(syntaxKind);
 
 const onBranded: Producer = (
   schema: z.ZodBranded<z.ZodTypeAny, string | number | symbol>,
@@ -206,7 +206,7 @@ const onLazy: Producer = (lazy: z.ZodLazy<z.ZodTypeAny>, { makeAlias, next }) =>
 
 const onFile: Producer = (schema: FileSchema) => {
   const subject = schema.unwrap();
-  const stringType = f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword);
+  const stringType = ensureTypeNode(ts.SyntaxKind.StringKeyword);
   const bufferType = ensureTypeNode("Buffer");
   const unionType = f.createUnionTypeNode([stringType, bufferType]);
   return subject instanceof z.ZodString
@@ -268,6 +268,6 @@ export const zodToTs = (
 ) =>
   walkSchema(schema, {
     rules: { ...brandHandling, ...producers },
-    onMissing: () => f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
+    onMissing: () => ensureTypeNode(ts.SyntaxKind.AnyKeyword),
     ctx,
   });

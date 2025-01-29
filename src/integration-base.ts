@@ -144,7 +144,7 @@ export abstract class IntegrationBase {
         undefined,
         makeParams({
           [this.ids.methodParameter.text]: ensureTypeNode(this.methodType.name),
-          [this.ids.pathParameter.text]: f.createKeywordTypeNode(
+          [this.ids.pathParameter.text]: ensureTypeNode(
             ts.SyntaxKind.StringKeyword,
           ),
           [this.ids.paramsArgument.text]: recordStringAny,
@@ -167,7 +167,7 @@ export abstract class IntegrationBase {
       this.ids.parseRequestFn,
       makeArrowFn(
         {
-          [this.ids.requestParameter.text]: f.createKeywordTypeNode(
+          [this.ids.requestParameter.text]: ensureTypeNode(
             ts.SyntaxKind.StringKeyword,
           ),
         },
@@ -190,7 +190,7 @@ export abstract class IntegrationBase {
       this.ids.substituteFn,
       makeArrowFn(
         {
-          [this.ids.pathParameter.text]: f.createKeywordTypeNode(
+          [this.ids.pathParameter.text]: ensureTypeNode(
             ts.SyntaxKind.StringKeyword,
           ),
           [this.ids.paramsArgument.text]: recordStringAny,
@@ -531,8 +531,8 @@ export abstract class IntegrationBase {
             ),
           }),
           f.createUnionTypeNode([
-            f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-            makePromise(f.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword)),
+            ensureTypeNode(ts.SyntaxKind.VoidKeyword),
+            makePromise(ensureTypeNode(ts.SyntaxKind.VoidKeyword)),
           ]),
         ),
       }),
@@ -594,7 +594,7 @@ export abstract class IntegrationBase {
             this.requestType.name,
             f.createTemplateLiteralType(f.createTemplateHead("get "), [
               f.createTemplateLiteralTypeSpan(
-                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+                ensureTypeNode(ts.SyntaxKind.StringKeyword),
                 f.createTemplateTail(""),
               ),
             ]),
@@ -605,9 +605,7 @@ export abstract class IntegrationBase {
               ensureTypeNode("K"),
             ),
             makeOneLine(
-              this.makeEventNarrow(
-                f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-              ),
+              this.makeEventNarrow(ensureTypeNode(ts.SyntaxKind.StringKeyword)),
             ),
           ),
         },
