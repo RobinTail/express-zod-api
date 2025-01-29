@@ -1,3 +1,4 @@
+import { pair } from "ramda";
 import ts from "typescript";
 
 export const f = ts.factory;
@@ -297,7 +298,7 @@ export const makeTypeParams = (
       >,
 ) =>
   (Array.isArray(params)
-    ? params.map((name) => [name, undefined] as const)
+    ? params.map((name) => pair(name, undefined))
     : Object.entries(params)
   ).map(([name, val]) => {
     const { type, init } =
