@@ -33,6 +33,7 @@ import {
   makeAssignment,
   makePublicProperty,
   makeIndexed,
+  makeMaybeAsync,
 } from "./typescript-api";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -503,10 +504,7 @@ export abstract class IntegrationBase {
               ),
             ),
           }),
-          f.createUnionTypeNode([
-            ensureTypeNode(ts.SyntaxKind.VoidKeyword),
-            makePromise(ts.SyntaxKind.VoidKeyword),
-          ]),
+          makeMaybeAsync(ts.SyntaxKind.VoidKeyword),
         ),
       }),
       [

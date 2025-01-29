@@ -387,6 +387,9 @@ export const makeIndexed = (
 ) =>
   f.createIndexedAccessTypeNode(ensureTypeNode(subject), ensureTypeNode(index));
 
+export const makeMaybeAsync = (subj: Parameters<typeof ensureTypeNode>[0]) =>
+  f.createUnionTypeNode([ensureTypeNode(subj), makePromise(subj)]);
+
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,
   ts.SyntaxKind.BigIntKeyword,
