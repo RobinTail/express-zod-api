@@ -62,7 +62,7 @@ export const makeTemplate = (
   );
 
 export const makeParam = (
-  name: ts.Identifier,
+  name: string | ts.Identifier,
   {
     type,
     mod,
@@ -306,7 +306,9 @@ export const makeTypeParams = (
   });
 
 export const makeArrowFn = (
-  params: ts.Identifier[] | Parameters<typeof makeParams>[0],
+  params:
+    | Array<Parameters<typeof makeParam>[0]>
+    | Parameters<typeof makeParams>[0],
   body: ts.ConciseBody,
   { isAsync }: { isAsync?: boolean } = {},
 ) =>

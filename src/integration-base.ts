@@ -619,10 +619,7 @@ export abstract class IntegrationBase {
         f.createObjectLiteralExpression(),
       ),
       this.ids.onMethod,
-      [
-        f.createStringLiteral("time"),
-        makeArrowFn({ time: undefined }, f.createBlock([])),
-      ],
+      [f.createStringLiteral("time"), makeArrowFn(["time"], f.createBlock([]))],
     ),
   ];
 }
