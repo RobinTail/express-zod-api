@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Example API
-  version: 22.2.0
+  version: 22.3.1
 paths:
   /v1/user/retrieve:
     get:
@@ -576,21 +576,21 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-  /v1/events/time:
+  /v1/events/stream:
     get:
-      operationId: GetV1EventsTime
+      operationId: GetV1EventsStream
       tags:
         - subscriptions
       parameters:
         - name: trigger
           in: query
           required: false
-          description: GET /v1/events/time Parameter
+          description: GET /v1/events/stream Parameter
           schema:
             type: string
       responses:
         "200":
-          description: GET /v1/events/time Positive response
+          description: GET /v1/events/stream Positive response
           content:
             text/event-stream:
               schema:
@@ -615,7 +615,7 @@ paths:
                   - data
                   - event
         "400":
-          description: GET /v1/events/time Negative response
+          description: GET /v1/events/stream Negative response
           content:
             text/plain:
               schema:

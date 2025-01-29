@@ -2,7 +2,7 @@
 
 ## Version 22
 
-### v22.3.0
+### v22.4.0
 
 - Feat: ability to supply extra data to a custom implementation of the generated client:
   - You can instantiate the client class with an implementation accepting an optional context of your choice;
@@ -26,6 +26,30 @@ client.provide(
   { id: "10" },
   { extraHeaders: { API_KEY: "123456" } },
 );
+```
+
+### v22.3.1
+
+- Fixed issue on emitting server-sent events (SSE), introduced in v21.5.0:
+  - Emitting SSE failed due to internal error `flush is not a function` having `compression` disabled in config;
+  - The `.flush()` method of `response` is a feature of `compression` (optional peer dependency);
+  - It is required to call the method when `compression` is enabled;
+  - This version fixes the issue by calling the method conditionally;
+  - This bug was reported by [@bobgubko](https://github.com/bobgubko).
+
+### v22.3.0
+
+- Feat: `Subscription` class for consuming Server-sent events:
+  - The `Integration` can now also generate a frontend helper class `Subscription` to ease SSE support;
+  - The new class establishes an `EventSource` instance and exposes it as the public `source` property;
+  - The class also provides the public `on` method for your typed listeners;
+  - You can configure the generated class name using `subscriptionClassName` option (default: `Subscription`);
+  - The feature is only applicable to the `variant` option set to `client` (default).
+
+```ts
+import { Subscription } from "./client.ts"; // the generated file
+
+new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
 ```
 
 ### v22.2.0
