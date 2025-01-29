@@ -325,7 +325,7 @@ export const makeTernary = (
 
 export const makeCall =
   (
-    first: ts.Expression,
+    first: ts.Expression | string,
     ...rest: Array<ts.Identifier | ts.ConditionalExpression | string>
   ) =>
   (...args: ts.Expression[]) =>
@@ -335,7 +335,7 @@ export const makeCall =
           typeof entry === "string" || ts.isIdentifier(entry)
             ? f.createPropertyAccessExpression(acc, entry)
             : f.createElementAccessExpression(acc, entry),
-        first,
+        typeof first === "string" ? f.createIdentifier(first) : first,
       ),
       undefined,
       args,

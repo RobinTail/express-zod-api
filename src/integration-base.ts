@@ -334,7 +334,7 @@ export abstract class IntegrationBase {
       makeTernary(
         this.ids.hasBodyConst,
         makeCall(
-          f.createIdentifier(JSON[Symbol.toStringTag]),
+          JSON[Symbol.toStringTag],
           propOf<JSON>("stringify"),
         )(this.ids.paramsArgument),
         this.ids.undefinedValue,
@@ -345,7 +345,7 @@ export abstract class IntegrationBase {
     const responseStatement = makeConst(
       this.ids.responseConst,
       f.createAwaitExpression(
-        makeCall(f.createIdentifier(fetch.name))(
+        makeCall(fetch.name)(
           this.makeFetchURL(),
           f.createObjectLiteralExpression([
             methodProperty,
@@ -503,7 +503,7 @@ export abstract class IntegrationBase {
               [this.ids.msgParameter],
               makeCall(this.ids.handlerParameter)(
                 makeCall(
-                  f.createIdentifier(JSON[Symbol.toStringTag]),
+                  JSON[Symbol.toStringTag],
                   propOf<JSON>("parse"),
                 )(
                   f.createPropertyAccessExpression(
