@@ -143,15 +143,10 @@ export abstract class IntegrationBase {
       f.createFunctionTypeNode(
         undefined,
         makeParams({
-          [this.ids.methodParameter.text]: ensureTypeNode(this.methodType.name),
-          [this.ids.pathParameter.text]: ensureTypeNode(
-            ts.SyntaxKind.StringKeyword,
-          ),
+          [this.ids.methodParameter.text]: this.methodType.name,
+          [this.ids.pathParameter.text]: ts.SyntaxKind.StringKeyword,
           [this.ids.paramsArgument.text]: recordStringAny,
-          [this.ids.ctxArgument.text]: {
-            optional: true,
-            type: ensureTypeNode("T"),
-          },
+          [this.ids.ctxArgument.text]: { optional: true, type: "T" },
         }),
         makePromise("any"),
       ),
@@ -166,11 +161,7 @@ export abstract class IntegrationBase {
     makeConst(
       this.ids.parseRequestFn,
       makeArrowFn(
-        {
-          [this.ids.requestParameter.text]: ensureTypeNode(
-            ts.SyntaxKind.StringKeyword,
-          ),
-        },
+        { [this.ids.requestParameter.text]: ts.SyntaxKind.StringKeyword },
         f.createAsExpression(
           makePropCall(this.ids.requestParameter, propOf<string>("split"), [
             f.createRegularExpressionLiteral("/ (.+)/"), // split once
@@ -190,9 +181,7 @@ export abstract class IntegrationBase {
       this.ids.substituteFn,
       makeArrowFn(
         {
-          [this.ids.pathParameter.text]: ensureTypeNode(
-            ts.SyntaxKind.StringKeyword,
-          ),
+          [this.ids.pathParameter.text]: ts.SyntaxKind.StringKeyword,
           [this.ids.paramsArgument.text]: recordStringAny,
         },
         f.createBlock([
@@ -258,15 +247,12 @@ export abstract class IntegrationBase {
     makePublicMethod(
       this.ids.provideMethod,
       makeParams({
-        [this.ids.requestParameter.text]: ensureTypeNode("K"),
+        [this.ids.requestParameter.text]: "K",
         [this.ids.paramsArgument.text]: f.createIndexedAccessTypeNode(
           ensureTypeNode(this.interfaces.input),
           ensureTypeNode("K"),
         ),
-        [this.ids.ctxArgument.text]: {
-          optional: true,
-          type: ensureTypeNode("T"),
-        },
+        [this.ids.ctxArgument.text]: { optional: true, type: "T" },
       }),
       f.createBlock([
         makeConst(
@@ -480,7 +466,7 @@ export abstract class IntegrationBase {
   protected makeSubscriptionConstructor = () =>
     makePublicConstructor(
       makeParams({
-        request: ensureTypeNode("K"),
+        request: "K",
         params: f.createIndexedAccessTypeNode(
           ensureTypeNode(this.interfaces.input),
           ensureTypeNode("K"),
@@ -519,7 +505,7 @@ export abstract class IntegrationBase {
     makePublicMethod(
       this.ids.onMethod,
       makeParams({
-        [this.ids.eventParameter.text]: ensureTypeNode("E"),
+        [this.ids.eventParameter.text]: "E",
         [this.ids.handlerParameter.text]: f.createFunctionTypeNode(
           undefined,
           makeParams({

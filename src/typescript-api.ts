@@ -69,7 +69,7 @@ export const makeParam = (
     init,
     optional,
   }: {
-    type?: ts.TypeNode;
+    type?: Parameters<typeof ensureTypeNode>[0];
     mod?: ts.Modifier[];
     init?: ts.Expression;
     optional?: boolean;
@@ -80,19 +80,26 @@ export const makeParam = (
     undefined,
     name,
     optional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-    type,
+    type ? ensureTypeNode(type) : undefined,
     init,
   );
 
 export const makeParams = (
   params: Partial<
-    Record<string, ts.TypeNode | Parameters<typeof makeParam>[1]>
+    Record<
+      string,
+      Parameters<typeof ensureTypeNode>[0] | Parameters<typeof makeParam>[1]
+    >
   >,
 ) =>
-  Object.entries(params).map(([name, type]) =>
+  Object.entries(params).map(([name, value]) =>
     makeParam(
       f.createIdentifier(name),
-      type && "kind" in type ? { type } : type,
+      typeof value === "string" ||
+        typeof value === "number" ||
+        (typeof value === "object" && "kind" in value)
+        ? { type: value }
+        : value,
     ),
   );
 
