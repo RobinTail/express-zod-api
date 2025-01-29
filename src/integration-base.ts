@@ -148,7 +148,7 @@ export abstract class IntegrationBase {
           [this.ids.paramsArgument.text]: recordStringAny,
           [this.ids.ctxArgument.text]: { optional: true, type: "T" },
         }),
-        makePromise("any"),
+        makePromise(ts.SyntaxKind.AnyKeyword),
       ),
       {
         expose: true,
@@ -518,7 +518,7 @@ export abstract class IntegrationBase {
           }),
           f.createUnionTypeNode([
             ensureTypeNode(ts.SyntaxKind.VoidKeyword),
-            makePromise(ensureTypeNode(ts.SyntaxKind.VoidKeyword)),
+            makePromise(ts.SyntaxKind.VoidKeyword),
           ]),
         ),
       }),

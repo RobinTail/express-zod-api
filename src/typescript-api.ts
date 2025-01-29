@@ -252,10 +252,8 @@ export const makePublicClass = (
 export const makeKeyOf = (subj: Parameters<typeof ensureTypeNode>[0]) =>
   f.createTypeOperatorNode(ts.SyntaxKind.KeyOfKeyword, ensureTypeNode(subj));
 
-export const makePromise = (subject: ts.TypeNode | "any") =>
-  f.createTypeReferenceNode(Promise.name, [
-    subject === "any" ? ensureTypeNode(ts.SyntaxKind.AnyKeyword) : subject,
-  ]);
+export const makePromise = (subject: Parameters<typeof ensureTypeNode>[0]) =>
+  f.createTypeReferenceNode(Promise.name, [ensureTypeNode(subject)]);
 
 export const makeInterface = (
   name: ts.Identifier | string,
