@@ -100,11 +100,7 @@ const tsFactoryConcerns = [
     message: "use makePromise() helper",
   },
   {
-    selector: "Identifier[name='createTypeReferenceNode']",
-    message: "use ensureTypeNode() helper",
-  },
-  {
-    selector: "Identifier[name='createKeywordTypeNode']",
+    selector: "Identifier[name=/^create(TypeReference|KeywordType)Node$/]",
     message: "use ensureTypeNode() helper",
   },
   {
