@@ -376,6 +376,12 @@ export const makeAssignment = (left: ts.Expression, right: ts.Expression) =>
     ),
   );
 
+export const makeIndexed = (
+  subject: Parameters<typeof ensureTypeNode>[0],
+  index: Parameters<typeof ensureTypeNode>[0],
+) =>
+  f.createIndexedAccessTypeNode(ensureTypeNode(subject), ensureTypeNode(index));
+
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,
   ts.SyntaxKind.BigIntKeyword,

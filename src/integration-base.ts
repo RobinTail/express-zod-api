@@ -32,6 +32,7 @@ import {
   recordStringAny,
   makeAssignment,
   makePublicProperty,
+  makeIndexed,
 } from "./typescript-api";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -84,11 +85,9 @@ export abstract class IntegrationBase {
   protected methodType = makePublicLiteralType("Method", methods);
 
   // type SomeOf<T> = T[keyof T];
-  protected someOfType = makeType(
-    "SomeOf",
-    f.createIndexedAccessTypeNode(ensureTypeNode("T"), makeKeyOf("T")),
-    { params: ["T"] },
-  );
+  protected someOfType = makeType("SomeOf", makeIndexed("T", makeKeyOf("T")), {
+    params: ["T"],
+  });
 
   // export type Request = keyof Input;
   protected requestType = makeType(
@@ -248,10 +247,7 @@ export abstract class IntegrationBase {
       this.ids.provideMethod,
       makeParams({
         [this.ids.requestParameter.text]: "K",
-        [this.ids.paramsArgument.text]: f.createIndexedAccessTypeNode(
-          ensureTypeNode(this.interfaces.input),
-          ensureTypeNode("K"),
-        ),
+        [this.ids.paramsArgument.text]: makeIndexed(this.interfaces.input, "K"),
         [this.ids.ctxArgument.text]: { optional: true, type: "T" },
       }),
       [
@@ -278,12 +274,7 @@ export abstract class IntegrationBase {
       ],
       {
         typeParams: { K: this.requestType.name },
-        returns: makePromise(
-          f.createIndexedAccessTypeNode(
-            ensureTypeNode(this.interfaces.response),
-            ensureTypeNode("K"),
-          ),
-        ),
+        returns: makePromise(makeIndexed(this.interfaces.response, "K")),
       },
     );
 
@@ -467,10 +458,7 @@ export abstract class IntegrationBase {
     makePublicConstructor(
       makeParams({
         request: "K",
-        params: f.createIndexedAccessTypeNode(
-          ensureTypeNode(this.interfaces.input),
-          ensureTypeNode("K"),
-        ),
+        params: makeIndexed(this.interfaces.input, "K"),
       }),
       [
         makeConst(
@@ -509,7 +497,7 @@ export abstract class IntegrationBase {
         [this.ids.handlerParameter.text]: f.createFunctionTypeNode(
           undefined,
           makeParams({
-            [this.ids.dataParameter.text]: f.createIndexedAccessTypeNode(
+            [this.ids.dataParameter.text]: makeIndexed(
               makeExtract("R", makeOneLine(this.makeEventNarrow("E"))),
               f.createLiteralTypeNode(
                 f.createStringLiteral(propOf<SSEShape>("data")),
@@ -556,8 +544,8 @@ export abstract class IntegrationBase {
       ],
       {
         typeParams: {
-          E: f.createIndexedAccessTypeNode(
-            ensureTypeNode("R"),
+          E: makeIndexed(
+            "R",
             f.createLiteralTypeNode(
               f.createStringLiteral(propOf<SSEShape>("event")),
             ),
@@ -586,10 +574,7 @@ export abstract class IntegrationBase {
             ]),
           ),
           R: makeExtract(
-            f.createIndexedAccessTypeNode(
-              ensureTypeNode(this.interfaces.positive),
-              ensureTypeNode("K"),
-            ),
+            makeIndexed(this.interfaces.positive, "K"),
             makeOneLine(this.makeEventNarrow(ts.SyntaxKind.StringKeyword)),
           ),
         },

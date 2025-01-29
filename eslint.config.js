@@ -118,6 +118,10 @@ const tsFactoryConcerns = [
     selector: "Identifier[name='EqualsToken']",
     message: "use makeAssignment() helper",
   },
+  {
+    selector: "Identifier[name='createIndexedAccessTypeNode']",
+    message: "use makeIndexed() helper",
+  },
 ];
 
 export default tsPlugin.config(

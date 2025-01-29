@@ -10,6 +10,7 @@ import {
   makeType,
   printNode,
   ensureTypeNode,
+  makeIndexed,
 } from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
@@ -153,14 +154,8 @@ export class Integration extends IntegrationBase {
         positive: this.someOf(dictionaries.positive),
         negative: this.someOf(dictionaries.negative),
         response: f.createUnionTypeNode([
-          f.createIndexedAccessTypeNode(
-            ensureTypeNode(this.interfaces.positive),
-            literalIdx,
-          ),
-          f.createIndexedAccessTypeNode(
-            ensureTypeNode(this.interfaces.negative),
-            literalIdx,
-          ),
+          makeIndexed(this.interfaces.positive, literalIdx),
+          makeIndexed(this.interfaces.negative, literalIdx),
         ]),
         encoded: f.createIntersectionTypeNode([
           ensureTypeNode(dictionaries.positive.name),
