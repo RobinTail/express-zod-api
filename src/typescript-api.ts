@@ -272,19 +272,22 @@ export const makeTypeParams = (
   params: Partial<
     Record<
       string,
-      | ts.Identifier
-      | ts.TypeNode
-      | { type?: ts.TypeNode; init: ts.TypeNode | ts.KeywordTypeSyntaxKind }
+      | Parameters<typeof ensureTypeNode>[0]
+      | {
+          type?: ts.TypeNode;
+          init: Parameters<typeof ensureTypeNode>[0];
+        }
     >
   >,
 ) =>
   Object.entries(params).map(([name, val]) => {
-    const { type, init } = val && "init" in val ? val : { type: val };
+    const { type, init } =
+      typeof val === "object" && "init" in val ? val : { type: val };
     return f.createTypeParameterDeclaration(
       [],
       name,
-      type && ensureTypeNode(type),
-      init && ensureTypeNode(init),
+      type ? ensureTypeNode(type) : undefined,
+      init ? ensureTypeNode(init) : undefined,
     );
   });
 
