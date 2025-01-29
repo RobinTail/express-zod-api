@@ -254,7 +254,7 @@ export abstract class IntegrationBase {
         ),
         [this.ids.ctxArgument.text]: { optional: true, type: "T" },
       }),
-      f.createBlock([
+      [
         makeConst(
           // const [method, path] = this.parseRequest(request);
           makeDeconstruction(this.ids.methodParameter, this.ids.pathParameter),
@@ -275,7 +275,7 @@ export abstract class IntegrationBase {
             this.ids.ctxArgument,
           ]),
         ),
-      ]),
+      ],
       {
         typeParams: { K: this.requestType.name },
         returns: makePromise(
@@ -522,7 +522,7 @@ export abstract class IntegrationBase {
           ]),
         ),
       }),
-      f.createBlock([
+      [
         f.createExpressionStatement(
           makePropCall(
             [f.createThis(), this.ids.sourceProp],
@@ -553,7 +553,7 @@ export abstract class IntegrationBase {
           ),
         ),
         f.createReturnStatement(f.createThis()),
-      ]),
+      ],
       {
         typeParams: {
           E: f.createIndexedAccessTypeNode(

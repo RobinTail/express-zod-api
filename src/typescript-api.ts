@@ -228,7 +228,7 @@ export const makePublicProperty = (
 export const makePublicMethod = (
   name: ts.Identifier,
   params: ts.ParameterDeclaration[],
-  body: ts.Block,
+  statements: ts.Statement[],
   {
     typeParams,
     returns,
@@ -245,7 +245,7 @@ export const makePublicMethod = (
     typeParams && makeTypeParams(typeParams),
     params,
     returns,
-    body,
+    f.createBlock(statements),
   );
 
 export const makePublicClass = (
