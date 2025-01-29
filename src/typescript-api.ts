@@ -1,6 +1,12 @@
 import { pair } from "ramda";
 import ts from "typescript";
 
+export type Typeable =
+  | ts.TypeNode
+  | ts.Identifier
+  | string
+  | ts.KeywordTypeSyntaxKind;
+
 export const f = ts.factory;
 
 const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
@@ -70,7 +76,7 @@ export const makeParam = (
     init,
     optional,
   }: {
-    type?: Parameters<typeof ensureTypeNode>[0];
+    type?: Typeable;
     mod?: ts.Modifier[];
     init?: ts.Expression;
     optional?: boolean;
@@ -86,12 +92,7 @@ export const makeParam = (
   );
 
 export const makeParams = (
-  params: Partial<
-    Record<
-      string,
-      Parameters<typeof ensureTypeNode>[0] | Parameters<typeof makeParam>[1]
-    >
-  >,
+  params: Partial<Record<string, Typeable | Parameters<typeof makeParam>[1]>>,
 ) =>
   Object.entries(params).map(([name, value]) =>
     makeParam(
@@ -115,8 +116,8 @@ export const makePublicConstructor = (
   );
 
 export const ensureTypeNode = (
-  subject: ts.TypeNode | ts.Identifier | string | ts.KeywordTypeSyntaxKind,
-  args?: Array<ts.TypeNode | ts.Identifier | string | ts.KeywordTypeSyntaxKind>, // only for string and id
+  subject: Typeable,
+  args?: Typeable[], // only for string and id
 ): ts.TypeNode =>
   typeof subject === "number"
     ? f.createKeywordTypeNode(subject)
@@ -135,7 +136,7 @@ export const recordStringAny = ensureTypeNode("Record", [
 
 export const makeInterfaceProp = (
   name: string | number,
-  value: Parameters<typeof ensureTypeNode>[0],
+  value: Typeable,
   { isOptional, comment }: { isOptional?: boolean; comment?: string } = {},
 ) => {
   const node = f.createPropertySignature(
@@ -162,10 +163,7 @@ export const makeDeconstruction = (
 export const makeConst = (
   name: string | ts.Identifier | ts.ArrayBindingPattern,
   value: ts.Expression,
-  {
-    type,
-    expose,
-  }: { type?: Parameters<typeof ensureTypeNode>[0]; expose?: true } = {},
+  { type, expose }: { type?: Typeable; expose?: true } = {},
 ) =>
   f.createVariableStatement(
     expose && exportModifier,
@@ -220,7 +218,7 @@ export const makeType = (
 
 export const makePublicProperty = (
   name: string | ts.PropertyName,
-  type: Parameters<typeof ensureTypeNode>[0],
+  type: Typeable,
 ) =>
   f.createPropertyDeclaration(
     accessModifiers.public,
@@ -266,10 +264,10 @@ export const makePublicClass = (
     statements,
   );
 
-export const makeKeyOf = (subj: Parameters<typeof ensureTypeNode>[0]) =>
+export const makeKeyOf = (subj: Typeable) =>
   f.createTypeOperatorNode(ts.SyntaxKind.KeyOfKeyword, ensureTypeNode(subj));
 
-export const makePromise = (subject: Parameters<typeof ensureTypeNode>[0]) =>
+export const makePromise = (subject: Typeable) =>
   ensureTypeNode(Promise.name, [subject]);
 
 export const makeInterface = (
@@ -291,14 +289,7 @@ export const makeTypeParams = (
   params:
     | string[]
     | Partial<
-        Record<
-          string,
-          | Parameters<typeof ensureTypeNode>[0]
-          | {
-              type?: ts.TypeNode;
-              init: Parameters<typeof ensureTypeNode>[0];
-            }
-        >
+        Record<string, Typeable | { type?: ts.TypeNode; init: Typeable }>
       >,
 ) =>
   (Array.isArray(params)
@@ -367,10 +358,8 @@ export const makePropCall = (
 export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
   f.createNewExpression(cls, undefined, args);
 
-export const makeExtract = (
-  base: Parameters<typeof ensureTypeNode>[0],
-  narrow: ts.TypeNode,
-) => ensureTypeNode("Extract", [base, narrow]);
+export const makeExtract = (base: Typeable, narrow: ts.TypeNode) =>
+  ensureTypeNode("Extract", [base, narrow]);
 
 export const makeAssignment = (left: ts.Expression, right: ts.Expression) =>
   f.createExpressionStatement(
@@ -381,13 +370,10 @@ export const makeAssignment = (left: ts.Expression, right: ts.Expression) =>
     ),
   );
 
-export const makeIndexed = (
-  subject: Parameters<typeof ensureTypeNode>[0],
-  index: Parameters<typeof ensureTypeNode>[0],
-) =>
+export const makeIndexed = (subject: Typeable, index: Typeable) =>
   f.createIndexedAccessTypeNode(ensureTypeNode(subject), ensureTypeNode(index));
 
-export const makeMaybeAsync = (subj: Parameters<typeof ensureTypeNode>[0]) =>
+export const makeMaybeAsync = (subj: Typeable) =>
   f.createUnionTypeNode([ensureTypeNode(subj), makePromise(subj)]);
 
 const primitives: ts.KeywordTypeSyntaxKind[] = [

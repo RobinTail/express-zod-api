@@ -34,6 +34,7 @@ import {
   makePublicProperty,
   makeIndexed,
   makeMaybeAsync,
+  Typeable,
 } from "./typescript-api";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
@@ -484,7 +485,7 @@ export abstract class IntegrationBase {
       ],
     );
 
-  protected makeEventNarrow = (value: Parameters<typeof ensureTypeNode>[0]) =>
+  protected makeEventNarrow = (value: Typeable) =>
     f.createTypeLiteralNode([
       makeInterfaceProp(propOf<SSEShape>("event"), value),
     ]);
