@@ -123,13 +123,10 @@ export const ensureTypeNode = (
       : subject;
 
 // Record<string, any>
-export const recordStringAny = f.createExpressionWithTypeArguments(
-  f.createIdentifier("Record"), // @todo maybe it should be type reference?
-  [
-    ensureTypeNode(ts.SyntaxKind.StringKeyword),
-    ensureTypeNode(ts.SyntaxKind.AnyKeyword),
-  ],
-);
+export const recordStringAny = f.createTypeReferenceNode("Record", [
+  ensureTypeNode(ts.SyntaxKind.StringKeyword),
+  ensureTypeNode(ts.SyntaxKind.AnyKeyword),
+]);
 
 export const makeInterfaceProp = (
   name: string | number,
