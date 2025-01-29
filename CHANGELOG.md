@@ -2,6 +2,32 @@
 
 ## Version 22
 
+### v22.4.0
+
+- Feat: ability to supply extra data to a custom implementation of the generated client:
+  - You can instantiate the client class with an implementation accepting an optional context of your choice;
+  - The public `.provide()` method can now accept an additional argument having the type of that context;
+  - The problem on missing such ability was reported by [@LucWag](https://github.com/LucWag).
+
+```ts
+import { Client, Implementation } from "./generated-client.ts";
+
+interface MyCtx {
+  extraKey: string;
+}
+
+const implementation: Implementation<MyCtx> = async (
+  method,
+  path,
+  params,
+  ctx, // ctx is optional MyCtx
+) => {};
+
+const client = new Client(implementation);
+
+client.provide("get /v1/user/retrieve", { id: "10" }, { extraKey: "123456" });
+```
+
 ### v22.3.1
 
 - Fixed issue on emitting server-sent events (SSE), introduced in v21.5.0:

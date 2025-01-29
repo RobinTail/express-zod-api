@@ -48,6 +48,7 @@ export abstract class IntegrationBase {
     keyParameter: f.createIdentifier("key"),
     pathParameter: f.createIdentifier("path"),
     paramsArgument: f.createIdentifier("params"),
+    ctxArgument: f.createIdentifier("ctx"),
     methodParameter: f.createIdentifier("method"),
     requestParameter: f.createIdentifier("request"),
     eventParameter: f.createIdentifier("event"),
@@ -147,10 +148,17 @@ export abstract class IntegrationBase {
             ts.SyntaxKind.StringKeyword,
           ),
           [this.ids.paramsArgument.text]: recordStringAny,
+          [this.ids.ctxArgument.text]: {
+            optional: true,
+            type: ensureTypeNode("T"),
+          },
         }),
         makePromise("any"),
       ),
-      { expose: true },
+      {
+        expose: true,
+        params: { T: { init: ts.SyntaxKind.UnknownKeyword } },
+      },
     );
 
   // const parseRequest = (request: string) => request.split(/ (.+)/, 2) as [Method, Path];
@@ -255,6 +263,10 @@ export abstract class IntegrationBase {
           ensureTypeNode(this.interfaces.input),
           ensureTypeNode("K"),
         ),
+        [this.ids.ctxArgument.text]: {
+          optional: true,
+          type: ensureTypeNode("T"),
+        },
       }),
       f.createBlock([
         makeConst(
@@ -274,6 +286,7 @@ export abstract class IntegrationBase {
                 this.ids.paramsArgument,
               ]),
             ),
+            this.ids.ctxArgument,
           ]),
         ),
       ]),
@@ -290,17 +303,23 @@ export abstract class IntegrationBase {
 
   // export class Client { ___ }
   protected makeClientClass = (name: string) =>
-    makePublicClass(name, [
-      // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
-      makePublicConstructor([
-        makeParam(this.ids.implementationArgument, {
-          type: ensureTypeNode(this.ids.implementationType),
-          mod: accessModifiers.protectedReadonly,
-          init: this.ids.defaultImplementationConst,
-        }),
-      ]),
-      this.makeProvider(),
-    ]);
+    makePublicClass(
+      name,
+      [
+        // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
+        makePublicConstructor([
+          makeParam(this.ids.implementationArgument, {
+            type: f.createTypeReferenceNode(this.ids.implementationType, [
+              ensureTypeNode("T"),
+            ]),
+            mod: accessModifiers.protectedReadonly,
+            init: this.ids.defaultImplementationConst,
+          }),
+        ]),
+        this.makeProvider(),
+      ],
+      { typeParams: { T: undefined } },
+    );
 
   // `?${new URLSearchParams(____)}`
   protected makeSearchParams = (from: ts.Expression) =>
