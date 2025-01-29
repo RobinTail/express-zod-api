@@ -337,11 +337,17 @@ export const makeTernary = (
   );
 
 export const makeCall =
-  (first: ts.Expression, ...rest: Array<ts.Identifier | string>) =>
+  (
+    first: ts.Expression,
+    ...rest: Array<ts.Identifier | ts.ConditionalExpression | string>
+  ) =>
   (...args: ts.Expression[]) =>
     f.createCallExpression(
       rest.reduce(
-        (acc, entry) => f.createPropertyAccessExpression(acc, entry),
+        (acc, entry) =>
+          typeof entry === "string" || ts.isIdentifier(entry)
+            ? f.createPropertyAccessExpression(acc, entry)
+            : f.createElementAccessExpression(acc, entry),
         first,
       ),
       undefined,

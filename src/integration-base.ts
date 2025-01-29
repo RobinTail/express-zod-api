@@ -412,13 +412,11 @@ export abstract class IntegrationBase {
     // return response[isJSON ? "json" : "text"]();
     const returnStatement = f.createReturnStatement(
       makeCall(
-        f.createElementAccessExpression(
-          this.ids.responseConst,
-          makeTernary(
-            this.ids.isJsonConst,
-            f.createStringLiteral(propOf<Response>("json")),
-            f.createStringLiteral(propOf<Response>("text")),
-          ),
+        this.ids.responseConst,
+        makeTernary(
+          this.ids.isJsonConst,
+          f.createStringLiteral(propOf<Response>("json")),
+          f.createStringLiteral(propOf<Response>("text")),
         ),
       )(),
     );
