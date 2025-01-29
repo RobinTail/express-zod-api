@@ -5,7 +5,7 @@
 ### v21.11.2
 
 - Fixed issue on emitting server-sent events (SSE), introduced in v21.5.0:
-  - Emit SSE failed having disabled `compression` in config due to internal error: `flush is not a function`;
+  - Emitting SSE failed due to internal error `flush is not a function` having `compression` disabled in config;
   - The `.flush()` method of `response` is a feature of `compression` (optional peer dependency);
   - It is required to call the method when `compression` is enabled;
   - This version fixes the issue by calling the method conditionally;
