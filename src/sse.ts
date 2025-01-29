@@ -62,7 +62,11 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
         emit: (event, data) => {
           ensureStream(response);
           response.write(formatEvent(events, event, data), "utf-8");
-          response.flush();
+          /**
+           * Issue 2347: flush is the method of compression, it must be called only when compression is enabled
+           * @link https://github.com/RobinTail/express-zod-api/issues/2347
+           * */
+          response.flush?.();
         },
       },
   });
