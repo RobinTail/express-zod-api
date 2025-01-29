@@ -2,6 +2,15 @@
 
 ## Version 22
 
+### v22.3.1
+
+- Fixed issue on emitting server-sent events (SSE), introduced in v21.5.0:
+  - Emitting SSE failed due to internal error `flush is not a function` having `compression` disabled in config;
+  - The `.flush()` method of `response` is a feature of `compression` (optional peer dependency);
+  - It is required to call the method when `compression` is enabled;
+  - This version fixes the issue by calling the method conditionally;
+  - This bug was reported by [@bobgubko](https://github.com/bobgubko).
+
 ### v22.3.0
 
 - Feat: `Subscription` class for consuming Server-sent events:
