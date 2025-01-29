@@ -100,7 +100,7 @@ export abstract class IntegrationBase {
 
   /** @example SomeOf<_> */
   protected someOf = ({ name }: ts.TypeAliasDeclaration) =>
-    f.createTypeReferenceNode(this.someOfType.name, [ensureTypeNode(name)]);
+    ensureTypeNode(this.someOfType.name, [name]);
 
   // export type Path = "/v1/user/retrieve" | ___;
   protected makePathType = () =>
@@ -286,9 +286,7 @@ export abstract class IntegrationBase {
         // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
         makePublicConstructor([
           makeParam(this.ids.implementationArgument, {
-            type: f.createTypeReferenceNode(this.ids.implementationType, [
-              ensureTypeNode("T"),
-            ]),
+            type: ensureTypeNode(this.ids.implementationType, ["T"]),
             mod: accessModifiers.protectedReadonly,
             init: this.ids.defaultImplementationConst,
           }),

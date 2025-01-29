@@ -116,17 +116,21 @@ export const makePublicConstructor = (
 
 export const ensureTypeNode = (
   subject: ts.TypeNode | ts.Identifier | string | ts.KeywordTypeSyntaxKind,
+  args?: Array<ts.TypeNode | ts.Identifier | string | ts.KeywordTypeSyntaxKind>, // only for string and id
 ): ts.TypeNode =>
   typeof subject === "number"
     ? f.createKeywordTypeNode(subject)
     : typeof subject === "string" || ts.isIdentifier(subject)
-      ? f.createTypeReferenceNode(subject)
+      ? f.createTypeReferenceNode(
+          subject,
+          args?.map((entry) => ensureTypeNode(entry)),
+        )
       : subject;
 
 // Record<string, any>
-export const recordStringAny = f.createTypeReferenceNode("Record", [
-  ensureTypeNode(ts.SyntaxKind.StringKeyword),
-  ensureTypeNode(ts.SyntaxKind.AnyKeyword),
+export const recordStringAny = ensureTypeNode("Record", [
+  ts.SyntaxKind.StringKeyword,
+  ts.SyntaxKind.AnyKeyword,
 ]);
 
 export const makeInterfaceProp = (
@@ -266,7 +270,7 @@ export const makeKeyOf = (subj: Parameters<typeof ensureTypeNode>[0]) =>
   f.createTypeOperatorNode(ts.SyntaxKind.KeyOfKeyword, ensureTypeNode(subj));
 
 export const makePromise = (subject: Parameters<typeof ensureTypeNode>[0]) =>
-  f.createTypeReferenceNode(Promise.name, [ensureTypeNode(subject)]);
+  ensureTypeNode(Promise.name, [subject]);
 
 export const makeInterface = (
   name: ts.Identifier | string,
@@ -366,7 +370,7 @@ export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
 export const makeExtract = (
   base: Parameters<typeof ensureTypeNode>[0],
   narrow: ts.TypeNode,
-) => f.createTypeReferenceNode("Extract", [ensureTypeNode(base), narrow]);
+) => ensureTypeNode("Extract", [base, narrow]);
 
 export const makeAssignment = (left: ts.Expression, right: ts.Expression) =>
   f.createExpressionStatement(

@@ -102,8 +102,7 @@ const tsFactoryConcerns = [
     message: "use makePromise() helper",
   },
   {
-    selector:
-      "CallExpression[callee.property.name='createTypeReferenceNode'][arguments.length=1]",
+    selector: "Identifier[name='createTypeReferenceNode']",
     message: "use ensureTypeNode() helper",
   },
   {
