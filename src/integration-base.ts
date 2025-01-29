@@ -302,6 +302,7 @@ export abstract class IntegrationBase {
       makeNew(f.createIdentifier(URLSearchParams.name), from),
     ]);
 
+  // new URL(`${path}${searchParams}`, "http:____")
   protected makeFetchURL = () =>
     makeNew(
       f.createIdentifier(URL.name),
@@ -552,6 +553,7 @@ export abstract class IntegrationBase {
       },
     );
 
+  // export class Subscription<K extends Extract<___>, R extends Extract<___>> { ___ }
   protected makeSubscriptionClass = (name: string) =>
     makePublicClass(
       name,
