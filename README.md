@@ -85,6 +85,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
 [<img src="https://github.com/HenriJ.png" alt="@HenriJ" width="50px" />](https://github.com/HenriJ)
 [<img src="https://github.com/JonParton.png" alt="@JonParton" width="50px" />](https://github.com/JonParton)
 [<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
@@ -101,7 +102,6 @@ These people contributed to the improvement of the framework by reporting bugs, 
 [<img src="https://github.com/danclaytondev.png" alt="@danclaytondev" width="50px" />](https://github.com/danclaytondev)
 [<img src="https://github.com/huyhoang160593.png" alt="@huyhoang160593" width="50px" />](https://github.com/huyhoang160593)
 [<img src="https://github.com/sarahssharkey.png" alt="@sarahssharkey" width="50px" />](https://github.com/sarahssharkey)
-[<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
 [<img src="https://github.com/master-chu.png" alt="@master-chu" width="50px" />](https://github.com/master-chu)
 [<img src="https://github.com/alindsay55661.png" alt="@alindsay55661" width="50px" />](https://github.com/alindsay55661)
 [<img src="https://github.com/john-schmitz.png" alt="@john-schmitz" width="50px" />](https://github.com/john-schmitz)
