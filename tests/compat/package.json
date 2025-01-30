@@ -9,7 +9,7 @@
     "express-zod-api": "link:../.."
   },
   "devDependencies": {
-    "jest": "^30.0.0-alpha.6",
+    "jest": "^30.0.0-alpha.7",
     "@types/jest": "^29.5.12",
     "@swc/core": "^1.5.0",
     "@swc/jest": "^0.2.29"
