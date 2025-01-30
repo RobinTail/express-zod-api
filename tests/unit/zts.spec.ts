@@ -267,6 +267,24 @@ describe("zod-to-ts", () => {
     });
   });
 
+  describe("Issue #2352: intersection of objects having same prop", () => {
+    test("should deduplicate the prop with a same name", () => {
+      const schema = z
+        .object({ query: z.string() })
+        .and(z.object({ query: z.string() }));
+      const node = zodToTs(schema, { ctx });
+      expect(printNodeTest(node)).toMatchSnapshot();
+    });
+
+    test("should not flatten the result for objects with a conflicting prop", () => {
+      const schema = z
+        .object({ query: z.string() })
+        .and(z.object({ query: z.number() }));
+      const node = zodToTs(schema, { ctx });
+      expect(printNodeTest(node)).toMatchSnapshot();
+    });
+  });
+
   describe("PrimitiveSchema", () => {
     const primitiveSchema = z.object({
       string: z.string(),
