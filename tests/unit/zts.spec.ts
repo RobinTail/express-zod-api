@@ -269,31 +269,47 @@ describe("zod-to-ts", () => {
 
   describe("Issue #2352: intersection of objects having same prop %#", () => {
     test.each([
-      [z.string(), z.string()],
-      [z.string().nonempty(), z.string().email()],
-      [z.string().transform(Number), z.string().pipe(z.coerce.date())],
-    ])("should deduplicate the prop with a same name", (a, b) => {
+      [z.string(), z.string(), "string"],
+      [z.string().nonempty(), z.string().email(), "string"],
+      [
+        z.string().transform(Number),
+        z.string().pipe(z.coerce.date()),
+        "string",
+      ],
+      [z.object({}), z.object({}), "{}"],
+    ])("should deduplicate the prop with a same name", (a, b, exp) => {
       const schema = z.object({ query: a }).and(z.object({ query: b }));
       const node = zodToTs(schema, { ctx });
-      expect(printNodeTest(node)).toBe("{\n    query: string;\n}");
+      expect(printNodeTest(node)).toBe(`{\n    query: ${exp};\n}`);
     });
 
     test.each([
-      [z.object({ query: z.number() }), "{\n    query: number;\n}"], // type
       [
-        z.object({ query: z.string().optional() }), // question mark
-        "{\n    query?: string | undefined;\n}",
+        z.object({ query: z.string() }),
+        z.object({ query: z.number() }), // prop type
+        "{\n    query: string;\n} & {\n    query: number;\n}",
       ],
       [
-        z.object({ query: z.string() }).partial(), // question mark
-        "{\n    query?: string | undefined;\n}",
+        z.object({ query: z.object({ sub: z.string() }) }),
+        z.object({ query: z.object({ sub: z.number() }) }), // different complex
+        "{\n    query: {\n        sub: string;\n    };\n} & {\n    query: {\n        sub: number;\n    };\n}",
+      ],
+      [
+        z.object({ query: z.string() }),
+        z.object({ query: z.string().optional() }), // question mark
+        "{\n    query: string;\n} & {\n    query?: string | undefined;\n}",
+      ],
+      [
+        z.object({ query: z.string() }),
+        z.object({ query: z.string() }).partial(), // also question mark
+        "{\n    query: string;\n} & {\n    query?: string | undefined;\n}",
       ],
     ])(
       "should not flatten the result for objects with a conflicting prop %#",
-      (b, exp) => {
-        const schema = z.object({ query: z.string() }).and(b);
+      (a, b, exp) => {
+        const schema = a.and(b);
         const node = zodToTs(schema, { ctx });
-        expect(printNodeTest(node)).toBe(`{\n    query: string;\n} & ${exp}`);
+        expect(printNodeTest(node)).toBe(exp);
       },
     );
   });

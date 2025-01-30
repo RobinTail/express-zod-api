@@ -36,10 +36,7 @@ const nodePath = {
       ts.ComputedPropertyName
     >,
   ]),
-  type: path([
-    "type" satisfies keyof ts.PropertySignature,
-    "kind" satisfies keyof NonNullable<ts.PropertySignature["type"]>,
-  ]),
+  type: path(["type" satisfies keyof ts.PropertySignature]),
   optional: path(["questionToken" satisfies keyof ts.TypeElement]),
 };
 
