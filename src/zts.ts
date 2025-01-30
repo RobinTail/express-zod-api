@@ -1,4 +1,3 @@
-import { chain, prop } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
@@ -139,7 +138,27 @@ const onRecord: Producer = (
 const tryFlattenIntersection = (nodes: ts.TypeNode[]) => {
   const areObjects = nodes.every(ts.isTypeLiteralNode);
   if (!areObjects) throw new Error("Not objects");
-  return f.createTypeLiteralNode(chain(prop("members"), nodes)); // similar to flattened pluck()
+  type Supported = ts.PropertySignature & {
+    name: Exclude<ts.PropertyName, ts.ComputedPropertyName>;
+  };
+  const isSupported = (node: ts.TypeElement): node is Supported =>
+    ts.isPropertySignature(node) && !ts.isComputedPropertyName(node.name);
+  const members = nodes.reduce<Array<Supported>>((agg, node) => {
+    for (const prop of node.members) {
+      if (!isSupported(prop)) throw new Error("Unsupported prop name");
+      const duplicate = agg.find((entry) => entry.name.text === prop.name.text);
+      if (duplicate) {
+        const areSimilar =
+          duplicate.type?.kind === prop.type?.kind &&
+          duplicate.questionToken === prop.questionToken;
+        if (areSimilar) continue;
+        throw new Error("Has conflicting prop");
+      }
+      agg.push(prop);
+    }
+    return agg;
+  }, []);
+  return f.createTypeLiteralNode(members);
 };
 
 const onIntersection: Producer = (

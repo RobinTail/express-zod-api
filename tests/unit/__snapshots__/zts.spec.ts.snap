@@ -82,13 +82,13 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
 exports[`zod-to-ts > Issue #2352: intersection of objects having same prop > should deduplicate the prop with a same name 1`] = `
 "{
     query: string;
-    query: string;
 }"
 `;
 
 exports[`zod-to-ts > Issue #2352: intersection of objects having same prop > should not flatten the result for objects with a conflicting prop 1`] = `
 "{
     query: string;
+} & {
     query: number;
 }"
 `;
