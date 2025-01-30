@@ -278,13 +278,24 @@ describe("zod-to-ts", () => {
       expect(printNodeTest(node)).toBe("{\n    query: string;\n}");
     });
 
-    test("should not flatten the result for objects with a conflicting prop", () => {
-      const schema = z
-        .object({ query: z.string() })
-        .and(z.object({ query: z.number() }));
-      const node = zodToTs(schema, { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
-    });
+    test.each([
+      [z.object({ query: z.number() }), "{\n    query: number;\n}"], // type
+      [
+        z.object({ query: z.string().optional() }), // question mark
+        "{\n    query?: string | undefined;\n}",
+      ],
+      [
+        z.object({ query: z.string() }).partial(), // question mark
+        "{\n    query?: string | undefined;\n}",
+      ],
+    ])(
+      "should not flatten the result for objects with a conflicting prop %#",
+      (b, exp) => {
+        const schema = z.object({ query: z.string() }).and(b);
+        const node = zodToTs(schema, { ctx });
+        expect(printNodeTest(node)).toBe(`{\n    query: string;\n} & ${exp}`);
+      },
+    );
   });
 
   describe("PrimitiveSchema", () => {
