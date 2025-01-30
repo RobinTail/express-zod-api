@@ -28,6 +28,21 @@ const samples = {
   [ts.SyntaxKind.UndefinedKeyword]: undefined,
 } satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
 
+const nodePath = {
+  name: path([
+    "name" satisfies keyof ts.TypeElement,
+    "text" satisfies keyof Exclude<
+      NonNullable<ts.TypeElement["name"]>,
+      ts.ComputedPropertyName
+    >,
+  ]),
+  type: path([
+    "type" satisfies keyof ts.PropertySignature,
+    "kind" satisfies keyof NonNullable<ts.PropertySignature["type"]>,
+  ]),
+  optional: path(["questionToken" satisfies keyof ts.TypeElement]),
+};
+
 const onLiteral: Producer = ({ value }: z.ZodLiteral<LiteralType>) =>
   makeLiteralType(value);
 
@@ -139,22 +154,19 @@ const onRecord: Producer = (
 const tryFlattenIntersection = (nodes: ts.TypeNode[]) => {
   const areObjects = nodes.every(ts.isTypeLiteralNode);
   if (!areObjects) throw new Error("Not objects");
-
-  const namePath = path(["name", "text"]);
-  const typePath = path(["type", "kind"]);
-  const optPath = path(["questionToken"]);
-
   const members = chain(prop("members"), nodes);
   const uniqs = uniqWith((...props) => {
-    const hasSameName = eqBy(namePath, ...props);
+    const hasSameName = eqBy(nodePath.name, ...props);
     if (hasSameName) {
-      const areSimilar = both(eqBy(typePath), eqBy(optPath))(...props);
+      const areSimilar = both(
+        eqBy(nodePath.type),
+        eqBy(nodePath.optional),
+      )(...props);
       if (areSimilar) return true;
       throw new Error("Has conflicting prop");
     }
     return false;
   }, members);
-
   return f.createTypeLiteralNode(uniqs);
 };
 
