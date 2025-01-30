@@ -13,7 +13,7 @@ export interface InputSecurity<K extends string> {
 }
 
 /** @todo add constraints similar to InputSecurity, rename to just HeaderSecurity */
-export interface CustomHeaderSecurity {
+export interface HeaderSecurity {
   type: "header";
   name: string;
 }
@@ -90,7 +90,7 @@ export type Security<K extends string = string, S extends string = string> =
   | BasicSecurity
   | BearerSecurity
   | InputSecurity<K>
-  | CustomHeaderSecurity
+  | HeaderSecurity
   | CookieSecurity
   | OpenIdSecurity
   | OAuth2Security<S>;
