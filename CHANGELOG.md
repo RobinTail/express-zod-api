@@ -4,7 +4,7 @@
 
 ### v22.4.1
 
-- Fixed bug Fixed a bug that could lead to duplicate properties in generated client types:
+- Fixed a bug that could lead to duplicate properties in generated client types:
   - If the middleware and/or endpoint schemas had the same property, it was duplicated by Integration.
   - The issue was introduced in [v20.15.3](#v20153) and reported by [@bobgubko](https://github.com/bobgubko).
 
