@@ -1,4 +1,5 @@
 import { ReferenceObject } from "openapi3-ts/oas31";
+import { prop } from "ramda";
 import { z } from "zod";
 import { ez } from "../../src";
 import {
@@ -288,6 +289,15 @@ describe("Documentation helpers", () => {
       expect(
         depictIntersection(
           z.object({ one: z.number() }).and(z.object({ two: z.number() })),
+          requestCtx,
+        ),
+      ).toMatchSnapshot();
+    });
+
+    test("should flatten objects with same prop of same type", () => {
+      expect(
+        depictIntersection(
+          z.object({ one: z.number() }).and(z.object({ one: z.number() })),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -644,11 +654,16 @@ describe("Documentation helpers", () => {
     test.each([
       { name: "x-request-id", expected: true },
       { name: "authorization", expected: true },
+      {
+        name: "secure",
+        familiar: ["secure"],
+        expected: true,
+      },
       { name: "unknown", expected: false },
     ])(
-      "should validate custom and well-known headers %#",
-      ({ name, expected }) => {
-        expect(defaultIsHeader(name)).toBe(expected);
+      "should validate custom, well-known and security headers %#",
+      ({ name, familiar, expected }) => {
+        expect(defaultIsHeader(name, familiar)).toBe(expected);
       },
     );
   });
@@ -696,16 +711,18 @@ describe("Documentation helpers", () => {
       ).toMatchSnapshot();
     });
 
-    test("Feature 1180: should depict header params when enabled", () => {
+    test("Features 1180 and 2344: should depict header params when enabled", () => {
       expect(
         depictRequestParams({
           schema: z.object({
             "x-request-id": z.string(),
             id: z.string(),
             test: z.boolean(),
+            secure: z.string(),
           }),
           inputSources: ["query", "headers", "params"],
           composition: "inline",
+          security: [[{ type: "header", name: "secure" }]],
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -801,26 +818,18 @@ describe("Documentation helpers", () => {
   describe("depictSecurity()", () => {
     test("should handle Basic, Bearer and CustomHeader Securities", () => {
       expect(
-        depictSecurity({
-          or: [
-            { and: [{ type: "basic" }, { type: "bearer" }] },
-            { type: "header", name: "X-Key" },
-          ],
-        }),
+        depictSecurity([
+          [{ type: "basic" }, { type: "bearer" }],
+          [{ type: "header", name: "X-Key" }],
+        ]),
       ).toMatchSnapshot();
     });
     test("should handle Input and Cookie Securities", () => {
       expect(
-        depictSecurity({
-          and: [
-            {
-              or: [
-                { type: "input", name: "apiKey" },
-                { type: "cookie", name: "hash" },
-              ],
-            },
-          ],
-        }),
+        depictSecurity([
+          [{ type: "input", name: "apiKey" }],
+          [{ type: "cookie", name: "hash" }],
+        ]),
       ).toMatchSnapshot();
     });
     test.each([
@@ -831,7 +840,7 @@ describe("Documentation helpers", () => {
       ({ inputSources }) => {
         expect(
           depictSecurity(
-            { type: "input", name: "key" },
+            [[{ type: "input", name: "key" }]],
             Array.from(inputSources),
           ),
         ).toMatchSnapshot();
@@ -839,142 +848,115 @@ describe("Documentation helpers", () => {
     );
     test("should handle OpenID and OAuth2 Securities", () => {
       expect(
-        depictSecurity({
-          or: [{ type: "openid", url: "https://test.url" }, { type: "oauth2" }],
-        }),
+        depictSecurity([
+          [{ type: "openid", url: "https://test.url" }],
+          [{ type: "oauth2" }],
+        ]),
       ).toMatchSnapshot();
     });
     test("should depict OAuth2 Security with flows", () => {
       expect(
-        depictSecurity({
-          type: "oauth2",
-          flows: {
-            implicit: {
-              authorizationUrl: "https://test.url",
-              refreshUrl: "https://test2.url",
-              scopes: {
-                read: "read something",
-                write: "write something",
+        depictSecurity([
+          [
+            {
+              type: "oauth2",
+              flows: {
+                implicit: {
+                  authorizationUrl: "https://test.url",
+                  refreshUrl: "https://test2.url",
+                  scopes: { read: "read something", write: "write something" },
+                },
+                authorizationCode: {
+                  authorizationUrl: "https://test.url",
+                  refreshUrl: "https://test2.url",
+                  tokenUrl: "https://test3.url",
+                  scopes: { read: "read something", write: "write something" },
+                },
+                clientCredentials: {
+                  refreshUrl: "https://test2.url",
+                  tokenUrl: "https://test3.url",
+                  scopes: { read: "read something", write: "write something" },
+                },
+                password: {
+                  refreshUrl: "https://test2.url",
+                  tokenUrl: "https://test3.url",
+                  scopes: { read: "read something", write: "write something" },
+                },
               },
             },
-            authorizationCode: {
-              authorizationUrl: "https://test.url",
-              refreshUrl: "https://test2.url",
-              tokenUrl: "https://test3.url",
-              scopes: {
-                read: "read something",
-                write: "write something",
-              },
-            },
-            clientCredentials: {
-              refreshUrl: "https://test2.url",
-              tokenUrl: "https://test3.url",
-              scopes: {
-                read: "read something",
-                write: "write something",
-              },
-            },
-            password: {
-              refreshUrl: "https://test2.url",
-              tokenUrl: "https://test3.url",
-              scopes: {
-                read: "read something",
-                write: "write something",
-              },
-            },
-          },
-        }),
+          ],
+        ]),
       ).toMatchSnapshot();
     });
     test("should handle undefined flows", () => {
       expect(
-        depictSecurity({
-          type: "oauth2",
-          flows: {
-            implicit: undefined,
-            password: undefined,
-          },
-        }),
+        depictSecurity([
+          [
+            {
+              type: "oauth2",
+              flows: { implicit: undefined, password: undefined },
+            },
+          ],
+        ]),
       ).toMatchSnapshot();
     });
     test("should add scopes when missing", () => {
       expect(
-        depictSecurity({
-          type: "oauth2",
-          flows: {
-            password: {
-              tokenUrl: "https://test.url",
+        depictSecurity([
+          [
+            {
+              type: "oauth2",
+              flows: { password: { tokenUrl: "https://test.url" } },
             },
-          },
-        }),
+          ],
+        ]),
       ).toMatchSnapshot();
     });
   });
 
   describe("depictSecurityRefs()", () => {
-    test("should handle LogicalAnd", () => {
+    test("should handle alternatives", () => {
       expect(
-        depictSecurityRefs({
-          and: [
-            { name: "A", scopes: [] },
-            { name: "B", scopes: [] },
-            { name: "C", scopes: [] },
-          ],
-        }),
+        depictSecurityRefs(
+          [[{ type: "apiKey" }, { type: "oauth2" }, { type: "openIdConnect" }]],
+          [],
+          prop("type"),
+        ),
       ).toMatchSnapshot();
       expect(
-        depictSecurityRefs({
-          and: [
-            { name: "A", scopes: [] },
-            {
-              or: [
-                { name: "B", scopes: [] },
-                { name: "C", scopes: [] },
-              ],
-            },
+        depictSecurityRefs(
+          [
+            [{ type: "apiKey" }, { type: "oauth2" }],
+            [{ type: "apiKey" }, { type: "openIdConnect" }],
           ],
-        }),
-      ).toMatchSnapshot();
-    });
-
-    test("should handle LogicalOr", () => {
-      expect(
-        depictSecurityRefs({
-          or: [
-            { name: "A", scopes: [] },
-            { name: "B", scopes: [] },
-            { name: "C", scopes: [] },
-          ],
-        }),
+          [],
+          prop("type"),
+        ),
       ).toMatchSnapshot();
       expect(
-        depictSecurityRefs({
-          or: [
-            { name: "A", scopes: [] },
-            {
-              and: [
-                { name: "B", scopes: [] },
-                { name: "C", scopes: [] },
-              ],
-            },
+        depictSecurityRefs(
+          [
+            [{ type: "apiKey" }],
+            [{ type: "oauth2" }],
+            [{ type: "openIdConnect" }],
           ],
-        }),
+          [],
+          prop("type"),
+        ),
       ).toMatchSnapshot();
-    });
-
-    test("should handle the plain value", () => {
-      expect(depictSecurityRefs({ name: "A", scopes: [] })).toMatchSnapshot();
     });
 
     test("should populate the scopes", () => {
       expect(
-        depictSecurityRefs({
-          or: [
-            { name: "A", scopes: ["write"] },
-            { name: "B", scopes: ["read"] },
-            { name: "C", scopes: ["read", "write"] },
+        depictSecurityRefs(
+          [
+            [{ type: "apiKey" }],
+            [{ type: "oauth2" }],
+            [{ type: "openIdConnect" }],
           ],
-        }),
+          ["read", "write"],
+          prop("type"),
+        ),
       ).toMatchSnapshot();
     });
   });

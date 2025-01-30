@@ -369,6 +369,23 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
 }
 `;
 
+exports[`Documentation helpers > depictIntersection() > should flatten objects with same prop of same type 1`] = `
+{
+  "properties": {
+    "one": {
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": -1.7976931348623157e+308,
+      "type": "number",
+    },
+  },
+  "required": [
+    "one",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`Documentation helpers > depictIntersection() > should flatten three object schemas with examples 1`] = `
 {
   "examples": [
@@ -848,7 +865,7 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 }
 `;
 
-exports[`Documentation helpers > depictRequestParams() > Feature 1180: should depict header params when enabled 1`] = `
+exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344: should depict header params when enabled 1`] = `
 [
   {
     "description": "GET /v1/user/:id Parameter",
@@ -878,6 +895,16 @@ exports[`Documentation helpers > depictRequestParams() > Feature 1180: should de
     "required": true,
     "schema": {
       "type": "boolean",
+    },
+  },
+  {
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
+    "in": "header",
+    "name": "secure",
+    "required": true,
+    "schema": {
+      "type": "string",
     },
   },
 ]
@@ -926,198 +953,196 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
 `;
 
 exports[`Documentation helpers > depictSecurity() > should add scopes when missing 1`] = `
-{
-  "flows": {
-    "password": {
-      "scopes": {},
-      "tokenUrl": "https://test.url",
+[
+  [
+    {
+      "flows": {
+        "password": {
+          "scopes": {},
+          "tokenUrl": "https://test.url",
+        },
+      },
+      "type": "oauth2",
     },
-  },
-  "type": "oauth2",
-}
+  ],
+]
 `;
 
 exports[`Documentation helpers > depictSecurity() > should depict OAuth2 Security with flows 1`] = `
-{
-  "flows": {
-    "authorizationCode": {
-      "authorizationUrl": "https://test.url",
-      "refreshUrl": "https://test2.url",
-      "scopes": {
-        "read": "read something",
-        "write": "write something",
+[
+  [
+    {
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://test.url",
+          "refreshUrl": "https://test2.url",
+          "scopes": {
+            "read": "read something",
+            "write": "write something",
+          },
+          "tokenUrl": "https://test3.url",
+        },
+        "clientCredentials": {
+          "refreshUrl": "https://test2.url",
+          "scopes": {
+            "read": "read something",
+            "write": "write something",
+          },
+          "tokenUrl": "https://test3.url",
+        },
+        "implicit": {
+          "authorizationUrl": "https://test.url",
+          "refreshUrl": "https://test2.url",
+          "scopes": {
+            "read": "read something",
+            "write": "write something",
+          },
+        },
+        "password": {
+          "refreshUrl": "https://test2.url",
+          "scopes": {
+            "read": "read something",
+            "write": "write something",
+          },
+          "tokenUrl": "https://test3.url",
+        },
       },
-      "tokenUrl": "https://test3.url",
+      "type": "oauth2",
     },
-    "clientCredentials": {
-      "refreshUrl": "https://test2.url",
-      "scopes": {
-        "read": "read something",
-        "write": "write something",
-      },
-      "tokenUrl": "https://test3.url",
-    },
-    "implicit": {
-      "authorizationUrl": "https://test.url",
-      "refreshUrl": "https://test2.url",
-      "scopes": {
-        "read": "read something",
-        "write": "write something",
-      },
-    },
-    "password": {
-      "refreshUrl": "https://test2.url",
-      "scopes": {
-        "read": "read something",
-        "write": "write something",
-      },
-      "tokenUrl": "https://test3.url",
-    },
-  },
-  "type": "oauth2",
-}
+  ],
+]
 `;
 
 exports[`Documentation helpers > depictSecurity() > should handle Basic, Bearer and CustomHeader Securities 1`] = `
-{
-  "or": [
+[
+  [
     {
-      "and": [
-        {
-          "scheme": "basic",
-          "type": "http",
-        },
-        {
-          "scheme": "bearer",
-          "type": "http",
-        },
-      ],
+      "scheme": "basic",
+      "type": "http",
     },
+    {
+      "scheme": "bearer",
+      "type": "http",
+    },
+  ],
+  [
     {
       "in": "header",
       "name": "X-Key",
       "type": "apiKey",
     },
   ],
-}
+]
 `;
 
 exports[`Documentation helpers > depictSecurity() > should handle Input and Cookie Securities 1`] = `
-{
-  "and": [
+[
+  [
     {
-      "or": [
-        {
-          "in": "query",
-          "name": "apiKey",
-          "type": "apiKey",
-        },
-        {
-          "in": "cookie",
-          "name": "hash",
-          "type": "apiKey",
-        },
-      ],
+      "in": "query",
+      "name": "apiKey",
+      "type": "apiKey",
     },
   ],
-}
+  [
+    {
+      "in": "cookie",
+      "name": "hash",
+      "type": "apiKey",
+    },
+  ],
+]
 `;
 
 exports[`Documentation helpers > depictSecurity() > should handle OpenID and OAuth2 Securities 1`] = `
-{
-  "or": [
+[
+  [
     {
       "openIdConnectUrl": "https://test.url",
       "type": "openIdConnect",
     },
+  ],
+  [
     {
       "flows": {},
       "type": "oauth2",
     },
   ],
-}
+]
 `;
 
 exports[`Documentation helpers > depictSecurity() > should handle undefined flows 1`] = `
-{
-  "flows": {},
-  "type": "oauth2",
-}
+[
+  [
+    {
+      "flows": {},
+      "type": "oauth2",
+    },
+  ],
+]
 `;
 
 exports[`Documentation helpers > depictSecurity() > should inform on 'actual' placement of the input security parameter 1`] = `
-{
-  "description": "key MUST be supplied within the request body instead of query",
-  "in": "query",
-  "name": "key",
-  "type": "apiKey",
-  "x-in-actual": "body",
-}
+[
+  [
+    {
+      "description": "key MUST be supplied within the request body instead of query",
+      "in": "query",
+      "name": "key",
+      "type": "apiKey",
+      "x-in-actual": "body",
+    },
+  ],
+]
 `;
 
 exports[`Documentation helpers > depictSecurity() > should inform on 'alternative' placement of the input security parameter 1`] = `
-{
-  "description": "key CAN also be supplied within the request body",
-  "in": "query",
-  "name": "key",
-  "type": "apiKey",
-  "x-in-alternative": "body",
-}
+[
+  [
+    {
+      "description": "key CAN also be supplied within the request body",
+      "in": "query",
+      "name": "key",
+      "type": "apiKey",
+      "x-in-alternative": "body",
+    },
+  ],
+]
 `;
 
-exports[`Documentation helpers > depictSecurityRefs() > should handle LogicalAnd 1`] = `
+exports[`Documentation helpers > depictSecurityRefs() > should handle alternatives 1`] = `
 [
   {
-    "A": [],
-    "B": [],
-    "C": [],
+    "apiKey": [],
+    "oauth2": [],
+    "openIdConnect": [],
   },
 ]
 `;
 
-exports[`Documentation helpers > depictSecurityRefs() > should handle LogicalAnd 2`] = `
+exports[`Documentation helpers > depictSecurityRefs() > should handle alternatives 2`] = `
 [
   {
-    "A": [],
-    "B": [],
+    "apiKey": [],
+    "oauth2": [],
   },
   {
-    "A": [],
-    "C": [],
+    "apiKey": [],
+    "openIdConnect": [],
   },
 ]
 `;
 
-exports[`Documentation helpers > depictSecurityRefs() > should handle LogicalOr 1`] = `
+exports[`Documentation helpers > depictSecurityRefs() > should handle alternatives 3`] = `
 [
   {
-    "A": [],
+    "apiKey": [],
   },
   {
-    "B": [],
+    "oauth2": [],
   },
   {
-    "C": [],
-  },
-]
-`;
-
-exports[`Documentation helpers > depictSecurityRefs() > should handle LogicalOr 2`] = `
-[
-  {
-    "A": [],
-  },
-  {
-    "B": [],
-    "C": [],
-  },
-]
-`;
-
-exports[`Documentation helpers > depictSecurityRefs() > should handle the plain value 1`] = `
-[
-  {
-    "A": [],
+    "openIdConnect": [],
   },
 ]
 `;
@@ -1125,17 +1150,16 @@ exports[`Documentation helpers > depictSecurityRefs() > should handle the plain 
 exports[`Documentation helpers > depictSecurityRefs() > should populate the scopes 1`] = `
 [
   {
-    "A": [
+    "apiKey": [],
+  },
+  {
+    "oauth2": [
+      "read",
       "write",
     ],
   },
   {
-    "B": [
-      "read",
-    ],
-  },
-  {
-    "C": [
+    "openIdConnect": [
       "read",
       "write",
     ],

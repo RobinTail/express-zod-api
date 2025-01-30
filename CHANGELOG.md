@@ -2,6 +2,102 @@
 
 ## Version 22
 
+### v22.4.1
+
+- Fixed a bug that could lead to duplicate properties in generated client types:
+  - If the middleware and/or endpoint schemas had the same property, it was duplicated by Integration.
+  - The issue was introduced in [v20.15.3](#v20153) and reported by [@bobgubko](https://github.com/bobgubko).
+
+```ts
+// reproduction
+factory
+  .addMiddleware({
+    input: z.object({ query: z.string() }), // ...
+  })
+  .build({
+    input: z.object({ query: z.string() }), // ...
+  });
+```
+
+```ts
+type Before = {
+  query: string;
+  query: string; // <— bug #2352
+};
+type After = {
+  query: string;
+};
+```
+
+### v22.4.0
+
+- Feat: ability to supply extra data to a custom implementation of the generated client:
+  - You can instantiate the client class with an implementation accepting an optional context of your choice;
+  - The public `.provide()` method can now accept an additional argument having the type of that context;
+  - The problem on missing such ability was reported by [@LucWag](https://github.com/LucWag).
+
+```ts
+import { Client, Implementation } from "./generated-client.ts";
+
+interface MyCtx {
+  extraKey: string;
+}
+
+const implementation: Implementation<MyCtx> = async (
+  method,
+  path,
+  params,
+  ctx, // ctx is optional MyCtx
+) => {};
+
+const client = new Client(implementation);
+
+client.provide("get /v1/user/retrieve", { id: "10" }, { extraKey: "123456" });
+```
+
+### v22.3.1
+
+- Fixed issue on emitting server-sent events (SSE), introduced in v21.5.0:
+  - Emitting SSE failed due to internal error `flush is not a function` having `compression` disabled in config;
+  - The `.flush()` method of `response` is a feature of `compression` (optional peer dependency);
+  - It is required to call the method when `compression` is enabled;
+  - This version fixes the issue by calling the method conditionally;
+  - This bug was reported by [@bobgubko](https://github.com/bobgubko).
+
+### v22.3.0
+
+- Feat: `Subscription` class for consuming Server-sent events:
+  - The `Integration` can now also generate a frontend helper class `Subscription` to ease SSE support;
+  - The new class establishes an `EventSource` instance and exposes it as the public `source` property;
+  - The class also provides the public `on` method for your typed listeners;
+  - You can configure the generated class name using `subscriptionClassName` option (default: `Subscription`);
+  - The feature is only applicable to the `variant` option set to `client` (default).
+
+```ts
+import { Subscription } from "./client.ts"; // the generated file
+
+new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
+```
+
+### v22.2.0
+
+- Feat: detecting headers from `Middleware::security` declarations:
+  - When `headers` are enabled within `inputSources` of config, the `Documentation` generator can now identify them
+    among other inputs additionally by using the security declarations of middlewares attached to an `Endpoint`;
+  - This approach enables handling of custom headers without `x-` prefix.
+
+```ts
+const authMiddleware = new Middleware({
+  security: { type: "header", name: "token" },
+});
+```
+
+### v22.1.1
+
+- This version contains an important technical simplification of routines related to processing of `security`
+  declarations of the used `Middleware` when generating API `Documentation`.
+  - No changes to the operation are expected. This refactoring is required for a feature that will be released later.
+
 ### v22.1.0
 
 - Feat: ability to configure the generated client class name:

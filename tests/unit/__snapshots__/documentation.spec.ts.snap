@@ -1742,21 +1742,21 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-  /v1/events/time:
+  /v1/events/stream:
     get:
-      operationId: GetV1EventsTime
+      operationId: GetV1EventsStream
       tags:
         - subscriptions
       parameters:
         - name: trigger
           in: query
           required: false
-          description: GET /v1/events/time Parameter
+          description: GET /v1/events/stream Parameter
           schema:
             type: string
       responses:
         "200":
-          description: GET /v1/events/time Positive response
+          description: GET /v1/events/stream Positive response
           content:
             text/event-stream:
               schema:
@@ -1781,7 +1781,7 @@ paths:
                   - data
                   - event
         "400":
-          description: GET /v1/events/time Negative response
+          description: GET /v1/events/stream Negative response
           content:
             text/plain:
               schema:
@@ -2132,31 +2132,31 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-  /v1/events/time:
+  /v1/events/stream:
     get:
-      operationId: GetV1EventsTime
+      operationId: GetV1EventsStream
       tags:
         - subscriptions
       parameters:
         - name: trigger
           in: query
           required: false
-          description: GET /v1/events/time Parameter
+          description: GET /v1/events/stream Parameter
           schema:
-            $ref: "#/components/schemas/GetV1EventsTimeParameterTrigger"
+            $ref: "#/components/schemas/GetV1EventsStreamParameterTrigger"
       responses:
         "200":
-          description: GET /v1/events/time Positive response
+          description: GET /v1/events/stream Positive response
           content:
             text/event-stream:
               schema:
-                $ref: "#/components/schemas/GetV1EventsTimePositiveResponse"
+                $ref: "#/components/schemas/GetV1EventsStreamPositiveResponse"
         "400":
-          description: GET /v1/events/time Negative response
+          description: GET /v1/events/stream Negative response
           content:
             text/plain:
               schema:
-                $ref: "#/components/schemas/GetV1EventsTimeNegativeResponse"
+                $ref: "#/components/schemas/GetV1EventsStreamNegativeResponse"
 components:
   schemas:
     GetV1UserRetrieveParameterId:
@@ -2514,9 +2514,9 @@ components:
     PostV1AvatarRawRequestBody:
       type: string
       format: binary
-    GetV1EventsTimeParameterTrigger:
+    GetV1EventsStreamParameterTrigger:
       type: string
-    GetV1EventsTimePositiveResponse:
+    GetV1EventsStreamPositiveResponse:
       type: object
       properties:
         data:
@@ -2537,7 +2537,7 @@ components:
       required:
         - data
         - event
-    GetV1EventsTimeNegativeResponse:
+    GetV1EventsStreamNegativeResponse:
       type: string
   responses: {}
   parameters: {}
