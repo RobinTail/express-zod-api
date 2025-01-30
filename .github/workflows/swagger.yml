@@ -2,9 +2,9 @@ name: OpenAPI Validation
 
 on:
   push:
-    branches: [ master, v17, v18, v19 ]
+    branches: [ master, v17, v18, v19, v20 ]
   pull_request:
-    branches: [ master, v17, v18, v19 ]
+    branches: [ master, v17, v18, v19, v20 ]
 
 
 jobs:
