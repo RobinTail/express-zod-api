@@ -267,13 +267,15 @@ describe("zod-to-ts", () => {
     });
   });
 
-  describe("Issue #2352: intersection of objects having same prop", () => {
-    test("should deduplicate the prop with a same name", () => {
-      const schema = z
-        .object({ query: z.string() })
-        .and(z.object({ query: z.string() }));
+  describe("Issue #2352: intersection of objects having same prop %#", () => {
+    test.each([
+      [z.string(), z.string()],
+      [z.string().nonempty(), z.string().email()],
+      [z.string().transform(Number), z.string().pipe(z.coerce.date())],
+    ])("should deduplicate the prop with a same name", (a, b) => {
+      const schema = z.object({ query: a }).and(z.object({ query: b }));
       const node = zodToTs(schema, { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNodeTest(node)).toBe("{\n    query: string;\n}");
     });
 
     test("should not flatten the result for objects with a conflicting prop", () => {
