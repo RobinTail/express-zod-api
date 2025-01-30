@@ -153,16 +153,13 @@ const tryFlattenIntersection = (nodes: ts.TypeNode[]) => {
   if (!areObjects) throw new Error("Not objects");
   const members = chain(prop("members"), nodes);
   const uniqs = uniqWith((...props) => {
-    const hasSameName = eqBy(nodePath.name, ...props);
-    if (hasSameName) {
-      const areSimilar = both(
-        eqBy(nodePath.type),
-        eqBy(nodePath.optional),
-      )(...props);
-      if (areSimilar) return true;
-      throw new Error("Has conflicting prop");
-    }
-    return false;
+    if (!eqBy(nodePath.name, ...props)) return false;
+    const areSimilar = both(
+      eqBy(nodePath.type),
+      eqBy(nodePath.optional),
+    )(...props);
+    if (areSimilar) return true;
+    throw new Error("Has conflicting prop");
   }, members);
   return f.createTypeLiteralNode(uniqs);
 };
