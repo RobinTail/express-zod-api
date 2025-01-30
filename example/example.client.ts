@@ -429,10 +429,11 @@ const substitute = (path: string, params: Record<string, any>) => {
   return [path, rest] as const;
 };
 
-export type Implementation = (
+export type Implementation<T = unknown> = (
   method: Method,
   path: string,
   params: Record<string, any>,
+  ctx?: T,
 ) => Promise<any>;
 
 const defaultImplementation: Implementation = async (method, path, params) => {
@@ -452,16 +453,17 @@ const defaultImplementation: Implementation = async (method, path, params) => {
   return response[isJSON ? "json" : "text"]();
 };
 
-export class Client {
+export class Client<T> {
   public constructor(
-    protected readonly implementation: Implementation = defaultImplementation,
+    protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}
   public provide<K extends Request>(
     request: K,
     params: Input[K],
+    ctx?: T,
   ): Promise<Response[K]> {
     const [method, path] = parseRequest(request);
-    return this.implementation(method, ...substitute(path, params));
+    return this.implementation(method, ...substitute(path, params), ctx);
   }
 }
 
