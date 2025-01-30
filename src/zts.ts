@@ -1,4 +1,4 @@
-import { both, chain, eqBy, path, prop, uniqWith } from "ramda";
+import { chain, eqBy, path, prop, uniqWith } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
@@ -154,11 +154,8 @@ const tryFlattenIntersection = (nodes: ts.TypeNode[]) => {
   const members = chain(prop("members"), nodes);
   const uniqs = uniqWith((...props) => {
     if (!eqBy(nodePath.name, ...props)) return false;
-    const areSimilar = both(
-      eqBy(nodePath.type),
-      eqBy(nodePath.optional),
-    )(...props);
-    if (areSimilar) return true;
+    if (eqBy(nodePath.type, ...props) && eqBy(nodePath.optional, ...props))
+      return true;
     throw new Error("Has conflicting prop");
   }, members);
   return f.createTypeLiteralNode(uniqs);
