@@ -74,7 +74,7 @@ describe("Index Entrypoint", () => {
       expectTypeOf<{
         type: "header";
         name: "some";
-      }>().toMatchTypeOf<HeaderSecurity>();
+      }>().toMatchTypeOf<HeaderSecurity<string>>();
       expectTypeOf<{ type: "input"; name: "some" }>().toMatchTypeOf<
         InputSecurity<string>
       >();
