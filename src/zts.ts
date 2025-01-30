@@ -135,15 +135,22 @@ const onRecord: Producer = (
   { next },
 ) => ensureTypeNode("Record", [keySchema, valueSchema].map(next));
 
+/** @throws Error */
+const tryFlattenIntersection = (nodes: ts.TypeNode[]) => {
+  const areObjects = nodes.every(ts.isTypeLiteralNode);
+  if (!areObjects) throw new Error("Not objects");
+  return f.createTypeLiteralNode(chain(prop("members"), nodes)); // similar to flattened pluck()
+};
+
 const onIntersection: Producer = (
   { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
   { next },
 ) => {
   const nodes = [left, right].map(next);
-  const areObjects = nodes.every(ts.isTypeLiteralNode);
-  return areObjects
-    ? f.createTypeLiteralNode(chain(prop("members"), nodes)) // similar to flattened pluck()
-    : f.createIntersectionTypeNode(nodes);
+  try {
+    return tryFlattenIntersection(nodes);
+  } catch {}
+  return f.createIntersectionTypeNode(nodes);
 };
 
 const onDefault: Producer = ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
