@@ -369,6 +369,23 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
 }
 `;
 
+exports[`Documentation helpers > depictIntersection() > should flatten objects with same prop of same type 1`] = `
+{
+  "properties": {
+    "one": {
+      "format": "double",
+      "maximum": 1.7976931348623157e+308,
+      "minimum": -1.7976931348623157e+308,
+      "type": "number",
+    },
+  },
+  "required": [
+    "one",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`Documentation helpers > depictIntersection() > should flatten three object schemas with examples 1`] = `
 {
   "examples": [

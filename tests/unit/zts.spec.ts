@@ -267,6 +267,44 @@ describe("zod-to-ts", () => {
     });
   });
 
+  describe("Issue #2352: intersection of objects having same prop %#", () => {
+    test.each([
+      [z.string(), z.string()],
+      [z.string().nonempty(), z.string().email()],
+      [z.string().transform(Number), z.string().pipe(z.coerce.date())],
+      [z.object({}), z.object({})],
+    ])("should deduplicate the prop with a same name", (a, b) => {
+      const schema = z.object({ query: a }).and(z.object({ query: b }));
+      const node = zodToTs(schema, { ctx });
+      expect(printNodeTest(node)).toMatchSnapshot();
+    });
+
+    test.each([
+      [
+        z.object({ query: z.string() }),
+        z.object({ query: z.number() }), // prop type
+      ],
+      [
+        z.object({ query: z.object({ sub: z.string() }) }),
+        z.object({ query: z.object({ sub: z.number() }) }), // different complex
+      ],
+      [
+        z.object({ query: z.string() }),
+        z.object({ query: z.string().optional() }), // question mark
+      ],
+      [
+        z.object({ query: z.string() }),
+        z.object({ query: z.string() }).partial(), // also question mark
+      ],
+    ])(
+      "should not flatten the result for objects with a conflicting prop %#",
+      (a, b) => {
+        const node = zodToTs(a.and(b), { ctx });
+        expect(printNodeTest(node)).toMatchSnapshot();
+      },
+    );
+  });
+
   describe("PrimitiveSchema", () => {
     const primitiveSchema = z.object({
       string: z.string(),

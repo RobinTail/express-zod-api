@@ -1,4 +1,4 @@
-import { chain, prop } from "ramda";
+import { chain, eqBy, path, prop, uniqWith } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
@@ -28,6 +28,18 @@ const samples = {
   [ts.SyntaxKind.StringKeyword]: "",
   [ts.SyntaxKind.UndefinedKeyword]: undefined,
 } satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
+
+const nodePath = {
+  name: path([
+    "name" satisfies keyof ts.TypeElement,
+    "text" satisfies keyof Exclude<
+      NonNullable<ts.TypeElement["name"]>,
+      ts.ComputedPropertyName
+    >,
+  ]),
+  type: path(["type" satisfies keyof ts.PropertySignature]),
+  optional: path(["questionToken" satisfies keyof ts.TypeElement]),
+};
 
 const onLiteral: Producer = ({ value }: z.ZodLiteral<LiteralType>) =>
   f.createLiteralTypeNode(
@@ -170,15 +182,29 @@ const onRecord: Producer = (
     [keySchema, valueSchema].map(next),
   );
 
+/** @throws Error */
+const tryFlattenIntersection = (nodes: ts.TypeNode[]) => {
+  const areObjects = nodes.every(ts.isTypeLiteralNode);
+  if (!areObjects) throw new Error("Not objects");
+  const members = chain(prop("members"), nodes);
+  const uniqs = uniqWith((...props) => {
+    if (!eqBy(nodePath.name, ...props)) return false;
+    if (eqBy(nodePath.type, ...props) && eqBy(nodePath.optional, ...props))
+      return true;
+    throw new Error("Has conflicting prop");
+  }, members);
+  return f.createTypeLiteralNode(uniqs);
+};
+
 const onIntersection: Producer = (
   { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
   { next },
 ) => {
   const nodes = [left, right].map(next);
-  const areObjects = nodes.every(ts.isTypeLiteralNode);
-  return areObjects
-    ? f.createTypeLiteralNode(chain(prop("members"), nodes)) // similar to flattened pluck()
-    : f.createIntersectionTypeNode(nodes);
+  try {
+    return tryFlattenIntersection(nodes);
+  } catch {}
+  return f.createIntersectionTypeNode(nodes);
 };
 
 const onDefault: Producer = ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>

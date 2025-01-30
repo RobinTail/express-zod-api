@@ -2,6 +2,33 @@
 
 ## Version 21
 
+### v21.11.3
+
+- Fixed a bug that could lead to duplicate properties in generated client types:
+  - If the middleware and/or endpoint schemas had the same property, it was duplicated by Integration.
+  - The issue was introduced in [v20.15.3](#v20153) and reported by [@bobgubko](https://github.com/bobgubko).
+
+```ts
+// reproduction
+factory
+  .addMiddleware({
+    input: z.object({ query: z.string() }), // ...
+  })
+  .build({
+    input: z.object({ query: z.string() }), // ...
+  });
+```
+
+```ts
+type Before = {
+  query: string;
+  query: string; // <— bug #2352
+};
+type After = {
+  query: string;
+};
+```
+
 ### v21.11.2
 
 - Fixed issue on emitting server-sent events (SSE), introduced in v21.5.0:
