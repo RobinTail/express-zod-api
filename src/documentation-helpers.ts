@@ -182,7 +182,6 @@ export const depictDiscriminatedUnion: Depicter = (
 };
 
 const propsMerger = (a: unknown, b: unknown) => {
-  console.log("merging", a, b);
   if (Array.isArray(a) && Array.isArray(b)) return concat(a, b);
   if (a === b) return b;
   throw new Error("Can not flatten properties");
