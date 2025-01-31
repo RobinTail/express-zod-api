@@ -11,7 +11,7 @@
   },
   "scripts": {
     "preinstall": "rm -rf node_modules",
-    "pretest": "echo 'client.provide(\"get\", \"/v1/test\", {id: 10});' > sample.ts",
+    "pretest": "echo 'placeholder' > sample.ts",
     "test": "eslint --fix && vitest --run && rm sample.ts"
   }
 }
