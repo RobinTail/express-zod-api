@@ -93,8 +93,6 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   initRouting({ app, routing, getLogger, config, parsers });
   app.use(parserFailureHandler, notFoundHandler);
 
-  logger.info("stack", app.router.stack);
-
   const created: Array<http.Server | https.Server> = [];
   const makeStarter =
     (server: (typeof created)[number], subject: HttpConfig["listen"]) => () =>
