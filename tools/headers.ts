@@ -118,11 +118,6 @@ const responseOnlyHeaders = {
     proof: "Defined in RFC 7231, Section 7.4.2.",
     reason: "Identifies the server software handling the response.",
   },
-  "server-timing": {
-    description:
-      "Communicates one or more metrics related to the server-side processing of the current request.",
-    proof: "RFC 7230: Server provides server timing information.",
-  },
   "set-cookie": {
     proof: "Defined in RFC 6265, Section 4.1.",
     reason: "Used to set cookies in responses.",
