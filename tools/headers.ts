@@ -19,6 +19,31 @@ const responseOnlyHeaders = {
     reason:
       "The server uses this to tell the client it supports partial requests (e.g., byte ranges).",
   },
+  "access-control-allow-credentials": {
+    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
+    reason: "Used in responses to indicate support for credentials in CORS.",
+  },
+  "access-control-allow-headers": {
+    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
+    reason: "Specifies allowed headers in preflight CORS responses.",
+  },
+  "access-control-allow-methods": {
+    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
+    reason: "Specifies allowed HTTP methods in preflight CORS responses.",
+  },
+  "access-control-allow-origin": {
+    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
+    reason: "Indicates allowed origins for CORS requests.",
+  },
+  "access-control-expose-headers": {
+    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
+    reason: "Lists headers exposed to the client in CORS responses.",
+  },
+  "access-control-max-age": {
+    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
+    reason:
+      "Specifies how long preflight results can be cached in CORS responses.",
+  },
   age: {
     proof: "Defined in RFC 7234, Section 5.1.",
     reason:
@@ -105,6 +130,10 @@ const responseOnlyHeaders = {
     reason:
       "Used by the server to provide information about proxy authentication.",
   },
+  "proxy-status": {
+    proof: "Defined in RFC 8586, Section 5.6.",
+    reason: "Communicates proxy-specific status information in responses.",
+  },
   refresh: {
     proof: "A non-standard but widely used header (MDN Docs).",
     reason: "Indicates redirection or automatic page refresh.",
@@ -114,9 +143,17 @@ const responseOnlyHeaders = {
     reason:
       "Used in responses to indicate when the client should retry a request.",
   },
+  "sec-websocket-accept": {
+    proof: "Defined in RFC 6455, Section 11.3.3.",
+    reason: "Used in WebSocket handshake responses to confirm acceptance.",
+  },
   server: {
     proof: "Defined in RFC 7231, Section 7.4.2.",
     reason: "Identifies the server software handling the response.",
+  },
+  "server-timing": {
+    proof: "Defined in W3C Server Timing Specification.",
+    reason: "Provides server-side timing metrics in responses.",
   },
   "set-cookie": {
     proof: "Defined in RFC 6265, Section 4.1.",
@@ -131,6 +168,10 @@ const responseOnlyHeaders = {
     proof: "Defined in RFC 6797, Section 6.1.",
     reason: "Enforces HTTPS policies in responses.",
   },
+  "surrogate-control": {
+    proof: "Defined in CDN-specific documentation (e.g., Akamai, Cloudflare).",
+    reason: "Used to manage CDN-specific cache behavior in responses.",
+  },
   "timing-allow-origin": {
     proof: "Defined in the Resource Timing Level 1 Spec.",
     reason:
@@ -144,47 +185,6 @@ const responseOnlyHeaders = {
   "www-authenticate": {
     proof: "Defined in RFC 7235, Section 4.1.",
     reason: "Used in responses for authentication challenges.",
-  },
-  "proxy-status": {
-    proof: "Defined in RFC 8586, Section 5.6.",
-    reason: "Communicates proxy-specific status information in responses.",
-  },
-  "sec-websocket-accept": {
-    proof: "Defined in RFC 6455, Section 11.3.3.",
-    reason: "Used in WebSocket handshake responses to confirm acceptance.",
-  },
-  "server-timing": {
-    proof: "Defined in W3C Server Timing Specification.",
-    reason: "Provides server-side timing metrics in responses.",
-  },
-  "access-control-allow-credentials": {
-    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
-    reason: "Used in responses to indicate support for credentials in CORS.",
-  },
-  "access-control-allow-headers": {
-    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
-    reason: "Specifies allowed headers in preflight CORS responses.",
-  },
-  "access-control-allow-methods": {
-    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
-    reason: "Specifies allowed HTTP methods in preflight CORS responses.",
-  },
-  "access-control-allow-origin": {
-    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
-    reason: "Indicates allowed origins for CORS requests.",
-  },
-  "access-control-expose-headers": {
-    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
-    reason: "Lists headers exposed to the client in CORS responses.",
-  },
-  "access-control-max-age": {
-    proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
-    reason:
-      "Specifies how long preflight results can be cached in CORS responses.",
-  },
-  "surrogate-control": {
-    proof: "Defined in CDN-specific documentation (e.g., Akamai, Cloudflare).",
-    reason: "Used to manage CDN-specific cache behavior in responses.",
   },
 };
 
