@@ -4,52 +4,15 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils";
-import { Method, methods } from "./method";
-import { name as self } from "../package.json";
 
 interface Queries {
-  provide: TSESTree.CallExpression & {
-    arguments: [
-      TSESTree.Literal & { value: Method },
-      TSESTree.Literal,
-      TSESTree.ObjectExpression,
-    ];
-  };
-  splitResponse: TSESTree.Property & { key: TSESTree.Identifier };
-  methodPath: TSESTree.ImportSpecifier & { imported: TSESTree.Identifier };
-  createConfig: TSESTree.Property & {
-    key: TSESTree.Identifier;
-    value: TSESTree.ObjectExpression;
-  };
-  newDocs: TSESTree.ObjectExpression;
-  newFactory: TSESTree.Property & { key: TSESTree.Identifier };
-  newSSE: TSESTree.Property & { key: TSESTree.Identifier };
-  newClient: TSESTree.NewExpression;
+  placeholder: TSESTree.Identifier;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  provide:
-    `${NT.CallExpression}[callee.property.name='provide'][arguments.length=3]` +
-    `:has(${NT.Literal}[value=/^${methods.join("|")}$/] + ${NT.Literal} + ${NT.ObjectExpression})`,
-  splitResponse:
-    `${NT.NewExpression}[callee.name='Integration'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='splitResponse']`,
-  methodPath: `${NT.ImportDeclaration} > ${NT.ImportSpecifier}[imported.name='MethodPath']`,
-  createConfig:
-    `${NT.CallExpression}[callee.name='createConfig'] > ${NT.ObjectExpression} > ` +
-    `${NT.Property}[key.name='tags'][value.type='ObjectExpression']`,
-  newDocs:
-    `${NT.NewExpression}[callee.name='Documentation'] > ` +
-    `${NT.ObjectExpression}[properties.length>0]:not(:has(>Property[key.name='tags']))`,
-  newFactory:
-    `${NT.NewExpression}[callee.name='EndpointsFactory'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='resultHandler']`,
-  newSSE:
-    `${NT.NewExpression}[callee.name='EventStreamFactory'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='events']`,
-  newClient: `${NT.NewExpression}[callee.name='ExpressZodAPIClient']`,
+  placeholder: `${NT.Identifier}`,
 };
 
 const listen = <
@@ -65,118 +28,15 @@ const listen = <
     {},
   );
 
-const v22 = ESLintUtils.RuleCreator.withoutDocs({
+const v23 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     fixable: "code",
     schema: [],
-    messages: {
-      add: `Add {{subject}} to {{to}}`,
-      change: "Change {{subject}} {{from}} to {{to}}.",
-      remove: "Remove {{subject}} {{name}}.",
-    },
+    messages: {},
   },
   defaultOptions: [],
-  create: (ctx) =>
-    listen({
-      provide: (node) => {
-        const {
-          arguments: [method, path],
-        } = node;
-        const request = `"${method.value} ${path.value}"`;
-        ctx.report({
-          messageId: "change",
-          node,
-          data: {
-            subject: "arguments",
-            from: `"${method.value}", "${path.value}"`,
-            to: request,
-          },
-          fix: (fixer) =>
-            fixer.replaceTextRange([method.range[0], path.range[1]], request),
-        });
-      },
-      splitResponse: (node) =>
-        ctx.report({
-          messageId: "remove",
-          node,
-          data: { subject: "property", name: node.key.name },
-          fix: (fixer) => fixer.remove(node),
-        }),
-      methodPath: (node) => {
-        const replacement = "Request";
-        ctx.report({
-          messageId: "change",
-          node: node.imported,
-          data: { subject: "type", from: node.imported.name, to: replacement },
-          fix: (fixer) => fixer.replaceText(node.imported, replacement),
-        });
-      },
-      createConfig: (node) => {
-        const props = node.value.properties
-          .filter(
-            (prop): prop is TSESTree.Property & { key: TSESTree.Identifier } =>
-              "key" in prop && "name" in prop.key,
-          )
-          .map((prop) => `    "${prop.key.name}": unknown,\n`);
-        ctx.report({
-          messageId: "remove",
-          node,
-          data: { subject: "property", name: node.key.name },
-          fix: (fixer) => [
-            fixer.remove(node),
-            fixer.insertTextAfter(
-              ctx.sourceCode.ast,
-              `\n// Declaring tag constraints\ndeclare module "${self}" {\n  interface TagOverrides {\n${props}  }\n}`,
-            ),
-          ],
-        });
-      },
-      newDocs: (node) =>
-        ctx.report({
-          messageId: "add",
-          node,
-          data: { subject: "tags", to: "Documentation" },
-          fix: (fixer) =>
-            fixer.insertTextBefore(
-              node.properties[0],
-              "tags: { /* move from createConfig() argument if any */ }, ",
-            ),
-        }),
-      newFactory: (node) =>
-        ctx.report({
-          messageId: "change",
-          node: node.parent,
-          data: {
-            subject: "argument",
-            from: "object",
-            to: "ResultHandler instance",
-          },
-          fix: (fixer) =>
-            fixer.replaceText(node.parent, ctx.sourceCode.getText(node.value)),
-        }),
-      newSSE: (node) =>
-        ctx.report({
-          messageId: "change",
-          node: node.parent,
-          data: { subject: "argument", from: "object", to: "events map" },
-          fix: (fixer) =>
-            fixer.replaceText(node.parent, ctx.sourceCode.getText(node.value)),
-        }),
-      newClient: (node) => {
-        const replacement = "Client";
-        ctx.report({
-          messageId: "change",
-          node: node.callee,
-          data: {
-            subject: "class",
-            from: "ExpressZodAPIClient",
-            to: replacement,
-          },
-          fix: (fixer) => fixer.replaceText(node.callee, replacement),
-        });
-      },
-    }),
+  create: () => listen({ placeholder: () => {} }),
 });
 
 /**
@@ -192,5 +52,5 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
  *          ];
  * */
 export default {
-  rules: { v22 },
+  rules: { v23 },
 } satisfies TSESLint.Linter.Plugin;
