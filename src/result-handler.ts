@@ -116,10 +116,13 @@ export const defaultResultHandler = new ResultHandler({
     if (error) {
       const httpError = ensureHttpError(error);
       logServerError(httpError, logger, request, input);
-      return void response.status(httpError.statusCode).json({
-        status: "error",
-        error: { message: getPublicErrorMessage(httpError) },
-      });
+      return void response
+        .status(httpError.statusCode)
+        .setHeaders(new Map(Object.entries(httpError.headers || {})))
+        .json({
+          status: "error",
+          error: { message: getPublicErrorMessage(httpError) },
+        });
     }
     response
       .status(defaultStatusCodes.positive)
