@@ -2,6 +2,10 @@
 
 ## Version 22
 
+### v22.4.2
+
+- Excluded 41 response-only headers from the list of well-known ones used to depict request params in Documentation.
+
 ### v22.4.1
 
 - Fixed a bug that could lead to duplicate properties in generated client types:
