@@ -51,7 +51,7 @@ export type {
   BasicSecurity,
   BearerSecurity,
   CookieSecurity,
-  CustomHeaderSecurity,
+  HeaderSecurity,
   InputSecurity,
   OAuth2Security,
   OpenIdSecurity,
