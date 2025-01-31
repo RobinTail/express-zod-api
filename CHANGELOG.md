@@ -4,7 +4,7 @@
 
 ### v22.4.2
 
-- Excluded 42 response-only headers from the list of well-known headers used by the Documentation generator.
+- Excluded 41 response-only headers from the list of well-known ones used to depict request params in Documentation.
 
 ### v22.4.1
 
