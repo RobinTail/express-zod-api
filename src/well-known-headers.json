@@ -32,7 +32,6 @@
   "capsule-protocol",
   "cert-not-after",
   "cert-not-before",
-  "clear-site-data",
   "client-cert",
   "client-cert-chain",
   "close",

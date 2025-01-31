@@ -46,6 +46,10 @@ const responseOnlyHeaders = {
     reason:
       "Used to detect infinite loops within CDNs; appears only in responses.",
   },
+  "clear-site-data": {
+    description: "Instructs the user agent to clear browsing data.",
+    proof: "RFC 7873: Server instructs client to clear data.",
+  },
   "content-base": {
     proof:
       "Mentioned in early HTTP/1.1 specs (e.g., RFC 2068, Section 14.11). Deprecated, but applies only to server responses.",
