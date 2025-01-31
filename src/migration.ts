@@ -6,13 +6,13 @@ import {
 } from "@typescript-eslint/utils";
 
 interface Queries {
-  placeholder: TSESTree.Identifier;
+  headerSecurity: TSESTree.Identifier;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  placeholder: `${NT.Identifier}`,
+  headerSecurity: `${NT.Identifier}[name='CustomHeaderSecurity']`,
 };
 
 const listen = <
@@ -33,10 +33,21 @@ const v23 = ESLintUtils.RuleCreator.withoutDocs({
     type: "problem",
     fixable: "code",
     schema: [],
-    messages: {},
+    messages: {
+      change: "change {{ subject }} from {{ from }} to {{ to }}",
+    },
   },
   defaultOptions: [],
-  create: () => listen({ placeholder: () => {} }),
+  create: (ctx) =>
+    listen({
+      headerSecurity: (node) =>
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "interface", from: node.name, to: "HeaderSecurity" },
+          fix: (fixer) => fixer.replaceText(node, "HeaderSecurity"),
+        }),
+    }),
 });
 
 /**
