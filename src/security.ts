@@ -12,7 +12,7 @@ export interface InputSecurity<K extends string> {
   name: K;
 }
 
-/** @todo add constraints similar to InputSecurity, rename to just HeaderSecurity */
+/** @todo rename to just HeaderSecurity */
 export interface CustomHeaderSecurity {
   type: "header";
   name: string;
