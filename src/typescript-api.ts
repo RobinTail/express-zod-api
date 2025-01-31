@@ -1,4 +1,15 @@
+import { map, pair } from "ramda";
 import ts from "typescript";
+
+export type Typeable =
+  | ts.TypeNode
+  | ts.Identifier
+  | string
+  | ts.KeywordTypeSyntaxKind;
+
+type TypeParams =
+  | string[]
+  | Partial<Record<string, Typeable | { type?: ts.TypeNode; init: Typeable }>>;
 
 export const f = ts.factory;
 
@@ -39,11 +50,9 @@ export const printNode = (
 
 const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 export const makePropertyIdentifier = (name: string | number) =>
-  typeof name === "number"
-    ? f.createNumericLiteral(name)
-    : safePropRegex.test(name)
-      ? f.createIdentifier(name)
-      : f.createStringLiteral(name);
+  typeof name === "string" && safePropRegex.test(name)
+    ? f.createIdentifier(name)
+    : literally(name);
 
 export const makeTemplate = (
   head: string,
@@ -61,54 +70,85 @@ export const makeTemplate = (
     ),
   );
 
-// Record<string, any>
-export const recordStringAny = f.createExpressionWithTypeArguments(
-  f.createIdentifier("Record"),
-  [
-    f.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-    f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-  ],
-);
-
 export const makeParam = (
-  name: ts.Identifier,
+  name: string | ts.Identifier,
   {
     type,
     mod,
     init,
-  }: { type?: ts.TypeNode; mod?: ts.Modifier[]; init?: ts.Expression } = {},
-) => f.createParameterDeclaration(mod, undefined, name, undefined, type, init);
-
-export const makeParams = (params: Partial<Record<string, ts.TypeNode>>) =>
-  Object.entries(params).map(([name, type]) =>
-    makeParam(f.createIdentifier(name), { type }),
+    optional,
+  }: {
+    type?: Typeable;
+    mod?: ts.Modifier[];
+    init?: ts.Expression;
+    optional?: boolean;
+  } = {},
+) =>
+  f.createParameterDeclaration(
+    mod,
+    undefined,
+    name,
+    optional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
+    type ? ensureTypeNode(type) : undefined,
+    init,
   );
 
-export const makePublicConstructor = (params: ts.ParameterDeclaration[]) =>
+export const makeParams = (
+  params: Partial<Record<string, Typeable | Parameters<typeof makeParam>[1]>>,
+) =>
+  Object.entries(params).map(([name, value]) =>
+    makeParam(
+      name,
+      typeof value === "string" ||
+        typeof value === "number" ||
+        (typeof value === "object" && "kind" in value)
+        ? { type: value }
+        : value,
+    ),
+  );
+
+export const makePublicConstructor = (
+  params: ts.ParameterDeclaration[],
+  statements: ts.Statement[] = [],
+) =>
   f.createConstructorDeclaration(
     accessModifiers.public,
     params,
-    f.createBlock([]),
+    f.createBlock(statements),
   );
 
 export const ensureTypeNode = (
-  subject: ts.TypeNode | ts.Identifier | string,
+  subject: Typeable,
+  args?: Typeable[], // only for string and id
 ): ts.TypeNode =>
-  typeof subject === "string" || ts.isIdentifier(subject)
-    ? f.createTypeReferenceNode(subject)
-    : subject;
+  typeof subject === "number"
+    ? f.createKeywordTypeNode(subject)
+    : typeof subject === "string" || ts.isIdentifier(subject)
+      ? f.createTypeReferenceNode(subject, args && map(ensureTypeNode, args))
+      : subject;
+
+// Record<string, any>
+export const recordStringAny = ensureTypeNode("Record", [
+  ts.SyntaxKind.StringKeyword,
+  ts.SyntaxKind.AnyKeyword,
+]);
 
 export const makeInterfaceProp = (
   name: string | number,
-  value: Parameters<typeof ensureTypeNode>[0],
-  { isOptional }: { isOptional?: boolean } = {},
-) =>
-  f.createPropertySignature(
+  value: Typeable,
+  { isOptional, comment }: { isOptional?: boolean; comment?: string } = {},
+) => {
+  const node = f.createPropertySignature(
     undefined,
     makePropertyIdentifier(name),
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     ensureTypeNode(value),
   );
+  return comment ? addJsDocComment(node, comment) : node;
+};
+
+export const makeOneLine = (subject: ts.TypeNode) =>
+  ts.setEmitFlags(subject, ts.EmitFlags.SingleLine);
 
 export const makeDeconstruction = (
   ...names: ts.Identifier[]
@@ -122,12 +162,19 @@ export const makeDeconstruction = (
 export const makeConst = (
   name: string | ts.Identifier | ts.ArrayBindingPattern,
   value: ts.Expression,
-  { type, expose }: { type?: ts.TypeNode; expose?: true } = {},
+  { type, expose }: { type?: Typeable; expose?: true } = {},
 ) =>
   f.createVariableStatement(
     expose && exportModifier,
     f.createVariableDeclarationList(
-      [f.createVariableDeclaration(name, undefined, type, value)],
+      [
+        f.createVariableDeclaration(
+          name,
+          undefined,
+          type ? ensureTypeNode(type) : undefined,
+          value,
+        ),
+      ],
       ts.NodeFlags.Const,
     ),
   );
@@ -136,15 +183,9 @@ export const makePublicLiteralType = (
   name: ts.Identifier | string,
   literals: string[],
 ) =>
-  makeType(
-    name,
-    f.createUnionTypeNode(
-      literals.map((option) =>
-        f.createLiteralTypeNode(f.createStringLiteral(option)),
-      ),
-    ),
-    { expose: true },
-  );
+  makeType(name, f.createUnionTypeNode(map(makeLiteralType, literals)), {
+    expose: true,
+  });
 
 export const makeType = (
   name: ts.Identifier | string,
@@ -153,11 +194,7 @@ export const makeType = (
     expose,
     comment,
     params,
-  }: {
-    expose?: boolean;
-    comment?: string;
-    params?: Parameters<typeof makeTypeParams>[0];
-  } = {},
+  }: { expose?: boolean; comment?: string; params?: TypeParams } = {},
 ) => {
   const node = f.createTypeAliasDeclaration(
     expose ? exportModifier : undefined,
@@ -168,17 +205,26 @@ export const makeType = (
   return comment ? addJsDocComment(node, comment) : node;
 };
 
+export const makePublicProperty = (
+  name: string | ts.PropertyName,
+  type: Typeable,
+) =>
+  f.createPropertyDeclaration(
+    accessModifiers.public,
+    name,
+    undefined,
+    ensureTypeNode(type),
+    undefined,
+  );
+
 export const makePublicMethod = (
   name: ts.Identifier,
   params: ts.ParameterDeclaration[],
-  body: ts.Block,
+  statements: ts.Statement[],
   {
     typeParams,
     returns,
-  }: {
-    typeParams?: Parameters<typeof makeTypeParams>[0];
-    returns?: ts.TypeNode;
-  } = {},
+  }: { typeParams?: TypeParams; returns?: ts.TypeNode } = {},
 ) =>
   f.createMethodDeclaration(
     accessModifiers.public,
@@ -188,27 +234,27 @@ export const makePublicMethod = (
     typeParams && makeTypeParams(typeParams),
     params,
     returns,
-    body,
+    f.createBlock(statements),
   );
 
-export const makePublicClass = (name: string, statements: ts.ClassElement[]) =>
+export const makePublicClass = (
+  name: string,
+  statements: ts.ClassElement[],
+  { typeParams }: { typeParams?: TypeParams } = {},
+) =>
   f.createClassDeclaration(
     exportModifier,
     name,
-    undefined,
+    typeParams && makeTypeParams(typeParams),
     undefined,
     statements,
   );
 
-export const makeKeyOf = (subj: Parameters<typeof ensureTypeNode>[0]) =>
+export const makeKeyOf = (subj: Typeable) =>
   f.createTypeOperatorNode(ts.SyntaxKind.KeyOfKeyword, ensureTypeNode(subj));
 
-export const makePromise = (subject: ts.TypeNode | "any") =>
-  f.createTypeReferenceNode(Promise.name, [
-    subject === "any"
-      ? f.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
-      : subject,
-  ]);
+export const makePromise = (subject: Typeable) =>
+  ensureTypeNode(Promise.name, [subject]);
 
 export const makeInterface = (
   name: ts.Identifier | string,
@@ -226,29 +272,37 @@ export const makeInterface = (
 };
 
 export const makeTypeParams = (
-  params: Partial<Record<string, ts.Identifier | ts.TypeNode>>,
+  params:
+    | string[]
+    | Partial<
+        Record<string, Typeable | { type?: ts.TypeNode; init: Typeable }>
+      >,
 ) =>
-  Object.entries(params).map(([name, val]) =>
-    f.createTypeParameterDeclaration([], name, val && ensureTypeNode(val)),
-  );
+  (Array.isArray(params)
+    ? params.map((name) => pair(name, undefined))
+    : Object.entries(params)
+  ).map(([name, val]) => {
+    const { type, init } =
+      typeof val === "object" && "init" in val ? val : { type: val };
+    return f.createTypeParameterDeclaration(
+      [],
+      name,
+      type ? ensureTypeNode(type) : undefined,
+      init ? ensureTypeNode(init) : undefined,
+    );
+  });
 
 export const makeArrowFn = (
-  params: ts.Identifier[] | Parameters<typeof makeParams>[0],
+  params:
+    | Array<Parameters<typeof makeParam>[0]>
+    | Parameters<typeof makeParams>[0],
   body: ts.ConciseBody,
-  {
-    isAsync,
-    typeParams,
-  }: {
-    isAsync?: boolean;
-    typeParams?: Parameters<typeof makeTypeParams>[0];
-  } = {},
+  { isAsync }: { isAsync?: boolean } = {},
 ) =>
   f.createArrowFunction(
     isAsync ? asyncModifier : undefined,
-    typeParams && makeTypeParams(typeParams),
-    Array.isArray(params)
-      ? params.map((key) => makeParam(key))
-      : makeParams(params),
+    undefined,
+    Array.isArray(params) ? map(makeParam, params) : makeParams(params),
     undefined,
     undefined,
     body,
@@ -269,24 +323,66 @@ export const makeTernary = (
     negative,
   );
 
-export const makePropCall = (
-  parent: ts.Expression | [ts.Expression, ts.Identifier | string],
-  child: ts.Identifier | string,
-  args?: ts.Expression[],
-) =>
-  f.createCallExpression(
-    f.createPropertyAccessExpression(
-      Array.isArray(parent)
-        ? f.createPropertyAccessExpression(...parent)
-        : parent,
-      child,
+export const makeCall =
+  (
+    first: ts.Expression | string,
+    ...rest: Array<ts.Identifier | ts.ConditionalExpression | string>
+  ) =>
+  (...args: ts.Expression[]) =>
+    f.createCallExpression(
+      rest.reduce(
+        (acc, entry) =>
+          typeof entry === "string" || ts.isIdentifier(entry)
+            ? f.createPropertyAccessExpression(acc, entry)
+            : f.createElementAccessExpression(acc, entry),
+        typeof first === "string" ? f.createIdentifier(first) : first,
+      ),
+      undefined,
+      args,
+    );
+
+export const makeNew = (cls: string, ...args: ts.Expression[]) =>
+  f.createNewExpression(f.createIdentifier(cls), undefined, args);
+
+export const makeExtract = (base: Typeable, narrow: ts.TypeNode) =>
+  ensureTypeNode("Extract", [base, narrow]);
+
+export const makeAssignment = (left: ts.Expression, right: ts.Expression) =>
+  f.createExpressionStatement(
+    f.createBinaryExpression(
+      left,
+      f.createToken(ts.SyntaxKind.EqualsToken),
+      right,
     ),
-    undefined,
-    args,
   );
 
-export const makeNew = (cls: ts.Identifier, ...args: ts.Expression[]) =>
-  f.createNewExpression(cls, undefined, args);
+export const makeIndexed = (subject: Typeable, index: Typeable) =>
+  f.createIndexedAccessTypeNode(ensureTypeNode(subject), ensureTypeNode(index));
+
+export const makeMaybeAsync = (subj: Typeable) =>
+  f.createUnionTypeNode([ensureTypeNode(subj), makePromise(subj)]);
+
+export const makeFnType = (
+  params: Parameters<typeof makeParams>[0],
+  returns: Typeable,
+) =>
+  f.createFunctionTypeNode(
+    undefined,
+    makeParams(params),
+    ensureTypeNode(returns),
+  );
+
+/* eslint-disable prettier/prettier -- shorter and works better this way than overrides */
+export const literally = <T extends string | null | boolean | number>(subj: T) => (
+  typeof subj === "number" ? f.createNumericLiteral(subj) : typeof subj === "boolean"
+    ? subj ? f.createTrue() : f.createFalse()
+    : subj === null ? f.createNull() : f.createStringLiteral(subj)
+  ) as T extends string ? ts.StringLiteral : T extends number ? ts.NumericLiteral
+    : T extends boolean ? ts.BooleanLiteral : ts.NullLiteral;
+/* eslint-enable prettier/prettier */
+
+export const makeLiteralType = (subj: Parameters<typeof literally>[0]) =>
+  f.createLiteralTypeNode(literally(subj));
 
 const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.AnyKeyword,

@@ -80,10 +80,8 @@ const tsFactoryConcerns = [
     message: "use makeParam() or makeParams() helpers",
   },
   {
-    selector:
-      "CallExpression[callee.property.name='createCallExpression']" +
-      "[arguments.0.callee.property.name='createPropertyAccessExpression']",
-    message: "use makePropCall() helper",
+    selector: "Identifier[name='createCallExpression']",
+    message: "use makeCall() helper",
   },
   {
     selector: "Identifier[name='KeyOfKeyword']",
@@ -102,9 +100,33 @@ const tsFactoryConcerns = [
     message: "use makePromise() helper",
   },
   {
-    selector:
-      "CallExpression[callee.property.name='createTypeReferenceNode'][arguments.length=1]",
+    selector: "Identifier[name=/^create(TypeReference|KeywordType)Node$/]",
     message: "use ensureTypeNode() helper",
+  },
+  {
+    selector: "Literal[value='Extract']",
+    message: "use makeExtract() helper",
+  },
+  {
+    selector: "Identifier[name='EqualsToken']",
+    message: "use makeAssignment() helper",
+  },
+  {
+    selector: "Identifier[name='createIndexedAccessTypeNode']",
+    message: "use makeIndexed() helper",
+  },
+  {
+    selector: "Identifier[name='createFunctionTypeNode']",
+    message: "use makeFnType() helper",
+  },
+  {
+    selector: "Identifier[name='createLiteralTypeNode']",
+    message: "use makeLiteralType() helper",
+  },
+  {
+    selector:
+      "Identifier[name=/^create(NumericLiteral|StringLiteral|True|False|Null)$/]",
+    message: "use literally() helper",
   },
 ];
 

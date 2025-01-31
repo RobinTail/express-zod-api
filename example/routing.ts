@@ -37,7 +37,7 @@ export const routing: Routing = {
       raw: rawAcceptingEndpoint,
     },
     events: {
-      time: subscriptionEndpoint,
+      stream: subscriptionEndpoint,
     },
   },
   // path /public serves static files from /example/assets

@@ -10,6 +10,8 @@ import {
   makeType,
   printNode,
   ensureTypeNode,
+  makeIndexed,
+  makeLiteralType,
 } from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
@@ -31,6 +33,8 @@ interface IntegrationParams {
   variant?: "types" | "client";
   /** @default Client */
   clientClassName?: string;
+  /** @default Subscription */
+  subscriptionClassName?: string;
   /**
    * @desc The API URL to use in the generated code
    * @default https://example.com
@@ -88,7 +92,7 @@ export class Integration extends IntegrationBase {
     let name = this.aliases.get(schema)?.name?.text;
     if (!name) {
       name = `Type${this.aliases.size + 1}`;
-      const temp = f.createLiteralTypeNode(f.createNull());
+      const temp = makeLiteralType(null);
       this.aliases.set(schema, makeType(name, temp));
       this.aliases.set(schema, makeType(name, produce()));
     }
@@ -100,6 +104,7 @@ export class Integration extends IntegrationBase {
     brandHandling,
     variant = "client",
     clientClassName = "Client",
+    subscriptionClassName = "Subscription",
     serverUrl = "https://example.com",
     optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
@@ -142,22 +147,14 @@ export class Integration extends IntegrationBase {
         {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
       );
       this.paths.add(path);
-      const literalIdx = f.createLiteralTypeNode(
-        f.createStringLiteral(request),
-      );
+      const literalIdx = makeLiteralType(request);
       this.registry.set(request, {
         input: ensureTypeNode(input.name),
         positive: this.someOf(dictionaries.positive),
         negative: this.someOf(dictionaries.negative),
         response: f.createUnionTypeNode([
-          f.createIndexedAccessTypeNode(
-            ensureTypeNode(this.interfaces.positive),
-            literalIdx,
-          ),
-          f.createIndexedAccessTypeNode(
-            ensureTypeNode(this.interfaces.negative),
-            literalIdx,
-          ),
+          makeIndexed(this.interfaces.positive, literalIdx),
+          makeIndexed(this.interfaces.negative, literalIdx),
         ]),
         encoded: f.createIntersectionTypeNode([
           ensureTypeNode(dictionaries.positive.name),
@@ -184,9 +181,12 @@ export class Integration extends IntegrationBase {
       this.makeImplementationType(),
       this.makeDefaultImplementation(),
       this.makeClientClass(clientClassName),
+      this.makeSubscriptionClass(subscriptionClassName),
     );
 
-    this.usage.push(...this.makeUsageStatements(clientClassName));
+    this.usage.push(
+      ...this.makeUsageStatements(clientClassName, subscriptionClassName),
+    );
   }
 
   protected printUsage(printerOptions?: ts.PrinterOptions) {
