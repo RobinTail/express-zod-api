@@ -12,9 +12,9 @@ export interface InputSecurity<K extends string> {
   name: K;
 }
 
-export interface HeaderSecurity<K extends string> {
+export interface HeaderSecurity {
   type: "header";
-  name: K;
+  name: string;
 }
 
 export interface CookieSecurity {
@@ -89,7 +89,7 @@ export type Security<K extends string = string, S extends string = string> =
   | BasicSecurity
   | BearerSecurity
   | InputSecurity<K>
-  | HeaderSecurity<K>
+  | HeaderSecurity
   | CookieSecurity
   | OpenIdSecurity
   | OAuth2Security<S>;

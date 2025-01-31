@@ -4,8 +4,7 @@
 
 ### v23.0.0
 
-- Publicly exposed interface `CustomHeaderSecurity` is renamed to `HeaderSecurity`;
-- Restrictions have been placed between header names in the middleware `security` declaration and in `input` properties.
+- Publicly exposed interface `CustomHeaderSecurity` is renamed to `HeaderSecurity`.
 
 ## Version 22
 
