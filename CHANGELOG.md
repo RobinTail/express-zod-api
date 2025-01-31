@@ -2,6 +2,10 @@
 
 ## Version 22
 
+### v22.4.2
+
+- Excluded 42 response-only headers from the list of well-known headers used by the Documentation generator.
+
 ### v22.4.1
 
 - Fixed a bug that could lead to duplicate properties in generated client types:
