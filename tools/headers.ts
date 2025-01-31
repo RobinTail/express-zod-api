@@ -136,6 +136,11 @@ const responseOnlyHeaders = {
     reason:
       "Specifies which origins can access timing information in the response.",
   },
+  vary: {
+    description:
+      "Tells caches that the response is variant and lists the headers that determine the variance.",
+    proof: "RFC 9110, 15.8: Server specifies response variations.",
+  },
   "www-authenticate": {
     proof: "Defined in RFC 7235, Section 4.1.",
     reason: "Used in responses for authentication challenges.",
