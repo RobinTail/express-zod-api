@@ -1,7 +1,10 @@
 import { writeFile, stat } from "node:fs/promises";
 import { z } from "zod";
 
-/** @link https://chatgpt.com/c/6795dae3-8a10-800e-96af-fd0d01579f39 */
+/**
+ * @link https://chatgpt.com/c/6795dae3-8a10-800e-96af-fd0d01579f39
+ * @link https://gemini.google.com/app/b47e9022a51a9846
+ * */
 const responseOnlyHeaders = {
   "accept-patch": {
     proof:
