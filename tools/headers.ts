@@ -55,15 +55,6 @@ const responseOnlyHeaders = {
       "Mentioned in early HTTP/1.1 specs (e.g., RFC 2068, Section 14.11). Deprecated, but applies only to server responses.",
     reason: "Specifies the base URL for relative URLs in a document.",
   },
-  "content-location": {
-    proof: "Defined in RFC 7231, Section 3.1.4.2.",
-    reason: "Specifies the location of the resource returned in the response.",
-  },
-  "content-range": {
-    proof: "Defined in RFC 7233, Section 4.2.",
-    reason:
-      "Indicates which part of the content is returned in a partial response.",
-  },
   "content-security-policy": {
     proof: "Defined in the CSP Specification.",
     reason:
