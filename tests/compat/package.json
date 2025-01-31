@@ -11,7 +11,7 @@
   },
   "scripts": {
     "preinstall": "rm -rf node_modules",
-    "pretest": "echo 'placeholder' > sample.ts",
+    "pretest": "echo 'const test: CustomHeaderSecurity = {};' > sample.ts",
     "test": "eslint --fix && vitest --run && rm sample.ts"
   }
 }
