@@ -44,24 +44,34 @@ export const createParserFailureHandler =
     });
   };
 
-const findSupportedMethods = (path: string, routerStack?: IRouter["stack"]) =>
-  routerStack
-    ?.map(({ route, ...rest }) =>
-      route && "matchers" in rest && Array.isArray(rest.matchers)
-        ? { route, matchers: rest.matchers }
-        : undefined,
-    )
-    .filter((entry) =>
-      entry?.matchers?.some((fn) => typeof fn === "function" && fn(path)),
-    )
-    .flatMap((entry) =>
-      entry?.route &&
+const findSupportedMethods = (path: string, routerStack?: IRouter["stack"]) => {
+  if (!routerStack) return [];
+  const suitable = routerStack.filter(
+    (
+      entry,
+    ): entry is typeof entry & {
+      route: NonNullable<(typeof entry)["route"]> & { methods: object };
+      matchers: unknown[];
+    } =>
+      entry.route !== undefined &&
       "methods" in entry.route &&
       typeof entry.route.methods === "object" &&
-      entry.route.methods !== null
-        ? Object.keys(entry.route.methods).map((method) => method.toUpperCase())
-        : [],
-    );
+      entry.route.methods !== null &&
+      "matchers" in entry &&
+      Array.isArray(entry.matchers),
+  );
+  const matching = suitable.filter(({ matchers }) =>
+    matchers.some((fn) => {
+      if (typeof fn !== "function") return false;
+      try {
+        return fn(path);
+      } catch {}
+    }),
+  );
+  return matching.flatMap((entry) =>
+    Object.keys(entry.route.methods).map((method) => method.toUpperCase()),
+  );
+};
 
 export const createNotFoundHandler =
   ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
