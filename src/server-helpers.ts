@@ -47,7 +47,7 @@ export const createParserFailureHandler =
 export const createNotFoundHandler =
   ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
   async (request, response) => {
-    const supportedMethods = request.app.router.stack
+    const supportedMethods = request.app?.router.stack
       .map(({ route, ...rest }) =>
         route && "matchers" in rest && Array.isArray(rest.matchers)
           ? { route, matchers: rest.matchers }
@@ -68,7 +68,7 @@ export const createNotFoundHandler =
             )
           : [],
       );
-    const error = supportedMethods.length
+    const error = supportedMethods?.length
       ? createHttpError(405, `${request.method} is not allowed`, {
           headers: { Allowed: supportedMethods.join(", ") },
         })
