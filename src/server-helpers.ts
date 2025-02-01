@@ -19,7 +19,7 @@ import { monitor } from "./graceful-shutdown";
 import { chain, F, tryCatch } from "ramda";
 
 type ILayer = IRouter["stack"][number]; // not exposed by express
-interface EquippedLayed extends ILayer {
+interface EquippedLayer extends ILayer {
   route: IRoute & { methods: object };
   matchers: Array<(subject: unknown) => unknown>;
 }
@@ -60,7 +60,7 @@ export const createParserFailureHandler =
 const findSupportedMethods = (path: string, routerStack?: ILayer[]) => {
   if (!routerStack) return [];
   const suitable = routerStack.filter(
-    (layer): layer is EquippedLayed =>
+    (layer): layer is EquippedLayer =>
       layer.route !== undefined &&
       "methods" in layer.route &&
       typeof layer.route.methods === "object" &&
