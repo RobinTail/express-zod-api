@@ -4,13 +4,25 @@ import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
-import { ErrorRequestHandler, RequestHandler, Request, IRouter } from "express";
+import {
+  ErrorRequestHandler,
+  RequestHandler,
+  Request,
+  IRouter,
+  IRoute,
+} from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
 import { chain } from "ramda";
+
+type ILayer = IRouter["stack"][number]; // not exposed by express
+interface EquippedLayed extends ILayer {
+  route: IRoute & { methods: object };
+  matchers: unknown[];
+}
 
 type EquippedRequest = Request<
   unknown,
@@ -45,21 +57,16 @@ export const createParserFailureHandler =
     });
   };
 
-const findSupportedMethods = (path: string, routerStack?: IRouter["stack"]) => {
+const findSupportedMethods = (path: string, routerStack?: ILayer[]) => {
   if (!routerStack) return [];
   const suitable = routerStack.filter(
-    (
-      entry,
-    ): entry is typeof entry & {
-      route: NonNullable<(typeof entry)["route"]> & { methods: object };
-      matchers: unknown[];
-    } =>
-      entry.route !== undefined &&
-      "methods" in entry.route &&
-      typeof entry.route.methods === "object" &&
-      entry.route.methods !== null &&
-      "matchers" in entry &&
-      Array.isArray(entry.matchers),
+    (layer): layer is EquippedLayed =>
+      layer.route !== undefined &&
+      "methods" in layer.route &&
+      typeof layer.route.methods === "object" &&
+      layer.route.methods !== null &&
+      "matchers" in layer &&
+      Array.isArray(layer.matchers),
   );
   const matching = suitable.filter(({ matchers }) =>
     matchers.some((fn) => {
