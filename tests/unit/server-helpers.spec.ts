@@ -64,37 +64,60 @@ describe("Server helpers", () => {
   });
 
   describe("createNotFoundHandler()", () => {
-    test("the handler should call ResultHandler with 404 error", async () => {
-      const errorHandler = new ResultHandler({
-        positive: vi.fn(),
-        negative: vi.fn(),
-        handler: vi.fn(),
-      });
-      const spy = vi.spyOn(errorHandler, "execute");
-      const handler = createNotFoundHandler({
-        errorHandler,
-        getLogger: () => makeLoggerMock(),
-        config: { cors: false },
-      });
-      const next = vi.fn();
-      const requestMock = makeRequestMock({
-        method: "POST",
-        path: "/v1/test",
-        body: { n: 453 },
-      });
-      const responseMock = makeResponseMock();
-      await handler(requestMock, responseMock, next);
-      expect(next).toHaveBeenCalledTimes(0);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy.mock.calls[0]).toHaveLength(1);
-      expect(spy.mock.calls[0][0].error).toEqual(
-        createHttpError(404, "Can not POST /v1/test"),
-      );
-      expect(spy.mock.calls[0][0].input).toBeNull();
-      expect(spy.mock.calls[0][0].output).toBeNull();
-      expect(spy.mock.calls[0][0].request).toEqual(requestMock);
-      expect(spy.mock.calls[0][0].response).toEqual(responseMock);
-    });
+    test.each([
+      { status: 404 as const, message: "Can not POST /v1/test" },
+      {
+        status: 405 as const,
+        message: "POST is not allowed",
+        headers: { Allowed: "GET, OPTIONS" },
+        requestProps: {
+          app: {
+            router: {
+              stack: [
+                {
+                  route: { methods: { get: true, options: true } },
+                  matchers: [() => true],
+                },
+              ],
+            },
+          },
+        },
+      },
+    ])(
+      "the handler should call ResultHandler with $status error",
+      async ({ status, message, headers, requestProps }) => {
+        const errorHandler = new ResultHandler({
+          positive: vi.fn(),
+          negative: vi.fn(),
+          handler: vi.fn(),
+        });
+        const spy = vi.spyOn(errorHandler, "execute");
+        const handler = createNotFoundHandler({
+          errorHandler,
+          getLogger: () => makeLoggerMock(),
+          config: { cors: false, wrongMethodBehavior: status },
+        });
+        const next = vi.fn();
+        const requestMock = makeRequestMock({
+          method: "POST",
+          path: "/v1/test",
+          body: { n: 453 },
+          ...requestProps,
+        });
+        const responseMock = makeResponseMock();
+        await handler(requestMock, responseMock, next);
+        expect(next).toHaveBeenCalledTimes(0);
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy.mock.calls[0]).toHaveLength(1);
+        expect(spy.mock.calls[0][0].error).toEqual(
+          createHttpError(status, message, { headers }),
+        );
+        expect(spy.mock.calls[0][0].input).toBeNull();
+        expect(spy.mock.calls[0][0].output).toBeNull();
+        expect(spy.mock.calls[0][0].request).toEqual(requestMock);
+        expect(spy.mock.calls[0][0].response).toEqual(responseMock);
+      },
+    );
 
     test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
       const errorHandler = new ResultHandler({
