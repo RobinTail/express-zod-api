@@ -10,6 +10,7 @@ import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
+import { chain } from "ramda";
 
 type EquippedRequest = Request<
   unknown,
@@ -68,8 +69,10 @@ const findSupportedMethods = (path: string, routerStack?: IRouter["stack"]) => {
       } catch {}
     }),
   );
-  return matching.flatMap((entry) =>
-    Object.keys(entry.route.methods).map((method) => method.toUpperCase()),
+  return chain(
+    ({ route: { methods } }) =>
+      Object.keys(methods).map((method) => method.toUpperCase()),
+    matching,
   );
 };
 
