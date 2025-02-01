@@ -118,7 +118,7 @@ export const defaultResultHandler = new ResultHandler({
       logServerError(httpError, logger, request, input);
       return void response
         .status(httpError.statusCode)
-        .setHeaders(new Map(Object.entries(httpError.headers || {})))
+        .set(httpError.headers)
         .json({
           status: "error",
           error: { message: getPublicErrorMessage(httpError) },
