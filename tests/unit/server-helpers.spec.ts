@@ -74,6 +74,7 @@ describe("Server helpers", () => {
       const handler = createNotFoundHandler({
         errorHandler,
         getLogger: () => makeLoggerMock(),
+        config: { cors: false },
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({
@@ -105,6 +106,7 @@ describe("Server helpers", () => {
       const handler = createNotFoundHandler({
         errorHandler,
         getLogger: () => makeLoggerMock(),
+        config: { cors: false },
       });
       const next = vi.fn();
       const requestMock = makeRequestMock({

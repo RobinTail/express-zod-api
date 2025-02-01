@@ -57,8 +57,7 @@ export const createParserFailureHandler =
     });
   };
 
-const findSupportedMethods = (path: string, routerStack?: ILayer[]) => {
-  if (!routerStack) return [];
+const findSupportedMethods = (path: string, routerStack: ILayer[]) => {
   const suitable = routerStack.filter(
     (layer): layer is EquippedLayer =>
       layer.route !== undefined &&
@@ -80,12 +79,16 @@ const findSupportedMethods = (path: string, routerStack?: ILayer[]) => {
 };
 
 export const createNotFoundHandler =
-  ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
+  ({
+    errorHandler,
+    getLogger,
+    config: { wrongMethodBehavior = 404 },
+  }: HandlerCreatorParams & { config: CommonConfig }): RequestHandler =>
   async (request, response) => {
-    const supportedMethods = findSupportedMethods(
-      request.path,
-      request.app?.router.stack,
-    );
+    const supportedMethods =
+      wrongMethodBehavior === 405 && request.app?.router.stack
+        ? findSupportedMethods(request.path, request.app.router.stack)
+        : undefined;
     const error = supportedMethods?.length
       ? createHttpError(405, `${request.method} is not allowed`, {
           headers: { Allowed: supportedMethods.join(", ") },

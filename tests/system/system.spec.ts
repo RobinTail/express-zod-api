@@ -112,6 +112,7 @@ describe("App in production mode", async () => {
   const config = createConfig({
     http: { listen: port },
     compression: { threshold: 1 },
+    wrongMethodBehavior: 405,
     beforeRouting: ({ app, getLogger }) => {
       depd("express")("Sample deprecation message");
       app.use((req, {}, next) => {

@@ -38,6 +38,13 @@ export interface CommonConfig {
    */
   cors: boolean | HeadersProvider;
   /**
+   * @desc How to respond to a request using a wrong method to an existing endpoint
+   * @example 404 — Not found
+   * @example 405 — Method not allowed, incl. the "Allowed" header with a list of methods
+   * @default 404
+   * */
+  wrongMethodBehavior?: 404 | 405;
+  /**
    * @desc The ResultHandler to use for handling routing, parsing and upload errors
    * @default defaultResultHandler
    * @see defaultResultHandler
