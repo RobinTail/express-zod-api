@@ -16,12 +16,12 @@ import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
-import { chain } from "ramda";
+import { chain, F, tryCatch } from "ramda";
 
 type ILayer = IRouter["stack"][number]; // not exposed by express
 interface EquippedLayed extends ILayer {
   route: IRoute & { methods: object };
-  matchers: unknown[];
+  matchers: Array<(subject: unknown) => unknown>;
 }
 
 type EquippedRequest = Request<
@@ -66,15 +66,11 @@ const findSupportedMethods = (path: string, routerStack?: ILayer[]) => {
       typeof layer.route.methods === "object" &&
       layer.route.methods !== null &&
       "matchers" in layer &&
-      Array.isArray(layer.matchers),
+      Array.isArray(layer.matchers) &&
+      layer.matchers.every((fn) => typeof fn === "function"),
   );
   const matching = suitable.filter(({ matchers }) =>
-    matchers.some((fn) => {
-      if (typeof fn !== "function") return false;
-      try {
-        return fn(path);
-      } catch {}
-    }),
+    matchers.some((fn) => tryCatch(fn, F)(path)),
   );
   return chain(
     ({ route: { methods } }) =>
