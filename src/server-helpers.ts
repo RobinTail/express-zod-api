@@ -4,7 +4,7 @@ import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
-import { ErrorRequestHandler, RequestHandler, Request } from "express";
+import { ErrorRequestHandler, RequestHandler, Request, IRouter } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
@@ -44,30 +44,32 @@ export const createParserFailureHandler =
     });
   };
 
+const findSupportedMethods = (path: string, routerStack?: IRouter["stack"]) =>
+  routerStack
+    ?.map(({ route, ...rest }) =>
+      route && "matchers" in rest && Array.isArray(rest.matchers)
+        ? { route, matchers: rest.matchers }
+        : undefined,
+    )
+    .filter((entry) =>
+      entry?.matchers?.some((fn) => typeof fn === "function" && fn(path)),
+    )
+    .flatMap((entry) =>
+      entry?.route &&
+      "methods" in entry.route &&
+      typeof entry.route.methods === "object" &&
+      entry.route.methods !== null
+        ? Object.keys(entry.route.methods).map((method) => method.toUpperCase())
+        : [],
+    );
+
 export const createNotFoundHandler =
   ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
   async (request, response) => {
-    const supportedMethods = request.app?.router.stack
-      .map(({ route, ...rest }) =>
-        route && "matchers" in rest && Array.isArray(rest.matchers)
-          ? { route, matchers: rest.matchers }
-          : undefined,
-      )
-      .filter((entry) =>
-        entry?.matchers?.some(
-          (fn) => typeof fn === "function" && fn(request.path),
-        ),
-      )
-      .flatMap((entry) =>
-        entry?.route &&
-        "methods" in entry.route &&
-        typeof entry.route.methods === "object" &&
-        entry.route.methods !== null
-          ? Object.keys(entry.route.methods).map((method) =>
-              method.toUpperCase(),
-            )
-          : [],
-      );
+    const supportedMethods = findSupportedMethods(
+      request.path,
+      request.app?.router.stack,
+    );
     const error = supportedMethods?.length
       ? createHttpError(405, `${request.method} is not allowed`, {
           headers: { Allowed: supportedMethods.join(", ") },
