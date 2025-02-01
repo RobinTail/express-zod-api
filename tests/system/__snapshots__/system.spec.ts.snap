@@ -66,6 +66,15 @@ exports[`App in production mode > Protocol > Should fail on invalid method 1`] =
 }
 `;
 
+exports[`App in production mode > Protocol > Should fail on invalid path 1`] = `
+{
+  "error": {
+    "message": "Can not GET /v1/wrong",
+  },
+  "status": "error",
+}
+`;
+
 exports[`App in production mode > Protocol > Should fail on malformed body 1`] = `
 {
   "error": {

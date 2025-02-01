@@ -300,6 +300,13 @@ describe("App in production mode", async () => {
   });
 
   describe("Protocol", () => {
+    test("Should fail on invalid path", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/wrong`);
+      expect(response.status).toBe(404);
+      const json = await response.json();
+      expect(json).toMatchSnapshot();
+    });
+
     test("Should fail on invalid method", async () => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "PUT",
