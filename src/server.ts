@@ -39,7 +39,7 @@ const makeCommonEntities = (config: CommonConfig) => {
   const loggingMiddleware = createLoggingMiddleware({ logger, config });
   const getLogger = makeGetLogger(logger);
   const commons = { getLogger, errorHandler };
-  const notFoundHandler = createNotFoundHandler({ ...commons, config });
+  const notFoundHandler = createNotFoundHandler(commons);
   const parserFailureHandler = createParserFailureHandler(commons);
   return {
     ...commons,

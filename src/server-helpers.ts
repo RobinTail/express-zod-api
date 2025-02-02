@@ -4,25 +4,12 @@ import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
-import {
-  ErrorRequestHandler,
-  RequestHandler,
-  Request,
-  IRouter,
-  IRoute,
-} from "express";
+import { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
-import { chain, F, tryCatch } from "ramda";
-
-type ILayer = IRouter["stack"][number]; // not exposed by express
-interface EquippedLayer extends ILayer {
-  route: IRoute & { methods: object };
-  matchers: Array<(subject: unknown) => unknown>;
-}
 
 type EquippedRequest = Request<
   unknown,
@@ -57,43 +44,13 @@ export const createParserFailureHandler =
     });
   };
 
-const findSupportedMethods = (path: string, routerStack: ILayer[]) => {
-  const suitable = routerStack.filter(
-    (layer): layer is EquippedLayer =>
-      layer.route !== undefined &&
-      "methods" in layer.route &&
-      typeof layer.route.methods === "object" &&
-      layer.route.methods !== null &&
-      "matchers" in layer &&
-      Array.isArray(layer.matchers) &&
-      layer.matchers.every((fn) => typeof fn === "function"),
-  );
-  const matching = suitable.filter(({ matchers }) =>
-    matchers.some((fn) => tryCatch(fn, F)(path)),
-  );
-  return chain(
-    ({ route: { methods } }) =>
-      Object.keys(methods).map((method) => method.toUpperCase()),
-    matching,
-  );
-};
-
 export const createNotFoundHandler =
-  ({
-    errorHandler,
-    getLogger,
-    config: { wrongMethodBehavior = 404 },
-  }: HandlerCreatorParams & { config: CommonConfig }): RequestHandler =>
+  ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
   async (request, response) => {
-    const supportedMethods =
-      wrongMethodBehavior === 405 && request.app?.router.stack
-        ? findSupportedMethods(request.path, request.app.router.stack)
-        : undefined;
-    const error = supportedMethods?.length
-      ? createHttpError(405, `${request.method} is not allowed`, {
-          headers: { Allowed: supportedMethods.join(", ") },
-        })
-      : createHttpError(404, `Can not ${request.method} ${request.path}`);
+    const error = createHttpError(
+      404,
+      `Can not ${request.method} ${request.path}`,
+    );
     const logger = getLogger(request);
     try {
       errorHandler.execute({

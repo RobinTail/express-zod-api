@@ -1,4 +1,5 @@
 import { IRouter, RequestHandler } from "express";
+import createHttpError from "http-errors";
 import { isProduction } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { ContentType } from "./content-type";
@@ -30,7 +31,7 @@ export const initRouting = ({
   parsers?: Parsers;
 }) => {
   const doc = new Diagnostics(getLogger());
-  const corsedPaths = new Set<string>();
+  const familiar = new Map<string, Array<Method | AuxMethod>>();
   const onEndpoint: OnEndpoint = (endpoint, path, method, siblingMethods) => {
     if (!isProduction()) doc.check(endpoint, { path, method });
     const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
@@ -56,11 +57,26 @@ export const initRouting = ({
       }
       return endpoint.execute({ request, response, logger, config });
     };
-    if (config.cors && !corsedPaths.has(path)) {
-      app.options(path, ...matchingParsers, handler);
-      corsedPaths.add(path);
+    if (!familiar.has(path)) {
+      familiar.set(path, []);
+      if (config.cors) {
+        app.options(path, ...matchingParsers, handler);
+        familiar.get(path)?.push("options");
+      }
     }
+    familiar.get(path)?.push(method);
     app[method](path, ...matchingParsers, handler);
   };
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
+  if (config.wrongMethodBehavior !== 405) return;
+  for (const [path, allowedMethods] of familiar.entries()) {
+    app.all(path, ({ method }, res, next) => {
+      return next(
+        allowedMethods &&
+          createHttpError(405, `${method} is not allowed`, {
+            headers: { Allowed: allowedMethods.join(", ").toUpperCase() },
+          }),
+      );
+    });
+  }
 };
