@@ -70,13 +70,13 @@ export const initRouting = ({
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
   if (config.wrongMethodBehavior !== 405) return;
   for (const [path, allowedMethods] of familiar.entries()) {
-    app.all(path, ({ method }, res, next) => {
-      return next(
+    app.all(path, ({ method }, res, next) =>
+      next(
         allowedMethods &&
           createHttpError(405, `${method} is not allowed`, {
             headers: { Allowed: allowedMethods.join(", ").toUpperCase() },
           }),
-      );
-    });
+      ),
+    );
   }
 };
