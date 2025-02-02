@@ -1,29 +1,28 @@
-import { F, tryCatch } from "ramda";
 import { bench } from "vitest";
+import { BuiltinLogger } from "../../src";
 
-const fn1 = () => new Array(1000).fill(0);
-const fn2 = () => {
-  throw new Error("Expected");
-};
+describe("Experiment for builtin logger", () => {
+  const fixed = (a: string, b?: number) => `${a}${b}`;
+  const generic = (...args: unknown[]) => args.join();
+  const logger = new BuiltinLogger();
 
-describe("Experiment on try..catch with success", () => {
-  bench("try..catch", () => {
-    fn1();
+  bench("fixed 2", () => {
+    fixed("second", 2);
   });
 
-  bench("tryCatch()", () => {
-    tryCatch(fn1, F)();
-  });
-});
-
-describe("Experiment on try..catch with error", () => {
-  bench("try..catch", () => {
-    try {
-      fn2();
-    } catch {}
+  bench("fixed 1", () => {
+    fixed("second");
   });
 
-  bench("tryCatch()", () => {
-    tryCatch(fn2, F)();
+  bench("generic 2", () => {
+    generic("second", 2);
+  });
+
+  bench("generic 1", () => {
+    generic("second");
+  });
+
+  bench(".child", () => {
+    logger.child({});
   });
 });
