@@ -16,7 +16,7 @@ import { Parsers, Routing, initRouting } from "./routing";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,
-  createParserFailureHandler,
+  createCatcher,
   createUploadParsers,
   makeGetLogger,
   installDeprecationListener,
@@ -40,12 +40,12 @@ const makeCommonEntities = (config: CommonConfig) => {
   const getLogger = makeGetLogger(logger);
   const commons = { getLogger, errorHandler };
   const notFoundHandler = createNotFoundHandler(commons);
-  const parserFailureHandler = createParserFailureHandler(commons);
+  const catcher = createCatcher(commons);
   return {
     ...commons,
     logger,
     notFoundHandler,
-    parserFailureHandler,
+    catcher,
     loggingMiddleware,
   };
 };
@@ -63,13 +63,8 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
 };
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
-  const {
-    logger,
-    getLogger,
-    notFoundHandler,
-    parserFailureHandler,
-    loggingMiddleware,
-  } = makeCommonEntities(config);
+  const { logger, getLogger, notFoundHandler, catcher, loggingMiddleware } =
+    makeCommonEntities(config);
   const app = express().disable("x-powered-by").use(loggingMiddleware);
 
   if (config.compression) {
@@ -91,7 +86,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
 
   await config.beforeRouting?.({ app, getLogger });
   initRouting({ app, routing, getLogger, config, parsers });
-  app.use(parserFailureHandler, notFoundHandler);
+  app.use(catcher, notFoundHandler);
 
   const created: Array<http.Server | https.Server> = [];
   const makeStarter =
