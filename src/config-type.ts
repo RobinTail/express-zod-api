@@ -42,6 +42,7 @@ export interface CommonConfig {
    * @example 404 — Not found
    * @example 405 — Method not allowed, incl. the "Allowed" header with a list of methods
    * @default 404
+   * @todo consider changing default to 405 in v23
    * */
   wrongMethodBehavior?: 404 | 405;
   /**
