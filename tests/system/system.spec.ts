@@ -112,6 +112,7 @@ describe("App in production mode", async () => {
   const config = createConfig({
     http: { listen: port },
     compression: { threshold: 1 },
+    wrongMethodBehavior: 405,
     beforeRouting: ({ app, getLogger }) => {
       depd("express")("Sample deprecation message");
       app.use((req, {}, next) => {
@@ -300,6 +301,13 @@ describe("App in production mode", async () => {
   });
 
   describe("Protocol", () => {
+    test("Should fail on invalid path", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/wrong`);
+      expect(response.status).toBe(404);
+      const json = await response.json();
+      expect(json).toMatchSnapshot();
+    });
+
     test("Should fail on invalid method", async () => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "PUT",
@@ -311,7 +319,8 @@ describe("App in production mode", async () => {
           something: "joke",
         }),
       });
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(405);
+      expect(response.headers.get("Allow")).toBe("GET, POST");
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
