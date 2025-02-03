@@ -19,12 +19,14 @@ export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
 export const createWrongMethodHandler =
   (allowedMethods: Array<Method | AuxMethod>): RequestHandler =>
-  ({ method }, _res, next) =>
-    next(
-      createHttpError(405, `${method} is not allowed`, {
-        headers: { Allowed: allowedMethods.join(", ").toUpperCase() },
-      }),
-    );
+  ({ method }, res, next) => {
+    const Allowed = allowedMethods.join(", ").toUpperCase();
+    res.set({ Allowed }); // in case of a custom ResultHandler that does not care about headers in error
+    const error = createHttpError(405, `${method} is not allowed`, {
+      headers: { Allowed },
+    });
+    next(error);
+  };
 
 export const initRouting = ({
   app,

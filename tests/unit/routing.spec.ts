@@ -433,12 +433,12 @@ describe("Routing", () => {
     test("should call forward 405 error with a header having list of allowed methods", () => {
       const handler = createWrongMethodHandler(["post", "options"]);
       const nextMock = vi.fn();
-      handler(makeRequestMock(), makeResponseMock(), nextMock);
+      const resMock = makeResponseMock();
+      handler(makeRequestMock(), resMock, nextMock);
+      expect(resMock._getHeaders()).toHaveProperty("allowed", "POST, OPTIONS");
       expect(nextMock).toHaveBeenCalledWith(
         createHttpError(405, "GET is not allowed", {
-          headers: {
-            Allowed: "POST, OPTIONS",
-          },
+          headers: { Allowed: "POST, OPTIONS" },
         }),
       );
     });
