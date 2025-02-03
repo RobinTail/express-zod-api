@@ -693,7 +693,7 @@ export const depictRequestParams = ({
         required: !paramSchema.isOptional(),
         description: depicted.description || description,
         schema: result,
-        examples: depictParamExamples(extractObjectSchema(schema), name),
+        examples: depictParamExamples(objectSchema, name),
       });
     },
     [],
