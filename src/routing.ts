@@ -21,10 +21,9 @@ const createWrongMethodHandler =
   (allowedMethods: Array<Method | AuxMethod>): RequestHandler =>
   ({ method }, res, next) =>
     next(
-      allowedMethods &&
-        createHttpError(405, `${method} is not allowed`, {
-          headers: { Allowed: allowedMethods.join(", ").toUpperCase() },
-        }),
+      createHttpError(405, `${method} is not allowed`, {
+        headers: { Allowed: allowedMethods.join(", ").toUpperCase() },
+      }),
     );
 
 export const initRouting = ({
