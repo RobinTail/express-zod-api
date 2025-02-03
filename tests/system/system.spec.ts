@@ -320,7 +320,7 @@ describe("App in production mode", async () => {
         }),
       });
       expect(response.status).toBe(405);
-      expect(response.headers.get("Allowed")).toBe("GET, POST");
+      expect(response.headers.get("Allow")).toBe("GET, POST");
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });

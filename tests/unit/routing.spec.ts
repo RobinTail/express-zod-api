@@ -435,10 +435,10 @@ describe("Routing", () => {
       const nextMock = vi.fn();
       const resMock = makeResponseMock();
       handler(makeRequestMock(), resMock, nextMock);
-      expect(resMock._getHeaders()).toHaveProperty("allowed", "POST, OPTIONS");
+      expect(resMock._getHeaders()).toHaveProperty("allow", "POST, OPTIONS");
       expect(nextMock).toHaveBeenCalledWith(
         createHttpError(405, "GET is not allowed", {
-          headers: { Allowed: "POST, OPTIONS" },
+          headers: { Allow: "POST, OPTIONS" },
         }),
       );
     });

@@ -21,10 +21,10 @@ export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 export const createWrongMethodHandler =
   (allowedMethods: Array<Method | AuxMethod>): RequestHandler =>
   ({ method }, res, next) => {
-    const Allowed = allowedMethods.join(", ").toUpperCase();
-    res.set({ Allowed }); // in case of a custom errorHandler configured that does not care about headers in error
+    const Allow = allowedMethods.join(", ").toUpperCase();
+    res.set({ Allow }); // in case of a custom errorHandler configured that does not care about headers in error
     const error = createHttpError(405, `${method} is not allowed`, {
-      headers: { Allowed },
+      headers: { Allow },
     });
     next(error);
   };
