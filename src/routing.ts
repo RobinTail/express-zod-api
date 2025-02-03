@@ -17,6 +17,16 @@ export interface Routing {
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
+const createWrongMethodHandler =
+  (allowedMethods: Array<Method | AuxMethod>): RequestHandler =>
+  ({ method }, res, next) =>
+    next(
+      allowedMethods &&
+        createHttpError(405, `${method} is not allowed`, {
+          headers: { Allowed: allowedMethods.join(", ").toUpperCase() },
+        }),
+    );
+
 export const initRouting = ({
   app,
   getLogger,
@@ -69,14 +79,6 @@ export const initRouting = ({
   };
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
   if (config.wrongMethodBehavior !== 405) return;
-  for (const [path, allowedMethods] of familiar.entries()) {
-    app.all(path, ({ method }, res, next) =>
-      next(
-        allowedMethods &&
-          createHttpError(405, `${method} is not allowed`, {
-            headers: { Allowed: allowedMethods.join(", ").toUpperCase() },
-          }),
-      ),
-    );
-  }
+  for (const [path, allowedMethods] of familiar.entries())
+    app.all(path, createWrongMethodHandler(allowedMethods));
 };
