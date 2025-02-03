@@ -19,8 +19,9 @@ import {
   makeRequestMock,
   makeResponseMock,
 } from "../../src/testing";
-import { initRouting } from "../../src/routing";
+import { createWrongMethodHandler, initRouting } from "../../src/routing";
 import type { IRouter, RequestHandler } from "express";
+import createHttpError from "http-errors";
 
 describe("Routing", () => {
   describe("initRouting()", () => {
@@ -425,6 +426,21 @@ describe("Routing", () => {
           { method: "get", path: "/path", reason: expect.any(Error) },
         ],
       ]);
+    });
+  });
+
+  describe("createWrongMethodHandler", () => {
+    test("should call forward 405 error with a header having list of allowed methods", () => {
+      const handler = createWrongMethodHandler(["post", "options"]);
+      const nextMock = vi.fn();
+      handler(makeRequestMock(), makeResponseMock(), nextMock);
+      expect(nextMock).toHaveBeenCalledWith(
+        createHttpError(405, "GET is not allowed", {
+          headers: {
+            Allowed: "POST, OPTIONS",
+          },
+        }),
+      );
     });
   });
 });

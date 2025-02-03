@@ -17,7 +17,7 @@ export interface Routing {
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
-const createWrongMethodHandler =
+export const createWrongMethodHandler =
   (allowedMethods: Array<Method | AuxMethod>): RequestHandler =>
   ({ method }, res, next) =>
     next(
