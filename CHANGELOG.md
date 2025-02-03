@@ -2,6 +2,20 @@
 
 ## Version 22
 
+### v22.5.0
+
+- Feature: Ability to respond with status code `405` (Method not allowed) to requests having wrong method:
+  - Previously, in all cases where the method and route combination was not defined, the response had status code `404`;
+  - For situations where a known route does not support the method being used, there is a more appropriate code `405`:
+    - See https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405 for details;
+  - You can activate this feature by setting the new `wrongMethodBehavior` config option `405` (default: `404`).
+
+```ts
+import { createConfig } from "express-zod-api";
+
+createConfig({ wrongMethodBehavior: 405 });
+```
+
 ### v22.4.2
 
 - Excluded 41 response-only headers from the list of well-known ones used to depict request params in Documentation.

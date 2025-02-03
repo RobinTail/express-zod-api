@@ -905,7 +905,8 @@ origins of errors that could happen in runtime and be handled the following way:
     - Others, inheriting from `Error` class (`500`);
 - Ones related to routing, parsing and upload issues — handled by `ResultHandler` assigned to `errorHandler` in config:
   - Default is `defaultResultHandler` — it sets the response status code from the corresponding `HttpError`:
-    `400` for parsing, `404` for routing, `config.upload.limitError.statusCode` for upload issues, or `500` for others.
+    `400` for parsing, `404` for routing, `config.upload.limitError.statusCode` for upload issues, or `500` for others;
+  - You can also set `wrongMethodBehavior` config option to `405` (Method not allowed) for requests having wrong method;
   - `ResultHandler` must handle possible `error` and avoid throwing its own errors, otherwise:
 - Ones related to `ResultHandler` execution — handled by `LastResortHandler`:
   - Response status code is always `500` and the response itself is a plain text.

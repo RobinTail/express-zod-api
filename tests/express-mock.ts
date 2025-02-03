@@ -19,6 +19,7 @@ const appMock = {
   delete: vi.fn(),
   options: vi.fn(),
   init: vi.fn(),
+  all: vi.fn(),
 };
 
 const expressMock = () => appMock;
