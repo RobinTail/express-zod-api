@@ -17,11 +17,12 @@ export interface Routing {
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
+/** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405 */
 export const createWrongMethodHandler =
   (allowedMethods: Array<Method | AuxMethod>): RequestHandler =>
   ({ method }, res, next) => {
     const Allowed = allowedMethods.join(", ").toUpperCase();
-    res.set({ Allowed }); // in case of a custom ResultHandler that does not care about headers in error
+    res.set({ Allowed }); // in case of a custom errorHandler configured that does not care about headers in error
     const error = createHttpError(405, `${method} is not allowed`, {
       headers: { Allowed },
     });
