@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { chain, memoizeWith, xprod } from "ramda";
+import { chain, memoizeWith, objOf, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -78,14 +78,12 @@ export const getMessageFromError = (error: Error): string => {
 /** Takes the original unvalidated examples from the properties of ZodObject schema shape */
 export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
   Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
-    (acc, [key, schema]) => {
-      const examples = (schema._def[metaSymbol]?.examples || []).map(
-        (example: unknown) => ({ [key]: example }),
-      );
-      return combinations(acc, examples, ([a, b]) =>
-        Object.assign({}, a, b),
-      ) as typeof acc;
-    },
+    (acc, [key, schema]) =>
+      combinations(
+        acc,
+        (schema._def[metaSymbol]?.examples || []).map(objOf(key)),
+        ([a, b]) => Object.assign({}, a, b),
+      ),
     [],
   );
 
