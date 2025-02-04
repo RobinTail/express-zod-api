@@ -2,8 +2,36 @@
 
 ## Version 22
 
+### v22.6.0
+
+- Feature: pulling examples up from the object schema properties:
+  - When describing I/O schemas for generating `Documentation` the examples used to work properly only when assigned to
+    the top level (`z.object().example()`), especially complex scenarios involving path parameters and middlewares;
+  - This version supports examples assigned to the individual properties on the I/O object schemas;
+  - It makes the syntax more readable and fixes the issue when example is only set for a path parameter.
+
+```ts
+const before = factory.build({
+  input: z
+    .object({
+      key: z.string(),
+    })
+    .example({
+      key: "1234-5678-90",
+    }),
+});
+
+const after = factory.build({
+  input: z.object({
+    key: z.string().example("1234-5678-90"),
+  }),
+});
+```
+
 ### v22.5.0
 
+- Feature: `defaultResultHandler` sets headers from `HttpError`:
+  - If you `throw createHttpError(400, "message", { headers })` those `headers` go to the negative response.
 - Feature: Ability to respond with status code `405` (Method not allowed) to requests having wrong method:
   - Previously, in all cases where the method and route combination was not defined, the response had status code `404`;
   - For situations where a known route does not support the method being used, there is a more appropriate code `405`:
