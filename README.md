@@ -1298,11 +1298,9 @@ import { defaultEndpointsFactory } from "express-zod-api";
 const exampleEndpoint = defaultEndpointsFactory.build({
   shortDescription: "Retrieves the user.", // <—— this becomes the summary line
   description: "The detailed explanaition on what this endpoint does.",
-  input: z
-    .object({
-      id: z.number().describe("the ID of the user"),
-    })
-    .example({ id: 123 }),
+  input: z.object({
+    id: z.number().describe("the ID of the user").example(123),
+  }),
   // ..., similarly for output and middlewares
 });
 ```
