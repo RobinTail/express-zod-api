@@ -591,7 +591,12 @@ export const depictExamples = (
     getExamples,
     map(when((subj) => detectType(subj) === "Object", omit(omitProps))),
     enumerateExamples,
-  )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
+  )({
+    schema,
+    variant: isResponse ? "parsed" : "original",
+    validate: true,
+    pullProps: true,
+  });
 
 export const depictParamExamples = (
   schema: z.ZodTypeAny,
@@ -602,7 +607,7 @@ export const depictParamExamples = (
     filter<FlatObject>(has(param)),
     pluck(param),
     enumerateExamples,
-  )({ schema, variant: "original", validate: true });
+  )({ schema, variant: "original", validate: true, pullProps: true });
 
 export const extractObjectSchema = (
   subject: IOSchema,
@@ -651,7 +656,7 @@ export const depictRequestParams = ({
   isHeader?: IsHeader;
   security?: Alternatives<Security>;
 }) => {
-  const { shape } = extractObjectSchema(schema);
+  const objectSchema = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
@@ -666,34 +671,37 @@ export const depictRequestParams = ({
     areHeadersEnabled &&
     (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders));
 
-  return Object.keys(shape).reduce<ParameterObject[]>((acc, name) => {
-    const location = isPathParam(name)
-      ? "path"
-      : isHeaderParam(name)
-        ? "header"
-        : isQueryEnabled
-          ? "query"
-          : undefined;
-    if (!location) return acc;
-    const depicted = walkSchema(shape[name], {
-      rules: { ...brandHandling, ...depicters },
-      onEach,
-      onMissing,
-      ctx: { isResponse: false, makeRef, path, method },
-    });
-    const result =
-      composition === "components"
-        ? makeRef(shape[name], depicted, makeCleanId(description, name))
-        : depicted;
-    return acc.concat({
-      name,
-      in: location,
-      required: !shape[name].isOptional(),
-      description: depicted.description || description,
-      schema: result,
-      examples: depictParamExamples(schema, name),
-    });
-  }, []);
+  return Object.entries(objectSchema.shape).reduce<ParameterObject[]>(
+    (acc, [name, paramSchema]) => {
+      const location = isPathParam(name)
+        ? "path"
+        : isHeaderParam(name)
+          ? "header"
+          : isQueryEnabled
+            ? "query"
+            : undefined;
+      if (!location) return acc;
+      const depicted = walkSchema(paramSchema, {
+        rules: { ...brandHandling, ...depicters },
+        onEach,
+        onMissing,
+        ctx: { isResponse: false, makeRef, path, method },
+      });
+      const result =
+        composition === "components"
+          ? makeRef(paramSchema, depicted, makeCleanId(description, name))
+          : depicted;
+      return acc.concat({
+        name,
+        in: location,
+        required: !paramSchema.isOptional(),
+        description: depicted.description || description,
+        schema: result,
+        examples: depictParamExamples(objectSchema, name),
+      });
+    },
+    [],
+  );
 };
 
 export const depicters: HandlingRules<
@@ -964,7 +972,7 @@ export const depictBody = ({
       composition === "components"
         ? makeRef(schema, bodyDepiction, makeCleanId(description))
         : bodyDepiction,
-    examples: depictExamples(schema, false, paramNames),
+    examples: depictExamples(extractObjectSchema(schema), false, paramNames),
   };
   return { description, content: { [mimeType]: media } };
 };
