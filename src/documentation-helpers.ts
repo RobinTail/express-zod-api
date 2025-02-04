@@ -671,9 +671,8 @@ export const depictRequestParams = ({
     areHeadersEnabled &&
     (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders));
 
-  return Object.keys(objectSchema.shape).reduce<ParameterObject[]>(
-    (acc, name) => {
-      const paramSchema = objectSchema.shape[name];
+  return Object.entries(objectSchema.shape).reduce<ParameterObject[]>(
+    (acc, [name, paramSchema]) => {
       const location = isPathParam(name)
         ? "path"
         : isHeaderParam(name)
