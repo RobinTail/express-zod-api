@@ -5,6 +5,10 @@
 ### v22.6.0
 
 - Feature: pulling examples up from the object schema properties:
+  - When describing I/O schemas for generating `Documentation` the examples used to work properly only when assigned to
+    the top level (`z.object().example()`), especially complex scenarios involving path parameters and middlewares;
+  - This version supports examples assigned to the individual properties on the I/O object schemas;
+  - It makes the syntax more readable and fixes the issue when example is only set for a path parameter.
 
 ```ts
 const before = factory.build({
