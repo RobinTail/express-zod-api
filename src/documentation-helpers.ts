@@ -591,7 +591,12 @@ export const depictExamples = (
     getExamples,
     map(when((subj) => detectType(subj) === "Object", omit(omitProps))),
     enumerateExamples,
-  )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
+  )({
+    schema,
+    variant: isResponse ? "parsed" : "original",
+    validate: true,
+    pullProps: true,
+  });
 
 export const depictParamExamples = (
   schema: z.ZodTypeAny,
@@ -602,7 +607,7 @@ export const depictParamExamples = (
     filter<FlatObject>(has(param)),
     pluck(param),
     enumerateExamples,
-  )({ schema, variant: "original", validate: true });
+  )({ schema, variant: "original", validate: true, pullProps: true });
 
 export const extractObjectSchema = (
   subject: IOSchema,

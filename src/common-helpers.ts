@@ -94,7 +94,7 @@ export const getExamples = <
   schema,
   variant = "original",
   validate = variant === "parsed",
-  pullProps = true,
+  pullProps = false,
 }: {
   schema: T;
   /**
@@ -111,7 +111,7 @@ export const getExamples = <
   validate?: boolean;
   /**
    * @desc should pull examples from properties — applicable to ZodObject only
-   * @default true
+   * @default false
    * */
   pullProps?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {

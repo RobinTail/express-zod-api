@@ -267,9 +267,10 @@ describe("Common Helpers", () => {
     );
 
     describe("Feature #2324: pulling examples up from the object props", () => {
-      test("by default", () => {
+      test("opt-in", () => {
         expect(
           getExamples({
+            pullProps: true,
             schema: z.object({
               a: z.string().example("one"),
               b: z.number().example(1),
@@ -277,17 +278,10 @@ describe("Common Helpers", () => {
           }),
         ).toEqual([{ a: "one", b: 1 }]);
       });
-      test("opt out on demand", () => {
-        expect(
-          getExamples({
-            schema: z.object({ a: z.string().example("one") }),
-            pullProps: false,
-          }),
-        ).toEqual([]);
-      });
       test("only when the object level is empty", () => {
         expect(
           getExamples({
+            pullProps: true,
             schema: z
               .object({
                 a: z.string().example("one"),
