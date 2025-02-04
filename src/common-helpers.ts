@@ -76,7 +76,7 @@ export const getMessageFromError = (error: Error): string => {
 };
 
 /** Takes the original unvalidated examples from the properties of ZodObject schema shape */
-const pullExampleProps = <T extends z.SomeZodObject>(subject: T): T =>
+export const pullExampleProps = <T extends z.SomeZodObject>(subject: T): T =>
   Object.entries(subject.shape).reduce((acc, [key, schema]) => {
     const examples = getExamples({
       schema,
