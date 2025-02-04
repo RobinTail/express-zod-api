@@ -1271,6 +1271,8 @@ paths:
           schema:
             type: string
             minLength: 1
+            examples:
+              - "1234567890"
           examples:
             example1:
               value: "1234567890"
@@ -1280,6 +1282,8 @@ paths:
           description: PATCH /v1/user/:id Parameter
           schema:
             type: string
+            examples:
+              - "12"
           examples:
             example1:
               value: "12"
@@ -1293,9 +1297,13 @@ paths:
                 key:
                   type: string
                   minLength: 1
+                  examples:
+                    - 1234-5678-90
                 name:
                   type: string
                   minLength: 1
+                  examples:
+                    - John Doe
                 birthday:
                   description: YYYY-MM-DDTHH:mm:ss.sssZ
                   type: string
@@ -1303,6 +1311,8 @@ paths:
                   pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
                   externalDocs:
                     url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                  examples:
+                    - 1963-04-21
               required:
                 - key
                 - name
@@ -1332,18 +1342,19 @@ paths:
                     properties:
                       name:
                         type: string
+                        examples:
+                          - John Doe
                       createdAt:
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string
                         format: date-time
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                        examples:
+                          - 2021-12-31T00:00:00.000Z
                     required:
                       - name
                       - createdAt
-                    examples:
-                      - name: John Doe
-                        createdAt: 2021-12-31T00:00:00.000Z
                 required:
                   - status
                   - data
@@ -2219,8 +2230,12 @@ components:
     PatchV1UserIdParameterToken:
       type: string
       minLength: 1
+      examples:
+        - "1234567890"
     PatchV1UserIdParameterId:
       type: string
+      examples:
+        - "12"
     PatchV1UserIdPositiveResponse:
       type: object
       properties:
@@ -2232,18 +2247,19 @@ components:
           properties:
             name:
               type: string
+              examples:
+                - John Doe
             createdAt:
               description: YYYY-MM-DDTHH:mm:ss.sssZ
               type: string
               format: date-time
               externalDocs:
                 url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+              examples:
+                - 2021-12-31T00:00:00.000Z
           required:
             - name
             - createdAt
-          examples:
-            - name: John Doe
-              createdAt: 2021-12-31T00:00:00.000Z
       required:
         - status
         - data
@@ -2269,9 +2285,13 @@ components:
         key:
           type: string
           minLength: 1
+          examples:
+            - 1234-5678-90
         name:
           type: string
           minLength: 1
+          examples:
+            - John Doe
         birthday:
           description: YYYY-MM-DDTHH:mm:ss.sssZ
           type: string
@@ -2279,6 +2299,8 @@ components:
           pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
           externalDocs:
             url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+          examples:
+            - 1963-04-21
       required:
         - key
         - name
@@ -4726,11 +4748,6 @@ paths:
               required:
                 - key
                 - str
-            examples:
-              example1:
-                value:
-                  key: 1234-56789-01
-                  str: test
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -5008,6 +5025,9 @@ paths:
             type: string
             examples:
               - "123"
+          examples:
+            example1:
+              value: "123"
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -5031,6 +5051,12 @@ paths:
                 required:
                   - status
                   - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      numericStr: "123"
         "400":
           description: GET /v1/getSomething Negative response
           content:
