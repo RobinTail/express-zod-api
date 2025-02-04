@@ -79,11 +79,9 @@ export const getMessageFromError = (error: Error): string => {
 export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
   Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
     (acc, [key, schema]) => {
-      const examples = getExamples({
-        schema,
-        variant: "original",
-        pullProps: false,
-      }).map((example) => ({ [key]: example }));
+      const examples = (schema._def[metaSymbol]?.examples || []).map(
+        (example: unknown) => ({ [key]: example }),
+      );
       return combinations(acc, examples, ([a, b]) =>
         Object.assign({}, a, b),
       ) as typeof acc;
