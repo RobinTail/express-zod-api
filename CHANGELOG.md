@@ -2,6 +2,28 @@
 
 ## Version 22
 
+### v22.6.0
+
+- Feature: pulling examples up from the object schema properties:
+
+```ts
+const before = factory.build({
+  input: z
+    .object({
+      key: z.string(),
+    })
+    .example({
+      key: "1234-5678-90",
+    }),
+});
+
+const after = factory.build({
+  input: z.object({
+    key: z.string().example("1234-5678-90"),
+  }),
+});
+```
+
 ### v22.5.0
 
 - Feature: `defaultResultHandler` sets headers from `HttpError`:
