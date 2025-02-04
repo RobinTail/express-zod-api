@@ -4,6 +4,8 @@
 
 ### v22.5.0
 
+- Feature: `defaultResultHandler` sets headers from `HttpError`:
+  - If you `throw createHttpError(400, "message", { headers })` those `headers` go to the negative response.
 - Feature: Ability to respond with status code `405` (Method not allowed) to requests having wrong method:
   - Previously, in all cases where the method and route combination was not defined, the response had status code `404`;
   - For situations where a known route does not support the method being used, there is a more appropriate code `405`:
