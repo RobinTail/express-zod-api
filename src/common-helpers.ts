@@ -82,7 +82,7 @@ export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
       combinations(
         acc,
         (schema._def[metaSymbol]?.examples || []).map(objOf(key)),
-        ([a, b]) => Object.assign({}, a, b),
+        ([left, right]) => ({ ...left, ...right }),
       ),
     [],
   );
