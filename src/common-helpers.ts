@@ -4,7 +4,7 @@ import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import { OutputValidationError } from "./errors";
-import { copyMeta, metaSymbol } from "./metadata";
+import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
@@ -76,19 +76,20 @@ export const getMessageFromError = (error: Error): string => {
 };
 
 /** Takes the original unvalidated examples from the properties of ZodObject schema shape */
-export const pullExampleProps = <T extends z.SomeZodObject>(subject: T): T =>
-  Object.entries(subject.shape).reduce((acc, [key, schema]) => {
-    const examples = getExamples({
-      schema,
-      variant: "original",
-      pullProps: false,
-    });
-    const asObject = examples.reduce<z.SomeZodObject>(
-      (tmp, example) => tmp.example({ [key]: example }),
-      z.object({ [key]: schema }),
-    );
-    return copyMeta(asObject, acc);
-  }, subject);
+export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
+  Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
+    (acc, [key, schema]) => {
+      const examples = getExamples({
+        schema,
+        variant: "original",
+        pullProps: false,
+      }).map((example) => ({ [key]: example }));
+      return combinations(acc, examples, ([a, b]) =>
+        Object.assign({}, a, b),
+      ) as typeof acc;
+    },
+    [],
+  );
 
 export const getExamples = <
   T extends z.ZodTypeAny,
@@ -118,15 +119,9 @@ export const getExamples = <
    * */
   pullProps?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  const examples = schema._def[metaSymbol]?.examples || [];
-  if (!examples.length && pullProps && schema instanceof z.ZodObject) {
-    return getExamples({
-      schema: pullExampleProps(schema),
-      pullProps: false, // avoid loop
-      variant,
-      validate,
-    });
-  }
+  let examples = schema._def[metaSymbol]?.examples || [];
+  if (!examples.length && pullProps && schema instanceof z.ZodObject)
+    examples = pullExampleProps(schema);
   if (!validate && variant === "original") return examples;
   const result: Array<z.input<T> | z.output<T>> = [];
   for (const example of examples) {
