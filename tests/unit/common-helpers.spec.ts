@@ -9,6 +9,7 @@ import {
   hasCoercion,
   makeCleanId,
   ensureError,
+  pullExampleProps,
 } from "../../src/common-helpers";
 import { z } from "zod";
 import { makeRequestMock } from "../../src/testing";
@@ -167,6 +168,24 @@ describe("Common Helpers", () => {
     });
   });
 
+  describe("pullExampleProps()", () => {
+    test("handles multiple examples per property", () => {
+      const schema = z.object({
+        a: z.string().example("one").example("two").example("three"),
+        b: z.number().example(1).example(2),
+        c: z.boolean().example(false),
+      });
+      expect(pullExampleProps(schema)).toEqual([
+        { a: "one", b: 1, c: false },
+        { a: "one", b: 2, c: false },
+        { a: "two", b: 1, c: false },
+        { a: "two", b: 2, c: false },
+        { a: "three", b: 1, c: false },
+        { a: "three", b: 2, c: false },
+      ]);
+    });
+  });
+
   describe("getExamples()", () => {
     test("should return an empty array in case examples are not set", () => {
       expect(getExamples({ schema: z.string(), variant: "parsed" })).toEqual(
@@ -246,6 +265,33 @@ describe("Common Helpers", () => {
         ]);
       },
     );
+
+    describe("Feature #2324: pulling examples up from the object props", () => {
+      test("opt-in", () => {
+        expect(
+          getExamples({
+            pullProps: true,
+            schema: z.object({
+              a: z.string().example("one"),
+              b: z.number().example(1),
+            }),
+          }),
+        ).toEqual([{ a: "one", b: 1 }]);
+      });
+      test("only when the object level is empty", () => {
+        expect(
+          getExamples({
+            pullProps: true,
+            schema: z
+              .object({
+                a: z.string().example("one"),
+                b: z.number().example(1),
+              })
+              .example({ a: "two", b: 2 }), // higher priority
+          }),
+        ).toEqual([{ a: "two", b: 2 }]);
+      });
+    });
   });
 
   describe("combinations()", () => {

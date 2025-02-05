@@ -60,7 +60,16 @@ exports[`App in production mode > Positive > Should compress the response in cas
 exports[`App in production mode > Protocol > Should fail on invalid method 1`] = `
 {
   "error": {
-    "message": "Can not PUT /v1/test",
+    "message": "PUT is not allowed",
+  },
+  "status": "error",
+}
+`;
+
+exports[`App in production mode > Protocol > Should fail on invalid path 1`] = `
+{
+  "error": {
+    "message": "Can not GET /v1/wrong",
   },
   "status": "error",
 }

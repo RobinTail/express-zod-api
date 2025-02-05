@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { EventSource } from "undici";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
-import { Client, Implementation } from "../../example/example.client";
+import { Client, Subscription } from "../../example/example.client";
 import { givePort } from "../helpers";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -18,10 +18,16 @@ describe("Example", async () => {
   const port = givePort("example");
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
 
+  beforeAll(() => {
+    // @todo revisit when Node 24 released (currently behind a flag, Node 22.3.0 and 23x)
+    vi.stubGlobal("EventSource", EventSource);
+  });
+
   afterAll(async () => {
     example.stdout.removeListener("data", listener);
     example.kill();
     await vi.waitFor(() => assert(example.killed), { timeout: 1e4 });
+    vi.unstubAllGlobals();
   });
 
   afterEach(() => {
@@ -86,7 +92,7 @@ describe("Example", async () => {
         },
       });
       await vi.waitFor(() =>
-        assert([/v1\/user\/50/, /50, 123, 456/].every(matchOut)),
+        assert([/v1\/user\/50/, /123, 456/, /Jane Doe/, /#50/].every(matchOut)),
       );
       expect(true).toBeTruthy();
     });
@@ -251,17 +257,14 @@ describe("Example", async () => {
     });
 
     test("Should emit SSE (server sent events)", async () => {
-      const source = new EventSource(`http://localhost:${port}/v1/events/time`);
-      const stack: unknown[] = [];
-      const onTime = (evt: Event) => stack.push((evt as MessageEvent).data);
-      source.addEventListener("time", onTime);
-      await vi.waitFor(() => assert(stack.length > 2), { timeout: 5e3 });
-      expect(
-        stack.every(
-          (entry) => typeof entry === "string" && /\d{10,}/.test(entry),
-        ),
+      const stack: number[] = [];
+      const onTime = (data: number) => void stack.push(data);
+      const subscription = new Subscription("get /v1/events/stream", {}).on(
+        "time",
+        onTime,
       );
-      source.removeEventListener("time", onTime);
+      await vi.waitFor(() => assert(stack.length > 2), { timeout: 5e3 });
+      subscription.source.close();
     });
   });
 
@@ -431,7 +434,7 @@ describe("Example", async () => {
 
     test("Should handle errors for SSE endpoints", async () => {
       const response = await fetch(
-        `http://localhost:${port}/v1/events/time?trigger=failure`,
+        `http://localhost:${port}/v1/events/stream?trigger=failure`,
       );
       expect(response.status).toBe(500);
       expect(response.headers.get("content-type")).toBe(
@@ -442,25 +445,7 @@ describe("Example", async () => {
   });
 
   describe("Client", () => {
-    const createImplementation =
-      (host: string): Implementation =>
-      async (method, path, params) => {
-        const hasBody = !["get", "delete"].includes(method);
-        const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-        const response = await fetch(new URL(`${path}${searchParams}`, host), {
-          method: method.toUpperCase(),
-          headers: hasBody
-            ? { "Content-Type": "application/json", token: "456" }
-            : undefined,
-          body: hasBody ? JSON.stringify(params) : undefined,
-        });
-        const contentType = response.headers.get("content-type");
-        if (!contentType) return;
-        const isJSON = contentType.startsWith("application/json");
-        return response[isJSON ? "json" : "text"]();
-      };
-
-    const client = new Client(createImplementation(`http://localhost:${port}`));
+    const client = new Client();
 
     test("Should perform the request with a positive response", async () => {
       const response = await client.provide("get /v1/user/retrieve", {
@@ -476,6 +461,7 @@ describe("Example", async () => {
     test("Issue #2177: should handle path params correctly", async () => {
       const response = await client.provide("patch /v1/user/:id", {
         key: "123",
+        token: "456",
         id: "12",
         name: "Alan Turing",
         birthday: "1912-06-23",

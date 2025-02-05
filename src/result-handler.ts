@@ -93,7 +93,7 @@ export class ResultHandler<
 export const defaultResultHandler = new ResultHandler({
   positive: (output) => {
     // Examples are taken for proxying: no validation needed for this
-    const examples = getExamples({ schema: output });
+    const examples = getExamples({ schema: output, pullProps: true });
     const responseSchema = z.object({
       status: z.literal("success"),
       data: output,
@@ -116,10 +116,13 @@ export const defaultResultHandler = new ResultHandler({
     if (error) {
       const httpError = ensureHttpError(error);
       logServerError(httpError, logger, request, input);
-      return void response.status(httpError.statusCode).json({
-        status: "error",
-        error: { message: getPublicErrorMessage(httpError) },
-      });
+      return void response
+        .status(httpError.statusCode)
+        .set(httpError.headers)
+        .json({
+          status: "error",
+          error: { message: getPublicErrorMessage(httpError) },
+        });
     }
     response
       .status(defaultStatusCodes.positive)
@@ -134,7 +137,7 @@ export const defaultResultHandler = new ResultHandler({
  * */
 export const arrayResultHandler = new ResultHandler({
   positive: (output) => {
-    // Examples are taken for proxying: no validation needed for this
+    // Examples are taken for pulling down: no validation needed for this, no pulling up
     const examples = getExamples({ schema: output });
     const responseSchema =
       "shape" in output &&

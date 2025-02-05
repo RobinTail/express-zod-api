@@ -86,6 +86,8 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
+[<img src="https://github.com/LucWag.png" alt="@LucWag" width="50px" />](https://github.com/LucWag)
 [<img src="https://github.com/HenriJ.png" alt="@HenriJ" width="50px" />](https://github.com/HenriJ)
 [<img src="https://github.com/JonParton.png" alt="@JonParton" width="50px" />](https://github.com/JonParton)
 [<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
@@ -102,7 +104,6 @@ These people contributed to the improvement of the framework by reporting bugs, 
 [<img src="https://github.com/danclaytondev.png" alt="@danclaytondev" width="50px" />](https://github.com/danclaytondev)
 [<img src="https://github.com/huyhoang160593.png" alt="@huyhoang160593" width="50px" />](https://github.com/huyhoang160593)
 [<img src="https://github.com/sarahssharkey.png" alt="@sarahssharkey" width="50px" />](https://github.com/sarahssharkey)
-[<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
 [<img src="https://github.com/master-chu.png" alt="@master-chu" width="50px" />](https://github.com/master-chu)
 [<img src="https://github.com/alindsay55661.png" alt="@alindsay55661" width="50px" />](https://github.com/alindsay55661)
 [<img src="https://github.com/john-schmitz.png" alt="@john-schmitz" width="50px" />](https://github.com/john-schmitz)
@@ -731,10 +732,11 @@ createConfig({
 In a similar way you can enable request headers as the input source. This is an opt-in feature. Please note:
 
 - consider giving `headers` the lowest priority among other `inputSources` to avoid overwrites;
+- consider handling headers in `Middleware` and declaring them within `security` property to improve `Documentation`;
 - the request headers acquired that way are always lowercase when describing their validation schemas.
 
 ```typescript
-import { createConfig, defaultEndpointsFactory } from "express-zod-api";
+import { createConfig, Middleware } from "express-zod-api";
 import { z } from "zod";
 
 createConfig({
@@ -743,7 +745,12 @@ createConfig({
   }, // ...
 });
 
-defaultEndpointsFactory.build({
+new Middleware({
+  security: { type: "header", name: "token" }, // recommended
+  input: z.object({ token: z.string() }),
+});
+
+factory.build({
   input: z.object({
     "x-request-id": z.string(), // this one is from request.headers
     id: z.string(), // this one is from request.query
@@ -898,7 +905,8 @@ origins of errors that could happen in runtime and be handled the following way:
     - Others, inheriting from `Error` class (`500`);
 - Ones related to routing, parsing and upload issues — handled by `ResultHandler` assigned to `errorHandler` in config:
   - Default is `defaultResultHandler` — it sets the response status code from the corresponding `HttpError`:
-    `400` for parsing, `404` for routing, `config.upload.limitError.statusCode` for upload issues, or `500` for others.
+    `400` for parsing, `404` for routing, `config.upload.limitError.statusCode` for upload issues, or `500` for others;
+  - You can also set `wrongMethodBehavior` config option to `405` (Method not allowed) for requests having wrong method;
   - `ResultHandler` must handle possible `error` and avoid throwing its own errors, otherwise:
 - Ones related to `ResultHandler` execution — handled by `LastResortHandler`:
   - Response status code is always `500` and the response itself is a plain text.
@@ -1196,8 +1204,9 @@ createConfig({
 
 If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server,
 consider [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) feature.
-Client application can subscribe to the event stream using `EventSource` class instance. The following example
-demonstrates the implementation emitting the `time` event each second.
+Client application can subscribe to the event stream using `EventSource` class instance or the
+[instance of the generated](#generating-a-frontend-client) `Subscription` class. The following example demonstrates
+the implementation emitting the `time` event each second.
 
 ```typescript
 import { z } from "zod";
@@ -1214,13 +1223,6 @@ const subscriptionEndpoint = EventStreamFactory({
       await setTimeout(1000);
     }
   },
-});
-```
-
-```js
-const source = new EventSource("https://example.com/api/v1/time");
-source.addEventListener("time", (event) => {
-  const data = JSON.parse(event.data); // number
 });
 ```
 
@@ -1256,28 +1258,17 @@ const prettierFormattedTypescriptCode = await client.printFormatted(); // or jus
 ```
 
 Alternatively, you can supply your own `format` function into that method or use a regular `print()` method instead.
-The generated client is flexibly configurable on the frontend side using an implementation function that
-directly makes requests to an endpoint using the libraries and methods of your choice.
-The client asserts the type of request parameters and response.
-Consuming the generated client requires Typescript version 4.1 or higher.
+The generated client is flexibly configurable on the frontend side for using a custom implementation function that
+makes requests using the libraries and methods of your choice. The default implementation uses `fetch`. The client
+asserts the type of request parameters and response. Consuming the generated client requires Typescript version 4.1+.
 
 ```typescript
-// example frontend, simple implementation based on fetch()
-import { Client } from "./client.ts"; // the generated file
+import { Client, Implementation, Subscription } from "./client.ts"; // the generated file
 
-const client = new Client(async (method, path, params) => {
-  const hasBody = !["get", "delete"].includes(method);
-  const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
-  const response = await fetch(`https://example.com${path}${searchParams}`, {
-    method: method.toUpperCase(),
-    headers: hasBody ? { "Content-Type": "application/json" } : undefined,
-    body: hasBody ? JSON.stringify(params) : undefined,
-  });
-  return response.json();
-});
-
+const client = new Client(/* optional custom Implementation */);
 client.provide("get /v1/user/retrieve", { id: "10" });
 client.provide("post /v1/user/:id", { id: "10" }); // it also substitues path params
+new Subscription("get /v1/events/stream", {}).on("time", (time) => {}); // Server-sent events (SSE)
 ```
 
 ## Creating a documentation
@@ -1307,11 +1298,9 @@ import { defaultEndpointsFactory } from "express-zod-api";
 const exampleEndpoint = defaultEndpointsFactory.build({
   shortDescription: "Retrieves the user.", // <—— this becomes the summary line
   description: "The detailed explanaition on what this endpoint does.",
-  input: z
-    .object({
-      id: z.number().describe("the ID of the user"),
-    })
-    .example({ id: 123 }),
+  input: z.object({
+    id: z.number().describe("the ID of the user").example(123),
+  }),
   // ..., similarly for output and middlewares
 });
 ```

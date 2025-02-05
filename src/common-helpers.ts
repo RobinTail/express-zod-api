@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { chain, memoizeWith, xprod } from "ramda";
+import { chain, memoizeWith, objOf, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -75,6 +75,18 @@ export const getMessageFromError = (error: Error): string => {
   return error.message;
 };
 
+/** Takes the original unvalidated examples from the properties of ZodObject schema shape */
+export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
+  Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
+    (acc, [key, schema]) =>
+      combinations(
+        acc,
+        (schema._def[metaSymbol]?.examples || []).map(objOf(key)),
+        ([left, right]) => ({ ...left, ...right }),
+      ),
+    [],
+  );
+
 export const getExamples = <
   T extends z.ZodTypeAny,
   V extends "original" | "parsed" | undefined,
@@ -82,6 +94,7 @@ export const getExamples = <
   schema,
   variant = "original",
   validate = variant === "parsed",
+  pullProps = false,
 }: {
   schema: T;
   /**
@@ -96,8 +109,15 @@ export const getExamples = <
    * @default variant === "parsed"
    * */
   validate?: boolean;
+  /**
+   * @desc should pull examples from properties — applicable to ZodObject only
+   * @default false
+   * */
+  pullProps?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  const examples = schema._def[metaSymbol]?.examples || [];
+  let examples = schema._def[metaSymbol]?.examples || [];
+  if (!examples.length && pullProps && schema instanceof z.ZodObject)
+    examples = pullExampleProps(schema);
   if (!validate && variant === "original") return examples;
   const result: Array<z.input<T> | z.output<T>> = [];
   for (const example of examples) {
@@ -155,3 +175,6 @@ export const isProduction = memoizeWith(
   () => process.env.TSUP_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSUP
   () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
 );
+
+export const nonEmpty = <T>(subject: T[] | ReadonlyArray<T>) =>
+  subject.length ? subject : undefined;

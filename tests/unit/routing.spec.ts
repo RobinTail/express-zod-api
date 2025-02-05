@@ -19,8 +19,9 @@ import {
   makeRequestMock,
   makeResponseMock,
 } from "../../src/testing";
-import { initRouting } from "../../src/routing";
+import { createWrongMethodHandler, initRouting } from "../../src/routing";
 import type { IRouter, RequestHandler } from "express";
+import createHttpError from "http-errors";
 
 describe("Routing", () => {
   describe("initRouting()", () => {
@@ -32,57 +33,66 @@ describe("Routing", () => {
       vi.clearAllMocks(); // resets call counters on mocked methods
     });
 
-    test("Should set right methods", () => {
-      const handlerMock = vi.fn();
-      const configMock = {
-        cors: true,
-        startupLogo: false,
-      };
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const getEndpoint = factory.build({
-        output: z.object({}),
-        handler: handlerMock,
-      });
-      const postEndpoint = factory.build({
-        method: "post",
-        output: z.object({}),
-        handler: handlerMock,
-      });
-      const getAndPostEndpoint = factory.build({
-        method: ["get", "post"],
-        output: z.object({}),
-        handler: handlerMock,
-      });
-      const routing: Routing = {
-        v1: {
-          user: {
-            get: getEndpoint,
-            set: postEndpoint,
-            universal: getAndPostEndpoint,
+    test.each([404, 405])(
+      "Should set right methods %#",
+      (wrongMethodBehavior) => {
+        const handlerMock = vi.fn();
+        const configMock = {
+          cors: true,
+          startupLogo: false,
+          wrongMethodBehavior,
+        };
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const getEndpoint = factory.build({
+          output: z.object({}),
+          handler: handlerMock,
+        });
+        const postEndpoint = factory.build({
+          method: "post",
+          output: z.object({}),
+          handler: handlerMock,
+        });
+        const getAndPostEndpoint = factory.build({
+          method: ["get", "post"],
+          output: z.object({}),
+          handler: handlerMock,
+        });
+        const routing: Routing = {
+          v1: {
+            user: {
+              get: getEndpoint,
+              set: postEndpoint,
+              universal: getAndPostEndpoint,
+            },
           },
-        },
-      };
-      const logger = makeLoggerMock();
-      initRouting({
-        app: appMock as unknown as IRouter,
-        getLogger: () => logger,
-        config: configMock as CommonConfig,
-        routing,
-      });
-      expect(appMock.get).toHaveBeenCalledTimes(2);
-      expect(appMock.post).toHaveBeenCalledTimes(2);
-      expect(appMock.put).toHaveBeenCalledTimes(0);
-      expect(appMock.delete).toHaveBeenCalledTimes(0);
-      expect(appMock.patch).toHaveBeenCalledTimes(0);
-      expect(appMock.options).toHaveBeenCalledTimes(3);
-      expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/get");
-      expect(appMock.get.mock.calls[1][0]).toBe("/v1/user/universal");
-      expect(appMock.post.mock.calls[0][0]).toBe("/v1/user/set");
-      expect(appMock.post.mock.calls[1][0]).toBe("/v1/user/universal");
-      expect(appMock.options.mock.calls[0][0]).toBe("/v1/user/get");
-      expect(appMock.options.mock.calls[1][0]).toBe("/v1/user/set");
-      expect(appMock.options.mock.calls[2][0]).toBe("/v1/user/universal");
-    });
+        };
+        const logger = makeLoggerMock();
+        initRouting({
+          app: appMock as unknown as IRouter,
+          getLogger: () => logger,
+          config: configMock as CommonConfig,
+          routing,
+        });
+        expect(appMock.get).toHaveBeenCalledTimes(2);
+        expect(appMock.post).toHaveBeenCalledTimes(2);
+        expect(appMock.put).toHaveBeenCalledTimes(0);
+        expect(appMock.delete).toHaveBeenCalledTimes(0);
+        expect(appMock.patch).toHaveBeenCalledTimes(0);
+        expect(appMock.options).toHaveBeenCalledTimes(3);
+        expect(appMock.get.mock.calls[0][0]).toBe("/v1/user/get");
+        expect(appMock.get.mock.calls[1][0]).toBe("/v1/user/universal");
+        expect(appMock.post.mock.calls[0][0]).toBe("/v1/user/set");
+        expect(appMock.post.mock.calls[1][0]).toBe("/v1/user/universal");
+        expect(appMock.options.mock.calls[0][0]).toBe("/v1/user/get");
+        expect(appMock.options.mock.calls[1][0]).toBe("/v1/user/set");
+        expect(appMock.options.mock.calls[2][0]).toBe("/v1/user/universal");
+        if (wrongMethodBehavior !== 405) return;
+        expect(appMock.all).toHaveBeenCalledTimes(3);
+        expect(appMock.all.mock.calls[0][0]).toBe("/v1/user/get");
+        expect(appMock.all.mock.calls[1][0]).toBe("/v1/user/set");
+        expect(appMock.all.mock.calls[2][0]).toBe("/v1/user/universal");
+      },
+    );
 
     test("Should accept serveStatic", () => {
       const routing: Routing = {
@@ -416,6 +426,21 @@ describe("Routing", () => {
           { method: "get", path: "/path", reason: expect.any(Error) },
         ],
       ]);
+    });
+  });
+
+  describe("createWrongMethodHandler", () => {
+    test("should call forward 405 error with a header having list of allowed methods", () => {
+      const handler = createWrongMethodHandler(["post", "options"]);
+      const nextMock = vi.fn();
+      const resMock = makeResponseMock();
+      handler(makeRequestMock(), resMock, nextMock);
+      expect(resMock._getHeaders()).toHaveProperty("allow", "POST, OPTIONS");
+      expect(nextMock).toHaveBeenCalledWith(
+        createHttpError(405, "GET is not allowed", {
+          headers: { Allow: "POST, OPTIONS" },
+        }),
+      );
     });
   });
 });

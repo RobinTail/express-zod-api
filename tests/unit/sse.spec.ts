@@ -75,28 +75,32 @@ describe("SSE", () => {
   });
 
   describe("makeMiddleware()", () => {
-    test("should create a Middleware providing options for emission", async () => {
-      const middleware = makeMiddleware({ test: z.string() });
-      expect(middleware).toBeInstanceOf(Middleware);
-      expectTypeOf(middleware).toEqualTypeOf<
-        Middleware<FlatObject, Emitter<{ test: z.ZodString }>, string>
-      >();
-      const { output, responseMock } = await testMiddleware({ middleware });
-      responseMock.flush = vi.fn();
-      expect(output).toEqual({
-        isClosed: expect.any(Function),
-        emit: expect.any(Function),
-      });
-      const { isClosed, emit } = output as Emitter<{ test: z.ZodString }>;
-      expect(isClosed()).toBeFalsy();
-      emit("test", "something");
-      expect(responseMock._getData()).toBe(
-        `event: test\ndata: "something"\n\n`,
-      );
-      expect(responseMock.flush).toHaveBeenCalled();
-      responseMock.end();
-      expect(isClosed()).toBeTruthy();
-    });
+    // with and without response.flush()
+    test.each([vi.fn(), undefined])(
+      "should create a Middleware providing options for emission %#",
+      async (flushMock) => {
+        const middleware = makeMiddleware({ test: z.string() });
+        expect(middleware).toBeInstanceOf(Middleware);
+        expectTypeOf(middleware).toEqualTypeOf<
+          Middleware<FlatObject, Emitter<{ test: z.ZodString }>, string>
+        >();
+        const { output, responseMock } = await testMiddleware({ middleware });
+        if (flushMock) responseMock.flush = flushMock;
+        expect(output).toEqual({
+          isClosed: expect.any(Function),
+          emit: expect.any(Function),
+        });
+        const { isClosed, emit } = output as Emitter<{ test: z.ZodString }>;
+        expect(isClosed()).toBeFalsy();
+        emit("test", "something");
+        expect(responseMock._getData()).toBe(
+          `event: test\ndata: "something"\n\n`,
+        );
+        if (flushMock) expect(flushMock).toHaveBeenCalled();
+        responseMock.end();
+        expect(isClosed()).toBeTruthy();
+      },
+    );
   });
 
   describe("makeResultHandler()", () => {

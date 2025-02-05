@@ -16,13 +16,13 @@ import {
 } from "openapi3-ts/oas31";
 import {
   concat,
+  chain,
   type as detectType,
   filter,
   fromPairs,
   has,
   isNil,
   map,
-  mergeAll,
   mergeDeepRight,
   mergeDeepWith,
   objOf,
@@ -55,11 +55,7 @@ import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { FileSchema, ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
-import {
-  LogicalContainer,
-  andToOr,
-  mapLogicalContainer,
-} from "./logical-container";
+import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
@@ -595,7 +591,12 @@ export const depictExamples = (
     getExamples,
     map(when((subj) => detectType(subj) === "Object", omit(omitProps))),
     enumerateExamples,
-  )({ schema, variant: isResponse ? "parsed" : "original", validate: true });
+  )({
+    schema,
+    variant: isResponse ? "parsed" : "original",
+    validate: true,
+    pullProps: true,
+  });
 
 export const depictParamExamples = (
   schema: z.ZodTypeAny,
@@ -606,7 +607,7 @@ export const depictParamExamples = (
     filter<FlatObject>(has(param)),
     pluck(param),
     enumerateExamples,
-  )({ schema, variant: "original", validate: true });
+  )({ schema, variant: "original", validate: true, pullProps: true });
 
 export const extractObjectSchema = (
   subject: IOSchema,
@@ -631,8 +632,13 @@ export const extractObjectSchema = (
   );
 };
 
-export const defaultIsHeader = (name: string): name is `x-${string}` =>
-  name.startsWith("x-") || wellKnownHeaders.includes(name);
+export const defaultIsHeader = (
+  name: string,
+  familiar?: string[],
+): name is `x-${string}` =>
+  familiar?.includes(name) ||
+  name.startsWith("x-") ||
+  wellKnownHeaders.includes(name);
 
 export const depictRequestParams = ({
   path,
@@ -643,50 +649,59 @@ export const depictRequestParams = ({
   composition,
   brandHandling,
   isHeader,
+  security,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
   isHeader?: IsHeader;
+  security?: Alternatives<Security>;
 }) => {
-  const { shape } = extractObjectSchema(schema);
+  const objectSchema = extractObjectSchema(schema);
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
   const areHeadersEnabled = inputSources.includes("headers");
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
+  const securityHeaders = chain(
+    filter((entry: Security) => entry.type === "header"),
+    security ?? [],
+  ).map(({ name }) => name);
   const isHeaderParam = (name: string) =>
     areHeadersEnabled &&
-    (isHeader?.(name, method, path) ?? defaultIsHeader(name));
+    (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders));
 
-  return Object.keys(shape).reduce<ParameterObject[]>((acc, name) => {
-    const location = isPathParam(name)
-      ? "path"
-      : isHeaderParam(name)
-        ? "header"
-        : isQueryEnabled
-          ? "query"
-          : undefined;
-    if (!location) return acc;
-    const depicted = walkSchema(shape[name], {
-      rules: { ...brandHandling, ...depicters },
-      onEach,
-      onMissing,
-      ctx: { isResponse: false, makeRef, path, method },
-    });
-    const result =
-      composition === "components"
-        ? makeRef(shape[name], depicted, makeCleanId(description, name))
-        : depicted;
-    return acc.concat({
-      name,
-      in: location,
-      required: !shape[name].isOptional(),
-      description: depicted.description || description,
-      schema: result,
-      examples: depictParamExamples(schema, name),
-    });
-  }, []);
+  return Object.entries(objectSchema.shape).reduce<ParameterObject[]>(
+    (acc, [name, paramSchema]) => {
+      const location = isPathParam(name)
+        ? "path"
+        : isHeaderParam(name)
+          ? "header"
+          : isQueryEnabled
+            ? "query"
+            : undefined;
+      if (!location) return acc;
+      const depicted = walkSchema(paramSchema, {
+        rules: { ...brandHandling, ...depicters },
+        onEach,
+        onMissing,
+        ctx: { isResponse: false, makeRef, path, method },
+      });
+      const result =
+        composition === "components"
+          ? makeRef(paramSchema, depicted, makeCleanId(description, name))
+          : depicted;
+      return acc.concat({
+        name,
+        in: location,
+        required: !paramSchema.isOptional(),
+        description: depicted.description || description,
+        schema: result,
+        examples: depictParamExamples(objectSchema, name),
+      });
+    },
+    [],
+  );
 };
 
 export const depicters: HandlingRules<
@@ -835,18 +850,9 @@ export const depictResponse = ({
   return { description, content: fromPairs(xprod(mimeTypes, [media])) };
 };
 
-type SecurityHelper<K extends Security["type"]> = (
-  security: Extract<Security, { type: K }>,
-  inputSources?: InputSource[],
-) => SecuritySchemeObject;
-
-const depictBasicSecurity: SecurityHelper<"basic"> = () => ({
-  type: "http",
-  scheme: "basic",
-});
-const depictBearerSecurity: SecurityHelper<"bearer"> = ({
+const depictBearerSecurity = ({
   format: bearerFormat,
-}) => {
+}: Extract<Security, { type: "bearer" }>) => {
   const result: SecuritySchemeObject = {
     type: "http",
     scheme: "bearer",
@@ -854,9 +860,9 @@ const depictBearerSecurity: SecurityHelper<"bearer"> = ({
   if (bearerFormat) result.bearerFormat = bearerFormat;
   return result;
 };
-const depictInputSecurity: SecurityHelper<"input"> = (
-  { name },
-  inputSources,
+const depictInputSecurity = (
+  { name }: Extract<Security, { type: "input" }>,
+  inputSources: InputSource[],
 ) => {
   const result: SecuritySchemeObject = {
     type: "apiKey",
@@ -874,24 +880,30 @@ const depictInputSecurity: SecurityHelper<"input"> = (
   }
   return result;
 };
-const depictHeaderSecurity: SecurityHelper<"header"> = ({ name }) => ({
-  type: "apiKey",
+const depictHeaderSecurity = ({
+  name,
+}: Extract<Security, { type: "header" }>) => ({
+  type: "apiKey" as const,
   in: "header",
   name,
 });
-const depictCookieSecurity: SecurityHelper<"cookie"> = ({ name }) => ({
-  type: "apiKey",
+const depictCookieSecurity = ({
+  name,
+}: Extract<Security, { type: "cookie" }>) => ({
+  type: "apiKey" as const,
   in: "cookie",
   name,
 });
-const depictOpenIdSecurity: SecurityHelper<"openid"> = ({
+const depictOpenIdSecurity = ({
   url: openIdConnectUrl,
-}) => ({
-  type: "openIdConnect",
+}: Extract<Security, { type: "openid" }>) => ({
+  type: "openIdConnect" as const,
   openIdConnectUrl,
 });
-const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
-  type: "oauth2",
+const depictOAuth2Security = ({
+  flows = {},
+}: Extract<Security, { type: "oauth2" }>) => ({
+  type: "oauth2" as const,
   flows: map(
     (flow): OAuthFlowObject => ({ ...flow, scopes: flow.scopes || {} }),
     reject(isNil, flows) as Required<typeof flows>,
@@ -899,40 +911,36 @@ const depictOAuth2Security: SecurityHelper<"oauth2"> = ({ flows = {} }) => ({
 });
 
 export const depictSecurity = (
-  container: LogicalContainer<Security>,
-  inputSources?: InputSource[],
-): LogicalContainer<SecuritySchemeObject> => {
-  const methods: { [K in Security["type"]]: SecurityHelper<K> } = {
-    basic: depictBasicSecurity,
-    bearer: depictBearerSecurity,
-    input: depictInputSecurity,
-    header: depictHeaderSecurity,
-    cookie: depictCookieSecurity,
-    openid: depictOpenIdSecurity,
-    oauth2: depictOAuth2Security,
+  alternatives: Alternatives<Security>,
+  inputSources: InputSource[] = [],
+): Alternatives<SecuritySchemeObject> => {
+  const mapper = (subj: Security): SecuritySchemeObject => {
+    if (subj.type === "basic") return { type: "http", scheme: "basic" };
+    else if (subj.type === "bearer") return depictBearerSecurity(subj);
+    else if (subj.type === "input")
+      return depictInputSecurity(subj, inputSources);
+    else if (subj.type === "header") return depictHeaderSecurity(subj);
+    else if (subj.type === "cookie") return depictCookieSecurity(subj);
+    else if (subj.type === "openid") return depictOpenIdSecurity(subj);
+    else return depictOAuth2Security(subj);
   };
-  return mapLogicalContainer(container, (security) =>
-    (methods[security.type] as SecurityHelper<typeof security.type>)(
-      security,
-      inputSources,
-    ),
-  );
+  return alternatives.map((entries) => entries.map(mapper));
 };
 
 export const depictSecurityRefs = (
-  container: LogicalContainer<{ name: string; scopes: string[] }>,
-): SecurityRequirementObject[] => {
-  if ("or" in container) {
-    return container.or.map(
-      (entry): SecurityRequirementObject =>
-        "and" in entry
-          ? mergeAll(map(({ name, scopes }) => objOf(name, scopes), entry.and))
-          : { [entry.name]: entry.scopes },
-    );
-  }
-  if ("and" in container) return depictSecurityRefs(andToOr(container));
-  return depictSecurityRefs({ or: [container] });
-};
+  alternatives: Alternatives<SecuritySchemeObject>,
+  scopes: string[] | ReadonlyArray<string>,
+  entitle: (subject: SecuritySchemeObject) => string,
+): SecurityRequirementObject[] =>
+  alternatives.map((alternative) =>
+    alternative.reduce<SecurityRequirementObject>((refs, securitySchema) => {
+      const name = entitle(securitySchema);
+      const hasScopes = ["oauth2", "openIdConnect"].includes(
+        securitySchema.type,
+      );
+      return Object.assign(refs, { [name]: hasScopes ? scopes : [] });
+    }, {}),
+  );
 
 export const depictBody = ({
   method,
@@ -964,7 +972,7 @@ export const depictBody = ({
       composition === "components"
         ? makeRef(schema, bodyDepiction, makeCleanId(description))
         : bodyDepiction,
-    examples: depictExamples(schema, false, paramNames),
+    examples: depictExamples(extractObjectSchema(schema), false, paramNames),
   };
   return { description, content: { [mimeType]: media } };
 };

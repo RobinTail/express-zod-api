@@ -2,12 +2,173 @@
 
 ## Version 22
 
+### v22.6.0
+
+- Feature: pulling examples up from the object schema properties:
+  - When describing I/O schemas for generating `Documentation` the examples used to work properly only when assigned to
+    the top level (`z.object().example()`), especially complex scenarios involving path parameters and middlewares;
+  - This version supports examples assigned to the individual properties on the I/O object schemas;
+  - It makes the syntax more readable and fixes the issue when example is only set for a path parameter.
+
+```ts
+const before = factory.build({
+  input: z
+    .object({
+      key: z.string(),
+    })
+    .example({
+      key: "1234-5678-90",
+    }),
+});
+
+const after = factory.build({
+  input: z.object({
+    key: z.string().example("1234-5678-90"),
+  }),
+});
+```
+
+### v22.5.0
+
+- Feature: `defaultResultHandler` sets headers from `HttpError`:
+  - If you `throw createHttpError(400, "message", { headers })` those `headers` go to the negative response.
+- Feature: Ability to respond with status code `405` (Method not allowed) to requests having wrong method:
+  - Previously, in all cases where the method and route combination was not defined, the response had status code `404`;
+  - For situations where a known route does not support the method being used, there is a more appropriate code `405`:
+    - See https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405 for details;
+  - You can activate this feature by setting the new `wrongMethodBehavior` config option `405` (default: `404`).
+
+```ts
+import { createConfig } from "express-zod-api";
+
+createConfig({ wrongMethodBehavior: 405 });
+```
+
+### v22.4.2
+
+- Excluded 41 response-only headers from the list of well-known ones used to depict request params in Documentation.
+
+### v22.4.1
+
+- Fixed a bug that could lead to duplicate properties in generated client types:
+  - If the middleware and/or endpoint schemas had the same property, it was duplicated by Integration.
+  - The issue was introduced in [v20.15.3](#v20153) and reported by [@bobgubko](https://github.com/bobgubko).
+
+```ts
+// reproduction
+factory
+  .addMiddleware({
+    input: z.object({ query: z.string() }), // ...
+  })
+  .build({
+    input: z.object({ query: z.string() }), // ...
+  });
+```
+
+```ts
+type Before = {
+  query: string;
+  query: string; // <— bug #2352
+};
+type After = {
+  query: string;
+};
+```
+
+### v22.4.0
+
+- Feat: ability to supply extra data to a custom implementation of the generated client:
+  - You can instantiate the client class with an implementation accepting an optional context of your choice;
+  - The public `.provide()` method can now accept an additional argument having the type of that context;
+  - The problem on missing such ability was reported by [@LucWag](https://github.com/LucWag).
+
+```ts
+import { Client, Implementation } from "./generated-client.ts";
+
+interface MyCtx {
+  extraKey: string;
+}
+
+const implementation: Implementation<MyCtx> = async (
+  method,
+  path,
+  params,
+  ctx, // ctx is optional MyCtx
+) => {};
+
+const client = new Client(implementation);
+
+client.provide("get /v1/user/retrieve", { id: "10" }, { extraKey: "123456" });
+```
+
+### v22.3.1
+
+- Fixed issue on emitting server-sent events (SSE), introduced in v21.5.0:
+  - Emitting SSE failed due to internal error `flush is not a function` having `compression` disabled in config;
+  - The `.flush()` method of `response` is a feature of `compression` (optional peer dependency);
+  - It is required to call the method when `compression` is enabled;
+  - This version fixes the issue by calling the method conditionally;
+  - This bug was reported by [@bobgubko](https://github.com/bobgubko).
+
+### v22.3.0
+
+- Feat: `Subscription` class for consuming Server-sent events:
+  - The `Integration` can now also generate a frontend helper class `Subscription` to ease SSE support;
+  - The new class establishes an `EventSource` instance and exposes it as the public `source` property;
+  - The class also provides the public `on` method for your typed listeners;
+  - You can configure the generated class name using `subscriptionClassName` option (default: `Subscription`);
+  - The feature is only applicable to the `variant` option set to `client` (default).
+
+```ts
+import { Subscription } from "./client.ts"; // the generated file
+
+new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
+```
+
+### v22.2.0
+
+- Feat: detecting headers from `Middleware::security` declarations:
+  - When `headers` are enabled within `inputSources` of config, the `Documentation` generator can now identify them
+    among other inputs additionally by using the security declarations of middlewares attached to an `Endpoint`;
+  - This approach enables handling of custom headers without `x-` prefix.
+
+```ts
+const authMiddleware = new Middleware({
+  security: { type: "header", name: "token" },
+});
+```
+
+### v22.1.1
+
+- This version contains an important technical simplification of routines related to processing of `security`
+  declarations of the used `Middleware` when generating API `Documentation`.
+  - No changes to the operation are expected. This refactoring is required for a feature that will be released later.
+
+### v22.1.0
+
+- Feat: ability to configure the generated client class name:
+  - New option `clientClassName` for `Integration::constructor()` argument, default: `Client`.
+- Feat: default implementation for the generated client:
+  - The argument of the generated client class constructor became optional;
+  - The `Implementation` previously suggested as an example (using `fetch`) became the one used by default;
+  - You may no longer need to write the implementation if the default one suits your needs.
+
+```ts
+import { Integration } from "express-zod-api";
+new Integration({ clientClassName: "FancyClient" });
+```
+
+```ts
+import { FancyClient } from "./generated-client.ts";
+const client = new FancyClient(/* optional implementation */);
+```
+
 ### v22.0.0
 
 - Minimum supported Node versions: 20.9.0 and 22.0.0:
-  - Node 18 is no longer supported, its end of life is April 30, 2025.
+  - Node 18 is no longer supported; its end of life is April 30, 2025.
 - `BuiltinLogger::profile()` behavior changed for picoseconds: expressing them through nanoseconds;
-- Feature: handling all headers as input source (when enabled):
+- Feature: handling all (not just `x-` prefixed) headers as an input source (when enabled):
   - Behavior changed for `headers` inside `inputSources` config option: all headers are addressed to the `input` object;
   - This change is motivated by the deprecation of `x-` prefixed headers;
   - Since the order inside `inputSources` matters, consider moving `headers` to the first place to avoid overwrites;
@@ -19,7 +180,7 @@
   - The overload of the `Client::provide()` having 3 arguments and the `Provider` type are removed;
   - The public `jsonEndpoints` const is removed — use the `content-type` header of an actual response instead;
   - The public type `MethodPath` is removed — use the `Request` type instead.
-- The approach on tagging endpoints changed:
+- The approach to tagging endpoints changed:
   - The `tags` property moved from the argument of `createConfig()` to `Documentation::constructor()`;
   - The overload of `EndpointsFactory::constructor()` accepting `config` property is removed;
   - The argument of `EventStreamFactory::constructor()` is now the events map (formerly assigned to `events` property);

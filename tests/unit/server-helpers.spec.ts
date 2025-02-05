@@ -3,7 +3,7 @@ import { metaSymbol } from "../../src/metadata";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,
-  createParserFailureHandler,
+  createCatcher,
   createUploadFailureHandler,
   createUploadLogger,
   createUploadParsers,
@@ -22,9 +22,9 @@ import {
 import createHttpError from "http-errors";
 
 describe("Server helpers", () => {
-  describe("createParserFailureHandler()", () => {
+  describe("createCatcher()", () => {
     test("the handler should call next if there is no error", () => {
-      const handler = createParserFailureHandler({
+      const handler = createCatcher({
         errorHandler: defaultResultHandler,
         getLogger: () => makeLoggerMock(),
       });
@@ -45,7 +45,7 @@ describe("Server helpers", () => {
           handler: vi.fn(),
         });
         const spy = vi.spyOn(errorHandler, "execute");
-        const handler = createParserFailureHandler({
+        const handler = createCatcher({
           errorHandler,
           getLogger: () => makeLoggerMock(),
         });
