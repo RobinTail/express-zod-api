@@ -80,7 +80,7 @@ export const initRouting = ({
     app[method](path, ...matchingParsers, handler);
   };
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
-  if (config.wrongMethodBehavior !== 405) return;
+  if (config.wrongMethodBehavior === 404) return;
   for (const [path, allowedMethods] of familiar.entries())
     app.all(path, createWrongMethodHandler(allowedMethods));
 };
