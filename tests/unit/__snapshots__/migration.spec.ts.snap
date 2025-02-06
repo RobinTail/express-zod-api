@@ -9,6 +9,7 @@ exports[`Migration > should consist of one rule being the major version of the p
       "meta": {
         "fixable": "code",
         "messages": {
+          "add": "add {{ subject }} to {{ to }}",
           "change": "change {{ subject }} from {{ from }} to {{ to }}",
         },
         "schema": [],
