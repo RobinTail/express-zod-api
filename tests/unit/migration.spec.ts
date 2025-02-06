@@ -18,7 +18,10 @@ describe("Migration", () => {
   });
 
   tester.run("v23", migration.rules.v23, {
-    valid: [`import { HeaderSecurity } from "express-zod-api";`],
+    valid: [
+      `import { HeaderSecurity } from "express-zod-api";`,
+      `createConfig({ wrongMethodBehavior: 405 });`,
+    ],
     invalid: [
       {
         code: `const security: CustomHeaderSecurity = {};`,
@@ -30,6 +33,19 @@ describe("Migration", () => {
               subject: "interface",
               from: "CustomHeaderSecurity",
               to: "HeaderSecurity",
+            },
+          },
+        ],
+      },
+      {
+        code: `createConfig({});`,
+        output: `createConfig({wrongMethodBehavior: 404,});`,
+        errors: [
+          {
+            messageId: "add",
+            data: {
+              subject: "wrongMethodBehavior property",
+              to: "configuration",
             },
           },
         ],

@@ -7,12 +7,14 @@ import {
 
 interface Queries {
   headerSecurity: TSESTree.Identifier;
+  createConfig: TSESTree.ObjectExpression;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
   headerSecurity: `${NT.Identifier}[name='CustomHeaderSecurity']`,
+  createConfig: `${NT.CallExpression}[callee.name='createConfig'] > ${NT.ObjectExpression}`,
 };
 
 const listen = <
@@ -35,6 +37,7 @@ const v23 = ESLintUtils.RuleCreator.withoutDocs({
     schema: [],
     messages: {
       change: "change {{ subject }} from {{ from }} to {{ to }}",
+      add: `add {{ subject }} to {{ to }}`,
     },
   },
   defaultOptions: [],
@@ -47,6 +50,28 @@ const v23 = ESLintUtils.RuleCreator.withoutDocs({
           data: { subject: "interface", from: node.name, to: "HeaderSecurity" },
           fix: (fixer) => fixer.replaceText(node, "HeaderSecurity"),
         }),
+      createConfig: (node) => {
+        const wmProp = node.properties.find(
+          (prop) =>
+            prop.type === NT.Property &&
+            prop.key.type === NT.Identifier &&
+            prop.key.name === "wrongMethodBehavior",
+        );
+        if (wmProp) return;
+        ctx.report({
+          node,
+          messageId: "add",
+          data: {
+            subject: "wrongMethodBehavior property",
+            to: "configuration",
+          },
+          fix: (fixer) =>
+            fixer.insertTextAfterRange(
+              [node.range[0], node.range[0] + 1],
+              "wrongMethodBehavior: 404,",
+            ),
+        });
+      },
     }),
 });
 
