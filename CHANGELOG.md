@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 23
+
+### v23.0.0
+
+- Publicly exposed interface `CustomHeaderSecurity` is renamed to `HeaderSecurity`;
+- The default value for `wrongMethodBehavior` config option is changed to `405`.
+
 ## Version 22
 
 ### v22.6.0
