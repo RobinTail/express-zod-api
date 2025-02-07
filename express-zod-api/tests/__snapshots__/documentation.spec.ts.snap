@@ -199,7 +199,7 @@ paths:
   /v1/getSome/thing:
     get:
       operationId: GetV1GetSomeThing
-      summary: thing is the path segment
+      summary: operationIdEndpoint
       description: thing is the path segment
       responses:
         "200":
