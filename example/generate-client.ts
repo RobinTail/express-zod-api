@@ -4,7 +4,7 @@ import { routing } from "./routing";
 import { config } from "./config";
 
 await writeFile(
-  "example/example.client.ts",
+  "example.client.ts",
   await new Integration({
     routing,
     serverUrl: `http://localhost:${config.http!.listen}`,

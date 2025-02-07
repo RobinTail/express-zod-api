@@ -6,6 +6,7 @@
   ],
   "scripts": {
     "start": "yarn workspace example start",
+    "build": "yarn workspace example build && yarn workspace express-zod-api build",
     "install_hooks": "husky"
   },
   "devDependencies": {

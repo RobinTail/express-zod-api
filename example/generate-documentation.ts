@@ -5,7 +5,7 @@ import { routing } from "./routing";
 import manifest from "../express-zod-api/package.json";
 
 await writeFile(
-  "example/example.documentation.yaml",
+  "example.documentation.yaml",
   new Documentation({
     routing,
     config,

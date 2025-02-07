@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "tsx index.ts"
+    "start": "tsx index.ts",
+    "build": "yarn build:docs && yarn build:client",
+    "build:docs": "tsx generate-documentation.ts",
+    "build:client": "tsx generate-client.ts"
   },
   "dependencies": {
     "express-zod-api": "*",
