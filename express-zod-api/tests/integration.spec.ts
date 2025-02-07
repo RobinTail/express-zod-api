@@ -9,15 +9,31 @@ import {
 } from "../src";
 
 describe("Integration", () => {
-  // @todo move to example workspace
-  /*
-  test.each(["client", "types"] as const)(
-    "Should generate a %s for example API",
-    async (variant) => {
-      const client = new Integration({ variant, routing });
-      expect(await client.printFormatted()).toMatchSnapshot();
-    },
-  );*/
+  test("Should support types variant and handle recirsive schemas", () => {
+    const recursiveSchema: z.ZodTypeAny = z.lazy(() =>
+      z.object({
+        name: z.string(),
+        features: recursiveSchema,
+      }),
+    );
+
+    const client = new Integration({
+      variant: "types",
+      routing: {
+        v1: {
+          test: defaultEndpointsFactory.build({
+            method: "post",
+            input: z.object({
+              features: recursiveSchema,
+            }),
+            output: z.object({}),
+            handler: async () => ({}),
+          }),
+        },
+      },
+    });
+    expect(client.print()).toMatchSnapshot();
+  });
 
   test("Should treat optionals the same way as z.infer() by default", async () => {
     const client = new Integration({
