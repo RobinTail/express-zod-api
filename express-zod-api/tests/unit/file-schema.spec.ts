@@ -98,7 +98,7 @@ describe("ez.file()", () => {
 
     test("should accept binary read string", async () => {
       const schema = ez.file("binary");
-      const data = await readFile("logo.svg", "binary");
+      const data = await readFile("../logo.svg", "binary");
       const result = schema.safeParse(data);
       expect(result).toEqual({
         success: true,
@@ -108,7 +108,7 @@ describe("ez.file()", () => {
 
     test("should accept base64 read string", async () => {
       const schema = ez.file("base64");
-      const data = await readFile("logo.svg", "base64");
+      const data = await readFile("../logo.svg", "base64");
       const result = schema.safeParse(data);
       expect(result).toEqual({
         success: true,
