@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { ezFileBrand } from "../../src/file-schema";
-import { ez } from "../../src";
+import { ezFileBrand } from "../../express-zod-api/src/file-schema";
+import { ez } from "../../express-zod-api/src";
 import { readFile } from "node:fs/promises";
-import { metaSymbol } from "../../src/metadata";
+import { metaSymbol } from "../../express-zod-api/src/metadata";
 
 describe("ez.file()", () => {
   describe("creation", () => {

@@ -12,8 +12,8 @@ import {
   defaultEndpointsFactory,
   ez,
   ResultHandler,
-} from "../../src";
-import { contentTypes } from "../../src/content-type";
+} from "../../express-zod-api/src";
+import { contentTypes } from "../../express-zod-api/src/content-type";
 import { z } from "zod";
 import { givePort } from "../helpers";
 

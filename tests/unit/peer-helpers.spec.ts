@@ -1,5 +1,5 @@
-import { MissingPeerError } from "../../src";
-import { loadPeer } from "../../src/peer-helpers";
+import { MissingPeerError } from "../../express-zod-api/src";
+import { loadPeer } from "../../express-zod-api/src/peer-helpers";
 
 describe("Peer loading helpers", () => {
   describe("loadPeer()", () => {

@@ -6,7 +6,7 @@ import {
   ensureHttpError,
   EventStreamFactory,
   defaultEndpointsFactory,
-} from "../src";
+} from "express-zod-api";
 import { authMiddleware } from "./middlewares";
 import { createReadStream } from "node:fs";
 import { z } from "zod";

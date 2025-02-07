@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { ezDateOutBrand } from "../../src/date-out-schema";
-import { ez } from "../../src";
-import { metaSymbol } from "../../src/metadata";
+import { ezDateOutBrand } from "../../express-zod-api/src/date-out-schema";
+import { ez } from "../../express-zod-api/src";
+import { metaSymbol } from "../../express-zod-api/src/metadata";
 
 describe("ez.dateOut()", () => {
   describe("creation", () => {

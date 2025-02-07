@@ -1,9 +1,9 @@
 import ts from "typescript";
 import { z } from "zod";
-import { ez } from "../../src";
-import { f, printNode } from "../../src/typescript-api";
-import { zodToTs } from "../../src/zts";
-import { ZTSContext } from "../../src/zts-helpers";
+import { ez } from "../../express-zod-api/src";
+import { f, printNode } from "../../express-zod-api/src/typescript-api";
+import { zodToTs } from "../../express-zod-api/src/zts";
+import { ZTSContext } from "../../express-zod-api/src/zts-helpers";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: ts.Node) =>

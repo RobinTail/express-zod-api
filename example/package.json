@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "example",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "dependencies": {
+    "express-zod-api": "*",
+    "swagger-ui-express": "^5.0.0"
+  },
+  "resolutions": {
+    "**/@scarf/scarf": "npm:empty-npm-package@1.0.0"
+  }
+}

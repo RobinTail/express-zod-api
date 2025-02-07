@@ -1,6 +1,6 @@
 import { bench } from "vitest";
 import { retrieveUserEndpoint } from "../../example/endpoints/retrieve-user";
-import { testEndpoint } from "../../src";
+import { testEndpoint } from "../../express-zod-api/src";
 
 describe.skip("Endpoint", () => {
   bench(

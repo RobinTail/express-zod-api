@@ -7,8 +7,8 @@ import {
   ez,
   testEndpoint,
   ResultHandler,
-} from "../../src";
-import { AbstractEndpoint, Endpoint } from "../../src/endpoint";
+} from "../../express-zod-api/src";
+import { AbstractEndpoint, Endpoint } from "../../express-zod-api/src/endpoint";
 
 describe("Endpoint", () => {
   describe(".getMethods()", () => {

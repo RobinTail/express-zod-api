@@ -1,7 +1,7 @@
 import createHttpError, { HttpError } from "http-errors";
-import { ResultHandlerError } from "../../src/errors";
-import { lastResortHandler } from "../../src/last-resort";
-import { makeLoggerMock, makeResponseMock } from "../../src/testing";
+import { ResultHandlerError } from "../../express-zod-api/src/errors";
+import { lastResortHandler } from "../../express-zod-api/src/last-resort";
+import { makeLoggerMock, makeResponseMock } from "../../express-zod-api/src/testing";
 
 describe("Last Resort Handler", () => {
   test("should be a function", () => {

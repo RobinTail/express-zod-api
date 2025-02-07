@@ -7,7 +7,7 @@ import {
   Producer,
   defaultEndpointsFactory,
   ResultHandler,
-} from "../../src";
+} from "../../express-zod-api/src";
 
 describe("Integration", () => {
   test.each(["client", "types"] as const)(

@@ -1,4 +1,4 @@
-import { ServeStatic } from "../../src";
+import { ServeStatic } from "../../express-zod-api/src";
 
 describe("ServeStatic", () => {
   describe("constructor()", () => {

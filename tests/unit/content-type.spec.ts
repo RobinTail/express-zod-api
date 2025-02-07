@@ -1,4 +1,4 @@
-import { contentTypes } from "../../src/content-type";
+import { contentTypes } from "../../express-zod-api/src/content-type";
 
 describe("contentTypes", () => {
   test("should has predefined properties", () => {

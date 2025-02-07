@@ -1,7 +1,7 @@
 import { ReferenceObject } from "openapi3-ts/oas31";
 import { prop } from "ramda";
 import { z } from "zod";
-import { ez } from "../../src";
+import { ez } from "../../express-zod-api/src";
 import {
   OpenAPIContext,
   depictAny,
@@ -50,8 +50,8 @@ import {
   onEach,
   onMissing,
   reformatParamsInPath,
-} from "../../src/documentation-helpers";
-import { walkSchema } from "../../src/schema-walker";
+} from "../../express-zod-api/src/documentation-helpers";
+import { walkSchema } from "../../express-zod-api/src/schema-walker";
 
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();

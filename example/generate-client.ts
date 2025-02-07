@@ -1,5 +1,5 @@
 import { writeFile } from "node:fs/promises";
-import { Integration } from "../src";
+import { Integration } from "express-zod-api";
 import { routing } from "./routing";
 import { config } from "./config";
 

@@ -1,5 +1,5 @@
 import { fileUploadMock } from "../express-mock";
-import { metaSymbol } from "../../src/metadata";
+import { metaSymbol } from "../../express-zod-api/src/metadata";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,
@@ -11,14 +11,14 @@ import {
   moveRaw,
   installDeprecationListener,
   installTerminationListener,
-} from "../../src/server-helpers";
-import { CommonConfig, defaultResultHandler, ResultHandler } from "../../src";
+} from "../../express-zod-api/src/server-helpers";
+import { CommonConfig, defaultResultHandler, ResultHandler } from "../../express-zod-api/src";
 import { Request } from "express";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
-} from "../../src/testing";
+} from "../../express-zod-api/src/testing";
 import createHttpError from "http-errors";
 
 describe("Server helpers", () => {

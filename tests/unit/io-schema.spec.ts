@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { IOSchema, Middleware, ez } from "../../src";
-import { getFinalEndpointInputSchema } from "../../src/io-schema";
-import { metaSymbol } from "../../src/metadata";
-import { AbstractMiddleware } from "../../src/middleware";
+import { IOSchema, Middleware, ez } from "../../express-zod-api/src";
+import { getFinalEndpointInputSchema } from "../../express-zod-api/src/io-schema";
+import { metaSymbol } from "../../express-zod-api/src/metadata";
+import { AbstractMiddleware } from "../../express-zod-api/src/middleware";
 
 describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {

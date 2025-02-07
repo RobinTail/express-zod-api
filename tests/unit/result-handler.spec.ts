@@ -6,15 +6,15 @@ import {
   arrayResultHandler,
   defaultResultHandler,
   ResultHandler,
-} from "../../src";
-import { ResultHandlerError } from "../../src/errors";
-import { metaSymbol } from "../../src/metadata";
-import { AbstractResultHandler, Result } from "../../src/result-handler";
+} from "../../express-zod-api/src";
+import { ResultHandlerError } from "../../express-zod-api/src/errors";
+import { metaSymbol } from "../../express-zod-api/src/metadata";
+import { AbstractResultHandler, Result } from "../../express-zod-api/src/result-handler";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
-} from "../../src/testing";
+} from "../../express-zod-api/src/testing";
 
 describe("ResultHandler", () => {
   describe("constructor()", () => {

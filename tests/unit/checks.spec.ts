@@ -1,9 +1,9 @@
 import { UploadedFile } from "express-fileupload";
 import { z } from "zod";
-import { ez } from "../../src";
-import { hasNestedSchema } from "../../src/deep-checks";
-import { metaSymbol } from "../../src/metadata";
-import { ezUploadBrand } from "../../src/upload-schema";
+import { ez } from "../../express-zod-api/src";
+import { hasNestedSchema } from "../../express-zod-api/src/deep-checks";
+import { metaSymbol } from "../../express-zod-api/src/metadata";
+import { ezUploadBrand } from "../../express-zod-api/src/upload-schema";
 
 describe("Checks", () => {
   describe("hasNestedSchema()", () => {

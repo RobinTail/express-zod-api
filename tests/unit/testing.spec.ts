@@ -4,7 +4,7 @@ import {
   Middleware,
   testEndpoint,
   testMiddleware,
-} from "../../src";
+} from "../../express-zod-api/src";
 import type { Mock } from "vitest";
 
 describe("Testing", () => {

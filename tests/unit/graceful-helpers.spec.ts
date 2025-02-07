@@ -4,9 +4,9 @@ import {
   closeAsync,
   weAreClosed,
   isEncrypted,
-} from "../../src/graceful-helpers";
+} from "../../express-zod-api/src/graceful-helpers";
 import http from "node:http";
-import { makeRequestMock } from "../../src/testing";
+import { makeRequestMock } from "../../express-zod-api/src/testing";
 import { Socket } from "node:net";
 
 describe("Graceful helpers", () => {

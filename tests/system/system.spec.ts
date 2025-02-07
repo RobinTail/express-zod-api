@@ -10,7 +10,7 @@ import {
   ResultHandler,
   BuiltinLogger,
   Middleware,
-} from "../../src";
+} from "../../express-zod-api/src";
 import { givePort } from "../helpers";
 import { setTimeout } from "node:timers/promises";
 

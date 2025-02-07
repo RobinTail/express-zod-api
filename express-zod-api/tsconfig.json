@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "module": "ES2022",
     "moduleResolution": "Bundler",
@@ -7,14 +7,7 @@
   },
   "include": [
     "src",
-    "example",
-    "tests/unit",
-    "tests/system",
-    "tests/oas",
-    "tests/bench",
-    "tests/*.ts",
-    "tools",
     "*.config.ts",
     "*.setup.ts"
-  ],
+  ]
 }

@@ -8,7 +8,7 @@ import {
   testMiddleware,
   EventStreamFactory,
   EndpointsFactory,
-} from "../../src";
+} from "../../express-zod-api/src";
 import {
   Emitter,
   ensureStream,
@@ -16,13 +16,13 @@ import {
   makeEventSchema,
   makeMiddleware,
   makeResultHandler,
-} from "../../src/sse";
+} from "../../express-zod-api/src/sse";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
-} from "../../src/testing";
-import { AbstractEndpoint } from "../../src/endpoint";
+} from "../../express-zod-api/src/testing";
+import { AbstractEndpoint } from "../../express-zod-api/src/endpoint";
 
 describe("SSE", () => {
   describe("makeEventSchema()", () => {

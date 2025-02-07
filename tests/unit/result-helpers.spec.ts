@@ -1,13 +1,13 @@
 import createHttpError from "http-errors";
 import { z } from "zod";
-import { InputValidationError, OutputValidationError } from "../../src";
+import { InputValidationError, OutputValidationError } from "../../express-zod-api/src";
 import {
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
   normalize,
-} from "../../src/result-helpers";
-import { makeLoggerMock, makeRequestMock } from "../../src/testing";
+} from "../../express-zod-api/src/result-helpers";
+import { makeLoggerMock, makeRequestMock } from "../../express-zod-api/src/testing";
 
 describe("Result helpers", () => {
   describe("normalize()", () => {

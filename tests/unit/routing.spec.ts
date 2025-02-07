@@ -13,13 +13,13 @@ import {
   ServeStatic,
   defaultResultHandler,
   ez,
-} from "../../src";
+} from "../../express-zod-api/src";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
-} from "../../src/testing";
-import { createWrongMethodHandler, initRouting } from "../../src/routing";
+} from "../../express-zod-api/src/testing";
+import { createWrongMethodHandler, initRouting } from "../../express-zod-api/src/routing";
 import type { IRouter, RequestHandler } from "express";
 import createHttpError from "http-errors";
 

@@ -6,9 +6,9 @@ import {
   defaultEndpointsFactory,
   ResultHandler,
   testMiddleware,
-} from "../../src";
-import { EmptyObject, EmptySchema } from "../../src/common-helpers";
-import { Endpoint } from "../../src/endpoint";
+} from "../../express-zod-api/src";
+import { EmptyObject, EmptySchema } from "../../express-zod-api/src/common-helpers";
+import { Endpoint } from "../../express-zod-api/src/endpoint";
 import { z } from "zod";
 
 describe("EndpointsFactory", () => {

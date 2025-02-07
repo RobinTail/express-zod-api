@@ -1,5 +1,5 @@
 import { Express, IRouter } from "express";
-import { createConfig } from "../../src";
+import { createConfig } from "../../express-zod-api/src";
 
 describe("ConfigType", () => {
   describe("createConfig()", () => {

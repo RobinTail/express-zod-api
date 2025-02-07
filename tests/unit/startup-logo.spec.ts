@@ -1,5 +1,5 @@
 import { WriteStream } from "node:tty";
-import { printStartupLogo } from "../../src/startup-logo";
+import { printStartupLogo } from "../../express-zod-api/src/startup-logo";
 
 describe("Startup logo", () => {
   describe("printStartupLogo()", () => {

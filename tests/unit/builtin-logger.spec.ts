@@ -1,5 +1,5 @@
 import { performance } from "node:perf_hooks";
-import { BuiltinLogger, BuiltinLoggerConfig } from "../../src/builtin-logger";
+import { BuiltinLogger, BuiltinLoggerConfig } from "../../express-zod-api/src/builtin-logger";
 
 describe("BuiltinLogger", () => {
   beforeEach(() => {

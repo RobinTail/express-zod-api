@@ -1,5 +1,5 @@
-import { BuiltinLogger } from "../../src";
-import { BuiltinLoggerConfig } from "../../src/builtin-logger";
+import { BuiltinLogger } from "../../express-zod-api/src";
+import { BuiltinLoggerConfig } from "../../express-zod-api/src/builtin-logger";
 import {
   AbstractLogger,
   isLoggerInstance,
@@ -7,7 +7,7 @@ import {
   isHidden,
   makeNumberFormat,
   formatDuration,
-} from "../../src/logger-helpers";
+} from "../../express-zod-api/src/logger-helpers";
 
 describe("Logger helpers", () => {
   describe("isSeverity()", () => {

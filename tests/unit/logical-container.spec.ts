@@ -1,4 +1,4 @@
-import { processContainers } from "../../src/logical-container";
+import { processContainers } from "../../express-zod-api/src/logical-container";
 
 describe("LogicalContainer", () => {
   describe("processContainers()", () => {

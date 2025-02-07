@@ -1,4 +1,4 @@
-import { moveRaw } from "../../src/server-helpers";
+import { moveRaw } from "../../express-zod-api/src/server-helpers";
 import { givePort } from "../helpers";
 import {
   appMock,
@@ -22,7 +22,7 @@ import {
   createServer,
   defaultResultHandler,
   ez,
-} from "../../src";
+} from "../../express-zod-api/src";
 import express from "express";
 
 describe("Server", () => {

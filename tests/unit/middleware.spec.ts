@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { InputValidationError, Middleware } from "../../src";
-import { EmptyObject } from "../../src/common-helpers";
-import { AbstractMiddleware, ExpressMiddleware } from "../../src/middleware";
+import { InputValidationError, Middleware } from "../../express-zod-api/src";
+import { EmptyObject } from "../../express-zod-api/src/common-helpers";
+import { AbstractMiddleware, ExpressMiddleware } from "../../express-zod-api/src/middleware";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
-} from "../../src/testing";
+} from "../../express-zod-api/src/testing";
 
 describe("Middleware", () => {
   describe("constructor()", () => {

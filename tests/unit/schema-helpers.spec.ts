@@ -1,4 +1,4 @@
-import { isValidDate } from "../../src/schema-helpers";
+import { isValidDate } from "../../express-zod-api/src/schema-helpers";
 
 describe("Schema helpers", () => {
   describe("isValidDate()", () => {

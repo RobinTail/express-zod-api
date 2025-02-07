@@ -3,8 +3,8 @@ import {
   DependsOnMethod,
   EndpointsFactory,
   defaultResultHandler,
-} from "../../src";
-import { AbstractEndpoint } from "../../src/endpoint";
+} from "../../express-zod-api/src";
+import { AbstractEndpoint } from "../../express-zod-api/src/endpoint";
 
 describe("DependsOnMethod", () => {
   test("should accept empty object", () => {

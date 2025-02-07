@@ -1,4 +1,4 @@
-import { defaultStatusCodes, responseVariants } from "../../src/api-response";
+import { defaultStatusCodes, responseVariants } from "../../express-zod-api/src/api-response";
 
 describe("ApiResponse", () => {
   describe("defaultStatusCodes", () => {

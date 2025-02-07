@@ -1,6 +1,6 @@
 import { bench } from "vitest";
 import { routing } from "../../example/routing";
-import { Integration } from "../../src";
+import { Integration } from "../../express-zod-api/src";
 
 describe.skip("Integration", () => {
   bench(

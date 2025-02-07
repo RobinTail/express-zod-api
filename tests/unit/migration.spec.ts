@@ -1,7 +1,7 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import migration from "../../src/migration";
+import migration from "../../express-zod-api/src/migration";
 import parser from "@typescript-eslint/parser";
-import { version } from "../../package.json";
+import { version } from "../../express-zod-api/package.json";
 
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;

@@ -1,7 +1,7 @@
 import { bench } from "vitest";
 import { config } from "../../example/config";
 import { routing } from "../../example/routing";
-import { Documentation } from "../../src";
+import { Documentation } from "../../express-zod-api/src";
 
 describe.skip("Documentation", () => {
   bench(

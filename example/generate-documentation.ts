@@ -1,8 +1,8 @@
 import { writeFile } from "node:fs/promises";
-import { Documentation } from "../src";
+import { Documentation } from "express-zod-api";
 import { config } from "./config";
 import { routing } from "./routing";
-import manifest from "../package.json";
+import manifest from "../express-zod-api/package.json";
 
 await writeFile(
   "example/example.documentation.yaml",

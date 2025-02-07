@@ -1,6 +1,6 @@
-import "../../src/zod-plugin"; // required for this test
+import "../../express-zod-api/src/zod-plugin"; // required for this test
 import { z } from "zod";
-import { copyMeta, metaSymbol } from "../../src/metadata";
+import { copyMeta, metaSymbol } from "../../express-zod-api/src/metadata";
 
 describe("Metadata", () => {
   describe("copyMeta()", () => {

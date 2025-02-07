@@ -1,4 +1,4 @@
-import "../../src/zod-plugin"; // required for this test
+import "../../express-zod-api/src/zod-plugin"; // required for this test
 import createHttpError from "http-errors";
 import {
   combinations,
@@ -10,9 +10,9 @@ import {
   makeCleanId,
   ensureError,
   pullExampleProps,
-} from "../../src/common-helpers";
+} from "../../express-zod-api/src/common-helpers";
 import { z } from "zod";
-import { makeRequestMock } from "../../src/testing";
+import { makeRequestMock } from "../../express-zod-api/src/testing";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
