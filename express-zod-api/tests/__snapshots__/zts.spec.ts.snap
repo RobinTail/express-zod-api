@@ -168,6 +168,8 @@ exports[`zod-to-ts > ez.file(buffer) > should depend on variant 1`] = `"Buffer"`
 
 exports[`zod-to-ts > ez.file(string) > should depend on variant 1`] = `"string"`;
 
+exports[`zod-to-ts > ez.raw() > should depict the raw property 1`] = `"Buffer"`;
+
 exports[`zod-to-ts > z.array() > outputs correct typescript 1`] = `
 "{
     id: number;

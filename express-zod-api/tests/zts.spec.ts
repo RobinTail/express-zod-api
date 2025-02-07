@@ -34,6 +34,13 @@ describe("zod-to-ts", () => {
     },
   );
 
+  describe("ez.raw()", () => {
+    test("should depict the raw property", () => {
+      const node = zodToTs(ez.raw({ extra: z.string() }), { ctx });
+      expect(printNodeTest(node)).toMatchSnapshot();
+    });
+  });
+
   describe("enums", () => {
     // noinspection JSUnusedGlobalSymbols
     enum Color {
