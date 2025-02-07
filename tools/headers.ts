@@ -191,7 +191,7 @@ const responseOnlyHeaders = {
   },
 };
 
-const dest = "src/well-known-headers.json";
+const dest = "express-zod-api/src/well-known-headers.json";
 const { mtime } = await stat(dest).then(
   (stats) => stats,
   () => ({ mtime: null }),
