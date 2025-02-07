@@ -50,6 +50,8 @@ jobs:
         parallel: true
     - name: Build
       run: yarn build
+    - name: Example test
+      run: yarn test:example
     - name: CJS test
       run: yarn test:cjs
     - name: ESM test

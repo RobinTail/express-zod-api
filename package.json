@@ -8,9 +8,10 @@
   "scripts": {
     "start": "yarn workspace example start",
     "prebuild": "tsx tools/contributors.ts && tsx tools/license.ts",
-    "build": "yarn workspace example build && yarn workspace express-zod-api build",
+    "build": "yarn workspace express-zod-api build && yarn workspace example build",
     "postbuild": "tsx tools/make-tests.ts",
-    "test": "yarn workspaces run test",
+    "test": "yarn workspace express-zod-api test",
+    "test:example": "yarn workspace example test",
     "test:oas": "yarn workspace example validate",
     "lint": "eslint && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
