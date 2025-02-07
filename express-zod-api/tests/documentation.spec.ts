@@ -23,26 +23,6 @@ describe("Documentation", () => {
   });
 
   describe("Basic cases", () => {
-    // @todo maybe move to example workspace
-    /*
-    test.each([
-      { composition: "inline" },
-      { composition: "components" },
-    ] as const)(
-      "should generate the correct schema of example routing %#",
-      ({ composition }) => {
-        const spec = new Documentation({
-          routing,
-          config: exampleConfig,
-          version: "1.2.3",
-          title: "Example API",
-          serverUrl: "https://example.com",
-          composition,
-        }).getSpecAsYaml();
-        expect(spec).toMatchSnapshot();
-      },
-    );*/
-
     test("should generate the correct schema for DELETE request without body", () => {
       const spec = new Documentation({
         routing: {
