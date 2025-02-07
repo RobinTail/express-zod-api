@@ -10,13 +10,11 @@ import { readFile } from "node:fs/promises";
 describe("System test for Example", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
-    console.log(chunk.toString());
     out += chunk.toString();
   };
   const matchOut = (regExp: RegExp) => regExp.test(out);
   const example = spawn("tsx", ["index.ts"]);
   example.stdout.on("data", listener);
-  example.stderr.on("data", listener);
   const port = givePort("example");
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
 
