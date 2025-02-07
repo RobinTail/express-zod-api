@@ -2,10 +2,7 @@ import { readFile } from "node:fs/promises";
 
 describe("OpenAPI schema validation", () => {
   test("should be valid", async () => {
-    const data = await readFile(
-      "./example/example.documentation.yaml",
-      "utf-8",
-    );
+    const data = await readFile("example.documentation.yaml", "utf-8");
     const response = await fetch(
       "https://validator.swagger.io/validator/debug",
       {
