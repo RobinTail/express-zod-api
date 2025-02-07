@@ -47,7 +47,7 @@ jobs:
           git checkout -b $BRANCH_NAME
           git add .
           git commit -m "Changed well-known headers on $(date +%Y-%m-%d)"
-          git push origin $BRANCH_NAME
+          git push -u origin $BRANCH_NAME
           echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
       - name: Create a pull request
