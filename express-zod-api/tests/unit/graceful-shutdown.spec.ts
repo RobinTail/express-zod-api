@@ -4,7 +4,8 @@ import https from "node:https";
 import { Agent, fetch } from "undici";
 import { setTimeout } from "node:timers/promises";
 import { monitor } from "../../src/graceful-shutdown";
-import { givePort, signCert } from "../../../tests/helpers";
+import { givePort } from "../../../tools/ports";
+import { signCert } from "../ssl-helpers";
 
 describe("monitor()", () => {
   const makeHttpServer = (handler: http.RequestListener) =>

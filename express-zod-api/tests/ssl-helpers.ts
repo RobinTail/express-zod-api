@@ -1,13 +1,4 @@
 import forge from "node-forge";
-import { when, equals, nAry } from "ramda";
-
-const disposer = (function* () {
-  let port = 8e3 + 1e2 * Number(process.env.VITEST_POOL_ID);
-  while (true) yield port++;
-})();
-
-export const givePort = (test?: "example", rsvd = 8090): number =>
-  test ? rsvd : when(equals(rsvd), nAry(0, givePort))(disposer.next().value);
 
 const certAttr = [
   { name: "commonName", value: "localhost" },
@@ -15,6 +6,7 @@ const certAttr = [
   { name: "organizationName", value: "ExpressZodAPI" },
   { shortName: "OU", value: "DEV" },
 ];
+
 const certExt = [
   { name: "basicConstraints", cA: true },
   { name: "extKeyUsage", serverAuth: true, clientAuth: true },

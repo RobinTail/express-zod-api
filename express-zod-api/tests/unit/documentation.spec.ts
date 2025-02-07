@@ -13,7 +13,7 @@ import {
 } from "../../src";
 import { contentTypes } from "../../src/content-type";
 import { z } from "zod";
-import { givePort } from "../../../tests/helpers";
+import { givePort } from "../../../tools/ports";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({

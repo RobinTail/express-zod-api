@@ -11,7 +11,7 @@ import {
   BuiltinLogger,
   Middleware,
 } from "../../src";
-import { givePort } from "../../../tests/helpers";
+import { givePort } from "../../../tools/ports";
 import { setTimeout } from "node:timers/promises";
 
 describe("App in production mode", async () => {

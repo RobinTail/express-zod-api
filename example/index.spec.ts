@@ -3,7 +3,7 @@ import { EventSource } from "undici";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
 import { Client, Subscription } from "./example.client";
-import { givePort } from "../tests/helpers";
+import { givePort } from "../tools/ports";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 
