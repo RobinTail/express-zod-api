@@ -1,11 +1,13 @@
 {
   "private": true,
+  "type": "module",
   "workspaces": [
     "express-zod-api",
     "example"
   ],
   "scripts": {
     "start": "yarn workspace example start",
+    "prebuild": "tsx tools/contributors.ts && tsx tools/license.ts",
     "build": "yarn workspace example build && yarn workspace express-zod-api build",
     "install_hooks": "husky"
   },
