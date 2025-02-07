@@ -6,7 +6,8 @@ on:
     - cron: "0 0 * * 0" # Runs every Sunday at midnight UTC
 
 permissions:
-  contents: write  # Grants write access to push changes and create PRs
+  contents: write  # Grants write access to push changes
+  pull-requests: write # and create PRs
 
 jobs:
   run-bash-and-pr:
