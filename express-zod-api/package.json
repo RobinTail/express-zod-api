@@ -22,7 +22,7 @@
     "posttest": "make-coverage-badge --output-path coverage.svg",
     "bench": "vitest bench --run ./bench",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
-    "prepack": "cp ../*.md ./",
+    "prepack": "cp ../*.md ../LICENSE ./",
     "postversion": "git push && git push --tags"
   },
   "type": "module",

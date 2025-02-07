@@ -9,3 +9,4 @@ coverage
 issue952-test/*.d.ts
 compat-test/sample.ts
 express-zod-api/*.md
+express-zod-api/LICENSE
