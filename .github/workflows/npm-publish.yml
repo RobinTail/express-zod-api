@@ -25,7 +25,9 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
-      - run: yarn install
-      - run: npm publish --provenance --tag ${{ inputs.tag }}
+      - name: Install dependencies
+        run: yarn install
+      - name: Publish with ${{ inputs.tag }}
+        run: npm publish -w=express-zod-api --provenance --tag ${{ inputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_KEY}}
