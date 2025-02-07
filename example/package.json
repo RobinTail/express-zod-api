@@ -7,7 +7,8 @@
     "start": "tsx index.ts",
     "build": "yarn build:docs && yarn build:client",
     "build:docs": "tsx generate-documentation.ts",
-    "build:client": "tsx generate-client.ts"
+    "build:client": "tsx generate-client.ts",
+    "test": "vitest run --globals"
   },
   "dependencies": {
     "express-zod-api": "*",

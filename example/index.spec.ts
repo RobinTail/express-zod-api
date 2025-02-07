@@ -2,18 +2,18 @@ import assert from "node:assert/strict";
 import { EventSource } from "undici";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
-import { Client, Subscription } from "example/example.client";
-import { givePort } from "../../../tests/helpers";
+import { Client, Subscription } from "./example.client";
+import { givePort } from "../tests/helpers";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 
-describe("Example", async () => {
+describe("System test for Example", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
   const matchOut = (regExp: RegExp) => regExp.test(out);
-  const example = spawn("tsx", ["example/index.ts"]);
+  const example = spawn("tsx", ["index.ts"]);
   example.stdout.on("data", listener);
   const port = givePort("example");
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
@@ -196,7 +196,7 @@ describe("Example", async () => {
     });
 
     test("Should upload the file", async () => {
-      const filename = "logo.svg";
+      const filename = "assets/logo.svg";
       const logo = await readFile(filename, "utf-8");
       const data = new FormData();
       data.append(
@@ -233,19 +233,19 @@ describe("Example", async () => {
       });
     });
 
-    test.each([readFileSync("logo.svg"), createReadStream("logo.svg")])(
-      "Should accept raw data %#",
-      async (subject) => {
-        const response = await fetch(`http://localhost:${port}/v1/avatar/raw`, {
-          method: "POST",
-          body: subject,
-          headers: { "Content-Type": "application/octet-stream" },
-          duplex: Buffer.isBuffer(subject) ? undefined : "half",
-        });
-        const json = await response.json();
-        expect(json).toMatchSnapshot();
-      },
-    );
+    test.each([
+      readFileSync("assets/logo.svg"),
+      createReadStream("assets/logo.svg"),
+    ])("Should accept raw data %#", async (subject) => {
+      const response = await fetch(`http://localhost:${port}/v1/avatar/raw`, {
+        method: "POST",
+        body: subject,
+        headers: { "Content-Type": "application/octet-stream" },
+        duplex: Buffer.isBuffer(subject) ? undefined : "half",
+      });
+      const json = await response.json();
+      expect(json).toMatchSnapshot();
+    });
 
     test("Should handle no content", async () => {
       const response = await fetch(
@@ -415,7 +415,7 @@ describe("Example", async () => {
     });
 
     test("Should fail to upload if the file is too large", async () => {
-      const filename = "dataflow.svg";
+      const filename = "assets/dataflow.svg";
       const logo = await readFile(filename, "utf-8");
       const data = new FormData();
       data.append(

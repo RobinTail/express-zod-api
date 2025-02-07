@@ -10,7 +10,7 @@
     "prebuild": "tsx tools/contributors.ts && tsx tools/license.ts",
     "build": "yarn workspace example build && yarn workspace express-zod-api build",
     "postbuild": "tsx tools/make-tests.ts",
-    "test": "yarn workspace express-zod-api test",
+    "test": "yarn workspaces run test",
     "install_hooks": "husky"
   },
   "devDependencies": {

@@ -13,5 +13,5 @@ export const streamAvatarEndpoint = fileStreamingEndpointsFactory.build({
   output: z.object({
     filename: z.string(),
   }),
-  handler: async () => ({ filename: "logo.svg" }),
+  handler: async () => ({ filename: "assets/logo.svg" }),
 });

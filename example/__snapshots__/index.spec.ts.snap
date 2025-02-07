@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Example > Client > Issue #2177: should handle path params correctly 1`] = `
+exports[`System test for Example > Client > Issue #2177: should handle path params correctly 1`] = `
 {
   "data": {
     "createdAt": "2022-01-22T00:00:00.000Z",
@@ -10,7 +10,7 @@ exports[`Example > Client > Issue #2177: should handle path params correctly 1`]
 }
 `;
 
-exports[`Example > Client > Should perform the request with a positive response 1`] = `
+exports[`System test for Example > Client > Should perform the request with a positive response 1`] = `
 {
   "data": {
     "features": [
@@ -49,7 +49,7 @@ exports[`Example > Client > Should perform the request with a positive response 
 }
 `;
 
-exports[`Example > Negative > GET request should fail on missing input param 1`] = `
+exports[`System test for Example > Negative > GET request should fail on missing input param 1`] = `
 {
   "error": {
     "message": "id: Required",
@@ -58,7 +58,7 @@ exports[`Example > Negative > GET request should fail on missing input param 1`]
 }
 `;
 
-exports[`Example > Negative > PATCH request should fail on schema validation 1`] = `
+exports[`System test for Example > Negative > PATCH request should fail on schema validation 1`] = `
 {
   "error": {
     "message": "id: should be greater than or equal to 0",
@@ -67,7 +67,7 @@ exports[`Example > Negative > PATCH request should fail on schema validation 1`]
 }
 `;
 
-exports[`Example > Negative > Should fail to upload if the file is too large 1`] = `
+exports[`System test for Example > Negative > Should fail to upload if the file is too large 1`] = `
 {
   "error": {
     "message": "The file is too large",
@@ -76,7 +76,7 @@ exports[`Example > Negative > Should fail to upload if the file is too large 1`]
 }
 `;
 
-exports[`Example > Negative > Should respond with error to the missing static file request 1`] = `
+exports[`System test for Example > Negative > Should respond with error to the missing static file request 1`] = `
 {
   "error": {
     "message": "Can not GET /public/missing.svg",
@@ -85,7 +85,7 @@ exports[`Example > Negative > Should respond with error to the missing static fi
 }
 `;
 
-exports[`Example > Positive > Should accept raw data 0 1`] = `
+exports[`System test for Example > Positive > Should accept raw data 0 1`] = `
 {
   "data": {
     "length": 48687,
@@ -94,7 +94,7 @@ exports[`Example > Positive > Should accept raw data 0 1`] = `
 }
 `;
 
-exports[`Example > Positive > Should accept raw data 1 1`] = `
+exports[`System test for Example > Positive > Should accept raw data 1 1`] = `
 {
   "data": {
     "length": 48687,
@@ -103,8 +103,8 @@ exports[`Example > Positive > Should accept raw data 1 1`] = `
 }
 `;
 
-exports[`Example > Positive > Should send an image with a correct header 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;
+exports[`System test for Example > Positive > Should send an image with a correct header 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;
 
-exports[`Example > Positive > Should serve static files 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;
+exports[`System test for Example > Positive > Should serve static files 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;
 
-exports[`Example > Positive > Should stream an image with a correct header 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;
+exports[`System test for Example > Positive > Should stream an image with a correct header 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;

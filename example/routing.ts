@@ -9,7 +9,6 @@ import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
 import { sendAvatarEndpoint } from "./endpoints/send-avatar";
 import { updateUserEndpoint } from "./endpoints/update-user";
 import { streamAvatarEndpoint } from "./endpoints/stream-avatar";
-import { join } from "node:path";
 
 export const routing: Routing = {
   v1: {
@@ -40,8 +39,8 @@ export const routing: Routing = {
       stream: subscriptionEndpoint,
     },
   },
-  // path /public serves static files from /example/assets
-  public: new ServeStatic(join("example", "assets"), {
+  // path /public serves static files from /assets
+  public: new ServeStatic("assets", {
     dotfiles: "deny",
     index: false,
     redirect: false,
