@@ -40,6 +40,7 @@ jobs:
           fi
 
       - name: Create branch, commit, and push changes
+        id: create-branch
         if: steps.git-state.outputs.changes == 'true'
         run: |
           BRANCH_NAME="headers-update-$(date +%Y%m%d)"
