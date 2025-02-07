@@ -11,6 +11,9 @@
     "build": "yarn workspace example build && yarn workspace express-zod-api build",
     "postbuild": "tsx tools/make-tests.ts",
     "test": "yarn workspaces run test",
+    "lint": "eslint && yarn prettier *.md --check",
+    "mdfix": "prettier *.md --write",
+    "precommit": "yarn lint && yarn test && yarn build && git add *.md example/example.* LICENSE **/coverage.svg",
     "install_hooks": "husky"
   },
   "devDependencies": {

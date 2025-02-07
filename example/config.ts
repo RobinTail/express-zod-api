@@ -26,6 +26,7 @@ export const config = createConfig({
 
 // These lines enable .child() and .profile() methods of built-in logger:
 declare module "express-zod-api" {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation
   interface LoggerOverrides extends BuiltinLogger {}
 }
 

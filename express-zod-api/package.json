@@ -26,9 +26,6 @@
     "test:compat": "yarn --cwd tests/compat && yarn --cwd tests/compat test",
     "test:oas": "vitest run tests/oas",
     "bench": "vitest bench --run tests/bench",
-    "lint": "eslint && yarn prettier *.md --check",
-    "mdfix": "prettier *.md --write",
-    "precommit": "yarn lint && yarn test && yarn build && git add *.md example/example.* LICENSE coverage.svg",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
     "postversion": "git push && git push --tags"
   },
