@@ -1,4 +1,5 @@
-import { writeFile, stat } from "node:fs/promises";
+import { execSync } from "node:child_process";
+import { writeFile } from "node:fs/promises";
 import { z } from "zod";
 
 /**
@@ -192,9 +193,11 @@ const responseOnlyHeaders = {
 };
 
 const dest = "src/well-known-headers.json";
-const { mtime } = await stat(dest).then(
-  (stats) => stats,
-  () => ({ mtime: null }),
+
+const mtime = new Date(
+  execSync(`git log -1 --pretty="format:%ci" ${dest}`, {
+    encoding: "utf8",
+  }),
 );
 
 console.info("Current state", mtime);
