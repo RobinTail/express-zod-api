@@ -3,6 +3,5 @@
   "compilerOptions": {
     "declaration": true,
     "emitDeclarationOnly": true
-  },
-  "include": ["*.ts"]
+  }
 }
