@@ -213,11 +213,7 @@ export default tsPlugin.config(
   },
   {
     name: "tests/all",
-    files: [
-      "express-zod-api/tests/**/*.ts",
-      "express-zod-api/vitest.setup.ts",
-      "tests/helpers.ts", // @todo mv?
-    ],
+    files: ["express-zod-api/tests/**/*.ts", "express-zod-api/vitest.setup.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": "warn",
