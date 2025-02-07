@@ -39,7 +39,7 @@ jobs:
       run: yarn install
     - name: Lint
       run: yarn lint
-    - name: Test
+    - name: Unit tests
       run: yarn test
     - name: Coveralls
       uses: coverallsapp/github-action@v2
