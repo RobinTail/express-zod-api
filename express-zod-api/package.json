@@ -99,7 +99,6 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.0",
-    "@tsconfig/node20": "^20.1.4",
     "@types/compression": "^1.7.5",
     "@types/cors": "^2.8.14",
     "@types/depd": "^1.1.36",
