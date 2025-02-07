@@ -18,7 +18,7 @@
   "scripts": {
     "build": "tsup && attw --pack",
     "pretest": "tsc --noEmit",
-    "test": "vitest run --coverage tests/unit tests/system",
+    "test": "vitest run --coverage",
     "posttest": "make-coverage-badge --output-path coverage.svg",
     "bench": "vitest bench --run ./bench",
     "prepublishOnly": "yarn lint && yarn test && yarn build",
