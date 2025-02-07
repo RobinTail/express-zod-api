@@ -5,7 +5,6 @@ yarn-error.log
 .idea
 .npmrc
 coverage
-tests/**/yarn.lock
-tests/**/quick-start.ts
-tests/issue952/*.d.ts
-tests/compat/sample.ts
+*-test/quick-start.ts
+issue952-test/*.d.ts
+compat-test/sample.ts

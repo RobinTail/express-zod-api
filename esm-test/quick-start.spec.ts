@@ -1,12 +1,12 @@
 import { spawn } from "node:child_process";
+import { givePort } from "../tests/helpers";
 
-describe("CJS Test", async () => {
-  const { givePort } = await import("../helpers.js");
+describe("ESM Test", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
-  const quickStart = spawn("tsx", ["quick-start.ts"], { cwd: "./tests/cjs" });
+  const quickStart = spawn("tsx", ["quick-start.ts"]);
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   const port = givePort("example");

@@ -1,17 +1,16 @@
 {
-  "name": "express-zod-api-compat-test",
+  "name": "compat-test",
   "private": true,
   "type": "module",
   "version": "0.0.0",
   "dependencies": {
-    "express-zod-api": "link:../..",
+    "express-zod-api": "*",
     "eslint": "9.0.0",
     "typescript-eslint": "8.0.0",
     "typescript": "~5.1.0"
   },
   "scripts": {
-    "preinstall": "rm -rf node_modules",
     "pretest": "echo 'client.provide(\"get\", \"/v1/test\", {id: 10});' > sample.ts",
-    "test": "eslint --fix && vitest --run && rm sample.ts"
+    "test": "eslint --fix && vitest run --globals && rm sample.ts"
   }
 }

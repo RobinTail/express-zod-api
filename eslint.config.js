@@ -225,7 +225,7 @@ export default tsPlugin.config(
   },
   {
     name: "generated/all",
-    files: ["tests/*/quick-start.ts", "example/example.client.ts"], // @todo mv?
+    files: ["*-test/quick-start.ts", "example/example.client.ts"],
     rules: {
       "prettier/prettier": "off",
       "@typescript-eslint/no-explicit-any": "off",

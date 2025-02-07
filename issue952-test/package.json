@@ -1,13 +1,12 @@
 {
-  "name": "express-zod-api-issue-952-test",
+  "name": "issue952-test",
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "preinstall": "rm -rf node_modules",
     "test": "tsc -p tsconfig.json",
     "posttest": "rm *.d.ts"
   },
   "dependencies": {
-    "express-zod-api": "link:../.."
+    "express-zod-api": "*"
   }
 }

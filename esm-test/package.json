@@ -1,0 +1,12 @@
+{
+  "name": "esm-test",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "express-zod-api": "*"
+  },
+  "scripts": {
+    "test": "vitest run --globals"
+  }
+}

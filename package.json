@@ -3,7 +3,11 @@
   "type": "module",
   "workspaces": [
     "express-zod-api",
-    "example"
+    "example",
+    "cjs-test",
+    "esm-test",
+    "compat-test",
+    "issue952-test"
   ],
   "scripts": {
     "start": "yarn workspace example start",
@@ -13,6 +17,10 @@
     "test": "yarn workspace express-zod-api test",
     "test:example": "yarn workspace example test",
     "test:oas": "yarn workspace example validate",
+    "test:cjs": "yarn workspace cjs-test test",
+    "test:esm": "yarn workspace esm-test test",
+    "test:952": "yarn workspace issue952-test test",
+    "test:compat": "yarn workspace compat-test test",
     "lint": "eslint && yarn prettier *.md --check",
     "mdfix": "prettier *.md --write",
     "precommit": "yarn lint && yarn test && yarn build && git add *.md example/example.* LICENSE **/coverage.svg",
