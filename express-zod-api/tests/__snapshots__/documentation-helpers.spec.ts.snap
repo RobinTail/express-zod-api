@@ -782,6 +782,13 @@ exports[`Documentation helpers > depictPipeline > should depict as 'string (in)'
 }
 `;
 
+exports[`Documentation helpers > depictRaw() > should depict the raw property 1`] = `
+{
+  "format": "binary",
+  "type": "string",
+}
+`;
+
 exports[`Documentation helpers > depictReadonly > should pass the next depicter 1`] = `
 {
   "type": "string",

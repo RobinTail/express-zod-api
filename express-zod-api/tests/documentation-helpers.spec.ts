@@ -40,6 +40,7 @@ import {
   depictTuple,
   depictUnion,
   depictUpload,
+  depictRaw,
   depicters,
   ensureShortDescription,
   excludeExamplesFromDepiction,
@@ -233,6 +234,14 @@ describe("Documentation helpers", () => {
   describe("depictAny()", () => {
     test("should set format:any", () => {
       expect(depictAny(z.any(), requestCtx)).toMatchSnapshot();
+    });
+  });
+
+  describe("depictRaw()", () => {
+    test("should depict the raw property", () => {
+      expect(
+        depictRaw(ez.raw({ extra: z.string() }), requestCtx),
+      ).toMatchSnapshot();
     });
   });
 
