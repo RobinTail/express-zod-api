@@ -17,7 +17,6 @@
   "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
     "build": "tsup && attw --pack",
-    "postbuild": "tsx tools/make-tests.ts",
     "pretest": "tsc --noEmit",
     "test": "vitest run --coverage tests/unit tests/system",
     "posttest": "make-coverage-badge --output-path coverage.svg",
