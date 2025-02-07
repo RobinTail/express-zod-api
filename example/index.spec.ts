@@ -7,7 +7,7 @@ import { givePort } from "../tests/helpers";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 
-describe("System test for Example", async () => {
+describe("Example", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
