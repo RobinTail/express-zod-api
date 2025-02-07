@@ -1,5 +1,5 @@
 import { bench } from "vitest";
-import { BuiltinLogger } from "../../express-zod-api/src";
+import { BuiltinLogger } from "../src";
 
 describe("Experiment for builtin logger", () => {
   const fixed = (a: string, b?: number) => `${a}${b}`;

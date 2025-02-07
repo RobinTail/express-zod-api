@@ -8,6 +8,7 @@
   "include": [
     "src",
     "tests",
+    "bench",
     "*.config.ts",
     "*.setup.ts"
   ]
