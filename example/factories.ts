@@ -39,7 +39,8 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory(
       if (
         output &&
         "filename" in output &&
-        typeof output.filename === "string"
+        typeof output.filename === "string" &&
+        output.filename.includes(".")
       ) {
         const extension = output.filename.split(".").pop()!;
         createReadStream(output.filename).pipe(response.type(extension));
