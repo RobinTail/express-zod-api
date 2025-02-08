@@ -2,6 +2,10 @@
 
 ## Version 22
 
+### v22.7.0
+
+- Technical release in connection with the implementation of workspaces into the project architecture.
+
 ### v22.6.0
 
 - Feature: pulling examples up from the object schema properties:
