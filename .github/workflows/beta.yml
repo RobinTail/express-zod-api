@@ -1,4 +1,4 @@
-name: Patch
+name: Beta
 
 on:
   workflow_dispatch:
