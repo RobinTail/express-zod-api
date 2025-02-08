@@ -53,5 +53,8 @@
     "vitest": "^3.0.5",
     "zod": "^3.23.0"
   },
+  "resolutions": {
+    "**/@scarf/scarf": "npm:empty-npm-package@1.0.0"
+  },
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
