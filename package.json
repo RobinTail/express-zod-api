@@ -22,7 +22,7 @@
     "test:952": "yarn workspace issue952-test test",
     "test:compat": "yarn workspace compat-test test",
     "bench": "yarn workspace express-zod-api bench",
-    "lint": "eslint && yarn prettier *.md --check",
+    "lint": "eslint && prettier *.md --check",
     "mdfix": "prettier *.md --write",
     "precommit": "yarn lint && yarn test && yarn build && git add *.md example/example.* LICENSE **/coverage.svg",
     "install_hooks": "husky"
