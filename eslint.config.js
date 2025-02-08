@@ -5,6 +5,13 @@ import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
 import unicornPlugin from "eslint-plugin-unicorn";
 import allowedDepsPlugin from "eslint-plugin-allowed-dependencies";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+const packageDir = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "express-zod-api",
+);
 
 const peformanceConcerns = [
   {
@@ -171,7 +178,7 @@ export default tsPlugin.config(
     rules: {
       "allowed/dependencies": [
         "error",
-        { typeOnly: ["eslint", "prettier"], packageDir: "express-zod-api" },
+        { typeOnly: ["eslint", "prettier"], packageDir },
       ],
       "no-restricted-syntax": ["warn", ...peformanceConcerns],
     },
@@ -204,10 +211,7 @@ export default tsPlugin.config(
     rules: {
       "allowed/dependencies": [
         "error",
-        {
-          ignore: ["^@typescript-eslint", "^\\."],
-          packageDir: "express-zod-api",
-        },
+        { ignore: ["^@typescript-eslint", "^\\."], packageDir },
       ],
     },
   },
