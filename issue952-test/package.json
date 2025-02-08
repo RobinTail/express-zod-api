@@ -5,8 +5,5 @@
   "scripts": {
     "test": "tsc -p tsconfig.json",
     "posttest": "rm *.d.ts"
-  },
-  "dependencies": {
-    "express-zod-api": "*"
   }
 }

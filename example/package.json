@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@types/swagger-ui-express": "^4.1.6",
-    "express-zod-api": "*",
     "swagger-ui-express": "^5.0.0"
   }
 }
