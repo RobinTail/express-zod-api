@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "name": "example",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts",
+    "build": "yarn build:docs && yarn build:client",
+    "build:docs": "tsx generate-documentation.ts",
+    "build:client": "tsx generate-client.ts",
+    "test": "vitest run --globals index.spec.ts",
+    "validate": "vitest run --globals validate.spec.ts"
+  },
+  "dependencies": {
+    "@types/swagger-ui-express": "^4.1.6",
+    "swagger-ui-express": "^5.0.0"
+  }
+}

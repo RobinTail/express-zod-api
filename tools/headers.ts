@@ -198,8 +198,7 @@ const responseOnlyHeaders = {
   },
 };
 
-const dest = "src/well-known-headers.json";
-
+const dest = "express-zod-api/src/well-known-headers.json";
 const mtime = tryCatch(
   (cmd) => new Date(execSync(cmd, { encoding: "utf8" })),
   () => undefined,

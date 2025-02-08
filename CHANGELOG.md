@@ -2,6 +2,10 @@
 
 ## Version 22
 
+### v22.7.0
+
+- Technical release in connection with the implementation of workspaces into the project architecture.
+
 ### v22.6.0
 
 - Feature: pulling examples up from the object schema properties:
@@ -3233,9 +3237,6 @@ const endpoint = endpointsFactory.build({
     of Types. So I made a decision to handle this case programmatically.
   - `createMiddleware()` and `Endpoint::constructor()` will throw in case of using `.transform()` on the top level of
     `IOSchema`.
-- **Help wanted**: In case anyone smarter than me is reading this, please let me know how I can improve `IOSchema`
-  [type](https://github.com/RobinTail/express-zod-api/blob/master/src/io-schema.ts) to allow refinements without
-  allowing transformations at the same time.
 
 ```ts
 // ZodEffects<ZodObject<{}>, boolean, {}>

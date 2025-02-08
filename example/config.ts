@@ -1,4 +1,4 @@
-import { createConfig } from "../src";
+import { BuiltinLogger, createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
 import yaml from "yaml";
 import { readFile } from "node:fs/promises";
@@ -14,7 +14,7 @@ export const config = createConfig({
   beforeRouting: async ({ app }) => {
     // third-party middlewares serving their own routes or establishing their own routing besides the API
     const documentation = yaml.parse(
-      await readFile("example/example.documentation.yaml", "utf-8"),
+      await readFile("example.documentation.yaml", "utf-8"),
     );
     app.use("/docs", ui.serve, ui.setup(documentation));
   },
@@ -24,6 +24,12 @@ export const config = createConfig({
   cors: true,
 });
 
+// These lines enable .child() and .profile() methods of built-in logger:
+declare module "express-zod-api" {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+
 // Uncomment these lines when using a custom logger, for example winston:
 /*
 declare module "express-zod-api" {
@@ -31,15 +37,7 @@ declare module "express-zod-api" {
 }
 */
 
-// Uncomment these lines for using .child() and .profile() methods of built-in logger:
-/*
-declare module "express-zod-api" {
-  interface LoggerOverrides extends BuiltinLogger {}
-}
-*/
-
-// Uncomment these lines for introducing constraints on tags
-/*
+// These lines enable constraints on tags
 declare module "express-zod-api" {
   interface TagOverrides {
     users: unknown;
@@ -47,4 +45,3 @@ declare module "express-zod-api" {
     subscriptions: unknown;
   }
 }
-*/

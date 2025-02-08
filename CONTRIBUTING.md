@@ -24,7 +24,7 @@ Which is highly appreciated as well. Consider these steps:
 - Install the pre-commit hooks using `yarn install_hooks`,
 - Make changes,
 - Run the tests using `yarn test`,
-  - In case you wanna run integration tests, run `yarn build` first.
+  - In case you wanna run tests from `example` and `*-test` workspaces, run `yarn build` first.
 - Commit everything,
 - Push your branch into your fork,
 - Create a PR between the forks:
