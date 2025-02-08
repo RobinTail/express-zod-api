@@ -13,7 +13,7 @@ const packageDir = join(
   "express-zod-api",
 );
 
-const peformanceConcerns = [
+const performanceConcerns = [
   {
     selector: "ImportDeclaration[source.value=/assert/]", // #2169
     message: "assert is slow, use throw",
@@ -180,7 +180,7 @@ export default tsPlugin.config(
         "error",
         { typeOnly: ["eslint", "prettier"], packageDir },
       ],
-      "no-restricted-syntax": ["warn", ...peformanceConcerns],
+      "no-restricted-syntax": ["warn", ...performanceConcerns],
     },
   },
   {
@@ -200,7 +200,7 @@ export default tsPlugin.config(
     rules: {
       "no-restricted-syntax": [
         "warn",
-        ...peformanceConcerns,
+        ...performanceConcerns,
         ...tsFactoryConcerns,
       ],
     },
