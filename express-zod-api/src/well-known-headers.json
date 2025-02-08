@@ -162,6 +162,7 @@
   "safe",
   "schedule-reply",
   "schedule-tag",
+  "sec-fetch-storage-access",
   "sec-gpc",
   "sec-purpose",
   "sec-token-binding",
