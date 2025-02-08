@@ -39,7 +39,7 @@ jobs:
       run: yarn install --ignore-engines
     - name: Lint
       run: yarn lint
-    - name: Test
+    - name: Unit tests
       run: yarn test
     - name: Coveralls
       uses: coverallsapp/github-action@v2
@@ -50,6 +50,8 @@ jobs:
         parallel: true
     - name: Build
       run: yarn build
+    - name: Example test
+      run: yarn test:example
     - name: CJS test
       run: yarn test:cjs
     - name: ESM test
