@@ -1,0 +1,32 @@
+name: Patch
+
+on:
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: 'Making pre- what?'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+          - release
+
+permissions:
+  contents: write
+
+jobs:
+  bumpVersion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: fregante/setup-git-user@v2
+      - run: |
+          yarn install
+          yarn install_hooks
+      - run: yarn workspace express-zod-api version --pre${{ inputs.kind }} --preid beta
