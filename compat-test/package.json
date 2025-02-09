@@ -3,11 +3,6 @@
   "private": true,
   "type": "module",
   "version": "0.0.0",
-  "dependencies": {
-    "eslint": "9.0.0",
-    "typescript-eslint": "8.0.0",
-    "typescript": "~5.1.0"
-  },
   "scripts": {
     "pretest": "echo 'client.provide(\"get\", \"/v1/test\", {id: 10});' > sample.ts",
     "test": "eslint --fix && vitest run --globals && rm sample.ts"
