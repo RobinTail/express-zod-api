@@ -1,8 +1,7 @@
 import { responseVariants } from "./api-response";
-import { FlatObject } from "./common-helpers";
+import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { assertJsonCompatible } from "./deep-checks";
-import { getRoutePathParams } from "./documentation-helpers";
 import { AbstractEndpoint } from "./endpoint";
 import { ActualLogger } from "./logger-helpers";
 

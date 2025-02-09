@@ -1,5 +1,7 @@
 import {
   ExamplesObject,
+  isReferenceObject,
+  isSchemaObject,
   MediaTypeObject,
   OAuthFlowObject,
   ParameterObject,
@@ -11,13 +13,10 @@ import {
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
-  isReferenceObject,
-  isSchemaObject,
 } from "openapi3-ts/oas31";
 import {
-  concat,
   chain,
-  type as detectType,
+  concat,
   filter,
   fromPairs,
   has,
@@ -32,6 +31,7 @@ import {
   reject,
   times,
   toLower,
+  type as detectType,
   union,
   when,
   xprod,
@@ -40,29 +40,31 @@ import {
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  FlatObject,
   combinations,
+  FlatObject,
   getExamples,
+  getRoutePathParams,
   hasCoercion,
   makeCleanId,
+  routePathParamsRegex,
+  Tag,
   tryToTransform,
   ucFirst,
-  Tag,
 } from "./common-helpers";
 import { InputSource } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { FileSchema, ezFileBrand } from "./file-schema";
+import { ezFileBrand, FileSchema } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
-import { RawSchema, ezRawBrand } from "./raw-schema";
+import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
 import { Security } from "./security";
-import { UploadSchema, ezUploadBrand } from "./upload-schema";
+import { ezUploadBrand, UploadSchema } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
 
 export interface OpenAPIContext extends FlatObject {
@@ -113,8 +115,6 @@ const samples = {
   array: [],
 } satisfies Record<Extract<SchemaObjectType, string>, unknown>;
 
-/** @see https://expressjs.com/en/guide/routing.html */
-const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 const timeRegex = /^\d{2}:\d{2}:\d{2}(\.\d+)?$/;
 
@@ -122,9 +122,6 @@ const getTimestampRegex = (hasOffset?: boolean) =>
   hasOffset
     ? /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)$/
     : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
-
-export const getRoutePathParams = (path: string): string[] =>
-  path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
 
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);

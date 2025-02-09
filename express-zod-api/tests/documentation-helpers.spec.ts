@@ -46,7 +46,6 @@ import {
   excludeExamplesFromDepiction,
   excludeParamsFromDepiction,
   extractObjectSchema,
-  getRoutePathParams,
   defaultIsHeader,
   onEach,
   onMissing,
@@ -85,34 +84,6 @@ describe("Documentation helpers", () => {
 
   beforeEach(() => {
     makeRefMock.mockClear();
-  });
-
-  describe("getRoutePathParams()", () => {
-    test("should return an array of param names", () => {
-      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
-        "userId",
-        "bookId",
-      ]);
-      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
-      expect(getRoutePathParams("/something")).toEqual([]);
-      expect(getRoutePathParams("")).toEqual([]);
-      expect(getRoutePathParams("\n")).toEqual([]);
-    });
-
-    test("should return an array of param names", () => {
-      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
-        "userId",
-        "bookId",
-      ]);
-      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
-      expect(getRoutePathParams("/test/:genus.:species")).toEqual([
-        "genus",
-        "species",
-      ]);
-      expect(getRoutePathParams("/something")).toEqual([]);
-      expect(getRoutePathParams("")).toEqual([]);
-      expect(getRoutePathParams("\n")).toEqual([]);
-    });
   });
 
   describe("extractObjectSchema()", () => {
