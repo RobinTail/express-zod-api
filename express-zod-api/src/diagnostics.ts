@@ -8,6 +8,7 @@ import { ActualLogger } from "./logger-helpers";
 
 export class Diagnostics {
   #verifiedEndpoints = new WeakSet<AbstractEndpoint>();
+  #verifiedPaths = new WeakMap<AbstractEndpoint, string[]>();
   constructor(protected logger: ActualLogger) {}
 
   public checkJsonCompat(endpoint: AbstractEndpoint, ctx: FlatObject): void {
@@ -44,6 +45,8 @@ export class Diagnostics {
     endpoint: AbstractEndpoint,
     ctx: FlatObject,
   ): void {
+    const ref = this.#verifiedPaths.get(endpoint);
+    if (ref?.includes(path)) return;
     const { shape } = extractObjectSchema(endpoint.getSchema("input"));
     const params = getRoutePathParams(path);
     for (const param of params) {
@@ -54,5 +57,7 @@ export class Diagnostics {
         );
       }
     }
+    if (ref) ref.push(path);
+    else this.#verifiedPaths.set(endpoint, [path]);
   }
 }
