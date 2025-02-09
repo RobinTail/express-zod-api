@@ -1,5 +1,84 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`I/O Schema and related helpers > extractObjectSchema() > Feature #600: Top level refinements > should handle refined object schema 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "one": {
+      "_type": "ZodString",
+    },
+  },
+}
+`;
+
+exports[`I/O Schema and related helpers > extractObjectSchema() > Feature #1869: Top level transformations > should handle transformations to another object 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "one": {
+      "_type": "ZodString",
+    },
+  },
+}
+`;
+
+exports[`I/O Schema and related helpers > extractObjectSchema() > should pass the object schema through 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "one": {
+      "_type": "ZodString",
+    },
+  },
+}
+`;
+
+exports[`I/O Schema and related helpers > extractObjectSchema() > should return object schema for the intersection of object schemas 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "one": {
+      "_type": "ZodString",
+    },
+    "two": {
+      "_type": "ZodNumber",
+    },
+  },
+}
+`;
+
+exports[`I/O Schema and related helpers > extractObjectSchema() > should return object schema for the union of object schemas 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "one": {
+      "_type": "ZodOptional",
+      "value": {
+        "_type": "ZodString",
+      },
+    },
+    "two": {
+      "_type": "ZodOptional",
+      "value": {
+        "_type": "ZodNumber",
+      },
+    },
+  },
+}
+`;
+
+exports[`I/O Schema and related helpers > extractObjectSchema() > should support ez.raw() 1`] = `
+{
+  "_type": "ZodObject",
+  "shape": {
+    "raw": {
+      "_type": "ZodBranded",
+      "brand": Symbol(File),
+    },
+  },
+}
+`;
+
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should handle no middlewares 1`] = `
 {
   "_type": "ZodObject",
