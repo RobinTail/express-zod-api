@@ -45,7 +45,7 @@ export const initRouting = ({
   const doc = new Diagnostics(getLogger());
   const familiar = new Map<string, Array<Method | AuxMethod>>();
   const onEndpoint: OnEndpoint = (endpoint, path, method, siblingMethods) => {
-    if (!isProduction()) doc.check(endpoint, { path, method });
+    if (!isProduction()) doc.checkJsonCompat(endpoint, { path, method });
     const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
     const handler: RequestHandler = async (request, response) => {
       const logger = getLogger(request);
