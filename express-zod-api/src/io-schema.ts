@@ -52,3 +52,26 @@ export const getFinalEndpointInputSchema = <
     finalSchema,
   ) as z.ZodIntersection<MIN, IN>;
 };
+
+export const extractObjectSchema = (
+  subject: IOSchema,
+): z.ZodObject<z.ZodRawShape> => {
+  if (subject instanceof z.ZodObject) return subject;
+  if (subject instanceof z.ZodBranded)
+    return extractObjectSchema(subject.unwrap());
+  if (
+    subject instanceof z.ZodUnion ||
+    subject instanceof z.ZodDiscriminatedUnion
+  ) {
+    return subject.options
+      .map((option) => extractObjectSchema(option))
+      .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
+  } else if (subject instanceof z.ZodEffects) {
+    return extractObjectSchema(subject._def.schema);
+  } else if (subject instanceof z.ZodPipeline) {
+    return extractObjectSchema(subject._def.in);
+  } // intersection left:
+  return extractObjectSchema(subject._def.left).merge(
+    extractObjectSchema(subject._def.right),
+  );
+};

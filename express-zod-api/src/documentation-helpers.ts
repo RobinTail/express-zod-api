@@ -56,7 +56,7 @@ import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { ezFileBrand, FileSchema } from "./file-schema";
-import { IOSchema } from "./io-schema";
+import { extractObjectSchema, IOSchema } from "./io-schema";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
@@ -605,29 +605,6 @@ export const depictParamExamples = (
     pluck(param),
     enumerateExamples,
   )({ schema, variant: "original", validate: true, pullProps: true });
-
-export const extractObjectSchema = (
-  subject: IOSchema,
-): z.ZodObject<z.ZodRawShape> => {
-  if (subject instanceof z.ZodObject) return subject;
-  if (subject instanceof z.ZodBranded)
-    return extractObjectSchema(subject.unwrap());
-  if (
-    subject instanceof z.ZodUnion ||
-    subject instanceof z.ZodDiscriminatedUnion
-  ) {
-    return subject.options
-      .map((option) => extractObjectSchema(option))
-      .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
-  } else if (subject instanceof z.ZodEffects) {
-    return extractObjectSchema(subject._def.schema);
-  } else if (subject instanceof z.ZodPipeline) {
-    return extractObjectSchema(subject._def.in);
-  } // intersection left:
-  return extractObjectSchema(subject._def.left).merge(
-    extractObjectSchema(subject._def.right),
-  );
-};
 
 export const defaultIsHeader = (
   name: string,

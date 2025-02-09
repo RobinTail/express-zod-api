@@ -2,8 +2,8 @@ import { responseVariants } from "./api-response";
 import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { assertJsonCompatible } from "./deep-checks";
-import { extractObjectSchema } from "./documentation-helpers";
 import { AbstractEndpoint } from "./endpoint";
+import { extractObjectSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 
 export class Diagnostics {
