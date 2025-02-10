@@ -1,0 +1,87 @@
+name: Validations
+
+on:
+  push:
+    branches: [ master, v18, v19, v20, v21 ]
+  pull_request:
+    branches: [ master, v18, v19, v20, v21 ]
+
+
+jobs:
+  OpenAPI:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # - name: Validate against OpenAPI 3.1
+      #   uses: char0n/apidom-validate@v1
+      #   with:
+      #     definition-file: example/example.documentation.yaml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: yarn install
+      - run: yarn test:oas
+      - name: Build distribution
+        run: yarn workspace express-zod-api build
+      - name: Pack artifact
+        run: yarn workspace express-zod-api pack --filename dist.tgz
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: express-zod-api/dist.tgz
+  Compatibility:
+    name: express@${{matrix.express-version}}
+    needs: OpenAPI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        express-version: [ 4, 5 ]
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+      - name: Init package.json
+        run: |
+          cat >package.json <<EOF
+          { "type": "module", "private": true }
+          EOF
+      - name: Add dependencies
+        run: |
+          yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod
+          yarn add eslint@9.0 typescript-eslint@8.0 vitest
+          yarn add express-zod-api@./dist.tgz
+      - name: sample.ts
+        run: |
+          cat >sample.ts <<EOF
+          client.provide("get", "/v1/test", {id: 10});
+          EOF
+      - name: migration.spec.ts
+        run: |
+          cat >migration.spec.ts <<EOF
+          import { readFile } from "node:fs/promises";
+          describe("Migration", () => {
+            test("should fix the import", async () => {
+              const fixed = await readFile("./sample.ts", "utf-8");
+              expect(fixed).toBe('client.provide("get /v1/test", {id: 10});\n');
+            });
+          });
+          EOF
+      - name: eslint.config.js
+        run: |
+          cat >eslint.config.js <<EOF
+          import parser from "@typescript-eslint/parser";
+          import migration from "express-zod-api/migration";
+          export default [
+            { languageOptions: { parser }, plugins: { migration } },
+            { files: ["**/*.ts"], rules: { "migration/v22": "error" } },
+          ];
+          EOF
+      - name: Run migration test
+        run: |
+          yarn eslint --fix
+          yarn vitest --globals
