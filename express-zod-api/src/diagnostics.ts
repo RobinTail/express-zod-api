@@ -47,8 +47,9 @@ export class Diagnostics {
   ): void {
     const ref = this.#verifiedPaths.get(endpoint);
     if (ref?.includes(path)) return;
-    const { shape } = extractObjectSchema(endpoint.getSchema("input"));
     const params = getRoutePathParams(path);
+    if (params.length === 0) return; // next statement is expensive
+    const { shape } = extractObjectSchema(endpoint.getSchema("input"));
     for (const param of params) {
       if (param in shape) continue;
       this.logger.warn(
