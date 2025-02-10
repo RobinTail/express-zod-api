@@ -8,20 +8,23 @@ import { AbstractEndpoint } from "./endpoint";
 import { extractObjectSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 
-const susCatcher = tryCatch(assertJsonCompatible); // (catcher)(...args)
-
 export class Diagnostics {
+  /** @desc (catcher)(...args) => bool | ReturnValue<typeof catcher> */
+  readonly #susCatcher;
   #verifiedEndpoints = new WeakSet<AbstractEndpoint>();
   #verifiedPaths = new WeakMap<
     AbstractEndpoint,
     { shape: ZodRawShape; paths: string[] }
   >();
-  constructor(protected logger: ActualLogger) {}
+
+  constructor(protected logger: ActualLogger) {
+    this.#susCatcher = tryCatch(assertJsonCompatible);
+  }
 
   public checkJsonCompat(endpoint: AbstractEndpoint, ctx: FlatObject): void {
     if (this.#verifiedEndpoints.has(endpoint)) return;
     if (endpoint.getRequestType() === "json") {
-      susCatcher((reason) =>
+      this.#susCatcher((reason) =>
         this.logger.warn(
           "The final input schema of the endpoint contains an unsupported JSON payload type.",
           Object.assign(ctx, { reason }),
@@ -29,7 +32,7 @@ export class Diagnostics {
       )(endpoint.getSchema("input"), "in");
     }
     for (const variant of responseVariants) {
-      const catcher = susCatcher((reason) =>
+      const catcher = this.#susCatcher((reason) =>
         this.logger.warn(
           `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
           Object.assign(ctx, { reason }),
