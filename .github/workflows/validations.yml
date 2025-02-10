@@ -43,8 +43,36 @@ jobs:
           name: dist
       - name: Install environment
         run: |
+          cat >package.json <<EOF
+          { "type": "module", "private": true }
+          EOF
           yarn add express typescript http-errors zod
           yarn add eslint typescript-eslint vitest
       - name: Install artifact
         run: yarn add express-zod-api@./dist.tgz
-      - run: ls -la
+      - name: Prepare migration test
+        run: |
+          cat >sample.ts <<EOF
+          client.provide("get", "/v1/test", {id: 10});
+          EOF
+          cat >migration.spec.ts <<EOF
+          import { readFile } from "node:fs/promises";
+          describe("Migration", () => {
+            test("should fix the import", async () => {
+              const fixed = await readFile("./sample.ts", "utf-8");
+              expect(fixed).toBe('client.provide("get /v1/test", {id: 10});\n');
+            });
+          });
+          EOF
+          cat >eslint.config.js <<EOF
+          import parser from "@typescript-eslint/parser";
+          import migration from "express-zod-api/migration";
+          export default [
+            { languageOptions: { parser }, plugins: { migration } },
+            { files: ["**/*.ts"], rules: { "migration/v22": "error" } },
+          ];
+          EOF
+      - name: Run migration test
+        run: |
+          yarn eslint --fix
+          yarn vitest --globals
