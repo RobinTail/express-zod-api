@@ -41,6 +41,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dist
+      - name: Install environment
+        run: |
+          yarn add express typescript http-errors zod
+          yarn add eslint typescript-eslint vitest
       - name: Install artifact
         run: yarn add express-zod-api@./dist.tgz
       - run: ls -la
