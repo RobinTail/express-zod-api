@@ -1,28 +1,27 @@
+import { has } from "ramda";
 import { bench } from "vitest";
-import { BuiltinLogger } from "../src";
 
-describe("Experiment for builtin logger", () => {
-  const fixed = (a: string, b?: number) => `${a}${b}`;
-  const generic = (...args: unknown[]) => args.join();
-  const logger = new BuiltinLogger();
+describe("Experiment for key lookup", () => {
+  const subject = {
+    a: 1,
+    b: 2,
+    c: 3,
+  };
 
-  bench("fixed 2", () => {
-    fixed("second", 2);
+  bench("in", () => {
+    return void ("a" in subject && "b" in subject && "c" in subject);
   });
 
-  bench("fixed 1", () => {
-    fixed("second");
+  bench("R.has", () => {
+    return void (has("a", subject) && has("b", subject) && has("c", subject));
   });
 
-  bench("generic 2", () => {
-    generic("second", 2);
-  });
-
-  bench("generic 1", () => {
-    generic("second");
-  });
-
-  bench(".child", () => {
-    logger.child({});
+  bench("Object.keys + includes", () => {
+    const keys = Object.keys(subject);
+    return void (
+      keys.includes("a") &&
+      keys.includes("b") &&
+      keys.includes("c")
+    );
   });
 });

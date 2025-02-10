@@ -43,8 +43,10 @@ import {
   FlatObject,
   combinations,
   getExamples,
+  getRoutePathParams,
   hasCoercion,
   makeCleanId,
+  routePathParamsRegex,
   tryToTransform,
   ucFirst,
   Tag,
@@ -54,7 +56,7 @@ import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { FileSchema, ezFileBrand } from "./file-schema";
-import { IOSchema } from "./io-schema";
+import { extractObjectSchema, IOSchema } from "./io-schema";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
@@ -113,8 +115,6 @@ const samples = {
   array: [],
 } satisfies Record<Extract<SchemaObjectType, string>, unknown>;
 
-/** @see https://expressjs.com/en/guide/routing.html */
-const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 const timeRegex = /^\d{2}:\d{2}:\d{2}(\.\d+)?$/;
 
@@ -122,9 +122,6 @@ const getTimestampRegex = (hasOffset?: boolean) =>
   hasOffset
     ? /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)$/
     : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
-
-export const getRoutePathParams = (path: string): string[] =>
-  path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
 
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
@@ -608,29 +605,6 @@ export const depictParamExamples = (
     pluck(param),
     enumerateExamples,
   )({ schema, variant: "original", validate: true, pullProps: true });
-
-export const extractObjectSchema = (
-  subject: IOSchema,
-): z.ZodObject<z.ZodRawShape> => {
-  if (subject instanceof z.ZodObject) return subject;
-  if (subject instanceof z.ZodBranded)
-    return extractObjectSchema(subject.unwrap());
-  if (
-    subject instanceof z.ZodUnion ||
-    subject instanceof z.ZodDiscriminatedUnion
-  ) {
-    return subject.options
-      .map((option) => extractObjectSchema(option))
-      .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
-  } else if (subject instanceof z.ZodEffects) {
-    return extractObjectSchema(subject._def.schema);
-  } else if (subject instanceof z.ZodPipeline) {
-    return extractObjectSchema(subject._def.in);
-  } // intersection left:
-  return extractObjectSchema(subject._def.left).merge(
-    extractObjectSchema(subject._def.right),
-  );
-};
 
 export const defaultIsHeader = (
   name: string,
