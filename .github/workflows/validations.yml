@@ -31,6 +31,7 @@ jobs:
           name: dist
           path: express-zod-api/dist.tgz
   Compatibility:
+    name: express@${{matrix.express-version}}
     needs: OpenAPI
     runs-on: ubuntu-latest
     strategy:
