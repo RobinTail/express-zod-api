@@ -21,8 +21,8 @@ jobs:
           node-version: 20
       - run: yarn install
       - run: yarn test:oas
-      - name: Build
-        run: yarn build
+      - name: Build distribution
+        run: yarn workspace express-zod-api build
       - name: Pack artifact
         run: yarn workspace express-zod-api pack --filename dist.tgz
       - name: Upload artifact
@@ -33,6 +33,9 @@ jobs:
   Compatibility:
     needs: OpenAPI
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        express-version: [ 4, 5 ]
     steps:
       - uses: actions/setup-node@v4
         with:
@@ -48,8 +51,8 @@ jobs:
           EOF
       - name: Add dependencies
         run: |
-          yarn add express typescript http-errors zod
-          yarn add eslint typescript-eslint vitest
+          yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod
+          yarn add eslint@9.0 typescript-eslint@8.0 vitest
           yarn add express-zod-api@./dist.tgz
       - name: sample.ts
         run: |
