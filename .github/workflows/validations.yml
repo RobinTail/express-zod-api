@@ -42,4 +42,6 @@ jobs:
         with:
           name: dist
           path: dist
-      - run: ls -la
+      - run: |
+          ls -la
+          ls -la dist
