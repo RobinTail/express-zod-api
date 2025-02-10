@@ -2,6 +2,38 @@
 
 ## Version 22
 
+### v22.8.0
+
+- Feature: warning about the endpoint input scheme ignoring the parameters of the route to which it is assigned:
+  - There is a technological gap between routing and endpoints, which at the same time allows an endpoint to be reused
+    across multiple routes. Therefore, there are no constraints between the route parameters and the `input` schema;
+  - This version introduces checking for such discrepancies:
+    - non-use of the path parameter or,
+    - a mistake in manually entering its name;
+  - The warning is displayed when the application is launched and NOT in production mode.
+
+```ts
+const updateUserEndpoint = factory.build({
+  method: "patch",
+  input: z.object({
+    id: z.string(), // implies path parameter "id"
+  }),
+});
+
+const routing: Routing = {
+  v1: {
+    user: {
+      ":username": updateUserEndpoint, // path parameter is "username" instead of "id"
+    },
+  },
+};
+```
+
+```shell
+warn: The input schema of the endpoint is most likely missing the parameter of the path it is assigned to.
+      { method: 'patch', path: '/v1/user/:username', param: 'username' }
+```
+
 ### v22.7.0
 
 - Technical release in connection with the implementation of workspaces into the project architecture.
