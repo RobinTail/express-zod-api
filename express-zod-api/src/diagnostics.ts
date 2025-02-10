@@ -50,12 +50,11 @@ export class Diagnostics {
     const { shape } = extractObjectSchema(endpoint.getSchema("input"));
     const params = getRoutePathParams(path);
     for (const param of params) {
-      if (!(param in shape)) {
-        this.logger.warn(
-          "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
-          Object.assign(ctx, { path, param }),
-        );
-      }
+      if (param in shape) continue;
+      this.logger.warn(
+        "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
+        Object.assign(ctx, { path, param }),
+      );
     }
     if (ref) ref.push(path);
     else this.#verifiedPaths.set(endpoint, [path]);
