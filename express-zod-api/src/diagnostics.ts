@@ -25,15 +25,14 @@ export class Diagnostics {
     }
     for (const variant of responseVariants) {
       for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
-        if (mimeTypes?.includes(contentTypes.json)) {
-          try {
-            assertJsonCompatible(schema, "out");
-          } catch (reason) {
-            this.logger.warn(
-              `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
-              Object.assign(ctx, { reason }),
-            );
-          }
+        if (!mimeTypes?.includes(contentTypes.json)) continue;
+        try {
+          assertJsonCompatible(schema, "out");
+        } catch (reason) {
+          this.logger.warn(
+            `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
+            Object.assign(ctx, { reason }),
+          );
         }
       }
     }
