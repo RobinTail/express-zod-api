@@ -427,6 +427,28 @@ describe("Routing", () => {
         ],
       ]);
     });
+
+    test("should warn about unused path params", () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        input: z.object({ id: z.string() }),
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      const configMock = { cors: false, startupLogo: false };
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: configMock as CommonConfig,
+        routing: { v1: { ":idx": endpoint } },
+      });
+      expect(logger._getLogs().warn).toEqual([
+        [
+          "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
+          { method: "get", param: "idx", path: "/v1/:idx" },
+        ],
+      ]);
+    });
   });
 
   describe("createWrongMethodHandler", () => {

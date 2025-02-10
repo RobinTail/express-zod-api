@@ -52,7 +52,7 @@ export class Diagnostics {
     for (const param of params) {
       if (!(param in shape)) {
         this.logger.warn(
-          `The input schema of the endpoint is most likely missing the path parameter it's assigned to.`,
+          "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
           Object.assign(ctx, { path, param }),
         );
       }
