@@ -1,5 +1,5 @@
 import { tryCatch } from "ramda";
-import { z } from "zod";
+import type { ZodRawShape } from "zod";
 import { responseVariants } from "./api-response";
 import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
@@ -14,7 +14,7 @@ export class Diagnostics {
   #verifiedEndpoints = new WeakSet<AbstractEndpoint>();
   #verifiedPaths = new WeakMap<
     AbstractEndpoint,
-    { shape: z.ZodRawShape; paths: string[] }
+    { shape: ZodRawShape; paths: string[] }
   >();
   constructor(protected logger: ActualLogger) {}
 
