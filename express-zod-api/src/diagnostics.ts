@@ -1,3 +1,4 @@
+import { tryCatch } from "ramda";
 import { responseVariants } from "./api-response";
 import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
@@ -5,6 +6,8 @@ import { assertJsonCompatible } from "./deep-checks";
 import { AbstractEndpoint } from "./endpoint";
 import { extractObjectSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
+
+const susCatcher = tryCatch(assertJsonCompatible); // (catcher)(...args)
 
 export class Diagnostics {
   #verifiedEndpoints = new WeakSet<AbstractEndpoint>();
@@ -14,26 +17,22 @@ export class Diagnostics {
   public checkJsonCompat(endpoint: AbstractEndpoint, ctx: FlatObject): void {
     if (this.#verifiedEndpoints.has(endpoint)) return;
     if (endpoint.getRequestType() === "json") {
-      try {
-        assertJsonCompatible(endpoint.getSchema("input"), "in");
-      } catch (reason) {
+      susCatcher((reason) =>
         this.logger.warn(
           "The final input schema of the endpoint contains an unsupported JSON payload type.",
           Object.assign(ctx, { reason }),
-        );
-      }
+        ),
+      )(endpoint.getSchema("input"), "in");
     }
     for (const variant of responseVariants) {
       for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
         if (!mimeTypes?.includes(contentTypes.json)) continue;
-        try {
-          assertJsonCompatible(schema, "out");
-        } catch (reason) {
+        susCatcher((reason) =>
           this.logger.warn(
             `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
             Object.assign(ctx, { reason }),
-          );
-        }
+          ),
+        )(schema, "out");
       }
     }
     this.#verifiedEndpoints.add(endpoint);
