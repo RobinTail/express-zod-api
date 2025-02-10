@@ -7,6 +7,5 @@ yarn-error.log
 coverage
 *-test/quick-start.ts
 issue952-test/*.d.ts
-compat-test/sample.ts
 express-zod-api/*.md
 express-zod-api/LICENSE
