@@ -60,7 +60,14 @@ jobs:
       run: yarn test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
       run: yarn test:952
-  finish:
+    - name: Pack artifact
+      run: yarn workspace express-zod-api pack --filename dist.tgz
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: express-zod-api/dist.tgz
+  report:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -70,3 +77,13 @@ jobs:
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
+  compat:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - run: ls -la
