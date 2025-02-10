@@ -1,4 +1,5 @@
 import { tryCatch } from "ramda";
+import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
@@ -11,7 +12,10 @@ const susCatcher = tryCatch(assertJsonCompatible); // (catcher)(...args)
 
 export class Diagnostics {
   #verifiedEndpoints = new WeakSet<AbstractEndpoint>();
-  #verifiedPaths = new WeakMap<AbstractEndpoint, string[]>();
+  #verifiedPaths = new WeakMap<
+    AbstractEndpoint,
+    { shape: z.ZodRawShape; paths: string[] }
+  >();
   constructor(protected logger: ActualLogger) {}
 
   public checkJsonCompat(endpoint: AbstractEndpoint, ctx: FlatObject): void {
@@ -45,10 +49,11 @@ export class Diagnostics {
     ctx: FlatObject,
   ): void {
     const ref = this.#verifiedPaths.get(endpoint);
-    if (ref?.includes(path)) return;
+    if (ref?.paths.includes(path)) return;
     const params = getRoutePathParams(path);
-    if (params.length === 0) return; // next statement is expensive
-    const { shape } = extractObjectSchema(endpoint.getSchema("input"));
+    if (params.length === 0) return; // next statement can be expensive
+    const shape =
+      ref?.shape || extractObjectSchema(endpoint.getSchema("input")).shape;
     for (const param of params) {
       if (param in shape) continue;
       this.logger.warn(
@@ -56,7 +61,7 @@ export class Diagnostics {
         Object.assign(ctx, { path, param }),
       );
     }
-    if (ref) ref.push(path);
-    else this.#verifiedPaths.set(endpoint, [path]);
+    if (ref) ref.paths.push(path);
+    else this.#verifiedPaths.set(endpoint, { shape, paths: [path] });
   }
 }
