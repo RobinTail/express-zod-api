@@ -23,7 +23,7 @@ const testContent = {
 
 for (const testName in testContent) {
   await writeFile(
-    `./tests/${testName}/quick-start.ts`,
+    `./${testName}-test/quick-start.ts`,
     testContent[testName as keyof typeof testContent],
   );
 }

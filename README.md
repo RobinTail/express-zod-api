@@ -180,7 +180,7 @@ Ensure having the following options in your `tsconfig.json` file in order to mak
 ## Set up config
 
 Create a minimal configuration. _See all available options
-[in sources](https://github.com/RobinTail/express-zod-api/blob/master/src/config-type.ts)._
+[in sources](https://github.com/RobinTail/express-zod-api/blob/master/express-zod-api/src/config-type.ts)._
 
 ```typescript
 import { createConfig } from "express-zod-api";
@@ -1412,8 +1412,6 @@ const output = z.object({
 });
 
 endpointsFactory.build({
-  method,
-  input,
   output,
   handler: async (): Promise<z.input<typeof output>> => ({
     anything: 123,

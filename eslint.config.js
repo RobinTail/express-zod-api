@@ -5,8 +5,15 @@ import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
 import unicornPlugin from "eslint-plugin-unicorn";
 import allowedDepsPlugin from "eslint-plugin-allowed-dependencies";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
-const peformanceConcerns = [
+const packageDir = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "express-zod-api",
+);
+
+const performanceConcerns = [
   {
     selector: "ImportDeclaration[source.value=/assert/]", // #2169
     message: "assert is slow, use throw",
@@ -142,7 +149,14 @@ export default tsPlugin.config(
   tsPlugin.configs.recommended,
   prettierOverrides,
   prettierRules,
-  { name: "globally/ignored", ignores: ["dist/", "coverage/", "migration/"] },
+  {
+    name: "globally/ignored",
+    ignores: [
+      "express-zod-api/dist/",
+      "express-zod-api/coverage/",
+      "express-zod-api/migration/",
+    ],
+  },
   {
     name: "globally/disabled",
     rules: {
@@ -160,43 +174,50 @@ export default tsPlugin.config(
   },
   {
     name: "source/all",
-    files: ["src/*.ts"],
+    files: ["express-zod-api/src/*.ts"],
     rules: {
-      "allowed/dependencies": ["error", { typeOnly: ["eslint", "prettier"] }],
-      "no-restricted-syntax": ["warn", ...peformanceConcerns],
+      "allowed/dependencies": [
+        "error",
+        { typeOnly: ["eslint", "prettier"], packageDir },
+      ],
+      "no-restricted-syntax": ["warn", ...performanceConcerns],
     },
   },
   {
     name: "source/plugin",
-    files: ["src/zod-plugin.ts"],
+    files: ["express-zod-api/src/zod-plugin.ts"],
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
   {
     name: "source/integration",
-    files: ["src/integration.ts", "src/integration-base.ts", "src/zts.ts"],
+    files: [
+      "express-zod-api/src/integration.ts",
+      "express-zod-api/src/integration-base.ts",
+      "express-zod-api/src/zts.ts",
+    ],
     rules: {
       "no-restricted-syntax": [
         "warn",
-        ...peformanceConcerns,
+        ...performanceConcerns,
         ...tsFactoryConcerns,
       ],
     },
   },
   {
     name: "source/migration",
-    files: ["src/migration.ts"],
+    files: ["express-zod-api/src/migration.ts"],
     rules: {
       "allowed/dependencies": [
         "error",
-        { ignore: ["^@typescript-eslint", "^\\."] },
+        { ignore: ["^@typescript-eslint", "^\\."], packageDir },
       ],
     },
   },
   {
     name: "tests/all",
-    files: ["tests/**/*.ts", "vitest.setup.ts"],
+    files: ["express-zod-api/tests/*.ts", "express-zod-api/vitest.setup.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": "warn",
@@ -204,7 +225,7 @@ export default tsPlugin.config(
   },
   {
     name: "generated/all",
-    files: ["tests/*/quick-start.ts", "example/example.client.ts"],
+    files: ["*-test/quick-start.ts", "example/example.client.ts"],
     rules: {
       "prettier/prettier": "off",
       "@typescript-eslint/no-explicit-any": "off",

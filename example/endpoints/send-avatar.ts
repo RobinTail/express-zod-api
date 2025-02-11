@@ -15,7 +15,7 @@ export const sendAvatarEndpoint = fileSendingEndpointsFactory.build({
     data: z.string(),
   }),
   handler: async () => {
-    const data = await readFile("logo.svg", "utf-8");
+    const data = await readFile("assets/logo.svg", "utf-8");
     return { data };
   },
 });

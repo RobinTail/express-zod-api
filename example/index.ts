@@ -1,4 +1,4 @@
-import { createServer } from "../src";
+import { createServer } from "express-zod-api";
 import { config } from "./config";
 import { routing } from "./routing";
 

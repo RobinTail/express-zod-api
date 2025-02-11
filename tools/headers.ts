@@ -1,4 +1,6 @@
-import { writeFile, stat } from "node:fs/promises";
+import { execSync } from "node:child_process";
+import { writeFile } from "node:fs/promises";
+import { tryCatch } from "ramda";
 import { z } from "zod";
 
 /**
@@ -46,6 +48,11 @@ const responseOnlyHeaders = {
     proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
     reason:
       "Specifies how long preflight results can be cached in CORS responses.",
+  },
+  "activate-storage-access": {
+    reason: "response header",
+    proof:
+      "https://developers.google.com/privacy-sandbox/blog/storage-access-api-headers-logic",
   },
   age: {
     proof: "Defined in RFC 7234, Section 5.1.",
@@ -191,11 +198,11 @@ const responseOnlyHeaders = {
   },
 };
 
-const dest = "src/well-known-headers.json";
-const { mtime } = await stat(dest).then(
-  (stats) => stats,
-  () => ({ mtime: null }),
-);
+const dest = "express-zod-api/src/well-known-headers.json";
+const mtime = tryCatch(
+  (cmd) => new Date(execSync(cmd, { encoding: "utf8" })),
+  () => undefined,
+)(`git log -1 --pretty="format:%ci" ${dest}`);
 
 console.info("Current state", mtime);
 
