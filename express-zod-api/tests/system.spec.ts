@@ -218,7 +218,7 @@ describe("App in production mode", async () => {
 
     /** @todo set min version of compression to 1.8 in v23 */
     test.each(["gzip", "br"])(
-      "Should compress the response in case it is supported by client",
+      "Should %s-compress the response in case it is supported by client",
       async (alg) => {
         const response = await fetch(
           `http://127.0.0.1:${port}/v1/test?key=123&something=joke`,

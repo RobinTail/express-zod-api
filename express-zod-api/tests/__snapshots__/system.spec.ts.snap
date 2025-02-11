@@ -42,7 +42,7 @@ exports[`App in production mode > Negative > Should treat custom errors in middl
 ]
 `;
 
-exports[`App in production mode > Positive > Should compress the response in case it is supported by client 1`] = `
+exports[`App in production mode > Positive > Should br-compress the response in case it is supported by client 1`] = `
 {
   "data": {
     "anything": 300,
@@ -57,7 +57,7 @@ exports[`App in production mode > Positive > Should compress the response in cas
 }
 `;
 
-exports[`App in production mode > Positive > Should compress the response in case it is supported by client 2`] = `
+exports[`App in production mode > Positive > Should gzip-compress the response in case it is supported by client 1`] = `
 {
   "data": {
     "anything": 300,
