@@ -34,54 +34,21 @@ jobs:
     name: express@${{matrix.express-version}}
     needs: OpenAPI
     runs-on: ubuntu-latest
+    container:
+      image: robintail/ez-compat-test
     strategy:
       matrix:
         express-version: [ 4, 5 ]
     steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: dist
-      - name: Init package.json
+          path: /app
+      - name: Install dynamic dependencies
+        working-directory: /app
         run: |
-          cat >package.json <<EOF
-          { "type": "module", "private": true }
-          EOF
-      - name: Add dependencies
-        run: |
-          yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod
-          yarn add eslint@9.0 typescript-eslint@8.0 vitest
-          yarn add express-zod-api@./dist.tgz
-      - name: sample.ts
-        run: |
-          cat >sample.ts <<EOF
-          client.provide("get", "/v1/test", {id: 10});
-          EOF
-      - name: migration.spec.ts
-        run: |
-          cat >migration.spec.ts <<EOF
-          import { readFile } from "node:fs/promises";
-          describe("Migration", () => {
-            test("should fix the import", async () => {
-              const fixed = await readFile("./sample.ts", "utf-8");
-              expect(fixed).toBe('client.provide("get /v1/test", {id: 10});\n');
-            });
-          });
-          EOF
-      - name: eslint.config.js
-        run: |
-          cat >eslint.config.js <<EOF
-          import parser from "@typescript-eslint/parser";
-          import migration from "express-zod-api/migration";
-          export default [
-            { languageOptions: { parser }, plugins: { migration } },
-            { files: ["**/*.ts"], rules: { "migration/v22": "error" } },
-          ];
-          EOF
+          yarn add express@${{matrix.express-version}} express-zod-api@./dist.tgz
       - name: Run migration test
-        run: |
-          yarn eslint --fix
-          yarn vitest --globals
+        working-directory: /app
+        run: yarn test
