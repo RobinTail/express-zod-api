@@ -45,8 +45,6 @@ import {
   ensureShortDescription,
   excludeExamplesFromDepiction,
   excludeParamsFromDepiction,
-  extractObjectSchema,
-  getRoutePathParams,
   defaultIsHeader,
   onEach,
   onMissing,
@@ -85,84 +83,6 @@ describe("Documentation helpers", () => {
 
   beforeEach(() => {
     makeRefMock.mockClear();
-  });
-
-  describe("getRoutePathParams()", () => {
-    test("should return an array of param names", () => {
-      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
-        "userId",
-        "bookId",
-      ]);
-      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
-      expect(getRoutePathParams("/something")).toEqual([]);
-      expect(getRoutePathParams("")).toEqual([]);
-      expect(getRoutePathParams("\n")).toEqual([]);
-    });
-
-    test("should return an array of param names", () => {
-      expect(getRoutePathParams("/users/:userId/books/:bookId")).toEqual([
-        "userId",
-        "bookId",
-      ]);
-      expect(getRoutePathParams("/flights/:from-:to")).toEqual(["from", "to"]);
-      expect(getRoutePathParams("/test/:genus.:species")).toEqual([
-        "genus",
-        "species",
-      ]);
-      expect(getRoutePathParams("/something")).toEqual([]);
-      expect(getRoutePathParams("")).toEqual([]);
-      expect(getRoutePathParams("\n")).toEqual([]);
-    });
-  });
-
-  describe("extractObjectSchema()", () => {
-    test("should pass the object schema through", () => {
-      const subject = extractObjectSchema(z.object({ one: z.string() }));
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    test("should return object schema for the union of object schemas", () => {
-      const subject = extractObjectSchema(
-        z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    test("should return object schema for the intersection of object schemas", () => {
-      const subject = extractObjectSchema(
-        z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    test("should support ez.raw()", () => {
-      const subject = extractObjectSchema(ez.raw());
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    describe("Feature #600: Top level refinements", () => {
-      test("should handle refined object schema", () => {
-        const subject = extractObjectSchema(
-          z.object({ one: z.string() }).refine(() => true),
-        );
-        expect(subject).toBeInstanceOf(z.ZodObject);
-        expect(subject).toMatchSnapshot();
-      });
-    });
-
-    describe("Feature #1869: Top level transformations", () => {
-      test("should handle transformations to another object", () => {
-        const subject = extractObjectSchema(
-          z.object({ one: z.string() }).transform(({ one }) => ({ two: one })),
-        );
-        expect(subject).toBeInstanceOf(z.ZodObject);
-        expect(subject).toMatchSnapshot();
-      });
-    });
   });
 
   describe("excludeParamsFromDepiction()", () => {

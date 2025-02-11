@@ -42,10 +42,13 @@ export const initRouting = ({
   routing: Routing;
   parsers?: Parsers;
 }) => {
-  const doc = new Diagnostics(getLogger());
+  let doc: Diagnostics | undefined = new Diagnostics(getLogger()); // disposable instance
   const familiar = new Map<string, Array<Method | AuxMethod>>();
   const onEndpoint: OnEndpoint = (endpoint, path, method, siblingMethods) => {
-    if (!isProduction()) doc.check(endpoint, { path, method });
+    if (!isProduction()) {
+      doc?.checkJsonCompat(endpoint, { path, method });
+      doc?.checkPathParams(path, endpoint, { method });
+    }
     const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
     const handler: RequestHandler = async (request, response) => {
       const logger = getLogger(request);
@@ -80,6 +83,7 @@ export const initRouting = ({
     app[method](path, ...matchingParsers, handler);
   };
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
+  doc = undefined; // hint for garbage collector
   if (config.wrongMethodBehavior !== 405) return;
   for (const [path, allowedMethods] of familiar.entries())
     app.all(path, createWrongMethodHandler(allowedMethods));

@@ -1412,8 +1412,6 @@ const output = z.object({
 });
 
 endpointsFactory.build({
-  method,
-  input,
   output,
   handler: async (): Promise<z.input<typeof output>> => ({
     anything: 123,

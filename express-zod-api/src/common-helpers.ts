@@ -24,6 +24,11 @@ type NoNever<T, F> = [T] extends [never] ? F : T;
 export interface TagOverrides {}
 export type Tag = NoNever<keyof TagOverrides, string>;
 
+/** @see https://expressjs.com/en/guide/routing.html */
+export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
+export const getRoutePathParams = (path: string): string[] =>
+  path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
+
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
   const isUpload = contentType.toLowerCase().startsWith(contentTypes.upload);
