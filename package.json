@@ -36,7 +36,7 @@
     "@types/node": "^22.0.0",
     "@typescript-eslint/rule-tester": "^8.15.0",
     "@vitest/coverage-v8": "^3.0.5",
-    "compression": "^1.7.4",
+    "compression": "^1.8.0",
     "eslint": "^9.3.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-allowed-dependencies": "^1.0.0",
