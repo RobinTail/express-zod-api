@@ -44,14 +44,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dist
-      - name: dirs
-        run: |
-          pwd
-          ls -la
-          ls -la ../
-          ls -la /
+          path: /app
       - name: Install dynamic dependencies
+        working-directory: /app
         run: |
           yarn add express@${{matrix.express-version}} express-zod-api@./dist.tgz
       - name: Run migration test
+        working-directory: /app
         run: yarn test
