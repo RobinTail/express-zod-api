@@ -57,6 +57,21 @@ exports[`App in production mode > Positive > Should compress the response in cas
 }
 `;
 
+exports[`App in production mode > Positive > Should compress the response in case it is supported by client 2`] = `
+{
+  "data": {
+    "anything": 300,
+    "doubleKey": "123123",
+    "method": "get",
+    "permissions": [
+      "any",
+    ],
+    "userId": 354,
+  },
+  "status": "success",
+}
+`;
+
 exports[`App in production mode > Protocol > Should fail on invalid method 1`] = `
 {
   "error": {
