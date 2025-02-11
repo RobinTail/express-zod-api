@@ -40,13 +40,16 @@ jobs:
       matrix:
         express-version: [ 4, 5 ]
     steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: dist
+      - name: dirs
+        run: |
+          pwd
+          ls -la
+          ls -la ../
+          ls -la /
       - name: Install dynamic dependencies
         run: |
           yarn add express@${{matrix.express-version}} express-zod-api@./dist.tgz
