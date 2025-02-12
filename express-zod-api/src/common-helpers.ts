@@ -83,12 +83,14 @@ export const getMessageFromError = (error: Error): string => {
 /** Takes the original unvalidated examples from the properties of ZodObject schema shape */
 export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
   Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
-    (acc, [key, schema]) =>
-      combinations(
+    (acc, [key, schema]) => {
+      const { _def } = schema as z.ZodType;
+      return combinations(
         acc,
-        (schema._def[metaSymbol]?.examples || []).map(objOf(key)),
+        (_def[metaSymbol]?.examples || []).map(objOf(key)),
         ([left, right]) => ({ ...left, ...right }),
-      ),
+      );
+    },
     [],
   );
 
