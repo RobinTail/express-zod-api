@@ -3126,6 +3126,81 @@ servers:
 "
 `;
 
+exports[`Documentation > Metadata > Feature #2390: should support deprecations 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing Metadata:deprecations
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      operationId: GetV1GetSomething
+      parameters:
+        - name: str
+          in: query
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: string
+            deprecated: true
+      responses:
+        "200":
+          description: GET /v1/getSomething Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                required:
+                  - status
+                  - data
+        "400":
+          description: GET /v1/getSomething Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
 exports[`Documentation > Metadata > Issue #827: .example() should be immutable 1`] = `
 "openapi: 3.1.0
 info:

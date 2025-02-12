@@ -1046,6 +1046,28 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test("Feature #2390: should support deprecations", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            // @todo deprecate the route as well
+            getSomething: defaultEndpointsFactory.build({
+              input: z.object({
+                str: z.string().deprecated(),
+              }),
+              output: z.object({}),
+              handler: vi.fn(),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Metadata:deprecations",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test("Issue #929: the location of the custom description should be on the param level", () => {
       const spec = new Documentation({
         composition: "components",
