@@ -66,7 +66,6 @@ export class Endpoint<
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
   readonly #methods?: Method[];
   readonly #middlewares: AbstractMiddleware[];
-  readonly #responses: Record<ResponseVariant, NormalizedResponse[]>;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   readonly #resultHandler: AbstractResultHandler;
   readonly #schemas: { input: IN; output: OUT };
@@ -109,10 +108,6 @@ export class Endpoint<
     this.#tags = tags;
     this.#descriptions = { long, short };
     this.#schemas = { input: inputSchema, output: outputSchema };
-    this.#responses = {
-      positive: resultHandler.getPositiveResponse(outputSchema),
-      negative: resultHandler.getNegativeResponse(),
-    };
   }
 
   public override clone() {
@@ -154,7 +149,11 @@ export class Endpoint<
   }
 
   public override getResponses(variant: ResponseVariant) {
-    return Object.freeze(this.#responses[variant]);
+    return Object.freeze(
+      variant === "negative"
+        ? this.#resultHandler.getNegativeResponse()
+        : this.#resultHandler.getPositiveResponse(this.#schemas.output),
+    );
   }
 
   public override getSecurity() {
