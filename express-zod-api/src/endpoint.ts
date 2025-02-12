@@ -58,92 +58,58 @@ export abstract class AbstractEndpoint extends Routable {
   public abstract getRequestType(): ContentType;
 }
 
+interface EndpointDefinition<
+  IN extends IOSchema,
+  OUT extends IOSchema,
+  OPT extends FlatObject,
+> {
+  middlewares?: AbstractMiddleware[];
+  inputSchema: IN;
+  outputSchema: OUT;
+  handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
+  resultHandler: AbstractResultHandler;
+  description?: string;
+  shortDescription?: string;
+  getOperationId?: (method: Method) => string | undefined;
+  methods?: Method[];
+  scopes?: string[];
+  tags?: string[];
+}
+
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
   OPT extends FlatObject,
 > extends AbstractEndpoint {
-  readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods?: Method[];
-  readonly #middlewares: AbstractMiddleware[];
-  readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  readonly #resultHandler: AbstractResultHandler;
-  readonly #schemas: { input: IN; output: OUT };
-  readonly #scopes: string[];
-  readonly #tags: string[];
-  readonly #getOperationId: (method: Method) => string | undefined;
+  readonly #def: EndpointDefinition<IN, OUT, OPT>;
 
-  constructor({
-    methods,
-    inputSchema,
-    outputSchema,
-    handler,
-    resultHandler,
-    getOperationId = () => undefined,
-    scopes = [],
-    middlewares = [],
-    tags = [],
-    description: long,
-    shortDescription: short,
-  }: {
-    middlewares?: AbstractMiddleware[];
-    inputSchema: IN;
-    outputSchema: OUT;
-    handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-    resultHandler: AbstractResultHandler;
-    description?: string;
-    shortDescription?: string;
-    getOperationId?: (method: Method) => string | undefined;
-    methods?: Method[];
-    scopes?: string[];
-    tags?: string[];
-  }) {
+  constructor(def: EndpointDefinition<IN, OUT, OPT>) {
     super();
-    this.#handler = handler;
-    this.#resultHandler = resultHandler;
-    this.#middlewares = middlewares;
-    this.#getOperationId = getOperationId;
-    this.#methods = methods;
-    this.#scopes = scopes;
-    this.#tags = tags;
-    this.#descriptions = { long, short };
-    this.#schemas = { input: inputSchema, output: outputSchema };
+    this.#def = def;
   }
 
   public override clone() {
-    return new Endpoint({
-      methods: this.#methods,
-      inputSchema: this.#schemas.input,
-      outputSchema: this.#schemas.output,
-      handler: this.#handler,
-      resultHandler: this.#resultHandler,
-      getOperationId: this.#getOperationId,
-      scopes: this.#scopes,
-      middlewares: this.#middlewares,
-      tags: this.#tags,
-      description: this.#descriptions.long,
-      shortDescription: this.#descriptions.short,
-    }) as this;
+    return new Endpoint(this.#def) as this;
   }
 
   public override getDescription(variant: DescriptionVariant) {
-    return this.#descriptions[variant];
+    return this.#def[variant === "short" ? "shortDescription" : "description"];
   }
 
   public override getMethods() {
-    return Object.freeze(this.#methods);
+    return Object.freeze(this.#def.methods);
   }
 
   public override getSchema(variant: "input"): IN;
   public override getSchema(variant: "output"): OUT;
   public override getSchema(variant: IOVariant) {
-    return this.#schemas[variant];
+    return this.#def[variant === "output" ? "outputSchema" : "inputSchema"];
   }
 
   public override getRequestType() {
-    return hasUpload(this.#schemas.input)
+    return hasUpload(this.#def.inputSchema)
       ? "upload"
-      : hasRaw(this.#schemas.input)
+      : hasRaw(this.#def.inputSchema)
         ? "raw"
         : "json";
   }
@@ -151,32 +117,32 @@ export class Endpoint<
   public override getResponses(variant: ResponseVariant) {
     return Object.freeze(
       variant === "negative"
-        ? this.#resultHandler.getNegativeResponse()
-        : this.#resultHandler.getPositiveResponse(this.#schemas.output),
+        ? this.#def.resultHandler.getNegativeResponse()
+        : this.#def.resultHandler.getPositiveResponse(this.#def.outputSchema),
     );
   }
 
   public override getSecurity() {
-    return this.#middlewares
+    return (this.#def.middlewares || [])
       .map((middleware) => middleware.getSecurity())
       .filter((entry) => entry !== undefined);
   }
 
   public override getScopes() {
-    return Object.freeze(this.#scopes);
+    return Object.freeze(this.#def.scopes || []);
   }
 
   public override getTags() {
-    return Object.freeze(this.#tags);
+    return Object.freeze(this.#def.tags || []);
   }
 
   public override getOperationId(method: Method): string | undefined {
-    return this.#getOperationId(method);
+    return this.#def.getOperationId?.(method);
   }
 
   async #parseOutput(output: z.input<OUT>) {
     try {
-      return (await this.#schemas.output.parseAsync(output)) as FlatObject;
+      return (await this.#def.outputSchema.parseAsync(output)) as FlatObject;
     } catch (e) {
       throw e instanceof z.ZodError ? new OutputValidationError(e) : e;
     }
@@ -196,7 +162,7 @@ export class Endpoint<
     logger: ActualLogger;
     options: Partial<OPT>;
   }) {
-    for (const mw of this.#middlewares) {
+    for (const mw of this.#def.middlewares || []) {
       if (method === "options" && !(mw instanceof ExpressMiddleware)) continue;
       Object.assign(
         options,
@@ -222,13 +188,13 @@ export class Endpoint<
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
-      finalInput = (await this.#schemas.input.parseAsync(
+      finalInput = (await this.#def.inputSchema.parseAsync(
         input,
       )) as z.output<IN>;
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
-    return this.#handler({ ...rest, input: finalInput });
+    return this.#def.handler({ ...rest, input: finalInput });
   }
 
   async #handleResult({
@@ -244,7 +210,7 @@ export class Endpoint<
     options: Partial<OPT>;
   }) {
     try {
-      await this.#resultHandler.execute({ ...rest, error });
+      await this.#def.resultHandler.execute({ ...rest, error });
     } catch (e) {
       lastResortHandler({
         ...rest,
