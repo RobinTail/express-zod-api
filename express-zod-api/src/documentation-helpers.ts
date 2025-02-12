@@ -720,7 +720,7 @@ export const onEach: SchemaHandler<
   SchemaObject | ReferenceObject,
   OpenAPIContext,
   "each"
-> = (schema: z.ZodTypeAny, { isResponse, prev }) => {
+> = (schema: z.ZodType, { isResponse, prev }) => {
   if (isReferenceObject(prev)) return {};
   const { description, _def } = schema;
   const shouldAvoidParsing = schema instanceof z.ZodLazy;

@@ -53,14 +53,15 @@ const onObject: Producer = (
   },
 ) => {
   const members = Object.entries(shape).map<ts.TypeElement>(([key, value]) => {
+    const { description: comment, _def } = value as z.ZodType;
     const isOptional =
       isResponse && hasCoercion(value)
         ? value instanceof z.ZodOptional
         : value.isOptional();
     return makeInterfaceProp(key, next(value), {
+      comment,
       isOptional: isOptional && hasQuestionMark,
-      isDeprecated: value._def[metaSymbol]?.isDeprecated,
-      comment: value.description,
+      isDeprecated: _def[metaSymbol]?.isDeprecated,
     });
   });
   return f.createTypeLiteralNode(members);
