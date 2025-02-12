@@ -4,16 +4,19 @@ import { Method } from "./method";
 import { Routable } from "./routable";
 
 export class DependsOnMethod extends Routable {
-  constructor(protected endpoints: Partial<Record<Method, AbstractEndpoint>>) {
+  readonly #endpoints: Partial<Record<Method, AbstractEndpoint>>;
+
+  constructor(endpoints: Partial<Record<Method, AbstractEndpoint>>) {
     super();
+    this.#endpoints = endpoints;
   }
 
   /** @desc [method, endpoint, siblingMethods] */
   public get entries(): ReadonlyArray<[Method, AbstractEndpoint, Method[]]> {
     const entries: Array<(typeof this.entries)[number]> = [];
-    const methods = keys(this.endpoints); // eslint-disable-line no-restricted-syntax -- literal type required
+    const methods = keys(this.#endpoints); // eslint-disable-line no-restricted-syntax -- literal type required
     for (const method of methods) {
-      const endpoint = this.endpoints[method];
+      const endpoint = this.#endpoints[method];
       if (endpoint) {
         entries.push([
           method,
@@ -26,6 +29,6 @@ export class DependsOnMethod extends Routable {
   }
 
   public override clone() {
-    return new DependsOnMethod(this.endpoints) as this;
+    return new DependsOnMethod(this.#endpoints) as this;
   }
 }
