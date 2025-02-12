@@ -34,6 +34,7 @@ export type Handler<IN, OUT, OPT> = (params: {
 type DescriptionVariant = "short" | "long";
 type IOVariant = "input" | "output";
 
+// @todo consider getters in v23
 export abstract class AbstractEndpoint extends Nestable {
   public abstract execute(params: {
     request: Request;
