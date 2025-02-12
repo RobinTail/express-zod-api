@@ -7,10 +7,11 @@ import { Diagnostics } from "./diagnostics";
 import { AuxMethod, Method } from "./method";
 import { Routable } from "./routable";
 import { OnEndpoint, walkRouting } from "./routing-walker";
+import { ServeStatic } from "./serve-static";
 import { GetLogger } from "./server-helpers";
 
 export interface Routing {
-  [SEGMENT: string]: Routing | Routable;
+  [SEGMENT: string]: Routing | Routable | ServeStatic;
 }
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;

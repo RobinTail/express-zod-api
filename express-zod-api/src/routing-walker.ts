@@ -43,8 +43,6 @@ export const walkRouting = ({
       if (element instanceof AbstractEndpoint) {
         const methods = element.getMethods() || ["get"];
         for (const method of methods) onEndpoint(element, path, method);
-      } else if (element instanceof ServeStatic) {
-        if (onStatic) element.apply(path, onStatic);
       } else if (element instanceof DependsOnMethod) {
         for (const [method, endpoint, siblingMethods] of element.entries) {
           const supportedMethods = endpoint.getMethods();
@@ -56,6 +54,8 @@ export const walkRouting = ({
           onEndpoint(endpoint, path, method, siblingMethods);
         }
       }
+    } else if (element instanceof ServeStatic) {
+      if (onStatic) element.apply(path, onStatic);
     } else {
       stack.unshift(...makePairs(element, path));
     }
