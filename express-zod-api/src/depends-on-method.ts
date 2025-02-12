@@ -11,7 +11,6 @@ export class DependsOnMethod extends Nestable {
   /** @desc [method, endpoint, siblingMethods] */
   public get entries(): ReadonlyArray<[Method, AbstractEndpoint, Method[]]> {
     const entries: Array<(typeof this.entries)[number]> = [];
-    // @todo for..of pairs() ?
     const methods = keys(this.endpoints); // eslint-disable-line no-restricted-syntax -- literal type required
     for (const method of methods) {
       const endpoint = this.endpoints[method];
