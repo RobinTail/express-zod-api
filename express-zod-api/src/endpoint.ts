@@ -73,7 +73,6 @@ export class Endpoint<
   readonly #scopes: string[];
   readonly #tags: string[];
   readonly #getOperationId: (method: Method) => string | undefined;
-  readonly #requestType: ContentType;
 
   constructor({
     methods,
@@ -114,11 +113,6 @@ export class Endpoint<
       positive: resultHandler.getPositiveResponse(outputSchema),
       negative: resultHandler.getNegativeResponse(),
     };
-    this.#requestType = hasUpload(inputSchema)
-      ? "upload"
-      : hasRaw(inputSchema)
-        ? "raw"
-        : "json";
   }
 
   public override clone() {
@@ -152,7 +146,11 @@ export class Endpoint<
   }
 
   public override getRequestType() {
-    return this.#requestType;
+    return hasUpload(this.#schemas.input)
+      ? "upload"
+      : hasRaw(this.#schemas.input)
+        ? "raw"
+        : "json";
   }
 
   public override getResponses(variant: ResponseVariant) {
