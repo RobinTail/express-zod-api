@@ -64,7 +64,7 @@ interface NestedSchemaLookupProps {
 
 /** @desc The optimized version of the schema walker for boolean checks */
 export const hasNestedSchema = (
-  subject: z.ZodTypeAny,
+  subject: z.ZodType,
   {
     condition,
     rules = ioChecks,
@@ -76,7 +76,9 @@ export const hasNestedSchema = (
   const handler =
     depth < maxDepth
       ? rules[subject._def[metaSymbol]?.brand as keyof typeof rules] ||
-        rules[subject._def.typeName as keyof typeof rules]
+        ("typeName" in subject._def
+          ? rules[subject._def.typeName as keyof typeof rules]
+          : undefined)
       : undefined;
   if (handler) {
     return handler(subject, {
