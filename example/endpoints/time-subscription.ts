@@ -6,7 +6,11 @@ import { eventsFactory } from "../factories";
 export const subscriptionEndpoint = eventsFactory.buildVoid({
   tag: "subscriptions",
   input: z.object({
-    trigger: z.string().optional(),
+    trigger: z
+      .string()
+      .optional()
+      .deprecated()
+      .describe("for testing error response"),
   }),
   handler: async ({
     input: { trigger },

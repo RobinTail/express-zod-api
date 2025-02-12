@@ -596,9 +596,11 @@ paths:
         - name: trigger
           in: query
           required: false
-          description: GET /v1/events/stream Parameter
+          description: for testing error response
           schema:
             type: string
+            description: for testing error response
+            deprecated: true
       responses:
         "200":
           description: GET /v1/events/stream Positive response
