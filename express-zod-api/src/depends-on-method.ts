@@ -4,7 +4,7 @@ import { Method } from "./method";
 import { Routable } from "./routable";
 
 export class DependsOnMethod extends Routable {
-  readonly #endpoints: Partial<Record<Method, AbstractEndpoint>>;
+  readonly #endpoints: ConstructorParameters<typeof DependsOnMethod>[0];
 
   constructor(endpoints: Partial<Record<Method, AbstractEndpoint>>) {
     super();

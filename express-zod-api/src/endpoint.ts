@@ -58,32 +58,26 @@ export abstract class AbstractEndpoint extends Routable {
   public abstract getRequestType(): ContentType;
 }
 
-interface EndpointDefinition<
-  IN extends IOSchema,
-  OUT extends IOSchema,
-  OPT extends FlatObject,
-> {
-  middlewares?: AbstractMiddleware[];
-  inputSchema: IN;
-  outputSchema: OUT;
-  handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  resultHandler: AbstractResultHandler;
-  description?: string;
-  shortDescription?: string;
-  getOperationId?: (method: Method) => string | undefined;
-  methods?: Method[];
-  scopes?: string[];
-  tags?: string[];
-}
-
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
   OPT extends FlatObject,
 > extends AbstractEndpoint {
-  readonly #def: EndpointDefinition<IN, OUT, OPT>;
+  readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0];
 
-  constructor(def: EndpointDefinition<IN, OUT, OPT>) {
+  constructor(def: {
+    middlewares?: AbstractMiddleware[];
+    inputSchema: IN;
+    outputSchema: OUT;
+    handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
+    resultHandler: AbstractResultHandler;
+    description?: string;
+    shortDescription?: string;
+    getOperationId?: (method: Method) => string | undefined;
+    methods?: Method[];
+    scopes?: string[];
+    tags?: string[];
+  }) {
     super();
     this.#def = def;
   }
