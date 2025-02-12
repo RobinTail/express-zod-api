@@ -63,17 +63,14 @@ export class Endpoint<
   OPT extends FlatObject,
 > extends AbstractEndpoint {
   readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods?: ReadonlyArray<Method>;
+  readonly #methods?: Method[];
   readonly #middlewares: AbstractMiddleware[];
-  readonly #responses: Record<
-    ResponseVariant,
-    ReadonlyArray<NormalizedResponse>
-  >;
+  readonly #responses: Record<ResponseVariant, NormalizedResponse[]>;
   readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
   readonly #resultHandler: AbstractResultHandler;
   readonly #schemas: { input: IN; output: OUT };
-  readonly #scopes: ReadonlyArray<string>;
-  readonly #tags: ReadonlyArray<string>;
+  readonly #scopes: string[];
+  readonly #tags: string[];
   readonly #getOperationId: (method: Method) => string | undefined;
   readonly #requestType: ContentType;
 
@@ -107,14 +104,14 @@ export class Endpoint<
     this.#resultHandler = resultHandler;
     this.#middlewares = middlewares;
     this.#getOperationId = getOperationId;
-    this.#methods = Object.freeze(methods);
-    this.#scopes = Object.freeze(scopes);
-    this.#tags = Object.freeze(tags);
+    this.#methods = methods;
+    this.#scopes = scopes;
+    this.#tags = tags;
     this.#descriptions = { long, short };
     this.#schemas = { input: inputSchema, output: outputSchema };
     this.#responses = {
-      positive: Object.freeze(resultHandler.getPositiveResponse(outputSchema)),
-      negative: Object.freeze(resultHandler.getNegativeResponse()),
+      positive: resultHandler.getPositiveResponse(outputSchema),
+      negative: resultHandler.getNegativeResponse(),
     };
     this.#requestType = hasUpload(inputSchema)
       ? "upload"
@@ -125,16 +122,15 @@ export class Endpoint<
 
   public override clone() {
     return new Endpoint({
-      // @todo internal props may be unfrozen, but methods returning them can freeze
-      methods: this.#methods?.slice(),
+      methods: this.#methods,
       inputSchema: this.#schemas.input,
       outputSchema: this.#schemas.output,
       handler: this.#handler,
       resultHandler: this.#resultHandler,
       getOperationId: this.#getOperationId,
-      scopes: this.#scopes.slice(),
+      scopes: this.#scopes,
       middlewares: this.#middlewares,
-      tags: this.#tags.slice(),
+      tags: this.#tags,
       description: this.#descriptions.long,
       shortDescription: this.#descriptions.short,
     }) as this;
@@ -145,7 +141,7 @@ export class Endpoint<
   }
 
   public override getMethods() {
-    return this.#methods;
+    return Object.freeze(this.#methods);
   }
 
   public override getSchema(variant: "input"): IN;
@@ -159,7 +155,7 @@ export class Endpoint<
   }
 
   public override getResponses(variant: ResponseVariant) {
-    return this.#responses[variant];
+    return Object.freeze(this.#responses[variant]);
   }
 
   public override getSecurity() {
@@ -169,11 +165,11 @@ export class Endpoint<
   }
 
   public override getScopes() {
-    return this.#scopes;
+    return Object.freeze(this.#scopes);
   }
 
   public override getTags() {
-    return this.#tags;
+    return Object.freeze(this.#tags);
   }
 
   public override getOperationId(method: Method): string | undefined {
