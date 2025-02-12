@@ -2,6 +2,7 @@ import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
 import { Method } from "./method";
+import { Routable } from "./routable";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
 
@@ -38,20 +39,22 @@ export const walkRouting = ({
   const stack = makePairs(routing);
   while (stack.length) {
     const [path, element] = stack.shift()!;
-    if (element instanceof AbstractEndpoint) {
-      const methods = element.getMethods() || ["get"];
-      for (const method of methods) onEndpoint(element, path, method);
-    } else if (element instanceof ServeStatic) {
-      if (onStatic) element.apply(path, onStatic);
-    } else if (element instanceof DependsOnMethod) {
-      for (const [method, endpoint, siblingMethods] of element.entries) {
-        const supportedMethods = endpoint.getMethods();
-        if (supportedMethods && !supportedMethods.includes(method)) {
-          throw new RoutingError(
-            `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
-          );
+    if (element instanceof Routable) {
+      if (element instanceof AbstractEndpoint) {
+        const methods = element.getMethods() || ["get"];
+        for (const method of methods) onEndpoint(element, path, method);
+      } else if (element instanceof ServeStatic) {
+        if (onStatic) element.apply(path, onStatic);
+      } else if (element instanceof DependsOnMethod) {
+        for (const [method, endpoint, siblingMethods] of element.entries) {
+          const supportedMethods = endpoint.getMethods();
+          if (supportedMethods && !supportedMethods.includes(method)) {
+            throw new RoutingError(
+              `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
+            );
+          }
+          onEndpoint(endpoint, path, method, siblingMethods);
         }
-        onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
       stack.unshift(...makePairs(element, path));

@@ -6,8 +6,9 @@ const endpoint = defaultEndpointsFactory.build({
   handler: vi.fn(),
 });
 
+// @todo add tests for Routable
 describe.each([new DependsOnMethod({ get: endpoint }), endpoint])(
-  "Nesting mixin %#",
+  "Nestable mixin %#",
   (subject) => {
     test("should have .nest() method returning Routing arrangement", () => {
       expect(subject).toHaveProperty("nest", expect.any(Function));
