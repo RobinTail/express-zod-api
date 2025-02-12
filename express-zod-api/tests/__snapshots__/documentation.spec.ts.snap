@@ -3135,6 +3135,7 @@ paths:
   /v1/getSomething:
     get:
       operationId: GetV1GetSomething
+      deprecated: true
       parameters:
         - name: str
           in: query

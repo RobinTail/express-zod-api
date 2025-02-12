@@ -182,4 +182,4 @@ export const isProduction = memoizeWith(
 );
 
 export const nonEmpty = <T>(subject: T[] | ReadonlyArray<T>) =>
-  subject.length ? subject : undefined;
+  subject.length ? subject.slice() : undefined;

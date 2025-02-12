@@ -1047,20 +1047,16 @@ describe("Documentation", () => {
     });
 
     test("Feature #2390: should support deprecations", () => {
+      const endpoint = defaultEndpointsFactory.build({
+        input: z.object({
+          str: z.string().deprecated(),
+        }),
+        output: z.object({}),
+        handler: vi.fn(),
+      });
       const spec = new Documentation({
         config: sampleConfig,
-        routing: {
-          v1: {
-            // @todo deprecate the route as well
-            getSomething: defaultEndpointsFactory.build({
-              input: z.object({
-                str: z.string().deprecated(),
-              }),
-              output: z.object({}),
-              handler: vi.fn(),
-            }),
-          },
-        },
+        routing: { v1: { getSomething: endpoint.deprecated() } },
         version: "3.4.5",
         title: "Testing Metadata:deprecations",
         serverUrl: "https://example.com",

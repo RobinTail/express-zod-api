@@ -1,5 +1,6 @@
 import {
   OpenApiBuilder,
+  OperationObject,
   ReferenceObject,
   ResponsesObject,
   SchemaObject,
@@ -245,18 +246,18 @@ export class Documentation extends OpenApiBuilder {
         },
       );
 
-      this.addPath(reformatParamsInPath(path), {
-        [method]: {
-          operationId,
-          summary,
-          description,
-          tags: nonEmpty(endpoint.getTags()),
-          parameters: nonEmpty(depictedParams),
-          requestBody,
-          security: nonEmpty(securityRefs),
-          responses,
-        },
-      });
+      const operation: OperationObject = {
+        operationId,
+        summary,
+        description,
+        deprecated: endpoint.isDeprecated ? true : undefined,
+        tags: nonEmpty(endpoint.getTags()),
+        parameters: nonEmpty(depictedParams),
+        requestBody,
+        security: nonEmpty(securityRefs),
+        responses,
+      };
+      this.addPath(reformatParamsInPath(path), { [method]: operation });
     };
     walkRouting({ routing, onEndpoint });
     if (tags) this.rootDoc.tags = depictTags(tags);
