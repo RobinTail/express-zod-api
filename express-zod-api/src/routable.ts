@@ -1,7 +1,6 @@
 import { Routing } from "./routing";
 
-// @todo rename to something like RoutingElement or Routable
-export abstract class Nesting {
+export abstract class Routable {
   #isDeprecated = false;
   public abstract clone(): this;
 

@@ -1,9 +1,9 @@
 import { keys, reject, equals } from "ramda";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
-import { Nesting } from "./nesting";
+import { Routable } from "./routable";
 
-export class DependsOnMethod extends Nesting {
+export class DependsOnMethod extends Routable {
   constructor(protected endpoints: Partial<Record<Method, AbstractEndpoint>>) {
     super();
   }

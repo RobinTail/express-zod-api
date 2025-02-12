@@ -21,7 +21,7 @@ import { LogicalContainer } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
-import { Nesting } from "./nesting";
+import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
 
@@ -34,7 +34,7 @@ export type Handler<IN, OUT, OPT> = (params: {
 type DescriptionVariant = "short" | "long";
 type IOVariant = "input" | "output";
 
-export abstract class AbstractEndpoint extends Nesting {
+export abstract class AbstractEndpoint extends Routable {
   public abstract execute(params: {
     request: Request;
     response: Response;
