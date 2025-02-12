@@ -1,4 +1,4 @@
-import { chain, eqBy, isNil, path, prop, reject, uniqWith } from "ramda";
+import { chain, eqBy, path, prop, uniqWith } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
@@ -57,13 +57,10 @@ const onObject: Producer = (
       isResponse && hasCoercion(value)
         ? value instanceof z.ZodOptional
         : value.isOptional();
-    const deprecated = value._def[metaSymbol]?.isDeprecated
-      ? "@deprecated"
-      : undefined;
-    const { description } = value;
     return makeInterfaceProp(key, next(value), {
       isOptional: isOptional && hasQuestionMark,
-      comment: reject(isNil, [deprecated, description]).join(" "),
+      isDeprecated: value._def[metaSymbol]?.isDeprecated,
+      comment: value.description,
     });
   });
   return f.createTypeLiteralNode(members);

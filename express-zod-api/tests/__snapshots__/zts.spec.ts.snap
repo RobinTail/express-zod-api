@@ -248,6 +248,15 @@ exports[`zod-to-ts > z.object() > supports string literal properties 1`] = `
 }"
 `;
 
+exports[`zod-to-ts > z.object() > supports zod.deprecated() 1`] = `
+"{
+    /** @deprecated */
+    one: string;
+    /** @deprecated with description */
+    two: string;
+}"
+`;
+
 exports[`zod-to-ts > z.object() > supports zod.describe() 1`] = `
 "{
     /** The name of the item */
