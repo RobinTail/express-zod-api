@@ -14,8 +14,13 @@ export class DependsOnMethod extends Routable {
     const methods = keys(this.endpoints); // eslint-disable-line no-restricted-syntax -- literal type required
     for (const method of methods) {
       const endpoint = this.endpoints[method];
-      if (endpoint)
-        entries.push([method, endpoint, reject(equals(method), methods)]);
+      if (endpoint) {
+        entries.push([
+          method,
+          this.isDeprecated ? endpoint.deprecated() : endpoint,
+          reject(equals(method), methods),
+        ]);
+      }
     }
     return Object.freeze(entries);
   }
