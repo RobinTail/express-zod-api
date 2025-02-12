@@ -52,7 +52,7 @@ const ioChecks: HandlingRules<boolean, EmptyObject, z.ZodFirstPartyTypeKind> = {
 };
 
 interface NestedSchemaLookupProps {
-  condition?: (schema: z.ZodTypeAny) => boolean;
+  condition?: (schema: z.ZodType) => boolean;
   rules?: HandlingRules<
     boolean,
     EmptyObject,
