@@ -95,7 +95,7 @@ export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
   );
 
 export const getExamples = <
-  T extends z.ZodTypeAny,
+  T extends z.ZodType,
   V extends "original" | "parsed" | undefined,
 >({
   schema,
