@@ -21,7 +21,7 @@ import { LogicalContainer } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
-import { Nestable } from "./routable";
+import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
 
@@ -35,7 +35,7 @@ type DescriptionVariant = "short" | "long";
 type IOVariant = "input" | "output";
 
 // @todo consider getters in v23
-export abstract class AbstractEndpoint extends Nestable {
+export abstract class AbstractEndpoint extends Routable {
   public abstract execute(params: {
     request: Request;
     response: Response;

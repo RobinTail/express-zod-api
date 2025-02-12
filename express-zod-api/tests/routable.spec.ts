@@ -21,9 +21,7 @@ describe.each([methodDepending, endpoint])("Routable mixin %#", (subject) => {
       expect(subject.deprecated().isDeprecated).toBe(true);
     });
   });
-});
 
-describe.each([methodDepending, endpoint])("Nestable mixin %#", (subject) => {
   describe(".nest()", () => {
     test("should return Routing arrangement", () => {
       expect(subject).toHaveProperty("nest", expect.any(Function));

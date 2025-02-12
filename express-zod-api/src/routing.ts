@@ -3,15 +3,16 @@ import createHttpError from "http-errors";
 import { isProduction } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { ContentType } from "./content-type";
+import { DependsOnMethod } from "./depends-on-method";
 import { Diagnostics } from "./diagnostics";
+import { AbstractEndpoint } from "./endpoint";
 import { AuxMethod, Method } from "./method";
-import { Routable } from "./routable";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { GetLogger } from "./server-helpers";
 
 export interface Routing {
-  [SEGMENT: string]: Routing | Routable | ServeStatic;
+  [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
 }
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
