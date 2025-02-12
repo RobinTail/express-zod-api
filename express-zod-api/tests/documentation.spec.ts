@@ -1174,30 +1174,14 @@ describe("Documentation", () => {
             getSomething: defaultEndpointsFactory
               .addMiddleware({
                 input: z
-                  .object({
-                    key: z.string(),
-                  })
-                  .example({
-                    key: "1234-56789-01",
-                  }),
+                  .object({ key: z.string() })
+                  .example({ key: "1234-56789-01" }),
                 handler: vi.fn(),
               })
               .build({
                 method: "post",
-                input: z
-                  .object({
-                    str: z.string(),
-                  })
-                  .example({
-                    str: "test",
-                  }),
-                output: z
-                  .object({
-                    num: z.number(),
-                  })
-                  .example({
-                    num: 123,
-                  }),
+                input: z.object({ str: z.string() }).example({ str: "test" }),
+                output: z.object({ num: z.number() }).example({ num: 123 }),
                 handler: async () => ({ num: 123 }),
               }),
           },
