@@ -1209,7 +1209,7 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("Issue #827: withMeta() should be immutable", () => {
+    test("Issue #827: .example() should be immutable", () => {
       const zodSchema = z.object({ a: z.string() });
       const spec = new Documentation({
         config: sampleConfig,

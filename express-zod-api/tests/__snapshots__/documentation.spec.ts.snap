@@ -3126,7 +3126,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Metadata > Issue #827: withMeta() should be immutable 1`] = `
+exports[`Documentation > Metadata > Issue #827: .example() should be immutable 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO parameter
