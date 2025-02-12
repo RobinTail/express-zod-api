@@ -689,9 +689,9 @@ done(); // error: expensive operation '555.55ms'
 ## Enabling compression
 
 According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
-it might be a good idea to enable GZIP and Brotli compression for your API responses.
+it might be a good idea to enable GZIP compression of your API responses.
 
-Install `compression` (version 1.8 supports Brotli) and `@types/compression`, and enable or configure compression:
+Install the following additional packages: `compression` and `@types/compression`, and enable or configure compression:
 
 ```typescript
 import { createConfig } from "express-zod-api";
@@ -703,7 +703,7 @@ const config = createConfig({
 ```
 
 In order to receive a compressed response the client should include the following header in the request:
-`Accept-Encoding: br, gzip, deflate`. Only responses with compressible content types are subject to compression.
+`Accept-Encoding: gzip, deflate`. Only responses with compressible content types are subject to compression.
 
 # Advanced features
 
