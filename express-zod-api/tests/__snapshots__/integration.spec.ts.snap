@@ -586,7 +586,7 @@ export type Request = keyof Input;
 "
 `;
 
-exports[`Integration > Should support types variant and handle recirsive schemas 1`] = `
+exports[`Integration > Should support types variant and handle recursive schemas 1`] = `
 "type Type1 = {
     name: string;
     features: Type1;
@@ -628,22 +628,27 @@ export type Path = "/v1/test";
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export interface Input {
+    /** @deprecated */
     "post /v1/test": PostV1TestInput;
 }
 
 export interface PositiveResponse {
+    /** @deprecated */
     "post /v1/test": SomeOf<PostV1TestPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
+    /** @deprecated */
     "post /v1/test": SomeOf<PostV1TestNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
+    /** @deprecated */
     "post /v1/test": PostV1TestPositiveResponseVariants & PostV1TestNegativeResponseVariants;
 }
 
 export interface Response {
+    /** @deprecated */
     "post /v1/test": PositiveResponse["post /v1/test"] | NegativeResponse["post /v1/test"];
 }
 

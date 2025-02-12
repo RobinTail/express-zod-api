@@ -43,11 +43,15 @@ import {
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
 type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
+type Store = Record<IOKind, ts.TypeNode>;
 
 export abstract class IntegrationBase {
   protected paths = new Set<string>();
   protected tags = new Map<string, ReadonlyArray<string>>();
-  protected registry = new Map<string, Record<IOKind, ts.TypeNode>>();
+  protected registry = new Map<
+    string,
+    { store: Store; isDeprecated: boolean }
+  >();
 
   protected ids = {
     pathType: f.createIdentifier("Path"),
@@ -117,8 +121,8 @@ export abstract class IntegrationBase {
     (Object.keys(this.interfaces) as IOKind[]).map((kind) =>
       makeInterface(
         this.interfaces[kind],
-        Array.from(this.registry).map(([request, faces]) =>
-          makeInterfaceProp(request, faces[kind]),
+        Array.from(this.registry).map(([request, { store, isDeprecated }]) =>
+          makeInterfaceProp(request, store[kind], { isDeprecated }),
         ),
         { expose: true },
       ),

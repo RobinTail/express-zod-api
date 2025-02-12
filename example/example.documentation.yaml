@@ -389,6 +389,7 @@ paths:
     get:
       operationId: GetV1AvatarSend
       summary: Sends a file content.
+      deprecated: true
       tags:
         - files
         - users
