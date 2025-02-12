@@ -267,7 +267,7 @@ interface PostV1AvatarRawNegativeResponseVariants {
 
 /** get /v1/events/stream */
 type GetV1EventsStreamInput = {
-  /** for testing error response */
+  /** @deprecated for testing error response */
   trigger?: string | undefined;
 };
 

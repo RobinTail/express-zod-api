@@ -1,10 +1,11 @@
-import { chain, eqBy, path, prop, uniqWith } from "ramda";
+import { chain, eqBy, isNil, path, prop, reject, uniqWith } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, tryToTransform } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand, FileSchema } from "./file-schema";
+import { metaSymbol } from "./metadata";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
@@ -56,9 +57,13 @@ const onObject: Producer = (
       isResponse && hasCoercion(value)
         ? value instanceof z.ZodOptional
         : value.isOptional();
+    const deprecated = value._def[metaSymbol]?.isDeprecated
+      ? "@deprecated"
+      : undefined;
+    const { description } = value;
     return makeInterfaceProp(key, next(value), {
       isOptional: isOptional && hasQuestionMark,
-      comment: value.description,
+      comment: reject(isNil, [deprecated, description]).join(" "),
     });
   });
   return f.createTypeLiteralNode(members);
