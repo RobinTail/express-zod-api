@@ -4,18 +4,24 @@ import { Method } from "./method";
 import { Nesting } from "./nesting";
 
 export class DependsOnMethod extends Nesting {
-  /** @desc [method, endpoint, siblingMethods] */
-  public readonly entries: ReadonlyArray<[Method, AbstractEndpoint, Method[]]>;
-
-  constructor(endpoints: Partial<Record<Method, AbstractEndpoint>>) {
+  constructor(protected endpoints: Partial<Record<Method, AbstractEndpoint>>) {
     super();
+  }
+
+  /** @desc [method, endpoint, siblingMethods] */
+  public get entries(): ReadonlyArray<[Method, AbstractEndpoint, Method[]]> {
     const entries: Array<(typeof this.entries)[number]> = [];
-    const methods = keys(endpoints); // eslint-disable-line no-restricted-syntax -- liternal type required
+    // @todo for..of pairs() ?
+    const methods = keys(this.endpoints); // eslint-disable-line no-restricted-syntax -- literal type required
     for (const method of methods) {
-      const endpoint = endpoints[method];
+      const endpoint = this.endpoints[method];
       if (endpoint)
         entries.push([method, endpoint, reject(equals(method), methods)]);
     }
-    this.entries = Object.freeze(entries);
+    return Object.freeze(entries);
+  }
+
+  public override clone() {
+    return new DependsOnMethod(this.endpoints) as this;
   }
 }

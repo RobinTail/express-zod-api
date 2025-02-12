@@ -122,6 +122,23 @@ export class Endpoint<
         : "json";
   }
 
+  public override clone() {
+    return new Endpoint({
+      // @todo internal props may be unfrozen, but methods returning them can freeze
+      methods: this.#methods?.slice(),
+      inputSchema: this.#schemas.input,
+      outputSchema: this.#schemas.output,
+      handler: this.#handler,
+      resultHandler: this.#resultHandler,
+      getOperationId: this.#getOperationId,
+      scopes: this.#scopes.slice(),
+      middlewares: this.#middlewares,
+      tags: this.#tags.slice(),
+      description: this.#descriptions.long,
+      shortDescription: this.#descriptions.short,
+    }) as this;
+  }
+
   public override getDescription(variant: DescriptionVariant) {
     return this.#descriptions[variant];
   }
