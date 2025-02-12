@@ -12,7 +12,7 @@ import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import { defaultInputSources, makeCleanId, nonEmpty } from "./common-helpers";
+import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
 import { Method } from "./method";
@@ -27,6 +27,7 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
   IsHeader,
+  nonEmpty,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";

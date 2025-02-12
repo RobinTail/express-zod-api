@@ -970,3 +970,6 @@ export const ensureShortDescription = (description: string) =>
   description.length <= shortDescriptionLimit
     ? description
     : description.slice(0, shortDescriptionLimit - 1) + "…";
+
+export const nonEmpty = <T>(subject: T[] | ReadonlyArray<T>) =>
+  subject.length ? subject.slice() : undefined;
