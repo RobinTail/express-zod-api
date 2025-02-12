@@ -49,6 +49,7 @@ export abstract class AbstractEndpoint extends Nestable {
   public abstract getResponses(
     variant: ResponseVariant,
   ): ReadonlyArray<NormalizedResponse>;
+  // @todo should return ReadonlyArray
   public abstract getSecurity(): LogicalContainer<Security>[];
   public abstract getScopes(): ReadonlyArray<string>;
   public abstract getTags(): ReadonlyArray<string>;
