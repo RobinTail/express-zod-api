@@ -50,9 +50,8 @@ export const walkSchema = <
 ): U => {
   const handler =
     rules[schema._def[metaSymbol]?.brand as keyof typeof rules] ||
-    ("typeName" in schema._def
-      ? rules[schema._def.typeName as keyof typeof rules]
-      : undefined);
+    ("typeName" in schema._def &&
+      rules[schema._def.typeName as keyof typeof rules]);
   const next = (subject: z.ZodTypeAny) =>
     walkSchema(subject, { ctx, onEach, rules, onMissing });
   const result = handler
