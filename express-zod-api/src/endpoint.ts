@@ -67,7 +67,7 @@ export class Endpoint<
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0];
 
   constructor(def: {
-    isDeprecated?: boolean;
+    deprecated?: boolean;
     middlewares?: AbstractMiddleware[];
     inputSchema: IN;
     outputSchema: OUT;
@@ -91,11 +91,11 @@ export class Endpoint<
   }
 
   public override deprecated() {
-    return this.#clone({ isDeprecated: true }) as this;
+    return this.#clone({ deprecated: true }) as this;
   }
 
   public override get isDeprecated(): boolean {
-    return this.#def.isDeprecated || false;
+    return this.#def.deprecated || false;
   }
 
   public override getDescription(variant: DescriptionVariant) {
