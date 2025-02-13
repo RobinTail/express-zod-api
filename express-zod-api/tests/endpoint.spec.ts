@@ -318,6 +318,26 @@ describe("Endpoint", () => {
     );
   });
 
+  describe(".getSecurity()", () => {
+    test("should return a array of security based logical containers", () => {
+      const endpoint = defaultEndpointsFactory
+        .addMiddleware({
+          security: { type: "header", name: "X-Token" },
+          handler: vi.fn(),
+        })
+        .addMiddleware({
+          security: { type: "header", name: "X-API-Key" },
+          handler: vi.fn(),
+        })
+        .build({ output: z.object({}), handler: vi.fn() });
+      const result = endpoint.getSecurity();
+      expect(result).toEqual([
+        { name: "X-Token", type: "header" },
+        { name: "X-API-Key", type: "header" },
+      ]);
+    });
+  });
+
   describe("getRequestType()", () => {
     test.each([
       { input: z.object({}), expected: "json" },
