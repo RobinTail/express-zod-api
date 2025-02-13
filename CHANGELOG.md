@@ -6,7 +6,7 @@
 
 - Publicly exposed interface `CustomHeaderSecurity` is renamed to `HeaderSecurity`;
 - The default value for `wrongMethodBehavior` config option is changed to `405`;
-- Minimum version of `compression` (optional peer dependency) is `1.8.0` (is supports Brotli).
+- Minimum version of `compression` (optional peer dependency) is `1.8.0` (it supports Brotli).
 
 ## Version 22
 
