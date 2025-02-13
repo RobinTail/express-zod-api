@@ -312,6 +312,27 @@ describe("Endpoint", () => {
     );
   });
 
+  describe(".security", () => {
+    test("should return a readonly array of security based logical containers", () => {
+      const endpoint = defaultEndpointsFactory
+        .addMiddleware({
+          security: { type: "header", name: "X-Token" },
+          handler: vi.fn(),
+        })
+        .addMiddleware({
+          security: { type: "header", name: "X-API-Key" },
+          handler: vi.fn(),
+        })
+        .build({ output: z.object({}), handler: vi.fn() });
+      const { security } = endpoint;
+      expect(security).toEqual([
+        { name: "X-Token", type: "header" },
+        { name: "X-API-Key", type: "header" },
+      ]);
+      expect(() => (security as any[]).push()).toThrowError(/read only/);
+    });
+  });
+
   describe(".requestType", () => {
     test.each([
       { input: z.object({}), expected: "json" },

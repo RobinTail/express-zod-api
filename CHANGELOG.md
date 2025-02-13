@@ -10,6 +10,10 @@
 
 ## Version 22
 
+### v22.9.1
+
+- Return type of public method `Endpoint::getSecurity()` corrected to `ReadonlyArray<LogicalContainer<Security>>`.
+
 ### v22.9.0
 
 - Featuring Deprecations:
