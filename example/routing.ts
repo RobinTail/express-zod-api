@@ -28,7 +28,7 @@ export const routing: Routing = {
     },
     avatar: {
       // custom result handler examples with a file serving
-      send: sendAvatarEndpoint,
+      send: sendAvatarEndpoint.deprecated(), // demo for deprecated route
       stream: streamAvatarEndpoint,
       // file upload example
       upload: uploadAvatarEndpoint,

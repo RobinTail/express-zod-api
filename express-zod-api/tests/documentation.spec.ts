@@ -1046,6 +1046,24 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test("Feature #2390: should support deprecations", () => {
+      const endpoint = defaultEndpointsFactory.build({
+        input: z.object({
+          str: z.string().deprecated(),
+        }),
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: { v1: { getSomething: endpoint.deprecated() } },
+        version: "3.4.5",
+        title: "Testing Metadata:deprecations",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test("Issue #929: the location of the custom description should be on the param level", () => {
       const spec = new Documentation({
         composition: "components",
@@ -1174,30 +1192,14 @@ describe("Documentation", () => {
             getSomething: defaultEndpointsFactory
               .addMiddleware({
                 input: z
-                  .object({
-                    key: z.string(),
-                  })
-                  .example({
-                    key: "1234-56789-01",
-                  }),
+                  .object({ key: z.string() })
+                  .example({ key: "1234-56789-01" }),
                 handler: vi.fn(),
               })
               .build({
                 method: "post",
-                input: z
-                  .object({
-                    str: z.string(),
-                  })
-                  .example({
-                    str: "test",
-                  }),
-                output: z
-                  .object({
-                    num: z.number(),
-                  })
-                  .example({
-                    num: 123,
-                  }),
+                input: z.object({ str: z.string() }).example({ str: "test" }),
+                output: z.object({ num: z.number() }).example({ num: 123 }),
                 handler: async () => ({ num: 123 }),
               }),
           },
@@ -1209,7 +1211,7 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("Issue #827: withMeta() should be immutable", () => {
+    test("Issue #827: .example() should be immutable", () => {
       const zodSchema = z.object({ a: z.string() });
       const spec = new Documentation({
         config: sampleConfig,

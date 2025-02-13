@@ -1,5 +1,6 @@
 import {
   OpenApiBuilder,
+  OperationObject,
   ReferenceObject,
   ResponsesObject,
   SchemaObject,
@@ -11,7 +12,7 @@ import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import { defaultInputSources, makeCleanId, nonEmpty } from "./common-helpers";
+import { defaultInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
 import { Method } from "./method";
@@ -26,6 +27,7 @@ import {
   ensureShortDescription,
   reformatParamsInPath,
   IsHeader,
+  nonEmpty,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
@@ -245,18 +247,18 @@ export class Documentation extends OpenApiBuilder {
         },
       );
 
-      this.addPath(reformatParamsInPath(path), {
-        [method]: {
-          operationId,
-          summary,
-          description,
-          tags: nonEmpty(endpoint.getTags()),
-          parameters: nonEmpty(depictedParams),
-          requestBody,
-          security: nonEmpty(securityRefs),
-          responses,
-        },
-      });
+      const operation: OperationObject = {
+        operationId,
+        summary,
+        description,
+        deprecated: endpoint.isDeprecated || undefined,
+        tags: nonEmpty(endpoint.getTags()),
+        parameters: nonEmpty(depictedParams),
+        requestBody,
+        security: nonEmpty(securityRefs),
+        responses,
+      };
+      this.addPath(reformatParamsInPath(path), { [method]: operation });
     };
     walkRouting({ routing, onEndpoint });
     if (tags) this.rootDoc.tags = depictTags(tags);

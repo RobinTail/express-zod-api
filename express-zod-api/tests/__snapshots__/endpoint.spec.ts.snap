@@ -14,7 +14,7 @@ exports[`Endpoint > #handleResult > Should handle errors within ResultHandler 1`
 ]
 `;
 
-exports[`Endpoint > .getResponses() > should return the negative responses 1`] = `
+exports[`Endpoint > .getResponses() > should return the negative responses (readonly) 1`] = `
 [
   {
     "mimeTypes": [
@@ -44,7 +44,7 @@ exports[`Endpoint > .getResponses() > should return the negative responses 1`] =
 ]
 `;
 
-exports[`Endpoint > .getResponses() > should return the positive responses 1`] = `
+exports[`Endpoint > .getResponses() > should return the positive responses (readonly) 1`] = `
 [
   {
     "mimeTypes": [

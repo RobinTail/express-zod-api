@@ -31,6 +31,7 @@ interface BuildProps<
   method?: Method | [Method, ...Method[]];
   scope?: SCO | SCO[];
   tag?: Tag | Tag[];
+  deprecated?: boolean;
 }
 
 export class EndpointsFactory<
@@ -94,14 +95,12 @@ export class EndpointsFactory<
 
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
     input = z.object({}) as BIN,
-    handler,
     output: outputSchema,
-    description,
-    shortDescription,
     operationId,
     scope,
     tag,
     method,
+    ...rest
   }: BuildProps<BIN, BOUT, IN, OUT, SCO>) {
     const { middlewares, resultHandler } = this;
     const methods = typeof method === "string" ? [method] : method;
@@ -110,7 +109,7 @@ export class EndpointsFactory<
     const scopes = typeof scope === "string" ? [scope] : scope || [];
     const tags = typeof tag === "string" ? [tag] : tag || [];
     return new Endpoint({
-      handler,
+      ...rest,
       middlewares,
       outputSchema,
       resultHandler,
@@ -118,8 +117,6 @@ export class EndpointsFactory<
       tags,
       methods,
       getOperationId,
-      description,
-      shortDescription,
       inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
     });
   }

@@ -12,7 +12,7 @@ import { AbstractEndpoint, Endpoint } from "../src/endpoint";
 
 describe("Endpoint", () => {
   describe(".getMethods()", () => {
-    test("Should return the correct set of methods", () => {
+    test("Should return the correct set of methods (readonly)", () => {
       const endpointMock = new Endpoint({
         methods: ["get", "post", "put", "delete", "patch"],
         inputSchema: z.object({}),
@@ -24,28 +24,9 @@ describe("Endpoint", () => {
           handler: vi.fn(),
         }),
       });
-      expect(endpointMock.getMethods()).toEqual([
-        "get",
-        "post",
-        "put",
-        "delete",
-        "patch",
-      ]);
-    });
-
-    test("Should return the array for a single method also", () => {
-      const endpointMock = new Endpoint({
-        methods: ["patch"],
-        inputSchema: z.object({}),
-        outputSchema: z.object({}),
-        handler: vi.fn<any>(),
-        resultHandler: new ResultHandler({
-          positive: z.string(),
-          negative: z.string(),
-          handler: vi.fn(),
-        }),
-      });
-      expect(endpointMock.getMethods()).toEqual(["patch"]);
+      const methods = endpointMock.getMethods();
+      expect(methods).toEqual(["get", "post", "put", "delete", "patch"]);
+      expect(() => (methods as any[]).push()).toThrowError(/read only/);
     });
   });
 
@@ -134,6 +115,19 @@ describe("Endpoint", () => {
       expect(responseMock._getStatusCode()).toBe(200);
       expect(handlerMock).toHaveBeenCalledTimes(0);
       expect(responseMock.writableEnded).toBeTruthy();
+    });
+  });
+
+  describe(".deprecated()", () => {
+    test("should make a deprecated copy of the endpoint", () => {
+      const endpointMock = defaultEndpointsFactory.build({
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      expect(endpointMock.isDeprecated).toBe(false);
+      const copy = endpointMock.deprecated();
+      expect(copy.isDeprecated).toBe(true);
+      expect(copy).not.toBe(endpointMock);
     });
   });
 
@@ -276,14 +270,50 @@ describe("Endpoint", () => {
 
   describe(".getResponses()", () => {
     test.each(["positive", "negative"] as const)(
-      "should return the %s responses",
+      "should return the %s responses (readonly)",
       (variant) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
           output: z.object({ something: z.number() }),
           handler: vi.fn(),
         });
-        expect(endpoint.getResponses(variant)).toMatchSnapshot();
+        const responses = endpoint.getResponses(variant);
+        expect(responses).toMatchSnapshot();
+        expect(() => (responses as any[]).push()).toThrowError(/read only/);
+      },
+    );
+  });
+
+  describe(".getScopes", () => {
+    test.each(["test", ["one", "two"]])(
+      "should return the scopes (readonly) %#",
+      (scope) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const endpoint = factory.build({
+          output: z.object({ something: z.number() }),
+          handler: vi.fn(),
+          scope,
+        });
+        const scopes = endpoint.getScopes();
+        expect(scopes).toEqual(typeof scope === "string" ? [scope] : scope);
+        expect(() => (scopes as any[]).push()).toThrowError(/read only/);
+      },
+    );
+  });
+
+  describe(".getTags", () => {
+    test.each(["test", ["one", "two"]])(
+      "should return the tags (readonly) %#",
+      (tag) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const endpoint = factory.build({
+          output: z.object({ something: z.number() }),
+          handler: vi.fn(),
+          tag,
+        });
+        const tags = endpoint.getTags();
+        expect(tags).toEqual(typeof tag === "string" ? [tag] : tag);
+        expect(() => (tags as any[]).push()).toThrowError(/read only/);
       },
     );
   });

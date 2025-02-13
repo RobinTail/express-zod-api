@@ -115,6 +115,7 @@ export class Integration extends IntegrationBase {
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint = (endpoint, path, method) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
+      const { isDeprecated } = endpoint;
       const request = `${method} ${path}`;
       const input = makeType(
         entitle("input"),
@@ -148,7 +149,7 @@ export class Integration extends IntegrationBase {
       );
       this.paths.add(path);
       const literalIdx = makeLiteralType(request);
-      this.registry.set(request, {
+      const store = {
         input: ensureTypeNode(input.name),
         positive: this.someOf(dictionaries.positive),
         negative: this.someOf(dictionaries.negative),
@@ -160,7 +161,8 @@ export class Integration extends IntegrationBase {
           ensureTypeNode(dictionaries.positive.name),
           ensureTypeNode(dictionaries.negative.name),
         ]),
-      });
+      };
+      this.registry.set(request, { isDeprecated, store });
       this.tags.set(request, endpoint.getTags());
     };
     walkRouting({ routing, onEndpoint });

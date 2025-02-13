@@ -104,40 +104,45 @@ describe("SSE", () => {
   });
 
   describe("makeResultHandler()", () => {
-    test("should create ResultHandler describing possible events and handling generic errors", () => {
-      const resultHandler = makeResultHandler({
-        test: z.string(),
-        another: z.number(),
-      });
-      expect(resultHandler).toBeInstanceOf(ResultHandler);
-      expect(resultHandler.getPositiveResponse(z.object({}))).toMatchSnapshot();
-      expect(resultHandler.getNegativeResponse()).toMatchSnapshot();
-      const positiveResponse = makeResponseMock();
-      const commons = {
-        input: {},
-        output: {},
-        options: {},
-        request: makeRequestMock(),
-        logger: makeLoggerMock(),
-      };
-      resultHandler.execute({
-        ...commons,
-        response: positiveResponse,
-        error: null,
-      });
-      expect(positiveResponse.statusCode).toBe(200);
-      expect(positiveResponse._getData()).toBe("");
-      expect(positiveResponse.writableEnded).toBeTruthy();
-      const negativeResponse = makeResponseMock();
-      resultHandler.execute({
-        ...commons,
-        response: negativeResponse,
-        error: new Error("failure"),
-      });
-      expect(negativeResponse.statusCode).toBe(500);
-      expect(negativeResponse._getData()).toBe("failure");
-      expect(negativeResponse.writableEnded).toBeTruthy();
-    });
+    test.each<Parameters<typeof makeResultHandler>[0]>([
+      { test: z.string(), another: z.number() },
+      { single: z.string() },
+    ])(
+      "should create ResultHandler describing possible events and handling generic errors %#",
+      (events) => {
+        const resultHandler = makeResultHandler(events);
+        expect(resultHandler).toBeInstanceOf(ResultHandler);
+        expect(
+          resultHandler.getPositiveResponse(z.object({})),
+        ).toMatchSnapshot();
+        expect(resultHandler.getNegativeResponse()).toMatchSnapshot();
+        const positiveResponse = makeResponseMock();
+        const commons = {
+          input: {},
+          output: {},
+          options: {},
+          request: makeRequestMock(),
+          logger: makeLoggerMock(),
+        };
+        resultHandler.execute({
+          ...commons,
+          response: positiveResponse,
+          error: null,
+        });
+        expect(positiveResponse.statusCode).toBe(200);
+        expect(positiveResponse._getData()).toBe("");
+        expect(positiveResponse.writableEnded).toBeTruthy();
+        const negativeResponse = makeResponseMock();
+        resultHandler.execute({
+          ...commons,
+          response: negativeResponse,
+          error: new Error("failure"),
+        });
+        expect(negativeResponse.statusCode).toBe(500);
+        expect(negativeResponse._getData()).toBe("failure");
+        expect(negativeResponse.writableEnded).toBeTruthy();
+      },
+    );
   });
 
   describe("EventStreamFactory()", () => {
@@ -145,7 +150,7 @@ describe("SSE", () => {
       expect(new EventStreamFactory({})).toBeInstanceOf(EndpointsFactory);
     });
 
-    test("should combine SSE Middlware with corresponding ResultHandler and return Endpoint", async () => {
+    test("should combine SSE Middleware with corresponding ResultHandler and return Endpoint", async () => {
       const endpoint = new EventStreamFactory({ test: z.string() }).buildVoid({
         input: z.object({ some: z.string().optional() }),
         handler: async ({ input, options }) => {

@@ -9,6 +9,7 @@ export interface Metadata {
   /** @override ZodDefault::_def.defaultValue() in depictDefault */
   defaultLabel?: string;
   brand?: string | number | symbol;
+  isDeprecated?: boolean;
 }
 
 /** @link https://github.com/colinhacks/zod/blob/3e4f71e857e75da722bd7e735b6d657a70682df2/src/types.ts#L485 */
