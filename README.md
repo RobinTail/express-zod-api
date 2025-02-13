@@ -57,7 +57,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Generating a Frontend Client](#generating-a-frontend-client)
    3. [Creating a documentation](#creating-a-documentation)
    4. [Tagging the endpoints](#tagging-the-endpoints)
-   5. [Customizable brands handling](#customizable-brands-handling)
+   5. [Deprecated schemas and routes](#deprecated-schemas-and-routes)
+   6. [Customizable brands handling](#customizable-brands-handling)
 8. [Caveats](#caveats)
    1. [Coercive schema of Zod](#coercive-schema-of-zod)
    2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
@@ -86,6 +87,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/mlms13.png" alt="@mlms13" width="50px" />](https://github.com/mlms13)
 [<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
 [<img src="https://github.com/LucWag.png" alt="@LucWag" width="50px" />](https://github.com/LucWag)
 [<img src="https://github.com/HenriJ.png" alt="@HenriJ" width="50px" />](https://github.com/HenriJ)
@@ -1236,6 +1238,7 @@ framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has si
 Express Zod API acts as a plugin for Zod, extending its functionality once you import anything from `express-zod-api`:
 
 - Adds `.example()` method to all Zod schemas for storing examples and reflecting them in the generated documentation;
+- Adds `.deprecated()` method to all schemas for marking properties and request parameters as deprecated;
 - Adds `.label()` method to `ZodDefault` for replacing the default value in documentation with a label;
 - Adds `.remap()` method to `ZodObject` for renaming object properties in a suitable way for making documentation;
 - Alters the `.brand()` method on all Zod schemas by making the assigned brand available in runtime.
@@ -1338,6 +1341,30 @@ new Documentation({
     files: { description: "All about files", url: "https://example.com" },
   },
 });
+```
+
+## Deprecated schemas and routes
+
+As your API evolves, you may need to mark some parameters or routes as deprecated before deleting them. For this
+purpose, the `.deprecated()` method is available on each schema, `Endpoint` and `DependsOnMethod`, it's immutable.
+You can also deprecate all routes the `Endpoint` assigned to by setting `EndpointsFactory::build({ deprecated: true })`.
+
+```ts
+import { Routing, DependsOnMethod } from "express-zod-api";
+import { z } from "zod";
+
+const someEndpoint = factory.build({
+  deprecated: true, // deprecates all routes the endpoint assigned to
+  input: z.object({
+    prop: z.string().deprecated(), // deprecates the property or a path parameter
+  }),
+});
+
+const routing: Routing = {
+  v1: oldEndpoint.deprecated(), // deprecates the /v1 path
+  v2: new DependsOnMethod({ get: oldEndpoint }).deprecated(), // deprecates the /v2 path
+  v3: someEndpoint, // the path is assigned with initially deprecated endpoint (also deprecated)
+};
 ```
 
 ## Customizable brands handling

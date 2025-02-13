@@ -49,4 +49,18 @@ describe("DependsOnMethod", () => {
     });
     expect(instance.entries).toEqual([]);
   });
+
+  test("should be able to deprecate the assigned endpoints within a copy of itself", () => {
+    const instance = new DependsOnMethod({
+      post: new EndpointsFactory(defaultResultHandler).build({
+        method: "post",
+        output: z.object({}),
+        handler: async () => ({}),
+      }),
+    });
+    expect(instance.entries[0][1].isDeprecated).toBe(false);
+    const copy = instance.deprecated();
+    expect(copy.entries[0][1].isDeprecated).toBe(true);
+    expect(copy).not.toBe(instance);
+  });
 });

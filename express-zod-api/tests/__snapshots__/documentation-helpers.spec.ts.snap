@@ -875,6 +875,7 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344: should depict header params when enabled 1`] = `
 [
   {
+    "deprecated": undefined,
     "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "header",
@@ -885,6 +886,7 @@ exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344:
     },
   },
   {
+    "deprecated": undefined,
     "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "path",
@@ -895,6 +897,7 @@ exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344:
     },
   },
   {
+    "deprecated": undefined,
     "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "query",
@@ -905,6 +908,7 @@ exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344:
     },
   },
   {
+    "deprecated": undefined,
     "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "header",
@@ -922,6 +926,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict none if b
 exports[`Documentation helpers > depictRequestParams() > should depict only path params if query is disabled 1`] = `
 [
   {
+    "deprecated": undefined,
     "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "path",
@@ -937,6 +942,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict only path
 exports[`Documentation helpers > depictRequestParams() > should depict query and path params 1`] = `
 [
   {
+    "deprecated": undefined,
     "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "path",
@@ -947,6 +953,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
     },
   },
   {
+    "deprecated": undefined,
     "description": "GET /v1/user/:id Parameter",
     "examples": undefined,
     "in": "query",

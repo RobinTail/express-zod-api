@@ -6,15 +6,16 @@ const endpoint = defaultEndpointsFactory.build({
   handler: vi.fn(),
 });
 
-describe.each([new DependsOnMethod({ get: endpoint }), endpoint])(
-  "Nesting mixin %#",
-  (subject) => {
-    test("should have .nest() method returning Routing arrangement", () => {
+const methodDepending = new DependsOnMethod({ get: endpoint });
+
+describe.each([methodDepending, endpoint])("Routable mixin %#", (subject) => {
+  describe(".nest()", () => {
+    test("should return Routing arrangement", () => {
       expect(subject).toHaveProperty("nest", expect.any(Function));
       expect(subject.nest({ subpath: endpoint })).toEqual({
         "": subject,
         subpath: endpoint,
       });
     });
-  },
-);
+  });
+});

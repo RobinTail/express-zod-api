@@ -27,7 +27,7 @@ exports[`SSE > makeEventSchema() > should make a valid schema of SSE event 1`] =
 }
 `;
 
-exports[`SSE > makeResultHandler() > should create ResultHandler describing possible events and handling generic errors 1`] = `
+exports[`SSE > makeResultHandler() > should create ResultHandler describing possible events and handling generic errors 0 1`] = `
 [
   {
     "mimeTypes": [
@@ -94,7 +94,60 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
 ]
 `;
 
-exports[`SSE > makeResultHandler() > should create ResultHandler describing possible events and handling generic errors 2`] = `
+exports[`SSE > makeResultHandler() > should create ResultHandler describing possible events and handling generic errors 0 2`] = `
+[
+  {
+    "mimeTypes": [
+      "text/plain",
+    ],
+    "schema": {
+      "_type": "ZodString",
+    },
+    "statusCodes": [
+      400,
+    ],
+  },
+]
+`;
+
+exports[`SSE > makeResultHandler() > should create ResultHandler describing possible events and handling generic errors 1 1`] = `
+[
+  {
+    "mimeTypes": [
+      "text/event-stream",
+    ],
+    "schema": {
+      "_type": "ZodObject",
+      "shape": {
+        "data": {
+          "_type": "ZodString",
+        },
+        "event": {
+          "_type": "ZodLiteral",
+          "value": "single",
+        },
+        "id": {
+          "_type": "ZodOptional",
+          "value": {
+            "_type": "ZodString",
+          },
+        },
+        "retry": {
+          "_type": "ZodOptional",
+          "value": {
+            "_type": "ZodNumber",
+          },
+        },
+      },
+    },
+    "statusCodes": [
+      200,
+    ],
+  },
+]
+`;
+
+exports[`SSE > makeResultHandler() > should create ResultHandler describing possible events and handling generic errors 1 2`] = `
 [
   {
     "mimeTypes": [

@@ -665,9 +665,11 @@ export const depictRequestParams = ({
         composition === "components"
           ? makeRef(paramSchema, depicted, makeCleanId(description, name))
           : depicted;
+      const { _def } = paramSchema as z.ZodType;
       return acc.concat({
         name,
         in: location,
+        deprecated: _def[metaSymbol]?.isDeprecated,
         required: !paramSchema.isOptional(),
         description: depicted.description || description,
         schema: result,
@@ -720,9 +722,9 @@ export const onEach: SchemaHandler<
   SchemaObject | ReferenceObject,
   OpenAPIContext,
   "each"
-> = (schema: z.ZodTypeAny, { isResponse, prev }) => {
+> = (schema: z.ZodType, { isResponse, prev }) => {
   if (isReferenceObject(prev)) return {};
-  const { description } = schema;
+  const { description, _def } = schema;
   const shouldAvoidParsing = schema instanceof z.ZodLazy;
   const hasTypePropertyInDepiction = prev.type !== undefined;
   const isResponseHavingCoercion = isResponse && hasCoercion(schema);
@@ -733,6 +735,7 @@ export const onEach: SchemaHandler<
     schema.isNullable();
   const result: SchemaObject = {};
   if (description) result.description = description;
+  if (_def[metaSymbol]?.isDeprecated) result.deprecated = true;
   if (isActuallyNullable) result.type = makeNullableType(prev);
   if (!shouldAvoidParsing) {
     const examples = getExamples({
@@ -969,3 +972,6 @@ export const ensureShortDescription = (description: string) =>
   description.length <= shortDescriptionLimit
     ? description
     : description.slice(0, shortDescriptionLimit - 1) + "…";
+
+export const nonEmpty = <T>(subject: T[] | ReadonlyArray<T>) =>
+  subject.length ? subject.slice() : undefined;

@@ -9,7 +9,7 @@ import {
 } from "../src";
 
 describe("Integration", () => {
-  test("Should support types variant and handle recirsive schemas", () => {
+  test("Should support types variant and handle recursive schemas", () => {
     const recursiveSchema: z.ZodTypeAny = z.lazy(() =>
       z.object({
         name: z.string(),
@@ -21,14 +21,16 @@ describe("Integration", () => {
       variant: "types",
       routing: {
         v1: {
-          test: defaultEndpointsFactory.build({
-            method: "post",
-            input: z.object({
-              features: recursiveSchema,
-            }),
-            output: z.object({}),
-            handler: async () => ({}),
-          }),
+          test: defaultEndpointsFactory
+            .build({
+              method: "post",
+              input: z.object({
+                features: recursiveSchema,
+              }),
+              output: z.object({}),
+              handler: async () => ({}),
+            })
+            .deprecated(),
         },
       },
     });

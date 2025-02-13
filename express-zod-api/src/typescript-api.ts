@@ -1,4 +1,4 @@
-import { map, pair } from "ramda";
+import { isNil, map, pair, reject } from "ramda";
 import ts from "typescript";
 
 export type Typeable =
@@ -25,7 +25,7 @@ export const accessModifiers = {
   ],
 };
 
-export const addJsDocComment = <T extends ts.Node>(node: T, text: string) =>
+export const addJsDoc = <T extends ts.Node>(node: T, text: string) =>
   ts.addSyntheticLeadingComment(
     node,
     ts.SyntaxKind.MultiLineCommentTrivia,
@@ -136,7 +136,11 @@ export const recordStringAny = ensureTypeNode("Record", [
 export const makeInterfaceProp = (
   name: string | number,
   value: Typeable,
-  { isOptional, comment }: { isOptional?: boolean; comment?: string } = {},
+  {
+    isOptional,
+    isDeprecated,
+    comment,
+  }: { isOptional?: boolean; isDeprecated?: boolean; comment?: string } = {},
 ) => {
   const node = f.createPropertySignature(
     undefined,
@@ -144,7 +148,11 @@ export const makeInterfaceProp = (
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     ensureTypeNode(value),
   );
-  return comment ? addJsDocComment(node, comment) : node;
+  const jsdoc = reject(isNil, [
+    isDeprecated ? "@deprecated" : undefined,
+    comment,
+  ]);
+  return jsdoc.length ? addJsDoc(node, jsdoc.join(" ")) : node;
 };
 
 export const makeOneLine = (subject: ts.TypeNode) =>
@@ -202,7 +210,7 @@ export const makeType = (
     params && makeTypeParams(params),
     value,
   );
-  return comment ? addJsDocComment(node, comment) : node;
+  return comment ? addJsDoc(node, comment) : node;
 };
 
 export const makePublicProperty = (
@@ -268,7 +276,7 @@ export const makeInterface = (
     undefined,
     props,
   );
-  return comment ? addJsDocComment(node, comment) : node;
+  return comment ? addJsDoc(node, comment) : node;
 };
 
 export const makeTypeParams = (

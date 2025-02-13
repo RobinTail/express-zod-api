@@ -35,7 +35,7 @@ export const walkSchema = <
   U extends object,
   Context extends FlatObject = EmptyObject,
 >(
-  schema: z.ZodTypeAny,
+  schema: z.ZodType,
   {
     onEach,
     rules,
@@ -50,7 +50,8 @@ export const walkSchema = <
 ): U => {
   const handler =
     rules[schema._def[metaSymbol]?.brand as keyof typeof rules] ||
-    rules[schema._def.typeName as keyof typeof rules];
+    ("typeName" in schema._def &&
+      rules[schema._def.typeName as keyof typeof rules]);
   const next = (subject: z.ZodTypeAny) =>
     walkSchema(subject, { ctx, onEach, rules, onMissing });
   const result = handler
