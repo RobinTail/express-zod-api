@@ -55,7 +55,7 @@ export class Diagnostics {
     if (ref?.paths.includes(path)) return;
     const params = getRoutePathParams(path);
     if (params.length === 0) return; // next statement can be expensive
-    const shape = ref?.shape || extractObjectSchema(endpoint.inputSchema).shape;
+    const { shape } = ref || extractObjectSchema(endpoint.inputSchema);
     for (const param of params) {
       if (param in shape) continue;
       this.logger.warn(
