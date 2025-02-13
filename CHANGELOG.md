@@ -11,7 +11,8 @@
   - `getDescription()` —> `description` and `shortDescription`;
   - `getSchema()` —> `inputSchema` and `outputSchema`;
   - `getMethods()` —> `methods`; `getTags()` —> `tags`; `getScopes()` —> `scopes`;
-  - `getSecurity()` —> `security`; `getRequestType()` —> `requestType`
+  - `getSecurity()` —> `security`; `getRequestType()` —> `requestType`;
+- Similar changes to `Middleware`: `getSchema()` –> `schema`, `getSecurity()` —> `security`.
 
 ## Version 22
 

@@ -132,7 +132,7 @@ export class Endpoint<
   public override get security() {
     return Object.freeze(
       (this.#def.middlewares || [])
-        .map((middleware) => middleware.getSecurity())
+        .map((middleware) => middleware.security)
         .filter((entry) => entry !== undefined),
     );
   }

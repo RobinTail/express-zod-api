@@ -42,7 +42,7 @@ export const getFinalEndpointInputSchema = <
   input: IN,
 ): z.ZodIntersection<MIN, IN> => {
   const allSchemas = middlewares
-    .map((mw) => mw.getSchema() as IOSchema)
+    .map((mw) => mw.schema as IOSchema)
     .concat(input);
 
   const finalSchema = allSchemas.reduce((acc, schema) => acc.and(schema));
