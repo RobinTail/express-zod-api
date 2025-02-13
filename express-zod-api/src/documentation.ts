@@ -169,11 +169,9 @@ export class Documentation extends OpenApiBuilder {
         brandHandling,
         makeRef: this.makeRef.bind(this),
       };
-      const [shortDesc, description] = (["short", "long"] as const).map(
-        endpoint.getDescription.bind(endpoint),
-      );
-      const summary = shortDesc
-        ? ensureShortDescription(shortDesc)
+      const { description, shortDescription } = endpoint;
+      const summary = shortDescription
+        ? ensureShortDescription(shortDescription)
         : hasSummaryFromDescription && description
           ? ensureShortDescription(description)
           : undefined;

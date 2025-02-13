@@ -31,8 +31,6 @@ export type Handler<IN, OUT, OPT> = (params: {
   logger: ActualLogger;
 }) => Promise<OUT>;
 
-type DescriptionVariant = "short" | "long";
-
 export abstract class AbstractEndpoint extends Routable {
   public abstract execute(params: {
     request: Request;
@@ -40,9 +38,8 @@ export abstract class AbstractEndpoint extends Routable {
     logger: ActualLogger;
     config: CommonConfig;
   }): Promise<void>;
-  public abstract getDescription(
-    variant: DescriptionVariant,
-  ): string | undefined;
+  public abstract get description(): string | undefined;
+  public abstract get shortDescription(): string | undefined;
   public abstract get methods(): ReadonlyArray<Method> | undefined;
   public abstract get inputSchema(): IOSchema;
   public abstract get outputSchema(): IOSchema;
@@ -97,8 +94,12 @@ export class Endpoint<
     return this.#def.deprecated || false;
   }
 
-  public override getDescription(variant: DescriptionVariant) {
-    return this.#def[variant === "short" ? "shortDescription" : "description"];
+  public override get description() {
+    return this.#def.description;
+  }
+
+  public override get shortDescription() {
+    return this.#def.shortDescription;
   }
 
   public override get methods() {
