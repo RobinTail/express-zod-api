@@ -169,7 +169,7 @@ export class Documentation extends OpenApiBuilder {
         brandHandling,
         makeRef: this.makeRef.bind(this),
       };
-      const { description, shortDescription } = endpoint;
+      const { description, shortDescription, scopes, inputSchema } = endpoint;
       const summary = shortDescription
         ? ensureShortDescription(shortDescription)
         : hasSummaryFromDescription && description
@@ -189,7 +189,7 @@ export class Documentation extends OpenApiBuilder {
         inputSources,
         isHeader,
         security,
-        schema: endpoint.inputSchema,
+        schema: inputSchema,
         description: descriptions?.requestParameter?.call(null, {
           method,
           path,
@@ -225,7 +225,7 @@ export class Documentation extends OpenApiBuilder {
         ? depictBody({
             ...commons,
             paramNames: pluck("name", depictedParams),
-            schema: endpoint.inputSchema,
+            schema: inputSchema,
             mimeType: contentTypes[endpoint.requestType],
             description: descriptions?.requestBody?.call(null, {
               method,
@@ -237,7 +237,7 @@ export class Documentation extends OpenApiBuilder {
 
       const securityRefs = depictSecurityRefs(
         depictSecurity(security, inputSources),
-        endpoint.scopes,
+        scopes,
         (securitySchema) => {
           const name = this.ensureUniqSecuritySchemaName(securitySchema);
           this.addSecurityScheme(name, securitySchema);
