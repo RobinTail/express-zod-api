@@ -24,11 +24,11 @@ export class DependsOnMethod extends Routable {
   }
 
   public override deprecated() {
-    const deprecatedContent = Object.entries(this.#endpoints).reduce(
+    const deprecatedEndpoints = Object.entries(this.#endpoints).reduce(
       (agg, [method, endpoint]) =>
         Object.assign(agg, { [method]: endpoint.deprecated() }),
       {} as ConstructorParameters<typeof DependsOnMethod>[0],
     );
-    return new DependsOnMethod(deprecatedContent) as this;
+    return new DependsOnMethod(deprecatedEndpoints) as this;
   }
 }
