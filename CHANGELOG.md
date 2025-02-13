@@ -4,7 +4,7 @@
 
 ### v22.9.0
 
-- Feature: Deprecations:
+- Featuring Deprecations:
   - You can deprecate all usage of an `Endpoint` using `EndpointsFactory::build({ deprecated: true })`;
   - You can deprecate a route using the assigned `Endpoint::deprecated()` or `DependsOnMethod::deprecated()`;
   - You can deprecate a schema using `ZodType::deprecated()`;
