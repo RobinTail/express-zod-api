@@ -39,7 +39,7 @@ export const walkRouting = ({
   while (stack.length) {
     const [path, element] = stack.shift()!;
     if (element instanceof AbstractEndpoint) {
-      const methods = element.methods || ["get"];
+      const { methods = ["get"] } = element;
       for (const method of methods) onEndpoint(element, path, method);
     } else if (element instanceof ServeStatic) {
       if (onStatic) element.apply(path, onStatic);
