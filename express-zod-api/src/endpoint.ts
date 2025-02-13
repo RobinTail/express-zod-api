@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { isNil, pluck, reject } from "ramda";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { hasRaw, hasUpload } from "./deep-checks";
@@ -31,10 +32,6 @@ export type Handler<IN, OUT, OPT> = (params: {
   logger: ActualLogger;
 }) => Promise<OUT>;
 
-type DescriptionVariant = "short" | "long";
-type IOVariant = "input" | "output";
-
-// @todo consider getters in v23
 export abstract class AbstractEndpoint extends Routable {
   public abstract execute(params: {
     request: Request;
@@ -42,19 +39,19 @@ export abstract class AbstractEndpoint extends Routable {
     logger: ActualLogger;
     config: CommonConfig;
   }): Promise<void>;
-  public abstract getDescription(
-    variant: DescriptionVariant,
-  ): string | undefined;
-  public abstract getMethods(): ReadonlyArray<Method> | undefined;
-  public abstract getSchema(variant: IOVariant): IOSchema;
   public abstract getResponses(
     variant: ResponseVariant,
   ): ReadonlyArray<NormalizedResponse>;
-  public abstract getSecurity(): LogicalContainer<Security>[];
-  public abstract getScopes(): ReadonlyArray<string>;
-  public abstract getTags(): ReadonlyArray<string>;
   public abstract getOperationId(method: Method): string | undefined;
-  public abstract getRequestType(): ContentType;
+  public abstract get description(): string | undefined;
+  public abstract get shortDescription(): string | undefined;
+  public abstract get methods(): ReadonlyArray<Method> | undefined;
+  public abstract get inputSchema(): IOSchema;
+  public abstract get outputSchema(): IOSchema;
+  public abstract get security(): LogicalContainer<Security>[];
+  public abstract get scopes(): ReadonlyArray<string>;
+  public abstract get tags(): ReadonlyArray<string>;
+  public abstract get requestType(): ContentType;
   public abstract get isDeprecated(): boolean;
 }
 
@@ -97,21 +94,27 @@ export class Endpoint<
     return this.#def.deprecated || false;
   }
 
-  public override getDescription(variant: DescriptionVariant) {
-    return this.#def[variant === "short" ? "shortDescription" : "description"];
+  public override get description() {
+    return this.#def.description;
   }
 
-  public override getMethods() {
+  public override get shortDescription() {
+    return this.#def.shortDescription;
+  }
+
+  public override get methods() {
     return Object.freeze(this.#def.methods);
   }
 
-  public override getSchema(variant: "input"): IN;
-  public override getSchema(variant: "output"): OUT;
-  public override getSchema(variant: IOVariant) {
-    return this.#def[variant === "output" ? "outputSchema" : "inputSchema"];
+  public override get inputSchema(): IN {
+    return this.#def.inputSchema;
   }
 
-  public override getRequestType() {
+  public override get outputSchema(): OUT {
+    return this.#def.outputSchema;
+  }
+
+  public override get requestType() {
     return hasUpload(this.#def.inputSchema)
       ? "upload"
       : hasRaw(this.#def.inputSchema)
@@ -127,17 +130,16 @@ export class Endpoint<
     );
   }
 
-  public override getSecurity() {
-    return (this.#def.middlewares || [])
-      .map((middleware) => middleware.getSecurity())
-      .filter((entry) => entry !== undefined);
+  public override get security() {
+    const entries = pluck("security", this.#def.middlewares || []);
+    return reject(isNil, entries);
   }
 
-  public override getScopes() {
+  public override get scopes() {
     return Object.freeze(this.#def.scopes || []);
   }
 
-  public override getTags() {
+  public override get tags() {
     return Object.freeze(this.#def.tags || []);
   }
 

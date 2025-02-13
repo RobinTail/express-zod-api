@@ -169,11 +169,9 @@ export class Documentation extends OpenApiBuilder {
         brandHandling,
         makeRef: this.makeRef.bind(this),
       };
-      const [shortDesc, description] = (["short", "long"] as const).map(
-        endpoint.getDescription.bind(endpoint),
-      );
-      const summary = shortDesc
-        ? ensureShortDescription(shortDesc)
+      const { description, shortDescription, scopes, inputSchema } = endpoint;
+      const summary = shortDescription
+        ? ensureShortDescription(shortDescription)
         : hasSummaryFromDescription && description
           ? ensureShortDescription(description)
           : undefined;
@@ -185,13 +183,13 @@ export class Documentation extends OpenApiBuilder {
         endpoint.getOperationId(method),
       );
 
-      const security = processContainers(endpoint.getSecurity());
+      const security = processContainers(endpoint.security);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         isHeader,
         security,
-        schema: endpoint.getSchema("input"),
+        schema: inputSchema,
         description: descriptions?.requestParameter?.call(null, {
           method,
           path,
@@ -227,8 +225,8 @@ export class Documentation extends OpenApiBuilder {
         ? depictBody({
             ...commons,
             paramNames: pluck("name", depictedParams),
-            schema: endpoint.getSchema("input"),
-            mimeType: contentTypes[endpoint.getRequestType()],
+            schema: inputSchema,
+            mimeType: contentTypes[endpoint.requestType],
             description: descriptions?.requestBody?.call(null, {
               method,
               path,
@@ -239,7 +237,7 @@ export class Documentation extends OpenApiBuilder {
 
       const securityRefs = depictSecurityRefs(
         depictSecurity(security, inputSources),
-        endpoint.getScopes(),
+        scopes,
         (securitySchema) => {
           const name = this.ensureUniqSecuritySchemaName(securitySchema);
           this.addSecurityScheme(name, securitySchema);
@@ -252,7 +250,7 @@ export class Documentation extends OpenApiBuilder {
         summary,
         description,
         deprecated: endpoint.isDeprecated || undefined,
-        tags: nonEmpty(endpoint.getTags()),
+        tags: nonEmpty(endpoint.tags),
         parameters: nonEmpty(depictedParams),
         requestBody,
         security: nonEmpty(securityRefs),

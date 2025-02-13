@@ -49,7 +49,7 @@ export const initRouting = ({
       doc?.checkJsonCompat(endpoint, { path, method });
       doc?.checkPathParams(path, endpoint, { method });
     }
-    const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
+    const matchingParsers = parsers?.[endpoint.requestType] || [];
     const handler: RequestHandler = async (request, response) => {
       const logger = getLogger(request);
       if (config.cors) {
