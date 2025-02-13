@@ -20,15 +20,15 @@ export const cloneSchema = <T extends z.ZodType>(schema: T) => {
   return copy;
 };
 
-export const copyMeta = <A extends z.ZodTypeAny, B extends z.ZodTypeAny>(
+export const copyMeta = <A extends z.ZodType, B extends z.ZodType>(
   src: A,
   dest: B,
 ): B => {
-  if (!(metaSymbol in src._def)) return dest;
-  const result = cloneSchema(dest);
-  result._def[metaSymbol].examples = combinations(
-    result._def[metaSymbol].examples,
-    src._def[metaSymbol].examples,
+  if (!(metaSymbol in src._def)) return dest; // ensure metadata in src below
+  const result = cloneSchema(dest); // ensures metadata in result below
+  result._def[metaSymbol]!.examples = combinations(
+    result._def[metaSymbol]!.examples,
+    src._def[metaSymbol]!.examples,
     ([destExample, srcExample]) =>
       typeof destExample === "object" && typeof srcExample === "object"
         ? mergeDeepRight({ ...destExample }, { ...srcExample })
