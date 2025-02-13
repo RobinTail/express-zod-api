@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { isNil, pluck, reject } from "ramda";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { hasRaw, hasUpload } from "./deep-checks";
@@ -130,11 +131,8 @@ export class Endpoint<
   }
 
   public override get security() {
-    return Object.freeze(
-      (this.#def.middlewares || [])
-        .map((middleware) => middleware.security)
-        .filter((entry) => entry !== undefined),
-    );
+    const entries = pluck("security", this.#def.middlewares || []);
+    return Object.freeze(reject(isNil, entries));
   }
 
   public override get scopes() {
