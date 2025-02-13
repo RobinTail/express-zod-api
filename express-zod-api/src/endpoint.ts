@@ -50,7 +50,8 @@ export abstract class AbstractEndpoint extends Routable {
   public abstract getResponses(
     variant: ResponseVariant,
   ): ReadonlyArray<NormalizedResponse>;
-  public abstract getSecurity(): ReadonlyArray<LogicalContainer<Security>>;
+  // @todo should return ReadonlyArray
+  public abstract getSecurity(): LogicalContainer<Security>[];
   public abstract getScopes(): ReadonlyArray<string>;
   public abstract getTags(): ReadonlyArray<string>;
   public abstract getOperationId(method: Method): string | undefined;
@@ -128,11 +129,9 @@ export class Endpoint<
   }
 
   public override getSecurity() {
-    return Object.freeze(
-      (this.#def.middlewares || [])
-        .map((middleware) => middleware.getSecurity())
-        .filter((entry) => entry !== undefined),
-    );
+    return (this.#def.middlewares || [])
+      .map((middleware) => middleware.getSecurity())
+      .filter((entry) => entry !== undefined);
   }
 
   public override getScopes() {
