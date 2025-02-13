@@ -596,6 +596,7 @@ paths:
       parameters:
         - name: trigger
           in: query
+          deprecated: true
           required: false
           description: for testing error response
           schema:

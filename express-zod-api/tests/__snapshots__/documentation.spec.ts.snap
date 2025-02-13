@@ -3139,6 +3139,7 @@ paths:
       parameters:
         - name: str
           in: query
+          deprecated: true
           required: true
           description: GET /v1/getSomething Parameter
           schema:

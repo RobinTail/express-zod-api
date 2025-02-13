@@ -665,9 +665,11 @@ export const depictRequestParams = ({
         composition === "components"
           ? makeRef(paramSchema, depicted, makeCleanId(description, name))
           : depicted;
+      const { _def } = paramSchema as z.ZodType;
       return acc.concat({
         name,
         in: location,
+        deprecated: _def[metaSymbol]?.isDeprecated,
         required: !paramSchema.isOptional(),
         description: depicted.description || description,
         schema: result,
