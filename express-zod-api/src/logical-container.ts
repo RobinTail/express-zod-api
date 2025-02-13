@@ -32,7 +32,7 @@ type Combination<T> = T[];
 export type Alternatives<T> = Array<Combination<T>>;
 
 export const processContainers = <T>(
-  containers: ReadonlyArray<LogicalContainer<T>>,
+  containers: LogicalContainer<T>[],
 ): Alternatives<T> => {
   const simples = filter(isSimple, containers);
   const ands = chain(prop("and"), filter(isLogicalAnd, containers));
