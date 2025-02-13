@@ -38,18 +38,18 @@ export abstract class AbstractEndpoint extends Routable {
     logger: ActualLogger;
     config: CommonConfig;
   }): Promise<void>;
+  public abstract getResponses(
+    variant: ResponseVariant,
+  ): ReadonlyArray<NormalizedResponse>;
+  public abstract getOperationId(method: Method): string | undefined;
   public abstract get description(): string | undefined;
   public abstract get shortDescription(): string | undefined;
   public abstract get methods(): ReadonlyArray<Method> | undefined;
   public abstract get inputSchema(): IOSchema;
   public abstract get outputSchema(): IOSchema;
-  public abstract getResponses(
-    variant: ResponseVariant,
-  ): ReadonlyArray<NormalizedResponse>;
   public abstract get security(): ReadonlyArray<LogicalContainer<Security>>;
   public abstract get scopes(): ReadonlyArray<string>;
   public abstract get tags(): ReadonlyArray<string>;
-  public abstract getOperationId(method: Method): string | undefined;
   public abstract get requestType(): ContentType;
   public abstract get isDeprecated(): boolean;
 }
