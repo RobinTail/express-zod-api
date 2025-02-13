@@ -251,7 +251,7 @@ export class Documentation extends OpenApiBuilder {
         operationId,
         summary,
         description,
-        deprecated: endpoint.isDeprecated ? true : undefined,
+        deprecated: endpoint.isDeprecated || undefined,
         tags: nonEmpty(endpoint.getTags()),
         parameters: nonEmpty(depictedParams),
         requestBody,

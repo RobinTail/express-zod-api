@@ -17,18 +17,18 @@ export class DependsOnMethod extends Routable {
     const methods = keys(this.#endpoints); // eslint-disable-line no-restricted-syntax -- literal type required
     for (const method of methods) {
       const endpoint = this.#endpoints[method];
-      if (endpoint) {
-        entries.push([
-          method,
-          this.isDeprecated ? endpoint.deprecated() : endpoint,
-          reject(equals(method), methods),
-        ]);
-      }
+      if (endpoint)
+        entries.push([method, endpoint, reject(equals(method), methods)]);
     }
     return Object.freeze(entries);
   }
 
-  public override clone() {
-    return new DependsOnMethod(this.#endpoints) as this;
+  public override deprecated() {
+    const deprecatedContent = Object.entries(this.#endpoints).reduce(
+      (agg, [method, endpoint]) =>
+        Object.assign(agg, { [method]: endpoint.deprecated() }),
+      {} as ConstructorParameters<typeof DependsOnMethod>[0],
+    );
+    return new DependsOnMethod(deprecatedContent) as this;
   }
 }

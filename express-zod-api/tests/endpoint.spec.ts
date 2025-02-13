@@ -118,6 +118,19 @@ describe("Endpoint", () => {
     });
   });
 
+  describe(".deprecated()", () => {
+    test("should make a deprecated copy of the endpoint", () => {
+      const endpointMock = defaultEndpointsFactory.build({
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      expect(endpointMock.isDeprecated).toBe(false);
+      const copy = endpointMock.deprecated();
+      expect(copy.isDeprecated).toBe(true);
+      expect(copy).not.toBe(endpointMock);
+    });
+  });
+
   describe("#parseOutput", () => {
     test("Should throw on output validation failure", async () => {
       const endpoint = defaultEndpointsFactory.build({

@@ -56,6 +56,7 @@ export abstract class AbstractEndpoint extends Routable {
   public abstract getTags(): ReadonlyArray<string>;
   public abstract getOperationId(method: Method): string | undefined;
   public abstract getRequestType(): ContentType;
+  public abstract get isDeprecated(): boolean;
 }
 
 export class Endpoint<
@@ -66,6 +67,7 @@ export class Endpoint<
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0];
 
   constructor(def: {
+    isDeprecated?: boolean;
     middlewares?: AbstractMiddleware[];
     inputSchema: IN;
     outputSchema: OUT;
@@ -82,8 +84,18 @@ export class Endpoint<
     this.#def = def;
   }
 
-  public override clone() {
-    return new Endpoint(this.#def) as this;
+  #cloneWith(
+    inc?: Partial<ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0]>,
+  ) {
+    return new Endpoint({ ...this.#def, ...inc });
+  }
+
+  public override deprecated() {
+    return this.#cloneWith({ isDeprecated: true }) as this;
+  }
+
+  public override get isDeprecated(): boolean {
+    return this.#def.isDeprecated || false;
   }
 
   public override getDescription(variant: DescriptionVariant) {
