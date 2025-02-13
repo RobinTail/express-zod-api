@@ -48,7 +48,7 @@ export abstract class AbstractEndpoint extends Routable {
   public abstract get methods(): ReadonlyArray<Method> | undefined;
   public abstract get inputSchema(): IOSchema;
   public abstract get outputSchema(): IOSchema;
-  public abstract get security(): ReadonlyArray<LogicalContainer<Security>>;
+  public abstract get security(): LogicalContainer<Security>[];
   public abstract get scopes(): ReadonlyArray<string>;
   public abstract get tags(): ReadonlyArray<string>;
   public abstract get requestType(): ContentType;
@@ -132,7 +132,7 @@ export class Endpoint<
 
   public override get security() {
     const entries = pluck("security", this.#def.middlewares || []);
-    return Object.freeze(reject(isNil, entries));
+    return reject(isNil, entries);
   }
 
   public override get scopes() {
