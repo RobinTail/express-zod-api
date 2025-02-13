@@ -76,9 +76,8 @@ export const hasNestedSchema = (
   const handler =
     depth < maxDepth
       ? rules[subject._def[metaSymbol]?.brand as keyof typeof rules] ||
-        ("typeName" in subject._def
-          ? rules[subject._def.typeName as keyof typeof rules]
-          : undefined)
+        ("typeName" in subject._def &&
+          rules[subject._def.typeName as keyof typeof rules])
       : undefined;
   if (handler) {
     return handler(subject, {
