@@ -45,8 +45,8 @@ export const walkRouting = ({
       if (onStatic) element.apply(path, onStatic);
     } else if (element instanceof DependsOnMethod) {
       for (const [method, endpoint, siblingMethods] of element.entries) {
-        const supportedMethods = endpoint.methods;
-        if (supportedMethods && !supportedMethods.includes(method)) {
+        const { methods } = endpoint;
+        if (methods && !methods.includes(method)) {
           throw new RoutingError(
             `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
           );
