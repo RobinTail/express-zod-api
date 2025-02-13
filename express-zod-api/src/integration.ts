@@ -115,13 +115,11 @@ export class Integration extends IntegrationBase {
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint = (endpoint, path, method) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
-      const { isDeprecated } = endpoint;
+      const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
-      const input = makeType(
-        entitle("input"),
-        zodToTs(endpoint.inputSchema, ctxIn),
-        { comment: request },
-      );
+      const input = makeType(entitle("input"), zodToTs(inputSchema, ctxIn), {
+        comment: request,
+      });
       this.program.push(input);
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
@@ -163,7 +161,7 @@ export class Integration extends IntegrationBase {
         ]),
       };
       this.registry.set(request, { isDeprecated, store });
-      this.tags.set(request, endpoint.tags);
+      this.tags.set(request, tags);
     };
     walkRouting({ routing, onEndpoint });
     this.program.unshift(...this.aliases.values());
