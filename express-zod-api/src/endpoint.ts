@@ -32,7 +32,6 @@ export type Handler<IN, OUT, OPT> = (params: {
 }) => Promise<OUT>;
 
 type DescriptionVariant = "short" | "long";
-type IOVariant = "input" | "output";
 
 export abstract class AbstractEndpoint extends Routable {
   public abstract execute(params: {
@@ -45,7 +44,8 @@ export abstract class AbstractEndpoint extends Routable {
     variant: DescriptionVariant,
   ): string | undefined;
   public abstract get methods(): ReadonlyArray<Method> | undefined;
-  public abstract getSchema(variant: IOVariant): IOSchema;
+  public abstract get inputSchema(): IOSchema;
+  public abstract get outputSchema(): IOSchema;
   public abstract getResponses(
     variant: ResponseVariant,
   ): ReadonlyArray<NormalizedResponse>;
@@ -105,10 +105,12 @@ export class Endpoint<
     return Object.freeze(this.#def.methods);
   }
 
-  public override getSchema(variant: "input"): IN;
-  public override getSchema(variant: "output"): OUT;
-  public override getSchema(variant: IOVariant) {
-    return this.#def[variant === "output" ? "outputSchema" : "inputSchema"];
+  public override get inputSchema(): IN {
+    return this.#def.inputSchema;
+  }
+
+  public override get outputSchema(): OUT {
+    return this.#def.outputSchema;
   }
 
   public override get requestType() {

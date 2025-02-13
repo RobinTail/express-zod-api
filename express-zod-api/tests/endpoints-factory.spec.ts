@@ -242,9 +242,9 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.methods).toBeUndefined();
-      expect(endpoint.getSchema("input")).toMatchSnapshot();
-      expect(endpoint.getSchema("output")).toMatchSnapshot();
-      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
+      expect(endpoint.inputSchema).toMatchSnapshot();
+      expect(endpoint.outputSchema).toMatchSnapshot();
+      expectTypeOf(endpoint.inputSchema._output).toMatchTypeOf<{
         n: number;
         s: string;
       }>();
@@ -270,9 +270,9 @@ describe("EndpointsFactory", () => {
         output: z.object({ o: z.boolean() }),
         handler: vi.fn(),
       });
-      expect(endpoint.getSchema("input")).toMatchSnapshot();
-      expect(endpoint.getSchema("output")).toMatchSnapshot();
-      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
+      expect(endpoint.inputSchema).toMatchSnapshot();
+      expect(endpoint.outputSchema).toMatchSnapshot();
+      expectTypeOf(endpoint.inputSchema._output).toMatchTypeOf<{
         a?: number;
         b?: string;
         i: string;
@@ -295,9 +295,9 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.methods).toBeUndefined();
-      expect(endpoint.getSchema("input")).toMatchSnapshot();
-      expect(endpoint.getSchema("output")).toMatchSnapshot();
-      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
+      expect(endpoint.inputSchema).toMatchSnapshot();
+      expect(endpoint.outputSchema).toMatchSnapshot();
+      expectTypeOf(endpoint.inputSchema._output).toMatchTypeOf<{
         n1: number;
         n2: number;
         s: string;
@@ -323,9 +323,9 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
       expect(endpoint.methods).toBeUndefined();
-      expect(endpoint.getSchema("input")).toMatchSnapshot();
-      expect(endpoint.getSchema("output")).toMatchSnapshot();
-      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<
+      expect(endpoint.inputSchema).toMatchSnapshot();
+      expect(endpoint.outputSchema).toMatchSnapshot();
+      expectTypeOf(endpoint.inputSchema._output).toMatchTypeOf<
         { s: string } & ({ n1: number } | { n2: number })
       >();
     });
@@ -338,9 +338,7 @@ describe("EndpointsFactory", () => {
         output: z.object({}),
         handler: vi.fn(),
       });
-      expectTypeOf(
-        endpoint.getSchema("input")._output,
-      ).toEqualTypeOf<EmptyObject>();
+      expectTypeOf(endpoint.inputSchema._output).toEqualTypeOf<EmptyObject>();
       expect(endpoint.isDeprecated).toBe(true);
     });
   });
@@ -351,8 +349,8 @@ describe("EndpointsFactory", () => {
       const endpoint = factory.buildVoid({
         handler: async () => {},
       });
-      expect(endpoint.getSchema("output")).toMatchSnapshot();
-      expectTypeOf(endpoint.getSchema("output")).toMatchTypeOf<EmptySchema>();
+      expect(endpoint.outputSchema).toMatchSnapshot();
+      expectTypeOf(endpoint.outputSchema).toMatchTypeOf<EmptySchema>();
     });
   });
 });

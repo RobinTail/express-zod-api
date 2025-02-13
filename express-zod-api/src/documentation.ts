@@ -191,7 +191,7 @@ export class Documentation extends OpenApiBuilder {
         inputSources,
         isHeader,
         security,
-        schema: endpoint.getSchema("input"),
+        schema: endpoint.inputSchema,
         description: descriptions?.requestParameter?.call(null, {
           method,
           path,
@@ -227,7 +227,7 @@ export class Documentation extends OpenApiBuilder {
         ? depictBody({
             ...commons,
             paramNames: pluck("name", depictedParams),
-            schema: endpoint.getSchema("input"),
+            schema: endpoint.inputSchema,
             mimeType: contentTypes[endpoint.requestType],
             description: descriptions?.requestBody?.call(null, {
               method,

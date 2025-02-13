@@ -8,7 +8,7 @@ import {
   testEndpoint,
   ResultHandler,
 } from "../src";
-import { AbstractEndpoint, Endpoint } from "../src/endpoint";
+import { Endpoint } from "../src/endpoint";
 
 describe("Endpoint", () => {
   describe(".methods", () => {
@@ -245,28 +245,22 @@ describe("Endpoint", () => {
     });
   });
 
-  describe(".getSchema()", () => {
-    test.each(["input", "output"] as const)(
-      "should return the %s schema",
-      (variant) => {
+  describe.each(["inputSchema", "outputSchema"] as const)(
+    ".%s prop",
+    (prop) => {
+      test("should return the %s", () => {
         const factory = new EndpointsFactory(defaultResultHandler);
-        const input = z.object({
-          something: z.number(),
-        });
-        const output = z.object({
-          something: z.number(),
-        });
+        const input = z.object({ something: z.number() });
+        const output = z.object({ something: z.string() });
         const endpoint = factory.build({
           input,
           output,
           handler: vi.fn(),
         });
-        expect((endpoint as AbstractEndpoint).getSchema(variant)).toEqual(
-          variant === "input" ? input : output,
-        );
-      },
-    );
-  });
+        expect(endpoint[prop]).toEqual(prop === "inputSchema" ? input : output);
+      });
+    },
+  );
 
   describe(".getResponses()", () => {
     test.each(["positive", "negative"] as const)(

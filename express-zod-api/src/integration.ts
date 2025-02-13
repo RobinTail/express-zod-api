@@ -119,7 +119,7 @@ export class Integration extends IntegrationBase {
       const request = `${method} ${path}`;
       const input = makeType(
         entitle("input"),
-        zodToTs(endpoint.getSchema("input"), ctxIn),
+        zodToTs(endpoint.inputSchema, ctxIn),
         { comment: request },
       );
       this.program.push(input);
