@@ -84,14 +84,14 @@ export class Endpoint<
     this.#def = def;
   }
 
-  #cloneWith(
+  #clone(
     inc?: Partial<ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0]>,
   ) {
     return new Endpoint({ ...this.#def, ...inc });
   }
 
   public override deprecated() {
-    return this.#cloneWith({ isDeprecated: true }) as this;
+    return this.#clone({ isDeprecated: true }) as this;
   }
 
   public override get isDeprecated(): boolean {
