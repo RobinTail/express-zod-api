@@ -11,7 +11,7 @@ import {
 import { AbstractEndpoint, Endpoint } from "../src/endpoint";
 
 describe("Endpoint", () => {
-  describe(".getMethods()", () => {
+  describe(".methods", () => {
     test("Should return the correct set of methods (readonly)", () => {
       const endpointMock = new Endpoint({
         methods: ["get", "post", "put", "delete", "patch"],
@@ -24,7 +24,7 @@ describe("Endpoint", () => {
           handler: vi.fn(),
         }),
       });
-      const methods = endpointMock.getMethods();
+      const { methods } = endpointMock;
       expect(methods).toEqual(["get", "post", "put", "delete", "patch"]);
       expect(() => (methods as any[]).push()).toThrowError(/read only/);
     });
@@ -284,7 +284,7 @@ describe("Endpoint", () => {
     );
   });
 
-  describe(".getScopes", () => {
+  describe(".scopes", () => {
     test.each(["test", ["one", "two"]])(
       "should return the scopes (readonly) %#",
       (scope) => {
@@ -294,14 +294,14 @@ describe("Endpoint", () => {
           handler: vi.fn(),
           scope,
         });
-        const scopes = endpoint.getScopes();
+        const { scopes } = endpoint;
         expect(scopes).toEqual(typeof scope === "string" ? [scope] : scope);
         expect(() => (scopes as any[]).push()).toThrowError(/read only/);
       },
     );
   });
 
-  describe(".getTags", () => {
+  describe(".tags", () => {
     test.each(["test", ["one", "two"]])(
       "should return the tags (readonly) %#",
       (tag) => {
@@ -311,14 +311,14 @@ describe("Endpoint", () => {
           handler: vi.fn(),
           tag,
         });
-        const tags = endpoint.getTags();
+        const { tags } = endpoint;
         expect(tags).toEqual(typeof tag === "string" ? [tag] : tag);
         expect(() => (tags as any[]).push()).toThrowError(/read only/);
       },
     );
   });
 
-  describe("getRequestType()", () => {
+  describe(".requestType", () => {
     test.each([
       { input: z.object({}), expected: "json" },
       { input: ez.raw(), expected: "raw" },
@@ -332,7 +332,7 @@ describe("Endpoint", () => {
           output: z.object({}),
           handler: vi.fn(),
         });
-        expect(endpoint.getRequestType()).toEqual(expected);
+        expect(endpoint.requestType).toEqual(expected);
       },
     );
   });

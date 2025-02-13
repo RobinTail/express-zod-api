@@ -241,7 +241,7 @@ describe("EndpointsFactory", () => {
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toBeUndefined();
+      expect(endpoint.methods).toBeUndefined();
       expect(endpoint.getSchema("input")).toMatchSnapshot();
       expect(endpoint.getSchema("output")).toMatchSnapshot();
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
@@ -294,7 +294,7 @@ describe("EndpointsFactory", () => {
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toBeUndefined();
+      expect(endpoint.methods).toBeUndefined();
       expect(endpoint.getSchema("input")).toMatchSnapshot();
       expect(endpoint.getSchema("output")).toMatchSnapshot();
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
@@ -322,7 +322,7 @@ describe("EndpointsFactory", () => {
         handler: handlerMock,
       });
       expect(endpoint).toBeInstanceOf(Endpoint);
-      expect(endpoint.getMethods()).toBeUndefined();
+      expect(endpoint.methods).toBeUndefined();
       expect(endpoint.getSchema("input")).toMatchSnapshot();
       expect(endpoint.getSchema("output")).toMatchSnapshot();
       expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<

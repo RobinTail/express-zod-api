@@ -39,13 +39,13 @@ export const walkRouting = ({
   while (stack.length) {
     const [path, element] = stack.shift()!;
     if (element instanceof AbstractEndpoint) {
-      const methods = element.getMethods() || ["get"];
+      const methods = element.methods || ["get"];
       for (const method of methods) onEndpoint(element, path, method);
     } else if (element instanceof ServeStatic) {
       if (onStatic) element.apply(path, onStatic);
     } else if (element instanceof DependsOnMethod) {
       for (const [method, endpoint, siblingMethods] of element.entries) {
-        const supportedMethods = endpoint.getMethods();
+        const supportedMethods = endpoint.methods;
         if (supportedMethods && !supportedMethods.includes(method)) {
           throw new RoutingError(
             `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,

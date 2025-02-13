@@ -185,7 +185,7 @@ export class Documentation extends OpenApiBuilder {
         endpoint.getOperationId(method),
       );
 
-      const security = processContainers(endpoint.getSecurity());
+      const security = processContainers(endpoint.security);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
@@ -228,7 +228,7 @@ export class Documentation extends OpenApiBuilder {
             ...commons,
             paramNames: pluck("name", depictedParams),
             schema: endpoint.getSchema("input"),
-            mimeType: contentTypes[endpoint.getRequestType()],
+            mimeType: contentTypes[endpoint.requestType],
             description: descriptions?.requestBody?.call(null, {
               method,
               path,
@@ -239,7 +239,7 @@ export class Documentation extends OpenApiBuilder {
 
       const securityRefs = depictSecurityRefs(
         depictSecurity(security, inputSources),
-        endpoint.getScopes(),
+        endpoint.scopes,
         (securitySchema) => {
           const name = this.ensureUniqSecuritySchemaName(securitySchema);
           this.addSecurityScheme(name, securitySchema);
@@ -252,7 +252,7 @@ export class Documentation extends OpenApiBuilder {
         summary,
         description,
         deprecated: endpoint.isDeprecated || undefined,
-        tags: nonEmpty(endpoint.getTags()),
+        tags: nonEmpty(endpoint.tags),
         parameters: nonEmpty(depictedParams),
         requestBody,
         security: nonEmpty(securityRefs),

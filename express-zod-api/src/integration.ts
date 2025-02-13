@@ -163,7 +163,7 @@ export class Integration extends IntegrationBase {
         ]),
       };
       this.registry.set(request, { isDeprecated, store });
-      this.tags.set(request, endpoint.getTags());
+      this.tags.set(request, endpoint.tags);
     };
     walkRouting({ routing, onEndpoint });
     this.program.unshift(...this.aliases.values());

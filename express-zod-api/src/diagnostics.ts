@@ -23,7 +23,7 @@ export class Diagnostics {
 
   public checkJsonCompat(endpoint: AbstractEndpoint, ctx: FlatObject): void {
     if (this.#verifiedEndpoints.has(endpoint)) return;
-    if (endpoint.getRequestType() === "json") {
+    if (endpoint.requestType === "json") {
       this.#susCatcher((reason) =>
         this.logger.warn(
           "The final input schema of the endpoint contains an unsupported JSON payload type.",
