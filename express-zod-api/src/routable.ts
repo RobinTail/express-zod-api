@@ -2,7 +2,7 @@ import { Routing } from "./routing";
 
 export abstract class Routable {
   #isDeprecated = false;
-  protected abstract clone(): this;
+  public abstract clone(): this;
 
   /** @desc Marks the route as deprecated */
   public deprecated() {

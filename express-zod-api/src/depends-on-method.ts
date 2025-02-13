@@ -28,7 +28,7 @@ export class DependsOnMethod extends Routable {
     return Object.freeze(entries);
   }
 
-  protected override clone() {
+  public override clone() {
     return new DependsOnMethod(this.#endpoints) as this;
   }
 }

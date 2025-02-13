@@ -82,7 +82,7 @@ export class Endpoint<
     this.#def = def;
   }
 
-  protected override clone() {
+  public override clone() {
     return new Endpoint(this.#def) as this;
   }
 
