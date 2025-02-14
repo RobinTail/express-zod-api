@@ -10,6 +10,7 @@ export class ServeStatic {
     this.params = params;
   }
 
+  /** @internal */
   public apply(
     path: string,
     cb: (path: string, handler: StaticHandler) => void,
