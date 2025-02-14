@@ -85,9 +85,9 @@ interface DocumentationParams {
 }
 
 export class Documentation extends OpenApiBuilder {
-  protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
-  protected lastOperationIdSuffixes = new Map<string, number>();
-  protected references = new Map<z.ZodTypeAny, string>();
+  readonly #lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
+  readonly #lastOperationIdSuffixes = new Map<string, number>();
+  readonly #references = new Map<z.ZodTypeAny, string>();
 
   protected makeRef(
     schema: z.ZodTypeAny,
@@ -95,11 +95,11 @@ export class Documentation extends OpenApiBuilder {
       | SchemaObject
       | ReferenceObject
       | (() => SchemaObject | ReferenceObject),
-    name = this.references.get(schema),
+    name = this.#references.get(schema),
   ): ReferenceObject {
     if (!name) {
-      name = `Schema${this.references.size + 1}`;
-      this.references.set(schema, name);
+      name = `Schema${this.#references.size + 1}`;
+      this.#references.set(schema, name);
       if (typeof subject === "function") subject = subject();
     }
     if (typeof subject === "object") this.addSchema(name, subject);
@@ -112,9 +112,9 @@ export class Documentation extends OpenApiBuilder {
     userDefined?: string,
   ) {
     const operationId = userDefined || makeCleanId(method, path);
-    let lastSuffix = this.lastOperationIdSuffixes.get(operationId);
+    let lastSuffix = this.#lastOperationIdSuffixes.get(operationId);
     if (lastSuffix === undefined) {
-      this.lastOperationIdSuffixes.set(operationId, 1);
+      this.#lastOperationIdSuffixes.set(operationId, 1);
       return operationId;
     }
     if (userDefined) {
@@ -125,7 +125,7 @@ export class Documentation extends OpenApiBuilder {
       });
     }
     lastSuffix++;
-    this.lastOperationIdSuffixes.set(operationId, lastSuffix);
+    this.#lastOperationIdSuffixes.set(operationId, lastSuffix);
     return `${operationId}${lastSuffix}`;
   }
 
@@ -138,8 +138,8 @@ export class Documentation extends OpenApiBuilder {
       )
         return name;
     }
-    const nextId = (this.lastSecuritySchemaIds.get(subject.type) || 0) + 1;
-    this.lastSecuritySchemaIds.set(subject.type, nextId);
+    const nextId = (this.#lastSecuritySchemaIds.get(subject.type) || 0) + 1;
+    this.#lastSecuritySchemaIds.set(subject.type, nextId);
     return `${subject.type.toUpperCase()}_${nextId}`;
   }
 
