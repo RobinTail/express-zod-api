@@ -89,7 +89,7 @@ export class Documentation extends OpenApiBuilder {
   readonly #lastOperationIdSuffixes = new Map<string, number>();
   readonly #references = new Map<z.ZodTypeAny, string>();
 
-  protected makeRef(
+  #makeRef(
     schema: z.ZodTypeAny,
     subject:
       | SchemaObject
@@ -106,11 +106,7 @@ export class Documentation extends OpenApiBuilder {
     return { $ref: `#/components/schemas/${name}` };
   }
 
-  protected ensureUniqOperationId(
-    path: string,
-    method: Method,
-    userDefined?: string,
-  ) {
+  #ensureUniqOperationId(path: string, method: Method, userDefined?: string) {
     const operationId = userDefined || makeCleanId(method, path);
     let lastSuffix = this.#lastOperationIdSuffixes.get(operationId);
     if (lastSuffix === undefined) {
@@ -129,7 +125,7 @@ export class Documentation extends OpenApiBuilder {
     return `${operationId}${lastSuffix}`;
   }
 
-  protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
+  #ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
     const serializedSubject = JSON.stringify(subject);
     for (const name in this.rootDoc.components?.securitySchemes || {}) {
       if (
@@ -167,7 +163,7 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         brandHandling,
-        makeRef: this.makeRef.bind(this),
+        makeRef: this.#makeRef.bind(this),
       };
       const { description, shortDescription, scopes, inputSchema } = endpoint;
       const summary = shortDescription
@@ -177,7 +173,7 @@ export class Documentation extends OpenApiBuilder {
           : undefined;
       const inputSources =
         config.inputSources?.[method] || defaultInputSources[method];
-      const operationId = this.ensureUniqOperationId(
+      const operationId = this.#ensureUniqOperationId(
         path,
         method,
         endpoint.getOperationId(method),
@@ -239,7 +235,7 @@ export class Documentation extends OpenApiBuilder {
         depictSecurity(security, inputSources),
         scopes,
         (securitySchema) => {
-          const name = this.ensureUniqSecuritySchemaName(securitySchema);
+          const name = this.#ensureUniqSecuritySchemaName(securitySchema);
           this.addSecurityScheme(name, securitySchema);
           return name;
         },
