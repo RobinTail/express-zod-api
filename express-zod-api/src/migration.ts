@@ -8,9 +8,6 @@ import {
 interface Queries {
   headerSecurity: TSESTree.Identifier;
   createConfig: TSESTree.ObjectExpression;
-  getters: TSESTree.CallExpression & {
-    callee: TSESTree.MemberExpression & { property: TSESTree.Identifier };
-  };
 }
 
 type Listener = keyof Queries;
@@ -18,27 +15,6 @@ type Listener = keyof Queries;
 const queries: Record<Listener, string> = {
   headerSecurity: `${NT.Identifier}[name='CustomHeaderSecurity']`,
   createConfig: `${NT.CallExpression}[callee.name='createConfig'] > ${NT.ObjectExpression}`,
-  getters:
-    `${NT.CallExpression}:has(` +
-    `>${NT.MemberExpression}[property.name=/get(Description|Schema|Methods|Tags|Scopes|Security|RequestType)/])`,
-};
-
-const getters = {
-  getMethods: "methods",
-  getTags: "tags",
-  getScopes: "scopes",
-  getSecurity: "security",
-  getRequestType: "requestType",
-  getDescription: (argument?: TSESTree.CallExpressionArgument) =>
-    argument && argument.type === NT.Literal && argument.value === "short"
-      ? "shortDescription"
-      : "description",
-  getSchema: (argument?: TSESTree.CallExpressionArgument) =>
-    argument
-      ? argument.type === NT.Literal && argument.value === "output"
-        ? "outputSchema"
-        : "inputSchema"
-      : "schema",
 };
 
 const listen = <
@@ -94,26 +70,6 @@ const v23 = ESLintUtils.RuleCreator.withoutDocs({
               [node.range[0], node.range[0] + 1],
               "wrongMethodBehavior: 404,",
             ),
-        });
-      },
-      getters: (node) => {
-        const method = node.callee.property.name;
-        if (node.arguments.length > 1) return;
-        const [argument] = node.arguments;
-        const replacement = getters[method as keyof typeof getters];
-        if (!replacement) return;
-        const getter =
-          typeof replacement === "function"
-            ? replacement(argument)
-            : replacement;
-        ctx.report({
-          node: node.callee.property,
-          messageId: "change",
-          data: { subject: "method", from: method, to: `${getter} property` },
-          fix: (fixer) => [
-            fixer.removeRange([node.callee.range[1], node.range[1]]), // (...args)
-            fixer.replaceText(node.callee.property, getter),
-          ],
         });
       },
     }),
