@@ -4,9 +4,9 @@
 
 ### v23.0.0
 
-- Publicly exposed interface `CustomHeaderSecurity` is renamed to `HeaderSecurity`;
-- The default value for `wrongMethodBehavior` config option is changed to `405`;
 - Minimum version of `compression` (optional peer dependency) is `1.8.0` (it supports Brotli);
+- The default value for `wrongMethodBehavior` config option is changed to `405`;
+- Publicly exposed interfaces: `CustomHeaderSecurity` —> `HeaderSecurity`, `NormalizedResponse` removed.
 - Only the following methods remained public, while other methods and properties were marked internal or removed:
   - `Endpoint`: `.execute()` and `.deprecated()`;
   - `Middleware`: `.execute()`;
@@ -14,8 +14,7 @@
   - `DependsOnMethod`: `.deprecated()`
   - `Documentation`: constructor only;
   - `Integration`: `.print()` and `.printFormatted()`;
-  - `ServeStatic`: constructor only;
-- The `NormalizedResponse` interface is no longer exposed (internal).
+  - `ServeStatic`: constructor only.
 
 ## Version 22
 
