@@ -81,20 +81,17 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  protected program: ts.Node[] = [this.someOfType];
-  protected usage: Array<ts.Node | string> = [];
-  protected aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
+  readonly #program: ts.Node[] = [this.someOfType];
+  readonly #aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
+  #usage: Array<ts.Node | string> = [];
 
-  protected makeAlias(
-    schema: z.ZodTypeAny,
-    produce: () => ts.TypeNode,
-  ): ts.TypeNode {
-    let name = this.aliases.get(schema)?.name?.text;
+  #makeAlias(schema: z.ZodTypeAny, produce: () => ts.TypeNode): ts.TypeNode {
+    let name = this.#aliases.get(schema)?.name?.text;
     if (!name) {
-      name = `Type${this.aliases.size + 1}`;
+      name = `Type${this.#aliases.size + 1}`;
       const temp = makeLiteralType(null);
-      this.aliases.set(schema, makeType(name, temp));
-      this.aliases.set(schema, makeType(name, produce()));
+      this.#aliases.set(schema, makeType(name, temp));
+      this.#aliases.set(schema, makeType(name, produce()));
     }
     return ensureTypeNode(name);
   }
@@ -110,19 +107,20 @@ export class Integration extends IntegrationBase {
     noContent = z.undefined(),
   }: IntegrationParams) {
     super(serverUrl);
-    const commons = { makeAlias: this.makeAlias.bind(this), optionalPropStyle };
+    const commons = {
+      makeAlias: this.#makeAlias.bind(this),
+      optionalPropStyle,
+    };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint = (endpoint, path, method) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
-      const { isDeprecated } = endpoint;
+      const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
-      const input = makeType(
-        entitle("input"),
-        zodToTs(endpoint.getSchema("input"), ctxIn),
-        { comment: request },
-      );
-      this.program.push(input);
+      const input = makeType(entitle("input"), zodToTs(inputSchema, ctxIn), {
+        comment: request,
+      });
+      this.#program.push(input);
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
@@ -132,7 +130,7 @@ export class Integration extends IntegrationBase {
               zodToTs(mimeTypes ? schema : noContent, ctxOut),
               { comment: request },
             );
-            this.program.push(variantType);
+            this.#program.push(variantType);
             return statusCodes.map((code) =>
               makeInterfaceProp(code, variantType.name),
             );
@@ -142,7 +140,7 @@ export class Integration extends IntegrationBase {
             props,
             { comment: request },
           );
-          this.program.push(dict);
+          this.#program.push(dict);
           return Object.assign(agg, { [responseVariant]: dict });
         },
         {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
@@ -163,11 +161,11 @@ export class Integration extends IntegrationBase {
         ]),
       };
       this.registry.set(request, { isDeprecated, store });
-      this.tags.set(request, endpoint.getTags());
+      this.tags.set(request, tags);
     };
     walkRouting({ routing, onEndpoint });
-    this.program.unshift(...this.aliases.values());
-    this.program.push(
+    this.#program.unshift(...this.#aliases.values());
+    this.#program.push(
       this.makePathType(),
       this.methodType,
       ...this.makePublicInterfaces(),
@@ -176,7 +174,7 @@ export class Integration extends IntegrationBase {
 
     if (variant === "types") return;
 
-    this.program.push(
+    this.#program.push(
       this.makeEndpointTags(),
       this.makeParseRequestFn(),
       this.makeSubstituteFn(),
@@ -186,14 +184,14 @@ export class Integration extends IntegrationBase {
       this.makeSubscriptionClass(subscriptionClassName),
     );
 
-    this.usage.push(
+    this.#usage.push(
       ...this.makeUsageStatements(clientClassName, subscriptionClassName),
     );
   }
 
-  protected printUsage(printerOptions?: ts.PrinterOptions) {
-    return this.usage.length
-      ? this.usage
+  #printUsage(printerOptions?: ts.PrinterOptions) {
+    return this.#usage.length
+      ? this.#usage
           .map((entry) =>
             typeof entry === "string"
               ? entry
@@ -204,7 +202,7 @@ export class Integration extends IntegrationBase {
   }
 
   public print(printerOptions?: ts.PrinterOptions) {
-    const usageExampleText = this.printUsage(printerOptions);
+    const usageExampleText = this.#printUsage(printerOptions);
     const commentNode =
       usageExampleText &&
       ts.addSyntheticLeadingComment(
@@ -216,12 +214,12 @@ export class Integration extends IntegrationBase {
         ts.SyntaxKind.MultiLineCommentTrivia,
         `\n${usageExampleText}`,
       );
-    return this.program
+    return this.#program
       .concat(commentNode || [])
       .map((node, index) =>
         printNode(
           node,
-          index < this.program.length
+          index < this.#program.length
             ? printerOptions
             : { ...printerOptions, omitTrailingSemicolon: true },
         ),
@@ -242,9 +240,9 @@ export class Integration extends IntegrationBase {
       } catch {}
     }
 
-    const usageExample = this.printUsage(printerOptions);
-    this.usage =
-      usageExample && format ? [await format(usageExample)] : this.usage;
+    const usageExample = this.#printUsage(printerOptions);
+    this.#usage =
+      usageExample && format ? [await format(usageExample)] : this.#usage;
 
     const output = this.print(printerOptions);
     return format ? format(output) : output;
