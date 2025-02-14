@@ -7,12 +7,9 @@
 - Publicly exposed interface `CustomHeaderSecurity` is renamed to `HeaderSecurity`;
 - The default value for `wrongMethodBehavior` config option is changed to `405`;
 - Minimum version of `compression` (optional peer dependency) is `1.8.0` (it supports Brotli);
-- The following public methods of `Endpoint` intended for internal usage became properties:
-  - `getDescription()` —> `description` and `shortDescription`;
-  - `getSchema()` —> `inputSchema` and `outputSchema`;
-  - `getMethods()` —> `methods`; `getTags()` —> `tags`; `getScopes()` —> `scopes`;
-  - `getSecurity()` —> `security`; `getRequestType()` —> `requestType`;
-- Similar changes to `Middleware`: `getSchema()` –> `schema`, `getSecurity()` —> `security`.
+- The following methods of `Endpoint` became undisclosed internal properties (removed):
+  - `getDescription(), getSchema(), getMethods(), getTags(), getScopes(), getSecurity(), getRequestType()`;
+- Similar changes to `Middleware` (removed): `getSchema(), getSecurity()`.
 
 ## Version 22
 

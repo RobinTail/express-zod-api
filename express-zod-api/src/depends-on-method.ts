@@ -11,7 +11,10 @@ export class DependsOnMethod extends Routable {
     this.#endpoints = endpoints;
   }
 
-  /** @desc [method, endpoint, siblingMethods] */
+  /**
+   * @desc [method, endpoint, siblingMethods]
+   * @internal
+   * */
   public get entries(): ReadonlyArray<[Method, AbstractEndpoint, Method[]]> {
     const entries: Array<(typeof this.entries)[number]> = [];
     const methods = keys(this.#endpoints); // eslint-disable-line no-restricted-syntax -- literal type required
