@@ -5,6 +5,7 @@ import { hasCoercion, tryToTransform } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand, FileSchema } from "./file-schema";
+import { metaSymbol } from "./metadata";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand, RawSchema } from "./raw-schema";
 import { HandlingRules, walkSchema } from "./schema-walker";
@@ -52,13 +53,15 @@ const onObject: Producer = (
   },
 ) => {
   const members = Object.entries(shape).map<ts.TypeElement>(([key, value]) => {
+    const { description: comment, _def } = value as z.ZodType;
     const isOptional =
       isResponse && hasCoercion(value)
         ? value instanceof z.ZodOptional
         : value.isOptional();
     return makeInterfaceProp(key, next(value), {
+      comment,
       isOptional: isOptional && hasQuestionMark,
-      comment: value.description,
+      isDeprecated: _def[metaSymbol]?.isDeprecated,
     });
   });
   return f.createTypeLiteralNode(members);

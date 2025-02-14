@@ -6,7 +6,6 @@
     "example",
     "cjs-test",
     "esm-test",
-    "compat-test",
     "issue952-test"
   ],
   "scripts": {
@@ -20,7 +19,6 @@
     "test:cjs": "yarn workspace cjs-test test",
     "test:esm": "yarn workspace esm-test test",
     "test:952": "yarn workspace issue952-test test",
-    "test:compat": "yarn workspace compat-test test",
     "bench": "yarn workspace express-zod-api bench",
     "lint": "eslint && prettier *.md --check",
     "mdfix": "prettier *.md --write",

@@ -334,12 +334,14 @@ describe("EndpointsFactory", () => {
       const factory = new EndpointsFactory(resultHandlerMock);
       const endpoint = factory.build({
         method: "get",
+        deprecated: true,
         output: z.object({}),
         handler: vi.fn(),
       });
       expectTypeOf(
         endpoint.getSchema("input")._output,
       ).toEqualTypeOf<EmptyObject>();
+      expect(endpoint.isDeprecated).toBe(true);
     });
   });
 

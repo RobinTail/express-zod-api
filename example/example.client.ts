@@ -267,6 +267,7 @@ interface PostV1AvatarRawNegativeResponseVariants {
 
 /** get /v1/events/stream */
 type GetV1EventsStreamInput = {
+  /** @deprecated for testing error response */
   trigger?: string | undefined;
 };
 
@@ -311,6 +312,7 @@ export interface Input {
   "patch /v1/user/:id": PatchV1UserIdInput;
   "post /v1/user/create": PostV1UserCreateInput;
   "get /v1/user/list": GetV1UserListInput;
+  /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendInput;
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
@@ -324,6 +326,7 @@ export interface PositiveResponse {
   "patch /v1/user/:id": SomeOf<PatchV1UserIdPositiveResponseVariants>;
   "post /v1/user/create": SomeOf<PostV1UserCreatePositiveResponseVariants>;
   "get /v1/user/list": SomeOf<GetV1UserListPositiveResponseVariants>;
+  /** @deprecated */
   "get /v1/avatar/send": SomeOf<GetV1AvatarSendPositiveResponseVariants>;
   "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamPositiveResponseVariants>;
   "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadPositiveResponseVariants>;
@@ -337,6 +340,7 @@ export interface NegativeResponse {
   "patch /v1/user/:id": SomeOf<PatchV1UserIdNegativeResponseVariants>;
   "post /v1/user/create": SomeOf<PostV1UserCreateNegativeResponseVariants>;
   "get /v1/user/list": SomeOf<GetV1UserListNegativeResponseVariants>;
+  /** @deprecated */
   "get /v1/avatar/send": SomeOf<GetV1AvatarSendNegativeResponseVariants>;
   "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamNegativeResponseVariants>;
   "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadNegativeResponseVariants>;
@@ -355,6 +359,7 @@ export interface EncodedResponse {
     PostV1UserCreateNegativeResponseVariants;
   "get /v1/user/list": GetV1UserListPositiveResponseVariants &
     GetV1UserListNegativeResponseVariants;
+  /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendPositiveResponseVariants &
     GetV1AvatarSendNegativeResponseVariants;
   "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponseVariants &
@@ -383,6 +388,7 @@ export interface Response {
   "get /v1/user/list":
     | PositiveResponse["get /v1/user/list"]
     | NegativeResponse["get /v1/user/list"];
+  /** @deprecated */
   "get /v1/avatar/send":
     | PositiveResponse["get /v1/avatar/send"]
     | NegativeResponse["get /v1/avatar/send"];

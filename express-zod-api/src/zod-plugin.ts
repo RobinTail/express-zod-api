@@ -2,7 +2,7 @@
  * @fileoverview Zod Runtime Plugin
  * @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31
  * @desc This code modifies and extends zod's functionality immediately when importing express-zod-api
- * @desc Enables .example() on all schemas (ZodType)
+ * @desc Enables .example() and .deprecated() on all schemas (ZodType)
  * @desc Enables .label() on ZodDefault
  * @desc Enables .remap() on ZodObject
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
@@ -20,6 +20,7 @@ declare module "zod" {
   interface ZodType {
     /** @desc Add an example value (before any transformations, can be called multiple times) */
     example(example: this["_input"]): this;
+    deprecated(): this;
   }
   interface ZodDefault<T extends z.ZodTypeAny> {
     /** @desc Change the default value in the generated Documentation to a label */
@@ -50,6 +51,12 @@ const exampleSetter = function (
 ) {
   const copy = cloneSchema(this);
   copy._def[metaSymbol]!.examples.push(value);
+  return copy;
+};
+
+const deprecationSetter = function (this: z.ZodType) {
+  const copy = cloneSchema(this);
+  copy._def[metaSymbol]!.isDeprecated = true;
   return copy;
 };
 
@@ -97,6 +104,11 @@ if (!(metaSymbol in globalThis)) {
     ["example" satisfies keyof z.ZodType]: {
       get(): z.ZodType["example"] {
         return exampleSetter.bind(this);
+      },
+    },
+    ["deprecated" satisfies keyof z.ZodType]: {
+      get(): z.ZodType["deprecated"] {
+        return deprecationSetter.bind(this);
       },
     },
     ["brand" satisfies keyof z.ZodType]: {

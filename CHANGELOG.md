@@ -2,6 +2,34 @@
 
 ## Version 22
 
+### v22.9.0
+
+- Featuring Deprecations:
+  - You can deprecate all usage of an `Endpoint` using `EndpointsFactory::build({ deprecated: true })`;
+  - You can deprecate a route using the assigned `Endpoint::deprecated()` or `DependsOnMethod::deprecated()`;
+  - You can deprecate a schema using `ZodType::deprecated()`;
+  - All `.deprecated()` methods are immutable — they create a new copy of the subject;
+  - Deprecated schemas and endpoints are reflected in the generated `Documentation` and `Integration`;
+  - The feature suggested by [@mlms13](https://github.com/mlms13).
+
+```ts
+import { Routing, DependsOnMethod } from "express-zod-api";
+import { z } from "zod";
+
+const someEndpoint = factory.build({
+  deprecated: true, // deprecates all routes the endpoint assigned to
+  input: z.object({
+    prop: z.string().deprecated(), // deprecates the property or a path parameter
+  }),
+});
+
+const routing: Routing = {
+  v1: oldEndpoint.deprecated(), // deprecates the /v1 path
+  v2: new DependsOnMethod({ get: oldEndpoint }).deprecated(), // deprecates the /v2 path
+  v3: someEndpoint, // the path is assigned with initially deprecated endpoint (also deprecated)
+};
+```
+
 ### v22.8.0
 
 - Feature: warning about the endpoint input scheme ignoring the parameters of the route to which it is assigned:

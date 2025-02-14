@@ -389,6 +389,7 @@ paths:
     get:
       operationId: GetV1AvatarSend
       summary: Sends a file content.
+      deprecated: true
       tags:
         - files
         - users
@@ -595,10 +596,13 @@ paths:
       parameters:
         - name: trigger
           in: query
+          deprecated: true
           required: false
-          description: GET /v1/events/stream Parameter
+          description: for testing error response
           schema:
             type: string
+            description: for testing error response
+            deprecated: true
       responses:
         "200":
           description: GET /v1/events/stream Positive response

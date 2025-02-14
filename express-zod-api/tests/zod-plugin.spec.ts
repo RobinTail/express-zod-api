@@ -49,6 +49,23 @@ describe("Zod Runtime Plugin", () => {
     });
   });
 
+  describe(".deprecated()", () => {
+    test("should be present", () => {
+      const schema = z.string();
+      expect(schema).toHaveProperty("deprecated");
+      expect(typeof schema.deprecated).toBe("function");
+    });
+
+    test("should set the corresponding metadata in the schema definition", () => {
+      const schema = z.string();
+      const schemaWithMeta = schema.deprecated();
+      expect(schemaWithMeta._def[metaSymbol]).toHaveProperty(
+        "isDeprecated",
+        true,
+      );
+    });
+  });
+
   describe(".label()", () => {
     test("should set the corresponding metadata in the schema definition", () => {
       const schema = z

@@ -1,21 +1,34 @@
 import { keys, reject, equals } from "ramda";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
-import { Nesting } from "./nesting";
+import { Routable } from "./routable";
 
-export class DependsOnMethod extends Nesting {
-  /** @desc [method, endpoint, siblingMethods] */
-  public readonly entries: ReadonlyArray<[Method, AbstractEndpoint, Method[]]>;
+export class DependsOnMethod extends Routable {
+  readonly #endpoints: ConstructorParameters<typeof DependsOnMethod>[0];
 
   constructor(endpoints: Partial<Record<Method, AbstractEndpoint>>) {
     super();
+    this.#endpoints = endpoints;
+  }
+
+  /** @desc [method, endpoint, siblingMethods] */
+  public get entries(): ReadonlyArray<[Method, AbstractEndpoint, Method[]]> {
     const entries: Array<(typeof this.entries)[number]> = [];
-    const methods = keys(endpoints); // eslint-disable-line no-restricted-syntax -- liternal type required
+    const methods = keys(this.#endpoints); // eslint-disable-line no-restricted-syntax -- literal type required
     for (const method of methods) {
-      const endpoint = endpoints[method];
+      const endpoint = this.#endpoints[method];
       if (endpoint)
         entries.push([method, endpoint, reject(equals(method), methods)]);
     }
-    this.entries = Object.freeze(entries);
+    return Object.freeze(entries);
+  }
+
+  public override deprecated() {
+    const deprecatedEndpoints = Object.entries(this.#endpoints).reduce(
+      (agg, [method, endpoint]) =>
+        Object.assign(agg, { [method]: endpoint.deprecated() }),
+      {} as ConstructorParameters<typeof DependsOnMethod>[0],
+    );
+    return new DependsOnMethod(deprecatedEndpoints) as this;
   }
 }

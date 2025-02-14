@@ -21,7 +21,7 @@ import { LogicalContainer } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
-import { Nesting } from "./nesting";
+import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
 
@@ -34,7 +34,8 @@ export type Handler<IN, OUT, OPT> = (params: {
 type DescriptionVariant = "short" | "long";
 type IOVariant = "input" | "output";
 
-export abstract class AbstractEndpoint extends Nesting {
+// @todo consider getters in v23
+export abstract class AbstractEndpoint extends Routable {
   public abstract execute(params: {
     request: Request;
     response: Response;
@@ -54,6 +55,7 @@ export abstract class AbstractEndpoint extends Nesting {
   public abstract getTags(): ReadonlyArray<string>;
   public abstract getOperationId(method: Method): string | undefined;
   public abstract getRequestType(): ContentType;
+  public abstract get isDeprecated(): boolean;
 }
 
 export class Endpoint<
@@ -61,34 +63,10 @@ export class Endpoint<
   OUT extends IOSchema,
   OPT extends FlatObject,
 > extends AbstractEndpoint {
-  readonly #descriptions: Record<DescriptionVariant, string | undefined>;
-  readonly #methods?: ReadonlyArray<Method>;
-  readonly #middlewares: AbstractMiddleware[];
-  readonly #responses: Record<
-    ResponseVariant,
-    ReadonlyArray<NormalizedResponse>
-  >;
-  readonly #handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
-  readonly #resultHandler: AbstractResultHandler;
-  readonly #schemas: { input: IN; output: OUT };
-  readonly #scopes: ReadonlyArray<string>;
-  readonly #tags: ReadonlyArray<string>;
-  readonly #getOperationId: (method: Method) => string | undefined;
-  readonly #requestType: ContentType;
+  readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0];
 
-  constructor({
-    methods,
-    inputSchema,
-    outputSchema,
-    handler,
-    resultHandler,
-    getOperationId = () => undefined,
-    scopes = [],
-    middlewares = [],
-    tags = [],
-    description: long,
-    shortDescription: short,
-  }: {
+  constructor(def: {
+    deprecated?: boolean;
     middlewares?: AbstractMiddleware[];
     inputSchema: IN;
     outputSchema: OUT;
@@ -102,69 +80,74 @@ export class Endpoint<
     tags?: string[];
   }) {
     super();
-    this.#handler = handler;
-    this.#resultHandler = resultHandler;
-    this.#middlewares = middlewares;
-    this.#getOperationId = getOperationId;
-    this.#methods = Object.freeze(methods);
-    this.#scopes = Object.freeze(scopes);
-    this.#tags = Object.freeze(tags);
-    this.#descriptions = { long, short };
-    this.#schemas = { input: inputSchema, output: outputSchema };
-    this.#responses = {
-      positive: Object.freeze(resultHandler.getPositiveResponse(outputSchema)),
-      negative: Object.freeze(resultHandler.getNegativeResponse()),
-    };
-    this.#requestType = hasUpload(inputSchema)
-      ? "upload"
-      : hasRaw(inputSchema)
-        ? "raw"
-        : "json";
+    this.#def = def;
+  }
+
+  #clone(
+    inc?: Partial<ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0]>,
+  ) {
+    return new Endpoint({ ...this.#def, ...inc });
+  }
+
+  public override deprecated() {
+    return this.#clone({ deprecated: true }) as this;
+  }
+
+  public override get isDeprecated(): boolean {
+    return this.#def.deprecated || false;
   }
 
   public override getDescription(variant: DescriptionVariant) {
-    return this.#descriptions[variant];
+    return this.#def[variant === "short" ? "shortDescription" : "description"];
   }
 
   public override getMethods() {
-    return this.#methods;
+    return Object.freeze(this.#def.methods);
   }
 
   public override getSchema(variant: "input"): IN;
   public override getSchema(variant: "output"): OUT;
   public override getSchema(variant: IOVariant) {
-    return this.#schemas[variant];
+    return this.#def[variant === "output" ? "outputSchema" : "inputSchema"];
   }
 
   public override getRequestType() {
-    return this.#requestType;
+    return hasUpload(this.#def.inputSchema)
+      ? "upload"
+      : hasRaw(this.#def.inputSchema)
+        ? "raw"
+        : "json";
   }
 
   public override getResponses(variant: ResponseVariant) {
-    return this.#responses[variant];
+    return Object.freeze(
+      variant === "negative"
+        ? this.#def.resultHandler.getNegativeResponse()
+        : this.#def.resultHandler.getPositiveResponse(this.#def.outputSchema),
+    );
   }
 
   public override getSecurity() {
-    return this.#middlewares
+    return (this.#def.middlewares || [])
       .map((middleware) => middleware.getSecurity())
       .filter((entry) => entry !== undefined);
   }
 
   public override getScopes() {
-    return this.#scopes;
+    return Object.freeze(this.#def.scopes || []);
   }
 
   public override getTags() {
-    return this.#tags;
+    return Object.freeze(this.#def.tags || []);
   }
 
   public override getOperationId(method: Method): string | undefined {
-    return this.#getOperationId(method);
+    return this.#def.getOperationId?.(method);
   }
 
   async #parseOutput(output: z.input<OUT>) {
     try {
-      return (await this.#schemas.output.parseAsync(output)) as FlatObject;
+      return (await this.#def.outputSchema.parseAsync(output)) as FlatObject;
     } catch (e) {
       throw e instanceof z.ZodError ? new OutputValidationError(e) : e;
     }
@@ -184,7 +167,7 @@ export class Endpoint<
     logger: ActualLogger;
     options: Partial<OPT>;
   }) {
-    for (const mw of this.#middlewares) {
+    for (const mw of this.#def.middlewares || []) {
       if (method === "options" && !(mw instanceof ExpressMiddleware)) continue;
       Object.assign(
         options,
@@ -210,13 +193,13 @@ export class Endpoint<
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
-      finalInput = (await this.#schemas.input.parseAsync(
+      finalInput = (await this.#def.inputSchema.parseAsync(
         input,
       )) as z.output<IN>;
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
-    return this.#handler({ ...rest, input: finalInput });
+    return this.#def.handler({ ...rest, input: finalInput });
   }
 
   async #handleResult({
@@ -232,7 +215,7 @@ export class Endpoint<
     options: Partial<OPT>;
   }) {
     try {
-      await this.#resultHandler.execute({ ...rest, error });
+      await this.#def.resultHandler.execute({ ...rest, error });
     } catch (e) {
       lastResortHandler({
         ...rest,
