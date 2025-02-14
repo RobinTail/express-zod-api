@@ -39,19 +39,31 @@ export abstract class AbstractEndpoint extends Routable {
     logger: ActualLogger;
     config: CommonConfig;
   }): Promise<void>;
+  /** @internal */
   public abstract getResponses(
     variant: ResponseVariant,
   ): ReadonlyArray<NormalizedResponse>;
+  /** @internal */
   public abstract getOperationId(method: Method): string | undefined;
+  /** @internal */
   public abstract get description(): string | undefined;
+  /** @internal */
   public abstract get shortDescription(): string | undefined;
+  /** @internal */
   public abstract get methods(): ReadonlyArray<Method> | undefined;
+  /** @internal */
   public abstract get inputSchema(): IOSchema;
+  /** @internal */
   public abstract get outputSchema(): IOSchema;
+  /** @internal */
   public abstract get security(): LogicalContainer<Security>[];
+  /** @internal */
   public abstract get scopes(): ReadonlyArray<string>;
+  /** @internal */
   public abstract get tags(): ReadonlyArray<string>;
+  /** @internal */
   public abstract get requestType(): ContentType;
+  /** @internal */
   public abstract get isDeprecated(): boolean;
 }
 
@@ -90,30 +102,37 @@ export class Endpoint<
     return this.#clone({ deprecated: true }) as this;
   }
 
+  /** @internal */
   public override get isDeprecated(): boolean {
     return this.#def.deprecated || false;
   }
 
+  /** @internal */
   public override get description() {
     return this.#def.description;
   }
 
+  /** @internal */
   public override get shortDescription() {
     return this.#def.shortDescription;
   }
 
+  /** @internal */
   public override get methods() {
     return Object.freeze(this.#def.methods);
   }
 
+  /** @internal */
   public override get inputSchema(): IN {
     return this.#def.inputSchema;
   }
 
+  /** @internal */
   public override get outputSchema(): OUT {
     return this.#def.outputSchema;
   }
 
+  /** @internal */
   public override get requestType() {
     return hasUpload(this.#def.inputSchema)
       ? "upload"
@@ -122,6 +141,7 @@ export class Endpoint<
         : "json";
   }
 
+  /** @internal */
   public override getResponses(variant: ResponseVariant) {
     return Object.freeze(
       variant === "negative"
@@ -130,19 +150,23 @@ export class Endpoint<
     );
   }
 
+  /** @internal */
   public override get security() {
     const entries = pluck("security", this.#def.middlewares || []);
     return reject(isNil, entries);
   }
 
+  /** @internal */
   public override get scopes() {
     return Object.freeze(this.#def.scopes || []);
   }
 
+  /** @internal */
   public override get tags() {
     return Object.freeze(this.#def.tags || []);
   }
 
+  /** @internal */
   public override getOperationId(method: Method): string | undefined {
     return this.#def.getOperationId?.(method);
   }
