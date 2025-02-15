@@ -276,14 +276,14 @@ export const depictObject: Depicter = (
   schema: z.ZodObject<z.ZodRawShape>,
   { isResponse, next },
 ) => {
-  const keys = Object.keys(schema.shape);
+  const props = Object.keys(schema.shape);
   const isOptionalProp = (prop: z.ZodTypeAny) =>
     isResponse && hasCoercion(prop)
       ? prop instanceof z.ZodOptional
       : prop.isOptional();
-  const required = keys.filter((key) => !isOptionalProp(schema.shape[key]));
+  const required = props.filter((key) => !isOptionalProp(schema.shape[key]));
   const result: SchemaObject = { type: "object" };
-  if (keys.length) result.properties = depictObjectProperties(schema, next);
+  if (props.length) result.properties = depictObjectProperties(schema, next);
   if (required.length) result.required = required;
   return result;
 };
@@ -350,14 +350,14 @@ export const depictRecord: Depicter = (
   { next },
 ) => {
   if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
-    const keys = Object.values(keySchema.enum) as string[];
+    const props = Object.values(keySchema.enum) as string[];
     const result: SchemaObject = { type: "object" };
-    if (keys.length) {
+    if (props.length) {
       result.properties = depictObjectProperties(
-        z.object(fromPairs(xprod(keys, [valueSchema]))),
+        z.object(fromPairs(xprod(props, [valueSchema]))),
         next,
       );
-      result.required = keys;
+      result.required = props;
     }
     return result;
   }
