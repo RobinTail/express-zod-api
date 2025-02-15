@@ -7,7 +7,7 @@ import {
   SecuritySchemeObject,
   SecuritySchemeType,
 } from "openapi3-ts/oas31";
-import { pluck } from "ramda";
+import * as R from "ramda";
 import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
@@ -226,7 +226,7 @@ export class Documentation extends OpenApiBuilder {
       const requestBody = inputSources.includes("body")
         ? depictBody({
             ...commons,
-            paramNames: pluck("name", depictedParams),
+            paramNames: R.pluck("name", depictedParams),
             schema: endpoint.getSchema("input"),
             mimeType: contentTypes[endpoint.getRequestType()],
             description: descriptions?.requestBody?.call(null, {
