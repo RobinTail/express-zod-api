@@ -1,7 +1,7 @@
 import { chain, eqBy, path, prop, tryCatch, uniqWith } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { hasCoercion, getTransformationType } from "./common-helpers";
+import { hasCoercion, getTransformedType } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand, FileSchema } from "./file-schema";
@@ -98,7 +98,7 @@ const onEffects: Producer = (
 ) => {
   const input = next(schema.innerType());
   if (isResponse && schema._def.effect.type === "transform") {
-    const outputType = getTransformationType(schema, makeSample(input));
+    const outputType = getTransformedType(schema, makeSample(input));
     const resolutions: Partial<
       Record<NonNullable<typeof outputType>, ts.KeywordTypeSyntaxKind>
     > = {
