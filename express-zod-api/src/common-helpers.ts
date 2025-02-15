@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { chain, memoizeWith, objOf, xprod } from "ramda";
+import { always, chain, memoizeWith, objOf, tryCatch, xprod } from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -163,16 +163,11 @@ export const makeCleanId = (...args: string[]) => {
   return byWord.map(ucFirst).join("");
 };
 
-export const tryToTransform = <T>(
-  schema: z.ZodEffects<z.ZodTypeAny, T>,
-  sample: T,
-) => {
-  try {
-    return typeof schema.parse(sample);
-  } catch {
-    return undefined;
-  }
-};
+export const tryToTransform = tryCatch(
+  <T>(schema: z.ZodEffects<z.ZodTypeAny, unknown, T>, sample: T) =>
+    typeof schema.parse(sample),
+  always(undefined),
+);
 
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
 export const isObject = (subject: unknown) =>
