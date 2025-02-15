@@ -153,8 +153,7 @@ const onRecord: Producer = (
 /** @throws Error */
 const intersect = tryCatch(
   (nodes: ts.TypeNode[]) => {
-    const areObjects = nodes.every(ts.isTypeLiteralNode);
-    if (!areObjects) throw new Error("Not objects");
+    if (!nodes.every(ts.isTypeLiteralNode)) throw new Error("Not objects");
     const members = chain(prop("members"), nodes);
     const uniqs = uniqWith((...props) => {
       if (!eqBy(nodePath.name, ...props)) return false;
