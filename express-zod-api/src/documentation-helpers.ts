@@ -195,10 +195,7 @@ const approaches = {
   examples: ({ examples: left = [] }, { examples: right = [] }) =>
     combinations(left, right, ([a, b]) => mergeDeepRight(a, b)),
 } satisfies {
-  [K in keyof SchemaObject]: (
-    left: SchemaObject,
-    right: SchemaObject,
-  ) => SchemaObject[K];
+  [K in keyof SchemaObject]: (...subj: SchemaObject[]) => SchemaObject[K];
 };
 const canMerge = pipe(without(Object.keys(approaches)), isEmpty);
 
