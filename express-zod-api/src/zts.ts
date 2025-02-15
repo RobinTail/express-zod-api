@@ -156,10 +156,7 @@ const intersect = R.tryCatch(
     const members = R.chain(R.prop("members"), nodes);
     const uniqs = R.uniqWith((...props) => {
       if (!R.eqBy(nodePath.name, ...props)) return false;
-      if (
-        R.eqBy(nodePath.type, ...props) &&
-        R.eqBy(nodePath.optional, ...props)
-      )
+      if (R.both(R.eqBy(nodePath.type), R.eqBy(nodePath.optional))(...props))
         return true;
       throw new Error("Has conflicting prop");
     }, members);
