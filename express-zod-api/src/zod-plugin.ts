@@ -7,7 +7,7 @@
  * @desc Enables .remap() on ZodObject
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
-import { clone, fromPairs, map, pipe, toPairs, pair } from "ramda";
+import * as R from "ramda";
 import { z } from "zod";
 import { FlatObject } from "./common-helpers";
 import { cloneSchema, Metadata, metaSymbol } from "./metadata";
@@ -75,7 +75,7 @@ const brandSetter = function (
     type: this,
     description: this._def.description,
     errorMap: this._def.errorMap,
-    [metaSymbol]: { examples: [], ...clone(this._def[metaSymbol]), brand },
+    [metaSymbol]: { examples: [], ...R.clone(this._def[metaSymbol]), brand },
   });
 };
 
@@ -88,12 +88,12 @@ const objectMapper = function (
   const transformer =
     typeof tool === "function"
       ? tool
-      : pipe(
-          toPairs, // eslint-disable-line no-restricted-syntax -- strict key type required
-          map(([key, value]) => pair(tool[String(key)] || key, value)),
-          fromPairs,
+      : R.pipe(
+          R.toPairs, // eslint-disable-line no-restricted-syntax -- strict key type required
+          R.map(([key, value]) => R.pair(tool[String(key)] || key, value)),
+          R.fromPairs,
         );
-  const nextShape = transformer(clone(this.shape)); // immutable
+  const nextShape = transformer(R.clone(this.shape)); // immutable
   const output = z.object(nextShape)[this._def.unknownKeys](); // proxies unknown keys when set to "passthrough"
   return this.transform(transformer).pipe(output);
 };

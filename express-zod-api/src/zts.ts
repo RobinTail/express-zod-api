@@ -1,4 +1,4 @@
-import { chain, eqBy, path, prop, tryCatch, uniqWith } from "ramda";
+import * as R from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { hasCoercion, getTransformedType } from "./common-helpers";
@@ -30,15 +30,15 @@ const samples = {
 } satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
 
 const nodePath = {
-  name: path([
+  name: R.path([
     "name" satisfies keyof ts.TypeElement,
     "text" satisfies keyof Exclude<
       NonNullable<ts.TypeElement["name"]>,
       ts.ComputedPropertyName
     >,
   ]),
-  type: path(["type" satisfies keyof ts.PropertySignature]),
-  optional: path(["questionToken" satisfies keyof ts.TypeElement]),
+  type: R.path(["type" satisfies keyof ts.PropertySignature]),
+  optional: R.path(["questionToken" satisfies keyof ts.TypeElement]),
 };
 
 const onLiteral: Producer = ({ value }: z.ZodLiteral<LiteralType>) =>
@@ -150,13 +150,16 @@ const onRecord: Producer = (
   { next },
 ) => ensureTypeNode("Record", [keySchema, valueSchema].map(next));
 
-const intersect = tryCatch(
+const intersect = R.tryCatch(
   (nodes: ts.TypeNode[]) => {
     if (!nodes.every(ts.isTypeLiteralNode)) throw new Error("Not objects");
-    const members = chain(prop("members"), nodes);
-    const uniqs = uniqWith((...props) => {
-      if (!eqBy(nodePath.name, ...props)) return false;
-      if (eqBy(nodePath.type, ...props) && eqBy(nodePath.optional, ...props))
+    const members = R.chain(R.prop("members"), nodes);
+    const uniqs = R.uniqWith((...props) => {
+      if (!R.eqBy(nodePath.name, ...props)) return false;
+      if (
+        R.eqBy(nodePath.type, ...props) &&
+        R.eqBy(nodePath.optional, ...props)
+      )
         return true;
       throw new Error("Has conflicting prop");
     }, members);

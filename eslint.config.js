@@ -23,12 +23,19 @@ const performanceConcerns = [
     message: "Reading process.env is slow and must be memoized",
   },
   {
-    selector: "CallExpression > Identifier[name='toPairs']", // #2168
+    selector:
+      "ImportDeclaration[source.value='ramda'] > ImportSpecifier, " +
+      "ImportDeclaration[source.value='ramda'] > ImportDefaultSpecifier",
+    message: "use import * as R from 'ramda'",
+  },
+  {
+    selector: "MemberExpression[object.name='R'] > Identifier[name='toPairs']", // #2168
     message: "R.toPairs() is 1.1x slower than Object.entries()",
   },
   {
     selector:
-      "CallExpression[callee.name='keys'], CallExpression[callee.name='keysIn']", // #2168
+      "MemberExpression[object.name='R'] > Identifier[name='keys'], " +
+      "MemberExpression[object.name='R'] > Identifier[name='keysIn']", // #2168
     message: "R.keys() and keysIn() are 1.2x slower than Object.keys()",
   },
   {
