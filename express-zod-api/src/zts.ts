@@ -1,7 +1,7 @@
-import { chain, eqBy, path, prop, uniqWith } from "ramda";
+import { chain, eqBy, path, prop, tryCatch, uniqWith } from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { hasCoercion, tryToTransform } from "./common-helpers";
+import { hasCoercion, getTransformedType } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand, FileSchema } from "./file-schema";
@@ -98,7 +98,7 @@ const onEffects: Producer = (
 ) => {
   const input = next(schema.innerType());
   if (isResponse && schema._def.effect.type === "transform") {
-    const outputType = tryToTransform(schema, makeSample(input));
+    const outputType = getTransformedType(schema, makeSample(input));
     const resolutions: Partial<
       Record<NonNullable<typeof outputType>, ts.KeywordTypeSyntaxKind>
     > = {
@@ -150,30 +150,25 @@ const onRecord: Producer = (
   { next },
 ) => ensureTypeNode("Record", [keySchema, valueSchema].map(next));
 
-/** @throws Error */
-const tryFlattenIntersection = (nodes: ts.TypeNode[]) => {
-  const areObjects = nodes.every(ts.isTypeLiteralNode);
-  if (!areObjects) throw new Error("Not objects");
-  const members = chain(prop("members"), nodes);
-  const uniqs = uniqWith((...props) => {
-    if (!eqBy(nodePath.name, ...props)) return false;
-    if (eqBy(nodePath.type, ...props) && eqBy(nodePath.optional, ...props))
-      return true;
-    throw new Error("Has conflicting prop");
-  }, members);
-  return f.createTypeLiteralNode(uniqs);
-};
+const intersect = tryCatch(
+  (nodes: ts.TypeNode[]) => {
+    if (!nodes.every(ts.isTypeLiteralNode)) throw new Error("Not objects");
+    const members = chain(prop("members"), nodes);
+    const uniqs = uniqWith((...props) => {
+      if (!eqBy(nodePath.name, ...props)) return false;
+      if (eqBy(nodePath.type, ...props) && eqBy(nodePath.optional, ...props))
+        return true;
+      throw new Error("Has conflicting prop");
+    }, members);
+    return f.createTypeLiteralNode(uniqs);
+  },
+  (_err, nodes) => f.createIntersectionTypeNode(nodes),
+);
 
 const onIntersection: Producer = (
   { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
   { next },
-) => {
-  const nodes = [left, right].map(next);
-  try {
-    return tryFlattenIntersection(nodes);
-  } catch {}
-  return f.createIntersectionTypeNode(nodes);
-};
+) => intersect([left, right].map(next));
 
 const onDefault: Producer = ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
   next(_def.innerType);
