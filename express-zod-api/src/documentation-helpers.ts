@@ -197,15 +197,16 @@ const approaches = {
 } satisfies {
   [K in keyof SchemaObject]: (...subj: SchemaObject[]) => SchemaObject[K];
 };
-const canMerge = pipe(without(Object.keys(approaches)), isEmpty);
+const canMerge = ({ type, ...rest }: SchemaObject) =>
+  type === "object" &&
+  pipe(Object.keys, without(Object.keys(approaches)), isEmpty)(rest);
 
 const intersect = tryCatch(
   (children: Array<SchemaObject | ReferenceObject>) => {
-    const [left, right] = filter(
-      ({ type, ...rest }: SchemaObject) =>
-        type === "object" && canMerge(Object.keys(rest)),
-      filter(isSchemaObject, children),
-    );
+    const [left, right] = pipe(
+      filter(isSchemaObject),
+      filter(canMerge),
+    )(children);
     if (!left || !right) throw new Error("Can not flatten objects");
     return toPairs(approaches).reduce<SchemaObject>( // eslint-disable-line no-restricted-syntax -- need literal keys here
       (flat, [prop, fn]) => {
