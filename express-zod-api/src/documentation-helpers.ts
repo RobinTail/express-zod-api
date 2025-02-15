@@ -37,6 +37,8 @@ import {
   xprod,
   zip,
   tryCatch,
+  without,
+  isEmpty,
 } from "ramda";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
@@ -179,6 +181,7 @@ export const depictDiscriminatedUnion: Depicter = (
   };
 };
 
+const canMerge = pipe(without(["properties", "required", "examples"]), isEmpty);
 const propsMerger = (a: unknown, b: unknown) => {
   if (Array.isArray(a) && Array.isArray(b)) return concat(a, b);
   if (a === b) return b;
@@ -187,15 +190,11 @@ const propsMerger = (a: unknown, b: unknown) => {
 
 const intersect = tryCatch(
   (children: Array<SchemaObject | ReferenceObject>) => {
-    const [left, right] = children
-      .filter(isSchemaObject)
-      .filter(
-        (entry) =>
-          entry.type === "object" &&
-          Object.keys(entry).every((key) =>
-            ["type", "properties", "required", "examples"].includes(key),
-          ),
-      );
+    const [left, right] = filter(
+      ({ type, ...rest }: SchemaObject) =>
+        type === "object" && canMerge(Object.keys(rest)),
+      filter(isSchemaObject, children),
+    );
     if (!left || !right) throw new Error("Can not flatten objects");
     const flat: SchemaObject = { type: "object" };
     if (left.properties || right.properties) {
