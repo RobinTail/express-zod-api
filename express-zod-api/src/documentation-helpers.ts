@@ -40,6 +40,8 @@ import {
   without,
   isEmpty,
   toPairs,
+  both,
+  always,
 } from "ramda";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
@@ -188,6 +190,7 @@ const propsMerger = (a: unknown, b: unknown) => {
   throw new Error("Can not flatten properties");
 };
 const approaches = {
+  type: always("object"),
   properties: ({ properties: left = {} }, { properties: right = {} }) =>
     mergeDeepWith(propsMerger, left, right),
   required: ({ required: left = [] }, { required: right = [] }) =>
@@ -197,9 +200,10 @@ const approaches = {
 } satisfies {
   [K in keyof SchemaObject]: (...subj: SchemaObject[]) => SchemaObject[K];
 };
-const canMerge = ({ type, ...rest }: SchemaObject) =>
-  type === "object" &&
-  pipe(Object.keys, without(Object.keys(approaches)), isEmpty)(rest);
+const canMerge = both(
+  ({ type }: SchemaObject) => type === "object",
+  pipe(Object.keys, without(Object.keys(approaches)), isEmpty),
+);
 
 const intersect = tryCatch(
   (children: Array<SchemaObject | ReferenceObject>) => {
@@ -207,14 +211,11 @@ const intersect = tryCatch(
       filter(isSchemaObject),
       filter(canMerge),
     )(children);
-    if (!left || !right) throw new Error("Can not flatten objects");
-    return toPairs(approaches).reduce<SchemaObject>( // eslint-disable-line no-restricted-syntax -- need literal keys here
-      (flat, [prop, fn]) => {
-        if (left[prop] || right[prop]) flat[prop] = fn(left, right);
-        return flat;
-      },
-      { type: "object" },
-    );
+    if (!left || !right) throw new Error("Can not flatten objects"); // eslint-disable-next-line no-restricted-syntax
+    return toPairs(approaches).reduce<SchemaObject>((flat, [prop, fn]) => {
+      if (left[prop] || right[prop]) flat[prop] = fn(left, right);
+      return flat;
+    }, {});
   },
   (_err, allOf): SchemaObject => ({ allOf }),
 );
