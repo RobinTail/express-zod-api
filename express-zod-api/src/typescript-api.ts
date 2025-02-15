@@ -1,4 +1,4 @@
-import { isNil, map, pair, reject } from "ramda";
+import * as R from "ramda";
 import ts from "typescript";
 
 export type Typeable =
@@ -124,7 +124,7 @@ export const ensureTypeNode = (
   typeof subject === "number"
     ? f.createKeywordTypeNode(subject)
     : typeof subject === "string" || ts.isIdentifier(subject)
-      ? f.createTypeReferenceNode(subject, args && map(ensureTypeNode, args))
+      ? f.createTypeReferenceNode(subject, args && R.map(ensureTypeNode, args))
       : subject;
 
 // Record<string, any>
@@ -148,7 +148,7 @@ export const makeInterfaceProp = (
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     ensureTypeNode(value),
   );
-  const jsdoc = reject(isNil, [
+  const jsdoc = R.reject(R.isNil, [
     isDeprecated ? "@deprecated" : undefined,
     comment,
   ]);
@@ -191,7 +191,7 @@ export const makePublicLiteralType = (
   name: ts.Identifier | string,
   literals: string[],
 ) =>
-  makeType(name, f.createUnionTypeNode(map(makeLiteralType, literals)), {
+  makeType(name, f.createUnionTypeNode(R.map(makeLiteralType, literals)), {
     expose: true,
   });
 
@@ -287,7 +287,7 @@ export const makeTypeParams = (
       >,
 ) =>
   (Array.isArray(params)
-    ? params.map((name) => pair(name, undefined))
+    ? params.map((name) => R.pair(name, undefined))
     : Object.entries(params)
   ).map(([name, val]) => {
     const { type, init } =
@@ -310,7 +310,7 @@ export const makeArrowFn = (
   f.createArrowFunction(
     isAsync ? asyncModifier : undefined,
     undefined,
-    Array.isArray(params) ? map(makeParam, params) : makeParams(params),
+    Array.isArray(params) ? R.map(makeParam, params) : makeParams(params),
     undefined,
     undefined,
     body,
