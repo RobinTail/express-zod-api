@@ -1,4 +1,4 @@
-import { tryCatch } from "ramda";
+import * as R from "ramda";
 import type { ZodRawShape } from "zod";
 import { responseVariants } from "./api-response";
 import { FlatObject, getRoutePathParams } from "./common-helpers";
@@ -10,7 +10,7 @@ import { ActualLogger } from "./logger-helpers";
 
 export class Diagnostics {
   /** @desc (catcher)(...args) => bool | ReturnValue<typeof catcher> */
-  readonly #trier = tryCatch(assertJsonCompatible);
+  readonly #trier = R.tryCatch(assertJsonCompatible);
   #verifiedEndpoints = new WeakSet<AbstractEndpoint>();
   #verifiedPaths = new WeakMap<
     AbstractEndpoint,

@@ -1,6 +1,6 @@
 import { combinations } from "./common-helpers";
 import { z } from "zod";
-import { clone, mergeDeepRight } from "ramda";
+import * as R from "ramda";
 
 export const metaSymbol = Symbol.for("express-zod-api");
 
@@ -16,7 +16,7 @@ export interface Metadata {
 export const cloneSchema = <T extends z.ZodType>(schema: T) => {
   const copy = schema.describe(schema.description as string);
   copy._def[metaSymbol] = // clone for deep copy, issue #827
-    clone(copy._def[metaSymbol]) || ({ examples: [] } satisfies Metadata);
+    R.clone(copy._def[metaSymbol]) || ({ examples: [] } satisfies Metadata);
   return copy;
 };
 
@@ -31,7 +31,7 @@ export const copyMeta = <A extends z.ZodType, B extends z.ZodType>(
     src._def[metaSymbol]!.examples,
     ([destExample, srcExample]) =>
       typeof destExample === "object" && typeof srcExample === "object"
-        ? mergeDeepRight({ ...destExample }, { ...srcExample })
+        ? R.mergeDeepRight({ ...destExample }, { ...srcExample })
         : srcExample, // not supposed to be called on non-object schemas
   );
   return result;

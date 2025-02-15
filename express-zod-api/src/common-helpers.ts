@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { chain, memoizeWith, objOf, xprod } from "ramda";
+import * as R from "ramda";
 import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -87,7 +87,7 @@ export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
       const { _def } = schema as z.ZodType;
       return combinations(
         acc,
-        (_def[metaSymbol]?.examples || []).map(objOf(key)),
+        (_def[metaSymbol]?.examples || []).map(R.objOf(key)),
         ([left, right]) => ({ ...left, ...right }),
       );
     },
@@ -139,7 +139,7 @@ export const combinations = <T>(
   a: T[],
   b: T[],
   merge: (pair: [T, T]) => T,
-): T[] => (a.length && b.length ? xprod(a, b).map(merge) : a.concat(b));
+): T[] => (a.length && b.length ? R.xprod(a, b).map(merge) : a.concat(b));
 
 /**
  * @desc isNullable() and isOptional() validate the schema's input
@@ -154,8 +154,8 @@ export const ucFirst = (subject: string) =>
   subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
 
 export const makeCleanId = (...args: string[]) => {
-  const byAlpha = chain((entry) => entry.split(/[^A-Z0-9]/gi), args);
-  const byWord = chain(
+  const byAlpha = R.chain((entry) => entry.split(/[^A-Z0-9]/gi), args);
+  const byWord = R.chain(
     (entry) =>
       entry.replaceAll(/[A-Z]+/g, (beginning) => `/${beginning}`).split("/"),
     byAlpha,
@@ -163,22 +163,17 @@ export const makeCleanId = (...args: string[]) => {
   return byWord.map(ucFirst).join("");
 };
 
-export const tryToTransform = <T>(
-  schema: z.ZodEffects<z.ZodTypeAny, T>,
-  sample: T,
-) => {
-  try {
-    return typeof schema.parse(sample);
-  } catch {
-    return undefined;
-  }
-};
+export const getTransformedType = R.tryCatch(
+  <T>(schema: z.ZodEffects<z.ZodTypeAny, unknown, T>, sample: T) =>
+    typeof schema.parse(sample),
+  R.always(undefined),
+);
 
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
 export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
 
-export const isProduction = memoizeWith(
+export const isProduction = R.memoizeWith(
   () => process.env.TSUP_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSUP
   () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
 );

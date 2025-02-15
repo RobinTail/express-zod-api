@@ -14,29 +14,7 @@ import {
   isReferenceObject,
   isSchemaObject,
 } from "openapi3-ts/oas31";
-import {
-  concat,
-  chain,
-  type as detectType,
-  filter,
-  fromPairs,
-  has,
-  isNil,
-  map,
-  mergeDeepRight,
-  mergeDeepWith,
-  objOf,
-  omit,
-  pipe,
-  pluck,
-  reject,
-  times,
-  toLower,
-  union,
-  when,
-  xprod,
-  zip,
-} from "ramda";
+import * as R from "ramda";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
@@ -47,7 +25,7 @@ import {
   hasCoercion,
   makeCleanId,
   routePathParamsRegex,
-  tryToTransform,
+  getTransformedType,
   ucFirst,
   Tag,
 } from "./common-helpers";
@@ -179,55 +157,49 @@ export const depictDiscriminatedUnion: Depicter = (
 };
 
 const propsMerger = (a: unknown, b: unknown) => {
-  if (Array.isArray(a) && Array.isArray(b)) return concat(a, b);
+  if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
   if (a === b) return b;
   throw new Error("Can not flatten properties");
 };
 
-/** @throws Error */
-const tryFlattenIntersection = (
-  children: Array<SchemaObject | ReferenceObject>,
-) => {
-  const [left, right] = children
-    .filter(isSchemaObject)
-    .filter(
-      (entry) =>
-        entry.type === "object" &&
-        Object.keys(entry).every((key) =>
-          ["type", "properties", "required", "examples"].includes(key),
-        ),
-    );
-  if (!left || !right) throw new Error("Can not flatten objects");
-  const flat: SchemaObject = { type: "object" };
-  if (left.properties || right.properties) {
-    flat.properties = mergeDeepWith(
-      propsMerger,
-      left.properties || {},
-      right.properties || {},
-    );
-  }
-  if (left.required || right.required)
-    flat.required = union(left.required || [], right.required || []);
-  if (left.examples || right.examples) {
-    flat.examples = combinations(
-      left.examples || [],
-      right.examples || [],
-      ([a, b]) => mergeDeepRight(a, b),
-    );
-  }
-  return flat;
-};
+const intersect = R.tryCatch(
+  (children: Array<SchemaObject | ReferenceObject>) => {
+    const [left, right] = children
+      .filter(isSchemaObject)
+      .filter(
+        (entry) =>
+          entry.type === "object" &&
+          Object.keys(entry).every((key) =>
+            ["type", "properties", "required", "examples"].includes(key),
+          ),
+      );
+    if (!left || !right) throw new Error("Can not flatten objects");
+    const flat: SchemaObject = { type: "object" };
+    if (left.properties || right.properties) {
+      flat.properties = R.mergeDeepWith(
+        propsMerger,
+        left.properties || {},
+        right.properties || {},
+      );
+    }
+    if (left.required || right.required)
+      flat.required = R.union(left.required || [], right.required || []);
+    if (left.examples || right.examples) {
+      flat.examples = combinations(
+        left.examples || [],
+        right.examples || [],
+        ([a, b]) => R.mergeDeepRight(a, b),
+      );
+    }
+    return flat;
+  },
+  (_err, allOf): SchemaObject => ({ allOf }),
+);
 
 export const depictIntersection: Depicter = (
   { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
   { next },
-) => {
-  const children = [left, right].map(next);
-  try {
-    return tryFlattenIntersection(children);
-  } catch {}
-  return { allOf: children };
-};
+) => intersect([left, right].map(next));
 
 export const depictOptional: Depicter = (
   schema: z.ZodOptional<z.ZodTypeAny>,
@@ -250,7 +222,7 @@ export const depictNullable: Depicter = (
 };
 
 const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
-  const detected = toLower(detectType(value)); // toLower is typed well unlike .toLowerCase()
+  const detected = R.toLower(R.type(value)); // toLower is typed well unlike .toLowerCase()
   const isSupported =
     detected === "number" ||
     detected === "string" ||
@@ -359,7 +331,7 @@ export const depictRecord: Depicter = (
     const result: SchemaObject = { type: "object" };
     if (keys.length) {
       result.properties = depictObjectProperties(
-        z.object(fromPairs(xprod(keys, [valueSchema]))),
+        z.object(R.fromPairs(R.xprod(keys, [valueSchema]))),
         next,
       );
       result.required = keys;
@@ -377,8 +349,8 @@ export const depictRecord: Depicter = (
     };
   }
   if (keySchema instanceof z.ZodUnion && areOptionsLiteral(keySchema.options)) {
-    const required = map((opt) => `${opt.value}`, keySchema.options);
-    const shape = fromPairs(xprod(required, [valueSchema]));
+    const required = R.map((opt) => `${opt.value}`, keySchema.options);
+    const shape = R.fromPairs(R.xprod(required, [valueSchema]));
     return {
       type: "object",
       properties: depictObjectProperties(z.object(shape), next),
@@ -512,7 +484,7 @@ export const depictNumber: Depicter = ({
 export const depictObjectProperties = (
   { shape }: z.ZodObject<z.ZodRawShape>,
   next: Parameters<Depicter>[1]["next"],
-) => map(next, shape);
+) => R.map(next, shape);
 
 const makeSample = (depicted: SchemaObject) => {
   const firstType = (
@@ -536,17 +508,14 @@ export const depictEffect: Depicter = (
   const input = next(schema.innerType());
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
-    const outputType = tryToTransform(schema, makeSample(input));
+    const outputType = getTransformedType(schema, makeSample(input));
     if (outputType && ["number", "string", "boolean"].includes(outputType))
       return { type: outputType as "number" | "string" | "boolean" };
     else return next(z.any());
   }
   if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
     const { type: inputType, ...rest } = input;
-    return {
-      ...rest,
-      format: `${rest.format || inputType} (preprocessed)`,
-    };
+    return { ...rest, format: `${rest.format || inputType} (preprocessed)` };
   }
   return input;
 };
@@ -571,10 +540,10 @@ export const depictRaw: Depicter = (schema: RawSchema, { next }) =>
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
   examples.length
-    ? fromPairs(
-        zip(
-          times((idx) => `example${idx + 1}`, examples.length),
-          map(objOf("value"), examples),
+    ? R.fromPairs(
+        R.zip(
+          R.times((idx) => `example${idx + 1}`, examples.length),
+          R.map(R.objOf("value"), examples),
         ),
       )
     : undefined;
@@ -584,9 +553,9 @@ export const depictExamples = (
   isResponse: boolean,
   omitProps: string[] = [],
 ): ExamplesObject | undefined =>
-  pipe(
+  R.pipe(
     getExamples,
-    map(when((subj) => detectType(subj) === "Object", omit(omitProps))),
+    R.map(R.when((subj) => R.type(subj) === "Object", R.omit(omitProps))),
     enumerateExamples,
   )({
     schema,
@@ -599,10 +568,10 @@ export const depictParamExamples = (
   schema: z.ZodTypeAny,
   param: string,
 ): ExamplesObject | undefined =>
-  pipe(
+  R.pipe(
     getExamples,
-    filter<FlatObject>(has(param)),
-    pluck(param),
+    R.filter<FlatObject>(R.has(param)),
+    R.pluck(param),
     enumerateExamples,
   )({ schema, variant: "original", validate: true, pullProps: true });
 
@@ -637,8 +606,8 @@ export const depictRequestParams = ({
   const areHeadersEnabled = inputSources.includes("headers");
   const isPathParam = (name: string) =>
     areParamsEnabled && pathParams.includes(name);
-  const securityHeaders = chain(
-    filter((entry: Security) => entry.type === "header"),
+  const securityHeaders = R.chain(
+    R.filter((entry: Security) => entry.type === "header"),
     security ?? [],
   ).map(({ name }) => name);
   const isHeaderParam = (name: string) =>
@@ -765,9 +734,9 @@ export const excludeParamsFromDepiction = (
 ): SchemaObject | ReferenceObject => {
   if (isReferenceObject(depicted)) return depicted;
   const copy = { ...depicted };
-  if (copy.properties) copy.properties = omit(names, copy.properties);
+  if (copy.properties) copy.properties = R.omit(names, copy.properties);
   if (copy.examples)
-    copy.examples = copy.examples.map((entry) => omit(names, entry));
+    copy.examples = copy.examples.map((entry) => R.omit(names, entry));
   if (copy.required)
     copy.required = copy.required.filter((name) => !names.includes(name));
   if (copy.allOf) {
@@ -786,7 +755,7 @@ export const excludeParamsFromDepiction = (
 export const excludeExamplesFromDepiction = (
   depicted: SchemaObject | ReferenceObject,
 ): SchemaObject | ReferenceObject =>
-  isReferenceObject(depicted) ? depicted : omit(["examples"], depicted);
+  isReferenceObject(depicted) ? depicted : R.omit(["examples"], depicted);
 
 export const depictResponse = ({
   method,
@@ -824,7 +793,7 @@ export const depictResponse = ({
         : depictedSchema,
     examples: depictExamples(schema, true),
   };
-  return { description, content: fromPairs(xprod(mimeTypes, [media])) };
+  return { description, content: R.fromPairs(R.xprod(mimeTypes, [media])) };
 };
 
 const depictBearerSecurity = ({
@@ -881,9 +850,9 @@ const depictOAuth2Security = ({
   flows = {},
 }: Extract<Security, { type: "oauth2" }>) => ({
   type: "oauth2" as const,
-  flows: map(
+  flows: R.map(
     (flow): OAuthFlowObject => ({ ...flow, scopes: flow.scopes || {} }),
-    reject(isNil, flows) as Required<typeof flows>,
+    R.reject(R.isNil, flows) as Required<typeof flows>,
   ),
 });
 

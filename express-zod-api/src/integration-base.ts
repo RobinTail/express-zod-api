@@ -1,4 +1,4 @@
-import { map } from "ramda";
+import * as R from "ramda";
 import ts from "typescript";
 import { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
@@ -161,7 +161,7 @@ export abstract class IntegrationBase {
         Array.from(this.tags).map(([request, tags]) =>
           f.createPropertyAssignment(
             makePropertyIdentifier(request),
-            f.createArrayLiteralExpression(map(literally, tags)),
+            f.createArrayLiteralExpression(R.map(literally, tags)),
           ),
         ),
       ),
