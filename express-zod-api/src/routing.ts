@@ -42,7 +42,7 @@ export const initRouting = ({
   routing: Routing;
   parsers?: Parsers;
 }) => {
-  let doc: Diagnostics | undefined = new Diagnostics(getLogger()); // disposable instance
+  let doc = isProduction() ? undefined : new Diagnostics(getLogger()); // disposable
   const familiar = new Map<string, Array<Method | AuxMethod>>();
   const onEndpoint: OnEndpoint = (endpoint, path, method, siblingMethods) => {
     if (!isProduction()) {
