@@ -163,7 +163,7 @@ export const makeCleanId = (...args: string[]) => {
   return byWord.map(ucFirst).join("");
 };
 
-export const tryToTransform = tryCatch(
+export const getTransformationType = tryCatch(
   <T>(schema: z.ZodEffects<z.ZodTypeAny, unknown, T>, sample: T) =>
     typeof schema.parse(sample),
   always(undefined),

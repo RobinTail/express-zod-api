@@ -47,7 +47,7 @@ import {
   hasCoercion,
   makeCleanId,
   routePathParamsRegex,
-  tryToTransform,
+  getTransformationType,
   ucFirst,
   Tag,
 } from "./common-helpers";
@@ -536,7 +536,7 @@ export const depictEffect: Depicter = (
   const input = next(schema.innerType());
   const { effect } = schema._def;
   if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
-    const outputType = tryToTransform(schema, makeSample(input));
+    const outputType = getTransformationType(schema, makeSample(input));
     if (outputType && ["number", "string", "boolean"].includes(outputType))
       return { type: outputType as "number" | "string" | "boolean" };
     else return next(z.any());
