@@ -39,6 +39,7 @@ import {
   tryCatch,
   without,
   isEmpty,
+  keys,
 } from "ramda";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
@@ -181,12 +182,25 @@ export const depictDiscriminatedUnion: Depicter = (
   };
 };
 
-const canMerge = pipe(without(["properties", "required", "examples"]), isEmpty);
 const propsMerger = (a: unknown, b: unknown) => {
   if (Array.isArray(a) && Array.isArray(b)) return concat(a, b);
   if (a === b) return b;
   throw new Error("Can not flatten properties");
 };
+const approaches = {
+  properties: ({ properties: left = {} }, { properties: right = {} }) =>
+    mergeDeepWith(propsMerger, left, right),
+  required: ({ required: left = [] }, { required: right = [] }) =>
+    union(left, right),
+  examples: ({ examples: left = [] }, { examples: right = [] }) =>
+    combinations(left, right, ([a, b]) => mergeDeepRight(a, b)),
+} satisfies {
+  [K in keyof SchemaObject]: (
+    left: SchemaObject,
+    right: SchemaObject,
+  ) => SchemaObject[K];
+};
+const canMerge = pipe(without(Object.keys(approaches)), isEmpty);
 
 const intersect = tryCatch(
   (children: Array<SchemaObject | ReferenceObject>) => {
@@ -196,24 +210,14 @@ const intersect = tryCatch(
       filter(isSchemaObject, children),
     );
     if (!left || !right) throw new Error("Can not flatten objects");
-    const flat: SchemaObject = { type: "object" };
-    if (left.properties || right.properties) {
-      flat.properties = mergeDeepWith(
-        propsMerger,
-        left.properties || {},
-        right.properties || {},
-      );
-    }
-    if (left.required || right.required)
-      flat.required = union(left.required || [], right.required || []);
-    if (left.examples || right.examples) {
-      flat.examples = combinations(
-        left.examples || [],
-        right.examples || [],
-        ([a, b]) => mergeDeepRight(a, b),
-      );
-    }
-    return flat;
+    return keys(approaches).reduce<SchemaObject>( // eslint-disable-line no-restricted-syntax -- need literal keys here
+      (flat, prop) => {
+        if (left[prop] || right[prop])
+          flat[prop] = approaches[prop](left, right);
+        return flat;
+      },
+      { type: "object" },
+    );
   },
   (_err, allOf): SchemaObject => ({ allOf }),
 );
