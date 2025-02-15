@@ -538,10 +538,7 @@ export const depictEffect: Depicter = (
   }
   if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
     const { type: inputType, ...rest } = input;
-    return {
-      ...rest,
-      format: `${rest.format || inputType} (preprocessed)`,
-    };
+    return { ...rest, format: `${rest.format || inputType} (preprocessed)` };
   }
   return input;
 };
