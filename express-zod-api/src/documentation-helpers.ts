@@ -185,7 +185,6 @@ const propsMerger = (a: unknown, b: unknown) => {
   throw new Error("Can not flatten properties");
 };
 
-/** @throws Error */
 const intersect = tryCatch(
   (children: Array<SchemaObject | ReferenceObject>) => {
     const [left, right] = children
