@@ -129,7 +129,7 @@ export const testMiddleware = async <
   middleware: AbstractMiddleware;
   /** @desc The aggregated output from previously executed middlewares */
   options?: FlatObject;
-  /** @desc Enables transforming possible middleware errors into response, so that testMiddlware does not throw */
+  /** @desc Enables transforming possible middleware errors into response, so that test Middleware does not throw */
   errorHandler?: (error: Error, response: Response) => void;
 }) => {
   const { requestMock, responseMock, loggerMock, configMock } =
