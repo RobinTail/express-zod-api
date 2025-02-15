@@ -150,7 +150,6 @@ const onRecord: Producer = (
   { next },
 ) => ensureTypeNode("Record", [keySchema, valueSchema].map(next));
 
-/** @throws Error */
 const intersect = tryCatch(
   (nodes: ts.TypeNode[]) => {
     if (!nodes.every(ts.isTypeLiteralNode)) throw new Error("Not objects");
