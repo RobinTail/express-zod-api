@@ -39,7 +39,7 @@ import {
   tryCatch,
   without,
   isEmpty,
-  keys,
+  toPairs,
 } from "ramda";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
@@ -207,10 +207,9 @@ const intersect = tryCatch(
       filter(isSchemaObject, children),
     );
     if (!left || !right) throw new Error("Can not flatten objects");
-    return keys(approaches).reduce<SchemaObject>( // eslint-disable-line no-restricted-syntax -- need literal keys here
-      (flat, prop) => {
-        if (left[prop] || right[prop])
-          flat[prop] = approaches[prop](left, right);
+    return toPairs(approaches).reduce<SchemaObject>( // eslint-disable-line no-restricted-syntax -- need literal keys here
+      (flat, [prop, fn]) => {
+        if (left[prop] || right[prop]) flat[prop] = fn(left, right);
         return flat;
       },
       { type: "object" },
@@ -276,14 +275,14 @@ export const depictObject: Depicter = (
   schema: z.ZodObject<z.ZodRawShape>,
   { isResponse, next },
 ) => {
-  const props = Object.keys(schema.shape);
+  const keys = Object.keys(schema.shape);
   const isOptionalProp = (prop: z.ZodTypeAny) =>
     isResponse && hasCoercion(prop)
       ? prop instanceof z.ZodOptional
       : prop.isOptional();
-  const required = props.filter((key) => !isOptionalProp(schema.shape[key]));
+  const required = keys.filter((key) => !isOptionalProp(schema.shape[key]));
   const result: SchemaObject = { type: "object" };
-  if (props.length) result.properties = depictObjectProperties(schema, next);
+  if (keys.length) result.properties = depictObjectProperties(schema, next);
   if (required.length) result.required = required;
   return result;
 };
@@ -350,14 +349,14 @@ export const depictRecord: Depicter = (
   { next },
 ) => {
   if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
-    const props = Object.values(keySchema.enum) as string[];
+    const keys = Object.values(keySchema.enum) as string[];
     const result: SchemaObject = { type: "object" };
-    if (props.length) {
+    if (keys.length) {
       result.properties = depictObjectProperties(
-        z.object(fromPairs(xprod(props, [valueSchema]))),
+        z.object(fromPairs(xprod(keys, [valueSchema]))),
         next,
       );
-      result.required = props;
+      result.required = keys;
     }
     return result;
   }
