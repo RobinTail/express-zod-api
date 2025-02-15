@@ -36,6 +36,7 @@ import {
   when,
   xprod,
   zip,
+  tryCatch,
 } from "ramda";
 import { z } from "zod";
 import { ResponseVariant } from "./api-response";
@@ -185,49 +186,44 @@ const propsMerger = (a: unknown, b: unknown) => {
 };
 
 /** @throws Error */
-const tryFlattenIntersection = (
-  children: Array<SchemaObject | ReferenceObject>,
-) => {
-  const [left, right] = children
-    .filter(isSchemaObject)
-    .filter(
-      (entry) =>
-        entry.type === "object" &&
-        Object.keys(entry).every((key) =>
-          ["type", "properties", "required", "examples"].includes(key),
-        ),
-    );
-  if (!left || !right) throw new Error("Can not flatten objects");
-  const flat: SchemaObject = { type: "object" };
-  if (left.properties || right.properties) {
-    flat.properties = mergeDeepWith(
-      propsMerger,
-      left.properties || {},
-      right.properties || {},
-    );
-  }
-  if (left.required || right.required)
-    flat.required = union(left.required || [], right.required || []);
-  if (left.examples || right.examples) {
-    flat.examples = combinations(
-      left.examples || [],
-      right.examples || [],
-      ([a, b]) => mergeDeepRight(a, b),
-    );
-  }
-  return flat;
-};
+const intersect = tryCatch(
+  (children: Array<SchemaObject | ReferenceObject>) => {
+    const [left, right] = children
+      .filter(isSchemaObject)
+      .filter(
+        (entry) =>
+          entry.type === "object" &&
+          Object.keys(entry).every((key) =>
+            ["type", "properties", "required", "examples"].includes(key),
+          ),
+      );
+    if (!left || !right) throw new Error("Can not flatten objects");
+    const flat: SchemaObject = { type: "object" };
+    if (left.properties || right.properties) {
+      flat.properties = mergeDeepWith(
+        propsMerger,
+        left.properties || {},
+        right.properties || {},
+      );
+    }
+    if (left.required || right.required)
+      flat.required = union(left.required || [], right.required || []);
+    if (left.examples || right.examples) {
+      flat.examples = combinations(
+        left.examples || [],
+        right.examples || [],
+        ([a, b]) => mergeDeepRight(a, b),
+      );
+    }
+    return flat;
+  },
+  (_err, allOf): SchemaObject => ({ allOf }),
+);
 
 export const depictIntersection: Depicter = (
   { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
   { next },
-) => {
-  const children = [left, right].map(next);
-  try {
-    return tryFlattenIntersection(children);
-  } catch {}
-  return { allOf: children };
-};
+) => intersect([left, right].map(next));
 
 export const depictOptional: Depicter = (
   schema: z.ZodOptional<z.ZodTypeAny>,
