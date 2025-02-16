@@ -18,6 +18,10 @@
 
 ## Version 22
 
+### v22.9.1
+
+- Minor refactoring and optimizations.
+
 ### v22.9.0
 
 - Featuring Deprecations:
