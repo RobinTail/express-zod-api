@@ -1,5 +1,5 @@
 import { Ansis, blue, green, hex, red, cyanBright } from "ansis";
-import { memoizeWith } from "ramda";
+import * as R from "ramda";
 import { isObject } from "./common-helpers";
 
 export const styles = {
@@ -61,7 +61,7 @@ const _makeNumberFormat = (unit: TimeUnit, fraction = 0) =>
     unitDisplay: "long",
     unit,
   });
-export const makeNumberFormat = memoizeWith(
+export const makeNumberFormat = R.memoizeWith(
   (unit, fraction) => `${unit}${fraction}`,
   _makeNumberFormat,
 );

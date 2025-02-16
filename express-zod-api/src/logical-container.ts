@@ -1,13 +1,4 @@
-import {
-  chain,
-  isEmpty,
-  map,
-  partition,
-  prop,
-  reject,
-  filter,
-  concat,
-} from "ramda";
+import * as R from "ramda";
 import { combinations, isObject } from "./common-helpers";
 
 type LogicalOr<T> = { or: T[] };
@@ -34,19 +25,19 @@ export type Alternatives<T> = Array<Combination<T>>;
 export const processContainers = <T>(
   containers: LogicalContainer<T>[],
 ): Alternatives<T> => {
-  const simples = filter(isSimple, containers);
-  const ands = chain(prop("and"), filter(isLogicalAnd, containers));
-  const [simpleAnds, orsInAnds] = partition(isSimple, ands);
-  const persistent: Combination<T> = concat(simples, simpleAnds);
-  const ors = filter(isLogicalOr, containers);
-  const alternators = map(prop("or"), concat(ors, orsInAnds)); // no chain!
+  const simples = R.filter(isSimple, containers);
+  const ands = R.chain(R.prop("and"), R.filter(isLogicalAnd, containers));
+  const [simpleAnds, orsInAnds] = R.partition(isSimple, ands);
+  const persistent: Combination<T> = R.concat(simples, simpleAnds);
+  const ors = R.filter(isLogicalOr, containers);
+  const alternators = R.map(R.prop("or"), R.concat(ors, orsInAnds)); // no chain!
   return alternators.reduce(
     (acc, entry) =>
       combinations(
         acc,
-        map((opt) => (isSimple(opt) ? [opt] : opt.and), entry),
-        ([a, b]) => concat(a, b),
+        R.map((opt) => (isSimple(opt) ? [opt] : opt.and), entry),
+        ([a, b]) => R.concat(a, b),
       ),
-    reject(isEmpty, [persistent]),
+    R.reject(R.isEmpty, [persistent]),
   );
 };

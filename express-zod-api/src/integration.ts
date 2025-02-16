@@ -1,4 +1,4 @@
-import { chain } from "ramda";
+import * as R from "ramda";
 import ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant, responseVariants } from "./api-response";
@@ -126,7 +126,7 @@ export class Integration extends IntegrationBase {
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
-          const props = chain(([idx, { schema, mimeTypes, statusCodes }]) => {
+          const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
             const variantType = makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
               zodToTs(mimeTypes ? schema : noContent, ctxOut),
