@@ -178,14 +178,14 @@ const canMerge = R.both(
 );
 
 const intersect = R.tryCatch(
-  (children: Array<SchemaObject | ReferenceObject>) => {
+  (children: Array<SchemaObject | ReferenceObject>): SchemaObject => {
     const [left, right] = children.filter(isSchemaObject).filter(canMerge);
     if (!left || !right) throw new Error("Can not flatten objects");
-    const nonEmpty: typeof approaches = R.pickBy(
+    const suitable: typeof approaches = R.pickBy(
       (_, prop) => (left[prop] || right[prop]) !== undefined,
       approaches,
     );
-    return R.map((fn) => fn(left, right), nonEmpty);
+    return R.map((fn) => fn(left, right), suitable);
   },
   (_err, allOf): SchemaObject => ({ allOf }),
 );
