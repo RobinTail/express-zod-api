@@ -183,11 +183,12 @@ const intersect = R.tryCatch(
       R.filter(isSchemaObject),
       R.filter(canMerge),
     )(children);
-    if (!left || !right) throw new Error("Can not flatten objects"); // eslint-disable-next-line no-restricted-syntax -- need literal
-    return R.toPairs(approaches).reduce<SchemaObject>((flat, [prop, fn]) => {
-      if (left[prop] || right[prop]) flat[prop] = fn(left, right);
-      return flat;
-    }, {});
+    if (!left || !right) throw new Error("Can not flatten objects");
+    const nonEmpty: typeof approaches = R.pickBy(
+      (_, prop) => R.isNotNil(left[prop] || right[prop]),
+      approaches,
+    );
+    return R.map((fn) => fn(left, right), nonEmpty);
   },
   (_err, allOf): SchemaObject => ({ allOf }),
 );
