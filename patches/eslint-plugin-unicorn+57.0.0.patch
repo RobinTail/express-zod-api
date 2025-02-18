@@ -1,0 +1,57 @@
+diff --git a/node_modules/eslint-plugin-unicorn/index.js b/node_modules/eslint-plugin-unicorn/index.js
+index ecb8de0..498e16b 100644
+--- a/node_modules/eslint-plugin-unicorn/index.js
++++ b/node_modules/eslint-plugin-unicorn/index.js
+@@ -1,7 +1,6 @@
+ import createDeprecatedRules from './rules/utils/create-deprecated-rules.js';
+ import flatConfigBase from './configs/flat-config-base.js';
+ import rules from './rules/index.js';
+-import packageJson from './package.json' with {type: 'json'};
+ 
+ const deprecatedRules = createDeprecatedRules({
+ 	// {ruleId: ReplacementRuleId | ReplacementRuleId[]}, if no replacement, use `{ruleId: []}`
+@@ -43,8 +42,8 @@ const createConfig = (rules, flatConfigName) => ({
+ 
+ const unicorn = {
+ 	meta: {
+-		name: packageJson.name,
+-		version: packageJson.version,
++		name: "eslint-plugin-unicorn",
++		version: "57.0.0",
+ 	},
+ 	rules: {
+ 		...rules,
+diff --git a/node_modules/eslint-plugin-unicorn/rules/utils/create-deprecated-rules.js b/node_modules/eslint-plugin-unicorn/rules/utils/create-deprecated-rules.js
+index 2dd23a3..5425b39 100644
+--- a/node_modules/eslint-plugin-unicorn/rules/utils/create-deprecated-rules.js
++++ b/node_modules/eslint-plugin-unicorn/rules/utils/create-deprecated-rules.js
+@@ -1,5 +1,3 @@
+-import packageJson from '../../package.json' with {type: 'json'};
+-
+ const repoUrl = 'https://github.com/sindresorhus/eslint-plugin-unicorn';
+ 
+ /** @returns {{ [ruleName: string]: import('eslint').Rule.RuleModule }} */
+@@ -11,7 +9,7 @@ export default function createDeprecatedRules(data) {
+ 				create: () => ({}),
+ 				meta: {
+ 					docs: {
+-						url: `${repoUrl}/blob/v${packageJson.version}/docs/deprecated-rules.md#${ruleId}`,
++						url: `${repoUrl}/blob/v57.0.0/docs/deprecated-rules.md#${ruleId}`,
+ 					},
+ 					deprecated: true,
+ 					replacedBy: Array.isArray(replacedBy) ? replacedBy : [replacedBy],
+diff --git a/node_modules/eslint-plugin-unicorn/rules/utils/get-documentation-url.js b/node_modules/eslint-plugin-unicorn/rules/utils/get-documentation-url.js
+index e01d1b8..23cc9a0 100644
+--- a/node_modules/eslint-plugin-unicorn/rules/utils/get-documentation-url.js
++++ b/node_modules/eslint-plugin-unicorn/rules/utils/get-documentation-url.js
+@@ -1,9 +1,8 @@
+ import path from 'node:path';
+-import packageJson from '../../package.json' with {type: 'json'};
+ 
+ const repoUrl = 'https://github.com/sindresorhus/eslint-plugin-unicorn';
+ 
+ export default function getDocumentationUrl(filename) {
+ 	const ruleName = path.basename(filename, '.js');
+-	return `${repoUrl}/blob/v${packageJson.version}/docs/rules/${ruleName}.md`;
++	return `${repoUrl}/blob/v57.0.0/docs/rules/${ruleName}.md`;
+ }

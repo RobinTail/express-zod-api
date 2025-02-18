@@ -23,7 +23,8 @@
     "lint": "eslint && prettier *.md --check",
     "mdfix": "prettier *.md --write",
     "precommit": "yarn lint && yarn test && yarn build && git add *.md example/example.* LICENSE",
-    "install_hooks": "husky"
+    "install_hooks": "husky",
+    "postinstall": "npx patch-package"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
