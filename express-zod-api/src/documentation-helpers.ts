@@ -161,37 +161,31 @@ const propsMerger = (a: unknown, b: unknown) => {
   if (a === b) return b;
   throw new Error("Can not flatten properties");
 };
+const approaches = {
+  type: R.always("object"),
+  properties: ({ properties: left = {} }, { properties: right = {} }) =>
+    R.mergeDeepWith(propsMerger, left, right),
+  required: ({ required: left = [] }, { required: right = [] }) =>
+    R.union(left, right),
+  examples: ({ examples: left = [] }, { examples: right = [] }) =>
+    combinations(left, right, ([a, b]) => R.mergeDeepRight(a, b)),
+} satisfies {
+  [K in keyof SchemaObject]: (...subj: SchemaObject[]) => SchemaObject[K];
+};
+const canMerge = R.both(
+  ({ type }: SchemaObject) => type === "object",
+  R.pipe(Object.keys, R.without(Object.keys(approaches)), R.isEmpty),
+);
 
 const intersect = R.tryCatch(
-  (children: Array<SchemaObject | ReferenceObject>) => {
-    const [left, right] = children
-      .filter(isSchemaObject)
-      .filter(
-        (entry) =>
-          entry.type === "object" &&
-          Object.keys(entry).every((key) =>
-            ["type", "properties", "required", "examples"].includes(key),
-          ),
-      );
+  (children: Array<SchemaObject | ReferenceObject>): SchemaObject => {
+    const [left, right] = children.filter(isSchemaObject).filter(canMerge);
     if (!left || !right) throw new Error("Can not flatten objects");
-    const flat: SchemaObject = { type: "object" };
-    if (left.properties || right.properties) {
-      flat.properties = R.mergeDeepWith(
-        propsMerger,
-        left.properties || {},
-        right.properties || {},
-      );
-    }
-    if (left.required || right.required)
-      flat.required = R.union(left.required || [], right.required || []);
-    if (left.examples || right.examples) {
-      flat.examples = combinations(
-        left.examples || [],
-        right.examples || [],
-        ([a, b]) => R.mergeDeepRight(a, b),
-      );
-    }
-    return flat;
+    const suitable: typeof approaches = R.pickBy(
+      (_, prop) => (left[prop] || right[prop]) !== undefined,
+      approaches,
+    );
+    return R.map((fn) => fn(left, right), suitable);
   },
   (_err, allOf): SchemaObject => ({ allOf }),
 );
