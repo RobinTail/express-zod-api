@@ -3,15 +3,12 @@ import jsPlugin from "@eslint/js";
 import tsPlugin from "typescript-eslint";
 import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
-import unicornPlugin from "eslint-plugin-unicorn";
 import allowedDepsPlugin from "eslint-plugin-allowed-dependencies";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-const packageDir = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "express-zod-api",
-);
+const root = dirname(fileURLToPath(import.meta.url));
+const packageDir = join(root, "express-zod-api");
 
 const performanceConcerns = [
   {
@@ -148,7 +145,6 @@ export default tsPlugin.config(
   {
     languageOptions: { globals: globals.node },
     plugins: {
-      unicorn: unicornPlugin,
       allowed: allowedDepsPlugin,
     },
   },
@@ -175,7 +171,6 @@ export default tsPlugin.config(
     name: "globally/enabled",
     rules: {
       curly: ["warn", "multi-or-nest", "consistent"],
-      "unicorn/prefer-node-protocol": "error",
       "@typescript-eslint/no-shadow": "warn",
     },
   },
