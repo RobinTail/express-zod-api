@@ -180,7 +180,7 @@ export default tsPlugin.config(
     rules: {
       "allowed/dependencies": [
         "error",
-        { typeOnly: ["eslint", "prettier"], packageDir },
+        { development: "typeOnly", packageDir },
       ],
       "no-restricted-syntax": ["warn", ...performanceConcerns],
     },
