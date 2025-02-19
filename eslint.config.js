@@ -178,10 +178,7 @@ export default tsPlugin.config(
     name: "source/all",
     files: ["express-zod-api/src/*.ts"],
     rules: {
-      "allowed/dependencies": [
-        "error",
-        { development: "typeOnly", packageDir },
-      ],
+      "allowed/dependencies": ["error", { packageDir }],
       "no-restricted-syntax": ["warn", ...performanceConcerns],
     },
   },
