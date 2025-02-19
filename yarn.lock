@@ -1554,10 +1554,10 @@ eslint-config-prettier@^10.0.1:
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-10.0.1.tgz#fbb03bfc8db0651df9ce4e8b7150d11c5fe3addf"
   integrity sha512-lZBts941cyJyeaooiKxAtzoPHTN+GbQTJFAIdQbRhA4/8whaAraEh47Whw/ZFfrjNSnlAxqfm9i0XVAEkULjCw==
 
-eslint-plugin-allowed-dependencies@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-allowed-dependencies/-/eslint-plugin-allowed-dependencies-1.0.1.tgz#1fdd87620a18e2ac923ffafe46b1312c6f4e9832"
-  integrity sha512-owrocf0t5RGOv1rIZ2oanvlYR0kx/hYVAF+eNZRn6RCZBno9/q6iEp3UJzZPKYzb0fV0fEwIFAbWWVcpemsv8Q==
+eslint-plugin-allowed-dependencies@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-allowed-dependencies/-/eslint-plugin-allowed-dependencies-1.1.0.tgz#8c68ca0c448cccfd8e03c9e7c1cbfc44939c28ac"
+  integrity sha512-ML9GLYcJwBNFLOiNvomctZauOb2VNv/p9pUZbEeSmWxzMPL8og5My8N8F5e7lgqJuf6L5Cdoq8TXwbzqReeRog==
   dependencies:
     ramda "^0.30.1"
 
