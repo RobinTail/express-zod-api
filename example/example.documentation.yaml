@@ -541,6 +541,7 @@ paths:
             schema:
               type: string
               format: binary
+        required: true
       responses:
         "200":
           description: POST /v1/avatar/raw Positive response
