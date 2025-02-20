@@ -171,6 +171,7 @@ paths:
                   key: 1234-5678-90
                   name: John Doe
                   birthday: 1963-04-21
+        required: true
       security:
         - APIKEY_1: []
           APIKEY_2: []
@@ -256,6 +257,7 @@ paths:
                   minLength: 1
               required:
                 - name
+        required: true
       responses:
         "201":
           description: POST /v1/user/create Positive response 201
@@ -462,6 +464,7 @@ paths:
                   format: binary
               required:
                 - avatar
+        required: true
       responses:
         "200":
           description: POST /v1/avatar/upload Positive response

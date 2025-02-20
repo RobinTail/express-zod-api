@@ -895,7 +895,7 @@ export const depictBody = ({
 }: ReqResHandlingProps<IOSchema> & {
   mimeType: string;
   paramNames: string[];
-}): RequestBodyObject => {
+}) => {
   const bodyDepiction = excludeExamplesFromDepiction(
     excludeParamsFromDepiction(
       walkSchema(schema, {
@@ -914,7 +914,14 @@ export const depictBody = ({
         : bodyDepiction,
     examples: depictExamples(extractObjectSchema(schema), false, paramNames),
   };
-  return { description, content: { [mimeType]: media } };
+  const body: RequestBodyObject = {
+    description,
+    content: { [mimeType]: media },
+  };
+  // @todo it can be allOf/oneOf, should rather repurpose excludeParamsFromDepiction()
+  if (isSchemaObject(bodyDepiction) && Boolean(bodyDepiction.required?.length))
+    body.required = true;
+  return body;
 };
 
 export const depictTags = (

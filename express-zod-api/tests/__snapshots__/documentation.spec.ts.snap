@@ -855,6 +855,7 @@ paths:
                     - two
               required:
                 - intersection
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1081,6 +1082,7 @@ paths:
                         - three
               required:
                 - union
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1181,6 +1183,7 @@ paths:
                 - bigint
                 - boolean
                 - dateIn
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1271,6 +1274,7 @@ paths:
                   type: string
               required:
                 - name
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1478,6 +1482,7 @@ paths:
                 - intPositive
                 - intNegative
                 - intLimited
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1618,6 +1623,7 @@ paths:
                 - url
                 - numeric
                 - combined
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1705,6 +1711,7 @@ paths:
                     - DEF
               required:
                 - regularEnum
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1920,6 +1927,7 @@ paths:
               required:
                 - one
                 - two
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -2029,6 +2037,7 @@ paths:
                 - ofOne
                 - ofStrings
                 - complex
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -2282,6 +2291,7 @@ paths:
                   maximum: 1.7976931348623157e+308
               required:
                 - test
+        required: true
       responses:
         "200":
           description: POST /v1/mtpl Positive response 200
@@ -2808,6 +2818,7 @@ paths:
                   type: string
               required:
                 - id
+        required: true
       responses:
         "200":
           description: PUT /v1/test Positive response
@@ -2951,6 +2962,7 @@ paths:
                   minItems: 1
               required:
                 - arr
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -3227,6 +3239,7 @@ paths:
               example1:
                 value:
                   a: first
+        required: true
       responses:
         "200":
           description: POST /v1/addSomething Positive response
@@ -3417,6 +3430,7 @@ paths:
               required:
                 - key
                 - str
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -3605,6 +3619,7 @@ paths:
               example1:
                 value:
                   strNum: "123"
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -3883,6 +3898,7 @@ paths:
                   type: boolean
               required:
                 - other
+        required: true
       responses:
         "200":
           description: Super positive response of /v1/:name
@@ -3963,6 +3979,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/TheBodyOfRequest"
+        required: true
       responses:
         "200":
           description: Super positive response of /v1/:name
@@ -4153,6 +4170,7 @@ paths:
                   type: boolean
               required:
                 - other
+        required: true
       responses:
         "200":
           description: POST /v1/:name Positive response
