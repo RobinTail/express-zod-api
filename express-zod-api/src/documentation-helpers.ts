@@ -725,16 +725,25 @@ export const onMissing: SchemaHandler<
 export const excludeParamsFromDepiction = (
   subject: SchemaObject | ReferenceObject,
   names: string[],
-): SchemaObject | ReferenceObject => {
-  if (isReferenceObject(subject)) return subject;
-  return R.mapObjIndexed((v, k) => {
+): [SchemaObject | ReferenceObject, boolean] => {
+  if (isReferenceObject(subject)) return [subject, false];
+  let hasRequired = false;
+  const result: SchemaObject = R.mapObjIndexed((v, k) => {
+    if (!v) return v;
     if (k === "properties") return R.omit(names, v);
     if (k === "examples") return R.map(R.omit(names), v);
     if (k === "required") return R.reject(R.includes(R.__, names), v);
-    if (["allOf", "oneOf"].includes(k))
-      return R.map((entry) => excludeParamsFromDepiction(entry, names), v);
+    if (["allOf", "oneOf"].includes(k)) {
+      return R.map((entry) => {
+        const [sub, subRequired] = excludeParamsFromDepiction(entry, names);
+        hasRequired = hasRequired || subRequired;
+        return sub;
+      }, v);
+    }
     return v;
   }, subject);
+  hasRequired = hasRequired || Boolean(result.required?.length);
+  return [result, hasRequired];
 };
 
 export const excludeExamplesFromDepiction = (
@@ -887,17 +896,16 @@ export const depictBody = ({
   mimeType: string;
   paramNames: string[];
 }) => {
-  const bodyDepiction = excludeExamplesFromDepiction(
-    excludeParamsFromDepiction(
-      walkSchema(schema, {
-        rules: { ...brandHandling, ...depicters },
-        onEach,
-        onMissing,
-        ctx: { isResponse: false, makeRef, path, method },
-      }),
-      paramNames,
-    ),
+  const [withoutParams, hasRequired] = excludeParamsFromDepiction(
+    walkSchema(schema, {
+      rules: { ...brandHandling, ...depicters },
+      onEach,
+      onMissing,
+      ctx: { isResponse: false, makeRef, path, method },
+    }),
+    paramNames,
   );
+  const bodyDepiction = excludeExamplesFromDepiction(withoutParams);
   const media: MediaTypeObject = {
     schema:
       composition === "components"
@@ -909,9 +917,7 @@ export const depictBody = ({
     description,
     content: { [mimeType]: media },
   };
-  // @todo it can be allOf/oneOf, should rather repurpose excludeParamsFromDepiction()
-  if (isSchemaObject(bodyDepiction) && Boolean(bodyDepiction.required?.length))
-    body.required = true;
+  if (hasRequired) body.required = true;
   return body;
 };
 

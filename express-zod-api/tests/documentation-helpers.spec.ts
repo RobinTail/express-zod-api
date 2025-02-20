@@ -100,13 +100,18 @@ describe("Documentation helpers", () => {
         onEach,
         onMissing,
       });
-      expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
+      const [result, hasRequired] = excludeParamsFromDepiction(depicted, ["a"]);
+      expect(result).toMatchSnapshot();
+      expect(hasRequired).toMatchSnapshot();
     });
 
     test("should handle the ReferenceObject", () => {
-      expect(
-        excludeParamsFromDepiction({ $ref: "test" }, ["a"]),
-      ).toMatchSnapshot();
+      const [result, hasRequired] = excludeParamsFromDepiction(
+        { $ref: "test" },
+        ["a"],
+      );
+      expect(result).toMatchSnapshot();
+      expect(hasRequired).toBe(false);
     });
   });
 

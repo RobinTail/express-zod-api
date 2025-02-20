@@ -743,6 +743,7 @@ paths:
                   required:
                     - type
                     - b
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -3062,6 +3063,7 @@ paths:
                   required:
                     - id
                     - field2
+        required: true
       responses:
         "200":
           description: POST /v1/getSomething Positive response
