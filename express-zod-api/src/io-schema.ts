@@ -1,4 +1,4 @@
-import { pluck } from "ramda";
+import * as R from "ramda";
 import { z } from "zod";
 import { FlatObject } from "./common-helpers";
 import { copyMeta } from "./metadata";
@@ -42,7 +42,7 @@ export const getFinalEndpointInputSchema = <
   middlewares: AbstractMiddleware[],
   input: IN,
 ): z.ZodIntersection<MIN, IN> => {
-  const allSchemas: IOSchema[] = pluck("schema", middlewares);
+  const allSchemas: IOSchema[] = R.pluck("schema", middlewares);
   allSchemas.push(input);
   const finalSchema = allSchemas.reduce((acc, schema) => acc.and(schema));
   return allSchemas.reduce(

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { isNil, pluck, reject } from "ramda";
+import * as R from "ramda";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { hasRaw, hasUpload } from "./deep-checks";
@@ -152,8 +152,8 @@ export class Endpoint<
 
   /** @internal */
   public override get security() {
-    const entries = pluck("security", this.#def.middlewares || []);
-    return reject(isNil, entries);
+    const entries = R.pluck("security", this.#def.middlewares || []);
+    return R.reject(R.isNil, entries);
   }
 
   /** @internal */
