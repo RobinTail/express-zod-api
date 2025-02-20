@@ -2,6 +2,15 @@
 
 ## Version 22
 
+### v22.10.0
+
+- Featuring required request bodies in the generated Documentation:
+  - This version sets the `required` property to `requestBody` when:
+    - It contains the required properties on it;
+    - Or it's based on `ez.raw()` (proprietary schema);
+  - The presence of `requestBody` depends on the Endpoint method(s) and the configuration of `inputSources`;
+  - The lack of the property was reported by [@LufyCZ](https://github.com/LufyCZ).
+
 ### v22.9.1
 
 - Minor refactoring and optimizations.
