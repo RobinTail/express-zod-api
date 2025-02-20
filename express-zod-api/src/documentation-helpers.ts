@@ -733,7 +733,7 @@ export const excludeParamsFromDepiction = (
     if (!v) return v;
     if (k === "properties") return R.omit(names, v);
     if (k === "examples") return R.map(R.omit(names), v);
-    if (k === "required") return R.reject(R.includes(R.__, names), v);
+    if (k === "required") return R.without(names, v);
     if (["allOf", "oneOf"].includes(k)) {
       return R.map((entry) => {
         const [sub, subRequired] = excludeParamsFromDepiction(entry, names);
