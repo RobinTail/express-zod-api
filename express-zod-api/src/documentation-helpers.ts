@@ -727,23 +727,14 @@ export const excludeParamsFromDepiction = (
   names: string[],
 ): SchemaObject | ReferenceObject => {
   if (isReferenceObject(depicted)) return depicted;
-  const copy = { ...depicted };
-  if (copy.properties) copy.properties = R.omit(names, copy.properties);
-  if (copy.examples)
-    copy.examples = copy.examples.map((entry) => R.omit(names, entry));
-  if (copy.required)
-    copy.required = copy.required.filter((name) => !names.includes(name));
-  if (copy.allOf) {
-    copy.allOf = copy.allOf.map((entry) =>
-      excludeParamsFromDepiction(entry, names),
-    );
-  }
-  if (copy.oneOf) {
-    copy.oneOf = copy.oneOf.map((entry) =>
-      excludeParamsFromDepiction(entry, names),
-    );
-  }
-  return copy;
+  return R.mapObjIndexed((v, k) => {
+    if (k === "properties") return R.omit(names, v);
+    if (k === "examples") return R.map(R.omit(names), v);
+    if (k === "required") return R.reject(R.includes(R.__, names), v);
+    if (["allOf", "oneOf"].includes(k))
+      return R.map((entry) => excludeParamsFromDepiction(entry, names), v);
+    return v;
+  }, depicted);
 };
 
 export const excludeExamplesFromDepiction = (
