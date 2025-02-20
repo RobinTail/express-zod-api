@@ -743,8 +743,7 @@ export const excludeParamsFromDepiction = (
     oneOf: subTransformer,
   };
   const result: SchemaObject = R.evolve(transformers, subject);
-  hasRequired = hasRequired || Boolean(result.required?.length);
-  return [result, hasRequired];
+  return [result, hasRequired || Boolean(result.required?.length)];
 };
 
 export const excludeExamplesFromDepiction = (
