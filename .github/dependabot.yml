@@ -14,8 +14,8 @@ updates:
       vitest:
         patterns:
           - "vitest"
-          - "@vitest/coverage-istanbul"
+          - "@vitest/coverage-v8"
       typescript-eslint:
         patterns:
           - "typescript-eslint"
-          - "@typescript-eslint/rule-tester"          
+          - "@typescript-eslint/rule-tester" 

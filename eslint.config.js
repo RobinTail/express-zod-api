@@ -1,17 +1,15 @@
-import globals from "globals";
-import jsPlugin from "@eslint/js";
+import globals from "globals"; // eslint-disable-line allowed/dependencies -- comes with eslint
+import jsPlugin from "@eslint/js"; // eslint-disable-line allowed/dependencies -- comes with eslint
 import tsPlugin from "typescript-eslint";
 import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
-import unicornPlugin from "eslint-plugin-unicorn";
 import allowedDepsPlugin from "eslint-plugin-allowed-dependencies";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-const packageDir = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "express-zod-api",
-);
+const root = dirname(fileURLToPath(import.meta.url));
+const releaseDir = join(root, "express-zod-api");
+const exampleDir = join(root, "example");
 
 const performanceConcerns = [
   {
@@ -148,7 +146,6 @@ export default tsPlugin.config(
   {
     languageOptions: { globals: globals.node },
     plugins: {
-      unicorn: unicornPlugin,
       allowed: allowedDepsPlugin,
     },
   },
@@ -175,18 +172,20 @@ export default tsPlugin.config(
     name: "globally/enabled",
     rules: {
       curly: ["warn", "multi-or-nest", "consistent"],
-      "unicorn/prefer-node-protocol": "error",
       "@typescript-eslint/no-shadow": "warn",
+      "allowed/dependencies": [
+        "error",
+        { development: true, ignore: ["express-zod-api"], packageDir: root },
+        { development: true, packageDir: releaseDir },
+        { packageDir: exampleDir },
+      ],
     },
   },
   {
     name: "source/all",
     files: ["express-zod-api/src/*.ts"],
     rules: {
-      "allowed/dependencies": [
-        "error",
-        { typeOnly: ["eslint", "prettier"], packageDir },
-      ],
+      "allowed/dependencies": ["error", { packageDir: releaseDir }],
       "no-restricted-syntax": ["warn", ...performanceConcerns],
     },
   },
@@ -214,11 +213,14 @@ export default tsPlugin.config(
   },
   {
     name: "source/migration",
-    files: ["express-zod-api/src/migration.ts"],
+    files: [
+      "express-zod-api/src/migration.ts",
+      "express-zod-api/tests/migration.spec.ts",
+    ],
     rules: {
       "allowed/dependencies": [
         "error",
-        { ignore: ["^@typescript-eslint", "^\\."], packageDir },
+        { ignore: ["^@typescript-eslint", "^\\."], packageDir: releaseDir },
       ],
     },
   },
