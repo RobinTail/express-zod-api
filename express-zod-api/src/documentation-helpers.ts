@@ -723,10 +723,10 @@ export const onMissing: SchemaHandler<
 };
 
 export const excludeParamsFromDepiction = (
-  depicted: SchemaObject | ReferenceObject,
+  subject: SchemaObject | ReferenceObject,
   names: string[],
 ): SchemaObject | ReferenceObject => {
-  if (isReferenceObject(depicted)) return depicted;
+  if (isReferenceObject(subject)) return subject;
   return R.mapObjIndexed((v, k) => {
     if (k === "properties") return R.omit(names, v);
     if (k === "examples") return R.map(R.omit(names), v);
@@ -734,7 +734,7 @@ export const excludeParamsFromDepiction = (
     if (["allOf", "oneOf"].includes(k))
       return R.map((entry) => excludeParamsFromDepiction(entry, names), v);
     return v;
-  }, depicted);
+  }, subject);
 };
 
 export const excludeExamplesFromDepiction = (
