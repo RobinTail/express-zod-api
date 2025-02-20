@@ -32,6 +32,7 @@ import {
 import { InputSource } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
+import { hasRaw } from "./deep-checks";
 import { DocumentationError } from "./errors";
 import { FileSchema, ezFileBrand } from "./file-schema";
 import { extractObjectSchema, IOSchema } from "./io-schema";
@@ -723,27 +724,26 @@ export const onMissing: SchemaHandler<
 };
 
 export const excludeParamsFromDepiction = (
-  depicted: SchemaObject | ReferenceObject,
+  subject: SchemaObject | ReferenceObject,
   names: string[],
-): SchemaObject | ReferenceObject => {
-  if (isReferenceObject(depicted)) return depicted;
-  const copy = { ...depicted };
-  if (copy.properties) copy.properties = R.omit(names, copy.properties);
-  if (copy.examples)
-    copy.examples = copy.examples.map((entry) => R.omit(names, entry));
-  if (copy.required)
-    copy.required = copy.required.filter((name) => !names.includes(name));
-  if (copy.allOf) {
-    copy.allOf = copy.allOf.map((entry) =>
-      excludeParamsFromDepiction(entry, names),
-    );
-  }
-  if (copy.oneOf) {
-    copy.oneOf = copy.oneOf.map((entry) =>
-      excludeParamsFromDepiction(entry, names),
-    );
-  }
-  return copy;
+): [SchemaObject | ReferenceObject, boolean] => {
+  if (isReferenceObject(subject)) return [subject, false];
+  let hasRequired = false;
+  const subTransformer = R.map((entry: SchemaObject | ReferenceObject) => {
+    const [sub, subRequired] = excludeParamsFromDepiction(entry, names);
+    hasRequired = hasRequired || subRequired;
+    return sub;
+  });
+  const remover = R.omit(names) as <T>(obj: T) => Partial<T>;
+  const transformers = {
+    properties: remover,
+    examples: R.map(remover),
+    required: R.without(names),
+    allOf: subTransformer,
+    oneOf: subTransformer,
+  };
+  const result: SchemaObject = R.evolve(transformers, subject);
+  return [result, hasRequired || Boolean(result.required?.length)];
 };
 
 export const excludeExamplesFromDepiction = (
@@ -895,18 +895,17 @@ export const depictBody = ({
 }: ReqResHandlingProps<IOSchema> & {
   mimeType: string;
   paramNames: string[];
-}): RequestBodyObject => {
-  const bodyDepiction = excludeExamplesFromDepiction(
-    excludeParamsFromDepiction(
-      walkSchema(schema, {
-        rules: { ...brandHandling, ...depicters },
-        onEach,
-        onMissing,
-        ctx: { isResponse: false, makeRef, path, method },
-      }),
-      paramNames,
-    ),
+}) => {
+  const [withoutParams, hasRequired] = excludeParamsFromDepiction(
+    walkSchema(schema, {
+      rules: { ...brandHandling, ...depicters },
+      onEach,
+      onMissing,
+      ctx: { isResponse: false, makeRef, path, method },
+    }),
+    paramNames,
   );
+  const bodyDepiction = excludeExamplesFromDepiction(withoutParams);
   const media: MediaTypeObject = {
     schema:
       composition === "components"
@@ -914,7 +913,12 @@ export const depictBody = ({
         : bodyDepiction,
     examples: depictExamples(extractObjectSchema(schema), false, paramNames),
   };
-  return { description, content: { [mimeType]: media } };
+  const body: RequestBodyObject = {
+    description,
+    content: { [mimeType]: media },
+  };
+  if (hasRequired || hasRaw(schema)) body.required = true;
+  return body;
 };
 
 export const depictTags = (
