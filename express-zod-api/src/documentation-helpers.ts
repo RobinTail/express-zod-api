@@ -729,18 +729,22 @@ export const excludeParamsFromDepiction = (
 ): [SchemaObject | ReferenceObject, boolean] => {
   if (isReferenceObject(subject)) return [subject, false];
   let hasRequired = false;
-  const result: SchemaObject = R.mapObjIndexed((v, k) => {
-    if (!v) return v;
-    if (k === "properties") return R.omit(names, v);
-    if (k === "examples") return R.map(R.omit(names), v);
-    if (k === "required") return R.without(names, v);
-    if (["allOf", "oneOf"].includes(k)) {
-      const sub = R.map((entry) => excludeParamsFromDepiction(entry, names), v);
-      hasRequired = hasRequired || R.pluck(1, sub).some(R.identity);
-      return R.pluck(0, sub);
-    }
-    return v;
-  }, subject);
+  const subTransformer = R.map((entry: SchemaObject | ReferenceObject) => {
+    const [sub, subRequired] = excludeParamsFromDepiction(entry, names);
+    hasRequired = hasRequired || subRequired;
+    return sub;
+  });
+  const remover = R.omit(names) as <T>(obj: T) => Partial<T>;
+  const result: SchemaObject = R.evolve(
+    {
+      properties: remover,
+      examples: R.map(remover),
+      required: R.without(names),
+      allOf: subTransformer,
+      oneOf: subTransformer,
+    },
+    subject,
+  );
   hasRequired = hasRequired || Boolean(result.required?.length);
   return [result, hasRequired];
 };
