@@ -735,16 +735,14 @@ export const excludeParamsFromDepiction = (
     return sub;
   });
   const remover = R.omit(names) as <T>(obj: T) => Partial<T>;
-  const result: SchemaObject = R.evolve(
-    {
-      properties: remover,
-      examples: R.map(remover),
-      required: R.without(names),
-      allOf: subTransformer,
-      oneOf: subTransformer,
-    },
-    subject,
-  );
+  const transformers = {
+    properties: remover,
+    examples: R.map(remover),
+    required: R.without(names),
+    allOf: subTransformer,
+    oneOf: subTransformer,
+  };
+  const result: SchemaObject = R.evolve(transformers, subject);
   hasRequired = hasRequired || Boolean(result.required?.length);
   return [result, hasRequired];
 };
