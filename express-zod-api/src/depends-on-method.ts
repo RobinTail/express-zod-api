@@ -1,7 +1,8 @@
 import * as R from "ramda";
 import { AbstractEndpoint } from "./endpoint";
 import { Method } from "./method";
-import { Routable } from "./routable";
+
+import { Routable } from "./routing";
 
 export class DependsOnMethod extends Routable {
   readonly #endpoints: ConstructorParameters<typeof DependsOnMethod>[0];

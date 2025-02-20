@@ -21,8 +21,8 @@ import { LogicalContainer } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
-import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
+import { Routable } from "./routing";
 import { Security } from "./security";
 
 export type Handler<IN, OUT, OPT> = (params: {

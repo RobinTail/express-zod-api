@@ -12,7 +12,7 @@ import {
 import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
-import { Parsers, Routing, initRouting } from "./routing";
+import { Routing } from "./routing";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,
@@ -22,6 +22,8 @@ import {
   installDeprecationListener,
   moveRaw,
   installTerminationListener,
+  initRouting,
+  Parsers,
 } from "./server-helpers";
 import { printStartupLogo } from "./startup-logo";
 
