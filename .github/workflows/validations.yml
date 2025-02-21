@@ -29,7 +29,7 @@ jobs:
       - name: Build distribution
         run: pnpm -F express-zod-api build
       - name: Pack artifact
-        run: mv $(pnpm -F express-zod-api pack) dist.tgz
+        run: pnpm -F express-zod-api pack --out dist.tgz
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
