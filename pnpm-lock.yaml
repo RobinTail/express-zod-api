@@ -88,9 +88,17 @@ importers:
         specifier: ^3.23.0
         version: 3.24.2
 
-  cjs-test: {}
+  cjs-test:
+    dependencies:
+      express-zod-api:
+        specifier: workspace:*
+        version: link:../express-zod-api
 
-  esm-test: {}
+  esm-test:
+    dependencies:
+      express-zod-api:
+        specifier: workspace:*
+        version: link:../express-zod-api
 
   example:
     dependencies:
@@ -208,7 +216,11 @@ importers:
         specifier: ^6.19.8
         version: 6.21.1
 
-  issue952-test: {}
+  issue952-test:
+    dependencies:
+      express-zod-api:
+        specifier: workspace:*
+        version: link:../express-zod-api
 
 packages:
 
