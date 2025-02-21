@@ -94,6 +94,9 @@ importers:
 
   example:
     dependencies:
+      express-zod-api:
+        specifier: workspace:*
+        version: link:../express-zod-api
       swagger-ui-express:
         specifier: ^5.0.0
         version: 5.0.1(express@5.0.1)

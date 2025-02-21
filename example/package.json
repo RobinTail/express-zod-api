@@ -12,6 +12,7 @@
     "validate": "vitest run --globals validate.spec.ts"
   },
   "dependencies": {
+    "express-zod-api": "workspace:*",
     "swagger-ui-express": "^5.0.0",
     "yaml": "^2.7.0"
   },
