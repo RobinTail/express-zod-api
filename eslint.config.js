@@ -1,5 +1,5 @@
-import globals from "globals"; // eslint-disable-line allowed/dependencies -- comes with eslint
-import jsPlugin from "@eslint/js"; // eslint-disable-line allowed/dependencies -- comes with eslint
+import globals from "globals";
+import jsPlugin from "@eslint/js";
 import tsPlugin from "typescript-eslint";
 import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";

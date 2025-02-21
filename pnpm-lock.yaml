@@ -12,6 +12,9 @@ importers:
 
   .:
     devDependencies:
+      '@eslint/js':
+        specifier: ^9.20.0
+        version: 9.20.0
       '@tsconfig/node20':
         specifier: ^20.1.4
         version: 20.1.4
@@ -57,6 +60,9 @@ importers:
       express-fileupload:
         specifier: ^1.5.0
         version: 1.5.1
+      globals:
+        specifier: ^16.0.0
+        version: 16.0.0
       http-errors:
         specifier: ^2.0.0
         version: 2.0.0
@@ -1248,6 +1254,10 @@ packages:
 
   globals@14.0.0:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
+    engines: {node: '>=18'}
+
+  globals@16.0.0:
+    resolution: {integrity: sha512-iInW14XItCXET01CQFqudPOWP2jYMl7T+QRQT+UNcR/iQncN/F0UNpgd76iFkBPgNQb4+X3LV9tLJYzwh+Gl3A==}
     engines: {node: '>=18'}
 
   gopd@1.2.0:
@@ -3199,6 +3209,8 @@ snapshots:
       path-scurry: 1.11.1
 
   globals@14.0.0: {}
+
+  globals@16.0.0: {}
 
   gopd@1.2.0: {}
 
