@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Corepack # https://github.com/actions/setup-node/issues/531
+        run: corepack enable
       - run: yarn install
       - run: yarn test:oas
       - name: Build distribution
@@ -41,6 +43,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Corepack # https://github.com/actions/setup-node/issues/531
+        run: corepack enable
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
