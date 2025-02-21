@@ -16,8 +16,7 @@
   "bugs": "https://github.com/RobinTail/express-zod-api/issues",
   "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
-    "build": "tsup",
-    "postbuild": "yarn pack --filename release.tgz && attw release.tgz && rm release.tgz",
+    "build": "tsup && attw --pack",
     "pretest": "tsc --noEmit",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
