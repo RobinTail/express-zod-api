@@ -18,6 +18,26 @@
 
 ## Version 22
 
+### v22.10.1
+
+- Fixed catching errors in a custom `ResultHandler` used as `errorHandler` for Not Found routes having async `handler`.
+
+```ts
+// reproduction
+import { createConfig, ResultHandler } from "express-zod-api";
+
+createConfig({
+  errorHandler: new ResultHandler({
+    // rejected promise was not awaited:
+    handler: async () => {
+      throw new Error(
+        "You should not do it. But if you do, we've got LastResortHandler to catch it.",
+      );
+    },
+  }),
+});
+```
+
 ### v22.10.0
 
 - Featuring required request bodies in the generated Documentation:

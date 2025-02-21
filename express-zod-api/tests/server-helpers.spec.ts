@@ -95,33 +95,39 @@ describe("Server helpers", () => {
       expect(spy.mock.calls[0][0].response).toEqual(responseMock);
     });
 
-    test("should call Last Resort Handler in case of ResultHandler is faulty", () => {
-      const errorHandler = new ResultHandler({
-        positive: vi.fn(),
-        negative: vi.fn(),
-        handler: vi.fn().mockImplementation(() => assert.fail("I am faulty")),
-      });
-      const spy = vi.spyOn(errorHandler, "execute");
-      const handler = createNotFoundHandler({
-        errorHandler,
-        getLogger: () => makeLoggerMock(),
-      });
-      const next = vi.fn();
-      const requestMock = makeRequestMock({
-        method: "POST",
-        path: "/v1/test",
-        body: { n: 453 },
-      });
-      const responseMock = makeResponseMock();
-      handler(requestMock, responseMock, next);
-      expect(next).toHaveBeenCalledTimes(0);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(responseMock._getStatusCode()).toBe(500);
-      expect(responseMock._getData()).toBe(
-        "An error occurred while serving the result: I am faulty.\n" +
-          "Original error: Can not POST /v1/test.",
-      );
-    });
+    test.each([
+      () => assert.fail("I am faulty"),
+      async () => assert.fail("I am faulty"),
+    ])(
+      "should call Last Resort Handler in case of ResultHandler is faulty %#",
+      async (rhImpl) => {
+        const errorHandler = new ResultHandler({
+          positive: vi.fn(),
+          negative: vi.fn(),
+          handler: vi.fn().mockImplementation(rhImpl),
+        });
+        const spy = vi.spyOn(errorHandler, "execute");
+        const handler = createNotFoundHandler({
+          errorHandler,
+          getLogger: () => makeLoggerMock(),
+        });
+        const next = vi.fn();
+        const requestMock = makeRequestMock({
+          method: "POST",
+          path: "/v1/test",
+          body: { n: 453 },
+        });
+        const responseMock = makeResponseMock();
+        await handler(requestMock, responseMock, next);
+        expect(next).toHaveBeenCalledTimes(0);
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(responseMock._getStatusCode()).toBe(500);
+        expect(responseMock._getData()).toBe(
+          "An error occurred while serving the result: I am faulty.\n" +
+            "Original error: Can not POST /v1/test.",
+        );
+      },
+    );
   });
 
   describe("createUploadFailureHandler()", () => {
