@@ -5,6 +5,7 @@ migration
 yarn-error.log
 .idea
 .npmrc
+.yarn/install-state.gz
 coverage
 *-test/quick-start.ts
 issue952-test/*.d.ts
