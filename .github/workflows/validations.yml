@@ -63,7 +63,7 @@ jobs:
           COREPACK_INTEGRITY_KEYS: 0
         run: |
           pnpm add express@${{matrix.express-version}} typescript@5.1 http-errors zod
-          pnpm add eslint@9.0 typescript-eslint@8.0 vitest
+          pnpm add eslint@9.0 @typescript-eslint/parser@8.0 vitest
           pnpm add express-zod-api@./dist.tgz
       - name: sample.ts
         run: |
