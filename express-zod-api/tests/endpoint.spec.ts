@@ -8,10 +8,10 @@ import {
   testEndpoint,
   ResultHandler,
 } from "../src";
-import { AbstractEndpoint, Endpoint } from "../src/endpoint";
+import { Endpoint } from "../src/endpoint";
 
 describe("Endpoint", () => {
-  describe(".getMethods()", () => {
+  describe(".methods", () => {
     test("Should return the correct set of methods (readonly)", () => {
       const endpointMock = new Endpoint({
         methods: ["get", "post", "put", "delete", "patch"],
@@ -24,7 +24,7 @@ describe("Endpoint", () => {
           handler: vi.fn(),
         }),
       });
-      const methods = endpointMock.getMethods();
+      const { methods } = endpointMock;
       expect(methods).toEqual(["get", "post", "put", "delete", "patch"]);
       expect(() => (methods as any[]).push()).toThrowError(/read only/);
     });
@@ -245,28 +245,22 @@ describe("Endpoint", () => {
     });
   });
 
-  describe(".getSchema()", () => {
-    test.each(["input", "output"] as const)(
-      "should return the %s schema",
-      (variant) => {
+  describe.each(["inputSchema", "outputSchema"] as const)(
+    ".%s prop",
+    (prop) => {
+      test("should return the %s", () => {
         const factory = new EndpointsFactory(defaultResultHandler);
-        const input = z.object({
-          something: z.number(),
-        });
-        const output = z.object({
-          something: z.number(),
-        });
+        const input = z.object({ something: z.number() });
+        const output = z.object({ something: z.string() });
         const endpoint = factory.build({
           input,
           output,
           handler: vi.fn(),
         });
-        expect((endpoint as AbstractEndpoint).getSchema(variant)).toEqual(
-          variant === "input" ? input : output,
-        );
-      },
-    );
-  });
+        expect(endpoint[prop]).toEqual(prop === "inputSchema" ? input : output);
+      });
+    },
+  );
 
   describe(".getResponses()", () => {
     test.each(["positive", "negative"] as const)(
@@ -284,7 +278,7 @@ describe("Endpoint", () => {
     );
   });
 
-  describe(".getScopes", () => {
+  describe(".scopes", () => {
     test.each(["test", ["one", "two"]])(
       "should return the scopes (readonly) %#",
       (scope) => {
@@ -294,14 +288,14 @@ describe("Endpoint", () => {
           handler: vi.fn(),
           scope,
         });
-        const scopes = endpoint.getScopes();
+        const { scopes } = endpoint;
         expect(scopes).toEqual(typeof scope === "string" ? [scope] : scope);
         expect(() => (scopes as any[]).push()).toThrowError(/read only/);
       },
     );
   });
 
-  describe(".getTags", () => {
+  describe(".tags", () => {
     test.each(["test", ["one", "two"]])(
       "should return the tags (readonly) %#",
       (tag) => {
@@ -311,14 +305,14 @@ describe("Endpoint", () => {
           handler: vi.fn(),
           tag,
         });
-        const tags = endpoint.getTags();
+        const { tags } = endpoint;
         expect(tags).toEqual(typeof tag === "string" ? [tag] : tag);
         expect(() => (tags as any[]).push()).toThrowError(/read only/);
       },
     );
   });
 
-  describe(".getSecurity()", () => {
+  describe(".security", () => {
     test("should return a array of security based logical containers", () => {
       const endpoint = defaultEndpointsFactory
         .addMiddleware({
@@ -330,15 +324,15 @@ describe("Endpoint", () => {
           handler: vi.fn(),
         })
         .build({ output: z.object({}), handler: vi.fn() });
-      const result = endpoint.getSecurity();
-      expect(result).toEqual([
+      const { security } = endpoint;
+      expect(security).toEqual([
         { name: "X-Token", type: "header" },
         { name: "X-API-Key", type: "header" },
       ]);
     });
   });
 
-  describe("getRequestType()", () => {
+  describe(".requestType", () => {
     test.each([
       { input: z.object({}), expected: "json" },
       { input: ez.raw(), expected: "raw" },
@@ -352,7 +346,7 @@ describe("Endpoint", () => {
           output: z.object({}),
           handler: vi.fn(),
         });
-        expect(endpoint.getRequestType()).toEqual(expected);
+        expect(endpoint.requestType).toEqual(expected);
       },
     );
   });

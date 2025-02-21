@@ -2,9 +2,9 @@ name: Validations
 
 on:
   push:
-    branches: [ master, v18, v19, v20, v21 ]
+    branches: [ master, v19, v20, v21, v22, make-v23 ]
   pull_request:
-    branches: [ master, v18, v19, v20, v21 ]
+    branches: [ master, v19, v20, v21, v22, make-v23 ]
 
 
 jobs:
@@ -58,7 +58,7 @@ jobs:
       - name: sample.ts
         run: |
           cat >sample.ts <<EOF
-          client.provide("get", "/v1/test", {id: 10});
+          const test: CustomHeaderSecurity = {};
           EOF
       - name: migration.spec.ts
         run: |
@@ -67,7 +67,7 @@ jobs:
           describe("Migration", () => {
             test("should fix the import", async () => {
               const fixed = await readFile("./sample.ts", "utf-8");
-              expect(fixed).toBe('client.provide("get /v1/test", {id: 10});\n');
+              expect(fixed).toBe("const test: HeaderSecurity = {};\n");
             });
           });
           EOF
@@ -78,7 +78,7 @@ jobs:
           import migration from "express-zod-api/migration";
           export default [
             { languageOptions: { parser }, plugins: { migration } },
-            { files: ["**/*.ts"], rules: { "migration/v22": "error" } },
+            { files: ["**/*.ts"], rules: { "migration/v23": "error" } },
           ];
           EOF
       - name: Run migration test
