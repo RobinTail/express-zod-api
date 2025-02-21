@@ -1458,7 +1458,7 @@ __metadata:
   resolution: "cjs-test@workspace:cjs-test"
   dependencies:
     express: "npm:^5.0.1"
-    express-zod-api: "workspace:*"
+    express-zod-api: "workspace:^"
     http-errors: "npm:^2.0.0"
     typescript: "npm:^5.5.2"
     zod: "npm:^3.23.0"
@@ -2049,7 +2049,7 @@ __metadata:
   resolution: "esm-test@workspace:esm-test"
   dependencies:
     express: "npm:^5.0.1"
-    express-zod-api: "workspace:*"
+    express-zod-api: "workspace:^"
     http-errors: "npm:^2.0.0"
     typescript: "npm:^5.5.2"
     zod: "npm:^3.23.0"
@@ -2123,7 +2123,7 @@ __metadata:
     compression: "npm:^1.7.4"
     express: "npm:^5.0.1"
     express-fileupload: "npm:^1.5.0"
-    express-zod-api: "workspace:*"
+    express-zod-api: "workspace:^"
     http-errors: "npm:^2.0.0"
     swagger-ui-express: "npm:^5.0.0"
     typescript: "npm:^5.5.2"
@@ -2155,7 +2155,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-zod-api@workspace:*, express-zod-api@workspace:express-zod-api":
+"express-zod-api@workspace:^, express-zod-api@workspace:express-zod-api":
   version: 0.0.0-use.local
   resolution: "express-zod-api@workspace:express-zod-api"
   dependencies:
@@ -2758,7 +2758,7 @@ __metadata:
   resolution: "issue952-test@workspace:issue952-test"
   dependencies:
     express: "npm:^5.0.1"
-    express-zod-api: "workspace:*"
+    express-zod-api: "workspace:^"
     http-errors: "npm:^2.0.0"
     typescript: "npm:^5.5.2"
     zod: "npm:^3.23.0"
