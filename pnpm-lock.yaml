@@ -218,9 +218,22 @@ importers:
 
   issue952-test:
     dependencies:
+      express:
+        specifier: ^5.0.1
+        version: 5.0.1
+      express-fileupload:
+        specifier: ^1.5.1
+        version: 1.5.1
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
+    devDependencies:
+      '@types/express':
+        specifier: ^5.0.0
+        version: 5.0.0
+      '@types/express-fileupload':
+        specifier: ^1.5.1
+        version: 1.5.1
 
 packages:
 
