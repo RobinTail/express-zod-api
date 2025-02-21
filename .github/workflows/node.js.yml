@@ -28,6 +28,8 @@ jobs:
     - name: Corepack
       run: corepack enable
     - name: Install dependencies
+      env:
+        COREPACK_INTEGRITY_KEYS: 0
       run: pnpm install
     - name: Lint
       run: pnpm lint
