@@ -19,4 +19,4 @@ jobs:
       - run: |
           yarn install
           yarn install_hooks
-      - run: yarn workspace express-zod-api version --patch
+      - run: yarn workspace express-zod-api version patch
