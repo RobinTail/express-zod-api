@@ -10,8 +10,11 @@
   ],
   "scripts": {
     "start": "yarn workspace example start",
-    "prebuild": "tsx tools/contributors.ts && tsx tools/license.ts",
-    "build": "yarn workspace express-zod-api build && yarn workspace example build && tsx tools/make-tests.ts",
+    "build:md": "tsx tools/contributors.ts && tsx tools/license.ts",
+    "build:release": "yarn workspace express-zod-api build",
+    "build:example": "yarn workspace example build",
+    "build:tests": "tsx tools/make-tests.ts",
+    "build": "yarn build:md && yarn build:release && yarn build:example && yarn build:tests",
     "test": "yarn workspace express-zod-api test",
     "test:example": "yarn workspace example test",
     "test:oas": "yarn workspace example validate",
