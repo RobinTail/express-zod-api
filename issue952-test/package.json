@@ -5,5 +5,12 @@
   "scripts": {
     "test": "tsc -p tsconfig.json",
     "posttest": "rm *.d.ts"
+  },
+  "dependencies": {
+    "express": "^5.0.0",
+    "express-zod-api": "workspace:*",
+    "http-errors": "^2.0.0",
+    "typescript": "^5.5.2",
+    "zod": "^3.23.0"
   }
 }
