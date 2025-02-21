@@ -4,7 +4,6 @@ describe("CJS Test", async () => {
   const { givePort } = await import("../tools/ports.js");
   let out = "";
   const listener = (chunk: Buffer) => {
-    console.log(chunk.toString()); // @todo remove
     out += chunk.toString();
   };
   const quickStart = spawn("tsx", ["quick-start.ts"]);
