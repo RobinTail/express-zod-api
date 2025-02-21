@@ -1,13 +1,6 @@
 {
   "private": true,
   "type": "module",
-  "workspaces": [
-    "express-zod-api",
-    "example",
-    "cjs-test",
-    "esm-test",
-    "issue952-test"
-  ],
   "scripts": {
     "start": "yarn workspace example start",
     "prebuild": "tsx tools/contributors.ts && tsx tools/license.ts",
@@ -51,8 +44,8 @@
     "zod": "^3.23.0"
   },
   "resolutions": {
-    "**/@scarf/scarf": "npm:empty-npm-package@1.0.0",
-    "**/esbuild": "~0.25.0"
+    "@scarf/scarf": "npm:empty-npm-package@1.0.0",
+    "esbuild": "~0.25.0"
   },
-  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+  "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af"
 }
