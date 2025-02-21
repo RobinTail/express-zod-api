@@ -19,6 +19,9 @@ jobs:
         with:
           fetch-depth: 0 # to figure out last change to the json file
 
+      - name: Corepack # https://github.com/actions/setup-node/issues/531
+        run: corepack enable
+
       - uses: fregante/setup-git-user@v2
 
       - uses: actions/setup-node@v4

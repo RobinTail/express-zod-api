@@ -25,6 +25,8 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
+      - name: Corepack # https://github.com/actions/setup-node/issues/531
+        run: corepack enable
       - name: Install dependencies
         run: yarn install
       - name: Publish with ${{ inputs.tag }}

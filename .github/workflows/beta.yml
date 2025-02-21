@@ -25,6 +25,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Corepack # https://github.com/actions/setup-node/issues/531
+        run: corepack enable
       - uses: fregante/setup-git-user@v2
       - run: |
           yarn install
