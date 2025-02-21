@@ -19,8 +19,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: yarn install
-      - run: yarn test:oas
+      - run: pnpm install
+      - run: pnpm test:oas
       - name: Build distribution
         run: pnpm -F express-zod-api build
       - name: Pack artifact
@@ -52,9 +52,9 @@ jobs:
           EOF
       - name: Add dependencies
         run: |
-          yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod
-          yarn add eslint@9.0 typescript-eslint@8.0 vitest
-          yarn add express-zod-api@./dist.tgz
+          pnpm add express@${{matrix.express-version}} typescript@5.1 http-errors zod
+          pnpm add eslint@9.0 typescript-eslint@8.0 vitest
+          pnpm add express-zod-api@./dist.tgz
       - name: sample.ts
         run: |
           cat >sample.ts <<EOF
@@ -83,5 +83,5 @@ jobs:
           EOF
       - name: Run migration test
         run: |
-          yarn eslint --fix
-          yarn vitest --globals
+          pnpm eslint --fix
+          pnpm vitest --globals
