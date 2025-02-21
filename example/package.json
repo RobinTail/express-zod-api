@@ -12,10 +12,19 @@
     "validate": "vitest run --globals validate.spec.ts"
   },
   "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^5.0.0",
+    "express-fileupload": "^1.5.0",
+    "http-errors": "^2.0.0",
     "swagger-ui-express": "^5.0.0",
-    "yaml": "^2.7.0"
+    "yaml": "^2.7.0",
+    "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@types/compression": "^1.7.5",
+    "@types/express": "^5.0.0",
+    "@types/express-fileupload": "^1.5.0",
+    "@types/http-errors": "^2.0.2",
     "@types/swagger-ui-express": "^4.1.6"
   }
 }
