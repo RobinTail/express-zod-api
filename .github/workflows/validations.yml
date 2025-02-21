@@ -22,9 +22,9 @@ jobs:
       - run: yarn install
       - run: yarn test:oas
       - name: Build distribution
-        run: yarn workspace express-zod-api build
+        run: pnpm -F express-zod-api build
       - name: Pack artifact
-        run: yarn workspace express-zod-api pack --filename dist.tgz
+        run: pnpm -F express-zod-api pack --filename dist.tgz
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

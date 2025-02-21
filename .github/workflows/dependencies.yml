@@ -26,7 +26,7 @@ jobs:
 
       - name: Upgrade dependencies
         run: |
-          yarn workspace express-zod-api upgrade
+          pnpm -F express-zod-api upgrade
           git checkout -- express-zod-api/package.json
           yarn install
 
