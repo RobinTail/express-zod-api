@@ -28,11 +28,11 @@ jobs:
     - name: Corepack
       run: corepack enable
     - name: Install dependencies
-      run: yarn install
+      run: pnpm install
     - name: Lint
-      run: yarn lint
+      run: pnpm lint
     - name: Unit tests
-      run: yarn test
+      run: pnpm test
     - name: Coveralls
       uses: coverallsapp/github-action@v2
       continue-on-error: true
@@ -41,15 +41,15 @@ jobs:
         flag-name: run-${{ matrix.node-version }}
         parallel: true
     - name: Build
-      run: yarn build
+      run: pnpm build
     - name: Example test
-      run: yarn test:example
+      run: pnpm test:example
     - name: CJS test
-      run: yarn test:cjs
+      run: pnpm test:cjs
     - name: ESM test
-      run: yarn test:esm
+      run: pnpm test:esm
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
-      run: yarn test:952
+      run: pnpm test:952
   report:
     needs: build
     runs-on: ubuntu-latest
