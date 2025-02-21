@@ -21,7 +21,7 @@
     "pretest": "tsc --noEmit",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
-    "prepublishOnly": "eslint && yarn test && yarn build",
+    "prepublishOnly": "eslint && pnpm test && pnpm build",
     "prepack": "cp ../*.md ../LICENSE ./",
     "postversion": "git push && git push --tags"
   },
