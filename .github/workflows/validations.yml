@@ -19,11 +19,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Corepack
-        run: corepack enable
+      - name: Corepack # https://github.com/nodejs/corepack/issues/612
+        run: npm i -g corepack@latest && corepack enable
       - name: Install dependencies
-        env:
-          COREPACK_INTEGRITY_KEYS: 0
         run: pnpm install
       - run: pnpm test:oas
       - name: Build distribution
@@ -47,8 +45,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Corepack
-        run: corepack enable
+      - name: Corepack # https://github.com/nodejs/corepack/issues/612
+        run: npm i -g corepack@latest && corepack enable
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
@@ -59,8 +57,6 @@ jobs:
           { "type": "module", "private": true }
           EOF
       - name: Add dependencies
-        env:
-          COREPACK_INTEGRITY_KEYS: 0
         run: |
           pnpm add express@${{matrix.express-version}} typescript@5.1 http-errors zod
           pnpm add eslint@9.0 @typescript-eslint/parser@8.0 @typescript-eslint/utils@8.0 vitest
