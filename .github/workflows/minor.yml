@@ -15,6 +15,6 @@ jobs:
           node-version: 20
       - uses: fregante/setup-git-user@v2
       - run: |
-          yarn install
-          yarn install_hooks
+          pnpm install
+          pnpm install_hooks
       - run: pnpm -F express-zod-api version --minor

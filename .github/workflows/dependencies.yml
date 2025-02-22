@@ -22,13 +22,13 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
 
       - name: Upgrade dependencies
         run: |
           pnpm -F express-zod-api upgrade
           git checkout -- express-zod-api/package.json
-          yarn install
+          pnpm install
 
       - name: Branch name
         id: create-branch
