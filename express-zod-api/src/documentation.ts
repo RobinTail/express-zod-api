@@ -60,6 +60,13 @@ interface DocumentationParams {
   descriptions?: Partial<Record<Component, Descriptor>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
+  /** @see depictNumber */
+  numericRange?: {
+    /** @default [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER] */
+    integer?: [number, number];
+    /** @default [-Number.MAX_VALUE, Number.MAX_VALUE] */
+    float?: [number, number];
+  };
   /** @default inline */
   composition?: "inline" | "components";
   /**
