@@ -23,17 +23,18 @@ jobs:
       - run: yarn test:oas
       - name: Build distribution
         run: yarn workspace express-zod-api build
-      - name: Pack artifacts
-        run: |
-          yarn workspace express-zod-api pack --filename dist.tgz
-          tar -cvzf esm-test.tar ./esm-test/*.ts ./tools/ports.ts
+      - name: Build tests
+        run: yarn tsx tools/make-tests.ts # todo use build:test if switched to pnpm
+      - name: Pack artifact
+        run: yarn workspace express-zod-api pack --filename dist.tgz
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist
           path: |
             express-zod-api/dist.tgz
-            esm-test.tar
+            esm-test/*.ts
+            tools/ports.ts
   Compatibility:
     name: express@${{matrix.express-version}}
     needs: OpenAPI
@@ -85,8 +86,6 @@ jobs:
             { files: ["**/*.ts"], rules: { "migration/v22": "error" } },
           ];
           EOF
-      - name: Unpack ESM test
-        run: tar -xvzf esm-test.tar
       - name: Run tests
         run: |
           yarn eslint --fix
