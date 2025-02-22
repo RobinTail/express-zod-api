@@ -87,8 +87,6 @@ jobs:
           EOF
       - name: Unpack ESM test
         run: tar -xvzf esm-test.tar
-      - name: Debug environment
-        run: ls -la
       - name: Run tests
         run: |
           yarn eslint --fix
