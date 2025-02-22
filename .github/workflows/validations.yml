@@ -42,7 +42,6 @@ jobs:
       matrix:
         express-version: [ 4, 5 ]
     steps:
-      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -57,9 +56,9 @@ jobs:
           EOF
       - name: Add dependencies
         run: |
-          pnpm add express@${{matrix.express-version}} typescript@5.1 http-errors zod
-          pnpm add eslint@9.0 @typescript-eslint/parser@8.0 @typescript-eslint/utils@8.0 vitest
-          pnpm add express-zod-api@./dist.tgz
+          yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod
+          yarn add eslint@9.0 typescript-eslint@8.0 vitest
+          yarn add express-zod-api@./dist.tgz
       - name: sample.ts
         run: |
           cat >sample.ts <<EOF
@@ -88,5 +87,5 @@ jobs:
           EOF
       - name: Run migration test
         run: |
-          pnpm eslint --fix
-          pnpm vitest --globals
+          yarn eslint --fix
+          yarn vitest --globals
