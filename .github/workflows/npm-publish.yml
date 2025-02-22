@@ -21,12 +21,12 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: pnpm
           registry-url: https://registry.npmjs.org/
-      - name: Corepack # https://github.com/nodejs/corepack/issues/612
-        run: npm i -g corepack@latest && corepack enable
       - name: Install dependencies
         run: pnpm install
       - name: Publish with ${{ inputs.tag }}

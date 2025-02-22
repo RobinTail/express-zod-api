@@ -16,11 +16,11 @@ jobs:
       #   uses: char0n/apidom-validate@v1
       #   with:
       #     definition-file: example/example.documentation.yaml
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Corepack # https://github.com/nodejs/corepack/issues/612
-        run: npm i -g corepack@latest && corepack enable
+          cache: pnpm
       - name: Install dependencies
         run: pnpm install
       - run: pnpm test:oas
@@ -42,11 +42,10 @@ jobs:
       matrix:
         express-version: [ 4, 5 ]
     steps:
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Corepack # https://github.com/nodejs/corepack/issues/612
-        run: npm i -g corepack@latest && corepack enable
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:

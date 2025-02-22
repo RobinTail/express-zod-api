@@ -20,13 +20,12 @@ jobs:
           fetch-depth: 0 # to figure out last change to the json file
 
       - uses: fregante/setup-git-user@v2
+      - uses: pnpm/action-setup@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Corepack # https://github.com/nodejs/corepack/issues/612
-        run: npm i -g corepack@latest && corepack enable
+          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install
