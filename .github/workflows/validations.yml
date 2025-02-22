@@ -23,13 +23,17 @@ jobs:
       - run: yarn test:oas
       - name: Build distribution
         run: yarn workspace express-zod-api build
-      - name: Pack artifact
-        run: yarn workspace express-zod-api pack --filename dist.tgz
-      - name: Upload artifact
+      - name: Pack artifacts
+        run: |
+          yarn workspace express-zod-api pack --filename dist.tgz
+          tar -cvzf esm-test.tar ./esm-test/*.ts ./tools/ports.ts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: express-zod-api/dist.tgz
+          path: |
+            express-zod-api/dist.tgz
+            esm-test.tar
   Compatibility:
     name: express@${{matrix.express-version}}
     needs: OpenAPI
@@ -54,7 +58,7 @@ jobs:
         run: |
           yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod
           yarn add eslint@9.0 typescript-eslint@8.0 vitest
-          yarn add express-zod-api@./dist.tgz
+          yarn add express-zod-api@./express-zod-api/dist.tgz
       - name: sample.ts
         run: |
           cat >sample.ts <<EOF
@@ -81,7 +85,11 @@ jobs:
             { files: ["**/*.ts"], rules: { "migration/v22": "error" } },
           ];
           EOF
-      - name: Run migration test
+      - name: Unpack ESM test
+        run: tar -xvzf esm-test.tar
+      - name: Debug environment
+        run: ls -la
+      - name: Run tests
         run: |
           yarn eslint --fix
           yarn vitest --globals
