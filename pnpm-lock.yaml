@@ -182,15 +182,6 @@ importers:
       '@types/semver':
         specifier: ^7.5.8
         version: 7.5.8
-      '@typescript-eslint/parser':
-        specifier: ^8.24.1
-        version: 8.24.1(eslint@9.20.1)(typescript@5.7.3)
-      '@typescript-eslint/utils':
-        specifier: ^8.24.1
-        version: 8.24.1(eslint@9.20.1)(typescript@5.7.3)
-      '@vitest/pretty-format':
-        specifier: ^3.0.6
-        version: 3.0.6
       camelize-ts:
         specifier: ^3.0.0
         version: 3.0.0
