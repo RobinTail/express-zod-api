@@ -25,6 +25,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Corepack # https://github.com/nodejs/corepack/issues/612
+        run: npm i -g corepack@latest && corepack enable
+
       - name: Install dependencies
         run: pnpm install
 

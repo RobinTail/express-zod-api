@@ -13,6 +13,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Corepack # https://github.com/nodejs/corepack/issues/612
+        run: npm i -g corepack@latest && corepack enable
       - uses: fregante/setup-git-user@v2
       - run: |
           pnpm install
