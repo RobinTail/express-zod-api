@@ -13,7 +13,9 @@
     - for integers: `[ Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER ]`;
     - for floats: `[ -Number.MAX_VALUE, Number.MAX_VALUE ]`;
   - The `null` value disables the feature (no min/max values printed unless defined explicitly by the schema);
-    - This can be useful when a third party tool is having issues to process the generated Documentation.
+    - This can be useful when a third party tool is having issues to process the generated Documentation;
+    - Such an issue was reported by [@APTy](https://github.com/APTy) for the Java-based tool:
+      [openapi-generator](https://github.com/OpenAPITools/openapi-generator).
 
 ```yaml
 # Examples of representation of numerical schemes depending on this setting
