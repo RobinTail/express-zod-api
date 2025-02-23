@@ -64,7 +64,7 @@ interface DocumentationParams {
   /**
    * @desc Acceptable limits of z.number() that API can handle (default: the limits of JavaScript engine)
    * @default {integer:[Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER], float:[-Number.MAX_VALUE, Number.MAX_VALUE]}
-   * @example { integer: null, float: null } — to disable the feature
+   * @example null — to disable the feature
    * @see depictNumber */
   numericRange?: NumericRange;
   /** @default inline */

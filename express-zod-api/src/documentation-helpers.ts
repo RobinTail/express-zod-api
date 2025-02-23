@@ -46,9 +46,7 @@ import { Security } from "./security";
 import { UploadSchema, ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
 
-export type NumericRange = Partial<
-  Record<"integer" | "float", [number, number] | null>
->;
+export type NumericRange = Record<"integer" | "float", [number, number]>;
 
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
@@ -60,7 +58,7 @@ export interface OpenAPIContext extends FlatObject {
       | (() => SchemaObject | ReferenceObject),
     name?: string,
   ) => ReferenceObject;
-  numericRange?: NumericRange;
+  numericRange?: NumericRange | null;
   path: string;
   method: Method;
 }
@@ -451,12 +449,16 @@ export const depictString: Depicter = ({
 export const depictNumber: Depicter = (
   { isInt, maxValue, minValue, _def: { checks } }: z.ZodNumber,
   {
-    numericRange: {
-      integer: intRange = [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
-      float: floatRange = [-Number.MAX_VALUE, Number.MAX_VALUE],
-    } = {},
+    numericRange = {
+      integer: [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
+      float: [-Number.MAX_VALUE, Number.MAX_VALUE],
+    },
   },
 ) => {
+  const { integer: intRange, float: floatRange } = numericRange || {
+    integer: null,
+    float: null,
+  };
   const minCheck = checks.find((check) => check.kind === "min");
   const minimum =
     minValue === null ? (isInt ? intRange?.[0] : floatRange?.[0]) : minValue;
