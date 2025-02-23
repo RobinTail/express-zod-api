@@ -624,10 +624,10 @@
     "@types/node" "*"
     "@types/send" "*"
 
-"@types/swagger-ui-express@^4.1.6":
-  version "4.1.7"
-  resolved "https://registry.yarnpkg.com/@types/swagger-ui-express/-/swagger-ui-express-4.1.7.tgz#a7b6d8cfc6b1c35723e92284507cf230ad22266a"
-  integrity sha512-ovLM9dNincXkzH4YwyYpll75vhzPBlWx6La89wwvYH7mHjVpf0X0K/vR/aUM7SRxmr5tt9z7E5XJcjQ46q+S3g==
+"@types/swagger-ui-express@^4.1.8":
+  version "4.1.8"
+  resolved "https://registry.yarnpkg.com/@types/swagger-ui-express/-/swagger-ui-express-4.1.8.tgz#3c0e0bf2543c7efb500eaa081bfde6d92f88096c"
+  integrity sha512-AhZV8/EIreHFmBV5wAs0gzJUNq9JbbSXgJLQubCC0jtIo6prnI9MIRRxnU4MZX9RB9yXxF1V4R7jtLl/Wcj31g==
   dependencies:
     "@types/express" "*"
     "@types/serve-static" "*"
