@@ -46,6 +46,8 @@ import { Security } from "./security";
 import { UploadSchema, ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
 
+export type NumericRange = Record<"integer" | "float", [number, number]>;
+
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   makeRef: (
@@ -56,6 +58,7 @@ export interface OpenAPIContext extends FlatObject {
       | (() => SchemaObject | ReferenceObject),
     name?: string,
   ) => ReferenceObject;
+  numericRange?: NumericRange | null;
   path: string;
   method: Method;
 }
@@ -73,7 +76,7 @@ export type IsHeader = (
 ) => boolean | null | undefined;
 
 interface ReqResHandlingProps<S extends z.ZodTypeAny>
-  extends Pick<OpenAPIContext, "makeRef" | "path" | "method"> {
+  extends Pick<OpenAPIContext, "makeRef" | "path" | "method" | "numericRange"> {
   schema: S;
   composition: "inline" | "components";
   description?: string;
@@ -443,27 +446,26 @@ export const depictString: Depicter = ({
 };
 
 /** @since OAS 3.1: exclusive min/max are numbers */
-export const depictNumber: Depicter = ({
-  isInt,
-  maxValue,
-  minValue,
-  _def: { checks },
-}: z.ZodNumber) => {
+export const depictNumber: Depicter = (
+  { isInt, maxValue, minValue, _def: { checks } }: z.ZodNumber,
+  {
+    numericRange = {
+      integer: [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
+      float: [-Number.MAX_VALUE, Number.MAX_VALUE],
+    },
+  },
+) => {
+  const { integer: intRange, float: floatRange } = numericRange || {
+    integer: null,
+    float: null,
+  };
   const minCheck = checks.find((check) => check.kind === "min");
   const minimum =
-    minValue === null
-      ? isInt
-        ? Number.MIN_SAFE_INTEGER
-        : -Number.MAX_VALUE
-      : minValue;
+    minValue === null ? (isInt ? intRange?.[0] : floatRange?.[0]) : minValue;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
   const maxCheck = checks.find((check) => check.kind === "max");
   const maximum =
-    maxValue === null
-      ? isInt
-        ? Number.MAX_SAFE_INTEGER
-        : Number.MAX_VALUE
-      : maxValue;
+    maxValue === null ? (isInt ? intRange?.[1] : floatRange?.[1]) : maxValue;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   const result: SchemaObject = {
     type: isInt ? "integer" : "number",
@@ -588,6 +590,7 @@ export const depictRequestParams = ({
   brandHandling,
   isHeader,
   security,
+  numericRange,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
@@ -623,7 +626,7 @@ export const depictRequestParams = ({
         rules: { ...brandHandling, ...depicters },
         onEach,
         onMissing,
-        ctx: { isResponse: false, makeRef, path, method },
+        ctx: { isResponse: false, makeRef, path, method, numericRange },
       });
       const result =
         composition === "components"
@@ -762,6 +765,7 @@ export const depictResponse = ({
   hasMultipleStatusCodes,
   statusCode,
   brandHandling,
+  numericRange,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
@@ -777,7 +781,7 @@ export const depictResponse = ({
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: { isResponse: true, makeRef, path, method },
+      ctx: { isResponse: true, makeRef, path, method, numericRange },
     }),
   );
   const media: MediaTypeObject = {
@@ -891,6 +895,7 @@ export const depictBody = ({
   composition,
   brandHandling,
   paramNames,
+  numericRange,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResHandlingProps<IOSchema> & {
   mimeType: string;
@@ -901,7 +906,7 @@ export const depictBody = ({
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: { isResponse: false, makeRef, path, method },
+      ctx: { isResponse: false, makeRef, path, method, numericRange },
     }),
     paramNames,
   );
