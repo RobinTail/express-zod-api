@@ -15,12 +15,12 @@
   resolved "https://registry.yarnpkg.com/@andrewbranch/untar.js/-/untar.js-1.0.3.tgz#ba9494f85eb83017c5c855763969caf1d0adea00"
   integrity sha512-Jh15/qVmrLGhkKJBdXlK1+9tY4lZruYjsgkDFj08ZmDiWVBLJcqkok7Z0/R0In+i1rScBpJlSvrTS2Lm41Pbnw==
 
-"@arethetypeswrong/cli@^0.17.0":
-  version "0.17.3"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.17.3.tgz#f5dc7a0b2ac894275f56c0848e9c28d7422310e0"
-  integrity sha512-wI9ZSTweunmzHboSyYtWRFpba9fM9mpX1g7EUoRr+86zHSd7NR7svb6EmJD2hv1V+SoisB2fERu6EQGGEfQ8oQ==
+"@arethetypeswrong/cli@^0.17.4":
+  version "0.17.4"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/cli/-/cli-0.17.4.tgz#45405f75081710c1cf0dab6edb4320fd75d215c8"
+  integrity sha512-AeiKxtf67XD/NdOqXgBOE5TZWH3EOCt+0GkbUpekOzngc+Q/cRZ5azjWyMxISxxfp0EItgm5NoSld9p7BAA5xQ==
   dependencies:
-    "@arethetypeswrong/core" "0.17.3"
+    "@arethetypeswrong/core" "0.17.4"
     chalk "^4.1.2"
     cli-table3 "^0.6.3"
     commander "^10.0.1"
@@ -28,12 +28,13 @@
     marked-terminal "^7.1.0"
     semver "^7.5.4"
 
-"@arethetypeswrong/core@0.17.3":
-  version "0.17.3"
-  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.17.3.tgz#ddcf903660f971e4b9948c6691f9b2f04919f5f0"
-  integrity sha512-2TB7O5JmC7UX7QHRGGftxRVQjV4Ce6oOIDGIDDERyT9dQ8lK/tRGfFubzO80rWeXm/gSrA8jirlXSWSE1i5ynQ==
+"@arethetypeswrong/core@0.17.4":
+  version "0.17.4"
+  resolved "https://registry.yarnpkg.com/@arethetypeswrong/core/-/core-0.17.4.tgz#f3f85aa8bbcca6d215938580165e47b2244c7f4c"
+  integrity sha512-Izvir8iIoU+X4SKtDAa5kpb+9cpifclzsbA8x/AZY0k0gIfXYQ1fa1B6Epfe6vNA2YfDX8VtrZFgvnXB6aPEoQ==
   dependencies:
     "@andrewbranch/untar.js" "^1.0.3"
+    "@loaderkit/resolve" "^1.0.2"
     cjs-module-lexer "^1.2.3"
     fflate "^0.8.2"
     lru-cache "^10.4.3"
@@ -70,6 +71,11 @@
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-1.0.2.tgz#bbe12dca5b4ef983a0d0af4b07b9bc90ea0ababa"
   integrity sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==
+
+"@braidai/lang@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@braidai/lang/-/lang-1.0.0.tgz#f4546ba247394eb1039338eb86e6d2e3ff05d11e"
+  integrity sha512-Ckpah5j8iAzDfc4YEP4uqnxyUznuAt6hRR093JSEYUgh2trQjCibQ2pfxHxzfz7y9vkUn9/rBxjFpGY+SPudHA==
 
 "@colors/colors@1.5.0":
   version "1.5.0"
@@ -338,6 +344,13 @@
   dependencies:
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
+
+"@loaderkit/resolve@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@loaderkit/resolve/-/resolve-1.0.2.tgz#d711555e9546e09eeff7f610674d42e86e189c15"
+  integrity sha512-yTCCjuQapvRz6S30B8DyqHu1WYsbYRCww6uNsmbQU4GQVf5gJzJSB60qUHj+qBSxReLtRL/mhmhYhrIc9jVFTw==
+  dependencies:
+    "@braidai/lang" "^1.0.0"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
