@@ -1,5 +1,5 @@
 import { ReferenceObject } from "openapi3-ts/oas31";
-import { prop } from "ramda";
+import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
 import {
@@ -899,7 +899,7 @@ describe("Documentation helpers", () => {
         depictSecurityRefs(
           [[{ type: "apiKey" }, { type: "oauth2" }, { type: "openIdConnect" }]],
           [],
-          prop("type"),
+          R.prop("type"),
         ),
       ).toMatchSnapshot();
       expect(
@@ -909,7 +909,7 @@ describe("Documentation helpers", () => {
             [{ type: "apiKey" }, { type: "openIdConnect" }],
           ],
           [],
-          prop("type"),
+          R.prop("type"),
         ),
       ).toMatchSnapshot();
       expect(
@@ -920,7 +920,7 @@ describe("Documentation helpers", () => {
             [{ type: "openIdConnect" }],
           ],
           [],
-          prop("type"),
+          R.prop("type"),
         ),
       ).toMatchSnapshot();
     });
@@ -934,7 +934,7 @@ describe("Documentation helpers", () => {
             [{ type: "openIdConnect" }],
           ],
           ["read", "write"],
-          prop("type"),
+          R.prop("type"),
         ),
       ).toMatchSnapshot();
     });
