@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
-import { tryCatch } from "ramda";
+import * as R from "ramda";
 import { z } from "zod";
 
 /**
@@ -199,7 +199,7 @@ const responseOnlyHeaders = {
 };
 
 const dest = "express-zod-api/src/well-known-headers.json";
-const mtime = tryCatch(
+const mtime = R.tryCatch(
   (cmd) => new Date(execSync(cmd, { encoding: "utf8" })),
   () => undefined,
 )(`git log -1 --pretty="format:%ci" ${dest}`);
