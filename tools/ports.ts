@@ -1,4 +1,4 @@
-import { equals, nAry, when } from "ramda";
+import * as R from "ramda";
 
 const disposer = (function* () {
   let port = 8e3 + 1e2 * Number(process.env.VITEST_POOL_ID);
@@ -6,4 +6,6 @@ const disposer = (function* () {
 })();
 
 export const givePort = (test?: "example", rsvd = 8090): number =>
-  test ? rsvd : when(equals(rsvd), nAry(0, givePort))(disposer.next().value);
+  test
+    ? rsvd
+    : R.when(R.equals(rsvd), R.nAry(0, givePort))(disposer.next().value);

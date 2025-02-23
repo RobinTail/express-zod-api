@@ -6,10 +6,24 @@ import prettierRules from "eslint-plugin-prettier/recommended";
 import allowedDepsPlugin from "eslint-plugin-allowed-dependencies";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { builtinModules } from "node:module";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const releaseDir = join(root, "express-zod-api");
 const exampleDir = join(root, "example");
+
+const importConcerns = [
+  {
+    selector:
+      "ImportDeclaration[source.value='ramda'] > ImportSpecifier, " +
+      "ImportDeclaration[source.value='ramda'] > ImportDefaultSpecifier",
+    message: "use import * as R from 'ramda'",
+  },
+  ...builtinModules.map((mod) => ({
+    selector: `ImportDeclaration[source.value='${mod}']`,
+    message: `use node:${mod} for the built-in module`,
+  })),
+];
 
 const performanceConcerns = [
   {
@@ -19,12 +33,6 @@ const performanceConcerns = [
   {
     selector: "MemberExpression[object.name='process'][property.name='env']", // #2144
     message: "Reading process.env is slow and must be memoized",
-  },
-  {
-    selector:
-      "ImportDeclaration[source.value='ramda'] > ImportSpecifier, " +
-      "ImportDeclaration[source.value='ramda'] > ImportDefaultSpecifier",
-    message: "use import * as R from 'ramda'",
   },
   {
     selector: "MemberExpression[object.name='R'] > Identifier[name='toPairs']", // #2168
@@ -173,6 +181,7 @@ export default tsPlugin.config(
     rules: {
       curly: ["warn", "multi-or-nest", "consistent"],
       "@typescript-eslint/no-shadow": "warn",
+      "no-restricted-syntax": ["warn", ...importConcerns],
       "allowed/dependencies": [
         "error",
         { development: true, ignore: ["express-zod-api"], packageDir: root },
@@ -186,7 +195,11 @@ export default tsPlugin.config(
     files: ["express-zod-api/src/*.ts"],
     rules: {
       "allowed/dependencies": ["error", { packageDir: releaseDir }],
-      "no-restricted-syntax": ["warn", ...performanceConcerns],
+      "no-restricted-syntax": [
+        "warn",
+        ...importConcerns,
+        ...performanceConcerns,
+      ],
     },
   },
   {
@@ -206,6 +219,7 @@ export default tsPlugin.config(
     rules: {
       "no-restricted-syntax": [
         "warn",
+        ...importConcerns,
         ...performanceConcerns,
         ...tsFactoryConcerns,
       ],
