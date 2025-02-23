@@ -47,7 +47,7 @@ import { UploadSchema, ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
 
 export type NumericRange = Partial<
-  Record<"integer" | "float", [number, number]>
+  Record<"integer" | "float", [number, number] | null>
 >;
 
 export interface OpenAPIContext extends FlatObject {
@@ -459,11 +459,11 @@ export const depictNumber: Depicter = (
 ) => {
   const minCheck = checks.find((check) => check.kind === "min");
   const minimum =
-    minValue === null ? (isInt ? intRange[0] : floatRange[0]) : minValue;
+    minValue === null ? (isInt ? intRange?.[0] : floatRange?.[0]) : minValue;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
   const maxCheck = checks.find((check) => check.kind === "max");
   const maximum =
-    maxValue === null ? (isInt ? intRange[1] : floatRange[1]) : maxValue;
+    maxValue === null ? (isInt ? intRange?.[1] : floatRange?.[1]) : maxValue;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   const result: SchemaObject = {
     type: isInt ? "integer" : "number",
