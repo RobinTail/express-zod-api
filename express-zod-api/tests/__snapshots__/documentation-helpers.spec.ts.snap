@@ -591,7 +591,7 @@ exports[`Documentation helpers > depictNullable() > should not add null type whe
 }
 `;
 
-exports[`Documentation helpers > depictNumber() > should type:number, min/max, format and exclusiveness props 1`] = `
+exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 0 1`] = `
 {
   "format": "double",
   "maximum": 1.7976931348623157e+308,
@@ -600,11 +600,65 @@ exports[`Documentation helpers > depictNumber() > should type:number, min/max, f
 }
 `;
 
-exports[`Documentation helpers > depictNumber() > should type:number, min/max, format and exclusiveness props 2`] = `
+exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 1 1`] = `
 {
   "format": "int64",
-  "maximum": 20,
-  "minimum": 10,
+  "maximum": 9007199254740991,
+  "minimum": -9007199254740991,
+  "type": "integer",
+}
+`;
+
+exports[`Documentation helpers > depictNumber() > should use numericRange when set 0 1`] = `
+{
+  "format": "double",
+  "maximum": 333.3333333333333,
+  "minimum": -333.3333333333333,
+  "type": "number",
+}
+`;
+
+exports[`Documentation helpers > depictNumber() > should use numericRange when set 1 1`] = `
+{
+  "format": "int64",
+  "maximum": 100,
+  "minimum": -100,
+  "type": "integer",
+}
+`;
+
+exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 0 1`] = `
+{
+  "format": "double",
+  "maximum": 33.333333333333336,
+  "minimum": -33.333333333333336,
+  "type": "number",
+}
+`;
+
+exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 1 1`] = `
+{
+  "format": "int64",
+  "maximum": 100,
+  "minimum": -100,
+  "type": "integer",
+}
+`;
+
+exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 2 1`] = `
+{
+  "exclusiveMaximum": 16.666666666666668,
+  "exclusiveMinimum": -16.666666666666668,
+  "format": "double",
+  "type": "number",
+}
+`;
+
+exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 3 1`] = `
+{
+  "exclusiveMaximum": 100,
+  "exclusiveMinimum": -100,
+  "format": "int64",
   "type": "integer",
 }
 `;
