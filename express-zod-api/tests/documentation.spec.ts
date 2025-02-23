@@ -38,6 +38,7 @@ describe("Documentation", () => {
             }),
           },
         },
+        numericRange: null,
         config: sampleConfig,
         version: "3.4.5",
         title: "Testing DELETE request without body",
