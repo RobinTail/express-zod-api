@@ -175,7 +175,7 @@ export default tsPlugin.config(
       "@typescript-eslint/no-shadow": "warn",
       "allowed/dependencies": [
         "error",
-        { development: true, ignore: ["express-zod-api"], packageDir: root },
+        { development: true, packageDir: root },
         { development: true, packageDir: releaseDir },
         { packageDir: exampleDir },
       ],
