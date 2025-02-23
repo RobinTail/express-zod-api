@@ -100,13 +100,18 @@ describe("Documentation helpers", () => {
         onEach,
         onMissing,
       });
-      expect(excludeParamsFromDepiction(depicted, ["a"])).toMatchSnapshot();
+      const [result, hasRequired] = excludeParamsFromDepiction(depicted, ["a"]);
+      expect(result).toMatchSnapshot();
+      expect(hasRequired).toMatchSnapshot();
     });
 
     test("should handle the ReferenceObject", () => {
-      expect(
-        excludeParamsFromDepiction({ $ref: "test" }, ["a"]),
-      ).toMatchSnapshot();
+      const [result, hasRequired] = excludeParamsFromDepiction(
+        { $ref: "test" },
+        ["a"],
+      );
+      expect(result).toMatchSnapshot();
+      expect(hasRequired).toBe(false);
     });
   });
 
@@ -454,8 +459,53 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictNumber()", () => {
-    test.each([z.number(), z.number().int().min(10).max(20)])(
-      "should type:number, min/max, format and exclusiveness props",
+    test.each([z.number(), z.number().int()])(
+      "should set min/max values according to JS capabilities %#",
+      (schema) => {
+        expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
+      },
+    );
+
+    test.each([z.number(), z.number().int()])(
+      "should use numericRange when set %#",
+      (schema) => {
+        expect(
+          depictNumber(schema, {
+            ...requestCtx,
+            numericRange: {
+              integer: [-100, 100],
+              float: [-1000 / 3, 1000 / 3],
+            },
+          }),
+        ).toMatchSnapshot();
+      },
+    );
+
+    test.each([z.number(), z.number().int()])(
+      "should not use numericRange when it is null %#",
+      (schema) => {
+        expect(
+          depictNumber(schema, {
+            ...requestCtx,
+            numericRange: null,
+          }),
+        ).toMatchSnapshot();
+      },
+    );
+
+    test.each([
+      z
+        .number()
+        .min(-100 / 3)
+        .max(100 / 3),
+      z.number().int().min(-100).max(100),
+      z
+        .number()
+        .gt(-100 / 6)
+        .lt(100 / 6),
+      z.number().int().gt(-100).lt(100),
+    ])(
+      "should use schema checks for min/max and exclusiveness %#",
       (schema) => {
         expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
       },

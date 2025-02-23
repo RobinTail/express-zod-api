@@ -2,6 +2,85 @@
 
 ## Version 22
 
+### v22.11.0
+
+- Featuring an ability to configure the numeric range of the generated Documentation:
+  - The new property `numericRange` on the `Documentation::constructor()` argument provides the way to specify
+    acceptable limits of `z.number()` and `z.number().int()` that your API can handle;
+  - Possible values: `{ integer: [number, number], float: [number, number] } | null`;
+  - Those numbers are used to depict min/max values for `z.number()` schema without limiting refinements;
+  - The default value is the limits of the JavaScript engine:
+    - for integers: `[ Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER ]`;
+    - for floats: `[ -Number.MAX_VALUE, Number.MAX_VALUE ]`;
+  - The `null` value disables the feature (no min/max values printed unless defined explicitly by the schema);
+    - This can be useful when a third party tool is having issues to process the generated Documentation;
+    - Such an issue was reported by [@APTy](https://github.com/APTy) for the Java-based tool:
+      [openapi-generator](https://github.com/OpenAPITools/openapi-generator).
+
+```yaml
+# Examples of representation of numerical schemes depending on this setting
+- schema: z.number()
+  numericRange: undefined
+  depicted:
+    type: number
+    format: double
+    minimum: -1.7976931348623157e+308 # -Number.MAX_VALUE
+    maximum: 1.7976931348623157e+308 # Number.MAX_VALUE
+- schema: z.number()
+  numericRange: null
+  depicted:
+    type: number
+    format: double
+- schema: z.number().int()
+  numericRange: undefined
+  depicted:
+    type: integer
+    format: int64
+    minimum: -9007199254740991 # Number.MIN_SAFE_INTEGER
+    maximum: 9007199254740991 # Number.MAX_SAFE_INTEGER
+- schema: z.number().int()
+  numericRange: null
+  depicted:
+    type: integer
+    format: int64
+- schema: z.number().int().nonnegative().max(100)
+  numericRange: undefined
+  depicted:
+    type: integer
+    format: int64
+    exclusiveMinimum: 0 # explicitly defined by .nonnegative()
+    maximum: 100 # explicitly defined by .max()
+```
+
+### v22.10.1
+
+- Fixed catching errors in a custom `ResultHandler` used as `errorHandler` for Not Found routes having async `handler`.
+
+```ts
+// reproduction
+import { createConfig, ResultHandler } from "express-zod-api";
+
+createConfig({
+  errorHandler: new ResultHandler({
+    // rejected promise was not awaited:
+    handler: async () => {
+      throw new Error(
+        "You should not do it. But if you do, we've got LastResortHandler to catch it.",
+      );
+    },
+  }),
+});
+```
+
+### v22.10.0
+
+- Featuring required request bodies in the generated Documentation:
+  - This version sets the `required` property to `requestBody` when:
+    - It contains the required properties on it;
+    - Or it's based on `ez.raw()` (proprietary schema);
+  - The presence of `requestBody` depends on the Endpoint method(s) and the configuration of `inputSources`;
+  - The lack of the property was reported by [@LufyCZ](https://github.com/LufyCZ).
+
 ### v22.9.1
 
 - Minor refactoring and optimizations.

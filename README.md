@@ -87,6 +87,8 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/APTy.png" alt="@APTy" width="50px" />](https://github.com/APTy)
+[<img src="https://github.com/LufyCZ.png" alt="@LufyCZ" width="50px" />](https://github.com/LufyCZ)
 [<img src="https://github.com/mlms13.png" alt="@mlms13" width="50px" />](https://github.com/mlms13)
 [<img src="https://github.com/bobgubko.png" alt="@bobgubko" width="50px" />](https://github.com/bobgubko)
 [<img src="https://github.com/LucWag.png" alt="@LucWag" width="50px" />](https://github.com/LucWag)
@@ -1288,7 +1290,8 @@ const yamlString = new Documentation({
   title: "Example API",
   serverUrl: "https://example.com",
   composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
-  // descriptions: { positiveResponse, negativeResponse, requestParameter, requestBody } // check out these features
+  // descriptions: { positiveResponse, negativeResponse, requestParameter, requestBody }, // check out these features
+  // numericRange: null, // to disable printing min/max values for z.number() based on JS engine limits
 }).getSpecAsYaml();
 ```
 

@@ -53,7 +53,7 @@ export const createNotFoundHandler =
     );
     const logger = getLogger(request);
     try {
-      errorHandler.execute({
+      await errorHandler.execute({
         request,
         response,
         logger,
