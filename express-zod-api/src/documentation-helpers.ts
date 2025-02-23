@@ -76,7 +76,7 @@ export type IsHeader = (
 ) => boolean | null | undefined;
 
 interface ReqResHandlingProps<S extends z.ZodTypeAny>
-  extends Pick<OpenAPIContext, "makeRef" | "path" | "method"> {
+  extends Pick<OpenAPIContext, "makeRef" | "path" | "method" | "numericRange"> {
   schema: S;
   composition: "inline" | "components";
   description?: string;
@@ -590,6 +590,7 @@ export const depictRequestParams = ({
   brandHandling,
   isHeader,
   security,
+  numericRange,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
@@ -625,7 +626,7 @@ export const depictRequestParams = ({
         rules: { ...brandHandling, ...depicters },
         onEach,
         onMissing,
-        ctx: { isResponse: false, makeRef, path, method },
+        ctx: { isResponse: false, makeRef, path, method, numericRange },
       });
       const result =
         composition === "components"
@@ -764,6 +765,7 @@ export const depictResponse = ({
   hasMultipleStatusCodes,
   statusCode,
   brandHandling,
+  numericRange,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
@@ -779,7 +781,7 @@ export const depictResponse = ({
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: { isResponse: true, makeRef, path, method },
+      ctx: { isResponse: true, makeRef, path, method, numericRange },
     }),
   );
   const media: MediaTypeObject = {
@@ -893,6 +895,7 @@ export const depictBody = ({
   composition,
   brandHandling,
   paramNames,
+  numericRange,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResHandlingProps<IOSchema> & {
   mimeType: string;
@@ -903,7 +906,7 @@ export const depictBody = ({
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: { isResponse: false, makeRef, path, method },
+      ctx: { isResponse: false, makeRef, path, method, numericRange },
     }),
     paramNames,
   );

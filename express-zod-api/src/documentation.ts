@@ -66,7 +66,7 @@ interface DocumentationParams {
    * @default {integer:[Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER], float:[-Number.MAX_VALUE, Number.MAX_VALUE]}
    * @example null — to disable the feature
    * @see depictNumber */
-  numericRange?: NumericRange;
+  numericRange?: NumericRange | null;
   /** @default inline */
   composition?: "inline" | "components";
   /**
