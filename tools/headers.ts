@@ -1,6 +1,5 @@
 import { execSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
-import { tryCatch } from "ramda";
 import { z } from "zod";
 
 /**
@@ -199,10 +198,13 @@ const responseOnlyHeaders = {
 };
 
 const dest = "express-zod-api/src/well-known-headers.json";
-const mtime = tryCatch(
-  (cmd) => new Date(execSync(cmd, { encoding: "utf8" })),
-  () => undefined,
-)(`git log -1 --pretty="format:%ci" ${dest}`);
+
+let mtime: Date | undefined;
+try {
+  mtime = new Date(
+    execSync(`git log -1 --pretty="format:%ci" ${dest}`, { encoding: "utf8" }),
+  );
+} catch {}
 
 console.info("Current state", mtime);
 
