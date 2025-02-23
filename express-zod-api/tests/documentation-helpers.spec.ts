@@ -481,6 +481,18 @@ describe("Documentation helpers", () => {
       },
     );
 
+    test.each([z.number(), z.number().int()])(
+      "should not use numericRange when it is null %#",
+      (schema) => {
+        expect(
+          depictNumber(schema, {
+            ...requestCtx,
+            numericRange: null,
+          }),
+        ).toMatchSnapshot();
+      },
+    );
+
     test.each([
       z
         .number()

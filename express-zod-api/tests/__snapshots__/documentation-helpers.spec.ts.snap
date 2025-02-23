@@ -591,6 +591,24 @@ exports[`Documentation helpers > depictNullable() > should not add null type whe
 }
 `;
 
+exports[`Documentation helpers > depictNumber() > should not use numericRange when it is null 0 1`] = `
+{
+  "format": "double",
+  "maximum": undefined,
+  "minimum": undefined,
+  "type": "number",
+}
+`;
+
+exports[`Documentation helpers > depictNumber() > should not use numericRange when it is null 1 1`] = `
+{
+  "format": "int64",
+  "maximum": undefined,
+  "minimum": undefined,
+  "type": "integer",
+}
+`;
+
 exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 0 1`] = `
 {
   "format": "double",
