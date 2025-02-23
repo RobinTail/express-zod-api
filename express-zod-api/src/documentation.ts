@@ -28,6 +28,7 @@ import {
   reformatParamsInPath,
   IsHeader,
   nonEmpty,
+  NumericRange,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
@@ -60,13 +61,10 @@ interface DocumentationParams {
   descriptions?: Partial<Record<Component, Descriptor>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
-  /** @see depictNumber */
-  numericRange?: {
-    /** @default [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER] */
-    integer?: [number, number];
-    /** @default [-Number.MAX_VALUE, Number.MAX_VALUE] */
-    float?: [number, number];
-  };
+  /**
+   * @default {integer:[Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER], float:[-Number.MAX_VALUE, Number.MAX_VALUE]}
+   * @see depictNumber */
+  numericRange?: NumericRange;
   /** @default inline */
   composition?: "inline" | "components";
   /**
@@ -160,6 +158,7 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     tags,
     isHeader,
+    numericRange,
     hasSummaryFromDescription = true,
     composition = "inline",
   }: DocumentationParams) {
@@ -174,6 +173,7 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         brandHandling,
+        numericRange,
         makeRef: this.makeRef.bind(this),
       };
       const [shortDesc, description] = (["short", "long"] as const).map(

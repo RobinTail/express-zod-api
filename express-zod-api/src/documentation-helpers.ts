@@ -46,6 +46,10 @@ import { Security } from "./security";
 import { UploadSchema, ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
 
+export type NumericRange = Partial<
+  Record<"integer" | "float", [number, number]>
+>;
+
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   makeRef: (
@@ -56,6 +60,7 @@ export interface OpenAPIContext extends FlatObject {
       | (() => SchemaObject | ReferenceObject),
     name?: string,
   ) => ReferenceObject;
+  numericRange?: NumericRange;
   path: string;
   method: Method;
 }
@@ -443,27 +448,22 @@ export const depictString: Depicter = ({
 };
 
 /** @since OAS 3.1: exclusive min/max are numbers */
-export const depictNumber: Depicter = ({
-  isInt,
-  maxValue,
-  minValue,
-  _def: { checks },
-}: z.ZodNumber) => {
+export const depictNumber: Depicter = (
+  { isInt, maxValue, minValue, _def: { checks } }: z.ZodNumber,
+  {
+    numericRange: {
+      integer: intRange = [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
+      float: floatRange = [-Number.MAX_VALUE, Number.MAX_VALUE],
+    } = {},
+  },
+) => {
   const minCheck = checks.find((check) => check.kind === "min");
   const minimum =
-    minValue === null
-      ? isInt
-        ? Number.MIN_SAFE_INTEGER
-        : -Number.MAX_VALUE
-      : minValue;
+    minValue === null ? (isInt ? intRange[0] : floatRange[0]) : minValue;
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
   const maxCheck = checks.find((check) => check.kind === "max");
   const maximum =
-    maxValue === null
-      ? isInt
-        ? Number.MAX_SAFE_INTEGER
-        : Number.MAX_VALUE
-      : maxValue;
+    maxValue === null ? (isInt ? intRange[1] : floatRange[1]) : maxValue;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   const result: SchemaObject = {
     type: isInt ? "integer" : "number",
