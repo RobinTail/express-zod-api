@@ -3,7 +3,7 @@ import {
   AST_NODE_TYPES as NT,
   type TSESLint,
   type TSESTree,
-} from "@typescript-eslint/utils";
+} from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- special case
 import { Method, methods } from "./method";
 import { name as self } from "../package.json";
 

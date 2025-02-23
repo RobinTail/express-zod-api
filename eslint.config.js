@@ -1,5 +1,5 @@
-import globals from "globals"; // eslint-disable-line allowed/dependencies -- hoisted in .npmrc
-import jsPlugin from "@eslint/js"; // eslint-disable-line allowed/dependencies -- hoisted in .npmrc
+import globals from "globals";
+import jsPlugin from "@eslint/js";
 import tsPlugin from "typescript-eslint";
 import prettierOverrides from "eslint-config-prettier";
 import prettierRules from "eslint-plugin-prettier/recommended";
@@ -8,9 +8,10 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { builtinModules } from "node:module";
 
-const root = dirname(fileURLToPath(import.meta.url));
-const releaseDir = join(root, "express-zod-api");
-const exampleDir = join(root, "example");
+const releaseDir = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "express-zod-api",
+);
 
 const importConcerns = [
   {
@@ -182,12 +183,6 @@ export default tsPlugin.config(
       curly: ["warn", "multi-or-nest", "consistent"],
       "@typescript-eslint/no-shadow": "warn",
       "no-restricted-syntax": ["warn", ...importConcerns],
-      "allowed/dependencies": [
-        "error",
-        { development: true, packageDir: root },
-        { development: true, packageDir: releaseDir },
-        { packageDir: exampleDir },
-      ],
     },
   },
   {
@@ -222,19 +217,6 @@ export default tsPlugin.config(
         ...importConcerns,
         ...performanceConcerns,
         ...tsFactoryConcerns,
-      ],
-    },
-  },
-  {
-    name: "source/migration",
-    files: [
-      "express-zod-api/src/migration.ts",
-      "express-zod-api/tests/migration.spec.ts",
-    ],
-    rules: {
-      "allowed/dependencies": [
-        "error",
-        { ignore: ["^@typescript-eslint", "^\\."], packageDir: releaseDir },
       ],
     },
   },
