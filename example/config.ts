@@ -1,7 +1,5 @@
 import { BuiltinLogger, createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
-import yaml from "yaml";
-import { readFile } from "node:fs/promises";
 import createHttpError from "http-errors";
 
 export const config = createConfig({
@@ -11,12 +9,13 @@ export const config = createConfig({
     limitError: createHttpError(413, "The file is too large"), // affects uploadAvatarEndpoint
   },
   compression: true, // affects sendAvatarEndpoint
-  beforeRouting: async ({ app }) => {
-    // third-party middlewares serving their own routes or establishing their own routing besides the API
-    const documentation = yaml.parse(
-      await readFile("example.documentation.yaml", "utf-8"),
+  // third-party middlewares serving their own routes or establishing their own routing besides the API
+  beforeRouting: ({ app }) => {
+    app.use(
+      "/docs",
+      ui.serve,
+      ui.setup(null, { swaggerUrl: "/public/docs.yaml" }),
     );
-    app.use("/docs", ui.serve, ui.setup(documentation));
   },
   inputSources: {
     patch: ["headers", "body", "params"], // affects authMiddleware used by updateUserEndpoint

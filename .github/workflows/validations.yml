@@ -23,13 +23,15 @@ jobs:
       - run: yarn test:oas
       - name: Build distribution
         run: yarn workspace express-zod-api build
+      - name: Build tests
+        run: yarn postbuild # builds the tests
       - name: Pack artifact
-        run: yarn workspace express-zod-api pack --filename dist.tgz
+        run: yarn workspace express-zod-api pack --filename ../compat-test/dist.tgz
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: express-zod-api/dist.tgz
+          path: compat-test
   Compatibility:
     name: express@${{matrix.express-version}}
     needs: OpenAPI
@@ -45,43 +47,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dist
-      - name: Init package.json
-        run: |
-          cat >package.json <<EOF
-          { "type": "module", "private": true }
-          EOF
       - name: Add dependencies
         run: |
           yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod
-          yarn add eslint@9.0 typescript-eslint@8.0 vitest
+          yarn add -D eslint@9.0 typescript-eslint@8.0 vitest tsx
           yarn add express-zod-api@./dist.tgz
-      - name: sample.ts
-        run: |
-          cat >sample.ts <<EOF
-          const test: CustomHeaderSecurity = {};
-          EOF
-      - name: migration.spec.ts
-        run: |
-          cat >migration.spec.ts <<EOF
-          import { readFile } from "node:fs/promises";
-          describe("Migration", () => {
-            test("should fix the import", async () => {
-              const fixed = await readFile("./sample.ts", "utf-8");
-              expect(fixed).toBe("const test: HeaderSecurity = {};\n");
-            });
-          });
-          EOF
-      - name: eslint.config.js
-        run: |
-          cat >eslint.config.js <<EOF
-          import parser from "@typescript-eslint/parser";
-          import migration from "express-zod-api/migration";
-          export default [
-            { languageOptions: { parser }, plugins: { migration } },
-            { files: ["**/*.ts"], rules: { "migration/v23": "error" } },
-          ];
-          EOF
-      - name: Run migration test
+      - name: Run tests
         run: |
           yarn eslint --fix
-          yarn vitest --globals
+          yarn vitest

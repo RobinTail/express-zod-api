@@ -12,8 +12,7 @@
     "validate": "vitest run --globals validate.spec.ts"
   },
   "dependencies": {
-    "swagger-ui-express": "^5.0.0",
-    "yaml": "^2.7.0"
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "@types/swagger-ui-express": "^4.1.8"
