@@ -1,0 +1,5 @@
+{
+  "type": "module",
+  "private": true,
+  "description": "This file is a subject for populating by a CI workflow"
+}
