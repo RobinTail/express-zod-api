@@ -19,4 +19,4 @@ jobs:
       - run: |
           pnpm install
           pnpm install_hooks
-      - run: pnpm -F express-zod-api exec pnpm version --minor
+      - run: pnpm -F express-zod-api exec pnpm version minor
