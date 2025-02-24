@@ -1,4 +1,4 @@
-import express, { Express, RequestHandler } from "express";
+import express from "express";
 import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
@@ -59,7 +59,7 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
     getLogger,
     config,
   });
-  return { notFoundHandler: notFoundHandler as RequestHandler, logger };
+  return { notFoundHandler, logger };
 };
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
@@ -113,9 +113,5 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     });
   }
 
-  return {
-    app: app as Express,
-    logger,
-    servers: starters.map((starter) => starter()),
-  };
+  return { app, logger, servers: starters.map((starter) => starter()) };
 };
