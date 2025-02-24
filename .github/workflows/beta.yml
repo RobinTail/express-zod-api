@@ -31,5 +31,5 @@ jobs:
       - run: |
           pnpm install
           pnpm install_hooks
-      - run: pnpm version pre${{ inputs.kind }} --preid beta
+      - run: npm version pre${{ inputs.kind }} --preid beta
         working-directory: express-zod-api

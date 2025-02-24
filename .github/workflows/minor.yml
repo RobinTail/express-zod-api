@@ -19,5 +19,5 @@ jobs:
       - run: |
           pnpm install
           pnpm install_hooks
-      - run: pnpm version minor
+      - run: npm version minor
         working-directory: express-zod-api
