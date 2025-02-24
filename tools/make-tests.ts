@@ -18,6 +18,7 @@ const quickStart = await extractQuickStartFromReadme();
 const testContent = {
   cjs: quickStart,
   esm: quickStart,
+  compat: quickStart,
   issue952: quickStart.replace(/const/g, "export const"),
 };
 

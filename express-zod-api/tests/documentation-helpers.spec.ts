@@ -1,5 +1,5 @@
 import { ReferenceObject } from "openapi3-ts/oas31";
-import { prop } from "ramda";
+import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
 import {
@@ -459,8 +459,53 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictNumber()", () => {
-    test.each([z.number(), z.number().int().min(10).max(20)])(
-      "should type:number, min/max, format and exclusiveness props",
+    test.each([z.number(), z.number().int()])(
+      "should set min/max values according to JS capabilities %#",
+      (schema) => {
+        expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
+      },
+    );
+
+    test.each([z.number(), z.number().int()])(
+      "should use numericRange when set %#",
+      (schema) => {
+        expect(
+          depictNumber(schema, {
+            ...requestCtx,
+            numericRange: {
+              integer: [-100, 100],
+              float: [-1000 / 3, 1000 / 3],
+            },
+          }),
+        ).toMatchSnapshot();
+      },
+    );
+
+    test.each([z.number(), z.number().int()])(
+      "should not use numericRange when it is null %#",
+      (schema) => {
+        expect(
+          depictNumber(schema, {
+            ...requestCtx,
+            numericRange: null,
+          }),
+        ).toMatchSnapshot();
+      },
+    );
+
+    test.each([
+      z
+        .number()
+        .min(-100 / 3)
+        .max(100 / 3),
+      z.number().int().min(-100).max(100),
+      z
+        .number()
+        .gt(-100 / 6)
+        .lt(100 / 6),
+      z.number().int().gt(-100).lt(100),
+    ])(
+      "should use schema checks for min/max and exclusiveness %#",
       (schema) => {
         expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
       },
@@ -854,7 +899,7 @@ describe("Documentation helpers", () => {
         depictSecurityRefs(
           [[{ type: "apiKey" }, { type: "oauth2" }, { type: "openIdConnect" }]],
           [],
-          prop("type"),
+          R.prop("type"),
         ),
       ).toMatchSnapshot();
       expect(
@@ -864,7 +909,7 @@ describe("Documentation helpers", () => {
             [{ type: "apiKey" }, { type: "openIdConnect" }],
           ],
           [],
-          prop("type"),
+          R.prop("type"),
         ),
       ).toMatchSnapshot();
       expect(
@@ -875,7 +920,7 @@ describe("Documentation helpers", () => {
             [{ type: "openIdConnect" }],
           ],
           [],
-          prop("type"),
+          R.prop("type"),
         ),
       ).toMatchSnapshot();
     });
@@ -889,7 +934,7 @@ describe("Documentation helpers", () => {
             [{ type: "openIdConnect" }],
           ],
           ["read", "write"],
-          prop("type"),
+          R.prop("type"),
         ),
       ).toMatchSnapshot();
     });

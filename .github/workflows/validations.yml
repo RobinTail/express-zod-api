@@ -24,17 +24,14 @@ jobs:
       - name: Build distribution
         run: yarn workspace express-zod-api build
       - name: Build tests
-        run: yarn tsx tools/make-tests.ts # todo use build:test if switched to pnpm
+        run: yarn postbuild # builds the tests
       - name: Pack artifact
-        run: yarn workspace express-zod-api pack --filename dist.tgz
-      - name: Upload artifacts
+        run: yarn workspace express-zod-api pack --filename ../compat-test/dist.tgz
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: |
-            express-zod-api/dist.tgz
-            esm-test/*.ts
-            tools/ports.ts
+          path: compat-test
   Compatibility:
     name: express@${{matrix.express-version}}
     needs: OpenAPI
@@ -50,43 +47,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dist
-      - name: Init package.json
-        run: |
-          cat >package.json <<EOF
-          { "type": "module", "private": true }
-          EOF
       - name: Add dependencies
         run: |
           yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod
           yarn add -D eslint@9.0 typescript-eslint@8.0 vitest tsx
-          yarn add express-zod-api@./express-zod-api/dist.tgz
-      - name: sample.ts
-        run: |
-          cat >sample.ts <<EOF
-          client.provide("get", "/v1/test", {id: 10});
-          EOF
-      - name: migration.spec.ts
-        run: |
-          cat >migration.spec.ts <<EOF
-          import { readFile } from "node:fs/promises";
-          describe("Migration", () => {
-            test("should fix the import", async () => {
-              const fixed = await readFile("./sample.ts", "utf-8");
-              expect(fixed).toBe('client.provide("get /v1/test", {id: 10});\n');
-            });
-          });
-          EOF
-      - name: eslint.config.js
-        run: |
-          cat >eslint.config.js <<EOF
-          import parser from "@typescript-eslint/parser";
-          import migration from "express-zod-api/migration";
-          export default [
-            { languageOptions: { parser }, plugins: { migration } },
-            { files: ["**/*.ts"], rules: { "migration/v22": "error" } },
-          ];
-          EOF
+          yarn add express-zod-api@./dist.tgz
       - name: Run tests
         run: |
           yarn eslint --fix
-          yarn vitest --globals
+          yarn vitest
