@@ -22,8 +22,7 @@
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
     "prepublishOnly": "eslint && pnpm test && pnpm build",
-    "prepack": "cp ../*.md ../LICENSE ./",
-    "postversion": "git push && git push --tags"
+    "prepack": "cp ../*.md ../LICENSE ./"
   },
   "type": "module",
   "sideEffects": true,

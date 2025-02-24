@@ -19,5 +19,5 @@ jobs:
       - run: |
           pnpm install
           pnpm install_hooks
-      - run: npm version patch
+      - run: npx bumpp patch
         working-directory: express-zod-api
