@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import {
   createRequest,
   createResponse,
-  MockRequest,
   RequestOptions,
   ResponseOptions,
 } from "node-mocks-http";
@@ -18,9 +17,7 @@ import {
 } from "./logger-helpers";
 import { AbstractMiddleware } from "./middleware";
 
-export const makeRequestMock = <REQ extends RequestOptions>(
-  props?: REQ,
-): MockRequest<Request & REQ> =>
+export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) =>
   createRequest<Request & REQ>({
     ...props,
     headers: { "content-type": contentTypes.json, ...props?.headers },
@@ -114,11 +111,7 @@ export const testEndpoint = async <
     config: configMock as CommonConfig,
     logger: loggerMock as ActualLogger,
   });
-  return {
-    requestMock: requestMock as MockRequest<Request & REQ>,
-    responseMock,
-    loggerMock,
-  };
+  return { requestMock, responseMock, loggerMock };
 };
 
 export const testMiddleware = async <
@@ -148,20 +141,10 @@ export const testMiddleware = async <
       input,
       options,
     });
-    return {
-      requestMock: requestMock as MockRequest<Request & REQ>,
-      responseMock,
-      loggerMock,
-      output,
-    };
+    return { requestMock, responseMock, loggerMock, output };
   } catch (error) {
     if (!errorHandler) throw error;
     errorHandler(ensureError(error), responseMock);
-    return {
-      requestMock: requestMock as MockRequest<Request & REQ>,
-      responseMock,
-      loggerMock,
-      output: {},
-    };
+    return { requestMock, responseMock, loggerMock, output: {} };
   }
 };
