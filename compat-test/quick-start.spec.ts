@@ -12,7 +12,6 @@ import {
 describe("ESM Test", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
-    console.log(chunk.toString());
     out += chunk.toString();
   };
   const quickStart = spawn("tsx", ["quick-start.ts"]);
