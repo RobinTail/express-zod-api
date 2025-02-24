@@ -2,6 +2,10 @@
 
 ## Version 22
 
+### v22.11.1
+
+- Simplified the type of `requestMock` returned from `testEndpoint` and `testMiddleware`.
+
 ### v22.11.0
 
 - Featuring an ability to configure the numeric range of the generated Documentation:
