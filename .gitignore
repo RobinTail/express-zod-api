@@ -2,9 +2,7 @@ node_modules
 dist
 *.tgz
 migration
-yarn-error.log
 .idea
-.npmrc
 coverage
 *-test/quick-start.ts
 issue952-test/*.d.ts

@@ -1,0 +1,6 @@
+packages:
+  - express-zod-api
+  - example
+  - cjs-test
+  - esm-test
+  - issue952-test
