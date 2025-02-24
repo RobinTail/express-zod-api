@@ -10,9 +10,5 @@
     "express-zod-api": "workspace:*",
     "express": "^5.0.1",
     "express-fileupload": "^1.5.1"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.0",
-    "@types/express-fileupload": "^1.5.1"
   }
 }
