@@ -10,7 +10,6 @@ import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
-import type {} from "qs"; // fixes TS2742 for attachRouting
 
 type EquippedRequest = Request<
   unknown,
