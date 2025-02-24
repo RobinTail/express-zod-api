@@ -31,10 +31,10 @@
   - The `null` value disables the feature (no min/max values printed unless defined explicitly by the schema);
     - This can be useful when a third party tool is having issues to process the generated Documentation;
     - Such an issue was reported by [@APTy](https://github.com/APTy) for the Java-based tool:
-      [openapi-generator](https://github.com/OpenAPITools/openapi-generator).
+      [openapi-generator](https://github.com/OpenAPITools/openapi-generator);
+  - Examples of representation of numerical schemes depending on this setting:
 
 ```yaml
-# Examples of representation of numerical schemes depending on this setting
 - schema: z.number()
   numericRange: undefined
   depicted:
@@ -1609,25 +1609,22 @@ const labeledDefaultSchema = withMeta(
 - Fixed possibly invalid values of `type` property when depicting `z.literal()`, `z.enum()` and `z.nativeEnum()`.
 
 ```yaml
-# z.literal("success")
-before:
-  type: string
-  enum: # replaced
-    - success
-after:
-  type: string
-  const: success
-```
-
-```yaml
-# z.literal(null)
-before:
-  type: object # fixed
-  enum:
-    - null
-after:
-  type: "null"
-  const: null
+- schema: z.literal("success")
+  before:
+    type: string
+    enum: # replaced
+      - success
+  after:
+    type: string
+    const: success
+- schema: z.literal(null)
+  before:
+    type: object # fixed
+    enum:
+      - null
+  after:
+    type: "null"
+    const: null
 ```
 
 ### v17.5.0
@@ -2807,10 +2804,10 @@ const defaultResultHandler = createResultHandler({
 ### v10.5.0
 
 - Errors that may occur when generating documentation are now more informative.
-  - Changes made to the message of `OpenAPIError` class.
+  - Changes made to the message of `OpenAPIError` class;
+- Example of additional details in the second line of the error message:
 
 ```yaml
-# example of additional details in the second line of the error message
 before: >-
   Using transformations on the top level of input schema is not allowed.
 after: |-
@@ -2892,7 +2889,7 @@ new Client({
   - Affected schemas: `z.any()` and `z.preprocess()`.
 
 ```yaml
-# depiction of z.any() in the generated documentation
+schema: z.any()
 before:
   format: any
   nullable: true
@@ -3027,7 +3024,7 @@ after:
     - If/when it's not enough precise, consider specifying your own implementation.
 
 ```yaml
-# having z.lazy() within your IO schema
+schema: z.lazy()
 before:
   error: Zod type ZodLazy is unsupported
 after:
@@ -3410,7 +3407,7 @@ z.object({}).transform(() => []); // never[] inherits Array inherits Object, {} 
   - Preserving the custom description of `z.dateIn()` and `z.dateOut()` schemas when generating OpenAPI documentation.
 
 ```yaml
-# z.dateIn().describe("custom description")
+schema: z.dateIn().describe("custom description")
 before:
   description: YYYY-MM-DDTHH:mm:ss.sssZ
 after:
@@ -3782,10 +3779,10 @@ const config = createConfig({
 ```
 
 ```yaml
-# the default headers are:
 Access-Control-Allow-Origin: *
 Access-Control-Allow-Methods: ..., OPTIONS # endpoint methods + OPTIONS
 Access-Control-Allow-Headers: content-type
+Access-Control-Max-Age: 5000
 ```
 
 ### v7.4.1
@@ -4295,10 +4292,8 @@ const endpoint = newFactory.build({
   - See "Path templating" at https://swagger.io/specification/.
 
 ```yaml
-# before
-/v1/user/:id:
-# after
-"/v1/user/{id}":
+before: "/v1/user/:id"
+after: "/v1/user/{id}"
 ```
 
 ### v3.1.1
@@ -4602,11 +4597,11 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
 - You can send other data and specify additional `input` parameters, including arrays and objects.
 - Fixed the OPTIONS duplication issue in response header when `cors` option is enabled:
 
-```http request
-# before
-Access-Control-Allow-Methods: POST, OPTIONS, OPTIONS
-# after
-Access-Control-Allow-Methods: POST, OPTIONS
+```yaml
+before:
+  Access-Control-Allow-Methods: POST, OPTIONS, OPTIONS
+after:
+  Access-Control-Allow-Methods: POST, OPTIONS
 ```
 
 ### v2.4.0
