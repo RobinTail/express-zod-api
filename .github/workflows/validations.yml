@@ -23,6 +23,8 @@ jobs:
       - run: yarn test:oas
       - name: Build distribution
         run: yarn workspace express-zod-api build
+      - name: Build tests
+        run: yarn postbuild # builds the tests
       - name: Pack artifact
         run: yarn workspace express-zod-api pack --filename ../compat-test/dist.tgz
       - name: Upload artifact
@@ -48,9 +50,9 @@ jobs:
       - name: Add dependencies
         run: |
           yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod
-          yarn add eslint@9.0 typescript-eslint@8.0 vitest
+          yarn add -D eslint@9.0 typescript-eslint@8.0 vitest tsx
           yarn add express-zod-api@./dist.tgz
-      - name: Run migration test
+      - name: Run tests
         run: |
           yarn eslint --fix
           yarn vitest
