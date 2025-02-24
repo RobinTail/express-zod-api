@@ -17,13 +17,11 @@ import {
 } from "node-mocks-http";
 import { AbstractMiddleware } from "./middleware";
 
-export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) => {
-  const mock = createRequest<Request>({
+export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) =>
+  createRequest<Request & REQ>({
     ...props,
     headers: { "content-type": contentTypes.json, ...props?.headers },
   });
-  return mock as typeof mock & REQ;
-};
 
 export const makeResponseMock = (opt?: ResponseOptions) =>
   createResponse<Response>(opt);
