@@ -31,6 +31,7 @@ jobs:
         run: |
           pnpm -w upgrade
           pnpm -F express-zod-api upgrade
+          pnpm dedupe
 
       - name: Branch name
         id: create-branch
