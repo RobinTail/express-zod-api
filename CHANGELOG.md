@@ -2,6 +2,16 @@
 
 ## Version 22
 
+### v22.11.2
+
+- Fixed: allow future versions of Express 5:
+  - Incorrect condition for the peer dependency was introduced in v21.0.0.
+
+```diff
+- "express": "^4.21.1 || 5.0.1",
++ "express": "^4.21.1 || ^5.0.1",
+```
+
 ### v22.11.1
 
 - Simplified the type of `requestMock` returned from `testEndpoint` and `testMiddleware`.

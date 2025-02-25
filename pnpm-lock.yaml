@@ -130,7 +130,7 @@ importers:
         specifier: ^1.7.4
         version: 1.8.0
       express:
-        specifier: ^4.21.1 || 5.0.1
+        specifier: ^4.21.1 || ^5.0.1
         version: 5.0.1
       express-fileupload:
         specifier: ^1.5.0
