@@ -28,7 +28,9 @@ jobs:
         run: pnpm install
 
       - name: Upgrade dependencies
-        run: pnpm -F express-zod-api upgrade
+        run: |
+          pnpm -w upgrade
+          pnpm -F express-zod-api upgrade
 
       - name: Branch name
         id: create-branch
