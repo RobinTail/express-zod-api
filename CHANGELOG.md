@@ -2,6 +2,16 @@
 
 ## Version 21
 
+### v21.11.4
+
+- Fixed: allow future versions of Express 5:
+  - Incorrect condition for the peer dependency was introduced in v21.0.0.
+
+```diff
+- "express": "^4.21.1 || 5.0.1",
++ "express": "^4.21.1 || ^5.0.1",
+```
+
 ### v21.11.3
 
 - Fixed a bug that could lead to duplicate properties in generated client types:
