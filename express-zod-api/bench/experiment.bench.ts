@@ -1,4 +1,4 @@
-import { has } from "ramda";
+import * as R from "ramda";
 import { bench } from "vitest";
 
 describe("Experiment for key lookup", () => {
@@ -13,7 +13,11 @@ describe("Experiment for key lookup", () => {
   });
 
   bench("R.has", () => {
-    return void (has("a", subject) && has("b", subject) && has("c", subject));
+    return void (
+      R.has("a", subject) &&
+      R.has("b", subject) &&
+      R.has("c", subject)
+    );
   });
 
   bench("Object.keys + includes", () => {
