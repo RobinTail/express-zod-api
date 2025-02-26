@@ -19,14 +19,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: yarn install
-      - run: yarn test:oas
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun test:oas
       - name: Build distribution
-        run: yarn workspace express-zod-api build
+        run: bun -F express-zod-api build
       - name: Build tests
-        run: yarn postbuild # builds the tests
+        run: bun postbuild # builds the tests
       - name: Pack artifact
-        run: yarn workspace express-zod-api pack --filename ../compat-test/dist.tgz
+        working-directory: express-zod-api
+        run: bun pm pack --filename compat-test/dist.tgz
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
