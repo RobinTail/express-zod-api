@@ -9,20 +9,20 @@
     "issue952-test"
   ],
   "scripts": {
-    "start": "yarn workspace example start",
+    "start": "bun -F example start",
     "prebuild": "tsx tools/contributors.ts && tsx tools/license.ts",
-    "build": "yarn workspace express-zod-api build && yarn workspace example build",
+    "build": "bun -F express-zod-api build && bun -F example build",
     "postbuild": "tsx tools/make-tests.ts",
-    "test": "yarn workspace express-zod-api test",
-    "test:example": "yarn workspace example test",
-    "test:oas": "yarn workspace example validate",
-    "test:cjs": "yarn workspace cjs-test test",
-    "test:esm": "yarn workspace esm-test test",
-    "test:952": "yarn workspace issue952-test test",
-    "bench": "yarn workspace express-zod-api bench",
+    "test": "bun -F express-zod-api test",
+    "test:example": "bun -F example test",
+    "test:oas": "bun -F example validate",
+    "test:cjs": "bun -F cjs-test test",
+    "test:esm": "bun -F esm-test test",
+    "test:952": "bun -F issue952-test test",
+    "bench": "bun -F express-zod-api bench",
     "lint": "eslint && prettier *.md --check",
     "mdfix": "prettier *.md --write",
-    "precommit": "yarn lint && yarn test && yarn build && git add *.md example/example.* LICENSE",
+    "precommit": "bun lint && bun run test && bun run build && git add *.md example/example.* LICENSE",
     "install_hooks": "husky"
   },
   "devDependencies": {
@@ -52,6 +52,5 @@
   },
   "resolutions": {
     "**/@scarf/scarf": "npm:empty-npm-package@1.0.0"
-  },
-  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+  }
 }

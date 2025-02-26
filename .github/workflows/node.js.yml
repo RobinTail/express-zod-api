@@ -18,9 +18,6 @@ jobs:
         node-version: [20.9.0, 20.x, 22.0.0, 22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
-    - name: Get yarn cache dir
-      id: yarnCache
-      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
     - name: Checkout
       uses: actions/checkout@v4
     - name: Install Node.js ${{ matrix.node-version }}
@@ -28,19 +25,26 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+    - name: Install bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+    - name: Get bun cache dir and hash
+      id: bunCache
+      run: |
+        echo "dir=$(bun pm cache)" >> $GITHUB_OUTPUT
+        echo "hash=$(bun pm hash)" >> $GITHUB_OUTPUT
     - name: Cache node modules
       uses: actions/cache@v4
-      env:
-        cache-name: cache-yarn
       with:
-        path: ${{ steps.yarnCache.outputs.dir }}
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/yarn.lock') }}
+        path: ${{ steps.bunCache.outputs.dir }}
+        key: ${{ runner.os }}-build-cache-bun-${{ steps.bunCache.outputs.hash }}
     - name: Install dependencies
-      run: yarn install
+      run: bun install
     - name: Lint
-      run: yarn lint
+      run: bun lint
     - name: Unit tests
-      run: yarn test
+      run: bun run test
     - name: Coveralls
       uses: coverallsapp/github-action@v2
       continue-on-error: true
@@ -49,15 +53,15 @@ jobs:
         flag-name: run-${{ matrix.node-version }}
         parallel: true
     - name: Build
-      run: yarn build
+      run: bun run build
     - name: Example test
-      run: yarn test:example
+      run: bun test:example
     - name: CJS test
-      run: yarn test:cjs
+      run: bun test:cjs
     - name: ESM test
-      run: yarn test:esm
+      run: bun test:esm
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
-      run: yarn test:952
+      run: bun test:952
   report:
     needs: build
     runs-on: ubuntu-latest

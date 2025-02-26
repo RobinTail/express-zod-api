@@ -17,11 +17,11 @@
   "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
     "build": "tsup",
-    "postbuild": "yarn pack --filename release.tgz && attw release.tgz && rm release.tgz",
+    "postbuild": "attw --pack",
     "pretest": "tsc --noEmit",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
-    "prepublishOnly": "eslint && yarn test && yarn build",
+    "prepublishOnly": "eslint && bun run test && bun run build",
     "prepack": "cp ../*.md ../LICENSE ./",
     "postversion": "git push && git push --tags"
   },
@@ -135,6 +135,5 @@
     "swagger-documentation",
     "zod",
     "validation"
-  ],
-  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+  ]
 }
