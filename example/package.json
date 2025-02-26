@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "tsx index.ts",
+    "start": "bun run index.ts",
     "build": "bun build:docs && bun build:client",
-    "build:docs": "tsx generate-documentation.ts",
-    "build:client": "tsx generate-client.ts",
+    "build:docs": "bun run generate-documentation.ts",
+    "build:client": "bun run generate-client.ts",
     "test": "vitest run --globals index.spec.ts",
     "validate": "vitest run --globals validate.spec.ts"
   },
