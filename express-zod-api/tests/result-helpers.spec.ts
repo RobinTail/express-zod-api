@@ -116,22 +116,22 @@ describe("Result helpers", () => {
         ).toBe(mode === "production" ? "Bad Request" : "invalid inputs");
         expect(
           getPublicErrorMessage(
-            createHttpError(500, "something particual failed", {
+            createHttpError(500, "something particular failed", {
               expose: true,
             }),
           ),
-        ).toBe("something particual failed");
+        ).toBe("something particular failed");
       });
 
       test("should return generalized message for 500", () => {
         expect(
           getPublicErrorMessage(
-            createHttpError(500, "something particual failed"),
+            createHttpError(500, "something particular failed"),
           ),
         ).toBe(
           mode === "production"
             ? "Internal Server Error"
-            : "something particual failed",
+            : "something particular failed",
         );
       });
     },
