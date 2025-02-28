@@ -740,7 +740,7 @@ const after: Routing = {
 - Introducing `errorHandler` option for `testMiddleware()` method:
   - If your middleware throws an error there was no ability to make assertions other than the thrown error;
   - New option can be assigned with a function for transforming the error into response, so that `testMiddlware` itself
-    would not throw, enabling usage of all returned entities for mutiple assertions in test;
+    would not throw, enabling usage of all returned entities for multiple assertions in test;
   - The feature suggested by [@williamgcampbell](https://github.com/williamgcampbell).
 
 ```ts

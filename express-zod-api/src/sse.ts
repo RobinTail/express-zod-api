@@ -16,7 +16,7 @@ type EventsMap = Record<string, z.ZodTypeAny>;
 export interface Emitter<E extends EventsMap> extends FlatObject {
   /** @desc Returns true when the connection was closed or terminated */
   isClosed: () => boolean;
-  /** @desc Sends an event to the stream accordin to the declared schema */
+  /** @desc Sends an event to the stream according to the declared schema */
   emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => void;
 }
 
