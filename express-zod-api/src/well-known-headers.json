@@ -72,6 +72,7 @@
   "depth",
   "derived-from",
   "destination",
+  "detached-jws",
   "differential-id",
   "dictionary-id",
   "digest",
