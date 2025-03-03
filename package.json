@@ -43,7 +43,7 @@
     "express-fileupload": "^1.5.0",
     "http-errors": "^2.0.0",
     "husky": "^9.0.5",
-    "prettier": "3.5.2",
+    "prettier": "3.5.3",
     "tsx": "^4.19.3",
     "typescript": "^5.5.2",
     "typescript-eslint": "^8.25.0",
