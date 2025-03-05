@@ -32,7 +32,7 @@
     "@types/express-fileupload": "^1.5.0",
     "@types/http-errors": "^2.0.2",
     "@types/node": "^22.13.5",
-    "@typescript-eslint/rule-tester": "^8.25.0",
+    "@typescript-eslint/rule-tester": "^8.26.0",
     "@vitest/coverage-v8": "^3.0.7",
     "compression": "^1.7.4",
     "eslint": "^9.21.0",
@@ -46,7 +46,7 @@
     "prettier": "3.5.3",
     "tsx": "^4.19.3",
     "typescript": "^5.5.2",
-    "typescript-eslint": "^8.25.0",
+    "typescript-eslint": "^8.26.0",
     "vitest": "^3.0.7",
     "zod": "^3.23.0"
   },
