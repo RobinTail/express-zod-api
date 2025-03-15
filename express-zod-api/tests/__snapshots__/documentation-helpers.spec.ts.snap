@@ -1099,7 +1099,7 @@ exports[`Documentation helpers > depictSecurity() > should depict OAuth2 Securit
 ]
 `;
 
-exports[`Documentation helpers > depictSecurity() > should handle Basic, Bearer and CustomHeader Securities 1`] = `
+exports[`Documentation helpers > depictSecurity() > should handle Basic, Bearer and Header Securities 1`] = `
 [
   [
     {
