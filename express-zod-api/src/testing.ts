@@ -14,17 +14,22 @@ import {
   RequestOptions,
   createResponse,
   ResponseOptions,
+  MockRequest,
+  MockResponse,
 } from "node-mocks-http";
 import { AbstractMiddleware } from "./middleware";
 
-export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) =>
+export const makeRequestMock = <REQ extends RequestOptions>(
+  props?: REQ,
+): MockRequest<Request & REQ> =>
   createRequest<Request & REQ>({
     ...props,
     headers: { "content-type": contentTypes.json, ...props?.headers },
   });
 
-export const makeResponseMock = (opt?: ResponseOptions) =>
-  createResponse<Response>(opt);
+export const makeResponseMock = (
+  opt?: ResponseOptions,
+): MockResponse<Response> => createResponse<Response>(opt);
 
 export const makeLoggerMock = <LOG extends FlatObject>(loggerProps?: LOG) => {
   const logs: Record<Severity, unknown[]> = {
