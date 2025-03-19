@@ -147,7 +147,7 @@ Much can be customized to fit your needs.
 ## Technologies
 
 - [Typescript](https://www.typescriptlang.org/) first.
-- Web server — [Express.js](https://expressjs.com/) v4 or v5.
+- Web server — [Express.js](https://expressjs.com/) v5.
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin).
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
@@ -165,7 +165,7 @@ Install the framework, its peer dependencies and type assistance packages using 
 [package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/).
 
 ```shell
-# example for yarn and express 5 (recommended):
+# example for yarn:
 yarn add express-zod-api express@^5 zod typescript http-errors
 yarn add -D @types/express@^5 @types/node @types/http-errors
 ```
