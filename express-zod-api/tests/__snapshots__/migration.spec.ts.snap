@@ -7,6 +7,9 @@ exports[`Migration > should consist of one rule being the major version of the p
       "create": [Function],
       "defaultOptions": [],
       "meta": {
+        "deprecated": {
+          "message": "Single-use tool that can be removed and changed regardless SemVer. Remember to delete it after use.",
+        },
         "fixable": "code",
         "messages": {
           "add": "Add {{subject}} to {{to}}",

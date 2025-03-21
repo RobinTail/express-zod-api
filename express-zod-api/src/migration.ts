@@ -75,6 +75,10 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
       change: "Change {{subject}} {{from}} to {{to}}.",
       remove: "Remove {{subject}} {{name}}.",
     },
+    deprecated: {
+      message:
+        "Single-use tool that can be removed and changed regardless SemVer. Remember to delete it after use.",
+    },
   },
   defaultOptions: [],
   create: (ctx) =>
