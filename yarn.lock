@@ -493,10 +493,10 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-4.6.0.tgz#3c7c9c46e678feefe7a2e5bb609d3dbd665ffb3f"
   integrity sha512-t09vSN3MdfsyCHoFcTRCH/iUtG7OJ0CsjzB8cjAmKc/va/kIgeDI/TxsigdncE/4be734m0cvIYwNaV4i2XqAw==
 
-"@tsconfig/node20@^20.1.4":
-  version "20.1.4"
-  resolved "https://registry.yarnpkg.com/@tsconfig/node20/-/node20-20.1.4.tgz#3457d42eddf12d3bde3976186ab0cd22b85df928"
-  integrity sha512-sqgsT69YFeLWf5NtJ4Xq/xAF8p4ZQHlmGW74Nu2tD4+g5fAsposc4ZfaaPixVu4y01BEiDCWLRDCvDM5JOsRxg==
+"@tsconfig/node20@^20.1.5":
+  version "20.1.5"
+  resolved "https://registry.yarnpkg.com/@tsconfig/node20/-/node20-20.1.5.tgz#6e5dc3c90088865669c555a156252f75d1a84c0a"
+  integrity sha512-Vm8e3WxDTqMGPU4GATF9keQAIy1Drd7bPwlgzKJnZtoOsTm1tduUTbDjg0W5qERvGuxPI2h9RbMufH0YdfBylA==
 
 "@types/body-parser@*":
   version "1.19.5"
