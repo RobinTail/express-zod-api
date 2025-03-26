@@ -1,6 +1,6 @@
 import { z } from "zod";
-import type { EmptyObject, FlatObject } from "./common-helpers";
-import { metaSymbol } from "./metadata";
+import type { EmptyObject, FlatObject } from "./common-helpers.ts";
+import { metaSymbol } from "./metadata.ts";
 
 export interface NextHandlerInc<U> {
   next: (schema: z.ZodTypeAny) => U;

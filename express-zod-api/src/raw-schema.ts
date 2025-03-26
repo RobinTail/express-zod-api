@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { file } from "./file-schema";
+import { file } from "./file-schema.ts";
 
 export const ezRawBrand = Symbol("Raw");
 

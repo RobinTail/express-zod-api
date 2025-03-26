@@ -1,7 +1,7 @@
-import "../src/zod-plugin"; // required for this test
+import "../src/zod-plugin.ts"; // required for this test
 import camelize from "camelize-ts";
 import { z } from "zod";
-import { metaSymbol } from "../src/metadata";
+import { metaSymbol } from "../src/metadata.ts";
 
 describe("Zod Runtime Plugin", () => {
   describe(".example()", () => {

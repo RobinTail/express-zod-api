@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { ez } from "../src";
-import { metaSymbol } from "../src/metadata";
-import { ezUploadBrand } from "../src/upload-schema";
+import { ez } from "../src/index.ts";
+import { metaSymbol } from "../src/metadata.ts";
+import { ezUploadBrand } from "../src/upload-schema.ts";
 
 describe("ez.upload()", () => {
   describe("creation", () => {

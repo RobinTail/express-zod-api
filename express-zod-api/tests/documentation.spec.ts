@@ -10,10 +10,10 @@ import {
   defaultEndpointsFactory,
   ez,
   ResultHandler,
-} from "../src";
-import { contentTypes } from "../src/content-type";
+} from "../src/index.ts";
+import { contentTypes } from "../src/content-type.ts";
 import { z } from "zod";
-import { givePort } from "../../tools/ports";
+import { givePort } from "../../tools/ports.ts";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({

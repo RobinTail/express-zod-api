@@ -16,7 +16,7 @@ import {
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
-import { ResponseVariant } from "./api-response";
+import { ResponseVariant } from "./api-response.ts";
 import {
   FlatObject,
   combinations,
@@ -28,23 +28,23 @@ import {
   getTransformedType,
   ucFirst,
   Tag,
-} from "./common-helpers";
-import { InputSource } from "./config-type";
-import { DateInSchema, ezDateInBrand } from "./date-in-schema";
-import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
-import { hasRaw } from "./deep-checks";
-import { DocumentationError } from "./errors";
-import { FileSchema, ezFileBrand } from "./file-schema";
-import { extractObjectSchema, IOSchema } from "./io-schema";
-import { Alternatives } from "./logical-container";
-import { metaSymbol } from "./metadata";
-import { Method } from "./method";
-import { ProprietaryBrand } from "./proprietary-schemas";
-import { RawSchema, ezRawBrand } from "./raw-schema";
-import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
-import { Security } from "./security";
-import { UploadSchema, ezUploadBrand } from "./upload-schema";
-import wellKnownHeaders from "./well-known-headers.json";
+} from "./common-helpers.ts";
+import { InputSource } from "./config-type.ts";
+import { DateInSchema, ezDateInBrand } from "./date-in-schema.ts";
+import { DateOutSchema, ezDateOutBrand } from "./date-out-schema.ts";
+import { hasRaw } from "./deep-checks.ts";
+import { DocumentationError } from "./errors.ts";
+import { FileSchema, ezFileBrand } from "./file-schema.ts";
+import { extractObjectSchema, IOSchema } from "./io-schema.ts";
+import { Alternatives } from "./logical-container.ts";
+import { metaSymbol } from "./metadata.ts";
+import { Method } from "./method.ts";
+import { ProprietaryBrand } from "./proprietary-schemas.ts";
+import { RawSchema, ezRawBrand } from "./raw-schema.ts";
+import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker.ts";
+import { Security } from "./security.ts";
+import { UploadSchema, ezUploadBrand } from "./upload-schema.ts";
+import wellKnownHeaders from "./well-known-headers.json" with { type: "json" };
 
 export type NumericRange = Record<"integer" | "float", [number, number]>;
 

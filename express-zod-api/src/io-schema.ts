@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { FlatObject } from "./common-helpers";
-import { copyMeta } from "./metadata";
-import { AbstractMiddleware } from "./middleware";
-import { RawSchema } from "./raw-schema";
+import { FlatObject } from "./common-helpers.ts";
+import { copyMeta } from "./metadata.ts";
+import { AbstractMiddleware } from "./middleware.ts";
+import { RawSchema } from "./raw-schema.ts";
 
 type BaseObject<U extends z.UnknownKeysParam> = z.ZodObject<z.ZodRawShape, U>;
 

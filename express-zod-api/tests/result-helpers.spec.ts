@@ -1,13 +1,13 @@
 import createHttpError from "http-errors";
 import { z } from "zod";
-import { InputValidationError, OutputValidationError } from "../src";
+import { InputValidationError, OutputValidationError } from "../src/index.ts";
 import {
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
   normalize,
-} from "../src/result-helpers";
-import { makeLoggerMock, makeRequestMock } from "../src/testing";
+} from "../src/result-helpers.ts";
+import { makeLoggerMock, makeRequestMock } from "../src/testing.ts";
 
 describe("Result helpers", () => {
   describe("normalize()", () => {

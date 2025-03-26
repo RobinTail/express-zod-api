@@ -6,15 +6,15 @@ import {
   arrayResultHandler,
   defaultResultHandler,
   ResultHandler,
-} from "../src";
-import { ResultHandlerError } from "../src/errors";
-import { metaSymbol } from "../src/metadata";
-import { AbstractResultHandler, Result } from "../src/result-handler";
+} from "../src/index.ts";
+import { ResultHandlerError } from "../src/errors.ts";
+import { metaSymbol } from "../src/metadata.ts";
+import { AbstractResultHandler, Result } from "../src/result-handler.ts";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
-} from "../src/testing";
+} from "../src/testing.ts";
 
 describe("ResultHandler", () => {
   describe("constructor()", () => {

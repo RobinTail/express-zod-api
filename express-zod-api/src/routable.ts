@@ -1,4 +1,4 @@
-import { Routing } from "./routing";
+import { Routing } from "./routing.ts";
 
 export abstract class Routable {
   /** @desc Marks the route as deprecated (makes a copy of the endpoint) */

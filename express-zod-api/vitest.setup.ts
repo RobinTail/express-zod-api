@@ -1,7 +1,7 @@
 import type { NewPlugin } from "@vitest/pretty-format";
 import { z } from "zod";
-import { ResultHandlerError } from "./src/errors";
-import { metaSymbol } from "./src/metadata";
+import { ResultHandlerError } from "./src/errors.ts";
+import { metaSymbol } from "./src/metadata.ts";
 
 /** Takes cause and certain props of custom errors into account */
 const errorSerializer: NewPlugin = {

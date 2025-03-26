@@ -1,5 +1,5 @@
 import z from "zod";
-import { arrayRespondingFactory } from "../factories";
+import { arrayRespondingFactory } from "../factories.ts";
 
 /**
  * This endpoint demonstrates the ability to respond with array.

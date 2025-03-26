@@ -1,12 +1,12 @@
 import * as R from "ramda";
 import type { ZodRawShape } from "zod";
-import { responseVariants } from "./api-response";
-import { FlatObject, getRoutePathParams } from "./common-helpers";
-import { contentTypes } from "./content-type";
-import { assertJsonCompatible } from "./deep-checks";
-import { AbstractEndpoint } from "./endpoint";
-import { extractObjectSchema } from "./io-schema";
-import { ActualLogger } from "./logger-helpers";
+import { responseVariants } from "./api-response.ts";
+import { FlatObject, getRoutePathParams } from "./common-helpers.ts";
+import { contentTypes } from "./content-type.ts";
+import { assertJsonCompatible } from "./deep-checks.ts";
+import { AbstractEndpoint } from "./endpoint.ts";
+import { extractObjectSchema } from "./io-schema.ts";
+import { ActualLogger } from "./logger-helpers.ts";
 
 export class Diagnostics {
   /** @desc (catcher)(...args) => bool | ReturnValue<typeof catcher> */

@@ -1,13 +1,13 @@
 import createHttpError from "http-errors";
 import { z } from "zod";
-import { DocumentationError, RoutingError } from "../src";
+import { DocumentationError, RoutingError } from "../src/index.ts";
 import {
   IOSchemaError,
   InputValidationError,
   MissingPeerError,
   OutputValidationError,
   ResultHandlerError,
-} from "../src/errors";
+} from "../src/errors.ts";
 
 describe("Errors", () => {
   describe("environment check", () => {

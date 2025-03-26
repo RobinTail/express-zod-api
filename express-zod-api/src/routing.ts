@@ -1,15 +1,15 @@
 import { IRouter, RequestHandler } from "express";
 import createHttpError from "http-errors";
-import { isProduction } from "./common-helpers";
-import { CommonConfig } from "./config-type";
-import { ContentType } from "./content-type";
-import { DependsOnMethod } from "./depends-on-method";
-import { Diagnostics } from "./diagnostics";
-import { AbstractEndpoint } from "./endpoint";
-import { AuxMethod, Method } from "./method";
-import { OnEndpoint, walkRouting } from "./routing-walker";
-import { ServeStatic } from "./serve-static";
-import { GetLogger } from "./server-helpers";
+import { isProduction } from "./common-helpers.ts";
+import { CommonConfig } from "./config-type.ts";
+import { ContentType } from "./content-type.ts";
+import { DependsOnMethod } from "./depends-on-method.ts";
+import { Diagnostics } from "./diagnostics.ts";
+import { AbstractEndpoint } from "./endpoint.ts";
+import { AuxMethod, Method } from "./method.ts";
+import { OnEndpoint, walkRouting } from "./routing-walker.ts";
+import { ServeStatic } from "./serve-static.ts";
+import { GetLogger } from "./server-helpers.ts";
 
 export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;

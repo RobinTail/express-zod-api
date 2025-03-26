@@ -4,8 +4,8 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- special case
-import { Method, methods } from "./method";
-import { name as self } from "../package.json";
+import { Method, methods } from "./method.ts";
+import manifest from "../package.json" with { type: "json" };
 
 interface Queries {
   provide: TSESTree.CallExpression & {
@@ -127,7 +127,7 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
             fixer.remove(node),
             fixer.insertTextAfter(
               ctx.sourceCode.ast,
-              `\n// Declaring tag constraints\ndeclare module "${self}" {\n  interface TagOverrides {\n${props}  }\n}`,
+              `\n// Declaring tag constraints\ndeclare module "${manifest.name}" {\n  interface TagOverrides {\n${props}  }\n}`,
             ),
           ],
         });

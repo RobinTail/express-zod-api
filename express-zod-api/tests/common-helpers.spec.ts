@@ -1,4 +1,4 @@
-import "../src/zod-plugin"; // required for this test
+import "../src/zod-plugin.ts"; // required for this test
 import createHttpError from "http-errors";
 import {
   combinations,
@@ -11,9 +11,9 @@ import {
   ensureError,
   pullExampleProps,
   getRoutePathParams,
-} from "../src/common-helpers";
+} from "../src/common-helpers.ts";
 import { z } from "zod";
-import { makeRequestMock } from "../src/testing";
+import { makeRequestMock } from "../src/testing.ts";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {

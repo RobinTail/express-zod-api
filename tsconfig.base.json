@@ -4,6 +4,7 @@
     "noImplicitAny": true,
     "noImplicitOverride": true,
     "strictNullChecks": true,
+    "allowImportingTsExtensions": true,
     "types": ["vitest/globals"]
   }
 }

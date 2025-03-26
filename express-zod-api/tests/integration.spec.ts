@@ -6,7 +6,7 @@ import {
   Producer,
   defaultEndpointsFactory,
   ResultHandler,
-} from "../src";
+} from "../src/index.ts";
 
 describe("Integration", () => {
   test("Should support types variant and handle recursive schemas", () => {

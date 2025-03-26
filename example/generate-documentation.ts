@@ -1,15 +1,14 @@
 import { writeFile } from "node:fs/promises";
 import { Documentation } from "express-zod-api";
-import { config } from "./config";
-import { routing } from "./routing";
-import manifest from "./package.json";
+import { config } from "./config.ts";
+import { routing } from "./routing.ts";
 
 await writeFile(
   "example.documentation.yaml",
   new Documentation({
     routing,
     config,
-    version: manifest.version,
+    version: "0.0.0",
     title: "Example API",
     serverUrl: "https://example.com",
     tags: {

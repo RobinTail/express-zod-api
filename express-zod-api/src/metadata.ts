@@ -1,4 +1,4 @@
-import { combinations } from "./common-helpers";
+import { combinations } from "./common-helpers.ts";
 import { z } from "zod";
 import * as R from "ramda";
 

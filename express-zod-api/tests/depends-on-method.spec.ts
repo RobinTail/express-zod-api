@@ -3,8 +3,8 @@ import {
   DependsOnMethod,
   EndpointsFactory,
   defaultResultHandler,
-} from "../src";
-import { AbstractEndpoint } from "../src/endpoint";
+} from "../src/index.ts";
+import { AbstractEndpoint } from "../src/endpoint.ts";
 
 describe("DependsOnMethod", () => {
   test("should accept empty object", () => {

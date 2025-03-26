@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { EventSource } from "undici";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
-import { Client, Subscription } from "./example.client";
-import { givePort } from "../tools/ports";
+import { Client, Subscription } from "./example.client.ts";
+import { givePort } from "../tools/ports.ts";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 
