@@ -90,8 +90,10 @@ export class BuiltinLogger implements AbstractLogger {
     );
     if (meta !== undefined) output.push(this.prettyPrint(meta));
     if (Object.keys(ctx).length > 0) output.push(this.prettyPrint(ctx));
-    const line = output.join(" ");
-    if (!isAsync) return console.log(line);
+    (isAsync ? this.postpone.bind(this) : console.log)(output.join(" "));
+  }
+
+  protected postpone(line: string) {
     this.stack.push(line);
     setImmediate(this.purge.bind(this));
   }
