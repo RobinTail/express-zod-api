@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { performance } from "node:perf_hooks";
 import { BuiltinLogger, BuiltinLoggerConfig } from "../src/builtin-logger";
 
@@ -176,6 +177,39 @@ describe("BuiltinLogger", () => {
       expect(logSpy).toHaveBeenCalledWith(
         expect.stringMatching(/debug: test '?\d+\s?\w*'?$/),
       );
+    });
+  });
+
+  // it has to be last, because it affects timer in beforeEach
+  describe("async logging", () => {
+    test("on demand", async () => {
+      const { logger, logSpy } = makeLogger({
+        level: "debug",
+        color: false,
+        async: true,
+      });
+      logger.debug("testing debug message");
+      expect(logSpy).not.toHaveBeenCalled();
+      await vi.waitFor(() => assert(logSpy.mock.calls.length > 0));
+      expect(logSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test("maintains the queue", async () => {
+      const { logger, logSpy } = makeLogger({
+        level: "debug",
+        color: false,
+        async: true,
+      });
+      logger.debug("one");
+      logger.debug("two");
+      logger.debug("three");
+      expect(logSpy).not.toHaveBeenCalled();
+      await vi.waitFor(() => assert(logSpy.mock.calls.length > 2));
+      expect(logSpy.mock.calls).toEqual([
+        [expect.stringContaining("one")],
+        [expect.stringContaining("two")],
+        [expect.stringContaining("three")],
+      ]);
     });
   });
 });
