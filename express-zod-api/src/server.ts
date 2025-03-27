@@ -104,13 +104,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     starters.push(makeStarter(httpsServer, config.https.listen));
   }
 
-  if (config.gracefulShutdown) {
-    installTerminationListener({
-      logger,
-      servers: created,
-      options: config.gracefulShutdown === true ? {} : config.gracefulShutdown,
-    });
-  }
+  installTerminationListener(created, { logger, config });
 
   return { app, logger, servers: starters.map((starter) => starter()) };
 };

@@ -1,4 +1,7 @@
 import type fileUpload from "express-fileupload";
+import http from "node:http";
+import https from "node:https";
+import { BuiltinLogger } from "./builtin-logger";
 import { metaSymbol } from "./metadata";
 import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
@@ -153,16 +156,21 @@ export const installDeprecationListener = (logger: ActualLogger) =>
     ),
   );
 
-export const installTerminationListener = ({
-  servers,
-  logger,
-  options: { timeout, events = ["SIGINT", "SIGTERM"] },
-}: {
-  servers: Parameters<typeof monitor>[0];
-  options: Extract<ServerConfig["gracefulShutdown"], object>;
-  logger: ActualLogger;
-}) => {
-  const graceful = monitor(servers, { logger, timeout });
-  const onTerm = () => graceful.shutdown().then(() => process.exit());
+export const installTerminationListener = (
+  servers: Array<http.Server | https.Server>, // @todo extract
+  {
+    logger,
+    config: { gracefulShutdown: grace },
+  }: { config: ServerConfig; logger: ActualLogger },
+) => {
+  const { timeout, events = ["SIGINT", "SIGTERM"] } = {
+    ...(typeof grace === "object" && grace),
+  };
+  const graceful = grace ? monitor(servers, { logger, timeout }) : undefined;
+  const onTerm = async () => {
+    await graceful?.shutdown();
+    if (logger instanceof BuiltinLogger) logger.purge();
+    process.exit();
+  };
   for (const trigger of events) process.on(trigger, onTerm);
 };
