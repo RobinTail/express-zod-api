@@ -64,7 +64,7 @@ export class BuiltinLogger implements AbstractLogger {
     this.config = { color, level, async, depth, ctx };
   }
 
-  protected prettyPrint(subject: unknown) {
+  protected format(subject: unknown) {
     const { depth, color: colors, level } = this.config;
     return inspect(subject, {
       depth,
@@ -88,8 +88,8 @@ export class BuiltinLogger implements AbstractLogger {
       hasColor ? `${styles[method](method)}:` : `${method}:`,
       message,
     );
-    if (meta !== undefined) output.push(this.prettyPrint(meta));
-    if (Object.keys(ctx).length > 0) output.push(this.prettyPrint(ctx));
+    if (meta !== undefined) output.push(this.format(meta));
+    if (Object.keys(ctx).length > 0) output.push(this.format(ctx));
     (isAsync ? this.postpone.bind(this) : console.log)(output.join(" "));
   }
 
