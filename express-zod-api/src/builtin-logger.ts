@@ -98,7 +98,8 @@ export class BuiltinLogger implements AbstractLogger {
     setImmediate(this.purge.bind(this));
   }
 
-  protected purge() {
+  /** @internal */
+  public purge() {
     while (this.stack.length) console.log(this.stack.shift());
   }
 
