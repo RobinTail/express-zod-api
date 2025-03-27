@@ -95,7 +95,7 @@ export class BuiltinLogger implements AbstractLogger {
 
   protected postpone(line: string) {
     this.stack.push(line);
-    setImmediate(this.purge.bind(this));
+    setImmediate(this.purge.bind(this)).unref(); // process.exit has higher priority
   }
 
   /** @internal */
