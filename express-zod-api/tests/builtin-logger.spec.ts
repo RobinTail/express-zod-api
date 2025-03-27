@@ -41,7 +41,7 @@ describe("BuiltinLogger", () => {
     });
 
     test.each(["development", "production"])(
-      "Level can be omitted and depends on env",
+      "Several settings depend on %s environment",
       (mode) => {
         vi.stubEnv("TSUP_STATIC", mode);
         vi.stubEnv("NODE_ENV", mode);
@@ -49,6 +49,7 @@ describe("BuiltinLogger", () => {
         expect(logger["config"]["level"]).toBe(
           mode === "production" ? "warn" : "debug",
         );
+        expect(logger["config"]["async"]).toBe(mode === "production");
       },
     );
 
