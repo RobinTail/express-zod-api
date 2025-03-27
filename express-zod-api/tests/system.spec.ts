@@ -112,7 +112,6 @@ describe("App in production mode", async () => {
   const config = createConfig({
     http: { listen: port },
     compression: { threshold: 1 },
-    wrongMethodBehavior: 405,
     beforeRouting: ({ app, getLogger }) => {
       depd("express")("Sample deprecation message");
       app.use((req, {}, next) => {
@@ -216,7 +215,6 @@ describe("App in production mode", async () => {
       });
     });
 
-    /** @todo set min version of compression to 1.8 in v23 */
     test.each(["gzip", "br"])(
       "Should %s-compress the response in case it is supported by client",
       async (alg) => {

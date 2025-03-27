@@ -168,6 +168,7 @@ export default tsPlugin.config(
       "express-zod-api/dist/",
       "express-zod-api/coverage/",
       "express-zod-api/migration/",
+      "compat-test/sample.ts",
     ],
   },
   {
