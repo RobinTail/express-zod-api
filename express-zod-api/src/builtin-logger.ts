@@ -51,6 +51,7 @@ interface ProfilerOptions {
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
   protected readonly config: BuiltinLoggerConfig;
+  protected readonly stack: string[] = [];
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   public constructor({
@@ -91,7 +92,12 @@ export class BuiltinLogger implements AbstractLogger {
     if (Object.keys(ctx).length > 0) output.push(this.prettyPrint(ctx));
     const line = output.join(" ");
     if (!isAsync) return console.log(line);
-    setImmediate(console.log, line);
+    this.stack.push(line);
+    setImmediate(this.purge.bind(this));
+  }
+
+  protected purge() {
+    while (this.stack.length) console.log(this.stack.shift());
   }
 
   public debug(message: string, meta?: unknown) {
