@@ -52,6 +52,7 @@ interface ProfilerOptions {
 export class BuiltinLogger implements AbstractLogger {
   protected readonly config: BuiltinLoggerConfig;
   protected readonly stack: string[] = [];
+  protected postponed?: NodeJS.Immediate;
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   public constructor({
@@ -95,7 +96,8 @@ export class BuiltinLogger implements AbstractLogger {
 
   protected postpone(line: string) {
     this.stack.push(line);
-    setImmediate(this.purge.bind(this)).unref(); // process.exit has higher priority
+    clearImmediate(this.postponed);
+    this.postponed = setImmediate(this.purge.bind(this)).unref(); // do not block process.exit()
   }
 
   /** @internal */
