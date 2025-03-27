@@ -23,6 +23,11 @@ export interface BuiltinLoggerConfig {
   /** @desc Enables colors on printed severity and inspected entities */
   color: boolean;
   /**
+   * @desc Printing logs does not delay execution
+   * @see https://expressjs.com/en/advanced/best-practice-performance.html#do-logging-correctly
+   * */
+  async: boolean;
+  /**
    * @desc Control how deeply entities should be inspected
    * @example null
    * @example Infinity
@@ -51,10 +56,11 @@ export class BuiltinLogger implements AbstractLogger {
   public constructor({
     color = ansis.isSupported(),
     level = isProduction() ? "warn" : "debug",
+    async = isProduction(),
     depth = 2,
     ctx = {},
   }: Partial<BuiltinLoggerConfig> = {}) {
-    this.config = { color, level, depth, ctx };
+    this.config = { color, level, async, depth, ctx };
   }
 
   protected prettyPrint(subject: unknown) {
@@ -72,6 +78,7 @@ export class BuiltinLogger implements AbstractLogger {
       level,
       ctx: { requestId, ...ctx },
       color: hasColor,
+      async: isAsync,
     } = this.config;
     if (level === "silent" || isHidden(method, level)) return;
     const output: string[] = [new Date().toISOString()];
@@ -82,7 +89,9 @@ export class BuiltinLogger implements AbstractLogger {
     );
     if (meta !== undefined) output.push(this.prettyPrint(meta));
     if (Object.keys(ctx).length > 0) output.push(this.prettyPrint(ctx));
-    console.log(output.join(" "));
+    const line = output.join(" ");
+    if (!isAsync) return console.log(line);
+    setImmediate(console.log, line);
   }
 
   public debug(message: string, meta?: unknown) {
