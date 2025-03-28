@@ -1,6 +1,4 @@
 import type fileUpload from "express-fileupload";
-import http from "node:http";
-import https from "node:https";
 import { BuiltinLogger } from "./builtin-logger";
 import { metaSymbol } from "./metadata";
 import { loadPeer } from "./peer-helpers";
@@ -12,7 +10,7 @@ import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
-import { monitor } from "./graceful-shutdown";
+import { monitor, SomeServers } from "./graceful-shutdown";
 
 type EquippedRequest = Request<
   unknown,
@@ -161,7 +159,7 @@ export const installDeprecationListener = (logger: ActualLogger) =>
   );
 
 export const installTerminationListener = (
-  servers: Array<http.Server | https.Server>, // @todo extract
+  servers: SomeServers,
   {
     logger,
     childLoggers,

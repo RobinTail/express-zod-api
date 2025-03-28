@@ -102,7 +102,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   initRouting({ app, routing, getLogger, config, parsers });
   app.use(catcher, notFoundHandler);
 
-  const created: Array<http.Server | https.Server> = [];
+  const created: Parameters<typeof installTerminationListener>[0] = [];
   const makeStarter =
     (server: (typeof created)[number], subject: HttpConfig["listen"]) => () =>
       server.listen(subject, () => logger.info("Listening", subject));

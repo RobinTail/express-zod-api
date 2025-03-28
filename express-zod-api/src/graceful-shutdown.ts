@@ -11,8 +11,10 @@ import {
   weAreClosed,
 } from "./graceful-helpers";
 
+export type SomeServers = Array<http.Server | https.Server>;
+
 export const monitor = (
-  servers: Array<http.Server | https.Server>,
+  servers: SomeServers,
   { timeout = 1e3, logger }: { timeout?: number; logger?: ActualLogger } = {},
 ) => {
   let pending: Promise<PromiseSettledResult<void>[]> | undefined;
