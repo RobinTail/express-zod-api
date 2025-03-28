@@ -110,6 +110,7 @@ export class BuiltinLogger implements AbstractLogger {
    * */
   public dispose(cb?: () => void) {
     this.config.level = "silent"; // no more logs
+    if (!this.config.async) return;
     clearImmediate(this.postponed);
     if (!cb) return this.purge();
     this.postponed = setImmediate(() => {
