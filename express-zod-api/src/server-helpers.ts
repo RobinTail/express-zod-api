@@ -178,8 +178,8 @@ export const installTerminationListener = (
   const graceful = grace ? monitor(servers, { logger, timeout }) : undefined;
   const onTerm = async () => {
     await graceful?.shutdown();
-    if (childLoggers) for (const child of childLoggers) child.purge();
-    if (logger instanceof BuiltinLogger) logger.purge();
+    if (childLoggers) for (const child of childLoggers) child.dispose();
+    if (logger instanceof BuiltinLogger) logger.dispose();
     process.exit();
   };
   for (const trigger of events) process.on(trigger, onTerm);

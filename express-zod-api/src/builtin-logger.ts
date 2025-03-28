@@ -100,15 +100,18 @@ export class BuiltinLogger implements AbstractLogger {
     this.postponed = setImmediate(this.purge.bind(this)).unref(); // do not block process.exit()
   }
 
-  /** @internal */
-  public purge() {
+  protected purge() {
     while (this.stack.length) console.log(this.stack.shift());
   }
 
-  /** @internal */
-  public dispose(cb: () => void) {
+  /**
+   * @internal
+   * @desc Prepares the instance for deleting. Callback is for postponed deletion.
+   * */
+  public dispose(cb?: () => void) {
     this.config.level = "silent"; // no more logs
     clearImmediate(this.postponed);
+    if (!cb) return this.purge();
     this.postponed = setImmediate(() => {
       this.purge();
       cb();
