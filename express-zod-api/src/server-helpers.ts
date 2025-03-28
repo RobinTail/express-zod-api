@@ -128,14 +128,18 @@ export const moveRaw: RequestHandler = (req, {}, next) => {
 export const createLoggingMiddleware =
   ({
     logger: parent,
+    childLoggers,
     config,
   }: {
     logger: ActualLogger;
+    childLoggers?: Set<BuiltinLogger>;
     config: CommonConfig;
   }): RequestHandler =>
   async (request, response, next) => {
     const logger =
       (await config.childLoggerProvider?.({ request, parent })) || parent;
+    if (childLoggers && logger instanceof BuiltinLogger)
+      childLoggers.add(logger);
     logger.debug(`${request.method}: ${request.path}`);
     if (request.res)
       (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
@@ -160,8 +164,13 @@ export const installTerminationListener = (
   servers: Array<http.Server | https.Server>, // @todo extract
   {
     logger,
+    childLoggers,
     config: { gracefulShutdown: grace },
-  }: { config: ServerConfig; logger: ActualLogger },
+  }: {
+    config: ServerConfig;
+    logger: ActualLogger;
+    childLoggers?: Set<BuiltinLogger>;
+  },
 ) => {
   const { timeout, events = ["SIGINT", "SIGTERM"] } = {
     ...(typeof grace === "object" && grace),
@@ -169,6 +178,7 @@ export const installTerminationListener = (
   const graceful = grace ? monitor(servers, { logger, timeout }) : undefined;
   const onTerm = async () => {
     await graceful?.shutdown();
+    if (childLoggers) for (const child of childLoggers) child.purge();
     if (logger instanceof BuiltinLogger) logger.purge();
     process.exit();
   };

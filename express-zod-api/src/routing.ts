@@ -1,5 +1,6 @@
 import { IRouter, RequestHandler } from "express";
 import createHttpError from "http-errors";
+import { BuiltinLogger } from "./builtin-logger";
 import { isProduction } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { ContentType } from "./content-type";
@@ -32,12 +33,14 @@ export const createWrongMethodHandler =
 export const initRouting = ({
   app,
   getLogger,
+  childLoggers,
   config,
   routing,
   parsers,
 }: {
   app: IRouter;
   getLogger: GetLogger;
+  childLoggers?: Set<BuiltinLogger>;
   config: CommonConfig;
   routing: Routing;
   parsers?: Parsers;
@@ -70,7 +73,9 @@ export const initRouting = ({
             : defaultHeaders;
         for (const key in headers) response.set(key, headers[key]);
       }
-      return endpoint.execute({ request, response, logger, config });
+      await endpoint.execute({ request, response, logger, config });
+      if (childLoggers && logger instanceof BuiltinLogger)
+        logger.dispose(() => childLoggers.delete(logger));
     };
     if (!familiar.has(path)) {
       familiar.set(path, []);

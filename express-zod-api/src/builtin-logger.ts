@@ -105,6 +105,16 @@ export class BuiltinLogger implements AbstractLogger {
     while (this.stack.length) console.log(this.stack.shift());
   }
 
+  /** @internal */
+  public dispose(cb: () => void) {
+    this.config.level = "silent"; // no more logs
+    clearImmediate(this.postponed);
+    this.postponed = setImmediate(() => {
+      this.purge();
+      cb();
+    });
+  }
+
   public debug(message: string, meta?: unknown) {
     this.print("debug", message, meta);
   }

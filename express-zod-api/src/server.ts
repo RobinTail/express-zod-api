@@ -31,12 +31,20 @@ const makeCommonEntities = (config: CommonConfig) => {
   const logger = isLoggerInstance(config.logger)
     ? config.logger
     : new BuiltinLogger(config.logger);
+  const childLoggers =
+    logger instanceof BuiltinLogger && config.childLoggerProvider
+      ? new Set<BuiltinLogger>()
+      : undefined;
   logger.debug("Running", {
     build: process.env.TSUP_BUILD || "from sources", // eslint-disable-line no-restricted-syntax -- substituted by TSUP
     env: process.env.NODE_ENV || "development", // eslint-disable-line no-restricted-syntax -- intentionally for debug
   });
   installDeprecationListener(logger);
-  const loggingMiddleware = createLoggingMiddleware({ logger, config });
+  const loggingMiddleware = createLoggingMiddleware({
+    logger,
+    childLoggers,
+    config,
+  });
   const getLogger = makeGetLogger(logger);
   const commons = { getLogger, errorHandler };
   const notFoundHandler = createNotFoundHandler(commons);
@@ -44,6 +52,7 @@ const makeCommonEntities = (config: CommonConfig) => {
   return {
     ...commons,
     logger,
+    childLoggers,
     notFoundHandler,
     catcher,
     loggingMiddleware,
@@ -63,8 +72,14 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
 };
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
-  const { logger, getLogger, notFoundHandler, catcher, loggingMiddleware } =
-    makeCommonEntities(config);
+  const {
+    logger,
+    childLoggers,
+    getLogger,
+    notFoundHandler,
+    catcher,
+    loggingMiddleware,
+  } = makeCommonEntities(config);
   const app = express().disable("x-powered-by").use(loggingMiddleware);
 
   if (config.compression) {
@@ -104,7 +119,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     starters.push(makeStarter(httpsServer, config.https.listen));
   }
 
-  installTerminationListener(created, { logger, config });
+  installTerminationListener(created, { logger, childLoggers, config });
 
   return { app, logger, servers: starters.map((starter) => starter()) };
 };
