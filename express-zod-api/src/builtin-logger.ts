@@ -94,14 +94,18 @@ export class BuiltinLogger implements AbstractLogger {
     (isAsync ? this.postpone.bind(this) : console.log)(output.join(" "));
   }
 
+  /** @todo avoid waiting too long if the stack is shorter than the threshold */
   protected postpone(line: string) {
     this.stack.push(line);
-    clearImmediate(this.postponed);
-    this.postponed = setImmediate(this.purge.bind(this)).unref(); // do not block process.exit()
+    if (this.stack.length < 100) return; // @todo extract const or make it configurable
+    this.postponed ??= setImmediate(this.purge.bind(this)).unref(); // do not block process.exit()
   }
 
   protected purge() {
-    while (this.stack.length) console.log(this.stack.shift());
+    const output = this.stack.join("\n");
+    this.stack.length = 0; // faster https://jsben.ch/hyj65
+    console.log(output);
+    this.postponed = undefined;
   }
 
   /**
