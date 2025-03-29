@@ -112,7 +112,7 @@
     "semver": "^7.6.3",
     "snakify-ts": "^2.3.0",
     "tsup": "^8.4.0",
-    "undici": "^6.19.8"
+    "undici": "^7.6.0"
   },
   "keywords": [
     "nodejs",
