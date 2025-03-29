@@ -9,7 +9,6 @@ const commons: Options = {
   splitting: false,
   sourcemap: false,
   clean: true,
-  dts: true,
   minify: true,
   target: `node${minNode.major}.${minNode.minor}.${minNode.patch}`,
   removeNodeProtocol: false, // @todo will be default in v9
@@ -19,6 +18,7 @@ export default defineConfig([
   {
     ...commons,
     shims: true,
+    dts: true,
     name,
     entry: ["src/index.ts"],
     esbuildOptions: (options, { format }) => {
@@ -40,10 +40,11 @@ export default defineConfig([
   {
     ...commons,
     name: "./logger-worker".padStart(name.length),
-    entry: ["src/logger-worker.ts"],
+    entry: ["src/logger-worker.js"],
   },
   {
     ...commons,
+    dts: true,
     name: "./migration".padStart(name.length),
     entry: { index: "src/migration.ts" },
     outDir: "migration",

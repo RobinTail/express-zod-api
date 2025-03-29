@@ -13,7 +13,9 @@ describe("BuiltinLogger", () => {
 
   const makeLogger = (props?: Partial<BuiltinLoggerConfig>) => {
     const logger = new BuiltinLogger(props);
-    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+    const logSpy = vi
+      .spyOn(BuiltinLogger["worker"], "postMessage")
+      .mockImplementation(() => {});
     return { logger, logSpy };
   };
 
@@ -41,7 +43,7 @@ describe("BuiltinLogger", () => {
     });
 
     test.each(["development", "production"])(
-      "Level can be omitted and depends on env",
+      "Some settings depend on %s environment",
       (mode) => {
         vi.stubEnv("TSUP_STATIC", mode);
         vi.stubEnv("NODE_ENV", mode);
