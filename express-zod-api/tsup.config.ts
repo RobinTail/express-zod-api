@@ -17,7 +17,7 @@ const commons: Options = {
 export default defineConfig([
   {
     ...commons,
-    shims: true,
+    shims: true, // used by BuiltinLogger
     dts: true,
     name,
     entry: ["src/index.ts"],
