@@ -18,6 +18,7 @@ const commons: Options = {
 export default defineConfig([
   {
     ...commons,
+    shims: true,
     name,
     entry: ["src/index.ts"],
     esbuildOptions: (options, { format }) => {
@@ -35,6 +36,11 @@ export default defineConfig([
         "process.env.TSUP_STATIC": `"static"`, // used by isProduction()
       };
     },
+  },
+  {
+    ...commons,
+    name: "./logger-worker".padStart(name.length),
+    entry: ["src/logger-worker.ts"],
   },
   {
     ...commons,

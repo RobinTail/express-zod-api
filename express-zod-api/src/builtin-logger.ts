@@ -1,4 +1,5 @@
 import ansis from "ansis";
+import path from "node:path";
 import { inspect } from "node:util";
 import { performance } from "node:perf_hooks";
 import { FlatObject, isProduction } from "./common-helpers";
@@ -9,6 +10,7 @@ import {
   Severity,
   styles,
 } from "./logger-helpers";
+import { Worker } from "node:worker_threads";
 
 interface Context extends FlatObject {
   requestId?: string;
@@ -46,6 +48,7 @@ interface ProfilerOptions {
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
   protected readonly config: BuiltinLoggerConfig;
+  private static worker: Worker;
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   public constructor({
@@ -55,6 +58,9 @@ export class BuiltinLogger implements AbstractLogger {
     ctx = {},
   }: Partial<BuiltinLoggerConfig> = {}) {
     this.config = { color, level, depth, ctx };
+    BuiltinLogger.worker ??= new Worker(
+      path.resolve(__dirname, "logger-worker.js"), // __dirname enabled by tsup shims
+    );
   }
 
   protected format(subject: unknown) {
@@ -82,7 +88,7 @@ export class BuiltinLogger implements AbstractLogger {
     );
     if (meta !== undefined) output.push(this.format(meta));
     if (Object.keys(ctx).length > 0) output.push(this.format(ctx));
-    console.log(output.join(" "));
+    BuiltinLogger.worker.postMessage(output.join(" "));
   }
 
   public debug(message: string, meta?: unknown) {
