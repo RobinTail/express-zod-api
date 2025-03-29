@@ -43,7 +43,7 @@ describe("BuiltinLogger", () => {
     });
 
     test.each(["development", "production"])(
-      "Some settings depend on %s environment",
+      "Level can be omitted and depends on env",
       (mode) => {
         vi.stubEnv("TSUP_STATIC", mode);
         vi.stubEnv("NODE_ENV", mode);
