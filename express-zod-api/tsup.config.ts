@@ -39,8 +39,8 @@ export default defineConfig([
   },
   {
     ...commons,
-    name: "./logger-worker".padStart(name.length),
-    entry: ["src/logger-worker.js"],
+    name: "./worker".padStart(name.length),
+    entry: ["src/worker.js"],
   },
   {
     ...commons,

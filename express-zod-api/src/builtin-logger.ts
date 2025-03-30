@@ -63,7 +63,7 @@ export class BuiltinLogger implements AbstractLogger {
     this.config = { color, level, depth, ctx, async };
     BuiltinLogger.worker ??= this.config.async
       ? new Worker(
-          path.resolve(__dirname, "logger-worker.js"), // __dirname enabled by tsup shims
+          path.resolve(__dirname, "worker.js"), // __dirname enabled by tsup shims
           { workerData: { interval: 500 } },
         )
       : undefined;
