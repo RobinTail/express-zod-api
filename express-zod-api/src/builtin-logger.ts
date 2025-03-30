@@ -95,9 +95,11 @@ export class BuiltinLogger implements AbstractLogger {
     );
     if (meta !== undefined) output.push(this.format(meta));
     if (Object.keys(ctx).length > 0) output.push(this.format(ctx));
-    ((isAsync && BuiltinLogger.worker?.postMessage) || console.log)(
-      output.join(" "),
-    );
+    const fn =
+      isAsync && BuiltinLogger.worker
+        ? BuiltinLogger.worker.postMessage.bind(BuiltinLogger.worker)
+        : console.log;
+    fn(output.join(" "));
   }
 
   public debug(message: string, meta?: unknown) {
