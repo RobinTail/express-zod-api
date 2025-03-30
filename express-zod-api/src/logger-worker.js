@@ -1,3 +1,4 @@
+import { clearInterval } from "node:timers";
 import { parentPort } from "node:worker_threads";
 
 if (!parentPort)
@@ -15,5 +16,10 @@ const flush = () => {
 /** @param {string} line */
 const onMessage = (line) => buffer.push(line);
 
+const job = setInterval(flush, 1000);
 parentPort.on("message", onMessage);
-setInterval(flush, 1000);
+parentPort.on("close", () => {
+  clearInterval(job);
+  parentPort.off("message", onMessage);
+  flush();
+});
