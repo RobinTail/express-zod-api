@@ -1,5 +1,5 @@
 import { clearInterval } from "node:timers";
-import { parentPort, workerData, threadId } from "node:worker_threads";
+import { parentPort, workerData } from "node:worker_threads";
 
 if (!parentPort)
   throw new Error("Logger worker must be run as a Worker Thread.");
@@ -7,9 +7,7 @@ if (!parentPort)
 const { interval = 100 } = { ...workerData };
 
 /** @type string[] */
-const buffer = [
-  `Logger worker thread ${threadId} (${process.env.TSUP_FORMAT}) started`,
-];
+const buffer = [];
 
 const flush = () => {
   if (buffer.length === 0) return;

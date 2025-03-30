@@ -42,11 +42,6 @@ export default defineConfig([
     ...commons,
     name: "./worker".padStart(name.length),
     entry: ["src/worker.js"],
-    esbuildOptions: (options, { format }) => {
-      options.define = {
-        "process.env.TSUP_FORMAT": `"${format.toUpperCase()}"`,
-      };
-    },
   },
   {
     ...commons,
