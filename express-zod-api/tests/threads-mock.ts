@@ -6,6 +6,7 @@ const parentPort = {
 
 vi.mock("node:worker_threads", () => ({
   parentPort,
+  workerData: { interval: 100 },
 }));
 
 export { parentPort };
