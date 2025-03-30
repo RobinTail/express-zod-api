@@ -17,7 +17,7 @@
   "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
     "build": "tsup",
-    "postbuild": "yarn pack --filename release.tgz && attw release.tgz && rm release.tgz",
+    "postbuild": "yarn pack --filename release.tgz && attw release.tgz --exclude-entrypoints worker && rm release.tgz",
     "pretest": "tsc --noEmit",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
@@ -50,6 +50,10 @@
         "types": "./migration/index.d.cts",
         "default": "./migration/index.cjs"
       }
+    },
+    "./worker": {
+      "import": "./worker/index.js",
+      "require": "./worker/index.cjs"
     }
   },
   "files": [

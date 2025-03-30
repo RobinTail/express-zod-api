@@ -34,6 +34,7 @@ export default defineConfig([
       options.define = {
         "process.env.TSUP_BUILD": `"v${version} (${format.toUpperCase()})"`,
         "process.env.TSUP_STATIC": `"static"`, // used by isProduction()
+        "process.env.TSUP_EXT": `"${format === "esm" ? "js" : "cjs"}"`, // used by BuiltinLogger
       };
     },
   },
@@ -41,6 +42,11 @@ export default defineConfig([
     ...commons,
     name: "./worker".padStart(name.length),
     entry: ["src/worker.js"],
+    esbuildOptions: (options, { format }) => {
+      options.define = {
+        "process.env.TSUP_FORMAT": `"${format.toUpperCase()}"`,
+      };
+    },
   },
   {
     ...commons,
