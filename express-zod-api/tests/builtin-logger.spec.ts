@@ -13,9 +13,7 @@ describe("BuiltinLogger", () => {
 
   const makeLogger = (props?: Partial<BuiltinLoggerConfig>) => {
     const logger = new BuiltinLogger(props);
-    const logSpy = vi
-      .spyOn(BuiltinLogger["worker"], "postMessage")
-      .mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     return { logger, logSpy };
   };
 
@@ -40,6 +38,16 @@ describe("BuiltinLogger", () => {
       expect(logSpy).not.toHaveBeenCalled();
       logger.warn("testing warn message");
       expect(logSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test("Should create async logger", () => {
+      const { logger } = makeLogger({ async: true, level: "debug" });
+      expect(BuiltinLogger["worker"]).toBeTruthy();
+      const spy = vi
+        .spyOn(BuiltinLogger["worker"]!, "postMessage")
+        .mockImplementation(() => {});
+      logger.debug("test");
+      expect(spy).toHaveBeenCalledWith(expect.stringMatching(/test$/));
     });
 
     test.each(["development", "production"])(
