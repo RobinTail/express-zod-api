@@ -16,7 +16,7 @@ const flush = () => {
 /** @param {string} line */
 const onMessage = (line) => buffer.push(line);
 
-const job = setInterval(flush, 100);
+const job = setInterval(flush, 100); // @todo const or config
 parentPort.on("message", onMessage);
 parentPort.on("close", () => {
   clearInterval(job);
