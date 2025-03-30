@@ -88,7 +88,7 @@ export class BuiltinLogger implements AbstractLogger {
     );
     if (meta !== undefined) output.push(this.format(meta));
     if (Object.keys(ctx).length > 0) output.push(this.format(ctx));
-    BuiltinLogger.worker.postMessage(output.join(" "));
+    BuiltinLogger.worker.postMessage(output);
   }
 
   public debug(message: string, meta?: unknown) {
