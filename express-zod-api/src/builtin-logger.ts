@@ -48,7 +48,7 @@ interface ProfilerOptions {
 }
 
 /** @desc Built-in console logger with optional colorful inspections */
-export class BuiltinLogger implements AbstractLogger {
+export class BuiltinLogger implements AbstractLogger, AsyncDisposable {
   protected readonly config: BuiltinLoggerConfig;
   protected static worker?: Worker;
 
@@ -81,7 +81,21 @@ export class BuiltinLogger implements AbstractLogger {
   }
 
   protected postpone(line: string) {
-    BuiltinLogger.worker?.postMessage(line);
+    BuiltinLogger.worker?.postMessage({ command: "log", line });
+  }
+
+  public async [Symbol.asyncDispose]() {
+    if (!BuiltinLogger.worker) return;
+    const done = new Promise<void>((resolve) => {
+      setTimeout(resolve, 500);
+      BuiltinLogger.worker!.once(
+        "message",
+        (ack) => ack === "done" && resolve(),
+      );
+    });
+    BuiltinLogger.worker.postMessage({ command: "close" });
+    await done;
+    await BuiltinLogger.worker.terminate();
   }
 
   protected print(method: Severity, message: string, meta?: unknown) {

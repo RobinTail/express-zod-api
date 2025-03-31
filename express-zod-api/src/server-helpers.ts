@@ -1,4 +1,5 @@
 import type fileUpload from "express-fileupload";
+import { BuiltinLogger } from "./builtin-logger";
 import { metaSymbol } from "./metadata";
 import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
@@ -163,6 +164,10 @@ export const installTerminationListener = ({
   logger: ActualLogger;
 }) => {
   const graceful = monitor(servers, { logger, timeout });
-  const onTerm = () => graceful.shutdown().then(() => process.exit());
+  const onTerm = () =>
+    graceful.shutdown().then(async () => {
+      if (logger instanceof BuiltinLogger) await logger[Symbol.asyncDispose]();
+      process.exit();
+    });
   for (const trigger of events) process.on(trigger, onTerm);
 };

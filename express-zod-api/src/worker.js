@@ -15,13 +15,17 @@ const flush = () => {
   buffer.length = 0;
 };
 
-/** @param {string} line */
-const onMessage = (line) => buffer.push(line);
-
 const job = setInterval(flush, interval);
+
+/** @argument object */
+const onMessage = ({ command, line }) => {
+  if (command === "log") return buffer.push(line);
+  if (command === "close") {
+    clearInterval(job);
+    parentPort.off("message", onMessage);
+    flush();
+    parentPort.postMessage("done");
+  }
+};
+
 parentPort.on("message", onMessage);
-parentPort.on("close", () => {
-  clearInterval(job);
-  parentPort.off("message", onMessage);
-  flush();
-});
