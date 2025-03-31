@@ -80,6 +80,10 @@ export class BuiltinLogger implements AbstractLogger {
     });
   }
 
+  protected postpone(line: string) {
+    BuiltinLogger.worker?.postMessage(line);
+  }
+
   protected print(method: Severity, message: string, meta?: unknown) {
     const {
       level,
@@ -96,11 +100,7 @@ export class BuiltinLogger implements AbstractLogger {
     );
     if (meta !== undefined) output.push(this.format(meta));
     if (Object.keys(ctx).length > 0) output.push(this.format(ctx));
-    const fn =
-      isAsync && BuiltinLogger.worker
-        ? BuiltinLogger.worker.postMessage.bind(BuiltinLogger.worker)
-        : console.log;
-    fn(output.join(" "));
+    (isAsync ? this.postpone.bind(this) : console.log)(output.join(" "));
   }
 
   public debug(message: string, meta?: unknown) {
