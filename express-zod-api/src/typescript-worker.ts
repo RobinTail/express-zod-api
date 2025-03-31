@@ -1,5 +1,14 @@
 import path from "node:path";
 import { Worker } from "node:worker_threads";
+import {
+  f,
+  literally,
+  makeArrowFn,
+  makeCall,
+  printNode,
+  propOf,
+} from "./typescript-api";
+import type * as API from "tsx/esm/api";
 
 /**
  * @see https://github.com/nodejs/node/issues/47747#issuecomment-2309062943
@@ -13,10 +22,27 @@ export class TypescriptWorker extends Worker {
       `worker.${process.env.TSUP_EXT || "ts"}`, // eslint-disable-line no-restricted-syntax -- replaced by TSUP
     );
     if (filename.endsWith(".ts")) {
-      super(
-        `import("tsx/esm/api").then(({ register }) => { register(); import("${filename}") })`,
-        { eval: true, workerData },
+      const tsxApiConst = "api";
+      const dynamicImportFn = "import";
+      const loader = f.createExpressionStatement(
+        makeCall(
+          makeCall(dynamicImportFn)(literally("tsx/esm/api")),
+          propOf<Promise<typeof API>>("then"),
+        )(
+          makeArrowFn(
+            [tsxApiConst],
+            f.createBlock([
+              f.createExpressionStatement(
+                makeCall(tsxApiConst, propOf<typeof API>("register"))(),
+              ),
+              f.createExpressionStatement(
+                makeCall(dynamicImportFn)(literally(filename)),
+              ),
+            ]),
+          ),
+        ),
       );
+      super(printNode(loader), { eval: true, workerData });
     } else {
       super(filename, { workerData });
     }
