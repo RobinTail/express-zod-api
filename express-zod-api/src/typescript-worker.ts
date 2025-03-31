@@ -22,23 +22,22 @@ export class TypescriptWorker extends Worker {
       `worker.${process.env.TSUP_EXT || "ts"}`, // eslint-disable-line no-restricted-syntax -- replaced by TSUP
     );
     if (filename.endsWith(".ts")) {
+      const tsxApiModule = "tsx/esm/api";
       const tsxApiConst = "api";
       const dynamicImportFn = "import";
       const loader = f.createExpressionStatement(
         makeCall(
-          makeCall(dynamicImportFn)(literally("tsx/esm/api")),
+          makeCall(dynamicImportFn)(literally(tsxApiModule)),
           propOf<Promise<typeof API>>("then"),
         )(
           makeArrowFn(
             [tsxApiConst],
-            f.createBlock([
-              f.createExpressionStatement(
+            f.createBlock(
+              [
                 makeCall(tsxApiConst, propOf<typeof API>("register"))(),
-              ),
-              f.createExpressionStatement(
                 makeCall(dynamicImportFn)(literally(filename)),
-              ),
-            ]),
+              ].map(f.createExpressionStatement),
+            ),
           ),
         ),
       );
