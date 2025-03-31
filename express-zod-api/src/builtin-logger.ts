@@ -11,6 +11,7 @@ import {
   styles,
 } from "./logger-helpers";
 import { Worker } from "node:worker_threads";
+import { TypescriptWorker } from "./typescript-worker";
 
 interface Context extends FlatObject {
   requestId?: string;
@@ -62,9 +63,9 @@ export class BuiltinLogger implements AbstractLogger, AsyncDisposable {
   }: Partial<BuiltinLoggerConfig> = {}) {
     this.config = { color, level, depth, ctx, async };
     BuiltinLogger.worker ??= this.config.async
-      ? new Worker(
+      ? new TypescriptWorker(
           // eslint-disable-next-line no-restricted-syntax -- replaced by TSUP
-          path.resolve(__dirname, `worker.${process.env.TSUP_EXT || "js"}`), // __dirname enabled by tsup shims
+          path.resolve(__dirname, `worker.${process.env.TSUP_EXT || "ts"}`), // __dirname enabled by tsup shims
           { workerData: { interval: 500 } },
         )
       : undefined;

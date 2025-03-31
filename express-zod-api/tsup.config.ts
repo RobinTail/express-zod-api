@@ -41,7 +41,7 @@ export default defineConfig([
   {
     ...commons,
     name: "./worker".padStart(name.length),
-    entry: ["src/worker.js"],
+    entry: ["src/worker.ts"],
   },
   {
     ...commons,

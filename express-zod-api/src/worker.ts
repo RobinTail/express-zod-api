@@ -6,8 +6,7 @@ if (!parentPort)
 
 const { interval = 100 } = { ...workerData };
 
-/** @type string[] */
-const buffer = [];
+const buffer: string[] = [];
 
 const flush = () => {
   if (buffer.length === 0) return;
@@ -17,14 +16,19 @@ const flush = () => {
 
 const job = setInterval(flush, interval);
 
-/** @argument object */
-const onMessage = ({ command, line }) => {
-  if (command === "log") return buffer.push(line);
+const onMessage = ({
+  command,
+  line,
+}: {
+  command: "log" | "close";
+  line?: string;
+}) => {
+  if (command === "log" && line) return buffer.push(line);
   if (command === "close") {
     clearInterval(job);
-    parentPort.off("message", onMessage);
+    parentPort?.off("message", onMessage);
     flush();
-    parentPort.postMessage("done");
+    parentPort?.postMessage("done");
   }
 };
 

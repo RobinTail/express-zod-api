@@ -3,7 +3,6 @@ import { parentPort } from "./threads-mock";
 import { setTimeout } from "node:timers/promises";
 
 describe("Worker", async () => {
-  // @ts-expect-error -- JS file without declaration
   await import("../src/worker");
   const logger = vi.spyOn(console, "log").mockImplementation(() => {});
 
