@@ -13,7 +13,7 @@ import type * as API from "tsx/esm/api";
 /**
  * @see https://github.com/nodejs/node/issues/47747#issuecomment-2309062943
  * @link https://github.com/alshdavid/mach/blob/main/packages/mach_npm/platform/mach/worker.ts
- * @todo remove Typescript supported or loaders fixed for workers
+ * @todo remove when workers either support types stripping or import loaders
  * */
 export class TypescriptWorker extends Worker {
   public constructor(workerData: { interval: number }) {
