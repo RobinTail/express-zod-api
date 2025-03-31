@@ -17,7 +17,7 @@ const commons: Options = {
 export default defineConfig([
   {
     ...commons,
-    shims: true, // used by BuiltinLogger
+    shims: true, // used by TypescriptWorker
     dts: true,
     name,
     entry: ["src/index.ts"],
@@ -34,7 +34,7 @@ export default defineConfig([
       options.define = {
         "process.env.TSUP_BUILD": `"v${version} (${format.toUpperCase()})"`,
         "process.env.TSUP_STATIC": `"static"`, // used by isProduction()
-        "process.env.TSUP_EXT": `"${format === "esm" ? "js" : "cjs"}"`, // used by BuiltinLogger
+        "process.env.TSUP_EXT": `"${format === "esm" ? "js" : "cjs"}"`, // used by TypescriptWorker
       };
     },
   },

@@ -1,5 +1,4 @@
 import ansis from "ansis";
-import path from "node:path";
 import { inspect } from "node:util";
 import { performance } from "node:perf_hooks";
 import { FlatObject, isProduction } from "./common-helpers";
@@ -10,7 +9,6 @@ import {
   Severity,
   styles,
 } from "./logger-helpers";
-import { Worker } from "node:worker_threads";
 import { TypescriptWorker } from "./typescript-worker";
 
 interface Context extends FlatObject {
@@ -51,7 +49,7 @@ interface ProfilerOptions {
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger, AsyncDisposable {
   protected readonly config: BuiltinLoggerConfig;
-  protected static worker?: Worker;
+  protected static worker?: TypescriptWorker;
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   public constructor({
@@ -63,11 +61,7 @@ export class BuiltinLogger implements AbstractLogger, AsyncDisposable {
   }: Partial<BuiltinLoggerConfig> = {}) {
     this.config = { color, level, depth, ctx, async };
     BuiltinLogger.worker ??= this.config.async
-      ? new TypescriptWorker(
-          // eslint-disable-next-line no-restricted-syntax -- replaced by TSUP
-          path.resolve(__dirname, `worker.${process.env.TSUP_EXT || "ts"}`), // __dirname enabled by tsup shims
-          { workerData: { interval: 500 } },
-        )
+      ? new TypescriptWorker({ interval: 500 })
       : undefined;
   }
 
