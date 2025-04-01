@@ -20,6 +20,8 @@ export interface WorkerData {
   fd: number;
 }
 
+export type Message = { command: "close" } | { command: "log"; line: string };
+
 /**
  * @see https://github.com/nodejs/node/issues/47747#issuecomment-2309062943
  * @link https://github.com/alshdavid/mach/blob/main/packages/mach_npm/platform/mach/worker.ts
@@ -56,5 +58,9 @@ export class TypescriptWorker extends Worker {
       eval: !!loader,
       workerData,
     });
+  }
+
+  public override postMessage(value: Message) {
+    super.postMessage(value);
   }
 }

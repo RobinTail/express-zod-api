@@ -1,7 +1,7 @@
 import { write } from "node:fs";
 import { clearInterval } from "node:timers";
 import { parentPort, workerData } from "node:worker_threads";
-import type { WorkerData } from "./typescript-worker";
+import type { Message, WorkerData } from "./typescript-worker";
 
 if (!parentPort)
   throw new Error("Logger worker must be run as a Worker Thread.");
@@ -19,15 +19,9 @@ const flush = () => {
 
 const job = setInterval(flush, interval);
 
-const onMessage = ({
-  command,
-  line,
-}: {
-  command: "log" | "close";
-  line?: string;
-}) => {
-  if (command === "log" && line) return buffer.push(line);
-  if (command === "close") {
+const onMessage = (msg: Message) => {
+  if (msg.command === "log") return buffer.push(msg.line);
+  if (msg.command === "close") {
     clearInterval(job);
     parentPort?.off("message", onMessage);
     flush();
