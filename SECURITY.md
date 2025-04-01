@@ -8,7 +8,7 @@
 |  21.x.x | Kesaria       | 11.2024 | :white_check_mark: |
 |  20.x.x | Zoey          | 06.2024 | :white_check_mark: |
 |  19.x.x | Dime          | 05.2024 | :white_check_mark: |
-|  18.x.x | Victoria      | 04.2024 | :white_check_mark: |
+|  18.x.x | Victoria      | 04.2024 |        :x:         |
 |  17.x.x | Tonya         | 02.2024 |        :x:         |
 |  16.x.x | Nina          | 12.2023 |        :x:         |
 |  15.x.x | Vika          | 12.2023 |        :x:         |
