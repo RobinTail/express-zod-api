@@ -12,8 +12,7 @@ const buffer: string[] = [];
 
 const flush = () => {
   if (buffer.length === 0) return;
-  buffer.push("");
-  write(fd, buffer.join("\n"), () => {}); // @todo error handling?
+  write(fd, buffer.join("\n") + "\n", () => {}); // @todo error handling?
   buffer.length = 0;
 };
 
