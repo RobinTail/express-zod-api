@@ -8,10 +8,10 @@ const parentPort = {
 
 vi.mock("node:worker_threads", () => ({
   parentPort,
-  workerData: { interval: 100, fd: 0 } satisfies WorkerData,
+  workerData: { interval: 100, maxBufferSize: 5, fd: 0 } satisfies WorkerData,
 }));
 
-const writeMock = vi.fn();
+const writeMock = vi.fn(({}: number, {}: string, cb: () => void) => cb());
 
 vi.mock("fs", () => ({
   write: writeMock,

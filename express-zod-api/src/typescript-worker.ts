@@ -13,6 +13,8 @@ import type * as API from "tsx/esm/api";
 export interface WorkerData {
   /** @desc How often to print the logs */
   interval: number;
+  /** @desc Print logs immediately when the buffer overflows */
+  maxBufferSize: number;
   /**
    * @desc this should be faster than console.log because it bypasses stream buffering
    * @example process.stdout.fd
