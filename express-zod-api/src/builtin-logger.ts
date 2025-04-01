@@ -9,7 +9,7 @@ import {
   Severity,
   styles,
 } from "./logger-helpers";
-import { TypescriptWorker } from "./typescript-worker";
+import { Ack, TypescriptWorker } from "./typescript-worker";
 
 interface Context extends FlatObject {
   requestId?: string;
@@ -85,7 +85,7 @@ export class BuiltinLogger implements AbstractLogger, AsyncDisposable {
       setTimeout(resolve, 500);
       BuiltinLogger.worker!.once(
         "message",
-        (ack) => ack === "done" && resolve(),
+        (ack) => ack === ("done" satisfies Ack) && resolve(),
       );
     });
     BuiltinLogger.worker.postMessage({ command: "close" });

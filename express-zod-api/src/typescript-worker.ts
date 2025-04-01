@@ -21,6 +21,7 @@ export interface WorkerData {
 }
 
 export type Message = { command: "close" } | { command: "log"; line: string };
+export type Ack = "done";
 
 /**
  * @see https://github.com/nodejs/node/issues/47747#issuecomment-2309062943
