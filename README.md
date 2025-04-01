@@ -166,8 +166,8 @@ Install the framework, its peer dependencies and type assistance packages using 
 
 ```shell
 # example for yarn:
-yarn add express-zod-api express@^5 zod typescript http-errors
-yarn add -D @types/express@^5 @types/node @types/http-errors
+yarn add express-zod-api express zod typescript http-errors
+yarn add -D @types/express @types/node @types/http-errors
 ```
 
 Ensure having the following options in your `tsconfig.json` file in order to make it work as expected:
