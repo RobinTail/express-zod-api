@@ -35,22 +35,6 @@ describe("Worker", async () => {
     );
   });
 
-  test("should flush immediately when buffer overflows", async () => {
-    onMessage({ command: "log", line: "1" });
-    onMessage({ command: "log", line: "2" });
-    onMessage({ command: "log", line: "3" });
-    onMessage({ command: "log", line: "4" });
-    onMessage({ command: "log", line: "5" });
-    onMessage({ command: "log", line: "6" });
-    expect(writeMock).toHaveBeenLastCalledWith(
-      0,
-      "1\n2\n3\n4\n5\n",
-      expect.any(Function),
-    );
-    await vi.waitFor(() => assert.equal(writeMock.mock.calls.length, 2));
-    expect(writeMock).toHaveBeenLastCalledWith(0, "6\n", expect.any(Function));
-  });
-
   test("should flush and stop listening on closing", async () => {
     onMessage({ command: "log", line: "one" });
     expect(writeMock).not.toHaveBeenCalled();

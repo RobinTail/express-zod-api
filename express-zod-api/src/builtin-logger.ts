@@ -61,11 +61,7 @@ export class BuiltinLogger implements AbstractLogger, AsyncDisposable {
   }: Partial<BuiltinLoggerConfig> = {}) {
     this.config = { color, level, depth, ctx, async };
     BuiltinLogger.worker ??= this.config.async
-      ? new TypescriptWorker({
-          interval: 500,
-          maxBufferSize: 1000,
-          fd: process.stdout.fd,
-        })
+      ? new TypescriptWorker({ interval: 500, fd: process.stdout.fd })
       : undefined;
   }
 
