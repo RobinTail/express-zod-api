@@ -16,7 +16,7 @@ import type * as API from "tsx/esm/api";
  * @todo remove when workers either support types stripping or import loaders
  * */
 export class TypescriptWorker extends Worker {
-  public constructor(workerData: { interval: number }) {
+  public constructor(workerData: { interval: number; fd: number }) {
     const filename = path.resolve(
       __dirname, // __dirname enabled by TSUP shims
       `worker.${process.env.TSUP_EXT || "ts"}`, // eslint-disable-line no-restricted-syntax -- replaced by TSUP

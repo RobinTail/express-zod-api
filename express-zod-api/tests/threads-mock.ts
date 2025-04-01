@@ -6,7 +6,13 @@ const parentPort = {
 
 vi.mock("node:worker_threads", () => ({
   parentPort,
-  workerData: { interval: 100 },
+  workerData: { interval: 100, fd: 0 },
 }));
 
-export { parentPort };
+const writeMock = vi.fn();
+
+vi.mock("fs", () => ({
+  write: writeMock,
+}));
+
+export { parentPort, writeMock };

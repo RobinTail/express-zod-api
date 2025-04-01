@@ -1,13 +1,12 @@
 import assert from "node:assert/strict";
-import { parentPort } from "./threads-mock";
+import { parentPort, writeMock } from "./threads-mock";
 import { setTimeout } from "node:timers/promises";
 
 describe("Worker", async () => {
   await import("../src/worker");
-  const logger = vi.spyOn(console, "log").mockImplementation(() => {});
 
   afterEach(() => {
-    logger.mockClear();
+    writeMock.mockClear();
   });
 
   const onMessage = parentPort.on.mock.calls[0][1];
@@ -16,32 +15,44 @@ describe("Worker", async () => {
 
   test("should handle incoming message", async () => {
     onMessage({ command: "log", line: "test" });
-    await vi.waitFor(() => assert.equal(logger.mock.calls.length, 1));
-    expect(logger).toHaveBeenLastCalledWith("test");
+    await vi.waitFor(() => assert.equal(writeMock.mock.calls.length, 1));
+    expect(writeMock).toHaveBeenLastCalledWith(
+      0,
+      "test\n",
+      expect.any(Function),
+    );
   });
 
   test("should maintain the queue", async () => {
     onMessage({ command: "log", line: "one" });
     onMessage({ command: "log", line: "two" });
     onMessage({ command: "log", line: "three" });
-    await vi.waitFor(() => assert.equal(logger.mock.calls.length, 1));
-    expect(logger).toHaveBeenLastCalledWith("one\ntwo\nthree");
+    await vi.waitFor(() => assert.equal(writeMock.mock.calls.length, 1));
+    expect(writeMock).toHaveBeenLastCalledWith(
+      0,
+      "one\ntwo\nthree\n",
+      expect.any(Function),
+    );
   });
 
   test("should flush and stop listening on closing", async () => {
     onMessage({ command: "log", line: "one" });
-    expect(logger).not.toHaveBeenCalled();
+    expect(writeMock).not.toHaveBeenCalled();
     onMessage({ command: "close" });
     expect(parentPort.off).toHaveBeenCalledWith(
       "message",
       expect.any(Function),
     );
-    await vi.waitFor(() => assert.equal(logger.mock.calls.length, 1));
-    expect(logger).toHaveBeenLastCalledWith("one");
+    await vi.waitFor(() => assert.equal(writeMock.mock.calls.length, 1));
+    expect(writeMock).toHaveBeenLastCalledWith(
+      0,
+      "one\n",
+      expect.any(Function),
+    );
     expect(parentPort.postMessage).toHaveBeenCalledWith("done");
     onMessage({ command: "log", line: "two" });
     onMessage({ command: "log", line: "three" });
     await setTimeout(300);
-    expect(logger).toHaveBeenCalledOnce();
+    expect(writeMock).toHaveBeenCalledOnce();
   });
 });
