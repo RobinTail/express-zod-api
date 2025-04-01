@@ -31,11 +31,12 @@ export class TypescriptWorker extends Worker {
       __dirname, // __dirname enabled by TSUP shims
       `worker.${process.env.TSUP_EXT || "ts"}`, // eslint-disable-line no-restricted-syntax -- replaced by TSUP
     );
-    if (filename.endsWith(".ts")) {
-      const tsxApiModule = "tsx/esm/api";
-      const tsxApiConst = "api";
-      const dynamicImportFn = "import";
-      const loader = f.createExpressionStatement(
+    const tsxApiModule = "tsx/esm/api";
+    const tsxApiConst = "api";
+    const dynamicImportFn = "import";
+    const loader =
+      filename.endsWith(".ts") &&
+      f.createExpressionStatement(
         makeCall(
           makeCall(dynamicImportFn)(literally(tsxApiModule)),
           propOf<Promise<typeof API>>("then"),
@@ -51,9 +52,9 @@ export class TypescriptWorker extends Worker {
           ),
         ),
       );
-      super(printNode(loader), { eval: true, workerData });
-    } else {
-      super(filename, { workerData });
-    }
+    super(loader ? printNode(loader) : filename, {
+      eval: !!loader,
+      workerData,
+    });
   }
 }
