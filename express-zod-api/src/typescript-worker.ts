@@ -10,13 +10,23 @@ import {
 } from "./typescript-api";
 import type * as API from "tsx/esm/api";
 
+export interface WorkerData {
+  /** @desc How often to print the logs */
+  interval: number;
+  /**
+   * @desc this should be faster than console.log because it bypasses stream buffering
+   * @example process.stdout.fd
+   * */
+  fd: number;
+}
+
 /**
  * @see https://github.com/nodejs/node/issues/47747#issuecomment-2309062943
  * @link https://github.com/alshdavid/mach/blob/main/packages/mach_npm/platform/mach/worker.ts
  * @todo remove when workers either support types stripping or import loaders
  * */
 export class TypescriptWorker extends Worker {
-  public constructor(workerData: { interval: number; fd: number }) {
+  public constructor(workerData: WorkerData) {
     const filename = path.resolve(
       __dirname, // __dirname enabled by TSUP shims
       `worker.${process.env.TSUP_EXT || "ts"}`, // eslint-disable-line no-restricted-syntax -- replaced by TSUP

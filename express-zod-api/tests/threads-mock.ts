@@ -1,3 +1,5 @@
+import type { WorkerData } from "../src/typescript-worker";
+
 const parentPort = {
   on: vi.fn(),
   off: vi.fn(),
@@ -6,7 +8,7 @@ const parentPort = {
 
 vi.mock("node:worker_threads", () => ({
   parentPort,
-  workerData: { interval: 100, fd: 0 },
+  workerData: { interval: 100, fd: 0 } satisfies WorkerData,
 }));
 
 const writeMock = vi.fn();

@@ -1,11 +1,12 @@
 import { write } from "node:fs";
 import { clearInterval } from "node:timers";
 import { parentPort, workerData } from "node:worker_threads";
+import type { WorkerData } from "./typescript-worker";
 
 if (!parentPort)
   throw new Error("Logger worker must be run as a Worker Thread.");
 
-const { interval = 100, fd } = { ...workerData };
+const { interval, fd } = workerData as WorkerData;
 
 const buffer: string[] = [];
 
