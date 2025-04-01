@@ -23,6 +23,11 @@ export interface BuiltinLoggerConfig {
   /** @desc Enables colors on printed severity and inspected entities */
   color: boolean;
   /**
+   * @desc Printing logs does not delay execution
+   * @see https://expressjs.com/en/advanced/best-practice-performance.html#do-logging-correctly
+   * */
+  async: boolean;
+  /**
    * @desc Control how deeply entities should be inspected
    * @example null
    * @example Infinity
@@ -46,15 +51,18 @@ interface ProfilerOptions {
 /** @desc Built-in console logger with optional colorful inspections */
 export class BuiltinLogger implements AbstractLogger {
   protected readonly config: BuiltinLoggerConfig;
+  protected readonly stack: string[] = [];
+  protected postponed?: NodeJS.Immediate;
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   public constructor({
     color = ansis.isSupported(),
     level = isProduction() ? "warn" : "debug",
+    async = isProduction(),
     depth = 2,
     ctx = {},
   }: Partial<BuiltinLoggerConfig> = {}) {
-    this.config = { color, level, depth, ctx };
+    this.config = { color, level, async, depth, ctx };
   }
 
   protected format(subject: unknown) {
@@ -72,6 +80,7 @@ export class BuiltinLogger implements AbstractLogger {
       level,
       ctx: { requestId, ...ctx },
       color: hasColor,
+      async: isAsync,
     } = this.config;
     if (level === "silent" || isHidden(method, level)) return;
     const output: string[] = [new Date().toISOString()];
@@ -82,7 +91,36 @@ export class BuiltinLogger implements AbstractLogger {
     );
     if (meta !== undefined) output.push(this.format(meta));
     if (Object.keys(ctx).length > 0) output.push(this.format(ctx));
-    console.log(output.join(" "));
+    (isAsync ? this.postpone.bind(this) : console.log)(output.join(" "));
+  }
+
+  /** @todo avoid waiting too long if the stack is shorter than the threshold */
+  protected postpone(line: string) {
+    this.stack.push(line);
+    if (this.stack.length < 100) return; // @todo extract const or make it configurable
+    this.postponed ??= setImmediate(this.purge.bind(this)).unref(); // do not block process.exit()
+  }
+
+  protected purge() {
+    const output = this.stack.join("\n");
+    this.stack.length = 0; // faster https://jsben.ch/hyj65
+    console.log(output);
+    this.postponed = undefined;
+  }
+
+  /**
+   * @internal
+   * @desc Prepares the instance for deleting. Callback is for postponed deletion.
+   * */
+  public dispose(cb?: () => void) {
+    this.config.level = "silent"; // no more logs
+    if (!this.config.async) return;
+    clearImmediate(this.postponed);
+    if (!cb) return this.purge();
+    this.postponed = setImmediate(() => {
+      this.purge();
+      cb();
+    });
   }
 
   public debug(message: string, meta?: unknown) {

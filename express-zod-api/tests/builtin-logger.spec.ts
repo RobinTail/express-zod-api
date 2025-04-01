@@ -41,7 +41,7 @@ describe("BuiltinLogger", () => {
     });
 
     test.each(["development", "production"])(
-      "Level can be omitted and depends on env",
+      "Several settings depend on %s environment",
       (mode) => {
         vi.stubEnv("TSUP_STATIC", mode);
         vi.stubEnv("NODE_ENV", mode);
@@ -49,6 +49,7 @@ describe("BuiltinLogger", () => {
         expect(logger["config"]["level"]).toBe(
           mode === "production" ? "warn" : "debug",
         );
+        expect(logger["config"]["async"]).toBe(mode === "production");
       },
     );
 
@@ -175,6 +176,37 @@ describe("BuiltinLogger", () => {
       expect(logSpy).toHaveBeenCalledWith(
         expect.stringMatching(/debug: test '?\d+\s?\w*'?$/),
       );
+    });
+  });
+
+  // it has to be last, because it affects timer in beforeEach
+  describe("async logging", () => {
+    test("on demand", () => {
+      const { logger, logSpy } = makeLogger({
+        level: "debug",
+        color: false,
+        async: true,
+      });
+      logger.debug("testing debug message");
+      expect(logSpy).not.toHaveBeenCalled();
+      logger.dispose();
+      expect(logSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test("maintains the queue", () => {
+      const { logger, logSpy } = makeLogger({
+        level: "debug",
+        color: false,
+        async: true,
+      });
+      logger.debug("one");
+      logger.debug("two");
+      logger.debug("three");
+      expect(logSpy).not.toHaveBeenCalled();
+      logger.dispose();
+      expect(logSpy.mock.calls).toEqual([
+        [expect.stringMatching(/.+one\n.+two\n.+three/)],
+      ]);
     });
   });
 });

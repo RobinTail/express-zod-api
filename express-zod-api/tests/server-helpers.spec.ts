@@ -12,7 +12,12 @@ import {
   installDeprecationListener,
   installTerminationListener,
 } from "../src/server-helpers";
-import { CommonConfig, defaultResultHandler, ResultHandler } from "../src";
+import {
+  CommonConfig,
+  defaultResultHandler,
+  ResultHandler,
+  ServerConfig,
+} from "../src";
 import { Request } from "express";
 import {
   makeLoggerMock,
@@ -303,10 +308,11 @@ describe("Server helpers", () => {
     test("should install termination signal listener on process", () => {
       const spy = vi.spyOn(process, "on").mockImplementation(vi.fn());
       const logger = makeLoggerMock();
-      installTerminationListener({
-        servers: [],
+      installTerminationListener([], {
         logger,
-        options: { events: ["NOT_HAPPEN"] },
+        config: {
+          gracefulShutdown: { events: ["NOT_HAPPEN"] },
+        } as ServerConfig,
       });
       expect(spy).toHaveBeenCalledWith("NOT_HAPPEN", expect.any(Function));
     });

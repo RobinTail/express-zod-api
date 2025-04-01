@@ -1,4 +1,5 @@
 import type fileUpload from "express-fileupload";
+import { BuiltinLogger } from "./builtin-logger";
 import { metaSymbol } from "./metadata";
 import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
@@ -9,7 +10,7 @@ import createHttpError, { isHttpError } from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
-import { monitor } from "./graceful-shutdown";
+import { monitor, SomeServers } from "./graceful-shutdown";
 
 type EquippedRequest = Request<
   unknown,
@@ -125,14 +126,18 @@ export const moveRaw: RequestHandler = (req, {}, next) => {
 export const createLoggingMiddleware =
   ({
     logger: parent,
+    childLoggers,
     config,
   }: {
     logger: ActualLogger;
+    childLoggers?: Set<BuiltinLogger>;
     config: CommonConfig;
   }): RequestHandler =>
   async (request, response, next) => {
     const logger =
       (await config.childLoggerProvider?.({ request, parent })) || parent;
+    if (childLoggers && logger instanceof BuiltinLogger)
+      childLoggers.add(logger);
     logger.debug(`${request.method}: ${request.path}`);
     if (request.res)
       (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
@@ -153,16 +158,27 @@ export const installDeprecationListener = (logger: ActualLogger) =>
     ),
   );
 
-export const installTerminationListener = ({
-  servers,
-  logger,
-  options: { timeout, events = ["SIGINT", "SIGTERM"] },
-}: {
-  servers: Parameters<typeof monitor>[0];
-  options: Extract<ServerConfig["gracefulShutdown"], object>;
-  logger: ActualLogger;
-}) => {
-  const graceful = monitor(servers, { logger, timeout });
-  const onTerm = () => graceful.shutdown().then(() => process.exit());
+export const installTerminationListener = (
+  servers: SomeServers,
+  {
+    logger,
+    childLoggers,
+    config: { gracefulShutdown: grace },
+  }: {
+    config: ServerConfig;
+    logger: ActualLogger;
+    childLoggers?: Set<BuiltinLogger>;
+  },
+) => {
+  const { timeout, events = ["SIGINT", "SIGTERM"] } = {
+    ...(typeof grace === "object" && grace),
+  };
+  const graceful = grace ? monitor(servers, { logger, timeout }) : undefined;
+  const onTerm = async () => {
+    await graceful?.shutdown();
+    if (childLoggers) for (const child of childLoggers) child.dispose();
+    if (logger instanceof BuiltinLogger) logger.dispose();
+    process.exit();
+  };
   for (const trigger of events) process.on(trigger, onTerm);
 };
