@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { EmptyObject, EmptySchema, FlatObject, Tag } from "./common-helpers";
+import { RequestType } from "./content-type";
 import { Endpoint, Handler } from "./endpoint";
 import { IOSchema, getFinalEndpointInputSchema } from "./io-schema";
 import { Method } from "./method";
@@ -32,6 +33,12 @@ interface BuildProps<
   scope?: SCO | SCO[];
   tag?: Tag | Tag[];
   deprecated?: boolean;
+  /**
+   * @desc Allows to override the schema-based parsers for the Endpoint requests
+   * @link https://github.com/RobinTail/express-zod-api/discussions/2509
+   * @default "upload" when schema contains ez.upload(), "raw" for ones having ez.raw() and "json" for others
+   * */
+  requestType?: RequestType;
 }
 
 export class EndpointsFactory<

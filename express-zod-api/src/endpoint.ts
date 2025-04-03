@@ -20,7 +20,7 @@ import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
-import { ContentType } from "./content-type";
+import { ContentType, RequestType } from "./content-type";
 import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
@@ -78,6 +78,7 @@ export class Endpoint<
     methods?: Method[];
     scopes?: string[];
     tags?: string[];
+    requestType?: RequestType;
   }) {
     super();
     this.#def = def;
@@ -112,11 +113,14 @@ export class Endpoint<
   }
 
   public override getRequestType() {
-    return hasUpload(this.#def.inputSchema)
-      ? "upload"
-      : hasRaw(this.#def.inputSchema)
-        ? "raw"
-        : "json";
+    return (
+      this.#def.requestType ||
+      (hasUpload(this.#def.inputSchema)
+        ? "upload"
+        : hasRaw(this.#def.inputSchema)
+          ? "raw"
+          : "json")
+    );
   }
 
   public override getResponses(variant: ResponseVariant) {

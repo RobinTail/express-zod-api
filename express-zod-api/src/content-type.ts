@@ -6,3 +6,4 @@ export const contentTypes = {
 };
 
 export type ContentType = keyof typeof contentTypes;
+export type RequestType = Extract<ContentType, "json" | "upload" | "raw">;
