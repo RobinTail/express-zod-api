@@ -31,7 +31,7 @@ export const getRoutePathParams = (path: string): string[] =>
 
 const areFilesAvailable = (request: Request): boolean => {
   const contentType = request.header("content-type") || "";
-  const isUpload = contentType.toLowerCase().startsWith(contentTypes.upload);
+  const isUpload = contentType.toLowerCase().startsWith(contentTypes.multipart);
   return "files" in request && isUpload;
 };
 
