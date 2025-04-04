@@ -116,7 +116,7 @@ export class Endpoint<
     return (
       this.#def.requestType ||
       (hasUpload(this.#def.inputSchema)
-        ? "multipart"
+        ? "upload"
         : hasRaw(this.#def.inputSchema)
           ? "raw"
           : "json")

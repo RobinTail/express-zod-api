@@ -1,9 +1,9 @@
 export const contentTypes = {
   json: "application/json",
-  multipart: "multipart/form-data",
+  upload: "multipart/form-data",
   raw: "application/octet-stream",
   sse: "text/event-stream",
 };
 
 export type ContentType = keyof typeof contentTypes;
-export type RequestType = Extract<ContentType, "json" | "multipart" | "raw">;
+export type RequestType = Extract<ContentType, "json" | "upload" | "raw">;

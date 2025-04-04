@@ -342,7 +342,7 @@ describe("Endpoint", () => {
     test.each([
       { input: z.object({}), expected: "json" },
       { input: ez.raw(), expected: "raw" },
-      { input: z.object({ file: ez.upload() }), expected: "multipart" },
+      { input: z.object({ file: ez.upload() }), expected: "upload" },
     ])(
       "should return the assigned one upon constructing",
       ({ input, expected }) => {
