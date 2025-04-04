@@ -339,6 +339,15 @@ describe("Endpoint", () => {
   });
 
   describe("getRequestType()", () => {
+    test("should return the explicitly defined value", () => {
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const endpoint = factory.buildVoid({
+        requestType: "upload",
+        handler: vi.fn(),
+      });
+      expect(endpoint.getRequestType()).toEqual("upload");
+    });
+
     test.each([
       { input: z.object({}), expected: "json" },
       { input: ez.raw(), expected: "raw" },
