@@ -344,8 +344,9 @@ describe("Endpoint", () => {
       { input: ez.raw(), expected: "raw" },
       { input: z.object({ file: ez.upload() }), expected: "upload" },
       { input: ez.form({}), expected: "form" },
+      { input: ez.form({ file: ez.upload() }), expected: "upload" },
     ])(
-      "should return the one based on the input schema",
+      "should return the one based on the input schema %#",
       ({ input, expected }) => {
         const factory = new EndpointsFactory(defaultResultHandler);
         const endpoint = factory.build({
