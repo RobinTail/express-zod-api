@@ -11,10 +11,10 @@
   - The feature brings the `requestType` property to `EndpointsFactory::build()` method and accepts these values:
     - `json` — for `application/json` request parsed by `express.json()`;
     - `raw` — for `application/octet-stream` request parsed by `express.raw()`;
-    - `upload` — for `multipart/form-data` request parsed by `express-fileupload` (optional peer dependency);
-  - This way you can use the suitable parser for form data even without uploading files:
-    - Please note: `express-fileupload` has to be installed for that, because `express` can not handle
-      `multipart/form-data` on its own without an external parsing library;
+    - `upload` — for `multipart/form-data` request;
+  - By setting `requestType: "upload"` you can use the suitable parser for form data even without uploading files:
+    - Please note: `express-fileupload` (optional peer dependency) has to be installed for that and `upload` config
+      option has to be enabled, because `express` can not handle `multipart/form-data` on its own;
     - Alternatively, `beforeRouting` config option can be used for `app.use()` with another parsing library.
 
 ### v22.11.2
