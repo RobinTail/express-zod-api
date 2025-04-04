@@ -1,4 +1,4 @@
-import { contentTypes } from "../src/content-type";
+import { contentTypes, ContentType } from "../src/content-type";
 
 describe("contentTypes", () => {
   test("should has predefined properties", () => {
@@ -7,5 +7,11 @@ describe("contentTypes", () => {
       upload: "multipart/form-data",
       raw: "application/octet-stream",
     });
+  });
+});
+
+describe("ContentType", () => {
+  test("should accept keys of contentTypes", () => {
+    expectTypeOf<ContentType>().toEqualTypeOf<"json" | "upload" | "raw">();
   });
 });
