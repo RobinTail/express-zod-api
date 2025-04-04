@@ -80,6 +80,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   const parsers: Parsers = {
     json: [config.jsonParser || express.json()],
     raw: [config.rawParser || express.raw(), moveRaw],
+    form: [config.formParser || express.urlencoded()],
     upload: config.upload
       ? await createUploadParsers({ config, getLogger })
       : [],
