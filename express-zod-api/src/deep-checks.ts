@@ -4,6 +4,7 @@ import { EmptyObject } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand } from "./file-schema";
+import { ezFormBrand } from "./form-schema";
 import { IOSchema } from "./io-schema";
 import { metaSymbol } from "./metadata";
 import { ProprietaryBrand } from "./proprietary-schemas";
@@ -101,6 +102,12 @@ export const hasUpload = (subject: IOSchema) =>
 export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema(subject, {
     condition: (schema) => schema._def[metaSymbol]?.brand === ezRawBrand,
+    maxDepth: 3,
+  });
+
+export const hasForm = (subject: IOSchema) =>
+  hasNestedSchema(subject, {
+    condition: (schema) => schema._def[metaSymbol]?.brand === ezFormBrand,
     maxDepth: 3,
   });
 
