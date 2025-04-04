@@ -15,7 +15,7 @@ export interface Routing {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
 }
 
-export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
+export type Parsers = Record<ContentType, RequestHandler[]>;
 
 /** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405 */
 export const createWrongMethodHandler =

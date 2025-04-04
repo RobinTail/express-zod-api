@@ -1,7 +1,6 @@
 import { Response } from "express";
 import { z } from "zod";
 import { EmptySchema, FlatObject } from "./common-helpers";
-import { contentTypes } from "./content-type";
 import { EndpointsFactory } from "./endpoints-factory";
 import { Middleware } from "./middleware";
 import { ResultHandler } from "./result-handler";
@@ -12,6 +11,8 @@ import {
 } from "./result-helpers";
 
 type EventsMap = Record<string, z.ZodTypeAny>;
+
+const contentType = "text/event-stream";
 
 export interface Emitter<E extends EventsMap> extends FlatObject {
   /** @desc Returns true when the connection was closed or terminated */
@@ -49,7 +50,7 @@ export const ensureStream = (response: Response) =>
   response.headersSent ||
   response.writeHead(200, {
     connection: "keep-alive",
-    "content-type": contentTypes.sse,
+    "content-type": contentType,
     "cache-control": "no-cache",
   });
 
@@ -77,7 +78,7 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
         makeEventSchema(event, schema),
       );
       return {
-        mimeType: contentTypes.sse,
+        mimeType: contentType,
         schema: rest.length
           ? z.discriminatedUnion("event", [first, ...rest])
           : first,

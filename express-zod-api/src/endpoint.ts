@@ -20,7 +20,7 @@ import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer } from "./logical-container";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
-import { ContentType, RequestType } from "./content-type";
+import { ContentType } from "./content-type";
 import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
@@ -78,7 +78,7 @@ export class Endpoint<
     methods?: Method[];
     scopes?: string[];
     tags?: string[];
-    requestType?: RequestType;
+    requestType?: ContentType;
   }) {
     super();
     this.#def = def;
