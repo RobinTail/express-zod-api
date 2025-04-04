@@ -17,6 +17,24 @@
       option has to be enabled, because `express` can not handle `multipart/form-data` on its own;
     - Alternatively, `beforeRouting` config option can be used for `app.use()` with another parsing library.
 
+```ts
+import { createConfig, defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const config = createConfig({
+  upload: true, // enables express-fileupload for multipart/form-data requests
+});
+
+const formHandlingEndpoint = defaultEndpointsFactory.build({
+  requestType: "upload", // enables express-fileupload for this Endpoint even without ez.upload() in its schema
+  input: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    message: z.string(),
+  }),
+});
+```
+
 ### v22.11.2
 
 - Fixed: allow future versions of Express 5:
