@@ -639,6 +639,80 @@ paths:
             text/plain:
               schema:
                 type: string
+  /v1/forms/feedback:
+    post:
+      operationId: PostV1FormsFeedback
+      requestBody:
+        description: POST /v1/forms/feedback Request body
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                email:
+                  type: string
+                  format: email
+                message:
+                  type: string
+                  minLength: 1
+              required:
+                - name
+                - email
+                - message
+        required: true
+      responses:
+        "200":
+          description: POST /v1/forms/feedback Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                    properties:
+                      crc:
+                        type: number
+                        format: double
+                        minimum: -1.7976931348623157e+308
+                        maximum: 1.7976931348623157e+308
+                    required:
+                      - crc
+                required:
+                  - status
+                  - data
+        "400":
+          description: POST /v1/forms/feedback Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
 components:
   schemas:
     Schema1:

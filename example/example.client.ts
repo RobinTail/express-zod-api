@@ -292,6 +292,39 @@ interface GetV1EventsStreamNegativeResponseVariants {
   400: GetV1EventsStreamNegativeVariant1;
 }
 
+/** post /v1/forms/feedback */
+type PostV1FormsFeedbackInput = {
+  name: string;
+  email: string;
+  message: string;
+};
+
+/** post /v1/forms/feedback */
+type PostV1FormsFeedbackPositiveVariant1 = {
+  status: "success";
+  data: {
+    crc: number;
+  };
+};
+
+/** post /v1/forms/feedback */
+interface PostV1FormsFeedbackPositiveResponseVariants {
+  200: PostV1FormsFeedbackPositiveVariant1;
+}
+
+/** post /v1/forms/feedback */
+type PostV1FormsFeedbackNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** post /v1/forms/feedback */
+interface PostV1FormsFeedbackNegativeResponseVariants {
+  400: PostV1FormsFeedbackNegativeVariant1;
+}
+
 export type Path =
   | "/v1/user/retrieve"
   | "/v1/user/:id/remove"
@@ -302,7 +335,8 @@ export type Path =
   | "/v1/avatar/stream"
   | "/v1/avatar/upload"
   | "/v1/avatar/raw"
-  | "/v1/events/stream";
+  | "/v1/events/stream"
+  | "/v1/forms/feedback";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
@@ -318,6 +352,7 @@ export interface Input {
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
   "post /v1/avatar/raw": PostV1AvatarRawInput;
   "get /v1/events/stream": GetV1EventsStreamInput;
+  "post /v1/forms/feedback": PostV1FormsFeedbackInput;
 }
 
 export interface PositiveResponse {
@@ -332,6 +367,7 @@ export interface PositiveResponse {
   "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadPositiveResponseVariants>;
   "post /v1/avatar/raw": SomeOf<PostV1AvatarRawPositiveResponseVariants>;
   "get /v1/events/stream": SomeOf<GetV1EventsStreamPositiveResponseVariants>;
+  "post /v1/forms/feedback": SomeOf<PostV1FormsFeedbackPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
@@ -346,6 +382,7 @@ export interface NegativeResponse {
   "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadNegativeResponseVariants>;
   "post /v1/avatar/raw": SomeOf<PostV1AvatarRawNegativeResponseVariants>;
   "get /v1/events/stream": SomeOf<GetV1EventsStreamNegativeResponseVariants>;
+  "post /v1/forms/feedback": SomeOf<PostV1FormsFeedbackNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
@@ -370,6 +407,8 @@ export interface EncodedResponse {
     PostV1AvatarRawNegativeResponseVariants;
   "get /v1/events/stream": GetV1EventsStreamPositiveResponseVariants &
     GetV1EventsStreamNegativeResponseVariants;
+  "post /v1/forms/feedback": PostV1FormsFeedbackPositiveResponseVariants &
+    PostV1FormsFeedbackNegativeResponseVariants;
 }
 
 export interface Response {
@@ -404,6 +443,9 @@ export interface Response {
   "get /v1/events/stream":
     | PositiveResponse["get /v1/events/stream"]
     | NegativeResponse["get /v1/events/stream"];
+  "post /v1/forms/feedback":
+    | PositiveResponse["post /v1/forms/feedback"]
+    | NegativeResponse["post /v1/forms/feedback"];
 }
 
 export type Request = keyof Input;
@@ -419,6 +461,7 @@ export const endpointTags = {
   "post /v1/avatar/upload": ["files"],
   "post /v1/avatar/raw": ["files"],
   "get /v1/events/stream": ["subscriptions"],
+  "post /v1/forms/feedback": [],
 };
 
 const parseRequest = (request: string) =>

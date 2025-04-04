@@ -1,0 +1,17 @@
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
+
+export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.form({
+    name: z.string().min(1),
+    email: z.string().email(),
+    message: z.string().min(1),
+  }),
+  output: z.object({
+    crc: z.number(),
+  }),
+  handler: async ({ input: { name, email, message } }) => ({
+    crc: [name, email, message].reduce((acc, { length }) => acc + length, 0),
+  }),
+});
