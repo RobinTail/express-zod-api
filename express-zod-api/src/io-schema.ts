@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { FlatObject } from "./common-helpers";
+import { FormSchema } from "./form-schema";
 import { copyMeta } from "./metadata";
 import { AbstractMiddleware } from "./middleware";
 import { RawSchema } from "./raw-schema";
@@ -22,6 +23,7 @@ export type IOSchema<U extends z.UnknownKeysParam = z.UnknownKeysParam> =
   | BaseObject<U> // z.object()
   | EffectsChain<U> // z.object().refine(), z.object().transform(), z.object().preprocess()
   | RawSchema // ez.raw()
+  | FormSchema // ez.form()
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]> // z.object().or()
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>> // z.object().and()
   | z.ZodDiscriminatedUnion<string, BaseObject<U>[]> // z.discriminatedUnion()
