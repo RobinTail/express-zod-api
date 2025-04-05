@@ -250,6 +250,26 @@ describe("Example", async () => {
       expect(json).toMatchSnapshot();
     });
 
+    test("Should accept URL encoded HTML form", async () => {
+      const data = new URLSearchParams();
+      data.append("name", "John Doe");
+      data.append("email", "john@example.com");
+      data.append("message", "All good");
+      const response = await fetch(
+        `http://localhost:${port}/v1/forms/feedback`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: data.toString(),
+        },
+      );
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({
+        status: "success",
+        data: { crc: 32 },
+      });
+    });
+
     test("Should handle no content", async () => {
       const response = await fetch(
         `http://localhost:${port}/v1/user/50/remove`,
