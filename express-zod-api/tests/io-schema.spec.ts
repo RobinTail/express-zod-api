@@ -22,6 +22,9 @@ describe("I/O Schema and related helpers", () => {
       expectTypeOf(ez.raw()).toMatchTypeOf<IOSchema>();
       expectTypeOf(ez.raw({ something: z.any() })).toMatchTypeOf<IOSchema>();
     });
+    test("accepts ez.form()", () => {
+      expectTypeOf(ez.form({})).toExtend<IOSchema>();
+    });
     test("respects the UnknownKeys type argument", () => {
       expectTypeOf(z.object({})).not.toMatchTypeOf<IOSchema<"passthrough">>();
     });

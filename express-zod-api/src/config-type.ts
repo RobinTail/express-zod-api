@@ -173,6 +173,12 @@ export interface ServerConfig extends CommonConfig {
    * */
   rawParser?: RequestHandler;
   /**
+   * @desc Custom parser for URL Encoded requests used for submitting HTML forms
+   * @default express.urlencoded()
+   * @link https://expressjs.com/en/4x/api.html#express.urlencoded
+   * */
+  formParser?: RequestHandler;
+  /**
    * @desc A code to execute before processing the Routing of your API (and before parsing).
    * @desc This can be a good place for express middlewares establishing their own routes.
    * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
