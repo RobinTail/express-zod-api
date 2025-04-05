@@ -986,6 +986,8 @@ export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
+_Hint: for unlisted extra fields use the following syntax: `ez.form( z.object({}).passthrough() )`._
+
 ## File uploads
 
 Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and enable or
