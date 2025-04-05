@@ -10,7 +10,7 @@ export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
     message: z.string().min(1),
   }),
   output: z.object({
-    crc: z.number(),
+    crc: z.number().int().positive(),
   }),
   handler: async ({ input: { name, email, message } }) => ({
     crc: [name, email, message].reduce((acc, { length }) => acc + length, 0),

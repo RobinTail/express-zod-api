@@ -680,10 +680,10 @@ paths:
                     type: object
                     properties:
                       crc:
-                        type: number
-                        format: double
-                        minimum: -1.7976931348623157e+308
-                        maximum: 1.7976931348623157e+308
+                        type: integer
+                        format: int64
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
                     required:
                       - crc
                 required:
