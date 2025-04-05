@@ -642,6 +642,8 @@ paths:
   /v1/forms/feedback:
     post:
       operationId: PostV1FormsFeedback
+      tags:
+        - forms
       requestBody:
         description: POST /v1/forms/feedback Request body
         content:

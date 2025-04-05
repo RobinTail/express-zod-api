@@ -461,7 +461,7 @@ export const endpointTags = {
   "post /v1/avatar/upload": ["files"],
   "post /v1/avatar/raw": ["files"],
   "get /v1/events/stream": ["subscriptions"],
-  "post /v1/forms/feedback": [],
+  "post /v1/forms/feedback": ["forms"],
 };
 
 const parseRequest = (request: string) =>

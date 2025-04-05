@@ -42,5 +42,6 @@ declare module "express-zod-api" {
     users: unknown;
     files: unknown;
     subscriptions: unknown;
+    forms: unknown;
   }
 }

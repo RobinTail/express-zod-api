@@ -3,6 +3,7 @@ import { z } from "zod";
 
 export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
   method: "post",
+  tag: "forms",
   input: ez.form({
     name: z.string().min(1),
     email: z.string().email(),
