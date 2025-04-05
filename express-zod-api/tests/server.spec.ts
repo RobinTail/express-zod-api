@@ -4,6 +4,7 @@ import {
   appMock,
   compressionMock,
   expressJsonMock,
+  expressUrlencodedMock,
   expressMock,
   expressRawMock,
 } from "./express-mock";
@@ -304,6 +305,31 @@ describe("Server", () => {
         "/v1/test",
         expressRawMock,
         moveRaw,
+        expect.any(Function), // endpoint
+      );
+    });
+
+    test("should enable urlencoded on request", async () => {
+      const configMock = {
+        http: { listen: givePort() },
+        cors: true,
+        startupLogo: false,
+        logger: { level: "warn" },
+      } satisfies ServerConfig;
+      const routingMock = {
+        v1: {
+          test: new EndpointsFactory(defaultResultHandler).buildVoid({
+            input: ez.form({}),
+            handler: vi.fn(),
+          }),
+        },
+      };
+      await createServer(configMock, routingMock);
+      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(appMock.get).toHaveBeenCalledTimes(1);
+      expect(appMock.get).toHaveBeenCalledWith(
+        "/v1/test",
+        expressUrlencodedMock,
         expect.any(Function), // endpoint
       );
     });
