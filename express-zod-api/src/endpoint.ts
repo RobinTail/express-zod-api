@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as R from "ramda";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
-import { hasRaw, hasUpload } from "./deep-checks";
+import { hasForm, hasRaw, hasUpload } from "./deep-checks";
 import {
   FlatObject,
   getActualMethod,
@@ -138,7 +138,9 @@ export class Endpoint<
       ? "upload"
       : hasRaw(this.#def.inputSchema)
         ? "raw"
-        : "json";
+        : hasForm(this.#def.inputSchema)
+          ? "form"
+          : "json";
   }
 
   /** @internal */

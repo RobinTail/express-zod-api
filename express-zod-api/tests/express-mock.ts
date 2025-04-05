@@ -1,5 +1,6 @@
 const expressJsonMock = vi.fn();
 const expressRawMock = vi.fn();
+const expressUrlencodedMock = vi.fn();
 const compressionMock = vi.fn();
 const fileUploadMock = vi.fn();
 
@@ -25,6 +26,7 @@ const appMock = {
 const expressMock = () => appMock;
 expressMock.json = () => expressJsonMock;
 expressMock.raw = () => expressRawMock;
+expressMock.urlencoded = () => expressUrlencodedMock;
 expressMock.static = staticMock;
 
 vi.mock("express", () => ({ default: expressMock }));
@@ -36,6 +38,7 @@ export {
   appMock,
   expressJsonMock,
   expressRawMock,
+  expressUrlencodedMock,
   staticMock,
   staticHandler,
 };

@@ -19,6 +19,29 @@
 
 ## Version 22
 
+### v22.12.0
+
+- Featuring HTML forms support (URL Encoded request body):
+  - Introducing the new proprietary schema `ez.form()` accepting an object shape or a custom `z.object()` schema;
+  - Introducing the new config option `formParser` having `express.urlencoded()` as the default value;
+  - Requests to Endpoints having `input` schema assigned with `ez.form()` are parsed using `formParser`;
+    - Exception: requests to Endpoints having `ez.upload()` within `ez.form()` are still parsed by `express-fileupload`.
+
+```ts
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
+
+// The request content type should be "application/x-www-form-urlencoded"
+export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.form({
+    name: z.string().min(1),
+    email: z.string().email(),
+    message: z.string().min(1),
+  }),
+});
+```
+
 ### v22.11.2
 
 - Fixed: allow future versions of Express 5:

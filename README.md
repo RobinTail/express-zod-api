@@ -41,11 +41,12 @@ Start your API server with I/O schema validation and custom middlewares in minut
    8. [Error handling](#error-handling)
    9. [Production mode](#production-mode)
    10. [Non-object response](#non-object-response) including file downloads
-   11. [File uploads](#file-uploads)
-   12. [Serving static files](#serving-static-files)
-   13. [Connect to your own express app](#connect-to-your-own-express-app)
-   14. [Testing endpoints](#testing-endpoints)
-   15. [Testing middlewares](#testing-middlewares)
+   11. [HTML Forms (URL encoded)](#html-forms-url-encoded)
+   12. [File uploads](#file-uploads)
+   13. [Serving static files](#serving-static-files)
+   14. [Connect to your own express app](#connect-to-your-own-express-app)
+   15. [Testing endpoints](#testing-endpoints)
+   16. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -964,43 +965,53 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 );
 ```
 
-## File uploads
+## HTML Forms (URL encoded)
 
-Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and enable or
-configure file uploads:
+Use the proprietary schema `ez.form()` with an object shape or a custom `z.object()` with form fields in order to
+describe the `input` schema of an Endpoint. Requests to the Endpoint are parsed using the `formParser` config option,
+which is `express.urlencoded()` by default. The request content type should be `application/x-www-form-urlencoded`
+(default for HTML forms without uploads).
 
-```typescript
-import { createConfig } from "express-zod-api";
+```ts
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
 
-const config = createConfig({
-  upload: true, // or options
+export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.form({
+    name: z.string().min(1),
+    email: z.string().email(),
+    message: z.string().min(1),
+  }),
 });
 ```
 
-Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on available options.
-Some options are forced in order to ensure the correct workflow: `abortOnLimit: false`, `parseNested: true`, `logger`
-is assigned with `.debug()` method of the configured logger, and `debug` is enabled by default.
-The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional middleware for
-restricting the ability to upload using the `beforeUpload` option. So the configuration for the limited and restricted
-upload might look this way:
+_Hint: for unlisted extra fields use the following syntax: `ez.form( z.object({}).passthrough() )`._
+
+## File uploads
+
+Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and enable or
+configure file uploads. Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on
+available options. The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional
+middleware for restricting the ability to upload using the `beforeUpload` option. So the configuration for the limited
+and restricted upload might look this way:
 
 ```typescript
 import createHttpError from "http-errors";
 
 const config = createConfig({
-  upload: {
+  upload: /* true or options: */ {
     limits: { fileSize: 51200 }, // 50 KB
     limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
     beforeUpload: ({ request, logger }) => {
       if (!canUpload(request)) throw createHttpError(403, "Not authorized");
     },
+    debug: true, // default
   },
 });
 ```
 
-Then you can change the `Endpoint` to handle requests having the `multipart/form-data` content type instead of JSON by
-using `ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file
-uploads. Here is a simplified example:
+Then use `ez.upload()` schema for a corresponding property. The request content type must be `multipart/form-data`:
 
 ```typescript
 import { z } from "zod";
