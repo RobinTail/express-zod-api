@@ -8,7 +8,8 @@
   - Introducing the new proprietary schema `ez.form()` accepting an object shape or a custom `z.object()` schema;
   - Introducing the new config option `formParser` having `express.urlencoded()` as the default value;
   - Requests to Endpoints having `input` schema assigned with `ez.form()` are parsed using `formParser`;
-    - Exception: requests to Endpoints having `ez.upload()` within `ez.form()` are still parsed by `express-fileupload`.
+    - Exception: requests to Endpoints having `ez.upload()` within `ez.form()` are still parsed by `express-fileupload`;
+  - The lack of this feature was reported by [@james10424](https://github.com/james10424).
 
 ```ts
 import { defaultEndpointsFactory, ez } from "express-zod-api";
