@@ -92,36 +92,32 @@ interface DocumentationParams {
 }
 
 export class Documentation extends OpenApiBuilder {
-  protected lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
-  protected lastOperationIdSuffixes = new Map<string, number>();
-  protected references = new Map<z.ZodTypeAny, string>();
+  readonly #lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
+  readonly #lastOperationIdSuffixes = new Map<string, number>();
+  readonly #references = new Map<z.ZodTypeAny, string>();
 
-  protected makeRef(
+  #makeRef(
     schema: z.ZodTypeAny,
     subject:
       | SchemaObject
       | ReferenceObject
       | (() => SchemaObject | ReferenceObject),
-    name = this.references.get(schema),
+    name = this.#references.get(schema),
   ): ReferenceObject {
     if (!name) {
-      name = `Schema${this.references.size + 1}`;
-      this.references.set(schema, name);
+      name = `Schema${this.#references.size + 1}`;
+      this.#references.set(schema, name);
       if (typeof subject === "function") subject = subject();
     }
     if (typeof subject === "object") this.addSchema(name, subject);
     return { $ref: `#/components/schemas/${name}` };
   }
 
-  protected ensureUniqOperationId(
-    path: string,
-    method: Method,
-    userDefined?: string,
-  ) {
+  #ensureUniqOperationId(path: string, method: Method, userDefined?: string) {
     const operationId = userDefined || makeCleanId(method, path);
-    let lastSuffix = this.lastOperationIdSuffixes.get(operationId);
+    let lastSuffix = this.#lastOperationIdSuffixes.get(operationId);
     if (lastSuffix === undefined) {
-      this.lastOperationIdSuffixes.set(operationId, 1);
+      this.#lastOperationIdSuffixes.set(operationId, 1);
       return operationId;
     }
     if (userDefined) {
@@ -132,11 +128,11 @@ export class Documentation extends OpenApiBuilder {
       });
     }
     lastSuffix++;
-    this.lastOperationIdSuffixes.set(operationId, lastSuffix);
+    this.#lastOperationIdSuffixes.set(operationId, lastSuffix);
     return `${operationId}${lastSuffix}`;
   }
 
-  protected ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
+  #ensureUniqSecuritySchemaName(subject: SecuritySchemeObject) {
     const serializedSubject = JSON.stringify(subject);
     for (const name in this.rootDoc.components?.securitySchemes || {}) {
       if (
@@ -145,8 +141,8 @@ export class Documentation extends OpenApiBuilder {
       )
         return name;
     }
-    const nextId = (this.lastSecuritySchemaIds.get(subject.type) || 0) + 1;
-    this.lastSecuritySchemaIds.set(subject.type, nextId);
+    const nextId = (this.#lastSecuritySchemaIds.get(subject.type) || 0) + 1;
+    this.#lastSecuritySchemaIds.set(subject.type, nextId);
     return `${subject.type.toUpperCase()}_${nextId}`;
   }
 
@@ -176,31 +172,29 @@ export class Documentation extends OpenApiBuilder {
         composition,
         brandHandling,
         numericRange,
-        makeRef: this.makeRef.bind(this),
+        makeRef: this.#makeRef.bind(this),
       };
-      const [shortDesc, description] = (["short", "long"] as const).map(
-        endpoint.getDescription.bind(endpoint),
-      );
-      const summary = shortDesc
-        ? ensureShortDescription(shortDesc)
+      const { description, shortDescription, scopes, inputSchema } = endpoint;
+      const summary = shortDescription
+        ? ensureShortDescription(shortDescription)
         : hasSummaryFromDescription && description
           ? ensureShortDescription(description)
           : undefined;
       const inputSources =
         config.inputSources?.[method] || defaultInputSources[method];
-      const operationId = this.ensureUniqOperationId(
+      const operationId = this.#ensureUniqOperationId(
         path,
         method,
         endpoint.getOperationId(method),
       );
 
-      const security = processContainers(endpoint.getSecurity());
+      const security = processContainers(endpoint.security);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         isHeader,
         security,
-        schema: endpoint.getSchema("input"),
+        schema: inputSchema,
         description: descriptions?.requestParameter?.call(null, {
           method,
           path,
@@ -236,8 +230,8 @@ export class Documentation extends OpenApiBuilder {
         ? depictBody({
             ...commons,
             paramNames: R.pluck("name", depictedParams),
-            schema: endpoint.getSchema("input"),
-            mimeType: contentTypes[endpoint.getRequestType()],
+            schema: inputSchema,
+            mimeType: contentTypes[endpoint.requestType],
             description: descriptions?.requestBody?.call(null, {
               method,
               path,
@@ -248,9 +242,9 @@ export class Documentation extends OpenApiBuilder {
 
       const securityRefs = depictSecurityRefs(
         depictSecurity(security, inputSources),
-        endpoint.getScopes(),
+        scopes,
         (securitySchema) => {
-          const name = this.ensureUniqSecuritySchemaName(securitySchema);
+          const name = this.#ensureUniqSecuritySchemaName(securitySchema);
           this.addSecurityScheme(name, securitySchema);
           return name;
         },
@@ -261,7 +255,7 @@ export class Documentation extends OpenApiBuilder {
         summary,
         description,
         deprecated: endpoint.isDeprecated || undefined,
-        tags: nonEmpty(endpoint.getTags()),
+        tags: nonEmpty(endpoint.tags),
         parameters: nonEmpty(depictedParams),
         requestBody,
         security: nonEmpty(securityRefs),

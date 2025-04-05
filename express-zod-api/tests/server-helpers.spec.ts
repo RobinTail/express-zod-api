@@ -195,13 +195,13 @@ describe("Server helpers", () => {
       ]);
     });
 
-    test("should handle errors thrown by beforeUpload", async () => {
+    test("should delegate errors thrown by beforeUpload", async () => {
       const error = createHttpError(403, "Not authorized");
-      beforeUploadMock.mockImplementationOnce(() => {
-        throw error;
-      });
-      await parsers[0](requestMock, responseMock, nextMock);
-      expect(nextMock).toHaveBeenCalledWith(error);
+      beforeUploadMock.mockRejectedValueOnce(error);
+      await expect(() =>
+        parsers[0](requestMock, responseMock, nextMock),
+      ).rejects.toThrowError(error);
+      expect(nextMock).not.toHaveBeenCalled();
     });
 
     test("should install the uploader with its special logger", async () => {

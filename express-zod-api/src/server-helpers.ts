@@ -99,11 +99,7 @@ export const createUploadParsers = async ({
   const parsers: RequestHandler[] = [];
   parsers.push(async (request, response, next) => {
     const logger = getLogger(request);
-    try {
-      await beforeUpload?.({ request, logger });
-    } catch (error) {
-      return next(error);
-    }
+    await beforeUpload?.({ request, logger });
     return uploader({
       debug: true,
       ...options,
