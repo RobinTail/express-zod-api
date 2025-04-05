@@ -1005,17 +1005,11 @@ const config = createConfig({
       if (!canUpload(request)) throw createHttpError(403, "Not authorized");
     },
     debug: true, // default
-    // some options are forced in order to ensure the correct workflow:
-    abortOnLimit: false,
-    parseNested: true,
-    logger: configuredLogger, // with "debug" severity
   },
 });
 ```
 
-Then you can change the `Endpoint` to handle requests having the `multipart/form-data` content type instead of JSON by
-using `ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file
-uploads. Here is a simplified example:
+Then use `ez.upload()` schema for a corresponding property. The request content type must be `multipart/form-data`:
 
 ```typescript
 import { z } from "zod";
