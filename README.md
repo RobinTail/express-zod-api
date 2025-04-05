@@ -88,6 +88,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/james10424.png" alt="@james10424" width="50px" />](https://github.com/james10424)
 [<img src="https://github.com/APTy.png" alt="@APTy" width="50px" />](https://github.com/APTy)
 [<img src="https://github.com/LufyCZ.png" alt="@LufyCZ" width="50px" />](https://github.com/LufyCZ)
 [<img src="https://github.com/mlms13.png" alt="@mlms13" width="50px" />](https://github.com/mlms13)
