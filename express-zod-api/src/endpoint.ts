@@ -26,8 +26,11 @@ import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
 
 export type Handler<IN, OUT, OPT> = (params: {
+  /** @desc The validated inputs from all the enables input sources */
   input: IN;
+  /** @desc The returns of the assigned Middlewares */
   options: OPT;
+  /** @desc The instance of the configured logger */
   logger: ActualLogger;
 }) => Promise<OUT>;
 

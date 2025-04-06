@@ -44,10 +44,17 @@ export class Middleware<
     security,
     handler,
   }: {
+    /**
+     * @desc Input schema of the Middleware, combining properties from all the enabled input sources
+     * @default z.object({})
+     * @see defaultInputSources
+     * */
     input?: IN;
+    /** @desc Declaration of the security schemas implemented within the handler */
     security?: LogicalContainer<
       Security<Extract<keyof z.input<IN>, string>, SCO>
     >;
+    /** @desc The handler returning options available to Endpoints */
     handler: Handler<z.output<IN>, OPT, OUT>;
   }) {
     super();
