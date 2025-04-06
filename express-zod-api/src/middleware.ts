@@ -8,10 +8,18 @@ import { Security } from "./security";
 import { ActualLogger } from "./logger-helpers";
 
 type Handler<IN, OPT, OUT> = (params: {
+  /** @desc The inputs from the enabled input sources validated against final input schema of the Middleware */
   input: IN;
+  /**
+   * @desc The returns of the previously executed Middlewares (typed when chaining Middlewares)
+   * @link https://github.com/RobinTail/express-zod-api/discussions/1250
+   * */
   options: OPT;
+  /** @link https://expressjs.com/en/5x/api.html#req */
   request: Request;
+  /** @link https://expressjs.com/en/5x/api.html#res */
   response: Response;
+  /** @desc The instance of the configured logger */
   logger: ActualLogger;
 }) => Promise<OUT>;
 
