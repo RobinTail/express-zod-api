@@ -154,7 +154,7 @@ describe("SSE", () => {
       const endpoint = new EventStreamFactory({ test: z.string() }).buildVoid({
         input: z.object({ some: z.string().optional() }),
         handler: async ({ input, options }) => {
-          expectTypeOf(input).toMatchTypeOf<{ some?: string }>();
+          expectTypeOf(input).toExtend<{ some?: string }>();
           expectTypeOf(options.emit)
             .parameter(0)
             .toEqualTypeOf("test" as const);
