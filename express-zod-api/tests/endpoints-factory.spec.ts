@@ -74,7 +74,7 @@ describe("EndpointsFactory", () => {
       const factory = defaultEndpointsFactory.addMiddleware({
         handler: async () => ({ test: "fist option" }),
       });
-      expectTypeOf(factory).toMatchTypeOf<
+      expectTypeOf(factory).toEqualTypeOf<
         EndpointsFactory<
           z.ZodIntersection<EmptySchema, EmptySchema>,
           EmptyObject & { test: string }
@@ -244,7 +244,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.getMethods()).toBeUndefined();
       expect(endpoint.getSchema("input")).toMatchSnapshot();
       expect(endpoint.getSchema("output")).toMatchSnapshot();
-      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
+      expectTypeOf(endpoint.getSchema("input")._output).toExtend<{
         n: number;
         s: string;
       }>();
@@ -272,7 +272,7 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint.getSchema("input")).toMatchSnapshot();
       expect(endpoint.getSchema("output")).toMatchSnapshot();
-      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
+      expectTypeOf(endpoint.getSchema("input")._output).toExtend<{
         a?: number;
         b?: string;
         i: string;
@@ -297,7 +297,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.getMethods()).toBeUndefined();
       expect(endpoint.getSchema("input")).toMatchSnapshot();
       expect(endpoint.getSchema("output")).toMatchSnapshot();
-      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<{
+      expectTypeOf(endpoint.getSchema("input")._output).toExtend<{
         n1: number;
         n2: number;
         s: string;
@@ -325,7 +325,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.getMethods()).toBeUndefined();
       expect(endpoint.getSchema("input")).toMatchSnapshot();
       expect(endpoint.getSchema("output")).toMatchSnapshot();
-      expectTypeOf(endpoint.getSchema("input")._output).toMatchTypeOf<
+      expectTypeOf(endpoint.getSchema("input")._output).toExtend<
         { s: string } & ({ n1: number } | { n2: number })
       >();
     });
@@ -352,7 +352,7 @@ describe("EndpointsFactory", () => {
         handler: async () => {},
       });
       expect(endpoint.getSchema("output")).toMatchSnapshot();
-      expectTypeOf(endpoint.getSchema("output")).toMatchTypeOf<EmptySchema>();
+      expectTypeOf(endpoint.getSchema("output")).toExtend<EmptySchema>();
     });
   });
 });
