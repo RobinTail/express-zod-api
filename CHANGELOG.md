@@ -2,6 +2,10 @@
 
 ## Version 22
 
+### v22.12.1
+
+- [@danmichaelo](https://github.com/danmichaelo) fixed a broken link in the Security policy.
+
 ### v22.12.0
 
 - Featuring HTML forms support (URL Encoded request body):
