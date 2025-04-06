@@ -39,72 +39,77 @@ describe("Index Entrypoint", () => {
     test("Convenience types should be exposed", () => {
       expectTypeOf(() => ({
         type: "number" as const,
-      })).toMatchTypeOf<Depicter>();
+      })).toExtend<Depicter>();
       expectTypeOf(() =>
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-      ).toMatchTypeOf<Producer>();
+      ).toExtend<Producer>();
     });
 
     test("Issue 952, 1182, 1269: should expose certain types and interfaces", () => {
-      expectTypeOf<"get">().toMatchTypeOf<Method>();
-      expectTypeOf(z.object({})).toMatchTypeOf<IOSchema>();
-      expectTypeOf({}).toMatchTypeOf<FlatObject>();
+      expectTypeOf<"get">().toExtend<Method>();
+      expectTypeOf(z.object({})).toExtend<IOSchema>();
+      expectTypeOf({}).toExtend<FlatObject>();
       expectTypeOf({}).toEqualTypeOf<LoggerOverrides>();
-      expectTypeOf({}).toMatchTypeOf<Routing>();
+      expectTypeOf({}).toExtend<Routing>();
       expectTypeOf<{
         cors: true;
         logger: { level: "silent" };
-      }>().toMatchTypeOf<CommonConfig>();
+      }>().toExtend<CommonConfig>();
       expectTypeOf<{
         app: IRouter;
         cors: true;
         logger: { level: "silent" };
-      }>().toMatchTypeOf<AppConfig>();
+      }>().toExtend<AppConfig>();
       expectTypeOf<{
         http: { listen: 8090 };
         logger: { level: "silent" };
         cors: false;
-      }>().toMatchTypeOf<ServerConfig>();
-      expectTypeOf<{ type: "basic" }>().toMatchTypeOf<BasicSecurity>();
-      expectTypeOf<{ type: "bearer" }>().toMatchTypeOf<BearerSecurity>();
+      }>().toExtend<ServerConfig>();
+      expectTypeOf<{ type: "basic" }>().toEqualTypeOf<BasicSecurity>();
+      expectTypeOf<{
+        type: "bearer";
+        format?: string;
+      }>().toEqualTypeOf<BearerSecurity>();
       expectTypeOf<{
         type: "cookie";
-        name: "some";
-      }>().toMatchTypeOf<CookieSecurity>();
+        name: string;
+      }>().toEqualTypeOf<CookieSecurity>();
       expectTypeOf<{
         type: "header";
-        name: "some";
-      }>().toMatchTypeOf<HeaderSecurity>();
-      expectTypeOf<{ type: "input"; name: "some" }>().toMatchTypeOf<
+        name: string;
+      }>().toEqualTypeOf<HeaderSecurity>();
+      expectTypeOf<{ type: "input"; name: string }>().toEqualTypeOf<
         InputSecurity<string>
       >();
-      expectTypeOf<{ type: "oauth2" }>().toMatchTypeOf<
-        OAuth2Security<string>
-      >();
+      expectTypeOf<{ type: "oauth2" }>().toExtend<OAuth2Security<string>>();
       expectTypeOf<{
         type: "openid";
-        url: "https://";
-      }>().toMatchTypeOf<OpenIdSecurity>();
-      expectTypeOf({ schema: z.string() }).toMatchTypeOf<
+        url: string;
+      }>().toEqualTypeOf<OpenIdSecurity>();
+      expectTypeOf({ schema: z.string() }).toExtend<
         ApiResponse<z.ZodTypeAny>
       >();
     });
 
     test("Extended Zod prototypes", () => {
-      expectTypeOf({
-        example: () => z.any(),
-      }).toMatchTypeOf<Partial<z.ZodAny>>();
-      expectTypeOf({
-        example: () => z.string().default(""),
-        label: () => z.string().default(""),
-      }).toMatchTypeOf<Partial<z.ZodDefault<z.ZodString>>>();
+      expectTypeOf<z.ZodAny>()
+        .toHaveProperty("example")
+        .toEqualTypeOf<(value: any) => z.ZodAny>();
+      expectTypeOf<z.ZodDefault<z.ZodString>>()
+        .toHaveProperty("example")
+        .toEqualTypeOf<
+          (value: string | undefined) => z.ZodDefault<z.ZodString>
+        >();
+      expectTypeOf<z.ZodDefault<z.ZodString>>()
+        .toHaveProperty("label")
+        .toEqualTypeOf<(value: string) => z.ZodDefault<z.ZodString>>();
       expectTypeOf({
         remap: () =>
           z.pipeline(
             z.object({}).transform(() => ({})),
             z.object({}),
           ),
-      }).toMatchTypeOf<Partial<z.ZodObject<z.ZodRawShape, "strip">>>();
+      }).toExtend<Partial<z.ZodObject<z.ZodRawShape>>>();
     });
   });
 });

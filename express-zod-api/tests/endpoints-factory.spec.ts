@@ -74,7 +74,7 @@ describe("EndpointsFactory", () => {
       const factory = defaultEndpointsFactory.addMiddleware({
         handler: async () => ({ test: "fist option" }),
       });
-      expectTypeOf(factory).toMatchTypeOf<
+      expectTypeOf(factory).toEqualTypeOf<
         EndpointsFactory<
           z.ZodIntersection<EmptySchema, EmptySchema>,
           EmptyObject & { test: string }
@@ -240,7 +240,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toMatchTypeOf<{
+      expectTypeOf(endpoint.inputSchema._output).toExtend<{
         n: number;
         s: string;
       }>();
@@ -268,7 +268,7 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toMatchTypeOf<{
+      expectTypeOf(endpoint.inputSchema._output).toExtend<{
         a?: number;
         b?: string;
         i: string;
@@ -293,7 +293,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toMatchTypeOf<{
+      expectTypeOf(endpoint.inputSchema._output).toExtend<{
         n1: number;
         n2: number;
         s: string;
@@ -321,7 +321,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toMatchTypeOf<
+      expectTypeOf(endpoint.inputSchema._output).toExtend<
         { s: string } & ({ n1: number } | { n2: number })
       >();
     });
@@ -346,7 +346,7 @@ describe("EndpointsFactory", () => {
         handler: async () => {},
       });
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.outputSchema).toMatchTypeOf<EmptySchema>();
+      expectTypeOf(endpoint.outputSchema).toExtend<EmptySchema>();
     });
   });
 });

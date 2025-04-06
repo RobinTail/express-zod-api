@@ -29,7 +29,7 @@ describe("ResultHandler", () => {
           { statusCode: 500, schema: z.literal("failure") },
         ],
         handler: ({ response }) => {
-          expectTypeOf(response).toMatchTypeOf<
+          expectTypeOf(response).toEqualTypeOf<
             Response<"ok" | "kinda" | "error" | "failure">
           >();
           response.status(200).send("error");

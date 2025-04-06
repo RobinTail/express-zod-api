@@ -475,7 +475,7 @@ describe("Example", async () => {
         id: "10",
       });
       expect(response).toMatchSnapshot();
-      expectTypeOf(response).toMatchTypeOf<
+      expectTypeOf(response).toExtend<
         | { status: "success"; data: { id: number; name: string } }
         | { status: "error"; error: { message: string } }
       >();
@@ -491,10 +491,14 @@ describe("Example", async () => {
       });
       expect(typeof response).toBe("object");
       expect(response).toMatchSnapshot();
-      expectTypeOf(response).toMatchTypeOf<
-        | { status: "success"; data: { name: string; createdAt: string } }
-        | { status: "error"; error: { message: string } }
-      >();
+      expectTypeOf<{
+        status: "success";
+        data: { name: string; createdAt: string };
+      }>().toExtend<typeof response>();
+      expectTypeOf<{
+        status: "error";
+        error: { message: string };
+      }>().toExtend<typeof response>();
     });
 
     test("Issue #2182: should deny unlisted combination of path and method", async () => {
