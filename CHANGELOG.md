@@ -5,7 +5,7 @@
 ### v22.13.0
 
 - [@danmichaelo](https://github.com/danmichaelo) fixed a broken link in the Security policy;
-- Added JSDoc for the props of `EndpointsFactory::build()` argument and `Middleware::constructor()` params.
+- Added JSDoc for several types involved into creating Middlewares and producing Endpoints.
 
 ### v22.12.0
 
