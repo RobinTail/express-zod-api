@@ -2,9 +2,10 @@
 
 ## Version 22
 
-### v22.12.1
+### v22.13.0
 
-- [@danmichaelo](https://github.com/danmichaelo) fixed a broken link in the Security policy.
+- [@danmichaelo](https://github.com/danmichaelo) fixed a broken link in the Security policy;
+- Added JSDoc for the props of `EndpointsFactory::build()` argument and `Middleware::constructor()` params.
 
 ### v22.12.0
 
