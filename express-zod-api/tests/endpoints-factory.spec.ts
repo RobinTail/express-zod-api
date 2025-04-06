@@ -155,11 +155,14 @@ describe("EndpointsFactory", () => {
           assert.fail("Rejected"),
         );
         const newFactory = factory[method](middleware);
-        await expect(() =>
-          testMiddleware({
-            middleware: newFactory["middlewares"][0],
-          }),
-        ).rejects.toThrowErrorMatchingSnapshot();
+        const { responseMock } = await testMiddleware({
+          middleware: newFactory["middlewares"][0],
+        });
+        expect(responseMock._getStatusCode()).toBe(500);
+        expect(responseMock._getJSONData()).toEqual({
+          error: { message: "Rejected" },
+          status: "error",
+        });
         expect(middleware).toHaveBeenCalledTimes(1);
       });
 
@@ -195,11 +198,14 @@ describe("EndpointsFactory", () => {
           next(new Error("This one has failed"));
         });
         const newFactory = factory[method](middleware);
-        await expect(() =>
-          testMiddleware({
-            middleware: newFactory["middlewares"][0],
-          }),
-        ).rejects.toThrowError("This one has failed");
+        const { responseMock } = await testMiddleware({
+          middleware: newFactory["middlewares"][0],
+        });
+        expect(responseMock._getStatusCode()).toBe(500);
+        expect(responseMock._getJSONData()).toEqual({
+          error: { message: "This one has failed" },
+          status: "error",
+        });
         expect(middleware).toHaveBeenCalledTimes(1);
       });
 
@@ -211,11 +217,14 @@ describe("EndpointsFactory", () => {
         const newFactory = factory[method](middleware, {
           transformer: (err) => createHttpError(401, err.message),
         });
-        await expect(() =>
-          testMiddleware({
-            middleware: newFactory["middlewares"][0],
-          }),
-        ).rejects.toThrowErrorMatchingSnapshot();
+        const { responseMock } = await testMiddleware({
+          middleware: newFactory["middlewares"][0],
+        });
+        expect(responseMock._getStatusCode()).toBe(401);
+        expect(responseMock._getJSONData()).toEqual({
+          error: { message: "This one has failed" },
+          status: "error",
+        });
         expect(middleware).toHaveBeenCalledTimes(1);
       });
     },

@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { ensureError, FlatObject, getInput } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
+import { ResultHandlerError } from "./errors";
+import { lastResortHandler } from "./last-resort";
 import {
   AbstractLogger,
   ActualLogger,
@@ -16,6 +18,7 @@ import {
   ResponseOptions,
 } from "node-mocks-http";
 import { AbstractMiddleware } from "./middleware";
+import { defaultResultHandler } from "./result-handler";
 
 export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) =>
   createRequest<Request & REQ>({
@@ -120,34 +123,40 @@ export const testMiddleware = async <
 >({
   middleware,
   options = {},
-  errorHandler,
   ...rest
 }: TestingProps<REQ, LOG> & {
   /** @desc The middleware to test */
   middleware: AbstractMiddleware;
   /** @desc The aggregated output from previously executed middlewares */
   options?: FlatObject;
-  /**
-   * @desc Enables transforming possible middleware errors into response, so that test Middleware does not throw
-   * @todo consider utilizing errorHandler from config instead in v23
-   * */
-  errorHandler?: (error: Error, response: Response) => void;
 }) => {
-  const { requestMock, responseMock, loggerMock, configMock } =
-    makeTestingMocks(rest);
-  const input = getInput(requestMock, configMock.inputSources);
+  const {
+    requestMock,
+    responseMock,
+    loggerMock,
+    configMock: { inputSources, errorHandler = defaultResultHandler },
+  } = makeTestingMocks(rest);
+  const input = getInput(requestMock, inputSources);
+  const commons = {
+    request: requestMock,
+    response: responseMock,
+    logger: loggerMock,
+    input,
+    options,
+  };
   try {
-    const output = await middleware.execute({
-      request: requestMock,
-      response: responseMock,
-      logger: loggerMock,
-      input,
-      options,
-    });
+    const output = await middleware.execute(commons);
     return { requestMock, responseMock, loggerMock, output };
-  } catch (error) {
-    if (!errorHandler) throw error;
-    errorHandler(ensureError(error), responseMock);
+  } catch (e) {
+    const error = ensureError(e);
+    try {
+      await errorHandler.execute({ ...commons, error, output: null });
+    } catch (handlingError) {
+      lastResortHandler({
+        ...commons,
+        error: new ResultHandlerError(error, ensureError(handlingError)),
+      });
+    }
     return { requestMock, responseMock, loggerMock, output: {} };
   }
 };
