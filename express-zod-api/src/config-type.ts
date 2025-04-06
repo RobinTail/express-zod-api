@@ -65,7 +65,7 @@ export interface CommonConfig {
    * */
   childLoggerProvider?: ChildLoggerProvider;
   /**
-   * @desc A function for producing access logs
+   * @desc The function for producing access logs
    * @default ({ method, path }, logger) => logger.debug(`${method}: ${path}`)
    * @example null — disables the feature
    * */
