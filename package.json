@@ -45,7 +45,7 @@
     "husky": "^9.0.5",
     "prettier": "3.5.3",
     "tsx": "^4.19.3",
-    "typescript": "^5.5.2",
+    "typescript": "^5.8.3",
     "typescript-eslint": "^8.28.0",
     "vitest": "^3.1.1",
     "zod": "^3.23.0"
