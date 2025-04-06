@@ -1,3 +1,4 @@
+import { fail } from "node:assert/strict";
 import { fileUploadMock } from "./express-mock";
 import { metaSymbol } from "../src/metadata";
 import {
@@ -282,6 +283,22 @@ describe("Server helpers", () => {
         const response = makeResponseMock();
         await handler(request, response, vi.fn());
         expect(logger._getLogs().debug).toEqual(expected);
+      },
+    );
+
+    test.each(["childLoggerProvider", "accessLogger"] as const)(
+      "should handle errors in %s",
+      async (prop) => {
+        const config = {
+          [prop]: () => fail("Something went wrong"),
+        } as unknown as CommonConfig;
+        const logger = makeLoggerMock();
+        const handler = createLoggingMiddleware({ logger, config });
+        const request = makeRequestMock({ path: "/test" });
+        const response = makeResponseMock();
+        const nextMock = vi.fn();
+        await handler(request, response, nextMock);
+        expect(nextMock.mock.calls).toMatchSnapshot();
       },
     );
   });

@@ -135,11 +135,16 @@ export const createLoggingMiddleware =
     config: CommonConfig;
   }): RequestHandler =>
   async (request, response, next) => {
-    const logger = (await childLoggerProvider?.({ request, parent })) || parent;
-    accessLogger?.(request, logger);
-    if (request.res)
-      (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
-    next();
+    try {
+      const logger =
+        (await childLoggerProvider?.({ request, parent })) || parent;
+      accessLogger?.(request, logger);
+      if (request.res)
+        (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
+      next();
+    } catch (error) {
+      next(error); // @todo remove in v23 that is express 5 only
+    }
   };
 
 export const makeGetLogger =
