@@ -19,9 +19,10 @@
 
 ## Version 22
 
-### v22.12.1
+### v22.13.0
 
-- [@danmichaelo](https://github.com/danmichaelo) fixed a broken link in the Security policy.
+- [@danmichaelo](https://github.com/danmichaelo) fixed a broken link in the Security policy;
+- Added JSDoc for several types involved into creating Middlewares and producing Endpoints.
 
 ### v22.12.0
 

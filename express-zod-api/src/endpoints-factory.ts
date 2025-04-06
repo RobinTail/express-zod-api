@@ -22,15 +22,39 @@ interface BuildProps<
   OPT extends FlatObject,
   SCO extends string,
 > {
+  /**
+   * @desc Input schema of the Endpoint, combining properties from all the enabled input sources (path params, headers)
+   * @default z.object({})
+   * @see defaultInputSources
+   * */
   input?: IN;
+  /** @desc The schema by which the returns of the Endpoint handler is validated */
   output: OUT;
+  /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (options) and a logger */
   handler: Handler<z.output<z.ZodIntersection<MIN, IN>>, z.input<OUT>, OPT>;
+  /** @desc The operation description for the generated Documentation */
   description?: string;
+  /** @desc The operation summary for the generated Documentation (50 symbols max) */
   shortDescription?: string;
+  /** @desc The operation ID for the generated Documentation (must be unique) */
   operationId?: string | ((method: Method) => string);
+  /**
+   * @desc HTTP method(s) this endpoint can handle
+   * @default "get" unless the Endpoint is assigned within DependsOnMethod
+   * @see DependsOnMethod
+   * */
   method?: Method | [Method, ...Method[]];
+  /**
+   * @desc Scope(s) from the list of the ones defined by the added Middlewares having "oauth2" security type
+   * @see OAuth2Security
+   * */
   scope?: SCO | SCO[];
+  /**
+   * @desc Tag(s) for generating Documentation. For establishing constraints:
+   * @see TagOverrides
+   * */
   tag?: Tag | Tag[];
+  /** @desc Marks the operation deprecated in the generated Documentation */
   deprecated?: boolean;
 }
 

@@ -101,7 +101,6 @@ type UploadOptions = Pick<
   limitError?: Error;
   /**
    * @desc A handler to execute before uploading — it can be used for restrictions by throwing an error.
-   * @default undefined
    * @example ({ request }) => { throw createHttpError(403, "Not authorized"); }
    * */
   beforeUpload?: BeforeUpload;
@@ -155,13 +154,11 @@ export interface ServerConfig extends CommonConfig {
   jsonParser?: RequestHandler;
   /**
    * @desc Enable or configure uploads handling.
-   * @default undefined
    * @requires express-fileupload
    * */
   upload?: boolean | UploadOptions;
   /**
    * @desc Enable or configure response compression.
-   * @default undefined
    * @requires compression
    */
   compression?: boolean | CompressionOptions;
@@ -181,13 +178,11 @@ export interface ServerConfig extends CommonConfig {
    * @desc A code to execute before processing the Routing of your API (and before parsing).
    * @desc This can be a good place for express middlewares establishing their own routes.
    * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
-   * @default undefined
    * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
    * */
   beforeRouting?: BeforeRouting;
   /**
    * @desc Rejects new connections and attempts to finish ongoing ones in the specified time before exit.
-   * @default undefined
    * */
   gracefulShutdown?: boolean | GracefulOptions;
 }
