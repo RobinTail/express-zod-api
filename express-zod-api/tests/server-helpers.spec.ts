@@ -243,26 +243,45 @@ describe("Server helpers", () => {
   });
 
   describe("createLoggingMiddleware", () => {
-    const logger = makeLoggerMock();
-    const child = makeLoggerMock({ isChild: true });
-    test.each([undefined, () => child, async () => child])(
-      "should make RequestHandler writing logger to res.locals %#",
-      async (childLoggerProvider) => {
-        const config = { childLoggerProvider } as CommonConfig;
+    describe("should make RequestHandler writing logger to res.locals", () => {
+      const logger = makeLoggerMock();
+      const child = makeLoggerMock({ isChild: true });
+      test.each([undefined, () => child, async () => child])(
+        "%#",
+        async (childLoggerProvider) => {
+          const config = { childLoggerProvider } as CommonConfig;
+          const handler = createLoggingMiddleware({ logger, config });
+          expect(typeof handler).toBe("function");
+          const nextMock = vi.fn();
+          const response = makeResponseMock();
+          const request = makeRequestMock({ path: "/test" });
+          request.res = response;
+          await handler(request, response, nextMock);
+          expect(nextMock).toHaveBeenCalled();
+          expect(
+            (childLoggerProvider ? child : logger)._getLogs().debug.pop(),
+          ).toEqual(["GET: /test"]);
+          expect(request.res).toHaveProperty("locals", {
+            [metaSymbol]: { logger: childLoggerProvider ? child : logger },
+          });
+        },
+      );
+    });
+
+    test.each<[CommonConfig["accessLogger"], string[][]]>([
+      [undefined, [["GET: /test"]]],
+      [null, []],
+      [({}, instance) => instance.debug("TEST"), [["TEST"]]],
+    ])(
+      "access logger can be customized and disabled %#",
+      async (accessLogger, expected) => {
+        const config = { accessLogger } as CommonConfig;
+        const logger = makeLoggerMock();
         const handler = createLoggingMiddleware({ logger, config });
-        expect(typeof handler).toBe("function");
-        const nextMock = vi.fn();
-        const response = makeResponseMock();
         const request = makeRequestMock({ path: "/test" });
-        request.res = response;
-        await handler(request, response, nextMock);
-        expect(nextMock).toHaveBeenCalled();
-        expect(
-          (childLoggerProvider ? child : logger)._getLogs().debug.pop(),
-        ).toEqual(["GET: /test"]);
-        expect(request.res).toHaveProperty("locals", {
-          [metaSymbol]: { logger: childLoggerProvider ? child : logger },
-        });
+        const response = makeResponseMock();
+        await handler(request, response, vi.fn());
+        expect(logger._getLogs().debug).toEqual(expected);
       },
     );
   });
