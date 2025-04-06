@@ -30,6 +30,8 @@ type ChildLoggerProvider = (params: {
   parent: ActualLogger;
 }) => ActualLogger | Promise<ActualLogger>;
 
+type OnRequest = (request: Request, logger: ActualLogger) => void;
+
 export interface CommonConfig {
   /**
    * @desc Enables cross-origin resource sharing.
@@ -62,6 +64,12 @@ export interface CommonConfig {
    * @example ({ parent }) => parent.child({ requestId: uuid() })
    * */
   childLoggerProvider?: ChildLoggerProvider;
+  /**
+   * @desc A code to execute for every request, typically meant for debugging purposes.
+   * @default ({ method, path }, logger) => logger.debug(`${method}: ${path}`)
+   * @example null — to disable the default
+   * */
+  onRequest?: null | OnRequest;
   /**
    * @desc You can disable the startup logo.
    * @default true

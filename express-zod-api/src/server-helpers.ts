@@ -125,15 +125,18 @@ export const moveRaw: RequestHandler = (req, {}, next) => {
 export const createLoggingMiddleware =
   ({
     logger: parent,
-    config,
+    config: {
+      childLoggerProvider,
+      onRequest = ({ method, path }, logger) =>
+        logger.debug(`${method}: ${path}`),
+    },
   }: {
     logger: ActualLogger;
     config: CommonConfig;
   }): RequestHandler =>
   async (request, response, next) => {
-    const logger =
-      (await config.childLoggerProvider?.({ request, parent })) || parent;
-    logger.debug(`${request.method}: ${request.path}`);
+    const logger = (await childLoggerProvider?.({ request, parent })) || parent;
+    onRequest?.(request, logger);
     if (request.res)
       (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
     next();
