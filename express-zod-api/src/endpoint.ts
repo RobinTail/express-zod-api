@@ -26,7 +26,7 @@ import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
 
 export type Handler<IN, OUT, OPT> = (params: {
-  /** @desc The validated inputs from all the enabled input sources */
+  /** @desc The inputs from the enabled input sources validated against the final input schema (incl. Middlewares) */
   input: IN;
   /** @desc The returns of the assigned Middlewares */
   options: OPT;
