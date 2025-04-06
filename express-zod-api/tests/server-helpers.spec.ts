@@ -247,7 +247,7 @@ describe("Server helpers", () => {
       const logger = makeLoggerMock();
       const child = makeLoggerMock({ isChild: true });
       test.each([undefined, () => child, async () => child])(
-        "%#",
+        "case %#",
         async (childLoggerProvider) => {
           const config = { childLoggerProvider } as CommonConfig;
           const handler = createLoggingMiddleware({ logger, config });
