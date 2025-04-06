@@ -30,7 +30,7 @@ type ChildLoggerProvider = (params: {
   parent: ActualLogger;
 }) => ActualLogger | Promise<ActualLogger>;
 
-type OnRequest = (request: Request, logger: ActualLogger) => void;
+type LogAccess = (request: Request, logger: ActualLogger) => void;
 
 export interface CommonConfig {
   /**
@@ -65,11 +65,11 @@ export interface CommonConfig {
    * */
   childLoggerProvider?: ChildLoggerProvider;
   /**
-   * @desc A code to execute for every request, typically meant for debugging purposes.
+   * @desc A function for producing access logs
    * @default ({ method, path }, logger) => logger.debug(`${method}: ${path}`)
-   * @example null — to disable the default
+   * @example null — disables the feature
    * */
-  onRequest?: null | OnRequest;
+  accessLogger?: null | LogAccess;
   /**
    * @desc You can disable the startup logo.
    * @default true

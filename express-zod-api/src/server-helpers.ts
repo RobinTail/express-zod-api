@@ -121,13 +121,13 @@ export const moveRaw: RequestHandler = (req, {}, next) => {
   next();
 };
 
-/** @since v19 prints the actual path of the request, not a configured route, severity decreased to debug level */
+/** @since v22.13 the access logging can be customized and disabled */
 export const createLoggingMiddleware =
   ({
     logger: parent,
     config: {
       childLoggerProvider,
-      onRequest = ({ method, path }, logger) =>
+      accessLogger = ({ method, path }, logger) =>
         logger.debug(`${method}: ${path}`),
     },
   }: {
@@ -136,7 +136,7 @@ export const createLoggingMiddleware =
   }): RequestHandler =>
   async (request, response, next) => {
     const logger = (await childLoggerProvider?.({ request, parent })) || parent;
-    onRequest?.(request, logger);
+    accessLogger?.(request, logger);
     if (request.res)
       (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
     next();
