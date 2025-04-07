@@ -10,7 +10,6 @@ import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
-import { ensureHttpError } from "./result-helpers";
 
 type EquippedRequest = Request<
   unknown,
@@ -33,7 +32,7 @@ export const createCatcher =
   async (error, request, response, next) => {
     if (!error) return next();
     return errorHandler.execute({
-      error: ensureHttpError(ensureError(error)),
+      error: ensureError(error),
       request,
       response,
       input: null,
