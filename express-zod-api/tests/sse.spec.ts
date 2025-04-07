@@ -1,4 +1,3 @@
-import { expectTypeOf } from "vitest";
 import { z } from "zod";
 import {
   FlatObject,
