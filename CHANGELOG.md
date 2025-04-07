@@ -2,6 +2,10 @@
 
 ## Version 20
 
+### v20.22.3
+
+- Fixed: the output type of the `ez.raw()` schema (without an argument) was missing the `raw` property (since v19.0.0).
+
 ### v20.22.2
 
 - Fixed a bug that could lead to duplicate properties in generated client types:
