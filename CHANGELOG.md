@@ -2,6 +2,10 @@
 
 ## Version 21
 
+### v21.11.5
+
+- Fixed: the output type of the `ez.raw()` schema (without an argument) was missing the `raw` property (since v19.0.0).
+
 ### v21.11.4
 
 - Fixed: allow future versions of Express 5:
