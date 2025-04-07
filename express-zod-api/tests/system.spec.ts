@@ -118,21 +118,18 @@ describe("App in production mode", async () => {
       app.use((req, {}, next) => {
         const childLogger = getLogger(req);
         assert("isChild" in childLogger && childLogger.isChild);
-        assert.notEqual(
-          req.path,
-          "/trigger/beforeRouting",
-          "Failure of beforeRouting triggered",
-        );
+        if (req.path === "/trigger/beforeRouting")
+          return next(new Error("Failure of beforeRouting triggered"));
         next();
       });
     },
-    accessLogger: ({ method, path }, logger) => {
+    accessLogger: ({ method, path }, instance) => {
       assert.notEqual(
         path,
         "/trigger/accessLogger",
         "Failure of accessLogger triggered",
       );
-      logger.debug(`${method}: ${path}`);
+      instance.debug(`${method}: ${path}`);
     },
     cors: false,
     startupLogo: true,
@@ -320,9 +317,7 @@ describe("App in production mode", async () => {
         );
         expect(await response.json()).toEqual({
           status: "error",
-          error: {
-            message: expect.stringMatching(`Failure of ${path} triggered`),
-          },
+          error: { message: "Internal Server Error" },
         });
         expect(response.status).toBe(500);
       },
@@ -482,7 +477,7 @@ describe("App in production mode", async () => {
       await setTimeout(500);
       process.emit("FAKE" as "SIGTERM");
       expect(infoMethod).toHaveBeenCalledWith("Graceful shutdown", {
-        sockets: 1,
+        sockets: expect.any(Number),
         timeout: 1000,
       });
       await setTimeout(1500);

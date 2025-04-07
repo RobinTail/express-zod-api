@@ -5,11 +5,12 @@ import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
 import { ErrorRequestHandler, RequestHandler, Request } from "express";
-import createHttpError, { isHttpError } from "http-errors";
+import createHttpError from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
+import { ensureHttpError } from "./result-helpers";
 
 type EquippedRequest = Request<
   unknown,
@@ -32,9 +33,7 @@ export const createCatcher =
   async (error, request, response, next) => {
     if (!error) return next();
     return errorHandler.execute({
-      error: isHttpError(error)
-        ? error
-        : createHttpError(400, ensureError(error).message),
+      error: ensureHttpError(ensureError(error)),
       request,
       response,
       input: null,
