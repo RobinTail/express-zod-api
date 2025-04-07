@@ -111,6 +111,12 @@ describe("App in production mode", async () => {
     }),
     handler: vi.fn(),
   });
+  const rawEndpoint = new EndpointsFactory(defaultResultHandler).build({
+    method: "post",
+    input: ez.raw({}), // @todo rm argument
+    output: z.object({ crc: z.number() }),
+    handler: async ({ input: { raw } }) => ({ crc: raw.length }),
+  });
   const routing = {
     v1: {
       corsed: corsedEndpoint,
@@ -118,6 +124,7 @@ describe("App in production mode", async () => {
       test: testEndpoint,
       long: longEndpoint,
       form: formEndpoint,
+      raw: rawEndpoint,
     },
   };
   vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
@@ -126,6 +133,7 @@ describe("App in production mode", async () => {
     compression: { threshold: 1 },
     wrongMethodBehavior: 405,
     formParser: express.urlencoded({ parameterLimit: 2 }),
+    rawParser: express.raw({ limit: 20 }),
     beforeRouting: ({ app, getLogger }) => {
       depd("express")("Sample deprecation message");
       app.use((req, {}, next) => {
@@ -282,6 +290,17 @@ describe("App in production mode", async () => {
       const json = await response.json();
       expect(json).toEqual({ status: "success", data: {} });
     });
+
+    test("Should handle raw request", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/raw`, {
+        method: "POST",
+        headers: { "content-type": "application/octet-stream" },
+        body: Buffer.from("testing"),
+      });
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({ status: "success", data: { crc: 7 } });
+    });
   });
 
   describe("Negative", () => {
@@ -392,7 +411,7 @@ describe("App in production mode", async () => {
       });
     });
 
-    test("Should URL encoded parser failures", async () => {
+    test("Should handle URL encoded parser failures", async () => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/form`, {
         method: "POST",
         headers: { "content-type": "application/x-www-form-urlencoded" },
@@ -407,6 +426,20 @@ describe("App in production mode", async () => {
       expect(json).toEqual({
         status: "error",
         error: { message: "too many parameters" },
+      });
+    });
+
+    test("Should handle Raw parser failures", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/raw`, {
+        method: "POST",
+        headers: { "content-type": "application/octet-stream" },
+        body: Buffer.alloc(100),
+      });
+      expect(response.status).toBe(413);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: "error",
+        error: { message: "request entity too large" },
       });
     });
 
