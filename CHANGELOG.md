@@ -2,6 +2,10 @@
 
 ## Version 22
 
+### v22.13.1
+
+- Fixed: the output type of the `ez.raw()` schema (without an argument) was missing the `raw` property (since v19.0.0).
+
 ### v22.13.0
 
 - Ability to configure and disable access logging:
