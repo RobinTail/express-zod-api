@@ -118,6 +118,11 @@ describe("App in production mode", async () => {
       app.use((req, {}, next) => {
         const childLogger = getLogger(req);
         assert("isChild" in childLogger && childLogger.isChild);
+        assert.notEqual(
+          req.path,
+          "/trigger/before-routing",
+          "Failure of beforeRouting triggered",
+        );
         next();
       });
     },
@@ -297,6 +302,19 @@ describe("App in production mode", async () => {
       const text = await response.text();
       expect(text).toBe("Internal Server Error");
       expect(errorMethod.mock.lastCall).toMatchSnapshot();
+    });
+
+    test("Should treat beforeRouting error as internal", async () => {
+      const response = await fetch(
+        `http://127.0.0.1:${port}/trigger/before-routing`,
+      );
+      expect(await response.json()).toEqual({
+        status: "error",
+        error: {
+          message: expect.stringMatching(/Failure of beforeRouting triggered/),
+        },
+      });
+      expect(response.status).toBe(500);
     });
   });
 
