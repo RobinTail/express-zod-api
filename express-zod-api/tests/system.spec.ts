@@ -113,7 +113,7 @@ describe("App in production mode", async () => {
   });
   const rawEndpoint = new EndpointsFactory(defaultResultHandler).build({
     method: "post",
-    input: ez.raw({}), // @todo rm argument
+    input: ez.raw(),
     output: z.object({ crc: z.number() }),
     handler: async ({ input: { raw } }) => ({ crc: raw.length }),
   });
