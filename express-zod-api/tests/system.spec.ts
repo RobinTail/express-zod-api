@@ -120,11 +120,19 @@ describe("App in production mode", async () => {
         assert("isChild" in childLogger && childLogger.isChild);
         assert.notEqual(
           req.path,
-          "/trigger/before-routing",
+          "/trigger/beforeRouting",
           "Failure of beforeRouting triggered",
         );
         next();
       });
+    },
+    accessLogger: ({ method, path }, logger) => {
+      assert.notEqual(
+        path,
+        "/trigger/accessLogger",
+        "Failure of accessLogger triggered",
+      );
+      logger.debug(`${method}: ${path}`);
     },
     cors: false,
     startupLogo: true,
@@ -304,18 +312,21 @@ describe("App in production mode", async () => {
       expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
-    test("Should treat beforeRouting error as internal", async () => {
-      const response = await fetch(
-        `http://127.0.0.1:${port}/trigger/before-routing`,
-      );
-      expect(await response.json()).toEqual({
-        status: "error",
-        error: {
-          message: expect.stringMatching(/Failure of beforeRouting triggered/),
-        },
-      });
-      expect(response.status).toBe(500);
-    });
+    test.each(["beforeRouting", "accessLogger"])(
+      "Should treat %s error as internal",
+      async (path) => {
+        const response = await fetch(
+          `http://127.0.0.1:${port}/trigger/${path}`,
+        );
+        expect(await response.json()).toEqual({
+          status: "error",
+          error: {
+            message: expect.stringMatching(`Failure of ${path} triggered`),
+          },
+        });
+        expect(response.status).toBe(500);
+      },
+    );
   });
 
   describe("Protocol", () => {
