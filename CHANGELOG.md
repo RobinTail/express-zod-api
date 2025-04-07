@@ -2,6 +2,10 @@
 
 ## Version 19
 
+### v19.3.1
+
+- Fixed: the output type of the `ez.raw()` schema (without an argument) was missing the `raw` property (since v19.0.0).
+
 ### v19.3.0
 
 - Feat: Supporting `vitest` version 2:
