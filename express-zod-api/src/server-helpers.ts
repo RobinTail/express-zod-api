@@ -117,22 +117,30 @@ export const moveRaw: RequestHandler = (req, {}, next) => {
   next();
 };
 
-/** @since v19 prints the actual path of the request, not a configured route, severity decreased to debug level */
+/** @since v22.13 the access logging can be customized and disabled */
 export const createLoggingMiddleware =
   ({
     logger: parent,
-    config,
+    config: {
+      childLoggerProvider,
+      accessLogger = ({ method, path }, logger) =>
+        logger.debug(`${method}: ${path}`),
+    },
   }: {
     logger: ActualLogger;
     config: CommonConfig;
   }): RequestHandler =>
   async (request, response, next) => {
-    const logger =
-      (await config.childLoggerProvider?.({ request, parent })) || parent;
-    logger.debug(`${request.method}: ${request.path}`);
-    if (request.res)
-      (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
-    next();
+    try {
+      const logger =
+        (await childLoggerProvider?.({ request, parent })) || parent;
+      accessLogger?.(request, logger);
+      if (request.res)
+        (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
+      next();
+    } catch (error) {
+      next(error); // @todo remove in v23 that is express 5 only
+    }
   };
 
 export const makeGetLogger =
