@@ -4,8 +4,21 @@
 
 ### v22.13.0
 
+- Ability to configure and disable access logging:
+  - New config option: `accessLogger` — the function for producing access logs;
+  - The default value is the function writing messages similar to `GET: /v1/path` having `debug` severity;
+  - The option can be assigned with `null` to disable writing of access logs;
+  - Thanks to the contributions of [@gmorgen1](https://github.com/gmorgen1) and [@crgeary](https://github.com/crgeary);
 - [@danmichaelo](https://github.com/danmichaelo) fixed a broken link in the Security policy;
 - Added JSDoc for several types involved into creating Middlewares and producing Endpoints.
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  accessLogger: (request, logger) => logger.info(request.path), // or null to disable
+});
+```
 
 ### v22.12.0
 
@@ -1400,7 +1413,7 @@ new Integration({
     - This makes all requests eligible for the assigned parsers and reverts changes made in [v18.5.2](#v1852);
     - Specifying `rawParser` in config is no longer needed to enable the feature.
 - Non-breaking significant changes:
-  - Request logging reflects the actual path instead of the configured route, and it's placed in front of parsing:
+  - Access logging reflects the actual path instead of the configured route, and it's placed in front of parsing:
     - The severity of those messaged reduced from `info` to `debug`;
   - The debug messages from uploader are enabled by default when the logger level is set to `debug`;
 - How to migrate confidently:

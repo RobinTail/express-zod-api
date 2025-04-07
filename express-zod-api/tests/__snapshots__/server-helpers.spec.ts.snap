@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Server helpers > createLoggingMiddleware > should handle errors in accessLogger 1`] = `
+[
+  [
+    AssertionError({
+      "message": "Something went wrong",
+    }),
+  ],
+]
+`;
+
+exports[`Server helpers > createLoggingMiddleware > should handle errors in childLoggerProvider 1`] = `
+[
+  [
+    AssertionError({
+      "message": "Something went wrong",
+    }),
+  ],
+]
+`;
