@@ -1,5 +1,6 @@
 import cors from "cors";
 import depd from "depd";
+import express from "express";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -10,6 +11,7 @@ import {
   ResultHandler,
   BuiltinLogger,
   Middleware,
+  ez,
 } from "../src";
 import { givePort } from "../../tools/ports";
 import { setTimeout } from "node:timers/promises";
@@ -100,12 +102,22 @@ describe("App in production mode", async () => {
     output: z.object({}),
     handler: async () => setTimeout(5000, {}),
   });
+  const formEndpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+    method: "post",
+    input: ez.form({
+      name: z.string(),
+      email: z.string().optional(),
+      message: z.string().optional(),
+    }),
+    handler: vi.fn(),
+  });
   const routing = {
     v1: {
       corsed: corsedEndpoint,
       faulty: faultyEndpoint,
       test: testEndpoint,
       long: longEndpoint,
+      form: formEndpoint,
     },
   };
   vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
@@ -113,6 +125,7 @@ describe("App in production mode", async () => {
     http: { listen: port },
     compression: { threshold: 1 },
     wrongMethodBehavior: 405,
+    formParser: express.urlencoded({ parameterLimit: 2 }),
     beforeRouting: ({ app, getLogger }) => {
       depd("express")("Sample deprecation message");
       app.use((req, {}, next) => {
@@ -258,6 +271,17 @@ describe("App in production mode", async () => {
         "Content-Range,X-Content-Range",
       );
     });
+
+    test("Should handle URL encoded request", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/form`, {
+        method: "POST",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ name: "test", message: "ok" }).toString(),
+      });
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({ status: "success", data: {} });
+    });
   });
 
   describe("Negative", () => {
@@ -349,7 +373,7 @@ describe("App in production mode", async () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("Should fail on malformed body", async () => {
+    test("Should handle JSON parser failures", async () => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "POST", // valid method this time
         headers: {
@@ -365,6 +389,24 @@ describe("App in production mode", async () => {
             /Unterminated string in JSON at position 25/,
           ),
         },
+      });
+    });
+
+    test("Should URL encoded parser failures", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/form`, {
+        method: "POST",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          name: "John Doe",
+          email: "john@example.com",
+          message: "All good",
+        }).toString(),
+      });
+      expect(response.status).toBe(413);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: "error",
+        error: { message: "too many parameters" },
       });
     });
 
