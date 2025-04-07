@@ -210,6 +210,7 @@ export default tsPlugin.config(
       "express-zod-api/src/integration.ts",
       "express-zod-api/src/integration-base.ts",
       "express-zod-api/src/zts.ts",
+      "express-zod-api/src/typescript-worker.ts",
     ],
     rules: {
       "no-restricted-syntax": [
