@@ -287,7 +287,7 @@ describe("Server helpers", () => {
     );
 
     test.each(["childLoggerProvider", "accessLogger"] as const)(
-      "should handle errors in %s",
+      "should delegate errors in %s",
       async (prop) => {
         const config = {
           [prop]: () => fail("Something went wrong"),
@@ -297,8 +297,10 @@ describe("Server helpers", () => {
         const request = makeRequestMock({ path: "/test" });
         const response = makeResponseMock();
         const nextMock = vi.fn();
-        await handler(request, response, nextMock);
-        expect(nextMock.mock.calls).toMatchSnapshot();
+        await expect(() =>
+          handler(request, response, nextMock),
+        ).rejects.toThrowErrorMatchingSnapshot();
+        expect(nextMock).not.toHaveBeenCalled();
       },
     );
   });
