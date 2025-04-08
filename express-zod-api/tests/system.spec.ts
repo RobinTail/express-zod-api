@@ -1,6 +1,7 @@
 import cors from "cors";
 import depd from "depd";
 import express from "express";
+import { readFile } from "node:fs/promises";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -117,6 +118,11 @@ describe("App in production mode", async () => {
     output: z.object({ crc: z.number() }),
     handler: async ({ input: { raw } }) => ({ crc: raw.length }),
   });
+  const uploadEndpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+    method: "post",
+    input: ez.form({ avatar: ez.upload() }),
+    handler: vi.fn(),
+  });
   const routing = {
     v1: {
       corsed: corsedEndpoint,
@@ -125,6 +131,7 @@ describe("App in production mode", async () => {
       long: longEndpoint,
       form: formEndpoint,
       raw: rawEndpoint,
+      upload: uploadEndpoint,
     },
   };
   vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
@@ -134,6 +141,11 @@ describe("App in production mode", async () => {
     wrongMethodBehavior: 405,
     formParser: express.urlencoded({ parameterLimit: 2 }),
     rawParser: express.raw({ limit: 20 }),
+    upload: {
+      beforeUpload: ({ request }) => {
+        if ("trigger" in request.query) throw new Error("beforeUpload failure");
+      },
+    },
     beforeRouting: ({ app, getLogger }) => {
       depd("express")("Sample deprecation message");
       app.use((req, {}, next) => {
@@ -301,6 +313,24 @@ describe("App in production mode", async () => {
       const json = await response.json();
       expect(json).toEqual({ status: "success", data: { crc: 7 } });
     });
+
+    test("Should handle upload request", async () => {
+      const filename = "../logo.svg";
+      const logo = await readFile(filename, "utf-8");
+      const data = new FormData();
+      data.append(
+        "avatar",
+        new Blob([logo], { type: "image/svg+xml" }),
+        filename,
+      );
+      const response = await fetch(`http://localhost:${port}/v1/upload`, {
+        method: "POST",
+        body: data,
+      });
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({ data: {}, status: "success" });
+    });
   });
 
   describe("Negative", () => {
@@ -365,6 +395,27 @@ describe("App in production mode", async () => {
         expect(response.status).toBe(500);
       },
     );
+
+    test("Should treat beforeUpload error as internal", async () => {
+      const filename = "../logo.svg";
+      const logo = await readFile(filename, "utf-8");
+      const data = new FormData();
+      data.append(
+        "avatar",
+        new Blob([logo], { type: "image/svg+xml" }),
+        filename,
+      );
+      const response = await fetch(
+        `http://localhost:${port}/v1/upload?trigger=beforeUpload`,
+        { method: "POST", body: data },
+      );
+      expect(response.status).toBe(500);
+      const json = await response.json();
+      expect(json).toEqual({
+        error: { message: "Internal Server Error" },
+        status: "error",
+      });
+    });
   });
 
   describe("Protocol", () => {
