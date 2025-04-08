@@ -911,7 +911,7 @@ origins of errors that could happen in runtime and be handled the following way:
   - Errors thrown within endpoint's `handler`:
     - `HttpError`, made by `createHttpError()` method of `http-errors` (required peer dependency). The default response
       status code is taken from `error.statusCode`;
-    - Others, inheriting from `Error` class (`500`);
+    - For other errors the default status code is `500`;
 - Ones related to routing, parsing and upload issues — handled by `ResultHandler` assigned to `errorHandler` in config:
   - Default is `defaultResultHandler` — it sets the response status code from the corresponding `HttpError`:
     `400` for parsing, `404` for routing, `config.upload.limitError.statusCode` for upload issues, or `500` for others;
