@@ -917,6 +917,8 @@ it normalizes errors into consistent HTTP responses with sensible status codes. 
 - `ResultHandler` failures:
   - Handled by `LastResortHandler` with status code `500` and a plain text response.
 
+You can override these behaviors by using a custom `ResultHandler` with `EndpointsFactory` and as the `errorHandler`.
+
 ## Production mode
 
 Consider enabling production mode by setting `NODE_ENV` environment variable to `production` for your deployment:
