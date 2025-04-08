@@ -913,11 +913,12 @@ origins of errors that could happen in runtime and be handled the following way:
       status code is taken from `error.statusCode`;
     - For other errors the default status code is `500`;
 - Ones related to routing, parsing and upload issues — handled by `ResultHandler` assigned to `errorHandler` in config:
-  - Default is `defaultResultHandler` — it sets the response status code from the corresponding `HttpError`:
-    `400` for parsing, `404` for routing, `config.upload.limitError.statusCode` for upload issues, or `500` for others;
-  - You can also set `wrongMethodBehavior` config option to `405` (Method not allowed) for requests having wrong method;
-  - `ResultHandler` must handle possible `error` and avoid throwing its own errors, otherwise:
-- Ones related to `ResultHandler` execution — handled by `LastResortHandler`:
+  - Default is `defaultResultHandler`:
+    - Parsing errors as they are (usually `HttpError` having `4XX` codes);
+    - Routing errors: `404` or `405` depending on `wrongMethodBehavior` config option;
+    - Upload issues: only when `upload.limitError` config option is set (takes its `statusCode` if it's `HttpError`);
+    - For other errors `500` for others;
+- In case your custom `ResultHandler` throws an error it's handled by `LastResortHandler`:
   - Response status code is always `500` and the response itself is a plain text.
 
 ## Production mode
