@@ -902,23 +902,20 @@ const resultHandler = new ResultHandler({
 All runtime errors are handled by a `ResultHandler`. The default is `defaultResultHandler`. Using `ensureHttpError()`
 it normalizes errors into consistent HTTP responses with sensible status codes. Errors can originate from three layers:
 
-- Ones related to `Endpoint` execution — handled by a `ResultHandler` assigned to the `EndpointsFactory` produced it:
-  - The following proprietary classes are available to you for customizing error handling in your `ResultHandler`:
-    - `InputValidationError` — when request payload does not match the `input` schema of the endpoint or middleware.
-      The default response status code is `400`, `cause` property contains the original `ZodError`;
-    - `OutputValidationError` — when returns of the endpoint's `handler` does not match its `output` schema (`500`);
-  - Errors thrown within endpoint's `handler`:
-    - `HttpError`, made by `createHttpError()` method of `http-errors` (required peer dependency). The default response
-      status code is taken from `error.statusCode`;
-    - For other errors the default status code is `500`;
-- Ones related to routing, parsing and upload issues — handled by `ResultHandler` assigned to `errorHandler` in config:
-  - Default is `defaultResultHandler`:
-    - Parsing errors as they are (usually `HttpError` having `4XX` codes);
-    - Routing errors: `404` or `405` depending on `wrongMethodBehavior` config option;
-    - Upload issues: only when `upload.limitError` config option is set (takes its `statusCode` if it's `HttpError`);
-    - For other errors `500` for others;
-- In case your custom `ResultHandler` throws an error it's handled by `LastResortHandler`:
-  - Response status code is always `500` and the response itself is a plain text.
+- `Endpoint` execution (including attached `Middleware`):
+  - Handled by `ResultHandler` assigned to `EndpointsFactory` (`defaultEndpointsFactory` uses `defaultResultHandler`);
+  - `InputValidationError`: violating `input` schema, the default status code is `400`;
+  - `OutputValidationError`: violating `output` schema, the default status code is `500`;
+  - `HttpError`: can be thrown in handlers using `createHttpError()`, its `statusCode` used by default;
+  - For other errors the default status code is `500`;
+- Routing, parsing and upload issues:
+  - Handled by `ResultHandler` assigned to `errorHandler` config option (`defaultResultHandler` is default);
+  - Parsing errors: handled as they are (usually it's `HttpError` having `4XX` status code used by default);
+  - Routing errors: `404` and `405` (depending on `wrongMethodBehavior` config option);
+  - Upload issues: when `upload.limitError` config option is set (takes its `statusCode` if it's also `HttpError`);
+  - For other errors the default status code is `500`;
+- `ResultHandler` failures:
+  - Handled by `LastResortHandler` with status code `500` and a plain text response.
 
 ## Production mode
 
