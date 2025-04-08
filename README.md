@@ -899,9 +899,8 @@ const resultHandler = new ResultHandler({
 
 ## Error handling
 
-`ResultHandler` is designed to be the entity responsible for centralized error handling. By default, that center is
-the `defaultResultHandler`, however, since much can be customized, you should be aware that there are three possible
-origins of errors that could happen in runtime and be handled the following way:
+All runtime errors are handled by a `ResultHandler`. The default is `defaultResultHandler`. Using `ensureHttpError()`
+it normalizes errors into consistent HTTP responses with sensible status codes. Errors can originate from three layers:
 
 - Ones related to `Endpoint` execution — handled by a `ResultHandler` assigned to the `EndpointsFactory` produced it:
   - The following proprietary classes are available to you for customizing error handling in your `ResultHandler`:
