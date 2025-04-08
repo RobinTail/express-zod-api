@@ -906,7 +906,7 @@ it normalizes errors into consistent HTTP responses with sensible status codes. 
   - Handled by a `ResultHandler` used by `EndpointsFactory` (`defaultEndpointsFactory` uses `defaultResultHandler`);
   - `InputValidationError`: request violates `input` schema, the default status code is `400`;
   - `OutputValidationError`: handler violates `output` schema, the default status code is `500`;
-  - `HttpError`: can be thrown in handlers with helps of `createHttpError()`, its `.statusCode` is used for response;
+  - `HttpError`: can be thrown in handlers with help of `createHttpError()`, its `.statusCode` is used for response;
   - For other errors the default status code is `500`;
 - Routing, parsing and upload issues:
   - Handled by `ResultHandler` configured as `errorHandler` (the defaults is `defaultResultHandler`);
