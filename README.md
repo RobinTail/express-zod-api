@@ -903,21 +903,21 @@ All runtime errors are handled by a `ResultHandler`. The default is `defaultResu
 it normalizes errors into consistent HTTP responses with sensible status codes. Errors can originate from three layers:
 
 - `Endpoint` execution (including attached `Middleware`):
-  - Handled by `ResultHandler` assigned to `EndpointsFactory` (`defaultEndpointsFactory` uses `defaultResultHandler`);
-  - `InputValidationError`: violating `input` schema, the default status code is `400`;
-  - `OutputValidationError`: violating `output` schema, the default status code is `500`;
-  - `HttpError`: can be thrown in handlers using `createHttpError()`, its `statusCode` used by default;
+  - Handled by a `ResultHandler` used by `EndpointsFactory` (`defaultEndpointsFactory` uses `defaultResultHandler`);
+  - `InputValidationError`: request violates `input` schema, the default status code is `400`;
+  - `OutputValidationError`: handler violates `output` schema, the default status code is `500`;
+  - `HttpError`: can be thrown in handlers with helps of `createHttpError()`, its `.statusCode` is used for response;
   - For other errors the default status code is `500`;
 - Routing, parsing and upload issues:
-  - Handled by `ResultHandler` assigned to `errorHandler` config option (`defaultResultHandler` is default);
-  - Parsing errors: handled as they are (usually it's `HttpError` having `4XX` status code used by default);
-  - Routing errors: `404` and `405` (depending on `wrongMethodBehavior` config option);
-  - Upload issues: when `upload.limitError` config option is set (takes its `statusCode` if it's also `HttpError`);
+  - Handled by `ResultHandler` configured as `errorHandler` (the defaults is `defaultResultHandler`);
+  - Parsing errors: passed through as-is (typically `HttpError` with `4XX` code used for response by default);
+  - Routing errors: `404` or `405`, based on `wrongMethodBehavior` configuration;
+  - Upload issues: thrown only if `upload.limitError` is configured (`HttpError::statusCode` can be used for response);
   - For other errors the default status code is `500`;
 - `ResultHandler` failures:
   - Handled by `LastResortHandler` with status code `500` and a plain text response.
 
-You can override these behaviors by using a custom `ResultHandler` with `EndpointsFactory` and as the `errorHandler`.
+You can customize it by passing a custom `ResultHandler` to `EndpointsFactory` and by configuring `errorHandler`.
 
 ## Production mode
 
