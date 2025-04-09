@@ -6,4 +6,5 @@ export const schemas = {
   dateIn: ez.dateIn(),
   dateOut: ez.dateOut(),
   upload: ez.upload(),
+  form: ez.form({}),
 };

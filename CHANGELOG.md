@@ -19,6 +19,19 @@
 
 ## Version 22
 
+### v22.13.2
+
+- Fixed inconsistency between the actual catcher behavior and the error handling documentation:
+  - Removed conversion of non-`HttpError`s to `BadRequest` before passing them to `errorHandler`;
+  - A `ResultHandler` configured as `errorHandler` is responsible to handling all errors and responding accordingly.
+  - The default `errorHandler` is `defaultResultHandler`:
+    - Using `ensureHttpError()` it coverts non-`HttpError`s to `InternalServerError` and responds with status code `500`;
+  - The issue has occurred since [v19.0.0](#v1900).
+
+### v22.13.1
+
+- Fixed: the output type of the `ez.raw()` schema (without an argument) was missing the `raw` property (since v19.0.0).
+
 ### v22.13.0
 
 - Ability to configure and disable access logging:

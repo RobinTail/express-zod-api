@@ -90,19 +90,19 @@ exports[`App in production mode > Protocol > Should fail on invalid path 1`] = `
 }
 `;
 
-exports[`App in production mode > Protocol > Should fail on malformed body 1`] = `
+exports[`App in production mode > Protocol > Should fail when missing content type header 1`] = `
 {
   "error": {
-    "message": StringMatching /Unterminated string in JSON at position 25/,
+    "message": "key: Required",
   },
   "status": "error",
 }
 `;
 
-exports[`App in production mode > Protocol > Should fail when missing content type header 1`] = `
+exports[`App in production mode > Protocol > Should handle JSON parser failures 1`] = `
 {
   "error": {
-    "message": "key: Required",
+    "message": StringMatching /Unterminated string in JSON at position 25/,
   },
   "status": "error",
 }
