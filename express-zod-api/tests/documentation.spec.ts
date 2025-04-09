@@ -817,14 +817,8 @@ describe("Documentation", () => {
       const unionSchema = z.union([subType1, subType2]);
       type TestingType = z.infer<typeof unionSchema>;
 
-      expectTypeOf({
-        id: "string",
-        field1: "string",
-      }).toMatchTypeOf<TestingType>();
-      expectTypeOf({
-        id: "string",
-        field2: "string",
-      }).toMatchTypeOf<TestingType>();
+      expectTypeOf<{ id: string; field1: string }>().toExtend<TestingType>();
+      expectTypeOf<{ id: string; field2: string }>().toExtend<TestingType>();
 
       const spec = new Documentation({
         config: sampleConfig,

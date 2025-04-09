@@ -5,7 +5,7 @@ import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
 import { ErrorRequestHandler, RequestHandler, Request } from "express";
-import createHttpError, { isHttpError } from "http-errors";
+import createHttpError from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
@@ -32,9 +32,7 @@ export const createCatcher =
   async (error, request, response, next) => {
     if (!error) return next();
     return errorHandler.execute({
-      error: isHttpError(error)
-        ? error
-        : createHttpError(400, ensureError(error).message),
+      error: ensureError(error),
       request,
       response,
       input: null,
@@ -117,19 +115,22 @@ export const moveRaw: RequestHandler = (req, {}, next) => {
   next();
 };
 
-/** @since v19 prints the actual path of the request, not a configured route, severity decreased to debug level */
+/** @since v22.13 the access logging can be customized and disabled */
 export const createLoggingMiddleware =
   ({
     logger: parent,
-    config,
+    config: {
+      childLoggerProvider,
+      accessLogger = ({ method, path }, logger) =>
+        logger.debug(`${method}: ${path}`),
+    },
   }: {
     logger: ActualLogger;
     config: CommonConfig;
   }): RequestHandler =>
   async (request, response, next) => {
-    const logger =
-      (await config.childLoggerProvider?.({ request, parent })) || parent;
-    logger.debug(`${request.method}: ${request.path}`);
+    const logger = (await childLoggerProvider?.({ request, parent })) || parent;
+    accessLogger?.(request, logger);
     if (request.res)
       (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
     next();
