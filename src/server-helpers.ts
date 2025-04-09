@@ -27,7 +27,7 @@ interface HandlerCreatorParams {
   getLogger: GetLogger;
 }
 
-export const createParserFailureHandler =
+export const createCatcher =
   ({ errorHandler, getLogger }: HandlerCreatorParams): ErrorRequestHandler =>
   async (error, request, response, next) => {
     if (!error) return next();
