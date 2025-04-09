@@ -24,19 +24,19 @@ exports[`App > Protocol > Should fail on invalid method 1`] = `
 }
 `;
 
-exports[`App > Protocol > Should fail on malformed body 1`] = `
+exports[`App > Protocol > Should fail when missing content type header 1`] = `
 {
   "error": {
-    "message": StringMatching /\\(Unexpected end of JSON input\\|Unterminated string in JSON at position 25\\)/,
+    "message": "key: Required",
   },
   "status": "error",
 }
 `;
 
-exports[`App > Protocol > Should fail when missing content type header 1`] = `
+exports[`App > Protocol > Should handle JSON parser failures 1`] = `
 {
   "error": {
-    "message": "key: Required",
+    "message": StringMatching /\\(Unexpected end of JSON input\\|Unterminated string in JSON at position 25\\)/,
   },
   "status": "error",
 }

@@ -9,7 +9,7 @@ import {
   moveRaw,
 } from "../../src/server-helpers";
 import { describe, expect, test, vi } from "vitest";
-import { defaultResultHandler } from "../../src";
+import { createResultHandler, defaultResultHandler } from "../../src";
 import { Request, Response } from "express";
 import assert from "node:assert/strict";
 import {
@@ -66,6 +66,37 @@ describe("Server helpers", () => {
         true,
       );
     });
+
+    test.each([
+      new SyntaxError("Unexpected end of JSON input"),
+      new Error("Anything"),
+      createHttpError(400, "Unexpected end of JSON input"),
+      "just a text",
+    ])(
+      "the handler should call error handler with given error %#",
+      async (error) => {
+        const errorHandler = createResultHandler({
+          getPositiveResponse: vi.fn(),
+          getNegativeResponse: vi.fn(),
+          handler: vi.fn(),
+        });
+        const spy = vi.spyOn(errorHandler, "handler");
+        const handler = createParserFailureHandler({
+          errorHandler,
+          rootLogger: makeLoggerMock({ fnMethod: vi.fn }),
+        });
+        await handler(
+          error,
+          makeRequestMock({ fnMethod: vi.fn }),
+          makeResponseMock({ fnMethod: vi.fn }),
+          vi.fn<any>(),
+        );
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy.mock.calls[0][0].error).toEqual(
+          error instanceof Error ? error : new Error(error),
+        );
+      },
+    );
   });
 
   describe("createNotFoundHandler()", () => {

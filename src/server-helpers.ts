@@ -5,7 +5,7 @@ import { AnyResultHandlerDefinition } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
 import { ErrorRequestHandler, RequestHandler, Response } from "express";
-import createHttpError, { isHttpError } from "http-errors";
+import createHttpError from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { makeErrorFromAnything } from "./common-helpers";
@@ -20,16 +20,13 @@ export type LocalResponse = Response<
   { [metaSymbol]?: { logger: ActualLogger } }
 >;
 
+// @todo despite naming it actually makes catcher
 export const createParserFailureHandler =
   ({ errorHandler, rootLogger }: HandlerCreatorParams): ErrorRequestHandler =>
   async (error, request, response: LocalResponse, next) => {
-    if (!error) {
-      return next();
-    }
-    errorHandler.handler({
-      error: isHttpError(error)
-        ? error
-        : createHttpError(400, makeErrorFromAnything(error).message),
+    if (!error) return next();
+    return errorHandler.handler({
+      error: makeErrorFromAnything(error),
       request,
       response,
       input: null,
