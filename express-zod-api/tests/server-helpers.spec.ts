@@ -36,9 +36,11 @@ describe("Server helpers", () => {
 
     test.each([
       new SyntaxError("Unexpected end of JSON input"),
+      new Error("Anything"),
       createHttpError(400, "Unexpected end of JSON input"),
+      "just a text",
     ])(
-      "the handler should call error handler with correct error code %#",
+      "the handler should call error handler with given error %#",
       async (error) => {
         const errorHandler = new ResultHandler({
           positive: vi.fn(),
@@ -58,7 +60,7 @@ describe("Server helpers", () => {
         );
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy.mock.calls[0][0].error).toEqual(
-          createHttpError(400, "Unexpected end of JSON input"),
+          error instanceof Error ? error : new Error(error),
         );
       },
     );
