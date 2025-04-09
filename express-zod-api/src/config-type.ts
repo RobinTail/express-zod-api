@@ -60,12 +60,12 @@ export interface CommonConfig {
    * */
   logger?: Partial<BuiltinLoggerConfig> | AbstractLogger;
   /**
-   * @desc A child logger returned by this hook overrides the logger in all handlers for each request
+   * @desc A child logger returned by this function can override the logger in all handlers for each request
    * @example ({ parent }) => parent.child({ requestId: uuid() })
    * */
   childLoggerProvider?: ChildLoggerProvider;
   /**
-   * @desc The hook for producing access logs
+   * @desc The function for producing access logs
    * @default ({ method, path }, logger) => logger.debug(`${method}: ${path}`)
    * @example null — disables the feature
    * */
@@ -109,7 +109,7 @@ type UploadOptions = Pick<
    * */
   limitError?: Error;
   /**
-   * @desc A hook to execute before uploading — it can be used for restrictions by throwing an error.
+   * @desc A handler to execute before uploading — it can be used for restrictions by throwing an error.
    * @example ({ request }) => { throw createHttpError(403, "Not authorized"); }
    * */
   beforeUpload?: BeforeUpload;
@@ -184,7 +184,7 @@ export interface ServerConfig extends CommonConfig {
    * */
   formParser?: RequestHandler;
   /**
-   * @desc A hook to execute before processing the Routing of your API (and before parsing).
+   * @desc A code to execute before processing the Routing of your API (and before parsing).
    * @desc This can be a good place for express middlewares establishing their own routes.
    * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
    * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }

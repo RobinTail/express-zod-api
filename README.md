@@ -371,7 +371,7 @@ const resultHandlerWithCleanup = new ResultHandler({
 There are two ways of connecting the native express middlewares depending on their nature and your objective.
 
 In case it's a middleware establishing and serving its own routes, or somehow globally modifying the behaviour, or
-being an additional request parser (like `cookie-parser`), use the `beforeRouting` hook. However, it might be better
+being an additional request parser (like `cookie-parser`), use the `beforeRouting` option. However, it might be better
 to avoid `cors` here — [the framework handles it on its own](#cross-origin-resource-sharing).
 
 ```typescript
@@ -644,7 +644,7 @@ declare module "express-zod-api" {
 ## Child logger
 
 In case you need a dedicated logger for each request (for example, equipped with a request ID), you can specify the
-`childLoggerProvider` hook in your configuration. The function accepts the initially defined logger and the request,
+`childLoggerProvider` option in your configuration. The function accepts the initially defined logger and the request,
 it can also be asynchronous. The child logger returned by that function will replace the `logger` in all handlers.
 You can use the `.child()` method of the built-in logger or [install a custom logger](#customizing-logger) instead.
 
@@ -906,9 +906,9 @@ it normalizes errors into consistent HTTP responses with sensible status codes. 
   - Handled by a `ResultHandler` used by `EndpointsFactory` (`defaultEndpointsFactory` uses `defaultResultHandler`);
   - `InputValidationError`: request violates `input` schema, the default status code is `400`;
   - `OutputValidationError`: handler violates `output` schema, the default status code is `500`;
-  - `HttpError` thrown in handlers (with help of `createHttpError()`): its `.statusCode` is used for response;
+  - `HttpError`: can be thrown in handlers with help of `createHttpError()`, its `.statusCode` is used for response;
   - For other errors the default status code is `500`;
-- Routing, parsing, hooks, and upload issues:
+- Routing, parsing and upload issues:
   - Handled by `ResultHandler` configured as `errorHandler` (the defaults is `defaultResultHandler`);
   - Parsing errors: passed through as-is (typically `HttpError` with `4XX` code used for response by default);
   - Routing errors: `404` or `405`, based on `wrongMethodBehavior` configuration;
@@ -996,7 +996,7 @@ _Hint: for unlisted extra fields use the following syntax: `ez.form( z.object({}
 Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and enable or
 configure file uploads. Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on
 available options. The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional
-middleware for restricting the ability to upload using the `beforeUpload` hook. So the configuration for the limited
+middleware for restricting the ability to upload using the `beforeUpload` option. So the configuration for the limited
 and restricted upload might look this way:
 
 ```typescript
@@ -1080,7 +1080,7 @@ errors yourself. In this regard `attachRouting()` provides you with `notFoundHan
 to your custom express app.
 
 Besides that, if you're looking to include additional request parsers, or a middleware that establishes its own routes,
-then consider using the `beforeRouting` [hook in config instead](#using-native-express-middlewares).
+then consider using the `beforeRouting` [option in config instead](#using-native-express-middlewares).
 
 ## Testing endpoints
 
