@@ -20,8 +20,7 @@ export type LocalResponse = Response<
   { [metaSymbol]?: { logger: ActualLogger } }
 >;
 
-// @todo despite naming it actually makes catcher
-export const createParserFailureHandler =
+export const createCatcher =
   ({ errorHandler, rootLogger }: HandlerCreatorParams): ErrorRequestHandler =>
   async (error, request, response: LocalResponse, next) => {
     if (!error) return next();
