@@ -5,7 +5,7 @@ import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
 import { ErrorRequestHandler, RequestHandler, Request } from "express";
-import createHttpError, { isHttpError } from "http-errors";
+import createHttpError from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
@@ -32,9 +32,7 @@ export const createParserFailureHandler =
   async (error, request, response, next) => {
     if (!error) return next();
     return errorHandler.execute({
-      error: isHttpError(error)
-        ? error
-        : createHttpError(400, ensureError(error).message),
+      error: ensureError(error),
       request,
       response,
       input: null,

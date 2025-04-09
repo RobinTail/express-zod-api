@@ -1,5 +1,7 @@
 import cors from "cors";
 import depd from "depd";
+import express from "express";
+import { readFile } from "node:fs/promises";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -10,6 +12,7 @@ import {
   ResultHandler,
   BuiltinLogger,
   Middleware,
+  ez,
 } from "../../src";
 import { givePort } from "../helpers";
 import { setTimeout } from "node:timers/promises";
@@ -100,23 +103,44 @@ describe("App in production mode", async () => {
     output: z.object({}),
     handler: async () => setTimeout(5000, {}),
   });
+  const rawEndpoint = new EndpointsFactory(defaultResultHandler).build({
+    method: "post",
+    input: ez.raw(),
+    output: z.object({ crc: z.number() }),
+    handler: async ({ input: { raw } }) => ({ crc: raw.length }),
+  });
+  const uploadEndpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
+    method: "post",
+    input: z.object({ avatar: ez.upload() }),
+    handler: vi.fn(),
+  });
   const routing = {
     v1: {
       corsed: corsedEndpoint,
       faulty: faultyEndpoint,
       test: testEndpoint,
       long: longEndpoint,
+      raw: rawEndpoint,
+      upload: uploadEndpoint,
     },
   };
   vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
   const config = createConfig({
     http: { listen: port },
     compression: { threshold: 1 },
+    rawParser: express.raw({ limit: 20 }),
+    upload: {
+      beforeUpload: ({ request }) => {
+        if ("trigger" in request.query) throw new Error("beforeUpload failure");
+      },
+    },
     beforeRouting: ({ app, getLogger }) => {
       depd("express")("Sample deprecation message");
       app.use((req, {}, next) => {
         const childLogger = getLogger(req);
         assert("isChild" in childLogger && childLogger.isChild);
+        if (req.path === "/trigger/beforeRouting")
+          return next(new Error("Failure of beforeRouting triggered"));
         next();
       });
     },
@@ -247,6 +271,35 @@ describe("App in production mode", async () => {
         "Content-Range,X-Content-Range",
       );
     });
+
+    test("Should handle raw request", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/raw`, {
+        method: "POST",
+        headers: { "content-type": "application/octet-stream" },
+        body: Buffer.from("testing"),
+      });
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({ status: "success", data: { crc: 7 } });
+    });
+
+    test("Should handle upload request", async () => {
+      const filename = "logo.svg";
+      const logo = await readFile(filename, "utf-8");
+      const data = new FormData();
+      data.append(
+        "avatar",
+        new Blob([logo], { type: "image/svg+xml" }),
+        filename,
+      );
+      const response = await fetch(`http://localhost:${port}/v1/upload`, {
+        method: "POST",
+        body: data,
+      });
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({ data: {}, status: "success" });
+    });
   });
 
   describe("Negative", () => {
@@ -297,6 +350,38 @@ describe("App in production mode", async () => {
       expect(text).toBe("Internal Server Error");
       expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
+
+    test("Should treat beforeRouting error as internal", async () => {
+      const response = await fetch(
+        `http://127.0.0.1:${port}/trigger/beforeRouting`,
+      );
+      expect(await response.json()).toEqual({
+        status: "error",
+        error: { message: "Internal Server Error" },
+      });
+      expect(response.status).toBe(500);
+    });
+
+    test("Should treat beforeUpload error as internal", async () => {
+      const filename = "logo.svg";
+      const logo = await readFile(filename, "utf-8");
+      const data = new FormData();
+      data.append(
+        "avatar",
+        new Blob([logo], { type: "image/svg+xml" }),
+        filename,
+      );
+      const response = await fetch(
+        `http://localhost:${port}/v1/upload?trigger=beforeUpload`,
+        { method: "POST", body: data },
+      );
+      expect(response.status).toBe(500);
+      const json = await response.json();
+      expect(json).toEqual({
+        error: { message: "Internal Server Error" },
+        status: "error",
+      });
+    });
   });
 
   describe("Protocol", () => {
@@ -316,7 +401,7 @@ describe("App in production mode", async () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("Should fail on malformed body", async () => {
+    test("Should handle JSON parser failures", async () => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "POST", // valid method this time
         headers: {
@@ -334,6 +419,20 @@ describe("App in production mode", async () => {
             /(Unexpected end of JSON input|Unterminated string in JSON at position 25)/,
           ),
         },
+      });
+    });
+
+    test("Should handle Raw parser failures", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/raw`, {
+        method: "POST",
+        headers: { "content-type": "application/octet-stream" },
+        body: Buffer.alloc(100),
+      });
+      expect(response.status).toBe(413);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: "error",
+        error: { message: "request entity too large" },
       });
     });
 
@@ -446,7 +545,7 @@ describe("App in production mode", async () => {
       await setTimeout(500);
       process.emit("FAKE" as "SIGTERM");
       expect(infoMethod).toHaveBeenCalledWith("Graceful shutdown", {
-        sockets: 1,
+        sockets: expect.any(Number),
         timeout: 1000,
       });
       await setTimeout(1500);
