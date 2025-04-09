@@ -43,8 +43,7 @@ export interface CommonConfig {
    * @desc How to respond to a request that uses a wrong method to an existing endpoint
    * @example 404 — Not found
    * @example 405 — Method not allowed, incl. the "Allow" header with a list of methods
-   * @default 404
-   * @todo consider changing default to 405 in v23
+   * @default 405
    * */
   wrongMethodBehavior?: 404 | 405;
   /**

@@ -198,13 +198,13 @@ describe("Server helpers", () => {
       ]);
     });
 
-    test("should handle errors thrown by beforeUpload", async () => {
+    test("should delegate errors thrown by beforeUpload", async () => {
       const error = createHttpError(403, "Not authorized");
-      beforeUploadMock.mockImplementationOnce(() => {
-        throw error;
-      });
-      await parsers[0](requestMock, responseMock, nextMock);
-      expect(nextMock).toHaveBeenCalledWith(error);
+      beforeUploadMock.mockRejectedValueOnce(error);
+      await expect(() =>
+        parsers[0](requestMock, responseMock, nextMock),
+      ).rejects.toThrowError(error);
+      expect(nextMock).not.toHaveBeenCalled();
     });
 
     test("should install the uploader with its special logger", async () => {
@@ -289,7 +289,7 @@ describe("Server helpers", () => {
     );
 
     test.each(["childLoggerProvider", "accessLogger"] as const)(
-      "should handle errors in %s",
+      "should delegate errors in %s",
       async (prop) => {
         const config = {
           [prop]: () => fail("Something went wrong"),
@@ -299,8 +299,10 @@ describe("Server helpers", () => {
         const request = makeRequestMock({ path: "/test" });
         const response = makeResponseMock();
         const nextMock = vi.fn();
-        await handler(request, response, nextMock);
-        expect(nextMock.mock.calls).toMatchSnapshot();
+        await expect(() =>
+          handler(request, response, nextMock),
+        ).rejects.toThrowErrorMatchingSnapshot();
+        expect(nextMock).not.toHaveBeenCalled();
       },
     );
   });

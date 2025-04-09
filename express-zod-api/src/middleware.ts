@@ -24,8 +24,10 @@ type Handler<IN, OPT, OUT> = (params: {
 }) => Promise<OUT>;
 
 export abstract class AbstractMiddleware {
-  public abstract getSecurity(): LogicalContainer<Security> | undefined;
-  public abstract getSchema(): IOSchema<"strip">;
+  /** @internal */
+  public abstract get security(): LogicalContainer<Security> | undefined;
+  /** @internal */
+  public abstract get schema(): IOSchema<"strip">;
   public abstract execute(params: {
     input: unknown;
     options: FlatObject;
@@ -71,11 +73,13 @@ export class Middleware<
     this.#handler = handler;
   }
 
-  public override getSecurity() {
+  /** @internal */
+  public override get security() {
     return this.#security;
   }
 
-  public override getSchema() {
+  /** @internal */
+  public override get schema() {
     return this.#schema;
   }
 
