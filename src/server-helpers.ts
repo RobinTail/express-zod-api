@@ -26,7 +26,7 @@ interface HandlerCreatorParams {
   getChildLogger: ChildLoggerExtractor;
 }
 
-export const createParserFailureHandler =
+export const createCatcher =
   ({
     errorHandler,
     getChildLogger,
