@@ -15,25 +15,25 @@ describe("ez.file()", () => {
     test("should create a string file", () => {
       const schema = ez.file("string");
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectTypeOf(schema._output).toMatchTypeOf<string>();
+      expectTypeOf(schema._output).toBeString();
     });
 
     test("should create a buffer file", () => {
       const schema = ez.file("buffer");
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectTypeOf(schema._output).toMatchTypeOf<Buffer>();
+      expectTypeOf(schema._output).toExtend<Buffer>();
     });
 
     test("should create a binary file", () => {
       const schema = ez.file("binary");
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectTypeOf(schema._output).toMatchTypeOf<Buffer | string>();
+      expectTypeOf(schema._output).toExtend<Buffer | string>();
     });
 
     test("should create a base64 file", () => {
       const schema = ez.file("base64");
       expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectTypeOf(schema._output).toMatchTypeOf<string>();
+      expectTypeOf(schema._output).toBeString();
     });
   });
 

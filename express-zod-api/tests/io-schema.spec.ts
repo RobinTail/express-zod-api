@@ -10,51 +10,49 @@ import { AbstractMiddleware } from "../src/middleware";
 describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {
     test("accepts object", () => {
-      expectTypeOf(z.object({})).toMatchTypeOf<IOSchema>();
-      expectTypeOf(z.object({})).toMatchTypeOf<IOSchema<"strip">>();
-      expectTypeOf(z.object({}).strict()).toMatchTypeOf<IOSchema<"strict">>();
-      expectTypeOf(z.object({}).passthrough()).toMatchTypeOf<
+      expectTypeOf(z.object({})).toExtend<IOSchema>();
+      expectTypeOf(z.object({})).toExtend<IOSchema<"strip">>();
+      expectTypeOf(z.object({}).strict()).toExtend<IOSchema<"strict">>();
+      expectTypeOf(z.object({}).passthrough()).toExtend<
         IOSchema<"passthrough">
       >();
-      expectTypeOf(z.object({}).strip()).toMatchTypeOf<IOSchema<"strip">>();
+      expectTypeOf(z.object({}).strip()).toExtend<IOSchema<"strip">>();
     });
     test("accepts ez.raw()", () => {
-      expectTypeOf(ez.raw()).toMatchTypeOf<IOSchema>();
-      expectTypeOf(ez.raw({ something: z.any() })).toMatchTypeOf<IOSchema>();
+      expectTypeOf(ez.raw()).toExtend<IOSchema>();
+      expectTypeOf(ez.raw({ something: z.any() })).toExtend<IOSchema>();
     });
     test("accepts ez.form()", () => {
       expectTypeOf(ez.form({})).toExtend<IOSchema>();
     });
     test("respects the UnknownKeys type argument", () => {
-      expectTypeOf(z.object({})).not.toMatchTypeOf<IOSchema<"passthrough">>();
+      expectTypeOf(z.object({})).not.toExtend<IOSchema<"passthrough">>();
     });
     test("accepts union of objects", () => {
-      expectTypeOf(
-        z.union([z.object({}), z.object({})]),
-      ).toMatchTypeOf<IOSchema>();
-      expectTypeOf(z.object({}).or(z.object({}))).toMatchTypeOf<IOSchema>();
+      expectTypeOf(z.union([z.object({}), z.object({})])).toExtend<IOSchema>();
+      expectTypeOf(z.object({}).or(z.object({}))).toExtend<IOSchema>();
       expectTypeOf(
         z.object({}).or(z.object({}).or(z.object({}))),
-      ).toMatchTypeOf<IOSchema>();
+      ).toExtend<IOSchema>();
     });
     test("does not accept union of object and array of objects", () => {
       expectTypeOf(
         z.object({}).or(z.array(z.object({}))),
-      ).not.toMatchTypeOf<IOSchema>();
+      ).not.toExtend<IOSchema>();
     });
     test("accepts intersection of objects", () => {
       expectTypeOf(
         z.intersection(z.object({}), z.object({})),
-      ).toMatchTypeOf<IOSchema>();
-      expectTypeOf(z.object({}).and(z.object({}))).toMatchTypeOf<IOSchema>();
+      ).toExtend<IOSchema>();
+      expectTypeOf(z.object({}).and(z.object({}))).toExtend<IOSchema>();
       expectTypeOf(
         z.object({}).and(z.object({}).and(z.object({}))),
-      ).toMatchTypeOf<IOSchema>();
+      ).toExtend<IOSchema>();
     });
     test("does not accepts intersection of object with array of objects", () => {
       expectTypeOf(
         z.object({}).and(z.array(z.object({}))),
-      ).not.toMatchTypeOf<IOSchema>();
+      ).not.toExtend<IOSchema>();
     });
     test("accepts discriminated union of objects", () => {
       expectTypeOf(
@@ -62,28 +60,26 @@ describe("I/O Schema and related helpers", () => {
           z.object({ type: z.literal("one") }),
           z.object({ type: z.literal("two") }),
         ]),
-      ).toMatchTypeOf<IOSchema>();
+      ).toExtend<IOSchema>();
     });
     test("accepts a mix of types based on object", () => {
       expectTypeOf(
         z.object({}).or(z.object({}).and(z.object({}))),
-      ).toMatchTypeOf<IOSchema>();
+      ).toExtend<IOSchema>();
       expectTypeOf(
         z.object({}).and(z.object({}).or(z.object({}))),
-      ).toMatchTypeOf<IOSchema>();
+      ).toExtend<IOSchema>();
     });
     describe("Feature #600: Top level refinements", () => {
       test("accepts a refinement of object", () => {
-        expectTypeOf(z.object({}).refine(() => true)).toMatchTypeOf<IOSchema>();
-        expectTypeOf(
-          z.object({}).superRefine(() => true),
-        ).toMatchTypeOf<IOSchema>();
+        expectTypeOf(z.object({}).refine(() => true)).toExtend<IOSchema>();
+        expectTypeOf(z.object({}).superRefine(() => true)).toExtend<IOSchema>();
         expectTypeOf(
           z.object({}).refinement(() => true, {
             code: "custom",
             message: "test",
           }),
-        ).toMatchTypeOf<IOSchema>();
+        ).toExtend<IOSchema>();
       });
       test("Issue 662: accepts nested refinements", () => {
         expectTypeOf(
@@ -92,21 +88,21 @@ describe("I/O Schema and related helpers", () => {
             .refine(() => true)
             .refine(() => true)
             .refine(() => true),
-        ).toMatchTypeOf<IOSchema>();
+        ).toExtend<IOSchema>();
         expectTypeOf(
           z
             .object({})
             .superRefine(() => true)
             .superRefine(() => true)
             .superRefine(() => true),
-        ).toMatchTypeOf<IOSchema>();
+        ).toExtend<IOSchema>();
       });
     });
     describe("Feature #1869: Top level transformations", () => {
       test("accepts transformations to another object", () => {
         expectTypeOf(
           z.object({ s: z.string() }).transform(() => ({ n: 123 })),
-        ).toMatchTypeOf<IOSchema>();
+        ).toExtend<IOSchema>();
       });
       test("accepts nested transformations", () => {
         expectTypeOf(
@@ -115,7 +111,7 @@ describe("I/O Schema and related helpers", () => {
             .transform(() => ({ a: 123 }))
             .transform(() => ({ b: 456 }))
             .transform(() => ({ c: 789 })),
-        ).toMatchTypeOf<IOSchema>();
+        ).toExtend<IOSchema>();
       });
       test("accepts piping into another object schema", () => {
         expectTypeOf(
@@ -123,23 +119,21 @@ describe("I/O Schema and related helpers", () => {
             .object({ s: z.string() })
             .transform(() => ({ n: 123 }))
             .pipe(z.object({ n: z.number() })),
-        ).toMatchTypeOf<IOSchema>();
+        ).toExtend<IOSchema>();
         expectTypeOf(
           z.object({ user_id: z.string() }).remap({ user_id: "userId" }),
-        ).toMatchTypeOf<IOSchema>();
+        ).toExtend<IOSchema>();
       });
       test("does not accept transformation to another type", () => {
         expectTypeOf(
           z.object({}).transform(() => true),
-        ).not.toMatchTypeOf<IOSchema>();
-        expectTypeOf(
-          z.object({}).transform(() => []),
-        ).not.toMatchTypeOf<IOSchema>();
+        ).not.toExtend<IOSchema>();
+        expectTypeOf(z.object({}).transform(() => [])).not.toExtend<IOSchema>();
       });
       test("does not accept piping into another kind of schema", () => {
         expectTypeOf(
           z.object({ s: z.string() }).pipe(z.array(z.string())),
-        ).not.toMatchTypeOf<IOSchema>();
+        ).not.toExtend<IOSchema>();
       });
       test("does not accept nested piping", () => {
         expectTypeOf(
@@ -147,7 +141,7 @@ describe("I/O Schema and related helpers", () => {
             .object({ a: z.string() })
             .remap({ a: "b" })
             .pipe(z.object({ b: z.string() })),
-        ).not.toMatchTypeOf<IOSchema>();
+        ).not.toExtend<IOSchema>();
       });
     });
   });

@@ -1,3 +1,4 @@
+import { fail } from "node:assert/strict";
 import { fileUploadMock } from "./express-mock";
 import { metaSymbol } from "../src/metadata";
 import {
@@ -35,9 +36,11 @@ describe("Server helpers", () => {
 
     test.each([
       new SyntaxError("Unexpected end of JSON input"),
+      new Error("Anything"),
       createHttpError(400, "Unexpected end of JSON input"),
+      "just a text",
     ])(
-      "the handler should call error handler with correct error code %#",
+      "the handler should call error handler with given error %#",
       async (error) => {
         const errorHandler = new ResultHandler({
           positive: vi.fn(),
@@ -57,7 +60,7 @@ describe("Server helpers", () => {
         );
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy.mock.calls[0][0].error).toEqual(
-          createHttpError(400, "Unexpected end of JSON input"),
+          error instanceof Error ? error : new Error(error),
         );
       },
     );
@@ -243,26 +246,61 @@ describe("Server helpers", () => {
   });
 
   describe("createLoggingMiddleware", () => {
-    const logger = makeLoggerMock();
-    const child = makeLoggerMock({ isChild: true });
-    test.each([undefined, () => child, async () => child])(
-      "should make RequestHandler writing logger to res.locals %#",
-      async (childLoggerProvider) => {
-        const config = { childLoggerProvider } as CommonConfig;
+    describe("should make RequestHandler writing logger to res.locals", () => {
+      const logger = makeLoggerMock();
+      const child = makeLoggerMock({ isChild: true });
+      test.each([undefined, () => child, async () => child])(
+        "case %#",
+        async (childLoggerProvider) => {
+          const config = { childLoggerProvider } as CommonConfig;
+          const handler = createLoggingMiddleware({ logger, config });
+          expect(typeof handler).toBe("function");
+          const nextMock = vi.fn();
+          const response = makeResponseMock();
+          const request = makeRequestMock({ path: "/test" });
+          request.res = response;
+          await handler(request, response, nextMock);
+          expect(nextMock).toHaveBeenCalled();
+          expect(
+            (childLoggerProvider ? child : logger)._getLogs().debug.pop(),
+          ).toEqual(["GET: /test"]);
+          expect(request.res).toHaveProperty("locals", {
+            [metaSymbol]: { logger: childLoggerProvider ? child : logger },
+          });
+        },
+      );
+    });
+
+    test.each<[CommonConfig["accessLogger"], string[][]]>([
+      [undefined, [["GET: /test"]]],
+      [null, []],
+      [({}, instance) => instance.debug("TEST"), [["TEST"]]],
+    ])(
+      "access logger can be customized and disabled %#",
+      async (accessLogger, expected) => {
+        const config = { accessLogger } as CommonConfig;
+        const logger = makeLoggerMock();
         const handler = createLoggingMiddleware({ logger, config });
-        expect(typeof handler).toBe("function");
-        const nextMock = vi.fn();
-        const response = makeResponseMock();
         const request = makeRequestMock({ path: "/test" });
-        request.res = response;
+        const response = makeResponseMock();
+        await handler(request, response, vi.fn());
+        expect(logger._getLogs().debug).toEqual(expected);
+      },
+    );
+
+    test.each(["childLoggerProvider", "accessLogger"] as const)(
+      "should handle errors in %s",
+      async (prop) => {
+        const config = {
+          [prop]: () => fail("Something went wrong"),
+        } as unknown as CommonConfig;
+        const logger = makeLoggerMock();
+        const handler = createLoggingMiddleware({ logger, config });
+        const request = makeRequestMock({ path: "/test" });
+        const response = makeResponseMock();
+        const nextMock = vi.fn();
         await handler(request, response, nextMock);
-        expect(nextMock).toHaveBeenCalled();
-        expect(
-          (childLoggerProvider ? child : logger)._getLogs().debug.pop(),
-        ).toEqual(["GET: /test"]);
-        expect(request.res).toHaveProperty("locals", {
-          [metaSymbol]: { logger: childLoggerProvider ? child : logger },
-        });
+        expect(nextMock.mock.calls).toMatchSnapshot();
       },
     );
   });
