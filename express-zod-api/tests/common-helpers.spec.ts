@@ -1,4 +1,3 @@
-import "../src/zod-plugin"; // required for this test
 import createHttpError from "http-errors";
 import {
   combinations,
