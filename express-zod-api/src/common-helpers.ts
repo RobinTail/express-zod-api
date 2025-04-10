@@ -9,7 +9,7 @@ import { AuxMethod, Method } from "./method";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = Record<string, never>;
-export type EmptySchema = z.ZodObject<EmptyObject, "strip">;
+export type EmptySchema = z.ZodObject<EmptyObject, EmptyObject>;
 export type FlatObject = Record<string, unknown>;
 
 /** @link https://stackoverflow.com/a/65492934 */
@@ -81,7 +81,7 @@ export const getMessageFromError = (error: Error): string => {
 };
 
 /** Takes the original unvalidated examples from the properties of ZodObject schema shape */
-export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
+export const pullExampleProps = <T extends z.ZodObject>(subject: T) =>
   Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
     (acc, [key, schema]) => {
       const { _def } = schema as z.ZodType;
@@ -164,7 +164,7 @@ export const makeCleanId = (...args: string[]) => {
 };
 
 export const getTransformedType = R.tryCatch(
-  <T>(schema: z.ZodEffects<z.ZodTypeAny, unknown, T>, sample: T) =>
+  <T>(schema: z.ZodTransform<z.ZodType, T>, sample: T) =>
     typeof schema.parse(sample),
   R.always(undefined),
 );
