@@ -10,7 +10,7 @@ type BaseObject<U extends FlatObject> = z.ZodObject<$ZodShape, U>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- workaround for TS2456, circular reference
 interface ObjectTransformation<T extends z.ZodType>
-  extends z.ZodTransform<FlatObject, T> {}
+  extends z.ZodPipe<T, z.ZodTransform<FlatObject, z.output<T>>> {}
 
 type EffectsChain<U extends FlatObject> = ObjectTransformation<
   BaseObject<U> | EffectsChain<U>
@@ -28,10 +28,7 @@ export type IOSchema<U extends FlatObject = FlatObject> =
   | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]> // z.object().or()
   | z.ZodIntersection<IOSchema<U>, IOSchema<U>> // z.object().and()
   | z.ZodDiscriminatedUnion<BaseObject<U>[]> // z.discriminatedUnion()
-  | z.ZodPipe<
-      z.ZodPipe<BaseObject<U>, z.ZodTransform<FlatObject, FlatObject>>,
-      BaseObject<U>
-    >; // z.object().remap()
+  | z.ZodPipe<ObjectTransformation<BaseObject<U>>, BaseObject<U>>; // z.object().remap()
 
 /**
  * @description intersects input schemas of middlewares and the endpoint
