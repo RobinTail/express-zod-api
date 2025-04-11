@@ -8,32 +8,32 @@ describe("ez.file()", () => {
   describe("creation", () => {
     test("should create an instance being string by default", () => {
       const schema = ez.file();
-      expect(schema).toBeInstanceOf(z.ZodBranded);
+      expect(schema).toBeInstanceOf(z.ZodString);
       expect(schema._def[metaSymbol]?.brand).toBe(ezFileBrand);
     });
 
     test("should create a string file", () => {
       const schema = ez.file("string");
-      expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectTypeOf(schema._output).toBeString();
+      expect(schema).toBeInstanceOf(z.ZodString);
+      expectTypeOf(schema._zod.output).toBeString();
     });
 
     test("should create a buffer file", () => {
       const schema = ez.file("buffer");
-      expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectTypeOf(schema._output).toExtend<Buffer>();
+      expect(schema).toBeInstanceOf(z.ZodCustom);
+      expectTypeOf(schema._zod.output).toExtend<Buffer>();
     });
 
     test("should create a binary file", () => {
       const schema = ez.file("binary");
-      expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectTypeOf(schema._output).toExtend<Buffer | string>();
+      expect(schema).toBeInstanceOf(z.ZodUnion);
+      expectTypeOf(schema._zod.output).toExtend<Buffer | string>();
     });
 
     test("should create a base64 file", () => {
       const schema = ez.file("base64");
-      expect(schema).toBeInstanceOf(z.ZodBranded);
-      expectTypeOf(schema._output).toBeString();
+      expect(schema).toBeInstanceOf(z.ZodString);
+      expectTypeOf(schema._zod.output).toBeString();
     });
   });
 
