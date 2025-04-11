@@ -167,14 +167,14 @@ describe("Common Helpers", () => {
           path: ["user", "id"],
           message: "expected number, got string",
           expected: "number",
-          received: "string",
+          input: "test",
         },
         {
           code: "invalid_type",
           path: ["user", "name"],
           message: "expected string, got number",
           expected: "string",
-          received: "number",
+          input: 123,
         },
       ]);
       expect(getMessageFromError(error)).toMatchSnapshot();
@@ -182,7 +182,12 @@ describe("Common Helpers", () => {
 
     test("should handle empty path in ZodIssue", () => {
       const error = new z.ZodError([
-        { code: "custom", path: [], message: "Top level refinement issue" },
+        {
+          code: "custom",
+          path: [],
+          message: "Top level refinement issue",
+          input: "test",
+        },
       ]);
       expect(getMessageFromError(error)).toMatchSnapshot();
     });
@@ -345,7 +350,7 @@ describe("Common Helpers", () => {
           {
             code: "invalid_type",
             expected: "string",
-            received: "number",
+            input: 123,
             path: [""],
             message: "invalid type",
           },
@@ -387,7 +392,7 @@ describe("Common Helpers", () => {
     test.each([
       { schema: z.string(), coercion: false },
       { schema: z.coerce.string(), coercion: true },
-      { schema: z.boolean({ coerce: true }), coercion: true },
+      { schema: z.coerce.boolean(), coercion: true },
       { schema: z.custom(), coercion: false },
     ])(
       "should check the presence and value of coerce prop %#",
