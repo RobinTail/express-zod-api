@@ -94,8 +94,8 @@ describe("Zod Runtime Plugin", () => {
     test("should transform and pipe the object schema keys", () => {
       const schema = z.object({ user_id: z.string() });
       const mappedSchema = schema.remap({ user_id: "userId" });
-      expect(mappedSchema._def.in._def.schema).toEqual(schema);
-      expect(mappedSchema._def.out.shape).toEqual({
+      expect(mappedSchema.in.in).toEqual(schema);
+      expect(mappedSchema.out.shape).toEqual({
         userId: schema.shape.user_id,
       });
       expect(mappedSchema._def.out.shape.userId).not.toBe(schema.shape.user_id);
