@@ -44,14 +44,19 @@ describe("I/O Schema and related helpers", () => {
       expectTypeOf(
         z.intersection(z.object({}), z.object({})),
       ).toExtend<IOSchema>();
-      expectTypeOf(z.object({}).and(z.object({}))).toExtend<IOSchema>();
       expectTypeOf(
-        z.object({}).and(z.object({}).and(z.object({}))),
+        z.intersection(z.object({}), z.object({})),
+      ).toExtend<IOSchema>();
+      expectTypeOf(
+        z.intersection(
+          z.intersection(z.object({}), z.object({})),
+          z.object({}),
+        ),
       ).toExtend<IOSchema>();
     });
     test("does not accepts intersection of object with array of objects", () => {
       expectTypeOf(
-        z.object({}).and(z.array(z.object({}))),
+        z.intersection(z.object({}), z.array(z.object({}))),
       ).not.toExtend<IOSchema>();
     });
     test("accepts discriminated union of objects", () => {
@@ -64,21 +69,18 @@ describe("I/O Schema and related helpers", () => {
     });
     test("accepts a mix of types based on object", () => {
       expectTypeOf(
-        z.object({}).or(z.object({}).and(z.object({}))),
+        z.object({}).or(z.intersection(z.object({}), z.object({}))),
       ).toExtend<IOSchema>();
       expectTypeOf(
-        z.object({}).and(z.object({}).or(z.object({}))),
+        z.intersection(z.object({}), z.object({}).or(z.object({}))),
       ).toExtend<IOSchema>();
     });
     describe("Feature #600: Top level refinements", () => {
       test("accepts a refinement of object", () => {
         expectTypeOf(z.object({}).refine(() => true)).toExtend<IOSchema>();
-        expectTypeOf(z.object({}).superRefine(() => true)).toExtend<IOSchema>();
+        expectTypeOf(z.object({}).check(() => void 0)).toExtend<IOSchema>();
         expectTypeOf(
-          z.object({}).refinement(() => true, {
-            code: "custom",
-            message: "test",
-          }),
+          z.object({}).refine(() => true, { error: "test" }),
         ).toExtend<IOSchema>();
       });
       test("Issue 662: accepts nested refinements", () => {
@@ -92,9 +94,9 @@ describe("I/O Schema and related helpers", () => {
         expectTypeOf(
           z
             .object({})
-            .superRefine(() => true)
-            .superRefine(() => true)
-            .superRefine(() => true),
+            .check(() => void 0)
+            .check(() => void 0)
+            .check(() => void 0),
         ).toExtend<IOSchema>();
       });
     });
@@ -132,7 +134,10 @@ describe("I/O Schema and related helpers", () => {
       });
       test("does not accept piping into another kind of schema", () => {
         expectTypeOf(
-          z.object({ s: z.string() }).pipe(z.array(z.string())),
+          z
+            .object({ s: z.string() })
+            .transform(Object.values)
+            .pipe(z.array(z.string())),
         ).not.toExtend<IOSchema>();
       });
       test("does not accept nested piping", () => {
