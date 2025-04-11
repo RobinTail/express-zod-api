@@ -118,7 +118,7 @@ describe("ResultHandler", () => {
               message: "Expected string, got number",
               path: ["something"],
               expected: "string",
-              received: "number",
+              input: 453,
             },
           ]),
         ),
