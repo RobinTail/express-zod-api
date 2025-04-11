@@ -396,8 +396,10 @@ describe("Routing", () => {
     test.each([
       [z.bigint(), z.set(z.string())],
       [z.nan(), z.map(z.string(), z.boolean())],
-      [z.date().pipe(z.string()), z.symbol().catch(Symbol("test"))],
-      [z.function().transform(() => "test"), z.tuple([z.function()])],
+      [
+        z.date().transform(String).pipe(z.string()),
+        z.symbol().catch(Symbol("test")),
+      ],
       [ez.dateOut(), ez.dateIn()],
       [z.lazy(() => z.void()), ez.raw()],
       [z.promise(z.any()), ez.upload()],
