@@ -7,7 +7,7 @@ describe("ez.dateOut()", () => {
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.dateOut();
-      expect(schema).toBeInstanceOf(z.ZodBranded);
+      expect(schema).toBeInstanceOf(z.ZodPipe);
       expect(schema._def[metaSymbol]?.brand).toEqual(ezDateOutBrand);
     });
   });
