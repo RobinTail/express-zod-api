@@ -120,9 +120,9 @@ describe("Integration", () => {
   describe("Feature #1470: Custom brands", () => {
     test("should by handled accordingly", async () => {
       const rule: Producer = (
-        schema: z.ZodBranded<z.ZodTypeAny, PropertyKey>,
+        schema: ReturnType<z.ZodTypeAny["brand"]>,
         { next },
-      ) => next(schema.unwrap());
+      ) => next(schema);
       const client = new Integration({
         variant: "types",
         brandHandling: {
