@@ -9,10 +9,9 @@ describe("ez.form()", () => {
       "should create a branded object instance based on the argument %#",
       (base) => {
         const schema = ez.form(base);
-        expect(schema).toBeInstanceOf(z.ZodBranded);
+        expect(schema).toBeInstanceOf(z.ZodObject);
         expect(schema._def[metaSymbol]?.brand).toBe(ezFormBrand);
-        expect(schema.unwrap()).toBeInstanceOf(z.ZodObject);
-        expect(schema.unwrap().shape).toHaveProperty(
+        expect(schema._zod.shape).toHaveProperty(
           "name",
           expect.any(z.ZodString),
         );
