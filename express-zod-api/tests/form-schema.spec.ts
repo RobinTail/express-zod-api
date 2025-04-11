@@ -10,7 +10,7 @@ describe("ez.form()", () => {
       (base) => {
         const schema = ez.form(base);
         expect(schema).toBeInstanceOf(z.ZodObject);
-        expect(schema._def[metaSymbol]?.brand).toBe(ezFormBrand);
+        expect(schema.meta()?.[metaSymbol]?.brand).toBe(ezFormBrand);
         expect(schema._zod.shape).toHaveProperty(
           "name",
           expect.any(z.ZodString),

@@ -9,7 +9,7 @@ import { ezUploadBrand } from "../src/upload-schema";
 describe("Checks", () => {
   describe("hasNestedSchema()", () => {
     const condition = (subject: z.ZodTypeAny) =>
-      subject._def[metaSymbol]?.brand === ezUploadBrand;
+      subject.meta()?.[metaSymbol]?.brand === ezUploadBrand;
 
     test("should return true for given argument satisfying condition", () => {
       expect(hasNestedSchema(ez.upload(), { condition })).toBeTruthy();

@@ -285,7 +285,7 @@ describe("I/O Schema and related helpers", () => {
         .object({ five: z.string() })
         .example({ five: "some" });
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(result._def[metaSymbol]?.examples).toEqual([
+      expect(result.meta()?.[metaSymbol]?.examples).toEqual([
         {
           one: "test",
           two: 123,

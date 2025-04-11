@@ -8,7 +8,7 @@ describe("ez.raw()", () => {
     test("should be an instance of branded object", () => {
       const schema = ez.raw();
       expect(schema).toBeInstanceOf(z.ZodObject);
-      expect(schema._def[metaSymbol]?.brand).toBe(ezRawBrand);
+      expect(schema.meta()?.[metaSymbol]?.brand).toBe(ezRawBrand);
     });
   });
 

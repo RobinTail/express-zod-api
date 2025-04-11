@@ -109,11 +109,12 @@ export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
 export const depictDefault: Depicter = (
-  { _def }: z.ZodDefault<z.ZodTypeAny>,
+  schema: z.ZodDefault<z.ZodTypeAny>,
   { next },
 ) => ({
-  ...next(_def.innerType),
-  default: _def[metaSymbol]?.defaultLabel || _def.defaultValue(),
+  ...next(schema.unwrap()),
+  default:
+    schema.meta()?.[metaSymbol]?.defaultLabel || schema._zod.def.defaultValue(),
 });
 
 export const depictCatch: Depicter = (
@@ -130,12 +131,13 @@ export const depictUpload: Depicter = ({}: UploadSchema, ctx) => {
 };
 
 export const depictFile: Depicter = (schema: FileSchema) => {
-  const subject = schema.unwrap();
   return {
     type: "string",
     format:
-      subject instanceof z.ZodString
-        ? subject._def.checks.find((check) => check.kind === "base64")
+      schema instanceof z.ZodString
+        ? schema._zod.def.checks?.find(
+            (check) => check._zod.def.check === "base64",
+          )
           ? "byte"
           : "file"
         : "binary",
@@ -632,11 +634,11 @@ export const depictRequestParams = ({
         composition === "components"
           ? makeRef(paramSchema, depicted, makeCleanId(description, name))
           : depicted;
-      const { _def } = paramSchema as z.ZodType;
       return acc.concat({
         name,
         in: location,
-        deprecated: _def[metaSymbol]?.isDeprecated,
+        deprecated: (paramSchema as z.ZodType).meta()?.[metaSymbol] // @todo revisit for the need of "as"
+          ?.isDeprecated,
         required: !paramSchema.isOptional(),
         description: depicted.description || description,
         schema: result,
@@ -691,7 +693,7 @@ export const onEach: SchemaHandler<
   "each"
 > = (schema: z.ZodType, { isResponse, prev }) => {
   if (isReferenceObject(prev)) return {};
-  const { description, _def } = schema;
+  const { description } = schema;
   const shouldAvoidParsing = schema instanceof z.ZodLazy;
   const hasTypePropertyInDepiction = prev.type !== undefined;
   const isResponseHavingCoercion = isResponse && hasCoercion(schema);
@@ -702,7 +704,7 @@ export const onEach: SchemaHandler<
     schema.isNullable();
   const result: SchemaObject = {};
   if (description) result.description = description;
-  if (_def[metaSymbol]?.isDeprecated) result.deprecated = true;
+  if (schema.meta()?.[metaSymbol]?.isDeprecated) result.deprecated = true;
   if (isActuallyNullable) result.type = makeNullableType(prev);
   if (!shouldAvoidParsing) {
     const examples = getExamples({

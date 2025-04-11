@@ -9,7 +9,7 @@ describe("ez.file()", () => {
     test("should create an instance being string by default", () => {
       const schema = ez.file();
       expect(schema).toBeInstanceOf(z.ZodString);
-      expect(schema._def[metaSymbol]?.brand).toBe(ezFileBrand);
+      expect(schema.meta()?.[metaSymbol]?.brand).toBe(ezFileBrand);
     });
 
     test("should create a string file", () => {

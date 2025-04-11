@@ -197,13 +197,13 @@ describe("ResultHandler", () => {
           }),
       );
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema._def[metaSymbol]).toMatchSnapshot();
+      expect(apiResponse[0].schema.meta()?.[metaSymbol]).toMatchSnapshot();
     });
 
     test("should generate negative response example", () => {
       const apiResponse = subject.getNegativeResponse();
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema._def[metaSymbol]).toMatchSnapshot();
+      expect(apiResponse[0].schema.meta()?.[metaSymbol]).toMatchSnapshot();
     });
   });
 
