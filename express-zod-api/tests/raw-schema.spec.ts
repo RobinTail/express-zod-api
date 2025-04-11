@@ -7,7 +7,7 @@ describe("ez.raw()", () => {
   describe("creation", () => {
     test("should be an instance of branded object", () => {
       const schema = ez.raw();
-      expect(schema).toBeInstanceOf(z.ZodBranded);
+      expect(schema).toBeInstanceOf(z.ZodObject);
       expect(schema._def[metaSymbol]?.brand).toBe(ezRawBrand);
     });
   });
@@ -15,17 +15,20 @@ describe("ez.raw()", () => {
   describe("types", () => {
     test("without extension", () => {
       const schema = ez.raw();
-      expectTypeOf(schema._output).toExtend<{ raw: Buffer }>();
+      expectTypeOf(schema._zod.output).toExtend<{ raw: Buffer }>();
     });
 
     test("with empty extension", () => {
       const schema = ez.raw({});
-      expectTypeOf(schema._output).toExtend<{ raw: Buffer }>();
+      expectTypeOf(schema._zod.output).toExtend<{ raw: Buffer }>();
     });
 
     test("with populated extension", () => {
       const schema = ez.raw({ extra: z.number() });
-      expectTypeOf(schema._output).toExtend<{ raw: Buffer; extra: number }>();
+      expectTypeOf(schema._zod.output).toExtend<{
+        raw: Buffer;
+        extra: number;
+      }>();
     });
   });
 
