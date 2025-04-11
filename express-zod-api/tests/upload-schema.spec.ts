@@ -7,8 +7,8 @@ describe("ez.upload()", () => {
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.upload();
-      expect(schema).toBeInstanceOf(z.ZodBranded);
-      expect(schema._def[metaSymbol]?.brand).toBe(ezUploadBrand);
+      expect(schema).toBeInstanceOf(z.ZodCustom);
+      expect(schema.meta()?.[metaSymbol]?.brand).toBe(ezUploadBrand);
     });
   });
 

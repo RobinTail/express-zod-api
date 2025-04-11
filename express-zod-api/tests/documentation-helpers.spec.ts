@@ -89,10 +89,11 @@ describe("Documentation helpers", () => {
     test.each<z.ZodTypeAny>([
       z.object({ a: z.string(), b: z.string() }),
       z.object({ a: z.string() }).or(z.object({ b: z.string() })),
-      z.object({ a: z.string() }).and(z.object({ b: z.string() })), // flattened
-      z
-        .record(z.literal("a"), z.string())
-        .and(z.record(z.string(), z.string())),
+      z.intersection(z.object({ a: z.string() }), z.object({ b: z.string() })), // flattened
+      z.intersection(
+        z.record(z.literal("a"), z.string()),
+        z.record(z.string(), z.string()),
+      ),
     ])("should omit specified params %#", (schema) => {
       const depicted = walkSchema(schema, {
         ctx: requestCtx,
@@ -222,7 +223,10 @@ describe("Documentation helpers", () => {
     test("should flatten two object schemas", () => {
       expect(
         depictIntersection(
-          z.object({ one: z.number() }).and(z.object({ two: z.number() })),
+          z.intersection(
+            z.object({ one: z.number() }),
+            z.object({ two: z.number() }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -231,7 +235,10 @@ describe("Documentation helpers", () => {
     test("should flatten objects with same prop of same type", () => {
       expect(
         depictIntersection(
-          z.object({ one: z.number() }).and(z.object({ one: z.number() })),
+          z.intersection(
+            z.object({ one: z.number() }),
+            z.object({ one: z.number() }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -240,7 +247,10 @@ describe("Documentation helpers", () => {
     test("should NOT flatten object schemas having conflicting props", () => {
       expect(
         depictIntersection(
-          z.object({ one: z.number() }).and(z.object({ one: z.string() })),
+          z.intersection(
+            z.object({ one: z.number() }),
+            z.object({ one: z.string() }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -249,14 +259,14 @@ describe("Documentation helpers", () => {
     test("should merge examples deeply", () => {
       expect(
         depictIntersection(
-          z
-            .object({ test: z.object({ a: z.number() }) })
-            .example({ test: { a: 123 } })
-            .and(
-              z
-                .object({ test: z.object({ b: z.number() }) })
-                .example({ test: { b: 456 } }),
-            ),
+          z.intersection(
+            z
+              .object({ test: z.object({ a: z.number() }) })
+              .example({ test: { a: 123 } }),
+            z
+              .object({ test: z.object({ b: z.number() }) })
+              .example({ test: { b: 456 } }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -265,11 +275,13 @@ describe("Documentation helpers", () => {
     test("should flatten three object schemas with examples", () => {
       expect(
         depictIntersection(
-          z
-            .object({ one: z.number() })
-            .example({ one: 123 })
-            .and(z.object({ two: z.number() }).example({ two: 456 }))
-            .and(z.object({ three: z.number() }).example({ three: 789 })),
+          z.intersection(
+            z.intersection(
+              z.object({ one: z.number() }).example({ one: 123 }),
+              z.object({ two: z.number() }).example({ two: 456 }),
+            ),
+            z.object({ three: z.number() }).example({ three: 789 }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -278,17 +290,21 @@ describe("Documentation helpers", () => {
     test("should maintain uniqueness in the array of required props", () => {
       expect(
         depictIntersection(
-          z
-            .record(z.literal("test"), z.number())
-            .and(z.object({ test: z.literal(5) })),
+          z.intersection(
+            z.record(z.literal("test"), z.number()),
+            z.object({ test: z.literal(5) }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
     });
 
     test.each([
-      z.record(z.string(), z.number()).and(z.object({ test: z.number() })), // has additionalProperties
-      z.number().and(z.literal(5)), // not objects
+      z.intersection(
+        z.record(z.string(), z.number()), // has additionalProperties
+        z.object({ test: z.number() }),
+      ),
+      z.intersection(z.number(), z.literal(5)), // not objects
     ])("should fall back to allOf in other cases %#", (schema) => {
       expect(depictIntersection(schema, requestCtx)).toMatchSnapshot();
     });
@@ -333,7 +349,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictLiteral()", () => {
-    test.each(["testng", null, BigInt(123), Symbol("test")])(
+    test.each(["testng", null, BigInt(123)])(
       "should set type and involve const property %#",
       (value) => {
         expect(depictLiteral(z.literal(value), requestCtx)).toMatchSnapshot();
@@ -347,7 +363,7 @@ describe("Documentation helpers", () => {
       { ctx: responseCtx, shape: { a: z.number(), b: z.string() } },
       {
         ctx: responseCtx,
-        shape: { a: z.coerce.number(), b: z.string({ coerce: true }) },
+        shape: { a: z.coerce.number(), b: z.coerce.string() },
       },
       { ctx: responseCtx, shape: { a: z.number(), b: z.string().optional() } },
       {
@@ -391,12 +407,12 @@ describe("Documentation helpers", () => {
 
   describe("depictRecord()", () => {
     test.each([
-      z.record(z.boolean()),
+      z.record(z.number(), z.boolean()),
       z.record(z.string(), z.boolean()),
       z.record(z.enum(["one", "two"]), z.boolean()),
       z.record(z.literal("testing"), z.boolean()),
       z.record(z.literal("one").or(z.literal("two")), z.boolean()),
-      z.record(z.any()), // Issue #900
+      z.record(z.string(), z.any()), // Issue #900
     ])(
       "should set properties+required or additionalProperties props %#",
       (schema) => {
@@ -446,11 +462,11 @@ describe("Documentation helpers", () => {
       z.string().date(),
       z.string().time(),
       z.string().duration(),
-      z.string().cidr(),
-      z.string().ip(),
+      z.string().cidrv4(),
+      z.string().ipv4(),
       z.string().jwt(),
       z.string().base64(),
-      z.string().base64url(),
+      z.string().base64url(), // @todo unclear what happened to it https://github.com/colinhacks/zod/issues/3711
       z.string().cuid2(),
       z.string().ulid(),
     ])("should set format, pattern and min/maxLength props %#", (schema) => {
@@ -774,7 +790,7 @@ describe("Documentation helpers", () => {
     const directlyRecursive: z.ZodLazy<z.ZodTypeAny> = z.lazy(
       () => directlyRecursive,
     );
-    const recursiveObject: z.ZodLazy<z.ZodObject<z.ZodRawShape>> = z.lazy(() =>
+    const recursiveObject: z.ZodLazy<z.ZodObject> = z.lazy(() =>
       z.object({ prop: recursiveObject }),
     );
 

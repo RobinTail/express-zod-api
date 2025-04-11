@@ -112,9 +112,10 @@ describe("zod-to-ts", () => {
       union: z.union([z.object({ number: z.number() }), z.literal("hi")]),
       enum: z.enum(["hi", "bye"]),
       intersectionWithTransform: z
-        .number()
-        .and(z.bigint())
-        .and(z.number().and(z.string()))
+        .intersection(
+          z.intersection(z.number(), z.bigint()),
+          z.intersection(z.number(), z.string()),
+        )
         .transform((arg) => console.log(arg)),
       date: z.date(),
       undefined: z.undefined(),
@@ -132,6 +133,7 @@ describe("zod-to-ts", () => {
       ]),
       tupleRest: z.tuple([z.string(), z.number()]).rest(z.boolean()),
       record: z.record(
+        z.string(),
         z.object({
           object: z.object({
             arrayOfUnions: z
@@ -147,16 +149,14 @@ describe("zod-to-ts", () => {
       set: z.set(z.string()),
       intersection: z.intersection(z.string(), z.number()).or(z.bigint()),
       promise: z.promise(z.number()),
-      function: z
-        .function()
-        .args(z.string().nullish().default("heo"), z.boolean(), z.boolean())
-        .returns(z.string()),
       optDefaultString: z.string().optional().default("hi"),
-      refinedStringWithSomeBullshit: z
-        .string()
-        .refine((val) => val.length > 10)
-        .or(z.number())
-        .and(z.bigint().nullish().default(1000n)),
+      refinedStringWithSomeBullshit: z.intersection(
+        z
+          .string()
+          .refine((val) => val.length > 10)
+          .or(z.number()),
+        z.bigint().nullish().default(1000n),
+      ),
       nativeEnum: z.nativeEnum(Fruits),
       lazy: z.lazy(() => z.string()),
       discUnion: z.discriminatedUnion("kind", [
@@ -166,7 +166,7 @@ describe("zod-to-ts", () => {
       ]),
       branded: z.string().brand("BRAND"),
       catch: z.number().catch(123),
-      pipeline: z.string().regex(/\d+/).pipe(z.coerce.number()),
+      pipeline: z.string().regex(/\d+/).transform(Number).pipe(z.number()),
       readonly: z.string().readonly(),
     });
 
@@ -287,10 +287,19 @@ describe("zod-to-ts", () => {
     test.each([
       [z.string(), z.string()],
       [z.string().nonempty(), z.string().email()],
-      [z.string().transform(Number), z.string().pipe(z.coerce.date())],
+      [
+        z.string().transform(Number),
+        z
+          .string()
+          .transform((str) => new Date(str))
+          .pipe(z.date()),
+      ],
       [z.object({}), z.object({})],
     ])("should deduplicate the prop with a same name", (a, b) => {
-      const schema = z.object({ query: a }).and(z.object({ query: b }));
+      const schema = z.intersection(
+        z.object({ query: a }),
+        z.object({ query: b }),
+      );
       const node = zodToTs(schema, { ctx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
@@ -315,7 +324,7 @@ describe("zod-to-ts", () => {
     ])(
       "should not flatten the result for objects with a conflicting prop %#",
       (a, b) => {
-        const node = zodToTs(a.and(b), { ctx });
+        const node = zodToTs(z.intersection(a, b), { ctx });
         expect(printNodeTest(node)).toMatchSnapshot();
       },
     );

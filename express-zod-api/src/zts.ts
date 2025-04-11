@@ -45,23 +45,24 @@ const onLiteral: Producer = ({ value }: z.ZodLiteral<LiteralType>) =>
   makeLiteralType(value);
 
 const onObject: Producer = (
-  { shape }: z.ZodObject<z.ZodRawShape>,
+  { _zod: { shape } }: z.ZodObject,
   {
     isResponse,
     next,
     optionalPropStyle: { withQuestionMark: hasQuestionMark },
   },
 ) => {
-  const members = Object.entries(shape).map<ts.TypeElement>(([key, value]) => {
-    const { description: comment, _def } = value as z.ZodType;
+  const members = (
+    Object.entries(shape) as [string, z.ZodType][]
+  ).map<ts.TypeElement>(([key, value]) => {
     const isOptional =
       isResponse && hasCoercion(value)
         ? value instanceof z.ZodOptional
         : value.isOptional();
     return makeInterfaceProp(key, next(value), {
-      comment,
+      comment: value.description,
       isOptional: isOptional && hasQuestionMark,
-      isDeprecated: _def[metaSymbol]?.isDeprecated,
+      isDeprecated: value.meta()?.[metaSymbol]?.isDeprecated,
     });
   });
   return f.createTypeLiteralNode(members);

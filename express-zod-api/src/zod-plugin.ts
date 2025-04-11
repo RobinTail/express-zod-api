@@ -10,77 +10,91 @@
 import * as R from "ramda";
 import { z } from "zod";
 import { FlatObject } from "./common-helpers";
-import { cloneSchema, Metadata, metaSymbol } from "./metadata";
+import { Metadata, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
+import type { $ZodType, $ZodShape } from "@zod/core";
 
-declare module "zod" {
-  interface ZodTypeDef {
+declare module "@zod/core" {
+  interface GlobalMeta {
     [metaSymbol]?: Metadata;
   }
+}
+
+declare module "zod" {
   interface ZodType {
     /** @desc Add an example value (before any transformations, can be called multiple times) */
-    example(example: this["_input"]): this;
+    example(example: z.input<this>): this;
     deprecated(): this;
   }
-  interface ZodDefault<T extends z.ZodTypeAny> {
+  interface ZodDefault<T extends $ZodType = $ZodType> extends ZodType {
     /** @desc Change the default value in the generated Documentation to a label */
     label(label: string): this;
   }
   interface ZodObject<
-    T extends z.ZodRawShape,
-    UnknownKeys extends z.UnknownKeysParam = z.UnknownKeysParam,
-    Catchall extends z.ZodTypeAny = z.ZodTypeAny,
-    Output = z.objectOutputType<T, Catchall, UnknownKeys>,
-    Input = z.objectInputType<T, Catchall, UnknownKeys>,
-  > {
-    remap<V extends string, U extends { [P in keyof T]?: V }>(
+    // @ts-expect-error -- external issue
+    out Shape extends $ZodShape = $ZodShape,
+    Extra extends Record<string, unknown> = Record<string, unknown>,
+  > extends ZodType {
+    remap<V extends string, U extends { [P in keyof Shape]?: V }>(
       mapping: U,
-    ): z.ZodPipeline<
-      z.ZodEffects<this, FlatObject>, // internal type simplified
-      z.ZodObject<Remap<T, U, V> & Intact<T, U>, UnknownKeys>
+    ): z.ZodPipe<
+      z.ZodPipe<
+        this,
+        z.ZodTransform<FlatObject, FlatObject> // internal type simplified
+      >,
+      z.ZodObject<Remap<Shape, U, V> & Intact<Shape, U>, Extra>
     >;
-    remap<U extends z.ZodRawShape>(
-      mapper: (subject: T) => U,
-    ): z.ZodPipeline<z.ZodEffects<this, FlatObject>, z.ZodObject<U>>; // internal type simplified
+    remap<U extends $ZodShape>(
+      mapper: (subject: Shape) => U,
+    ): z.ZodPipe<
+      z.ZodPipe<this, z.ZodTransform<FlatObject, FlatObject>>, // internal type simplified
+      z.ZodObject<U>
+    >;
   }
 }
 
-const exampleSetter = function (
-  this: z.ZodType,
-  value: (typeof this)["_input"],
-) {
-  const copy = cloneSchema(this);
-  copy._def[metaSymbol]!.examples.push(value);
-  return copy;
+const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
+  const { examples, ...rest } = this.meta()?.[metaSymbol] || { examples: [] };
+  examples.push(value);
+  return this.meta({
+    description: this.description,
+    [metaSymbol]: { ...rest, examples },
+  });
 };
 
 const deprecationSetter = function (this: z.ZodType) {
-  const copy = cloneSchema(this);
-  copy._def[metaSymbol]!.isDeprecated = true;
-  return copy;
+  return this.meta({
+    description: this.description,
+    [metaSymbol]: {
+      examples: [],
+      ...this.meta()?.[metaSymbol],
+      isDeprecated: true,
+    },
+  });
 };
 
-const labelSetter = function (this: z.ZodDefault<z.ZodTypeAny>, label: string) {
-  const copy = cloneSchema(this);
-  copy._def[metaSymbol]!.defaultLabel = label;
-  return copy;
+const labelSetter = function (
+  this: z.ZodDefault<z.ZodTypeAny>,
+  defaultLabel: string,
+) {
+  return this.meta({
+    description: this.description,
+    [metaSymbol]: { examples: [], ...this.meta()?.[metaSymbol], defaultLabel },
+  });
 };
 
 const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
 ) {
-  return new z.ZodBranded({
-    typeName: z.ZodFirstPartyTypeKind.ZodBranded,
-    type: this,
-    description: this._def.description,
-    errorMap: this._def.errorMap,
-    [metaSymbol]: { examples: [], ...R.clone(this._def[metaSymbol]), brand },
+  return this.meta({
+    description: this.description,
+    [metaSymbol]: { examples: [], ...this.meta()?.[metaSymbol], brand },
   });
 };
 
 const objectMapper = function (
-  this: z.ZodObject<z.ZodRawShape>,
+  this: z.ZodObject,
   tool:
     | Record<string, string>
     | (<T>(subject: T) => { [P in string | keyof T]: T[keyof T] }),
@@ -93,8 +107,10 @@ const objectMapper = function (
           R.map(([key, value]) => R.pair(tool[String(key)] || key, value)),
           R.fromPairs,
         );
-  const nextShape = transformer(R.clone(this.shape)); // immutable
-  const output = z.object(nextShape)[this._def.unknownKeys](); // proxies unknown keys when set to "passthrough"
+  const nextShape = transformer(R.clone(this._zod.shape)); // immutable
+  const hasPassThrough = this._zod.def.catchall instanceof z.ZodUnknown;
+  const output = (hasPassThrough ? z.looseObject : z.object)(nextShape); // proxies unknown keys when set to "passthrough"
+  // @ts-expect-error -- ignoring inconsistency of Extra type
   return this.transform(transformer).pipe(output);
 };
 
@@ -102,16 +118,19 @@ if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
   Object.defineProperties(z.ZodType.prototype, {
     ["example" satisfies keyof z.ZodType]: {
+      enumerable: true,
       get(): z.ZodType["example"] {
         return exampleSetter.bind(this);
       },
     },
     ["deprecated" satisfies keyof z.ZodType]: {
+      enumerable: true,
       get(): z.ZodType["deprecated"] {
         return deprecationSetter.bind(this);
       },
     },
     ["brand" satisfies keyof z.ZodType]: {
+      enumerable: true,
       set() {}, // this is required to override the existing method
       get() {
         return brandSetter.bind(this) as z.ZodType["brand"];
@@ -122,6 +141,7 @@ if (!(metaSymbol in globalThis)) {
     z.ZodDefault.prototype,
     "label" satisfies keyof z.ZodDefault<z.ZodTypeAny>,
     {
+      enumerable: true,
       get(): z.ZodDefault<z.ZodTypeAny>["label"] {
         return labelSetter.bind(this);
       },
@@ -129,10 +149,10 @@ if (!(metaSymbol in globalThis)) {
   );
   Object.defineProperty(
     z.ZodObject.prototype,
-    "remap" satisfies keyof z.ZodObject<z.ZodRawShape>,
+    "remap" satisfies keyof z.ZodObject,
     {
       get() {
-        return objectMapper.bind(this) as z.ZodObject<z.ZodRawShape>["remap"];
+        return objectMapper.bind(this) as unknown as z.ZodObject["remap"];
       },
     },
   );
