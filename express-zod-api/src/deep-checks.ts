@@ -76,7 +76,7 @@ export const hasNestedSchema = (
   if (condition?.(subject)) return true;
   const handler =
     depth < maxDepth
-      ? rules[subject._def[metaSymbol]?.brand as keyof typeof rules] ||
+      ? rules[subject.meta()?.[metaSymbol]?.brand as keyof typeof rules] ||
         ("typeName" in subject._def &&
           rules[subject._def.typeName as keyof typeof rules])
       : undefined;
@@ -96,7 +96,7 @@ export const hasNestedSchema = (
 
 export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema(subject, {
-    condition: (schema) => schema._def[metaSymbol]?.brand === ezUploadBrand,
+    condition: (schema) => schema.meta()?.[metaSymbol]?.brand === ezUploadBrand,
     rules: {
       ...ioChecks,
       [ezFormBrand]: (schema: FormSchema, { next }) =>
@@ -106,13 +106,13 @@ export const hasUpload = (subject: IOSchema) =>
 
 export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema(subject, {
-    condition: (schema) => schema._def[metaSymbol]?.brand === ezRawBrand,
+    condition: (schema) => schema.meta()?.[metaSymbol]?.brand === ezRawBrand,
     maxDepth: 3,
   });
 
 export const hasForm = (subject: IOSchema) =>
   hasNestedSchema(subject, {
-    condition: (schema) => schema._def[metaSymbol]?.brand === ezFormBrand,
+    condition: (schema) => schema.meta()?.[metaSymbol]?.brand === ezFormBrand,
     maxDepth: 3,
   });
 

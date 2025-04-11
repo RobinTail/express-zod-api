@@ -84,12 +84,12 @@ export const getMessageFromError = (error: Error): string => {
 export const pullExampleProps = <T extends z.ZodObject>(subject: T) =>
   Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
     (acc, [key, schema]) => {
-      const { _def } = schema as z.ZodType;
-      return combinations(
-        acc,
-        (_def[metaSymbol]?.examples || []).map(R.objOf(key)),
-        ([left, right]) => ({ ...left, ...right }),
-      );
+      const examples =
+        (schema as z.ZodType).meta()?.[metaSymbol]?.examples || [];
+      return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
+        ...left,
+        ...right,
+      }));
     },
     [],
   );
@@ -122,7 +122,7 @@ export const getExamples = <
    * */
   pullProps?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  let examples = schema._def[metaSymbol]?.examples || [];
+  let examples = schema.meta()?.[metaSymbol]?.examples || [];
   if (!examples.length && pullProps && schema instanceof z.ZodObject)
     examples = pullExampleProps(schema);
   if (!validate && variant === "original") return examples;
