@@ -25,7 +25,7 @@ type Handler<IN, OPT, OUT> = (params: {
 
 export abstract class AbstractMiddleware {
   public abstract getSecurity(): LogicalContainer<Security> | undefined;
-  public abstract getSchema(): IOSchema<"strip">;
+  public abstract getSchema(): IOSchema;
   public abstract execute(params: {
     input: unknown;
     options: FlatObject;
@@ -39,7 +39,7 @@ export class Middleware<
   OPT extends FlatObject,
   OUT extends FlatObject,
   SCO extends string,
-  IN extends IOSchema<"strip"> = EmptySchema,
+  IN extends IOSchema = EmptySchema,
 > extends AbstractMiddleware {
   readonly #schema: IN;
   readonly #security?: LogicalContainer<

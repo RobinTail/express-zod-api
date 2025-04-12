@@ -1,34 +1,28 @@
 import { z } from "zod";
-import type { $ZodShape } from "@zod/core";
-import { EmptyObject, FlatObject } from "./common-helpers";
+import { FlatObject } from "./common-helpers";
 import { FormSchema } from "./form-schema";
 import { copyMeta } from "./metadata";
 import { AbstractMiddleware } from "./middleware";
 import { RawSchema } from "./raw-schema";
 
-type BaseObject<U extends FlatObject> = z.ZodObject<$ZodShape, U>;
+type BaseObject = z.ZodObject;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- workaround for TS2456, circular reference
 interface ObjectTransformation<T extends z.ZodType>
   extends z.ZodPipe<T, z.ZodTransform<FlatObject, z.output<T>>> {}
 
-type EffectsChain<U extends FlatObject> = ObjectTransformation<
-  BaseObject<U> | EffectsChain<U>
->;
+type EffectsChain = ObjectTransformation<BaseObject | EffectsChain>;
 
-/**
- * @desc The type allowed on the top level of Middlewares and Endpoints
- * @param U — only EmptyObject is allowed for Middlewares due to intersection issue (Zod) #600
- * */
-export type IOSchema<U extends FlatObject = FlatObject> =
-  | BaseObject<U> // z.object()
-  | EffectsChain<U> // z.object().refine(), z.object().transform(), z.object().preprocess()
+/** @desc The type allowed on the top level of Middlewares and Endpoints */
+export type IOSchema =
+  | BaseObject // z.object() + .refine()
+  | EffectsChain // z.object().transform()
   | RawSchema // ez.raw()
   | FormSchema // ez.form()
-  | z.ZodUnion<[IOSchema<U>, ...IOSchema<U>[]]> // z.object().or()
-  | z.ZodIntersection<IOSchema<U>, IOSchema<U>> // z.object().and()
-  | z.ZodDiscriminatedUnion<BaseObject<U>[]> // z.discriminatedUnion()
-  | z.ZodPipe<ObjectTransformation<BaseObject<U>>, BaseObject<U>>; // z.object().remap()
+  | z.ZodUnion<[IOSchema, ...IOSchema[]]> // z.object().or()
+  | z.ZodIntersection<IOSchema, IOSchema> // z.object().and()
+  | z.ZodDiscriminatedUnion<BaseObject[]> // z.discriminatedUnion()
+  | z.ZodPipe<ObjectTransformation<BaseObject>, BaseObject>; // z.object().remap()
 
 /**
  * @description intersects input schemas of middlewares and the endpoint
@@ -38,7 +32,7 @@ export type IOSchema<U extends FlatObject = FlatObject> =
  * @see copyMeta
  */
 export const getFinalEndpointInputSchema = <
-  MIN extends IOSchema<EmptyObject>,
+  MIN extends IOSchema,
   IN extends IOSchema,
 >(
   middlewares: AbstractMiddleware[],
@@ -48,7 +42,9 @@ export const getFinalEndpointInputSchema = <
     .map((mw) => mw.getSchema() as IOSchema)
     .concat(input);
 
-  const finalSchema = allSchemas.reduce((acc, schema) => acc.and(schema));
+  const finalSchema = allSchemas.reduce((acc, schema) =>
+    z.intersection(acc, schema),
+  );
 
   return allSchemas.reduce(
     (acc, schema) => copyMeta(schema, acc),

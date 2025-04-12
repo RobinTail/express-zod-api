@@ -18,7 +18,7 @@ import {
 interface BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema | z.ZodVoid,
-  MIN extends IOSchema<"strip">,
+  MIN extends IOSchema,
   OPT extends FlatObject,
   SCO extends string,
 > {
@@ -59,7 +59,7 @@ interface BuildProps<
 }
 
 export class EndpointsFactory<
-  IN extends IOSchema<"strip"> = EmptySchema,
+  IN extends IOSchema = EmptySchema,
   OUT extends FlatObject = EmptyObject,
   SCO extends string = string,
 > {
@@ -67,7 +67,7 @@ export class EndpointsFactory<
   constructor(protected resultHandler: AbstractResultHandler) {}
 
   static #create<
-    CIN extends IOSchema<"strip">,
+    CIN extends IOSchema,
     COUT extends FlatObject,
     CSCO extends string,
   >(middlewares: AbstractMiddleware[], resultHandler: AbstractResultHandler) {
@@ -79,7 +79,7 @@ export class EndpointsFactory<
   public addMiddleware<
     AOUT extends FlatObject,
     ASCO extends string,
-    AIN extends IOSchema<"strip"> = EmptySchema,
+    AIN extends IOSchema = EmptySchema,
   >(
     subject:
       | Middleware<OUT, AOUT, ASCO, AIN>
