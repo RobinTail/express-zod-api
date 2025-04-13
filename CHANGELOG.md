@@ -7,7 +7,7 @@
 - Minimum version of `express` (required peer dependency) is `5.0.1`;
 - Minimum version of `compression` (optional peer dependency) is `1.8.0` (it supports Brotli);
 - The default value for `wrongMethodBehavior` config option is changed to `405`;
-- Publicly exposed interfaces: `CustomHeaderSecurity` —> `HeaderSecurity`, `NormalizedResponse` removed.
+- Publicly exposed interfaces: `CustomHeaderSecurity` renamed to `HeaderSecurity`, `NormalizedResponse` removed.
 - The `errorHandler` property removed from `testMiddleware()` argument in favor of config option having same name;
 - Only the following methods remained public, while other methods and properties were marked internal or removed:
   - `Endpoint`: `.execute()` and `.deprecated()`;
@@ -16,7 +16,19 @@
   - `DependsOnMethod`: `.deprecated()`
   - `Documentation`: constructor only;
   - `Integration`: `.print()` and `.printFormatted()`;
-  - `ServeStatic`: constructor only.
+  - `ServeStatic`: constructor only;
+- Consider the automated migration using the built-in ESLint rule.
+
+```js
+// eslint.config.mjs — minimal ESLint 9 config to apply migrations automatically using "eslint --fix"
+import parser from "@typescript-eslint/parser";
+import migration from "express-zod-api/migration";
+
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v23": "error" } },
+];
+```
 
 ## Version 22
 
