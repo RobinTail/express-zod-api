@@ -4,7 +4,7 @@
 
 ### v23.0.0
 
-- Minimum version of `express` (required peer dependency) is `5.0.1`;
+- Minimum version of `express` (required peer dependency) is `5.1.0` (first release of v5 marked as `latest`);
 - Minimum version of `compression` (optional peer dependency) is `1.8.0` (it supports Brotli);
 - The default value for `wrongMethodBehavior` config option is changed to `405`;
 - Publicly exposed interfaces: `CustomHeaderSecurity` renamed to `HeaderSecurity`, `NormalizedResponse` removed.
