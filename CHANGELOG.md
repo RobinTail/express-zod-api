@@ -13,7 +13,7 @@
   - `Endpoint`: `.execute()` and `.deprecated()`;
   - `Middleware`: `.execute()`;
   - `ResultHandler`: `.execute()`;
-  - `DependsOnMethod`: `.deprecated()`
+  - `DependsOnMethod`: `.deprecated()`;
   - `Documentation`: constructor only;
   - `Integration`: `.print()` and `.printFormatted()`;
   - `ServeStatic`: constructor only;
