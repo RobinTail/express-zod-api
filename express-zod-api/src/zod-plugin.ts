@@ -107,7 +107,7 @@ const objectMapper = function (
           R.map(([key, value]) => R.pair(tool[String(key)] || key, value)),
           R.fromPairs,
         );
-  const nextShape = transformer(R.clone(this._zod.shape)); // immutable
+  const nextShape = transformer(R.clone(this._zod.def.shape)); // immutable
   const hasPassThrough = this._zod.def.catchall instanceof z.ZodUnknown;
   const output = (hasPassThrough ? z.looseObject : z.object)(nextShape); // proxies unknown keys when set to "passthrough"
   // @ts-expect-error -- ignoring inconsistency of Extra type
