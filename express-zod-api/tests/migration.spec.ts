@@ -21,6 +21,7 @@ describe("Migration", () => {
     valid: [
       `import { HeaderSecurity } from "express-zod-api";`,
       `createConfig({ wrongMethodBehavior: 405 });`,
+      `testMiddleware({ middleware })`,
     ],
     invalid: [
       {
@@ -47,6 +48,26 @@ describe("Migration", () => {
               subject: "wrongMethodBehavior property",
               to: "configuration",
             },
+          },
+        ],
+      },
+      {
+        code: `testMiddleware({ errorHandler: (error, response) => response.end(error.message) })`,
+        output: `testMiddleware({configProps: {errorHandler: new ResultHandler({ positive: [], negative: [], handler: ({ error, response }) => {response.end(error.message)} }),},  })`,
+        errors: [
+          {
+            messageId: "move",
+            data: { subject: "errorHandler", to: "configProps" },
+          },
+        ],
+      },
+      {
+        code: `testMiddleware({ errorHandler(error, response) { response.end(error.message) }, configProps: { wrongMethodBehavior: 404 } })`,
+        output: `testMiddleware({  configProps: {errorHandler: new ResultHandler({ positive: [], negative: [], handler: ({ error, response }) => {{ response.end(error.message) }} }), wrongMethodBehavior: 404 } })`,
+        errors: [
+          {
+            messageId: "move",
+            data: { subject: "errorHandler", to: "configProps" },
           },
         ],
       },
