@@ -15,7 +15,7 @@ describe("Middleware", () => {
         handler: vi.fn(),
       });
       expect(mw).toBeInstanceOf(AbstractMiddleware);
-      expectTypeOf(mw.getSchema()._zod.output).toEqualTypeOf<{
+      expectTypeOf(mw.schema._zod.output).toEqualTypeOf<{
         something: number;
       }>();
     });
@@ -23,7 +23,7 @@ describe("Middleware", () => {
     test("should allow to omit input schema", () => {
       const mw = new Middleware({ handler: vi.fn() });
       /** @see $InferObjectOutput - external logic */
-      expectTypeOf(mw.getSchema()._zod.output).toEqualTypeOf<object>();
+      expectTypeOf(mw.schema._zod.output).toEqualTypeOf<object>();
     });
 
     describe("#600: Top level refinements", () => {
@@ -32,7 +32,7 @@ describe("Middleware", () => {
           input: z.object({ something: z.number() }).refine(() => true),
           handler: vi.fn(),
         });
-        expect(mw.getSchema()).toBeInstanceOf(z.ZodObject);
+        expect(mw.schema).toBeInstanceOf(z.ZodObject);
       });
     });
   });
@@ -88,6 +88,6 @@ describe("ExpressMiddleware", () => {
     const mw = new ExpressMiddleware(vi.fn());
     expect(mw).toBeInstanceOf(Middleware);
     /** @see $InferObjectOutput - external logic */
-    expectTypeOf(mw.getSchema()._zod.output).toEqualTypeOf<object>();
+    expectTypeOf(mw.schema._zod.output).toEqualTypeOf<object>();
   });
 });

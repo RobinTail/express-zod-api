@@ -811,7 +811,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictSecurity()", () => {
-    test("should handle Basic, Bearer and CustomHeader Securities", () => {
+    test("should handle Basic, Bearer and Header Securities", () => {
       expect(
         depictSecurity([
           [{ type: "basic" }, { type: "bearer" }],

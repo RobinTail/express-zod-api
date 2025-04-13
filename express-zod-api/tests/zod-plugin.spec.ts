@@ -1,4 +1,3 @@
-import "../src/zod-plugin"; // required for this test
 import camelize from "camelize-ts";
 import { z } from "zod";
 import { metaSymbol } from "../src/metadata";
