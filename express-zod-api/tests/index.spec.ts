@@ -9,7 +9,7 @@ import {
   BearerSecurity,
   CommonConfig,
   CookieSecurity,
-  CustomHeaderSecurity,
+  HeaderSecurity,
   Depicter,
   FlatObject,
   IOSchema,
@@ -77,7 +77,7 @@ describe("Index Entrypoint", () => {
       expectTypeOf<{
         type: "header";
         name: string;
-      }>().toEqualTypeOf<CustomHeaderSecurity>();
+      }>().toEqualTypeOf<HeaderSecurity>();
       expectTypeOf<{ type: "input"; name: string }>().toEqualTypeOf<
         InputSecurity<string>
       >();

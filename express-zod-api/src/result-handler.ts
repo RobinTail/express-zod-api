@@ -41,7 +41,9 @@ export type LazyResult<R extends Result, A extends unknown[] = []> = (
 
 export abstract class AbstractResultHandler {
   readonly #handler: Handler;
+  /** @internal */
   public abstract getPositiveResponse(output: IOSchema): NormalizedResponse[];
+  /** @internal */
   public abstract getNegativeResponse(): NormalizedResponse[];
   protected constructor(handler: Handler) {
     this.#handler = handler;
@@ -71,6 +73,7 @@ export class ResultHandler<
     this.#negative = params.negative;
   }
 
+  /** @internal */
   public override getPositiveResponse(output: IOSchema) {
     return normalize(this.#positive, {
       variant: "positive",
@@ -80,6 +83,7 @@ export class ResultHandler<
     });
   }
 
+  /** @internal */
   public override getNegativeResponse() {
     return normalize(this.#negative, {
       variant: "negative",

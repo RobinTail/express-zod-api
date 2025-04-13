@@ -1,7 +1,9 @@
 import { z } from "zod";
 import {
+  CommonConfig,
   defaultEndpointsFactory,
   Middleware,
+  ResultHandler,
   testEndpoint,
   testMiddleware,
 } from "../src";
@@ -74,20 +76,38 @@ describe("Testing", () => {
       });
     });
 
-    test("Issue #2153: should optionally catch errors to enable usual returns", async () => {
-      const { output, loggerMock, responseMock } = await testMiddleware({
-        errorHandler: (error, response) => response.end(error.message),
-        middleware: new Middleware({
-          input: z.object({}),
-          handler: async ({ logger }) => {
-            logger.info("logging something");
-            throw new Error("something went wrong");
-          },
-        }),
-      });
-      expect(output).toEqual({});
-      expect(loggerMock._getLogs().info).toEqual([["logging something"]]);
-      expect(responseMock._getData()).toBe("something went wrong");
-    });
+    test.each<CommonConfig["errorHandler"]>([
+      undefined,
+      new ResultHandler({
+        positive: [],
+        negative: [],
+        handler: ({ error, response }) => void response.end(error!.message),
+      }),
+    ])(
+      "Issue #2153: should catch errors using errorHandler %#",
+      async (errorHandler) => {
+        const { output, loggerMock, responseMock } = await testMiddleware({
+          configProps: { errorHandler },
+          middleware: new Middleware({
+            input: z.object({}),
+            handler: async ({ logger }) => {
+              logger.info("logging something");
+              throw new Error("something went wrong");
+            },
+          }),
+        });
+        expect(output).toEqual({});
+        expect(loggerMock._getLogs().info).toEqual([["logging something"]]);
+        expect(responseMock._isJSON()).toBe(!errorHandler);
+        if (responseMock._isJSON()) {
+          expect(responseMock._getJSONData()).toEqual({
+            status: "error",
+            error: { message: "something went wrong" },
+          });
+        } else {
+          expect(responseMock._getData()).toMatch(/something went wrong/);
+        }
+      },
+    );
   });
 });

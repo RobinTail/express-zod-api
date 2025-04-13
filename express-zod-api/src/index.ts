@@ -46,12 +46,12 @@ export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
 export type { IOSchema } from "./io-schema";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
-export type { ApiResponse, NormalizedResponse } from "./api-response";
+export type { ApiResponse } from "./api-response";
 export type {
   BasicSecurity,
   BearerSecurity,
   CookieSecurity,
-  CustomHeaderSecurity,
+  HeaderSecurity,
   InputSecurity,
   OAuth2Security,
   OpenIdSecurity,
