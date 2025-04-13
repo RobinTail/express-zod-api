@@ -8,6 +8,7 @@
 - Minimum version of `compression` (optional peer dependency) is `1.8.0` (it supports Brotli);
 - The default value for `wrongMethodBehavior` config option is changed to `405`;
 - Publicly exposed interfaces: `CustomHeaderSecurity` —> `HeaderSecurity`, `NormalizedResponse` removed.
+- The `errorHandler` property removed from `testMiddleware()` argument in favor of config option having same name;
 - Only the following methods remained public, while other methods and properties were marked internal or removed:
   - `Endpoint`: `.execute()` and `.deprecated()`;
   - `Middleware`: `.execute()`;
