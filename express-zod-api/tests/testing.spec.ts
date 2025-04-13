@@ -1,4 +1,3 @@
-import { fail } from "node:assert/strict";
 import { z } from "zod";
 import {
   CommonConfig,
@@ -83,11 +82,6 @@ describe("Testing", () => {
         positive: [],
         negative: [],
         handler: ({ error, response }) => void response.end(error!.message),
-      }),
-      new ResultHandler({
-        positive: [],
-        negative: [],
-        handler: () => fail("Malfunction"),
       }),
     ])(
       "Issue #2153: should catch errors using errorHandler %#",

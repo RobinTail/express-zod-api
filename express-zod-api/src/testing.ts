@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import { ensureError, FlatObject, getInput } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { AbstractEndpoint } from "./endpoint";
-import { ResultHandlerError } from "./errors";
-import { lastResortHandler } from "./last-resort";
 import {
   AbstractLogger,
   ActualLogger,
@@ -148,15 +146,11 @@ export const testMiddleware = async <
     const output = await middleware.execute(commons);
     return { requestMock, responseMock, loggerMock, output };
   } catch (e) {
-    const error = ensureError(e);
-    try {
-      await errorHandler.execute({ ...commons, error, output: null });
-    } catch (handlingError) {
-      lastResortHandler({
-        ...commons,
-        error: new ResultHandlerError(error, ensureError(handlingError)),
-      });
-    }
+    await errorHandler.execute({
+      ...commons,
+      error: ensureError(e),
+      output: null,
+    });
     return { requestMock, responseMock, loggerMock, output: {} };
   }
 };
