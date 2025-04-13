@@ -466,7 +466,7 @@ describe("Documentation helpers", () => {
       z.string().ipv4(),
       z.string().jwt(),
       z.string().base64(),
-      z.string().base64url(), // @todo unclear what happened to it https://github.com/colinhacks/zod/issues/3711
+      z.string().base64url(),
       z.string().cuid2(),
       z.string().ulid(),
     ])("should set format, pattern and min/maxLength props %#", (schema) => {
