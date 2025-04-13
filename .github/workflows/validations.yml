@@ -2,9 +2,9 @@ name: Validations
 
 on:
   push:
-    branches: [ master, v18, v19, v20, v21 ]
+    branches: [ master, v19, v20, v21, v22 ]
   pull_request:
-    branches: [ master, v18, v19, v20, v21 ]
+    branches: [ master, v19, v20, v21, v22 ]
 
 
 jobs:
@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        express-version: [ 4, 5 ]
+        express-version: [ 5 ]
     steps:
       - uses: actions/setup-node@v4
         with:

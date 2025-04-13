@@ -97,11 +97,7 @@ export const createUploadParsers = async ({
   const parsers: RequestHandler[] = [];
   parsers.push(async (request, response, next) => {
     const logger = getLogger(request);
-    try {
-      await beforeUpload?.({ request, logger });
-    } catch (error) {
-      return next(error);
-    }
+    await beforeUpload?.({ request, logger });
     return uploader({
       debug: true,
       ...options,
@@ -133,16 +129,11 @@ export const createLoggingMiddleware =
     config: CommonConfig;
   }): RequestHandler =>
   async (request, response, next) => {
-    try {
-      const logger =
-        (await childLoggerProvider?.({ request, parent })) || parent;
-      accessLogger?.(request, logger);
-      if (request.res)
-        (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
-      next();
-    } catch (error) {
-      next(error); // @todo remove in v23 that is express 5 only
-    }
+    const logger = (await childLoggerProvider?.({ request, parent })) || parent;
+    accessLogger?.(request, logger);
+    if (request.res)
+      (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
+    next();
   };
 
 export const makeGetLogger =

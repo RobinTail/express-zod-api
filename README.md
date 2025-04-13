@@ -152,7 +152,7 @@ Much can be customized to fit your needs.
 ## Technologies
 
 - [Typescript](https://www.typescriptlang.org/) first.
-- Web server — [Express.js](https://expressjs.com/) v4 or v5.
+- Web server — [Express.js](https://expressjs.com/) v5.
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin).
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
@@ -170,7 +170,7 @@ Install the framework, its peer dependencies and type assistance packages using 
 [package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/).
 
 ```shell
-# example for yarn and express 5 (recommended):
+# example for yarn:
 yarn add express-zod-api express zod typescript http-errors
 yarn add -D @types/express @types/node @types/http-errors
 ```
@@ -700,7 +700,7 @@ done(); // error: expensive operation '555.55ms'
 According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
 it might be a good idea to enable GZIP and Brotli compression for your API responses.
 
-Install `compression` (version 1.8 supports Brotli) and `@types/compression`, and enable or configure compression:
+Install `compression` and `@types/compression`, and enable or configure compression:
 
 ```typescript
 import { createConfig } from "express-zod-api";
@@ -1111,8 +1111,8 @@ test("should respond successfully", async () => {
 ## Testing middlewares
 
 Middlewares can also be tested individually using the `testMiddleware()` method. You can also pass `options` collected
-from outputs of previous middlewares, if the one being tested somehow depends on them. There is `errorHandler` option
-for catching a middleware error and transforming into a response to assert in test along with other returned entities.
+from outputs of previous middlewares, if the one being tested somehow depends on them. Possible errors would be handled
+either by `errorHandler` configured within given `configProps` or `defaultResultHandler`.
 
 ```typescript
 import { z } from "zod";
@@ -1130,7 +1130,6 @@ const { output, responseMock, loggerMock } = await testMiddleware({
   middleware,
   requestProps: { method: "POST", body: { test: "something" } },
   options: { prev: "accumulated" }, // responseOptions, configProps, loggerProps
-  // errorHandler: (error, response) => response.end(error.message),
 });
 expect(loggerMock._getLogs().error).toHaveLength(0);
 expect(output).toEqual({ collectedOptions: ["prev"], testLength: 9 });
