@@ -27,6 +27,9 @@ import type {
   $ZodCheckLengthEquals,
   $ZodISODate,
   $ZodISOTime,
+  $ZodNumber,
+  $ZodCheckGreaterThan,
+  $ZodCheckLessThan,
 } from "@zod/core";
 import {
   ExamplesObject,
@@ -511,7 +514,7 @@ export const depictString: Depicter = ({ _zod: { def } }: $ZodString) => {
 
 /** @since OAS 3.1: exclusive min/max are numbers */
 export const depictNumber: Depicter = (
-  { isInt, maxValue, minValue, _def: { checks } }: z.ZodNumber,
+  { _zod: { def } }: $ZodNumber,
   {
     numericRange = {
       integer: [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
@@ -523,17 +526,26 @@ export const depictNumber: Depicter = (
     integer: null,
     float: null,
   };
-  const minCheck = checks.find((check) => check.kind === "min");
-  const minimum =
-    minValue === null ? (isInt ? intRange?.[0] : floatRange?.[0]) : minValue;
+  // @todo should also test z.int, z.int32, z.int64
+  const intCheck = getCheck(def, "number_format", "safeint");
+  console.log(def.checks);
+  const minCheck = getCheck<$ZodCheckGreaterThan>(def, "greater_than");
+  const minimum = !minCheck
+    ? intCheck
+      ? intRange?.[0]
+      : floatRange?.[0]
+    : Number(minCheck.value);
   const isMinInclusive = minCheck ? minCheck.inclusive : true;
-  const maxCheck = checks.find((check) => check.kind === "max");
-  const maximum =
-    maxValue === null ? (isInt ? intRange?.[1] : floatRange?.[1]) : maxValue;
+  const maxCheck = getCheck<$ZodCheckLessThan>(def, "less_than");
+  const maximum = !maxCheck
+    ? intCheck
+      ? intRange?.[1]
+      : floatRange?.[1]
+    : Number(maxCheck.value);
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   const result: SchemaObject = {
-    type: isInt ? "integer" : "number",
-    format: isInt ? "int64" : "double",
+    type: intCheck ? "integer" : "number",
+    format: intCheck ? "int64" : "double", // @todo should probably use int32
   };
   if (isMinInclusive) result.minimum = minimum;
   else result.exclusiveMinimum = minimum;
