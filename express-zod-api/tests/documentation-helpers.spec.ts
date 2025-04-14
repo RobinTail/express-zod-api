@@ -8,14 +8,12 @@ import {
   depictArray,
   depictBigInt,
   depictBoolean,
-  depictBranded,
   depictCatch,
   depictDate,
   depictDateIn,
   depictDateOut,
   depictDefault,
   depictDiscriminatedUnion,
-  depictEffect,
   depictEnum,
   depictExamples,
   depictFile,
@@ -542,6 +540,7 @@ describe("Documentation helpers", () => {
     });
   });
 
+  // @todo move to the test of pipe
   describe("depictEffect()", () => {
     test.each([
       {
@@ -562,19 +561,19 @@ describe("Documentation helpers", () => {
       {
         schema: z
           .object({ s: z.string() })
-          .refine(() => false, { message: "test" }),
+          .refine(() => false, { message: "test" }), // @todo this case is no longer applicable
         ctx: requestCtx,
         expected: "object (refinement)",
       },
     ])("should depict as $expected", ({ schema, ctx }) => {
-      expect(depictEffect(schema, ctx)).toMatchSnapshot();
+      expect(depictPipeline(schema, ctx)).toMatchSnapshot();
     });
 
     test.each([
       z.number().transform((num) => () => num),
       z.number().transform(() => assert.fail("this should be handled")),
     ])("should handle edge cases", (schema) => {
-      expect(depictEffect(schema, responseCtx)).toMatchSnapshot();
+      expect(depictPipeline(schema, responseCtx)).toMatchSnapshot();
     });
   });
 

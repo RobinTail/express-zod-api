@@ -163,7 +163,7 @@ export const makeCleanId = (...args: string[]) => {
 };
 
 export const getTransformedType = R.tryCatch(
-  <T>(schema: z.ZodTransform<z.ZodType, T>, sample: T) =>
+  <T>(schema: z.ZodTransform<unknown, T>, sample: T) =>
     typeof schema.parse(sample),
   R.always(undefined),
 );

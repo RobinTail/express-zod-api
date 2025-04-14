@@ -574,29 +574,37 @@ const makeNullableType = ({
   return type ? [...new Set(type).add("null")] : "null";
 };
 
-export const depictEffect: Depicter = (
-  schema: z.ZodEffects<z.ZodTypeAny>,
-  { isResponse, next },
-) => {
-  const input = next(schema.innerType());
-  const { effect } = schema._def;
-  if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
-    const outputType = getTransformedType(schema, makeSample(input));
-    if (outputType && ["number", "string", "boolean"].includes(outputType))
-      return { type: outputType as "number" | "string" | "boolean" };
-    else return next(z.any());
-  }
-  if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
-    const { type: inputType, ...rest } = input;
-    return { ...rest, format: `${rest.format || inputType} (preprocessed)` };
-  }
-  return input;
-};
-
 export const depictPipeline: Depicter = (
   { _zod: { def } }: $ZodPipe,
   { isResponse, next },
-) => next(def[isResponse ? "out" : "in"]);
+) => {
+  const target = def[isResponse ? "out" : "in"];
+  const opposite = def[isResponse ? "in" : "out"];
+  if (target._zod.def.type === "transform") {
+    const opposingDepiction = next(opposite);
+    if (isSchemaObject(opposingDepiction)) {
+      if (!isResponse) {
+        const { type: opposingType, ...rest } = opposingDepiction;
+        return {
+          ...rest,
+          format: `${rest.format || opposingType} (preprocessed)`,
+        };
+      } else {
+        const opposingType = getTransformedType(
+          def.out as z.ZodTransform, // @todo should use $ZodTransform from core?
+          makeSample(opposingDepiction),
+        );
+        if (
+          opposingType &&
+          ["number", "string", "boolean"].includes(opposingType)
+        )
+          return { type: opposingType as "number" | "string" | "boolean" };
+        else return next(z.any());
+      }
+    }
+  }
+  return next(target);
+};
 
 export const depictLazy: Depicter = (
   lazy: $ZodLazy,
@@ -738,7 +746,6 @@ export const depicters: HandlingRules<
   any: depictAny,
   default: depictDefault,
   enum: depictEnum,
-  transform: depictEffect,
   optional: depictOptional,
   nullable: depictNullable,
   date: depictDate,
