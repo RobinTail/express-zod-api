@@ -1,3 +1,4 @@
+import type { $ZodTypeDef } from "@zod/core";
 import { fail } from "node:assert/strict"; // eslint-disable-line no-restricted-syntax -- acceptable
 import { z } from "zod";
 import { EmptyObject } from "./common-helpers";
@@ -31,24 +32,24 @@ const onWrapped: Check = (
   schema:
     | z.ZodOptional<z.ZodTypeAny>
     | z.ZodNullable<z.ZodTypeAny>
-    | z.ZodReadonly<z.ZodTypeAny>
-    | z.ZodBranded<z.ZodTypeAny, string | number | symbol>,
+    | z.ZodReadonly<z.ZodTypeAny>,
   { next },
 ) => next(schema.unwrap());
 
-const ioChecks: HandlingRules<boolean, EmptyObject, z.ZodFirstPartyTypeKind> = {
-  ZodObject: ({ shape }: z.ZodObject<z.ZodRawShape>, { next }) =>
+type FirstPartyKind = $ZodTypeDef["type"];
+
+const ioChecks: HandlingRules<boolean, EmptyObject, FirstPartyKind> = {
+  object: ({ shape }: z.ZodObject<z.ZodRawShape>, { next }) =>
     Object.values(shape).some(next),
-  ZodUnion: onSomeUnion,
-  ZodDiscriminatedUnion: onSomeUnion,
-  ZodIntersection: onIntersection,
-  ZodEffects: (schema: z.ZodEffects<z.ZodTypeAny>, { next }) =>
+  union: onSomeUnion,
+  intersection: onIntersection,
+  transform: (schema: z.ZodEffects<z.ZodTypeAny>, { next }) =>
     next(schema.innerType()),
-  ZodOptional: onWrapped,
-  ZodNullable: onWrapped,
-  ZodRecord: ({ valueSchema }: z.ZodRecord, { next }) => next(valueSchema),
-  ZodArray: ({ element }: z.ZodArray<z.ZodTypeAny>, { next }) => next(element),
-  ZodDefault: ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
+  optional: onWrapped,
+  nullable: onWrapped,
+  record: ({ valueSchema }: z.ZodRecord, { next }) => next(valueSchema),
+  array: ({ element }: z.ZodArray<z.ZodTypeAny>, { next }) => next(element),
+  default: ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
     next(_def.innerType),
 };
 
@@ -57,7 +58,7 @@ interface NestedSchemaLookupProps {
   rules?: HandlingRules<
     boolean,
     EmptyObject,
-    z.ZodFirstPartyTypeKind | ProprietaryBrand
+    FirstPartyKind | ProprietaryBrand
   >;
   maxDepth?: number;
   depth?: number;
@@ -77,8 +78,7 @@ export const hasNestedSchema = (
   const handler =
     depth < maxDepth
       ? rules[subject.meta()?.[metaSymbol]?.brand as keyof typeof rules] ||
-        ("typeName" in subject._def &&
-          rules[subject._def.typeName as keyof typeof rules])
+        rules[subject._zod.def.type]
       : undefined;
   if (handler) {
     return handler(subject, {
@@ -123,29 +123,25 @@ export const assertJsonCompatible = (subject: IOSchema, dir: "in" | "out") => {
     maxDepth: 300,
     rules: {
       ...ioChecks,
-      ZodBranded: onWrapped,
-      ZodReadonly: onWrapped,
-      ZodCatch: ({ _def: { innerType } }: z.ZodCatch<z.ZodTypeAny>, { next }) =>
+      readonly: onWrapped,
+      catch: ({ _def: { innerType } }: z.ZodCatch<z.ZodTypeAny>, { next }) =>
         next(innerType),
-      ZodPipeline: (
-        { _def }: z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>,
-        { next },
-      ) => next(_def[dir]),
-      ZodLazy: (lazy: z.ZodLazy<z.ZodTypeAny>, { next }) =>
+      pipe: ({ _def }: z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>, { next }) =>
+        next(_def[dir]),
+      lazy: (lazy: z.ZodLazy<z.ZodTypeAny>, { next }) =>
         lazies.has(lazy) ? false : lazies.add(lazy) && next(lazy.schema),
-      ZodTuple: ({ items, _def: { rest } }: z.AnyZodTuple, { next }) =>
+      tuple: ({ items, _def: { rest } }: z.AnyZodTuple, { next }) =>
         [...items].concat(rest ?? []).some(next),
-      ZodEffects: { out: undefined, in: ioChecks.ZodEffects }[dir],
-      ZodNaN: () => fail("z.nan()"),
-      ZodSymbol: () => fail("z.symbol()"),
-      ZodFunction: () => fail("z.function()"),
-      ZodMap: () => fail("z.map()"),
-      ZodSet: () => fail("z.set()"),
-      ZodBigInt: () => fail("z.bigint()"),
-      ZodVoid: () => fail("z.void()"),
-      ZodPromise: () => fail("z.promise()"),
-      ZodNever: () => fail("z.never()"),
-      ZodDate: () => dir === "in" && fail("z.date()"),
+      transform: { out: undefined, in: ioChecks.ZodEffects }[dir],
+      nan: () => fail("z.nan()"),
+      symbol: () => fail("z.symbol()"),
+      map: () => fail("z.map()"),
+      set: () => fail("z.set()"),
+      bigint: () => fail("z.bigint()"),
+      void: () => fail("z.void()"),
+      promise: () => fail("z.promise()"),
+      never: () => fail("z.never()"),
+      date: () => dir === "in" && fail("z.date()"),
       [ezDateOutBrand]: () => dir === "in" && fail("ez.dateOut()"),
       [ezDateInBrand]: () => dir === "out" && fail("ez.dateIn()"),
       [ezRawBrand]: () => dir === "out" && fail("ez.raw()"),
