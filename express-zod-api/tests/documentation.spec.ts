@@ -281,7 +281,7 @@ describe("Documentation", () => {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
               output: z.object({
-                simple: z.record(z.number().int()),
+                simple: z.record(z.string(), z.number().int()),
                 stringy: z.record(z.string().regex(/[A-Z]+/), z.boolean()),
                 numeric: z.record(z.number().int(), z.boolean()),
                 literal: z.record(z.literal("only"), z.boolean()),
@@ -374,7 +374,7 @@ describe("Documentation", () => {
                 cuid: z.string().cuid(),
                 cuid2: z.string().cuid2(),
                 ulid: z.string().ulid(),
-                ip: z.string().ip(),
+                ip: z.string().ipv4(),
                 emoji: z.string().emoji(),
                 url: z.string().url(),
                 numeric: z.string().regex(/\d+/),
@@ -530,7 +530,6 @@ describe("Documentation", () => {
       z.undefined(),
       z.map(z.any(), z.any()),
       z.set(z.any()),
-      z.function(),
       z.promise(z.any()),
       z.nan(),
       z.symbol(),
@@ -560,7 +559,7 @@ describe("Documentation", () => {
           }),
       ).toThrow(
         new DocumentationError(
-          `Zod type ${zodType._def.typeName} is unsupported.`,
+          `Zod type ${zodType._zod.def.type} is unsupported.`,
           {
             method: "post",
             path: "/v1/getSomething",
@@ -1235,9 +1234,9 @@ describe("Documentation", () => {
     test("should be handled accordingly in request, response and params", () => {
       const deep = Symbol("DEEP");
       const rule: Depicter = (
-        schema: z.ZodBranded<z.ZodTypeAny, PropertyKey>,
+        schema: z.ZodBoolean & z.$brand<typeof deep>,
         { next },
-      ) => next(schema.unwrap());
+      ) => next(schema);
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
