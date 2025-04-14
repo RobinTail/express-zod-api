@@ -711,9 +711,8 @@ export const depictRequestParams = ({
       return acc.concat({
         name,
         in: location,
-        deprecated: (paramSchema as z.ZodType).meta()?.[metaSymbol] // @todo revisit for the need of "as"
-          ?.isDeprecated,
-        required: !paramSchema.isOptional(),
+        deprecated: globalRegistry.get(paramSchema)?.[metaSymbol]?.isDeprecated,
+        required: !paramSchema._zod.qin,
         description: depicted.description || description,
         schema: result,
         examples: depictParamExamples(objectSchema, name),
