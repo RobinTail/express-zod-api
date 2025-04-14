@@ -131,7 +131,7 @@ export const hasForm = (subject: IOSchema) =>
   });
 
 /** @throws AssertionError with incompatible schema constructor */
-export const assertJsonCompatible = (subject: IOSchema, dir: "in" | "out") => {
+export const assertJsonCompatible = (subject: $ZodType, dir: "in" | "out") => {
   const lazies = new WeakSet<$ZodLazy>();
   return hasNestedSchema(subject, {
     maxDepth: 300,
