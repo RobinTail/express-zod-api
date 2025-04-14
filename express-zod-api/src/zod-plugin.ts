@@ -116,24 +116,30 @@ const objectMapper = function (
 
 if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
-  Object.defineProperties(z.ZodType.prototype, {
-    ["example" satisfies keyof z.ZodType]: {
-      get(): z.ZodType["example"] {
-        return exampleSetter.bind(this);
+  for (const entry of Object.keys(z)) {
+    if (!entry.startsWith("Zod")) continue;
+    const Cls = z[entry as keyof typeof z];
+    if (typeof Cls !== "function") continue;
+    Object.defineProperties(Cls.prototype, {
+      ["example" satisfies keyof z.ZodType]: {
+        get(): z.ZodType["example"] {
+          return exampleSetter.bind(this);
+        },
       },
-    },
-    ["deprecated" satisfies keyof z.ZodType]: {
-      get(): z.ZodType["deprecated"] {
-        return deprecationSetter.bind(this);
+      ["deprecated" satisfies keyof z.ZodType]: {
+        get(): z.ZodType["deprecated"] {
+          return deprecationSetter.bind(this);
+        },
       },
-    },
-    ["brand" satisfies keyof z.ZodType]: {
-      set() {}, // this is required to override the existing method
-      get() {
-        return brandSetter.bind(this) as z.ZodType["brand"];
+      ["brand" satisfies keyof z.ZodType]: {
+        set() {}, // this is required to override the existing method
+        get() {
+          return brandSetter.bind(this) as z.ZodType["brand"];
+        },
       },
-    },
-  });
+    });
+  }
+
   Object.defineProperty(
     z.ZodDefault.prototype,
     "label" satisfies keyof z.ZodDefault<z.ZodTypeAny>,
