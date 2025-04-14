@@ -1,5 +1,6 @@
 import type {
   $ZodCatch,
+  $ZodDate,
   $ZodDefault,
   $ZodDiscriminatedUnion,
   $ZodEnum,
@@ -8,6 +9,7 @@ import type {
   $ZodNullable,
   $ZodObject,
   $ZodOptional,
+  $ZodRecord,
   $ZodType,
   $ZodUnion,
 } from "@zod/core";
@@ -318,7 +320,7 @@ export const depictDateOut: Depicter = ({}: DateOutSchema, ctx) => {
 };
 
 /** @throws DocumentationError */
-export const depictDate: Depicter = ({}: z.ZodDate, ctx) => {
+export const depictDate: Depicter = ({}: $ZodDate, ctx) => {
   throw new DocumentationError(
     `Using z.date() within ${
       ctx.isResponse ? "output" : "input"
@@ -337,46 +339,58 @@ export const depictBigInt: Depicter = () => ({
 });
 
 const areOptionsLiteral = (
-  subject: z.ZodTypeAny[],
-): subject is z.ZodLiteral<unknown>[] =>
-  subject.every((option) => option instanceof z.ZodLiteral);
+  subject: ReadonlyArray<$ZodType>,
+): subject is $ZodLiteral[] =>
+  subject.every((option) => option._zod.def.type === "literal");
 
+// @todo consider more checks instead of "as string"
 export const depictRecord: Depicter = (
-  { keySchema, valueSchema }: z.ZodRecord<z.ZodTypeAny>,
+  { _zod: { def } }: $ZodRecord,
   { next },
 ) => {
-  if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
-    const keys = Object.values(keySchema.enum) as string[];
+  if (def.keyType._zod.def.type === "enum") {
+    const keys = Object.values(
+      (def.keyType as $ZodEnum)._zod.def.entries,
+    ) as string[];
     const result: SchemaObject = { type: "object" };
     if (keys.length) {
       result.properties = depictObjectProperties(
-        z.object(R.fromPairs(R.xprod(keys, [valueSchema]))),
+        z.looseObject(R.fromPairs(R.xprod(keys, [def.valueType]))),
         next,
       );
       result.required = keys;
     }
     return result;
   }
-  if (keySchema instanceof z.ZodLiteral) {
+  if (def.keyType._zod.def.type === "literal") {
     return {
       type: "object",
       properties: depictObjectProperties(
-        z.object({ [keySchema.value]: valueSchema }),
+        z.looseObject({
+          [(def.keyType as $ZodLiteral)._zod.def.values[0] as string]:
+            def.valueType,
+        }),
         next,
       ),
-      required: [keySchema.value],
+      required: [(def.keyType as $ZodLiteral)._zod.def.values[0] as string],
     };
   }
-  if (keySchema instanceof z.ZodUnion && areOptionsLiteral(keySchema.options)) {
-    const required = R.map((opt) => `${opt.value}`, keySchema.options);
-    const shape = R.fromPairs(R.xprod(required, [valueSchema]));
+  if (
+    def.keyType._zod.def.type === "union" &&
+    areOptionsLiteral((def.keyType as $ZodUnion)._zod.def.options)
+  ) {
+    const required = R.map(
+      (opt: $ZodLiteral) => `${opt._zod.def.values[0]}`,
+      (def.keyType as $ZodUnion)._zod.def.options as unknown as $ZodLiteral[], // ensured above
+    );
+    const shape = R.fromPairs(R.xprod(required, [def.valueType]));
     return {
       type: "object",
-      properties: depictObjectProperties(z.object(shape), next),
+      properties: depictObjectProperties(z.looseObject(shape), next),
       required,
     };
   }
-  return { type: "object", additionalProperties: next(valueSchema) };
+  return { type: "object", additionalProperties: next(def.valueType) };
 };
 
 export const depictArray: Depicter = (
