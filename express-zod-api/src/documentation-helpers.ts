@@ -646,13 +646,16 @@ export const depictExamples = (
 export const depictParamExamples = (
   schema: z.ZodType,
   param: string,
-): ExamplesObject | undefined =>
-  R.pipe(
+): ExamplesObject | undefined => {
+  const isObject = (subj: unknown): subj is FlatObject =>
+    R.type(subj) === "Object";
+  return R.pipe(
     getExamples,
-    R.filter<FlatObject>(R.has(param)),
+    R.filter(R.both(isObject, R.has(param))),
     R.pluck(param),
     enumerateExamples,
   )({ schema, variant: "original", validate: true, pullProps: true });
+};
 
 export const defaultIsHeader = (
   name: string,
