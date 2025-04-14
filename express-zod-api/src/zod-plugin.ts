@@ -118,19 +118,16 @@ if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
   Object.defineProperties(z.ZodType.prototype, {
     ["example" satisfies keyof z.ZodType]: {
-      enumerable: true,
       get(): z.ZodType["example"] {
         return exampleSetter.bind(this);
       },
     },
     ["deprecated" satisfies keyof z.ZodType]: {
-      enumerable: true,
       get(): z.ZodType["deprecated"] {
         return deprecationSetter.bind(this);
       },
     },
     ["brand" satisfies keyof z.ZodType]: {
-      enumerable: true,
       set() {}, // this is required to override the existing method
       get() {
         return brandSetter.bind(this) as z.ZodType["brand"];
@@ -141,7 +138,6 @@ if (!(metaSymbol in globalThis)) {
     z.ZodDefault.prototype,
     "label" satisfies keyof z.ZodDefault<z.ZodTypeAny>,
     {
-      enumerable: true,
       get(): z.ZodDefault<z.ZodTypeAny>["label"] {
         return labelSetter.bind(this);
       },
