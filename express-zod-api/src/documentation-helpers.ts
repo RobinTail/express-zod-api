@@ -1,3 +1,16 @@
+import type {
+  $ZodCatch,
+  $ZodDefault,
+  $ZodDiscriminatedUnion,
+  $ZodEnum,
+  $ZodIntersection,
+  $ZodLiteral,
+  $ZodNullable,
+  $ZodObject,
+  $ZodOptional,
+  $ZodType,
+  $ZodUnion,
+} from "@zod/core";
 import {
   ExamplesObject,
   MediaTypeObject,
@@ -15,7 +28,7 @@ import {
   isSchemaObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
   FlatObject,
@@ -113,19 +126,15 @@ const getTimestampRegex = (hasOffset?: boolean) =>
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const depictDefault: Depicter = (
-  schema: z.ZodDefault<z.ZodTypeAny>,
-  { next },
-) => ({
-  ...next(schema.unwrap()),
+export const depictDefault: Depicter = (schema: $ZodDefault, { next }) => ({
+  ...next(schema._zod.def.innerType),
   default:
-    schema.meta()?.[metaSymbol]?.defaultLabel || schema._zod.def.defaultValue(),
+    globalRegistry.get(schema)?.[metaSymbol]?.defaultLabel ||
+    schema._zod.def.defaultValue(),
 });
 
-export const depictCatch: Depicter = (
-  { _def: { innerType } }: z.ZodCatch<z.ZodTypeAny>,
-  { next },
-) => next(innerType);
+export const depictCatch: Depicter = ({ _zod: { def } }: $ZodCatch, { next }) =>
+  next(def.innerType);
 
 export const depictAny: Depicter = () => ({ format: "any" });
 
@@ -150,9 +159,11 @@ export const depictFile: Depicter = (schema: FileSchema) => {
 };
 
 export const depictUnion: Depicter = (
-  { options }: z.ZodUnion<z.ZodUnionOptions>,
+  { _zod }: $ZodUnion | $ZodDiscriminatedUnion,
   { next },
-) => ({ oneOf: options.map(next) });
+) => ({
+  oneOf: _zod.def.options.map(next),
+});
 
 // @todo add possible discriminator to depictUnion, this should be deleted
 export const depictDiscriminatedUnion: Depicter = (
@@ -203,26 +214,27 @@ const intersect = R.tryCatch(
 );
 
 export const depictIntersection: Depicter = (
-  { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
+  { _zod: { def } }: $ZodIntersection,
   { next },
-) => intersect([left, right].map(next));
+) => intersect([def.left, def.right].map(next));
 
 export const depictOptional: Depicter = (
-  schema: z.ZodOptional<z.ZodTypeAny>,
+  { _zod: { def } }: $ZodOptional,
   { next },
-) => next(schema.unwrap());
+) => next(def.innerType);
 
+// @todo consider extracting into one method utilizing innerType
 export const depictReadonly: Depicter = (
-  schema: z.ZodReadonly<z.ZodTypeAny>,
+  { _zod: { def } }: z.ZodReadonly<z.ZodTypeAny>,
   { next },
-) => next(schema.unwrap());
+) => next(def.innerType);
 
 /** @since OAS 3.1 nullable replaced with type array having null */
 export const depictNullable: Depicter = (
-  schema: z.ZodNullable<z.ZodTypeAny>,
+  { _zod: { def } }: $ZodNullable,
   { next },
 ) => {
-  const nested = next(schema.unwrap());
+  const nested = next(def.innerType);
   if (isSchemaObject(nested)) nested.type = makeNullableType(nested);
   return nested;
 };
@@ -243,28 +255,29 @@ const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
       : undefined;
 };
 
-export const depictEnum: Depicter = (
-  schema: z.ZodEnum<[string, ...string[]]> | z.ZodNativeEnum<z.EnumLike>,
-) => ({
-  type: getSupportedType(Object.values(schema.enum)[0]),
-  enum: Object.values(schema.enum),
+export const depictEnum: Depicter = ({ _zod: { def } }: $ZodEnum) => ({
+  type: getSupportedType(Object.values(def.entries)[0]),
+  enum: Object.values(def.entries),
 });
 
-export const depictLiteral: Depicter = ({ value }: z.ZodLiteral<unknown>) => ({
-  type: getSupportedType(value), // constructor allows z.Primitive only, but ZodLiteral does not have that constraint
-  const: value,
+// @todo looks very similar to depictEnum, also takes values twice
+export const depictLiteral: Depicter = ({ _zod: { def } }: $ZodLiteral) => ({
+  type: getSupportedType(Object.values(def.values)),
+  enum: Object.values(def.values),
 });
 
 export const depictObject: Depicter = (
-  schema: z.ZodObject<z.ZodRawShape>,
+  schema: $ZodObject,
   { isResponse, next },
 ) => {
-  const keys = Object.keys(schema.shape);
-  const isOptionalProp = (prop: z.ZodTypeAny) =>
+  const keys = Object.keys(schema._zod.def.shape);
+  const isOptionalProp = (prop: $ZodType) =>
     isResponse && hasCoercion(prop)
       ? prop instanceof z.ZodOptional
-      : prop.isOptional();
-  const required = keys.filter((key) => !isOptionalProp(schema.shape[key]));
+      : (isResponse ? prop._zod.qout : prop._zod.qin) === "true";
+  const required = keys.filter(
+    (key) => !isOptionalProp(schema._zod.def.shape[key]),
+  );
   const result: SchemaObject = { type: "object" };
   if (keys.length) result.properties = depictObjectProperties(schema, next);
   if (required.length) result.required = required;
@@ -487,9 +500,9 @@ export const depictNumber: Depicter = (
 };
 
 export const depictObjectProperties = (
-  { shape }: z.ZodObject<z.ZodRawShape>,
+  { _zod: { def } }: $ZodObject,
   next: Parameters<Depicter>[1]["next"],
-) => R.map(next, shape);
+) => R.map(next, def.shape);
 
 const makeSample = (depicted: SchemaObject) => {
   const firstType = (

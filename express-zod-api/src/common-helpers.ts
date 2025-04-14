@@ -1,3 +1,4 @@
+import type { $ZodType } from "@zod/core";
 import { Request } from "express";
 import * as R from "ramda";
 import { z } from "zod";
@@ -145,10 +146,8 @@ export const combinations = <T>(
  * @desc isNullable() and isOptional() validate the schema's input
  * @desc They always return true in case of coercion, which should be taken into account when depicting response
  */
-export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
-  "coerce" in schema._def && typeof schema._def.coerce === "boolean"
-    ? schema._def.coerce
-    : false;
+export const hasCoercion = ({ _zod: { def } }: $ZodType): boolean =>
+  "coerce" in def && typeof def.coerce === "boolean" ? def.coerce : false;
 
 export const ucFirst = (subject: string) =>
   subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
