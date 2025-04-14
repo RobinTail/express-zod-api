@@ -1,7 +1,9 @@
-import type { $ZodType } from "@zod/core";
+import type { $ZodType, $ZodTypeDef } from "@zod/core";
 import { globalRegistry } from "zod";
 import type { EmptyObject, FlatObject } from "./common-helpers";
 import { metaSymbol } from "./metadata";
+
+export type FirstPartyKind = $ZodTypeDef["type"];
 
 export interface NextHandlerInc<U> {
   next: (schema: $ZodType) => U;

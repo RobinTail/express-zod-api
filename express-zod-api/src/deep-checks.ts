@@ -13,7 +13,6 @@ import type {
   $ZodRecord,
   $ZodTuple,
   $ZodType,
-  $ZodTypeDef,
   $ZodUnion,
 } from "@zod/core";
 import { fail } from "node:assert/strict"; // eslint-disable-line no-restricted-syntax -- acceptable
@@ -27,7 +26,12 @@ import { IOSchema } from "./io-schema";
 import { metaSymbol } from "./metadata";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
-import { HandlingRules, NextHandlerInc, SchemaHandler } from "./schema-walker";
+import {
+  FirstPartyKind,
+  HandlingRules,
+  NextHandlerInc,
+  SchemaHandler,
+} from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
 
 /** @desc Check is a schema handling rule returning boolean */
@@ -47,8 +51,6 @@ const onWrapped: Check = (
   }: $ZodOptional | $ZodNullable | $ZodReadonly | $ZodDefault | $ZodCatch,
   { next },
 ) => next(def.innerType);
-
-type FirstPartyKind = $ZodTypeDef["type"];
 
 const ioChecks: HandlingRules<boolean, EmptyObject, FirstPartyKind> = {
   object: ({ _zod }: $ZodObject, { next }) =>

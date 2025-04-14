@@ -41,7 +41,12 @@ import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { RawSchema, ezRawBrand } from "./raw-schema";
-import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
+import {
+  FirstPartyKind,
+  HandlingRules,
+  SchemaHandler,
+  walkSchema,
+} from "./schema-walker";
 import { Security } from "./security";
 import { UploadSchema, ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
@@ -149,6 +154,7 @@ export const depictUnion: Depicter = (
   { next },
 ) => ({ oneOf: options.map(next) });
 
+// @todo add possible discriminator to depictUnion, this should be deleted
 export const depictDiscriminatedUnion: Depicter = (
   {
     options,
@@ -524,11 +530,6 @@ export const depictPipeline: Depicter = (
   { isResponse, next },
 ) => next(_def[isResponse ? "out" : "in"]);
 
-export const depictBranded: Depicter = (
-  schema: z.ZodBranded<z.ZodTypeAny, string | number | symbol>,
-  { next },
-) => next(schema.unwrap());
-
 export const depictLazy: Depicter = (
   lazy: z.ZodLazy<z.ZodTypeAny>,
   { next, makeRef },
@@ -652,34 +653,31 @@ export const depictRequestParams = ({
 export const depicters: HandlingRules<
   SchemaObject | ReferenceObject,
   OpenAPIContext,
-  z.ZodFirstPartyTypeKind | ProprietaryBrand
+  FirstPartyKind | ProprietaryBrand
 > = {
-  ZodString: depictString,
-  ZodNumber: depictNumber,
-  ZodBigInt: depictBigInt,
-  ZodBoolean: depictBoolean,
-  ZodNull: depictNull,
-  ZodArray: depictArray,
-  ZodTuple: depictTuple,
-  ZodRecord: depictRecord,
-  ZodObject: depictObject,
-  ZodLiteral: depictLiteral,
-  ZodIntersection: depictIntersection,
-  ZodUnion: depictUnion,
-  ZodAny: depictAny,
-  ZodDefault: depictDefault,
-  ZodEnum: depictEnum,
-  ZodNativeEnum: depictEnum,
-  ZodEffects: depictEffect,
-  ZodOptional: depictOptional,
-  ZodNullable: depictNullable,
-  ZodDiscriminatedUnion: depictDiscriminatedUnion,
-  ZodBranded: depictBranded,
-  ZodDate: depictDate,
-  ZodCatch: depictCatch,
-  ZodPipeline: depictPipeline,
-  ZodLazy: depictLazy,
-  ZodReadonly: depictReadonly,
+  string: depictString,
+  number: depictNumber,
+  bigint: depictBigInt,
+  boolean: depictBoolean,
+  null: depictNull,
+  array: depictArray,
+  tuple: depictTuple,
+  record: depictRecord,
+  object: depictObject,
+  literal: depictLiteral,
+  intersection: depictIntersection,
+  union: depictUnion,
+  any: depictAny,
+  default: depictDefault,
+  enum: depictEnum,
+  transform: depictEffect,
+  optional: depictOptional,
+  nullable: depictNullable,
+  date: depictDate,
+  catch: depictCatch,
+  pipe: depictPipeline,
+  lazy: depictLazy,
+  readonly: depictReadonly,
   [ezFileBrand]: depictFile,
   [ezUploadBrand]: depictUpload,
   [ezDateOutBrand]: depictDateOut,
