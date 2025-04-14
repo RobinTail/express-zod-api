@@ -1,6 +1,24 @@
+import type {
+  $ZodArray,
+  $ZodCatch,
+  $ZodDefault,
+  $ZodDiscriminatedUnion,
+  $ZodEnum,
+  $ZodIntersection,
+  $ZodLazy,
+  $ZodLiteral,
+  $ZodNullable,
+  $ZodOptional,
+  $ZodPipe,
+  $ZodReadonly,
+  $ZodRecord,
+  $ZodTransform,
+  $ZodTuple,
+  $ZodUnion,
+} from "@zod/core";
 import * as R from "ramda";
 import ts from "typescript";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import { hasCoercion, getTransformedType } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
@@ -8,14 +26,14 @@ import { ezFileBrand, FileSchema } from "./file-schema";
 import { metaSymbol } from "./metadata";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand, RawSchema } from "./raw-schema";
-import { HandlingRules, walkSchema } from "./schema-walker";
+import { FirstPartyKind, HandlingRules, walkSchema } from "./schema-walker";
 import {
   ensureTypeNode,
   isPrimitive,
   makeInterfaceProp,
   makeLiteralType,
 } from "./typescript-api";
-import { LiteralType, Producer, ZTSContext } from "./zts-helpers";
+import { Producer, ZTSContext } from "./zts-helpers";
 
 const { factory: f } = ts;
 
@@ -41,49 +59,48 @@ const nodePath = {
   optional: R.path(["questionToken" satisfies keyof ts.TypeElement]),
 };
 
-const onLiteral: Producer = ({ value }: z.ZodLiteral<LiteralType>) =>
-  makeLiteralType(value);
+const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) =>
+  f.createUnionTypeNode(def.values.map(makeLiteralType));
 
 const onObject: Producer = (
-  { _zod: { shape } }: z.ZodObject,
+  { _zod: { def } }: z.ZodObject,
   {
     isResponse,
     next,
     optionalPropStyle: { withQuestionMark: hasQuestionMark },
   },
 ) => {
-  const members = (
-    Object.entries(shape) as [string, z.ZodType][]
-  ).map<ts.TypeElement>(([key, value]) => {
-    const isOptional =
-      isResponse && hasCoercion(value)
-        ? value instanceof z.ZodOptional
-        : value.isOptional();
-    return makeInterfaceProp(key, next(value), {
-      comment: value.description,
-      isOptional: isOptional && hasQuestionMark,
-      isDeprecated: value.meta()?.[metaSymbol]?.isDeprecated,
-    });
-  });
+  const members = Object.entries(def.shape).map<ts.TypeElement>(
+    ([key, value]) => {
+      const isOptional =
+        isResponse && hasCoercion(value)
+          ? value instanceof z.ZodOptional
+          : isResponse
+            ? value._zod.qout
+            : value._zod.qin;
+      const { description: comment, ...meta } = globalRegistry.get(value) || {};
+      return makeInterfaceProp(key, next(value), {
+        comment,
+        isOptional: isOptional && hasQuestionMark,
+        isDeprecated: meta[metaSymbol]?.isDeprecated,
+      });
+    },
+  );
   return f.createTypeLiteralNode(members);
 };
 
-const onArray: Producer = ({ element }: z.ZodArray<z.ZodTypeAny>, { next }) =>
-  f.createArrayTypeNode(next(element));
+const onArray: Producer = ({ _zod: { def } }: $ZodArray, { next }) =>
+  f.createArrayTypeNode(next(def.element));
 
-const onEnum: Producer = ({ options }: z.ZodEnum<[string, ...string[]]>) =>
-  f.createUnionTypeNode(options.map(makeLiteralType));
+const onEnum: Producer = ({ _zod: { def } }: $ZodEnum) =>
+  f.createUnionTypeNode(Object.values(def.entries).map(makeLiteralType));
 
 const onSomeUnion: Producer = (
-  {
-    options,
-  }:
-    | z.ZodUnion<z.ZodUnionOptions>
-    | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>,
+  { _zod: { def } }: $ZodUnion | $ZodDiscriminatedUnion,
   { next },
 ) => {
   const nodes = new Map<ts.TypeNode | ts.KeywordTypeSyntaxKind, ts.TypeNode>();
-  for (const option of options) {
+  for (const option of def.options) {
     const node = next(option);
     nodes.set(isPrimitive(node) ? node.kind : node, node);
   }
@@ -93,10 +110,8 @@ const onSomeUnion: Producer = (
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
 
-const onEffects: Producer = (
-  schema: z.ZodEffects<z.ZodTypeAny>,
-  { next, isResponse },
-) => {
+/** @todo move into onPipeline */
+const onEffects: Producer = (schema: $ZodTransform, { next, isResponse }) => {
   const input = next(schema.innerType());
   if (isResponse && schema._def.effect.type === "transform") {
     const outputType = getTransformedType(schema, makeSample(input));
@@ -117,14 +132,11 @@ const onEffects: Producer = (
   return input;
 };
 
-const onNativeEnum: Producer = (schema: z.ZodNativeEnum<z.EnumLike>) =>
-  f.createUnionTypeNode(Object.values(schema.enum).map(makeLiteralType));
-
 const onOptional: Producer = (
-  schema: z.ZodOptional<z.ZodTypeAny>,
+  { _zod: { def } }: $ZodOptional,
   { next, optionalPropStyle: { withUndefined: hasUndefined } },
 ) => {
-  const actualTypeNode = next(schema.unwrap());
+  const actualTypeNode = next(def.innerType);
   return hasUndefined
     ? f.createUnionTypeNode([
         actualTypeNode,
@@ -133,23 +145,18 @@ const onOptional: Producer = (
     : actualTypeNode;
 };
 
-const onNullable: Producer = (schema: z.ZodNullable<z.ZodTypeAny>, { next }) =>
-  f.createUnionTypeNode([next(schema.unwrap()), makeLiteralType(null)]);
+const onNullable: Producer = ({ _zod: { def } }: $ZodNullable, { next }) =>
+  f.createUnionTypeNode([next(def.innerType), makeLiteralType(null)]);
 
-const onTuple: Producer = (
-  { items, _def: { rest } }: z.AnyZodTuple,
-  { next },
-) =>
+const onTuple: Producer = ({ _zod: { def } }: $ZodTuple, { next }) =>
   f.createTupleTypeNode(
-    items
+    def.items
       .map(next)
-      .concat(rest === null ? [] : f.createRestTypeNode(next(rest))),
+      .concat(def.rest === null ? [] : f.createRestTypeNode(next(def.rest))),
   );
 
-const onRecord: Producer = (
-  { keySchema, valueSchema }: z.ZodRecord<z.ZodTypeAny>,
-  { next },
-) => ensureTypeNode("Record", [keySchema, valueSchema].map(next));
+const onRecord: Producer = ({ _zod: { def } }: $ZodRecord, { next }) =>
+  ensureTypeNode("Record", [def.keyType, def.valueType].map(next));
 
 const intersect = R.tryCatch(
   (nodes: ts.TypeNode[]) => {
@@ -167,87 +174,78 @@ const intersect = R.tryCatch(
 );
 
 const onIntersection: Producer = (
-  { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
+  { _zod: { def } }: $ZodIntersection,
   { next },
-) => intersect([left, right].map(next));
+) => intersect([def.left, def.right].map(next));
 
-const onDefault: Producer = ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
-  next(_def.innerType);
+const onDefault: Producer = ({ _zod: { def } }: $ZodDefault, { next }) =>
+  next(def.innerType);
 
 const onPrimitive =
   (syntaxKind: ts.KeywordTypeSyntaxKind): Producer =>
   () =>
     ensureTypeNode(syntaxKind);
 
-const onBranded: Producer = (
-  schema: z.ZodBranded<z.ZodTypeAny, string | number | symbol>,
-  { next },
-) => next(schema.unwrap());
+const onReadonly: Producer = ({ _zod: { def } }: $ZodReadonly, { next }) =>
+  next(def.innerType);
 
-const onReadonly: Producer = (schema: z.ZodReadonly<z.ZodTypeAny>, { next }) =>
-  next(schema.unwrap());
-
-const onCatch: Producer = ({ _def }: z.ZodCatch<z.ZodTypeAny>, { next }) =>
-  next(_def.innerType);
+/** @todo consider combining with similar methods like readonly */
+const onCatch: Producer = ({ _zod: { def } }: $ZodCatch, { next }) =>
+  next(def.innerType);
 
 const onPipeline: Producer = (
-  { _def }: z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>,
+  { _zod: { def } }: $ZodPipe,
   { next, isResponse },
-) => next(_def[isResponse ? "out" : "in"]);
+) => next(def[isResponse ? "out" : "in"]);
 
 const onNull: Producer = () => makeLiteralType(null);
 
-const onLazy: Producer = (lazy: z.ZodLazy<z.ZodTypeAny>, { makeAlias, next }) =>
-  makeAlias(lazy, () => next(lazy.schema));
+const onLazy: Producer = (lazy: $ZodLazy, { makeAlias, next }) =>
+  makeAlias(lazy, () => next(lazy._zod.def.getter()));
 
 const onFile: Producer = (schema: FileSchema) => {
-  const subject = schema.unwrap();
   const stringType = ensureTypeNode(ts.SyntaxKind.StringKeyword);
   const bufferType = ensureTypeNode("Buffer");
   const unionType = f.createUnionTypeNode([stringType, bufferType]);
-  return subject instanceof z.ZodString
+  return schema instanceof z.ZodString
     ? stringType
-    : subject instanceof z.ZodUnion
+    : schema instanceof z.ZodUnion
       ? unionType
       : bufferType;
 };
 
 const onRaw: Producer = (schema: RawSchema, { next }) =>
-  next(schema.unwrap().shape.raw);
+  next(schema._zod.def.shape.raw);
 
 const producers: HandlingRules<
   ts.TypeNode,
   ZTSContext,
-  z.ZodFirstPartyTypeKind | ProprietaryBrand
+  FirstPartyKind | ProprietaryBrand
 > = {
-  ZodString: onPrimitive(ts.SyntaxKind.StringKeyword),
-  ZodNumber: onPrimitive(ts.SyntaxKind.NumberKeyword),
-  ZodBigInt: onPrimitive(ts.SyntaxKind.BigIntKeyword),
-  ZodBoolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
-  ZodAny: onPrimitive(ts.SyntaxKind.AnyKeyword),
-  ZodUndefined: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
+  string: onPrimitive(ts.SyntaxKind.StringKeyword),
+  number: onPrimitive(ts.SyntaxKind.NumberKeyword),
+  bigint: onPrimitive(ts.SyntaxKind.BigIntKeyword),
+  boolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
+  any: onPrimitive(ts.SyntaxKind.AnyKeyword),
+  undefined: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
   [ezDateInBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
   [ezDateOutBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
-  ZodNull: onNull,
-  ZodArray: onArray,
-  ZodTuple: onTuple,
-  ZodRecord: onRecord,
-  ZodObject: onObject,
-  ZodLiteral: onLiteral,
-  ZodIntersection: onIntersection,
-  ZodUnion: onSomeUnion,
-  ZodDefault: onDefault,
-  ZodEnum: onEnum,
-  ZodNativeEnum: onNativeEnum,
-  ZodEffects: onEffects,
-  ZodOptional: onOptional,
-  ZodNullable: onNullable,
-  ZodDiscriminatedUnion: onSomeUnion,
-  ZodBranded: onBranded,
-  ZodCatch: onCatch,
-  ZodPipeline: onPipeline,
-  ZodLazy: onLazy,
-  ZodReadonly: onReadonly,
+  null: onNull,
+  array: onArray,
+  tuple: onTuple,
+  record: onRecord,
+  object: onObject,
+  literal: onLiteral,
+  intersection: onIntersection,
+  union: onSomeUnion,
+  default: onDefault,
+  enum: onEnum,
+  optional: onOptional,
+  nullable: onNullable,
+  catch: onCatch,
+  pipe: onPipeline,
+  lazy: onLazy,
+  readonly: onReadonly,
   [ezFileBrand]: onFile,
   [ezRawBrand]: onRaw,
 };

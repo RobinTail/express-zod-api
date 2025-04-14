@@ -1,3 +1,4 @@
+import type { $ZodType } from "@zod/core";
 import * as R from "ramda";
 import ts from "typescript";
 import { z } from "zod";
@@ -82,10 +83,10 @@ interface FormattedPrintingOptions {
 
 export class Integration extends IntegrationBase {
   readonly #program: ts.Node[] = [this.someOfType];
-  readonly #aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
+  readonly #aliases = new Map<$ZodType, ts.TypeAliasDeclaration>();
   #usage: Array<ts.Node | string> = [];
 
-  #makeAlias(schema: z.ZodTypeAny, produce: () => ts.TypeNode): ts.TypeNode {
+  #makeAlias(schema: $ZodType, produce: () => ts.TypeNode): ts.TypeNode {
     let name = this.#aliases.get(schema)?.name?.text;
     if (!name) {
       name = `Type${this.#aliases.size + 1}`;
