@@ -50,7 +50,7 @@ export class Middleware<
   readonly #handler: Handler<z.output<IN>, OPT, OUT>;
 
   constructor({
-    input = z.object({}) as IN,
+    input = z.object({}) as unknown as IN,
     security,
     handler,
   }: {
