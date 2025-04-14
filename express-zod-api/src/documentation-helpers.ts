@@ -181,21 +181,12 @@ export const depictFile: Depicter = (schema: FileSchema) => {
 export const depictUnion: Depicter = (
   { _zod }: $ZodUnion | $ZodDiscriminatedUnion,
   { next },
-) => ({
-  oneOf: _zod.def.options.map(next),
-});
-
-// @todo add possible discriminator to depictUnion, this should be deleted
-export const depictDiscriminatedUnion: Depicter = (
-  {
-    options,
-    discriminator,
-  }: z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>,
-  { next },
 ) => {
+  const discProp = Array.from(_zod.disc?.keys() || []).pop();
   return {
-    discriminator: { propertyName: discriminator },
-    oneOf: options.map(next),
+    oneOf: _zod.def.options.map(next),
+    discriminator:
+      typeof discProp === "string" ? { propertyName: discProp } : undefined,
   };
 };
 

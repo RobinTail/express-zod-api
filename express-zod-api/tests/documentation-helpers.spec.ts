@@ -13,7 +13,6 @@ import {
   depictDateIn,
   depictDateOut,
   depictDefault,
-  depictDiscriminatedUnion,
   depictEnum,
   depictExamples,
   depictFile,
@@ -200,10 +199,11 @@ describe("Documentation helpers", () => {
     });
   });
 
+  // @todo move to union test
   describe("depictDiscriminatedUnion()", () => {
     test("should wrap next depicters in oneOf prop and set discriminator prop", () => {
       expect(
-        depictDiscriminatedUnion(
+        depictUnion(
           z.discriminatedUnion("status", [
             z.object({ status: z.literal("success"), data: z.any() }),
             z.object({
