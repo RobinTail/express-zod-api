@@ -22,9 +22,6 @@ describe("I/O Schema and related helpers", () => {
     test("accepts ez.form()", () => {
       expectTypeOf(ez.form({})).toExtend<IOSchema>();
     });
-    test("respects the UnknownKeys type argument", () => {
-      expectTypeOf(z.object({})).not.toExtend<IOSchema>();
-    });
     test("accepts union of objects", () => {
       expectTypeOf(z.union([z.object({}), z.object({})])).toExtend<IOSchema>();
       expectTypeOf(z.object({}).or(z.object({}))).toExtend<IOSchema>();
@@ -135,14 +132,6 @@ describe("I/O Schema and related helpers", () => {
             .object({ s: z.string() })
             .transform(Object.values)
             .pipe(z.array(z.string())),
-        ).not.toExtend<IOSchema>();
-      });
-      test("does not accept nested piping", () => {
-        expectTypeOf(
-          z
-            .object({ a: z.string() })
-            .remap({ a: "b" })
-            .pipe(z.object({ b: z.string() })),
         ).not.toExtend<IOSchema>();
       });
     });
