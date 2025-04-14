@@ -144,10 +144,10 @@ export const arrayResultHandler = new ResultHandler({
     // Examples are taken for pulling down: no validation needed for this, no pulling up
     const examples = getExamples({ schema: output });
     const responseSchema =
-      "shape" in output &&
+      output instanceof z.ZodObject &&
       "items" in output.shape &&
       output.shape.items instanceof z.ZodArray
-        ? (output.shape.items as z.ZodArray<z.ZodTypeAny>)
+        ? output.shape.items
         : z.array(z.any());
     return examples.reduce<typeof responseSchema>(
       (acc, example) =>
