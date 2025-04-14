@@ -1,5 +1,6 @@
 import * as R from "ramda";
 import { z } from "zod";
+import { IOSchemaError } from "./errors";
 import { copyMeta } from "./metadata";
 import { AbstractMiddleware } from "./middleware";
 
@@ -40,14 +41,15 @@ export const extractObjectSchema = (subject: IOSchema): z.ZodObject => {
     subject instanceof z.ZodDiscriminatedUnion
   ) {
     return subject.options
-      .map((option) => extractObjectSchema(option))
+      .map((option) => extractObjectSchema(option as IOSchema))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
-  } else if (subject instanceof z.ZodEffects) {
-    return extractObjectSchema(subject._def.schema);
-  } else if (subject instanceof z.ZodPipeline) {
-    return extractObjectSchema(subject._def.in);
-  } // intersection left:
-  return extractObjectSchema(subject._def.left).merge(
-    extractObjectSchema(subject._def.right),
-  );
+  }
+  if (subject instanceof z.ZodPipe)
+    return extractObjectSchema(subject.in as IOSchema);
+  if (subject instanceof z.ZodIntersection) {
+    return extractObjectSchema(subject._zod.def.left as IOSchema).merge(
+      extractObjectSchema(subject._zod.def.right as IOSchema),
+    );
+  }
+  throw new IOSchemaError("Can not flatten IOSchema");
 };
