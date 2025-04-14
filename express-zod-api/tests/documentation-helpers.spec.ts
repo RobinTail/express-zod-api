@@ -584,7 +584,7 @@ describe("Documentation helpers", () => {
       { ctx: requestCtx, expected: "string (in)" },
     ])("should depict as $expected", ({ ctx }) => {
       expect(
-        depictPipeline(z.string().pipe(z.coerce.boolean()), ctx),
+        depictPipeline(z.string().transform(Boolean).pipe(z.boolean()), ctx),
       ).toMatchSnapshot();
     });
   });
