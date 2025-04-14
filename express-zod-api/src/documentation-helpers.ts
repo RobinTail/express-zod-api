@@ -519,7 +519,6 @@ export const depictNumber: Depicter = (
   };
   // @todo should also test z.int, z.int32, z.int64
   const intCheck = getCheck(def, "number_format", "safeint");
-  console.log(def.checks);
   const minCheck = getCheck<$ZodCheckGreaterThan>(def, "greater_than");
   const minimum = !minCheck
     ? intCheck

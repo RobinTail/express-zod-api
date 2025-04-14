@@ -1,3 +1,4 @@
+import type { $ZodType } from "@zod/core";
 import { ReferenceObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
@@ -56,7 +57,7 @@ describe("Documentation helpers", () => {
     method: "get",
     isResponse: false,
     makeRef: makeRefMock,
-    next: (schema: z.ZodTypeAny) =>
+    next: (schema: $ZodType) =>
       walkSchema(schema, {
         rules: depicters,
         onEach,
@@ -69,7 +70,7 @@ describe("Documentation helpers", () => {
     method: "get",
     isResponse: true,
     makeRef: makeRefMock,
-    next: (schema: z.ZodTypeAny) =>
+    next: (schema: $ZodType) =>
       walkSchema(schema, {
         rules: depicters,
         onEach,
@@ -764,14 +765,6 @@ describe("Documentation helpers", () => {
         expect(() => depictDate(z.date(), ctx)).toThrowErrorMatchingSnapshot();
       },
     );
-  });
-
-  describe("depictBranded", () => {
-    test("should pass the next depicter", () => {
-      expect(
-        depictBranded(z.string().min(2).brand("Test"), responseCtx),
-      ).toMatchSnapshot();
-    });
   });
 
   describe("depictReadonly", () => {
