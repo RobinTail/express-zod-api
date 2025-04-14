@@ -18,6 +18,15 @@ import type {
   $ZodUnion,
   $ZodChecks,
   $ZodTypeDef,
+  $ZodCheckMinLength,
+  $ZodCheckMaxLength,
+  $ZodString,
+  $ZodCheckRegex,
+  $ZodISODateTime,
+  $ZodJWT,
+  $ZodCheckLengthEquals,
+  $ZodISODate,
+  $ZodISOTime,
 } from "@zod/core";
 import {
   ExamplesObject,
@@ -399,12 +408,20 @@ export const depictRecord: Depicter = (
   return { type: "object", additionalProperties: next(def.valueType) };
 };
 
-type CheckName = $ZodChecks["_zod"]["def"]["check"];
-const getCheck = <K extends CheckName>(def: $ZodTypeDef, name: K) =>
-  (def.checks as Array<$ZodChecks> | undefined)?.find(
-    (one): one is $ZodChecks & { _zod: { def: { check: K } } } =>
-      one._zod.def.check === name,
-  );
+const getCheck = <T extends $ZodChecks>(
+  def: $ZodTypeDef,
+  name: T["_zod"]["def"]["check"],
+  format?: T extends { _zod: { def: { format: string } } }
+    ? T["_zod"]["def"]["format"]
+    : never,
+): T["_zod"]["def"] | undefined =>
+  R.find(
+    R.both(
+      R.pathEq(name, ["_zod", "def", "check"]),
+      format ? R.pathEq(format, ["_zod", "def", "format"]) : R.T,
+    ),
+    (def.checks || []) as $ZodChecks[],
+  )?._zod.def;
 
 // @todo should also have exact length check
 export const depictArray: Depicter = (
@@ -415,10 +432,10 @@ export const depictArray: Depicter = (
     type: "array",
     items: next(def.element),
   };
-  const minCheck = getCheck(def, "min_length");
-  const maxCheck = getCheck(def, "max_length");
-  if (minCheck) result.minItems = minCheck._zod.def.minimum;
-  if (maxCheck) result.maxItems = maxCheck._zod.def.maximum;
+  const minCheck = getCheck<$ZodCheckMinLength>(def, "min_length");
+  const maxCheck = getCheck<$ZodCheckMaxLength>(def, "max_length");
+  if (minCheck) result.minItems = minCheck.minimum;
+  if (maxCheck) result.maxItems = maxCheck.maximum;
   return result;
 };
 
@@ -436,50 +453,43 @@ export const depictTuple: Depicter = (
   items: def.rest === null ? { not: {} } : next(def.rest),
 });
 
-export const depictString: Depicter = ({
-  isEmail,
-  isURL,
-  minLength,
-  maxLength,
-  isUUID,
-  isCUID,
-  isCUID2,
-  isULID,
-  isIP,
-  isEmoji,
-  isDatetime,
-  isCIDR,
-  isDate,
-  isTime,
-  isBase64,
-  isNANOID,
-  isBase64url,
-  isDuration,
-  _def: { checks },
-}: z.ZodString) => {
-  const regexCheck = checks.find((check) => check.kind === "regex");
-  const datetimeCheck = checks.find((check) => check.kind === "datetime");
-  const isJWT = checks.some((check) => check.kind === "jwt");
-  const lenCheck = checks.find((check) => check.kind === "length");
+export const depictString: Depicter = ({ _zod: { def } }: $ZodString) => {
+  const minCheck = getCheck<$ZodCheckMinLength>(def, "min_length");
+  const maxCheck = getCheck<$ZodCheckMaxLength>(def, "max_length");
+  const regexCheck = getCheck<$ZodCheckRegex>(def, "string_format", "regex");
+  const dateCheck = getCheck<$ZodISODate>(def, "string_format", "date");
+  const timeCheck = getCheck<$ZodISOTime>(def, "string_format", "time");
+  const datetimeCheck = getCheck<$ZodISODateTime>(
+    def,
+    "string_format",
+    "datetime",
+  );
+  const jwtCheck = getCheck<$ZodJWT>(def, "string_format", "jwt");
+  const lenCheck = getCheck<$ZodCheckLengthEquals>(def, "length_equals");
   const result: SchemaObject = { type: "string" };
+  // @todo should rather invoke those methods inside the loop below to avoid so much lookup
   const formats: Record<NonNullable<SchemaObject["format"]>, boolean> = {
-    "date-time": isDatetime,
-    byte: isBase64,
-    base64url: isBase64url,
-    date: isDate,
-    time: isTime,
-    duration: isDuration,
-    email: isEmail,
-    url: isURL,
-    uuid: isUUID,
-    cuid: isCUID,
-    cuid2: isCUID2,
-    ulid: isULID,
-    nanoid: isNANOID,
-    jwt: isJWT,
-    ip: isIP,
-    cidr: isCIDR,
-    emoji: isEmoji,
+    "date-time": !!datetimeCheck,
+    byte: !!getCheck(def, "string_format", "base64"),
+    base64url: !!getCheck(def, "string_format", "base64url"),
+    date: !!dateCheck,
+    time: !!timeCheck,
+    duration: !!getCheck(def, "string_format", "duration"),
+    email: !!getCheck(def, "string_format", "email"),
+    url: !!getCheck(def, "string_format", "url"),
+    uuid: !!getCheck(def, "string_format", "uuid"),
+    cuid: !!getCheck(def, "string_format", "cuid"),
+    cuid2: !!getCheck(def, "string_format", "cuid2"),
+    ulid: !!getCheck(def, "string_format", "ulid"),
+    nanoid: !!getCheck(def, "string_format", "nanoid"),
+    jwt: !!jwtCheck,
+    ip:
+      !!getCheck(def, "string_format", "ipv4") ||
+      !!getCheck(def, "string_format", "ipv6"),
+    cidr:
+      !!getCheck(def, "string_format", "cidrv4") ||
+      !!getCheck(def, "string_format", "cidrv6"),
+    emoji: !!getCheck(def, "string_format", "emoji"),
   };
   for (const format in formats) {
     if (formats[format]) {
@@ -488,14 +498,14 @@ export const depictString: Depicter = ({
     }
   }
   if (lenCheck)
-    [result.minLength, result.maxLength] = [lenCheck.value, lenCheck.value];
-  if (minLength !== null) result.minLength = minLength;
-  if (maxLength !== null) result.maxLength = maxLength;
-  if (isDate) result.pattern = dateRegex.source;
-  if (isTime) result.pattern = timeRegex.source;
-  if (isDatetime)
-    result.pattern = getTimestampRegex(datetimeCheck?.offset).source;
-  if (regexCheck) result.pattern = regexCheck.regex.source;
+    [result.minLength, result.maxLength] = [lenCheck.length, lenCheck.length];
+  if (minCheck) result.minLength = minCheck.minimum;
+  if (maxCheck) result.maxLength = maxCheck.maximum;
+  if (dateCheck) result.pattern = dateRegex.source;
+  if (timeCheck) result.pattern = timeRegex.source;
+  if (datetimeCheck)
+    result.pattern = getTimestampRegex(datetimeCheck.offset).source;
+  if (regexCheck) result.pattern = regexCheck.pattern.source;
   return result;
 };
 
