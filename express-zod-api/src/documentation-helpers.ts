@@ -628,10 +628,12 @@ export const depictExamples = (
   schema: z.ZodType,
   isResponse: boolean,
   omitProps: string[] = [],
-): ExamplesObject | undefined =>
-  R.pipe(
+): ExamplesObject | undefined => {
+  const isObject = (subj: unknown): subj is FlatObject =>
+    R.type(subj) === "Object";
+  return R.pipe(
     getExamples,
-    R.map(R.when((subj) => R.type(subj) === "Object", R.omit(omitProps))),
+    R.map(R.when(isObject, R.omit(omitProps))),
     enumerateExamples,
   )({
     schema,
@@ -639,6 +641,7 @@ export const depictExamples = (
     validate: true,
     pullProps: true,
   });
+};
 
 export const depictParamExamples = (
   schema: z.ZodType,
