@@ -5,11 +5,14 @@ import type {
   $ZodDiscriminatedUnion,
   $ZodEnum,
   $ZodIntersection,
+  $ZodLazy,
   $ZodLiteral,
   $ZodNullable,
   $ZodObject,
   $ZodOptional,
+  $ZodPipe,
   $ZodRecord,
+  $ZodTuple,
   $ZodType,
   $ZodUnion,
 } from "@zod/core";
@@ -71,7 +74,7 @@ export type NumericRange = Record<"integer" | "float", [number, number]>;
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   makeRef: (
-    schema: z.ZodTypeAny,
+    schema: $ZodType,
     subject:
       | SchemaObject
       | ReferenceObject
@@ -408,13 +411,13 @@ export const depictArray: Depicter = (
  * @since 17.5.0 added rest handling, fixed tuple type
  * */
 export const depictTuple: Depicter = (
-  { items, _def: { rest } }: z.AnyZodTuple,
+  { _zod: { def } }: $ZodTuple,
   { next },
 ) => ({
   type: "array",
-  prefixItems: items.map(next),
+  prefixItems: def.items.map(next),
   // does not appear to support items:false, so not:{} is a recommended alias
-  items: rest === null ? { not: {} } : next(rest),
+  items: def.rest === null ? { not: {} } : next(def.rest),
 });
 
 export const depictString: Depicter = ({
@@ -553,17 +556,17 @@ export const depictEffect: Depicter = (
 };
 
 export const depictPipeline: Depicter = (
-  { _def }: z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>,
+  { _zod: { def } }: $ZodPipe,
   { isResponse, next },
-) => next(_def[isResponse ? "out" : "in"]);
+) => next(def[isResponse ? "out" : "in"]);
 
 export const depictLazy: Depicter = (
-  lazy: z.ZodLazy<z.ZodTypeAny>,
+  lazy: $ZodLazy,
   { next, makeRef },
-): ReferenceObject => makeRef(lazy, () => next(lazy.schema));
+): ReferenceObject => makeRef(lazy, () => next(lazy._zod.def.getter()));
 
-export const depictRaw: Depicter = (schema: RawSchema, { next }) =>
-  next(schema.unwrap().shape.raw);
+export const depictRaw: Depicter = ({ _zod: { def } }: RawSchema, { next }) =>
+  next(def.shape.raw);
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
   examples.length
@@ -576,7 +579,7 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
     : undefined;
 
 export const depictExamples = (
-  schema: z.ZodTypeAny,
+  schema: z.ZodType,
   isResponse: boolean,
   omitProps: string[] = [],
 ): ExamplesObject | undefined =>
@@ -592,7 +595,7 @@ export const depictExamples = (
   });
 
 export const depictParamExamples = (
-  schema: z.ZodTypeAny,
+  schema: z.ZodType,
   param: string,
 ): ExamplesObject | undefined =>
   R.pipe(

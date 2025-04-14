@@ -1,3 +1,4 @@
+import type { $ZodType } from "@zod/core";
 import {
   OpenApiBuilder,
   OperationObject,
@@ -8,7 +9,6 @@ import {
   SecuritySchemeType,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
@@ -94,10 +94,10 @@ interface DocumentationParams {
 export class Documentation extends OpenApiBuilder {
   readonly #lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   readonly #lastOperationIdSuffixes = new Map<string, number>();
-  readonly #references = new Map<z.ZodTypeAny, string>();
+  readonly #references = new Map<$ZodType, string>();
 
   #makeRef(
-    schema: z.ZodTypeAny,
+    schema: $ZodType,
     subject:
       | SchemaObject
       | ReferenceObject
