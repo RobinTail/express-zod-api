@@ -1,29 +1,12 @@
 import * as R from "ramda";
 import { z } from "zod";
-import { FlatObject } from "./common-helpers";
-import { FormSchema } from "./form-schema";
 import { copyMeta } from "./metadata";
 import { AbstractMiddleware } from "./middleware";
-import { RawSchema } from "./raw-schema";
 
-type BaseObject = z.ZodObject;
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- workaround for TS2456, circular reference
-interface ObjectTransformation<T extends z.ZodType>
-  extends z.ZodPipe<T, z.ZodTransform<FlatObject, z.output<T>>> {}
-
-type EffectsChain = ObjectTransformation<BaseObject | EffectsChain>;
+type Base = object & { [Symbol.iterator]?: never };
 
 /** @desc The type allowed on the top level of Middlewares and Endpoints */
-export type IOSchema =
-  | BaseObject // z.object() + .refine()
-  | EffectsChain // z.object().transform()
-  | RawSchema // ez.raw()
-  | FormSchema // ez.form()
-  | z.ZodUnion<[IOSchema, ...IOSchema[]]> // z.object().or()
-  | z.ZodIntersection<IOSchema, IOSchema> // z.object().and()
-  | z.ZodDiscriminatedUnion<BaseObject[]> // z.discriminatedUnion()
-  | z.ZodPipe<ObjectTransformation<BaseObject>, BaseObject>; // z.object().remap()
+export type IOSchema = z.ZodType<Base>;
 
 /**
  * @description intersects input schemas of middlewares and the endpoint

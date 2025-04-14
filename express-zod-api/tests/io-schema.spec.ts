@@ -11,12 +11,9 @@ describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {
     test("accepts object", () => {
       expectTypeOf(z.object({})).toExtend<IOSchema>();
-      expectTypeOf(z.object({})).toExtend<IOSchema<"strip">>();
-      expectTypeOf(z.object({}).strict()).toExtend<IOSchema<"strict">>();
-      expectTypeOf(z.object({}).passthrough()).toExtend<
-        IOSchema<"passthrough">
-      >();
-      expectTypeOf(z.object({}).strip()).toExtend<IOSchema<"strip">>();
+      expectTypeOf(z.object({}).strip()).toExtend<IOSchema>();
+      expectTypeOf(z.object({}).strict()).toExtend<IOSchema>();
+      expectTypeOf(z.object({}).passthrough()).toExtend<IOSchema>();
     });
     test("accepts ez.raw()", () => {
       expectTypeOf(ez.raw()).toExtend<IOSchema>();
@@ -26,7 +23,7 @@ describe("I/O Schema and related helpers", () => {
       expectTypeOf(ez.form({})).toExtend<IOSchema>();
     });
     test("respects the UnknownKeys type argument", () => {
-      expectTypeOf(z.object({})).not.toExtend<IOSchema<"passthrough">>();
+      expectTypeOf(z.object({})).not.toExtend<IOSchema>();
     });
     test("accepts union of objects", () => {
       expectTypeOf(z.union([z.object({}), z.object({})])).toExtend<IOSchema>();
