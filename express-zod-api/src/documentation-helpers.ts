@@ -1,4 +1,5 @@
 import type {
+  $ZodArray,
   $ZodCatch,
   $ZodDate,
   $ZodDefault,
@@ -15,6 +16,7 @@ import type {
   $ZodTuple,
   $ZodType,
   $ZodUnion,
+  $ZodChecks,
 } from "@zod/core";
 import {
   ExamplesObject,
@@ -396,13 +398,23 @@ export const depictRecord: Depicter = (
   return { type: "object", additionalProperties: next(def.valueType) };
 };
 
-export const depictArray: Depicter = (
-  { _def: { minLength, maxLength }, element }: z.ZodArray<z.ZodTypeAny>,
-  { next },
-) => {
-  const result: SchemaObject = { type: "array", items: next(element) };
-  if (minLength) result.minItems = minLength.value;
-  if (maxLength) result.maxItems = maxLength.value;
+type CheckName = $ZodChecks["_zod"]["def"]["check"];
+const getCheck = <K extends CheckName>(schema: $ZodType, name: K) =>
+  (schema._zod.def.checks as Array<$ZodChecks> | undefined)?.find(
+    (one): one is $ZodChecks & { _zod: { def: { check: K } } } =>
+      one._zod.def.check === name,
+  );
+
+// @todo should also have exact length check
+export const depictArray: Depicter = (schema: $ZodArray, { next }) => {
+  const result: SchemaObject = {
+    type: "array",
+    items: next(schema._zod.def.element),
+  };
+  const minCheck = getCheck(schema, "min_length");
+  const maxCheck = getCheck(schema, "max_length");
+  if (minCheck) result.minItems = minCheck._zod.def.minimum;
+  if (maxCheck) result.maxItems = maxCheck._zod.def.maximum;
   return result;
 };
 
