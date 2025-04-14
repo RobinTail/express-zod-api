@@ -40,6 +40,22 @@ describe("BuiltinLogger", () => {
       expect(logSpy).toHaveBeenCalledTimes(1);
     });
 
+    test("Should create async logger", async () => {
+      const { logger } = makeLogger({ async: true, level: "debug" });
+      expect(BuiltinLogger["worker"]).toBeTruthy();
+      const spy = vi
+        .spyOn(BuiltinLogger["worker"]!, "postMessage")
+        .mockImplementation(() => {});
+      logger.debug("test");
+      expect(spy).toHaveBeenCalledWith({
+        command: "log",
+        line: expect.stringMatching(/test$/),
+      });
+      vi.useRealTimers(); // because of setTimeout in the disposer
+      await logger[Symbol.asyncDispose]();
+      expect(spy).toHaveBeenCalledWith({ command: "close" });
+    });
+
     test.each(["development", "production"])(
       "Level can be omitted and depends on env",
       (mode) => {
