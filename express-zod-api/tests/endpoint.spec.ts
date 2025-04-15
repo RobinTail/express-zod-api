@@ -527,8 +527,7 @@ describe("Endpoint", () => {
           },
         ),
       output: z
-        .object({})
-        .passthrough()
+        .looseObject({})
         .refine((obj) => !("emitOutputValidationFailure" in obj), {
           message: "failure on demand",
         }),

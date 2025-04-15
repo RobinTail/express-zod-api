@@ -336,7 +336,7 @@ describe("Documentation helpers", () => {
       one = "ONE",
       two = "TWO",
     }
-    test.each([z.enum(["one", "two"]), z.nativeEnum(Test)])(
+    test.each([z.enum(["one", "two"]), z.enum(Test)])(
       "should set type and enum properties",
       (schema) => {
         expect(depictEnum(schema, requestCtx)).toMatchSnapshot();

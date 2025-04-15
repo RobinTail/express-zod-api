@@ -42,12 +42,12 @@ export const extractObjectSchema = (subject: IOSchema): z.ZodObject => {
   ) {
     return subject._zod.def.options
       .map((option) => extractObjectSchema(option as IOSchema))
-      .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
+      .reduce((acc, option) => acc.extend(option.partial()), z.object({}));
   }
   if (subject instanceof z.ZodPipe)
     return extractObjectSchema(subject.in as IOSchema);
   if (subject instanceof z.ZodIntersection) {
-    return extractObjectSchema(subject._zod.def.left as IOSchema).merge(
+    return extractObjectSchema(subject._zod.def.left as IOSchema).extend(
       extractObjectSchema(subject._zod.def.right as IOSchema),
     );
   }

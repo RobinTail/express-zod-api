@@ -438,10 +438,10 @@ describe("Documentation", () => {
                 regularEnum: z.enum(["ABC", "DEF"]),
               }),
               output: z.object({
-                nativeEnum: z.nativeEnum({ FEG: 1, XYZ: 2 }),
+                nativeEnum: z.enum({ FEG: 1, XYZ: 2 }),
               }),
               handler: async () => ({
-                nativeEnum: 1,
+                nativeEnum: 1 as const,
               }),
             }),
           },

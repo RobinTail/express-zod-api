@@ -28,7 +28,7 @@ describe("ez.form()", () => {
     });
 
     test("should accept extras when the base has .passthrough()", () => {
-      const schema = ez.form(z.object({ name: z.string() }).passthrough());
+      const schema = ez.form(z.object({ name: z.string() }).loose());
       expect(schema.parse({ name: "test", extra: "kept" })).toEqual({
         name: "test",
         extra: "kept",

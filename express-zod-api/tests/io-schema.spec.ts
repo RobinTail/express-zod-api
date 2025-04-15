@@ -13,7 +13,7 @@ describe("I/O Schema and related helpers", () => {
       expectTypeOf(z.object({})).toExtend<IOSchema>();
       expectTypeOf(z.object({}).strip()).toExtend<IOSchema>();
       expectTypeOf(z.object({}).strict()).toExtend<IOSchema>();
-      expectTypeOf(z.object({}).passthrough()).toExtend<IOSchema>();
+      expectTypeOf(z.object({}).loose()).toExtend<IOSchema>();
     });
     test("accepts ez.raw()", () => {
       expectTypeOf(ez.raw()).toExtend<IOSchema>();
@@ -220,7 +220,7 @@ describe("I/O Schema and related helpers", () => {
     test("Zod Issue #600: can not intersect object schema with passthrough and transformation", () => {
       // @see https://github.com/colinhacks/zod/issues/600
       // this is the reason why IOSchema is generic and middlewares have to be "strip"
-      const left = z.object({}).passthrough();
+      const left = z.looseObject({});
       const right = z.object({
         id: z.string().transform((str) => parseInt(str)),
       });
