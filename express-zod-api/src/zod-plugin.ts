@@ -120,6 +120,7 @@ if (!(metaSymbol in globalThis)) {
     if (!entry.startsWith("Zod")) continue;
     const Cls = z[entry as keyof typeof z];
     if (typeof Cls !== "function") continue;
+    let originalCheck: z.ZodType["check"];
     Object.defineProperties(Cls.prototype, {
       ["example" satisfies keyof z.ZodType]: {
         get(): z.ZodType["example"] {
@@ -135,6 +136,21 @@ if (!(metaSymbol in globalThis)) {
         set() {}, // this is required to override the existing method
         get() {
           return brandSetter.bind(this) as z.ZodType["brand"];
+        },
+      },
+      ["check" satisfies keyof z.ZodType]: {
+        set(fn) {
+          originalCheck = fn;
+        },
+        get() {
+          return function (
+            this: z.ZodType,
+            ...args: Parameters<z.ZodType["check"]>
+          ) {
+            const meta = this.meta()?.[metaSymbol];
+            const result = originalCheck.apply(this, args);
+            return result.meta({ [metaSymbol]: meta });
+          };
         },
       },
     });

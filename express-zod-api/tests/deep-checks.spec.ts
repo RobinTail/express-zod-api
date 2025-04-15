@@ -26,7 +26,7 @@ describe("Checks", () => {
       ez.upload().nullable(),
       ez.upload().default({} as UploadedFile & $brand<symbol>),
       z.record(z.string(), ez.upload()),
-      ez.upload().refine(() => true), // @todo this might not ever work because of detached meta system
+      ez.upload().refine(() => true),
       z.array(ez.upload()),
     ])("should return true for wrapped needle %#", (subject) => {
       expect(hasNestedSchema(subject, { condition })).toBeTruthy();

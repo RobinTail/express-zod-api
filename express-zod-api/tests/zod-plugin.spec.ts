@@ -40,7 +40,6 @@ describe("Zod Runtime Plugin", () => {
       ]);
     });
 
-    /** @todo this might no longer ever work due to detached meta system of Zod 4 */
     test("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = schema.example("test");
