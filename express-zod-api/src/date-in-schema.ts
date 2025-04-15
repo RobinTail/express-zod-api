@@ -12,7 +12,7 @@ export const dateIn = () => {
 
   return schema
     .transform((str) => new Date(str))
-    .pipe(z.date().refine(isValidDate))
+    .pipe(z.date().refine(isValidDate)) // @todo isValidDate no longer needed
     .brand(ezDateInBrand as symbol);
 };
 

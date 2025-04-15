@@ -3,10 +3,41 @@
 exports[`ez.dateIn() > parsing > should handle invalid date 1`] = `
 [
   {
-    "code": "invalid_string",
-    "message": "Invalid date",
+    "code": "invalid_union",
+    "errors": [
+      [
+        {
+          "code": "invalid_format",
+          "format": "date",
+          "message": "Invalid ISO date",
+          "origin": "string",
+          "path": [],
+          "pattern": "/^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))$/",
+        },
+      ],
+      [
+        {
+          "code": "invalid_format",
+          "format": "datetime",
+          "message": "Invalid ISO datetime",
+          "origin": "string",
+          "path": [],
+          "pattern": "/^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z)$/",
+        },
+      ],
+      [
+        {
+          "code": "invalid_format",
+          "format": "datetime",
+          "message": "Invalid ISO datetime",
+          "origin": "string",
+          "path": [],
+          "pattern": "/^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z?)$/",
+        },
+      ],
+    ],
+    "message": "Invalid input",
     "path": [],
-    "validation": "date",
   },
 ]
 `;
@@ -14,10 +45,41 @@ exports[`ez.dateIn() > parsing > should handle invalid date 1`] = `
 exports[`ez.dateIn() > parsing > should handle invalid format 1`] = `
 [
   {
-    "code": "invalid_string",
-    "message": "Invalid date",
+    "code": "invalid_union",
+    "errors": [
+      [
+        {
+          "code": "invalid_format",
+          "format": "date",
+          "message": "Invalid ISO date",
+          "origin": "string",
+          "path": [],
+          "pattern": "/^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))$/",
+        },
+      ],
+      [
+        {
+          "code": "invalid_format",
+          "format": "datetime",
+          "message": "Invalid ISO datetime",
+          "origin": "string",
+          "path": [],
+          "pattern": "/^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z)$/",
+        },
+      ],
+      [
+        {
+          "code": "invalid_format",
+          "format": "datetime",
+          "message": "Invalid ISO datetime",
+          "origin": "string",
+          "path": [],
+          "pattern": "/^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z?)$/",
+        },
+      ],
+    ],
+    "message": "Invalid input",
     "path": [],
-    "validation": "date",
   },
 ]
 `;
@@ -26,43 +88,34 @@ exports[`ez.dateIn() > parsing > should handle wrong parsed type 1`] = `
 [
   {
     "code": "invalid_union",
+    "errors": [
+      [
+        {
+          "code": "invalid_type",
+          "expected": "string",
+          "message": "Invalid input: expected string, received number",
+          "path": [],
+        },
+      ],
+      [
+        {
+          "code": "invalid_type",
+          "expected": "string",
+          "message": "Invalid input: expected string, received number",
+          "path": [],
+        },
+      ],
+      [
+        {
+          "code": "invalid_type",
+          "expected": "string",
+          "message": "Invalid input: expected string, received number",
+          "path": [],
+        },
+      ],
+    ],
     "message": "Invalid input",
     "path": [],
-    "unionErrors": [
-      ZodError({
-        "message": "[
-  {
-    "code": "invalid_type",
-    "expected": "string",
-    "received": "number",
-    "path": [],
-    "message": "Expected string, received number"
-  }
-]",
-      }),
-      ZodError({
-        "message": "[
-  {
-    "code": "invalid_type",
-    "expected": "string",
-    "received": "number",
-    "path": [],
-    "message": "Expected string, received number"
-  }
-]",
-      }),
-      ZodError({
-        "message": "[
-  {
-    "code": "invalid_type",
-    "expected": "string",
-    "received": "number",
-    "path": [],
-    "message": "Expected string, received number"
-  }
-]",
-      }),
-    ],
   },
 ]
 `;
