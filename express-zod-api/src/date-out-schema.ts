@@ -6,7 +6,7 @@ export const ezDateOutBrand = Symbol("DateOut");
 export const dateOut = () =>
   z
     .date()
-    .refine(isValidDate)
+    .refine(isValidDate) // @todo looks line this is no longer required
     .transform((date) => date.toISOString())
     .brand(ezDateOutBrand as symbol);
 

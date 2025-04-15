@@ -22,9 +22,8 @@ describe("ez.dateOut()", () => {
           {
             code: "invalid_type",
             expected: "date",
-            message: "Expected date, received string",
+            message: "Invalid input: expected date, received string",
             path: [],
-            received: "string",
           },
         ]);
       }
@@ -46,9 +45,11 @@ describe("ez.dateOut()", () => {
       if (!result.success) {
         expect(result.error.issues).toEqual([
           {
-            code: "invalid_date",
-            message: "Invalid date",
+            code: "invalid_type",
+            expected: "date",
+            message: "Invalid input: expected date, received Date",
             path: [],
+            received: "Invalid Date",
           },
         ]);
       }
