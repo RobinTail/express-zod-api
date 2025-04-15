@@ -225,11 +225,11 @@ describe("I/O Schema and related helpers", () => {
         id: z.string().transform((str) => parseInt(str)),
       });
       const schema = z.intersection(left, right);
-      const result = schema.safeParse({
-        id: "123",
-      });
-      expect(result.success).toBeFalsy();
-      expect(result.error).toMatchSnapshot();
+      expect(() =>
+        schema.parse({
+          id: "123",
+        }),
+      ).toThrowErrorMatchingSnapshot();
     });
 
     test("Should merge mixed object schemas", () => {
