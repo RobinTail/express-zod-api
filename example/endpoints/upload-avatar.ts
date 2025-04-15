@@ -11,7 +11,7 @@ export const uploadAvatarEndpoint = defaultEndpointsFactory.build({
   }),
   output: z.object({
     name: z.string(),
-    size: z.int().nonnegative(),
+    size: z.number().int().nonnegative(),
     mime: z.string(),
     hash: z.string(),
     otherInputs: z.record(z.string(), z.any()),
