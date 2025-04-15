@@ -16,7 +16,7 @@ export const uploadAvatarEndpoint = defaultEndpointsFactory.build({
     size: z.number().int().nonnegative(),
     mime: z.string(),
     hash: z.string(),
-    otherInputs: z.record(z.any()),
+    otherInputs: z.record(z.string(), z.any()),
   }),
   handler: async ({ input: { avatar, ...rest } }) => {
     return {
