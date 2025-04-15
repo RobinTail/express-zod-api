@@ -98,7 +98,9 @@ describe("Zod Runtime Plugin", () => {
       expect(mappedSchema.out.shape).toEqual({
         userId: schema.shape.user_id,
       });
-      expect(mappedSchema._def.out.shape.userId).not.toBe(schema.shape.user_id);
+      expect(mappedSchema._zod.def.out.shape.userId).not.toBe(
+        schema.shape.user_id,
+      );
       expect(mappedSchema.parse({ user_id: "test" })).toEqual({
         userId: "test",
       });
@@ -109,7 +111,7 @@ describe("Zod Runtime Plugin", () => {
       (mapping) => {
         const schema = z.object({ user_id: z.string(), name: z.string() });
         const mappedSchema = schema.remap(mapping);
-        expect(mappedSchema._def.out.shape).toEqual({
+        expect(mappedSchema._zod.def.out.shape).toEqual({
           userId: schema.shape.user_id,
           name: schema.shape.name,
         });
@@ -123,7 +125,7 @@ describe("Zod Runtime Plugin", () => {
     test("should support a mapping function", () => {
       const schema = z.object({ user_id: z.string(), name: z.string() });
       const mappedSchema = schema.remap((shape) => camelize(shape, true));
-      expect(mappedSchema._def.out.shape).toEqual({
+      expect(mappedSchema._zod.def.out.shape).toEqual({
         userId: schema.shape.user_id,
         name: schema.shape.name,
       });
@@ -134,7 +136,7 @@ describe("Zod Runtime Plugin", () => {
     });
 
     test("should support passthrough object schemas", () => {
-      const schema = z.object({ user_id: z.string() }).passthrough();
+      const schema = z.looseObject({ user_id: z.string() });
       const mappedSchema = schema.remap({ user_id: "userId" });
       expect(
         mappedSchema.parse({ user_id: "test", extra: "excessive" }),

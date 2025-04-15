@@ -6,14 +6,12 @@ export const uploadAvatarEndpoint = defaultEndpointsFactory.build({
   method: "post",
   tag: "files",
   description: "Handles a file upload.",
-  input: z
-    .object({
-      avatar: ez.upload(),
-    })
-    .passthrough(),
+  input: z.looseObject({
+    avatar: ez.upload(),
+  }),
   output: z.object({
     name: z.string(),
-    size: z.number().int().nonnegative(),
+    size: z.int().nonnegative(),
     mime: z.string(),
     hash: z.string(),
     otherInputs: z.record(z.string(), z.any()),

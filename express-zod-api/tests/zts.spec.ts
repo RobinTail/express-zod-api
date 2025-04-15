@@ -64,9 +64,9 @@ describe("zod-to-ts", () => {
     }
 
     test.each([
-      { schema: z.nativeEnum(Color), feature: "numeric" },
-      { schema: z.nativeEnum(Fruit), feature: "string" },
-      { schema: z.nativeEnum(StringLiteral), feature: "quoted string" },
+      { schema: z.enum(Color), feature: "numeric" },
+      { schema: z.enum(Fruit), feature: "string" },
+      { schema: z.enum(StringLiteral), feature: "quoted string" },
     ])("handles $feature literals", ({ schema }) => {
       expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });
@@ -157,7 +157,7 @@ describe("zod-to-ts", () => {
           .or(z.number()),
         z.bigint().nullish().default(1000n),
       ),
-      nativeEnum: z.nativeEnum(Fruits),
+      nativeEnum: z.enum(Fruits),
       lazy: z.lazy(() => z.string()),
       discUnion: z.discriminatedUnion("kind", [
         z.object({ kind: z.literal("circle"), radius: z.number() }),
@@ -286,7 +286,7 @@ describe("zod-to-ts", () => {
   describe("Issue #2352: intersection of objects having same prop %#", () => {
     test.each([
       [z.string(), z.string()],
-      [z.string().nonempty(), z.string().email()],
+      [z.string().nonempty(), z.email()],
       [
         z.string().transform(Number),
         z
