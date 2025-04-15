@@ -180,12 +180,13 @@ export const depictUnion: Depicter = (
   { _zod }: $ZodUnion | $ZodDiscriminatedUnion,
   { next },
 ) => {
-  const discProp = Array.from(_zod.disc?.keys() || []).pop();
-  return {
-    oneOf: _zod.def.options.map(next),
-    discriminator:
-      typeof discProp === "string" ? { propertyName: discProp } : undefined,
-  };
+  const result: SchemaObject = { oneOf: _zod.def.options.map(next) };
+  if (_zod.disc) {
+    const propertyName = Array.from(_zod.disc.keys()).pop();
+    if (typeof propertyName === "string")
+      result.discriminator = { propertyName };
+  }
+  return result;
 };
 
 const propsMerger = (a: unknown, b: unknown) => {
