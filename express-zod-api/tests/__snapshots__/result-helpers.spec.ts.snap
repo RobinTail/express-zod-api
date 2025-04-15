@@ -9,20 +9,19 @@ InternalServerError({
 })
 `;
 
-exports[`Result helpers > ensureHttpError() > should handle InputValidationError: Expected string, received number 1`] = `
+exports[`Result helpers > ensureHttpError() > should handle InputValidationError: Invalid input: expected string, received number 1`] = `
 BadRequestError({
-  "cause": ZodError({
-    "message": "[
-  {
-    "code": "invalid_type",
-    "expected": "string",
-    "received": "number",
-    "path": [],
-    "message": "Expected string, received number"
-  }
-]",
-  }),
-  "message": "Expected string, received number",
+  "cause": ZodError {
+    "issues": [
+      {
+        "code": "invalid_type",
+        "expected": "string",
+        "message": "Invalid input: expected string, received number",
+        "path": [],
+      },
+    ],
+  },
+  "message": "Invalid input: expected string, received number",
 })
 `;
 
@@ -32,19 +31,18 @@ NotFoundError({
 })
 `;
 
-exports[`Result helpers > ensureHttpError() > should handle OutputValidationError: Expected string, received number 1`] = `
+exports[`Result helpers > ensureHttpError() > should handle OutputValidationError: Invalid input: expected string, received number 1`] = `
 InternalServerError({
-  "cause": ZodError({
-    "message": "[
-  {
-    "code": "invalid_type",
-    "expected": "string",
-    "received": "number",
-    "path": [],
-    "message": "Expected string, received number"
-  }
-]",
-  }),
-  "message": "output: Expected string, received number",
+  "cause": ZodError {
+    "issues": [
+      {
+        "code": "invalid_type",
+        "expected": "string",
+        "message": "Invalid input: expected string, received number",
+        "path": [],
+      },
+    ],
+  },
+  "message": "output: Invalid input: expected string, received number",
 })
 `;
