@@ -40,7 +40,7 @@ export const extractObjectSchema = (subject: IOSchema): z.ZodObject => {
     subject instanceof z.ZodUnion ||
     subject instanceof z.ZodDiscriminatedUnion
   ) {
-    return subject.options
+    return subject._zod.def.options
       .map((option) => extractObjectSchema(option as IOSchema))
       .reduce((acc, option) => acc.merge(option.partial()), z.object({}));
   }
