@@ -126,6 +126,7 @@ exports[`Documentation helpers > depictDiscriminatedUnion() > should wrap next d
       },
       "required": [
         "status",
+        "data",
       ],
       "type": "object",
     },
