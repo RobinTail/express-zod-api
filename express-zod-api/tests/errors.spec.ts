@@ -1,4 +1,3 @@
-import createHttpError from "http-errors";
 import { z } from "zod";
 import { DocumentationError, RoutingError } from "../src";
 import {
@@ -10,35 +9,6 @@ import {
 } from "../src/errors";
 
 describe("Errors", () => {
-  describe("environment check", () => {
-    test("should distinguish error instances of different classes", () => {
-      expect(createHttpError(500, "some message")).not.toEqual(
-        new Error("some message"),
-      );
-    });
-
-    test("should distinguish HTTP errors by status code and message", () => {
-      expect(createHttpError(400, "test")).not.toEqual(
-        createHttpError(500, "test"),
-      );
-      expect(createHttpError(400, "one")).not.toEqual(
-        createHttpError(400, "two"),
-      );
-      expect(createHttpError(400, new Error("one"))).not.toEqual(
-        createHttpError(400, new Error("two")),
-      );
-    });
-
-    test("should distinguish error causes", () => {
-      expect(new Error("test", { cause: "one" })).not.toEqual(
-        new Error("test", { cause: "two" }),
-      );
-      expect(
-        createHttpError(400, new Error("test", { cause: "one" })),
-      ).not.toEqual(createHttpError(400, new Error("test", { cause: "two" })));
-    });
-  });
-
   describe("RoutingError", () => {
     const error = new RoutingError("test");
 

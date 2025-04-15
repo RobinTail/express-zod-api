@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { isValidDate } from "./schema-helpers";
 
 export const ezDateInBrand = Symbol("DateIn");
 
@@ -12,7 +11,7 @@ export const dateIn = () => {
 
   return schema
     .transform((str) => new Date(str))
-    .pipe(z.date().refine(isValidDate)) // @todo isValidDate no longer needed
+    .pipe(z.date())
     .brand(ezDateInBrand as symbol);
 };
 
