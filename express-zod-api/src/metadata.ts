@@ -25,8 +25,8 @@ export const copyMeta = <A extends z.ZodType, B extends z.ZodType>(
     [metaSymbol]: {
       ...destMeta,
       examples: combinations(
-        srcMeta.examples || [],
         destMeta?.examples || [],
+        srcMeta.examples || [],
         ([destExample, srcExample]) =>
           typeof destExample === "object" && typeof srcExample === "object"
             ? R.mergeDeepRight({ ...destExample }, { ...srcExample })
