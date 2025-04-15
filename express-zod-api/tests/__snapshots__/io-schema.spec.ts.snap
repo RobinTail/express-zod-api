@@ -2,80 +2,90 @@
 
 exports[`I/O Schema and related helpers > extractObjectSchema() > Feature #600: Top level refinements > should handle refined object schema 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "properties": {
     "one": {
-      "_type": "ZodString",
+      "type": "string",
     },
   },
+  "required": [
+    "one",
+  ],
+  "type": "object",
 }
 `;
 
 exports[`I/O Schema and related helpers > extractObjectSchema() > Feature #1869: Top level transformations > should handle transformations to another object 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "properties": {
     "one": {
-      "_type": "ZodString",
+      "type": "string",
     },
   },
+  "required": [
+    "one",
+  ],
+  "type": "object",
 }
 `;
 
 exports[`I/O Schema and related helpers > extractObjectSchema() > should pass the object schema through 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "properties": {
     "one": {
-      "_type": "ZodString",
+      "type": "string",
     },
   },
+  "required": [
+    "one",
+  ],
+  "type": "object",
 }
 `;
 
 exports[`I/O Schema and related helpers > extractObjectSchema() > should return object schema for the intersection of object schemas 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "properties": {
     "one": {
-      "_type": "ZodString",
+      "type": "string",
     },
     "two": {
-      "_type": "ZodNumber",
+      "type": "number",
     },
   },
+  "required": [
+    "one",
+    "two",
+  ],
+  "type": "object",
 }
 `;
 
 exports[`I/O Schema and related helpers > extractObjectSchema() > should return object schema for the union of object schemas 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "properties": {
     "one": {
-      "_type": "ZodOptional",
-      "value": {
-        "_type": "ZodString",
-      },
+      "type": "string",
     },
     "two": {
-      "_type": "ZodOptional",
-      "value": {
-        "_type": "ZodNumber",
-      },
+      "type": "number",
     },
   },
+  "required": [],
+  "type": "object",
 }
 `;
 
 exports[`I/O Schema and related helpers > extractObjectSchema() > should support ez.raw() 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "properties": {
     "raw": {
-      "_type": "ZodBranded",
-      "brand": Symbol(File),
+      "x-brand": "Symbol(File)",
     },
   },
+  "required": [
+    "raw",
+  ],
+  "type": "object",
 }
 `;
 

@@ -1,7 +1,8 @@
 import "./src/zod-plugin"; // required for tests importing sources using the plugin methods
 import type { NewPlugin } from "@vitest/pretty-format";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import { ResultHandlerError } from "./src/errors";
+import { metaSymbol } from "./src/metadata";
 
 /** Takes cause and certain props of custom errors into account */
 const errorSerializer: NewPlugin = {
@@ -21,7 +22,17 @@ const errorSerializer: NewPlugin = {
 const schemaSerializer: NewPlugin = {
   test: (subject) => subject instanceof z.ZodType,
   serialize: (entity: z.ZodType, config, indentation, depth, refs, printer) => {
-    return printer(z.toJSONSchema(entity), config, indentation, depth, refs);
+    const serialization = z.toJSONSchema(entity, {
+      unrepresentable: "any",
+      override: ({ zodSchema, jsonSchema }) => {
+        if (zodSchema._zod.def.type === "custom") {
+          jsonSchema["x-brand"] = globalRegistry
+            .get(zodSchema)
+            ?.[metaSymbol]?.brand?.toString();
+        }
+      },
+    });
+    return printer(serialization, config, indentation, depth, refs);
   },
 };
 
