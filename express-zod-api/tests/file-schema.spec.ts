@@ -44,15 +44,13 @@ describe("ez.file()", () => {
         subject: 123,
         code: "invalid_type",
         expected: "string",
-        received: "number",
-        message: "Expected string, received number",
+        message: "Invalid input: expected string, received number",
       },
       {
         schema: ez.file("buffer"),
         subject: "123",
         code: "custom",
         message: "Expected Buffer",
-        fatal: true,
       },
     ])(
       "should invalidate wrong types",
