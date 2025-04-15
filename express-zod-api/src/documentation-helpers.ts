@@ -262,15 +262,12 @@ export const depictEnum: Depicter = ({ _zod: { def } }: $ZodEnum) => ({
   enum: Object.values(def.entries),
 });
 
-// @todo looks very similar to depictEnum, also takes values twice
 export const depictLiteral: Depicter = ({ _zod: { def } }: $ZodLiteral) => {
   const values = Object.values(def.values);
-  if (values.length === 1)
-    return { type: getSupportedType(values[0]), const: values[0] };
-  return {
-    type: getSupportedType(values[0]),
-    enum: Object.values(def.values),
-  };
+  const result: SchemaObject = { type: getSupportedType(values[0]) };
+  if (values.length === 1) result.const = values[0];
+  else result.enum = Object.values(def.values);
+  return result;
 };
 
 export const depictObject: Depicter = (
