@@ -12,7 +12,7 @@ import {
   ResultHandler,
 } from "../src";
 import { contentTypes } from "../src/content-type";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import { givePort } from "../../tools/ports";
 
 describe("Documentation", () => {
@@ -1234,9 +1234,12 @@ describe("Documentation", () => {
     test("should be handled accordingly in request, response and params", () => {
       const deep = Symbol("DEEP");
       const rule: Depicter = (
-        schema: z.ZodBoolean & z.$brand<typeof deep>,
+        schema: ReturnType<z.ZodBoolean["brand"]>,
         { next },
-      ) => next(schema);
+      ) => {
+        globalRegistry.remove(schema);
+        return next(schema);
+      };
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
