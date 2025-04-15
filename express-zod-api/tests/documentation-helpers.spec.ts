@@ -198,10 +198,7 @@ describe("Documentation helpers", () => {
         depictUnion(z.string().or(z.number()), requestCtx),
       ).toMatchSnapshot();
     });
-  });
 
-  // @todo move to union test
-  describe("depictDiscriminatedUnion()", () => {
     test("should wrap next depicters in oneOf prop and set discriminator prop", () => {
       expect(
         depictUnion(
