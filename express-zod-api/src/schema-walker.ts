@@ -51,10 +51,11 @@ export const walkSchema = <
     onMissing: SchemaHandler<U, Context, "last">;
   },
 ): U => {
+  const brand = globalRegistry.get(schema)?.[metaSymbol]?.brand;
   const handler =
-    rules[
-      globalRegistry.get(schema)?.[metaSymbol]?.brand as keyof typeof rules
-    ] || rules[schema._zod.def.type];
+    brand && brand in rules
+      ? rules[brand as keyof typeof rules]
+      : rules[schema._zod.def.type];
   const next = (subject: $ZodType) =>
     walkSchema(subject, { ctx, onEach, rules, onMissing });
   const result = handler

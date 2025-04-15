@@ -110,28 +110,6 @@ const onSomeUnion: Producer = (
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
 
-/** @todo move into onPipeline */
-const onEffects: Producer = (schema: $ZodTransform, { next, isResponse }) => {
-  const input = next(schema.innerType());
-  if (isResponse && schema._def.effect.type === "transform") {
-    const outputType = getTransformedType(schema, makeSample(input));
-    const resolutions: Partial<
-      Record<NonNullable<typeof outputType>, ts.KeywordTypeSyntaxKind>
-    > = {
-      number: ts.SyntaxKind.NumberKeyword,
-      bigint: ts.SyntaxKind.BigIntKeyword,
-      boolean: ts.SyntaxKind.BooleanKeyword,
-      string: ts.SyntaxKind.StringKeyword,
-      undefined: ts.SyntaxKind.UndefinedKeyword,
-      object: ts.SyntaxKind.ObjectKeyword,
-    };
-    return ensureTypeNode(
-      (outputType && resolutions[outputType]) || ts.SyntaxKind.AnyKeyword,
-    );
-  }
-  return input;
-};
-
 const onOptional: Producer = (
   { _zod: { def } }: $ZodOptional,
   { next, optionalPropStyle: { withUndefined: hasUndefined } },
@@ -196,7 +174,31 @@ const onCatch: Producer = ({ _zod: { def } }: $ZodCatch, { next }) =>
 const onPipeline: Producer = (
   { _zod: { def } }: $ZodPipe,
   { next, isResponse },
-) => next(def[isResponse ? "out" : "in"]);
+) => {
+  const target = def[isResponse ? "out" : "in"];
+  const opposite = def[isResponse ? "in" : "out"];
+  if (target._zod.def.type === "transform") {
+    const opposingType = next(opposite);
+    const targetType = getTransformedType(
+      target as z.ZodTransform, // @todo should use $ZodTransform?
+      makeSample(opposingType),
+    );
+    const resolutions: Partial<
+      Record<NonNullable<typeof targetType>, ts.KeywordTypeSyntaxKind>
+    > = {
+      number: ts.SyntaxKind.NumberKeyword,
+      bigint: ts.SyntaxKind.BigIntKeyword,
+      boolean: ts.SyntaxKind.BooleanKeyword,
+      string: ts.SyntaxKind.StringKeyword,
+      undefined: ts.SyntaxKind.UndefinedKeyword,
+      object: ts.SyntaxKind.ObjectKeyword,
+    };
+    return ensureTypeNode(
+      (targetType && resolutions[targetType]) || ts.SyntaxKind.AnyKeyword,
+    );
+  }
+  return next(target);
+};
 
 const onNull: Producer = () => makeLiteralType(null);
 

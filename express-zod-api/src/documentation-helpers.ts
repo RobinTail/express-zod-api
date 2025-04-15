@@ -580,15 +580,12 @@ export const depictPipeline: Depicter = (
           format: `${rest.format || opposingType} (preprocessed)`,
         };
       } else {
-        const opposingType = getTransformedType(
-          def.out as z.ZodTransform, // @todo should use $ZodTransform from core?
+        const targetType = getTransformedType(
+          target as z.ZodTransform, // @todo should use $ZodTransform from core?
           makeSample(opposingDepiction),
         );
-        if (
-          opposingType &&
-          ["number", "string", "boolean"].includes(opposingType)
-        )
-          return { type: opposingType as "number" | "string" | "boolean" };
+        if (targetType && ["number", "string", "boolean"].includes(targetType))
+          return { type: targetType as "number" | "string" | "boolean" };
         else return next(z.any());
       }
     }
