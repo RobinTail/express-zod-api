@@ -117,8 +117,8 @@ export const defaultResultHandler = new ResultHandler({
       error: { message: "Sample error message" },
     }),
   handler: ({ error, input, output, request, response, logger }) => {
-    if (error) {
-      const httpError = ensureHttpError(error);
+    if (error || !output) {
+      const httpError = ensureHttpError(error || new Error("Missing output"));
       logServerError(httpError, logger, request, input);
       return void response
         .status(httpError.statusCode)
