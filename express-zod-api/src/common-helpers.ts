@@ -64,7 +64,11 @@ export const getInput = (
 };
 
 export const ensureError = (subject: unknown): Error =>
-  subject instanceof Error ? subject : new Error(String(subject));
+  subject instanceof Error
+    ? subject
+    : subject instanceof z.ZodError
+      ? new Error(subject.message)
+      : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
   if (error instanceof z.ZodError) {

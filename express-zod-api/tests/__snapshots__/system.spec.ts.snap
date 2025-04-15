@@ -122,18 +122,24 @@ exports[`App in production mode > Validation > Problem 787: Should NOT treat Zod
   "Server side error",
   {
     "error": InternalServerError({
-      "cause": ZodError({
+      "cause": Error({
         "message": "[
   {
-    "code": "invalid_type",
     "expected": "number",
-    "received": "string",
+    "code": "invalid_type",
     "path": [],
-    "message": "Expected number, received string"
+    "message": "Invalid input: expected number, received string"
   }
 ]",
       }),
-      "message": "Expected number, received string",
+      "message": "[
+  {
+    "expected": "number",
+    "code": "invalid_type",
+    "path": [],
+    "message": "Invalid input: expected number, received string"
+  }
+]",
     }),
     "payload": {
       "key": "123",
