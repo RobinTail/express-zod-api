@@ -28,13 +28,6 @@ exports[`Documentation helpers > depictBoolean() > should set type:boolean 1`] =
 }
 `;
 
-exports[`Documentation helpers > depictBranded > should pass the next depicter 1`] = `
-{
-  "minLength": 2,
-  "type": "string",
-}
-`;
-
 exports[`Documentation helpers > depictCatch() > should pass next depicter 1`] = `
 {
   "type": "boolean",
@@ -460,13 +453,6 @@ exports[`Documentation helpers > depictLiteral() > should set type and involve c
 {
   "const": 123n,
   "type": "integer",
-}
-`;
-
-exports[`Documentation helpers > depictLiteral() > should set type and involve const property 3 1`] = `
-{
-  "const": Symbol(test),
-  "type": undefined,
 }
 `;
 
