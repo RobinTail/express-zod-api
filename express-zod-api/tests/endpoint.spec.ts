@@ -142,7 +142,7 @@ describe("Endpoint", () => {
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
         status: "error",
-        error: { message: "output/email: Invalid email" },
+        error: { message: "output/email: Invalid email address" },
       });
     });
 
