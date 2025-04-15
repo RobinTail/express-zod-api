@@ -83,10 +83,16 @@ interface FormattedPrintingOptions {
 
 export class Integration extends IntegrationBase {
   readonly #program: ts.Node[] = [this.someOfType];
-  readonly #aliases = new Map<$ZodType, ts.TypeAliasDeclaration>();
+  readonly #aliases = new Map<
+    $ZodType | (() => $ZodType),
+    ts.TypeAliasDeclaration
+  >();
   #usage: Array<ts.Node | string> = [];
 
-  #makeAlias(schema: $ZodType, produce: () => ts.TypeNode): ts.TypeNode {
+  #makeAlias(
+    schema: $ZodType | (() => $ZodType),
+    produce: () => ts.TypeNode,
+  ): ts.TypeNode {
     let name = this.#aliases.get(schema)?.name?.text;
     if (!name) {
       name = `Type${this.#aliases.size + 1}`;

@@ -89,7 +89,7 @@ export type NumericRange = Record<"integer" | "float", [number, number]>;
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   makeRef: (
-    schema: $ZodType,
+    schema: $ZodType | (() => $ZodType),
     subject:
       | SchemaObject
       | ReferenceObject
@@ -598,9 +598,9 @@ export const depictPipeline: Depicter = (
 };
 
 export const depictLazy: Depicter = (
-  lazy: $ZodLazy,
+  { _zod: { def } }: $ZodLazy,
   { next, makeRef },
-): ReferenceObject => makeRef(lazy, () => next(lazy._zod.def.getter()));
+): ReferenceObject => makeRef(def.getter, () => next(def.getter()));
 
 export const depictRaw: Depicter = ({ _zod: { def } }: RawSchema, { next }) =>
   next(def.shape.raw);

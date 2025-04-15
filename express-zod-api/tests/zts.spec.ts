@@ -92,7 +92,7 @@ describe("zod-to-ts", () => {
       })
       .partial();
 
-    const circular: z.ZodLazy<z.ZodTypeAny> = z.lazy(() =>
+    const circular: z.ZodLazy = z.lazy(() =>
       z.object({
         a: z.string(),
         b: circular,

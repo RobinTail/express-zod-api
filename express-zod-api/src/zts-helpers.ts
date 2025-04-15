@@ -5,7 +5,10 @@ import { SchemaHandler } from "./schema-walker";
 
 export interface ZTSContext extends FlatObject {
   isResponse: boolean;
-  makeAlias: (schema: $ZodType, produce: () => ts.TypeNode) => ts.TypeNode;
+  makeAlias: (
+    schema: $ZodType | (() => $ZodType),
+    produce: () => ts.TypeNode,
+  ) => ts.TypeNode;
   optionalPropStyle: { withQuestionMark?: boolean; withUndefined?: boolean };
 }
 

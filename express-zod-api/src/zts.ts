@@ -207,8 +207,8 @@ const onPipeline: Producer = (
 
 const onNull: Producer = () => makeLiteralType(null);
 
-const onLazy: Producer = (lazy: $ZodLazy, { makeAlias, next }) =>
-  makeAlias(lazy, () => next(lazy._zod.def.getter()));
+const onLazy: Producer = ({ _zod: { def } }: $ZodLazy, { makeAlias, next }) =>
+  makeAlias(def.getter, () => next(def.getter()));
 
 const onFile: Producer = (schema: FileSchema) => {
   const stringType = ensureTypeNode(ts.SyntaxKind.StringKeyword);

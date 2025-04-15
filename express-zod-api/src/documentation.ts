@@ -94,10 +94,10 @@ interface DocumentationParams {
 export class Documentation extends OpenApiBuilder {
   readonly #lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   readonly #lastOperationIdSuffixes = new Map<string, number>();
-  readonly #references = new Map<$ZodType, string>();
+  readonly #references = new Map<$ZodType | (() => $ZodType), string>();
 
   #makeRef(
-    schema: $ZodType,
+    schema: $ZodType | (() => $ZodType),
     subject:
       | SchemaObject
       | ReferenceObject

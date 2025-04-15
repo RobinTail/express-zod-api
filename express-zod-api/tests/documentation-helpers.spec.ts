@@ -777,13 +777,9 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictLazy", () => {
-    const recursiveArray: z.ZodLazy<z.ZodArray<z.ZodTypeAny>> = z.lazy(() =>
-      recursiveArray.array(),
-    );
-    const directlyRecursive: z.ZodLazy<z.ZodTypeAny> = z.lazy(
-      () => directlyRecursive,
-    );
-    const recursiveObject: z.ZodLazy<z.ZodObject> = z.lazy(() =>
+    const recursiveArray: z.ZodLazy = z.lazy(() => recursiveArray.array());
+    const directlyRecursive: z.ZodLazy = z.lazy(() => directlyRecursive);
+    const recursiveObject: z.ZodLazy = z.lazy(() =>
       z.object({ prop: recursiveObject }),
     );
 
@@ -798,7 +794,10 @@ describe("Documentation helpers", () => {
         expect(makeRefMock).not.toHaveBeenCalled();
         expect(depictLazy(schema, responseCtx)).toMatchSnapshot();
         expect(makeRefMock).toHaveBeenCalledTimes(1);
-        expect(makeRefMock).toHaveBeenCalledWith(schema, expect.any(Function));
+        expect(makeRefMock).toHaveBeenCalledWith(
+          schema._zod.def.getter,
+          expect.any(Function),
+        );
       },
     );
   });
