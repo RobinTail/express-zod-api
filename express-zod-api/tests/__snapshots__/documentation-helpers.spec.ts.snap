@@ -524,6 +524,17 @@ exports[`Documentation helpers > depictLazy > should handle circular references 
 }
 `;
 
+exports[`Documentation helpers > depictLiteral() > should handle multiple values 1`] = `
+{
+  "enum": [
+    1,
+    2,
+    3,
+  ],
+  "type": "number",
+}
+`;
+
 exports[`Documentation helpers > depictLiteral() > should set type and involve const property 0 1`] = `
 {
   "const": "testng",

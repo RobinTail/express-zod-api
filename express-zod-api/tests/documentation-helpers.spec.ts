@@ -354,6 +354,10 @@ describe("Documentation helpers", () => {
         expect(depictLiteral(z.literal(value), requestCtx)).toMatchSnapshot();
       },
     );
+
+    test("should handle multiple values", () => {
+      expect(depictLiteral(z.literal([1, 2, 3]), requestCtx)).toMatchSnapshot();
+    });
   });
 
   describe("depictObject()", () => {
