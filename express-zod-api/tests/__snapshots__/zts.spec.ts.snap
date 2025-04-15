@@ -11,7 +11,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     circular: SomeType;
     union: {
         number: number;
-    } | "hi";
+    } | ("hi");
     enum: "hi" | "bye";
     intersectionWithTransform: (number & bigint) & (number & string);
     date: any;
@@ -56,7 +56,6 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     set: any;
     intersection: (string & number) | bigint;
     promise: any;
-    function: any;
     optDefaultString?: string | undefined;
     refinedStringWithSomeBullshit: (string | number) & ((bigint | null) | undefined);
     nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;

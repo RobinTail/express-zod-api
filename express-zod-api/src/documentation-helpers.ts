@@ -289,7 +289,9 @@ export const depictObject: Depicter = (
   const isOptionalProp = (prop: $ZodType) =>
     isResponse && hasCoercion(prop)
       ? prop instanceof z.ZodOptional
-      : (isResponse ? prop._zod.qout : prop._zod.qin) === "true";
+      : prop instanceof z.ZodPromise
+        ? false
+        : (prop as z.ZodType).isOptional();
   const required = keys.filter(
     (key) => !isOptionalProp(schema._zod.def.shape[key]),
   );
@@ -712,7 +714,7 @@ export const depictRequestParams = ({
         name,
         in: location,
         deprecated: globalRegistry.get(paramSchema)?.[metaSymbol]?.isDeprecated,
-        required: !paramSchema._zod.qin,
+        required: !(paramSchema as z.ZodType).isOptional(),
         description: depicted.description || description,
         schema: result,
         examples: depictParamExamples(objectSchema, name),
@@ -763,7 +765,8 @@ export const onEach: SchemaHandler<
 > = (schema: z.ZodType, { isResponse, prev }) => {
   if (isReferenceObject(prev)) return {};
   const { description } = schema;
-  const shouldAvoidParsing = schema instanceof z.ZodLazy;
+  const shouldAvoidParsing =
+    schema instanceof z.ZodLazy || schema instanceof z.ZodPromise;
   const hasTypePropertyInDepiction = prev.type !== undefined;
   const isResponseHavingCoercion = isResponse && hasCoercion(schema);
   const isActuallyNullable =

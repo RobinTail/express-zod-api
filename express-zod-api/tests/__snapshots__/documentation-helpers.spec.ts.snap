@@ -1412,7 +1412,6 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
       },
       "required": [
         "status",
-        "data",
       ],
       "type": "object",
     },

@@ -80,9 +80,9 @@ const onObject: Producer = (
       const isOptional =
         isResponse && hasCoercion(value)
           ? value instanceof z.ZodOptional
-          : isResponse
-            ? value._zod.qout
-            : value._zod.qin;
+          : value instanceof z.ZodPromise
+            ? false
+            : (value as z.ZodType).isOptional();
       const { description: comment, ...meta } = globalRegistry.get(value) || {};
       return makeInterfaceProp(key, next(value), {
         comment,
