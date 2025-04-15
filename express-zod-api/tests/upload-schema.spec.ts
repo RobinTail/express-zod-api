@@ -21,7 +21,6 @@ describe("ez.upload()", () => {
         expect(result.error.issues).toEqual([
           {
             code: "custom",
-            fatal: true,
             message: "Expected file upload, received number",
             path: [],
           },
