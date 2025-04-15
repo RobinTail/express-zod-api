@@ -1,17 +1,16 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`ez.form() > parsing > should throw for missing props as a regular object schema 1`] = `
-ZodError({
-  "message": "[
-  {
-    "code": "invalid_type",
-    "expected": "string",
-    "received": "undefined",
-    "path": [
-      "name"
-    ],
-    "message": "Required"
-  }
-]",
-})
+ZodError {
+  "issues": [
+    {
+      "code": "invalid_type",
+      "expected": "string",
+      "message": "Invalid input: expected string, received undefined",
+      "path": [
+        "name",
+      ],
+    },
+  ],
+}
 `;
