@@ -559,7 +559,7 @@ describe("Documentation", () => {
           }),
       ).toThrow(
         new DocumentationError(
-          `Zod type ${zodType._zod.def.type} is unsupported.`,
+          `Zod type ${zodType.constructor.name} is unsupported.`,
           {
             method: "post",
             path: "/v1/getSomething",
