@@ -352,10 +352,8 @@ export const depictRecord: Depicter = (
   { _zod: { def } }: $ZodRecord,
   { next },
 ) => {
-  if (def.keyType._zod.def.type === "enum") {
-    const keys = Object.values(
-      (def.keyType as $ZodEnum)._zod.def.entries,
-    ) as string[];
+  if (def.keyType instanceof z.ZodEnum) {
+    const keys = Object.values(def.keyType._zod.def.entries) as string[];
     const result: SchemaObject = { type: "object" };
     if (keys.length) {
       result.properties = depictObjectProperties(
@@ -366,26 +364,25 @@ export const depictRecord: Depicter = (
     }
     return result;
   }
-  if (def.keyType._zod.def.type === "literal") {
+  if (def.keyType instanceof z.ZodLiteral) {
     return {
       type: "object",
       properties: depictObjectProperties(
         z.looseObject({
-          [(def.keyType as $ZodLiteral)._zod.def.values[0] as string]:
-            def.valueType,
+          [def.keyType._zod.def.values[0] as string]: def.valueType,
         }),
         next,
       ),
-      required: [(def.keyType as $ZodLiteral)._zod.def.values[0] as string],
+      required: [def.keyType._zod.def.values[0] as string],
     };
   }
   if (
-    def.keyType._zod.def.type === "union" &&
-    areOptionsLiteral((def.keyType as $ZodUnion)._zod.def.options)
+    def.keyType instanceof z.ZodUnion &&
+    areOptionsLiteral(def.keyType._zod.def.options)
   ) {
     const required = R.map(
       (opt: $ZodLiteral) => `${opt._zod.def.values[0]}`,
-      (def.keyType as $ZodUnion)._zod.def.options as unknown as $ZodLiteral[], // ensured above
+      def.keyType._zod.def.options as $ZodLiteral[], // ensured above
     );
     const shape = R.fromPairs(R.xprod(required, [def.valueType]));
     return {
