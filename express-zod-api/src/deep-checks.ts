@@ -86,12 +86,12 @@ export const hasNestedSchema = (
   }: NestedSchemaLookupProps,
 ): boolean => {
   if (condition?.(subject)) return true;
+  if (depth >= maxDepth) return false;
+  const brand = globalRegistry.get(subject)?.[metaSymbol]?.brand;
   const handler =
-    depth < maxDepth
-      ? rules[
-          globalRegistry.get(subject)?.[metaSymbol]?.brand as keyof typeof rules
-        ] || rules[subject._zod.def.type]
-      : undefined;
+    brand && brand in rules
+      ? rules[brand as keyof typeof rules]
+      : rules[subject._zod.def.type];
   if (handler) {
     return handler(subject, {
       next: (schema) =>
