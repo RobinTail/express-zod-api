@@ -381,9 +381,10 @@ export const makeFnType = (
   );
 
 /* eslint-disable prettier/prettier -- shorter and works better this way than overrides */
-export const literally = <T extends string | null | boolean | number>(subj: T) => (
-  typeof subj === "number" ? f.createNumericLiteral(subj) : typeof subj === "boolean"
-    ? subj ? f.createTrue() : f.createFalse()
+export const literally = <T extends string | null | boolean | number | bigint>(subj: T) => (
+  typeof subj === "number" ? f.createNumericLiteral(subj)
+    : typeof subj === "bigint" ? f.createBigIntLiteral(subj.toString())
+    : typeof subj === "boolean" ? subj ? f.createTrue() : f.createFalse()
     : subj === null ? f.createNull() : f.createStringLiteral(subj)
   ) as T extends string ? ts.StringLiteral : T extends number ? ts.NumericLiteral
     : T extends boolean ? ts.BooleanLiteral : ts.NullLiteral;

@@ -59,7 +59,13 @@ const nodePath = {
 };
 
 const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) =>
-  f.createUnionTypeNode(def.values.map(makeLiteralType));
+  f.createUnionTypeNode(
+    def.values.map((entry) =>
+      entry === undefined
+        ? ensureTypeNode(ts.SyntaxKind.UndefinedKeyword)
+        : makeLiteralType(entry),
+    ),
+  );
 
 const onObject: Producer = (
   { _zod: { def } }: z.ZodObject,
