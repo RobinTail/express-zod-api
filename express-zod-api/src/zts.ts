@@ -177,12 +177,9 @@ const onPipeline: Producer = (
 ) => {
   const target = def[isResponse ? "out" : "in"];
   const opposite = def[isResponse ? "in" : "out"];
-  if (target._zod.def.type === "transform") {
+  if (target instanceof z.ZodTransform) {
     const opposingType = next(opposite);
-    const targetType = getTransformedType(
-      target as z.ZodTransform, // @todo should use $ZodTransform?
-      makeSample(opposingType),
-    );
+    const targetType = getTransformedType(target, makeSample(opposingType));
     const resolutions: Partial<
       Record<NonNullable<typeof targetType>, ts.KeywordTypeSyntaxKind>
     > = {

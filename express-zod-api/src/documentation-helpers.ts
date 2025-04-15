@@ -565,7 +565,7 @@ export const depictPipeline: Depicter = (
 ) => {
   const target = def[isResponse ? "out" : "in"];
   const opposite = def[isResponse ? "in" : "out"];
-  if (target._zod.def.type === "transform") {
+  if (target instanceof z.ZodTransform) {
     const opposingDepiction = next(opposite);
     if (isSchemaObject(opposingDepiction)) {
       if (!isResponse) {
@@ -576,7 +576,7 @@ export const depictPipeline: Depicter = (
         };
       } else {
         const targetType = getTransformedType(
-          target as z.ZodTransform, // @todo should use $ZodTransform from core?
+          target,
           makeSample(opposingDepiction),
         );
         if (targetType && ["number", "string", "boolean"].includes(targetType))
