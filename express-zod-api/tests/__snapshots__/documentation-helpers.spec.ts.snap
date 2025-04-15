@@ -108,36 +108,6 @@ exports[`Documentation helpers > depictDefault() > should set default property 1
 }
 `;
 
-exports[`Documentation helpers > depictEffect() > should depict as 'number (out)' 1`] = `
-{
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictEffect() > should depict as 'string (in)' 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictEffect() > should depict as 'string (preprocess)' 1`] = `
-{
-  "format": "string (preprocessed)",
-}
-`;
-
-exports[`Documentation helpers > depictEffect() > should handle edge cases 1`] = `
-{
-  "format": "any",
-}
-`;
-
-exports[`Documentation helpers > depictEffect() > should handle edge cases 2`] = `
-{
-  "format": "any",
-}
-`;
-
 exports[`Documentation helpers > depictEnum() > should set type and enum properties 1`] = `
 {
   "enum": [
@@ -796,9 +766,39 @@ exports[`Documentation helpers > depictPipeline > should depict as 'boolean (out
 }
 `;
 
+exports[`Documentation helpers > depictPipeline > should depict as 'number (out)' 1`] = `
+{
+  "type": "number",
+}
+`;
+
 exports[`Documentation helpers > depictPipeline > should depict as 'string (in)' 1`] = `
 {
   "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictPipeline > should depict as 'string (in)' 2`] = `
+{
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictPipeline > should depict as 'string (preprocess)' 1`] = `
+{
+  "format": "string (preprocessed)",
+}
+`;
+
+exports[`Documentation helpers > depictPipeline > should handle edge cases 1`] = `
+{
+  "format": "any",
+}
+`;
+
+exports[`Documentation helpers > depictPipeline > should handle edge cases 2`] = `
+{
+  "format": "any",
 }
 `;
 

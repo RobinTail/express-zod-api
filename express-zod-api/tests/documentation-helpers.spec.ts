@@ -542,8 +542,16 @@ describe("Documentation helpers", () => {
     });
   });
 
-  // @todo move to the test of pipe
-  describe("depictEffect()", () => {
+  describe("depictPipeline", () => {
+    test.each([
+      { ctx: responseCtx, expected: "boolean (out)" },
+      { ctx: requestCtx, expected: "string (in)" },
+    ])("should depict as $expected", ({ ctx }) => {
+      expect(
+        depictPipeline(z.string().transform(Boolean).pipe(z.boolean()), ctx),
+      ).toMatchSnapshot();
+    });
+
     test.each([
       {
         schema: z.string().transform((v) => parseInt(v, 10)),
@@ -569,17 +577,6 @@ describe("Documentation helpers", () => {
       z.number().transform(() => assert.fail("this should be handled")),
     ])("should handle edge cases", (schema) => {
       expect(depictPipeline(schema, responseCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictPipeline", () => {
-    test.each([
-      { ctx: responseCtx, expected: "boolean (out)" },
-      { ctx: requestCtx, expected: "string (in)" },
-    ])("should depict as $expected", ({ ctx }) => {
-      expect(
-        depictPipeline(z.string().transform(Boolean).pipe(z.boolean()), ctx),
-      ).toMatchSnapshot();
     });
   });
 
