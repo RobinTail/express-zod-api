@@ -1,4 +1,5 @@
 import createHttpError from "http-errors";
+import * as R from "ramda";
 import { z } from "zod";
 
 describe("Environment checks", () => {
@@ -13,6 +14,19 @@ describe("Environment checks", () => {
         expect(z.iso.datetime().safeParse(str).success).toBeFalsy();
       },
     );
+  });
+
+  describe("Zod checks/refinements", () => {
+    test.each([
+      z.string().email(),
+      z.email(),
+      z.number().int(),
+      z.int(),
+      z.int32(),
+    ])("Snapshot control $constructor.name definition", (schema) => {
+      const snapshot = R.omit(["id"], schema._zod);
+      expect(snapshot).toMatchSnapshot();
+    });
   });
 
   describe("Vitest error comparison", () => {

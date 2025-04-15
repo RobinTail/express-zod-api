@@ -527,7 +527,7 @@ export const depictNumber: Depicter = (
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   const result: SchemaObject = {
     type: intCheck ? "integer" : "number",
-    format: intCheck ? "int64" : "double", // @todo should probably use int32
+    format: intCheck ? "int64" : "double",
   };
   if (isMinInclusive) result.minimum = minimum;
   else result.exclusiveMinimum = minimum;
