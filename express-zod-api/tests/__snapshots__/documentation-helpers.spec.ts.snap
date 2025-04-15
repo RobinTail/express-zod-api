@@ -28,12 +28,6 @@ exports[`Documentation helpers > depictBoolean() > should set type:boolean 1`] =
 }
 `;
 
-exports[`Documentation helpers > depictCatch() > should pass next depicter 1`] = `
-{
-  "type": "boolean",
-}
-`;
-
 exports[`Documentation helpers > depictDate > should throw clear error 0 1`] = `
 DocumentationError({
   "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
@@ -723,18 +717,6 @@ exports[`Documentation helpers > depictObjectProperties() > should wrap next dep
 }
 `;
 
-exports[`Documentation helpers > depictOptional() > should pass the next depicter 0 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictOptional() > should pass the next depicter 1 1`] = `
-{
-  "type": "string",
-}
-`;
-
 exports[`Documentation helpers > depictParamExamples() > should pass examples for the given parameter 1`] = `
 {
   "example1": {
@@ -791,12 +773,6 @@ exports[`Documentation helpers > depictPipeline > should handle edge cases 2`] =
 exports[`Documentation helpers > depictRaw() > should depict the raw property 1`] = `
 {
   "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictReadonly > should pass the next depicter 1`] = `
-{
   "type": "string",
 }
 `;
@@ -1471,6 +1447,30 @@ DocumentationError({
   "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
   "message": "Please use ez.upload() only for input.",
 })
+`;
+
+exports[`Documentation helpers > depictWrapped() > handle readonly 1`] = `
+{
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictWrapped() > should handle catch 1`] = `
+{
+  "type": "boolean",
+}
+`;
+
+exports[`Documentation helpers > depictWrapped() > should handle optional 0 1`] = `
+{
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictWrapped() > should handle optional 1 1`] = `
+{
+  "type": "string",
+}
 `;
 
 exports[`Documentation helpers > excludeExamplesFromDepiction() > should remove example property of supplied object 1`] = `

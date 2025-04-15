@@ -161,20 +161,15 @@ const onIntersection: Producer = (
   { next },
 ) => intersect([def.left, def.right].map(next));
 
-const onDefault: Producer = ({ _zod: { def } }: $ZodDefault, { next }) =>
-  next(def.innerType);
-
 const onPrimitive =
   (syntaxKind: ts.KeywordTypeSyntaxKind): Producer =>
   () =>
     ensureTypeNode(syntaxKind);
 
-const onReadonly: Producer = ({ _zod: { def } }: $ZodReadonly, { next }) =>
-  next(def.innerType);
-
-/** @todo consider combining with similar methods like readonly */
-const onCatch: Producer = ({ _zod: { def } }: $ZodCatch, { next }) =>
-  next(def.innerType);
+const onWrapped: Producer = (
+  { _zod: { def } }: $ZodReadonly | $ZodCatch | $ZodDefault,
+  { next },
+) => next(def.innerType);
 
 const onPipeline: Producer = (
   { _zod: { def } }: $ZodPipe,
@@ -245,14 +240,14 @@ const producers: HandlingRules<
   literal: onLiteral,
   intersection: onIntersection,
   union: onSomeUnion,
-  default: onDefault,
+  default: onWrapped,
   enum: onEnum,
   optional: onOptional,
   nullable: onNullable,
-  catch: onCatch,
+  catch: onWrapped,
   pipe: onPipeline,
   lazy: onLazy,
-  readonly: onReadonly,
+  readonly: onWrapped,
   [ezFileBrand]: onFile,
   [ezRawBrand]: onRaw,
 };

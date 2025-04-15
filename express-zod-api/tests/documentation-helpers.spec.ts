@@ -9,7 +9,7 @@ import {
   depictArray,
   depictBigInt,
   depictBoolean,
-  depictCatch,
+  depictWrapped,
   depictDate,
   depictDateIn,
   depictDateOut,
@@ -25,10 +25,8 @@ import {
   depictNumber,
   depictObject,
   depictObjectProperties,
-  depictOptional,
   depictParamExamples,
   depictPipeline,
-  depictReadonly,
   depictRecord,
   depictRequestParams,
   depictSecurity,
@@ -147,10 +145,20 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictCatch()", () => {
-    test("should pass next depicter", () => {
+  describe("depictWrapped()", () => {
+    test("should handle catch", () => {
       expect(
-        depictCatch(z.boolean().catch(true), requestCtx),
+        depictWrapped(z.boolean().catch(true), requestCtx),
+      ).toMatchSnapshot();
+    });
+
+    test.each([requestCtx, responseCtx])("should handle optional %#", (ctx) => {
+      expect(depictWrapped(z.string().optional(), ctx)).toMatchSnapshot();
+    });
+
+    test("handle readonly", () => {
+      expect(
+        depictWrapped(z.string().readonly(), responseCtx),
       ).toMatchSnapshot();
     });
   });
@@ -304,15 +312,6 @@ describe("Documentation helpers", () => {
     ])("should fall back to allOf in other cases %#", (schema) => {
       expect(depictIntersection(schema, requestCtx)).toMatchSnapshot();
     });
-  });
-
-  describe("depictOptional()", () => {
-    test.each([requestCtx, responseCtx])(
-      "should pass the next depicter %#",
-      (ctx) => {
-        expect(depictOptional(z.string().optional(), ctx)).toMatchSnapshot();
-      },
-    );
   });
 
   describe("depictNullable()", () => {
@@ -756,14 +755,6 @@ describe("Documentation helpers", () => {
         expect(() => depictDate(z.date(), ctx)).toThrowErrorMatchingSnapshot();
       },
     );
-  });
-
-  describe("depictReadonly", () => {
-    test("should pass the next depicter", () => {
-      expect(
-        depictReadonly(z.string().readonly(), responseCtx),
-      ).toMatchSnapshot();
-    });
   });
 
   describe("depictLazy", () => {

@@ -30,6 +30,7 @@ import type {
   $ZodNumber,
   $ZodCheckGreaterThan,
   $ZodCheckLessThan,
+  $ZodReadonly,
 } from "@zod/core";
 import {
   ExamplesObject,
@@ -153,9 +154,6 @@ export const depictDefault: Depicter = (schema: $ZodDefault, { next }) => ({
     schema._zod.def.defaultValue(),
 });
 
-export const depictCatch: Depicter = ({ _zod: { def } }: $ZodCatch, { next }) =>
-  next(def.innerType);
-
 export const depictAny: Depicter = () => ({ format: "any" });
 
 export const depictUpload: Depicter = ({}: UploadSchema, ctx) => {
@@ -228,14 +226,8 @@ export const depictIntersection: Depicter = (
   { next },
 ) => intersect([def.left, def.right].map(next));
 
-export const depictOptional: Depicter = (
-  { _zod: { def } }: $ZodOptional,
-  { next },
-) => next(def.innerType);
-
-// @todo consider extracting into one method utilizing innerType
-export const depictReadonly: Depicter = (
-  { _zod: { def } }: z.ZodReadonly<z.ZodTypeAny>,
+export const depictWrapped: Depicter = (
+  { _zod: { def } }: $ZodOptional | $ZodReadonly | $ZodCatch,
   { next },
 ) => next(def.innerType);
 
@@ -744,13 +736,13 @@ export const depicters: HandlingRules<
   any: depictAny,
   default: depictDefault,
   enum: depictEnum,
-  optional: depictOptional,
+  optional: depictWrapped,
   nullable: depictNullable,
   date: depictDate,
-  catch: depictCatch,
+  catch: depictWrapped,
   pipe: depictPipeline,
   lazy: depictLazy,
-  readonly: depictReadonly,
+  readonly: depictWrapped,
   [ezFileBrand]: depictFile,
   [ezUploadBrand]: depictUpload,
   [ezDateOutBrand]: depictDateOut,
