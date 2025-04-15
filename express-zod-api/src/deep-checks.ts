@@ -132,7 +132,7 @@ export const hasForm = (subject: IOSchema) =>
 
 /** @throws AssertionError with incompatible schema constructor */
 export const assertJsonCompatible = (subject: $ZodType, dir: "in" | "out") => {
-  const lazies = new WeakSet<$ZodLazy>();
+  const lazies = new WeakSet<() => $ZodType>();
   return hasNestedSchema(subject, {
     maxDepth: 300,
     rules: {
@@ -140,10 +140,10 @@ export const assertJsonCompatible = (subject: $ZodType, dir: "in" | "out") => {
       readonly: onWrapped,
       catch: onWrapped,
       pipe: ({ _zod }: $ZodPipe, { next }) => next(_zod.def[dir]),
-      lazy: (lazy: $ZodLazy, { next }) =>
-        lazies.has(lazy)
+      lazy: ({ _zod: { def } }: $ZodLazy, { next }) =>
+        lazies.has(def.getter)
           ? false
-          : lazies.add(lazy) && next(lazy._zod.def.getter()),
+          : lazies.add(def.getter) && next(def.getter()),
       tuple: ({ _zod: { def } }: $ZodTuple, { next }) =>
         [...def.items].concat(def.rest ?? []).some(next),
       nan: () => fail("z.nan()"),
