@@ -169,9 +169,7 @@ export const depictFile: Depicter = (schema: FileSchema) => {
     type: "string",
     format:
       schema instanceof z.ZodString
-        ? schema._zod.def.checks?.find(
-            (check) => check._zod.def.check === "base64",
-          )
+        ? getCheck(schema._zod.def, "string_format", "base64")
           ? "byte"
           : "file"
         : "binary",
