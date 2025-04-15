@@ -114,20 +114,6 @@ exports[`Documentation helpers > depictEffect() > should depict as 'number (out)
 }
 `;
 
-exports[`Documentation helpers > depictEffect() > should depict as 'object (refinement)' 1`] = `
-{
-  "properties": {
-    "s": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "s",
-  ],
-  "type": "object",
-}
-`;
-
 exports[`Documentation helpers > depictEffect() > should depict as 'string (in)' 1`] = `
 {
   "type": "string",

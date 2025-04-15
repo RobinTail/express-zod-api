@@ -560,13 +560,6 @@ describe("Documentation helpers", () => {
         ctx: requestCtx,
         expected: "string (preprocess)",
       },
-      {
-        schema: z
-          .object({ s: z.string() })
-          .refine(() => false, { message: "test" }), // @todo this case is no longer applicable
-        ctx: requestCtx,
-        expected: "object (refinement)",
-      },
     ])("should depict as $expected", ({ schema, ctx }) => {
       expect(depictPipeline(schema, ctx)).toMatchSnapshot();
     });
