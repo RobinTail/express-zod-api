@@ -20,26 +20,27 @@ export class Diagnostics {
 
   constructor(protected logger: ActualLogger) {}
 
-  // @todo make it part of checkJsonCompat with renaming it
-  public checkIOSchema(endpoint: AbstractEndpoint): void {
-    // eslint-disable-next-line no-restricted-syntax -- acceptable here, need typed key
-    const stack = R.toPairs({
-      input: endpoint.inputSchema,
-      output: endpoint.outputSchema,
-    }).map(([pipes, schema]) =>
-      z.toJSONSchema(schema, { unrepresentable: "any", pipes }),
-    );
-    while (stack.length > 0) {
-      const entry = stack.shift()!;
-      if (entry.type && entry.type !== "object")
-        return this.logger.warn("Endpoint schema is not object-based"); // @todo provide more context
-      for (const prop of ["allOf", "oneOf", "anyOf"] as const)
-        if (entry[prop]) stack.push(...entry[prop]);
-    }
-  }
-
-  public checkJsonCompat(endpoint: AbstractEndpoint, ctx: FlatObject): void {
+  public checkSchema(endpoint: AbstractEndpoint, ctx: FlatObject): void {
     if (this.#verifiedEndpoints.has(endpoint)) return;
+    for (const dir of ["input", "output"] as const) {
+      const stack = [
+        z.toJSONSchema(endpoint[`${dir}Schema`], {
+          unrepresentable: "any",
+          pipes: dir,
+        }),
+      ];
+      while (stack.length > 0) {
+        const entry = stack.shift()!;
+        if (entry.type && entry.type !== "object") {
+          return this.logger.warn(
+            `Endpoint ${dir} schema is not object-based`,
+            Object.assign(ctx, { reason: entry }),
+          );
+        }
+        for (const prop of ["allOf", "oneOf", "anyOf"] as const)
+          if (entry[prop]) stack.push(...entry[prop]);
+      }
+    }
     if (endpoint.requestType === "json") {
       this.#trier((reason) =>
         this.logger.warn(
