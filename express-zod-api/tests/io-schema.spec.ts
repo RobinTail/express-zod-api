@@ -336,5 +336,13 @@ describe("I/O Schema and related helpers", () => {
         expect(subject).toMatchSnapshot();
       });
     });
+
+    describe("Zod 4", () => {
+      test("should throw for incompatible ones", () => {
+        expect(() =>
+          extractObjectSchema(z.string() as unknown as IOSchema),
+        ).toThrowErrorMatchingSnapshot();
+      });
+    });
   });
 });

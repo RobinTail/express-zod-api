@@ -28,6 +28,15 @@ exports[`I/O Schema and related helpers > extractObjectSchema() > Feature #1869:
 }
 `;
 
+exports[`I/O Schema and related helpers > extractObjectSchema() > Zod 4 > should throw for incompatible ones 1`] = `
+IOSchemaError({
+  "cause": {
+    "type": "string",
+  },
+  "message": "Can not flatten IOSchema",
+})
+`;
+
 exports[`I/O Schema and related helpers > extractObjectSchema() > should pass the object schema through 1`] = `
 {
   "properties": {

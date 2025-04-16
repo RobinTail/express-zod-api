@@ -51,5 +51,5 @@ export const extractObjectSchema = (subject: IOSchema): z.ZodObject => {
       extractObjectSchema(subject._zod.def.right as IOSchema),
     );
   }
-  throw new IOSchemaError("Can not flatten IOSchema");
+  throw new IOSchemaError("Can not flatten IOSchema", { cause: subject });
 };
