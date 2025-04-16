@@ -28,7 +28,7 @@ describe("Environment checks", () => {
       z.int(),
       z.int32(),
     ])("Snapshot control $constructor.name definition", (schema) => {
-      const snapshot = R.omit(["id"], schema._zod);
+      const snapshot = R.omit(["id", "version"], schema._zod);
       expect(snapshot).toMatchSnapshot();
     });
   });
