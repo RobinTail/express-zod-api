@@ -16,6 +16,10 @@ describe("Environment checks", () => {
     );
   });
 
+  /**
+   * @todo try z.int().max(1000) when it's fixed in Zod 4
+   * @link https://github.com/colinhacks/zod/issues/4162
+   */
   describe("Zod checks/refinements", () => {
     test.each([
       z.string().email(),
