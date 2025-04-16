@@ -46,6 +46,7 @@ export const initRouting = ({
   const familiar = new Map<string, Array<Method | AuxMethod>>();
   const onEndpoint: OnEndpoint = (endpoint, path, method, siblingMethods) => {
     if (!isProduction()) {
+      doc?.checkIOSchema(endpoint);
       doc?.checkJsonCompat(endpoint, { path, method });
       doc?.checkPathParams(path, endpoint, { method });
     }

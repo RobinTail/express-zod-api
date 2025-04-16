@@ -1,5 +1,6 @@
 import * as R from "ramda";
 import type { $ZodShape } from "@zod/core";
+import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
@@ -18,6 +19,25 @@ export class Diagnostics {
   >();
 
   constructor(protected logger: ActualLogger) {}
+
+  // @todo make it part of checkJsonCompat with renaming it
+  public checkIOSchema(endpoint: AbstractEndpoint): void {
+    // eslint-disable-next-line no-restricted-syntax -- acceptable here, need typed key
+    const stack = R.toPairs({
+      input: endpoint.inputSchema,
+      output: endpoint.outputSchema,
+    }).map(([pipes, schema]) =>
+      z.toJSONSchema(schema, { unrepresentable: "any", pipes }),
+    );
+    while (stack.length > 0) {
+      const entry = stack.shift()!;
+      if (entry.type && entry.type !== "object")
+        return this.logger.warn("Endpoint schema is not object-based"); // @todo provide more context
+      if (entry.allOf) stack.push(...entry.allOf);
+      if (entry.oneOf) stack.push(...entry.oneOf);
+      if (entry.anyOf) stack.push(...entry.anyOf); // @todo DNRY
+    }
+  }
 
   public checkJsonCompat(endpoint: AbstractEndpoint, ctx: FlatObject): void {
     if (this.#verifiedEndpoints.has(endpoint)) return;
