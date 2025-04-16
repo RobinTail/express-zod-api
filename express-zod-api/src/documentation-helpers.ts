@@ -481,7 +481,7 @@ export const depictString: Depicter = (
 
 /** @since OAS 3.1: exclusive min/max are numbers */
 export const depictNumber: Depicter = (
-  { _zod: { def } }: $ZodNumber,
+  schema: $ZodNumber,
   {
     // @todo consider using computed values provided by Zod instead
     numericRange = {
@@ -509,7 +509,9 @@ export const depictNumber: Depicter = (
       float32: "float",
       float64: "double",
     };
-  for (const check of def.checks || []) {
+  const { checks = [] } = schema._zod.def;
+  if (isCheck<$ZodNumberFormat>(schema, "number_format")) checks.push(schema);
+  for (const check of checks) {
     if (isCheck<$ZodNumberFormat>(check, "number_format")) {
       if (check._zod.def.format.includes("int")) {
         result.type = "integer";

@@ -474,14 +474,14 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictNumber()", () => {
-    test.each([z.number(), z.number().int()])(
+    test.each([z.number(), z.int()])(
       "should set min/max values according to JS capabilities %#",
       (schema) => {
         expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
       },
     );
 
-    test.each([z.number(), z.number().int()])(
+    test.each([z.number(), z.int()])(
       "should use numericRange when set %#",
       (schema) => {
         expect(
@@ -496,7 +496,7 @@ describe("Documentation helpers", () => {
       },
     );
 
-    test.each([z.number(), z.number().int()])(
+    test.each([z.number(), z.int()])(
       "should not use numericRange when it is null %#",
       (schema) => {
         expect(
