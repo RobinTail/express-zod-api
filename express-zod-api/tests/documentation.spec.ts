@@ -281,9 +281,9 @@ describe("Documentation", () => {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
               output: z.object({
-                simple: z.record(z.string(), z.number().int()),
+                simple: z.record(z.string(), z.int()),
                 stringy: z.record(z.string().regex(/[A-Z]+/), z.boolean()),
-                numeric: z.record(z.number().int(), z.boolean()),
+                numeric: z.record(z.int(), z.boolean()),
                 literal: z.record(z.literal("only"), z.boolean()),
                 union: z.record(
                   z.literal("option1").or(z.literal("option2")),
@@ -337,7 +337,7 @@ describe("Documentation", () => {
                 doublePositive: z.number().positive(),
                 doubleNegative: z.number().negative(),
                 doubleLimited: z.number().min(-0.5).max(0.5),
-                int: z.number().int(),
+                int: z.int(),
                 intPositive: z.number().int().positive(),
                 intNegative: z.number().int().negative(),
                 intLimited: z.number().int().min(-100).max(100),
@@ -369,14 +369,14 @@ describe("Documentation", () => {
                 min: z.string().nonempty(),
                 max: z.string().max(15),
                 range: z.string().min(2).max(3),
-                email: z.string().email(),
-                uuid: z.string().uuid(),
-                cuid: z.string().cuid(),
-                cuid2: z.string().cuid2(),
-                ulid: z.string().ulid(),
-                ip: z.string().ipv4(),
-                emoji: z.string().emoji(),
-                url: z.string().url(),
+                email: z.email(),
+                uuid: z.uuid(),
+                cuid: z.cuid(),
+                cuid2: z.cuid2(),
+                ulid: z.ulid(),
+                ip: z.ipv4(),
+                emoji: z.emoji(),
+                url: z.url(),
                 numeric: z.string().regex(/\d+/),
                 combined: z
                   .string()

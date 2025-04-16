@@ -285,7 +285,7 @@ describe("Common Helpers", () => {
         }),
       ).toEqual([123, 456]);
     });
-    test.each([z.array(z.number().int()), z.tuple([z.number(), z.number()])])(
+    test.each([z.array(z.int()), z.tuple([z.number(), z.number()])])(
       "Issue #892: should handle examples of arrays and tuples %#",
       (schema) => {
         expect(
