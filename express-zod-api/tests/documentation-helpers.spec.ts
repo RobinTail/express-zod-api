@@ -134,8 +134,7 @@ describe("Documentation helpers", () => {
     test("Feature #1706: should override the default value by a label from metadata", () => {
       expect(
         depictDefault(
-          z
-            .string()
+          z.iso
             .datetime()
             .default(() => new Date().toISOString())
             .label("Today"),

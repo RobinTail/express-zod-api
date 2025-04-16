@@ -44,7 +44,9 @@ describe("Zod Runtime Plugin", () => {
       const schema = z.string();
       const schemaWithMeta = schema.example("test");
       expect(schemaWithMeta.meta()?.[metaSymbol]?.examples).toEqual(["test"]);
-      expect(schemaWithMeta.email().meta()?.[metaSymbol]).toEqual({
+      expect(
+        schemaWithMeta.regex(/@example.com$/).meta()?.[metaSymbol],
+      ).toEqual({
         examples: ["test"],
       });
     });
@@ -69,10 +71,7 @@ describe("Zod Runtime Plugin", () => {
 
   describe(".label()", () => {
     test("should set the corresponding metadata in the schema definition", () => {
-      const schema = z
-        .string()
-        .datetime()
-        .default(() => new Date().toISOString());
+      const schema = z.iso.datetime().default(() => new Date().toISOString());
       expect(schema).toHaveProperty("label");
       const schemaWithMeta = schema.label("Today");
       expect(schemaWithMeta.meta()?.[metaSymbol]).toHaveProperty(
