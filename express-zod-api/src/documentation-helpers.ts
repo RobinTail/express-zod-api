@@ -527,7 +527,7 @@ export const depictNumber: Depicter = (
     }
     if (isCheck<$ZodCheckLessThan>(check, "less_than")) {
       max = Number(check._zod.def.value);
-      inclMax = inclMin = check._zod.def.inclusive;
+      inclMax = check._zod.def.inclusive;
     }
   }
   result[inclMin ? "minimum" : "exclusiveMinimum"] = min;
