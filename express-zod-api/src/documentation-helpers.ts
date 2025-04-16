@@ -27,7 +27,6 @@ import type {
   $ZodCheckLessThan,
   $ZodReadonly,
   $ZodStringFormat,
-  $ZodCheck,
   $ZodNumberFormat,
   $ZodStringFormats,
   $ZodNumberFormats,
@@ -430,11 +429,13 @@ export const depictTuple: Depicter = (
 });
 
 const isCheck = <T extends $ZodChecks>(
-  check: $ZodCheck,
+  check: unknown,
   name: T["_zod"]["def"]["check"],
-): check is T => check._zod.def.check === name;
+): check is T => R.pathEq(name, ["_zod", "def", "check"], check);
 
-export const depictString: Depicter = ({ _zod: { def } }: $ZodString) => {
+export const depictString: Depicter = (
+  schema: $ZodString | $ZodStringFormat,
+) => {
   const result: SchemaObject = { type: "string" };
   const formatCast: Partial<Record<$ZodStringFormats, SchemaObject["format"]>> =
     {
@@ -446,7 +447,9 @@ export const depictString: Depicter = ({ _zod: { def } }: $ZodString) => {
       cidrv6: "cidr",
       regex: undefined,
     };
-  for (const check of def.checks || []) {
+  const { checks = [] } = schema._zod.def;
+  if (isCheck<$ZodStringFormat>(schema, "string_format")) checks.push(schema);
+  for (const check of checks) {
     if (isCheck<$ZodCheckLengthEquals>(check, "length_equals")) {
       [result.minLength, result.maxLength] = Array(2).fill(
         check._zod.def.length,
