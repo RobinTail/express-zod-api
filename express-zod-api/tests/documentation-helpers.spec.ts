@@ -343,7 +343,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictLiteral()", () => {
-    test.each(["testng", null, BigInt(123)])(
+    test.each(["testng", null, BigInt(123), undefined])(
       "should set type and involve const property %#",
       (value) => {
         expect(depictLiteral(z.literal(value), requestCtx)).toMatchSnapshot();
