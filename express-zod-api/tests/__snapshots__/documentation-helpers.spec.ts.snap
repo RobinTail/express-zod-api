@@ -532,6 +532,24 @@ exports[`Documentation helpers > depictNumber() > should set min/max values acco
 }
 `;
 
+exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 2 1`] = `
+{
+  "format": "double",
+  "maximum": 1.7976931348623157e+308,
+  "minimum": -1.7976931348623157e+308,
+  "type": "number",
+}
+`;
+
+exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 3 1`] = `
+{
+  "format": "hacked",
+  "maximum": 1.7976931348623157e+308,
+  "minimum": -1.7976931348623157e+308,
+  "type": "number",
+}
+`;
+
 exports[`Documentation helpers > depictNumber() > should use numericRange when set 0 1`] = `
 {
   "format": "double",

@@ -473,7 +473,12 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictNumber()", () => {
-    test.each([z.number(), z.int()])(
+    test.each([
+      z.number(),
+      z.int(),
+      z.float64(),
+      R.assocPath(["_zod", "def", "format"], "hacked", z.int()),
+    ])(
       "should set min/max values according to JS capabilities %#",
       (schema) => {
         expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
