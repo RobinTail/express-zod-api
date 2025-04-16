@@ -21,16 +21,15 @@ import type {
   $ZodCheckMinLength,
   $ZodCheckMaxLength,
   $ZodString,
-  $ZodCheckRegex,
   $ZodISODateTime,
   $ZodCheckLengthEquals,
-  $ZodISODate,
-  $ZodISOTime,
   $ZodNumber,
   $ZodCheckGreaterThan,
   $ZodCheckLessThan,
   $ZodReadonly,
   $ZodCheckStringFormatDef,
+  $ZodStringFormat,
+  $ZodCheck,
 } from "@zod/core";
 import {
   ExamplesObject,
@@ -439,18 +438,12 @@ export const depictTuple: Depicter = (
   items: def.rest === null ? { not: {} } : next(def.rest),
 });
 
+const isCheck = <T extends $ZodChecks>(
+  check: $ZodCheck,
+  name: T["_zod"]["def"]["check"],
+): check is T => check._zod.def.check === name;
+
 export const depictString: Depicter = ({ _zod: { def } }: $ZodString) => {
-  const minCheck = getCheck<$ZodCheckMinLength>(def, "min_length");
-  const maxCheck = getCheck<$ZodCheckMaxLength>(def, "max_length");
-  const regexCheck = getCheck<$ZodCheckRegex>(def, "string_format", "regex");
-  const dateCheck = getCheck<$ZodISODate>(def, "string_format", "date");
-  const timeCheck = getCheck<$ZodISOTime>(def, "string_format", "time");
-  const datetimeCheck = getCheck<$ZodISODateTime>(
-    def,
-    "string_format",
-    "datetime",
-  );
-  const lenCheck = getCheck<$ZodCheckLengthEquals>(def, "length_equals");
   const result: SchemaObject = { type: "string" };
   const formatCast: Partial<
     Record<$ZodCheckStringFormatDef["format"], SchemaObject["format"]>
@@ -461,30 +454,35 @@ export const depictString: Depicter = ({ _zod: { def } }: $ZodString) => {
     ipv6: "ip",
     cidrv4: "cidr",
     cidrv6: "cidr",
+    regex: undefined,
   };
   for (const check of def.checks || []) {
-    if (
-      check._zod.def.check === "string_format" &&
-      "format" in check._zod.def &&
-      typeof check._zod.def.format === "string" &&
-      check._zod.def.format !== "regex"
-    ) {
-      result.format =
+    if (isCheck<$ZodCheckLengthEquals>(check, "length_equals")) {
+      [result.minLength, result.maxLength] = Array(2).fill(
+        check._zod.def.length,
+      );
+    }
+    if (isCheck<$ZodCheckMinLength>(check, "min_length"))
+      result.minLength = check._zod.def.minimum;
+    if (isCheck<$ZodCheckMaxLength>(check, "max_length"))
+      result.maxLength = check._zod.def.maximum;
+    if (isCheck<$ZodStringFormat>(check, "string_format")) {
+      if (check._zod.def.format === "regex")
+        result.pattern = check._zod.def.pattern?.source;
+      if (check._zod.def.format === "date") result.pattern = dateRegex.source;
+      if (check._zod.def.format === "time") result.pattern = timeRegex.source;
+      if (check._zod.def.format === "datetime") {
+        result.pattern = getTimestampRegex(
+          (check as $ZodISODateTime)._zod.def.offset,
+        ).source;
+      }
+      const format =
         check._zod.def.format in formatCast
-          ? formatCast[check._zod.def.format as keyof typeof formatCast]
+          ? formatCast[check._zod.def.format]
           : check._zod.def.format;
-      break;
+      if (format) result.format = format;
     }
   }
-  if (lenCheck)
-    [result.minLength, result.maxLength] = [lenCheck.length, lenCheck.length];
-  if (minCheck) result.minLength = minCheck.minimum;
-  if (maxCheck) result.maxLength = maxCheck.maximum;
-  if (dateCheck) result.pattern = dateRegex.source;
-  if (timeCheck) result.pattern = timeRegex.source;
-  if (datetimeCheck)
-    result.pattern = getTimestampRegex(datetimeCheck.offset).source;
-  if (regexCheck) result.pattern = regexCheck.pattern.source;
   return result;
 };
 
