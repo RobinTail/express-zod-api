@@ -1603,10 +1603,10 @@ paths:
                   pattern: \\d+
                 combined:
                   type: string
-                  format: email
                   minLength: 1
-                  maxLength: 90
+                  format: email
                   pattern: .*@example\\.com
+                  maxLength: 90
               required:
                 - regular
                 - min
