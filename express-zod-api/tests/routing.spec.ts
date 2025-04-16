@@ -393,6 +393,7 @@ describe("Routing", () => {
       });
     });
 
+    const circular: z.ZodType = z.lazy(() => z.tuple([circular, z.nan()]));
     test.each([
       [z.bigint(), z.set(z.string())],
       [z.nan(), z.map(z.string(), z.boolean())],
@@ -404,6 +405,7 @@ describe("Routing", () => {
       [z.lazy(() => z.void()), ez.raw()],
       [z.promise(z.any()), ez.upload()],
       [z.never(), z.tuple([ez.file()]).rest(z.nan())],
+      [z.nan().pipe(z.any()), circular],
     ])("should warn about JSON incompatible schemas %#", (input, output) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
         input: z.object({ input }),
