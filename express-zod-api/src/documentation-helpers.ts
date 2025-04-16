@@ -23,7 +23,6 @@ import type {
   $ZodString,
   $ZodCheckRegex,
   $ZodISODateTime,
-  $ZodJWT,
   $ZodCheckLengthEquals,
   $ZodISODate,
   $ZodISOTime,
@@ -31,6 +30,7 @@ import type {
   $ZodCheckGreaterThan,
   $ZodCheckLessThan,
   $ZodReadonly,
+  $ZodCheckStringFormatDef,
 } from "@zod/core";
 import {
   ExamplesObject,
@@ -450,36 +450,29 @@ export const depictString: Depicter = ({ _zod: { def } }: $ZodString) => {
     "string_format",
     "datetime",
   );
-  const jwtCheck = getCheck<$ZodJWT>(def, "string_format", "jwt");
   const lenCheck = getCheck<$ZodCheckLengthEquals>(def, "length_equals");
   const result: SchemaObject = { type: "string" };
-  // @todo should rather invoke those methods inside the loop below to avoid so much lookup
-  const formats: Record<NonNullable<SchemaObject["format"]>, boolean> = {
-    "date-time": !!datetimeCheck,
-    byte: !!getCheck(def, "string_format", "base64"),
-    base64url: !!getCheck(def, "string_format", "base64url"),
-    date: !!dateCheck,
-    time: !!timeCheck,
-    duration: !!getCheck(def, "string_format", "duration"),
-    email: !!getCheck(def, "string_format", "email"),
-    url: !!getCheck(def, "string_format", "url"),
-    uuid: !!getCheck(def, "string_format", "uuid"),
-    cuid: !!getCheck(def, "string_format", "cuid"),
-    cuid2: !!getCheck(def, "string_format", "cuid2"),
-    ulid: !!getCheck(def, "string_format", "ulid"),
-    nanoid: !!getCheck(def, "string_format", "nanoid"),
-    jwt: !!jwtCheck,
-    ip:
-      !!getCheck(def, "string_format", "ipv4") ||
-      !!getCheck(def, "string_format", "ipv6"),
-    cidr:
-      !!getCheck(def, "string_format", "cidrv4") ||
-      !!getCheck(def, "string_format", "cidrv6"),
-    emoji: !!getCheck(def, "string_format", "emoji"),
+  const formatCast: Partial<
+    Record<$ZodCheckStringFormatDef["format"], SchemaObject["format"]>
+  > = {
+    datetime: "date-time",
+    base64: "byte",
+    ipv4: "ip",
+    ipv6: "ip",
+    cidrv4: "cidr",
+    cidrv6: "cidr",
   };
-  for (const format in formats) {
-    if (formats[format]) {
-      result.format = format;
+  for (const check of def.checks || []) {
+    if (
+      check._zod.def.check === "string_format" &&
+      "format" in check._zod.def &&
+      typeof check._zod.def.format === "string" &&
+      check._zod.def.format !== "regex"
+    ) {
+      result.format =
+        check._zod.def.format in formatCast
+          ? formatCast[check._zod.def.format as keyof typeof formatCast]
+          : check._zod.def.format;
       break;
     }
   }
