@@ -17,7 +17,6 @@ import type {
   $ZodType,
   $ZodUnion,
   $ZodChecks,
-  $ZodTypeDef,
   $ZodCheckMinLength,
   $ZodCheckMaxLength,
   $ZodString,
@@ -27,9 +26,11 @@ import type {
   $ZodCheckGreaterThan,
   $ZodCheckLessThan,
   $ZodReadonly,
-  $ZodCheckStringFormatDef,
   $ZodStringFormat,
   $ZodCheck,
+  $ZodNumberFormat,
+  $ZodStringFormats,
+  $ZodNumberFormats,
 } from "@zod/core";
 import {
   ExamplesObject,
@@ -166,7 +167,11 @@ export const depictFile: Depicter = (schema: FileSchema) => {
     type: "string",
     format:
       schema instanceof z.ZodString
-        ? getCheck(schema._zod.def, "string_format", "base64")
+        ? schema._zod.def.checks?.find(
+            (entry) =>
+              isCheck<$ZodStringFormat>(entry, "string_format") &&
+              entry._zod.def.format === "base64",
+          )
           ? "byte"
           : "file"
         : "binary",
@@ -393,21 +398,6 @@ export const depictRecord: Depicter = (
   return { type: "object", additionalProperties: next(def.valueType) };
 };
 
-const getCheck = <T extends $ZodChecks>(
-  def: $ZodTypeDef,
-  name: T["_zod"]["def"]["check"],
-  format?: T extends { _zod: { def: { format: string } } }
-    ? T["_zod"]["def"]["format"]
-    : never,
-): T["_zod"]["def"] | undefined =>
-  R.find(
-    R.both(
-      R.pathEq(name, ["_zod", "def", "check"]),
-      format ? R.pathEq(format, ["_zod", "def", "format"]) : R.T,
-    ),
-    (def.checks || []) as $ZodChecks[],
-  )?._zod.def;
-
 // @todo should also have exact length check
 export const depictArray: Depicter = (
   { _zod: { def } }: $ZodArray,
@@ -417,10 +407,12 @@ export const depictArray: Depicter = (
     type: "array",
     items: next(def.element),
   };
-  const minCheck = getCheck<$ZodCheckMinLength>(def, "min_length");
-  const maxCheck = getCheck<$ZodCheckMaxLength>(def, "max_length");
-  if (minCheck) result.minItems = minCheck.minimum;
-  if (maxCheck) result.maxItems = maxCheck.maximum;
+  for (const check of def.checks || []) {
+    if (isCheck<$ZodCheckMinLength>(check, "min_length"))
+      result.minItems = check._zod.def.minimum;
+    if (isCheck<$ZodCheckMaxLength>(check, "max_length"))
+      result.maxItems = check._zod.def.maximum;
+  }
   return result;
 };
 
@@ -445,17 +437,16 @@ const isCheck = <T extends $ZodChecks>(
 
 export const depictString: Depicter = ({ _zod: { def } }: $ZodString) => {
   const result: SchemaObject = { type: "string" };
-  const formatCast: Partial<
-    Record<$ZodCheckStringFormatDef["format"], SchemaObject["format"]>
-  > = {
-    datetime: "date-time",
-    base64: "byte",
-    ipv4: "ip",
-    ipv6: "ip",
-    cidrv4: "cidr",
-    cidrv6: "cidr",
-    regex: undefined,
-  };
+  const formatCast: Partial<Record<$ZodStringFormats, SchemaObject["format"]>> =
+    {
+      datetime: "date-time",
+      base64: "byte",
+      ipv4: "ip",
+      ipv6: "ip",
+      cidrv4: "cidr",
+      cidrv6: "cidr",
+      regex: undefined,
+    };
   for (const check of def.checks || []) {
     if (isCheck<$ZodCheckLengthEquals>(check, "length_equals")) {
       [result.minLength, result.maxLength] = Array(2).fill(
@@ -490,6 +481,7 @@ export const depictString: Depicter = ({ _zod: { def } }: $ZodString) => {
 export const depictNumber: Depicter = (
   { _zod: { def } }: $ZodNumber,
   {
+    // @todo consider using computed values provided by Zod instead
     numericRange = {
       integer: [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
       float: [-Number.MAX_VALUE, Number.MAX_VALUE],
@@ -500,30 +492,46 @@ export const depictNumber: Depicter = (
     integer: null,
     float: null,
   };
-  // @todo should also test z.int, z.int32, z.int64
-  const intCheck = getCheck(def, "number_format", "safeint");
-  const minCheck = getCheck<$ZodCheckGreaterThan>(def, "greater_than");
-  const minimum = !minCheck
-    ? intCheck
-      ? intRange?.[0]
-      : floatRange?.[0]
-    : Number(minCheck.value);
-  const isMinInclusive = minCheck ? minCheck.inclusive : true;
-  const maxCheck = getCheck<$ZodCheckLessThan>(def, "less_than");
-  const maximum = !maxCheck
-    ? intCheck
-      ? intRange?.[1]
-      : floatRange?.[1]
-    : Number(maxCheck.value);
-  const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
+  let min = floatRange?.[0];
+  let inclMin = true;
+  let max = floatRange?.[1];
+  let inclMax = true;
   const result: SchemaObject = {
-    type: intCheck ? "integer" : "number",
-    format: intCheck ? "int64" : "double",
+    type: "number",
+    format: "double",
   };
-  if (isMinInclusive) result.minimum = minimum;
-  else result.exclusiveMinimum = minimum;
-  if (isMaxInclusive) result.maximum = maximum;
-  else result.exclusiveMaximum = maximum;
+  const formatCast: Partial<Record<$ZodNumberFormats, SchemaObject["format"]>> =
+    {
+      safeint: "int64",
+      uint32: "int32",
+      float32: "float",
+      float64: "double",
+    };
+  for (const check of def.checks || []) {
+    if (isCheck<$ZodNumberFormat>(check, "number_format")) {
+      if (check._zod.def.format.includes("int")) {
+        result.type = "integer";
+        min = intRange?.[0];
+        max = intRange?.[1];
+        inclMin = true;
+        inclMax = true;
+      }
+      result.format =
+        check._zod.def.format in formatCast
+          ? formatCast[check._zod.def.format]
+          : check._zod.def.format;
+    }
+    if (isCheck<$ZodCheckGreaterThan>(check, "greater_than")) {
+      min = Number(check._zod.def.value);
+      inclMin = check._zod.def.inclusive;
+    }
+    if (isCheck<$ZodCheckLessThan>(check, "less_than")) {
+      max = Number(check._zod.def.value);
+      inclMax = inclMin = check._zod.def.inclusive;
+    }
+  }
+  result[inclMin ? "minimum" : "exclusiveMinimum"] = min;
+  result[inclMax ? "maximum" : "exclusiveMaximum"] = max;
   return result;
 };
 
