@@ -33,9 +33,8 @@ export class Diagnostics {
       const entry = stack.shift()!;
       if (entry.type && entry.type !== "object")
         return this.logger.warn("Endpoint schema is not object-based"); // @todo provide more context
-      if (entry.allOf) stack.push(...entry.allOf);
-      if (entry.oneOf) stack.push(...entry.oneOf);
-      if (entry.anyOf) stack.push(...entry.anyOf); // @todo DNRY
+      for (const prop of ["allOf", "oneOf", "anyOf"] as const)
+        if (entry[prop]) stack.push(...entry[prop]);
     }
   }
 
