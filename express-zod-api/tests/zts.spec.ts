@@ -369,6 +369,7 @@ describe("zod-to-ts", () => {
       z.literal(true),
       z.literal(false),
       z.literal(123),
+      z.literal(undefined),
     ])("Should produce the correct typescript %#", (schema) => {
       expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });
