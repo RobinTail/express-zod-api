@@ -24,19 +24,12 @@ export class Diagnostics {
     if (this.#verifiedEndpoints.has(endpoint)) return;
     for (const dir of ["input", "output"] as const) {
       const stack = [
-        z.toJSONSchema(endpoint[`${dir}Schema`], {
-          unrepresentable: "any",
-          pipes: dir,
-        }),
+        z.toJSONSchema(endpoint[`${dir}Schema`], { unrepresentable: "any" }), // @todo transformations?
       ];
       while (stack.length > 0) {
         const entry = stack.shift()!;
-        if (entry.type && entry.type !== "object") {
-          return this.logger.warn(
-            `Endpoint ${dir} schema is not object-based`,
-            Object.assign(ctx, { reason: entry }),
-          );
-        }
+        if (entry.type && entry.type !== "object")
+          this.logger.warn(`Endpoint ${dir} schema is not object-based`, ctx);
         for (const prop of ["allOf", "oneOf", "anyOf"] as const)
           if (entry[prop]) stack.push(...entry[prop]);
       }

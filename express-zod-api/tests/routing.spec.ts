@@ -430,6 +430,35 @@ describe("Routing", () => {
       ]);
     });
 
+    test.each([
+      [z.string().array(), z.string()],
+      [z.lazy(() => z.number()), z.object({}).pipe(z.array(z.string()))],
+    ])("should warn about non-object based schemas I/O %#", (input, output) => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        input: input as unknown as z.ZodObject,
+        output: output as unknown as z.ZodObject,
+        handler: vi.fn(),
+      });
+      const configMock = { cors: false, startupLogo: false };
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: configMock as CommonConfig,
+        routing: { path: endpoint },
+      });
+      expect(logger._getLogs().warn).toEqual([
+        [
+          "Endpoint input schema is not object-based",
+          { method: "get", path: "/path" },
+        ],
+        [
+          "Endpoint output schema is not object-based",
+          { method: "get", path: "/path" },
+        ],
+      ]);
+    });
+
     test("should warn about unused path params", () => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
         input: z.object({ id: z.string() }),
