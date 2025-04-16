@@ -351,13 +351,12 @@ const areOptionsLiteral = (
 ): subject is $ZodLiteral[] =>
   subject.every((option) => option._zod.def.type === "literal");
 
-// @todo consider more checks instead of "as string"
 export const depictRecord: Depicter = (
   { _zod: { def } }: $ZodRecord,
   { next },
 ) => {
   if (def.keyType instanceof z.ZodEnum) {
-    const keys = Object.values(def.keyType._zod.def.entries) as string[];
+    const keys = Object.values(def.keyType._zod.def.entries).map(String);
     const result: SchemaObject = { type: "object" };
     if (keys.length) {
       result.properties = depictObjectProperties(
@@ -369,15 +368,14 @@ export const depictRecord: Depicter = (
     return result;
   }
   if (def.keyType instanceof z.ZodLiteral) {
+    const keys = def.keyType._zod.def.values.map(String);
     return {
       type: "object",
       properties: depictObjectProperties(
-        z.looseObject({
-          [def.keyType._zod.def.values[0] as string]: def.valueType,
-        }),
+        z.looseObject(R.fromPairs(R.xprod(keys, [def.valueType]))),
         next,
       ),
-      required: [def.keyType._zod.def.values[0] as string],
+      required: keys,
     };
   }
   if (
