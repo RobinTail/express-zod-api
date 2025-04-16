@@ -396,7 +396,6 @@ export const depictRecord: Depicter = (
   return { type: "object", additionalProperties: next(def.valueType) };
 };
 
-// @todo should also have exact length check
 export const depictArray: Depicter = (
   { _zod: { def } }: $ZodArray,
   { next },
@@ -406,6 +405,8 @@ export const depictArray: Depicter = (
     items: next(def.element),
   };
   for (const check of def.checks || []) {
+    if (isCheck<$ZodCheckLengthEquals>(check, "length_equals"))
+      [result.minItems, result.maxItems] = Array(2).fill(check._zod.def.length);
     if (isCheck<$ZodCheckMinLength>(check, "min_length"))
       result.minItems = check._zod.def.minimum;
     if (isCheck<$ZodCheckMaxLength>(check, "max_length"))
