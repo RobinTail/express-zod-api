@@ -1,6 +1,6 @@
-import * as R from "ramda";
-import { z } from "zod";
 import { combinations } from "./common-helpers";
+import { z } from "zod";
+import * as R from "ramda";
 
 export const metaSymbol = Symbol.for("express-zod-api");
 
@@ -19,7 +19,6 @@ export const copyMeta = <A extends z.ZodType, B extends z.ZodType>(
   const srcMeta = src.meta()?.[metaSymbol];
   const destMeta = dest.meta()?.[metaSymbol];
   if (!srcMeta) return dest; // ensure metadata in src below
-
   return dest.meta({
     description: dest.description,
     [metaSymbol]: {
