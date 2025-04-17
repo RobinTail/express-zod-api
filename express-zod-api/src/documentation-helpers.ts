@@ -2,7 +2,6 @@ import type {
   $ZodCheckGreaterThan,
   $ZodCheckLessThan,
   $ZodChecks,
-  $ZodDate,
   $ZodEnum,
   $ZodIntersection,
   $ZodLazy,
@@ -189,6 +188,16 @@ export const delegate: Depicter = (schema, ctx) =>
           ),
         );
       }
+      if (zodSchema._zod.def.type === "date") {
+        throw new DocumentationError(
+          `Using z.date() within ${
+            ctx.isResponse ? "output" : "input"
+          } schema is forbidden. Please use ez.date${
+            ctx.isResponse ? "Out" : "In"
+          }() instead. Check out the documentation for details.`,
+          ctx,
+        );
+      }
       // on each
       const examples = getExamples({
         schema: zodSchema as z.ZodType, // @todo remove "as"
@@ -296,18 +305,6 @@ export const depictDateOut: Depicter = ({}: DateOutSchema, ctx) => {
       url: isoDateDocumentationUrl,
     },
   };
-};
-
-/** @throws DocumentationError */
-export const depictDate: Depicter = ({}: $ZodDate, ctx) => {
-  throw new DocumentationError(
-    `Using z.date() within ${
-      ctx.isResponse ? "output" : "input"
-    } schema is forbidden. Please use ez.date${
-      ctx.isResponse ? "Out" : "In"
-    }() instead. Check out the documentation for details.`,
-    ctx,
-  );
 };
 
 const isCheck = <T extends $ZodChecks>(
@@ -561,7 +558,7 @@ export const depicters: HandlingRules<
   enum: delegate,
   optional: delegate,
   nullable: delegate,
-  date: depictDate,
+  date: delegate,
   catch: delegate,
   pipe: depictPipeline,
   lazy: delegate,

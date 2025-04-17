@@ -5,7 +5,6 @@ import { z } from "zod";
 import { ez } from "../src";
 import {
   OpenAPIContext,
-  depictDate,
   depictDateIn,
   depictDateOut,
   depictExamples,
@@ -729,7 +728,7 @@ describe("Documentation helpers", () => {
     test.each([responseCtx, requestCtx])(
       "should throw clear error %#",
       (ctx) => {
-        expect(() => depictDate(z.date(), ctx)).toThrowErrorMatchingSnapshot();
+        expect(() => delegate(z.date(), ctx)).toThrowErrorMatchingSnapshot();
       },
     );
   });
