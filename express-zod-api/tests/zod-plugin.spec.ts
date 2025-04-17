@@ -25,6 +25,11 @@ describe("Zod Runtime Plugin", () => {
         "test",
       ]);
       expect(schema.meta()?.[metaSymbol]).toBeUndefined();
+      const second = schemaWithExample.example("test2");
+      expect(second.meta()?.[metaSymbol]?.examples).toEqual(["test", "test2"]);
+      expect(schemaWithExample.meta()?.[metaSymbol]?.examples).toEqual([
+        "test",
+      ]);
     });
 
     test("can be used multiple times", () => {
