@@ -28,7 +28,6 @@ import {
   reformatParamsInPath,
   IsHeader,
   nonEmpty,
-  NumericRange,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
@@ -61,12 +60,6 @@ interface DocumentationParams {
   descriptions?: Partial<Record<Component, Descriptor>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
-  /**
-   * @desc Acceptable limits of z.number() that API can handle (default: the limits of JavaScript engine)
-   * @default {integer:[Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER], float:[-Number.MAX_VALUE, Number.MAX_VALUE]}
-   * @example null — to disable the feature
-   * @see depictNumber */
-  numericRange?: NumericRange | null;
   /** @default inline */
   composition?: "inline" | "components";
   /**
@@ -156,7 +149,6 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     tags,
     isHeader,
-    numericRange,
     hasSummaryFromDescription = true,
     composition = "inline",
   }: DocumentationParams) {
@@ -171,7 +163,6 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         brandHandling,
-        numericRange,
         makeRef: this.#makeRef.bind(this),
       };
       const { description, shortDescription, scopes, inputSchema } = endpoint;

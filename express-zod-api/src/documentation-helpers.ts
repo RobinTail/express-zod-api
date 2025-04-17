@@ -1,15 +1,10 @@
 import type {
-  $ZodCheckGreaterThan,
-  $ZodCheckLessThan,
   $ZodChecks,
   $ZodEnum,
   $ZodIntersection,
   $ZodLazy,
   $ZodLiteral,
   $ZodNullable,
-  $ZodNumber,
-  $ZodNumberFormat,
-  $ZodNumberFormats,
   $ZodPipe,
   $ZodStringFormat,
   $ZodTuple,
@@ -68,8 +63,6 @@ import { Security } from "./security";
 import { ezUploadBrand, UploadSchema } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
 
-export type NumericRange = Record<"integer" | "float", [number, number]>;
-
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   makeRef: (
@@ -80,7 +73,6 @@ export interface OpenAPIContext extends FlatObject {
       | (() => SchemaObject | ReferenceObject),
     name?: string,
   ) => ReferenceObject;
-  numericRange?: NumericRange | null;
   path: string;
   method: Method;
 }
@@ -312,66 +304,6 @@ const isCheck = <T extends $ZodChecks>(
   name: T["_zod"]["def"]["check"],
 ): check is T => R.pathEq(name, ["_zod", "def", "check"], check);
 
-/** @since OAS 3.1: exclusive min/max are numbers */
-export const depictNumber: Depicter = (
-  schema: $ZodNumber,
-  {
-    // @todo consider using computed values provided by Zod instead
-    numericRange = {
-      integer: [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
-      float: [-Number.MAX_VALUE, Number.MAX_VALUE],
-    },
-  },
-) => {
-  const { integer: intRange, float: floatRange } = numericRange || {
-    integer: null,
-    float: null,
-  };
-  let min = floatRange?.[0];
-  let inclMin = true;
-  let max = floatRange?.[1];
-  let inclMax = true;
-  const result: SchemaObject = {
-    type: "number",
-    format: "double",
-  };
-  const formatCast: Partial<Record<$ZodNumberFormats, SchemaObject["format"]>> =
-    {
-      safeint: "int64",
-      uint32: "int32",
-      float32: "float",
-      float64: "double",
-    };
-  const { checks = [] } = schema._zod.def;
-  if (isCheck<$ZodNumberFormat>(schema, "number_format")) checks.push(schema);
-  for (const check of checks) {
-    if (isCheck<$ZodNumberFormat>(check, "number_format")) {
-      if (check._zod.def.format.includes("int")) {
-        result.type = "integer";
-        min = intRange?.[0];
-        max = intRange?.[1];
-        inclMin = true;
-        inclMax = true;
-      }
-      result.format =
-        check._zod.def.format in formatCast
-          ? formatCast[check._zod.def.format]
-          : check._zod.def.format;
-    }
-    if (isCheck<$ZodCheckGreaterThan>(check, "greater_than")) {
-      min = Number(check._zod.def.value);
-      inclMin = check._zod.def.inclusive;
-    }
-    if (isCheck<$ZodCheckLessThan>(check, "less_than")) {
-      max = Number(check._zod.def.value);
-      inclMax = check._zod.def.inclusive;
-    }
-  }
-  result[inclMin ? "minimum" : "exclusiveMinimum"] = min;
-  result[inclMax ? "maximum" : "exclusiveMaximum"] = max;
-  return result;
-};
-
 const makeSample = (depicted: SchemaObject) => {
   const firstType = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
@@ -480,7 +412,6 @@ export const depictRequestParams = ({
   brandHandling,
   isHeader,
   security,
-  numericRange,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResHandlingProps<IOSchema> & {
   inputSources: InputSource[];
@@ -516,7 +447,7 @@ export const depictRequestParams = ({
         rules: { ...brandHandling, ...depicters },
         onEach,
         onMissing,
-        ctx: { isResponse: false, makeRef, path, method, numericRange },
+        ctx: { isResponse: false, makeRef, path, method },
       });
       const result =
         composition === "components"
@@ -542,7 +473,7 @@ export const depicters: HandlingRules<
   FirstPartyKind | ProprietaryBrand
 > = {
   string: delegate,
-  number: depictNumber,
+  number: delegate,
   bigint: delegate,
   boolean: delegate,
   null: delegate,
@@ -651,7 +582,6 @@ export const depictResponse = ({
   hasMultipleStatusCodes,
   statusCode,
   brandHandling,
-  numericRange,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
@@ -667,7 +597,7 @@ export const depictResponse = ({
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: { isResponse: true, makeRef, path, method, numericRange },
+      ctx: { isResponse: true, makeRef, path, method },
     }),
   );
   const media: MediaTypeObject = {
@@ -781,7 +711,6 @@ export const depictBody = ({
   composition,
   brandHandling,
   paramNames,
-  numericRange,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResHandlingProps<IOSchema> & {
   mimeType: string;
@@ -792,7 +721,7 @@ export const depictBody = ({
       rules: { ...brandHandling, ...depicters },
       onEach,
       onMissing,
-      ctx: { isResponse: false, makeRef, path, method, numericRange },
+      ctx: { isResponse: false, makeRef, path, method },
     }),
     paramNames,
   );

@@ -532,27 +532,22 @@ exports[`Documentation helpers > depictNumber() > should not use numericRange wh
 
 exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 0 1`] = `
 {
-  "format": "double",
-  "maximum": 1.7976931348623157e+308,
-  "minimum": -1.7976931348623157e+308,
   "type": "number",
 }
 `;
 
 exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 1 1`] = `
 {
-  "format": "int64",
-  "maximum": 9007199254740991,
-  "minimum": -9007199254740991,
+  "exclusiveMaximum": 9007199254740991,
+  "exclusiveMinimum": -9007199254740991,
   "type": "integer",
 }
 `;
 
 exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 2 1`] = `
 {
-  "format": "double",
-  "maximum": 1.7976931348623157e+308,
-  "minimum": -1.7976931348623157e+308,
+  "exclusiveMaximum": 1.7976931348623157e+308,
+  "exclusiveMinimum": -1.7976931348623157e+308,
   "type": "number",
 }
 `;
@@ -586,7 +581,6 @@ exports[`Documentation helpers > depictNumber() > should use numericRange when s
 
 exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 0 1`] = `
 {
-  "format": "double",
   "maximum": 33.333333333333336,
   "minimum": -33.333333333333336,
   "type": "number",
@@ -595,7 +589,6 @@ exports[`Documentation helpers > depictNumber() > should use schema checks for m
 
 exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 1 1`] = `
 {
-  "format": "int64",
   "maximum": 100,
   "minimum": -100,
   "type": "integer",
@@ -606,7 +599,6 @@ exports[`Documentation helpers > depictNumber() > should use schema checks for m
 {
   "exclusiveMaximum": 16.666666666666668,
   "exclusiveMinimum": -16.666666666666668,
-  "format": "double",
   "type": "number",
 }
 `;
@@ -615,7 +607,6 @@ exports[`Documentation helpers > depictNumber() > should use schema checks for m
 {
   "exclusiveMaximum": 100,
   "exclusiveMinimum": -100,
-  "format": "int64",
   "type": "integer",
 }
 `;

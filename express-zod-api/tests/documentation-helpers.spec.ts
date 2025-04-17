@@ -9,7 +9,6 @@ import {
   depictDateOut,
   depictExamples,
   depictFile,
-  depictNumber,
   depictParamExamples,
   depictPipeline,
   depictRequestParams,
@@ -459,42 +458,10 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictNumber()", () => {
-    test.each([
-      z.number(),
-      z.int(),
-      z.float64(),
-      R.assocPath(["_zod", "def", "format"], "hacked", z.int()),
-    ])(
+    test.each([z.number(), z.int(), z.float64()])(
       "should set min/max values according to JS capabilities %#",
       (schema) => {
-        expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
-
-    test.each([z.number(), z.int()])(
-      "should use numericRange when set %#",
-      (schema) => {
-        expect(
-          depictNumber(schema, {
-            ...requestCtx,
-            numericRange: {
-              integer: [-100, 100],
-              float: [-1000 / 3, 1000 / 3],
-            },
-          }),
-        ).toMatchSnapshot();
-      },
-    );
-
-    test.each([z.number(), z.int()])(
-      "should not use numericRange when it is null %#",
-      (schema) => {
-        expect(
-          depictNumber(schema, {
-            ...requestCtx,
-            numericRange: null,
-          }),
-        ).toMatchSnapshot();
+        expect(delegate(schema, requestCtx)).toMatchSnapshot();
       },
     );
 
@@ -512,7 +479,7 @@ describe("Documentation helpers", () => {
     ])(
       "should use schema checks for min/max and exclusiveness %#",
       (schema) => {
-        expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
+        expect(delegate(schema, requestCtx)).toMatchSnapshot();
       },
     );
   });
