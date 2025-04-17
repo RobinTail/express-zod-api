@@ -13,7 +13,6 @@ import type {
   $ZodNumberFormats,
   $ZodObject,
   $ZodPipe,
-  $ZodRecord,
   $ZodStringFormat,
   $ZodTuple,
   $ZodType,
@@ -303,60 +302,6 @@ export const depictDate: Depicter = ({}: $ZodDate, ctx) => {
   );
 };
 
-const areOptionsLiteral = (
-  subject: ReadonlyArray<$ZodType>,
-): subject is $ZodLiteral[] =>
-  subject.every((option) => option._zod.def.type === "literal");
-
-export const depictRecord: Depicter = (
-  { _zod: { def } }: $ZodRecord,
-  { next },
-) => {
-  if (def.keyType instanceof z.ZodEnum) {
-    const keys = Object.values(def.keyType._zod.def.entries).map(String);
-    const result: SchemaObject = { type: "object" };
-    if (keys.length) {
-      result.properties = depictObjectProperties(
-        z.looseObject(R.fromPairs(R.xprod(keys, [def.valueType]))),
-        next,
-      );
-      result.required = keys;
-    }
-    return result;
-  }
-  if (def.keyType instanceof z.ZodLiteral) {
-    const keys = def.keyType._zod.def.values.map(String);
-    return {
-      type: "object",
-      properties: depictObjectProperties(
-        z.looseObject(R.fromPairs(R.xprod(keys, [def.valueType]))),
-        next,
-      ),
-      required: keys,
-    };
-  }
-  if (
-    def.keyType instanceof z.ZodUnion &&
-    areOptionsLiteral(def.keyType._zod.def.options)
-  ) {
-    const required = R.map(
-      (opt: $ZodLiteral) => `${opt._zod.def.values[0]}`,
-      def.keyType._zod.def.options as $ZodLiteral[], // ensured above
-    );
-    const shape = R.fromPairs(R.xprod(required, [def.valueType]));
-    return {
-      type: "object",
-      properties: depictObjectProperties(z.looseObject(shape), next),
-      required,
-    };
-  }
-  return {
-    type: "object",
-    propertyNames: next(def.keyType),
-    additionalProperties: next(def.valueType),
-  };
-};
-
 const isCheck = <T extends $ZodChecks>(
   check: unknown,
   name: T["_zod"]["def"]["check"],
@@ -608,7 +553,7 @@ export const depicters: HandlingRules<
   null: delegate,
   array: delegate,
   tuple: delegate,
-  record: depictRecord,
+  record: delegate,
   object: delegate,
   literal: delegate,
   intersection: delegate,

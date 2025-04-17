@@ -15,7 +15,6 @@ import {
   depictObjectProperties,
   depictParamExamples,
   depictPipeline,
-  depictRecord,
   depictRequestParams,
   depictSecurity,
   depictSecurityRefs,
@@ -394,7 +393,7 @@ describe("Documentation helpers", () => {
     ])(
       "should set properties+required or additionalProperties props %#",
       (schema) => {
-        expect(depictRecord(schema, requestCtx)).toMatchSnapshot();
+        expect(delegate(schema, requestCtx)).toMatchSnapshot();
       },
     );
   });

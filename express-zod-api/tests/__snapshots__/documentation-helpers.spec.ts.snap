@@ -806,9 +806,8 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
     "type": "boolean",
   },
   "propertyNames": {
-    "format": "int64",
-    "maximum": 9007199254740991,
-    "minimum": -9007199254740991,
+    "exclusiveMaximum": 9007199254740991,
+    "exclusiveMinimum": -9007199254740991,
     "type": "integer",
   },
   "type": "object",
@@ -829,50 +828,50 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 2 1`] = `
 {
-  "properties": {
-    "one": {
-      "type": "boolean",
-    },
-    "two": {
-      "type": "boolean",
-    },
+  "additionalProperties": {
+    "type": "boolean",
   },
-  "required": [
-    "one",
-    "two",
-  ],
+  "propertyNames": {
+    "enum": [
+      "one",
+      "two",
+    ],
+    "type": "string",
+  },
   "type": "object",
 }
 `;
 
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 3 1`] = `
 {
-  "properties": {
-    "testing": {
-      "type": "boolean",
-    },
+  "additionalProperties": {
+    "type": "boolean",
   },
-  "required": [
-    "testing",
-  ],
+  "propertyNames": {
+    "const": "testing",
+    "type": "string",
+  },
   "type": "object",
 }
 `;
 
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 4 1`] = `
 {
-  "properties": {
-    "one": {
-      "type": "boolean",
-    },
-    "two": {
-      "type": "boolean",
-    },
+  "additionalProperties": {
+    "type": "boolean",
   },
-  "required": [
-    "one",
-    "two",
-  ],
+  "propertyNames": {
+    "oneOf": [
+      {
+        "const": "one",
+        "type": "string",
+      },
+      {
+        "const": "two",
+        "type": "string",
+      },
+    ],
+  },
   "type": "object",
 }
 `;
