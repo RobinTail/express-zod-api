@@ -8,7 +8,7 @@
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
 import * as R from "ramda";
-import { z } from "zod";
+import { z, globalRegistry } from "zod";
 import { FlatObject } from "./common-helpers";
 import { Metadata, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
@@ -148,7 +148,7 @@ if (!(metaSymbol in globalThis)) {
             ...args: Parameters<z.ZodType["check"]>
           ) {
             /** @link https://v4.zod.dev/metadata#register */
-            return originalCheck.apply(this, args).register(z.globalRegistry, {
+            return originalCheck.apply(this, args).register(globalRegistry, {
               [metaSymbol]: this.meta()?.[metaSymbol],
             });
           };
