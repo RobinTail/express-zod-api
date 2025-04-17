@@ -6,7 +6,6 @@ export const ezRawBrand = Symbol("Raw");
 
 const base = z.object({ raw: file("buffer") });
 
-/** @todo how to define branded type in the second overload without it? */
 const extended = <S extends $ZodShape>(extra: S) =>
   base.extend(extra).brand(ezRawBrand as symbol);
 
