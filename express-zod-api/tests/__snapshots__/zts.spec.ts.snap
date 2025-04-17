@@ -11,7 +11,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     circular: SomeType;
     union: {
         number: number;
-    } | ("hi");
+    } | "hi";
     enum: "hi" | "bye";
     intersectionWithTransform: (number & bigint) & (number & string);
     date: any;

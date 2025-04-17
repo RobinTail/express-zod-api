@@ -58,14 +58,14 @@ const nodePath = {
   optional: R.path(["questionToken" satisfies keyof ts.TypeElement]),
 };
 
-const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) =>
-  f.createUnionTypeNode(
-    def.values.map((entry) =>
-      entry === undefined
-        ? ensureTypeNode(ts.SyntaxKind.UndefinedKeyword)
-        : makeLiteralType(entry),
-    ),
+const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
+  const values = def.values.map((entry) =>
+    entry === undefined
+      ? ensureTypeNode(ts.SyntaxKind.UndefinedKeyword)
+      : makeLiteralType(entry),
   );
+  return values.length === 1 ? values[0] : f.createUnionTypeNode(values);
+};
 
 const onObject: Producer = (
   { _zod: { def } }: z.ZodObject,
