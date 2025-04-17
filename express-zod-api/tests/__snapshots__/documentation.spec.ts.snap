@@ -611,14 +611,12 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
+            minItems: 1
+            maxItems: 3
             type: array
             items:
               type: integer
-              format: int64
-              exclusiveMinimum: 0
-              maximum: 9007199254740991
-            minItems: 1
-            maxItems: 3
+              exclusiveMaximum: 9007199254740991
         - name: unlimited
           in: query
           required: true
