@@ -17,6 +17,7 @@ paths:
           description: a numeric string containing the id of the user
           schema:
             type: string
+            format: regex
             pattern: \d+
             description: a numeric string containing the id of the user
       responses:
@@ -97,6 +98,7 @@ paths:
           description: numeric string
           schema:
             type: string
+            format: regex
             pattern: \d+
             description: numeric string
       responses:
@@ -402,6 +404,7 @@ paths:
           description: GET /v1/avatar/send Parameter
           schema:
             type: string
+            format: regex
             pattern: \d+
       responses:
         "200":
@@ -430,6 +433,7 @@ paths:
           description: GET /v1/avatar/stream Parameter
           schema:
             type: string
+            format: regex
             pattern: \d+
       responses:
         "200":
@@ -659,6 +663,7 @@ paths:
                 email:
                   type: string
                   format: email
+                  pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
                 message:
                   type: string
                   minLength: 1
