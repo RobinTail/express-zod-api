@@ -31,6 +31,14 @@ describe("Environment checks", () => {
       const snapshot = R.omit(["id", "version"], schema._zod);
       expect(snapshot).toMatchSnapshot();
     });
+
+    /**
+     * @link https://github.com/colinhacks/zod/issues/4162
+     * @link https://github.com/colinhacks/zod/issues/4141
+     * */
+    test("This should fail when they fix it", () => {
+      expect(z.email()).not.toHaveProperty("max");
+    });
   });
 
   describe("Vitest error comparison", () => {
