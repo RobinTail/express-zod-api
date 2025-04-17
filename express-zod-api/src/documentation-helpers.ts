@@ -352,7 +352,7 @@ export const depictDate: Depicter = ({}: $ZodDate, ctx) => {
 
 export const depictBoolean = delegate();
 
-export const depictBigInt: Depicter = () => ({
+export const depictBigInt = delegate({
   type: "integer",
   format: "bigint",
 });
