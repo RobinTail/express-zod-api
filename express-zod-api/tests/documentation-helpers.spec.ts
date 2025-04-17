@@ -411,6 +411,7 @@ describe("Documentation helpers", () => {
       z.record(z.literal("testing"), z.boolean()),
       z.record(z.literal("one").or(z.literal("two")), z.boolean()),
       z.record(z.string(), z.any()), // Issue #900
+      z.record(z.string().regex(/x-\w+/), z.boolean()),
     ])(
       "should set properties+required or additionalProperties props %#",
       (schema) => {

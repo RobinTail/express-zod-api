@@ -4,7 +4,9 @@
 
 ### v23.1.0
 
-- Fixed length array support in generated Documentation (`z.boolean().array().length(2)`).
+- Improved generated Documentation:
+  - Arrays having fixed length: `z.boolean().array().length(2)`;
+  - Records with non-literal keys (added `propertyNames`): `z.record(z.string().regex(/x-\w+/), z.boolean())`.
 
 ### v23.0.0
 

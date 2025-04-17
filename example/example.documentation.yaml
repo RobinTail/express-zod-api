@@ -492,6 +492,8 @@ paths:
                         type: string
                       otherInputs:
                         type: object
+                        propertyNames:
+                          type: string
                         additionalProperties:
                           format: any
                     required:
