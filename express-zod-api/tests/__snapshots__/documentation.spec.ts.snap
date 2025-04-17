@@ -1704,10 +1704,10 @@ paths:
               type: object
               properties:
                 regularEnum:
-                  type: string
                   enum:
                     - ABC
                     - DEF
+                  type: string
               required:
                 - regularEnum
         required: true
@@ -1726,10 +1726,10 @@ paths:
                     type: object
                     properties:
                       nativeEnum:
-                        type: number
                         enum:
                           - 1
                           - 2
+                        type: number
                     required:
                       - nativeEnum
                 required:

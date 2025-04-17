@@ -146,6 +146,19 @@ const getTimestampRegex = (hasOffset?: boolean) =>
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
+const delegate =
+  (overrides?: SchemaObject | Depicter): Depicter =>
+  (schema, ctx) => {
+    const jsonSchema = z.toJSONSchema(schema, {
+      unrepresentable: "any",
+      pipes: ctx.isResponse ? "output" : "input",
+    });
+    return Object.assign(
+      jsonSchema,
+      typeof overrides === "function" ? overrides(schema, ctx) : overrides,
+    );
+  };
+
 export const depictDefault: Depicter = (schema: $ZodDefault, { next }) => ({
   ...next(schema._zod.def.innerType),
   default:
@@ -153,7 +166,7 @@ export const depictDefault: Depicter = (schema: $ZodDefault, { next }) => ({
     schema._zod.def.defaultValue(),
 });
 
-export const depictAny: Depicter = () => ({ format: "any" });
+export const depictAny = delegate({ format: "any" });
 
 export const depictUpload: Depicter = ({}: UploadSchema, ctx) => {
   if (ctx.isResponse)
@@ -260,10 +273,9 @@ const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
       : undefined;
 };
 
-export const depictEnum: Depicter = ({ _zod: { def } }: $ZodEnum) => ({
+export const depictEnum = delegate(({ _zod: { def } }: $ZodEnum) => ({
   type: getSupportedType(Object.values(def.entries)[0]),
-  enum: Object.values(def.entries),
-});
+}));
 
 export const depictLiteral: Depicter = ({ _zod: { def } }: $ZodLiteral) => {
   const values = Object.values(def.values);
@@ -297,7 +309,7 @@ export const depictObject: Depicter = (
  * @see https://swagger.io/docs/specification/data-models/data-types/
  * @since OAS 3.1: using type: "null"
  * */
-export const depictNull: Depicter = () => ({ type: "null" });
+export const depictNull = delegate();
 
 export const depictDateIn: Depicter = ({}: DateInSchema, ctx) => {
   if (ctx.isResponse)
@@ -338,7 +350,7 @@ export const depictDate: Depicter = ({}: $ZodDate, ctx) => {
   );
 };
 
-export const depictBoolean: Depicter = () => ({ type: "boolean" });
+export const depictBoolean = delegate();
 
 export const depictBigInt: Depicter = () => ({
   type: "integer",
