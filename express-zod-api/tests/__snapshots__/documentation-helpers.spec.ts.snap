@@ -1496,8 +1496,13 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
   },
   "oneOf": [
     {
+      "discriminator": {
+        "propertyName": "status",
+      },
       "properties": {
-        "data": {},
+        "data": {
+          "format": "any",
+        },
         "status": {
           "const": "success",
         },
@@ -1509,6 +1514,9 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
       "type": "object",
     },
     {
+      "discriminator": {
+        "propertyName": "status",
+      },
       "properties": {
         "error": {
           "properties": {

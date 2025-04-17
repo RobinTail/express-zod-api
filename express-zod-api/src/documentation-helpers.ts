@@ -2,7 +2,6 @@ import type {
   $ZodArray,
   $ZodCatch,
   $ZodDate,
-  $ZodDiscriminatedUnion,
   $ZodEnum,
   $ZodIntersection,
   $ZodLazy,
@@ -14,7 +13,6 @@ import type {
   $ZodRecord,
   $ZodTuple,
   $ZodType,
-  $ZodUnion,
   $ZodChecks,
   $ZodCheckMinLength,
   $ZodCheckMaxLength,
@@ -134,7 +132,7 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-const delegate =
+export const delegate =
   (overrides?: SchemaObject | Depicter): Depicter =>
   (schema, ctx) => {
     const result = z.toJSONSchema(schema, {
@@ -159,6 +157,18 @@ const delegate =
             globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
             jsonSchema.default;
         }
+        if (zodSchema._zod.def.type === "any") jsonSchema.format = "any";
+        if (zodSchema._zod.disc) {
+          const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
+          jsonSchema.discriminator = { propertyName };
+        }
+        if (zodSchema._zod.def.type === "enum") {
+          jsonSchema.type = getSupportedType(
+            Object.values((zodSchema as $ZodEnum)._zod.def.entries)[0],
+          );
+        }
+        if (zodSchema._zod.def.type === "bigint")
+          Object.assign(jsonSchema, { type: "integer", format: "bigint" });
       },
     });
     return Object.assign(
@@ -166,10 +176,6 @@ const delegate =
       typeof overrides === "function" ? overrides(schema, ctx) : overrides,
     );
   };
-
-export const depictDefault = delegate();
-
-export const depictAny = delegate({ format: "any" });
 
 export const depictUpload: Depicter = ({}: UploadSchema, ctx) => {
   if (ctx.isResponse)
@@ -192,15 +198,6 @@ export const depictFile: Depicter = (schema: FileSchema) => {
         : "binary",
   };
 };
-
-export const depictUnion = delegate(
-  ({ _zod }: $ZodUnion | $ZodDiscriminatedUnion) => {
-    const propertyName = Array.from(_zod.disc?.keys() || []).pop();
-    return typeof propertyName === "string"
-      ? { discriminator: { propertyName } }
-      : {};
-  },
-);
 
 const propsMerger = (a: unknown, b: unknown) => {
   if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
@@ -246,9 +243,6 @@ export const depictWrapped: Depicter = (
   { next },
 ) => next(def.innerType);
 
-/** @since OAS 3.1 nullable replaced with type array having null */
-export const depictNullable = delegate();
-
 const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
   const detected = R.toLower(R.type(value)); // toLower is typed well unlike .toLowerCase()
   const isSupported =
@@ -264,10 +258,6 @@ const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
       ? detected
       : undefined;
 };
-
-export const depictEnum = delegate(({ _zod: { def } }: $ZodEnum) => ({
-  type: getSupportedType(Object.values(def.entries)[0]),
-}));
 
 export const depictLiteral: Depicter = ({ _zod: { def } }: $ZodLiteral) => {
   const values = Object.values(def.values);
@@ -296,12 +286,6 @@ export const depictObject: Depicter = (
   if (required.length) result.required = required;
   return result;
 };
-
-/**
- * @see https://swagger.io/docs/specification/data-models/data-types/
- * @since OAS 3.1: using type: "null"
- * */
-export const depictNull = delegate();
 
 export const depictDateIn: Depicter = ({}: DateInSchema, ctx) => {
   if (ctx.isResponse)
@@ -341,13 +325,6 @@ export const depictDate: Depicter = ({}: $ZodDate, ctx) => {
     ctx,
   );
 };
-
-export const depictBoolean = delegate();
-
-export const depictBigInt = delegate({
-  type: "integer",
-  format: "bigint",
-});
 
 const areOptionsLiteral = (
   subject: ReadonlyArray<$ZodType>,
@@ -440,8 +417,6 @@ const isCheck = <T extends $ZodChecks>(
   check: unknown,
   name: T["_zod"]["def"]["check"],
 ): check is T => R.pathEq(name, ["_zod", "def", "check"], check);
-
-export const depictString = delegate();
 
 /** @since OAS 3.1: exclusive min/max are numbers */
 export const depictNumber: Depicter = (
@@ -682,23 +657,23 @@ export const depicters: HandlingRules<
   OpenAPIContext,
   FirstPartyKind | ProprietaryBrand
 > = {
-  string: depictString,
+  string: delegate(),
   number: depictNumber,
-  bigint: depictBigInt,
-  boolean: depictBoolean,
-  null: depictNull,
+  bigint: delegate(),
+  boolean: delegate(),
+  null: delegate(),
   array: depictArray,
   tuple: depictTuple,
   record: depictRecord,
   object: depictObject,
   literal: depictLiteral,
   intersection: depictIntersection,
-  union: depictUnion,
-  any: depictAny,
-  default: depictDefault,
-  enum: depictEnum,
+  union: delegate(),
+  any: delegate(),
+  default: delegate(),
+  enum: delegate(),
   optional: depictWrapped,
-  nullable: depictNullable,
+  nullable: delegate(),
   date: depictDate,
   catch: depictWrapped,
   pipe: depictPipeline,

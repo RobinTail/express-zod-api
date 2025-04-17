@@ -5,23 +5,16 @@ import { z } from "zod";
 import { ez } from "../src";
 import {
   OpenAPIContext,
-  depictAny,
   depictArray,
-  depictBigInt,
-  depictBoolean,
   depictWrapped,
   depictDate,
   depictDateIn,
   depictDateOut,
-  depictDefault,
-  depictEnum,
   depictExamples,
   depictFile,
   depictIntersection,
   depictLazy,
   depictLiteral,
-  depictNull,
-  depictNullable,
   depictNumber,
   depictObject,
   depictObjectProperties,
@@ -31,10 +24,8 @@ import {
   depictRequestParams,
   depictSecurity,
   depictSecurityRefs,
-  depictString,
   depictTags,
   depictTuple,
-  depictUnion,
   depictUpload,
   depictRaw,
   depicters,
@@ -45,8 +36,11 @@ import {
   onEach,
   onMissing,
   reformatParamsInPath,
+  delegate,
 } from "../src/documentation-helpers";
 import { walkSchema } from "../src/schema-walker";
+
+const delegated = delegate();
 
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
@@ -128,12 +122,12 @@ describe("Documentation helpers", () => {
   describe("depictDefault()", () => {
     test("should set default property", () => {
       expect(
-        depictDefault(z.boolean().default(true), requestCtx),
+        delegated(z.boolean().default(true), requestCtx),
       ).toMatchSnapshot();
     });
     test("Feature #1706: should override the default value by a label from metadata", () => {
       expect(
-        depictDefault(
+        delegated(
           z.iso
             .datetime()
             .default(() => new Date().toISOString())
@@ -164,7 +158,7 @@ describe("Documentation helpers", () => {
 
   describe("depictAny()", () => {
     test("should set format:any", () => {
-      expect(depictAny(z.any(), requestCtx)).toMatchSnapshot();
+      expect(delegated(z.any(), requestCtx)).toMatchSnapshot();
     });
   });
 
@@ -202,13 +196,13 @@ describe("Documentation helpers", () => {
   describe("depictUnion()", () => {
     test("should wrap next depicters into oneOf property", () => {
       expect(
-        depictUnion(z.string().or(z.number()), requestCtx),
+        delegated(z.string().or(z.number()), requestCtx),
       ).toMatchSnapshot();
     });
 
     test("should wrap next depicters in oneOf prop and set discriminator prop", () => {
       expect(
-        depictUnion(
+        delegated(
           z.discriminatedUnion("status", [
             z.object({ status: z.literal("success"), data: z.any() }),
             z.object({
@@ -317,14 +311,14 @@ describe("Documentation helpers", () => {
     test.each([requestCtx, responseCtx])(
       "should add null to the type %#",
       (ctx) => {
-        expect(depictNullable(z.string().nullable(), ctx)).toMatchSnapshot();
+        expect(delegated(z.string().nullable(), ctx)).toMatchSnapshot();
       },
     );
 
     test.each([z.null().nullable(), z.string().nullable().nullable()])(
       "should not add null type when it's already there %#",
       (schema) => {
-        expect(depictNullable(schema, requestCtx)).toMatchSnapshot();
+        expect(delegated(schema, requestCtx)).toMatchSnapshot();
       },
     );
   });
@@ -337,7 +331,7 @@ describe("Documentation helpers", () => {
     test.each([z.enum(["one", "two"]), z.enum(Test)])(
       "should set type and enum properties",
       (schema) => {
-        expect(depictEnum(schema, requestCtx)).toMatchSnapshot();
+        expect(delegated(schema, requestCtx)).toMatchSnapshot();
       },
     );
   });
@@ -387,19 +381,19 @@ describe("Documentation helpers", () => {
 
   describe("depictNull()", () => {
     test("should give type:null", () => {
-      expect(depictNull(z.null(), requestCtx)).toMatchSnapshot();
+      expect(delegated(z.null(), requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictBoolean()", () => {
     test("should set type:boolean", () => {
-      expect(depictBoolean(z.boolean(), requestCtx)).toMatchSnapshot();
+      expect(delegated(z.boolean(), requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictBigInt()", () => {
     test("should set type:integer and format:bigint", () => {
-      expect(depictBigInt(z.bigint(), requestCtx)).toMatchSnapshot();
+      expect(delegated(z.bigint(), requestCtx)).toMatchSnapshot();
     });
   });
 
@@ -457,7 +451,7 @@ describe("Documentation helpers", () => {
 
   describe("depictString()", () => {
     test("should set type:string", () => {
-      expect(depictString(z.string(), requestCtx)).toMatchSnapshot();
+      expect(delegated(z.string(), requestCtx)).toMatchSnapshot();
     });
 
     test.each([
@@ -479,7 +473,7 @@ describe("Documentation helpers", () => {
       z.cuid2(),
       z.ulid(),
     ])("should set format, pattern and min/maxLength props %#", (schema) => {
-      expect(depictString(schema, requestCtx)).toMatchSnapshot();
+      expect(delegated(schema, requestCtx)).toMatchSnapshot();
     });
   });
 

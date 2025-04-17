@@ -728,6 +728,8 @@ paths:
                   required:
                     - type
                     - a
+                  discriminator:
+                    propertyName: type
                 - type: object
                   properties:
                     type:
@@ -737,6 +739,8 @@ paths:
                   required:
                     - type
                     - b
+                  discriminator:
+                    propertyName: type
               discriminator:
                 propertyName: type
         required: true
@@ -757,10 +761,13 @@ paths:
                         properties:
                           status:
                             const: success
-                          data: {}
+                          data:
+                            format: any
                         required:
                           - status
                           - data
+                        discriminator:
+                          propertyName: status
                       - type: object
                         properties:
                           status:
@@ -775,6 +782,8 @@ paths:
                         required:
                           - status
                           - error
+                        discriminator:
+                          propertyName: status
                     discriminator:
                       propertyName: status
                 required:
@@ -3890,10 +3899,8 @@ paths:
           description: parameter of post /v1/:name
           schema:
             oneOf:
-              - type: string
-                const: John
-              - type: string
-                const: Jane
+              - const: John
+              - const: Jane
       requestBody:
         description: the body of request
         content:
@@ -4010,10 +4017,8 @@ components:
   schemas:
     ParameterOfPostV1NameName:
       oneOf:
-        - type: string
-          const: John
-        - type: string
-          const: Jane
+        - const: John
+        - const: Jane
     SuperPositiveResponseOfV1Name:
       type: object
       properties:
@@ -4078,10 +4083,8 @@ paths:
           description: GET /v1/:name Parameter
           schema:
             oneOf:
-              - type: string
-                const: John
-              - type: string
-                const: Jane
+              - const: John
+              - const: Jane
         - name: other
           in: query
           required: true
@@ -4162,10 +4165,8 @@ paths:
           description: POST /v1/:name Parameter
           schema:
             oneOf:
-              - type: string
-                const: John
-              - type: string
-                const: Jane
+              - const: John
+              - const: Jane
       requestBody:
         description: POST /v1/:name Request body
         content:
