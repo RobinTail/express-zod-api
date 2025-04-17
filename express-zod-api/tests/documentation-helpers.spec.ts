@@ -12,7 +12,6 @@ import {
   depictFile,
   depictLazy,
   depictNumber,
-  depictObjectProperties,
   depictParamExamples,
   depictPipeline,
   depictRequestParams,
@@ -518,20 +517,6 @@ describe("Documentation helpers", () => {
         expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
       },
     );
-  });
-
-  describe("depictObjectProperties()", () => {
-    test("should wrap next depicters in a shape of object", () => {
-      expect(
-        depictObjectProperties(
-          z.object({
-            one: z.string(),
-            two: z.boolean(),
-          }),
-          requestCtx.next,
-        ),
-      ).toMatchSnapshot();
-    });
   });
 
   describe("depictPipeline", () => {

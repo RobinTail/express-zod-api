@@ -367,11 +367,6 @@ export const depictNumber: Depicter = (
   return result;
 };
 
-export const depictObjectProperties = (
-  { _zod: { def } }: $ZodObject,
-  next: Parameters<Depicter>[1]["next"],
-) => R.map(next, def.shape);
-
 const makeSample = (depicted: SchemaObject) => {
   const firstType = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
