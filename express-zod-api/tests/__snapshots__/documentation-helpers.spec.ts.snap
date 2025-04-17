@@ -42,8 +42,8 @@ exports[`Documentation helpers > depictArray() > should reflect min/max/exact le
   "items": {
     "type": "boolean",
   },
-  "maxLength": 4,
-  "minLength": 4,
+  "maxItems": 4,
+  "minItems": 4,
   "type": "array",
 }
 `;

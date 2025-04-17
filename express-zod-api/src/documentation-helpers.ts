@@ -367,7 +367,7 @@ export const depictArray: Depicter = (
 ) => {
   const result: SchemaObject = { type: "array", items: next(element) };
   if (exactLength)
-    [result.minLength, result.maxLength] = Array(2).fill(exactLength.value);
+    [result.minItems, result.maxItems] = Array(2).fill(exactLength.value);
   if (minLength) result.minItems = minLength.value;
   if (maxLength) result.maxItems = maxLength.value;
   return result;
