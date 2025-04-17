@@ -355,7 +355,11 @@ export const depictRecord: Depicter = (
       required,
     };
   }
-  return { type: "object", additionalProperties: next(valueSchema) };
+  return {
+    type: "object",
+    propertyNames: next(keySchema),
+    additionalProperties: next(valueSchema),
+  };
 };
 
 export const depictArray: Depicter = (

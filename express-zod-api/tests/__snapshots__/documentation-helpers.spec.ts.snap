@@ -384,6 +384,9 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
         "minimum": -1.7976931348623157e+308,
         "type": "number",
       },
+      "propertyNames": {
+        "type": "string",
+      },
       "type": "object",
     },
     {
@@ -924,6 +927,9 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
   "additionalProperties": {
     "type": "boolean",
   },
+  "propertyNames": {
+    "type": "string",
+  },
   "type": "object",
 }
 `;
@@ -932,6 +938,9 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 {
   "additionalProperties": {
     "type": "boolean",
+  },
+  "propertyNames": {
+    "type": "string",
   },
   "type": "object",
 }
@@ -991,6 +1000,22 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 {
   "additionalProperties": {
     "format": "any",
+  },
+  "propertyNames": {
+    "type": "string",
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 6 1`] = `
+{
+  "additionalProperties": {
+    "type": "boolean",
+  },
+  "propertyNames": {
+    "pattern": "x-\\w+",
+    "type": "string",
   },
   "type": "object",
 }
@@ -1622,6 +1647,9 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
     },
     {
       "additionalProperties": {
+        "type": "string",
+      },
+      "propertyNames": {
         "type": "string",
       },
       "type": "object",
