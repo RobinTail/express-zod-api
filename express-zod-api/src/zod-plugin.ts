@@ -149,7 +149,8 @@ if (!(metaSymbol in globalThis)) {
           ) {
             const meta = this.meta()?.[metaSymbol];
             const result = originalCheck.apply(this, args);
-            return result.meta({ [metaSymbol]: meta });
+            /** @link https://v4.zod.dev/metadata#register */
+            return result.register(z.globalRegistry, { [metaSymbol]: meta });
           };
         },
       },
