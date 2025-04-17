@@ -423,6 +423,16 @@ describe("Documentation helpers", () => {
     test("should set type:array and pass items depiction", () => {
       expect(depictArray(z.array(z.boolean()), requestCtx)).toMatchSnapshot();
     });
+
+    test.each([
+      z.boolean().array().min(3),
+      z.boolean().array().max(5),
+      z.boolean().array().min(3).max(5),
+      z.boolean().array().length(4),
+      z.array(z.boolean()).nonempty(),
+    ])("should reflect min/max/exact length of the array %#", (schema) => {
+      expect(depictArray(schema, requestCtx)).toMatchSnapshot();
+    });
   });
 
   describe("depictTuple()", () => {

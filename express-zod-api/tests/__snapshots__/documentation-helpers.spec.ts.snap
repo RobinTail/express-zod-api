@@ -6,6 +6,58 @@ exports[`Documentation helpers > depictAny() > should set format:any 1`] = `
 }
 `;
 
+exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 0 1`] = `
+{
+  "items": {
+    "type": "boolean",
+  },
+  "minItems": 3,
+  "type": "array",
+}
+`;
+
+exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 1 1`] = `
+{
+  "items": {
+    "type": "boolean",
+  },
+  "maxItems": 5,
+  "type": "array",
+}
+`;
+
+exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 2 1`] = `
+{
+  "items": {
+    "type": "boolean",
+  },
+  "maxItems": 5,
+  "minItems": 3,
+  "type": "array",
+}
+`;
+
+exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 3 1`] = `
+{
+  "items": {
+    "type": "boolean",
+  },
+  "maxItems": 4,
+  "minItems": 4,
+  "type": "array",
+}
+`;
+
+exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 4 1`] = `
+{
+  "items": {
+    "type": "boolean",
+  },
+  "minItems": 1,
+  "type": "array",
+}
+`;
+
 exports[`Documentation helpers > depictArray() > should set type:array and pass items depiction 1`] = `
 {
   "items": {
