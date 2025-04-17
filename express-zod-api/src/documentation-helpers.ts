@@ -19,8 +19,6 @@ import type {
   $ZodChecks,
   $ZodCheckMinLength,
   $ZodCheckMaxLength,
-  $ZodString,
-  $ZodISODateTime,
   $ZodCheckLengthEquals,
   $ZodNumber,
   $ZodCheckGreaterThan,
@@ -28,7 +26,6 @@ import type {
   $ZodReadonly,
   $ZodStringFormat,
   $ZodNumberFormat,
-  $ZodStringFormats,
   $ZodNumberFormats,
 } from "@zod/core";
 import {
@@ -134,14 +131,6 @@ const samples = {
   null: null,
   array: [],
 } satisfies Record<Extract<SchemaObjectType, string>, unknown>;
-
-const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-const timeRegex = /^\d{2}:\d{2}:\d{2}(\.\d+)?$/;
-
-const getTimestampRegex = (hasOffset?: boolean) =>
-  hasOffset
-    ? /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)$/
-    : /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
@@ -449,51 +438,7 @@ const isCheck = <T extends $ZodChecks>(
   name: T["_zod"]["def"]["check"],
 ): check is T => R.pathEq(name, ["_zod", "def", "check"], check);
 
-export const depictString: Depicter = (
-  schema: $ZodString | $ZodStringFormat,
-) => {
-  const result: SchemaObject = { type: "string" };
-  const formatCast: Partial<Record<$ZodStringFormats, SchemaObject["format"]>> =
-    {
-      datetime: "date-time",
-      base64: "byte",
-      ipv4: "ip",
-      ipv6: "ip",
-      cidrv4: "cidr",
-      cidrv6: "cidr",
-      regex: undefined,
-    };
-  const { checks = [] } = schema._zod.def;
-  if (isCheck<$ZodStringFormat>(schema, "string_format")) checks.push(schema);
-  for (const check of checks) {
-    if (isCheck<$ZodCheckLengthEquals>(check, "length_equals")) {
-      [result.minLength, result.maxLength] = Array(2).fill(
-        check._zod.def.length,
-      );
-    }
-    if (isCheck<$ZodCheckMinLength>(check, "min_length"))
-      result.minLength = check._zod.def.minimum;
-    if (isCheck<$ZodCheckMaxLength>(check, "max_length"))
-      result.maxLength = check._zod.def.maximum;
-    if (isCheck<$ZodStringFormat>(check, "string_format")) {
-      if (check._zod.def.format === "regex")
-        result.pattern = check._zod.def.pattern?.source;
-      if (check._zod.def.format === "date") result.pattern = dateRegex.source;
-      if (check._zod.def.format === "time") result.pattern = timeRegex.source;
-      if (check._zod.def.format === "datetime") {
-        result.pattern = getTimestampRegex(
-          (check as $ZodISODateTime)._zod.def.offset,
-        ).source;
-      }
-      const format =
-        check._zod.def.format in formatCast
-          ? formatCast[check._zod.def.format]
-          : check._zod.def.format;
-      if (format) result.format = format;
-    }
-  }
-  return result;
-};
+export const depictString = delegate();
 
 /** @since OAS 3.1: exclusive min/max are numbers */
 export const depictNumber: Depicter = (

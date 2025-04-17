@@ -1577,36 +1577,44 @@ paths:
                 email:
                   type: string
                   format: email
+                  pattern: ^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$
                 uuid:
                   type: string
                   format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
                 cuid:
                   type: string
                   format: cuid
+                  pattern: ^[cC][^\\s-]{8,}$
                 cuid2:
                   type: string
                   format: cuid2
+                  pattern: ^[0-9a-z]+$
                 ulid:
                   type: string
                   format: ulid
+                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
                 ip:
                   type: string
-                  format: ip
+                  format: ipv4
+                  pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$
                 emoji:
                   type: string
                   format: emoji
+                  pattern: ^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$
                 url:
                   type: string
-                  format: url
+                  format: uri
                 numeric:
                   type: string
+                  format: regex
                   pattern: \\d+
                 combined:
                   type: string
                   minLength: 1
-                  format: email
-                  pattern: .*@example\\.com
                   maxLength: 90
+                  format: regex
+                  pattern: .*@example\\.com
               required:
                 - regular
                 - min
@@ -1819,6 +1827,7 @@ paths:
                         type: object
                         propertyNames:
                           type: string
+                          format: regex
                           pattern: "[A-Z]+"
                         additionalProperties:
                           type: boolean
@@ -3808,8 +3817,8 @@ paths:
           required: true
           description: here is the test
           schema:
-            type: string
             description: here is the test
+            type: string
       responses:
         "200":
           description: GET /v1/getSomething Positive response
