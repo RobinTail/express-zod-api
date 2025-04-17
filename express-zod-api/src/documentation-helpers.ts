@@ -11,7 +11,6 @@ import type {
   $ZodNumber,
   $ZodNumberFormat,
   $ZodNumberFormats,
-  $ZodObject,
   $ZodPipe,
   $ZodStringFormat,
   $ZodTuple,
@@ -180,6 +179,15 @@ export const delegate: Depicter = (schema, ctx) =>
       ) {
         // does not appear to support items:false, so not:{} is a recommended alias
         jsonSchema.items = { not: {} };
+      }
+      if (zodSchema._zod.def.type === "lazy") {
+        for (const prop in jsonSchema) delete jsonSchema[prop]; // undo all
+        Object.assign(
+          jsonSchema,
+          ctx.makeRef((zodSchema as $ZodLazy)._zod.def.getter, () =>
+            delegate((zodSchema as $ZodLazy)._zod.def.getter(), ctx),
+          ),
+        );
       }
       // on each
       const examples = getExamples({
@@ -411,11 +419,6 @@ export const depictPipeline: Depicter = (
   return next(target);
 };
 
-export const depictLazy: Depicter = (
-  { _zod: { def } }: $ZodLazy,
-  { next, makeRef },
-): ReferenceObject => makeRef(def.getter, () => next(def.getter()));
-
 export const depictRaw: Depicter = ({ _zod: { def } }: RawSchema, { next }) =>
   next(def.shape.raw);
 
@@ -561,7 +564,7 @@ export const depicters: HandlingRules<
   date: depictDate,
   catch: delegate,
   pipe: depictPipeline,
-  lazy: depictLazy,
+  lazy: delegate,
   readonly: delegate,
   [ezFileBrand]: depictFile,
   [ezUploadBrand]: depictUpload,

@@ -10,7 +10,6 @@ import {
   depictDateOut,
   depictExamples,
   depictFile,
-  depictLazy,
   depictNumber,
   depictParamExamples,
   depictPipeline,
@@ -751,7 +750,7 @@ describe("Documentation helpers", () => {
           }),
         );
         expect(makeRefMock).not.toHaveBeenCalled();
-        expect(depictLazy(schema, responseCtx)).toMatchSnapshot();
+        expect(delegate(schema, responseCtx)).toMatchSnapshot();
         expect(makeRefMock).toHaveBeenCalledTimes(1);
         expect(makeRefMock).toHaveBeenCalledWith(
           schema._zod.def.getter,
