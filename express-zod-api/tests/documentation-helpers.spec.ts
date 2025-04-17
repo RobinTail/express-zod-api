@@ -6,7 +6,6 @@ import { ez } from "../src";
 import {
   OpenAPIContext,
   depictArray,
-  depictWrapped,
   depictDate,
   depictDateIn,
   depictDateOut,
@@ -133,19 +132,15 @@ describe("Documentation helpers", () => {
 
   describe("depictWrapped()", () => {
     test("should handle catch", () => {
-      expect(
-        depictWrapped(z.boolean().catch(true), requestCtx),
-      ).toMatchSnapshot();
+      expect(delegate(z.boolean().catch(true), requestCtx)).toMatchSnapshot();
     });
 
     test.each([requestCtx, responseCtx])("should handle optional %#", (ctx) => {
-      expect(depictWrapped(z.string().optional(), ctx)).toMatchSnapshot();
+      expect(delegate(z.string().optional(), ctx)).toMatchSnapshot();
     });
 
     test("handle readonly", () => {
-      expect(
-        depictWrapped(z.string().readonly(), responseCtx),
-      ).toMatchSnapshot();
+      expect(delegate(z.string().readonly(), responseCtx)).toMatchSnapshot();
     });
   });
 

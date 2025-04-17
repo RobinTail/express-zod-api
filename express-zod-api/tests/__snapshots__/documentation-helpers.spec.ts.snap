@@ -1511,12 +1511,14 @@ DocumentationError({
 
 exports[`Documentation helpers > depictWrapped() > handle readonly 1`] = `
 {
+  "readOnly": true,
   "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictWrapped() > should handle catch 1`] = `
 {
+  "default": true,
   "type": "boolean",
 }
 `;

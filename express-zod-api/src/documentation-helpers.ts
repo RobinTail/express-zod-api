@@ -1,6 +1,5 @@
 import type {
   $ZodArray,
-  $ZodCatch,
   $ZodCheckGreaterThan,
   $ZodCheckLengthEquals,
   $ZodCheckLessThan,
@@ -17,9 +16,7 @@ import type {
   $ZodNumberFormat,
   $ZodNumberFormats,
   $ZodObject,
-  $ZodOptional,
   $ZodPipe,
-  $ZodReadonly,
   $ZodRecord,
   $ZodStringFormat,
   $ZodTuple,
@@ -247,11 +244,6 @@ const intersect = R.tryCatch(
   },
   (_err, allOf): SchemaObject => ({ allOf }),
 );
-
-export const depictWrapped: Depicter = (
-  { _zod: { def } }: $ZodOptional | $ZodReadonly | $ZodCatch,
-  { next },
-) => next(def.innerType);
 
 const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
   const detected = R.toLower(R.type(value)); // toLower is typed well unlike .toLowerCase()
@@ -654,13 +646,13 @@ export const depicters: HandlingRules<
   any: delegate,
   default: delegate,
   enum: delegate,
-  optional: depictWrapped,
+  optional: delegate,
   nullable: delegate,
   date: depictDate,
-  catch: depictWrapped,
+  catch: delegate,
   pipe: depictPipeline,
   lazy: depictLazy,
-  readonly: depictWrapped,
+  readonly: delegate,
   [ezFileBrand]: depictFile,
   [ezUploadBrand]: depictUpload,
   [ezDateOutBrand]: depictDateOut,
