@@ -5,7 +5,6 @@ import { z } from "zod";
 import { ez } from "../src";
 import {
   OpenAPIContext,
-  depictArray,
   depictDate,
   depictDateIn,
   depictDateOut,
@@ -21,7 +20,6 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictTags,
-  depictTuple,
   depictUpload,
   depictRaw,
   depicters,
@@ -403,7 +401,7 @@ describe("Documentation helpers", () => {
 
   describe("depictArray()", () => {
     test("should set type:array and pass items depiction", () => {
-      expect(depictArray(z.array(z.boolean()), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.array(z.boolean()), requestCtx)).toMatchSnapshot();
     });
 
     test.each([
@@ -413,14 +411,14 @@ describe("Documentation helpers", () => {
       z.boolean().array().length(4),
       z.array(z.boolean()).nonempty(),
     ])("should reflect min/max/exact length of the array %#", (schema) => {
-      expect(depictArray(schema, requestCtx)).toMatchSnapshot();
+      expect(delegate(schema, requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictTuple()", () => {
     test("should utilize prefixItems and set items:not:{}", () => {
       expect(
-        depictTuple(
+        delegate(
           z.tuple([z.boolean(), z.string(), z.literal("test")]),
           requestCtx,
         ),
@@ -428,11 +426,11 @@ describe("Documentation helpers", () => {
     });
     test("should depict rest as items when defined", () => {
       expect(
-        depictTuple(z.tuple([z.boolean()]).rest(z.string()), requestCtx),
+        delegate(z.tuple([z.boolean()]).rest(z.string()), requestCtx),
       ).toMatchSnapshot();
     });
     test("should depict empty tuples as is", () => {
-      expect(depictTuple(z.tuple([]), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.tuple([]), requestCtx)).toMatchSnapshot();
     });
   });
 

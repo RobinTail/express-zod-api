@@ -1,10 +1,6 @@
 import type {
-  $ZodArray,
   $ZodCheckGreaterThan,
-  $ZodCheckLengthEquals,
   $ZodCheckLessThan,
-  $ZodCheckMaxLength,
-  $ZodCheckMinLength,
   $ZodChecks,
   $ZodDate,
   $ZodEnum,
@@ -178,6 +174,13 @@ export const delegate: Depicter = (schema, ctx) =>
           //if (values.length === 1) result.const = values[0];
           //else result.enum = Object.values(def.values);
         }
+      }
+      if (
+        zodSchema._zod.def.type === "tuple" &&
+        (zodSchema as $ZodTuple)._zod.def.rest === null
+      ) {
+        // does not appear to support items:false, so not:{} is a recommended alias
+        jsonSchema.items = { not: {} };
       }
       // on each
       const examples = getExamples({
@@ -353,39 +356,6 @@ export const depictRecord: Depicter = (
     additionalProperties: next(def.valueType),
   };
 };
-
-export const depictArray: Depicter = (
-  { _zod: { def } }: $ZodArray,
-  { next },
-) => {
-  const result: SchemaObject = {
-    type: "array",
-    items: next(def.element),
-  };
-  for (const check of def.checks || []) {
-    if (isCheck<$ZodCheckLengthEquals>(check, "length_equals"))
-      [result.minItems, result.maxItems] = Array(2).fill(check._zod.def.length);
-    if (isCheck<$ZodCheckMinLength>(check, "min_length"))
-      result.minItems = check._zod.def.minimum;
-    if (isCheck<$ZodCheckMaxLength>(check, "max_length"))
-      result.maxItems = check._zod.def.maximum;
-  }
-  return result;
-};
-
-/**
- * @since OAS 3.1 using prefixItems for depicting tuples
- * @since 17.5.0 added rest handling, fixed tuple type
- * */
-export const depictTuple: Depicter = (
-  { _zod: { def } }: $ZodTuple,
-  { next },
-) => ({
-  type: "array",
-  prefixItems: def.items.map(next),
-  // does not appear to support items:false, so not:{} is a recommended alias
-  items: def.rest === null ? { not: {} } : next(def.rest),
-});
 
 const isCheck = <T extends $ZodChecks>(
   check: unknown,
@@ -636,8 +606,8 @@ export const depicters: HandlingRules<
   bigint: delegate,
   boolean: delegate,
   null: delegate,
-  array: depictArray,
-  tuple: depictTuple,
+  array: delegate,
+  tuple: delegate,
   record: depictRecord,
   object: delegate,
   literal: delegate,
