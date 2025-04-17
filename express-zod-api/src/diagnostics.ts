@@ -24,7 +24,7 @@ export class Diagnostics {
     if (this.#verifiedEndpoints.has(endpoint)) return;
     for (const dir of ["input", "output"] as const) {
       const stack = [
-        z.toJSONSchema(endpoint[`${dir}Schema`], { unrepresentable: "any" }), // @todo transformations?
+        z.toJSONSchema(endpoint[`${dir}Schema`], { unrepresentable: "any" }),
       ];
       while (stack.length > 0) {
         const entry = stack.shift()!;
