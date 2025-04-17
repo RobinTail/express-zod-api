@@ -405,7 +405,7 @@ describe("Documentation helpers", () => {
 
   describe("depictRecord()", () => {
     test.each([
-      z.record(z.number(), z.boolean()),
+      z.record(z.int(), z.boolean()),
       z.record(z.string(), z.boolean()),
       z.record(z.enum(["one", "two"]), z.boolean()),
       z.record(z.literal("testing"), z.boolean()),

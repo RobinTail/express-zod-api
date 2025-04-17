@@ -863,10 +863,10 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
     "type": "boolean",
   },
   "propertyNames": {
-    "format": "double",
-    "maximum": 1.7976931348623157e+308,
-    "minimum": -1.7976931348623157e+308,
-    "type": "number",
+    "format": "int64",
+    "maximum": 9007199254740991,
+    "minimum": -9007199254740991,
+    "type": "integer",
   },
   "type": "object",
 }
