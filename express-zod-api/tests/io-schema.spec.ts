@@ -124,9 +124,11 @@ describe("I/O Schema and related helpers", () => {
         expectTypeOf(
           z.object({}).transform(() => true),
         ).not.toExtend<IOSchema>();
+        expectTypeOf(z.object({}).transform(String)).not.toExtend<IOSchema>();
         expectTypeOf(z.object({}).transform(() => [])).not.toExtend<IOSchema>();
       });
       test("does not accept piping into another kind of schema", () => {
+        expectTypeOf(z.unknown({}).pipe(z.string())).not.toExtend<IOSchema>();
         expectTypeOf(
           z
             .object({ s: z.string() })
