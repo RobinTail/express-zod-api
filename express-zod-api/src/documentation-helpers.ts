@@ -359,10 +359,15 @@ export const depictRecord: Depicter = (
 };
 
 export const depictArray: Depicter = (
-  { _def: { minLength, maxLength }, element }: z.ZodArray<z.ZodTypeAny>,
+  {
+    _def: { minLength, maxLength, exactLength },
+    element,
+  }: z.ZodArray<z.ZodTypeAny>,
   { next },
 ) => {
   const result: SchemaObject = { type: "array", items: next(element) };
+  if (exactLength)
+    [result.minLength, result.maxLength] = Array(2).fill(exactLength.value);
   if (minLength) result.minItems = minLength.value;
   if (maxLength) result.maxItems = maxLength.value;
   return result;
