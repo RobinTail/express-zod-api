@@ -221,7 +221,7 @@ describe("I/O Schema and related helpers", () => {
 
     test("Zod Issue #600: can not intersect object schema with passthrough and transformation", () => {
       // @see https://github.com/colinhacks/zod/issues/600
-      // this is the reason why IOSchema is generic and middlewares have to be "strip"
+      // Limitation: IOSchema in middlewares must be of "strip" kind
       const left = z.looseObject({});
       const right = z.object({
         id: z.string().transform((str) => parseInt(str)),
