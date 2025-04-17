@@ -2,7 +2,6 @@ import type {
   $ZodArray,
   $ZodCatch,
   $ZodDate,
-  $ZodDefault,
   $ZodDiscriminatedUnion,
   $ZodEnum,
   $ZodIntersection,
@@ -140,6 +139,7 @@ const delegate =
   (schema, ctx) => {
     const result = z.toJSONSchema(schema, {
       unrepresentable: "any",
+      metadata: globalRegistry,
       pipes: ctx.isResponse ? "output" : "input",
       override: ({ zodSchema, jsonSchema }) => {
         if (zodSchema._zod.def.type === "nullable") {
@@ -154,6 +154,11 @@ const delegate =
             isSchemaObject(nested) && { type: makeNullableType(nested) },
           );
         }
+        if (zodSchema._zod.def.type === "default") {
+          jsonSchema.default =
+            globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
+            jsonSchema.default;
+        }
       },
     });
     return Object.assign(
@@ -162,12 +167,7 @@ const delegate =
     );
   };
 
-export const depictDefault: Depicter = (schema: $ZodDefault, { next }) => ({
-  ...next(schema._zod.def.innerType),
-  default:
-    globalRegistry.get(schema)?.[metaSymbol]?.defaultLabel ||
-    schema._zod.def.defaultValue(),
-});
+export const depictDefault = delegate();
 
 export const depictAny = delegate({ format: "any" });
 
