@@ -27,7 +27,7 @@ export abstract class AbstractMiddleware {
   /** @internal */
   public abstract get security(): LogicalContainer<Security> | undefined;
   /** @internal */
-  public abstract get schema(): IOSchema<"strip">;
+  public abstract get schema(): IOSchema;
   public abstract execute(params: {
     input: unknown;
     options: FlatObject;
@@ -41,7 +41,7 @@ export class Middleware<
   OPT extends FlatObject,
   OUT extends FlatObject,
   SCO extends string,
-  IN extends IOSchema<"strip"> = EmptySchema,
+  IN extends IOSchema = EmptySchema,
 > extends AbstractMiddleware {
   readonly #schema: IN;
   readonly #security?: LogicalContainer<
@@ -50,7 +50,7 @@ export class Middleware<
   readonly #handler: Handler<z.output<IN>, OPT, OUT>;
 
   constructor({
-    input = z.object({}) as IN,
+    input = z.object({}) as unknown as IN,
     security,
     handler,
   }: {

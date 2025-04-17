@@ -2,28 +2,26 @@
 
 exports[`SSE > makeEventSchema() > should make a valid schema of SSE event 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "properties": {
     "data": {
-      "_type": "ZodString",
+      "type": "string",
     },
     "event": {
-      "_type": "ZodLiteral",
-      "value": "test",
+      "const": "test",
     },
     "id": {
-      "_type": "ZodOptional",
-      "value": {
-        "_type": "ZodString",
-      },
+      "type": "string",
     },
     "retry": {
-      "_type": "ZodOptional",
-      "value": {
-        "_type": "ZodNumber",
-      },
+      "exclusiveMaximum": 9007199254740991,
+      "type": "integer",
     },
   },
+  "required": [
+    "data",
+    "event",
+  ],
+  "type": "object",
 }
 `;
 
@@ -34,56 +32,50 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
       "text/event-stream",
     ],
     "schema": {
-      "_type": "ZodDiscriminatedUnion",
-      "discriminator": "event",
-      "options": [
+      "oneOf": [
         {
-          "_type": "ZodObject",
-          "shape": {
+          "properties": {
             "data": {
-              "_type": "ZodString",
+              "type": "string",
             },
             "event": {
-              "_type": "ZodLiteral",
-              "value": "test",
+              "const": "test",
             },
             "id": {
-              "_type": "ZodOptional",
-              "value": {
-                "_type": "ZodString",
-              },
+              "type": "string",
             },
             "retry": {
-              "_type": "ZodOptional",
-              "value": {
-                "_type": "ZodNumber",
-              },
+              "exclusiveMaximum": 9007199254740991,
+              "type": "integer",
             },
           },
+          "required": [
+            "data",
+            "event",
+          ],
+          "type": "object",
         },
         {
-          "_type": "ZodObject",
-          "shape": {
+          "properties": {
             "data": {
-              "_type": "ZodNumber",
+              "type": "number",
             },
             "event": {
-              "_type": "ZodLiteral",
-              "value": "another",
+              "const": "another",
             },
             "id": {
-              "_type": "ZodOptional",
-              "value": {
-                "_type": "ZodString",
-              },
+              "type": "string",
             },
             "retry": {
-              "_type": "ZodOptional",
-              "value": {
-                "_type": "ZodNumber",
-              },
+              "exclusiveMaximum": 9007199254740991,
+              "type": "integer",
             },
           },
+          "required": [
+            "data",
+            "event",
+          ],
+          "type": "object",
         },
       ],
     },
@@ -101,7 +93,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
       "text/plain",
     ],
     "schema": {
-      "_type": "ZodString",
+      "type": "string",
     },
     "statusCodes": [
       400,
@@ -117,28 +109,26 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
       "text/event-stream",
     ],
     "schema": {
-      "_type": "ZodObject",
-      "shape": {
+      "properties": {
         "data": {
-          "_type": "ZodString",
+          "type": "string",
         },
         "event": {
-          "_type": "ZodLiteral",
-          "value": "single",
+          "const": "single",
         },
         "id": {
-          "_type": "ZodOptional",
-          "value": {
-            "_type": "ZodString",
-          },
+          "type": "string",
         },
         "retry": {
-          "_type": "ZodOptional",
-          "value": {
-            "_type": "ZodNumber",
-          },
+          "exclusiveMaximum": 9007199254740991,
+          "type": "integer",
         },
       },
+      "required": [
+        "data",
+        "event",
+      ],
+      "type": "object",
     },
     "statusCodes": [
       200,
@@ -154,7 +144,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
       "text/plain",
     ],
     "schema": {
-      "_type": "ZodString",
+      "type": "string",
     },
     "statusCodes": [
       400,

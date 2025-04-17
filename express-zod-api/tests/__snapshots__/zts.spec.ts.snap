@@ -56,7 +56,6 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     set: any;
     intersection: (string & number) | bigint;
     promise: any;
-    function: any;
     optDefaultString?: string | undefined;
     refinedStringWithSomeBullshit: (string | number) & ((bigint | null) | undefined);
     nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
@@ -206,6 +205,8 @@ exports[`zod-to-ts > z.literal() > Should produce the correct typescript 1 1`] =
 exports[`zod-to-ts > z.literal() > Should produce the correct typescript 2 1`] = `"false"`;
 
 exports[`zod-to-ts > z.literal() > Should produce the correct typescript 3 1`] = `"123"`;
+
+exports[`zod-to-ts > z.literal() > Should produce the correct typescript 4 1`] = `"undefined"`;
 
 exports[`zod-to-ts > z.nullable() > outputs correct typescript 1`] = `
 "{

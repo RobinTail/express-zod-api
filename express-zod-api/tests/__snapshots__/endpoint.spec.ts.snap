@@ -21,21 +21,27 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
       "application/json",
     ],
     "schema": {
-      "_type": "ZodObject",
-      "shape": {
+      "properties": {
         "error": {
-          "_type": "ZodObject",
-          "shape": {
+          "properties": {
             "message": {
-              "_type": "ZodString",
+              "type": "string",
             },
           },
+          "required": [
+            "message",
+          ],
+          "type": "object",
         },
         "status": {
-          "_type": "ZodLiteral",
-          "value": "error",
+          "const": "error",
         },
       },
+      "required": [
+        "status",
+        "error",
+      ],
+      "type": "object",
     },
     "statusCodes": [
       400,
@@ -51,21 +57,27 @@ exports[`Endpoint > .getResponses() > should return the positive responses (read
       "application/json",
     ],
     "schema": {
-      "_type": "ZodObject",
-      "shape": {
+      "properties": {
         "data": {
-          "_type": "ZodObject",
-          "shape": {
+          "properties": {
             "something": {
-              "_type": "ZodNumber",
+              "type": "number",
             },
           },
+          "required": [
+            "something",
+          ],
+          "type": "object",
         },
         "status": {
-          "_type": "ZodLiteral",
-          "value": "success",
+          "const": "success",
         },
       },
+      "required": [
+        "status",
+        "data",
+      ],
+      "type": "object",
     },
     "statusCodes": [
       200,

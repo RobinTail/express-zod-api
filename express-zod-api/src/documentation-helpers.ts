@@ -1,3 +1,36 @@
+import type {
+  $ZodArray,
+  $ZodCatch,
+  $ZodDate,
+  $ZodDefault,
+  $ZodDiscriminatedUnion,
+  $ZodEnum,
+  $ZodIntersection,
+  $ZodLazy,
+  $ZodLiteral,
+  $ZodNullable,
+  $ZodObject,
+  $ZodOptional,
+  $ZodPipe,
+  $ZodRecord,
+  $ZodTuple,
+  $ZodType,
+  $ZodUnion,
+  $ZodChecks,
+  $ZodCheckMinLength,
+  $ZodCheckMaxLength,
+  $ZodString,
+  $ZodISODateTime,
+  $ZodCheckLengthEquals,
+  $ZodNumber,
+  $ZodCheckGreaterThan,
+  $ZodCheckLessThan,
+  $ZodReadonly,
+  $ZodStringFormat,
+  $ZodNumberFormat,
+  $ZodStringFormats,
+  $ZodNumberFormats,
+} from "@zod/core";
 import {
   ExamplesObject,
   MediaTypeObject,
@@ -15,7 +48,7 @@ import {
   isSchemaObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
   FlatObject,
@@ -41,7 +74,12 @@ import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { RawSchema, ezRawBrand } from "./raw-schema";
-import { HandlingRules, SchemaHandler, walkSchema } from "./schema-walker";
+import {
+  FirstPartyKind,
+  HandlingRules,
+  SchemaHandler,
+  walkSchema,
+} from "./schema-walker";
 import { Security } from "./security";
 import { UploadSchema, ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
@@ -51,7 +89,7 @@ export type NumericRange = Record<"integer" | "float", [number, number]>;
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   makeRef: (
-    schema: z.ZodTypeAny,
+    schema: $ZodType | (() => $ZodType),
     subject:
       | SchemaObject
       | ReferenceObject
@@ -108,18 +146,12 @@ const getTimestampRegex = (hasOffset?: boolean) =>
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const depictDefault: Depicter = (
-  { _def }: z.ZodDefault<z.ZodTypeAny>,
-  { next },
-) => ({
-  ...next(_def.innerType),
-  default: _def[metaSymbol]?.defaultLabel || _def.defaultValue(),
+export const depictDefault: Depicter = (schema: $ZodDefault, { next }) => ({
+  ...next(schema._zod.def.innerType),
+  default:
+    globalRegistry.get(schema)?.[metaSymbol]?.defaultLabel ||
+    schema._zod.def.defaultValue(),
 });
-
-export const depictCatch: Depicter = (
-  { _def: { innerType } }: z.ZodCatch<z.ZodTypeAny>,
-  { next },
-) => next(innerType);
 
 export const depictAny: Depicter = () => ({ format: "any" });
 
@@ -130,12 +162,15 @@ export const depictUpload: Depicter = ({}: UploadSchema, ctx) => {
 };
 
 export const depictFile: Depicter = (schema: FileSchema) => {
-  const subject = schema.unwrap();
   return {
     type: "string",
     format:
-      subject instanceof z.ZodString
-        ? subject._def.checks.find((check) => check.kind === "base64")
+      schema instanceof z.ZodString
+        ? schema._zod.def.checks?.find(
+            (entry) =>
+              isCheck<$ZodStringFormat>(entry, "string_format") &&
+              entry._zod.def.format === "base64",
+          )
           ? "byte"
           : "file"
         : "binary",
@@ -143,21 +178,16 @@ export const depictFile: Depicter = (schema: FileSchema) => {
 };
 
 export const depictUnion: Depicter = (
-  { options }: z.ZodUnion<z.ZodUnionOptions>,
-  { next },
-) => ({ oneOf: options.map(next) });
-
-export const depictDiscriminatedUnion: Depicter = (
-  {
-    options,
-    discriminator,
-  }: z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>,
+  { _zod }: $ZodUnion | $ZodDiscriminatedUnion,
   { next },
 ) => {
-  return {
-    discriminator: { propertyName: discriminator },
-    oneOf: options.map(next),
-  };
+  const result: SchemaObject = { oneOf: _zod.def.options.map(next) };
+  if (_zod.disc) {
+    const propertyName = Array.from(_zod.disc.keys()).pop();
+    if (typeof propertyName === "string")
+      result.discriminator = { propertyName };
+  }
+  return result;
 };
 
 const propsMerger = (a: unknown, b: unknown) => {
@@ -195,26 +225,21 @@ const intersect = R.tryCatch(
 );
 
 export const depictIntersection: Depicter = (
-  { _def: { left, right } }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
+  { _zod: { def } }: $ZodIntersection,
   { next },
-) => intersect([left, right].map(next));
+) => intersect([def.left, def.right].map(next));
 
-export const depictOptional: Depicter = (
-  schema: z.ZodOptional<z.ZodTypeAny>,
+export const depictWrapped: Depicter = (
+  { _zod: { def } }: $ZodOptional | $ZodReadonly | $ZodCatch,
   { next },
-) => next(schema.unwrap());
-
-export const depictReadonly: Depicter = (
-  schema: z.ZodReadonly<z.ZodTypeAny>,
-  { next },
-) => next(schema.unwrap());
+) => next(def.innerType);
 
 /** @since OAS 3.1 nullable replaced with type array having null */
 export const depictNullable: Depicter = (
-  schema: z.ZodNullable<z.ZodTypeAny>,
+  { _zod: { def } }: $ZodNullable,
   { next },
 ) => {
-  const nested = next(schema.unwrap());
+  const nested = next(def.innerType);
   if (isSchemaObject(nested)) nested.type = makeNullableType(nested);
   return nested;
 };
@@ -235,28 +260,33 @@ const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
       : undefined;
 };
 
-export const depictEnum: Depicter = (
-  schema: z.ZodEnum<[string, ...string[]]> | z.ZodNativeEnum<z.EnumLike>,
-) => ({
-  type: getSupportedType(Object.values(schema.enum)[0]),
-  enum: Object.values(schema.enum),
+export const depictEnum: Depicter = ({ _zod: { def } }: $ZodEnum) => ({
+  type: getSupportedType(Object.values(def.entries)[0]),
+  enum: Object.values(def.entries),
 });
 
-export const depictLiteral: Depicter = ({ value }: z.ZodLiteral<unknown>) => ({
-  type: getSupportedType(value), // constructor allows z.Primitive only, but ZodLiteral does not have that constraint
-  const: value,
-});
+export const depictLiteral: Depicter = ({ _zod: { def } }: $ZodLiteral) => {
+  const values = Object.values(def.values);
+  const result: SchemaObject = { type: getSupportedType(values[0]) };
+  if (values.length === 1) result.const = values[0];
+  else result.enum = Object.values(def.values);
+  return result;
+};
 
 export const depictObject: Depicter = (
-  schema: z.ZodObject<z.ZodRawShape>,
+  schema: $ZodObject,
   { isResponse, next },
 ) => {
-  const keys = Object.keys(schema.shape);
-  const isOptionalProp = (prop: z.ZodTypeAny) =>
+  const keys = Object.keys(schema._zod.def.shape);
+  const isOptionalProp = (prop: $ZodType) =>
     isResponse && hasCoercion(prop)
       ? prop instanceof z.ZodOptional
-      : prop.isOptional();
-  const required = keys.filter((key) => !isOptionalProp(schema.shape[key]));
+      : prop instanceof z.ZodPromise
+        ? false
+        : (prop as z.ZodType).isOptional();
+  const required = keys.filter(
+    (key) => !isOptionalProp(schema._zod.def.shape[key]),
+  );
   const result: SchemaObject = { type: "object" };
   if (keys.length) result.properties = depictObjectProperties(schema, next);
   if (required.length) result.required = required;
@@ -297,7 +327,7 @@ export const depictDateOut: Depicter = ({}: DateOutSchema, ctx) => {
 };
 
 /** @throws DocumentationError */
-export const depictDate: Depicter = ({}: z.ZodDate, ctx) => {
+export const depictDate: Depicter = ({}: $ZodDate, ctx) => {
   throw new DocumentationError(
     `Using z.date() within ${
       ctx.isResponse ? "output" : "input"
@@ -316,64 +346,75 @@ export const depictBigInt: Depicter = () => ({
 });
 
 const areOptionsLiteral = (
-  subject: z.ZodTypeAny[],
-): subject is z.ZodLiteral<unknown>[] =>
-  subject.every((option) => option instanceof z.ZodLiteral);
+  subject: ReadonlyArray<$ZodType>,
+): subject is $ZodLiteral[] =>
+  subject.every((option) => option._zod.def.type === "literal");
 
 export const depictRecord: Depicter = (
-  { keySchema, valueSchema }: z.ZodRecord<z.ZodTypeAny>,
+  { _zod: { def } }: $ZodRecord,
   { next },
 ) => {
-  if (keySchema instanceof z.ZodEnum || keySchema instanceof z.ZodNativeEnum) {
-    const keys = Object.values(keySchema.enum) as string[];
+  if (def.keyType instanceof z.ZodEnum) {
+    const keys = Object.values(def.keyType._zod.def.entries).map(String);
     const result: SchemaObject = { type: "object" };
     if (keys.length) {
       result.properties = depictObjectProperties(
-        z.object(R.fromPairs(R.xprod(keys, [valueSchema]))),
+        z.looseObject(R.fromPairs(R.xprod(keys, [def.valueType]))),
         next,
       );
       result.required = keys;
     }
     return result;
   }
-  if (keySchema instanceof z.ZodLiteral) {
+  if (def.keyType instanceof z.ZodLiteral) {
+    const keys = def.keyType._zod.def.values.map(String);
     return {
       type: "object",
       properties: depictObjectProperties(
-        z.object({ [keySchema.value]: valueSchema }),
+        z.looseObject(R.fromPairs(R.xprod(keys, [def.valueType]))),
         next,
       ),
-      required: [keySchema.value],
+      required: keys,
     };
   }
-  if (keySchema instanceof z.ZodUnion && areOptionsLiteral(keySchema.options)) {
-    const required = R.map((opt) => `${opt.value}`, keySchema.options);
-    const shape = R.fromPairs(R.xprod(required, [valueSchema]));
+  if (
+    def.keyType instanceof z.ZodUnion &&
+    areOptionsLiteral(def.keyType._zod.def.options)
+  ) {
+    const required = R.map(
+      (opt: $ZodLiteral) => `${opt._zod.def.values[0]}`,
+      def.keyType._zod.def.options as $ZodLiteral[], // ensured above
+    );
+    const shape = R.fromPairs(R.xprod(required, [def.valueType]));
     return {
       type: "object",
-      properties: depictObjectProperties(z.object(shape), next),
+      properties: depictObjectProperties(z.looseObject(shape), next),
       required,
     };
   }
   return {
     type: "object",
-    propertyNames: next(keySchema),
-    additionalProperties: next(valueSchema),
+    propertyNames: next(def.keyType),
+    additionalProperties: next(def.valueType),
   };
 };
 
 export const depictArray: Depicter = (
-  {
-    _def: { minLength, maxLength, exactLength },
-    element,
-  }: z.ZodArray<z.ZodTypeAny>,
+  { _zod: { def } }: $ZodArray,
   { next },
 ) => {
-  const result: SchemaObject = { type: "array", items: next(element) };
-  if (exactLength)
-    [result.minItems, result.maxItems] = Array(2).fill(exactLength.value);
-  if (minLength) result.minItems = minLength.value;
-  if (maxLength) result.maxItems = maxLength.value;
+  const result: SchemaObject = {
+    type: "array",
+    items: next(def.element),
+  };
+  for (const check of def.checks || []) {
+    if (isCheck<$ZodCheckLengthEquals>(check, "length_equals"))
+      [result.minItems, result.maxItems] = Array(2).fill(check._zod.def.length);
+    if (isCheck<$ZodCheckMinLength>(check, "min_length"))
+      result.minItems = check._zod.def.minimum;
+    if (isCheck<$ZodCheckMaxLength>(check, "max_length"))
+      result.maxItems = check._zod.def.maximum;
+  }
   return result;
 };
 
@@ -382,82 +423,71 @@ export const depictArray: Depicter = (
  * @since 17.5.0 added rest handling, fixed tuple type
  * */
 export const depictTuple: Depicter = (
-  { items, _def: { rest } }: z.AnyZodTuple,
+  { _zod: { def } }: $ZodTuple,
   { next },
 ) => ({
   type: "array",
-  prefixItems: items.map(next),
+  prefixItems: def.items.map(next),
   // does not appear to support items:false, so not:{} is a recommended alias
-  items: rest === null ? { not: {} } : next(rest),
+  items: def.rest === null ? { not: {} } : next(def.rest),
 });
 
-export const depictString: Depicter = ({
-  isEmail,
-  isURL,
-  minLength,
-  maxLength,
-  isUUID,
-  isCUID,
-  isCUID2,
-  isULID,
-  isIP,
-  isEmoji,
-  isDatetime,
-  isCIDR,
-  isDate,
-  isTime,
-  isBase64,
-  isNANOID,
-  isBase64url,
-  isDuration,
-  _def: { checks },
-}: z.ZodString) => {
-  const regexCheck = checks.find((check) => check.kind === "regex");
-  const datetimeCheck = checks.find((check) => check.kind === "datetime");
-  const isJWT = checks.some((check) => check.kind === "jwt");
-  const lenCheck = checks.find((check) => check.kind === "length");
+const isCheck = <T extends $ZodChecks>(
+  check: unknown,
+  name: T["_zod"]["def"]["check"],
+): check is T => R.pathEq(name, ["_zod", "def", "check"], check);
+
+export const depictString: Depicter = (
+  schema: $ZodString | $ZodStringFormat,
+) => {
   const result: SchemaObject = { type: "string" };
-  const formats: Record<NonNullable<SchemaObject["format"]>, boolean> = {
-    "date-time": isDatetime,
-    byte: isBase64,
-    base64url: isBase64url,
-    date: isDate,
-    time: isTime,
-    duration: isDuration,
-    email: isEmail,
-    url: isURL,
-    uuid: isUUID,
-    cuid: isCUID,
-    cuid2: isCUID2,
-    ulid: isULID,
-    nanoid: isNANOID,
-    jwt: isJWT,
-    ip: isIP,
-    cidr: isCIDR,
-    emoji: isEmoji,
-  };
-  for (const format in formats) {
-    if (formats[format]) {
-      result.format = format;
-      break;
+  const formatCast: Partial<Record<$ZodStringFormats, SchemaObject["format"]>> =
+    {
+      datetime: "date-time",
+      base64: "byte",
+      ipv4: "ip",
+      ipv6: "ip",
+      cidrv4: "cidr",
+      cidrv6: "cidr",
+      regex: undefined,
+    };
+  const { checks = [] } = schema._zod.def;
+  if (isCheck<$ZodStringFormat>(schema, "string_format")) checks.push(schema);
+  for (const check of checks) {
+    if (isCheck<$ZodCheckLengthEquals>(check, "length_equals")) {
+      [result.minLength, result.maxLength] = Array(2).fill(
+        check._zod.def.length,
+      );
+    }
+    if (isCheck<$ZodCheckMinLength>(check, "min_length"))
+      result.minLength = check._zod.def.minimum;
+    if (isCheck<$ZodCheckMaxLength>(check, "max_length"))
+      result.maxLength = check._zod.def.maximum;
+    if (isCheck<$ZodStringFormat>(check, "string_format")) {
+      if (check._zod.def.format === "regex")
+        result.pattern = check._zod.def.pattern?.source;
+      if (check._zod.def.format === "date") result.pattern = dateRegex.source;
+      if (check._zod.def.format === "time") result.pattern = timeRegex.source;
+      if (check._zod.def.format === "datetime") {
+        result.pattern = getTimestampRegex(
+          (check as $ZodISODateTime)._zod.def.offset,
+        ).source;
+      }
+      const format =
+        check._zod.def.format in formatCast
+          ? formatCast[check._zod.def.format]
+          : check._zod.def.format;
+      if (format) result.format = format;
     }
   }
-  if (lenCheck)
-    [result.minLength, result.maxLength] = [lenCheck.value, lenCheck.value];
-  if (minLength !== null) result.minLength = minLength;
-  if (maxLength !== null) result.maxLength = maxLength;
-  if (isDate) result.pattern = dateRegex.source;
-  if (isTime) result.pattern = timeRegex.source;
-  if (isDatetime)
-    result.pattern = getTimestampRegex(datetimeCheck?.offset).source;
-  if (regexCheck) result.pattern = regexCheck.regex.source;
   return result;
 };
 
 /** @since OAS 3.1: exclusive min/max are numbers */
 export const depictNumber: Depicter = (
-  { isInt, maxValue, minValue, _def: { checks } }: z.ZodNumber,
+  schema: $ZodNumber,
   {
+    // @todo consider using computed values provided by Zod instead
     numericRange = {
       integer: [Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER],
       float: [-Number.MAX_VALUE, Number.MAX_VALUE],
@@ -468,29 +498,55 @@ export const depictNumber: Depicter = (
     integer: null,
     float: null,
   };
-  const minCheck = checks.find((check) => check.kind === "min");
-  const minimum =
-    minValue === null ? (isInt ? intRange?.[0] : floatRange?.[0]) : minValue;
-  const isMinInclusive = minCheck ? minCheck.inclusive : true;
-  const maxCheck = checks.find((check) => check.kind === "max");
-  const maximum =
-    maxValue === null ? (isInt ? intRange?.[1] : floatRange?.[1]) : maxValue;
-  const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
+  let min = floatRange?.[0];
+  let inclMin = true;
+  let max = floatRange?.[1];
+  let inclMax = true;
   const result: SchemaObject = {
-    type: isInt ? "integer" : "number",
-    format: isInt ? "int64" : "double",
+    type: "number",
+    format: "double",
   };
-  if (isMinInclusive) result.minimum = minimum;
-  else result.exclusiveMinimum = minimum;
-  if (isMaxInclusive) result.maximum = maximum;
-  else result.exclusiveMaximum = maximum;
+  const formatCast: Partial<Record<$ZodNumberFormats, SchemaObject["format"]>> =
+    {
+      safeint: "int64",
+      uint32: "int32",
+      float32: "float",
+      float64: "double",
+    };
+  const { checks = [] } = schema._zod.def;
+  if (isCheck<$ZodNumberFormat>(schema, "number_format")) checks.push(schema);
+  for (const check of checks) {
+    if (isCheck<$ZodNumberFormat>(check, "number_format")) {
+      if (check._zod.def.format.includes("int")) {
+        result.type = "integer";
+        min = intRange?.[0];
+        max = intRange?.[1];
+        inclMin = true;
+        inclMax = true;
+      }
+      result.format =
+        check._zod.def.format in formatCast
+          ? formatCast[check._zod.def.format]
+          : check._zod.def.format;
+    }
+    if (isCheck<$ZodCheckGreaterThan>(check, "greater_than")) {
+      min = Number(check._zod.def.value);
+      inclMin = check._zod.def.inclusive;
+    }
+    if (isCheck<$ZodCheckLessThan>(check, "less_than")) {
+      max = Number(check._zod.def.value);
+      inclMax = check._zod.def.inclusive;
+    }
+  }
+  result[inclMin ? "minimum" : "exclusiveMinimum"] = min;
+  result[inclMax ? "maximum" : "exclusiveMaximum"] = max;
   return result;
 };
 
 export const depictObjectProperties = (
-  { shape }: z.ZodObject<z.ZodRawShape>,
+  { _zod: { def } }: $ZodObject,
   next: Parameters<Depicter>[1]["next"],
-) => R.map(next, shape);
+) => R.map(next, def.shape);
 
 const makeSample = (depicted: SchemaObject) => {
   const firstType = (
@@ -507,42 +563,42 @@ const makeNullableType = ({
   return type ? [...new Set(type).add("null")] : "null";
 };
 
-export const depictEffect: Depicter = (
-  schema: z.ZodEffects<z.ZodTypeAny>,
+export const depictPipeline: Depicter = (
+  { _zod: { def } }: $ZodPipe,
   { isResponse, next },
 ) => {
-  const input = next(schema.innerType());
-  const { effect } = schema._def;
-  if (isResponse && effect.type === "transform" && isSchemaObject(input)) {
-    const outputType = getTransformedType(schema, makeSample(input));
-    if (outputType && ["number", "string", "boolean"].includes(outputType))
-      return { type: outputType as "number" | "string" | "boolean" };
-    else return next(z.any());
+  const target = def[isResponse ? "out" : "in"];
+  const opposite = def[isResponse ? "in" : "out"];
+  if (target instanceof z.ZodTransform) {
+    const opposingDepiction = next(opposite);
+    if (isSchemaObject(opposingDepiction)) {
+      if (!isResponse) {
+        const { type: opposingType, ...rest } = opposingDepiction;
+        return {
+          ...rest,
+          format: `${rest.format || opposingType} (preprocessed)`,
+        };
+      } else {
+        const targetType = getTransformedType(
+          target,
+          makeSample(opposingDepiction),
+        );
+        if (targetType && ["number", "string", "boolean"].includes(targetType))
+          return { type: targetType as "number" | "string" | "boolean" };
+        else return next(z.any());
+      }
+    }
   }
-  if (!isResponse && effect.type === "preprocess" && isSchemaObject(input)) {
-    const { type: inputType, ...rest } = input;
-    return { ...rest, format: `${rest.format || inputType} (preprocessed)` };
-  }
-  return input;
+  return next(target);
 };
 
-export const depictPipeline: Depicter = (
-  { _def }: z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>,
-  { isResponse, next },
-) => next(_def[isResponse ? "out" : "in"]);
-
-export const depictBranded: Depicter = (
-  schema: z.ZodBranded<z.ZodTypeAny, string | number | symbol>,
-  { next },
-) => next(schema.unwrap());
-
 export const depictLazy: Depicter = (
-  lazy: z.ZodLazy<z.ZodTypeAny>,
+  { _zod: { def } }: $ZodLazy,
   { next, makeRef },
-): ReferenceObject => makeRef(lazy, () => next(lazy.schema));
+): ReferenceObject => makeRef(def.getter, () => next(def.getter()));
 
-export const depictRaw: Depicter = (schema: RawSchema, { next }) =>
-  next(schema.unwrap().shape.raw);
+export const depictRaw: Depicter = ({ _zod: { def } }: RawSchema, { next }) =>
+  next(def.shape.raw);
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
   examples.length
@@ -555,13 +611,15 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
     : undefined;
 
 export const depictExamples = (
-  schema: z.ZodTypeAny,
+  schema: z.ZodType,
   isResponse: boolean,
   omitProps: string[] = [],
-): ExamplesObject | undefined =>
-  R.pipe(
+): ExamplesObject | undefined => {
+  const isObject = (subj: unknown): subj is FlatObject =>
+    R.type(subj) === "Object";
+  return R.pipe(
     getExamples,
-    R.map(R.when((subj) => R.type(subj) === "Object", R.omit(omitProps))),
+    R.map(R.when(isObject, R.omit(omitProps))),
     enumerateExamples,
   )({
     schema,
@@ -569,17 +627,21 @@ export const depictExamples = (
     validate: true,
     pullProps: true,
   });
+};
 
 export const depictParamExamples = (
-  schema: z.ZodTypeAny,
+  schema: z.ZodType,
   param: string,
-): ExamplesObject | undefined =>
-  R.pipe(
+): ExamplesObject | undefined => {
+  const isObject = (subj: unknown): subj is FlatObject =>
+    R.type(subj) === "Object";
+  return R.pipe(
     getExamples,
-    R.filter<FlatObject>(R.has(param)),
+    R.filter(R.both(isObject, R.has(param))),
     R.pluck(param),
     enumerateExamples,
   )({ schema, variant: "original", validate: true, pullProps: true });
+};
 
 export const defaultIsHeader = (
   name: string,
@@ -641,12 +703,11 @@ export const depictRequestParams = ({
         composition === "components"
           ? makeRef(paramSchema, depicted, makeCleanId(description, name))
           : depicted;
-      const { _def } = paramSchema as z.ZodType;
       return acc.concat({
         name,
         in: location,
-        deprecated: _def[metaSymbol]?.isDeprecated,
-        required: !paramSchema.isOptional(),
+        deprecated: globalRegistry.get(paramSchema)?.[metaSymbol]?.isDeprecated,
+        required: !(paramSchema as z.ZodType).isOptional(),
         description: depicted.description || description,
         schema: result,
         examples: depictParamExamples(objectSchema, name),
@@ -659,34 +720,30 @@ export const depictRequestParams = ({
 export const depicters: HandlingRules<
   SchemaObject | ReferenceObject,
   OpenAPIContext,
-  z.ZodFirstPartyTypeKind | ProprietaryBrand
+  FirstPartyKind | ProprietaryBrand
 > = {
-  ZodString: depictString,
-  ZodNumber: depictNumber,
-  ZodBigInt: depictBigInt,
-  ZodBoolean: depictBoolean,
-  ZodNull: depictNull,
-  ZodArray: depictArray,
-  ZodTuple: depictTuple,
-  ZodRecord: depictRecord,
-  ZodObject: depictObject,
-  ZodLiteral: depictLiteral,
-  ZodIntersection: depictIntersection,
-  ZodUnion: depictUnion,
-  ZodAny: depictAny,
-  ZodDefault: depictDefault,
-  ZodEnum: depictEnum,
-  ZodNativeEnum: depictEnum,
-  ZodEffects: depictEffect,
-  ZodOptional: depictOptional,
-  ZodNullable: depictNullable,
-  ZodDiscriminatedUnion: depictDiscriminatedUnion,
-  ZodBranded: depictBranded,
-  ZodDate: depictDate,
-  ZodCatch: depictCatch,
-  ZodPipeline: depictPipeline,
-  ZodLazy: depictLazy,
-  ZodReadonly: depictReadonly,
+  string: depictString,
+  number: depictNumber,
+  bigint: depictBigInt,
+  boolean: depictBoolean,
+  null: depictNull,
+  array: depictArray,
+  tuple: depictTuple,
+  record: depictRecord,
+  object: depictObject,
+  literal: depictLiteral,
+  intersection: depictIntersection,
+  union: depictUnion,
+  any: depictAny,
+  default: depictDefault,
+  enum: depictEnum,
+  optional: depictWrapped,
+  nullable: depictNullable,
+  date: depictDate,
+  catch: depictWrapped,
+  pipe: depictPipeline,
+  lazy: depictLazy,
+  readonly: depictWrapped,
   [ezFileBrand]: depictFile,
   [ezUploadBrand]: depictUpload,
   [ezDateOutBrand]: depictDateOut,
@@ -700,8 +757,9 @@ export const onEach: SchemaHandler<
   "each"
 > = (schema: z.ZodType, { isResponse, prev }) => {
   if (isReferenceObject(prev)) return {};
-  const { description, _def } = schema;
-  const shouldAvoidParsing = schema instanceof z.ZodLazy;
+  const { description } = schema;
+  const shouldAvoidParsing =
+    schema instanceof z.ZodLazy || schema instanceof z.ZodPromise;
   const hasTypePropertyInDepiction = prev.type !== undefined;
   const isResponseHavingCoercion = isResponse && hasCoercion(schema);
   const isActuallyNullable =
@@ -711,7 +769,7 @@ export const onEach: SchemaHandler<
     schema.isNullable();
   const result: SchemaObject = {};
   if (description) result.description = description;
-  if (_def[metaSymbol]?.isDeprecated) result.deprecated = true;
+  if (schema.meta()?.[metaSymbol]?.isDeprecated) result.deprecated = true;
   if (isActuallyNullable) result.type = makeNullableType(prev);
   if (!shouldAvoidParsing) {
     const examples = getExamples({

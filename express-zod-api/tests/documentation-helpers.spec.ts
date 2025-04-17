@@ -1,3 +1,4 @@
+import type { $ZodType } from "@zod/core";
 import { ReferenceObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
@@ -8,14 +9,11 @@ import {
   depictArray,
   depictBigInt,
   depictBoolean,
-  depictBranded,
-  depictCatch,
+  depictWrapped,
   depictDate,
   depictDateIn,
   depictDateOut,
   depictDefault,
-  depictDiscriminatedUnion,
-  depictEffect,
   depictEnum,
   depictExamples,
   depictFile,
@@ -27,10 +25,8 @@ import {
   depictNumber,
   depictObject,
   depictObjectProperties,
-  depictOptional,
   depictParamExamples,
   depictPipeline,
-  depictReadonly,
   depictRecord,
   depictRequestParams,
   depictSecurity,
@@ -59,7 +55,7 @@ describe("Documentation helpers", () => {
     method: "get",
     isResponse: false,
     makeRef: makeRefMock,
-    next: (schema: z.ZodTypeAny) =>
+    next: (schema: $ZodType) =>
       walkSchema(schema, {
         rules: depicters,
         onEach,
@@ -72,7 +68,7 @@ describe("Documentation helpers", () => {
     method: "get",
     isResponse: true,
     makeRef: makeRefMock,
-    next: (schema: z.ZodTypeAny) =>
+    next: (schema: $ZodType) =>
       walkSchema(schema, {
         rules: depicters,
         onEach,
@@ -89,10 +85,11 @@ describe("Documentation helpers", () => {
     test.each<z.ZodTypeAny>([
       z.object({ a: z.string(), b: z.string() }),
       z.object({ a: z.string() }).or(z.object({ b: z.string() })),
-      z.object({ a: z.string() }).and(z.object({ b: z.string() })), // flattened
-      z
-        .record(z.literal("a"), z.string())
-        .and(z.record(z.string(), z.string())),
+      z.intersection(z.object({ a: z.string() }), z.object({ b: z.string() })), // flattened
+      z.intersection(
+        z.record(z.literal("a"), z.string()),
+        z.record(z.string(), z.string()),
+      ),
     ])("should omit specified params %#", (schema) => {
       const depicted = walkSchema(schema, {
         ctx: requestCtx,
@@ -137,8 +134,7 @@ describe("Documentation helpers", () => {
     test("Feature #1706: should override the default value by a label from metadata", () => {
       expect(
         depictDefault(
-          z
-            .string()
+          z.iso
             .datetime()
             .default(() => new Date().toISOString())
             .label("Today"),
@@ -148,10 +144,20 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictCatch()", () => {
-    test("should pass next depicter", () => {
+  describe("depictWrapped()", () => {
+    test("should handle catch", () => {
       expect(
-        depictCatch(z.boolean().catch(true), requestCtx),
+        depictWrapped(z.boolean().catch(true), requestCtx),
+      ).toMatchSnapshot();
+    });
+
+    test.each([requestCtx, responseCtx])("should handle optional %#", (ctx) => {
+      expect(depictWrapped(z.string().optional(), ctx)).toMatchSnapshot();
+    });
+
+    test("handle readonly", () => {
+      expect(
+        depictWrapped(z.string().readonly(), responseCtx),
       ).toMatchSnapshot();
     });
   });
@@ -199,12 +205,10 @@ describe("Documentation helpers", () => {
         depictUnion(z.string().or(z.number()), requestCtx),
       ).toMatchSnapshot();
     });
-  });
 
-  describe("depictDiscriminatedUnion()", () => {
     test("should wrap next depicters in oneOf prop and set discriminator prop", () => {
       expect(
-        depictDiscriminatedUnion(
+        depictUnion(
           z.discriminatedUnion("status", [
             z.object({ status: z.literal("success"), data: z.any() }),
             z.object({
@@ -222,7 +226,10 @@ describe("Documentation helpers", () => {
     test("should flatten two object schemas", () => {
       expect(
         depictIntersection(
-          z.object({ one: z.number() }).and(z.object({ two: z.number() })),
+          z.intersection(
+            z.object({ one: z.number() }),
+            z.object({ two: z.number() }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -231,7 +238,10 @@ describe("Documentation helpers", () => {
     test("should flatten objects with same prop of same type", () => {
       expect(
         depictIntersection(
-          z.object({ one: z.number() }).and(z.object({ one: z.number() })),
+          z.intersection(
+            z.object({ one: z.number() }),
+            z.object({ one: z.number() }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -240,7 +250,10 @@ describe("Documentation helpers", () => {
     test("should NOT flatten object schemas having conflicting props", () => {
       expect(
         depictIntersection(
-          z.object({ one: z.number() }).and(z.object({ one: z.string() })),
+          z.intersection(
+            z.object({ one: z.number() }),
+            z.object({ one: z.string() }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -249,14 +262,14 @@ describe("Documentation helpers", () => {
     test("should merge examples deeply", () => {
       expect(
         depictIntersection(
-          z
-            .object({ test: z.object({ a: z.number() }) })
-            .example({ test: { a: 123 } })
-            .and(
-              z
-                .object({ test: z.object({ b: z.number() }) })
-                .example({ test: { b: 456 } }),
-            ),
+          z.intersection(
+            z
+              .object({ test: z.object({ a: z.number() }) })
+              .example({ test: { a: 123 } }),
+            z
+              .object({ test: z.object({ b: z.number() }) })
+              .example({ test: { b: 456 } }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -265,11 +278,13 @@ describe("Documentation helpers", () => {
     test("should flatten three object schemas with examples", () => {
       expect(
         depictIntersection(
-          z
-            .object({ one: z.number() })
-            .example({ one: 123 })
-            .and(z.object({ two: z.number() }).example({ two: 456 }))
-            .and(z.object({ three: z.number() }).example({ three: 789 })),
+          z.intersection(
+            z.intersection(
+              z.object({ one: z.number() }).example({ one: 123 }),
+              z.object({ two: z.number() }).example({ two: 456 }),
+            ),
+            z.object({ three: z.number() }).example({ three: 789 }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -278,29 +293,24 @@ describe("Documentation helpers", () => {
     test("should maintain uniqueness in the array of required props", () => {
       expect(
         depictIntersection(
-          z
-            .record(z.literal("test"), z.number())
-            .and(z.object({ test: z.literal(5) })),
+          z.intersection(
+            z.record(z.literal("test"), z.number()),
+            z.object({ test: z.literal(5) }),
+          ),
           requestCtx,
         ),
       ).toMatchSnapshot();
     });
 
     test.each([
-      z.record(z.string(), z.number()).and(z.object({ test: z.number() })), // has additionalProperties
-      z.number().and(z.literal(5)), // not objects
+      z.intersection(
+        z.record(z.string(), z.number()), // has additionalProperties
+        z.object({ test: z.number() }),
+      ),
+      z.intersection(z.number(), z.literal(5)), // not objects
     ])("should fall back to allOf in other cases %#", (schema) => {
       expect(depictIntersection(schema, requestCtx)).toMatchSnapshot();
     });
-  });
-
-  describe("depictOptional()", () => {
-    test.each([requestCtx, responseCtx])(
-      "should pass the next depicter %#",
-      (ctx) => {
-        expect(depictOptional(z.string().optional(), ctx)).toMatchSnapshot();
-      },
-    );
   });
 
   describe("depictNullable()", () => {
@@ -324,7 +334,7 @@ describe("Documentation helpers", () => {
       one = "ONE",
       two = "TWO",
     }
-    test.each([z.enum(["one", "two"]), z.nativeEnum(Test)])(
+    test.each([z.enum(["one", "two"]), z.enum(Test)])(
       "should set type and enum properties",
       (schema) => {
         expect(depictEnum(schema, requestCtx)).toMatchSnapshot();
@@ -333,12 +343,16 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictLiteral()", () => {
-    test.each(["testng", null, BigInt(123), Symbol("test")])(
+    test.each(["testng", null, BigInt(123), undefined])(
       "should set type and involve const property %#",
       (value) => {
         expect(depictLiteral(z.literal(value), requestCtx)).toMatchSnapshot();
       },
     );
+
+    test("should handle multiple values", () => {
+      expect(depictLiteral(z.literal([1, 2, 3]), requestCtx)).toMatchSnapshot();
+    });
   });
 
   describe("depictObject()", () => {
@@ -347,7 +361,7 @@ describe("Documentation helpers", () => {
       { ctx: responseCtx, shape: { a: z.number(), b: z.string() } },
       {
         ctx: responseCtx,
-        shape: { a: z.coerce.number(), b: z.string({ coerce: true }) },
+        shape: { a: z.coerce.number(), b: z.coerce.string() },
       },
       { ctx: responseCtx, shape: { a: z.number(), b: z.string().optional() } },
       {
@@ -391,12 +405,12 @@ describe("Documentation helpers", () => {
 
   describe("depictRecord()", () => {
     test.each([
-      z.record(z.boolean()),
+      z.record(z.int(), z.boolean()),
       z.record(z.string(), z.boolean()),
       z.record(z.enum(["one", "two"]), z.boolean()),
       z.record(z.literal("testing"), z.boolean()),
       z.record(z.literal("one").or(z.literal("two")), z.boolean()),
-      z.record(z.any()), // Issue #900
+      z.record(z.string(), z.any()), // Issue #900
       z.record(z.string().regex(/x-\w+/), z.boolean()),
     ])(
       "should set properties+required or additionalProperties props %#",
@@ -449,35 +463,40 @@ describe("Documentation helpers", () => {
     test.each([
       z.string().email().min(10).max(20),
       z.string().url().length(15),
-      z.string().uuid(),
-      z.string().cuid(),
-      z.string().datetime(),
-      z.string().datetime({ offset: true }),
+      z.uuid(),
+      z.cuid(),
+      z.iso.datetime(),
+      z.iso.datetime({ offset: true }),
       z.string().regex(/^\d+.\d+.\d+$/),
-      z.string().date(),
-      z.string().time(),
-      z.string().duration(),
-      z.string().cidr(),
-      z.string().ip(),
-      z.string().jwt(),
-      z.string().base64(),
-      z.string().base64url(),
-      z.string().cuid2(),
-      z.string().ulid(),
+      z.iso.date(),
+      z.iso.time(),
+      z.iso.duration(),
+      z.cidrv4(),
+      z.ipv4(),
+      z.jwt(),
+      z.base64(),
+      z.base64url(),
+      z.cuid2(),
+      z.ulid(),
     ])("should set format, pattern and min/maxLength props %#", (schema) => {
       expect(depictString(schema, requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictNumber()", () => {
-    test.each([z.number(), z.number().int()])(
+    test.each([
+      z.number(),
+      z.int(),
+      z.float64(),
+      R.assocPath(["_zod", "def", "format"], "hacked", z.int()),
+    ])(
       "should set min/max values according to JS capabilities %#",
       (schema) => {
         expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
       },
     );
 
-    test.each([z.number(), z.number().int()])(
+    test.each([z.number(), z.int()])(
       "should use numericRange when set %#",
       (schema) => {
         expect(
@@ -492,7 +511,7 @@ describe("Documentation helpers", () => {
       },
     );
 
-    test.each([z.number(), z.number().int()])(
+    test.each([z.number(), z.int()])(
       "should not use numericRange when it is null %#",
       (schema) => {
         expect(
@@ -537,7 +556,16 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictEffect()", () => {
+  describe("depictPipeline", () => {
+    test.each([
+      { ctx: responseCtx, expected: "boolean (out)" },
+      { ctx: requestCtx, expected: "string (in)" },
+    ])("should depict as $expected", ({ ctx }) => {
+      expect(
+        depictPipeline(z.string().transform(Boolean).pipe(z.boolean()), ctx),
+      ).toMatchSnapshot();
+    });
+
     test.each([
       {
         schema: z.string().transform((v) => parseInt(v, 10)),
@@ -554,33 +582,15 @@ describe("Documentation helpers", () => {
         ctx: requestCtx,
         expected: "string (preprocess)",
       },
-      {
-        schema: z
-          .object({ s: z.string() })
-          .refine(() => false, { message: "test" }),
-        ctx: requestCtx,
-        expected: "object (refinement)",
-      },
     ])("should depict as $expected", ({ schema, ctx }) => {
-      expect(depictEffect(schema, ctx)).toMatchSnapshot();
+      expect(depictPipeline(schema, ctx)).toMatchSnapshot();
     });
 
     test.each([
       z.number().transform((num) => () => num),
       z.number().transform(() => assert.fail("this should be handled")),
     ])("should handle edge cases", (schema) => {
-      expect(depictEffect(schema, responseCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictPipeline", () => {
-    test.each([
-      { ctx: responseCtx, expected: "boolean (out)" },
-      { ctx: requestCtx, expected: "string (in)" },
-    ])("should depict as $expected", ({ ctx }) => {
-      expect(
-        depictPipeline(z.string().pipe(z.coerce.boolean()), ctx),
-      ).toMatchSnapshot();
+      expect(depictPipeline(schema, responseCtx)).toMatchSnapshot();
     });
   });
 
@@ -762,30 +772,10 @@ describe("Documentation helpers", () => {
     );
   });
 
-  describe("depictBranded", () => {
-    test("should pass the next depicter", () => {
-      expect(
-        depictBranded(z.string().min(2).brand("Test"), responseCtx),
-      ).toMatchSnapshot();
-    });
-  });
-
-  describe("depictReadonly", () => {
-    test("should pass the next depicter", () => {
-      expect(
-        depictReadonly(z.string().readonly(), responseCtx),
-      ).toMatchSnapshot();
-    });
-  });
-
   describe("depictLazy", () => {
-    const recursiveArray: z.ZodLazy<z.ZodArray<z.ZodTypeAny>> = z.lazy(() =>
-      recursiveArray.array(),
-    );
-    const directlyRecursive: z.ZodLazy<z.ZodTypeAny> = z.lazy(
-      () => directlyRecursive,
-    );
-    const recursiveObject: z.ZodLazy<z.ZodObject<z.ZodRawShape>> = z.lazy(() =>
+    const recursiveArray: z.ZodLazy = z.lazy(() => recursiveArray.array());
+    const directlyRecursive: z.ZodLazy = z.lazy(() => directlyRecursive);
+    const recursiveObject: z.ZodLazy = z.lazy(() =>
       z.object({ prop: recursiveObject }),
     );
 
@@ -800,7 +790,10 @@ describe("Documentation helpers", () => {
         expect(makeRefMock).not.toHaveBeenCalled();
         expect(depictLazy(schema, responseCtx)).toMatchSnapshot();
         expect(makeRefMock).toHaveBeenCalledTimes(1);
-        expect(makeRefMock).toHaveBeenCalledWith(schema, expect.any(Function));
+        expect(makeRefMock).toHaveBeenCalledWith(
+          schema._zod.def.getter,
+          expect.any(Function),
+        );
       },
     );
   });

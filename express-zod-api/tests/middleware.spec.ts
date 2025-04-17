@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { InputValidationError, Middleware } from "../src";
-import { EmptyObject } from "../src/common-helpers";
 import { AbstractMiddleware, ExpressMiddleware } from "../src/middleware";
 import {
   makeLoggerMock,
@@ -16,14 +15,15 @@ describe("Middleware", () => {
         handler: vi.fn(),
       });
       expect(mw).toBeInstanceOf(AbstractMiddleware);
-      expectTypeOf(mw.schema._output).toEqualTypeOf<{
+      expectTypeOf(mw.schema._zod.output).toEqualTypeOf<{
         something: number;
       }>();
     });
 
     test("should allow to omit input schema", () => {
       const mw = new Middleware({ handler: vi.fn() });
-      expectTypeOf(mw.schema._output).toEqualTypeOf<EmptyObject>();
+      /** @see $InferObjectOutput - external logic */
+      expectTypeOf(mw.schema._zod.output).toEqualTypeOf<object>();
     });
 
     describe("#600: Top level refinements", () => {
@@ -32,7 +32,7 @@ describe("Middleware", () => {
           input: z.object({ something: z.number() }).refine(() => true),
           handler: vi.fn(),
         });
-        expect(mw.schema).toBeInstanceOf(z.ZodEffects);
+        expect(mw.schema).toBeInstanceOf(z.ZodObject);
       });
     });
   });
@@ -87,6 +87,7 @@ describe("ExpressMiddleware", () => {
   test("should inherit from Middleware", () => {
     const mw = new ExpressMiddleware(vi.fn());
     expect(mw).toBeInstanceOf(Middleware);
-    expectTypeOf(mw.schema._output).toEqualTypeOf<EmptyObject>();
+    /** @see $InferObjectOutput - external logic */
+    expectTypeOf(mw.schema._zod.output).toEqualTypeOf<object>();
   });
 });

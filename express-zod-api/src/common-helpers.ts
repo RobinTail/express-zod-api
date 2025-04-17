@@ -1,3 +1,4 @@
+import type { $ZodType } from "@zod/core";
 import { Request } from "express";
 import * as R from "ramda";
 import { z } from "zod";
@@ -9,7 +10,7 @@ import { AuxMethod, Method } from "./method";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = Record<string, never>;
-export type EmptySchema = z.ZodObject<EmptyObject, "strip">;
+export type EmptySchema = z.ZodObject<EmptyObject>;
 export type FlatObject = Record<string, unknown>;
 
 /** @link https://stackoverflow.com/a/65492934 */
@@ -63,7 +64,11 @@ export const getInput = (
 };
 
 export const ensureError = (subject: unknown): Error =>
-  subject instanceof Error ? subject : new Error(String(subject));
+  subject instanceof Error
+    ? subject
+    : subject instanceof z.ZodError
+      ? new Error(subject.message)
+      : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
   if (error instanceof z.ZodError) {
@@ -81,15 +86,15 @@ export const getMessageFromError = (error: Error): string => {
 };
 
 /** Takes the original unvalidated examples from the properties of ZodObject schema shape */
-export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
+export const pullExampleProps = <T extends z.ZodObject>(subject: T) =>
   Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
     (acc, [key, schema]) => {
-      const { _def } = schema as z.ZodType;
-      return combinations(
-        acc,
-        (_def[metaSymbol]?.examples || []).map(R.objOf(key)),
-        ([left, right]) => ({ ...left, ...right }),
-      );
+      const examples =
+        (schema as z.ZodType).meta()?.[metaSymbol]?.examples || [];
+      return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
+        ...left,
+        ...right,
+      }));
     },
     [],
   );
@@ -122,7 +127,7 @@ export const getExamples = <
    * */
   pullProps?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  let examples = schema._def[metaSymbol]?.examples || [];
+  let examples = schema.meta()?.[metaSymbol]?.examples || [];
   if (!examples.length && pullProps && schema instanceof z.ZodObject)
     examples = pullExampleProps(schema);
   if (!validate && variant === "original") return examples;
@@ -145,10 +150,8 @@ export const combinations = <T>(
  * @desc isNullable() and isOptional() validate the schema's input
  * @desc They always return true in case of coercion, which should be taken into account when depicting response
  */
-export const hasCoercion = (schema: z.ZodTypeAny): boolean =>
-  "coerce" in schema._def && typeof schema._def.coerce === "boolean"
-    ? schema._def.coerce
-    : false;
+export const hasCoercion = ({ _zod: { def } }: $ZodType): boolean =>
+  "coerce" in def && def.coerce === true;
 
 export const ucFirst = (subject: string) =>
   subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
@@ -164,7 +167,7 @@ export const makeCleanId = (...args: string[]) => {
 };
 
 export const getTransformedType = R.tryCatch(
-  <T>(schema: z.ZodEffects<z.ZodTypeAny, unknown, T>, sample: T) =>
+  <T>(schema: z.ZodTransform<unknown, T>, sample: T) =>
     typeof schema.parse(sample),
   R.always(undefined),
 );

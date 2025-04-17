@@ -718,8 +718,6 @@ paths:
         content:
           application/json:
             schema:
-              discriminator:
-                propertyName: type
               oneOf:
                 - type: object
                   properties:
@@ -741,6 +739,8 @@ paths:
                   required:
                     - type
                     - b
+              discriminator:
+                propertyName: type
         required: true
       responses:
         "200":
@@ -754,8 +754,6 @@ paths:
                     type: string
                     const: success
                   data:
-                    discriminator:
-                      propertyName: status
                     oneOf:
                       - type: object
                         properties:
@@ -781,6 +779,8 @@ paths:
                         required:
                           - status
                           - error
+                    discriminator:
+                      propertyName: status
                 required:
                   - status
                   - data
@@ -1603,10 +1603,10 @@ paths:
                   pattern: \\d+
                 combined:
                   type: string
-                  format: email
                   minLength: 1
-                  maxLength: 90
+                  format: email
                   pattern: .*@example\\.com
+                  maxLength: 90
               required:
                 - regular
                 - min

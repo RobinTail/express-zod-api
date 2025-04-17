@@ -68,7 +68,7 @@ export const statusDependingFactory = new EndpointsFactory(
     negative: [
       {
         statusCode: 409,
-        schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
+        schema: z.object({ status: z.literal("exists"), id: z.int() }),
       },
       {
         statusCode: [400, 500],
@@ -76,8 +76,8 @@ export const statusDependingFactory = new EndpointsFactory(
       },
     ],
     handler: ({ error, response, output }) => {
-      if (error) {
-        const httpError = ensureHttpError(error);
+      if (error || !output) {
+        const httpError = ensureHttpError(error || new Error("Missing output"));
         const doesExist =
           httpError.statusCode === 409 &&
           "id" in httpError &&

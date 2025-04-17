@@ -166,14 +166,14 @@ describe("Common Helpers", () => {
           path: ["user", "id"],
           message: "expected number, got string",
           expected: "number",
-          received: "string",
+          input: "test",
         },
         {
           code: "invalid_type",
           path: ["user", "name"],
           message: "expected string, got number",
           expected: "string",
-          received: "number",
+          input: 123,
         },
       ]);
       expect(getMessageFromError(error)).toMatchSnapshot();
@@ -181,7 +181,12 @@ describe("Common Helpers", () => {
 
     test("should handle empty path in ZodIssue", () => {
       const error = new z.ZodError([
-        { code: "custom", path: [], message: "Top level refinement issue" },
+        {
+          code: "custom",
+          path: [],
+          message: "Top level refinement issue",
+          input: "test",
+        },
       ]);
       expect(getMessageFromError(error)).toMatchSnapshot();
     });
@@ -280,7 +285,7 @@ describe("Common Helpers", () => {
         }),
       ).toEqual([123, 456]);
     });
-    test.each([z.array(z.number().int()), z.tuple([z.number(), z.number()])])(
+    test.each([z.array(z.int()), z.tuple([z.number(), z.number()])])(
       "Issue #892: should handle examples of arrays and tuples %#",
       (schema) => {
         expect(
@@ -344,13 +349,13 @@ describe("Common Helpers", () => {
           {
             code: "invalid_type",
             expected: "string",
-            received: "number",
+            input: 123,
             path: [""],
             message: "invalid type",
           },
         ]),
         `[\n  {\n    "code": "invalid_type",\n    "expected": "string",\n` +
-          `    "received": "number",\n    "path": [\n      ""\n` +
+          `    "input": 123,\n    "path": [\n      ""\n` +
           `    ],\n    "message": "invalid type"\n  }\n]`,
       ],
       [createHttpError(500, "Internal Server Error"), "Internal Server Error"],
@@ -386,7 +391,7 @@ describe("Common Helpers", () => {
     test.each([
       { schema: z.string(), coercion: false },
       { schema: z.coerce.string(), coercion: true },
-      { schema: z.boolean({ coerce: true }), coercion: true },
+      { schema: z.coerce.boolean(), coercion: true },
       { schema: z.custom(), coercion: false },
     ])(
       "should check the presence and value of coerce prop %#",

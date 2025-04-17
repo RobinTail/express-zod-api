@@ -3,10 +3,12 @@
 exports[`ez.file() > parsing > should perform additional check for base64 file 1`] = `
 [
   {
-    "code": "invalid_string",
-    "message": "Invalid base64",
+    "code": "invalid_format",
+    "format": "base64",
+    "message": "Invalid base64-encoded string",
+    "origin": "string",
     "path": [],
-    "validation": "base64",
+    "pattern": "/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/",
   },
 ]
 `;

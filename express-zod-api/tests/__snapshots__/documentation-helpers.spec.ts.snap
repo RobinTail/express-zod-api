@@ -80,19 +80,6 @@ exports[`Documentation helpers > depictBoolean() > should set type:boolean 1`] =
 }
 `;
 
-exports[`Documentation helpers > depictBranded > should pass the next depicter 1`] = `
-{
-  "minLength": 2,
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictCatch() > should pass next depicter 1`] = `
-{
-  "type": "boolean",
-}
-`;
-
 exports[`Documentation helpers > depictDate > should throw clear error 0 1`] = `
 DocumentationError({
   "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
@@ -157,99 +144,6 @@ exports[`Documentation helpers > depictDefault() > should set default property 1
 {
   "default": true,
   "type": "boolean",
-}
-`;
-
-exports[`Documentation helpers > depictDiscriminatedUnion() > should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
-{
-  "discriminator": {
-    "propertyName": "status",
-  },
-  "oneOf": [
-    {
-      "properties": {
-        "data": {
-          "format": "any",
-        },
-        "status": {
-          "const": "success",
-          "type": "string",
-        },
-      },
-      "required": [
-        "status",
-      ],
-      "type": "object",
-    },
-    {
-      "properties": {
-        "error": {
-          "properties": {
-            "message": {
-              "type": "string",
-            },
-          },
-          "required": [
-            "message",
-          ],
-          "type": "object",
-        },
-        "status": {
-          "const": "error",
-          "type": "string",
-        },
-      },
-      "required": [
-        "status",
-        "error",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictEffect() > should depict as 'number (out)' 1`] = `
-{
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictEffect() > should depict as 'object (refinement)' 1`] = `
-{
-  "properties": {
-    "s": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "s",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictEffect() > should depict as 'string (in)' 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictEffect() > should depict as 'string (preprocess)' 1`] = `
-{
-  "format": "string (preprocessed)",
-}
-`;
-
-exports[`Documentation helpers > depictEffect() > should handle edge cases 1`] = `
-{
-  "format": "any",
-}
-`;
-
-exports[`Documentation helpers > depictEffect() > should handle edge cases 2`] = `
-{
-  "format": "any",
 }
 `;
 
@@ -579,6 +473,17 @@ exports[`Documentation helpers > depictLazy > should handle circular references 
 }
 `;
 
+exports[`Documentation helpers > depictLiteral() > should handle multiple values 1`] = `
+{
+  "enum": [
+    1,
+    2,
+    3,
+  ],
+  "type": "number",
+}
+`;
+
 exports[`Documentation helpers > depictLiteral() > should set type and involve const property 0 1`] = `
 {
   "const": "testng",
@@ -602,7 +507,7 @@ exports[`Documentation helpers > depictLiteral() > should set type and involve c
 
 exports[`Documentation helpers > depictLiteral() > should set type and involve const property 3 1`] = `
 {
-  "const": Symbol(test),
+  "const": undefined,
   "type": undefined,
 }
 `;
@@ -679,6 +584,24 @@ exports[`Documentation helpers > depictNumber() > should set min/max values acco
   "maximum": 9007199254740991,
   "minimum": -9007199254740991,
   "type": "integer",
+}
+`;
+
+exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 2 1`] = `
+{
+  "format": "double",
+  "maximum": 1.7976931348623157e+308,
+  "minimum": -1.7976931348623157e+308,
+  "type": "number",
+}
+`;
+
+exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 3 1`] = `
+{
+  "format": "hacked",
+  "maximum": 1.7976931348623157e+308,
+  "minimum": -1.7976931348623157e+308,
+  "type": "number",
 }
 `;
 
@@ -874,18 +797,6 @@ exports[`Documentation helpers > depictObjectProperties() > should wrap next dep
 }
 `;
 
-exports[`Documentation helpers > depictOptional() > should pass the next depicter 0 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictOptional() > should pass the next depicter 1 1`] = `
-{
-  "type": "string",
-}
-`;
-
 exports[`Documentation helpers > depictParamExamples() > should pass examples for the given parameter 1`] = `
 {
   "example1": {
@@ -903,9 +814,39 @@ exports[`Documentation helpers > depictPipeline > should depict as 'boolean (out
 }
 `;
 
+exports[`Documentation helpers > depictPipeline > should depict as 'number (out)' 1`] = `
+{
+  "type": "number",
+}
+`;
+
 exports[`Documentation helpers > depictPipeline > should depict as 'string (in)' 1`] = `
 {
   "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictPipeline > should depict as 'string (in)' 2`] = `
+{
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictPipeline > should depict as 'string (preprocess)' 1`] = `
+{
+  "format": "string (preprocessed)",
+}
+`;
+
+exports[`Documentation helpers > depictPipeline > should handle edge cases 1`] = `
+{
+  "format": "any",
+}
+`;
+
+exports[`Documentation helpers > depictPipeline > should handle edge cases 2`] = `
+{
+  "format": "any",
 }
 `;
 
@@ -916,19 +857,16 @@ exports[`Documentation helpers > depictRaw() > should depict the raw property 1`
 }
 `;
 
-exports[`Documentation helpers > depictReadonly > should pass the next depicter 1`] = `
-{
-  "type": "string",
-}
-`;
-
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 0 1`] = `
 {
   "additionalProperties": {
     "type": "boolean",
   },
   "propertyNames": {
-    "type": "string",
+    "format": "int64",
+    "maximum": 9007199254740991,
+    "minimum": -9007199254740991,
+    "type": "integer",
   },
   "type": "object",
 }
@@ -1537,6 +1475,55 @@ exports[`Documentation helpers > depictTuple() > should utilize prefixItems and 
 }
 `;
 
+exports[`Documentation helpers > depictUnion() > should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
+{
+  "discriminator": {
+    "propertyName": "status",
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "data": {
+          "format": "any",
+        },
+        "status": {
+          "const": "success",
+          "type": "string",
+        },
+      },
+      "required": [
+        "status",
+      ],
+      "type": "object",
+    },
+    {
+      "properties": {
+        "error": {
+          "properties": {
+            "message": {
+              "type": "string",
+            },
+          },
+          "required": [
+            "message",
+          ],
+          "type": "object",
+        },
+        "status": {
+          "const": "error",
+          "type": "string",
+        },
+      },
+      "required": [
+        "status",
+        "error",
+      ],
+      "type": "object",
+    },
+  ],
+}
+`;
+
 exports[`Documentation helpers > depictUnion() > should wrap next depicters into oneOf property 1`] = `
 {
   "oneOf": [
@@ -1565,6 +1552,30 @@ DocumentationError({
   "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
   "message": "Please use ez.upload() only for input.",
 })
+`;
+
+exports[`Documentation helpers > depictWrapped() > handle readonly 1`] = `
+{
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictWrapped() > should handle catch 1`] = `
+{
+  "type": "boolean",
+}
+`;
+
+exports[`Documentation helpers > depictWrapped() > should handle optional 0 1`] = `
+{
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictWrapped() > should handle optional 1 1`] = `
+{
+  "type": "string",
+}
 `;
 
 exports[`Documentation helpers > excludeExamplesFromDepiction() > should remove example property of supplied object 1`] = `
