@@ -1,32 +1,34 @@
 import type {
   $ZodArray,
   $ZodCatch,
+  $ZodCheckGreaterThan,
+  $ZodCheckLengthEquals,
+  $ZodCheckLessThan,
+  $ZodCheckMaxLength,
+  $ZodCheckMinLength,
+  $ZodChecks,
   $ZodDate,
   $ZodEnum,
   $ZodIntersection,
   $ZodLazy,
   $ZodLiteral,
   $ZodNullable,
+  $ZodNumber,
+  $ZodNumberFormat,
+  $ZodNumberFormats,
   $ZodObject,
   $ZodOptional,
   $ZodPipe,
+  $ZodReadonly,
   $ZodRecord,
+  $ZodStringFormat,
   $ZodTuple,
   $ZodType,
-  $ZodChecks,
-  $ZodCheckMinLength,
-  $ZodCheckMaxLength,
-  $ZodCheckLengthEquals,
-  $ZodNumber,
-  $ZodCheckGreaterThan,
-  $ZodCheckLessThan,
-  $ZodReadonly,
-  $ZodStringFormat,
-  $ZodNumberFormat,
-  $ZodNumberFormats,
 } from "@zod/core";
 import {
   ExamplesObject,
+  isReferenceObject,
+  isSchemaObject,
   MediaTypeObject,
   OAuthFlowObject,
   ParameterObject,
@@ -38,36 +40,34 @@ import {
   SecurityRequirementObject,
   SecuritySchemeObject,
   TagObject,
-  isReferenceObject,
-  isSchemaObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  FlatObject,
   combinations,
+  FlatObject,
   getExamples,
   getRoutePathParams,
+  getTransformedType,
   hasCoercion,
   makeCleanId,
   routePathParamsRegex,
-  getTransformedType,
-  ucFirst,
   Tag,
+  ucFirst,
 } from "./common-helpers";
 import { InputSource } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
 import { hasRaw } from "./deep-checks";
 import { DocumentationError } from "./errors";
-import { FileSchema, ezFileBrand } from "./file-schema";
+import { ezFileBrand, FileSchema } from "./file-schema";
 import { extractObjectSchema, IOSchema } from "./io-schema";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
-import { RawSchema, ezRawBrand } from "./raw-schema";
+import { ezRawBrand, RawSchema } from "./raw-schema";
 import {
   FirstPartyKind,
   HandlingRules,
@@ -75,7 +75,7 @@ import {
   walkSchema,
 } from "./schema-walker";
 import { Security } from "./security";
-import { UploadSchema, ezUploadBrand } from "./upload-schema";
+import { ezUploadBrand, UploadSchema } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
 
 export type NumericRange = Record<"integer" | "float", [number, number]>;
@@ -132,50 +132,56 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const delegate =
-  (overrides?: SchemaObject | Depicter): Depicter =>
-  (schema, ctx) => {
-    const result = z.toJSONSchema(schema, {
-      unrepresentable: "any",
-      metadata: globalRegistry,
-      pipes: ctx.isResponse ? "output" : "input",
-      override: ({ zodSchema, jsonSchema }) => {
-        if (zodSchema._zod.def.type === "nullable") {
-          const nested = delegate()(
-            (zodSchema as $ZodNullable)._zod.def.innerType,
-            ctx,
-          );
-          delete jsonSchema.oneOf; // undo defaults
-          Object.assign(
-            jsonSchema,
-            nested,
-            isSchemaObject(nested) && { type: makeNullableType(nested) },
-          );
-        }
-        if (zodSchema._zod.def.type === "default") {
-          jsonSchema.default =
-            globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
-            jsonSchema.default;
-        }
-        if (zodSchema._zod.def.type === "any") jsonSchema.format = "any";
-        if (zodSchema._zod.disc) {
-          const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
-          jsonSchema.discriminator = { propertyName };
-        }
-        if (zodSchema._zod.def.type === "enum") {
-          jsonSchema.type = getSupportedType(
-            Object.values((zodSchema as $ZodEnum)._zod.def.entries)[0],
-          );
-        }
-        if (zodSchema._zod.def.type === "bigint")
-          Object.assign(jsonSchema, { type: "integer", format: "bigint" });
-      },
-    });
-    return Object.assign(
-      result,
-      typeof overrides === "function" ? overrides(schema, ctx) : overrides,
-    );
-  };
+export const delegate: Depicter = (schema, ctx) =>
+  z.toJSONSchema(schema, {
+    unrepresentable: "any",
+    metadata: globalRegistry,
+    pipes: ctx.isResponse ? "output" : "input",
+    override: ({ zodSchema, jsonSchema }) => {
+      if (zodSchema._zod.def.type === "nullable") {
+        const nested = delegate(
+          (zodSchema as $ZodNullable)._zod.def.innerType,
+          ctx,
+        );
+        delete jsonSchema.oneOf; // undo defaults
+        Object.assign(
+          jsonSchema,
+          nested,
+          isSchemaObject(nested) && { type: makeNullableType(nested) },
+        );
+      }
+      if (zodSchema._zod.def.type === "default") {
+        jsonSchema.default =
+          globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
+          jsonSchema.default;
+      }
+      if (zodSchema._zod.def.type === "any") jsonSchema.format = "any";
+      if (zodSchema._zod.def.type === "union" && zodSchema._zod.disc) {
+        const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
+        jsonSchema.discriminator = { propertyName };
+      }
+      if (zodSchema._zod.def.type === "enum") {
+        jsonSchema.type = getSupportedType(
+          Object.values((zodSchema as $ZodEnum)._zod.def.entries)[0],
+        );
+      }
+      if (zodSchema._zod.def.type === "bigint")
+        Object.assign(jsonSchema, { type: "integer", format: "bigint" });
+      if (zodSchema._zod.def.type === "intersection") {
+        const { left, right } = (zodSchema as $ZodIntersection)._zod.def;
+        const attempt = intersect([left, right].map((e) => delegate(e, ctx)));
+        delete jsonSchema.allOf; // undo default
+        Object.assign(jsonSchema, attempt);
+      }
+      // on each
+      const examples = getExamples({
+        schema: zodSchema as z.ZodType, // @todo remove "as"
+        variant: ctx.isResponse ? "parsed" : "original",
+        validate: true,
+      });
+      if (examples.length) jsonSchema.examples = examples.slice();
+    },
+  }) as SchemaObject;
 
 export const depictUpload: Depicter = ({}: UploadSchema, ctx) => {
   if (ctx.isResponse)
@@ -233,11 +239,6 @@ const intersect = R.tryCatch(
   (_err, allOf): SchemaObject => ({ allOf }),
 );
 
-export const depictIntersection: Depicter = (
-  { _zod: { def } }: $ZodIntersection,
-  { next },
-) => intersect([def.left, def.right].map(next));
-
 export const depictWrapped: Depicter = (
   { _zod: { def } }: $ZodOptional | $ZodReadonly | $ZodCatch,
   { next },
@@ -264,26 +265,6 @@ export const depictLiteral: Depicter = ({ _zod: { def } }: $ZodLiteral) => {
   const result: SchemaObject = { type: getSupportedType(values[0]) };
   if (values.length === 1) result.const = values[0];
   else result.enum = Object.values(def.values);
-  return result;
-};
-
-export const depictObject: Depicter = (
-  schema: $ZodObject,
-  { isResponse, next },
-) => {
-  const keys = Object.keys(schema._zod.def.shape);
-  const isOptionalProp = (prop: $ZodType) =>
-    isResponse && hasCoercion(prop)
-      ? prop instanceof z.ZodOptional
-      : prop instanceof z.ZodPromise
-        ? false
-        : (prop as z.ZodType).isOptional();
-  const required = keys.filter(
-    (key) => !isOptionalProp(schema._zod.def.shape[key]),
-  );
-  const result: SchemaObject = { type: "object" };
-  if (keys.length) result.properties = depictObjectProperties(schema, next);
-  if (required.length) result.required = required;
   return result;
 };
 
@@ -657,23 +638,23 @@ export const depicters: HandlingRules<
   OpenAPIContext,
   FirstPartyKind | ProprietaryBrand
 > = {
-  string: delegate(),
+  string: delegate,
   number: depictNumber,
-  bigint: delegate(),
-  boolean: delegate(),
-  null: delegate(),
+  bigint: delegate,
+  boolean: delegate,
+  null: delegate,
   array: depictArray,
   tuple: depictTuple,
   record: depictRecord,
-  object: depictObject,
+  object: delegate,
   literal: depictLiteral,
-  intersection: depictIntersection,
-  union: delegate(),
-  any: delegate(),
-  default: delegate(),
-  enum: delegate(),
+  intersection: delegate,
+  union: delegate,
+  any: delegate,
+  default: delegate,
+  enum: delegate,
   optional: depictWrapped,
-  nullable: delegate(),
+  nullable: delegate,
   date: depictDate,
   catch: depictWrapped,
   pipe: depictPipeline,

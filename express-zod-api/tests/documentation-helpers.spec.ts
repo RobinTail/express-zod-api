@@ -12,11 +12,9 @@ import {
   depictDateOut,
   depictExamples,
   depictFile,
-  depictIntersection,
   depictLazy,
   depictLiteral,
   depictNumber,
-  depictObject,
   depictObjectProperties,
   depictParamExamples,
   depictPipeline,
@@ -39,8 +37,6 @@ import {
   delegate,
 } from "../src/documentation-helpers";
 import { walkSchema } from "../src/schema-walker";
-
-const delegated = delegate();
 
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
@@ -121,13 +117,11 @@ describe("Documentation helpers", () => {
 
   describe("depictDefault()", () => {
     test("should set default property", () => {
-      expect(
-        delegated(z.boolean().default(true), requestCtx),
-      ).toMatchSnapshot();
+      expect(delegate(z.boolean().default(true), requestCtx)).toMatchSnapshot();
     });
     test("Feature #1706: should override the default value by a label from metadata", () => {
       expect(
-        delegated(
+        delegate(
           z.iso
             .datetime()
             .default(() => new Date().toISOString())
@@ -158,7 +152,7 @@ describe("Documentation helpers", () => {
 
   describe("depictAny()", () => {
     test("should set format:any", () => {
-      expect(delegated(z.any(), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.any(), requestCtx)).toMatchSnapshot();
     });
   });
 
@@ -195,14 +189,12 @@ describe("Documentation helpers", () => {
 
   describe("depictUnion()", () => {
     test("should wrap next depicters into oneOf property", () => {
-      expect(
-        delegated(z.string().or(z.number()), requestCtx),
-      ).toMatchSnapshot();
+      expect(delegate(z.string().or(z.number()), requestCtx)).toMatchSnapshot();
     });
 
     test("should wrap next depicters in oneOf prop and set discriminator prop", () => {
       expect(
-        delegated(
+        delegate(
           z.discriminatedUnion("status", [
             z.object({ status: z.literal("success"), data: z.any() }),
             z.object({
@@ -219,7 +211,7 @@ describe("Documentation helpers", () => {
   describe("depictIntersection()", () => {
     test("should flatten two object schemas", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
             z.object({ one: z.number() }),
             z.object({ two: z.number() }),
@@ -231,7 +223,7 @@ describe("Documentation helpers", () => {
 
     test("should flatten objects with same prop of same type", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
             z.object({ one: z.number() }),
             z.object({ one: z.number() }),
@@ -243,7 +235,7 @@ describe("Documentation helpers", () => {
 
     test("should NOT flatten object schemas having conflicting props", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
             z.object({ one: z.number() }),
             z.object({ one: z.string() }),
@@ -255,7 +247,7 @@ describe("Documentation helpers", () => {
 
     test("should merge examples deeply", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
             z
               .object({ test: z.object({ a: z.number() }) })
@@ -271,7 +263,7 @@ describe("Documentation helpers", () => {
 
     test("should flatten three object schemas with examples", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
             z.intersection(
               z.object({ one: z.number() }).example({ one: 123 }),
@@ -286,9 +278,9 @@ describe("Documentation helpers", () => {
 
     test("should maintain uniqueness in the array of required props", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
-            z.record(z.literal("test"), z.number()),
+            z.object({ test: z.number() }),
             z.object({ test: z.literal(5) }),
           ),
           requestCtx,
@@ -303,7 +295,7 @@ describe("Documentation helpers", () => {
       ),
       z.intersection(z.number(), z.literal(5)), // not objects
     ])("should fall back to allOf in other cases %#", (schema) => {
-      expect(depictIntersection(schema, requestCtx)).toMatchSnapshot();
+      expect(delegate(schema, requestCtx)).toMatchSnapshot();
     });
   });
 
@@ -311,14 +303,14 @@ describe("Documentation helpers", () => {
     test.each([requestCtx, responseCtx])(
       "should add null to the type %#",
       (ctx) => {
-        expect(delegated(z.string().nullable(), ctx)).toMatchSnapshot();
+        expect(delegate(z.string().nullable(), ctx)).toMatchSnapshot();
       },
     );
 
     test.each([z.null().nullable(), z.string().nullable().nullable()])(
       "should not add null type when it's already there %#",
       (schema) => {
-        expect(delegated(schema, requestCtx)).toMatchSnapshot();
+        expect(delegate(schema, requestCtx)).toMatchSnapshot();
       },
     );
   });
@@ -331,7 +323,7 @@ describe("Documentation helpers", () => {
     test.each([z.enum(["one", "two"]), z.enum(Test)])(
       "should set type and enum properties",
       (schema) => {
-        expect(delegated(schema, requestCtx)).toMatchSnapshot();
+        expect(delegate(schema, requestCtx)).toMatchSnapshot();
       },
     );
   });
@@ -365,7 +357,7 @@ describe("Documentation helpers", () => {
     ])(
       "should type:object, properties and required props %#",
       ({ shape, ctx }) => {
-        expect(depictObject(z.object(shape), ctx)).toMatchSnapshot();
+        expect(delegate(z.object(shape), ctx)).toMatchSnapshot();
       },
     );
 
@@ -375,25 +367,25 @@ describe("Documentation helpers", () => {
         b: z.coerce.string(),
         c: z.coerce.string().optional(),
       });
-      expect(depictObject(schema, responseCtx)).toMatchSnapshot();
+      expect(delegate(schema, responseCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictNull()", () => {
     test("should give type:null", () => {
-      expect(delegated(z.null(), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.null(), requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictBoolean()", () => {
     test("should set type:boolean", () => {
-      expect(delegated(z.boolean(), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.boolean(), requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictBigInt()", () => {
     test("should set type:integer and format:bigint", () => {
-      expect(delegated(z.bigint(), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.bigint(), requestCtx)).toMatchSnapshot();
     });
   });
 
@@ -451,7 +443,7 @@ describe("Documentation helpers", () => {
 
   describe("depictString()", () => {
     test("should set type:string", () => {
-      expect(delegated(z.string(), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.string(), requestCtx)).toMatchSnapshot();
     });
 
     test.each([
@@ -473,7 +465,7 @@ describe("Documentation helpers", () => {
       z.cuid2(),
       z.ulid(),
     ])("should set format, pattern and min/maxLength props %#", (schema) => {
-      expect(delegated(schema, requestCtx)).toMatchSnapshot();
+      expect(delegate(schema, requestCtx)).toMatchSnapshot();
     });
   });
 

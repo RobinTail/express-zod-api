@@ -242,9 +242,6 @@ exports[`Documentation helpers > depictIntersection() > should NOT flatten objec
     {
       "properties": {
         "one": {
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
       },
@@ -273,9 +270,6 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
   "allOf": [
     {
       "additionalProperties": {
-        "format": "double",
-        "maximum": 1.7976931348623157e+308,
-        "minimum": -1.7976931348623157e+308,
         "type": "number",
       },
       "propertyNames": {
@@ -286,9 +280,6 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
     {
       "properties": {
         "test": {
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
       },
@@ -305,14 +296,10 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
 {
   "allOf": [
     {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     {
       "const": 5,
-      "type": "number",
     },
   ],
 }
@@ -322,9 +309,6 @@ exports[`Documentation helpers > depictIntersection() > should flatten objects w
 {
   "properties": {
     "one": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   },
@@ -346,21 +330,12 @@ exports[`Documentation helpers > depictIntersection() > should flatten three obj
   ],
   "properties": {
     "one": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "three": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "two": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   },
@@ -377,15 +352,9 @@ exports[`Documentation helpers > depictIntersection() > should flatten two objec
 {
   "properties": {
     "one": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "two": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   },
@@ -402,9 +371,6 @@ exports[`Documentation helpers > depictIntersection() > should maintain uniquene
   "properties": {
     "test": {
       "const": 5,
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   },
@@ -429,15 +395,9 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
     "test": {
       "properties": {
         "a": {
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
         "b": {
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
       },
@@ -669,10 +629,7 @@ exports[`Documentation helpers > depictObject() > Bug #758 1`] = `
       "type": "string",
     },
     "c": {
-      "type": [
-        "string",
-        "null",
-      ],
+      "type": "string",
     },
   },
   "required": [
@@ -687,9 +644,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -708,9 +662,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -729,9 +680,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -750,9 +698,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -770,18 +715,15 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
-      "type": [
-        "string",
-        "null",
-      ],
+      "type": "string",
     },
   },
+  "required": [
+    "b",
+  ],
   "type": "object",
 }
 `;
@@ -1496,9 +1438,6 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
   },
   "oneOf": [
     {
-      "discriminator": {
-        "propertyName": "status",
-      },
       "properties": {
         "data": {
           "format": "any",
@@ -1514,9 +1453,6 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
       "type": "object",
     },
     {
-      "discriminator": {
-        "propertyName": "status",
-      },
       "properties": {
         "error": {
           "properties": {
@@ -1668,8 +1604,12 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 {
   "allOf": [
     {
-      "properties": {},
-      "required": [],
+      "additionalProperties": {
+        "type": "string",
+      },
+      "propertyNames": {
+        "const": "a",
+      },
       "type": "object",
     },
     {
