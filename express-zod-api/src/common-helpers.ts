@@ -151,7 +151,7 @@ export const combinations = <T>(
  * @desc They always return true in case of coercion, which should be taken into account when depicting response
  */
 export const hasCoercion = ({ _zod: { def } }: $ZodType): boolean =>
-  "coerce" in def && typeof def.coerce === "boolean" ? def.coerce : false;
+  "coerce" in def && def.coerce === true;
 
 export const ucFirst = (subject: string) =>
   subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
