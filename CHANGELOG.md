@@ -2,6 +2,10 @@
 
 ## Version 23
 
+### v23.1.0
+
+- Fixed length array support in generated Documentation (`z.boolean().array().length(2)`).
+
 ### v23.0.0
 
 - Minimum version of `express` (required peer dependency) is `5.1.0` (first release of v5 marked as `latest`);
