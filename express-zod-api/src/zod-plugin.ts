@@ -142,15 +142,15 @@ if (!(metaSymbol in globalThis)) {
         set(fn) {
           originalCheck = fn;
         },
-        get() {
+        get(): z.ZodType["check"] {
           return function (
             this: z.ZodType,
             ...args: Parameters<z.ZodType["check"]>
           ) {
-            const meta = this.meta()?.[metaSymbol];
-            const result = originalCheck.apply(this, args);
             /** @link https://v4.zod.dev/metadata#register */
-            return result.register(z.globalRegistry, { [metaSymbol]: meta });
+            return originalCheck.apply(this, args).register(z.globalRegistry, {
+              [metaSymbol]: this.meta()?.[metaSymbol],
+            });
           };
         },
       },
