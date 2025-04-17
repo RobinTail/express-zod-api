@@ -138,12 +138,26 @@ export const reformatParamsInPath = (path: string) =>
 const delegate =
   (overrides?: SchemaObject | Depicter): Depicter =>
   (schema, ctx) => {
-    const jsonSchema = z.toJSONSchema(schema, {
+    const result = z.toJSONSchema(schema, {
       unrepresentable: "any",
       pipes: ctx.isResponse ? "output" : "input",
+      override: ({ zodSchema, jsonSchema }) => {
+        if (zodSchema._zod.def.type === "nullable") {
+          const nested = delegate()(
+            (zodSchema as $ZodNullable)._zod.def.innerType,
+            ctx,
+          );
+          delete jsonSchema.oneOf; // undo defaults
+          Object.assign(
+            jsonSchema,
+            nested,
+            isSchemaObject(nested) && { type: makeNullableType(nested) },
+          );
+        }
+      },
     });
     return Object.assign(
-      jsonSchema,
+      result,
       typeof overrides === "function" ? overrides(schema, ctx) : overrides,
     );
   };
@@ -237,14 +251,7 @@ export const depictWrapped: Depicter = (
 ) => next(def.innerType);
 
 /** @since OAS 3.1 nullable replaced with type array having null */
-export const depictNullable: Depicter = (
-  { _zod: { def } }: $ZodNullable,
-  { next },
-) => {
-  const nested = next(def.innerType);
-  if (isSchemaObject(nested)) nested.type = makeNullableType(nested);
-  return nested;
-};
+export const depictNullable = delegate();
 
 const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
   const detected = R.toLower(R.type(value)); // toLower is typed well unlike .toLowerCase()
