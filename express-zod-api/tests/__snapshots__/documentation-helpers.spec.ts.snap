@@ -300,6 +300,7 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
     },
     {
       "const": 5,
+      "type": "number",
     },
   ],
 }
@@ -1444,6 +1445,7 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
         },
         "status": {
           "const": "success",
+          "type": "string",
         },
       },
       "required": [
@@ -1467,6 +1469,7 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
         },
         "status": {
           "const": "error",
+          "type": "string",
         },
       },
       "required": [
@@ -1609,6 +1612,7 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
       },
       "propertyNames": {
         "const": "a",
+        "type": "string",
       },
       "type": "object",
     },

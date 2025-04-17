@@ -173,6 +173,15 @@ export const delegate: Depicter = (schema, ctx) =>
         delete jsonSchema.allOf; // undo default
         Object.assign(jsonSchema, attempt);
       }
+      if (zodSchema._zod.def.type === "literal") {
+        {
+          jsonSchema.type = getSupportedType(
+            Object.values((zodSchema as $ZodLiteral)._zod.def.values)[0],
+          );
+          //if (values.length === 1) result.const = values[0];
+          //else result.enum = Object.values(def.values);
+        }
+      }
       // on each
       const examples = getExamples({
         schema: zodSchema as z.ZodType, // @todo remove "as"
@@ -258,14 +267,6 @@ const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
     : isSupported
       ? detected
       : undefined;
-};
-
-export const depictLiteral: Depicter = ({ _zod: { def } }: $ZodLiteral) => {
-  const values = Object.values(def.values);
-  const result: SchemaObject = { type: getSupportedType(values[0]) };
-  if (values.length === 1) result.const = values[0];
-  else result.enum = Object.values(def.values);
-  return result;
 };
 
 export const depictDateIn: Depicter = ({}: DateInSchema, ctx) => {
@@ -647,7 +648,7 @@ export const depicters: HandlingRules<
   tuple: depictTuple,
   record: depictRecord,
   object: delegate,
-  literal: depictLiteral,
+  literal: delegate,
   intersection: delegate,
   union: delegate,
   any: delegate,

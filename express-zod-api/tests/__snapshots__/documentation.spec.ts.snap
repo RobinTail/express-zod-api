@@ -542,14 +542,13 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
                       whatever:
                         type: number
-                        format: double
                     required:
                       - whatever
                 required:
@@ -563,8 +562,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -643,19 +642,16 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
                       literal:
-                        type: string
                         const: something
+                        type: string
                       transformation:
                         type: number
-                        format: double
-                        minimum: -1.7976931348623157e+308
-                        maximum: 1.7976931348623157e+308
                     required:
                       - literal
                       - transformation
@@ -670,8 +666,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -723,24 +719,22 @@ paths:
                   properties:
                     type:
                       const: a
+                      type: string
                     a:
                       type: string
                   required:
                     - type
                     - a
-                  discriminator:
-                    propertyName: type
                 - type: object
                   properties:
                     type:
                       const: b
+                      type: string
                     b:
                       type: string
                   required:
                     - type
                     - b
-                  discriminator:
-                    propertyName: type
               discriminator:
                 propertyName: type
         required: true
@@ -753,25 +747,25 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     oneOf:
                       - type: object
                         properties:
                           status:
                             const: success
+                            type: string
                           data:
                             format: any
                         required:
                           - status
                           - data
-                        discriminator:
-                          propertyName: status
                       - type: object
                         properties:
                           status:
                             const: error
+                            type: string
                           error:
                             type: object
                             properties:
@@ -782,8 +776,6 @@ paths:
                         required:
                           - status
                           - error
-                        discriminator:
-                          propertyName: status
                     discriminator:
                       propertyName: status
                 required:
@@ -797,8 +789,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -869,8 +861,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -879,8 +871,6 @@ paths:
                         properties:
                           five:
                             type: integer
-                            format: int64
-                            minimum: 0
                             maximum: 9007199254740991
                           six:
                             type: string
@@ -900,8 +890,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -984,8 +974,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -1006,8 +996,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -1090,8 +1080,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -1113,8 +1103,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
