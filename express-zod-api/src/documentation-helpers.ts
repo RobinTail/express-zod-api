@@ -193,18 +193,14 @@ export const depictFile: Depicter = (schema: FileSchema) => {
   };
 };
 
-export const depictUnion: Depicter = (
-  { _zod }: $ZodUnion | $ZodDiscriminatedUnion,
-  { next },
-) => {
-  const result: SchemaObject = { oneOf: _zod.def.options.map(next) };
-  if (_zod.disc) {
-    const propertyName = Array.from(_zod.disc.keys()).pop();
-    if (typeof propertyName === "string")
-      result.discriminator = { propertyName };
-  }
-  return result;
-};
+export const depictUnion = delegate(
+  ({ _zod }: $ZodUnion | $ZodDiscriminatedUnion) => {
+    const propertyName = Array.from(_zod.disc?.keys() || []).pop();
+    return typeof propertyName === "string"
+      ? { discriminator: { propertyName } }
+      : {};
+  },
+);
 
 const propsMerger = (a: unknown, b: unknown) => {
   if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
