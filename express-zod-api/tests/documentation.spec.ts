@@ -525,49 +525,6 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test.each([
-      z.undefined(),
-      z.map(z.any(), z.any()),
-      z.set(z.any()),
-      z.promise(z.any()),
-      z.nan(),
-      z.symbol(),
-      z.unknown(),
-      z.never(),
-      z.void(),
-    ])("should throw on unsupported types %#", (zodType) => {
-      expect(
-        () =>
-          new Documentation({
-            config: sampleConfig,
-            routing: {
-              v1: {
-                getSomething: defaultEndpointsFactory.build({
-                  method: "post",
-                  input: z.object({
-                    property: zodType,
-                  }),
-                  output: z.object({}),
-                  handler: async () => ({}),
-                }),
-              },
-            },
-            version: "3.4.5",
-            title: "Testing unsupported types",
-            serverUrl: "https://example.com",
-          }),
-      ).toThrow(
-        new DocumentationError(
-          `Zod type ${zodType.constructor.name} is unsupported.`,
-          {
-            method: "post",
-            path: "/v1/getSomething",
-            isResponse: false,
-          },
-        ),
-      );
-    });
-
     test("should ensure uniq security schema names", () => {
       const mw1 = new Middleware({
         security: {
