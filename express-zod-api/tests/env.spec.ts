@@ -37,7 +37,7 @@ describe("Environment checks", () => {
      * @link https://github.com/colinhacks/zod/issues/4141
      * */
     test("This should fail when they fix it", () => {
-      expect(z.email()).not.toHaveProperty("max");
+      expect(z.int()).not.toHaveProperty("max");
     });
   });
 
