@@ -1,9 +1,7 @@
 import type {
   $ZodEnum,
-  $ZodIntersection,
   $ZodLazy,
   $ZodLiteral,
-  $ZodNullable,
   $ZodPipe,
   $ZodTuple,
   $ZodType,
@@ -145,9 +143,8 @@ export const delegate: Depicter = (schema, ctx) =>
       }
       if (zodSchema._zod.def.type === "bigint")
         Object.assign(jsonSchema, { type: "integer", format: "bigint" });
-      if (zodSchema._zod.def.type === "intersection") {
-        const { left, right } = (zodSchema as $ZodIntersection)._zod.def;
-        const attempt = intersect([left, right].map((e) => delegate(e, ctx)));
+      if (zodSchema._zod.def.type === "intersection" && jsonSchema.allOf) {
+        const attempt = intersect(jsonSchema.allOf as SchemaObject[]); // @todo remove "as"
         delete jsonSchema.allOf; // undo default
         Object.assign(jsonSchema, attempt);
       }
@@ -293,6 +290,7 @@ const approaches = {
     R.union(left, right),
   examples: ({ examples: left = [] }, { examples: right = [] }) =>
     combinations(left, right, ([a, b]) => R.mergeDeepRight(a, b)),
+  description: ({ description: left }, { description: right }) => left || right,
 } satisfies {
   [K in keyof SchemaObject]: (...subj: SchemaObject[]) => SchemaObject[K];
 };
