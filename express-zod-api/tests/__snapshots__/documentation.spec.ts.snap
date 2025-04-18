@@ -1604,9 +1604,9 @@ paths:
                 combined:
                   type: string
                   minLength: 1
-                  format: email
                   pattern: .*@example\\.com
                   maxLength: 90
+                  format: email
               required:
                 - regular
                 - min

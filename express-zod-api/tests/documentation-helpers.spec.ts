@@ -461,8 +461,8 @@ describe("Documentation helpers", () => {
     });
 
     test.each([
-      z.string().email().min(10).max(20),
-      z.string().url().length(15),
+      z.email().min(10).max(20),
+      z.url().length(15),
       z.uuid(),
       z.cuid(),
       z.iso.datetime(),
