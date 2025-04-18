@@ -17,6 +17,7 @@ import type { $ZodType, $ZodShape } from "@zod/core";
 declare module "@zod/core" {
   interface GlobalMeta {
     [metaSymbol]?: Metadata;
+    deprecated?: boolean;
   }
 }
 
@@ -66,11 +67,8 @@ const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
 const deprecationSetter = function (this: z.ZodType) {
   return this.meta({
     description: this.description,
-    [metaSymbol]: {
-      examples: [],
-      ...this.meta()?.[metaSymbol],
-      isDeprecated: true,
-    },
+    deprecated: true,
+    [metaSymbol]: this.meta()?.[metaSymbol],
   });
 };
 
