@@ -761,16 +761,15 @@ export const onEach: SchemaHandler<
   const shouldAvoidParsing =
     schema instanceof z.ZodLazy || schema instanceof z.ZodPromise;
   const hasTypePropertyInDepiction = prev.type !== undefined;
-  const isResponseHavingCoercion = isResponse && hasCoercion(schema);
-  const isActuallyNullable =
+  const acceptsNull =
+    !isResponse &&
     !shouldAvoidParsing &&
     hasTypePropertyInDepiction &&
-    !isResponseHavingCoercion &&
     schema.isNullable();
   const result: SchemaObject = {};
   if (description) result.description = description;
   if (schema.meta()?.deprecated) result.deprecated = true;
-  if (isActuallyNullable) result.type = makeNullableType(prev);
+  if (acceptsNull) result.type = makeNullableType(prev);
   if (!shouldAvoidParsing) {
     const examples = getExamples({
       schema,
