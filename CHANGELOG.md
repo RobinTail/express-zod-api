@@ -4,8 +4,9 @@
 
 ### v23.1.1
 
-- Fixed: coerced types in response were marked as nullable;
-- Fixed: coerced, preprocessed and `z.any()` schemas in response were marked as optional.
+- Fixed response depiction in the generated Documentation:
+  - coerced types were marked as nullable;
+  - coerced, preprocessed and `z.any()` schemas were marked as optional.
 
 ### v23.1.0
 
