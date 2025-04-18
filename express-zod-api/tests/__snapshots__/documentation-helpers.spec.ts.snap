@@ -746,10 +746,7 @@ exports[`Documentation helpers > depictObject() > Bug #758 1`] = `
       "type": "string",
     },
     "c": {
-      "type": [
-        "string",
-        "null",
-      ],
+      "type": "string",
     },
   },
   "required": [
