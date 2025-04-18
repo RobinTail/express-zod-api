@@ -2288,9 +2288,6 @@ paths:
               properties:
                 test:
                   type: number
-                  format: double
-                  minimum: -1.7976931348623157e+308
-                  maximum: 1.7976931348623157e+308
               required:
                 - test
         required: true
@@ -2303,8 +2300,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: ok
+                    type: string
                   data:
                     type: object
                     properties:
@@ -2323,8 +2320,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: kinda
+                    type: string
                   data:
                     type: object
                     properties:
@@ -2340,15 +2337,15 @@ paths:
           content:
             application/json:
               schema:
-                type: string
                 const: error
+                type: string
         "500":
           description: POST /v1/mtpl Negative response 500
           content:
             application/json:
               schema:
-                type: string
                 const: failure
+                type: string
 components:
   schemas: {}
   responses: {}
@@ -2492,8 +2489,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -2512,8 +2509,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -2571,8 +2568,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -2591,8 +2588,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -3175,10 +3172,12 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -3190,8 +3189,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -3258,8 +3257,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -3299,8 +3298,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -3379,10 +3378,12 @@ components:
       type: object
       properties:
         status:
-          type: string
           const: success
+          type: string
         data:
           type: object
+          properties: {}
+          required: []
       required:
         - status
         - data
@@ -3390,8 +3391,8 @@ components:
       type: object
       properties:
         status:
-          type: string
           const: error
+          type: string
         error:
           type: object
           properties:
@@ -3449,16 +3450,13 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
                       num:
                         type: number
-                        format: double
-                        minimum: -1.7976931348623157e+308
-                        maximum: 1.7976931348623157e+308
                     required:
                       - num
                     examples:
@@ -3480,8 +3478,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -3542,8 +3540,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -3570,8 +3568,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -3638,8 +3636,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -3666,8 +3664,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -3730,8 +3728,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -3758,8 +3756,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -3818,17 +3816,15 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
                       result:
-                        type: integer
-                        format: int64
-                        exclusiveMinimum: 0
-                        maximum: 9007199254740991
                         description: some positive integer
+                        type: integer
+                        exclusiveMaximum: 9007199254740991
                     required:
                       - result
                 required:
@@ -3842,8 +3838,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
