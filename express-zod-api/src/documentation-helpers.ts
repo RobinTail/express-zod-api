@@ -1,12 +1,10 @@
 import type {
-  $ZodChecks,
   $ZodEnum,
   $ZodIntersection,
   $ZodLazy,
   $ZodLiteral,
   $ZodNullable,
   $ZodPipe,
-  $ZodStringFormat,
   $ZodTuple,
   $ZodType,
   JSONSchema,
@@ -339,11 +337,6 @@ const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
       ? detected
       : undefined;
 };
-
-const isCheck = <T extends $ZodChecks>(
-  check: unknown,
-  name: T["_zod"]["def"]["check"],
-): check is T => R.pathEq(name, ["_zod", "def", "check"], check);
 
 const makeSample = (depicted: SchemaObject) => {
   const firstType = (
