@@ -18,7 +18,7 @@ import type {
 import * as R from "ramda";
 import ts from "typescript";
 import { globalRegistry, z } from "zod";
-import { hasCoercion, getTransformedType } from "./common-helpers";
+import { getTransformedType } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand, FileSchema } from "./file-schema";
@@ -76,12 +76,11 @@ const onObject: Producer = (
 ) => {
   const members = Object.entries(def.shape).map<ts.TypeElement>(
     ([key, value]) => {
-      const isOptional =
-        isResponse && hasCoercion(value)
-          ? value instanceof z.ZodOptional
-          : value instanceof z.ZodPromise
-            ? false
-            : (value as z.ZodType).isOptional();
+      const isOptional = isResponse
+        ? value instanceof z.ZodOptional
+        : value instanceof z.ZodPromise
+          ? false
+          : (value as z.ZodType).isOptional();
       const { description: comment, deprecated: isDeprecated } =
         globalRegistry.get(value) || {};
       return makeInterfaceProp(key, next(value), {

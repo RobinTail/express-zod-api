@@ -5,7 +5,6 @@ import {
   getExamples,
   getInput,
   getMessageFromError,
-  hasCoercion,
   makeCleanId,
   ensureError,
   pullExampleProps,
@@ -385,20 +384,6 @@ describe("Common Helpers", () => {
       expect(typeof result.message).toBe("string");
       expect(result.message).toBe(expected);
     });
-  });
-
-  describe("hasCoercion()", () => {
-    test.each([
-      { schema: z.string(), coercion: false },
-      { schema: z.coerce.string(), coercion: true },
-      { schema: z.coerce.boolean(), coercion: true },
-      { schema: z.custom(), coercion: false },
-    ])(
-      "should check the presence and value of coerce prop %#",
-      ({ schema, coercion }) => {
-        expect(hasCoercion(schema)).toBe(coercion);
-      },
-    );
   });
 
   describe("makeCleanId()", () => {

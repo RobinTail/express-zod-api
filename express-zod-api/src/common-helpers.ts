@@ -1,4 +1,3 @@
-import type { $ZodType } from "@zod/core";
 import { Request } from "express";
 import * as R from "ramda";
 import { z } from "zod";
@@ -145,13 +144,6 @@ export const combinations = <T>(
   b: T[],
   merge: (pair: [T, T]) => T,
 ): T[] => (a.length && b.length ? R.xprod(a, b).map(merge) : a.concat(b));
-
-/**
- * @desc isNullable() and isOptional() validate the schema's input
- * @desc They always return true in case of coercion, which should be taken into account when depicting response
- */
-export const hasCoercion = ({ _zod: { def } }: $ZodType): boolean =>
-  "coerce" in def && def.coerce === true;
 
 export const ucFirst = (subject: string) =>
   subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
