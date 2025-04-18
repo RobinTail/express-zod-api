@@ -12,7 +12,6 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictTags,
-  depictUpload,
   depictRaw,
   depicters,
   ensureShortDescription,
@@ -150,11 +149,11 @@ describe("Documentation helpers", () => {
 
   describe("depictUpload()", () => {
     test("should set format:binary and type:string", () => {
-      expect(depictUpload(ez.upload(), requestCtx)).toMatchSnapshot();
+      expect(delegate(ez.upload(), requestCtx)).toMatchSnapshot();
     });
     test("should throw when using in response", () => {
       expect(() =>
-        depictUpload(ez.upload(), responseCtx),
+        delegate(ez.upload(), responseCtx),
       ).toThrowErrorMatchingSnapshot();
     });
   });

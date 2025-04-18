@@ -60,7 +60,7 @@ import {
   walkSchema,
 } from "./schema-walker";
 import { Security } from "./security";
-import { ezUploadBrand, UploadSchema } from "./upload-schema";
+import { ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
 
 export interface OpenAPIContext extends FlatObject {
@@ -215,41 +215,49 @@ export const delegate: Depicter = (schema, ctx) =>
             }
           }
         }
-        if (brand === ezDateInBrand) {
-          if (ctx.isResponse) {
-            throw new DocumentationError(
-              "Please use ez.dateOut() for output.",
-              ctx,
-            );
-          }
-          delete jsonSchema.oneOf; // undo default
-          Object.assign(jsonSchema, {
-            description: "YYYY-MM-DDTHH:mm:ss.sssZ",
-            type: "string",
-            format: "date-time",
-            pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/
-              .source,
-            externalDocs: {
-              url: isoDateDocumentationUrl,
-            },
-          });
+      }
+      if (brand === ezDateInBrand) {
+        if (ctx.isResponse) {
+          throw new DocumentationError(
+            "Please use ez.dateOut() for output.",
+            ctx,
+          );
         }
-        if (brand === ezDateOutBrand) {
-          if (!ctx.isResponse) {
-            throw new DocumentationError(
-              "Please use ez.dateIn() for input.",
-              ctx,
-            );
-          }
-          Object.assign(jsonSchema, {
-            description: "YYYY-MM-DDTHH:mm:ss.sssZ",
-            type: "string",
-            format: "date-time",
-            externalDocs: {
-              url: isoDateDocumentationUrl,
-            },
-          });
+        delete jsonSchema.oneOf; // undo default
+        Object.assign(jsonSchema, {
+          description: "YYYY-MM-DDTHH:mm:ss.sssZ",
+          type: "string",
+          format: "date-time",
+          pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
+          externalDocs: {
+            url: isoDateDocumentationUrl,
+          },
+        });
+      }
+      if (brand === ezDateOutBrand) {
+        if (!ctx.isResponse) {
+          throw new DocumentationError(
+            "Please use ez.dateIn() for input.",
+            ctx,
+          );
         }
+        Object.assign(jsonSchema, {
+          description: "YYYY-MM-DDTHH:mm:ss.sssZ",
+          type: "string",
+          format: "date-time",
+          externalDocs: {
+            url: isoDateDocumentationUrl,
+          },
+        });
+      }
+      if (brand === ezUploadBrand) {
+        if (ctx.isResponse) {
+          throw new DocumentationError(
+            "Please use ez.upload() only for input.",
+            ctx,
+          );
+        }
+        Object.assign(jsonSchema, { type: "string", format: "binary" });
       }
       // on each
       const examples = getExamples({
@@ -260,12 +268,6 @@ export const delegate: Depicter = (schema, ctx) =>
       if (examples.length) jsonSchema.examples = examples.slice();
     },
   }) as SchemaObject;
-
-export const depictUpload: Depicter = ({}: UploadSchema, ctx) => {
-  if (ctx.isResponse)
-    throw new DocumentationError("Please use ez.upload() only for input.", ctx);
-  return { type: "string", format: "binary" };
-};
 
 export const depictFile: Depicter = (schema: FileSchema) => {
   return {
@@ -500,7 +502,7 @@ export const depicters: HandlingRules<
   lazy: delegate,
   readonly: delegate,
   [ezFileBrand]: depictFile,
-  [ezUploadBrand]: depictUpload,
+  [ezUploadBrand]: delegate,
   [ezDateOutBrand]: delegate,
   [ezDateInBrand]: delegate,
   [ezRawBrand]: depictRaw,
