@@ -117,7 +117,7 @@ export const delegate: Depicter = (schema, ctx) =>
   z.toJSONSchema(schema, {
     unrepresentable: "any",
     metadata: globalRegistry,
-    pipes: ctx.isResponse ? "output" : "input",
+    io: ctx.isResponse ? "output" : "input",
     override: ({ zodSchema, jsonSchema }) => {
       const brand = globalRegistry.get(zodSchema)?.[metaSymbol]?.brand;
       if (zodSchema._zod.def.type === "nullable") {
