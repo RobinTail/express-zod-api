@@ -1415,49 +1415,30 @@ paths:
               properties:
                 double:
                   type: number
-                  format: double
-                  minimum: -1.7976931348623157e+308
-                  maximum: 1.7976931348623157e+308
                 doublePositive:
                   type: number
-                  format: double
-                  exclusiveMinimum: 0
-                  maximum: 1.7976931348623157e+308
                 doubleNegative:
                   type: number
-                  format: double
-                  minimum: -1.7976931348623157e+308
-                  exclusiveMaximum: 0
                 doubleLimited:
                   type: number
-                  format: double
                   minimum: -0.5
                   maximum: 0.5
                 int:
                   type: integer
-                  format: int64
-                  minimum: -9007199254740991
-                  maximum: 9007199254740991
+                  exclusiveMinimum: -9007199254740991
+                  exclusiveMaximum: 9007199254740991
                 intPositive:
                   type: integer
-                  format: int64
-                  exclusiveMinimum: 0
-                  maximum: 9007199254740991
+                  exclusiveMaximum: 9007199254740991
                 intNegative:
                   type: integer
-                  format: int64
-                  minimum: -9007199254740991
-                  exclusiveMaximum: 0
+                  exclusiveMinimum: -9007199254740991
                 intLimited:
                   type: integer
-                  format: int64
                   minimum: -100
                   maximum: 100
                 zero:
                   type: integer
-                  format: int64
-                  minimum: 0
-                  maximum: 0
               required:
                 - double
                 - doublePositive
@@ -1477,8 +1458,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -1498,8 +1479,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -1714,8 +1695,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -1737,8 +1718,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -2030,9 +2011,7 @@ paths:
                     - type: boolean
                     - type: string
                     - type: integer
-                      format: int64
-                      exclusiveMinimum: 0
-                      maximum: 9007199254740991
+                      exclusiveMaximum: 9007199254740991
                   items:
                     not: {}
               required:
@@ -2049,8 +2028,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -2072,8 +2051,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -2131,13 +2110,15 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
                       any:
                         format: any
+                    required:
+                      - any
                 required:
                   - status
                   - data
@@ -2149,8 +2130,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
