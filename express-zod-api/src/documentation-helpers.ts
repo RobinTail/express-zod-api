@@ -120,17 +120,13 @@ export const delegate: Depicter = (schema, ctx) =>
     io: ctx.isResponse ? "output" : "input",
     override: ({ zodSchema, jsonSchema }) => {
       const brand = globalRegistry.get(zodSchema)?.[metaSymbol]?.brand;
-      if (zodSchema._zod.def.type === "nullable") {
-        const nested = delegate(
-          (zodSchema as $ZodNullable)._zod.def.innerType,
-          ctx,
-        );
+      if (zodSchema._zod.def.type === "nullable" && jsonSchema.oneOf) {
+        const original = jsonSchema.oneOf[0];
+        Object.assign(original, {
+          type: makeNullableType(original as SchemaObject), // @todo remove "as"
+        });
+        Object.assign(jsonSchema, original);
         delete jsonSchema.oneOf; // undo defaults
-        Object.assign(
-          jsonSchema,
-          nested,
-          isSchemaObject(nested) && { type: makeNullableType(nested) },
-        );
       }
       if (zodSchema._zod.def.type === "default") {
         jsonSchema.default =
