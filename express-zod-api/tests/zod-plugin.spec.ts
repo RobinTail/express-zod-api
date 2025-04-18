@@ -67,10 +67,7 @@ describe("Zod Runtime Plugin", () => {
     test("should set the corresponding metadata in the schema definition", () => {
       const schema = z.string();
       const schemaWithMeta = schema.deprecated();
-      expect(schemaWithMeta.meta()?.[metaSymbol]).toHaveProperty(
-        "isDeprecated",
-        true,
-      );
+      expect(schemaWithMeta.meta()).toHaveProperty("deprecated", true);
     });
   });
 
