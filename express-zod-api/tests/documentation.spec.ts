@@ -379,9 +379,8 @@ describe("Documentation", () => {
                 url: z.url(),
                 numeric: z.string().regex(/\d+/),
                 combined: z
-                  .string()
-                  .min(1)
                   .email()
+                  .min(1)
                   .regex(/.*@example\.com/is)
                   .max(90),
               }),
