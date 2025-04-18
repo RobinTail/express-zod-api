@@ -42,8 +42,8 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource } from "./config-type";
-import { DateInSchema, ezDateInBrand } from "./date-in-schema";
-import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
+import { ezDateInBrand } from "./date-in-schema";
+import { ezDateOutBrand } from "./date-out-schema";
 import { hasRaw } from "./deep-checks";
 import { DocumentationError } from "./errors";
 import { ezFileBrand, FileSchema } from "./file-schema";
@@ -120,6 +120,7 @@ export const delegate: Depicter = (schema, ctx) =>
     metadata: globalRegistry,
     pipes: ctx.isResponse ? "output" : "input",
     override: ({ zodSchema, jsonSchema }) => {
+      const brand = globalRegistry.get(zodSchema)?.[metaSymbol]?.brand;
       if (zodSchema._zod.def.type === "nullable") {
         const nested = delegate(
           (zodSchema as $ZodNullable)._zod.def.innerType,
@@ -180,16 +181,6 @@ export const delegate: Depicter = (schema, ctx) =>
           ),
         );
       }
-      if (zodSchema._zod.def.type === "date") {
-        throw new DocumentationError(
-          `Using z.date() within ${
-            ctx.isResponse ? "output" : "input"
-          } schema is forbidden. Please use ez.date${
-            ctx.isResponse ? "Out" : "In"
-          }() instead. Check out the documentation for details.`,
-          ctx,
-        );
-      }
       if (zodSchema._zod.def.type === "pipe") {
         const target = (zodSchema as $ZodPipe)._zod.def[
           ctx.isResponse ? "out" : "in"
@@ -223,6 +214,41 @@ export const delegate: Depicter = (schema, ctx) =>
               }
             }
           }
+        }
+        if (brand === ezDateInBrand) {
+          if (ctx.isResponse) {
+            throw new DocumentationError(
+              "Please use ez.dateOut() for output.",
+              ctx,
+            );
+          }
+          delete jsonSchema.oneOf; // undo default
+          Object.assign(jsonSchema, {
+            description: "YYYY-MM-DDTHH:mm:ss.sssZ",
+            type: "string",
+            format: "date-time",
+            pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/
+              .source,
+            externalDocs: {
+              url: isoDateDocumentationUrl,
+            },
+          });
+        }
+        if (brand === ezDateOutBrand) {
+          if (!ctx.isResponse) {
+            throw new DocumentationError(
+              "Please use ez.dateIn() for input.",
+              ctx,
+            );
+          }
+          Object.assign(jsonSchema, {
+            description: "YYYY-MM-DDTHH:mm:ss.sssZ",
+            type: "string",
+            format: "date-time",
+            externalDocs: {
+              url: isoDateDocumentationUrl,
+            },
+          });
         }
       }
       // on each
@@ -305,33 +331,6 @@ const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
     : isSupported
       ? detected
       : undefined;
-};
-
-export const depictDateIn: Depicter = ({}: DateInSchema, ctx) => {
-  if (ctx.isResponse)
-    throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  return {
-    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
-    type: "string",
-    format: "date-time",
-    pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
-    externalDocs: {
-      url: isoDateDocumentationUrl,
-    },
-  };
-};
-
-export const depictDateOut: Depicter = ({}: DateOutSchema, ctx) => {
-  if (!ctx.isResponse)
-    throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
-  return {
-    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
-    type: "string",
-    format: "date-time",
-    externalDocs: {
-      url: isoDateDocumentationUrl,
-    },
-  };
 };
 
 const isCheck = <T extends $ZodChecks>(
@@ -502,8 +501,8 @@ export const depicters: HandlingRules<
   readonly: delegate,
   [ezFileBrand]: depictFile,
   [ezUploadBrand]: depictUpload,
-  [ezDateOutBrand]: depictDateOut,
-  [ezDateInBrand]: depictDateIn,
+  [ezDateOutBrand]: delegate,
+  [ezDateInBrand]: delegate,
   [ezRawBrand]: depictRaw,
 };
 

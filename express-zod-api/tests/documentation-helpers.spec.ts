@@ -5,8 +5,6 @@ import { z } from "zod";
 import { ez } from "../src";
 import {
   OpenAPIContext,
-  depictDateIn,
-  depictDateOut,
   depictExamples,
   depictFile,
   depictParamExamples,
@@ -670,22 +668,22 @@ describe("Documentation helpers", () => {
 
   describe("depictDateIn", () => {
     test("should set type:string, pattern and format", () => {
-      expect(depictDateIn(ez.dateIn(), requestCtx)).toMatchSnapshot();
+      expect(delegate(ez.dateIn(), requestCtx)).toMatchSnapshot();
     });
     test("should throw when ZodDateIn in response", () => {
       expect(() =>
-        depictDateIn(ez.dateIn(), responseCtx),
+        delegate(ez.dateIn(), responseCtx),
       ).toThrowErrorMatchingSnapshot();
     });
   });
 
   describe("depictDateOut", () => {
     test("should set type:string, description and format", () => {
-      expect(depictDateOut(ez.dateOut(), responseCtx)).toMatchSnapshot();
+      expect(delegate(ez.dateOut(), responseCtx)).toMatchSnapshot();
     });
     test("should throw when ZodDateOut in request", () => {
       expect(() =>
-        depictDateOut(ez.dateOut(), requestCtx),
+        delegate(ez.dateOut(), requestCtx),
       ).toThrowErrorMatchingSnapshot();
     });
   });

@@ -1156,6 +1156,7 @@ paths:
                   format: bigint
                 boolean:
                   type: boolean
+                  readOnly: true
                 dateIn:
                   description: YYYY-MM-DDTHH:mm:ss.sssZ
                   type: string
@@ -1177,17 +1178,17 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
                       "null":
                         type: "null"
                       dateOut:
+                        format: date-time
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string
-                        format: date-time
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                     required:
@@ -1204,8 +1205,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -1924,9 +1925,7 @@ paths:
                   type: string
                 two:
                   type: integer
-                  format: int64
-                  exclusiveMinimum: 0
-                  maximum: 9007199254740991
+                  exclusiveMaximum: 9007199254740991
               required:
                 - one
                 - two
@@ -1940,8 +1939,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -1960,8 +1959,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
