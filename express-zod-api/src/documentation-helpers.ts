@@ -706,7 +706,7 @@ export const depictRequestParams = ({
       return acc.concat({
         name,
         in: location,
-        deprecated: globalRegistry.get(paramSchema)?.[metaSymbol]?.isDeprecated,
+        deprecated: globalRegistry.get(paramSchema)?.deprecated,
         required: !(paramSchema as z.ZodType).isOptional(),
         description: depicted.description || description,
         schema: result,
@@ -769,7 +769,7 @@ export const onEach: SchemaHandler<
     schema.isNullable();
   const result: SchemaObject = {};
   if (description) result.description = description;
-  if (schema.meta()?.[metaSymbol]?.isDeprecated) result.deprecated = true;
+  if (schema.meta()?.deprecated) result.deprecated = true;
   if (isActuallyNullable) result.type = makeNullableType(prev);
   if (!shouldAvoidParsing) {
     const examples = getExamples({

@@ -9,7 +9,6 @@ export interface Metadata {
   /** @override ZodDefault::_zod.def.defaultValue() in depictDefault */
   defaultLabel?: string;
   brand?: string | number | symbol;
-  isDeprecated?: boolean;
 }
 
 export const copyMeta = <A extends z.ZodType, B extends z.ZodType>(

@@ -22,7 +22,6 @@ import { hasCoercion, getTransformedType } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand, FileSchema } from "./file-schema";
-import { metaSymbol } from "./metadata";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand, RawSchema } from "./raw-schema";
 import { FirstPartyKind, HandlingRules, walkSchema } from "./schema-walker";
@@ -83,11 +82,12 @@ const onObject: Producer = (
           : value instanceof z.ZodPromise
             ? false
             : (value as z.ZodType).isOptional();
-      const { description: comment, ...meta } = globalRegistry.get(value) || {};
+      const { description: comment, deprecated: isDeprecated } =
+        globalRegistry.get(value) || {};
       return makeInterfaceProp(key, next(value), {
         comment,
+        isDeprecated,
         isOptional: isOptional && hasQuestionMark,
-        isDeprecated: meta[metaSymbol]?.isDeprecated,
       });
     },
   );
