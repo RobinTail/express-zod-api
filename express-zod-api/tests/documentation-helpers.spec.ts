@@ -688,15 +688,6 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictDate", () => {
-    test.each([responseCtx, requestCtx])(
-      "should throw clear error %#",
-      (ctx) => {
-        expect(() => delegate(z.date(), ctx)).toThrowErrorMatchingSnapshot();
-      },
-    );
-  });
-
   describe("depictLazy", () => {
     const recursiveArray: z.ZodLazy = z.lazy(() => recursiveArray.array());
     const directlyRecursive: z.ZodLazy = z.lazy(() => directlyRecursive);
