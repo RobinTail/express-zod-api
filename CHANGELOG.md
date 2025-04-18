@@ -2,6 +2,10 @@
 
 ## Version 23
 
+### v23.1.1
+
+- Fixed: coerced types in response were marked as nullable.
+
 ### v23.1.0
 
 - Improved generated Documentation:
