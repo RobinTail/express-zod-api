@@ -1,4 +1,3 @@
-import type { $ZodType } from "@zod/core";
 import {
   OpenApiBuilder,
   OperationObject,
@@ -87,22 +86,12 @@ interface DocumentationParams {
 export class Documentation extends OpenApiBuilder {
   readonly #lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   readonly #lastOperationIdSuffixes = new Map<string, number>();
-  readonly #references = new Map<$ZodType | (() => $ZodType), string>();
 
   #makeRef(
-    schema: $ZodType | (() => $ZodType),
-    subject:
-      | SchemaObject
-      | ReferenceObject
-      | (() => SchemaObject | ReferenceObject),
-    name = this.#references.get(schema),
+    subject: SchemaObject | ReferenceObject,
+    name = `Schema${Object.keys(this.rootDoc.components?.schemas || {}).length + 1}`,
   ): ReferenceObject {
-    if (!name) {
-      name = `Schema${this.#references.size + 1}`;
-      this.#references.set(schema, name);
-      if (typeof subject === "function") subject = subject();
-    }
-    if (typeof subject === "object") this.addSchema(name, subject);
+    this.addSchema(name, subject);
     return { $ref: `#/components/schemas/${name}` };
   }
 

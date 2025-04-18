@@ -684,32 +684,6 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictLazy", () => {
-    const recursiveArray: z.ZodLazy = z.lazy(() => recursiveArray.array());
-    const directlyRecursive: z.ZodLazy = z.lazy(() => directlyRecursive);
-    const recursiveObject: z.ZodLazy = z.lazy(() =>
-      z.object({ prop: recursiveObject }),
-    );
-
-    test.each([recursiveArray, directlyRecursive, recursiveObject])(
-      "should handle circular references %#",
-      (schema) => {
-        makeRefMock.mockImplementationOnce(
-          (): ReferenceObject => ({
-            $ref: "#/components/schemas/SomeSchema",
-          }),
-        );
-        expect(makeRefMock).not.toHaveBeenCalled();
-        expect(delegate(schema, responseCtx)).toMatchSnapshot();
-        expect(makeRefMock).toHaveBeenCalledTimes(1);
-        expect(makeRefMock).toHaveBeenCalledWith(
-          schema._zod.def.getter,
-          expect.any(Function),
-        );
-      },
-    );
-  });
-
   describe("depictSecurity()", () => {
     test("should handle Basic, Bearer and Header Securities", () => {
       expect(

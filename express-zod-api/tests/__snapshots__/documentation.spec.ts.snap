@@ -1286,21 +1286,13 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
                       zodExample:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          subcategories:
-                            $ref: "#/components/schemas/Schema1"
-                        required:
-                          - name
-                          - subcategories
+                        $ref: "#/components/schemas/__schema0"
                     required:
                       - zodExample
                 required:
@@ -1314,8 +1306,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -1334,18 +1326,18 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    Schema1:
-      type: array
-      items:
-        type: object
-        properties:
-          name:
-            type: string
-          subcategories:
-            $ref: "#/components/schemas/Schema1"
-        required:
-          - name
-          - subcategories
+    __schema0:
+      type: object
+      properties:
+        name:
+          type: string
+        subcategories:
+          type: array
+          items:
+            $ref: "#/components/schemas/__schema0"
+      required:
+        - name
+        - subcategories
   responses: {}
   parameters: {}
   examples: {}

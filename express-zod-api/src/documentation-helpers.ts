@@ -1,10 +1,8 @@
 import type {
   $ZodEnum,
-  $ZodLazy,
   $ZodLiteral,
   $ZodPipe,
   $ZodTuple,
-  $ZodType,
   JSONSchema,
 } from "@zod/core";
 import {
@@ -62,11 +60,7 @@ import wellKnownHeaders from "./well-known-headers.json";
 export interface OpenAPIContext extends FlatObject {
   isResponse: boolean;
   makeRef: (
-    schema: $ZodType | (() => $ZodType),
-    subject:
-      | SchemaObject
-      | ReferenceObject
-      | (() => SchemaObject | ReferenceObject),
+    subject: SchemaObject | ReferenceObject,
     name?: string,
   ) => ReferenceObject;
   path: string;
@@ -110,8 +104,8 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const delegate: Depicter = (schema, ctx) =>
-  z.toJSONSchema(schema, {
+export const delegate: Depicter = (schema, ctx) => {
+  const result = z.toJSONSchema(schema, {
     unrepresentable: "any",
     metadata: globalRegistry,
     io: ctx.isResponse ? "output" : "input",
@@ -158,15 +152,6 @@ export const delegate: Depicter = (schema, ctx) =>
       ) {
         // does not appear to support items:false, so not:{} is a recommended alias
         jsonSchema.items = { not: {} };
-      }
-      if (zodSchema._zod.def.type === "lazy") {
-        for (const prop in jsonSchema) delete jsonSchema[prop]; // undo all
-        Object.assign(
-          jsonSchema,
-          ctx.makeRef((zodSchema as $ZodLazy)._zod.def.getter, () =>
-            delegate((zodSchema as $ZodLazy)._zod.def.getter(), ctx),
-          ),
-        );
       }
       if (zodSchema._zod.def.type === "pipe") {
         const target = (zodSchema as $ZodPipe)._zod.def[
@@ -288,7 +273,32 @@ export const delegate: Depicter = (schema, ctx) =>
       });
       if (examples.length) jsonSchema.examples = examples.slice();
     },
-  }) as SchemaObject;
+  });
+  const { $defs, ...rest } = result;
+
+  /**
+   * postprocessing refs: specifying "uri" function and custom registries didn't allow to customize ref name
+   * @todo is there a less hacky way to do that?
+   * */
+  const stack: unknown[] = [rest, $defs];
+  while (stack.length) {
+    const entry = stack.shift()!;
+    if (R.is(Object, entry)) {
+      if (isReferenceObject(entry) && !entry.$ref.startsWith("#/components")) {
+        const actualName = entry.$ref.split("/").pop()!;
+        const depiction = $defs?.[actualName];
+        if (depiction)
+          entry.$ref = ctx.makeRef(depiction as SchemaObject, actualName).$ref; // @todo remove as
+        continue;
+      }
+      stack.push(...R.values(entry));
+    }
+    if (R.is(Array, entry)) stack.push(...R.values(entry));
+  }
+  // ^^
+
+  return rest as SchemaObject;
+};
 
 const propsMerger = (a: unknown, b: unknown) => {
   if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
@@ -456,7 +466,7 @@ export const depictRequestParams = ({
       });
       const result =
         composition === "components"
-          ? makeRef(paramSchema, depicted, makeCleanId(description, name))
+          ? makeRef(depicted, makeCleanId(description, name))
           : depicted;
       return acc.concat({
         name,
@@ -607,7 +617,7 @@ export const depictResponse = ({
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, depictedSchema, makeCleanId(description))
+        ? makeRef(depictedSchema, makeCleanId(description))
         : depictedSchema,
     examples: depictExamples(schema, true),
   };
@@ -733,7 +743,7 @@ export const depictBody = ({
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, bodyDepiction, makeCleanId(description))
+        ? makeRef(bodyDepiction, makeCleanId(description))
         : bodyDepiction,
     examples: depictExamples(extractObjectSchema(schema), false, paramNames),
   };
