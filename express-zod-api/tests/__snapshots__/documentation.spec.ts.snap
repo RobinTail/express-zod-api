@@ -766,6 +766,7 @@ paths:
                             format: any
                         required:
                           - status
+                          - data
                       - type: object
                         properties:
                           status:
@@ -2145,6 +2146,8 @@ paths:
                     properties:
                       any:
                         format: any
+                    required:
+                      - any
                 required:
                   - status
                   - data
@@ -2230,6 +2233,8 @@ paths:
                     properties:
                       boolean:
                         type: boolean
+                    required:
+                      - boolean
                 required:
                   - status
                   - data

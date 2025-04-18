@@ -22,7 +22,6 @@ import {
   combinations,
   getExamples,
   getRoutePathParams,
-  hasCoercion,
   makeCleanId,
   routePathParamsRegex,
   getTransformedType,
@@ -253,9 +252,7 @@ export const depictObject: Depicter = (
 ) => {
   const keys = Object.keys(schema.shape);
   const isOptionalProp = (prop: z.ZodTypeAny) =>
-    isResponse && hasCoercion(prop)
-      ? prop instanceof z.ZodOptional
-      : prop.isOptional();
+    isResponse ? prop instanceof z.ZodOptional : prop.isOptional();
   const required = keys.filter((key) => !isOptionalProp(schema.shape[key]));
   const result: SchemaObject = { type: "object" };
   if (keys.length) result.properties = depictObjectProperties(schema, next);
