@@ -1786,6 +1786,8 @@ paths:
           application/json:
             schema:
               type: object
+              properties: {}
+              required: []
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1795,8 +1797,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -1806,9 +1808,8 @@ paths:
                           type: string
                         additionalProperties:
                           type: integer
-                          format: int64
-                          minimum: -9007199254740991
-                          maximum: 9007199254740991
+                          exclusiveMinimum: -9007199254740991
+                          exclusiveMaximum: 9007199254740991
                       stringy:
                         type: object
                         propertyNames:
@@ -1821,38 +1822,36 @@ paths:
                         type: object
                         propertyNames:
                           type: integer
-                          format: int64
-                          minimum: -9007199254740991
-                          maximum: 9007199254740991
+                          exclusiveMinimum: -9007199254740991
+                          exclusiveMaximum: 9007199254740991
                         additionalProperties:
                           type: boolean
                       literal:
                         type: object
-                        properties:
-                          only:
-                            type: boolean
-                        required:
-                          - only
+                        propertyNames:
+                          const: only
+                          type: string
+                        additionalProperties:
+                          type: boolean
                       union:
                         type: object
-                        properties:
-                          option1:
-                            type: boolean
-                          option2:
-                            type: boolean
-                        required:
-                          - option1
-                          - option2
+                        propertyNames:
+                          oneOf:
+                            - const: option1
+                              type: string
+                            - const: option2
+                              type: string
+                        additionalProperties:
+                          type: boolean
                       enum:
                         type: object
-                        properties:
-                          option1:
-                            type: boolean
-                          option2:
-                            type: boolean
-                        required:
-                          - option1
-                          - option2
+                        propertyNames:
+                          enum:
+                            - option1
+                            - option2
+                          type: string
+                        additionalProperties:
+                          type: boolean
                     required:
                       - simple
                       - stringy
@@ -1871,8 +1870,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -3161,8 +3160,8 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
-            type: string
             deprecated: true
+            type: string
       responses:
         "200":
           description: GET /v1/getSomething Positive response

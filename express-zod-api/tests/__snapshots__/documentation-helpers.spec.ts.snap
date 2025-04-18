@@ -707,7 +707,10 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
       "type": "number",
     },
     "b": {
-      "type": "string",
+      "type": [
+        "string",
+        "null",
+      ],
     },
   },
   "required": [
@@ -1506,7 +1509,10 @@ exports[`Documentation helpers > depictWrapped() > handle readonly 1`] = `
 exports[`Documentation helpers > depictWrapped() > should handle catch 1`] = `
 {
   "default": true,
-  "type": "boolean",
+  "type": [
+    "boolean",
+    "null",
+  ],
 }
 `;
 

@@ -268,6 +268,20 @@ export const delegate: Depicter = (schema, ctx) =>
         delete jsonSchema.required;
       }
       // on each
+      const shouldAvoidParsing =
+        zodSchema._zod.def.type === "lazy" ||
+        zodSchema._zod.def.type === "promise";
+      const hasTypePropertyInDepiction = jsonSchema.type !== undefined;
+      const isActuallyNullable =
+        !ctx.isResponse &&
+        !shouldAvoidParsing &&
+        hasTypePropertyInDepiction &&
+        (zodSchema as z.ZodType).isNullable(); // @todo remove "as"
+      if (isActuallyNullable) {
+        Object.assign(jsonSchema, {
+          type: makeNullableType(jsonSchema as SchemaObject), // @todo remove "as"
+        });
+      }
       const examples = getExamples({
         schema: zodSchema as z.ZodType, // @todo remove "as"
         variant: ctx.isResponse ? "parsed" : "original",
