@@ -5,7 +5,7 @@
 ### v23.1.1
 
 - Fixed: coerced types in response were marked as nullable;
-- Fixed: coerced object properties in response were marked as optional.
+- Fixed: coerced, preprocessed and `z.any()` schemas in response were marked as optional.
 
 ### v23.1.0
 

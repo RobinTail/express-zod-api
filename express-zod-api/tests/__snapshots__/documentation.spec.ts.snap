@@ -2233,6 +2233,8 @@ paths:
                     properties:
                       boolean:
                         type: boolean
+                    required:
+                      - boolean
                 required:
                   - status
                   - data
