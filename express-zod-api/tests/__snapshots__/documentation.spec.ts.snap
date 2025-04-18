@@ -2229,9 +2229,7 @@ paths:
                     type: object
                     properties:
                       boolean:
-                        type:
-                          - boolean
-                          - "null"
+                        type: boolean
                 required:
                   - status
                   - data
