@@ -55,7 +55,6 @@ import {
   combinations,
   getExamples,
   getRoutePathParams,
-  hasCoercion,
   makeCleanId,
   routePathParamsRegex,
   getTransformedType,
@@ -279,7 +278,7 @@ export const depictObject: Depicter = (
 ) => {
   const keys = Object.keys(schema._zod.def.shape);
   const isOptionalProp = (prop: $ZodType) =>
-    isResponse && hasCoercion(prop)
+    isResponse
       ? prop instanceof z.ZodOptional
       : prop instanceof z.ZodPromise
         ? false
