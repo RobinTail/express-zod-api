@@ -156,13 +156,9 @@ export const delegate: Depicter = (schema, ctx) =>
         Object.assign(jsonSchema, attempt);
       }
       if (zodSchema._zod.def.type === "literal") {
-        {
-          jsonSchema.type = getSupportedType(
-            Object.values((zodSchema as $ZodLiteral)._zod.def.values)[0],
-          );
-          //if (values.length === 1) result.const = values[0];
-          //else result.enum = Object.values(def.values);
-        }
+        jsonSchema.type = getSupportedType(
+          Object.values((zodSchema as $ZodLiteral)._zod.def.values)[0],
+        );
       }
       if (
         zodSchema._zod.def.type === "tuple" &&

@@ -310,8 +310,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictLiteral()", () => {
-    // @todo wait for external issue fixed
-    test.each(["testng", null /* BigInt(123), undefined */])(
+    test.each(["testng", null, BigInt(123), undefined])(
       "should set type and involve const property %#",
       (value) => {
         expect(delegate(z.literal(value), requestCtx)).toMatchSnapshot();

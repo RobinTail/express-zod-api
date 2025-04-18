@@ -463,17 +463,12 @@ exports[`Documentation helpers > depictLiteral() > should set type and involve c
 
 exports[`Documentation helpers > depictLiteral() > should set type and involve const property 2 1`] = `
 {
-  "const": 123n,
+  "const": 123,
   "type": "integer",
 }
 `;
 
-exports[`Documentation helpers > depictLiteral() > should set type and involve const property 3 1`] = `
-{
-  "const": undefined,
-  "type": undefined,
-}
-`;
+exports[`Documentation helpers > depictLiteral() > should set type and involve const property 3 1`] = `{}`;
 
 exports[`Documentation helpers > depictNull() > should give type:null 1`] = `
 {
