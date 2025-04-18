@@ -9,6 +9,7 @@ import type {
   $ZodStringFormat,
   $ZodTuple,
   $ZodType,
+  JSONSchema,
 } from "@zod/core";
 import {
   ExamplesObject,
@@ -46,13 +47,13 @@ import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { hasRaw } from "./deep-checks";
 import { DocumentationError } from "./errors";
-import { ezFileBrand, FileSchema } from "./file-schema";
+import { ezFileBrand } from "./file-schema";
 import { extractObjectSchema, IOSchema } from "./io-schema";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
-import { ezRawBrand, RawSchema } from "./raw-schema";
+import { ezRawBrand } from "./raw-schema";
 import {
   FirstPartyKind,
   HandlingRules,
@@ -259,6 +260,26 @@ export const delegate: Depicter = (schema, ctx) =>
         }
         Object.assign(jsonSchema, { type: "string", format: "binary" });
       }
+      if (brand === ezFileBrand) {
+        delete jsonSchema.oneOf; // undo default
+        Object.assign(jsonSchema, {
+          type: "string",
+          format:
+            jsonSchema.type === "string"
+              ? jsonSchema.format === "base64"
+                ? "byte"
+                : "file"
+              : "binary",
+        });
+      }
+      if (brand === ezRawBrand) {
+        Object.assign(
+          jsonSchema,
+          (jsonSchema as JSONSchema.ObjectSchema).properties!.raw,
+        );
+        delete jsonSchema.properties; // undo default
+        delete jsonSchema.required;
+      }
       // on each
       const examples = getExamples({
         schema: zodSchema as z.ZodType, // @todo remove "as"
@@ -268,22 +289,6 @@ export const delegate: Depicter = (schema, ctx) =>
       if (examples.length) jsonSchema.examples = examples.slice();
     },
   }) as SchemaObject;
-
-export const depictFile: Depicter = (schema: FileSchema) => {
-  return {
-    type: "string",
-    format:
-      schema instanceof z.ZodString
-        ? schema._zod.def.checks?.find(
-            (entry) =>
-              isCheck<$ZodStringFormat>(entry, "string_format") &&
-              entry._zod.def.format === "base64",
-          )
-          ? "byte"
-          : "file"
-        : "binary",
-  };
-};
 
 const propsMerger = (a: unknown, b: unknown) => {
   if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
@@ -354,9 +359,6 @@ const makeNullableType = ({
   if (typeof type === "string") return [type, "null"];
   return type ? [...new Set(type).add("null")] : "null";
 };
-
-export const depictRaw: Depicter = ({ _zod: { def } }: RawSchema, { next }) =>
-  next(def.shape.raw);
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
   examples.length
@@ -501,11 +503,11 @@ export const depicters: HandlingRules<
   pipe: delegate,
   lazy: delegate,
   readonly: delegate,
-  [ezFileBrand]: depictFile,
+  [ezFileBrand]: delegate,
   [ezUploadBrand]: delegate,
   [ezDateOutBrand]: delegate,
   [ezDateInBrand]: delegate,
-  [ezRawBrand]: depictRaw,
+  [ezRawBrand]: delegate,
 };
 
 export const onEach: SchemaHandler<

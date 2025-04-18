@@ -6,13 +6,11 @@ import { ez } from "../src";
 import {
   OpenAPIContext,
   depictExamples,
-  depictFile,
   depictParamExamples,
   depictRequestParams,
   depictSecurity,
   depictSecurityRefs,
   depictTags,
-  depictRaw,
   depicters,
   ensureShortDescription,
   excludeExamplesFromDepiction,
@@ -142,7 +140,7 @@ describe("Documentation helpers", () => {
   describe("depictRaw()", () => {
     test("should depict the raw property", () => {
       expect(
-        depictRaw(ez.raw({ extra: z.string() }), requestCtx),
+        delegate(ez.raw({ extra: z.string() }), requestCtx),
       ).toMatchSnapshot();
     });
   });
@@ -166,7 +164,7 @@ describe("Documentation helpers", () => {
       ez.file("string"),
       ez.file("buffer"),
     ])("should set type:string and format accordingly %#", (schema) => {
-      expect(depictFile(schema, responseCtx)).toMatchSnapshot();
+      expect(delegate(schema, responseCtx)).toMatchSnapshot();
     });
   });
 

@@ -217,7 +217,9 @@ exports[`Documentation helpers > depictFile() > should set type:string and forma
 
 exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 2 1`] = `
 {
+  "contentEncoding": "base64",
   "format": "byte",
+  "pattern": "^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$",
   "type": "string",
 }
 `;
