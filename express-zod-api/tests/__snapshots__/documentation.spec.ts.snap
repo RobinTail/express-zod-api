@@ -2656,10 +2656,12 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -2671,8 +2673,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -2744,10 +2746,12 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -2759,8 +2763,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -2830,10 +2834,12 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -2845,8 +2851,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -2894,10 +2900,10 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
+            minItems: 1
             type: array
             items:
               type: string
-            minItems: 1
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -2907,16 +2913,16 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
                       arr:
+                        minItems: 1
                         type: array
                         items:
                           type: string
-                        minItems: 1
                     required:
                       - arr
                 required:
@@ -2930,8 +2936,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -2958,10 +2964,10 @@ paths:
               type: object
               properties:
                 arr:
+                  minItems: 1
                   type: array
                   items:
                     type: string
-                  minItems: 1
               required:
                 - arr
         required: true
@@ -2974,16 +2980,16 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
                       arr:
+                        minItems: 1
                         type: array
                         items:
                           type: string
-                        minItems: 1
                     required:
                       - arr
                 required:
@@ -2997,8 +3003,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -3074,8 +3080,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     oneOf:
                       - type: object
@@ -3107,8 +3113,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -3887,7 +3893,9 @@ paths:
           schema:
             oneOf:
               - const: John
+                type: string
               - const: Jane
+                type: string
       requestBody:
         description: the body of request
         content:
@@ -3909,10 +3917,12 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -3924,8 +3934,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -4005,15 +4015,19 @@ components:
     ParameterOfPostV1NameName:
       oneOf:
         - const: John
+          type: string
         - const: Jane
+          type: string
     SuperPositiveResponseOfV1Name:
       type: object
       properties:
         status:
-          type: string
           const: success
+          type: string
         data:
           type: object
+          properties: {}
+          required: []
       required:
         - status
         - data
@@ -4021,8 +4035,8 @@ components:
       type: object
       properties:
         status:
-          type: string
           const: error
+          type: string
         error:
           type: object
           properties:
@@ -4071,7 +4085,9 @@ paths:
           schema:
             oneOf:
               - const: John
+                type: string
               - const: Jane
+                type: string
         - name: other
           in: query
           required: true
@@ -4087,10 +4103,12 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -4102,8 +4120,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
@@ -4153,7 +4171,9 @@ paths:
           schema:
             oneOf:
               - const: John
+                type: string
               - const: Jane
+                type: string
       requestBody:
         description: POST /v1/:name Request body
         content:
@@ -4175,10 +4195,12 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -4190,8 +4212,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:
