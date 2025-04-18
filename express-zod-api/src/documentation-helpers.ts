@@ -190,6 +190,41 @@ export const delegate: Depicter = (schema, ctx) =>
           ctx,
         );
       }
+      if (zodSchema._zod.def.type === "pipe") {
+        const target = (zodSchema as $ZodPipe)._zod.def[
+          ctx.isResponse ? "out" : "in"
+        ];
+        const opposite = (zodSchema as $ZodPipe)._zod.def[
+          ctx.isResponse ? "in" : "out"
+        ];
+        if (target instanceof z.ZodTransform) {
+          const opposingDepiction = delegate(opposite, ctx);
+          if (isSchemaObject(opposingDepiction)) {
+            if (!ctx.isResponse) {
+              const { type: opposingType, ...rest } = opposingDepiction;
+              Object.assign(jsonSchema, {
+                ...rest,
+                format: `${rest.format || opposingType} (preprocessed)`,
+              });
+            } else {
+              const targetType = getTransformedType(
+                target,
+                makeSample(opposingDepiction),
+              );
+              if (
+                targetType &&
+                ["number", "string", "boolean"].includes(targetType)
+              ) {
+                Object.assign(jsonSchema, {
+                  type: targetType as "number" | "string" | "boolean",
+                });
+              } else {
+                Object.assign(jsonSchema, delegate(z.any(), ctx));
+              }
+            }
+          }
+        }
+      }
       // on each
       const examples = getExamples({
         schema: zodSchema as z.ZodType, // @todo remove "as"
@@ -317,35 +352,6 @@ const makeNullableType = ({
   if (type === "null") return type;
   if (typeof type === "string") return [type, "null"];
   return type ? [...new Set(type).add("null")] : "null";
-};
-
-export const depictPipeline: Depicter = (
-  { _zod: { def } }: $ZodPipe,
-  { isResponse, next },
-) => {
-  const target = def[isResponse ? "out" : "in"];
-  const opposite = def[isResponse ? "in" : "out"];
-  if (target instanceof z.ZodTransform) {
-    const opposingDepiction = next(opposite);
-    if (isSchemaObject(opposingDepiction)) {
-      if (!isResponse) {
-        const { type: opposingType, ...rest } = opposingDepiction;
-        return {
-          ...rest,
-          format: `${rest.format || opposingType} (preprocessed)`,
-        };
-      } else {
-        const targetType = getTransformedType(
-          target,
-          makeSample(opposingDepiction),
-        );
-        if (targetType && ["number", "string", "boolean"].includes(targetType))
-          return { type: targetType as "number" | "string" | "boolean" };
-        else return next(z.any());
-      }
-    }
-  }
-  return next(target);
 };
 
 export const depictRaw: Depicter = ({ _zod: { def } }: RawSchema, { next }) =>
@@ -491,7 +497,7 @@ export const depicters: HandlingRules<
   nullable: delegate,
   date: delegate,
   catch: delegate,
-  pipe: depictPipeline,
+  pipe: delegate,
   lazy: delegate,
   readonly: delegate,
   [ezFileBrand]: depictFile,

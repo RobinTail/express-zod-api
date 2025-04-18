@@ -10,7 +10,6 @@ import {
   depictExamples,
   depictFile,
   depictParamExamples,
-  depictPipeline,
   depictRequestParams,
   depictSecurity,
   depictSecurityRefs,
@@ -490,7 +489,7 @@ describe("Documentation helpers", () => {
       { ctx: requestCtx, expected: "string (in)" },
     ])("should depict as $expected", ({ ctx }) => {
       expect(
-        depictPipeline(z.string().transform(Boolean).pipe(z.boolean()), ctx),
+        delegate(z.string().transform(Boolean).pipe(z.boolean()), ctx),
       ).toMatchSnapshot();
     });
 
@@ -511,14 +510,14 @@ describe("Documentation helpers", () => {
         expected: "string (preprocess)",
       },
     ])("should depict as $expected", ({ schema, ctx }) => {
-      expect(depictPipeline(schema, ctx)).toMatchSnapshot();
+      expect(delegate(schema, ctx)).toMatchSnapshot();
     });
 
     test.each([
       z.number().transform((num) => () => num),
       z.number().transform(() => assert.fail("this should be handled")),
     ])("should handle edge cases", (schema) => {
-      expect(depictPipeline(schema, responseCtx)).toMatchSnapshot();
+      expect(delegate(schema, responseCtx)).toMatchSnapshot();
     });
   });
 
