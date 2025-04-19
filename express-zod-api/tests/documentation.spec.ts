@@ -484,10 +484,13 @@ describe("Documentation", () => {
       const baseCategorySchema = z.object({
         name: z.string(),
       });
-      type Category = z.infer<typeof baseCategorySchema> & {
-        subcategories: Category[];
-      };
-      const categorySchema: z.ZodType<Category> = baseCategorySchema.extend({
+      /**
+       * External issue in core 0.8.0
+       * @link https://github.com/colinhacks/zod/issues/4234
+       * @todo remove let when fixed
+       */
+      let categorySchema = baseCategorySchema;
+      categorySchema = baseCategorySchema.extend({
         subcategories: z.lazy(() => categorySchema.array()),
       });
       const spec = new Documentation({
