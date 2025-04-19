@@ -80,20 +80,6 @@ exports[`Documentation helpers > depictBoolean() > should set type:boolean 1`] =
 }
 `;
 
-exports[`Documentation helpers > depictDate > should throw clear error 0 1`] = `
-DocumentationError({
-  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Using z.date() within output schema is forbidden. Please use ez.dateOut() instead. Check out the documentation for details.",
-})
-`;
-
-exports[`Documentation helpers > depictDate > should throw clear error 1 1`] = `
-DocumentationError({
-  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Using z.date() within input schema is forbidden. Please use ez.dateIn() instead. Check out the documentation for details.",
-})
-`;
-
 exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
@@ -418,24 +404,6 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
 }
 `;
 
-exports[`Documentation helpers > depictLazy > should handle circular references 0 1`] = `
-{
-  "$ref": "#/components/schemas/SomeSchema",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 1 1`] = `
-{
-  "$ref": "#/components/schemas/SomeSchema",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 2 1`] = `
-{
-  "$ref": "#/components/schemas/SomeSchema",
-}
-`;
-
 exports[`Documentation helpers > depictLiteral() > should handle multiple values 1`] = `
 {
   "enum": [
@@ -509,24 +477,6 @@ exports[`Documentation helpers > depictNullable() > should not add null type whe
 }
 `;
 
-exports[`Documentation helpers > depictNumber() > should not use numericRange when it is null 0 1`] = `
-{
-  "format": "double",
-  "maximum": undefined,
-  "minimum": undefined,
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should not use numericRange when it is null 1 1`] = `
-{
-  "format": "int64",
-  "maximum": undefined,
-  "minimum": undefined,
-  "type": "integer",
-}
-`;
-
 exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 0 1`] = `
 {
   "type": "number",
@@ -546,33 +496,6 @@ exports[`Documentation helpers > depictNumber() > should set min/max values acco
   "exclusiveMaximum": 1.7976931348623157e+308,
   "exclusiveMinimum": -1.7976931348623157e+308,
   "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 3 1`] = `
-{
-  "format": "hacked",
-  "maximum": 1.7976931348623157e+308,
-  "minimum": -1.7976931348623157e+308,
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should use numericRange when set 0 1`] = `
-{
-  "format": "double",
-  "maximum": 333.3333333333333,
-  "minimum": -333.3333333333333,
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should use numericRange when set 1 1`] = `
-{
-  "format": "int64",
-  "maximum": 100,
-  "minimum": -100,
-  "type": "integer",
 }
 `;
 
@@ -717,17 +640,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
     "b",
   ],
   "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObjectProperties() > should wrap next depicters in a shape of object 1`] = `
-{
-  "one": {
-    "type": "string",
-  },
-  "two": {
-    "type": "boolean",
-  },
 }
 `;
 
