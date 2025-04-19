@@ -1271,15 +1271,8 @@ paths:
           application/json:
             schema:
               type: object
-              properties:
-                name:
-                  type: string
-                subcategories:
-                  $ref: "#/components/schemas/Schema1"
-              required:
-                - name
-                - subcategories
-        required: true
+              properties: {}
+              required: []
       responses:
         "200":
           description: POST /v1/getSomething Positive response
