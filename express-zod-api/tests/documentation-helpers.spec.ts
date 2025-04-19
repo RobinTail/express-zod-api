@@ -24,14 +24,12 @@ describe("Documentation helpers", () => {
     method: "get",
     isResponse: false,
     makeRef: makeRefMock,
-    jsonSchema: {},
   } satisfies OpenAPIContext;
   const responseCtx = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
     makeRef: makeRefMock,
-    jsonSchema: {},
   } satisfies OpenAPIContext;
 
   beforeEach(() => {

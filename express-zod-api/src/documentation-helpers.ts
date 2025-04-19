@@ -60,14 +60,16 @@ export interface OpenAPIContext {
     name?: string,
   ) => ReferenceObject;
   brandHandling?: Record<string | symbol, Depicter>;
-  jsonSchema: JSONSchema.BaseSchema;
   path: string;
   method: Method;
 }
 
 // @todo update test in index.spec.ts
 // @todo rename to something implying postprocessing instead of depicting
-export type Depicter = (zodSchema: $ZodType, ctx: OpenAPIContext) => void;
+export type Depicter = (
+  zodCtx: { zodSchema: $ZodType; jsonSchema: JSONSchema.BaseSchema },
+  oasCtx: OpenAPIContext,
+) => void;
 
 /** @desc Using defaultIsHeader when returns null or undefined */
 export type IsHeader = (
@@ -103,20 +105,20 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-const onDefault: Depicter = (zodSchema, { jsonSchema }) =>
+const onDefault: Depicter = ({ zodSchema, jsonSchema }) =>
   (jsonSchema.default =
     globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
     jsonSchema.default);
 
-const onAny: Depicter = ({}, { jsonSchema }) => (jsonSchema.format = "any");
+const onAny: Depicter = ({ jsonSchema }) => (jsonSchema.format = "any");
 
-const onUpload: Depicter = ({}, ctx) => {
+const onUpload: Depicter = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.upload() only for input.", ctx);
-  Object.assign(ctx.jsonSchema, { type: "string", format: "binary" });
+  Object.assign(jsonSchema, { type: "string", format: "binary" });
 };
 
-const onFile: Depicter = ({}, { jsonSchema }) => {
+const onFile: Depicter = ({ jsonSchema }) => {
   delete jsonSchema.oneOf; // undo default
   Object.assign(jsonSchema, {
     type: "string",
@@ -129,7 +131,7 @@ const onFile: Depicter = ({}, { jsonSchema }) => {
   });
 };
 
-const onUnion: Depicter = (zodSchema, { jsonSchema }) => {
+const onUnion: Depicter = ({ zodSchema, jsonSchema }) => {
   if (!zodSchema._zod.disc) return;
   const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
   jsonSchema.discriminator = { propertyName };
@@ -170,7 +172,7 @@ const intersect = R.tryCatch(
   (_err, allOf): SchemaObject => ({ allOf }),
 );
 
-const onIntersection: Depicter = ({}, { jsonSchema }) => {
+const onIntersection: Depicter = ({ jsonSchema }) => {
   if (!jsonSchema.allOf) return;
   const attempt = intersect(jsonSchema.allOf as SchemaObject[]); // @todo remove "as"
   delete jsonSchema.allOf; // undo default
@@ -178,7 +180,7 @@ const onIntersection: Depicter = ({}, { jsonSchema }) => {
 };
 
 /** @since OAS 3.1 nullable replaced with type array having null */
-const onNullable: Depicter = ({}, { jsonSchema }) => {
+const onNullable: Depicter = ({ jsonSchema }) => {
   if (!jsonSchema.oneOf) return;
   const original = jsonSchema.oneOf[0];
   Object.assign(original, {
@@ -204,21 +206,21 @@ const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
       : undefined;
 };
 
-const onEnum: Depicter = (zodSchema, { jsonSchema }) =>
+const onEnum: Depicter = ({ zodSchema, jsonSchema }) =>
   (jsonSchema.type = getSupportedType(
     Object.values((zodSchema as $ZodEnum)._zod.def.entries)[0],
   ));
 
-const onLiteral: Depicter = (zodSchema, { jsonSchema }) =>
+const onLiteral: Depicter = ({ zodSchema, jsonSchema }) =>
   (jsonSchema.type = getSupportedType(
     Object.values((zodSchema as $ZodLiteral)._zod.def.values)[0],
   ));
 
-const onDateIn: Depicter = ({}, ctx) => {
+const onDateIn: Depicter = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  delete ctx.jsonSchema.oneOf; // undo default
-  Object.assign(ctx.jsonSchema, {
+  delete jsonSchema.oneOf; // undo default
+  Object.assign(jsonSchema, {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
@@ -229,10 +231,10 @@ const onDateIn: Depicter = ({}, ctx) => {
   });
 };
 
-const onDateOut: Depicter = ({}, ctx) => {
+const onDateOut: Depicter = ({ jsonSchema }, ctx) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
-  Object.assign(ctx.jsonSchema, {
+  Object.assign(jsonSchema, {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
@@ -242,14 +244,14 @@ const onDateOut: Depicter = ({}, ctx) => {
   });
 };
 
-const onBigInt: Depicter = ({}, { jsonSchema }) =>
+const onBigInt: Depicter = ({ jsonSchema }) =>
   Object.assign(jsonSchema, { type: "integer", format: "bigint" });
 
 /**
  * @since OAS 3.1 using prefixItems for depicting tuples
  * @since 17.5.0 added rest handling, fixed tuple type
  */
-const onTuple: Depicter = (zodSchema, { jsonSchema }) => {
+const onTuple: Depicter = ({ zodSchema, jsonSchema }) => {
   if ((zodSchema as $ZodTuple)._zod.def.rest !== null) return;
   // does not appear to support items:false, so not:{} is a recommended alias
   jsonSchema.items = { not: {} };
@@ -270,7 +272,7 @@ const makeNullableType = ({
   return type ? [...new Set(type).add("null")] : "null";
 };
 
-const onPipeline: Depicter = (zodSchema, ctx) => {
+const onPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
   const target = (zodSchema as $ZodPipe)._zod.def[
     ctx.isResponse ? "out" : "in"
   ];
@@ -282,7 +284,7 @@ const onPipeline: Depicter = (zodSchema, ctx) => {
     if (isSchemaObject(opposingDepiction)) {
       if (!ctx.isResponse) {
         const { type: opposingType, ...rest } = opposingDepiction;
-        Object.assign(ctx.jsonSchema, {
+        Object.assign(jsonSchema, {
           ...rest,
           format: `${rest.format || opposingType} (preprocessed)`,
         });
@@ -295,18 +297,18 @@ const onPipeline: Depicter = (zodSchema, ctx) => {
           targetType &&
           ["number", "string", "boolean"].includes(targetType)
         ) {
-          Object.assign(ctx.jsonSchema, {
+          Object.assign(jsonSchema, {
             type: targetType as "number" | "string" | "boolean",
           });
         } else {
-          Object.assign(ctx.jsonSchema, delegate(z.any(), ctx));
+          Object.assign(jsonSchema, delegate(z.any(), ctx));
         }
       }
     }
   }
 };
 
-const onRaw: Depicter = ({}, { jsonSchema }) => {
+const onRaw: Depicter = ({ jsonSchema }) => {
   Object.assign(
     jsonSchema,
     (jsonSchema as JSONSchema.ObjectSchema).properties!.raw,
@@ -433,7 +435,6 @@ export const depictRequestParams = ({
 };
 
 const rules: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> = {
-  // @todo reconsider arguments
   nullable: onNullable,
   default: onDefault,
   any: onAny,
@@ -451,7 +452,7 @@ const rules: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> = {
   [ezRawBrand]: onRaw,
 };
 
-const onEach: Depicter = (zodSchema, { jsonSchema, isResponse }) => {
+const onEach: Depicter = ({ zodSchema, jsonSchema }, { isResponse }) => {
   const { description, deprecated } = globalRegistry.get(zodSchema) ?? {};
   if (description) jsonSchema.description ??= description;
   if (deprecated) jsonSchema.deprecated = true;
@@ -484,18 +485,17 @@ export const delegate = (
     unrepresentable: "any",
     metadata: globalRegistry,
     io: ctx.isResponse ? "output" : "input",
-    override: ({ zodSchema, jsonSchema }) => {
-      const { brand } = globalRegistry.get(zodSchema)?.[metaSymbol] ?? {};
+    override: (zodCtx) => {
+      const { brand } =
+        globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
       const allRules: Record<string | symbol, Depicter> = {
         ...ctx.brandHandling,
         ...rules,
       };
-      allRules[brand && allRules[brand] ? brand : zodSchema._zod.def.type]?.(
-        zodSchema,
-        { ...ctx, jsonSchema },
-      );
-      // on each
-      onEach(zodSchema, { ...ctx, jsonSchema });
+      allRules[
+        brand && allRules[brand] ? brand : zodCtx.zodSchema._zod.def.type
+      ]?.(zodCtx, ctx);
+      onEach(zodCtx, ctx);
     },
   });
   const { $defs, ...rest } = result;
