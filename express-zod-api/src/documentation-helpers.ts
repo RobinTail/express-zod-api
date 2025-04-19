@@ -46,26 +46,28 @@ import { extractObjectSchema, IOSchema } from "./io-schema";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
+import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
+import { FirstPartyKind } from "./schema-walker";
 import { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
 
-export interface OpenAPIContext extends FlatObject {
+export interface OpenAPIContext {
   isResponse: boolean;
   makeRef: (
     subject: SchemaObject | ReferenceObject,
     name?: string,
   ) => ReferenceObject;
   brandHandling?: Record<string | symbol, Depicter>;
+  jsonSchema: JSONSchema.BaseSchema;
   path: string;
   method: Method;
 }
 
-export type Depicter = (
-  zodSchema: $ZodType,
-  ctx: OpenAPIContext,
-) => SchemaObject;
+// @todo update test in index.spec.ts
+// @todo rename to something implying postprocessing instead of depicting
+export type Depicter = (zodSchema: $ZodType, ctx: OpenAPIContext) => void;
 
 /** @desc Using defaultIsHeader when returns null or undefined */
 export type IsHeader = (
@@ -101,181 +103,184 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const delegate: Depicter = (schema, ctx) => {
+const rules: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> = {
+  // @todo reconsider arguments
+  nullable: ({}, { jsonSchema }) => {
+    if (!jsonSchema.oneOf) return;
+    const original = jsonSchema.oneOf[0];
+    Object.assign(original, {
+      type: makeNullableType(original as SchemaObject), // @todo remove "as"
+    });
+    Object.assign(jsonSchema, original);
+    delete jsonSchema.oneOf;
+  },
+  default: (zodSchema, { jsonSchema }) =>
+    (jsonSchema.default =
+      globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
+      jsonSchema.default),
+  any: ({}, { jsonSchema }) => (jsonSchema.format = "any"),
+  union: (zodSchema, { jsonSchema }) => {
+    if (!zodSchema._zod.disc) return;
+    const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
+    jsonSchema.discriminator = { propertyName };
+  },
+  enum: (zodSchema, { jsonSchema }) =>
+    (jsonSchema.type = getSupportedType(
+      Object.values((zodSchema as $ZodEnum)._zod.def.entries)[0],
+    )),
+  bigint: ({}, { jsonSchema }) =>
+    Object.assign(jsonSchema, { type: "integer", format: "bigint" }),
+  intersection: ({}, { jsonSchema }) => {
+    if (!jsonSchema.allOf) return;
+    const attempt = intersect(jsonSchema.allOf as SchemaObject[]); // @todo remove "as"
+    delete jsonSchema.allOf; // undo default
+    Object.assign(jsonSchema, attempt);
+  },
+  literal: (zodSchema, { jsonSchema }) =>
+    (jsonSchema.type = getSupportedType(
+      Object.values((zodSchema as $ZodLiteral)._zod.def.values)[0],
+    )),
+  tuple: (zodSchema, { jsonSchema }) => {
+    if ((zodSchema as $ZodTuple)._zod.def.rest !== null) return;
+    jsonSchema.items = { not: {} };
+  },
+  pipe: (zodSchema, ctx) => {
+    const target = (zodSchema as $ZodPipe)._zod.def[
+      ctx.isResponse ? "out" : "in"
+    ];
+    const opposite = (zodSchema as $ZodPipe)._zod.def[
+      ctx.isResponse ? "in" : "out"
+    ];
+    if (target instanceof z.ZodTransform) {
+      const opposingDepiction = delegate(opposite, ctx);
+      if (isSchemaObject(opposingDepiction)) {
+        if (!ctx.isResponse) {
+          const { type: opposingType, ...rest } = opposingDepiction;
+          Object.assign(ctx.jsonSchema, {
+            ...rest,
+            format: `${rest.format || opposingType} (preprocessed)`,
+          });
+        } else {
+          const targetType = getTransformedType(
+            target,
+            makeSample(opposingDepiction),
+          );
+          if (
+            targetType &&
+            ["number", "string", "boolean"].includes(targetType)
+          ) {
+            Object.assign(ctx.jsonSchema, {
+              type: targetType as "number" | "string" | "boolean",
+            });
+          } else {
+            Object.assign(ctx.jsonSchema, delegate(z.any(), ctx));
+          }
+        }
+      }
+    }
+  },
+  [ezDateInBrand]: ({}, ctx) => {
+    if (ctx.isResponse)
+      throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
+    delete ctx.jsonSchema.oneOf; // undo default
+    Object.assign(ctx.jsonSchema, {
+      description: "YYYY-MM-DDTHH:mm:ss.sssZ",
+      type: "string",
+      format: "date-time",
+      pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
+      externalDocs: {
+        url: isoDateDocumentationUrl,
+      },
+    });
+  },
+  [ezDateOutBrand]: ({}, ctx) => {
+    if (!ctx.isResponse)
+      throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
+    Object.assign(ctx.jsonSchema, {
+      description: "YYYY-MM-DDTHH:mm:ss.sssZ",
+      type: "string",
+      format: "date-time",
+      externalDocs: {
+        url: isoDateDocumentationUrl,
+      },
+    });
+  },
+  [ezUploadBrand]: ({}, ctx) => {
+    if (ctx.isResponse) {
+      throw new DocumentationError(
+        "Please use ez.upload() only for input.",
+        ctx,
+      );
+    }
+    Object.assign(ctx.jsonSchema, { type: "string", format: "binary" });
+  },
+  [ezFileBrand]: ({}, { jsonSchema }) => {
+    delete jsonSchema.oneOf; // undo default
+    Object.assign(jsonSchema, {
+      type: "string",
+      format:
+        jsonSchema.type === "string"
+          ? jsonSchema.format === "base64"
+            ? "byte"
+            : "file"
+          : "binary",
+    });
+  },
+  [ezRawBrand]: ({}, { jsonSchema }) => {
+    Object.assign(
+      jsonSchema,
+      (jsonSchema as JSONSchema.ObjectSchema).properties!.raw,
+    );
+    delete jsonSchema.properties; // undo default
+    delete jsonSchema.required;
+  },
+};
+
+const onEach: Depicter = (zodSchema, { jsonSchema, isResponse }) => {
+  const { description, deprecated } = globalRegistry.get(zodSchema) ?? {};
+  if (description) jsonSchema.description ??= description;
+  if (deprecated) jsonSchema.deprecated = true;
+  const shouldAvoidParsing =
+    zodSchema._zod.def.type === "lazy" || zodSchema._zod.def.type === "promise";
+  const hasTypePropertyInDepiction = jsonSchema.type !== undefined;
+  const acceptsNull =
+    !isResponse &&
+    !shouldAvoidParsing &&
+    hasTypePropertyInDepiction &&
+    (zodSchema as z.ZodType).isNullable(); // @todo remove "as"
+  if (acceptsNull) {
+    Object.assign(jsonSchema, {
+      type: makeNullableType(jsonSchema as SchemaObject), // @todo remove "as"
+    });
+  }
+  const examples = getExamples({
+    schema: zodSchema as z.ZodType, // @todo remove "as"
+    variant: isResponse ? "parsed" : "original",
+    validate: true,
+  });
+  if (examples.length) jsonSchema.examples = examples.slice();
+};
+
+export const delegate = (
+  schema: $ZodType,
+  ctx: Omit<OpenAPIContext, "jsonSchema">, // @todo cleanup the mess
+) => {
   const result = z.toJSONSchema(schema, {
     unrepresentable: "any",
     metadata: globalRegistry,
     io: ctx.isResponse ? "output" : "input",
     override: ({ zodSchema, jsonSchema }) => {
-      const { description, deprecated } = globalRegistry.get(zodSchema) ?? {};
-      const { brand, defaultLabel } =
-        globalRegistry.get(zodSchema)?.[metaSymbol] ?? {};
-      if (zodSchema._zod.def.type === "nullable" && jsonSchema.oneOf) {
-        const original = jsonSchema.oneOf[0];
-        Object.assign(original, {
-          type: makeNullableType(original as SchemaObject), // @todo remove "as"
-        });
-        Object.assign(jsonSchema, original);
-        delete jsonSchema.oneOf; // undo defaults
-      }
-      if (zodSchema._zod.def.type === "default")
-        jsonSchema.default = defaultLabel ?? jsonSchema.default;
-
-      if (zodSchema._zod.def.type === "any") jsonSchema.format = "any";
-      if (zodSchema._zod.def.type === "union" && zodSchema._zod.disc) {
-        const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
-        jsonSchema.discriminator = { propertyName };
-      }
-      if (zodSchema._zod.def.type === "enum") {
-        jsonSchema.type = getSupportedType(
-          Object.values((zodSchema as $ZodEnum)._zod.def.entries)[0],
-        );
-      }
-      if (zodSchema._zod.def.type === "bigint")
-        Object.assign(jsonSchema, { type: "integer", format: "bigint" });
-      if (zodSchema._zod.def.type === "intersection" && jsonSchema.allOf) {
-        const attempt = intersect(jsonSchema.allOf as SchemaObject[]); // @todo remove "as"
-        delete jsonSchema.allOf; // undo default
-        Object.assign(jsonSchema, attempt);
-      }
-      if (zodSchema._zod.def.type === "literal") {
-        jsonSchema.type = getSupportedType(
-          Object.values((zodSchema as $ZodLiteral)._zod.def.values)[0],
-        );
-      }
-      if (
-        zodSchema._zod.def.type === "tuple" &&
-        (zodSchema as $ZodTuple)._zod.def.rest === null
-      ) {
-        // does not appear to support items:false, so not:{} is a recommended alias
-        jsonSchema.items = { not: {} };
-      }
-      if (zodSchema._zod.def.type === "pipe") {
-        const target = (zodSchema as $ZodPipe)._zod.def[
-          ctx.isResponse ? "out" : "in"
-        ];
-        const opposite = (zodSchema as $ZodPipe)._zod.def[
-          ctx.isResponse ? "in" : "out"
-        ];
-        if (target instanceof z.ZodTransform) {
-          const opposingDepiction = delegate(opposite, ctx);
-          if (isSchemaObject(opposingDepiction)) {
-            if (!ctx.isResponse) {
-              const { type: opposingType, ...rest } = opposingDepiction;
-              Object.assign(jsonSchema, {
-                ...rest,
-                format: `${rest.format || opposingType} (preprocessed)`,
-              });
-            } else {
-              const targetType = getTransformedType(
-                target,
-                makeSample(opposingDepiction),
-              );
-              if (
-                targetType &&
-                ["number", "string", "boolean"].includes(targetType)
-              ) {
-                Object.assign(jsonSchema, {
-                  type: targetType as "number" | "string" | "boolean",
-                });
-              } else {
-                Object.assign(jsonSchema, delegate(z.any(), ctx));
-              }
-            }
-          }
-        }
-      }
-      if (brand === ezDateInBrand) {
-        if (ctx.isResponse) {
-          throw new DocumentationError(
-            "Please use ez.dateOut() for output.",
-            ctx,
-          );
-        }
-        delete jsonSchema.oneOf; // undo default
-        Object.assign(jsonSchema, {
-          description: "YYYY-MM-DDTHH:mm:ss.sssZ",
-          type: "string",
-          format: "date-time",
-          pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
-          externalDocs: {
-            url: isoDateDocumentationUrl,
-          },
-        });
-      }
-      if (brand === ezDateOutBrand) {
-        if (!ctx.isResponse) {
-          throw new DocumentationError(
-            "Please use ez.dateIn() for input.",
-            ctx,
-          );
-        }
-        Object.assign(jsonSchema, {
-          description: "YYYY-MM-DDTHH:mm:ss.sssZ",
-          type: "string",
-          format: "date-time",
-          externalDocs: {
-            url: isoDateDocumentationUrl,
-          },
-        });
-      }
-      if (brand === ezUploadBrand) {
-        if (ctx.isResponse) {
-          throw new DocumentationError(
-            "Please use ez.upload() only for input.",
-            ctx,
-          );
-        }
-        Object.assign(jsonSchema, { type: "string", format: "binary" });
-      }
-      if (brand === ezFileBrand) {
-        delete jsonSchema.oneOf; // undo default
-        Object.assign(jsonSchema, {
-          type: "string",
-          format:
-            jsonSchema.type === "string"
-              ? jsonSchema.format === "base64"
-                ? "byte"
-                : "file"
-              : "binary",
-        });
-      }
-      if (brand === ezRawBrand) {
-        Object.assign(
-          jsonSchema,
-          (jsonSchema as JSONSchema.ObjectSchema).properties!.raw,
-        );
-        delete jsonSchema.properties; // undo default
-        delete jsonSchema.required;
-      }
-      // custom brands handling
-      if (brand && ctx.brandHandling && ctx.brandHandling[brand]) {
-        for (const key in jsonSchema) delete jsonSchema[key]; // undo default
-        Object.assign(jsonSchema, ctx.brandHandling[brand](zodSchema, ctx));
-      }
+      const { brand } = globalRegistry.get(zodSchema)?.[metaSymbol] ?? {};
+      const allRules: Record<string | symbol, Depicter> = {
+        ...ctx.brandHandling,
+        ...rules,
+      };
+      allRules[brand && allRules[brand] ? brand : zodSchema._zod.def.type]?.(
+        zodSchema,
+        { ...ctx, jsonSchema },
+      );
       // on each
-      if (description) jsonSchema.description ??= description;
-      if (deprecated) jsonSchema.deprecated = true;
-      const shouldAvoidParsing =
-        zodSchema._zod.def.type === "lazy" ||
-        zodSchema._zod.def.type === "promise";
-      const hasTypePropertyInDepiction = jsonSchema.type !== undefined;
-      const acceptsNull =
-        !ctx.isResponse &&
-        !shouldAvoidParsing &&
-        hasTypePropertyInDepiction &&
-        (zodSchema as z.ZodType).isNullable(); // @todo remove "as"
-      if (acceptsNull) {
-        Object.assign(jsonSchema, {
-          type: makeNullableType(jsonSchema as SchemaObject), // @todo remove "as"
-        });
-      }
-      const examples = getExamples({
-        schema: zodSchema as z.ZodType, // @todo remove "as"
-        variant: ctx.isResponse ? "parsed" : "original",
-        validate: true,
-      });
-      if (examples.length) jsonSchema.examples = examples.slice();
+      onEach(zodSchema, { ...ctx, jsonSchema });
     },
   });
   const { $defs, ...rest } = result;

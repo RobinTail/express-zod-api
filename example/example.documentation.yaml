@@ -186,9 +186,9 @@ paths:
                         examples:
                           - John Doe
                       createdAt:
-                        format: date-time
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string
+                        format: date-time
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                         examples:
