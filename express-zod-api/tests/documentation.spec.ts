@@ -481,7 +481,8 @@ describe("Documentation", () => {
     });
 
     test("should handle circular schemas via z.lazy()", () => {
-      const baseCategorySchema = z.object({
+      // @todo switch to z.interface instead
+      const baseCategorySchema = z.looseObject({
         name: z.string(),
       });
       /**
