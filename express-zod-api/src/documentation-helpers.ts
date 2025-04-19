@@ -59,14 +59,13 @@ export interface OpenAPIContext {
     subject: SchemaObject | ReferenceObject,
     name?: string,
   ) => ReferenceObject;
-  brandHandling?: Record<string | symbol, Depicter>;
+  // @todo consider moving it out
+  brandHandling?: Record<string | symbol, Overrider>;
   path: string;
   method: Method;
 }
 
-// @todo update test in index.spec.ts
-// @todo rename to something implying postprocessing instead of depicting
-export type Depicter = (
+export type Overrider = (
   zodCtx: { zodSchema: $ZodType; jsonSchema: JSONSchema.BaseSchema },
   oasCtx: OpenAPIContext,
 ) => void;
@@ -105,20 +104,20 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-const onDefault: Depicter = ({ zodSchema, jsonSchema }) =>
+const onDefault: Overrider = ({ zodSchema, jsonSchema }) =>
   (jsonSchema.default =
     globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
     jsonSchema.default);
 
-const onAny: Depicter = ({ jsonSchema }) => (jsonSchema.format = "any");
+const onAny: Overrider = ({ jsonSchema }) => (jsonSchema.format = "any");
 
-const onUpload: Depicter = ({ jsonSchema }, ctx) => {
+const onUpload: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.upload() only for input.", ctx);
   Object.assign(jsonSchema, { type: "string", format: "binary" });
 };
 
-const onFile: Depicter = ({ jsonSchema }) => {
+const onFile: Overrider = ({ jsonSchema }) => {
   delete jsonSchema.oneOf; // undo default
   Object.assign(jsonSchema, {
     type: "string",
@@ -131,7 +130,7 @@ const onFile: Depicter = ({ jsonSchema }) => {
   });
 };
 
-const onUnion: Depicter = ({ zodSchema, jsonSchema }) => {
+const onUnion: Overrider = ({ zodSchema, jsonSchema }) => {
   if (!zodSchema._zod.disc) return;
   const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
   jsonSchema.discriminator = { propertyName };
@@ -172,7 +171,7 @@ const intersect = R.tryCatch(
   (_err, allOf): SchemaObject => ({ allOf }),
 );
 
-const onIntersection: Depicter = ({ jsonSchema }) => {
+const onIntersection: Overrider = ({ jsonSchema }) => {
   if (!jsonSchema.allOf) return;
   const attempt = intersect(jsonSchema.allOf as SchemaObject[]); // @todo remove "as"
   delete jsonSchema.allOf; // undo default
@@ -180,7 +179,7 @@ const onIntersection: Depicter = ({ jsonSchema }) => {
 };
 
 /** @since OAS 3.1 nullable replaced with type array having null */
-const onNullable: Depicter = ({ jsonSchema }) => {
+const onNullable: Overrider = ({ jsonSchema }) => {
   if (!jsonSchema.oneOf) return;
   const original = jsonSchema.oneOf[0];
   Object.assign(original, {
@@ -206,17 +205,17 @@ const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
       : undefined;
 };
 
-const onEnum: Depicter = ({ zodSchema, jsonSchema }) =>
+const onEnum: Overrider = ({ zodSchema, jsonSchema }) =>
   (jsonSchema.type = getSupportedType(
     Object.values((zodSchema as $ZodEnum)._zod.def.entries)[0],
   ));
 
-const onLiteral: Depicter = ({ zodSchema, jsonSchema }) =>
+const onLiteral: Overrider = ({ zodSchema, jsonSchema }) =>
   (jsonSchema.type = getSupportedType(
     Object.values((zodSchema as $ZodLiteral)._zod.def.values)[0],
   ));
 
-const onDateIn: Depicter = ({ jsonSchema }, ctx) => {
+const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
   delete jsonSchema.oneOf; // undo default
@@ -231,7 +230,7 @@ const onDateIn: Depicter = ({ jsonSchema }, ctx) => {
   });
 };
 
-const onDateOut: Depicter = ({ jsonSchema }, ctx) => {
+const onDateOut: Overrider = ({ jsonSchema }, ctx) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
   Object.assign(jsonSchema, {
@@ -244,14 +243,14 @@ const onDateOut: Depicter = ({ jsonSchema }, ctx) => {
   });
 };
 
-const onBigInt: Depicter = ({ jsonSchema }) =>
+const onBigInt: Overrider = ({ jsonSchema }) =>
   Object.assign(jsonSchema, { type: "integer", format: "bigint" });
 
 /**
  * @since OAS 3.1 using prefixItems for depicting tuples
  * @since 17.5.0 added rest handling, fixed tuple type
  */
-const onTuple: Depicter = ({ zodSchema, jsonSchema }) => {
+const onTuple: Overrider = ({ zodSchema, jsonSchema }) => {
   if ((zodSchema as $ZodTuple)._zod.def.rest !== null) return;
   // does not appear to support items:false, so not:{} is a recommended alias
   jsonSchema.items = { not: {} };
@@ -272,7 +271,7 @@ const makeNullableType = ({
   return type ? [...new Set(type).add("null")] : "null";
 };
 
-const onPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
+const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
   const target = (zodSchema as $ZodPipe)._zod.def[
     ctx.isResponse ? "out" : "in"
   ];
@@ -308,7 +307,7 @@ const onPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
   }
 };
 
-const onRaw: Depicter = ({ jsonSchema }) => {
+const onRaw: Overrider = ({ jsonSchema }) => {
   Object.assign(
     jsonSchema,
     (jsonSchema as JSONSchema.ObjectSchema).properties!.raw,
@@ -434,7 +433,7 @@ export const depictRequestParams = ({
   );
 };
 
-const rules: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> = {
+const rules: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> = {
   nullable: onNullable,
   default: onDefault,
   any: onAny,
@@ -452,7 +451,7 @@ const rules: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> = {
   [ezRawBrand]: onRaw,
 };
 
-const onEach: Depicter = ({ zodSchema, jsonSchema }, { isResponse }) => {
+const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
   const { description, deprecated } = globalRegistry.get(zodSchema) ?? {};
   if (description) jsonSchema.description ??= description;
   if (deprecated) jsonSchema.deprecated = true;
@@ -488,7 +487,7 @@ export const delegate = (
     override: (zodCtx) => {
       const { brand } =
         globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
-      const allRules: Record<string | symbol, Depicter> = {
+      const allRules: Record<string | symbol, Overrider> = {
         ...ctx.brandHandling,
         ...rules,
       };
