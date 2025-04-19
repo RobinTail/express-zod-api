@@ -480,19 +480,11 @@ describe("Documentation", () => {
       expect(boolean.parse(null)).toBe(false);
     });
 
+    // @todo switch to z.interface for that
     test("should handle circular schemas via z.lazy()", () => {
-      // @todo switch to z.interface instead
-      const baseCategorySchema = z.looseObject({
+      const category: z.ZodObject = z.object({
         name: z.string(),
-      });
-      /**
-       * External issue in core 0.8.0
-       * @link https://github.com/colinhacks/zod/issues/4234
-       * @todo remove let when fixed
-       */
-      let categorySchema = baseCategorySchema;
-      categorySchema = baseCategorySchema.extend({
-        subcategories: z.lazy(() => categorySchema.array()),
+        subcategories: z.lazy(() => category.array()),
       });
       const spec = new Documentation({
         config: sampleConfig,
@@ -500,9 +492,9 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
-              input: baseCategorySchema,
+              input: category,
               output: z.object({
-                zodExample: categorySchema,
+                zodExample: category,
               }),
               handler: async () => ({
                 zodExample: {
