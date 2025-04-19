@@ -30,7 +30,6 @@ import {
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
-import { HandlingRules } from "./schema-walker";
 
 type Component =
   | "positiveResponse"
@@ -67,7 +66,7 @@ interface DocumentationParams {
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
    * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => ({ type: "object" })
    */
-  brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
+  brandHandling?: OpenAPIContext["brandHandling"];
   /**
    * @desc Ability to configure recognition of headers among other input data
    * @desc Only applicable when "headers" is present within inputSources config option

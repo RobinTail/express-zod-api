@@ -1,7 +1,6 @@
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
 import {
-  Depicter,
   Documentation,
   DocumentationError,
   EndpointsFactory,
@@ -12,7 +11,7 @@ import {
   ResultHandler,
 } from "../src";
 import { contentTypes } from "../src/content-type";
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import { givePort } from "../../tools/ports";
 
 describe("Documentation", () => {
@@ -1188,13 +1187,7 @@ describe("Documentation", () => {
   describe("Feature #1470: Custom brands", () => {
     test("should be handled accordingly in request, response and params", () => {
       const deep = Symbol("DEEP");
-      const rule: Depicter = (
-        schema: ReturnType<z.ZodBoolean["brand"]>,
-        { next },
-      ) => {
-        globalRegistry.remove(schema);
-        return next(schema);
-      };
+      const rule = () => ({ type: "boolean" as const });
       const spec = new Documentation({
         config: sampleConfig,
         routing: {

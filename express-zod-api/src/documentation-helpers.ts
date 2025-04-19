@@ -3,6 +3,7 @@ import type {
   $ZodLiteral,
   $ZodPipe,
   $ZodTuple,
+  $ZodType,
   JSONSchema,
 } from "@zod/core";
 import {
@@ -63,7 +64,7 @@ export interface OpenAPIContext extends FlatObject {
     subject: SchemaObject | ReferenceObject,
     name?: string,
   ) => ReferenceObject;
-  brandHandling: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
+  brandHandling: Record<string | symbol, (zodSchema: $ZodType) => SchemaObject>;
   path: string;
   method: Method;
 }
@@ -257,7 +258,7 @@ export const delegate: Depicter = (schema, ctx) => {
       // custom brands handling
       if (brand && ctx.brandHandling[brand]) {
         for (const key in jsonSchema) delete jsonSchema[key]; // undo default
-        Object.assign(jsonSchema, ctx.brandHandling[brand](zodSchema, ctx));
+        Object.assign(jsonSchema, ctx.brandHandling[brand](zodSchema));
       }
       // on each
       const shouldAvoidParsing =
