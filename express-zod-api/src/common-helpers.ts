@@ -1,6 +1,7 @@
+import type { $ZodType } from "@zod/core";
 import { Request } from "express";
 import * as R from "ramda";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import { OutputValidationError } from "./errors";
@@ -99,7 +100,7 @@ export const pullExampleProps = <T extends z.ZodObject>(subject: T) =>
   );
 
 export const getExamples = <
-  T extends z.ZodType,
+  T extends $ZodType,
   V extends "original" | "parsed" | undefined,
 >({
   schema,
@@ -126,13 +127,13 @@ export const getExamples = <
    * */
   pullProps?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  let examples = schema.meta()?.[metaSymbol]?.examples || [];
+  let examples = globalRegistry.get(schema)?.[metaSymbol]?.examples || [];
   if (!examples.length && pullProps && schema instanceof z.ZodObject)
     examples = pullExampleProps(schema);
   if (!validate && variant === "original") return examples;
   const result: Array<z.input<T> | z.output<T>> = [];
   for (const example of examples) {
-    const parsedExample = schema.safeParse(example);
+    const parsedExample = z.safeParse(schema, example);
     if (parsedExample.success)
       result.push(variant === "parsed" ? parsedExample.data : example);
   }

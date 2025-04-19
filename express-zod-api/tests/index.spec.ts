@@ -1,5 +1,7 @@
+import type { $ZodType, JSONSchema } from "@zod/core";
 import { IRouter } from "express";
 import ts from "typescript";
+import { expectTypeOf } from "vitest";
 import { z } from "zod";
 import * as entrypoint from "../src";
 import {
@@ -10,7 +12,7 @@ import {
   CommonConfig,
   CookieSecurity,
   HeaderSecurity,
-  Depicter,
+  Overrider,
   FlatObject,
   IOSchema,
   InputSecurity,
@@ -37,9 +39,9 @@ describe("Index Entrypoint", () => {
     });
 
     test("Convenience types should be exposed", () => {
-      expectTypeOf(() => ({
-        type: "number" as const,
-      })).toExtend<Depicter>();
+      expectTypeOf(
+        ({}: { zodSchema: $ZodType; jsonSchema: JSONSchema.BaseSchema }) => {},
+      ).toExtend<Overrider>();
       expectTypeOf(() =>
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
       ).toExtend<Producer>();

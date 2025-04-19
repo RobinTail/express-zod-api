@@ -1388,7 +1388,7 @@ const routing: Routing = {
 You can customize handling rules for your schemas in Documentation and Integration. Use the `.brand()` method on your
 schema to make it special and distinguishable for the framework in runtime. Using symbols is recommended for branding.
 After that utilize the `brandHandling` feature of both constructors to declare your custom implementation. In case you
-need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
+need to reuse a handling rule for multiple brands, use the exposed types `Overrider` and `Producer`.
 
 ```ts
 import ts from "typescript";
@@ -1396,19 +1396,19 @@ import { z } from "zod";
 import {
   Documentation,
   Integration,
-  Depicter,
+  Overrider,
   Producer,
 } from "express-zod-api";
 
 const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for this purpose
 const myBrandedSchema = z.string().brand(myBrand);
 
-const ruleForDocs: Depicter = (
-  schema: typeof myBrandedSchema, // you should assign type yourself
-  { next, path, method, isResponse }, // handle a nested schema using next()
+const ruleForDocs: Overrider = (
+  { zodSchema, jsonSchema }, // adjust jsonSchema for overrides
+  { path, method, isResponse }, // handle a nested schema using next()
 ) => {
-  const defaultDepiction = next(schema.unwrap()); // { type: string }
-  return { summary: "Special type of data" };
+  delete jsonSchema.format;
+  jsonSchema.summary = "Special type of data";
 };
 
 const ruleForClient: Producer = (
