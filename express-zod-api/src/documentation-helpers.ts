@@ -59,7 +59,7 @@ export interface OpenAPIContext extends FlatObject {
     subject: SchemaObject | ReferenceObject,
     name?: string,
   ) => ReferenceObject;
-  brandHandling: Record<string | symbol, Depicter>;
+  brandHandling?: Record<string | symbol, Depicter>;
   path: string;
   method: Method;
 }
@@ -251,7 +251,7 @@ export const delegate: Depicter = (schema, ctx) => {
         delete jsonSchema.required;
       }
       // custom brands handling
-      if (brand && ctx.brandHandling[brand]) {
+      if (brand && ctx.brandHandling && ctx.brandHandling[brand]) {
         for (const key in jsonSchema) delete jsonSchema[key]; // undo default
         Object.assign(jsonSchema, ctx.brandHandling[brand](zodSchema, ctx));
       }

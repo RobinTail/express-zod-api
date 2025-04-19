@@ -64,7 +64,7 @@ interface DocumentationParams {
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
-   * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => ({ type: "object" })
+   * @example { MyBrand: ( schema: typeof myBrandSchema, ctx ) => ({ type: "object" })
    */
   brandHandling?: OpenAPIContext["brandHandling"];
   /**
