@@ -146,19 +146,30 @@ const approaches = {
   required: ({ required: left = [] }, { required: right = [] }) =>
     R.union(left, right),
   examples: ({ examples: left = [] }, { examples: right = [] }) =>
-    combinations(left, right, ([a, b]) => R.mergeDeepRight(a, b)),
+    combinations(left, right, ([a, b]) =>
+      typeof a === "object" && typeof b === "object"
+        ? R.mergeDeepRight({ ...a }, { ...b })
+        : a,
+    ),
   description: ({ description: left }, { description: right }) => left || right,
 } satisfies {
-  [K in keyof SchemaObject]: (...subj: SchemaObject[]) => SchemaObject[K];
+  [K in keyof JSONSchema.ObjectSchema]: (
+    ...subj: JSONSchema.ObjectSchema[]
+  ) => JSONSchema.ObjectSchema[K];
 };
-const canMerge = R.both(
-  ({ type }: SchemaObject) => type === "object",
-  R.pipe(Object.keys, R.without(Object.keys(approaches)), R.isEmpty),
+const canMerge = R.pipe(
+  Object.keys,
+  R.without(Object.keys(approaches)),
+  R.isEmpty,
 );
 
 const intersect = R.tryCatch(
-  (children: Array<SchemaObject | ReferenceObject>): SchemaObject => {
-    const [left, right] = children.filter(isSchemaObject).filter(canMerge);
+  (children: Array<JSONSchema.BaseSchema>): JSONSchema.ObjectSchema => {
+    const [left, right] = children
+      .filter(
+        (schema): schema is JSONSchema.ObjectSchema => schema.type === "object",
+      )
+      .filter(canMerge);
     if (!left || !right) throw new Error("Can not flatten objects");
     const suitable: typeof approaches = R.pickBy(
       (_, prop) => (left[prop] || right[prop]) !== undefined,
@@ -166,12 +177,12 @@ const intersect = R.tryCatch(
     );
     return R.map((fn) => fn(left, right), suitable);
   },
-  (_err, allOf): SchemaObject => ({ allOf }),
+  (_err, allOf): JSONSchema.BaseSchema => ({ allOf }),
 );
 
 const onIntersection: Overrider = ({ jsonSchema }) => {
   if (!jsonSchema.allOf) return;
-  const attempt = intersect(jsonSchema.allOf as SchemaObject[]); // @todo remove "as"
+  const attempt = intersect(jsonSchema.allOf);
   delete jsonSchema.allOf; // undo default
   Object.assign(jsonSchema, attempt);
 };
