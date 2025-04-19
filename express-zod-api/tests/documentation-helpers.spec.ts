@@ -20,17 +20,21 @@ import {
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
   const requestCtx = {
-    path: "/v1/user/:id",
-    method: "get",
-    isResponse: false,
-    makeRef: makeRefMock,
-  } satisfies OpenAPIContext;
+    ctx: {
+      path: "/v1/user/:id",
+      method: "get",
+      isResponse: false,
+      makeRef: makeRefMock,
+    } satisfies OpenAPIContext,
+  };
   const responseCtx = {
-    path: "/v1/user/:id",
-    method: "get",
-    isResponse: true,
-    makeRef: makeRefMock,
-  } satisfies OpenAPIContext;
+    ctx: {
+      path: "/v1/user/:id",
+      method: "get",
+      isResponse: true,
+      makeRef: makeRefMock,
+    } satisfies OpenAPIContext,
+  };
 
   beforeEach(() => {
     makeRefMock.mockClear();
@@ -574,7 +578,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["query", "params"],
           composition: "inline",
-          ...requestCtx,
+          ...requestCtx.ctx,
         }),
       ).toMatchSnapshot();
     });
@@ -588,7 +592,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["body", "params"],
           composition: "inline",
-          ...requestCtx,
+          ...requestCtx.ctx,
         }),
       ).toMatchSnapshot();
     });
@@ -602,7 +606,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["body"],
           composition: "inline",
-          ...requestCtx,
+          ...requestCtx.ctx,
         }),
       ).toMatchSnapshot();
     });
@@ -619,7 +623,7 @@ describe("Documentation helpers", () => {
           inputSources: ["query", "headers", "params"],
           composition: "inline",
           security: [[{ type: "header", name: "secure" }]],
-          ...requestCtx,
+          ...requestCtx.ctx,
         }),
       ).toMatchSnapshot();
     });

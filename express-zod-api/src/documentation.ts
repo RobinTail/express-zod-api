@@ -16,7 +16,6 @@ import { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
 import { Method } from "./method";
 import {
-  OpenAPIContext,
   depictBody,
   depictRequestParams,
   depictResponse,
@@ -27,6 +26,7 @@ import {
   reformatParamsInPath,
   IsHeader,
   nonEmpty,
+  BrandHandling,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
@@ -66,7 +66,7 @@ interface DocumentationParams {
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
    * @example { MyBrand: ( schema: typeof myBrandSchema, { jsonSchema } ) => ({ type: "object" })
    */
-  brandHandling?: OpenAPIContext["brandHandling"];
+  brandHandling?: BrandHandling;
   /**
    * @desc Ability to configure recognition of headers among other input data
    * @desc Only applicable when "headers" is present within inputSources config option

@@ -59,8 +59,6 @@ export interface OpenAPIContext {
     subject: SchemaObject | ReferenceObject,
     name?: string,
   ) => ReferenceObject;
-  // @todo consider moving it out
-  brandHandling?: Record<string | symbol, Overrider>;
   path: string;
   method: Method;
 }
@@ -77,11 +75,14 @@ export type IsHeader = (
   path: string,
 ) => boolean | null | undefined;
 
+export type BrandHandling = Record<string | symbol, Overrider>;
+
 interface ReqResHandlingProps<S extends z.ZodTypeAny>
   extends Omit<OpenAPIContext, "isResponse"> {
   schema: S;
   composition: "inline" | "components";
   description?: string;
+  brandHandling?: BrandHandling;
 }
 
 const shortDescriptionLimit = 50;
@@ -276,7 +277,7 @@ const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
     ctx.isResponse ? "in" : "out"
   ];
   if (target instanceof z.ZodTransform) {
-    const opposingDepiction = delegate(opposite, ctx);
+    const opposingDepiction = delegate(opposite, { ctx, rules: overrides }); // @todo can avoid it?
     if (isSchemaObject(opposingDepiction)) {
       if (!ctx.isResponse) {
         const { type: opposingType, ...rest } = opposingDepiction;
@@ -297,7 +298,10 @@ const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
             type: targetType as "number" | "string" | "boolean",
           });
         } else {
-          Object.assign(jsonSchema, delegate(z.any(), ctx));
+          Object.assign(
+            jsonSchema,
+            delegate(z.any(), { ctx, rules: overrides }), // @todo try to avoid it
+          );
         }
       }
     }
@@ -406,11 +410,8 @@ export const depictRequestParams = ({
             : undefined;
       if (!location) return acc;
       const depicted = delegate(paramSchema, {
-        isResponse: false,
-        makeRef,
-        path,
-        method,
-        brandHandling,
+        rules: { ...brandHandling, ...overrides },
+        ctx: { isResponse: false, makeRef, path, method },
       });
       const result =
         composition === "components"
@@ -430,23 +431,24 @@ export const depictRequestParams = ({
   );
 };
 
-const rules: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> = {
-  nullable: onNullable,
-  default: onDefault,
-  any: onAny,
-  union: onUnion,
-  enum: onEnum,
-  bigint: onBigInt,
-  intersection: onIntersection,
-  literal: onLiteral,
-  tuple: onTuple,
-  pipe: onPipeline,
-  [ezDateInBrand]: onDateIn,
-  [ezDateOutBrand]: onDateOut,
-  [ezUploadBrand]: onUpload,
-  [ezFileBrand]: onFile,
-  [ezRawBrand]: onRaw,
-};
+const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
+  {
+    nullable: onNullable,
+    default: onDefault,
+    any: onAny,
+    union: onUnion,
+    enum: onEnum,
+    bigint: onBigInt,
+    intersection: onIntersection,
+    literal: onLiteral,
+    tuple: onTuple,
+    pipe: onPipeline,
+    [ezDateInBrand]: onDateIn,
+    [ezDateOutBrand]: onDateOut,
+    [ezUploadBrand]: onUpload,
+    [ezFileBrand]: onFile,
+    [ezRawBrand]: onRaw,
+  };
 
 const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
   const { description, deprecated } = globalRegistry.get(zodSchema) ?? {};
@@ -473,7 +475,13 @@ const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
   if (examples.length) jsonSchema.examples = examples.slice();
 };
 
-export const delegate = (schema: $ZodType, ctx: OpenAPIContext) => {
+export const delegate = (
+  schema: $ZodType,
+  {
+    ctx,
+    rules = overrides,
+  }: { ctx: OpenAPIContext; rules?: Record<string | symbol, Overrider> },
+) => {
   const result = z.toJSONSchema(schema, {
     unrepresentable: "any",
     metadata: globalRegistry,
@@ -481,13 +489,10 @@ export const delegate = (schema: $ZodType, ctx: OpenAPIContext) => {
     override: (zodCtx) => {
       const { brand } =
         globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
-      const allRules: Record<string | symbol, Overrider> = {
-        ...ctx.brandHandling,
-        ...rules,
-      };
-      allRules[
-        brand && allRules[brand] ? brand : zodCtx.zodSchema._zod.def.type
-      ]?.(zodCtx, ctx);
+      rules[brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type]?.(
+        zodCtx,
+        ctx,
+      );
       onEach(zodCtx, ctx);
     },
   });
@@ -568,11 +573,8 @@ export const depictResponse = ({
   if (!mimeTypes) return { description };
   const depictedSchema = excludeExamplesFromDepiction(
     delegate(schema, {
-      isResponse: true,
-      makeRef,
-      path,
-      method,
-      brandHandling,
+      rules: { ...brandHandling, ...overrides },
+      ctx: { isResponse: true, makeRef, path, method },
     }),
   );
   const media: MediaTypeObject = {
@@ -693,11 +695,8 @@ export const depictBody = ({
 }) => {
   const [withoutParams, hasRequired] = excludeParamsFromDepiction(
     delegate(schema, {
-      isResponse: false,
-      makeRef,
-      path,
-      method,
-      brandHandling,
+      rules: { ...brandHandling, ...overrides },
+      ctx: { isResponse: false, makeRef, path, method },
     }),
     paramNames,
   );
