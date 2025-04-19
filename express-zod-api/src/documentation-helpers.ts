@@ -476,10 +476,7 @@ const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
   if (examples.length) jsonSchema.examples = examples.slice();
 };
 
-export const delegate = (
-  schema: $ZodType,
-  ctx: Omit<OpenAPIContext, "jsonSchema">, // @todo cleanup the mess
-) => {
+export const delegate = (schema: $ZodType, ctx: OpenAPIContext) => {
   const result = z.toJSONSchema(schema, {
     unrepresentable: "any",
     metadata: globalRegistry,
