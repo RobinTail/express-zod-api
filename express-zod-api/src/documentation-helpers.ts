@@ -78,10 +78,7 @@ export type IsHeader = (
 ) => boolean | null | undefined;
 
 interface ReqResHandlingProps<S extends z.ZodTypeAny>
-  extends Pick<
-    OpenAPIContext,
-    "makeRef" | "brandHandling" | "path" | "method"
-  > {
+  extends Omit<OpenAPIContext, "isResponse"> {
   schema: S;
   composition: "inline" | "components";
   description?: string;
