@@ -1,5 +1,4 @@
 import type { $ZodType } from "@zod/core";
-import { ReferenceObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
@@ -30,6 +29,7 @@ describe("Documentation helpers", () => {
     method: "get",
     isResponse: false,
     makeRef: makeRefMock,
+    brandHandling: {},
     next: (schema: $ZodType) =>
       walkSchema(schema, {
         rules: depicters,
@@ -43,6 +43,7 @@ describe("Documentation helpers", () => {
     method: "get",
     isResponse: true,
     makeRef: makeRefMock,
+    brandHandling: {},
     next: (schema: $ZodType) =>
       walkSchema(schema, {
         rules: depicters,

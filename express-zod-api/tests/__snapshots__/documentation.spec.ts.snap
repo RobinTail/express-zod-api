@@ -2389,8 +2389,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: success
+                    type: string
                   data:
                     type: object
                     properties:
@@ -2409,8 +2409,8 @@ paths:
                 type: object
                 properties:
                   status:
-                    type: string
                     const: error
+                    type: string
                   error:
                     type: object
                     properties:

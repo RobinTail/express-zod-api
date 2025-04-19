@@ -135,9 +135,9 @@ export class Documentation extends OpenApiBuilder {
     version,
     serverUrl,
     descriptions,
-    brandHandling,
     tags,
     isHeader,
+    brandHandling = {},
     hasSummaryFromDescription = true,
     composition = "inline",
   }: DocumentationParams) {

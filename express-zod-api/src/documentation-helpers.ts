@@ -63,6 +63,7 @@ export interface OpenAPIContext extends FlatObject {
     subject: SchemaObject | ReferenceObject,
     name?: string,
   ) => ReferenceObject;
+  brandHandling: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
   path: string;
   method: Method;
 }
@@ -80,11 +81,13 @@ export type IsHeader = (
 ) => boolean | null | undefined;
 
 interface ReqResHandlingProps<S extends z.ZodTypeAny>
-  extends Pick<OpenAPIContext, "makeRef" | "path" | "method"> {
+  extends Pick<
+    OpenAPIContext,
+    "makeRef" | "brandHandling" | "path" | "method"
+  > {
   schema: S;
   composition: "inline" | "components";
   description?: string;
-  brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
 }
 
 const shortDescriptionLimit = 50;
@@ -250,6 +253,11 @@ export const delegate: Depicter = (schema, ctx) => {
         );
         delete jsonSchema.properties; // undo default
         delete jsonSchema.required;
+      }
+      // custom brands handling
+      if (brand && ctx.brandHandling[brand]) {
+        for (const key in jsonSchema) delete jsonSchema[key]; // undo default
+        Object.assign(jsonSchema, ctx.brandHandling[brand](zodSchema, ctx));
       }
       // on each
       const shouldAvoidParsing =
@@ -459,10 +467,10 @@ export const depictRequestParams = ({
             : undefined;
       if (!location) return acc;
       const depicted = walkSchema(paramSchema, {
-        rules: { ...brandHandling, ...depicters },
+        rules: depicters,
         onEach,
         onMissing,
-        ctx: { isResponse: false, makeRef, path, method },
+        ctx: { isResponse: false, makeRef, path, method, brandHandling },
       });
       const result =
         composition === "components"
@@ -608,10 +616,10 @@ export const depictResponse = ({
   if (!mimeTypes) return { description };
   const depictedSchema = excludeExamplesFromDepiction(
     walkSchema(schema, {
-      rules: { ...brandHandling, ...depicters },
+      rules: depicters,
       onEach,
       onMissing,
-      ctx: { isResponse: true, makeRef, path, method },
+      ctx: { isResponse: true, makeRef, path, method, brandHandling },
     }),
   );
   const media: MediaTypeObject = {
@@ -732,10 +740,10 @@ export const depictBody = ({
 }) => {
   const [withoutParams, hasRequired] = excludeParamsFromDepiction(
     walkSchema(schema, {
-      rules: { ...brandHandling, ...depicters },
+      rules: depicters,
       onEach,
       onMissing,
-      ctx: { isResponse: false, makeRef, path, method },
+      ctx: { isResponse: false, makeRef, path, method, brandHandling },
     }),
     paramNames,
   );
