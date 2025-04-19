@@ -191,9 +191,7 @@ const onIntersection: Overrider = ({ jsonSchema }) => {
 const onNullable: Overrider = ({ jsonSchema }) => {
   if (!jsonSchema.oneOf) return;
   const original = jsonSchema.oneOf[0];
-  Object.assign(original, {
-    type: makeNullableType(original as SchemaObject), // @todo remove "as"
-  });
+  Object.assign(original, { type: makeNullableType(original) });
   Object.assign(jsonSchema, original);
   delete jsonSchema.oneOf;
 };
@@ -274,9 +272,11 @@ const makeSample = (depicted: SchemaObject) => {
 
 const makeNullableType = ({
   type,
-}: SchemaObject): SchemaObjectType | SchemaObjectType[] => {
+}: JSONSchema.BaseSchema | SchemaObject):
+  | SchemaObjectType
+  | SchemaObjectType[] => {
   if (type === "null") return type;
-  if (typeof type === "string") return [type, "null"];
+  if (typeof type === "string") return [type as SchemaObjectType, "null"];
   return type ? [...new Set(type).add("null")] : "null";
 };
 
@@ -473,11 +473,8 @@ const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
     !shouldAvoidParsing &&
     hasTypePropertyInDepiction &&
     (zodSchema as z.ZodType).isNullable(); // @todo remove "as"
-  if (acceptsNull) {
-    Object.assign(jsonSchema, {
-      type: makeNullableType(jsonSchema as SchemaObject), // @todo remove "as"
-    });
-  }
+  if (acceptsNull)
+    Object.assign(jsonSchema, { type: makeNullableType(jsonSchema) });
   const examples = getExamples({
     schema: zodSchema as z.ZodType, // @todo remove "as"
     variant: isResponse ? "parsed" : "original",
