@@ -472,7 +472,8 @@ const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
     !isResponse &&
     !shouldAvoidParsing &&
     hasTypePropertyInDepiction &&
-    (zodSchema as z.ZodType).isNullable(); // @todo remove "as"
+    zodSchema instanceof z.ZodType &&
+    zodSchema.isNullable();
   if (acceptsNull)
     Object.assign(jsonSchema, { type: makeNullableType(jsonSchema) });
   const examples = getExamples({
