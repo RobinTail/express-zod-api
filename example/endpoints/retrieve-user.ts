@@ -6,7 +6,7 @@ import { methodProviderMiddleware } from "../middlewares";
 
 // Demonstrating circular schemas using z.lazy()
 // @todo switch to using z.interface instead
-const baseFeature = z.object({
+const baseFeature = z.looseObject({
   title: z.string(),
 });
 type Feature = z.infer<typeof baseFeature> & {
