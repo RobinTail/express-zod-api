@@ -48,12 +48,7 @@ import { metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
-import {
-  FirstPartyKind,
-  HandlingRules,
-  SchemaHandler,
-  walkSchema,
-} from "./schema-walker";
+import { FirstPartyKind, HandlingRules, SchemaHandler } from "./schema-walker";
 import { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
@@ -108,13 +103,15 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const delegate: Depicter = (schema, ctx) => {
+export const delegate = (schema: $ZodType, ctx: OpenAPIContext) => {
   const result = z.toJSONSchema(schema, {
     unrepresentable: "any",
     metadata: globalRegistry,
     io: ctx.isResponse ? "output" : "input",
     override: ({ zodSchema, jsonSchema }) => {
-      const brand = globalRegistry.get(zodSchema)?.[metaSymbol]?.brand;
+      const { description } = globalRegistry.get(zodSchema) ?? {};
+      const { brand, defaultLabel } =
+        globalRegistry.get(zodSchema)?.[metaSymbol] ?? {};
       if (zodSchema._zod.def.type === "nullable" && jsonSchema.oneOf) {
         const original = jsonSchema.oneOf[0];
         Object.assign(original, {
@@ -123,11 +120,9 @@ export const delegate: Depicter = (schema, ctx) => {
         Object.assign(jsonSchema, original);
         delete jsonSchema.oneOf; // undo defaults
       }
-      if (zodSchema._zod.def.type === "default") {
-        jsonSchema.default =
-          globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
-          jsonSchema.default;
-      }
+      if (zodSchema._zod.def.type === "default")
+        jsonSchema.default = defaultLabel ?? jsonSchema.default;
+
       if (zodSchema._zod.def.type === "any") jsonSchema.format = "any";
       if (zodSchema._zod.def.type === "union" && zodSchema._zod.disc) {
         const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
@@ -261,6 +256,7 @@ export const delegate: Depicter = (schema, ctx) => {
         Object.assign(jsonSchema, ctx.brandHandling[brand](zodSchema));
       }
       // on each
+      if (description) jsonSchema.description ??= description;
       const shouldAvoidParsing =
         zodSchema._zod.def.type === "lazy" ||
         zodSchema._zod.def.type === "promise";
@@ -467,11 +463,12 @@ export const depictRequestParams = ({
             ? "query"
             : undefined;
       if (!location) return acc;
-      const depicted = walkSchema(paramSchema, {
-        rules: depicters,
-        onEach,
-        onMissing,
-        ctx: { isResponse: false, makeRef, path, method, brandHandling },
+      const depicted = delegate(paramSchema, {
+        isResponse: false,
+        makeRef,
+        path,
+        method,
+        brandHandling,
       });
       const result =
         composition === "components"
@@ -616,11 +613,12 @@ export const depictResponse = ({
 }): ResponseObject => {
   if (!mimeTypes) return { description };
   const depictedSchema = excludeExamplesFromDepiction(
-    walkSchema(schema, {
-      rules: depicters,
-      onEach,
-      onMissing,
-      ctx: { isResponse: true, makeRef, path, method, brandHandling },
+    delegate(schema, {
+      isResponse: true,
+      makeRef,
+      path,
+      method,
+      brandHandling,
     }),
   );
   const media: MediaTypeObject = {
@@ -740,11 +738,12 @@ export const depictBody = ({
   paramNames: string[];
 }) => {
   const [withoutParams, hasRequired] = excludeParamsFromDepiction(
-    walkSchema(schema, {
-      rules: depicters,
-      onEach,
-      onMissing,
-      ctx: { isResponse: false, makeRef, path, method, brandHandling },
+    delegate(schema, {
+      isResponse: false,
+      makeRef,
+      path,
+      method,
+      brandHandling,
     }),
     paramNames,
   );
