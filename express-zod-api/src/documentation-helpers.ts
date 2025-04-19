@@ -177,6 +177,7 @@ const onIntersection: Depicter = ({}, { jsonSchema }) => {
   Object.assign(jsonSchema, attempt);
 };
 
+/** @since OAS 3.1 nullable replaced with type array having null */
 const onNullable: Depicter = ({}, { jsonSchema }) => {
   if (!jsonSchema.oneOf) return;
   const original = jsonSchema.oneOf[0];
@@ -244,8 +245,13 @@ const onDateOut: Depicter = ({}, ctx) => {
 const onBigInt: Depicter = ({}, { jsonSchema }) =>
   Object.assign(jsonSchema, { type: "integer", format: "bigint" });
 
+/**
+ * @since OAS 3.1 using prefixItems for depicting tuples
+ * @since 17.5.0 added rest handling, fixed tuple type
+ */
 const onTuple: Depicter = (zodSchema, { jsonSchema }) => {
   if ((zodSchema as $ZodTuple)._zod.def.rest !== null) return;
+  // does not appear to support items:false, so not:{} is a recommended alias
   jsonSchema.items = { not: {} };
 };
 
