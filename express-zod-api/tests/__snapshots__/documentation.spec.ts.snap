@@ -1272,8 +1272,11 @@ paths:
               properties:
                 name:
                   type: string
+                subcategories:
+                  $ref: "#/components/schemas/Schema1"
               required:
                 - name
+                - subcategories
         required: true
       responses:
         "200":
