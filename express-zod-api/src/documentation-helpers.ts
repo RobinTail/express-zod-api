@@ -46,9 +46,7 @@ import { extractObjectSchema, IOSchema } from "./io-schema";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
-import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
-import { FirstPartyKind, HandlingRules, SchemaHandler } from "./schema-walker";
 import { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
@@ -485,81 +483,6 @@ export const depictRequestParams = ({
       });
     },
     [],
-  );
-};
-
-export const depicters: HandlingRules<
-  SchemaObject | ReferenceObject,
-  OpenAPIContext,
-  FirstPartyKind | ProprietaryBrand
-> = {
-  string: delegate,
-  number: delegate,
-  bigint: delegate,
-  boolean: delegate,
-  null: delegate,
-  array: delegate,
-  tuple: delegate,
-  record: delegate,
-  object: delegate,
-  literal: delegate,
-  intersection: delegate,
-  union: delegate,
-  any: delegate,
-  default: delegate,
-  enum: delegate,
-  optional: delegate,
-  nullable: delegate,
-  date: delegate,
-  catch: delegate,
-  pipe: delegate,
-  lazy: delegate,
-  readonly: delegate,
-  [ezFileBrand]: delegate,
-  [ezUploadBrand]: delegate,
-  [ezDateOutBrand]: delegate,
-  [ezDateInBrand]: delegate,
-  [ezRawBrand]: delegate,
-};
-
-export const onEach: SchemaHandler<
-  SchemaObject | ReferenceObject,
-  OpenAPIContext,
-  "each"
-> = (schema: z.ZodType, { isResponse, prev }) => {
-  if (isReferenceObject(prev)) return {};
-  const { description } = schema;
-  const shouldAvoidParsing =
-    schema instanceof z.ZodLazy || schema instanceof z.ZodPromise;
-  const hasTypePropertyInDepiction = prev.type !== undefined;
-  const acceptsNull =
-    !isResponse &&
-    !shouldAvoidParsing &&
-    hasTypePropertyInDepiction &&
-    schema.isNullable();
-  const result: SchemaObject = {};
-  if (description) result.description = description;
-  if (schema.meta()?.deprecated) result.deprecated = true;
-  if (acceptsNull) result.type = makeNullableType(prev);
-  if (!shouldAvoidParsing) {
-    const examples = getExamples({
-      schema,
-      variant: isResponse ? "parsed" : "original",
-      validate: true,
-    });
-    if (examples.length) result.examples = examples.slice();
-  }
-  return result;
-};
-
-export const onMissing: SchemaHandler<
-  SchemaObject | ReferenceObject,
-  OpenAPIContext,
-  "last"
-> = (schema: z.ZodTypeAny, ctx) => {
-  throw new DocumentationError(
-    `Zod type ${schema.constructor.name} is unsupported.`,
-    ctx,
   );
 };
 

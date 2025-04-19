@@ -1,4 +1,3 @@
-import type { $ZodType } from "@zod/core";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
@@ -10,17 +9,13 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictTags,
-  depicters,
   ensureShortDescription,
   excludeExamplesFromDepiction,
   excludeParamsFromDepiction,
   defaultIsHeader,
-  onEach,
-  onMissing,
   reformatParamsInPath,
   delegate,
 } from "../src/documentation-helpers";
-import { walkSchema } from "../src/schema-walker";
 
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
@@ -29,26 +24,12 @@ describe("Documentation helpers", () => {
     method: "get",
     isResponse: false,
     makeRef: makeRefMock,
-    next: (schema: $ZodType) =>
-      walkSchema(schema, {
-        rules: depicters,
-        onEach,
-        onMissing,
-        ctx: requestCtx,
-      }),
   } satisfies OpenAPIContext;
   const responseCtx = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
     makeRef: makeRefMock,
-    next: (schema: $ZodType) =>
-      walkSchema(schema, {
-        rules: depicters,
-        onEach,
-        onMissing,
-        ctx: responseCtx,
-      }),
   } satisfies OpenAPIContext;
 
   beforeEach(() => {
@@ -65,12 +46,7 @@ describe("Documentation helpers", () => {
         z.record(z.string(), z.string()),
       ),
     ])("should omit specified params %#", (schema) => {
-      const depicted = walkSchema(schema, {
-        ctx: requestCtx,
-        rules: depicters,
-        onEach,
-        onMissing,
-      });
+      const depicted = delegate(schema, requestCtx);
       const [result, hasRequired] = excludeParamsFromDepiction(depicted, ["a"]);
       expect(result).toMatchSnapshot();
       expect(hasRequired).toMatchSnapshot();
