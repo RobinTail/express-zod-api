@@ -684,13 +684,13 @@ exports[`Documentation helpers > depictPipeline > should depict as 'string (prep
 }
 `;
 
-exports[`Documentation helpers > depictPipeline > should handle edge cases 1`] = `
+exports[`Documentation helpers > depictPipeline > should handle edge cases 0 1`] = `
 {
   "format": "any",
 }
 `;
 
-exports[`Documentation helpers > depictPipeline > should handle edge cases 2`] = `
+exports[`Documentation helpers > depictPipeline > should handle edge cases 1 1`] = `
 {
   "format": "any",
 }

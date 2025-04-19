@@ -309,10 +309,7 @@ const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
             type: targetType as "number" | "string" | "boolean",
           });
         } else {
-          Object.assign(
-            jsonSchema,
-            delegate(z.any(), { ctx, rules: overrides }), // @todo try to avoid it
-          );
+          onAny({ zodSchema, jsonSchema }, ctx);
         }
       }
     }

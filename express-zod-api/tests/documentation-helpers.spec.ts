@@ -489,7 +489,7 @@ describe("Documentation helpers", () => {
     test.each([
       z.number().transform((num) => () => num),
       z.number().transform(() => assert.fail("this should be handled")),
-    ])("should handle edge cases", (schema) => {
+    ])("should handle edge cases %#", (schema) => {
       expect(delegate(schema, responseCtx)).toMatchSnapshot();
     });
   });
