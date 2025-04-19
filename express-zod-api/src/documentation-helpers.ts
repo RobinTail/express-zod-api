@@ -59,15 +59,15 @@ export interface OpenAPIContext extends FlatObject {
     subject: SchemaObject | ReferenceObject,
     name?: string,
   ) => ReferenceObject;
-  brandHandling: Record<string | symbol, (zodSchema: $ZodType) => SchemaObject>;
+  brandHandling: Record<string | symbol, Depicter>;
   path: string;
   method: Method;
 }
 
-export type Depicter = SchemaHandler<
-  SchemaObject | ReferenceObject,
-  OpenAPIContext
->;
+export type Depicter = (
+  zodSchema: $ZodType,
+  ctx: OpenAPIContext,
+) => SchemaObject;
 
 /** @desc Using defaultIsHeader when returns null or undefined */
 export type IsHeader = (
@@ -103,7 +103,7 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const delegate = (schema: $ZodType, ctx: OpenAPIContext) => {
+export const delegate: Depicter = (schema, ctx) => {
   const result = z.toJSONSchema(schema, {
     unrepresentable: "any",
     metadata: globalRegistry,
@@ -253,7 +253,7 @@ export const delegate = (schema: $ZodType, ctx: OpenAPIContext) => {
       // custom brands handling
       if (brand && ctx.brandHandling[brand]) {
         for (const key in jsonSchema) delete jsonSchema[key]; // undo default
-        Object.assign(jsonSchema, ctx.brandHandling[brand](zodSchema));
+        Object.assign(jsonSchema, ctx.brandHandling[brand](zodSchema, ctx));
       }
       // on each
       if (description) jsonSchema.description ??= description;
