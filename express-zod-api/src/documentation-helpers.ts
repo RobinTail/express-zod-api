@@ -107,7 +107,7 @@ export const delegate: Depicter = (schema, ctx) => {
     metadata: globalRegistry,
     io: ctx.isResponse ? "output" : "input",
     override: ({ zodSchema, jsonSchema }) => {
-      const { description } = globalRegistry.get(zodSchema) ?? {};
+      const { description, deprecated } = globalRegistry.get(zodSchema) ?? {};
       const { brand, defaultLabel } =
         globalRegistry.get(zodSchema)?.[metaSymbol] ?? {};
       if (zodSchema._zod.def.type === "nullable" && jsonSchema.oneOf) {
@@ -255,6 +255,7 @@ export const delegate: Depicter = (schema, ctx) => {
       }
       // on each
       if (description) jsonSchema.description ??= description;
+      if (deprecated) jsonSchema.deprecated = true;
       const shouldAvoidParsing =
         zodSchema._zod.def.type === "lazy" ||
         zodSchema._zod.def.type === "promise";
