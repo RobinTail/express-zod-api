@@ -101,7 +101,7 @@ describe("EndpointsFactory", () => {
       expect(newFactory["middlewares"].length).toBe(1);
       expect(newFactory["middlewares"][0].schema).toBeInstanceOf(z.ZodObject);
       expect(
-        (newFactory["middlewares"][0].schema as z.AnyZodObject).shape,
+        (newFactory["middlewares"][0].schema as z.ZodObject).shape,
       ).toEqual({});
       const { output: options } = await testMiddleware({
         middleware: newFactory["middlewares"][0],
@@ -129,7 +129,7 @@ describe("EndpointsFactory", () => {
         expect(newFactory["middlewares"].length).toBe(1);
         expect(newFactory["middlewares"][0].schema).toBeInstanceOf(z.ZodObject);
         expect(
-          (newFactory["middlewares"][0].schema as z.AnyZodObject).shape,
+          (newFactory["middlewares"][0].schema as z.ZodObject).shape,
         ).toEqual({});
         const {
           output: options,
@@ -249,7 +249,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toExtend<{
+      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<{
         n: number;
         s: string;
       }>();
@@ -277,7 +277,7 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toExtend<{
+      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<{
         a?: number;
         b?: string;
         i: string;
@@ -286,7 +286,10 @@ describe("EndpointsFactory", () => {
 
     test("Should create an endpoint with intersection middleware", () => {
       const middleware = new Middleware({
-        input: z.object({ n1: z.number() }).and(z.object({ n2: z.number() })),
+        input: z.intersection(
+          z.object({ n1: z.number() }),
+          z.object({ n2: z.number() }),
+        ),
         handler: vi.fn<any>(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
@@ -302,7 +305,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toExtend<{
+      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<{
         n1: number;
         n2: number;
         s: string;
@@ -330,7 +333,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toExtend<
+      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<
         { s: string } & ({ n1: number } | { n2: number })
       >();
     });
@@ -343,7 +346,8 @@ describe("EndpointsFactory", () => {
         output: z.object({}),
         handler: vi.fn(),
       });
-      expectTypeOf(endpoint.inputSchema._output).toEqualTypeOf<EmptyObject>();
+      /** @see $InferObjectOutput - external logic */
+      expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<object>();
       expect(endpoint.isDeprecated).toBe(true);
     });
   });

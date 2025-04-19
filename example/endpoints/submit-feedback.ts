@@ -6,7 +6,7 @@ export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
   tag: "forms",
   input: ez.form({
     name: z.string().min(1),
-    email: z.string().email(),
+    email: z.email(),
     message: z.string().min(1),
   }),
   output: z.object({

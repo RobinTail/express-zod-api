@@ -12,7 +12,7 @@ import {
   ResultHandler,
 } from "../src";
 import { contentTypes } from "../src/content-type";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import { givePort } from "../../tools/ports";
 
 describe("Documentation", () => {
@@ -281,9 +281,9 @@ describe("Documentation", () => {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
               output: z.object({
-                simple: z.record(z.number().int()),
+                simple: z.record(z.string(), z.int()),
                 stringy: z.record(z.string().regex(/[A-Z]+/), z.boolean()),
-                numeric: z.record(z.number().int(), z.boolean()),
+                numeric: z.record(z.int(), z.boolean()),
                 literal: z.record(z.literal("only"), z.boolean()),
                 union: z.record(
                   z.literal("option1").or(z.literal("option2")),
@@ -337,7 +337,7 @@ describe("Documentation", () => {
                 doublePositive: z.number().positive(),
                 doubleNegative: z.number().negative(),
                 doubleLimited: z.number().min(-0.5).max(0.5),
-                int: z.number().int(),
+                int: z.int(),
                 intPositive: z.number().int().positive(),
                 intNegative: z.number().int().negative(),
                 intLimited: z.number().int().min(-100).max(100),
@@ -369,19 +369,18 @@ describe("Documentation", () => {
                 min: z.string().nonempty(),
                 max: z.string().max(15),
                 range: z.string().min(2).max(3),
-                email: z.string().email(),
-                uuid: z.string().uuid(),
-                cuid: z.string().cuid(),
-                cuid2: z.string().cuid2(),
-                ulid: z.string().ulid(),
-                ip: z.string().ip(),
-                emoji: z.string().emoji(),
-                url: z.string().url(),
+                email: z.email(),
+                uuid: z.uuid(),
+                cuid: z.cuid(),
+                cuid2: z.cuid2(),
+                ulid: z.ulid(),
+                ip: z.ipv4(),
+                emoji: z.emoji(),
+                url: z.url(),
                 numeric: z.string().regex(/\d+/),
                 combined: z
-                  .string()
-                  .min(1)
                   .email()
+                  .min(1)
                   .regex(/.*@example\.com/is)
                   .max(90),
               }),
@@ -438,10 +437,10 @@ describe("Documentation", () => {
                 regularEnum: z.enum(["ABC", "DEF"]),
               }),
               output: z.object({
-                nativeEnum: z.nativeEnum({ FEG: 1, XYZ: 2 }),
+                nativeEnum: z.enum({ FEG: 1, XYZ: 2 }),
               }),
               handler: async () => ({
-                nativeEnum: 1,
+                nativeEnum: 1 as const,
               }),
             }),
           },
@@ -483,15 +482,11 @@ describe("Documentation", () => {
       expect(boolean.parse(null)).toBe(false);
     });
 
+    // @todo switch to z.interface for that
     test("should handle circular schemas via z.lazy()", () => {
-      const baseCategorySchema = z.object({
+      const category: z.ZodObject = z.object({
         name: z.string(),
-      });
-      type Category = z.infer<typeof baseCategorySchema> & {
-        subcategories: Category[];
-      };
-      const categorySchema: z.ZodType<Category> = baseCategorySchema.extend({
-        subcategories: z.lazy(() => categorySchema.array()),
+        subcategories: z.lazy(() => category.array()),
       });
       const spec = new Documentation({
         config: sampleConfig,
@@ -499,9 +494,9 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
-              input: baseCategorySchema,
+              input: category,
               output: z.object({
-                zodExample: categorySchema,
+                zodExample: category,
               }),
               handler: async () => ({
                 zodExample: {
@@ -530,7 +525,6 @@ describe("Documentation", () => {
       z.undefined(),
       z.map(z.any(), z.any()),
       z.set(z.any()),
-      z.function(),
       z.promise(z.any()),
       z.nan(),
       z.symbol(),
@@ -560,7 +554,7 @@ describe("Documentation", () => {
           }),
       ).toThrow(
         new DocumentationError(
-          `Zod type ${zodType._def.typeName} is unsupported.`,
+          `Zod type ${zodType.constructor.name} is unsupported.`,
           {
             method: "post",
             path: "/v1/getSomething",
@@ -1235,9 +1229,12 @@ describe("Documentation", () => {
     test("should be handled accordingly in request, response and params", () => {
       const deep = Symbol("DEEP");
       const rule: Depicter = (
-        schema: z.ZodBranded<z.ZodTypeAny, PropertyKey>,
+        schema: ReturnType<z.ZodBoolean["brand"]>,
         { next },
-      ) => next(schema.unwrap());
+      ) => {
+        globalRegistry.remove(schema);
+        return next(schema);
+      };
       const spec = new Documentation({
         config: sampleConfig,
         routing: {

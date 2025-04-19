@@ -135,14 +135,14 @@ describe("Endpoint", () => {
     test("Should throw on output validation failure", async () => {
       const endpoint = defaultEndpointsFactory.build({
         method: "post",
-        output: z.object({ email: z.string().email() }),
+        output: z.object({ email: z.email() }),
         handler: async () => ({ email: "not email" }),
       });
       const { responseMock } = await testEndpoint({ endpoint });
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
         status: "error",
-        error: { message: "output/email: Invalid email" },
+        error: { message: "output/email: Invalid email address" },
       });
     });
 
@@ -527,8 +527,7 @@ describe("Endpoint", () => {
           },
         ),
       output: z
-        .object({})
-        .passthrough()
+        .looseObject({})
         .refine((obj) => !("emitOutputValidationFailure" in obj), {
           message: "failure on demand",
         }),
@@ -601,7 +600,7 @@ describe("Endpoint", () => {
       method: "post",
       input: z
         .object({
-          email: z.string().email().optional(),
+          email: z.email().optional(),
           id: z.string().optional(),
           otherThing: z.string().optional(),
         })

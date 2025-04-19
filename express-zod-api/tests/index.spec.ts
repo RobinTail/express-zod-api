@@ -103,13 +103,7 @@ describe("Index Entrypoint", () => {
       expectTypeOf<z.ZodDefault<z.ZodString>>()
         .toHaveProperty("label")
         .toEqualTypeOf<(value: string) => z.ZodDefault<z.ZodString>>();
-      expectTypeOf({
-        remap: () =>
-          z.pipeline(
-            z.object({}).transform(() => ({})),
-            z.object({}),
-          ),
-      }).toExtend<Partial<z.ZodObject<z.ZodRawShape>>>();
+      expectTypeOf<z.ZodObject>().toHaveProperty("remap");
     });
   });
 });

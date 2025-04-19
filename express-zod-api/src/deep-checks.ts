@@ -1,63 +1,75 @@
+import type {
+  $ZodArray,
+  $ZodCatch,
+  $ZodDefault,
+  $ZodDiscriminatedUnion,
+  $ZodIntersection,
+  $ZodLazy,
+  $ZodNullable,
+  $ZodObject,
+  $ZodOptional,
+  $ZodPipe,
+  $ZodReadonly,
+  $ZodRecord,
+  $ZodTuple,
+  $ZodType,
+  $ZodUnion,
+} from "@zod/core";
 import { fail } from "node:assert/strict"; // eslint-disable-line no-restricted-syntax -- acceptable
-import { z } from "zod";
+import { globalRegistry } from "zod";
 import { EmptyObject } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand } from "./file-schema";
-import { ezFormBrand, FormSchema } from "./form-schema";
+import { ezFormBrand } from "./form-schema";
 import { IOSchema } from "./io-schema";
 import { metaSymbol } from "./metadata";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
-import { HandlingRules, NextHandlerInc, SchemaHandler } from "./schema-walker";
+import {
+  FirstPartyKind,
+  HandlingRules,
+  NextHandlerInc,
+  SchemaHandler,
+} from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
 
 /** @desc Check is a schema handling rule returning boolean */
 type Check = SchemaHandler<boolean>;
 
 const onSomeUnion: Check = (
-  schema:
-    | z.ZodUnion<z.ZodUnionOptions>
-    | z.ZodDiscriminatedUnion<string, z.ZodDiscriminatedUnionOption<string>[]>,
+  { _zod }: $ZodUnion | $ZodDiscriminatedUnion,
   { next },
-) => schema.options.some(next);
+) => _zod.def.options.some(next);
 
-const onIntersection: Check = (
-  { _def }: z.ZodIntersection<z.ZodTypeAny, z.ZodTypeAny>,
-  { next },
-) => [_def.left, _def.right].some(next);
+const onIntersection: Check = ({ _zod }: $ZodIntersection, { next }) =>
+  [_zod.def.left, _zod.def.right].some(next);
 
 const onWrapped: Check = (
-  schema:
-    | z.ZodOptional<z.ZodTypeAny>
-    | z.ZodNullable<z.ZodTypeAny>
-    | z.ZodReadonly<z.ZodTypeAny>
-    | z.ZodBranded<z.ZodTypeAny, string | number | symbol>,
+  {
+    _zod: { def },
+  }: $ZodOptional | $ZodNullable | $ZodReadonly | $ZodDefault | $ZodCatch,
   { next },
-) => next(schema.unwrap());
+) => next(def.innerType);
 
-const ioChecks: HandlingRules<boolean, EmptyObject, z.ZodFirstPartyTypeKind> = {
-  ZodObject: ({ shape }: z.ZodObject<z.ZodRawShape>, { next }) =>
-    Object.values(shape).some(next),
-  ZodUnion: onSomeUnion,
-  ZodDiscriminatedUnion: onSomeUnion,
-  ZodIntersection: onIntersection,
-  ZodEffects: (schema: z.ZodEffects<z.ZodTypeAny>, { next }) =>
-    next(schema.innerType()),
-  ZodOptional: onWrapped,
-  ZodNullable: onWrapped,
-  ZodRecord: ({ valueSchema }: z.ZodRecord, { next }) => next(valueSchema),
-  ZodArray: ({ element }: z.ZodArray<z.ZodTypeAny>, { next }) => next(element),
-  ZodDefault: ({ _def }: z.ZodDefault<z.ZodTypeAny>, { next }) =>
-    next(_def.innerType),
+const ioChecks: HandlingRules<boolean, EmptyObject, FirstPartyKind> = {
+  object: ({ _zod }: $ZodObject, { next }) =>
+    Object.values(_zod.def.shape).some(next),
+  union: onSomeUnion,
+  intersection: onIntersection,
+  optional: onWrapped,
+  nullable: onWrapped,
+  default: onWrapped,
+  record: ({ _zod }: $ZodRecord, { next }) => next(_zod.def.valueType),
+  array: ({ _zod }: $ZodArray, { next }) => next(_zod.def.element),
 };
 
 interface NestedSchemaLookupProps {
-  condition?: (schema: z.ZodType) => boolean;
+  condition?: (schema: $ZodType) => boolean;
   rules?: HandlingRules<
     boolean,
     EmptyObject,
-    z.ZodFirstPartyTypeKind | ProprietaryBrand
+    FirstPartyKind | ProprietaryBrand
   >;
   maxDepth?: number;
   depth?: number;
@@ -65,7 +77,7 @@ interface NestedSchemaLookupProps {
 
 /** @desc The optimized version of the schema walker for boolean checks */
 export const hasNestedSchema = (
-  subject: z.ZodType,
+  subject: $ZodType,
   {
     condition,
     rules = ioChecks,
@@ -74,12 +86,12 @@ export const hasNestedSchema = (
   }: NestedSchemaLookupProps,
 ): boolean => {
   if (condition?.(subject)) return true;
+  if (depth >= maxDepth) return false;
+  const brand = globalRegistry.get(subject)?.[metaSymbol]?.brand;
   const handler =
-    depth < maxDepth
-      ? rules[subject._def[metaSymbol]?.brand as keyof typeof rules] ||
-        ("typeName" in subject._def &&
-          rules[subject._def.typeName as keyof typeof rules])
-      : undefined;
+    brand && brand in rules
+      ? rules[brand as keyof typeof rules]
+      : rules[subject._zod.def.type];
   if (handler) {
     return handler(subject, {
       next: (schema) =>
@@ -96,56 +108,53 @@ export const hasNestedSchema = (
 
 export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema(subject, {
-    condition: (schema) => schema._def[metaSymbol]?.brand === ezUploadBrand,
+    condition: (schema) =>
+      globalRegistry.get(schema)?.[metaSymbol]?.brand === ezUploadBrand,
     rules: {
       ...ioChecks,
-      [ezFormBrand]: (schema: FormSchema, { next }) =>
-        Object.values(schema.unwrap().shape).some(next),
+      [ezFormBrand]: ioChecks.object,
     },
   });
 
 export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema(subject, {
-    condition: (schema) => schema._def[metaSymbol]?.brand === ezRawBrand,
+    condition: (schema) =>
+      globalRegistry.get(schema)?.[metaSymbol]?.brand === ezRawBrand,
     maxDepth: 3,
   });
 
 export const hasForm = (subject: IOSchema) =>
   hasNestedSchema(subject, {
-    condition: (schema) => schema._def[metaSymbol]?.brand === ezFormBrand,
+    condition: (schema) =>
+      globalRegistry.get(schema)?.[metaSymbol]?.brand === ezFormBrand,
     maxDepth: 3,
   });
 
 /** @throws AssertionError with incompatible schema constructor */
-export const assertJsonCompatible = (subject: IOSchema, dir: "in" | "out") => {
-  const lazies = new WeakSet<z.ZodLazy<z.ZodTypeAny>>();
+export const assertJsonCompatible = (subject: $ZodType, dir: "in" | "out") => {
+  const lazies = new WeakSet<() => $ZodType>();
   return hasNestedSchema(subject, {
     maxDepth: 300,
     rules: {
       ...ioChecks,
-      ZodBranded: onWrapped,
-      ZodReadonly: onWrapped,
-      ZodCatch: ({ _def: { innerType } }: z.ZodCatch<z.ZodTypeAny>, { next }) =>
-        next(innerType),
-      ZodPipeline: (
-        { _def }: z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>,
-        { next },
-      ) => next(_def[dir]),
-      ZodLazy: (lazy: z.ZodLazy<z.ZodTypeAny>, { next }) =>
-        lazies.has(lazy) ? false : lazies.add(lazy) && next(lazy.schema),
-      ZodTuple: ({ items, _def: { rest } }: z.AnyZodTuple, { next }) =>
-        [...items].concat(rest ?? []).some(next),
-      ZodEffects: { out: undefined, in: ioChecks.ZodEffects }[dir],
-      ZodNaN: () => fail("z.nan()"),
-      ZodSymbol: () => fail("z.symbol()"),
-      ZodFunction: () => fail("z.function()"),
-      ZodMap: () => fail("z.map()"),
-      ZodSet: () => fail("z.set()"),
-      ZodBigInt: () => fail("z.bigint()"),
-      ZodVoid: () => fail("z.void()"),
-      ZodPromise: () => fail("z.promise()"),
-      ZodNever: () => fail("z.never()"),
-      ZodDate: () => dir === "in" && fail("z.date()"),
+      readonly: onWrapped,
+      catch: onWrapped,
+      pipe: ({ _zod }: $ZodPipe, { next }) => next(_zod.def[dir]),
+      lazy: ({ _zod: { def } }: $ZodLazy, { next }) =>
+        lazies.has(def.getter)
+          ? false
+          : lazies.add(def.getter) && next(def.getter()),
+      tuple: ({ _zod: { def } }: $ZodTuple, { next }) =>
+        [...def.items].concat(def.rest ?? []).some(next),
+      nan: () => fail("z.nan()"),
+      symbol: () => fail("z.symbol()"),
+      map: () => fail("z.map()"),
+      set: () => fail("z.set()"),
+      bigint: () => fail("z.bigint()"),
+      void: () => fail("z.void()"),
+      promise: () => fail("z.promise()"),
+      never: () => fail("z.never()"),
+      date: () => dir === "in" && fail("z.date()"),
       [ezDateOutBrand]: () => dir === "in" && fail("ez.dateOut()"),
       [ezDateInBrand]: () => dir === "out" && fail("ez.dateIn()"),
       [ezRawBrand]: () => dir === "out" && fail("ez.raw()"),

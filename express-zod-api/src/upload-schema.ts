@@ -27,9 +27,11 @@ export const upload = () =>
         typeof subject.size === "number" &&
         typeof subject.md5 === "string" &&
         typeof subject.mv === "function",
-      (input) => ({
-        message: `Expected file upload, received ${typeof input}`,
-      }),
+      {
+        error: ({ input }) => ({
+          message: `Expected file upload, received ${typeof input}`,
+        }),
+      },
     )
     .brand(ezUploadBrand as symbol);
 

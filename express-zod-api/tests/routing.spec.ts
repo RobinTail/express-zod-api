@@ -393,15 +393,19 @@ describe("Routing", () => {
       });
     });
 
+    const circular: z.ZodType = z.lazy(() => z.tuple([circular, z.nan()]));
     test.each([
       [z.bigint(), z.set(z.string())],
       [z.nan(), z.map(z.string(), z.boolean())],
-      [z.date().pipe(z.string()), z.symbol().catch(Symbol("test"))],
-      [z.function().transform(() => "test"), z.tuple([z.function()])],
+      [
+        z.date().transform(String).pipe(z.string()),
+        z.symbol().catch(Symbol("test")),
+      ],
       [ez.dateOut(), ez.dateIn()],
       [z.lazy(() => z.void()), ez.raw()],
       [z.promise(z.any()), ez.upload()],
       [z.never(), z.tuple([ez.file()]).rest(z.nan())],
+      [z.nan().pipe(z.any()), circular],
     ])("should warn about JSON incompatible schemas %#", (input, output) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
         input: z.object({ input }),
@@ -424,6 +428,35 @@ describe("Routing", () => {
         [
           "The final positive response schema of the endpoint contains an unsupported JSON payload type.",
           { method: "get", path: "/path", reason: expect.any(Error) },
+        ],
+      ]);
+    });
+
+    test.each([
+      [z.string().array(), z.string()],
+      [z.lazy(() => z.number()), z.object({}).pipe(z.array(z.string()))],
+    ])("should warn about non-object based schemas I/O %#", (input, output) => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        input: input as unknown as z.ZodObject,
+        output: output as unknown as z.ZodObject,
+        handler: vi.fn(),
+      });
+      const configMock = { cors: false, startupLogo: false };
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: configMock as CommonConfig,
+        routing: { path: endpoint },
+      });
+      expect(logger._getLogs().warn).toEqual([
+        [
+          "Endpoint input schema is not object-based",
+          { method: "get", path: "/path" },
+        ],
+        [
+          "Endpoint output schema is not object-based",
+          { method: "get", path: "/path" },
         ],
       ]);
     });

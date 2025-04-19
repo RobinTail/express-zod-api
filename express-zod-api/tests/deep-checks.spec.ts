@@ -1,5 +1,6 @@
 import { UploadedFile } from "express-fileupload";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
+import type { $brand, $ZodType } from "@zod/core";
 import { ez } from "../src";
 import { hasNestedSchema } from "../src/deep-checks";
 import { metaSymbol } from "../src/metadata";
@@ -7,8 +8,8 @@ import { ezUploadBrand } from "../src/upload-schema";
 
 describe("Checks", () => {
   describe("hasNestedSchema()", () => {
-    const condition = (subject: z.ZodTypeAny) =>
-      subject._def[metaSymbol]?.brand === ezUploadBrand;
+    const condition = (subject: $ZodType) =>
+      globalRegistry.get(subject)?.[metaSymbol]?.brand === ezUploadBrand;
 
     test("should return true for given argument satisfying condition", () => {
       expect(hasNestedSchema(ez.upload(), { condition })).toBeTruthy();
@@ -17,11 +18,14 @@ describe("Checks", () => {
     test.each([
       z.object({ test: ez.upload() }),
       ez.upload().or(z.boolean()),
-      z.object({ test: z.boolean() }).and(z.object({ test2: ez.upload() })),
+      z.intersection(
+        z.object({ test: z.boolean() }),
+        z.object({ test2: ez.upload() }),
+      ),
       z.optional(ez.upload()),
       ez.upload().nullable(),
-      ez.upload().default({} as UploadedFile),
-      z.record(ez.upload()),
+      ez.upload().default({} as UploadedFile & $brand<symbol>),
+      z.record(z.string(), ez.upload()),
       ez.upload().refine(() => true),
       z.array(ez.upload()),
     ])("should return true for wrapped needle %#", (subject) => {
@@ -32,7 +36,7 @@ describe("Checks", () => {
       z.object({}),
       z.any(),
       z.literal("test"),
-      z.boolean().and(z.literal(true)),
+      z.intersection(z.boolean(), z.literal(true)),
       z.number().or(z.string()),
     ])("should return false in other cases %#", (subject) => {
       expect(hasNestedSchema(subject, { condition })).toBeFalsy();

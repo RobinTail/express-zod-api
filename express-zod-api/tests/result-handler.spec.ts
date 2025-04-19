@@ -118,7 +118,7 @@ describe("ResultHandler", () => {
               message: "Expected string, got number",
               path: ["something"],
               expected: "string",
-              received: "number",
+              input: 453,
             },
           ]),
         ),
@@ -197,13 +197,13 @@ describe("ResultHandler", () => {
           }),
       );
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema._def[metaSymbol]).toMatchSnapshot();
+      expect(apiResponse[0].schema.meta()?.[metaSymbol]).toMatchSnapshot();
     });
 
     test("should generate negative response example", () => {
       const apiResponse = subject.getNegativeResponse();
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema._def[metaSymbol]).toMatchSnapshot();
+      expect(apiResponse[0].schema.meta()?.[metaSymbol]).toMatchSnapshot();
     });
   });
 
@@ -215,10 +215,10 @@ describe("ResultHandler", () => {
         z.object({ anything: z.number() }).example({ anything: 118 }),
       )
       .pop()?.schema;
-    expect(positiveSchema?._def).toHaveProperty("typeName", "ZodArray");
+    expect(positiveSchema).toHaveProperty(["_zod", "def", "type"], "array");
     expect(positiveSchema).toHaveProperty(
-      ["element", "_def", "typeName"],
-      "ZodAny",
+      ["_zod", "def", "element", "_zod", "def", "type"],
+      "any",
     );
     expect(() =>
       arrayResultHandler.execute({

@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import {
   EndpointsFactory,
   Integration,
@@ -120,9 +120,12 @@ describe("Integration", () => {
   describe("Feature #1470: Custom brands", () => {
     test("should by handled accordingly", async () => {
       const rule: Producer = (
-        schema: z.ZodBranded<z.ZodTypeAny, PropertyKey>,
+        schema: ReturnType<z.ZodType["brand"]>,
         { next },
-      ) => next(schema.unwrap());
+      ) => {
+        globalRegistry.remove(schema);
+        return next(schema);
+      };
       const client = new Integration({
         variant: "types",
         brandHandling: {

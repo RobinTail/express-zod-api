@@ -5,13 +5,14 @@ import { defaultEndpointsFactory } from "express-zod-api";
 import { methodProviderMiddleware } from "../middlewares";
 
 // Demonstrating circular schemas using z.lazy()
-const baseFeature = z.object({
-  title: z.string(),
-});
-type Feature = z.infer<typeof baseFeature> & {
+// @todo switch to z.interface for that
+interface Feature {
+  title: string;
   features: Feature[];
-};
-const feature: z.ZodType<Feature> = baseFeature.extend({
+}
+
+const feature: z.ZodType<Feature> = z.object({
+  title: z.string(),
   features: z.lazy(() => feature.array()),
 });
 

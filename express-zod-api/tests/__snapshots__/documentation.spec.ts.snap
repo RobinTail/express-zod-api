@@ -718,8 +718,6 @@ paths:
         content:
           application/json:
             schema:
-              discriminator:
-                propertyName: type
               oneOf:
                 - type: object
                   properties:
@@ -741,6 +739,8 @@ paths:
                   required:
                     - type
                     - b
+              discriminator:
+                propertyName: type
         required: true
       responses:
         "200":
@@ -754,8 +754,6 @@ paths:
                     type: string
                     const: success
                   data:
-                    discriminator:
-                      propertyName: status
                     oneOf:
                       - type: object
                         properties:
@@ -782,6 +780,8 @@ paths:
                         required:
                           - status
                           - error
+                    discriminator:
+                      propertyName: status
                 required:
                   - status
                   - data
@@ -1272,8 +1272,11 @@ paths:
               properties:
                 name:
                   type: string
+                subcategories:
+                  $ref: "#/components/schemas/Schema1"
               required:
                 - name
+                - subcategories
         required: true
       responses:
         "200":
@@ -1604,10 +1607,10 @@ paths:
                   pattern: \\d+
                 combined:
                   type: string
-                  format: email
                   minLength: 1
-                  maxLength: 90
                   pattern: .*@example\\.com
+                  maxLength: 90
+                  format: email
               required:
                 - regular
                 - min
