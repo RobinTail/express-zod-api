@@ -116,7 +116,7 @@ const onUpload: Overrider = ({ jsonSchema }, ctx) => {
 };
 
 const onFile: Overrider = ({ jsonSchema }) => {
-  delete jsonSchema.oneOf; // undo default
+  delete jsonSchema.anyOf; // undo default
   Object.assign(jsonSchema, {
     type: "string",
     format:
@@ -131,7 +131,7 @@ const onFile: Overrider = ({ jsonSchema }) => {
 const onUnion: Overrider = ({ zodSchema, jsonSchema }) => {
   if (!zodSchema._zod.disc) return;
   const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
-  jsonSchema.discriminator = { propertyName };
+  jsonSchema.discriminator ??= { propertyName };
 };
 
 const propsMerger = (a: unknown, b: unknown) => {
@@ -189,11 +189,11 @@ const onIntersection: Overrider = ({ jsonSchema }) => {
 
 /** @since OAS 3.1 nullable replaced with type array having null */
 const onNullable: Overrider = ({ jsonSchema }) => {
-  if (!jsonSchema.oneOf) return;
-  const original = jsonSchema.oneOf[0];
+  if (!jsonSchema.anyOf) return;
+  const original = jsonSchema.anyOf[0];
   Object.assign(original, { type: makeNullableType(original) });
   Object.assign(jsonSchema, original);
-  delete jsonSchema.oneOf;
+  delete jsonSchema.anyOf;
 };
 
 const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
@@ -225,7 +225,7 @@ const onLiteral: Overrider = ({ zodSchema, jsonSchema }) =>
 const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  delete jsonSchema.oneOf; // undo default
+  delete jsonSchema.anyOf; // undo default
   Object.assign(jsonSchema, {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
@@ -549,6 +549,7 @@ export const excludeParamsFromDepiction = (
     required: R.without(names),
     allOf: subTransformer,
     oneOf: subTransformer,
+    anyOf: subTransformer,
   };
   const result: SchemaObject = R.evolve(transformers, subject);
   return [result, hasRequired || Boolean(result.required?.length)];

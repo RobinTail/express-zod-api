@@ -729,7 +729,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
+              anyOf:
                 - type: object
                   properties:
                     type:
@@ -765,7 +765,7 @@ paths:
                     const: success
                     type: string
                   data:
-                    oneOf:
+                    anyOf:
                       - type: object
                         properties:
                           status:
@@ -1062,7 +1062,7 @@ paths:
               type: object
               properties:
                 union:
-                  oneOf:
+                  anyOf:
                     - type: object
                       properties:
                         one:
@@ -1101,7 +1101,7 @@ paths:
                     type: object
                     properties:
                       or:
-                        oneOf:
+                        anyOf:
                           - type: string
                           - type: integer
                             exclusiveMaximum: 9007199254740991
@@ -1824,7 +1824,7 @@ paths:
                       union:
                         type: object
                         propertyNames:
-                          oneOf:
+                          anyOf:
                             - const: option1
                               type: string
                             - const: option2
@@ -3037,7 +3037,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
+              anyOf:
                 - type: object
                   properties:
                     id:
@@ -3069,7 +3069,7 @@ paths:
                     const: success
                     type: string
                   data:
-                    oneOf:
+                    anyOf:
                       - type: object
                         properties:
                           id:
@@ -3876,7 +3876,7 @@ paths:
           required: true
           description: parameter of post /v1/:name
           schema:
-            oneOf:
+            anyOf:
               - const: John
                 type: string
               - const: Jane
@@ -3998,7 +3998,7 @@ paths:
 components:
   schemas:
     ParameterOfPostV1NameName:
-      oneOf:
+      anyOf:
         - const: John
           type: string
         - const: Jane
@@ -4068,7 +4068,7 @@ paths:
           required: true
           description: GET /v1/:name Parameter
           schema:
-            oneOf:
+            anyOf:
               - const: John
                 type: string
               - const: Jane
@@ -4154,7 +4154,7 @@ paths:
           required: true
           description: POST /v1/:name Parameter
           schema:
-            oneOf:
+            anyOf:
               - const: John
                 type: string
               - const: Jane

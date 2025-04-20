@@ -764,7 +764,7 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
     "type": "boolean",
   },
   "propertyNames": {
-    "oneOf": [
+    "anyOf": [
       {
         "const": "one",
         "type": "string",
@@ -1336,10 +1336,7 @@ exports[`Documentation helpers > depictTuple() > should utilize prefixItems and 
 
 exports[`Documentation helpers > depictUnion() > should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
 {
-  "discriminator": {
-    "propertyName": "status",
-  },
-  "oneOf": [
+  "anyOf": [
     {
       "properties": {
         "data": {
@@ -1381,12 +1378,15 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
       "type": "object",
     },
   ],
+  "discriminator": {
+    "propertyName": "status",
+  },
 }
 `;
 
 exports[`Documentation helpers > depictUnion() > should wrap next depicters into oneOf property 1`] = `
 {
-  "oneOf": [
+  "anyOf": [
     {
       "type": "string",
     },
@@ -1471,7 +1471,7 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified params 1 1`] = `
 {
-  "oneOf": [
+  "anyOf": [
     {
       "properties": {},
       "required": [],
