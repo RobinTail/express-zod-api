@@ -94,7 +94,7 @@ const samples = {
   object: {},
   null: null,
   array: [],
-} satisfies Record<Extract<SchemaObjectType, string>, unknown>;
+} satisfies Record<SchemaObjectType, unknown>;
 
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 const timeRegex = /^\d{2}:\d{2}:\d{2}(\.\d+)?$/;
@@ -218,18 +218,14 @@ export const depictNullable: Depicter = (
   return nested;
 };
 
+const isSupportedType = (subject: string): subject is SchemaObjectType =>
+  subject in samples;
+
 const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
   const detected = R.toLower(R.type(value)); // toLower is typed well unlike .toLowerCase()
-  const isSupported =
-    detected === "number" ||
-    detected === "string" ||
-    detected === "boolean" ||
-    detected === "object" ||
-    detected === "null" ||
-    detected === "array";
   return typeof value === "bigint"
     ? "integer"
-    : isSupported
+    : isSupportedType(detected)
       ? detected
       : undefined;
 };
