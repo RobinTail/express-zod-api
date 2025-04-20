@@ -288,7 +288,7 @@ const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
     ctx.isResponse ? "in" : "out"
   ];
   if (target instanceof z.ZodTransform) {
-    const opposingDepiction = delegate(opposite, { ctx, rules: overrides }); // @todo can avoid it?
+    const opposingDepiction = delegate(opposite, { ctx, rules: overrides });
     if (isSchemaObject(opposingDepiction)) {
       if (!ctx.isResponse) {
         const { type: opposingType, ...rest } = opposingDepiction;
