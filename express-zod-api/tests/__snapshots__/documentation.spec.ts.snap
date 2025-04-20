@@ -1288,7 +1288,7 @@ paths:
                     type: object
                     properties:
                       zodExample:
-                        $ref: "#/components/schemas/__schema0"
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - zodExample
                 required:
@@ -1322,7 +1322,7 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    __schema0:
+    Schema1:
       type: object
       properties:
         name:
@@ -1330,7 +1330,7 @@ components:
         subcategories:
           type: array
           items:
-            $ref: "#/components/schemas/__schema0"
+            $ref: "#/components/schemas/Schema1"
       required:
         - name
         - subcategories

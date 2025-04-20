@@ -56,6 +56,7 @@ import wellKnownHeaders from "./well-known-headers.json";
 export interface OpenAPIContext {
   isResponse: boolean;
   makeRef: (
+    key: object,
     subject: SchemaObject | ReferenceObject,
     name?: string,
   ) => ReferenceObject;
@@ -423,7 +424,7 @@ export const depictRequestParams = ({
       });
       const result =
         composition === "components"
-          ? makeRef(depicted, makeCleanId(description, name))
+          ? makeRef(paramSchema, depicted, makeCleanId(description, name))
           : depicted;
       return acc.concat({
         name,
@@ -497,7 +498,7 @@ const fixReferences = (
         const actualName = entry.$ref.split("/").pop()!;
         const depiction = $defs?.[actualName];
         if (depiction)
-          entry.$ref = makeRef(depiction as SchemaObject, actualName).$ref;
+          entry.$ref = makeRef(depiction, depiction as SchemaObject).$ref;
         continue;
       }
       stack.push(...R.values(entry));
@@ -590,7 +591,7 @@ export const depictResponse = ({
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(depictedSchema, makeCleanId(description))
+        ? makeRef(schema, depictedSchema, makeCleanId(description))
         : depictedSchema,
     examples: depictExamples(schema, true),
   };
@@ -714,7 +715,7 @@ export const depictBody = ({
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(bodyDepiction, makeCleanId(description))
+        ? makeRef(schema, bodyDepiction, makeCleanId(description))
         : bodyDepiction,
     examples: depictExamples(extractObjectSchema(schema), false, paramNames),
   };

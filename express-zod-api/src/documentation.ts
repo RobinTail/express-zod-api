@@ -85,11 +85,17 @@ interface DocumentationParams {
 export class Documentation extends OpenApiBuilder {
   readonly #lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   readonly #lastOperationIdSuffixes = new Map<string, number>();
+  readonly #references = new Map<object, string>();
 
   #makeRef(
+    key: object,
     subject: SchemaObject | ReferenceObject,
-    name = `Schema${Object.keys(this.rootDoc.components?.schemas || {}).length + 1}`,
+    name = this.#references.get(key),
   ): ReferenceObject {
+    if (!name) {
+      name = `Schema${Object.keys(this.rootDoc.components?.schemas || {}).length + 1}`;
+      this.#references.set(key, name);
+    }
     this.addSchema(name, subject);
     return { $ref: `#/components/schemas/${name}` };
   }

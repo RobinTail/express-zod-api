@@ -42,7 +42,7 @@ paths:
                       features:
                         type: array
                         items:
-                          $ref: "#/components/schemas/__schema0"
+                          $ref: "#/components/schemas/Schema1"
                     required:
                       - id
                       - name
@@ -700,7 +700,7 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    __schema0:
+    Schema1:
       type: object
       properties:
         title:
@@ -708,7 +708,7 @@ components:
         features:
           type: array
           items:
-            $ref: "#/components/schemas/__schema0"
+            $ref: "#/components/schemas/Schema1"
       required:
         - title
         - features
