@@ -496,10 +496,8 @@ const fixReferences = (
     if (R.is(Object, entry)) {
       if (isReferenceObject(entry)) {
         if (entry.$ref === "#" && !$defs[entry.$ref]) {
-          return fixReferences(
-            { $defs: { ...$defs, [entry.$ref]: rest }, $ref: entry.$ref }, // false root handling
-            ctx,
-          );
+          $defs[entry.$ref] = rest;
+          return fixReferences({ $defs, $ref: entry.$ref }, ctx); // false root rewriting
         }
         if (!entry.$ref.startsWith("#/components")) {
           const actualName = entry.$ref.split("/").pop()!;
