@@ -10,6 +10,12 @@
   - `IOSchema` type had to be simplified down to a schema resulting in a `object`, but not an `array`;
   - Despite supporting examples by the new Zod method `.meta()`, users should still use `.example()` to set them;
   - Refer to [Migration guide on Zod 4](https://v4.zod.dev/v4/changelog) for adjusting your schemas;
+- Generating Documentation is partially delegated to Zod 4 `z.toJSONSchema()`:
+  - The basic depiction of each schema is now natively performed by Zod 4;
+  - Express Zod API implements some overrides and improvements to fit it into OpenAPI 3.1 that extends JSON Schema;
+  - The `numericRange` option removed from `Documentation` class constructor argument;
+  - The `brandHandling` should consist of postprocessing functions altering the depiction made by Zod 4;
+  - The `Depicter` type changed to `Overrider` having different signature;
 
 ## Version 23
 
