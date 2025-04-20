@@ -497,7 +497,7 @@ const fixReferences = (
         const actualName = entry.$ref.split("/").pop()!;
         const depiction = $defs?.[actualName];
         if (depiction)
-          entry.$ref = makeRef(depiction as SchemaObject, actualName).$ref; // @todo remove as
+          entry.$ref = makeRef(depiction as SchemaObject, actualName).$ref;
         continue;
       }
       stack.push(...R.values(entry));
