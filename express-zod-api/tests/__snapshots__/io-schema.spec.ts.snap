@@ -292,7 +292,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
           ],
         },
         {
-          "oneOf": [
+          "anyOf": [
             {
               "properties": {
                 "three": {
@@ -340,7 +340,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
     {
       "allOf": [
         {
-          "oneOf": [
+          "anyOf": [
             {
               "properties": {
                 "one": {
@@ -366,7 +366,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
           ],
         },
         {
-          "oneOf": [
+          "anyOf": [
             {
               "properties": {
                 "three": {
@@ -394,7 +394,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
       ],
     },
     {
-      "oneOf": [
+      "anyOf": [
         {
           "properties": {
             "five": {
