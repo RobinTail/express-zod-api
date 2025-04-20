@@ -481,33 +481,14 @@ const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
   if (examples.length) jsonSchema.examples = examples.slice();
 };
 
-export const delegate = (
-  schema: $ZodType,
-  {
-    ctx,
-    rules = overrides,
-  }: { ctx: OpenAPIContext; rules?: Record<string | symbol, Overrider> },
+/**
+ * postprocessing refs: specifying "uri" function and custom registries didn't allow to customize ref name
+ * @todo is there a less hacky way to do that?
+ * */
+const fixReferences = (
+  { $defs, ...rest }: JSONSchema.BaseSchema,
+  { makeRef }: OpenAPIContext,
 ) => {
-  const result = z.toJSONSchema(schema, {
-    unrepresentable: "any",
-    metadata: globalRegistry,
-    io: ctx.isResponse ? "output" : "input",
-    override: (zodCtx) => {
-      const { brand } =
-        globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
-      rules[brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type]?.(
-        zodCtx,
-        ctx,
-      );
-      onEach(zodCtx, ctx);
-    },
-  });
-  const { $defs, ...rest } = result;
-
-  /**
-   * postprocessing refs: specifying "uri" function and custom registries didn't allow to customize ref name
-   * @todo is there a less hacky way to do that?
-   * */
   const stack: unknown[] = [rest, $defs];
   while (stack.length) {
     const entry = stack.shift()!;
@@ -516,17 +497,39 @@ export const delegate = (
         const actualName = entry.$ref.split("/").pop()!;
         const depiction = $defs?.[actualName];
         if (depiction)
-          entry.$ref = ctx.makeRef(depiction as SchemaObject, actualName).$ref; // @todo remove as
+          entry.$ref = makeRef(depiction as SchemaObject, actualName).$ref; // @todo remove as
         continue;
       }
       stack.push(...R.values(entry));
     }
     if (R.is(Array, entry)) stack.push(...R.values(entry));
   }
-  // ^^
-
   return rest as SchemaObject;
 };
+
+export const delegate = (
+  schema: $ZodType,
+  {
+    ctx,
+    rules = overrides,
+  }: { ctx: OpenAPIContext; rules?: Record<string | symbol, Overrider> },
+) =>
+  fixReferences(
+    z.toJSONSchema(schema, {
+      unrepresentable: "any",
+      metadata: globalRegistry,
+      io: ctx.isResponse ? "output" : "input",
+      override: (zodCtx) => {
+        const { brand } =
+          globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
+        rules[
+          brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type
+        ]?.(zodCtx, ctx);
+        onEach(zodCtx, ctx);
+      },
+    }),
+    ctx,
+  );
 
 export const excludeParamsFromDepiction = (
   subject: SchemaObject | ReferenceObject,
