@@ -277,7 +277,7 @@ const makeNullableType = ({
   | SchemaObjectType
   | SchemaObjectType[] => {
   if (type === "null") return type;
-  if (typeof type === "string") return [type as SchemaObjectType, "null"];
+  if (typeof type === "string") return [type as SchemaObjectType, "null"]; // @todo make method instead of "as"
   return type ? [...new Set(type).add("null")] : "null";
 };
 
@@ -503,7 +503,7 @@ const fixReferences = (
           const actualName = entry.$ref.split("/").pop()!;
           const depiction = $defs[actualName];
           if (depiction)
-            entry.$ref = ctx.makeRef(depiction, depiction as SchemaObject).$ref;
+            entry.$ref = ctx.makeRef(depiction, depiction as SchemaObject).$ref; // @todo see below
           continue;
         }
       }
@@ -511,9 +511,10 @@ const fixReferences = (
     }
     if (R.is(Array, entry)) stack.push(...R.values(entry));
   }
-  return rest as SchemaObject;
+  return rest as SchemaObject; // @todo ideally, there should be a method to ensure that
 };
 
+// @todo rename?
 export const delegate = (
   schema: $ZodType,
   {

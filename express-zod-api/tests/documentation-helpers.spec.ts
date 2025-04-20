@@ -17,6 +17,11 @@ import {
   delegate,
 } from "../src/documentation-helpers";
 
+/**
+ * @todo all these functions is now the one, and the tests naming is not relevant anymore
+ * @todo these tests should now be transformed into ones of particular postprocessors and assert exactly what they do.
+ * @todo So we would not test Zod here, but internal methods only.
+ */
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
   const requestCtx = {
