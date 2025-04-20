@@ -80,20 +80,6 @@ exports[`Documentation helpers > depictBoolean() > should set type:boolean 1`] =
 }
 `;
 
-exports[`Documentation helpers > depictDate > should throw clear error 0 1`] = `
-DocumentationError({
-  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Using z.date() within output schema is forbidden. Please use ez.dateOut() instead. Check out the documentation for details.",
-})
-`;
-
-exports[`Documentation helpers > depictDate > should throw clear error 1 1`] = `
-DocumentationError({
-  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Using z.date() within input schema is forbidden. Please use ez.dateIn() instead. Check out the documentation for details.",
-})
-`;
-
 exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
@@ -135,7 +121,7 @@ exports[`Documentation helpers > depictDefault() > Feature #1706: should overrid
 {
   "default": "Today",
   "format": "date-time",
-  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+  "pattern": "^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z)$",
   "type": "string",
 }
 `;
@@ -217,7 +203,9 @@ exports[`Documentation helpers > depictFile() > should set type:string and forma
 
 exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 2 1`] = `
 {
+  "contentEncoding": "base64",
   "format": "byte",
+  "pattern": "^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$",
   "type": "string",
 }
 `;
@@ -242,9 +230,6 @@ exports[`Documentation helpers > depictIntersection() > should NOT flatten objec
     {
       "properties": {
         "one": {
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
       },
@@ -273,9 +258,6 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
   "allOf": [
     {
       "additionalProperties": {
-        "format": "double",
-        "maximum": 1.7976931348623157e+308,
-        "minimum": -1.7976931348623157e+308,
         "type": "number",
       },
       "propertyNames": {
@@ -286,9 +268,6 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
     {
       "properties": {
         "test": {
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
       },
@@ -305,9 +284,6 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
 {
   "allOf": [
     {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     {
@@ -322,9 +298,6 @@ exports[`Documentation helpers > depictIntersection() > should flatten objects w
 {
   "properties": {
     "one": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   },
@@ -346,21 +319,12 @@ exports[`Documentation helpers > depictIntersection() > should flatten three obj
   ],
   "properties": {
     "one": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "three": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "two": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   },
@@ -377,15 +341,9 @@ exports[`Documentation helpers > depictIntersection() > should flatten two objec
 {
   "properties": {
     "one": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "two": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   },
@@ -402,9 +360,6 @@ exports[`Documentation helpers > depictIntersection() > should maintain uniquene
   "properties": {
     "test": {
       "const": 5,
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   },
@@ -429,15 +384,9 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
     "test": {
       "properties": {
         "a": {
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
         "b": {
-          "format": "double",
-          "maximum": 1.7976931348623157e+308,
-          "minimum": -1.7976931348623157e+308,
           "type": "number",
         },
       },
@@ -452,24 +401,6 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
     "test",
   ],
   "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 0 1`] = `
-{
-  "$ref": "#/components/schemas/SomeSchema",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 1 1`] = `
-{
-  "$ref": "#/components/schemas/SomeSchema",
-}
-`;
-
-exports[`Documentation helpers > depictLazy > should handle circular references 2 1`] = `
-{
-  "$ref": "#/components/schemas/SomeSchema",
 }
 `;
 
@@ -500,17 +431,12 @@ exports[`Documentation helpers > depictLiteral() > should set type and involve c
 
 exports[`Documentation helpers > depictLiteral() > should set type and involve const property 2 1`] = `
 {
-  "const": 123n,
+  "const": 123,
   "type": "integer",
 }
 `;
 
-exports[`Documentation helpers > depictLiteral() > should set type and involve const property 3 1`] = `
-{
-  "const": undefined,
-  "type": undefined,
-}
-`;
+exports[`Documentation helpers > depictLiteral() > should set type and involve const property 3 1`] = `{}`;
 
 exports[`Documentation helpers > depictNull() > should give type:null 1`] = `
 {
@@ -551,81 +477,30 @@ exports[`Documentation helpers > depictNullable() > should not add null type whe
 }
 `;
 
-exports[`Documentation helpers > depictNumber() > should not use numericRange when it is null 0 1`] = `
-{
-  "format": "double",
-  "maximum": undefined,
-  "minimum": undefined,
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should not use numericRange when it is null 1 1`] = `
-{
-  "format": "int64",
-  "maximum": undefined,
-  "minimum": undefined,
-  "type": "integer",
-}
-`;
-
 exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 0 1`] = `
 {
-  "format": "double",
-  "maximum": 1.7976931348623157e+308,
-  "minimum": -1.7976931348623157e+308,
   "type": "number",
 }
 `;
 
 exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 1 1`] = `
 {
-  "format": "int64",
-  "maximum": 9007199254740991,
-  "minimum": -9007199254740991,
+  "exclusiveMaximum": 9007199254740991,
+  "exclusiveMinimum": -9007199254740991,
   "type": "integer",
 }
 `;
 
 exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 2 1`] = `
 {
-  "format": "double",
-  "maximum": 1.7976931348623157e+308,
-  "minimum": -1.7976931348623157e+308,
+  "exclusiveMaximum": 1.7976931348623157e+308,
+  "exclusiveMinimum": -1.7976931348623157e+308,
   "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 3 1`] = `
-{
-  "format": "hacked",
-  "maximum": 1.7976931348623157e+308,
-  "minimum": -1.7976931348623157e+308,
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should use numericRange when set 0 1`] = `
-{
-  "format": "double",
-  "maximum": 333.3333333333333,
-  "minimum": -333.3333333333333,
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should use numericRange when set 1 1`] = `
-{
-  "format": "int64",
-  "maximum": 100,
-  "minimum": -100,
-  "type": "integer",
 }
 `;
 
 exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 0 1`] = `
 {
-  "format": "double",
   "maximum": 33.333333333333336,
   "minimum": -33.333333333333336,
   "type": "number",
@@ -634,7 +509,6 @@ exports[`Documentation helpers > depictNumber() > should use schema checks for m
 
 exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 1 1`] = `
 {
-  "format": "int64",
   "maximum": 100,
   "minimum": -100,
   "type": "integer",
@@ -645,7 +519,6 @@ exports[`Documentation helpers > depictNumber() > should use schema checks for m
 {
   "exclusiveMaximum": 16.666666666666668,
   "exclusiveMinimum": -16.666666666666668,
-  "format": "double",
   "type": "number",
 }
 `;
@@ -654,7 +527,6 @@ exports[`Documentation helpers > depictNumber() > should use schema checks for m
 {
   "exclusiveMaximum": 100,
   "exclusiveMinimum": -100,
-  "format": "int64",
   "type": "integer",
 }
 `;
@@ -684,9 +556,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -705,9 +574,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -726,9 +592,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -747,9 +610,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -767,9 +627,6 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
 {
   "properties": {
     "a": {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
     "b": {
@@ -779,18 +636,10 @@ exports[`Documentation helpers > depictObject() > should type:object, properties
       ],
     },
   },
+  "required": [
+    "b",
+  ],
   "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObjectProperties() > should wrap next depicters in a shape of object 1`] = `
-{
-  "one": {
-    "type": "string",
-  },
-  "two": {
-    "type": "boolean",
-  },
 }
 `;
 
@@ -835,13 +684,13 @@ exports[`Documentation helpers > depictPipeline > should depict as 'string (prep
 }
 `;
 
-exports[`Documentation helpers > depictPipeline > should handle edge cases 1`] = `
+exports[`Documentation helpers > depictPipeline > should handle edge cases 0 1`] = `
 {
   "format": "any",
 }
 `;
 
-exports[`Documentation helpers > depictPipeline > should handle edge cases 2`] = `
+exports[`Documentation helpers > depictPipeline > should handle edge cases 1 1`] = `
 {
   "format": "any",
 }
@@ -860,9 +709,8 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
     "type": "boolean",
   },
   "propertyNames": {
-    "format": "int64",
-    "maximum": 9007199254740991,
-    "minimum": -9007199254740991,
+    "exclusiveMaximum": 9007199254740991,
+    "exclusiveMinimum": -9007199254740991,
     "type": "integer",
   },
   "type": "object",
@@ -883,50 +731,50 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 2 1`] = `
 {
-  "properties": {
-    "one": {
-      "type": "boolean",
-    },
-    "two": {
-      "type": "boolean",
-    },
+  "additionalProperties": {
+    "type": "boolean",
   },
-  "required": [
-    "one",
-    "two",
-  ],
+  "propertyNames": {
+    "enum": [
+      "one",
+      "two",
+    ],
+    "type": "string",
+  },
   "type": "object",
 }
 `;
 
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 3 1`] = `
 {
-  "properties": {
-    "testing": {
-      "type": "boolean",
-    },
+  "additionalProperties": {
+    "type": "boolean",
   },
-  "required": [
-    "testing",
-  ],
+  "propertyNames": {
+    "const": "testing",
+    "type": "string",
+  },
   "type": "object",
 }
 `;
 
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 4 1`] = `
 {
-  "properties": {
-    "one": {
-      "type": "boolean",
-    },
-    "two": {
-      "type": "boolean",
-    },
+  "additionalProperties": {
+    "type": "boolean",
   },
-  "required": [
-    "one",
-    "two",
-  ],
+  "propertyNames": {
+    "anyOf": [
+      {
+        "const": "one",
+        "type": "string",
+      },
+      {
+        "const": "two",
+        "type": "string",
+      },
+    ],
+  },
   "type": "object",
 }
 `;
@@ -949,6 +797,7 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
     "type": "boolean",
   },
   "propertyNames": {
+    "format": "regex",
     "pattern": "x-\\w+",
     "type": "string",
   },
@@ -1270,13 +1119,14 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
   "format": "email",
   "maxLength": 20,
   "minLength": 10,
+  "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
   "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 1 1`] = `
 {
-  "format": "url",
+  "format": "uri",
   "maxLength": 15,
   "minLength": 15,
   "type": "string",
@@ -1286,6 +1136,7 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 2 1`] = `
 {
   "format": "uuid",
+  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
   "type": "string",
 }
 `;
@@ -1293,6 +1144,7 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 3 1`] = `
 {
   "format": "cuid",
+  "pattern": "^[cC][^\\s-]{8,}$",
   "type": "string",
 }
 `;
@@ -1300,7 +1152,7 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 4 1`] = `
 {
   "format": "date-time",
-  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+  "pattern": "^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z)$",
   "type": "string",
 }
 `;
@@ -1308,13 +1160,14 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 5 1`] = `
 {
   "format": "date-time",
-  "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(([+-]\\d{2}:\\d{2})|Z)$",
+  "pattern": "^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z|([+-]\\d{2}:?\\d{2}))$",
   "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 6 1`] = `
 {
+  "format": "regex",
   "pattern": "^\\d+.\\d+.\\d+$",
   "type": "string",
 }
@@ -1323,7 +1176,7 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 7 1`] = `
 {
   "format": "date",
-  "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+  "pattern": "^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))$",
   "type": "string",
 }
 `;
@@ -1331,7 +1184,7 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 8 1`] = `
 {
   "format": "time",
-  "pattern": "^\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?$",
+  "pattern": "^([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?$",
   "type": "string",
 }
 `;
@@ -1339,20 +1192,23 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 9 1`] = `
 {
   "format": "duration",
+  "pattern": "^P(?:(\\d+W)|(?!.*W)(?=\\d|T\\d)(\\d+Y)?(\\d+M)?(\\d+D)?(T(?=\\d)(\\d+H)?(\\d+M)?(\\d+([.,]\\d+)?S)?)?)$",
   "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 10 1`] = `
 {
-  "format": "cidr",
+  "format": "cidrv4",
+  "pattern": "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\/([0-9]|[1-2][0-9]|3[0-2])$",
   "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 11 1`] = `
 {
-  "format": "ip",
+  "format": "ipv4",
+  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$",
   "type": "string",
 }
 `;
@@ -1366,14 +1222,18 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 13 1`] = `
 {
-  "format": "byte",
+  "contentEncoding": "base64",
+  "format": "base64",
+  "pattern": "^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$",
   "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 14 1`] = `
 {
+  "contentEncoding": "base64url",
   "format": "base64url",
+  "pattern": "^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$",
   "type": "string",
 }
 `;
@@ -1381,6 +1241,7 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 15 1`] = `
 {
   "format": "cuid2",
+  "pattern": "^[0-9a-z]+$",
   "type": "string",
 }
 `;
@@ -1388,6 +1249,7 @@ exports[`Documentation helpers > depictString() > should set format, pattern and
 exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 16 1`] = `
 {
   "format": "ulid",
+  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
   "type": "string",
 }
 `;
@@ -1474,10 +1336,7 @@ exports[`Documentation helpers > depictTuple() > should utilize prefixItems and 
 
 exports[`Documentation helpers > depictUnion() > should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
 {
-  "discriminator": {
-    "propertyName": "status",
-  },
-  "oneOf": [
+  "anyOf": [
     {
       "properties": {
         "data": {
@@ -1490,6 +1349,7 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
       },
       "required": [
         "status",
+        "data",
       ],
       "type": "object",
     },
@@ -1518,19 +1378,19 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
       "type": "object",
     },
   ],
+  "discriminator": {
+    "propertyName": "status",
+  },
 }
 `;
 
 exports[`Documentation helpers > depictUnion() > should wrap next depicters into oneOf property 1`] = `
 {
-  "oneOf": [
+  "anyOf": [
     {
       "type": "string",
     },
     {
-      "format": "double",
-      "maximum": 1.7976931348623157e+308,
-      "minimum": -1.7976931348623157e+308,
       "type": "number",
     },
   ],
@@ -1553,13 +1413,18 @@ DocumentationError({
 
 exports[`Documentation helpers > depictWrapped() > handle readonly 1`] = `
 {
+  "readOnly": true,
   "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictWrapped() > should handle catch 1`] = `
 {
-  "type": "boolean",
+  "default": true,
+  "type": [
+    "boolean",
+    "null",
+  ],
 }
 `;
 
@@ -1606,7 +1471,7 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified params 1 1`] = `
 {
-  "oneOf": [
+  "anyOf": [
     {
       "properties": {},
       "required": [],
@@ -1649,8 +1514,13 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 {
   "allOf": [
     {
-      "properties": {},
-      "required": [],
+      "additionalProperties": {
+        "type": "string",
+      },
+      "propertyNames": {
+        "const": "a",
+        "type": "string",
+      },
       "type": "object",
     },
     {

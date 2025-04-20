@@ -1,7 +1,6 @@
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
 import {
-  Depicter,
   Documentation,
   DocumentationError,
   EndpointsFactory,
@@ -10,9 +9,10 @@ import {
   defaultEndpointsFactory,
   ez,
   ResultHandler,
+  Overrider,
 } from "../src";
 import { contentTypes } from "../src/content-type";
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import { givePort } from "../../tools/ports";
 
 describe("Documentation", () => {
@@ -38,7 +38,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        numericRange: null,
         config: sampleConfig,
         version: "3.4.5",
         title: "Testing DELETE request without body",
@@ -496,7 +495,7 @@ describe("Documentation", () => {
               method: "post",
               input: category,
               output: z.object({
-                zodExample: category,
+                zodExample: category, // @todo consider external registry to deduplicate it
               }),
               handler: async () => ({
                 zodExample: {
@@ -519,49 +518,6 @@ describe("Documentation", () => {
         serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
-    });
-
-    test.each([
-      z.undefined(),
-      z.map(z.any(), z.any()),
-      z.set(z.any()),
-      z.promise(z.any()),
-      z.nan(),
-      z.symbol(),
-      z.unknown(),
-      z.never(),
-      z.void(),
-    ])("should throw on unsupported types %#", (zodType) => {
-      expect(
-        () =>
-          new Documentation({
-            config: sampleConfig,
-            routing: {
-              v1: {
-                getSomething: defaultEndpointsFactory.build({
-                  method: "post",
-                  input: z.object({
-                    property: zodType,
-                  }),
-                  output: z.object({}),
-                  handler: async () => ({}),
-                }),
-              },
-            },
-            version: "3.4.5",
-            title: "Testing unsupported types",
-            serverUrl: "https://example.com",
-          }),
-      ).toThrow(
-        new DocumentationError(
-          `Zod type ${zodType.constructor.name} is unsupported.`,
-          {
-            method: "post",
-            path: "/v1/getSomething",
-            isResponse: false,
-          },
-        ),
-      );
     });
 
     test("should ensure uniq security schema names", () => {
@@ -1228,13 +1184,7 @@ describe("Documentation", () => {
   describe("Feature #1470: Custom brands", () => {
     test("should be handled accordingly in request, response and params", () => {
       const deep = Symbol("DEEP");
-      const rule: Depicter = (
-        schema: ReturnType<z.ZodBoolean["brand"]>,
-        { next },
-      ) => {
-        globalRegistry.remove(schema);
-        return next(schema);
-      };
+      const rule: Overrider = ({ jsonSchema }) => (jsonSchema.type = "boolean");
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
@@ -1253,9 +1203,7 @@ describe("Documentation", () => {
           },
         },
         brandHandling: {
-          CUSTOM: () => ({
-            summary: "My custom schema",
-          }),
+          CUSTOM: ({ jsonSchema }) => (jsonSchema.summary = "My custom schema"),
           [deep]: rule,
         },
         version: "3.4.5",

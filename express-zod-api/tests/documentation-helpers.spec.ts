@@ -1,81 +1,45 @@
-import type { $ZodType } from "@zod/core";
-import { ReferenceObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
 import {
   OpenAPIContext,
-  depictAny,
-  depictArray,
-  depictBigInt,
-  depictBoolean,
-  depictWrapped,
-  depictDate,
-  depictDateIn,
-  depictDateOut,
-  depictDefault,
-  depictEnum,
   depictExamples,
-  depictFile,
-  depictIntersection,
-  depictLazy,
-  depictLiteral,
-  depictNull,
-  depictNullable,
-  depictNumber,
-  depictObject,
-  depictObjectProperties,
   depictParamExamples,
-  depictPipeline,
-  depictRecord,
   depictRequestParams,
   depictSecurity,
   depictSecurityRefs,
-  depictString,
   depictTags,
-  depictTuple,
-  depictUnion,
-  depictUpload,
-  depictRaw,
-  depicters,
   ensureShortDescription,
   excludeExamplesFromDepiction,
   excludeParamsFromDepiction,
   defaultIsHeader,
-  onEach,
-  onMissing,
   reformatParamsInPath,
+  delegate,
 } from "../src/documentation-helpers";
-import { walkSchema } from "../src/schema-walker";
 
+/**
+ * @todo all these functions is now the one, and the tests naming is not relevant anymore
+ * @todo these tests should now be transformed into ones of particular postprocessors and assert exactly what they do.
+ * @todo So we would not test Zod here, but internal methods only.
+ */
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
   const requestCtx = {
-    path: "/v1/user/:id",
-    method: "get",
-    isResponse: false,
-    makeRef: makeRefMock,
-    next: (schema: $ZodType) =>
-      walkSchema(schema, {
-        rules: depicters,
-        onEach,
-        onMissing,
-        ctx: requestCtx,
-      }),
-  } satisfies OpenAPIContext;
+    ctx: {
+      path: "/v1/user/:id",
+      method: "get",
+      isResponse: false,
+      makeRef: makeRefMock,
+    } satisfies OpenAPIContext,
+  };
   const responseCtx = {
-    path: "/v1/user/:id",
-    method: "get",
-    isResponse: true,
-    makeRef: makeRefMock,
-    next: (schema: $ZodType) =>
-      walkSchema(schema, {
-        rules: depicters,
-        onEach,
-        onMissing,
-        ctx: responseCtx,
-      }),
-  } satisfies OpenAPIContext;
+    ctx: {
+      path: "/v1/user/:id",
+      method: "get",
+      isResponse: true,
+      makeRef: makeRefMock,
+    } satisfies OpenAPIContext,
+  };
 
   beforeEach(() => {
     makeRefMock.mockClear();
@@ -91,12 +55,7 @@ describe("Documentation helpers", () => {
         z.record(z.string(), z.string()),
       ),
     ])("should omit specified params %#", (schema) => {
-      const depicted = walkSchema(schema, {
-        ctx: requestCtx,
-        rules: depicters,
-        onEach,
-        onMissing,
-      });
+      const depicted = delegate(schema, requestCtx);
       const [result, hasRequired] = excludeParamsFromDepiction(depicted, ["a"]);
       expect(result).toMatchSnapshot();
       expect(hasRequired).toMatchSnapshot();
@@ -127,13 +86,11 @@ describe("Documentation helpers", () => {
 
   describe("depictDefault()", () => {
     test("should set default property", () => {
-      expect(
-        depictDefault(z.boolean().default(true), requestCtx),
-      ).toMatchSnapshot();
+      expect(delegate(z.boolean().default(true), requestCtx)).toMatchSnapshot();
     });
     test("Feature #1706: should override the default value by a label from metadata", () => {
       expect(
-        depictDefault(
+        delegate(
           z.iso
             .datetime()
             .default(() => new Date().toISOString())
@@ -146,43 +103,39 @@ describe("Documentation helpers", () => {
 
   describe("depictWrapped()", () => {
     test("should handle catch", () => {
-      expect(
-        depictWrapped(z.boolean().catch(true), requestCtx),
-      ).toMatchSnapshot();
+      expect(delegate(z.boolean().catch(true), requestCtx)).toMatchSnapshot();
     });
 
     test.each([requestCtx, responseCtx])("should handle optional %#", (ctx) => {
-      expect(depictWrapped(z.string().optional(), ctx)).toMatchSnapshot();
+      expect(delegate(z.string().optional(), ctx)).toMatchSnapshot();
     });
 
     test("handle readonly", () => {
-      expect(
-        depictWrapped(z.string().readonly(), responseCtx),
-      ).toMatchSnapshot();
+      expect(delegate(z.string().readonly(), responseCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictAny()", () => {
     test("should set format:any", () => {
-      expect(depictAny(z.any(), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.any(), requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictRaw()", () => {
     test("should depict the raw property", () => {
       expect(
-        depictRaw(ez.raw({ extra: z.string() }), requestCtx),
+        delegate(ez.raw({ extra: z.string() }), requestCtx),
       ).toMatchSnapshot();
     });
   });
 
   describe("depictUpload()", () => {
     test("should set format:binary and type:string", () => {
-      expect(depictUpload(ez.upload(), requestCtx)).toMatchSnapshot();
+      expect(delegate(ez.upload(), requestCtx)).toMatchSnapshot();
     });
     test("should throw when using in response", () => {
       expect(() =>
-        depictUpload(ez.upload(), responseCtx),
+        delegate(ez.upload(), responseCtx),
       ).toThrowErrorMatchingSnapshot();
     });
   });
@@ -195,20 +148,18 @@ describe("Documentation helpers", () => {
       ez.file("string"),
       ez.file("buffer"),
     ])("should set type:string and format accordingly %#", (schema) => {
-      expect(depictFile(schema, responseCtx)).toMatchSnapshot();
+      expect(delegate(schema, responseCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictUnion()", () => {
     test("should wrap next depicters into oneOf property", () => {
-      expect(
-        depictUnion(z.string().or(z.number()), requestCtx),
-      ).toMatchSnapshot();
+      expect(delegate(z.string().or(z.number()), requestCtx)).toMatchSnapshot();
     });
 
     test("should wrap next depicters in oneOf prop and set discriminator prop", () => {
       expect(
-        depictUnion(
+        delegate(
           z.discriminatedUnion("status", [
             z.object({ status: z.literal("success"), data: z.any() }),
             z.object({
@@ -225,7 +176,7 @@ describe("Documentation helpers", () => {
   describe("depictIntersection()", () => {
     test("should flatten two object schemas", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
             z.object({ one: z.number() }),
             z.object({ two: z.number() }),
@@ -237,7 +188,7 @@ describe("Documentation helpers", () => {
 
     test("should flatten objects with same prop of same type", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
             z.object({ one: z.number() }),
             z.object({ one: z.number() }),
@@ -249,7 +200,7 @@ describe("Documentation helpers", () => {
 
     test("should NOT flatten object schemas having conflicting props", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
             z.object({ one: z.number() }),
             z.object({ one: z.string() }),
@@ -261,7 +212,7 @@ describe("Documentation helpers", () => {
 
     test("should merge examples deeply", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
             z
               .object({ test: z.object({ a: z.number() }) })
@@ -277,7 +228,7 @@ describe("Documentation helpers", () => {
 
     test("should flatten three object schemas with examples", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
             z.intersection(
               z.object({ one: z.number() }).example({ one: 123 }),
@@ -292,9 +243,9 @@ describe("Documentation helpers", () => {
 
     test("should maintain uniqueness in the array of required props", () => {
       expect(
-        depictIntersection(
+        delegate(
           z.intersection(
-            z.record(z.literal("test"), z.number()),
+            z.object({ test: z.number() }),
             z.object({ test: z.literal(5) }),
           ),
           requestCtx,
@@ -309,7 +260,7 @@ describe("Documentation helpers", () => {
       ),
       z.intersection(z.number(), z.literal(5)), // not objects
     ])("should fall back to allOf in other cases %#", (schema) => {
-      expect(depictIntersection(schema, requestCtx)).toMatchSnapshot();
+      expect(delegate(schema, requestCtx)).toMatchSnapshot();
     });
   });
 
@@ -317,14 +268,14 @@ describe("Documentation helpers", () => {
     test.each([requestCtx, responseCtx])(
       "should add null to the type %#",
       (ctx) => {
-        expect(depictNullable(z.string().nullable(), ctx)).toMatchSnapshot();
+        expect(delegate(z.string().nullable(), ctx)).toMatchSnapshot();
       },
     );
 
     test.each([z.null().nullable(), z.string().nullable().nullable()])(
       "should not add null type when it's already there %#",
       (schema) => {
-        expect(depictNullable(schema, requestCtx)).toMatchSnapshot();
+        expect(delegate(schema, requestCtx)).toMatchSnapshot();
       },
     );
   });
@@ -337,7 +288,7 @@ describe("Documentation helpers", () => {
     test.each([z.enum(["one", "two"]), z.enum(Test)])(
       "should set type and enum properties",
       (schema) => {
-        expect(depictEnum(schema, requestCtx)).toMatchSnapshot();
+        expect(delegate(schema, requestCtx)).toMatchSnapshot();
       },
     );
   });
@@ -346,12 +297,12 @@ describe("Documentation helpers", () => {
     test.each(["testng", null, BigInt(123), undefined])(
       "should set type and involve const property %#",
       (value) => {
-        expect(depictLiteral(z.literal(value), requestCtx)).toMatchSnapshot();
+        expect(delegate(z.literal(value), requestCtx)).toMatchSnapshot();
       },
     );
 
     test("should handle multiple values", () => {
-      expect(depictLiteral(z.literal([1, 2, 3]), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.literal([1, 2, 3]), requestCtx)).toMatchSnapshot();
     });
   });
 
@@ -371,7 +322,7 @@ describe("Documentation helpers", () => {
     ])(
       "should type:object, properties and required props %#",
       ({ shape, ctx }) => {
-        expect(depictObject(z.object(shape), ctx)).toMatchSnapshot();
+        expect(delegate(z.object(shape), ctx)).toMatchSnapshot();
       },
     );
 
@@ -381,25 +332,25 @@ describe("Documentation helpers", () => {
         b: z.coerce.string(),
         c: z.coerce.string().optional(),
       });
-      expect(depictObject(schema, responseCtx)).toMatchSnapshot();
+      expect(delegate(schema, responseCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictNull()", () => {
     test("should give type:null", () => {
-      expect(depictNull(z.null(), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.null(), requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictBoolean()", () => {
     test("should set type:boolean", () => {
-      expect(depictBoolean(z.boolean(), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.boolean(), requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictBigInt()", () => {
     test("should set type:integer and format:bigint", () => {
-      expect(depictBigInt(z.bigint(), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.bigint(), requestCtx)).toMatchSnapshot();
     });
   });
 
@@ -415,14 +366,14 @@ describe("Documentation helpers", () => {
     ])(
       "should set properties+required or additionalProperties props %#",
       (schema) => {
-        expect(depictRecord(schema, requestCtx)).toMatchSnapshot();
+        expect(delegate(schema, requestCtx)).toMatchSnapshot();
       },
     );
   });
 
   describe("depictArray()", () => {
     test("should set type:array and pass items depiction", () => {
-      expect(depictArray(z.array(z.boolean()), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.array(z.boolean()), requestCtx)).toMatchSnapshot();
     });
 
     test.each([
@@ -432,14 +383,14 @@ describe("Documentation helpers", () => {
       z.boolean().array().length(4),
       z.array(z.boolean()).nonempty(),
     ])("should reflect min/max/exact length of the array %#", (schema) => {
-      expect(depictArray(schema, requestCtx)).toMatchSnapshot();
+      expect(delegate(schema, requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictTuple()", () => {
     test("should utilize prefixItems and set items:not:{}", () => {
       expect(
-        depictTuple(
+        delegate(
           z.tuple([z.boolean(), z.string(), z.literal("test")]),
           requestCtx,
         ),
@@ -447,17 +398,17 @@ describe("Documentation helpers", () => {
     });
     test("should depict rest as items when defined", () => {
       expect(
-        depictTuple(z.tuple([z.boolean()]).rest(z.string()), requestCtx),
+        delegate(z.tuple([z.boolean()]).rest(z.string()), requestCtx),
       ).toMatchSnapshot();
     });
     test("should depict empty tuples as is", () => {
-      expect(depictTuple(z.tuple([]), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.tuple([]), requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictString()", () => {
     test("should set type:string", () => {
-      expect(depictString(z.string(), requestCtx)).toMatchSnapshot();
+      expect(delegate(z.string(), requestCtx)).toMatchSnapshot();
     });
 
     test.each([
@@ -479,47 +430,15 @@ describe("Documentation helpers", () => {
       z.cuid2(),
       z.ulid(),
     ])("should set format, pattern and min/maxLength props %#", (schema) => {
-      expect(depictString(schema, requestCtx)).toMatchSnapshot();
+      expect(delegate(schema, requestCtx)).toMatchSnapshot();
     });
   });
 
   describe("depictNumber()", () => {
-    test.each([
-      z.number(),
-      z.int(),
-      z.float64(),
-      R.assocPath(["_zod", "def", "format"], "hacked", z.int()),
-    ])(
+    test.each([z.number(), z.int(), z.float64()])(
       "should set min/max values according to JS capabilities %#",
       (schema) => {
-        expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
-
-    test.each([z.number(), z.int()])(
-      "should use numericRange when set %#",
-      (schema) => {
-        expect(
-          depictNumber(schema, {
-            ...requestCtx,
-            numericRange: {
-              integer: [-100, 100],
-              float: [-1000 / 3, 1000 / 3],
-            },
-          }),
-        ).toMatchSnapshot();
-      },
-    );
-
-    test.each([z.number(), z.int()])(
-      "should not use numericRange when it is null %#",
-      (schema) => {
-        expect(
-          depictNumber(schema, {
-            ...requestCtx,
-            numericRange: null,
-          }),
-        ).toMatchSnapshot();
+        expect(delegate(schema, requestCtx)).toMatchSnapshot();
       },
     );
 
@@ -537,23 +456,9 @@ describe("Documentation helpers", () => {
     ])(
       "should use schema checks for min/max and exclusiveness %#",
       (schema) => {
-        expect(depictNumber(schema, requestCtx)).toMatchSnapshot();
+        expect(delegate(schema, requestCtx)).toMatchSnapshot();
       },
     );
-  });
-
-  describe("depictObjectProperties()", () => {
-    test("should wrap next depicters in a shape of object", () => {
-      expect(
-        depictObjectProperties(
-          z.object({
-            one: z.string(),
-            two: z.boolean(),
-          }),
-          requestCtx.next,
-        ),
-      ).toMatchSnapshot();
-    });
   });
 
   describe("depictPipeline", () => {
@@ -562,7 +467,7 @@ describe("Documentation helpers", () => {
       { ctx: requestCtx, expected: "string (in)" },
     ])("should depict as $expected", ({ ctx }) => {
       expect(
-        depictPipeline(z.string().transform(Boolean).pipe(z.boolean()), ctx),
+        delegate(z.string().transform(Boolean).pipe(z.boolean()), ctx),
       ).toMatchSnapshot();
     });
 
@@ -583,14 +488,14 @@ describe("Documentation helpers", () => {
         expected: "string (preprocess)",
       },
     ])("should depict as $expected", ({ schema, ctx }) => {
-      expect(depictPipeline(schema, ctx)).toMatchSnapshot();
+      expect(delegate(schema, ctx)).toMatchSnapshot();
     });
 
     test.each([
       z.number().transform((num) => () => num),
       z.number().transform(() => assert.fail("this should be handled")),
-    ])("should handle edge cases", (schema) => {
-      expect(depictPipeline(schema, responseCtx)).toMatchSnapshot();
+    ])("should handle edge cases %#", (schema) => {
+      expect(delegate(schema, responseCtx)).toMatchSnapshot();
     });
   });
 
@@ -678,7 +583,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["query", "params"],
           composition: "inline",
-          ...requestCtx,
+          ...requestCtx.ctx,
         }),
       ).toMatchSnapshot();
     });
@@ -692,7 +597,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["body", "params"],
           composition: "inline",
-          ...requestCtx,
+          ...requestCtx.ctx,
         }),
       ).toMatchSnapshot();
     });
@@ -706,7 +611,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["body"],
           composition: "inline",
-          ...requestCtx,
+          ...requestCtx.ctx,
         }),
       ).toMatchSnapshot();
     });
@@ -723,7 +628,7 @@ describe("Documentation helpers", () => {
           inputSources: ["query", "headers", "params"],
           composition: "inline",
           security: [[{ type: "header", name: "secure" }]],
-          ...requestCtx,
+          ...requestCtx.ctx,
         }),
       ).toMatchSnapshot();
     });
@@ -743,59 +648,24 @@ describe("Documentation helpers", () => {
 
   describe("depictDateIn", () => {
     test("should set type:string, pattern and format", () => {
-      expect(depictDateIn(ez.dateIn(), requestCtx)).toMatchSnapshot();
+      expect(delegate(ez.dateIn(), requestCtx)).toMatchSnapshot();
     });
     test("should throw when ZodDateIn in response", () => {
       expect(() =>
-        depictDateIn(ez.dateIn(), responseCtx),
+        delegate(ez.dateIn(), responseCtx),
       ).toThrowErrorMatchingSnapshot();
     });
   });
 
   describe("depictDateOut", () => {
     test("should set type:string, description and format", () => {
-      expect(depictDateOut(ez.dateOut(), responseCtx)).toMatchSnapshot();
+      expect(delegate(ez.dateOut(), responseCtx)).toMatchSnapshot();
     });
     test("should throw when ZodDateOut in request", () => {
       expect(() =>
-        depictDateOut(ez.dateOut(), requestCtx),
+        delegate(ez.dateOut(), requestCtx),
       ).toThrowErrorMatchingSnapshot();
     });
-  });
-
-  describe("depictDate", () => {
-    test.each([responseCtx, requestCtx])(
-      "should throw clear error %#",
-      (ctx) => {
-        expect(() => depictDate(z.date(), ctx)).toThrowErrorMatchingSnapshot();
-      },
-    );
-  });
-
-  describe("depictLazy", () => {
-    const recursiveArray: z.ZodLazy = z.lazy(() => recursiveArray.array());
-    const directlyRecursive: z.ZodLazy = z.lazy(() => directlyRecursive);
-    const recursiveObject: z.ZodLazy = z.lazy(() =>
-      z.object({ prop: recursiveObject }),
-    );
-
-    test.each([recursiveArray, directlyRecursive, recursiveObject])(
-      "should handle circular references %#",
-      (schema) => {
-        makeRefMock.mockImplementationOnce(
-          (): ReferenceObject => ({
-            $ref: "#/components/schemas/SomeSchema",
-          }),
-        );
-        expect(makeRefMock).not.toHaveBeenCalled();
-        expect(depictLazy(schema, responseCtx)).toMatchSnapshot();
-        expect(makeRefMock).toHaveBeenCalledTimes(1);
-        expect(makeRefMock).toHaveBeenCalledWith(
-          schema._zod.def.getter,
-          expect.any(Function),
-        );
-      },
-    );
   });
 
   describe("depictSecurity()", () => {
