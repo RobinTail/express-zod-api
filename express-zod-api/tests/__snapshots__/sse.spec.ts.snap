@@ -32,7 +32,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
       "text/event-stream",
     ],
     "schema": {
-      "oneOf": [
+      "anyOf": [
         {
           "properties": {
             "data": {

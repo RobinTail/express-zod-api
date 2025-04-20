@@ -149,7 +149,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with union midd
 {
   "allOf": [
     {
-      "oneOf": [
+      "anyOf": [
         {
           "properties": {
             "n1": {
