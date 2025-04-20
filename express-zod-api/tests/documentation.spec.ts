@@ -493,6 +493,7 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
+              input: category,
               output: z.object({
                 zodExample: category,
               }),

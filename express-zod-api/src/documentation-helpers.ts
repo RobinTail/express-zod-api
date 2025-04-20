@@ -487,19 +487,27 @@ const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
  * @todo is there a less hacky way to do that?
  * */
 const fixReferences = (
-  { $defs, ...rest }: JSONSchema.BaseSchema,
-  { makeRef }: OpenAPIContext,
+  { $defs = {}, ...rest }: JSONSchema.BaseSchema,
+  ctx: OpenAPIContext,
 ) => {
   const stack: unknown[] = [rest, $defs];
   while (stack.length) {
     const entry = stack.shift()!;
     if (R.is(Object, entry)) {
-      if (isReferenceObject(entry) && !entry.$ref.startsWith("#/components")) {
-        const actualName = entry.$ref.split("/").pop()!;
-        const depiction = $defs?.[actualName];
-        if (depiction)
-          entry.$ref = makeRef(depiction, depiction as SchemaObject).$ref;
-        continue;
+      if (isReferenceObject(entry)) {
+        if (entry.$ref === "#" && !$defs[entry.$ref]) {
+          return fixReferences(
+            { $defs: { ...$defs, [entry.$ref]: rest }, $ref: entry.$ref }, // false root handling
+            ctx,
+          );
+        }
+        if (!entry.$ref.startsWith("#/components")) {
+          const actualName = entry.$ref.split("/").pop()!;
+          const depiction = $defs[actualName];
+          if (depiction)
+            entry.$ref = ctx.makeRef(depiction, depiction as SchemaObject).$ref;
+          continue;
+        }
       }
       stack.push(...R.values(entry));
     }
