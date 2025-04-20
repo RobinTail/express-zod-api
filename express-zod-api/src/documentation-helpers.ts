@@ -98,7 +98,7 @@ const samples = {
   object: {},
   null: null,
   array: [],
-} satisfies Record<Extract<SchemaObjectType, string>, unknown>;
+} satisfies Record<SchemaObjectType, unknown>;
 
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
@@ -197,18 +197,14 @@ const onNullable: Overrider = ({ jsonSchema }) => {
   delete jsonSchema.anyOf;
 };
 
+const isSupportedType = (subject: string): subject is SchemaObjectType =>
+  subject in samples;
+
 const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
   const detected = R.toLower(R.type(value)); // toLower is typed well unlike .toLowerCase()
-  const isSupported =
-    detected === "number" ||
-    detected === "string" ||
-    detected === "boolean" ||
-    detected === "object" ||
-    detected === "null" ||
-    detected === "array";
   return typeof value === "bigint"
     ? "integer"
-    : isSupported
+    : isSupportedType(detected)
       ? detected
       : undefined;
 };
@@ -277,7 +273,8 @@ const makeNullableType = ({
   | SchemaObjectType
   | SchemaObjectType[] => {
   if (type === "null") return type;
-  if (typeof type === "string") return [type as SchemaObjectType, "null"]; // @todo make method instead of "as"
+  if (typeof type === "string")
+    return isSupportedType(type) ? [type, "null"] : "null";
   return type ? [...new Set(type).add("null")] : "null";
 };
 
