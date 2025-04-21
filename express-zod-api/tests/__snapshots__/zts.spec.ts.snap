@@ -9,6 +9,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     }[];
     boolean: boolean;
     circular: SomeType;
+    circular2: SomeType;
     union: {
         number: number;
     } | "hi";

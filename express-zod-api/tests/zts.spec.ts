@@ -99,6 +99,13 @@ describe("zod-to-ts", () => {
       }),
     );
 
+    const circular2 = z.interface({
+      name: z.string(),
+      get subcategories() {
+        return z.array(circular2);
+      },
+    });
+
     const example = z.object({
       string: z.string(),
       number: z.number(),
@@ -109,6 +116,7 @@ describe("zod-to-ts", () => {
       ),
       boolean: z.boolean(),
       circular,
+      circular2,
       union: z.union([z.object({ number: z.number() }), z.literal("hi")]),
       enum: z.enum(["hi", "bye"]),
       intersectionWithTransform: z

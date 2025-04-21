@@ -66,6 +66,23 @@ const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
   return values.length === 1 ? values[0] : f.createUnionTypeNode(values);
 };
 
+const onInterface: Producer = (int: z.ZodInterface, { next, makeAlias }) =>
+  makeAlias(int, () => {
+    const members = Object.entries(int._zod.def.shape).map<ts.TypeElement>(
+      ([key, value]) => {
+        const isOptional = int._zod.def.optional.includes(key);
+        const { description: comment, deprecated: isDeprecated } =
+          globalRegistry.get(value) || {};
+        return makeInterfaceProp(key, next(value), {
+          comment,
+          isDeprecated,
+          isOptional,
+        });
+      },
+    );
+    return f.createTypeLiteralNode(members);
+  });
+
 const onObject: Producer = (
   { _zod: { def } }: z.ZodObject,
   {
@@ -233,6 +250,7 @@ const producers: HandlingRules<
   tuple: onTuple,
   record: onRecord,
   object: onObject,
+  interface: onInterface,
   literal: onLiteral,
   intersection: onIntersection,
   union: onSomeUnion,
