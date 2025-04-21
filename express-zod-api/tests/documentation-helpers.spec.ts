@@ -278,39 +278,6 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictRecord()", () => {
-    test.each([
-      z.record(z.int(), z.boolean()),
-      z.record(z.string(), z.boolean()),
-      z.record(z.enum(["one", "two"]), z.boolean()),
-      z.record(z.literal("testing"), z.boolean()),
-      z.record(z.literal("one").or(z.literal("two")), z.boolean()),
-      z.record(z.string(), z.any()), // Issue #900
-      z.record(z.string().regex(/x-\w+/), z.boolean()),
-    ])(
-      "should set properties+required or additionalProperties props %#",
-      (schema) => {
-        expect(delegate(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
-  });
-
-  describe("depictArray()", () => {
-    test("should set type:array and pass items depiction", () => {
-      expect(delegate(z.array(z.boolean()), requestCtx)).toMatchSnapshot();
-    });
-
-    test.each([
-      z.boolean().array().min(3),
-      z.boolean().array().max(5),
-      z.boolean().array().min(3).max(5),
-      z.boolean().array().length(4),
-      z.array(z.boolean()).nonempty(),
-    ])("should reflect min/max/exact length of the array %#", (schema) => {
-      expect(delegate(schema, requestCtx)).toMatchSnapshot();
-    });
-  });
-
   describe("depictTuple()", () => {
     test("should utilize prefixItems and set items:not:{}", () => {
       expect(

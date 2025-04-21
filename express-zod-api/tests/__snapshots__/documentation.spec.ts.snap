@@ -1137,6 +1137,7 @@ paths:
                 bigint:
                   type: string
                   format: bigint
+                  pattern: ^-?\\d+$
                 boolean:
                   type: boolean
                   readOnly: true
@@ -1442,6 +1443,7 @@ paths:
                       bigint:
                         type: string
                         format: bigint
+                        pattern: ^-?\\d+$
                     required:
                       - bigint
                 required:
