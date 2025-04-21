@@ -9,8 +9,6 @@ export interface ZTSContext extends FlatObject {
     schema: $ZodType | (() => $ZodType),
     produce: () => ts.TypeNode,
   ) => ts.TypeNode;
-  // @todo remove it in favor of z.interface
-  optionalPropStyle: { withQuestionMark?: boolean; withUndefined?: boolean };
 }
 
 export type Producer = SchemaHandler<ts.TypeNode, ZTSContext>;

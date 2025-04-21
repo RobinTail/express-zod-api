@@ -85,11 +85,7 @@ const onInterface: Producer = (int: z.ZodInterface, { next, makeAlias }) =>
 
 const onObject: Producer = (
   { _zod: { def } }: z.ZodObject,
-  {
-    isResponse,
-    next,
-    optionalPropStyle: { withQuestionMark: hasQuestionMark },
-  },
+  { isResponse, next },
 ) => {
   const members = Object.entries(def.shape).map<ts.TypeElement>(
     ([key, value]) => {
@@ -103,7 +99,7 @@ const onObject: Producer = (
       return makeInterfaceProp(key, next(value), {
         comment,
         isDeprecated,
-        isOptional: isOptional && hasQuestionMark,
+        isOptional,
       });
     },
   );
@@ -131,18 +127,11 @@ const onSomeUnion: Producer = (
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
 
-const onOptional: Producer = (
-  { _zod: { def } }: $ZodOptional,
-  { next, optionalPropStyle: { withUndefined: hasUndefined } },
-) => {
-  const actualTypeNode = next(def.innerType);
-  return hasUndefined
-    ? f.createUnionTypeNode([
-        actualTypeNode,
-        ensureTypeNode(ts.SyntaxKind.UndefinedKeyword),
-      ])
-    : actualTypeNode;
-};
+const onOptional: Producer = ({ _zod: { def } }: $ZodOptional, { next }) =>
+  f.createUnionTypeNode([
+    next(def.innerType),
+    ensureTypeNode(ts.SyntaxKind.UndefinedKeyword),
+  ]);
 
 const onNullable: Producer = ({ _zod: { def } }: $ZodNullable, { next }) =>
   f.createUnionTypeNode([next(def.innerType), makeLiteralType(null)]);

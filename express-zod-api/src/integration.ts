@@ -42,22 +42,6 @@ interface IntegrationParams {
    * */
   serverUrl?: string;
   /**
-   * @desc configures the style of object's optional properties
-   * @default { withQuestionMark: true, withUndefined: true }
-   */
-  optionalPropStyle?: {
-    /**
-     * @desc add question mark to the optional property definition
-     * @example { someProp?: boolean }
-     * */
-    withQuestionMark?: boolean;
-    /**
-     * @desc add undefined to the property union type
-     * @example { someProp: boolean | undefined }
-     */
-    withUndefined?: boolean;
-  };
-  /**
    * @desc The schema to use for responses without body such as 204
    * @default z.undefined()
    * */
@@ -110,14 +94,10 @@ export class Integration extends IntegrationBase {
     clientClassName = "Client",
     subscriptionClassName = "Subscription",
     serverUrl = "https://example.com",
-    optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
   }: IntegrationParams) {
     super(serverUrl);
-    const commons = {
-      makeAlias: this.#makeAlias.bind(this),
-      optionalPropStyle,
-    };
+    const commons = { makeAlias: this.#makeAlias.bind(this) };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint = (endpoint, path, method) => {
