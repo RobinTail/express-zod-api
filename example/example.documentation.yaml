@@ -30,7 +30,6 @@ paths:
                 properties:
                   status:
                     const: success
-                    type: string
                   data:
                     type: object
                     properties:
@@ -59,7 +58,6 @@ paths:
                 properties:
                   status:
                     const: error
-                    type: string
                   error:
                     type: object
                     properties:
@@ -177,7 +175,6 @@ paths:
                 properties:
                   status:
                     const: success
-                    type: string
                   data:
                     type: object
                     properties:
@@ -215,7 +212,6 @@ paths:
                 properties:
                   status:
                     const: error
-                    type: string
                   error:
                     type: object
                     properties:
@@ -260,7 +256,6 @@ paths:
                 properties:
                   status:
                     const: created
-                    type: string
                   data:
                     type: object
                     properties:
@@ -281,7 +276,6 @@ paths:
                 properties:
                   status:
                     const: created
-                    type: string
                   data:
                     type: object
                     properties:
@@ -302,7 +296,6 @@ paths:
                 properties:
                   status:
                     const: error
-                    type: string
                   reason:
                     type: string
                 required:
@@ -317,7 +310,6 @@ paths:
                 properties:
                   status:
                     const: exists
-                    type: string
                   id:
                     type: integer
                     exclusiveMinimum: -9007199254740991
@@ -334,7 +326,6 @@ paths:
                 properties:
                   status:
                     const: error
-                    type: string
                   reason:
                     type: string
                 required:
@@ -465,7 +456,6 @@ paths:
                 properties:
                   status:
                     const: success
-                    type: string
                   data:
                     type: object
                     properties:
@@ -502,7 +492,6 @@ paths:
                 properties:
                   status:
                     const: error
-                    type: string
                   error:
                     type: object
                     properties:
@@ -542,7 +531,6 @@ paths:
                 properties:
                   status:
                     const: success
-                    type: string
                   data:
                     type: object
                     properties:
@@ -563,7 +551,6 @@ paths:
                 properties:
                   status:
                     const: error
-                    type: string
                   error:
                     type: object
                     properties:
@@ -608,7 +595,6 @@ paths:
                     exclusiveMaximum: 9007199254740991
                   event:
                     const: time
-                    type: string
                   id:
                     type: string
                   retry:
@@ -660,7 +646,6 @@ paths:
                 properties:
                   status:
                     const: success
-                    type: string
                   data:
                     type: object
                     properties:
@@ -681,7 +666,6 @@ paths:
                 properties:
                   status:
                     const: error
-                    type: string
                   error:
                     type: object
                     properties:

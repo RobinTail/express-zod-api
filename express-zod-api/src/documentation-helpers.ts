@@ -1,11 +1,4 @@
-import type {
-  $ZodEnum,
-  $ZodLiteral,
-  $ZodPipe,
-  $ZodTuple,
-  $ZodType,
-  JSONSchema,
-} from "@zod/core";
+import type { $ZodPipe, $ZodTuple, $ZodType, JSONSchema } from "@zod/core";
 import {
   ExamplesObject,
   isReferenceObject,
@@ -199,25 +192,6 @@ export const onNullable: Overrider = ({ jsonSchema }) => {
 
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
   subject in samples;
-
-const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
-  const detected = R.toLower(R.type(value)); // toLower is typed well unlike .toLowerCase()
-  return typeof value === "bigint"
-    ? "integer"
-    : isSupportedType(detected)
-      ? detected
-      : undefined;
-};
-
-const onEnum: Overrider = ({ zodSchema, jsonSchema }) =>
-  (jsonSchema.type = getSupportedType(
-    Object.values((zodSchema as $ZodEnum)._zod.def.entries)[0],
-  ));
-
-const onLiteral: Overrider = ({ zodSchema, jsonSchema }) =>
-  (jsonSchema.type = getSupportedType(
-    Object.values((zodSchema as $ZodLiteral)._zod.def.values)[0],
-  ));
 
 const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
@@ -443,10 +417,8 @@ const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
     default: onDefault,
     any: onAny,
     union: onUnion,
-    enum: onEnum,
     bigint: onBigInt,
     intersection: onIntersection,
-    literal: onLiteral,
     tuple: onTuple,
     pipe: onPipeline,
     [ezDateInBrand]: onDateIn,
