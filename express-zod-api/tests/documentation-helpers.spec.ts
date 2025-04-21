@@ -287,32 +287,6 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictEnum()", () => {
-    enum Test {
-      one = "ONE",
-      two = "TWO",
-    }
-    test.each([z.enum(["one", "two"]), z.enum(Test)])(
-      "should set type and enum properties",
-      (schema) => {
-        expect(delegate(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
-  });
-
-  describe("depictLiteral()", () => {
-    test.each(["testng", null, BigInt(123), undefined])(
-      "should set type and involve const property %#",
-      (value) => {
-        expect(delegate(z.literal(value), requestCtx)).toMatchSnapshot();
-      },
-    );
-
-    test("should handle multiple values", () => {
-      expect(delegate(z.literal([1, 2, 3]), requestCtx)).toMatchSnapshot();
-    });
-  });
-
   describe("depictObject()", () => {
     test.each([
       { ctx: requestCtx, shape: { a: z.number(), b: z.string() } },
