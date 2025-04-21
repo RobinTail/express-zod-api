@@ -101,8 +101,6 @@ const onDefault: Overrider = ({ zodSchema, jsonSchema }) =>
     globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
     jsonSchema.default);
 
-const onAny: Overrider = ({ jsonSchema }) => (jsonSchema.format = "any");
-
 const onUpload: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.upload() only for input.", ctx);
@@ -280,8 +278,6 @@ const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
           Object.assign(jsonSchema, {
             type: targetType as "number" | "string" | "boolean",
           });
-        } else {
-          onAny({ zodSchema, jsonSchema }, ctx);
         }
       }
     }
@@ -415,7 +411,6 @@ const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
   {
     nullable: onNullable,
     default: onDefault,
-    any: onAny,
     union: onUnion,
     bigint: onBigInt,
     intersection: onIntersection,

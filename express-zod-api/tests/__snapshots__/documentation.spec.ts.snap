@@ -746,8 +746,7 @@ paths:
                         properties:
                           status:
                             const: success
-                          data:
-                            format: any
+                          data: {}
                         required:
                           - status
                           - data
@@ -2058,8 +2057,7 @@ paths:
           in: query
           required: false
           description: GET /v1/getSomething Parameter
-          schema:
-            format: any
+          schema: {}
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -2073,8 +2071,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      any:
-                        format: any
+                      any: {}
                     required:
                       - any
                 required:

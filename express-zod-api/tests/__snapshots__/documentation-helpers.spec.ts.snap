@@ -1,10 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Documentation helpers > depictAny() > should set format:any 1`] = `
-{
-  "format": "any",
-}
-`;
+exports[`Documentation helpers > depictAny() > should set format:any 1`] = `{}`;
 
 exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 0 1`] = `
 {
@@ -677,17 +673,9 @@ exports[`Documentation helpers > depictPipeline > should depict as 'string (prep
 }
 `;
 
-exports[`Documentation helpers > depictPipeline > should handle edge cases 0 1`] = `
-{
-  "format": "any",
-}
-`;
+exports[`Documentation helpers > depictPipeline > should handle edge cases 0 1`] = `{}`;
 
-exports[`Documentation helpers > depictPipeline > should handle edge cases 1 1`] = `
-{
-  "format": "any",
-}
-`;
+exports[`Documentation helpers > depictPipeline > should handle edge cases 1 1`] = `{}`;
 
 exports[`Documentation helpers > depictRaw() > should depict the raw property 1`] = `
 {
@@ -770,9 +758,7 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 5 1`] = `
 {
-  "additionalProperties": {
-    "format": "any",
-  },
+  "additionalProperties": {},
   "propertyNames": {
     "type": "string",
   },
@@ -1327,9 +1313,7 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
   "anyOf": [
     {
       "properties": {
-        "data": {
-          "format": "any",
-        },
+        "data": {},
         "status": {
           "const": "success",
         },
