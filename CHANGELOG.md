@@ -2,6 +2,18 @@
 
 ## Version 23
 
+### v23.1.1
+
+- Fixed response depiction in the generated Documentation:
+  - coerced types were marked as nullable;
+  - coerced, preprocessed and `z.any()` schemas were marked as optional.
+
+### v23.1.0
+
+- Improved generated Documentation:
+  - Arrays having fixed length: `z.boolean().array().length(2)`;
+  - Records with non-literal keys (added `propertyNames`): `z.record(z.string().regex(/x-\w+/), z.boolean())`.
+
 ### v23.0.0
 
 - Minimum version of `express` (required peer dependency) is `5.1.0` (first release of v5 marked as `latest`);

@@ -6,6 +6,58 @@ exports[`Documentation helpers > depictAny() > should set format:any 1`] = `
 }
 `;
 
+exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 0 1`] = `
+{
+  "items": {
+    "type": "boolean",
+  },
+  "minItems": 3,
+  "type": "array",
+}
+`;
+
+exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 1 1`] = `
+{
+  "items": {
+    "type": "boolean",
+  },
+  "maxItems": 5,
+  "type": "array",
+}
+`;
+
+exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 2 1`] = `
+{
+  "items": {
+    "type": "boolean",
+  },
+  "maxItems": 5,
+  "minItems": 3,
+  "type": "array",
+}
+`;
+
+exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 3 1`] = `
+{
+  "items": {
+    "type": "boolean",
+  },
+  "maxItems": 4,
+  "minItems": 4,
+  "type": "array",
+}
+`;
+
+exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 4 1`] = `
+{
+  "items": {
+    "type": "boolean",
+  },
+  "minItems": 1,
+  "type": "array",
+}
+`;
+
 exports[`Documentation helpers > depictArray() > should set type:array and pass items depiction 1`] = `
 {
   "items": {
@@ -331,6 +383,9 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
         "maximum": 1.7976931348623157e+308,
         "minimum": -1.7976931348623157e+308,
         "type": "number",
+      },
+      "propertyNames": {
+        "type": "string",
       },
       "type": "object",
     },
@@ -691,10 +746,7 @@ exports[`Documentation helpers > depictObject() > Bug #758 1`] = `
       "type": "string",
     },
     "c": {
-      "type": [
-        "string",
-        "null",
-      ],
+      "type": "string",
     },
   },
   "required": [
@@ -872,6 +924,9 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
   "additionalProperties": {
     "type": "boolean",
   },
+  "propertyNames": {
+    "type": "string",
+  },
   "type": "object",
 }
 `;
@@ -880,6 +935,9 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 {
   "additionalProperties": {
     "type": "boolean",
+  },
+  "propertyNames": {
+    "type": "string",
   },
   "type": "object",
 }
@@ -939,6 +997,22 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
 {
   "additionalProperties": {
     "format": "any",
+  },
+  "propertyNames": {
+    "type": "string",
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 6 1`] = `
+{
+  "additionalProperties": {
+    "type": "boolean",
+  },
+  "propertyNames": {
+    "pattern": "x-\\w+",
+    "type": "string",
   },
   "type": "object",
 }
@@ -1570,6 +1644,9 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
     },
     {
       "additionalProperties": {
+        "type": "string",
+      },
+      "propertyNames": {
         "type": "string",
       },
       "type": "object",

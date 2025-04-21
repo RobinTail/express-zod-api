@@ -1,7 +1,7 @@
 import * as R from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { hasCoercion, getTransformedType } from "./common-helpers";
+import { getTransformedType } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand, FileSchema } from "./file-schema";
@@ -54,10 +54,9 @@ const onObject: Producer = (
 ) => {
   const members = Object.entries(shape).map<ts.TypeElement>(([key, value]) => {
     const { description: comment, _def } = value as z.ZodType;
-    const isOptional =
-      isResponse && hasCoercion(value)
-        ? value instanceof z.ZodOptional
-        : value.isOptional();
+    const isOptional = isResponse
+      ? value instanceof z.ZodOptional
+      : value.isOptional();
     return makeInterfaceProp(key, next(value), {
       comment,
       isOptional: isOptional && hasQuestionMark,
