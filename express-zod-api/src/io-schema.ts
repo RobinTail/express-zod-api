@@ -36,6 +36,8 @@ export const getFinalEndpointInputSchema = <
 
 export const extractObjectSchema = (subject: IOSchema): z.ZodObject => {
   if (subject instanceof z.ZodObject) return subject;
+  if (subject instanceof z.ZodInterface)
+    return z.object(subject._zod.def.shape); // @todo mark optionals
   if (
     subject instanceof z.ZodUnion ||
     subject instanceof z.ZodDiscriminatedUnion
