@@ -18,6 +18,7 @@ import {
   delegate,
   onNullable,
   onDefault,
+  onRaw,
 } from "../src/documentation-helpers";
 
 /**
@@ -102,11 +103,14 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictRaw()", () => {
-    test("should depict the raw property", () => {
-      expect(
-        delegate(ez.raw({ extra: z.string() }), requestCtx),
-      ).toMatchSnapshot();
+  describe("onRaw()", () => {
+    test("should extract the raw property", () => {
+      const jsonSchema: JSONSchema.ObjectSchema = {
+        type: "object",
+        properties: { raw: { format: "binary", type: "string" } },
+      };
+      onRaw({ zodSchema: z.never(), jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 

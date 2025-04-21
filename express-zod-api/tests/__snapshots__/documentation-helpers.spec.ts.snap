@@ -578,13 +578,6 @@ exports[`Documentation helpers > depictPipeline > should handle edge cases 0 1`]
 
 exports[`Documentation helpers > depictPipeline > should handle edge cases 1 1`] = `{}`;
 
-exports[`Documentation helpers > depictRaw() > should depict the raw property 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
 exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 0 1`] = `
 {
   "additionalProperties": {
@@ -1407,5 +1400,12 @@ exports[`Documentation helpers > onNullable() > should add null type to the firs
 exports[`Documentation helpers > onNullable() > should not add null type when it's already there 1`] = `
 {
   "type": "null",
+}
+`;
+
+exports[`Documentation helpers > onRaw() > should extract the raw property 1`] = `
+{
+  "format": "binary",
+  "type": "string",
 }
 `;

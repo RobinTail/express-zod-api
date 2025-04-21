@@ -284,7 +284,7 @@ const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
   }
 };
 
-const onRaw: Overrider = ({ jsonSchema }) => {
+export const onRaw: Overrider = ({ jsonSchema }) => {
   Object.assign(
     jsonSchema,
     (jsonSchema as JSONSchema.ObjectSchema).properties!.raw,
