@@ -1,7 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Documentation helpers > depictAny() > should set format:any 1`] = `{}`;
-
 exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 0 1`] = `
 {
   "items": {

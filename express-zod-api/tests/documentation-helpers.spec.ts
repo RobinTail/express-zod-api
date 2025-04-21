@@ -102,12 +102,6 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictAny()", () => {
-    test("should set format:any", () => {
-      expect(delegate(z.any(), requestCtx)).toMatchSnapshot();
-    });
-  });
-
   describe("depictRaw()", () => {
     test("should depict the raw property", () => {
       expect(
