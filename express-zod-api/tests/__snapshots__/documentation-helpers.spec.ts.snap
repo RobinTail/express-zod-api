@@ -145,43 +145,6 @@ exports[`Documentation helpers > depictExamples() > should 'transform' examples 
 }
 `;
 
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 0 1`] = `
-{
-  "format": "file",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 1 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 2 1`] = `
-{
-  "contentEncoding": "base64",
-  "format": "byte",
-  "pattern": "^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 3 1`] = `
-{
-  "format": "file",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 4 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
 exports[`Documentation helpers > depictIntersection() > should NOT flatten object schemas having conflicting props 1`] = `
 {
   "allOf": [
@@ -1362,6 +1325,41 @@ exports[`Documentation helpers > onDefault() > Feature #1706: should override th
 {
   "default": "Today",
   "format": "date-time",
+}
+`;
+
+exports[`Documentation helpers > onFile() > should set type:string and format accordingly 0 1`] = `
+{
+  "format": "file",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onFile() > should set type:string and format accordingly 1 1`] = `
+{
+  "format": "binary",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onFile() > should set type:string and format accordingly 2 1`] = `
+{
+  "format": "byte",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onFile() > should set type:string and format accordingly 3 1`] = `
+{
+  "format": "file",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onFile() > should set type:string and format accordingly 4 1`] = `
+{
+  "format": "binary",
+  "type": "string",
 }
 `;
 

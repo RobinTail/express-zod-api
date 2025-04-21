@@ -107,7 +107,7 @@ export const onUpload: Overrider = ({ jsonSchema }, ctx) => {
   Object.assign(jsonSchema, { type: "string", format: "binary" });
 };
 
-const onFile: Overrider = ({ jsonSchema }) => {
+export const onFile: Overrider = ({ jsonSchema }) => {
   delete jsonSchema.anyOf; // undo default
   Object.assign(jsonSchema, {
     type: "string",

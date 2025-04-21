@@ -20,6 +20,7 @@ import {
   onDefault,
   onRaw,
   onUpload,
+  onFile,
 } from "../src/documentation-helpers";
 
 /**
@@ -129,15 +130,16 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictFile()", () => {
-    test.each([
-      ez.file(),
-      ez.file("binary"),
-      ez.file("base64"),
-      ez.file("string"),
-      ez.file("buffer"),
-    ])("should set type:string and format accordingly %#", (schema) => {
-      expect(delegate(schema, responseCtx)).toMatchSnapshot();
+  describe("onFile()", () => {
+    test.each<JSONSchema.BaseSchema>([
+      { type: "string" },
+      { anyOf: [{}, { type: "string" }] },
+      { type: "string", format: "base64" },
+      { anyOf: [], type: "string" },
+      {},
+    ])("should set type:string and format accordingly %#", (jsonSchema) => {
+      onFile({ zodSchema: z.never(), jsonSchema }, responseCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 
