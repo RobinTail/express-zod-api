@@ -1,6 +1,7 @@
+import { JSONSchema } from "@zod/core";
+import { SchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
-import { ez } from "../src";
 import {
   OpenAPIContext,
   depictExamples,
@@ -14,48 +15,80 @@ import {
   excludeParamsFromDepiction,
   defaultIsHeader,
   reformatParamsInPath,
-  delegate,
+  onNullable,
+  onDefault,
+  onRaw,
+  onUpload,
+  onFile,
+  onUnion,
+  onIntersection,
+  onBigInt,
+  onTuple,
+  onPipeline,
+  onDateIn,
+  onDateOut,
 } from "../src/documentation-helpers";
 
-/**
- * @todo all these functions is now the one, and the tests naming is not relevant anymore
- * @todo these tests should now be transformed into ones of particular postprocessors and assert exactly what they do.
- * @todo So we would not test Zod here, but internal methods only.
- */
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
   const requestCtx = {
-    ctx: {
-      path: "/v1/user/:id",
-      method: "get",
-      isResponse: false,
-      makeRef: makeRefMock,
-    } satisfies OpenAPIContext,
-  };
+    path: "/v1/user/:id",
+    method: "get",
+    isResponse: false,
+    makeRef: makeRefMock,
+  } satisfies OpenAPIContext;
   const responseCtx = {
-    ctx: {
-      path: "/v1/user/:id",
-      method: "get",
-      isResponse: true,
-      makeRef: makeRefMock,
-    } satisfies OpenAPIContext,
-  };
+    path: "/v1/user/:id",
+    method: "get",
+    isResponse: true,
+    makeRef: makeRefMock,
+  } satisfies OpenAPIContext;
 
   beforeEach(() => {
     makeRefMock.mockClear();
   });
 
   describe("excludeParamsFromDepiction()", () => {
-    test.each<z.ZodTypeAny>([
-      z.object({ a: z.string(), b: z.string() }),
-      z.object({ a: z.string() }).or(z.object({ b: z.string() })),
-      z.intersection(z.object({ a: z.string() }), z.object({ b: z.string() })), // flattened
-      z.intersection(
-        z.record(z.literal("a"), z.string()),
-        z.record(z.string(), z.string()),
-      ),
-    ])("should omit specified params %#", (schema) => {
-      const depicted = delegate(schema, requestCtx);
+    test.each<SchemaObject>([
+      {
+        type: "object",
+        properties: { a: { type: "string" }, b: { type: "string" } },
+        required: ["a", "b"],
+      },
+      {
+        anyOf: [
+          {
+            type: "object",
+            properties: { a: { type: "string" } },
+            required: ["a"],
+          },
+          {
+            type: "object",
+            properties: { b: { type: "string" } },
+            required: ["b"],
+          },
+        ],
+      },
+      {
+        type: "object",
+        properties: { a: { type: "string" }, b: { type: "string" } },
+        required: ["a", "b"],
+      },
+      {
+        allOf: [
+          {
+            type: "object",
+            propertyNames: { const: "a" },
+            additionalProperties: { type: "string" },
+          },
+          {
+            type: "object",
+            propertyNames: { type: "string" },
+            additionalProperties: { type: "string" },
+          },
+        ],
+      },
+    ])("should omit specified params %#", (depicted) => {
       const [result, hasRequired] = excludeParamsFromDepiction(depicted, ["a"]);
       expect(result).toMatchSnapshot();
       expect(hasRequired).toMatchSnapshot();
@@ -84,418 +117,227 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictDefault()", () => {
-    test("should set default property", () => {
-      expect(delegate(z.boolean().default(true), requestCtx)).toMatchSnapshot();
-    });
+  describe("onDefault()", () => {
     test("Feature #1706: should override the default value by a label from metadata", () => {
-      expect(
-        delegate(
-          z.iso
-            .datetime()
-            .default(() => new Date().toISOString())
-            .label("Today"),
-          responseCtx,
-        ),
-      ).toMatchSnapshot();
+      const zodSchema = z.iso
+        .datetime()
+        .default(() => new Date().toISOString())
+        .label("Today");
+      const jsonSchema: JSONSchema.BaseSchema = {
+        default: "2025-05-21",
+        format: "date-time",
+      };
+      onDefault({ zodSchema, jsonSchema }, responseCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 
-  describe("depictWrapped()", () => {
-    test("should handle catch", () => {
-      expect(delegate(z.boolean().catch(true), requestCtx)).toMatchSnapshot();
-    });
-
-    test.each([requestCtx, responseCtx])("should handle optional %#", (ctx) => {
-      expect(delegate(z.string().optional(), ctx)).toMatchSnapshot();
-    });
-
-    test("handle readonly", () => {
-      expect(delegate(z.string().readonly(), responseCtx)).toMatchSnapshot();
+  describe("onRaw()", () => {
+    test("should extract the raw property", () => {
+      const jsonSchema: JSONSchema.ObjectSchema = {
+        type: "object",
+        properties: { raw: { format: "binary", type: "string" } },
+      };
+      onRaw({ zodSchema: z.never(), jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 
-  describe("depictAny()", () => {
-    test("should set format:any", () => {
-      expect(delegate(z.any(), requestCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictRaw()", () => {
-    test("should depict the raw property", () => {
-      expect(
-        delegate(ez.raw({ extra: z.string() }), requestCtx),
-      ).toMatchSnapshot();
-    });
-  });
-
-  describe("depictUpload()", () => {
+  describe("onUpload()", () => {
+    const jsonSchema: JSONSchema.BaseSchema = {};
+    const zodSchema = z.never();
     test("should set format:binary and type:string", () => {
-      expect(delegate(ez.upload(), requestCtx)).toMatchSnapshot();
+      onUpload({ zodSchema, jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
     test("should throw when using in response", () => {
       expect(() =>
-        delegate(ez.upload(), responseCtx),
+        onUpload({ zodSchema, jsonSchema }, responseCtx),
       ).toThrowErrorMatchingSnapshot();
     });
   });
 
-  describe("depictFile()", () => {
-    test.each([
-      ez.file(),
-      ez.file("binary"),
-      ez.file("base64"),
-      ez.file("string"),
-      ez.file("buffer"),
-    ])("should set type:string and format accordingly %#", (schema) => {
-      expect(delegate(schema, responseCtx)).toMatchSnapshot();
+  describe("onFile()", () => {
+    test.each<JSONSchema.BaseSchema>([
+      { type: "string" },
+      { anyOf: [{}, { type: "string" }] },
+      { type: "string", format: "base64" },
+      { anyOf: [], type: "string" },
+      {},
+    ])("should set type:string and format accordingly %#", (jsonSchema) => {
+      onFile({ zodSchema: z.never(), jsonSchema }, responseCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 
-  describe("depictUnion()", () => {
-    test("should wrap next depicters into oneOf property", () => {
-      expect(delegate(z.string().or(z.number()), requestCtx)).toMatchSnapshot();
-    });
-
-    test("should wrap next depicters in oneOf prop and set discriminator prop", () => {
-      expect(
-        delegate(
-          z.discriminatedUnion("status", [
-            z.object({ status: z.literal("success"), data: z.any() }),
-            z.object({
-              status: z.literal("error"),
-              error: z.object({ message: z.string() }),
-            }),
-          ]),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+  describe("onUnion()", () => {
+    test("should set discriminator prop for such union", () => {
+      const zodSchema = z.discriminatedUnion([
+        z.object({ status: z.literal("success"), data: z.any() }),
+        z.object({
+          status: z.literal("error"),
+          error: z.object({ message: z.string() }),
+        }),
+      ]);
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onUnion({ zodSchema, jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 
-  describe("depictIntersection()", () => {
+  describe("onIntersection()", () => {
     test("should flatten two object schemas", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z.object({ one: z.number() }),
-            z.object({ two: z.number() }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {
+        allOf: [
+          { type: "object", properties: { one: { type: "number" } } },
+          { type: "object", properties: { two: { type: "number" } } },
+        ],
+      };
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
     test("should flatten objects with same prop of same type", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z.object({ one: z.number() }),
-            z.object({ one: z.number() }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {
+        allOf: [
+          { type: "object", properties: { one: { type: "number" } } },
+          { type: "object", properties: { one: { type: "number" } } },
+        ],
+      };
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
     test("should NOT flatten object schemas having conflicting props", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z.object({ one: z.number() }),
-            z.object({ one: z.string() }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {
+        allOf: [
+          { type: "object", properties: { one: { type: "number" } } },
+          { type: "object", properties: { one: { type: "string" } } },
+        ],
+      };
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
     test("should merge examples deeply", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z
-              .object({ test: z.object({ a: z.number() }) })
-              .example({ test: { a: 123 } }),
-            z
-              .object({ test: z.object({ b: z.number() }) })
-              .example({ test: { b: 456 } }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
-    });
-
-    test("should flatten three object schemas with examples", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z.intersection(
-              z.object({ one: z.number() }).example({ one: 123 }),
-              z.object({ two: z.number() }).example({ two: 456 }),
-            ),
-            z.object({ three: z.number() }).example({ three: 789 }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {
+        allOf: [
+          {
+            type: "object",
+            properties: { a: { type: "number" } },
+            examples: [{ a: 123 }],
+          },
+          {
+            type: "object",
+            properties: { b: { type: "number" } },
+            examples: [{ b: 456 }],
+          },
+        ],
+      };
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
     test("should maintain uniqueness in the array of required props", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z.object({ test: z.number() }),
-            z.object({ test: z.literal(5) }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {
+        allOf: [
+          { type: "object", properties: { test: { type: "number" } } },
+          { type: "object", properties: { test: { const: 5 } } },
+        ],
+      };
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
-    test.each([
-      z.intersection(
-        z.record(z.string(), z.number()), // has additionalProperties
-        z.object({ test: z.number() }),
-      ),
-      z.intersection(z.number(), z.literal(5)), // not objects
-    ])("should fall back to allOf in other cases %#", (schema) => {
-      expect(delegate(schema, requestCtx)).toMatchSnapshot();
+    test.each<JSONSchema.BaseSchema>([
+      {
+        allOf: [
+          {
+            additionalProperties: { type: "number" }, // can not handle
+            propertyNames: { type: "string" },
+            type: "object",
+          },
+          {
+            properties: { test: { type: "number" } },
+            required: ["test"],
+            type: "object",
+          },
+        ],
+      },
+      {
+        allOf: [{ type: "number" }, { const: 5 }], // not objects
+      },
+    ])("should fall back to allOf in other cases %#", (jsonSchema) => {
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
+      expect(jsonSchema).toHaveProperty("allOf");
     });
   });
 
-  describe("depictNullable()", () => {
+  describe("onNullable()", () => {
     test.each([requestCtx, responseCtx])(
-      "should add null to the type %#",
+      "should add null type to the first of anyOf %#",
       (ctx) => {
-        expect(delegate(z.string().nullable(), ctx)).toMatchSnapshot();
+        const jsonSchema: JSONSchema.BaseSchema = {
+          anyOf: [{ type: "string" }, { type: "null" }],
+        };
+        onNullable({ zodSchema: z.never(), jsonSchema }, ctx);
+        expect(jsonSchema).toMatchSnapshot();
       },
     );
 
-    test.each([z.null().nullable(), z.string().nullable().nullable()])(
-      "should not add null type when it's already there %#",
-      (schema) => {
-        expect(delegate(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
-  });
-
-  describe("depictEnum()", () => {
-    enum Test {
-      one = "ONE",
-      two = "TWO",
-    }
-    test.each([z.enum(["one", "two"]), z.enum(Test)])(
-      "should set type and enum properties",
-      (schema) => {
-        expect(delegate(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
-  });
-
-  describe("depictLiteral()", () => {
-    test.each(["testng", null, BigInt(123), undefined])(
-      "should set type and involve const property %#",
-      (value) => {
-        expect(delegate(z.literal(value), requestCtx)).toMatchSnapshot();
-      },
-    );
-
-    test("should handle multiple values", () => {
-      expect(delegate(z.literal([1, 2, 3]), requestCtx)).toMatchSnapshot();
+    test("should not add null type when it's already there", () => {
+      const jsonSchema: JSONSchema.BaseSchema = {
+        anyOf: [{ type: "null" }, { type: "null" }],
+      };
+      onNullable({ zodSchema: z.never(), jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 
-  describe("depictObject()", () => {
+  describe("onBigInt()", () => {
+    test("should set type:string and format:bigint", () => {
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onBigInt({ zodSchema: z.never(), jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
+    });
+  });
+
+  describe("onTuple()", () => {
     test.each([
-      { ctx: requestCtx, shape: { a: z.number(), b: z.string() } },
-      { ctx: responseCtx, shape: { a: z.number(), b: z.string() } },
-      {
-        ctx: responseCtx,
-        shape: { a: z.coerce.number(), b: z.coerce.string() },
-      },
-      { ctx: responseCtx, shape: { a: z.number(), b: z.string().optional() } },
-      {
-        ctx: requestCtx,
-        shape: { a: z.number().optional(), b: z.coerce.string() },
-      },
-    ])(
-      "should type:object, properties and required props %#",
-      ({ shape, ctx }) => {
-        expect(delegate(z.object(shape), ctx)).toMatchSnapshot();
-      },
-    );
-
-    test("Bug #758", () => {
-      const schema = z.object({
-        a: z.string(),
-        b: z.coerce.string(),
-        c: z.coerce.string().optional(),
-      });
-      expect(delegate(schema, responseCtx)).toMatchSnapshot();
+      z.tuple([z.boolean(), z.string(), z.literal("test")]),
+      z.tuple([]),
+    ])("should add items:not:{} when no rest %#", (zodSchema) => {
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onTuple({ zodSchema, jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 
-  describe("depictNull()", () => {
-    test("should give type:null", () => {
-      expect(delegate(z.null(), requestCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictBoolean()", () => {
-    test("should set type:boolean", () => {
-      expect(delegate(z.boolean(), requestCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictBigInt()", () => {
-    test("should set type:integer and format:bigint", () => {
-      expect(delegate(z.bigint(), requestCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictRecord()", () => {
-    test.each([
-      z.record(z.int(), z.boolean()),
-      z.record(z.string(), z.boolean()),
-      z.record(z.enum(["one", "two"]), z.boolean()),
-      z.record(z.literal("testing"), z.boolean()),
-      z.record(z.literal("one").or(z.literal("two")), z.boolean()),
-      z.record(z.string(), z.any()), // Issue #900
-      z.record(z.string().regex(/x-\w+/), z.boolean()),
-    ])(
-      "should set properties+required or additionalProperties props %#",
-      (schema) => {
-        expect(delegate(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
-  });
-
-  describe("depictArray()", () => {
-    test("should set type:array and pass items depiction", () => {
-      expect(delegate(z.array(z.boolean()), requestCtx)).toMatchSnapshot();
-    });
-
-    test.each([
-      z.boolean().array().min(3),
-      z.boolean().array().max(5),
-      z.boolean().array().min(3).max(5),
-      z.boolean().array().length(4),
-      z.array(z.boolean()).nonempty(),
-    ])("should reflect min/max/exact length of the array %#", (schema) => {
-      expect(delegate(schema, requestCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictTuple()", () => {
-    test("should utilize prefixItems and set items:not:{}", () => {
-      expect(
-        delegate(
-          z.tuple([z.boolean(), z.string(), z.literal("test")]),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
-    });
-    test("should depict rest as items when defined", () => {
-      expect(
-        delegate(z.tuple([z.boolean()]).rest(z.string()), requestCtx),
-      ).toMatchSnapshot();
-    });
-    test("should depict empty tuples as is", () => {
-      expect(delegate(z.tuple([]), requestCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictString()", () => {
-    test("should set type:string", () => {
-      expect(delegate(z.string(), requestCtx)).toMatchSnapshot();
-    });
-
-    test.each([
-      z.email().min(10).max(20),
-      z.url().length(15),
-      z.uuid(),
-      z.cuid(),
-      z.iso.datetime(),
-      z.iso.datetime({ offset: true }),
-      z.string().regex(/^\d+.\d+.\d+$/),
-      z.iso.date(),
-      z.iso.time(),
-      z.iso.duration(),
-      z.cidrv4(),
-      z.ipv4(),
-      z.jwt(),
-      z.base64(),
-      z.base64url(),
-      z.cuid2(),
-      z.ulid(),
-    ])("should set format, pattern and min/maxLength props %#", (schema) => {
-      expect(delegate(schema, requestCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictNumber()", () => {
-    test.each([z.number(), z.int(), z.float64()])(
-      "should set min/max values according to JS capabilities %#",
-      (schema) => {
-        expect(delegate(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
-
-    test.each([
-      z
-        .number()
-        .min(-100 / 3)
-        .max(100 / 3),
-      z.number().int().min(-100).max(100),
-      z
-        .number()
-        .gt(-100 / 6)
-        .lt(100 / 6),
-      z.number().int().gt(-100).lt(100),
-    ])(
-      "should use schema checks for min/max and exclusiveness %#",
-      (schema) => {
-        expect(delegate(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
-  });
-
-  describe("depictPipeline", () => {
-    test.each([
-      { ctx: responseCtx, expected: "boolean (out)" },
-      { ctx: requestCtx, expected: "string (in)" },
-    ])("should depict as $expected", ({ ctx }) => {
-      expect(
-        delegate(z.string().transform(Boolean).pipe(z.boolean()), ctx),
-      ).toMatchSnapshot();
-    });
-
+  describe("onPipeline", () => {
     test.each([
       {
-        schema: z.string().transform((v) => parseInt(v, 10)),
+        zodSchema: z.string().transform((v) => parseInt(v, 10)),
         ctx: responseCtx,
         expected: "number (out)",
       },
       {
-        schema: z.string().transform((v) => parseInt(v, 10)),
-        ctx: requestCtx,
-        expected: "string (in)",
-      },
-      {
-        schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
+        zodSchema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
         ctx: requestCtx,
         expected: "string (preprocess)",
       },
-    ])("should depict as $expected", ({ schema, ctx }) => {
-      expect(delegate(schema, ctx)).toMatchSnapshot();
+    ])("should depict as $expected", ({ zodSchema, ctx }) => {
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onPipeline({ zodSchema, jsonSchema }, ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
     test.each([
       z.number().transform((num) => () => num),
       z.number().transform(() => assert.fail("this should be handled")),
-    ])("should handle edge cases %#", (schema) => {
-      expect(delegate(schema, responseCtx)).toMatchSnapshot();
+    ])("should handle edge cases %#", (zodSchema) => {
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onPipeline({ zodSchema, jsonSchema }, responseCtx);
+      expect(jsonSchema).toEqual({});
     });
   });
 
@@ -583,7 +425,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["query", "params"],
           composition: "inline",
-          ...requestCtx.ctx,
+          ...requestCtx,
         }),
       ).toMatchSnapshot();
     });
@@ -597,7 +439,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["body", "params"],
           composition: "inline",
-          ...requestCtx.ctx,
+          ...requestCtx,
         }),
       ).toMatchSnapshot();
     });
@@ -611,7 +453,7 @@ describe("Documentation helpers", () => {
           }),
           inputSources: ["body"],
           composition: "inline",
-          ...requestCtx.ctx,
+          ...requestCtx,
         }),
       ).toMatchSnapshot();
     });
@@ -628,7 +470,7 @@ describe("Documentation helpers", () => {
           inputSources: ["query", "headers", "params"],
           composition: "inline",
           security: [[{ type: "header", name: "secure" }]],
-          ...requestCtx.ctx,
+          ...requestCtx,
         }),
       ).toMatchSnapshot();
     });
@@ -646,24 +488,28 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictDateIn", () => {
+  describe("onDateIn", () => {
     test("should set type:string, pattern and format", () => {
-      expect(delegate(ez.dateIn(), requestCtx)).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = { anyOf: [] };
+      onDateIn({ zodSchema: z.never(), jsonSchema }, requestCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
     test("should throw when ZodDateIn in response", () => {
       expect(() =>
-        delegate(ez.dateIn(), responseCtx),
+        onDateIn({ zodSchema: z.never(), jsonSchema: {} }, responseCtx),
       ).toThrowErrorMatchingSnapshot();
     });
   });
 
-  describe("depictDateOut", () => {
+  describe("onDateOut", () => {
     test("should set type:string, description and format", () => {
-      expect(delegate(ez.dateOut(), responseCtx)).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onDateOut({ zodSchema: z.never(), jsonSchema }, responseCtx);
+      expect(jsonSchema).toMatchSnapshot();
     });
     test("should throw when ZodDateOut in request", () => {
       expect(() =>
-        delegate(ez.dateOut(), requestCtx),
+        onDateOut({ zodSchema: z.never(), jsonSchema: {} }, requestCtx),
       ).toThrowErrorMatchingSnapshot();
     });
   });

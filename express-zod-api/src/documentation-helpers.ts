@@ -96,18 +96,18 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-const onDefault: Overrider = ({ zodSchema, jsonSchema }) =>
+export const onDefault: Overrider = ({ zodSchema, jsonSchema }) =>
   (jsonSchema.default =
     globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
     jsonSchema.default);
 
-const onUpload: Overrider = ({ jsonSchema }, ctx) => {
+export const onUpload: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.upload() only for input.", ctx);
   Object.assign(jsonSchema, { type: "string", format: "binary" });
 };
 
-const onFile: Overrider = ({ jsonSchema }) => {
+export const onFile: Overrider = ({ jsonSchema }) => {
   delete jsonSchema.anyOf; // undo default
   Object.assign(jsonSchema, {
     type: "string",
@@ -120,7 +120,7 @@ const onFile: Overrider = ({ jsonSchema }) => {
   });
 };
 
-const onUnion: Overrider = ({ zodSchema, jsonSchema }) => {
+export const onUnion: Overrider = ({ zodSchema, jsonSchema }) => {
   if (!zodSchema._zod.disc) return;
   const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
   jsonSchema.discriminator ??= { propertyName };
@@ -172,7 +172,7 @@ const intersect = R.tryCatch(
   (_err, allOf): JSONSchema.BaseSchema => ({ allOf }),
 );
 
-const onIntersection: Overrider = ({ jsonSchema }) => {
+export const onIntersection: Overrider = ({ jsonSchema }) => {
   if (!jsonSchema.allOf) return;
   const attempt = intersect(jsonSchema.allOf);
   delete jsonSchema.allOf; // undo default
@@ -180,7 +180,7 @@ const onIntersection: Overrider = ({ jsonSchema }) => {
 };
 
 /** @since OAS 3.1 nullable replaced with type array having null */
-const onNullable: Overrider = ({ jsonSchema }) => {
+export const onNullable: Overrider = ({ jsonSchema }) => {
   if (!jsonSchema.anyOf) return;
   const original = jsonSchema.anyOf[0];
   Object.assign(original, { type: makeNullableType(original) });
@@ -191,7 +191,7 @@ const onNullable: Overrider = ({ jsonSchema }) => {
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
   subject in samples;
 
-const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
+export const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
   delete jsonSchema.anyOf; // undo default
@@ -206,7 +206,7 @@ const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
   });
 };
 
-const onDateOut: Overrider = ({ jsonSchema }, ctx) => {
+export const onDateOut: Overrider = ({ jsonSchema }, ctx) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
   Object.assign(jsonSchema, {
@@ -219,14 +219,18 @@ const onDateOut: Overrider = ({ jsonSchema }, ctx) => {
   });
 };
 
-const onBigInt: Overrider = ({ jsonSchema }) =>
-  Object.assign(jsonSchema, { type: "integer", format: "bigint" });
+export const onBigInt: Overrider = ({ jsonSchema }) =>
+  Object.assign(jsonSchema, {
+    type: "string",
+    format: "bigint",
+    pattern: /^-?\d+$/.source,
+  });
 
 /**
  * @since OAS 3.1 using prefixItems for depicting tuples
  * @since 17.5.0 added rest handling, fixed tuple type
  */
-const onTuple: Overrider = ({ zodSchema, jsonSchema }) => {
+export const onTuple: Overrider = ({ zodSchema, jsonSchema }) => {
   if ((zodSchema as $ZodTuple)._zod.def.rest !== null) return;
   // does not appear to support items:false, so not:{} is a recommended alias
   jsonSchema.items = { not: {} };
@@ -250,7 +254,7 @@ const makeNullableType = ({
   return type ? [...new Set(type).add("null")] : "null";
 };
 
-const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
+export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
   const target = (zodSchema as $ZodPipe)._zod.def[
     ctx.isResponse ? "out" : "in"
   ];
@@ -284,7 +288,7 @@ const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
   }
 };
 
-const onRaw: Overrider = ({ jsonSchema }) => {
+export const onRaw: Overrider = ({ jsonSchema }) => {
   Object.assign(
     jsonSchema,
     (jsonSchema as JSONSchema.ObjectSchema).properties!.raw,
@@ -479,7 +483,7 @@ const fixReferences = (
 };
 
 // @todo rename?
-export const delegate = (
+const delegate = (
   schema: $ZodType,
   {
     ctx,

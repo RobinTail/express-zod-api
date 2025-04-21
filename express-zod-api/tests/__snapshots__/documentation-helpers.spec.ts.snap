@@ -1,152 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Documentation helpers > depictAny() > should set format:any 1`] = `{}`;
-
-exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 0 1`] = `
-{
-  "items": {
-    "type": "boolean",
-  },
-  "minItems": 3,
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 1 1`] = `
-{
-  "items": {
-    "type": "boolean",
-  },
-  "maxItems": 5,
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 2 1`] = `
-{
-  "items": {
-    "type": "boolean",
-  },
-  "maxItems": 5,
-  "minItems": 3,
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 3 1`] = `
-{
-  "items": {
-    "type": "boolean",
-  },
-  "maxItems": 4,
-  "minItems": 4,
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers > depictArray() > should reflect min/max/exact length of the array 4 1`] = `
-{
-  "items": {
-    "type": "boolean",
-  },
-  "minItems": 1,
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers > depictArray() > should set type:array and pass items depiction 1`] = `
-{
-  "items": {
-    "type": "boolean",
-  },
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers > depictBigInt() > should set type:integer and format:bigint 1`] = `
-{
-  "format": "bigint",
-  "type": "integer",
-}
-`;
-
-exports[`Documentation helpers > depictBoolean() > should set type:boolean 1`] = `
-{
-  "type": "boolean",
-}
-`;
-
-exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictDateIn > should throw when ZodDateIn in response 1`] = `
-DocumentationError({
-  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Please use ez.dateOut() for output.",
-})
-`;
-
-exports[`Documentation helpers > depictDateOut > should set type:string, description and format 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictDateOut > should throw when ZodDateOut in request 1`] = `
-DocumentationError({
-  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Please use ez.dateIn() for input.",
-})
-`;
-
-exports[`Documentation helpers > depictDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
-{
-  "default": "Today",
-  "format": "date-time",
-  "pattern": "^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z)$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictDefault() > should set default property 1`] = `
-{
-  "default": true,
-  "type": "boolean",
-}
-`;
-
-exports[`Documentation helpers > depictEnum() > should set type and enum properties 1`] = `
-{
-  "enum": [
-    "one",
-    "two",
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictEnum() > should set type and enum properties 2`] = `
-{
-  "enum": [
-    "ONE",
-    "TWO",
-  ],
-}
-`;
-
 exports[`Documentation helpers > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
   "example1": {
@@ -181,457 +34,6 @@ exports[`Documentation helpers > depictExamples() > should 'transform' examples 
 }
 `;
 
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 0 1`] = `
-{
-  "format": "file",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 1 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 2 1`] = `
-{
-  "contentEncoding": "base64",
-  "format": "byte",
-  "pattern": "^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 3 1`] = `
-{
-  "format": "file",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 4 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should NOT flatten object schemas having conflicting props 1`] = `
-{
-  "allOf": [
-    {
-      "properties": {
-        "one": {
-          "type": "number",
-        },
-      },
-      "required": [
-        "one",
-      ],
-      "type": "object",
-    },
-    {
-      "properties": {
-        "one": {
-          "type": "string",
-        },
-      },
-      "required": [
-        "one",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should fall back to allOf in other cases 0 1`] = `
-{
-  "allOf": [
-    {
-      "additionalProperties": {
-        "type": "number",
-      },
-      "propertyNames": {
-        "type": "string",
-      },
-      "type": "object",
-    },
-    {
-      "properties": {
-        "test": {
-          "type": "number",
-        },
-      },
-      "required": [
-        "test",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should fall back to allOf in other cases 1 1`] = `
-{
-  "allOf": [
-    {
-      "type": "number",
-    },
-    {
-      "const": 5,
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should flatten objects with same prop of same type 1`] = `
-{
-  "properties": {
-    "one": {
-      "type": "number",
-    },
-  },
-  "required": [
-    "one",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should flatten three object schemas with examples 1`] = `
-{
-  "examples": [
-    {
-      "one": 123,
-      "three": 789,
-      "two": 456,
-    },
-  ],
-  "properties": {
-    "one": {
-      "type": "number",
-    },
-    "three": {
-      "type": "number",
-    },
-    "two": {
-      "type": "number",
-    },
-  },
-  "required": [
-    "one",
-    "two",
-    "three",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should flatten two object schemas 1`] = `
-{
-  "properties": {
-    "one": {
-      "type": "number",
-    },
-    "two": {
-      "type": "number",
-    },
-  },
-  "required": [
-    "one",
-    "two",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should maintain uniqueness in the array of required props 1`] = `
-{
-  "properties": {
-    "test": {
-      "const": 5,
-      "type": "number",
-    },
-  },
-  "required": [
-    "test",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should merge examples deeply 1`] = `
-{
-  "examples": [
-    {
-      "test": {
-        "a": 123,
-        "b": 456,
-      },
-    },
-  ],
-  "properties": {
-    "test": {
-      "properties": {
-        "a": {
-          "type": "number",
-        },
-        "b": {
-          "type": "number",
-        },
-      },
-      "required": [
-        "a",
-        "b",
-      ],
-      "type": "object",
-    },
-  },
-  "required": [
-    "test",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictLiteral() > should handle multiple values 1`] = `
-{
-  "enum": [
-    1,
-    2,
-    3,
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictLiteral() > should set type and involve const property 0 1`] = `
-{
-  "const": "testng",
-}
-`;
-
-exports[`Documentation helpers > depictLiteral() > should set type and involve const property 1 1`] = `
-{
-  "const": null,
-}
-`;
-
-exports[`Documentation helpers > depictLiteral() > should set type and involve const property 2 1`] = `
-{
-  "const": 123,
-}
-`;
-
-exports[`Documentation helpers > depictLiteral() > should set type and involve const property 3 1`] = `{}`;
-
-exports[`Documentation helpers > depictNull() > should give type:null 1`] = `
-{
-  "type": "null",
-}
-`;
-
-exports[`Documentation helpers > depictNullable() > should add null to the type 0 1`] = `
-{
-  "type": [
-    "string",
-    "null",
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictNullable() > should add null to the type 1 1`] = `
-{
-  "type": [
-    "string",
-    "null",
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 0 1`] = `
-{
-  "type": "null",
-}
-`;
-
-exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 1 1`] = `
-{
-  "type": [
-    "string",
-    "null",
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 0 1`] = `
-{
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 1 1`] = `
-{
-  "exclusiveMaximum": 9007199254740991,
-  "exclusiveMinimum": -9007199254740991,
-  "type": "integer",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 2 1`] = `
-{
-  "exclusiveMaximum": 1.7976931348623157e+308,
-  "exclusiveMinimum": -1.7976931348623157e+308,
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 0 1`] = `
-{
-  "maximum": 33.333333333333336,
-  "minimum": -33.333333333333336,
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 1 1`] = `
-{
-  "maximum": 100,
-  "minimum": -100,
-  "type": "integer",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 2 1`] = `
-{
-  "exclusiveMaximum": 16.666666666666668,
-  "exclusiveMinimum": -16.666666666666668,
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictNumber() > should use schema checks for min/max and exclusiveness 3 1`] = `
-{
-  "exclusiveMaximum": 100,
-  "exclusiveMinimum": -100,
-  "type": "integer",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > Bug #758 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "string",
-    },
-    "b": {
-      "type": "string",
-    },
-    "c": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > should type:object, properties and required props 0 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > should type:object, properties and required props 1 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > should type:object, properties and required props 2 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > should type:object, properties and required props 3 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > should type:object, properties and required props 4 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "number",
-    },
-    "b": {
-      "type": [
-        "string",
-        "null",
-      ],
-    },
-  },
-  "required": [
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
 exports[`Documentation helpers > depictParamExamples() > should pass examples for the given parameter 1`] = `
 {
   "example1": {
@@ -640,143 +42,6 @@ exports[`Documentation helpers > depictParamExamples() > should pass examples fo
   "example2": {
     "value": 456,
   },
-}
-`;
-
-exports[`Documentation helpers > depictPipeline > should depict as 'boolean (out)' 1`] = `
-{
-  "type": "boolean",
-}
-`;
-
-exports[`Documentation helpers > depictPipeline > should depict as 'number (out)' 1`] = `
-{
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictPipeline > should depict as 'string (in)' 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictPipeline > should depict as 'string (in)' 2`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictPipeline > should depict as 'string (preprocess)' 1`] = `
-{
-  "format": "string (preprocessed)",
-}
-`;
-
-exports[`Documentation helpers > depictPipeline > should handle edge cases 0 1`] = `{}`;
-
-exports[`Documentation helpers > depictPipeline > should handle edge cases 1 1`] = `{}`;
-
-exports[`Documentation helpers > depictRaw() > should depict the raw property 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 0 1`] = `
-{
-  "additionalProperties": {
-    "type": "boolean",
-  },
-  "propertyNames": {
-    "exclusiveMaximum": 9007199254740991,
-    "exclusiveMinimum": -9007199254740991,
-    "type": "integer",
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 1 1`] = `
-{
-  "additionalProperties": {
-    "type": "boolean",
-  },
-  "propertyNames": {
-    "type": "string",
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 2 1`] = `
-{
-  "additionalProperties": {
-    "type": "boolean",
-  },
-  "propertyNames": {
-    "enum": [
-      "one",
-      "two",
-    ],
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 3 1`] = `
-{
-  "additionalProperties": {
-    "type": "boolean",
-  },
-  "propertyNames": {
-    "const": "testing",
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 4 1`] = `
-{
-  "additionalProperties": {
-    "type": "boolean",
-  },
-  "propertyNames": {
-    "anyOf": [
-      {
-        "const": "one",
-      },
-      {
-        "const": "two",
-      },
-    ],
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 5 1`] = `
-{
-  "additionalProperties": {},
-  "propertyNames": {
-    "type": "string",
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictRecord() > should set properties+required or additionalProperties props 6 1`] = `
-{
-  "additionalProperties": {
-    "type": "boolean",
-  },
-  "propertyNames": {
-    "format": "regex",
-    "pattern": "x-\\w+",
-    "type": "string",
-  },
-  "type": "object",
 }
 `;
 
@@ -1089,152 +354,6 @@ exports[`Documentation helpers > depictSecurityRefs() > should populate the scop
 ]
 `;
 
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 0 1`] = `
-{
-  "format": "email",
-  "maxLength": 20,
-  "minLength": 10,
-  "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 1 1`] = `
-{
-  "format": "uri",
-  "maxLength": 15,
-  "minLength": 15,
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 2 1`] = `
-{
-  "format": "uuid",
-  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 3 1`] = `
-{
-  "format": "cuid",
-  "pattern": "^[cC][^\\s-]{8,}$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 4 1`] = `
-{
-  "format": "date-time",
-  "pattern": "^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z)$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 5 1`] = `
-{
-  "format": "date-time",
-  "pattern": "^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z|([+-]\\d{2}:?\\d{2}))$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 6 1`] = `
-{
-  "format": "regex",
-  "pattern": "^\\d+.\\d+.\\d+$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 7 1`] = `
-{
-  "format": "date",
-  "pattern": "^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 8 1`] = `
-{
-  "format": "time",
-  "pattern": "^([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 9 1`] = `
-{
-  "format": "duration",
-  "pattern": "^P(?:(\\d+W)|(?!.*W)(?=\\d|T\\d)(\\d+Y)?(\\d+M)?(\\d+D)?(T(?=\\d)(\\d+H)?(\\d+M)?(\\d+([.,]\\d+)?S)?)?)$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 10 1`] = `
-{
-  "format": "cidrv4",
-  "pattern": "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\/([0-9]|[1-2][0-9]|3[0-2])$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 11 1`] = `
-{
-  "format": "ipv4",
-  "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 12 1`] = `
-{
-  "format": "jwt",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 13 1`] = `
-{
-  "contentEncoding": "base64",
-  "format": "base64",
-  "pattern": "^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 14 1`] = `
-{
-  "contentEncoding": "base64url",
-  "format": "base64url",
-  "pattern": "^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 15 1`] = `
-{
-  "format": "cuid2",
-  "pattern": "^[0-9a-z]+$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set format, pattern and min/maxLength props 16 1`] = `
-{
-  "format": "ulid",
-  "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictString() > should set type:string 1`] = `
-{
-  "type": "string",
-}
-`;
-
 exports[`Documentation helpers > depictTags() > should accept objects with URLs 1`] = `
 [
   {
@@ -1262,152 +381,6 @@ exports[`Documentation helpers > depictTags() > should accept plain descriptions
     "name": "files",
   },
 ]
-`;
-
-exports[`Documentation helpers > depictTuple() > should depict empty tuples as is 1`] = `
-{
-  "items": {
-    "not": {},
-  },
-  "prefixItems": [],
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers > depictTuple() > should depict rest as items when defined 1`] = `
-{
-  "items": {
-    "type": "string",
-  },
-  "prefixItems": [
-    {
-      "type": "boolean",
-    },
-  ],
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers > depictTuple() > should utilize prefixItems and set items:not:{} 1`] = `
-{
-  "items": {
-    "not": {},
-  },
-  "prefixItems": [
-    {
-      "type": "boolean",
-    },
-    {
-      "type": "string",
-    },
-    {
-      "const": "test",
-    },
-  ],
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers > depictUnion() > should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
-{
-  "anyOf": [
-    {
-      "properties": {
-        "data": {},
-        "status": {
-          "const": "success",
-        },
-      },
-      "required": [
-        "status",
-        "data",
-      ],
-      "type": "object",
-    },
-    {
-      "properties": {
-        "error": {
-          "properties": {
-            "message": {
-              "type": "string",
-            },
-          },
-          "required": [
-            "message",
-          ],
-          "type": "object",
-        },
-        "status": {
-          "const": "error",
-        },
-      },
-      "required": [
-        "status",
-        "error",
-      ],
-      "type": "object",
-    },
-  ],
-  "discriminator": {
-    "propertyName": "status",
-  },
-}
-`;
-
-exports[`Documentation helpers > depictUnion() > should wrap next depicters into oneOf property 1`] = `
-{
-  "anyOf": [
-    {
-      "type": "string",
-    },
-    {
-      "type": "number",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictUpload() > should set format:binary and type:string 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictUpload() > should throw when using in response 1`] = `
-DocumentationError({
-  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Please use ez.upload() only for input.",
-})
-`;
-
-exports[`Documentation helpers > depictWrapped() > handle readonly 1`] = `
-{
-  "readOnly": true,
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictWrapped() > should handle catch 1`] = `
-{
-  "default": true,
-  "type": [
-    "boolean",
-    "null",
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictWrapped() > should handle optional 0 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictWrapped() > should handle optional 1 1`] = `
-{
-  "type": "string",
-}
 `;
 
 exports[`Documentation helpers > excludeExamplesFromDepiction() > should remove example property of supplied object 1`] = `
@@ -1506,3 +479,251 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 `;
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified params 3 2`] = `false`;
+
+exports[`Documentation helpers > onBigInt() > should set type:string and format:bigint 1`] = `
+{
+  "format": "bigint",
+  "pattern": "^-?\\d+$",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onDateIn > should set type:string, pattern and format 1`] = `
+{
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onDateIn > should throw when ZodDateIn in response 1`] = `
+DocumentationError({
+  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.dateOut() for output.",
+})
+`;
+
+exports[`Documentation helpers > onDateOut > should set type:string, description and format 1`] = `
+{
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onDateOut > should throw when ZodDateOut in request 1`] = `
+DocumentationError({
+  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.dateIn() for input.",
+})
+`;
+
+exports[`Documentation helpers > onDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
+{
+  "default": "Today",
+  "format": "date-time",
+}
+`;
+
+exports[`Documentation helpers > onFile() > should set type:string and format accordingly 0 1`] = `
+{
+  "format": "file",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onFile() > should set type:string and format accordingly 1 1`] = `
+{
+  "format": "binary",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onFile() > should set type:string and format accordingly 2 1`] = `
+{
+  "format": "byte",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onFile() > should set type:string and format accordingly 3 1`] = `
+{
+  "format": "file",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onFile() > should set type:string and format accordingly 4 1`] = `
+{
+  "format": "binary",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onIntersection() > should NOT flatten object schemas having conflicting props 1`] = `
+{
+  "allOf": [
+    {
+      "properties": {
+        "one": {
+          "type": "number",
+        },
+      },
+      "type": "object",
+    },
+    {
+      "properties": {
+        "one": {
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+  ],
+}
+`;
+
+exports[`Documentation helpers > onIntersection() > should flatten objects with same prop of same type 1`] = `
+{
+  "properties": {
+    "one": {
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > onIntersection() > should flatten two object schemas 1`] = `
+{
+  "properties": {
+    "one": {
+      "type": "number",
+    },
+    "two": {
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > onIntersection() > should maintain uniqueness in the array of required props 1`] = `
+{
+  "properties": {
+    "test": {
+      "const": 5,
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > onIntersection() > should merge examples deeply 1`] = `
+{
+  "examples": [
+    {
+      "a": 123,
+      "b": 456,
+    },
+  ],
+  "properties": {
+    "a": {
+      "type": "number",
+    },
+    "b": {
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > onNullable() > should add null type to the first of anyOf 0 1`] = `
+{
+  "type": [
+    "string",
+    "null",
+  ],
+}
+`;
+
+exports[`Documentation helpers > onNullable() > should add null type to the first of anyOf 1 1`] = `
+{
+  "type": [
+    "string",
+    "null",
+  ],
+}
+`;
+
+exports[`Documentation helpers > onNullable() > should not add null type when it's already there 1`] = `
+{
+  "type": "null",
+}
+`;
+
+exports[`Documentation helpers > onPipeline > should depict as 'number (out)' 1`] = `
+{
+  "type": "number",
+}
+`;
+
+exports[`Documentation helpers > onPipeline > should depict as 'string (preprocess)' 1`] = `
+{
+  "format": "string (preprocessed)",
+}
+`;
+
+exports[`Documentation helpers > onRaw() > should extract the raw property 1`] = `
+{
+  "format": "binary",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onTuple() > should add items:not:{} when no rest 0 1`] = `
+{
+  "items": {
+    "not": {},
+  },
+}
+`;
+
+exports[`Documentation helpers > onTuple() > should add items:not:{} when no rest 1 1`] = `
+{
+  "items": {
+    "not": {},
+  },
+}
+`;
+
+exports[`Documentation helpers > onUnion() > should set discriminator prop for such union 1`] = `
+{
+  "discriminator": {
+    "propertyName": "status",
+  },
+}
+`;
+
+exports[`Documentation helpers > onUpload() > should set format:binary and type:string 1`] = `
+{
+  "format": "binary",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onUpload() > should throw when using in response 1`] = `
+DocumentationError({
+  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.upload() only for input.",
+})
+`;

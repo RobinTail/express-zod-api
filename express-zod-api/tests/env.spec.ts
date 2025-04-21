@@ -41,6 +41,28 @@ describe("Environment checks", () => {
     });
   });
 
+  describe("Zod imperfections", () => {
+    test("discriminated unions are not depicted well", () => {
+      expect(
+        z.toJSONSchema(
+          z.discriminatedUnion([
+            z.object({ status: z.literal("success"), data: z.any() }),
+            z.object({
+              status: z.literal("error"),
+              error: z.object({ message: z.string() }),
+            }),
+          ]),
+        ),
+      ).not.toHaveProperty("discriminator");
+    });
+
+    test("bigint is not representable", () => {
+      expect(z.toJSONSchema(z.bigint(), { unrepresentable: "any" })).toEqual(
+        {},
+      );
+    });
+  });
+
   describe("Vitest error comparison", () => {
     test("should distinguish error instances of different classes", () => {
       expect(createHttpError(500, "some message")).not.toEqual(
