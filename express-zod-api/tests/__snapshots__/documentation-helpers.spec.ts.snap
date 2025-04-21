@@ -139,7 +139,6 @@ exports[`Documentation helpers > depictEnum() > should set type and enum propert
     "one",
     "two",
   ],
-  "type": "string",
 }
 `;
 
@@ -149,7 +148,6 @@ exports[`Documentation helpers > depictEnum() > should set type and enum propert
     "ONE",
     "TWO",
   ],
-  "type": "string",
 }
 `;
 
@@ -288,7 +286,6 @@ exports[`Documentation helpers > depictIntersection() > should fall back to allO
     },
     {
       "const": 5,
-      "type": "number",
     },
   ],
 }
@@ -411,28 +408,24 @@ exports[`Documentation helpers > depictLiteral() > should handle multiple values
     2,
     3,
   ],
-  "type": "number",
 }
 `;
 
 exports[`Documentation helpers > depictLiteral() > should set type and involve const property 0 1`] = `
 {
   "const": "testng",
-  "type": "string",
 }
 `;
 
 exports[`Documentation helpers > depictLiteral() > should set type and involve const property 1 1`] = `
 {
   "const": null,
-  "type": "null",
 }
 `;
 
 exports[`Documentation helpers > depictLiteral() > should set type and involve const property 2 1`] = `
 {
   "const": 123,
-  "type": "integer",
 }
 `;
 
@@ -739,7 +732,6 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
       "one",
       "two",
     ],
-    "type": "string",
   },
   "type": "object",
 }
@@ -752,7 +744,6 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
   },
   "propertyNames": {
     "const": "testing",
-    "type": "string",
   },
   "type": "object",
 }
@@ -767,11 +758,9 @@ exports[`Documentation helpers > depictRecord() > should set properties+required
     "anyOf": [
       {
         "const": "one",
-        "type": "string",
       },
       {
         "const": "two",
-        "type": "string",
       },
     ],
   },
@@ -1327,7 +1316,6 @@ exports[`Documentation helpers > depictTuple() > should utilize prefixItems and 
     },
     {
       "const": "test",
-      "type": "string",
     },
   ],
   "type": "array",
@@ -1344,7 +1332,6 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
         },
         "status": {
           "const": "success",
-          "type": "string",
         },
       },
       "required": [
@@ -1368,7 +1355,6 @@ exports[`Documentation helpers > depictUnion() > should wrap next depicters in o
         },
         "status": {
           "const": "error",
-          "type": "string",
         },
       },
       "required": [
@@ -1519,7 +1505,6 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
       },
       "propertyNames": {
         "const": "a",
-        "type": "string",
       },
       "type": "object",
     },
