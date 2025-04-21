@@ -112,6 +112,7 @@ export const getExamples = <
    * @example "parsed" — for the case when possible schema transformations should be applied
    * @default "original"
    * @override validate: variant "parsed" activates validation as well
+   * @todo revisit the need of it
    * */
   variant?: V;
   /**
@@ -124,12 +125,12 @@ export const getExamples = <
    * @default false
    * */
   pullProps?: boolean;
-}): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
+}): ReadonlyArray<z.output<T>> => {
   let examples = globalRegistry.get(schema)?.examples || [];
   if (!examples.length && pullProps && schema instanceof z.ZodObject)
     examples = pullExampleProps(schema);
   if (!validate && variant === "original") return examples;
-  const result: Array<z.input<T> | z.output<T>> = [];
+  const result: Array<z.output<T>> = [];
   for (const example of examples) {
     const parsedExample = z.safeParse(schema, example);
     if (parsedExample.success)

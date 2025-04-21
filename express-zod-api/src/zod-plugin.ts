@@ -23,11 +23,8 @@ declare module "@zod/core" {
 
 declare module "zod" {
   interface ZodType {
-    /**
-     * @todo this should be changed to z.output
-     * @desc Add an example value (before any transformations, can be called multiple times)
-     * */
-    example(example: z.input<this>): this;
+    /** @desc Shorthand for .meta({examples}), it can be called multiple times */
+    example(example: z.output<this>): this;
     deprecated(): this;
   }
   interface ZodDefault<T extends $ZodType = $ZodType> extends ZodType {

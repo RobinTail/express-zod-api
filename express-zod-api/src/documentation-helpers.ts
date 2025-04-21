@@ -442,6 +442,7 @@ const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
     zodSchema.isNullable();
   if (acceptsNull)
     Object.assign(jsonSchema, { type: makeNullableType(jsonSchema) });
+  // @todo revisit the need of it
   const examples = getExamples({
     schema: zodSchema,
     variant: isResponse ? "parsed" : "original",
