@@ -55,6 +55,12 @@ describe("Environment checks", () => {
         ),
       ).not.toHaveProperty("discriminator");
     });
+
+    test("bigint is not representable", () => {
+      expect(z.toJSONSchema(z.bigint(), { unrepresentable: "any" })).toEqual(
+        {},
+      );
+    });
   });
 
   describe("Vitest error comparison", () => {
