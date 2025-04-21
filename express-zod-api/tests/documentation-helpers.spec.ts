@@ -23,6 +23,7 @@ import {
   onFile,
   onUnion,
   onIntersection,
+  onBigInt,
 } from "../src/documentation-helpers";
 
 /**
@@ -269,9 +270,11 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictBigInt()", () => {
-    test("should set type:integer and format:bigint", () => {
-      expect(delegate(z.bigint(), requestCtx)).toMatchSnapshot();
+  describe("onBigInt()", () => {
+    test("should set type:string and format:bigint", () => {
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onBigInt({ zodSchema: z.never(), jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 

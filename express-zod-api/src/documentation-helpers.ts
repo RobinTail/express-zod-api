@@ -219,8 +219,12 @@ const onDateOut: Overrider = ({ jsonSchema }, ctx) => {
   });
 };
 
-const onBigInt: Overrider = ({ jsonSchema }) =>
-  Object.assign(jsonSchema, { type: "integer", format: "bigint" });
+export const onBigInt: Overrider = ({ jsonSchema }) =>
+  Object.assign(jsonSchema, {
+    type: "string",
+    format: "bigint",
+    pattern: /^-?\d+$/.source,
+  });
 
 /**
  * @since OAS 3.1 using prefixItems for depicting tuples

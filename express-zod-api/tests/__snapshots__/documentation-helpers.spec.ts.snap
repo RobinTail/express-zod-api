@@ -61,13 +61,6 @@ exports[`Documentation helpers > depictArray() > should set type:array and pass 
 }
 `;
 
-exports[`Documentation helpers > depictBigInt() > should set type:integer and format:bigint 1`] = `
-{
-  "format": "bigint",
-  "type": "integer",
-}
-`;
-
 exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
@@ -958,6 +951,14 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 `;
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified params 3 2`] = `false`;
+
+exports[`Documentation helpers > onBigInt() > should set type:string and format:bigint 1`] = `
+{
+  "format": "bigint",
+  "pattern": "^-?\\d+$",
+  "type": "string",
+}
+`;
 
 exports[`Documentation helpers > onDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
 {
