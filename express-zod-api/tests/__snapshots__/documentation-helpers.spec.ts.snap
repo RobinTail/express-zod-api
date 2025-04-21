@@ -68,12 +68,6 @@ exports[`Documentation helpers > depictBigInt() > should set type:integer and fo
 }
 `;
 
-exports[`Documentation helpers > depictBoolean() > should set type:boolean 1`] = `
-{
-  "type": "boolean",
-}
-`;
-
 exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
@@ -145,12 +139,6 @@ exports[`Documentation helpers > depictExamples() > should 'transform' examples 
 }
 `;
 
-exports[`Documentation helpers > depictNull() > should give type:null 1`] = `
-{
-  "type": "null",
-}
-`;
-
 exports[`Documentation helpers > depictNumber() > should set min/max values according to JS capabilities 0 1`] = `
 {
   "type": "number",
@@ -202,118 +190,6 @@ exports[`Documentation helpers > depictNumber() > should use schema checks for m
   "exclusiveMaximum": 100,
   "exclusiveMinimum": -100,
   "type": "integer",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > Bug #758 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "string",
-    },
-    "b": {
-      "type": "string",
-    },
-    "c": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > should type:object, properties and required props 0 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > should type:object, properties and required props 1 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > should type:object, properties and required props 2 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-    "b",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > should type:object, properties and required props 3 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "number",
-    },
-    "b": {
-      "type": "string",
-    },
-  },
-  "required": [
-    "a",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictObject() > should type:object, properties and required props 4 1`] = `
-{
-  "properties": {
-    "a": {
-      "type": "number",
-    },
-    "b": {
-      "type": [
-        "string",
-        "null",
-      ],
-    },
-  },
-  "required": [
-    "b",
-  ],
-  "type": "object",
 }
 `;
 

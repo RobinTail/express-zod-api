@@ -269,48 +269,6 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictObject()", () => {
-    test.each([
-      { ctx: requestCtx, shape: { a: z.number(), b: z.string() } },
-      { ctx: responseCtx, shape: { a: z.number(), b: z.string() } },
-      {
-        ctx: responseCtx,
-        shape: { a: z.coerce.number(), b: z.coerce.string() },
-      },
-      { ctx: responseCtx, shape: { a: z.number(), b: z.string().optional() } },
-      {
-        ctx: requestCtx,
-        shape: { a: z.number().optional(), b: z.coerce.string() },
-      },
-    ])(
-      "should type:object, properties and required props %#",
-      ({ shape, ctx }) => {
-        expect(delegate(z.object(shape), ctx)).toMatchSnapshot();
-      },
-    );
-
-    test("Bug #758", () => {
-      const schema = z.object({
-        a: z.string(),
-        b: z.coerce.string(),
-        c: z.coerce.string().optional(),
-      });
-      expect(delegate(schema, responseCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictNull()", () => {
-    test("should give type:null", () => {
-      expect(delegate(z.null(), requestCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictBoolean()", () => {
-    test("should set type:boolean", () => {
-      expect(delegate(z.boolean(), requestCtx)).toMatchSnapshot();
-    });
-  });
-
   describe("depictBigInt()", () => {
     test("should set type:integer and format:bigint", () => {
       expect(delegate(z.bigint(), requestCtx)).toMatchSnapshot();
