@@ -9,33 +9,42 @@ import {
 } from "../src";
 
 describe("Integration", () => {
-  test("Should support types variant and handle recursive schemas", () => {
-    const recursiveSchema: z.ZodTypeAny = z.lazy(() =>
-      z.object({
-        name: z.string(),
-        features: recursiveSchema,
-      }),
-    );
-
-    const client = new Integration({
-      variant: "types",
-      routing: {
-        v1: {
-          test: defaultEndpointsFactory
-            .build({
-              method: "post",
-              input: z.object({
-                features: recursiveSchema,
-              }),
-              output: z.object({}),
-              handler: async () => ({}),
-            })
-            .deprecated(),
-        },
-      },
-    });
-    expect(client.print()).toMatchSnapshot();
+  const recursive1: z.ZodTypeAny = z.lazy(() =>
+    z.object({
+      name: z.string(),
+      features: recursive1,
+    }),
+  );
+  const recursive2 = z.interface({
+    name: z.string(),
+    get features() {
+      return recursive2;
+    },
   });
+
+  test.each([recursive1, recursive2])(
+    "Should support types variant and handle recursive schemas %#",
+    (recursiveSchema) => {
+      const client = new Integration({
+        variant: "types",
+        routing: {
+          v1: {
+            test: defaultEndpointsFactory
+              .build({
+                method: "post",
+                input: z.object({
+                  features: recursiveSchema,
+                }),
+                output: z.object({}),
+                handler: async () => ({}),
+              })
+              .deprecated(),
+          },
+        },
+      });
+      expect(client.print()).toMatchSnapshot();
+    },
+  );
 
   test("Should treat optionals the same way as z.infer() by default", async () => {
     const client = new Integration({
