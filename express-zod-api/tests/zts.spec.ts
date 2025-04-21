@@ -11,7 +11,6 @@ describe("zod-to-ts", () => {
   const ctx: ZTSContext = {
     isResponse: false,
     makeAlias: vi.fn(() => f.createTypeReferenceNode("SomeType")),
-    optionalPropStyle: { withQuestionMark: true, withUndefined: true },
   };
 
   describe("z.array()", () => {
