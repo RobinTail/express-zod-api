@@ -36,8 +36,15 @@ export const getFinalEndpointInputSchema = <
 
 export const extractObjectSchema = (subject: IOSchema): z.ZodObject => {
   if (subject instanceof z.ZodObject) return subject;
-  if (subject instanceof z.ZodInterface)
-    return z.object(subject._zod.def.shape); // @todo mark optionals
+  if (subject instanceof z.ZodInterface) {
+    const { optional } = subject._zod.def;
+    const mask = R.zipObj(optional, Array(optional.length).fill(true));
+    const partial = subject.pick(mask);
+    const required = subject.omit(mask);
+    return z
+      .object(required._zod.def.shape)
+      .extend(z.object(partial._zod.def.shape).partial());
+  }
   if (
     subject instanceof z.ZodUnion ||
     subject instanceof z.ZodDiscriminatedUnion

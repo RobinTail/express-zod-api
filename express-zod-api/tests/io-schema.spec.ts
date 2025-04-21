@@ -350,6 +350,14 @@ describe("I/O Schema and related helpers", () => {
     });
 
     describe("Zod 4", () => {
+      test("should handle interfaces with optional props", () => {
+        expect(
+          extractObjectSchema(
+            z.interface({ one: z.boolean(), "two?": z.boolean() }),
+          ),
+        ).toMatchSnapshot();
+      });
+
       test("should throw for incompatible ones", () => {
         expect(() =>
           extractObjectSchema(z.string() as unknown as IOSchema),
