@@ -472,8 +472,7 @@ paths:
                         type: object
                         propertyNames:
                           type: string
-                        additionalProperties:
-                          format: any
+                        additionalProperties: {}
                     required:
                       - name
                       - size
