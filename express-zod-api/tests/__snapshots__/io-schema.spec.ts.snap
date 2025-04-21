@@ -28,6 +28,23 @@ exports[`I/O Schema and related helpers > extractObjectSchema() > Feature #1869:
 }
 `;
 
+exports[`I/O Schema and related helpers > extractObjectSchema() > Zod 4 > should handle interfaces with optional props 1`] = `
+{
+  "properties": {
+    "one": {
+      "type": "boolean",
+    },
+    "two": {
+      "type": "boolean",
+    },
+  },
+  "required": [
+    "one",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`I/O Schema and related helpers > extractObjectSchema() > Zod 4 > should throw for incompatible ones 1`] = `
 IOSchemaError({
   "cause": {

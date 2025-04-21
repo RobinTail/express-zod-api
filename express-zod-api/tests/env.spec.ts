@@ -63,6 +63,17 @@ describe("Environment checks", () => {
     });
   });
 
+  describe("Zod new features", () => {
+    test("interface shape does not contain question marks, but there is a list of them", () => {
+      const schema = z.interface({
+        one: z.boolean(),
+        "two?": z.boolean(),
+      });
+      expect(Object.keys(schema._zod.def.shape)).toEqual(["one", "two"]);
+      expect(schema._zod.def.optional).toEqual(["two"]);
+    });
+  });
+
   describe("Vitest error comparison", () => {
     test("should distinguish error instances of different classes", () => {
       expect(createHttpError(500, "some message")).not.toEqual(
