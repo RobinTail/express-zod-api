@@ -481,11 +481,13 @@ describe("Documentation", () => {
       expect(boolean.parse(null)).toBe(false);
     });
 
-    // @todo switch to z.interface for that
+    // @todo rename the test
     test("should handle circular schemas via z.lazy()", () => {
-      const category: z.ZodObject = z.object({
+      const category = z.interface({
         name: z.string(),
-        subcategories: z.lazy(() => category.array()),
+        get subcategories() {
+          return z.array(category);
+        },
       });
       const spec = new Documentation({
         config: sampleConfig,
