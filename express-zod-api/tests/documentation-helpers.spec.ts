@@ -21,6 +21,7 @@ import {
   onRaw,
   onUpload,
   onFile,
+  onUnion,
 } from "../src/documentation-helpers";
 
 /**
@@ -143,24 +144,18 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictUnion()", () => {
-    test("should wrap next depicters into oneOf property", () => {
-      expect(delegate(z.string().or(z.number()), requestCtx)).toMatchSnapshot();
-    });
-
-    test("should wrap next depicters in oneOf prop and set discriminator prop", () => {
-      expect(
-        delegate(
-          z.discriminatedUnion("status", [
-            z.object({ status: z.literal("success"), data: z.any() }),
-            z.object({
-              status: z.literal("error"),
-              error: z.object({ message: z.string() }),
-            }),
-          ]),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+  describe("onUnion()", () => {
+    test("should set discriminator prop for such union", () => {
+      const zodSchema = z.discriminatedUnion([
+        z.object({ status: z.literal("success"), data: z.any() }),
+        z.object({
+          status: z.literal("error"),
+          error: z.object({ message: z.string() }),
+        }),
+      ]);
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onUnion({ zodSchema, jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 

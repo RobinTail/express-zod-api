@@ -1165,65 +1165,6 @@ exports[`Documentation helpers > depictTuple() > should utilize prefixItems and 
 }
 `;
 
-exports[`Documentation helpers > depictUnion() > should wrap next depicters in oneOf prop and set discriminator prop 1`] = `
-{
-  "anyOf": [
-    {
-      "properties": {
-        "data": {},
-        "status": {
-          "const": "success",
-        },
-      },
-      "required": [
-        "status",
-        "data",
-      ],
-      "type": "object",
-    },
-    {
-      "properties": {
-        "error": {
-          "properties": {
-            "message": {
-              "type": "string",
-            },
-          },
-          "required": [
-            "message",
-          ],
-          "type": "object",
-        },
-        "status": {
-          "const": "error",
-        },
-      },
-      "required": [
-        "status",
-        "error",
-      ],
-      "type": "object",
-    },
-  ],
-  "discriminator": {
-    "propertyName": "status",
-  },
-}
-`;
-
-exports[`Documentation helpers > depictUnion() > should wrap next depicters into oneOf property 1`] = `
-{
-  "anyOf": [
-    {
-      "type": "string",
-    },
-    {
-      "type": "number",
-    },
-  ],
-}
-`;
-
 exports[`Documentation helpers > excludeExamplesFromDepiction() > should remove example property of supplied object 1`] = `
 {
   "description": "test",
@@ -1391,6 +1332,14 @@ exports[`Documentation helpers > onRaw() > should extract the raw property 1`] =
 {
   "format": "binary",
   "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onUnion() > should set discriminator prop for such union 1`] = `
+{
+  "discriminator": {
+    "propertyName": "status",
+  },
 }
 `;
 

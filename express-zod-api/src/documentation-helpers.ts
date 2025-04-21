@@ -120,7 +120,7 @@ export const onFile: Overrider = ({ jsonSchema }) => {
   });
 };
 
-const onUnion: Overrider = ({ zodSchema, jsonSchema }) => {
+export const onUnion: Overrider = ({ zodSchema, jsonSchema }) => {
   if (!zodSchema._zod.disc) return;
   const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
   jsonSchema.discriminator ??= { propertyName };
