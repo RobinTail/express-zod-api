@@ -1,3 +1,4 @@
+import { JSONSchema } from "@zod/core";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
@@ -15,6 +16,7 @@ import {
   defaultIsHeader,
   reformatParamsInPath,
   delegate,
+  onNullable,
 } from "../src/documentation-helpers";
 
 /**
@@ -264,20 +266,25 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictNullable()", () => {
-    test.each([requestCtx, responseCtx])(
-      "should add null to the type %#",
+  describe("onNullable()", () => {
+    test.each([requestCtx.ctx, responseCtx.ctx])(
+      "should add null type to the first of anyOf %#",
       (ctx) => {
-        expect(delegate(z.string().nullable(), ctx)).toMatchSnapshot();
+        const jsonSchema: JSONSchema.BaseSchema = {
+          anyOf: [{ type: "string" }, { type: "null" }],
+        };
+        onNullable({ zodSchema: z.never(), jsonSchema }, ctx);
+        expect(jsonSchema).toMatchSnapshot();
       },
     );
 
-    test.each([z.null().nullable(), z.string().nullable().nullable()])(
-      "should not add null type when it's already there %#",
-      (schema) => {
-        expect(delegate(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
+    test("should not add null type when it's already there", () => {
+      const jsonSchema: JSONSchema.BaseSchema = {
+        anyOf: [{ type: "null" }, { type: "null" }],
+      };
+      onNullable({ zodSchema: z.never(), jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
+    });
   });
 
   describe("depictEnum()", () => {
