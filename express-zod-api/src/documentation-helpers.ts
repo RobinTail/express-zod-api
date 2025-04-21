@@ -101,7 +101,7 @@ export const onDefault: Overrider = ({ zodSchema, jsonSchema }) =>
     globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
     jsonSchema.default);
 
-const onUpload: Overrider = ({ jsonSchema }, ctx) => {
+export const onUpload: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.upload() only for input.", ctx);
   Object.assign(jsonSchema, { type: "string", format: "binary" });

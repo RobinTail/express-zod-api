@@ -19,6 +19,7 @@ import {
   onNullable,
   onDefault,
   onRaw,
+  onUpload,
 } from "../src/documentation-helpers";
 
 /**
@@ -114,13 +115,16 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictUpload()", () => {
+  describe("onUpload()", () => {
+    const jsonSchema: JSONSchema.BaseSchema = {};
+    const zodSchema = z.never();
     test("should set format:binary and type:string", () => {
-      expect(delegate(ez.upload(), requestCtx)).toMatchSnapshot();
+      onUpload({ zodSchema, jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
     test("should throw when using in response", () => {
       expect(() =>
-        delegate(ez.upload(), responseCtx),
+        onUpload({ zodSchema, jsonSchema }, responseCtx.ctx),
       ).toThrowErrorMatchingSnapshot();
     });
   });
