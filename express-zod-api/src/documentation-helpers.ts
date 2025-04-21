@@ -172,7 +172,7 @@ const intersect = R.tryCatch(
   (_err, allOf): JSONSchema.BaseSchema => ({ allOf }),
 );
 
-const onIntersection: Overrider = ({ jsonSchema }) => {
+export const onIntersection: Overrider = ({ jsonSchema }) => {
   if (!jsonSchema.allOf) return;
   const attempt = intersect(jsonSchema.allOf);
   delete jsonSchema.allOf; // undo default

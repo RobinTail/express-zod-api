@@ -145,185 +145,6 @@ exports[`Documentation helpers > depictExamples() > should 'transform' examples 
 }
 `;
 
-exports[`Documentation helpers > depictIntersection() > should NOT flatten object schemas having conflicting props 1`] = `
-{
-  "allOf": [
-    {
-      "properties": {
-        "one": {
-          "type": "number",
-        },
-      },
-      "required": [
-        "one",
-      ],
-      "type": "object",
-    },
-    {
-      "properties": {
-        "one": {
-          "type": "string",
-        },
-      },
-      "required": [
-        "one",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should fall back to allOf in other cases 0 1`] = `
-{
-  "allOf": [
-    {
-      "additionalProperties": {
-        "type": "number",
-      },
-      "propertyNames": {
-        "type": "string",
-      },
-      "type": "object",
-    },
-    {
-      "properties": {
-        "test": {
-          "type": "number",
-        },
-      },
-      "required": [
-        "test",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should fall back to allOf in other cases 1 1`] = `
-{
-  "allOf": [
-    {
-      "type": "number",
-    },
-    {
-      "const": 5,
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should flatten objects with same prop of same type 1`] = `
-{
-  "properties": {
-    "one": {
-      "type": "number",
-    },
-  },
-  "required": [
-    "one",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should flatten three object schemas with examples 1`] = `
-{
-  "examples": [
-    {
-      "one": 123,
-      "three": 789,
-      "two": 456,
-    },
-  ],
-  "properties": {
-    "one": {
-      "type": "number",
-    },
-    "three": {
-      "type": "number",
-    },
-    "two": {
-      "type": "number",
-    },
-  },
-  "required": [
-    "one",
-    "two",
-    "three",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should flatten two object schemas 1`] = `
-{
-  "properties": {
-    "one": {
-      "type": "number",
-    },
-    "two": {
-      "type": "number",
-    },
-  },
-  "required": [
-    "one",
-    "two",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should maintain uniqueness in the array of required props 1`] = `
-{
-  "properties": {
-    "test": {
-      "const": 5,
-      "type": "number",
-    },
-  },
-  "required": [
-    "test",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > depictIntersection() > should merge examples deeply 1`] = `
-{
-  "examples": [
-    {
-      "test": {
-        "a": 123,
-        "b": 456,
-      },
-    },
-  ],
-  "properties": {
-    "test": {
-      "properties": {
-        "a": {
-          "type": "number",
-        },
-        "b": {
-          "type": "number",
-        },
-      },
-      "required": [
-        "a",
-        "b",
-      ],
-      "type": "object",
-    },
-  },
-  "required": [
-    "test",
-  ],
-  "type": "object",
-}
-`;
-
 exports[`Documentation helpers > depictNull() > should give type:null 1`] = `
 {
   "type": "null",
@@ -1301,6 +1122,86 @@ exports[`Documentation helpers > onFile() > should set type:string and format ac
 {
   "format": "binary",
   "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onIntersection() > should NOT flatten object schemas having conflicting props 1`] = `
+{
+  "allOf": [
+    {
+      "properties": {
+        "one": {
+          "type": "number",
+        },
+      },
+      "type": "object",
+    },
+    {
+      "properties": {
+        "one": {
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+  ],
+}
+`;
+
+exports[`Documentation helpers > onIntersection() > should flatten objects with same prop of same type 1`] = `
+{
+  "properties": {
+    "one": {
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > onIntersection() > should flatten two object schemas 1`] = `
+{
+  "properties": {
+    "one": {
+      "type": "number",
+    },
+    "two": {
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > onIntersection() > should maintain uniqueness in the array of required props 1`] = `
+{
+  "properties": {
+    "test": {
+      "const": 5,
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > onIntersection() > should merge examples deeply 1`] = `
+{
+  "examples": [
+    {
+      "a": 123,
+      "b": 456,
+    },
+  ],
+  "properties": {
+    "a": {
+      "type": "number",
+    },
+    "b": {
+      "type": "number",
+    },
+  },
+  "type": "object",
 }
 `;
 

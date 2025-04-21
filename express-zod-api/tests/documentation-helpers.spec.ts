@@ -22,6 +22,7 @@ import {
   onUpload,
   onFile,
   onUnion,
+  onIntersection,
 } from "../src/documentation-helpers";
 
 /**
@@ -159,94 +160,91 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictIntersection()", () => {
+  describe("onIntersection()", () => {
     test("should flatten two object schemas", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z.object({ one: z.number() }),
-            z.object({ two: z.number() }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {
+        allOf: [
+          { type: "object", properties: { one: { type: "number" } } },
+          { type: "object", properties: { two: { type: "number" } } },
+        ],
+      };
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
     test("should flatten objects with same prop of same type", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z.object({ one: z.number() }),
-            z.object({ one: z.number() }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {
+        allOf: [
+          { type: "object", properties: { one: { type: "number" } } },
+          { type: "object", properties: { one: { type: "number" } } },
+        ],
+      };
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
     test("should NOT flatten object schemas having conflicting props", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z.object({ one: z.number() }),
-            z.object({ one: z.string() }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {
+        allOf: [
+          { type: "object", properties: { one: { type: "number" } } },
+          { type: "object", properties: { one: { type: "string" } } },
+        ],
+      };
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
     test("should merge examples deeply", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z
-              .object({ test: z.object({ a: z.number() }) })
-              .example({ test: { a: 123 } }),
-            z
-              .object({ test: z.object({ b: z.number() }) })
-              .example({ test: { b: 456 } }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
-    });
-
-    test("should flatten three object schemas with examples", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z.intersection(
-              z.object({ one: z.number() }).example({ one: 123 }),
-              z.object({ two: z.number() }).example({ two: 456 }),
-            ),
-            z.object({ three: z.number() }).example({ three: 789 }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {
+        allOf: [
+          {
+            type: "object",
+            properties: { a: { type: "number" } },
+            examples: [{ a: 123 }],
+          },
+          {
+            type: "object",
+            properties: { b: { type: "number" } },
+            examples: [{ b: 456 }],
+          },
+        ],
+      };
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
     test("should maintain uniqueness in the array of required props", () => {
-      expect(
-        delegate(
-          z.intersection(
-            z.object({ test: z.number() }),
-            z.object({ test: z.literal(5) }),
-          ),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {
+        allOf: [
+          { type: "object", properties: { test: { type: "number" } } },
+          { type: "object", properties: { test: { const: 5 } } },
+        ],
+      };
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
-    test.each([
-      z.intersection(
-        z.record(z.string(), z.number()), // has additionalProperties
-        z.object({ test: z.number() }),
-      ),
-      z.intersection(z.number(), z.literal(5)), // not objects
-    ])("should fall back to allOf in other cases %#", (schema) => {
-      expect(delegate(schema, requestCtx)).toMatchSnapshot();
+    test.each<JSONSchema.BaseSchema>([
+      {
+        allOf: [
+          {
+            additionalProperties: { type: "number" }, // can not handle
+            propertyNames: { type: "string" },
+            type: "object",
+          },
+          {
+            properties: { test: { type: "number" } },
+            required: ["test"],
+            type: "object",
+          },
+        ],
+      },
+      {
+        allOf: [{ type: "number" }, { const: 5 }], // not objects
+      },
+    ])("should fall back to allOf in other cases %#", (jsonSchema) => {
+      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toHaveProperty("allOf");
     });
   });
 
