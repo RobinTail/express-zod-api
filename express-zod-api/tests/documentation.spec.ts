@@ -481,8 +481,7 @@ describe("Documentation", () => {
       expect(boolean.parse(null)).toBe(false);
     });
 
-    // @todo rename the test
-    test("should handle circular schemas via z.lazy()", () => {
+    test("should handle circular schemas via z.interface()", () => {
       const category = z.interface({
         name: z.string(),
         get subcategories() {
