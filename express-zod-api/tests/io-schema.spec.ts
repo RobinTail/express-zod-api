@@ -5,7 +5,6 @@ import {
   extractObjectSchema,
   getFinalEndpointInputSchema,
 } from "../src/io-schema";
-import { metaSymbol } from "../src/metadata";
 import { AbstractMiddleware } from "../src/middleware";
 
 describe("I/O Schema and related helpers", () => {
@@ -288,7 +287,7 @@ describe("I/O Schema and related helpers", () => {
         .object({ five: z.string() })
         .example({ five: "some" });
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual([
+      expect(result.meta()?.examples).toEqual([
         {
           one: "test",
           two: 123,

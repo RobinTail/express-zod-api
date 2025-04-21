@@ -15,10 +15,7 @@ describe("Metadata", () => {
       const src = z.string().example("some");
       const dest = z.number();
       const result = copyMeta(src, dest);
-      expect(result.meta()?.[metaSymbol]).toBeTruthy();
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual(
-        src.meta()?.[metaSymbol]?.examples,
-      );
+      expect(result.meta()?.examples).toEqual(src.meta()?.examples);
     });
 
     test("should merge the meta from src to dest", () => {
@@ -32,8 +29,7 @@ describe("Metadata", () => {
         .example({ b: 456 })
         .example({ b: 789 });
       const result = copyMeta(src, dest);
-      expect(result.meta()?.[metaSymbol]).toBeTruthy();
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual([
+      expect(result.meta()?.examples).toEqual([
         { a: "some", b: 123 },
         { a: "another", b: 123 },
         { a: "some", b: 456 },
@@ -54,8 +50,7 @@ describe("Metadata", () => {
         .example({ a: { c: 456 } })
         .example({ a: { c: 789 } });
       const result = copyMeta(src, dest);
-      expect(result.meta()?.[metaSymbol]).toBeTruthy();
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual([
+      expect(result.meta()?.examples).toEqual([
         { a: { b: "some", c: 123 } },
         { a: { b: "another", c: 123 } },
         { a: { b: "some", c: 456 } },
@@ -71,7 +66,7 @@ describe("Metadata", () => {
         .object({ items: z.array(z.string()) })
         .example({ items: ["e", "f", "g"] });
       const result = copyMeta(src, dest);
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual(["a", "b"]);
+      expect(result.meta()?.examples).toEqual(["a", "b"]);
     });
   });
 });

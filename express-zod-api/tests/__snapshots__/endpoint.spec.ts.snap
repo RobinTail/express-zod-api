@@ -21,6 +21,14 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
       "application/json",
     ],
     "schema": {
+      "examples": [
+        {
+          "error": {
+            "message": "Sample error message",
+          },
+          "status": "error",
+        },
+      ],
       "properties": {
         "error": {
           "properties": {

@@ -13,23 +13,17 @@ describe("Zod Runtime Plugin", () => {
     test("should set the corresponding metadata in the schema definition", () => {
       const schema = z.string();
       const schemaWithMeta = schema.example("test");
-      expect(schemaWithMeta.meta()?.[metaSymbol]).toHaveProperty("examples", [
-        "test",
-      ]);
+      expect(schemaWithMeta.meta()).toHaveProperty("examples", ["test"]);
     });
 
     test("Issue 827: should be immutable", () => {
       const schema = z.string();
       const schemaWithExample = schema.example("test");
-      expect(schemaWithExample.meta()?.[metaSymbol]?.examples).toEqual([
-        "test",
-      ]);
+      expect(schemaWithExample.meta()?.examples).toEqual(["test"]);
       expect(schema.meta()?.[metaSymbol]).toBeUndefined();
       const second = schemaWithExample.example("test2");
-      expect(second.meta()?.[metaSymbol]?.examples).toEqual(["test", "test2"]);
-      expect(schemaWithExample.meta()?.[metaSymbol]?.examples).toEqual([
-        "test",
-      ]);
+      expect(second.meta()?.examples).toEqual(["test", "test2"]);
+      expect(schemaWithExample.meta()?.examples).toEqual(["test"]);
     });
 
     test("can be used multiple times", () => {
@@ -38,7 +32,7 @@ describe("Zod Runtime Plugin", () => {
         .example("test1")
         .example("test2")
         .example("test3");
-      expect(schemaWithMeta.meta()?.[metaSymbol]?.examples).toEqual([
+      expect(schemaWithMeta.meta()?.examples).toEqual([
         "test1",
         "test2",
         "test3",
@@ -48,12 +42,11 @@ describe("Zod Runtime Plugin", () => {
     test("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = schema.example("test");
-      expect(schemaWithMeta.meta()?.[metaSymbol]?.examples).toEqual(["test"]);
-      expect(
-        schemaWithMeta.regex(/@example.com$/).meta()?.[metaSymbol],
-      ).toEqual({
-        examples: ["test"],
-      });
+      expect(schemaWithMeta.meta()?.examples).toEqual(["test"]);
+      expect(schemaWithMeta.regex(/@example.com$/).meta()).toHaveProperty(
+        "examples",
+        ["test"],
+      );
     });
   });
 

@@ -85,6 +85,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with refined ob
       "type": "object",
     },
   ],
+  "examples": [],
 }
 `;
 

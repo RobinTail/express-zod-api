@@ -23,7 +23,10 @@ declare module "@zod/core" {
 
 declare module "zod" {
   interface ZodType {
-    /** @desc Add an example value (before any transformations, can be called multiple times) */
+    /**
+     * @todo this should be changed to z.output
+     * @desc Add an example value (before any transformations, can be called multiple times)
+     * */
     example(example: z.input<this>): this;
     deprecated(): this;
   }
@@ -55,12 +58,12 @@ declare module "zod" {
 }
 
 const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
-  const { examples, ...rest } = this.meta()?.[metaSymbol] || { examples: [] };
+  const { examples = [], ...rest } = this.meta() || {};
   const copy = examples.slice();
   copy.push(value);
   return this.meta({
-    description: this.description,
-    [metaSymbol]: { ...rest, examples: copy },
+    examples: copy,
+    ...rest,
   });
 };
 
@@ -78,7 +81,7 @@ const labelSetter = function (
 ) {
   return this.meta({
     description: this.description,
-    [metaSymbol]: { examples: [], ...this.meta()?.[metaSymbol], defaultLabel },
+    [metaSymbol]: { ...this.meta()?.[metaSymbol], defaultLabel },
   });
 };
 
@@ -88,7 +91,7 @@ const brandSetter = function (
 ) {
   return this.meta({
     description: this.description,
-    [metaSymbol]: { examples: [], ...this.meta()?.[metaSymbol], brand },
+    [metaSymbol]: { ...this.meta()?.[metaSymbol], brand },
   });
 };
 
@@ -147,9 +150,12 @@ if (!(metaSymbol in globalThis)) {
             ...args: Parameters<z.ZodType["check"]>
           ) {
             /** @link https://v4.zod.dev/metadata#register */
-            return originalCheck.apply(this, args).register(globalRegistry, {
-              [metaSymbol]: this.meta()?.[metaSymbol],
-            });
+            return (
+              originalCheck
+                .apply(this, args)
+                // @ts-expect-error -- ignore type because it's unknown
+                .register(globalRegistry, this.meta() || {})
+            );
           };
         },
       },
