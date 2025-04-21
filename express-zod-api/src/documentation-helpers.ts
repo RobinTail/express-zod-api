@@ -254,7 +254,7 @@ const makeNullableType = ({
   return type ? [...new Set(type).add("null")] : "null";
 };
 
-const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
+export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
   const target = (zodSchema as $ZodPipe)._zod.def[
     ctx.isResponse ? "out" : "in"
   ];

@@ -82,40 +82,6 @@ exports[`Documentation helpers > depictParamExamples() > should pass examples fo
 }
 `;
 
-exports[`Documentation helpers > depictPipeline > should depict as 'boolean (out)' 1`] = `
-{
-  "type": "boolean",
-}
-`;
-
-exports[`Documentation helpers > depictPipeline > should depict as 'number (out)' 1`] = `
-{
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > depictPipeline > should depict as 'string (in)' 1`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictPipeline > should depict as 'string (in)' 2`] = `
-{
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictPipeline > should depict as 'string (preprocess)' 1`] = `
-{
-  "format": "string (preprocessed)",
-}
-`;
-
-exports[`Documentation helpers > depictPipeline > should handle edge cases 0 1`] = `{}`;
-
-exports[`Documentation helpers > depictPipeline > should handle edge cases 1 1`] = `{}`;
-
 exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344: should depict header params when enabled 1`] = `
 [
   {
@@ -702,6 +668,18 @@ exports[`Documentation helpers > onNullable() > should add null type to the firs
 exports[`Documentation helpers > onNullable() > should not add null type when it's already there 1`] = `
 {
   "type": "null",
+}
+`;
+
+exports[`Documentation helpers > onPipeline > should depict as 'number (out)' 1`] = `
+{
+  "type": "number",
+}
+`;
+
+exports[`Documentation helpers > onPipeline > should depict as 'string (preprocess)' 1`] = `
+{
+  "format": "string (preprocessed)",
 }
 `;
 

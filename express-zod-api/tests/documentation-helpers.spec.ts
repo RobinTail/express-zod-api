@@ -25,6 +25,7 @@ import {
   onIntersection,
   onBigInt,
   onTuple,
+  onPipeline,
 } from "../src/documentation-helpers";
 
 /**
@@ -290,41 +291,31 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictPipeline", () => {
-    test.each([
-      { ctx: responseCtx, expected: "boolean (out)" },
-      { ctx: requestCtx, expected: "string (in)" },
-    ])("should depict as $expected", ({ ctx }) => {
-      expect(
-        delegate(z.string().transform(Boolean).pipe(z.boolean()), ctx),
-      ).toMatchSnapshot();
-    });
-
+  describe("onPipeline", () => {
     test.each([
       {
-        schema: z.string().transform((v) => parseInt(v, 10)),
-        ctx: responseCtx,
+        zodSchema: z.string().transform((v) => parseInt(v, 10)),
+        ctx: responseCtx.ctx,
         expected: "number (out)",
       },
       {
-        schema: z.string().transform((v) => parseInt(v, 10)),
-        ctx: requestCtx,
-        expected: "string (in)",
-      },
-      {
-        schema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
-        ctx: requestCtx,
+        zodSchema: z.preprocess((v) => parseInt(`${v}`, 10), z.string()),
+        ctx: requestCtx.ctx,
         expected: "string (preprocess)",
       },
-    ])("should depict as $expected", ({ schema, ctx }) => {
-      expect(delegate(schema, ctx)).toMatchSnapshot();
+    ])("should depict as $expected", ({ zodSchema, ctx }) => {
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onPipeline({ zodSchema, jsonSchema }, ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
 
     test.each([
       z.number().transform((num) => () => num),
       z.number().transform(() => assert.fail("this should be handled")),
-    ])("should handle edge cases %#", (schema) => {
-      expect(delegate(schema, responseCtx)).toMatchSnapshot();
+    ])("should handle edge cases %#", (zodSchema) => {
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onPipeline({ zodSchema, jsonSchema }, responseCtx.ctx);
+      expect(jsonSchema).toEqual({});
     });
   });
 
