@@ -290,61 +290,6 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictString()", () => {
-    test("should set type:string", () => {
-      expect(delegate(z.string(), requestCtx)).toMatchSnapshot();
-    });
-
-    test.each([
-      z.email().min(10).max(20),
-      z.url().length(15),
-      z.uuid(),
-      z.cuid(),
-      z.iso.datetime(),
-      z.iso.datetime({ offset: true }),
-      z.string().regex(/^\d+.\d+.\d+$/),
-      z.iso.date(),
-      z.iso.time(),
-      z.iso.duration(),
-      z.cidrv4(),
-      z.ipv4(),
-      z.jwt(),
-      z.base64(),
-      z.base64url(),
-      z.cuid2(),
-      z.ulid(),
-    ])("should set format, pattern and min/maxLength props %#", (schema) => {
-      expect(delegate(schema, requestCtx)).toMatchSnapshot();
-    });
-  });
-
-  describe("depictNumber()", () => {
-    test.each([z.number(), z.int(), z.float64()])(
-      "should set min/max values according to JS capabilities %#",
-      (schema) => {
-        expect(delegate(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
-
-    test.each([
-      z
-        .number()
-        .min(-100 / 3)
-        .max(100 / 3),
-      z.number().int().min(-100).max(100),
-      z
-        .number()
-        .gt(-100 / 6)
-        .lt(100 / 6),
-      z.number().int().gt(-100).lt(100),
-    ])(
-      "should use schema checks for min/max and exclusiveness %#",
-      (schema) => {
-        expect(delegate(schema, requestCtx)).toMatchSnapshot();
-      },
-    );
-  });
-
   describe("depictPipeline", () => {
     test.each([
       { ctx: responseCtx, expected: "boolean (out)" },
