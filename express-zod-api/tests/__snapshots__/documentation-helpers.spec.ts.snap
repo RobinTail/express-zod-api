@@ -654,50 +654,6 @@ exports[`Documentation helpers > depictTags() > should accept plain descriptions
 ]
 `;
 
-exports[`Documentation helpers > depictTuple() > should depict empty tuples as is 1`] = `
-{
-  "items": {
-    "not": {},
-  },
-  "prefixItems": [],
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers > depictTuple() > should depict rest as items when defined 1`] = `
-{
-  "items": {
-    "type": "string",
-  },
-  "prefixItems": [
-    {
-      "type": "boolean",
-    },
-  ],
-  "type": "array",
-}
-`;
-
-exports[`Documentation helpers > depictTuple() > should utilize prefixItems and set items:not:{} 1`] = `
-{
-  "items": {
-    "not": {},
-  },
-  "prefixItems": [
-    {
-      "type": "boolean",
-    },
-    {
-      "type": "string",
-    },
-    {
-      "const": "test",
-    },
-  ],
-  "type": "array",
-}
-`;
-
 exports[`Documentation helpers > excludeExamplesFromDepiction() > should remove example property of supplied object 1`] = `
 {
   "description": "test",
@@ -953,6 +909,22 @@ exports[`Documentation helpers > onRaw() > should extract the raw property 1`] =
 {
   "format": "binary",
   "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onTuple() > should add items:not:{} when no rest 0 1`] = `
+{
+  "items": {
+    "not": {},
+  },
+}
+`;
+
+exports[`Documentation helpers > onTuple() > should add items:not:{} when no rest 1 1`] = `
+{
+  "items": {
+    "not": {},
+  },
 }
 `;
 

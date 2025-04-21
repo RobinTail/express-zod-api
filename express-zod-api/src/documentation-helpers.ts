@@ -230,7 +230,7 @@ export const onBigInt: Overrider = ({ jsonSchema }) =>
  * @since OAS 3.1 using prefixItems for depicting tuples
  * @since 17.5.0 added rest handling, fixed tuple type
  */
-const onTuple: Overrider = ({ zodSchema, jsonSchema }) => {
+export const onTuple: Overrider = ({ zodSchema, jsonSchema }) => {
   if ((zodSchema as $ZodTuple)._zod.def.rest !== null) return;
   // does not appear to support items:false, so not:{} is a recommended alias
   jsonSchema.items = { not: {} };

@@ -24,6 +24,7 @@ import {
   onUnion,
   onIntersection,
   onBigInt,
+  onTuple,
 } from "../src/documentation-helpers";
 
 /**
@@ -278,22 +279,14 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictTuple()", () => {
-    test("should utilize prefixItems and set items:not:{}", () => {
-      expect(
-        delegate(
-          z.tuple([z.boolean(), z.string(), z.literal("test")]),
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
-    });
-    test("should depict rest as items when defined", () => {
-      expect(
-        delegate(z.tuple([z.boolean()]).rest(z.string()), requestCtx),
-      ).toMatchSnapshot();
-    });
-    test("should depict empty tuples as is", () => {
-      expect(delegate(z.tuple([]), requestCtx)).toMatchSnapshot();
+  describe("onTuple()", () => {
+    test.each([
+      z.tuple([z.boolean(), z.string(), z.literal("test")]),
+      z.tuple([]),
+    ])("should add items:not:{} when no rest %#", (zodSchema) => {
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onTuple({ zodSchema, jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 
