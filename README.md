@@ -1269,7 +1269,6 @@ import { Integration } from "express-zod-api";
 const client = new Integration({
   routing,
   variant: "client", // <— optional, see also "types" for a DIY solution
-  optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
 });
 
 const prettierFormattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted

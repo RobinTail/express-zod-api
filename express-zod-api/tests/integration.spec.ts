@@ -66,30 +66,6 @@ describe("Integration", () => {
     expect(await client.printFormatted()).toMatchSnapshot();
   });
 
-  test.each([{ withQuestionMark: true }, { withUndefined: true }, {}])(
-    "Feature #945: should have configurable treatment of optionals %#",
-    async (optionalPropStyle) => {
-      const client = new Integration({
-        optionalPropStyle,
-        routing: {
-          v1: {
-            "test-with-dashes": defaultEndpointsFactory.build({
-              method: "post",
-              input: z.object({
-                opt: z.string().optional(),
-              }),
-              output: z.object({
-                similar: z.number().optional(),
-              }),
-              handler: async () => ({}),
-            }),
-          },
-        },
-      });
-      expect(await client.printFormatted()).toMatchSnapshot();
-    },
-  );
-
   test("Should support multiple response schemas depending on status code", async () => {
     const factory = new EndpointsFactory(
       new ResultHandler({
