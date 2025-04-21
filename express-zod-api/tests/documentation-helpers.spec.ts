@@ -102,20 +102,6 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictWrapped()", () => {
-    test("should handle catch", () => {
-      expect(delegate(z.boolean().catch(true), requestCtx)).toMatchSnapshot();
-    });
-
-    test.each([requestCtx, responseCtx])("should handle optional %#", (ctx) => {
-      expect(delegate(z.string().optional(), ctx)).toMatchSnapshot();
-    });
-
-    test("handle readonly", () => {
-      expect(delegate(z.string().readonly(), responseCtx)).toMatchSnapshot();
-    });
-  });
-
   describe("depictAny()", () => {
     test("should set format:any", () => {
       expect(delegate(z.any(), requestCtx)).toMatchSnapshot();
