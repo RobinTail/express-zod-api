@@ -117,22 +117,6 @@ DocumentationError({
 })
 `;
 
-exports[`Documentation helpers > depictDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
-{
-  "default": "Today",
-  "format": "date-time",
-  "pattern": "^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z)$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictDefault() > should set default property 1`] = `
-{
-  "default": true,
-  "type": "boolean",
-}
-`;
-
 exports[`Documentation helpers > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
   "example1": {
@@ -1441,6 +1425,13 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 `;
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified params 3 2`] = `false`;
+
+exports[`Documentation helpers > onDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
+{
+  "default": "Today",
+  "format": "date-time",
+}
+`;
 
 exports[`Documentation helpers > onNullable() > should add null type to the first of anyOf 0 1`] = `
 {

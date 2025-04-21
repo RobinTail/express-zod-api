@@ -96,7 +96,7 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-const onDefault: Overrider = ({ zodSchema, jsonSchema }) =>
+export const onDefault: Overrider = ({ zodSchema, jsonSchema }) =>
   (jsonSchema.default =
     globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
     jsonSchema.default);

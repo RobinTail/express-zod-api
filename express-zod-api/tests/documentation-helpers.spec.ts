@@ -17,6 +17,7 @@ import {
   reformatParamsInPath,
   delegate,
   onNullable,
+  onDefault,
 } from "../src/documentation-helpers";
 
 /**
@@ -86,20 +87,18 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictDefault()", () => {
-    test("should set default property", () => {
-      expect(delegate(z.boolean().default(true), requestCtx)).toMatchSnapshot();
-    });
+  describe("onDefault()", () => {
     test("Feature #1706: should override the default value by a label from metadata", () => {
-      expect(
-        delegate(
-          z.iso
-            .datetime()
-            .default(() => new Date().toISOString())
-            .label("Today"),
-          responseCtx,
-        ),
-      ).toMatchSnapshot();
+      const zodSchema = z.iso
+        .datetime()
+        .default(() => new Date().toISOString())
+        .label("Today");
+      const jsonSchema: JSONSchema.BaseSchema = {
+        default: "2025-05-21",
+        format: "date-time",
+      };
+      onDefault({ zodSchema, jsonSchema }, responseCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
   });
 
