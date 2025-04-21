@@ -191,7 +191,7 @@ export const onNullable: Overrider = ({ jsonSchema }) => {
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
   subject in samples;
 
-const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
+export const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
   delete jsonSchema.anyOf; // undo default
@@ -206,7 +206,7 @@ const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
   });
 };
 
-const onDateOut: Overrider = ({ jsonSchema }, ctx) => {
+export const onDateOut: Overrider = ({ jsonSchema }, ctx) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
   Object.assign(jsonSchema, {

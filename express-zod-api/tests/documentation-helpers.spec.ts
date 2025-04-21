@@ -1,7 +1,6 @@
 import { JSONSchema } from "@zod/core";
 import * as R from "ramda";
 import { z } from "zod";
-import { ez } from "../src";
 import {
   OpenAPIContext,
   depictExamples,
@@ -26,6 +25,8 @@ import {
   onBigInt,
   onTuple,
   onPipeline,
+  onDateIn,
+  onDateOut,
 } from "../src/documentation-helpers";
 
 /**
@@ -466,24 +467,28 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictDateIn", () => {
+  describe("onDateIn", () => {
     test("should set type:string, pattern and format", () => {
-      expect(delegate(ez.dateIn(), requestCtx)).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = { anyOf: [] };
+      onDateIn({ zodSchema: z.never(), jsonSchema }, requestCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
     test("should throw when ZodDateIn in response", () => {
       expect(() =>
-        delegate(ez.dateIn(), responseCtx),
+        onDateIn({ zodSchema: z.never(), jsonSchema: {} }, responseCtx.ctx),
       ).toThrowErrorMatchingSnapshot();
     });
   });
 
-  describe("depictDateOut", () => {
+  describe("onDateOut", () => {
     test("should set type:string, description and format", () => {
-      expect(delegate(ez.dateOut(), responseCtx)).toMatchSnapshot();
+      const jsonSchema: JSONSchema.BaseSchema = {};
+      onDateOut({ zodSchema: z.never(), jsonSchema }, responseCtx.ctx);
+      expect(jsonSchema).toMatchSnapshot();
     });
     test("should throw when ZodDateOut in request", () => {
       expect(() =>
-        delegate(ez.dateOut(), requestCtx),
+        onDateOut({ zodSchema: z.never(), jsonSchema: {} }, requestCtx.ctx),
       ).toThrowErrorMatchingSnapshot();
     });
   });

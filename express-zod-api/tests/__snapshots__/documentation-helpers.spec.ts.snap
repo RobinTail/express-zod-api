@@ -1,42 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictDateIn > should throw when ZodDateIn in response 1`] = `
-DocumentationError({
-  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Please use ez.dateOut() for output.",
-})
-`;
-
-exports[`Documentation helpers > depictDateOut > should set type:string, description and format 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictDateOut > should throw when ZodDateOut in request 1`] = `
-DocumentationError({
-  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Please use ez.dateIn() for input.",
-})
-`;
-
 exports[`Documentation helpers > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
   "example1": {
@@ -523,6 +486,43 @@ exports[`Documentation helpers > onBigInt() > should set type:string and format:
   "pattern": "^-?\\d+$",
   "type": "string",
 }
+`;
+
+exports[`Documentation helpers > onDateIn > should set type:string, pattern and format 1`] = `
+{
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onDateIn > should throw when ZodDateIn in response 1`] = `
+DocumentationError({
+  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.dateOut() for output.",
+})
+`;
+
+exports[`Documentation helpers > onDateOut > should set type:string, description and format 1`] = `
+{
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > onDateOut > should throw when ZodDateOut in request 1`] = `
+DocumentationError({
+  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.dateIn() for input.",
+})
 `;
 
 exports[`Documentation helpers > onDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
