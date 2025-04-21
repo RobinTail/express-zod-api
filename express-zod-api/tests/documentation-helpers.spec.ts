@@ -1,4 +1,5 @@
 import { JSONSchema } from "@zod/core";
+import { SchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
 import {
@@ -14,7 +15,6 @@ import {
   excludeParamsFromDepiction,
   defaultIsHeader,
   reformatParamsInPath,
-  delegate,
   onNullable,
   onDefault,
   onRaw,
@@ -29,11 +29,6 @@ import {
   onDateOut,
 } from "../src/documentation-helpers";
 
-/**
- * @todo all these functions is now the one, and the tests naming is not relevant anymore
- * @todo these tests should now be transformed into ones of particular postprocessors and assert exactly what they do.
- * @todo So we would not test Zod here, but internal methods only.
- */
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
   const requestCtx = {
@@ -58,16 +53,46 @@ describe("Documentation helpers", () => {
   });
 
   describe("excludeParamsFromDepiction()", () => {
-    test.each<z.ZodTypeAny>([
-      z.object({ a: z.string(), b: z.string() }),
-      z.object({ a: z.string() }).or(z.object({ b: z.string() })),
-      z.intersection(z.object({ a: z.string() }), z.object({ b: z.string() })), // flattened
-      z.intersection(
-        z.record(z.literal("a"), z.string()),
-        z.record(z.string(), z.string()),
-      ),
-    ])("should omit specified params %#", (schema) => {
-      const depicted = delegate(schema, requestCtx);
+    test.each<SchemaObject>([
+      {
+        type: "object",
+        properties: { a: { type: "string" }, b: { type: "string" } },
+        required: ["a", "b"],
+      },
+      {
+        anyOf: [
+          {
+            type: "object",
+            properties: { a: { type: "string" } },
+            required: ["a"],
+          },
+          {
+            type: "object",
+            properties: { b: { type: "string" } },
+            required: ["b"],
+          },
+        ],
+      },
+      {
+        type: "object",
+        properties: { a: { type: "string" }, b: { type: "string" } },
+        required: ["a", "b"],
+      },
+      {
+        allOf: [
+          {
+            type: "object",
+            propertyNames: { const: "a" },
+            additionalProperties: { type: "string" },
+          },
+          {
+            type: "object",
+            propertyNames: { type: "string" },
+            additionalProperties: { type: "string" },
+          },
+        ],
+      },
+    ])("should omit specified params %#", (depicted) => {
       const [result, hasRequired] = excludeParamsFromDepiction(depicted, ["a"]);
       expect(result).toMatchSnapshot();
       expect(hasRequired).toMatchSnapshot();

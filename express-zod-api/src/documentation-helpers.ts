@@ -483,7 +483,7 @@ const fixReferences = (
 };
 
 // @todo rename?
-export const delegate = (
+const delegate = (
   schema: $ZodType,
   {
     ctx,
