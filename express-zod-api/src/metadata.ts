@@ -11,8 +11,7 @@ export interface Metadata {
   brand?: string | number | symbol;
 }
 
-// @todo this should be renamed to copyExamples or mixinExamples or something similar
-export const copyMeta = <A extends z.ZodType, B extends z.ZodType>(
+export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
   src: A,
   dest: B,
 ): B => {
