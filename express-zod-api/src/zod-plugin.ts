@@ -55,12 +55,12 @@ declare module "zod" {
 }
 
 const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
-  const { examples, ...rest } = this.meta()?.[metaSymbol] || { examples: [] };
-  const copy = examples.slice();
+  const { [metaSymbol]: internal, ...rest } = this.meta() || {};
+  const copy = internal?.examples.slice() || [];
   copy.push(value);
   return this.meta({
-    description: this.description,
-    [metaSymbol]: { ...rest, examples: copy },
+    ...rest,
+    [metaSymbol]: { ...internal, examples: copy },
   });
 };
 
