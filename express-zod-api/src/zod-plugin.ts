@@ -148,7 +148,10 @@ if (!(metaSymbol in globalThis)) {
           ) {
             /** @link https://v4.zod.dev/metadata#register */
             return originalCheck.apply(this, args).register(globalRegistry, {
-              [metaSymbol]: this.meta()?.[metaSymbol],
+              [metaSymbol]: {
+                examples: [],
+                brand: this.meta()?.[metaSymbol]?.brand,
+              },
             });
           };
         },
