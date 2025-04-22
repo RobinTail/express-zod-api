@@ -1,24 +1,26 @@
 import { z } from "zod";
-import { copyMeta, metaSymbol } from "../src/metadata";
+import { mixExamples, metaSymbol } from "../src/metadata";
 
 describe("Metadata", () => {
-  describe("copyMeta()", () => {
+  describe("mixExamples()", () => {
     test("should return the same dest schema in case src one has no meta", () => {
       const src = z.string();
       const dest = z.number();
-      const result = copyMeta(src, dest);
+      const result = mixExamples(src, dest);
       expect(result).toEqual(dest);
       expect(result.meta()?.[metaSymbol]).toBeFalsy();
       expect(dest.meta()?.[metaSymbol]).toBeFalsy();
     });
     test("should copy meta from src to dest in case meta is defined", () => {
-      const src = z.string().example("some");
-      const dest = z.number();
-      const result = copyMeta(src, dest);
+      const src = z.string().example("some").describe("test");
+      const dest = z.number().describe("another");
+      const result = mixExamples(src, dest);
+      expect(result).not.toEqual(dest); // immutable
       expect(result.meta()?.[metaSymbol]).toBeTruthy();
       expect(result.meta()?.[metaSymbol]?.examples).toEqual(
         src.meta()?.[metaSymbol]?.examples,
       );
+      expect(result.description).toBe("another"); // preserves it
     });
 
     test("should merge the meta from src to dest", () => {
@@ -31,7 +33,7 @@ describe("Metadata", () => {
         .example({ b: 123 })
         .example({ b: 456 })
         .example({ b: 789 });
-      const result = copyMeta(src, dest);
+      const result = mixExamples(src, dest);
       expect(result.meta()?.[metaSymbol]).toBeTruthy();
       expect(result.meta()?.[metaSymbol]?.examples).toEqual([
         { a: "some", b: 123 },
@@ -53,7 +55,7 @@ describe("Metadata", () => {
         .example({ a: { c: 123 } })
         .example({ a: { c: 456 } })
         .example({ a: { c: 789 } });
-      const result = copyMeta(src, dest);
+      const result = mixExamples(src, dest);
       expect(result.meta()?.[metaSymbol]).toBeTruthy();
       expect(result.meta()?.[metaSymbol]?.examples).toEqual([
         { a: { b: "some", c: 123 } },
@@ -70,7 +72,7 @@ describe("Metadata", () => {
       const dest = z
         .object({ items: z.array(z.string()) })
         .example({ items: ["e", "f", "g"] });
-      const result = copyMeta(src, dest);
+      const result = mixExamples(src, dest);
       expect(result.meta()?.[metaSymbol]?.examples).toEqual(["a", "b"]);
     });
   });

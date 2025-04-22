@@ -11,26 +11,26 @@ export interface Metadata {
   brand?: string | number | symbol;
 }
 
-// @todo this should be renamed to copyExamples or mixinExamples or something similar
-export const copyMeta = <A extends z.ZodType, B extends z.ZodType>(
+export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
   src: A,
   dest: B,
 ): B => {
-  const srcMeta = src.meta()?.[metaSymbol];
-  const destMeta = dest.meta()?.[metaSymbol];
-  if (!srcMeta) return dest; // ensure metadata in src below
+  const srcMeta = src.meta();
+  const destMeta = dest.meta();
+  if (!srcMeta?.[metaSymbol]) return dest; // ensures srcMeta[metaSymbol]
+  const examples = combinations(
+    destMeta?.[metaSymbol]?.examples || [],
+    srcMeta[metaSymbol].examples || [],
+    ([destExample, srcExample]) =>
+      typeof destExample === "object" &&
+      typeof srcExample === "object" &&
+      destExample &&
+      srcExample
+        ? R.mergeDeepRight(destExample, srcExample)
+        : srcExample, // not supposed to be called on non-object schemas
+  );
   return dest.meta({
-    description: dest.description,
-    [metaSymbol]: {
-      ...destMeta,
-      examples: combinations(
-        destMeta?.examples || [],
-        srcMeta.examples || [],
-        ([destExample, srcExample]) =>
-          typeof destExample === "object" && typeof srcExample === "object"
-            ? R.mergeDeepRight({ ...destExample }, { ...srcExample })
-            : srcExample, // not supposed to be called on non-object schemas
-      ),
-    },
+    ...destMeta,
+    [metaSymbol]: { ...destMeta?.[metaSymbol], examples },
   });
 };

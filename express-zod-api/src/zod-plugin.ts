@@ -6,6 +6,7 @@
  * @desc Enables .label() on ZodDefault
  * @desc Enables .remap() on ZodObject
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
+ * @desc Ensures that the brand withstands additional refinements or checks
  * */
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
@@ -55,20 +56,19 @@ declare module "zod" {
 }
 
 const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
-  const { examples, ...rest } = this.meta()?.[metaSymbol] || { examples: [] };
-  const copy = examples.slice();
+  const { [metaSymbol]: internal, ...rest } = this.meta() || {};
+  const copy = internal?.examples.slice() || [];
   copy.push(value);
   return this.meta({
-    description: this.description,
-    [metaSymbol]: { ...rest, examples: copy },
+    ...rest,
+    [metaSymbol]: { ...internal, examples: copy },
   });
 };
 
 const deprecationSetter = function (this: z.ZodType) {
   return this.meta({
-    description: this.description,
+    ...this.meta(),
     deprecated: true,
-    [metaSymbol]: this.meta()?.[metaSymbol],
   });
 };
 
@@ -76,9 +76,11 @@ const labelSetter = function (
   this: z.ZodDefault<z.ZodTypeAny>,
   defaultLabel: string,
 ) {
+  const { [metaSymbol]: internal = { examples: [] }, ...rest } =
+    this.meta() || {};
   return this.meta({
-    description: this.description,
-    [metaSymbol]: { examples: [], ...this.meta()?.[metaSymbol], defaultLabel },
+    ...rest,
+    [metaSymbol]: { ...internal, defaultLabel },
   });
 };
 
@@ -86,9 +88,11 @@ const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
 ) {
+  const { [metaSymbol]: internal = { examples: [] }, ...rest } =
+    this.meta() || {};
   return this.meta({
-    description: this.description,
-    [metaSymbol]: { examples: [], ...this.meta()?.[metaSymbol], brand },
+    ...rest,
+    [metaSymbol]: { ...internal, brand },
   });
 };
 
