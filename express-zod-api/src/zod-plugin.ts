@@ -8,7 +8,7 @@
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
 import * as R from "ramda";
-import { z, globalRegistry } from "zod";
+import { z } from "zod";
 import { FlatObject } from "./common-helpers";
 import { metaSymbol, metaRegistry } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
@@ -57,8 +57,7 @@ const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
   const { examples = [], ...rest } = metaRegistry.get(this) || {};
   const copy = examples.slice();
   copy.push(value);
-  metaRegistry.add(this, { ...rest, examples: copy });
-  return this;
+  return this.register(metaRegistry, { ...rest, examples: copy });
 };
 
 const deprecationSetter = function (this: z.ZodType) {
@@ -72,20 +71,22 @@ const labelSetter = function (
   this: z.ZodDefault<z.ZodTypeAny>,
   defaultLabel: string,
 ) {
-  metaRegistry.add(this, {
+  return this.register(metaRegistry, {
     examples: [],
     ...metaRegistry.get(this),
     defaultLabel,
   });
-  return this;
 };
 
 const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
 ) {
-  metaRegistry.add(this, { examples: [], ...metaRegistry.get(this), brand });
-  return this;
+  return this.register(metaRegistry, {
+    examples: [],
+    ...metaRegistry.get(this),
+    brand,
+  });
 };
 
 const objectMapper = function (
