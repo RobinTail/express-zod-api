@@ -17,7 +17,9 @@
   - The `brandHandling` should consist of postprocessing functions altering the depiction made by Zod 4;
   - The `Depicter` type changed to `Overrider` having different signature;
 - The `optionalPropStyle` option removed from `Integration` class constructor:
-  - Use the new `z.interface()` schema to describe key-optional objects: https://v4.zod.dev/v4#zinterface.
+  - Use the new `z.interface()` schema to describe key-optional objects: https://v4.zod.dev/v4#zinterface;
+- Changes to the plugin:
+  - Brand is the only kind of metadata that withstands refinements and checks.
 
 ## Version 23
 

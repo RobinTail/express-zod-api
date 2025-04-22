@@ -44,17 +44,6 @@ describe("Zod Runtime Plugin", () => {
         "test3",
       ]);
     });
-
-    test("should withstand refinements", () => {
-      const schema = z.string();
-      const schemaWithMeta = schema.example("test");
-      expect(schemaWithMeta.meta()?.[metaSymbol]?.examples).toEqual(["test"]);
-      expect(
-        schemaWithMeta.regex(/@example.com$/).meta()?.[metaSymbol],
-      ).toEqual({
-        examples: ["test"],
-      });
-    });
   });
 
   describe(".deprecated()", () => {
@@ -88,6 +77,18 @@ describe("Zod Runtime Plugin", () => {
       expect(z.string().brand("test").meta()?.[metaSymbol]?.brand).toEqual(
         "test",
       );
+    });
+
+    test("should withstand refinements", () => {
+      const schema = z.string();
+      const schemaWithMeta = schema.brand("test");
+      expect(schemaWithMeta.meta()?.[metaSymbol]).toHaveProperty(
+        "brand",
+        "test",
+      );
+      expect(
+        schemaWithMeta.regex(/@example.com$/).meta()?.[metaSymbol],
+      ).toHaveProperty("brand", "test");
     });
   });
 
