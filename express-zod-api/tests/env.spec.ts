@@ -79,6 +79,15 @@ describe("Environment checks", () => {
         ).toMatchSnapshot();
       },
     );
+
+    test("meta overrides, does not merge", () => {
+      const schema = z
+        .string()
+        .meta({ examples: ["test"] })
+        .meta({ description: "some" })
+        .meta({ title: "last" });
+      expect(schema.meta()).toMatchSnapshot();
+    });
   });
 
   describe("Zod new features", () => {
