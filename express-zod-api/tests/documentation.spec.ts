@@ -496,7 +496,7 @@ describe("Documentation", () => {
               method: "post",
               input: category,
               output: z.object({
-                zodExample: category, // @todo consider external registry to deduplicate it
+                zodExample: category,
               }),
               handler: async () => ({
                 zodExample: {
