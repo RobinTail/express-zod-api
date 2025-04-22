@@ -6,6 +6,7 @@
  * @desc Enables .label() on ZodDefault
  * @desc Enables .remap() on ZodObject
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
+ * @desc Ensures that the brand withstands additional refinements or checks
  * */
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
