@@ -75,9 +75,11 @@ const labelSetter = function (
   this: z.ZodDefault<z.ZodTypeAny>,
   defaultLabel: string,
 ) {
+  const { [metaSymbol]: internal = { examples: [] }, ...rest } =
+    this.meta() || {};
   return this.meta({
-    description: this.description,
-    [metaSymbol]: { examples: [], ...this.meta()?.[metaSymbol], defaultLabel },
+    ...rest,
+    [metaSymbol]: { ...internal, defaultLabel },
   });
 };
 
