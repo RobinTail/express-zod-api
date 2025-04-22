@@ -485,10 +485,7 @@ const fixReferences = (
 // @todo rename?
 const delegate = (
   schema: $ZodType,
-  {
-    ctx,
-    rules = overrides,
-  }: { ctx: OpenAPIContext; rules?: Record<string | symbol, Overrider> },
+  { ctx, rules = overrides }: { ctx: OpenAPIContext; rules?: BrandHandling },
 ) =>
   fixReferences(
     z.toJSONSchema(schema, {
