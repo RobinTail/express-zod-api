@@ -66,9 +66,8 @@ const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
 
 const deprecationSetter = function (this: z.ZodType) {
   return this.meta({
-    description: this.description,
+    ...this.meta(),
     deprecated: true,
-    [metaSymbol]: this.meta()?.[metaSymbol],
   });
 };
 
