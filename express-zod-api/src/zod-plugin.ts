@@ -87,9 +87,11 @@ const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
 ) {
+  const { [metaSymbol]: internal = { examples: [] }, ...rest } =
+    this.meta() || {};
   return this.meta({
-    description: this.description,
-    [metaSymbol]: { examples: [], ...this.meta()?.[metaSymbol], brand },
+    ...rest,
+    [metaSymbol]: { ...internal, brand },
   });
 };
 
