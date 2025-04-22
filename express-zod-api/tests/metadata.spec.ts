@@ -15,6 +15,7 @@ describe("Metadata", () => {
       const src = z.string().example("some");
       const dest = z.number();
       const result = mixExamples(src, dest);
+      expect(result).not.toEqual(dest); // immutable
       expect(result.meta()?.[metaSymbol]).toBeTruthy();
       expect(result.meta()?.[metaSymbol]?.examples).toEqual(
         src.meta()?.[metaSymbol]?.examples,
