@@ -5,7 +5,7 @@ import * as R from "ramda";
 export const metaSymbol = Symbol.for("express-zod-api");
 
 export interface Metadata {
-  examples: unknown[]; // @todo try z.$input[] instead
+  examples: z.$input[];
   /** @override ZodDefault::_zod.def.defaultValue() in depictDefault */
   defaultLabel?: string;
   brand?: string | number | symbol;
