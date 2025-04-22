@@ -61,6 +61,24 @@ describe("Environment checks", () => {
         {},
       );
     });
+
+    /**
+     * output examples would be possiblity fixed by this:
+     * @link https://github.com/colinhacks/zod/pull/4074/commits/818cfe78b0341e9e8cfbda248bff4268bd8352e8#diff-44530efe91e850ac97367f36dbb2eb83f8a567087a4dbbec1c262e177ac4d085R540
+     */
+    test.each(["input", "output"] as const)(
+      "%s examples of transformations",
+      (io) => {
+        const schema = z
+          .string()
+          .meta({ examples: ["test"] })
+          .transform(Number)
+          .meta({ examples: [4] });
+        expect(
+          z.toJSONSchema(schema, { io, unrepresentable: "any" }),
+        ).toMatchSnapshot();
+      },
+    );
   });
 
   describe("Zod new features", () => {
