@@ -12,14 +12,15 @@ describe("Metadata", () => {
       expect(dest.meta()?.[metaSymbol]).toBeFalsy();
     });
     test("should copy meta from src to dest in case meta is defined", () => {
-      const src = z.string().example("some");
-      const dest = z.number();
+      const src = z.string().example("some").describe("test");
+      const dest = z.number().describe("another");
       const result = mixExamples(src, dest);
       expect(result).not.toEqual(dest); // immutable
       expect(result.meta()?.[metaSymbol]).toBeTruthy();
       expect(result.meta()?.[metaSymbol]?.examples).toEqual(
         src.meta()?.[metaSymbol]?.examples,
       );
+      expect(result.description).toBe("another"); // preserves it
     });
 
     test("should merge the meta from src to dest", () => {
