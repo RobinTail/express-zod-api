@@ -71,7 +71,7 @@ export type IsHeader = (
 
 export type BrandHandling = Record<string | symbol, Overrider>;
 
-interface ReqResHandlingProps<S extends z.ZodTypeAny>
+interface ReqResHandlingProps<S extends $ZodType>
   extends Omit<OpenAPIContext, "isResponse"> {
   schema: S;
   composition: "inline" | "components";
@@ -308,7 +308,7 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
     : undefined;
 
 export const depictExamples = (
-  schema: z.ZodType,
+  schema: $ZodType,
   isResponse: boolean,
   omitProps: string[] = [],
 ): ExamplesObject | undefined => {
@@ -550,7 +550,7 @@ export const depictResponse = ({
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
-}: ReqResHandlingProps<z.ZodTypeAny> & {
+}: ReqResHandlingProps<$ZodType> & {
   mimeTypes: ReadonlyArray<string> | null;
   variant: ResponseVariant;
   statusCode: number;
