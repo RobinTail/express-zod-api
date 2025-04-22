@@ -20,6 +20,7 @@ describe("Metadata", () => {
       expect(result.meta()?.[metaSymbol]?.examples).toEqual(
         src.meta()?.[metaSymbol]?.examples,
       );
+      expect(result.meta()?.[metaSymbol]?.examples).toEqual(["some"]);
       expect(result.description).toBe("another"); // preserves it
     });
 
