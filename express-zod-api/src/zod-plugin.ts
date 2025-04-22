@@ -10,13 +10,12 @@
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
 import { FlatObject } from "./common-helpers";
-import { Metadata, metaSymbol } from "./metadata";
+import { metaSymbol, metaRegistry } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
 import type { $ZodType, $ZodShape } from "@zod/core";
 
 declare module "@zod/core" {
   interface GlobalMeta {
-    [metaSymbol]?: Metadata;
     deprecated?: boolean;
   }
 }
@@ -55,20 +54,17 @@ declare module "zod" {
 }
 
 const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
-  const { examples, ...rest } = this.meta()?.[metaSymbol] || { examples: [] };
+  const { examples = [], ...rest } = metaRegistry.get(this) || {};
   const copy = examples.slice();
   copy.push(value);
-  return this.meta({
-    description: this.description,
-    [metaSymbol]: { ...rest, examples: copy },
-  });
+  metaRegistry.add(this, { ...rest, examples: copy });
+  return this;
 };
 
 const deprecationSetter = function (this: z.ZodType) {
   return this.meta({
     description: this.description,
     deprecated: true,
-    [metaSymbol]: this.meta()?.[metaSymbol],
   });
 };
 
@@ -76,20 +72,20 @@ const labelSetter = function (
   this: z.ZodDefault<z.ZodTypeAny>,
   defaultLabel: string,
 ) {
-  return this.meta({
-    description: this.description,
-    [metaSymbol]: { examples: [], ...this.meta()?.[metaSymbol], defaultLabel },
+  metaRegistry.add(this, {
+    examples: [],
+    ...metaRegistry.get(this),
+    defaultLabel,
   });
+  return this;
 };
 
 const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
 ) {
-  return this.meta({
-    description: this.description,
-    [metaSymbol]: { examples: [], ...this.meta()?.[metaSymbol], brand },
-  });
+  metaRegistry.add(this, { examples: [], ...metaRegistry.get(this), brand });
+  return this;
 };
 
 const objectMapper = function (
@@ -147,9 +143,12 @@ if (!(metaSymbol in globalThis)) {
             ...args: Parameters<z.ZodType["check"]>
           ) {
             /** @link https://v4.zod.dev/metadata#register */
-            return originalCheck.apply(this, args).register(globalRegistry, {
-              [metaSymbol]: this.meta()?.[metaSymbol],
-            });
+            return originalCheck
+              .apply(this, args)
+              .register(
+                metaRegistry,
+                metaRegistry.get(this) || { examples: [] },
+              );
           };
         },
       },
