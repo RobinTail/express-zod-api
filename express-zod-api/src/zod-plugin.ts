@@ -11,13 +11,12 @@
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
 import { FlatObject } from "./common-helpers";
-import { Metadata, metaSymbol } from "./metadata";
+import { ezRegistry, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
 import type { $ZodType, $ZodShape } from "@zod/core";
 
 declare module "@zod/core" {
   interface GlobalMeta {
-    [metaSymbol]?: Metadata;
     deprecated?: boolean;
   }
 }
@@ -56,13 +55,10 @@ declare module "zod" {
 }
 
 const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
-  const { [metaSymbol]: internal, ...rest } = this.meta() || {};
-  const copy = internal?.examples.slice() || [];
+  const { examples = [], ...rest } = ezRegistry.get(this) || {};
+  const copy = examples.slice();
   copy.push(value);
-  return this.meta({
-    ...rest,
-    [metaSymbol]: { ...internal, examples: copy },
-  });
+  return this.clone().register(ezRegistry, { ...rest, examples: copy });
 };
 
 const deprecationSetter = function (this: z.ZodType) {
@@ -76,24 +72,16 @@ const labelSetter = function (
   this: z.ZodDefault<z.ZodTypeAny>,
   defaultLabel: string,
 ) {
-  const { [metaSymbol]: internal = { examples: [] }, ...rest } =
-    this.meta() || {};
-  return this.meta({
-    ...rest,
-    [metaSymbol]: { ...internal, defaultLabel },
-  });
+  const { examples = [], ...rest } = ezRegistry.get(this) || {};
+  return this.clone().register(ezRegistry, { ...rest, examples, defaultLabel });
 };
 
 const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
 ) {
-  const { [metaSymbol]: internal = { examples: [] }, ...rest } =
-    this.meta() || {};
-  return this.meta({
-    ...rest,
-    [metaSymbol]: { ...internal, brand },
-  });
+  const { examples = [], ...rest } = ezRegistry.get(this) || {};
+  return this.clone().register(ezRegistry, { ...rest, examples, brand });
 };
 
 const objectMapper = function (
@@ -151,11 +139,9 @@ if (!(metaSymbol in globalThis)) {
             ...args: Parameters<z.ZodType["check"]>
           ) {
             /** @link https://v4.zod.dev/metadata#register */
-            return originalCheck.apply(this, args).register(globalRegistry, {
-              [metaSymbol]: {
-                examples: [],
-                brand: this.meta()?.[metaSymbol]?.brand,
-              },
+            return originalCheck.apply(this, args).register(ezRegistry, {
+              examples: [],
+              brand: ezRegistry.get(this)?.brand,
             });
           };
         },

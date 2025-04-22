@@ -4,23 +4,25 @@ import * as R from "ramda";
 
 export const metaSymbol = Symbol.for("express-zod-api");
 
-export interface Metadata {
+export type Metadata = {
   examples: unknown[]; // @todo try z.$input[] instead
   /** @override ZodDefault::_zod.def.defaultValue() in depictDefault */
   defaultLabel?: string;
   brand?: string | number | symbol;
-}
+};
+
+export const ezRegistry = z.registry<Metadata>();
 
 export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
   src: A,
   dest: B,
 ): B => {
-  const srcMeta = src.meta();
-  const destMeta = dest.meta();
-  if (!srcMeta?.[metaSymbol]) return dest; // ensures srcMeta[metaSymbol]
+  const srcMeta = ezRegistry.get(src);
+  const destMeta = ezRegistry.get(dest);
+  if (!srcMeta) return dest; // ensures srcMeta.examples below
   const examples = combinations(
-    destMeta?.[metaSymbol]?.examples || [],
-    srcMeta[metaSymbol].examples || [],
+    destMeta?.examples || [],
+    srcMeta.examples || [],
     ([destExample, srcExample]) =>
       typeof destExample === "object" &&
       typeof srcExample === "object" &&
@@ -29,8 +31,5 @@ export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
         ? R.mergeDeepRight(destExample, srcExample)
         : srcExample, // not supposed to be called on non-object schemas
   );
-  return dest.meta({
-    ...destMeta,
-    [metaSymbol]: { ...destMeta?.[metaSymbol], examples },
-  });
+  return dest.clone().register(ezRegistry, { ...destMeta, examples });
 };

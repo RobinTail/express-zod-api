@@ -1,6 +1,6 @@
 import camelize from "camelize-ts";
 import { z } from "zod";
-import { metaSymbol } from "../src/metadata";
+import { ezRegistry } from "../src/metadata";
 
 describe("Zod Runtime Plugin", () => {
   describe(".example()", () => {
@@ -13,7 +13,7 @@ describe("Zod Runtime Plugin", () => {
     test("should set the corresponding metadata in the schema definition", () => {
       const schema = z.string();
       const schemaWithMeta = schema.example("test");
-      expect(schemaWithMeta.meta()?.[metaSymbol]).toHaveProperty("examples", [
+      expect(ezRegistry.get(schemaWithMeta)).toHaveProperty("examples", [
         "test",
       ]);
     });
@@ -21,15 +21,11 @@ describe("Zod Runtime Plugin", () => {
     test("Issue 827: should be immutable", () => {
       const schema = z.string();
       const schemaWithExample = schema.example("test");
-      expect(schemaWithExample.meta()?.[metaSymbol]?.examples).toEqual([
-        "test",
-      ]);
-      expect(schema.meta()?.[metaSymbol]).toBeUndefined();
+      expect(ezRegistry.get(schemaWithExample)?.examples).toEqual(["test"]);
+      expect(ezRegistry.get(schema)).toBeUndefined();
       const second = schemaWithExample.example("test2");
-      expect(second.meta()?.[metaSymbol]?.examples).toEqual(["test", "test2"]);
-      expect(schemaWithExample.meta()?.[metaSymbol]?.examples).toEqual([
-        "test",
-      ]);
+      expect(ezRegistry.get(second)?.examples).toEqual(["test", "test2"]);
+      expect(ezRegistry.get(schemaWithExample)?.examples).toEqual(["test"]);
     });
 
     test("can be used multiple times", () => {
@@ -38,7 +34,7 @@ describe("Zod Runtime Plugin", () => {
         .example("test1")
         .example("test2")
         .example("test3");
-      expect(schemaWithMeta.meta()?.[metaSymbol]?.examples).toEqual([
+      expect(ezRegistry.get(schemaWithMeta)?.examples).toEqual([
         "test1",
         "test2",
         "test3",
@@ -65,7 +61,7 @@ describe("Zod Runtime Plugin", () => {
       const schema = z.iso.datetime().default(() => new Date().toISOString());
       expect(schema).toHaveProperty("label");
       const schemaWithMeta = schema.label("Today");
-      expect(schemaWithMeta.meta()?.[metaSymbol]).toHaveProperty(
+      expect(ezRegistry.get(schemaWithMeta)).toHaveProperty(
         "defaultLabel",
         "Today",
       );
@@ -74,20 +70,15 @@ describe("Zod Runtime Plugin", () => {
 
   describe(".brand()", () => {
     test("should set the brand", () => {
-      expect(z.string().brand("test").meta()?.[metaSymbol]?.brand).toEqual(
-        "test",
-      );
+      expect(ezRegistry.get(z.string().brand("test"))?.brand).toEqual("test");
     });
 
     test("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = schema.brand("test");
-      expect(schemaWithMeta.meta()?.[metaSymbol]).toHaveProperty(
-        "brand",
-        "test",
-      );
+      expect(ezRegistry.get(schemaWithMeta)).toHaveProperty("brand", "test");
       expect(
-        schemaWithMeta.regex(/@example.com$/).meta()?.[metaSymbol],
+        ezRegistry.get(schemaWithMeta.regex(/@example.com$/)),
       ).toHaveProperty("brand", "test");
     });
   });
