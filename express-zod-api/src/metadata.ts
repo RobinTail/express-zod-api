@@ -31,5 +31,7 @@ export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
         ? R.mergeDeepRight(destExample, srcExample)
         : srcExample, // not supposed to be called on non-object schemas
   );
-  return dest.clone().register(ezRegistry, { ...destMeta, examples });
+  const result = dest.clone();
+  ezRegistry.add(result, { ...destMeta, examples });
+  return result;
 };
