@@ -262,7 +262,7 @@ export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
     ctx.isResponse ? "in" : "out"
   ];
   if (target instanceof z.ZodTransform) {
-    const opposingDepiction = delegate(opposite, { ctx, rules: overrides });
+    const opposingDepiction = depict(opposite, { ctx, rules: overrides });
     if (isSchemaObject(opposingDepiction)) {
       if (!ctx.isResponse) {
         const { type: opposingType, ...rest } = opposingDepiction;
@@ -389,7 +389,7 @@ export const depictRequestParams = ({
             ? "query"
             : undefined;
       if (!location) return acc;
-      const depicted = delegate(paramSchema, {
+      const depicted = depict(paramSchema, {
         rules: { ...brandHandling, ...overrides },
         ctx: { isResponse: false, makeRef, path, method },
       });
@@ -477,8 +477,7 @@ const fixReferences = (
   return subject as SchemaObject; // @todo ideally, there should be a method to ensure that
 };
 
-// @todo rename?
-const delegate = (
+const depict = (
   subject: $ZodType,
   { ctx, rules = overrides }: { ctx: OpenAPIContext; rules?: BrandHandling },
 ) => {
@@ -552,7 +551,7 @@ export const depictResponse = ({
 }): ResponseObject => {
   if (!mimeTypes) return { description };
   const depictedSchema = excludeExamplesFromDepiction(
-    delegate(schema, {
+    depict(schema, {
       rules: { ...brandHandling, ...overrides },
       ctx: { isResponse: true, makeRef, path, method },
     }),
@@ -674,7 +673,7 @@ export const depictBody = ({
   paramNames: string[];
 }) => {
   const [withoutParams, hasRequired] = excludeParamsFromDepiction(
-    delegate(schema, {
+    depict(schema, {
       rules: { ...brandHandling, ...overrides },
       ctx: { isResponse: false, makeRef, path, method },
     }),
