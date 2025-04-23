@@ -455,17 +455,17 @@ const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
  * @todo is there a less hacky way to do that?
  * */
 const fixReferences = (
-  $defs: Record<string, JSONSchema.BaseSchema>,
-  rest: JSONSchema.BaseSchema,
+  subject: JSONSchema.BaseSchema,
+  defs: Record<string, JSONSchema.BaseSchema>,
   ctx: OpenAPIContext,
 ) => {
-  const stack: unknown[] = [rest, $defs];
+  const stack: unknown[] = [subject, defs];
   while (stack.length) {
     const entry = stack.shift()!;
     if (R.is(Object, entry)) {
       if (isReferenceObject(entry) && !entry.$ref.startsWith("#/components")) {
         const actualName = entry.$ref.split("/").pop()!;
-        const depiction = $defs[actualName];
+        const depiction = defs[actualName];
         if (depiction)
           entry.$ref = ctx.makeRef(depiction, depiction as SchemaObject).$ref; // @todo see below
         continue;
@@ -474,7 +474,7 @@ const fixReferences = (
     }
     if (R.is(Array, entry)) stack.push(...R.values(entry));
   }
-  return rest as SchemaObject; // @todo ideally, there should be a method to ensure that
+  return subject as SchemaObject; // @todo ideally, there should be a method to ensure that
 };
 
 // @todo rename?
@@ -498,7 +498,7 @@ const delegate = (
       },
     },
   ) as JSONSchema.ObjectSchema;
-  return fixReferences($defs, properties["subject"], ctx);
+  return fixReferences(properties["subject"], $defs, ctx);
 };
 
 export const excludeParamsFromDepiction = (
