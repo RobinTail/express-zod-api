@@ -897,10 +897,10 @@ ansi-styles@^6.1.0:
   resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-6.2.1.tgz#0e62320cf99c21afff3b3012192546aacbfb05c5"
   integrity sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==
 
-ansis@^4.0.0-beta.19:
-  version "4.0.0-beta.19"
-  resolved "https://registry.yarnpkg.com/ansis/-/ansis-4.0.0-beta.19.tgz#bb268d359803d6b33e6d244f1e97b63d7cccff7b"
-  integrity sha512-SJgIKsbsze+oGWNaPTxPbJZhs1dX9fhPHCOtuWWTZCZyLR6MaC69IWI2IR43ZmpEyTnnkHpuB9GhbDkxDKc6JQ==
+ansis@^4.0.0-beta.20:
+  version "4.0.0-beta.20"
+  resolved "https://registry.yarnpkg.com/ansis/-/ansis-4.0.0-beta.20.tgz#b3483f1cb5949f5b16623bbe7ce8b814090ae8ce"
+  integrity sha512-QO3PfOCP7VLna+uFkXxYZIcWzr0mXrna38LwQCqsAaUC9bQA1EFcfTrIsNkBIZkTysdNVEXAQbQAU+/dCPcsiQ==
 
 any-promise@^1.0.0:
   version "1.3.0"

@@ -61,7 +61,7 @@
     "node": "^20.9.0 || ^22.0.0"
   },
   "dependencies": {
-    "ansis": "^4.0.0-beta.19",
+    "ansis": "^4.0.0-beta.20",
     "node-mocks-http": "^1.16.2",
     "openapi3-ts": "^4.4.0",
     "ramda": "^0.30.1"
