@@ -1,11 +1,11 @@
 import type { $ZodType } from "@zod/core";
 import { Request } from "express";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import { OutputValidationError } from "./errors";
-import { metaSymbol } from "./metadata";
+import { ezRegistry } from "./metadata";
 import { AuxMethod, Method } from "./method";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
@@ -89,8 +89,7 @@ export const getMessageFromError = (error: Error): string => {
 export const pullExampleProps = <T extends z.ZodObject>(subject: T) =>
   Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
     (acc, [key, schema]) => {
-      const examples =
-        (schema as z.ZodType).meta()?.[metaSymbol]?.examples || [];
+      const examples = ezRegistry.get(schema)?.examples || [];
       return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
         ...left,
         ...right,
@@ -127,7 +126,7 @@ export const getExamples = <
    * */
   pullProps?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  let examples = globalRegistry.get(schema)?.[metaSymbol]?.examples || [];
+  let examples = ezRegistry.get(schema)?.examples || [];
   if (!examples.length && pullProps && schema instanceof z.ZodObject)
     examples = pullExampleProps(schema);
   if (!validate && variant === "original") return examples;
