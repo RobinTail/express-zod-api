@@ -262,7 +262,7 @@ export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
     ctx.isResponse ? "in" : "out"
   ];
   if (target instanceof z.ZodTransform) {
-    const opposingDepiction = depict(opposite, { ctx, rules: overrides });
+    const opposingDepiction = depict(opposite, { ctx });
     if (isSchemaObject(opposingDepiction)) {
       if (!ctx.isResponse) {
         const { type: opposingType, ...rest } = opposingDepiction;
