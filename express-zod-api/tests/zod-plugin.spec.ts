@@ -81,6 +81,11 @@ describe("Zod Runtime Plugin", () => {
         ezRegistry.get(schemaWithMeta.regex(/@example.com$/)),
       ).toHaveProperty("brand", "test");
     });
+
+    test("should withstand describing", () => {
+      const schema = z.string().brand("test").describe("something");
+      expect(schema.meta()?.[metaSymbol]?.brand).toBe("test");
+    });
   });
 
   describe(".remap()", () => {
