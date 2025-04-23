@@ -16,14 +16,13 @@ import type {
   $ZodUnion,
 } from "@zod/core";
 import { fail } from "node:assert/strict"; // eslint-disable-line no-restricted-syntax -- acceptable
-import { globalRegistry } from "zod";
 import { EmptyObject } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand } from "./file-schema";
 import { ezFormBrand } from "./form-schema";
 import { IOSchema } from "./io-schema";
-import { metaSymbol } from "./metadata";
+import { ezRegistry } from "./metadata";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
 import {
@@ -87,7 +86,7 @@ export const hasNestedSchema = (
 ): boolean => {
   if (condition?.(subject)) return true;
   if (depth >= maxDepth) return false;
-  const brand = globalRegistry.get(subject)?.[metaSymbol]?.brand;
+  const brand = ezRegistry.get(subject)?.brand;
   const handler =
     brand && brand in rules
       ? rules[brand as keyof typeof rules]
@@ -108,8 +107,7 @@ export const hasNestedSchema = (
 
 export const hasUpload = (subject: IOSchema) =>
   hasNestedSchema(subject, {
-    condition: (schema) =>
-      globalRegistry.get(schema)?.[metaSymbol]?.brand === ezUploadBrand,
+    condition: (schema) => ezRegistry.get(schema)?.brand === ezUploadBrand,
     rules: {
       ...ioChecks,
       [ezFormBrand]: ioChecks.object,
@@ -118,15 +116,13 @@ export const hasUpload = (subject: IOSchema) =>
 
 export const hasRaw = (subject: IOSchema) =>
   hasNestedSchema(subject, {
-    condition: (schema) =>
-      globalRegistry.get(schema)?.[metaSymbol]?.brand === ezRawBrand,
+    condition: (schema) => ezRegistry.get(schema)?.brand === ezRawBrand,
     maxDepth: 3,
   });
 
 export const hasForm = (subject: IOSchema) =>
   hasNestedSchema(subject, {
-    condition: (schema) =>
-      globalRegistry.get(schema)?.[metaSymbol]?.brand === ezFormBrand,
+    condition: (schema) => ezRegistry.get(schema)?.brand === ezFormBrand,
     maxDepth: 3,
   });
 
