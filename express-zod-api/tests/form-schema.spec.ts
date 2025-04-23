@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ez } from "../src";
 import { ezFormBrand } from "../src/form-schema";
-import { metaSymbol } from "../src/metadata";
+import { ezRegistry } from "../src/metadata";
 
 describe("ez.form()", () => {
   describe("creation", () => {
@@ -10,7 +10,7 @@ describe("ez.form()", () => {
       (base) => {
         const schema = ez.form(base);
         expect(schema).toBeInstanceOf(z.ZodObject);
-        expect(schema.meta()?.[metaSymbol]?.brand).toBe(ezFormBrand);
+        expect(ezRegistry.get(schema)?.brand).toBe(ezFormBrand);
         expect(schema._zod.def.shape).toHaveProperty(
           "name",
           expect.any(z.ZodString),

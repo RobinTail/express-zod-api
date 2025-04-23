@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ez } from "../src";
-import { metaSymbol } from "../src/metadata";
+import { ezRegistry } from "../src/metadata";
 import { ezRawBrand } from "../src/raw-schema";
 
 describe("ez.raw()", () => {
@@ -8,7 +8,7 @@ describe("ez.raw()", () => {
     test("should be an instance of branded object", () => {
       const schema = ez.raw();
       expect(schema).toBeInstanceOf(z.ZodObject);
-      expect(schema.meta()?.[metaSymbol]?.brand).toBe(ezRawBrand);
+      expect(ezRegistry.get(schema)?.brand).toBe(ezRawBrand);
     });
   });
 
