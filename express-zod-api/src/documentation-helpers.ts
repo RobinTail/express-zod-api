@@ -455,25 +455,20 @@ const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
  * @todo is there a less hacky way to do that?
  * */
 const fixReferences = (
-  { $defs = {}, ...rest }: JSONSchema.BaseSchema,
+  $defs: Record<string, JSONSchema.BaseSchema>,
+  rest: JSONSchema.BaseSchema,
   ctx: OpenAPIContext,
 ) => {
   const stack: unknown[] = [rest, $defs];
   while (stack.length) {
     const entry = stack.shift()!;
     if (R.is(Object, entry)) {
-      if (isReferenceObject(entry)) {
-        if (entry.$ref === "#" && !$defs[entry.$ref]) {
-          $defs[entry.$ref] = rest;
-          return fixReferences({ $defs, $ref: entry.$ref }, ctx); // false root rewriting
-        }
-        if (!entry.$ref.startsWith("#/components")) {
-          const actualName = entry.$ref.split("/").pop()!;
-          const depiction = $defs[actualName];
-          if (depiction)
-            entry.$ref = ctx.makeRef(depiction, depiction as SchemaObject).$ref; // @todo see below
-          continue;
-        }
+      if (isReferenceObject(entry) && !entry.$ref.startsWith("#/components")) {
+        const actualName = entry.$ref.split("/").pop()!;
+        const depiction = $defs[actualName];
+        if (depiction)
+          entry.$ref = ctx.makeRef(depiction, depiction as SchemaObject).$ref; // @todo see below
+        continue;
       }
       stack.push(...R.values(entry));
     }
@@ -484,11 +479,12 @@ const fixReferences = (
 
 // @todo rename?
 const delegate = (
-  schema: $ZodType,
+  subject: $ZodType,
   { ctx, rules = overrides }: { ctx: OpenAPIContext; rules?: BrandHandling },
-) =>
-  fixReferences(
-    z.toJSONSchema(schema, {
+) => {
+  const { $defs = {}, properties = {} } = z.toJSONSchema(
+    z.object({ subject }),
+    {
       unrepresentable: "any",
       metadata: globalRegistry,
       io: ctx.isResponse ? "output" : "input",
@@ -500,9 +496,10 @@ const delegate = (
         ]?.(zodCtx, ctx);
         onEach(zodCtx, ctx);
       },
-    }),
-    ctx,
-  );
+    },
+  ) as JSONSchema.ObjectSchema;
+  return fixReferences($defs, properties["subject"], ctx);
+};
 
 export const excludeParamsFromDepiction = (
   subject: SchemaObject | ReferenceObject,
