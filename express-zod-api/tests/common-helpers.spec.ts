@@ -349,13 +349,11 @@ describe("Common Helpers", () => {
             code: "invalid_type",
             expected: "string",
             input: 123,
-            path: [""],
+            path: [],
             message: "invalid type",
           },
         ]),
-        `[\n  {\n    "code": "invalid_type",\n    "expected": "string",\n` +
-          `    "input": 123,\n    "path": [\n      ""\n` +
-          `    ],\n    "message": "invalid type"\n  }\n]`,
+        "invalid type",
       ],
       [createHttpError(500, "Internal Server Error"), "Internal Server Error"],
       [undefined, "undefined"],

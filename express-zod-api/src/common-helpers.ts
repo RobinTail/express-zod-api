@@ -67,7 +67,7 @@ export const ensureError = (subject: unknown): Error =>
   subject instanceof Error
     ? subject
     : subject instanceof z.ZodError
-      ? new Error(subject.message)
+      ? new Error(getMessageFromError(subject), { cause: subject })
       : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
