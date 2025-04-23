@@ -189,7 +189,11 @@ describe("Documentation helpers", () => {
     test("should flatten two object schemas", () => {
       const jsonSchema: JSONSchema.BaseSchema = {
         allOf: [
-          { type: "object", properties: { one: { type: "number" } } },
+          {
+            type: "object",
+            description: "some",
+            properties: { one: { type: "number" } },
+          },
           { type: "object", properties: { two: { type: "number" } } },
         ],
       };

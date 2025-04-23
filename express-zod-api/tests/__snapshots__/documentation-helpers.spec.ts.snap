@@ -603,6 +603,7 @@ exports[`Documentation helpers > onIntersection() > should flatten objects with 
 
 exports[`Documentation helpers > onIntersection() > should flatten two object schemas 1`] = `
 {
+  "description": "some",
   "properties": {
     "one": {
       "type": "number",

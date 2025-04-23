@@ -138,10 +138,10 @@ const approaches = {
   required: ({ required: left = [] }, { required: right = [] }) =>
     R.union(left, right),
   examples: ({ examples: left = [] }, { examples: right = [] }) =>
-    combinations(left, right, ([a, b]) =>
-      typeof a === "object" && typeof b === "object"
-        ? R.mergeDeepRight({ ...a }, { ...b })
-        : a,
+    combinations(
+      left.filter((entry) => typeof entry === "object"),
+      right.filter((entry) => typeof entry === "object"),
+      ([a, b]) => R.mergeDeepRight({ ...a }, { ...b }),
     ),
   description: ({ description: left }, { description: right }) => left || right,
 } satisfies {
