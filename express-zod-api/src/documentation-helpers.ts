@@ -37,7 +37,7 @@ import { DocumentationError } from "./errors";
 import { ezFileBrand } from "./file-schema";
 import { extractObjectSchema, IOSchema } from "./io-schema";
 import { Alternatives } from "./logical-container";
-import { metaSymbol } from "./metadata";
+import { ezRegistry } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
@@ -98,8 +98,7 @@ export const reformatParamsInPath = (path: string) =>
 
 export const onDefault: Overrider = ({ zodSchema, jsonSchema }) =>
   (jsonSchema.default =
-    globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
-    jsonSchema.default);
+    ezRegistry.get(zodSchema)?.defaultLabel ?? jsonSchema.default);
 
 export const onUpload: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
@@ -489,8 +488,7 @@ const delegate = (
       metadata: globalRegistry,
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
-        const { brand } =
-          globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
+        const { brand } = ezRegistry.get(zodCtx.zodSchema) ?? {};
         rules[
           brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type
         ]?.(zodCtx, ctx);
