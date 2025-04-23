@@ -111,7 +111,7 @@ if (!(metaSymbol in globalThis)) {
     if (!entry.startsWith("Zod")) continue;
     const Cls = z[entry as keyof typeof z];
     if (typeof Cls !== "function") continue;
-    let originalCheck: z.ZodType["check"];
+    let originalClone: z.ZodType["clone"];
     Object.defineProperties(Cls.prototype, {
       ["example" satisfies keyof z.ZodType]: {
         get(): z.ZodType["example"] {
@@ -129,20 +129,19 @@ if (!(metaSymbol in globalThis)) {
           return brandSetter.bind(this) as z.ZodType["brand"];
         },
       },
-      ["check" satisfies keyof z.ZodType]: {
+      ["clone" satisfies keyof z.ZodType]: {
         set(fn) {
-          originalCheck = fn;
+          originalClone = fn;
         },
-        get(): z.ZodType["check"] {
+        get(): z.ZodType["clone"] {
           return function (
             this: z.ZodType,
-            ...args: Parameters<z.ZodType["check"]>
+            ...args: Parameters<z.ZodType["clone"]>
           ) {
             /** @link https://v4.zod.dev/metadata#register */
-            return originalCheck.apply(this, args).register(ezRegistry, {
-              examples: [],
-              brand: ezRegistry.get(this)?.brand,
-            });
+            return originalClone
+              .apply(this, args)
+              .register(ezRegistry, ezRegistry.get(this) || { examples: [] });
           };
         },
       },

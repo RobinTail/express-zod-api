@@ -20,7 +20,7 @@ describe("Metadata", () => {
       expect(ezRegistry.get(result)?.examples).toEqual(
         ezRegistry.get(src)?.examples,
       );
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual(["some"]);
+      expect(ezRegistry.get(result)?.examples).toEqual(["some"]);
       expect(result.description).toBe("another"); // preserves it
     });
 

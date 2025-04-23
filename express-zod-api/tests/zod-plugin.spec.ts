@@ -84,7 +84,7 @@ describe("Zod Runtime Plugin", () => {
 
     test("should withstand describing", () => {
       const schema = z.string().brand("test").describe("something");
-      expect(schema.meta()?.[metaSymbol]?.brand).toBe("test");
+      expect(ezRegistry.get(schema)?.brand).toBe("test");
     });
   });
 
