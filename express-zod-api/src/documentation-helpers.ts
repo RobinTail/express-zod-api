@@ -483,7 +483,7 @@ const delegate = (
   { ctx, rules = overrides }: { ctx: OpenAPIContext; rules?: BrandHandling },
 ) => {
   const { $defs = {}, properties = {} } = z.toJSONSchema(
-    z.object({ subject }),
+    z.object({ subject }), // avoiding "document root" references
     {
       unrepresentable: "any",
       metadata: globalRegistry,
