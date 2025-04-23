@@ -8,7 +8,7 @@ import {
   ResultHandler,
 } from "../src";
 import { ResultHandlerError } from "../src/errors";
-import { metaSymbol } from "../src/metadata";
+import { ezRegistry } from "../src/metadata";
 import { AbstractResultHandler, Result } from "../src/result-handler";
 import {
   makeLoggerMock,
@@ -197,13 +197,13 @@ describe("ResultHandler", () => {
           }),
       );
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema.meta()?.[metaSymbol]).toMatchSnapshot();
+      expect(ezRegistry.get(apiResponse[0].schema)).toMatchSnapshot();
     });
 
     test("should generate negative response example", () => {
       const apiResponse = subject.getNegativeResponse();
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema.meta()?.[metaSymbol]).toMatchSnapshot();
+      expect(ezRegistry.get(apiResponse[0].schema)).toMatchSnapshot();
     });
   });
 
