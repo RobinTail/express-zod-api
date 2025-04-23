@@ -90,6 +90,11 @@ describe("Zod Runtime Plugin", () => {
         schemaWithMeta.regex(/@example.com$/).meta()?.[metaSymbol],
       ).toHaveProperty("brand", "test");
     });
+
+    test("should withstand describing", () => {
+      const schema = z.string().brand("test").describe("something");
+      expect(schema.meta()?.[metaSymbol]?.brand).toBe("test");
+    });
   });
 
   describe(".remap()", () => {
