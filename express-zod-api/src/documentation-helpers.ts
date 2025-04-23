@@ -429,6 +429,7 @@ const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
 
 const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
   const { description, deprecated } = globalRegistry.get(zodSchema) ?? {};
+  // @todo check if this still required after updating the core
   if (description) jsonSchema.description ??= description;
   if (deprecated) jsonSchema.deprecated = true;
   const shouldAvoidParsing =
@@ -485,7 +486,7 @@ const depict = (
     z.object({ subject }), // avoiding "document root" references
     {
       unrepresentable: "any",
-      metadata: globalRegistry,
+      metadata: globalRegistry, // @todo might be redundant
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
         const { brand } =
