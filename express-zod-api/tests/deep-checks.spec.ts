@@ -1,15 +1,15 @@
 import { UploadedFile } from "express-fileupload";
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import type { $brand, $ZodType } from "@zod/core";
 import { ez } from "../src";
 import { hasNestedSchema } from "../src/deep-checks";
-import { metaSymbol } from "../src/metadata";
+import { ezRegistry } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("Checks", () => {
   describe("hasNestedSchema()", () => {
     const condition = (subject: $ZodType) =>
-      globalRegistry.get(subject)?.[metaSymbol]?.brand === ezUploadBrand;
+      ezRegistry.get(subject)?.brand === ezUploadBrand;
 
     test("should return true for given argument satisfying condition", () => {
       expect(hasNestedSchema(ez.upload(), { condition })).toBeTruthy();
