@@ -1,4 +1,4 @@
-import { z } from "zod";
+import type { $ZodType } from "@zod/core";
 
 export const defaultStatusCodes = {
   positive: 200,
@@ -11,7 +11,7 @@ export const responseVariants = Object.keys(
 ) as ResponseVariant[];
 
 /** @public this is the user facing configuration */
-export interface ApiResponse<S extends z.ZodTypeAny> {
+export interface ApiResponse<S extends $ZodType> {
   schema: S;
   /** @default 200 for a positive and 400 for a negative response */
   statusCode?: number | [number, ...number[]];
@@ -31,7 +31,7 @@ export interface ApiResponse<S extends z.ZodTypeAny> {
  * @see normalize
  * */
 export interface NormalizedResponse {
-  schema: z.ZodTypeAny;
+  schema: $ZodType;
   statusCodes: [number, ...number[]];
   mimeTypes: [string, ...string[]] | null;
 }
