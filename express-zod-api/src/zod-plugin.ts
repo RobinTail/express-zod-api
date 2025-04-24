@@ -72,10 +72,7 @@ const deprecationSetter = function (this: z.ZodType) {
   });
 };
 
-const labelSetter = function (
-  this: z.ZodDefault<z.ZodTypeAny>,
-  defaultLabel: string,
-) {
+const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
   const { [metaSymbol]: internal = { examples: [] }, ...rest } =
     this.meta() || {};
   return this.meta({
@@ -165,9 +162,9 @@ if (!(metaSymbol in globalThis)) {
 
   Object.defineProperty(
     z.ZodDefault.prototype,
-    "label" satisfies keyof z.ZodDefault<z.ZodTypeAny>,
+    "label" satisfies keyof z.ZodDefault,
     {
-      get(): z.ZodDefault<z.ZodTypeAny>["label"] {
+      get(): z.ZodDefault["label"] {
         return labelSetter.bind(this);
       },
     },
