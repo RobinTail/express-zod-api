@@ -62,10 +62,7 @@ describe("Environment checks", () => {
       );
     });
 
-    /**
-     * output examples would be possibly fixed by this:
-     * @todo fixed, move out of imperfections
-     */
+    /** now input examples are broken */
     test.each(["input", "output"] as const)(
       "%s examples of transformations",
       (io) => {
