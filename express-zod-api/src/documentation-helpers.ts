@@ -289,7 +289,6 @@ export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
   }
 };
 
-// @todo THIS does not work well due to _ref
 export const onRaw: Overrider = ({ jsonSchema }) => {
   if (!jsonSchema._ref) return;
   if (jsonSchema._ref.type !== "object") return;
