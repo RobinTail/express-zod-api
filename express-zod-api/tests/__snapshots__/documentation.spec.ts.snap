@@ -930,8 +930,8 @@ paths:
           required: false
           description: GET /v1/getSomething Parameter
           schema:
-            type: string
             default: test
+            type: string
         - name: nullish
           in: query
           required: false
@@ -945,11 +945,11 @@ paths:
           required: false
           description: GET /v1/getSomething Parameter
           schema:
+            default: 123
             type:
               - integer
               - "null"
             exclusiveMaximum: 9007199254740991
-            default: 123
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -1139,8 +1139,8 @@ paths:
                   format: bigint
                   pattern: ^-?\\d+$
                 boolean:
-                  type: boolean
                   readOnly: true
+                  type: boolean
                 dateIn:
                   description: YYYY-MM-DDTHH:mm:ss.sssZ
                   type: string
@@ -1403,8 +1403,8 @@ paths:
                   maximum: 0.5
                 int:
                   type: integer
-                  exclusiveMinimum: -9007199254740991
-                  exclusiveMaximum: 9007199254740991
+                  minimum: -9007199254740991
+                  maximum: 9007199254740991
                 intPositive:
                   type: integer
                   exclusiveMaximum: 9007199254740991
@@ -1759,8 +1759,8 @@ paths:
                           type: string
                         additionalProperties:
                           type: integer
-                          exclusiveMinimum: -9007199254740991
-                          exclusiveMaximum: 9007199254740991
+                          minimum: -9007199254740991
+                          maximum: 9007199254740991
                       stringy:
                         type: object
                         propertyNames:
@@ -1773,8 +1773,8 @@ paths:
                         type: object
                         propertyNames:
                           type: integer
-                          exclusiveMinimum: -9007199254740991
-                          exclusiveMaximum: 9007199254740991
+                          minimum: -9007199254740991
+                          maximum: 9007199254740991
                         additionalProperties:
                           type: boolean
                       literal:
@@ -2307,15 +2307,15 @@ paths:
           required: true
           description: GET /v1/:name Parameter
           schema:
-            type: string
             summary: My custom schema
+            type: string
         - name: other
           in: query
           required: true
           description: GET /v1/:name Parameter
           schema:
-            type: boolean
             summary: My custom schema
+            type: boolean
         - name: regular
           in: query
           required: true
@@ -2336,8 +2336,8 @@ paths:
                     type: object
                     properties:
                       number:
-                        type: number
                         summary: My custom schema
+                        type: number
                     required:
                       - number
                 required:
@@ -3172,6 +3172,11 @@ paths:
                   status:
                     const: success
                   data:
+                    examples:
+                      - a: first
+                        b: prefix_first
+                      - a: second
+                        b: prefix_second
                     type: object
                     properties:
                       a:
@@ -3181,11 +3186,6 @@ paths:
                     required:
                       - a
                       - b
-                    examples:
-                      - a: first
-                        b: prefix_first
-                      - a: second
-                        b: prefix_second
                 required:
                   - status
                   - data
@@ -3282,9 +3282,9 @@ paths:
 components:
   schemas:
     GetHrisEmployeesParameterCursor:
-      type: string
       description: An optional cursor string used for pagination. This can be
         retrieved from the \`next\` property of the previous page response.
+      type: string
     GetHrisEmployeesPositiveResponse:
       type: object
       properties:
@@ -3361,14 +3361,14 @@ paths:
                   status:
                     const: success
                   data:
+                    examples:
+                      - num: 123
                     type: object
                     properties:
                       num:
                         type: number
                     required:
                       - num
-                    examples:
-                      - num: 123
                 required:
                   - status
                   - data
@@ -3449,14 +3449,14 @@ paths:
                   status:
                     const: success
                   data:
+                    examples:
+                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
                         type: string
                     required:
                       - numericStr
-                    examples:
-                      - numericStr: "123"
                 required:
                   - status
                   - data
@@ -3543,14 +3543,14 @@ paths:
                   status:
                     const: success
                   data:
+                    examples:
+                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
                         type: string
                     required:
                       - numericStr
-                    examples:
-                      - numericStr: "123"
                 required:
                   - status
                   - data
@@ -3616,9 +3616,9 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
-            type: string
             examples:
               - "123"
+            type: string
           examples:
             example1:
               value: "123"

@@ -158,6 +158,7 @@ const canMerge = R.pipe(
 const intersect = R.tryCatch(
   (children: Array<JSONSchema.BaseSchema>): JSONSchema.ObjectSchema => {
     const [left, right] = children
+      .map(({ _ref, ...rest }) => (_ref ? { ...rest, ..._ref } : rest))
       .filter(
         (schema): schema is JSONSchema.ObjectSchema => schema.type === "object",
       )
@@ -194,7 +195,7 @@ const isSupportedType = (subject: string): subject is SchemaObjectType =>
 export const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  delete jsonSchema.anyOf; // undo default
+  delete jsonSchema._ref; // undo default
   Object.assign(jsonSchema, {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
@@ -288,13 +289,15 @@ export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
   }
 };
 
+// @todo THIS does not work well due to _ref
 export const onRaw: Overrider = ({ jsonSchema }) => {
-  Object.assign(
-    jsonSchema,
-    (jsonSchema as JSONSchema.ObjectSchema).properties!.raw,
-  );
-  delete jsonSchema.properties; // undo default
-  delete jsonSchema.required;
+  if (!jsonSchema._ref) return;
+  if (jsonSchema._ref.type !== "object") return;
+  const objSchema = jsonSchema._ref as JSONSchema.ObjectSchema;
+  if (!objSchema.properties) return;
+  if (!("raw" in objSchema.properties)) return;
+  delete jsonSchema._ref; // undo
+  Object.assign(jsonSchema, objSchema.properties.raw);
 };
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>

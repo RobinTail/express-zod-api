@@ -134,9 +134,11 @@ describe("Documentation helpers", () => {
 
   describe("onRaw()", () => {
     test("should extract the raw property", () => {
-      const jsonSchema: JSONSchema.ObjectSchema = {
-        type: "object",
-        properties: { raw: { format: "binary", type: "string" } },
+      const jsonSchema: JSONSchema.BaseSchema = {
+        _ref: {
+          type: "object",
+          properties: { raw: { format: "binary", type: "string" } },
+        },
       };
       onRaw({ zodSchema: z.never(), jsonSchema }, requestCtx);
       expect(jsonSchema).toMatchSnapshot();
@@ -494,7 +496,7 @@ describe("Documentation helpers", () => {
 
   describe("onDateIn", () => {
     test("should set type:string, pattern and format", () => {
-      const jsonSchema: JSONSchema.BaseSchema = { anyOf: [] };
+      const jsonSchema: JSONSchema.BaseSchema = { _ref: { anyOf: [] } };
       onDateIn({ zodSchema: z.never(), jsonSchema }, requestCtx);
       expect(jsonSchema).toMatchSnapshot();
     });
