@@ -1,6 +1,5 @@
 import { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
-import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import {
   FlatObject,
@@ -27,7 +26,7 @@ export const normalize = <A extends unknown[]>(
   },
 ): NormalizedResponse[] => {
   if (typeof subject === "function") subject = subject(...args);
-  if (subject instanceof z.ZodType) return [{ schema: subject, ...fallback }];
+  if ("_zod" in subject) return [{ schema: subject, ...fallback }];
   if (Array.isArray(subject) && !subject.length) {
     const err = new Error(`At least one ${variant} response schema required.`);
     throw new ResultHandlerError(err);
