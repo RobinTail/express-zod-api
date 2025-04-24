@@ -1,6 +1,6 @@
 import { Response } from "express";
 import createHttpError from "http-errors";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import {
   InputValidationError,
   arrayResultHandler,
@@ -197,13 +197,17 @@ describe("ResultHandler", () => {
           }),
       );
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema.meta()?.[metaSymbol]).toMatchSnapshot();
+      expect(
+        globalRegistry.get(apiResponse[0].schema)?.[metaSymbol],
+      ).toMatchSnapshot();
     });
 
     test("should generate negative response example", () => {
       const apiResponse = subject.getNegativeResponse();
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema.meta()?.[metaSymbol]).toMatchSnapshot();
+      expect(
+        globalRegistry.get(apiResponse[0].schema)?.[metaSymbol],
+      ).toMatchSnapshot();
     });
   });
 
