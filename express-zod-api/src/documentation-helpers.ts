@@ -484,7 +484,6 @@ const depict = (
     z.object({ subject }), // avoiding "document root" references
     {
       unrepresentable: "any",
-      metadata: globalRegistry, // @todo might be redundant
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
         const { brand } =
