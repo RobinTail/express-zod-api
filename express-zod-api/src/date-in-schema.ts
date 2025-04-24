@@ -4,10 +4,10 @@ export const ezDateInBrand = Symbol("DateIn");
 
 export const dateIn = () => {
   const schema = z.union([
-    z.string().date(),
-    z.string().datetime(),
-    z.string().datetime({ local: true }),
-  ]);
+    z.iso.date(),
+    z.iso.datetime(),
+    z.iso.datetime({ local: true }),
+  ]) as z.ZodUnion<[z.ZodString, z.ZodString, z.ZodString]>; // this fixes DTS build for ez export
 
   return schema
     .transform((str) => new Date(str))
