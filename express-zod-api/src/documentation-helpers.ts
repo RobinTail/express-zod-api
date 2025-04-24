@@ -430,10 +430,6 @@ const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
   };
 
 const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
-  const { description, deprecated } = globalRegistry.get(zodSchema) ?? {};
-  // @todo check if this still required after updating the core
-  if (description) jsonSchema.description ??= description;
-  if (deprecated) jsonSchema.deprecated = true;
   const shouldAvoidParsing =
     zodSchema._zod.def.type === "lazy" || zodSchema._zod.def.type === "promise";
   const hasTypePropertyInDepiction = jsonSchema.type !== undefined;
