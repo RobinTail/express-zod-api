@@ -1,4 +1,4 @@
-import type { $ZodType } from "@zod/core";
+import type { $ZodObject, $ZodTransform, $ZodType } from "@zod/core";
 import { Request } from "express";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
@@ -86,11 +86,10 @@ export const getMessageFromError = (error: Error): string => {
 };
 
 /** Takes the original unvalidated examples from the properties of ZodObject schema shape */
-export const pullExampleProps = <T extends z.ZodObject>(subject: T) =>
-  Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
+export const pullExampleProps = <T extends $ZodObject>(subject: T) =>
+  Object.entries(subject._zod.def.shape).reduce<Partial<z.input<T>>[]>(
     (acc, [key, schema]) => {
-      const examples =
-        (schema as z.ZodType).meta()?.[metaSymbol]?.examples || [];
+      const { examples = [] } = globalRegistry.get(schema)?.[metaSymbol] || {};
       return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
         ...left,
         ...right,
@@ -160,8 +159,8 @@ export const makeCleanId = (...args: string[]) => {
 };
 
 export const getTransformedType = R.tryCatch(
-  <T>(schema: z.ZodTransform<unknown, T>, sample: T) =>
-    typeof schema.parse(sample),
+  <T>(schema: $ZodTransform<unknown, T>, sample: T) =>
+    typeof z.parse(schema, sample),
   R.always(undefined),
 );
 
