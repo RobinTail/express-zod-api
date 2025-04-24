@@ -1,7 +1,7 @@
 type Type1 = {
   title: string;
-  features: Type1;
-}[];
+  features: Type1[];
+};
 
 type SomeOf<T> = T[keyof T];
 
@@ -17,10 +17,7 @@ type GetV1UserRetrievePositiveVariant1 = {
   data: {
     id: number;
     name: string;
-    features: {
-      title: string;
-      features: Type1;
-    }[];
+    features: Type1[];
   };
 };
 

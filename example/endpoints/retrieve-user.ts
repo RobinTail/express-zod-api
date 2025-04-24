@@ -4,16 +4,12 @@ import { z } from "zod";
 import { defaultEndpointsFactory } from "express-zod-api";
 import { methodProviderMiddleware } from "../middlewares";
 
-// Demonstrating circular schemas using z.lazy()
-// @todo switch to z.interface for that
-interface Feature {
-  title: string;
-  features: Feature[];
-}
-
-const feature: z.ZodType<Feature> = z.object({
+// Demonstrating circular schemas using z.interface()
+const feature = z.interface({
   title: z.string(),
-  features: z.lazy(() => feature.array()),
+  get features() {
+    return z.array(feature);
+  },
 });
 
 export const retrieveUserEndpoint = defaultEndpointsFactory
