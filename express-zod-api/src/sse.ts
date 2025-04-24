@@ -1,3 +1,4 @@
+import type { $ZodType } from "@zod/core";
 import { Response } from "express";
 import { z } from "zod";
 import { EmptySchema, FlatObject } from "./common-helpers";
@@ -11,7 +12,7 @@ import {
   logServerError,
 } from "./result-helpers";
 
-type EventsMap = Record<string, z.ZodTypeAny>;
+type EventsMap = Record<string, $ZodType>;
 
 export interface Emitter<E extends EventsMap> extends FlatObject {
   /** @desc Returns true when the connection was closed or terminated */
@@ -20,7 +21,7 @@ export interface Emitter<E extends EventsMap> extends FlatObject {
   emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => void;
 }
 
-export const makeEventSchema = (event: string, data: z.ZodTypeAny) =>
+export const makeEventSchema = (event: string, data: $ZodType) =>
   z.object({
     data,
     event: z.literal(event),
