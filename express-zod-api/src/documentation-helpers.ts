@@ -327,7 +327,7 @@ export const depictExamples = (
 };
 
 export const depictParamExamples = (
-  schema: z.ZodType,
+  schema: $ZodType,
   param: string,
 ): ExamplesObject | undefined => {
   const isObject = (subj: unknown): subj is FlatObject =>

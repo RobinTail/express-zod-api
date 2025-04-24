@@ -4,15 +4,18 @@ import type {
   $ZodDefault,
   $ZodDiscriminatedUnion,
   $ZodEnum,
+  $ZodInterface,
   $ZodIntersection,
   $ZodLazy,
   $ZodLiteral,
   $ZodNullable,
+  $ZodObject,
   $ZodOptional,
   $ZodPipe,
   $ZodReadonly,
   $ZodRecord,
   $ZodTuple,
+  $ZodType,
   $ZodUnion,
 } from "@zod/core";
 import * as R from "ramda";
@@ -66,7 +69,7 @@ const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
   return values.length === 1 ? values[0] : f.createUnionTypeNode(values);
 };
 
-const onInterface: Producer = (int: z.ZodInterface, { next, makeAlias }) =>
+const onInterface: Producer = (int: $ZodInterface, { next, makeAlias }) =>
   makeAlias(int, () => {
     const members = Object.entries(int._zod.def.shape).map<ts.TypeElement>(
       ([key, value]) => {
@@ -84,7 +87,7 @@ const onInterface: Producer = (int: z.ZodInterface, { next, makeAlias }) =>
   });
 
 const onObject: Producer = (
-  { _zod: { def } }: z.ZodObject,
+  { _zod: { def } }: $ZodObject,
   { isResponse, next },
 ) => {
   const members = Object.entries(def.shape).map<ts.TypeElement>(
@@ -256,7 +259,7 @@ const producers: HandlingRules<
 };
 
 export const zodToTs = (
-  schema: z.ZodTypeAny,
+  schema: $ZodType,
   {
     brandHandling,
     ctx,
