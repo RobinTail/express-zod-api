@@ -439,15 +439,9 @@ const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
   };
 
 const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
-  const shouldAvoidParsing =
-    zodSchema._zod.def.type === "lazy" || zodSchema._zod.def.type === "promise";
   const hasTypePropertyInDepiction = jsonSchema.type !== undefined;
   const acceptsNull =
-    !isResponse &&
-    !shouldAvoidParsing &&
-    hasTypePropertyInDepiction &&
-    zodSchema instanceof z.ZodType &&
-    zodSchema.isNullable();
+    !isResponse && hasTypePropertyInDepiction && doesAccept(zodSchema, null);
   if (acceptsNull)
     Object.assign(jsonSchema, { type: makeNullableType(jsonSchema) });
   const examples = getExamples({
