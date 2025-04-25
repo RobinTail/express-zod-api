@@ -1,4 +1,4 @@
-import type { $ZodObject, $ZodType } from "@zod/core";
+import type { $ZodObject, $ZodTransform, $ZodType } from "@zod/core";
 import { Request } from "express";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
@@ -85,7 +85,7 @@ export const getMessageFromError = (error: Error): string => {
   return error.message;
 };
 
-const isSchema = <T extends $ZodType>(
+export const isSchema = <T extends $ZodType>(
   subject: $ZodType,
   type: T["_zod"]["def"]["type"],
 ): subject is T => subject._zod.def.type === type;
@@ -164,8 +164,8 @@ export const makeCleanId = (...args: string[]) => {
 };
 
 export const getTransformedType = R.tryCatch(
-  <T>(schema: z.ZodTransform<unknown, T>, sample: T) =>
-    typeof schema.parse(sample),
+  <T>(schema: $ZodTransform<unknown, T>, sample: T) =>
+    typeof z.parse(schema, sample),
   R.always(undefined),
 );
 

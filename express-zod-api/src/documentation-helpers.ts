@@ -1,4 +1,10 @@
-import type { $ZodPipe, $ZodTuple, $ZodType, JSONSchema } from "@zod/core";
+import type {
+  $ZodPipe,
+  $ZodTransform,
+  $ZodTuple,
+  $ZodType,
+  JSONSchema,
+} from "@zod/core";
 import {
   ExamplesObject,
   isReferenceObject,
@@ -24,6 +30,7 @@ import {
   getExamples,
   getRoutePathParams,
   getTransformedType,
+  isSchema,
   makeCleanId,
   routePathParamsRegex,
   Tag,
@@ -263,7 +270,7 @@ export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
   const opposite = (zodSchema as $ZodPipe)._zod.def[
     ctx.isResponse ? "in" : "out"
   ];
-  if (target instanceof z.ZodTransform) {
+  if (isSchema<$ZodTransform>(target, "transform")) {
     const opposingDepiction = depict(opposite, { ctx });
     if (isSchemaObject(opposingDepiction)) {
       if (!ctx.isResponse) {
