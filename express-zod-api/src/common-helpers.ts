@@ -169,6 +169,15 @@ export const getTransformedType = R.tryCatch(
   R.always(undefined),
 );
 
+/** isOptional and isNullable may throw */
+export const doesAccept = R.tryCatch(
+  (schema: $ZodType, value: undefined | null) => {
+    z.parse(schema, value);
+    return true;
+  },
+  R.always(false),
+);
+
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
 export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;

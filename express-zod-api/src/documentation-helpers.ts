@@ -26,6 +26,7 @@ import { globalRegistry, z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
   combinations,
+  doesAccept,
   FlatObject,
   getExamples,
   getRoutePathParams,
@@ -411,9 +412,7 @@ export const depictRequestParams = ({
         name,
         in: location,
         deprecated: globalRegistry.get(paramSchema)?.deprecated,
-        required: !(
-          paramSchema instanceof z.ZodType && paramSchema.isOptional()
-        ),
+        required: !doesAccept(paramSchema, undefined),
         description: depicted.description || description,
         schema: result,
         examples: depictParamExamples(objectSchema, name),
