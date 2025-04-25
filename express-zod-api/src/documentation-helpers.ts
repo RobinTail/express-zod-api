@@ -439,10 +439,11 @@ const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
   };
 
 const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
-  const hasTypePropertyInDepiction = jsonSchema.type !== undefined;
-  const acceptsNull =
-    !isResponse && hasTypePropertyInDepiction && doesAccept(zodSchema, null);
-  if (acceptsNull)
+  if (
+    !isResponse &&
+    jsonSchema.type !== undefined &&
+    doesAccept(zodSchema, null)
+  )
     Object.assign(jsonSchema, { type: makeNullableType(jsonSchema) });
   const examples = getExamples({
     schema: zodSchema,
