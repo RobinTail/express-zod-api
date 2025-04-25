@@ -45,7 +45,7 @@ interface IntegrationParams {
    * @desc The schema to use for responses without body such as 204
    * @default z.undefined()
    * */
-  noContent?: z.ZodTypeAny;
+  noContent?: z.ZodType;
   /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).

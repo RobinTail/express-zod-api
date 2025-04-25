@@ -9,7 +9,7 @@ import {
 } from "../src";
 
 describe("Integration", () => {
-  const recursive1: z.ZodTypeAny = z.lazy(() =>
+  const recursive1: z.ZodType = z.lazy(() =>
     z.object({
       name: z.string(),
       features: recursive1,
