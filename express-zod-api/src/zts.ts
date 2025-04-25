@@ -93,9 +93,9 @@ const onObject: Producer = (
     ([key, value]) => {
       const isOptional = isResponse
         ? value._zod.def.type === "optional"
-        : value._zod.def.type === "promise"
-          ? false
-          : value instanceof z.ZodType && value.isOptional();
+        : value._zod.def.type !== "promise" &&
+          value instanceof z.ZodType &&
+          value.isOptional();
       const { description: comment, deprecated: isDeprecated } =
         globalRegistry.get(value) || {};
       return makeInterfaceProp(key, next(value), {
