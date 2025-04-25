@@ -14,13 +14,14 @@ import type {
   $ZodPipe,
   $ZodReadonly,
   $ZodRecord,
+  $ZodTransform,
   $ZodTuple,
   $ZodUnion,
 } from "@zod/core";
 import * as R from "ramda";
 import ts from "typescript";
 import { globalRegistry, z } from "zod";
-import { getTransformedType } from "./common-helpers";
+import { doesAccept, getTransformedType, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand, FileSchema } from "./file-schema";
@@ -92,10 +93,8 @@ const onObject: Producer = (
   const members = Object.entries(def.shape).map<ts.TypeElement>(
     ([key, value]) => {
       const isOptional = isResponse
-        ? value._zod.def.type === "optional"
-        : value._zod.def.type !== "promise" &&
-          value instanceof z.ZodType &&
-          value.isOptional();
+        ? isSchema<$ZodOptional>(value, "optional")
+        : doesAccept(value, undefined);
       const { description: comment, deprecated: isDeprecated } =
         globalRegistry.get(value) || {};
       return makeInterfaceProp(key, next(value), {
@@ -184,7 +183,7 @@ const onPipeline: Producer = (
 ) => {
   const target = def[isResponse ? "out" : "in"];
   const opposite = def[isResponse ? "in" : "out"];
-  if (target instanceof z.ZodTransform) {
+  if (isSchema<$ZodTransform>(target, "transform")) {
     const opposingType = next(opposite);
     const targetType = getTransformedType(target, makeSample(opposingType));
     const resolutions: Partial<
