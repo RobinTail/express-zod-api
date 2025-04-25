@@ -1,4 +1,10 @@
-import type { $ZodPipe, $ZodTuple, $ZodType, JSONSchema } from "@zod/core";
+import type {
+  $ZodPipe,
+  $ZodTransform,
+  $ZodTuple,
+  $ZodType,
+  JSONSchema,
+} from "@zod/core";
 import {
   ExamplesObject,
   isReferenceObject,
@@ -20,10 +26,12 @@ import { globalRegistry, z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
   combinations,
+  doesAccept,
   FlatObject,
   getExamples,
   getRoutePathParams,
   getTransformedType,
+  isSchema,
   makeCleanId,
   routePathParamsRegex,
   Tag,
@@ -263,28 +271,24 @@ export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
   const opposite = (zodSchema as $ZodPipe)._zod.def[
     ctx.isResponse ? "in" : "out"
   ];
-  if (target instanceof z.ZodTransform) {
-    const opposingDepiction = depict(opposite, { ctx });
-    if (isSchemaObject(opposingDepiction)) {
-      if (!ctx.isResponse) {
-        const { type: opposingType, ...rest } = opposingDepiction;
+  if (!isSchema<$ZodTransform>(target, "transform")) return;
+  const opposingDepiction = depict(opposite, { ctx });
+  if (isSchemaObject(opposingDepiction)) {
+    if (!ctx.isResponse) {
+      const { type: opposingType, ...rest } = opposingDepiction;
+      Object.assign(jsonSchema, {
+        ...rest,
+        format: `${rest.format || opposingType} (preprocessed)`,
+      });
+    } else {
+      const targetType = getTransformedType(
+        target,
+        makeSample(opposingDepiction),
+      );
+      if (targetType && ["number", "string", "boolean"].includes(targetType)) {
         Object.assign(jsonSchema, {
-          ...rest,
-          format: `${rest.format || opposingType} (preprocessed)`,
+          type: targetType as "number" | "string" | "boolean",
         });
-      } else {
-        const targetType = getTransformedType(
-          target,
-          makeSample(opposingDepiction),
-        );
-        if (
-          targetType &&
-          ["number", "string", "boolean"].includes(targetType)
-        ) {
-          Object.assign(jsonSchema, {
-            type: targetType as "number" | "string" | "boolean",
-          });
-        }
       }
     }
   }
@@ -404,9 +408,7 @@ export const depictRequestParams = ({
         name,
         in: location,
         deprecated: globalRegistry.get(paramSchema)?.deprecated,
-        required: !(
-          paramSchema instanceof z.ZodType && paramSchema.isOptional()
-        ),
+        required: !doesAccept(paramSchema, undefined),
         description: depicted.description || description,
         schema: result,
         examples: depictParamExamples(objectSchema, name),
@@ -433,16 +435,11 @@ const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
   };
 
 const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
-  const shouldAvoidParsing =
-    zodSchema._zod.def.type === "lazy" || zodSchema._zod.def.type === "promise";
-  const hasTypePropertyInDepiction = jsonSchema.type !== undefined;
-  const acceptsNull =
+  if (
     !isResponse &&
-    !shouldAvoidParsing &&
-    hasTypePropertyInDepiction &&
-    zodSchema instanceof z.ZodType &&
-    zodSchema.isNullable();
-  if (acceptsNull)
+    jsonSchema.type !== undefined &&
+    doesAccept(zodSchema, null)
+  )
     Object.assign(jsonSchema, { type: makeNullableType(jsonSchema) });
   const examples = getExamples({
     schema: zodSchema,

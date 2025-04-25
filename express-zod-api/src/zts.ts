@@ -14,13 +14,15 @@ import type {
   $ZodPipe,
   $ZodReadonly,
   $ZodRecord,
+  $ZodString,
+  $ZodTransform,
   $ZodTuple,
   $ZodUnion,
 } from "@zod/core";
 import * as R from "ramda";
 import ts from "typescript";
 import { globalRegistry, z } from "zod";
-import { getTransformedType } from "./common-helpers";
+import { doesAccept, getTransformedType, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand, FileSchema } from "./file-schema";
@@ -92,10 +94,8 @@ const onObject: Producer = (
   const members = Object.entries(def.shape).map<ts.TypeElement>(
     ([key, value]) => {
       const isOptional = isResponse
-        ? value._zod.def.type === "optional"
-        : value._zod.def.type !== "promise" &&
-          value instanceof z.ZodType &&
-          value.isOptional();
+        ? isSchema<$ZodOptional>(value, "optional")
+        : doesAccept(value, undefined);
       const { description: comment, deprecated: isDeprecated } =
         globalRegistry.get(value) || {};
       return makeInterfaceProp(key, next(value), {
@@ -184,24 +184,22 @@ const onPipeline: Producer = (
 ) => {
   const target = def[isResponse ? "out" : "in"];
   const opposite = def[isResponse ? "in" : "out"];
-  if (target instanceof z.ZodTransform) {
-    const opposingType = next(opposite);
-    const targetType = getTransformedType(target, makeSample(opposingType));
-    const resolutions: Partial<
-      Record<NonNullable<typeof targetType>, ts.KeywordTypeSyntaxKind>
-    > = {
-      number: ts.SyntaxKind.NumberKeyword,
-      bigint: ts.SyntaxKind.BigIntKeyword,
-      boolean: ts.SyntaxKind.BooleanKeyword,
-      string: ts.SyntaxKind.StringKeyword,
-      undefined: ts.SyntaxKind.UndefinedKeyword,
-      object: ts.SyntaxKind.ObjectKeyword,
-    };
-    return ensureTypeNode(
-      (targetType && resolutions[targetType]) || ts.SyntaxKind.AnyKeyword,
-    );
-  }
-  return next(target);
+  if (!isSchema<$ZodTransform>(target, "transform")) return next(target);
+  const opposingType = next(opposite);
+  const targetType = getTransformedType(target, makeSample(opposingType));
+  const resolutions: Partial<
+    Record<NonNullable<typeof targetType>, ts.KeywordTypeSyntaxKind>
+  > = {
+    number: ts.SyntaxKind.NumberKeyword,
+    bigint: ts.SyntaxKind.BigIntKeyword,
+    boolean: ts.SyntaxKind.BooleanKeyword,
+    string: ts.SyntaxKind.StringKeyword,
+    undefined: ts.SyntaxKind.UndefinedKeyword,
+    object: ts.SyntaxKind.ObjectKeyword,
+  };
+  return ensureTypeNode(
+    (targetType && resolutions[targetType]) || ts.SyntaxKind.AnyKeyword,
+  );
 };
 
 const onNull: Producer = () => makeLiteralType(null);
@@ -213,9 +211,9 @@ const onFile: Producer = (schema: FileSchema) => {
   const stringType = ensureTypeNode(ts.SyntaxKind.StringKeyword);
   const bufferType = ensureTypeNode("Buffer");
   const unionType = f.createUnionTypeNode([stringType, bufferType]);
-  return schema._zod.def.type === "string"
+  return isSchema<$ZodString>(schema, "string")
     ? stringType
-    : schema._zod.def.type === "union"
+    : isSchema<$ZodUnion>(schema, "union")
       ? unionType
       : bufferType;
 };

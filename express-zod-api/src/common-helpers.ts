@@ -1,4 +1,4 @@
-import type { $ZodType } from "@zod/core";
+import type { $ZodObject, $ZodTransform, $ZodType } from "@zod/core";
 import { Request } from "express";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
@@ -85,9 +85,15 @@ export const getMessageFromError = (error: Error): string => {
   return error.message;
 };
 
+/** Faster replacement to instanceof for code operating core types (traversing schemas) */
+export const isSchema = <T extends $ZodType>(
+  subject: $ZodType,
+  type: T["_zod"]["def"]["type"],
+): subject is T => subject._zod.def.type === type;
+
 /** Takes the original unvalidated examples from the properties of ZodObject schema shape */
-export const pullExampleProps = <T extends z.ZodObject>(subject: T) =>
-  Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
+export const pullExampleProps = <T extends $ZodObject>(subject: T) =>
+  Object.entries(subject._zod.def.shape).reduce<Partial<z.input<T>>[]>(
     (acc, [key, schema]) => {
       const { examples = [] } = globalRegistry.get(schema)?.[metaSymbol] || {};
       return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
@@ -127,7 +133,7 @@ export const getExamples = <
   pullProps?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
   let examples = globalRegistry.get(schema)?.[metaSymbol]?.examples || [];
-  if (!examples.length && pullProps && schema instanceof z.ZodObject)
+  if (!examples.length && pullProps && isSchema<$ZodObject>(schema, "object"))
     examples = pullExampleProps(schema);
   if (!validate && variant === "original") return examples;
   const result: Array<z.input<T> | z.output<T>> = [];
@@ -159,9 +165,18 @@ export const makeCleanId = (...args: string[]) => {
 };
 
 export const getTransformedType = R.tryCatch(
-  <T>(schema: z.ZodTransform<unknown, T>, sample: T) =>
-    typeof schema.parse(sample),
+  <T>(schema: $ZodTransform<unknown, T>, sample: T) =>
+    typeof z.parse(schema, sample),
   R.always(undefined),
+);
+
+/** @link https://github.com/colinhacks/zod/issues/4159 */
+export const doesAccept = R.tryCatch(
+  (schema: $ZodType, value: undefined | null) => {
+    z.parse(schema, value);
+    return true;
+  },
+  R.always(false),
 );
 
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
