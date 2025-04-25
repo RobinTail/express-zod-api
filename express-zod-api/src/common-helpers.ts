@@ -85,6 +85,7 @@ export const getMessageFromError = (error: Error): string => {
   return error.message;
 };
 
+/** Faster replacement to instanceof for code operating core types (traversing schemas) */
 export const isSchema = <T extends $ZodType>(
   subject: $ZodType,
   type: T["_zod"]["def"]["type"],
@@ -169,7 +170,7 @@ export const getTransformedType = R.tryCatch(
   R.always(undefined),
 );
 
-/** isOptional and isNullable may throw */
+/** @link https://github.com/colinhacks/zod/issues/4159 */
 export const doesAccept = R.tryCatch(
   (schema: $ZodType, value: undefined | null) => {
     z.parse(schema, value);
