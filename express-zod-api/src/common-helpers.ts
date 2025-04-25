@@ -89,8 +89,7 @@ export const getMessageFromError = (error: Error): string => {
 export const pullExampleProps = <T extends z.ZodObject>(subject: T) =>
   Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
     (acc, [key, schema]) => {
-      const examples =
-        (schema as z.ZodType).meta()?.[metaSymbol]?.examples || [];
+      const { examples = [] } = globalRegistry.get(schema)?.[metaSymbol] || {};
       return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
         ...left,
         ...right,
