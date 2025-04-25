@@ -30,7 +30,7 @@ type Handler<RES = unknown> = (params: {
   logger: ActualLogger;
 }) => void | Promise<void>;
 
-export type Result<S extends z.ZodTypeAny = z.ZodTypeAny> =
+export type Result<S extends z.ZodType = z.ZodType> =
   | S // plain schema, default status codes applied
   | ApiResponse<S> // single response definition, status code(s) customizable
   | ApiResponse<S>[]; // Feature #1431: different responses for different status codes (non-empty, prog. check!)

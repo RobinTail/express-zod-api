@@ -88,9 +88,7 @@ describe("Index Entrypoint", () => {
         type: "openid";
         url: string;
       }>().toEqualTypeOf<OpenIdSecurity>();
-      expectTypeOf({ schema: z.string() }).toExtend<
-        ApiResponse<z.ZodTypeAny>
-      >();
+      expectTypeOf({ schema: z.string() }).toExtend<ApiResponse<z.ZodString>>();
     });
 
     test("Extended Zod prototypes", () => {

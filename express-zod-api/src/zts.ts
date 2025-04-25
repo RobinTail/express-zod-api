@@ -256,7 +256,7 @@ const producers: HandlingRules<
 };
 
 export const zodToTs = (
-  schema: z.ZodTypeAny,
+  schema: z.ZodType,
   {
     brandHandling,
     ctx,
