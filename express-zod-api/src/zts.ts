@@ -14,6 +14,7 @@ import type {
   $ZodPipe,
   $ZodReadonly,
   $ZodRecord,
+  $ZodString,
   $ZodTransform,
   $ZodTuple,
   $ZodUnion,
@@ -212,9 +213,9 @@ const onFile: Producer = (schema: FileSchema) => {
   const stringType = ensureTypeNode(ts.SyntaxKind.StringKeyword);
   const bufferType = ensureTypeNode("Buffer");
   const unionType = f.createUnionTypeNode([stringType, bufferType]);
-  return schema._zod.def.type === "string"
+  return isSchema<$ZodString>(schema, "string")
     ? stringType
-    : schema._zod.def.type === "union"
+    : isSchema<$ZodUnion>(schema, "union")
       ? unionType
       : bufferType;
 };
