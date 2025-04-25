@@ -271,28 +271,24 @@ export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
   const opposite = (zodSchema as $ZodPipe)._zod.def[
     ctx.isResponse ? "in" : "out"
   ];
-  if (isSchema<$ZodTransform>(target, "transform")) {
-    const opposingDepiction = depict(opposite, { ctx });
-    if (isSchemaObject(opposingDepiction)) {
-      if (!ctx.isResponse) {
-        const { type: opposingType, ...rest } = opposingDepiction;
+  if (!isSchema<$ZodTransform>(target, "transform")) return;
+  const opposingDepiction = depict(opposite, { ctx });
+  if (isSchemaObject(opposingDepiction)) {
+    if (!ctx.isResponse) {
+      const { type: opposingType, ...rest } = opposingDepiction;
+      Object.assign(jsonSchema, {
+        ...rest,
+        format: `${rest.format || opposingType} (preprocessed)`,
+      });
+    } else {
+      const targetType = getTransformedType(
+        target,
+        makeSample(opposingDepiction),
+      );
+      if (targetType && ["number", "string", "boolean"].includes(targetType)) {
         Object.assign(jsonSchema, {
-          ...rest,
-          format: `${rest.format || opposingType} (preprocessed)`,
+          type: targetType as "number" | "string" | "boolean",
         });
-      } else {
-        const targetType = getTransformedType(
-          target,
-          makeSample(opposingDepiction),
-        );
-        if (
-          targetType &&
-          ["number", "string", "boolean"].includes(targetType)
-        ) {
-          Object.assign(jsonSchema, {
-            type: targetType as "number" | "string" | "boolean",
-          });
-        }
       }
     }
   }

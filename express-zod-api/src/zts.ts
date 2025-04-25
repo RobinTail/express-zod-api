@@ -184,24 +184,22 @@ const onPipeline: Producer = (
 ) => {
   const target = def[isResponse ? "out" : "in"];
   const opposite = def[isResponse ? "in" : "out"];
-  if (isSchema<$ZodTransform>(target, "transform")) {
-    const opposingType = next(opposite);
-    const targetType = getTransformedType(target, makeSample(opposingType));
-    const resolutions: Partial<
-      Record<NonNullable<typeof targetType>, ts.KeywordTypeSyntaxKind>
-    > = {
-      number: ts.SyntaxKind.NumberKeyword,
-      bigint: ts.SyntaxKind.BigIntKeyword,
-      boolean: ts.SyntaxKind.BooleanKeyword,
-      string: ts.SyntaxKind.StringKeyword,
-      undefined: ts.SyntaxKind.UndefinedKeyword,
-      object: ts.SyntaxKind.ObjectKeyword,
-    };
-    return ensureTypeNode(
-      (targetType && resolutions[targetType]) || ts.SyntaxKind.AnyKeyword,
-    );
-  }
-  return next(target);
+  if (!isSchema<$ZodTransform>(target, "transform")) return next(target);
+  const opposingType = next(opposite);
+  const targetType = getTransformedType(target, makeSample(opposingType));
+  const resolutions: Partial<
+    Record<NonNullable<typeof targetType>, ts.KeywordTypeSyntaxKind>
+  > = {
+    number: ts.SyntaxKind.NumberKeyword,
+    bigint: ts.SyntaxKind.BigIntKeyword,
+    boolean: ts.SyntaxKind.BooleanKeyword,
+    string: ts.SyntaxKind.StringKeyword,
+    undefined: ts.SyntaxKind.UndefinedKeyword,
+    object: ts.SyntaxKind.ObjectKeyword,
+  };
+  return ensureTypeNode(
+    (targetType && resolutions[targetType]) || ts.SyntaxKind.AnyKeyword,
+  );
 };
 
 const onNull: Producer = () => makeLiteralType(null);
