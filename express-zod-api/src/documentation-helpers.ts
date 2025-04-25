@@ -155,29 +155,30 @@ const canMerge = R.pipe(
   R.isEmpty,
 );
 
-const intersect = R.tryCatch(
-  (children: Array<JSONSchema.BaseSchema>): JSONSchema.ObjectSchema => {
-    const [left, right] = children
-      .map(({ _ref, ...rest }) => (_ref ? { ...rest, ..._ref } : rest))
-      .filter(
-        (schema): schema is JSONSchema.ObjectSchema => schema.type === "object",
-      )
-      .filter(canMerge);
-    if (!left || !right) throw new Error("Can not flatten objects");
-    const suitable: typeof approaches = R.pickBy(
-      (_, prop) => (left[prop] || right[prop]) !== undefined,
-      approaches,
-    );
-    return R.map((fn) => fn(left, right), suitable);
-  },
-  (_err, allOf): JSONSchema.BaseSchema => ({ allOf }),
-);
+const intersect = (
+  children: Array<JSONSchema.BaseSchema>,
+): JSONSchema.ObjectSchema => {
+  const [left, right] = children
+    .map(({ _ref, ...rest }) => (_ref ? { ...rest, ..._ref } : rest))
+    .filter(
+      (schema): schema is JSONSchema.ObjectSchema => schema.type === "object",
+    )
+    .filter(canMerge);
+  if (!left || !right) throw new Error("Can not flatten objects");
+  const suitable: typeof approaches = R.pickBy(
+    (_, prop) => (left[prop] || right[prop]) !== undefined,
+    approaches,
+  );
+  return R.map((fn) => fn(left, right), suitable);
+};
 
 export const onIntersection: Overrider = ({ jsonSchema }) => {
   if (!jsonSchema.allOf) return;
-  const attempt = intersect(jsonSchema.allOf);
-  delete jsonSchema.allOf; // undo default
-  Object.assign(jsonSchema, attempt);
+  try {
+    const attempt = intersect(jsonSchema.allOf);
+    delete jsonSchema.allOf; // undo default
+    Object.assign(jsonSchema, attempt);
+  } catch {}
 };
 
 /** @since OAS 3.1 nullable replaced with type array having null */
