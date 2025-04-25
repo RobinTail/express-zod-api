@@ -4,10 +4,12 @@ import type {
   $ZodDefault,
   $ZodDiscriminatedUnion,
   $ZodEnum,
+  $ZodInterface,
   $ZodIntersection,
   $ZodLazy,
   $ZodLiteral,
   $ZodNullable,
+  $ZodObject,
   $ZodOptional,
   $ZodPipe,
   $ZodReadonly,
@@ -66,7 +68,7 @@ const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
   return values.length === 1 ? values[0] : f.createUnionTypeNode(values);
 };
 
-const onInterface: Producer = (int: z.ZodInterface, { next, makeAlias }) =>
+const onInterface: Producer = (int: $ZodInterface, { next, makeAlias }) =>
   makeAlias(int, () => {
     const members = Object.entries(int._zod.def.shape).map<ts.TypeElement>(
       ([key, value]) => {
@@ -84,16 +86,16 @@ const onInterface: Producer = (int: z.ZodInterface, { next, makeAlias }) =>
   });
 
 const onObject: Producer = (
-  { _zod: { def } }: z.ZodObject,
+  { _zod: { def } }: $ZodObject,
   { isResponse, next },
 ) => {
   const members = Object.entries(def.shape).map<ts.TypeElement>(
     ([key, value]) => {
       const isOptional = isResponse
-        ? value instanceof z.ZodOptional
-        : value instanceof z.ZodPromise
-          ? false
-          : (value as z.ZodType).isOptional();
+        ? value._zod.def.type === "optional"
+        : value._zod.def.type !== "promise" &&
+          value instanceof z.ZodType &&
+          value.isOptional();
       const { description: comment, deprecated: isDeprecated } =
         globalRegistry.get(value) || {};
       return makeInterfaceProp(key, next(value), {
@@ -211,9 +213,9 @@ const onFile: Producer = (schema: FileSchema) => {
   const stringType = ensureTypeNode(ts.SyntaxKind.StringKeyword);
   const bufferType = ensureTypeNode("Buffer");
   const unionType = f.createUnionTypeNode([stringType, bufferType]);
-  return schema instanceof z.ZodString
+  return schema._zod.def.type === "string"
     ? stringType
-    : schema instanceof z.ZodUnion
+    : schema._zod.def.type === "union"
       ? unionType
       : bufferType;
 };

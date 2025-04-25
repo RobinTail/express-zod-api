@@ -404,7 +404,9 @@ export const depictRequestParams = ({
         name,
         in: location,
         deprecated: globalRegistry.get(paramSchema)?.deprecated,
-        required: !(paramSchema as z.ZodType).isOptional(),
+        required: !(
+          paramSchema instanceof z.ZodType && paramSchema.isOptional()
+        ),
         description: depicted.description || description,
         schema: result,
         examples: depictParamExamples(objectSchema, name),
