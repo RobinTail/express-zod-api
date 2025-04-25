@@ -92,8 +92,8 @@ const onObject: Producer = (
   const members = Object.entries(def.shape).map<ts.TypeElement>(
     ([key, value]) => {
       const isOptional = isResponse
-        ? value instanceof z.ZodOptional
-        : value instanceof z.ZodPromise
+        ? value._zod.def.type === "optional"
+        : value._zod.def.type === "promise"
           ? false
           : (value as z.ZodType).isOptional();
       const { description: comment, deprecated: isDeprecated } =
@@ -213,9 +213,9 @@ const onFile: Producer = (schema: FileSchema) => {
   const stringType = ensureTypeNode(ts.SyntaxKind.StringKeyword);
   const bufferType = ensureTypeNode("Buffer");
   const unionType = f.createUnionTypeNode([stringType, bufferType]);
-  return schema instanceof z.ZodString
+  return schema._zod.def.type === "string"
     ? stringType
-    : schema instanceof z.ZodUnion
+    : schema._zod.def.type === "union"
       ? unionType
       : bufferType;
 };
