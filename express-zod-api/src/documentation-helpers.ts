@@ -201,10 +201,34 @@ export const onNullable: Overrider = ({ jsonSchema }) => {
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
   subject in samples;
 
+const ensureCompliance = ({
+  $ref,
+  type,
+  allOf,
+  oneOf,
+  anyOf,
+  not,
+  ...rest
+}: JSONSchema.BaseSchema): SchemaObject | ReferenceObject => {
+  if ($ref) return { $ref };
+  if (typeof type === "string") type = isSupportedType(type) ? type : undefined;
+  return {
+    type: Array.isArray(type)
+      ? type.filter(isSupportedType)
+      : type && isSupportedType(type)
+        ? type
+        : undefined,
+    allOf: allOf && allOf.map(ensureCompliance),
+    oneOf: oneOf && oneOf.map(ensureCompliance),
+    anyOf: anyOf && anyOf.map(ensureCompliance),
+    not: not && ensureCompliance(not),
+    ...rest,
+  };
+};
+
 export const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  unref(jsonSchema);
   delete jsonSchema.anyOf; // undo default
   Object.assign(jsonSchema, {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
@@ -299,7 +323,6 @@ export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
 };
 
 export const onRaw: Overrider = ({ jsonSchema }) => {
-  unref(jsonSchema);
   if (jsonSchema.type !== "object") return;
   const objSchema = jsonSchema as JSONSchema.ObjectSchema;
   if (!objSchema.properties) return;
@@ -440,7 +463,6 @@ const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
   };
 
 const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
-  unref(jsonSchema); // @todo possibly move to beginning of overrides from all other places
   if (!isResponse && doesAccept(zodSchema, null))
     Object.assign(jsonSchema, { type: makeNullableType(jsonSchema.type) });
   const examples = getExamples({
@@ -500,6 +522,7 @@ const depict = (
       unrepresentable: "any",
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
+        unref(zodCtx.jsonSchema);
         const { brand } =
           globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
         rules[
