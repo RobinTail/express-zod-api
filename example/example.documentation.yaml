@@ -518,8 +518,6 @@ paths:
           application/octet-stream:
             schema:
               type: string
-              required:
-                - raw
               format: binary
         required: true
       responses:

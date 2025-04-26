@@ -303,6 +303,7 @@ export const onRaw: Overrider = ({ jsonSchema }) => {
   if (!("raw" in objSchema.properties)) return;
   Object.assign(jsonSchema, objSchema.properties.raw);
   delete jsonSchema.properties; // undo default
+  delete jsonSchema.required;
 };
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
