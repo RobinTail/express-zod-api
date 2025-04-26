@@ -167,7 +167,7 @@ const intersect = (
   children: Array<JSONSchema.BaseSchema>,
 ): JSONSchema.ObjectSchema => {
   const [left, right] = children
-    .map(({ _ref, ...rest }) => (_ref ? { ...rest, ..._ref } : rest))
+    .map(unref)
     .filter(
       (schema): schema is JSONSchema.ObjectSchema => schema.type === "object",
     )
@@ -204,7 +204,8 @@ const isSupportedType = (subject: string): subject is SchemaObjectType =>
 export const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  delete jsonSchema._ref; // undo default
+  unref(jsonSchema);
+  delete jsonSchema.anyOf; // undo default
   Object.assign(jsonSchema, {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
@@ -295,13 +296,14 @@ export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
 };
 
 export const onRaw: Overrider = ({ jsonSchema }) => {
-  if (!jsonSchema._ref) return;
-  if (jsonSchema._ref.type !== "object") return;
-  const objSchema = jsonSchema._ref as JSONSchema.ObjectSchema;
+  unref(jsonSchema);
+  if (jsonSchema.type !== "object") return;
+  const objSchema = jsonSchema as JSONSchema.ObjectSchema;
   if (!objSchema.properties) return;
   if (!("raw" in objSchema.properties)) return;
-  delete jsonSchema._ref; // undo
   Object.assign(jsonSchema, objSchema.properties.raw);
+  delete jsonSchema.properties; // undo default
+  delete jsonSchema.required;
 };
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
@@ -474,6 +476,18 @@ const fixReferences = (
     if (R.is(Array, entry)) stack.push(...R.values(entry));
   }
   return subject as SchemaObject; // @todo ideally, there should be a method to ensure that
+};
+
+/** @link https://github.com/colinhacks/zod/issues/4275 */
+const unref = (
+  subject: JSONSchema.BaseSchema,
+): Omit<JSONSchema.BaseSchema, "_ref"> => {
+  while (subject._ref) {
+    const copy = { ...subject._ref };
+    delete subject._ref;
+    Object.assign(subject, copy);
+  }
+  return subject;
 };
 
 const depict = (
