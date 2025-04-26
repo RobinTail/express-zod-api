@@ -211,7 +211,6 @@ const ensureCompliance = ({
   ...rest
 }: JSONSchema.BaseSchema): SchemaObject | ReferenceObject => {
   if ($ref) return { $ref };
-  if (typeof type === "string") type = isSupportedType(type) ? type : undefined;
   return {
     type: Array.isArray(type)
       ? type.filter(isSupportedType)
@@ -490,14 +489,14 @@ const fixReferences = (
         const actualName = entry.$ref.split("/").pop()!;
         const depiction = defs[actualName];
         if (depiction)
-          entry.$ref = ctx.makeRef(depiction, depiction as SchemaObject).$ref; // @todo see below
+          entry.$ref = ctx.makeRef(depiction, ensureCompliance(depiction)).$ref;
         continue;
       }
       stack.push(...R.values(entry));
     }
     if (R.is(Array, entry)) stack.push(...R.values(entry));
   }
-  return subject as SchemaObject; // @todo ideally, there should be a method to ensure that
+  return ensureCompliance(subject);
 };
 
 /** @link https://github.com/colinhacks/zod/issues/4275 */
