@@ -16,8 +16,8 @@ paths:
           required: true
           description: a numeric string containing the id of the user
           schema:
-            description: a numeric string containing the id of the user
             type: string
+            description: a numeric string containing the id of the user
             format: regex
             pattern: \d+
       responses:
@@ -85,8 +85,8 @@ paths:
           required: true
           description: numeric string
           schema:
-            description: numeric string
             type: string
+            description: numeric string
             format: regex
             pattern: \d+
       responses:
@@ -578,9 +578,9 @@ paths:
           required: false
           description: for testing error response
           schema:
+            type: string
             deprecated: true
             description: for testing error response
-            type: string
       responses:
         "200":
           description: GET /v1/events/stream Positive response

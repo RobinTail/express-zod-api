@@ -211,18 +211,19 @@ const ensureCompliance = ({
   ...rest
 }: JSONSchema.BaseSchema): SchemaObject | ReferenceObject => {
   if ($ref) return { $ref };
-  return {
+  const valid: SchemaObject = {
     type: Array.isArray(type)
       ? type.filter(isSupportedType)
       : type && isSupportedType(type)
         ? type
         : undefined,
-    allOf: allOf && allOf.map(ensureCompliance),
-    oneOf: oneOf && oneOf.map(ensureCompliance),
-    anyOf: anyOf && anyOf.map(ensureCompliance),
-    not: not && ensureCompliance(not),
     ...rest,
   };
+  if (allOf) valid.allOf = allOf.map(ensureCompliance);
+  if (oneOf) valid.oneOf = oneOf.map(ensureCompliance);
+  if (anyOf) valid.anyOf = anyOf.map(ensureCompliance);
+  if (not) valid.not = ensureCompliance(not);
+  return valid;
 };
 
 export const onDateIn: Overrider = ({ jsonSchema }, ctx) => {

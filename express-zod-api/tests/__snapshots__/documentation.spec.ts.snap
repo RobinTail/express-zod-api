@@ -610,9 +610,9 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
+            type: array
             minItems: 1
             maxItems: 3
-            type: array
             items:
               type: integer
               exclusiveMaximum: 9007199254740991
@@ -708,6 +708,8 @@ paths:
         content:
           application/json:
             schema:
+              discriminator:
+                propertyName: type
               anyOf:
                 - type: object
                   properties:
@@ -727,8 +729,6 @@ paths:
                   required:
                     - type
                     - b
-              discriminator:
-                propertyName: type
         required: true
       responses:
         "200":
@@ -2405,8 +2405,8 @@ paths:
           required: true
           description: YYYY-MM-DDTHH:mm:ss.sssZ
           schema:
-            description: YYYY-MM-DDTHH:mm:ss.sssZ
             type: string
+            description: YYYY-MM-DDTHH:mm:ss.sssZ
             format: date-time
             pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
             externalDocs:
@@ -2818,8 +2818,8 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
-            minItems: 1
             type: array
+            minItems: 1
             items:
               type: string
       responses:
@@ -3076,8 +3076,8 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
-            deprecated: true
             type: string
+            deprecated: true
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -3282,9 +3282,9 @@ paths:
 components:
   schemas:
     GetHrisEmployeesParameterCursor:
+      type: string
       description: An optional cursor string used for pagination. This can be
         retrieved from the \`next\` property of the previous page response.
-      type: string
     GetHrisEmployeesPositiveResponse:
       type: object
       properties:
@@ -3706,8 +3706,8 @@ paths:
           required: true
           description: here is the test
           schema:
-            description: here is the test
             type: string
+            description: here is the test
       responses:
         "200":
           description: GET /v1/getSomething Positive response
