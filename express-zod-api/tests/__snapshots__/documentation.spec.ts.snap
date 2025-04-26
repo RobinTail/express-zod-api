@@ -930,8 +930,8 @@ paths:
           required: false
           description: GET /v1/getSomething Parameter
           schema:
-            default: test
             type: string
+            default: test
         - name: nullish
           in: query
           required: false
@@ -945,11 +945,11 @@ paths:
           required: false
           description: GET /v1/getSomething Parameter
           schema:
-            default: 123
             type:
               - integer
               - "null"
             exclusiveMaximum: 9007199254740991
+            default: 123
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -3172,11 +3172,6 @@ paths:
                   status:
                     const: success
                   data:
-                    examples:
-                      - a: first
-                        b: prefix_first
-                      - a: second
-                        b: prefix_second
                     type: object
                     properties:
                       a:
@@ -3186,6 +3181,11 @@ paths:
                     required:
                       - a
                       - b
+                    examples:
+                      - a: first
+                        b: prefix_first
+                      - a: second
+                        b: prefix_second
                 required:
                   - status
                   - data
@@ -3361,14 +3361,14 @@ paths:
                   status:
                     const: success
                   data:
-                    examples:
-                      - num: 123
                     type: object
                     properties:
                       num:
                         type: number
                     required:
                       - num
+                    examples:
+                      - num: 123
                 required:
                   - status
                   - data
@@ -3449,14 +3449,14 @@ paths:
                   status:
                     const: success
                   data:
-                    examples:
-                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
                         type: string
                     required:
                       - numericStr
+                    examples:
+                      - numericStr: "123"
                 required:
                   - status
                   - data
@@ -3543,14 +3543,14 @@ paths:
                   status:
                     const: success
                   data:
-                    examples:
-                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
                         type: string
                     required:
                       - numericStr
+                    examples:
+                      - numericStr: "123"
                 required:
                   - status
                   - data
@@ -3616,9 +3616,9 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
+            type: string
             examples:
               - "123"
-            type: string
           examples:
             example1:
               value: "123"

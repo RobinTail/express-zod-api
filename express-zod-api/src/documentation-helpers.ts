@@ -193,7 +193,7 @@ export const onIntersection: Overrider = ({ jsonSchema }) => {
 export const onNullable: Overrider = ({ jsonSchema }) => {
   if (!jsonSchema.anyOf) return;
   const original = jsonSchema.anyOf[0];
-  Object.assign(original, { type: makeNullableType(original) });
+  Object.assign(original, { type: makeNullableType(original.type) });
   Object.assign(jsonSchema, original);
   delete jsonSchema.anyOf;
 };
@@ -254,15 +254,18 @@ const makeSample = (depicted: SchemaObject) => {
   return samples?.[firstType];
 };
 
-const makeNullableType = ({
-  type,
-}: JSONSchema.BaseSchema | SchemaObject):
-  | SchemaObjectType
-  | SchemaObjectType[] => {
-  if (type === "null") return type;
-  if (typeof type === "string")
-    return isSupportedType(type) ? [type, "null"] : "null";
-  return type ? [...new Set(type).add("null")] : "null";
+/** @since v24.0.0 does not return null for undefined */
+const makeNullableType = (
+  current:
+    | JSONSchema.BaseSchema["type"]
+    | Array<NonNullable<JSONSchema.BaseSchema["type"]>>,
+): typeof current => {
+  if (current === ("null" satisfies SchemaObjectType)) return current;
+  if (typeof current === "string")
+    return [current, "null" satisfies SchemaObjectType];
+  return (
+    current && [...new Set(current).add("null" satisfies SchemaObjectType)]
+  );
 };
 
 export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
@@ -437,12 +440,9 @@ const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
   };
 
 const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
-  if (
-    !isResponse &&
-    jsonSchema.type !== undefined &&
-    doesAccept(zodSchema, null)
-  )
-    Object.assign(jsonSchema, { type: makeNullableType(jsonSchema) });
+  unref(jsonSchema); // @todo possibly move to beginning of overrides from all other places
+  if (!isResponse && doesAccept(zodSchema, null))
+    Object.assign(jsonSchema, { type: makeNullableType(jsonSchema.type) });
   const examples = getExamples({
     schema: zodSchema,
     variant: isResponse ? "parsed" : "original",

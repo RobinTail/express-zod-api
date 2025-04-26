@@ -107,10 +107,10 @@ paths:
           required: true
           description: PATCH /v1/user/:id Parameter
           schema:
-            examples:
-              - "1234567890"
             type: string
             minLength: 1
+            examples:
+              - "1234567890"
           examples:
             example1:
               value: "1234567890"
@@ -119,9 +119,9 @@ paths:
           required: true
           description: PATCH /v1/user/:id Parameter
           schema:
+            type: string
             examples:
               - "12"
-            type: string
           examples:
             example1:
               value: "12"
@@ -133,15 +133,15 @@ paths:
               type: object
               properties:
                 key:
+                  type: string
+                  minLength: 1
                   examples:
                     - 1234-5678-90
+                name:
                   type: string
                   minLength: 1
-                name:
                   examples:
                     - John Doe
-                  type: string
-                  minLength: 1
                 birthday:
                   description: YYYY-MM-DDTHH:mm:ss.sssZ
                   type: string
@@ -179,9 +179,9 @@ paths:
                     type: object
                     properties:
                       name:
+                        type: string
                         examples:
                           - John Doe
-                        type: string
                       createdAt:
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string
