@@ -193,7 +193,7 @@ export const onIntersection: Overrider = ({ jsonSchema }) => {
 export const onNullable: Overrider = ({ jsonSchema }) => {
   if (!jsonSchema.anyOf) return;
   const original = jsonSchema.anyOf[0];
-  Object.assign(original, { type: makeNullableType(original) });
+  Object.assign(original, { type: makeNullableType(original.type) });
   Object.assign(jsonSchema, original);
   delete jsonSchema.anyOf;
 };
@@ -201,10 +201,34 @@ export const onNullable: Overrider = ({ jsonSchema }) => {
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
   subject in samples;
 
+const ensureCompliance = ({
+  $ref,
+  type,
+  allOf,
+  oneOf,
+  anyOf,
+  not,
+  ...rest
+}: JSONSchema.BaseSchema): SchemaObject | ReferenceObject => {
+  if ($ref) return { $ref };
+  const valid: SchemaObject = {
+    type: Array.isArray(type)
+      ? type.filter(isSupportedType)
+      : type && isSupportedType(type)
+        ? type
+        : undefined,
+    ...rest,
+  };
+  if (allOf) valid.allOf = allOf.map(ensureCompliance);
+  if (oneOf) valid.oneOf = oneOf.map(ensureCompliance);
+  if (anyOf) valid.anyOf = anyOf.map(ensureCompliance);
+  if (not) valid.not = ensureCompliance(not);
+  return valid;
+};
+
 export const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  unref(jsonSchema);
   delete jsonSchema.anyOf; // undo default
   Object.assign(jsonSchema, {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
@@ -254,15 +278,18 @@ const makeSample = (depicted: SchemaObject) => {
   return samples?.[firstType];
 };
 
-const makeNullableType = ({
-  type,
-}: JSONSchema.BaseSchema | SchemaObject):
-  | SchemaObjectType
-  | SchemaObjectType[] => {
-  if (type === "null") return type;
-  if (typeof type === "string")
-    return isSupportedType(type) ? [type, "null"] : "null";
-  return type ? [...new Set(type).add("null")] : "null";
+/** @since v24.0.0 does not return null for undefined */
+const makeNullableType = (
+  current:
+    | JSONSchema.BaseSchema["type"]
+    | Array<NonNullable<JSONSchema.BaseSchema["type"]>>,
+): typeof current => {
+  if (current === ("null" satisfies SchemaObjectType)) return current;
+  if (typeof current === "string")
+    return [current, "null" satisfies SchemaObjectType];
+  return (
+    current && [...new Set(current).add("null" satisfies SchemaObjectType)]
+  );
 };
 
 export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
@@ -296,7 +323,6 @@ export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
 };
 
 export const onRaw: Overrider = ({ jsonSchema }) => {
-  unref(jsonSchema);
   if (jsonSchema.type !== "object") return;
   const objSchema = jsonSchema as JSONSchema.ObjectSchema;
   if (!objSchema.properties) return;
@@ -437,12 +463,8 @@ const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
   };
 
 const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
-  if (
-    !isResponse &&
-    jsonSchema.type !== undefined &&
-    doesAccept(zodSchema, null)
-  )
-    Object.assign(jsonSchema, { type: makeNullableType(jsonSchema) });
+  if (!isResponse && doesAccept(zodSchema, null))
+    Object.assign(jsonSchema, { type: makeNullableType(jsonSchema.type) });
   const examples = getExamples({
     schema: zodSchema,
     variant: isResponse ? "parsed" : "original",
@@ -468,14 +490,14 @@ const fixReferences = (
         const actualName = entry.$ref.split("/").pop()!;
         const depiction = defs[actualName];
         if (depiction)
-          entry.$ref = ctx.makeRef(depiction, depiction as SchemaObject).$ref; // @todo see below
+          entry.$ref = ctx.makeRef(depiction, ensureCompliance(depiction)).$ref;
         continue;
       }
       stack.push(...R.values(entry));
     }
     if (R.is(Array, entry)) stack.push(...R.values(entry));
   }
-  return subject as SchemaObject; // @todo ideally, there should be a method to ensure that
+  return ensureCompliance(subject);
 };
 
 /** @link https://github.com/colinhacks/zod/issues/4275 */
@@ -500,6 +522,7 @@ const depict = (
       unrepresentable: "any",
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
+        unref(zodCtx.jsonSchema);
         const { brand } =
           globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
         rules[
