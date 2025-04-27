@@ -1403,7 +1403,7 @@ const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for
 const myBrandedSchema = z.string().brand(myBrand);
 
 const ruleForDocs: Overrider = (
-  { zodSchema, jsonSchema }, // adjust jsonSchema for overrides
+  { zodSchema, jsonSchema }, // return changed jsonSchema
   { path, method, isResponse }, // handle a nested schema using next()
 ) => ({
   ...jsonSchema,
