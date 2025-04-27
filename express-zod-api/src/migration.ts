@@ -5,7 +5,7 @@ import {
   // type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- special case
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- @todo
+/*
 interface Queries {}
 
 type Listener = keyof Queries;
@@ -24,6 +24,7 @@ const listen = <
       }),
     {},
   );
+*/
 
 const v24 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
@@ -37,7 +38,7 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
     },
   },
   defaultOptions: [],
-  create: () => listen({}),
+  create: () => ({}),
 });
 
 /**
