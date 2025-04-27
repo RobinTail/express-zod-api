@@ -2307,14 +2307,12 @@ paths:
           required: true
           description: GET /v1/:name Parameter
           schema:
-            type: string
             summary: My custom schema
         - name: other
           in: query
           required: true
           description: GET /v1/:name Parameter
           schema:
-            type: boolean
             summary: My custom schema
         - name: regular
           in: query
@@ -2336,7 +2334,6 @@ paths:
                     type: object
                     properties:
                       number:
-                        type: number
                         summary: My custom schema
                     required:
                       - number

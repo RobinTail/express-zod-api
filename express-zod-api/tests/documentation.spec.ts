@@ -1185,10 +1185,7 @@ describe("Documentation", () => {
   describe("Feature #1470: Custom brands", () => {
     test("should be handled accordingly in request, response and params", () => {
       const deep = Symbol("DEEP");
-      const rule: Depicter = ({ jsonSchema }) => ({
-        ...jsonSchema,
-        type: "boolean",
-      });
+      const rule: Depicter = ({ jsonSchema }) => jsonSchema;
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
@@ -1207,8 +1204,7 @@ describe("Documentation", () => {
           },
         },
         brandHandling: {
-          CUSTOM: ({ jsonSchema }) => ({
-            ...jsonSchema,
+          CUSTOM: () => ({
             summary: "My custom schema",
           }),
           [deep]: rule,
