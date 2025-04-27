@@ -194,9 +194,10 @@ export const onIntersection: Overrider = ({ jsonSchema }) => {
 /** @since OAS 3.1 nullable replaced with type array having null */
 export const onNullable: Overrider = ({ jsonSchema }) => {
   if (jsonSchema.anyOf) {
-    const { type, ...rest } = jsonSchema.anyOf[0];
-    return { type: makeNullableType(type), ...rest };
+    const original = jsonSchema.anyOf[0];
+    return Object.assign(original, { type: makeNullableType(original.type) });
   }
+
   return jsonSchema;
 };
 
