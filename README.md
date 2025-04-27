@@ -1404,7 +1404,7 @@ const myBrandedSchema = z.string().brand(myBrand);
 
 const ruleForDocs: Overrider = (
   { zodSchema, jsonSchema }, // return changed jsonSchema
-  { path, method, isResponse }, // handle a nested schema using next()
+  { path, method, isResponse },
 ) => ({
   ...jsonSchema,
   summary: "Special type of data",
