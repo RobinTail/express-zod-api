@@ -5,8 +5,13 @@ import {
   type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- special case
 
+type NamedProp = TSESTree.PropertyNonComputedName & {
+  key: TSESTree.Identifier;
+};
+
 interface Queries {
-  numericRange: TSESTree.PropertyNonComputedName & { key: TSESTree.Identifier };
+  numericRange: NamedProp;
+  optionalPropStyle: NamedProp;
 }
 
 type Listener = keyof Queries;
@@ -15,6 +20,9 @@ const queries: Record<Listener, string> = {
   numericRange:
     `${NT.NewExpression}[callee.name='Documentation'] > ` +
     `${NT.ObjectExpression} > ${NT.Property}[key.name='numericRange']`,
+  optionalPropStyle:
+    `${NT.NewExpression}[callee.name='Integration'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='optionalPropStyle']`,
 };
 
 const listen = <
@@ -55,6 +63,13 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
   create: (ctx) =>
     listen({
       numericRange: (node) =>
+        ctx.report({
+          node,
+          messageId: "remove",
+          data: { subject: node.key.name },
+          fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
+        }),
+      optionalPropStyle: (node) =>
         ctx.report({
           node,
           messageId: "remove",

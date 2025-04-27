@@ -18,7 +18,7 @@ describe("Migration", () => {
   });
 
   tester.run("v24", migration.rules.v24, {
-    valid: [`new Documentation({});`],
+    valid: [`new Documentation({});`, `new Integration({})`],
     invalid: [
       {
         code: `new Documentation({ numericRange: {}, });`,
@@ -27,6 +27,16 @@ describe("Migration", () => {
           {
             messageId: "remove",
             data: { subject: "numericRange" },
+          },
+        ],
+      },
+      {
+        code: `new Integration({ optionalPropStyle: {}, });`,
+        output: `new Integration({  });`,
+        errors: [
+          {
+            messageId: "remove",
+            data: { subject: "optionalPropStyle" },
           },
         ],
       },
