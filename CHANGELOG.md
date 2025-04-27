@@ -15,7 +15,7 @@
   - Express Zod API implements some overrides and improvements to fit it into OpenAPI 3.1 that extends JSON Schema;
   - The `numericRange` option removed from `Documentation` class constructor argument;
   - The `brandHandling` should consist of postprocessing functions altering the depiction made by Zod 4;
-  - The `Depicter` type changed to `Overrider` having different signature;
+  - The `Depicter` type signature changed;
 - The `optionalPropStyle` option removed from `Integration` class constructor:
   - Use the new `z.interface()` schema to describe key-optional objects: https://v4.zod.dev/v4#zinterface;
 - Changes to the plugin:

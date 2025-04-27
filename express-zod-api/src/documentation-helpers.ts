@@ -65,10 +65,10 @@ export interface OpenAPIContext {
   method: Method;
 }
 
-export type Overrider = (
+export type Depicter = (
   zodCtx: { zodSchema: $ZodType; jsonSchema: JSONSchema.BaseSchema },
   oasCtx: OpenAPIContext,
-) => void;
+) => JSONSchema.BaseSchema | SchemaObject;
 
 /** @desc Using defaultIsHeader when returns null or undefined */
 export type IsHeader = (
@@ -77,7 +77,7 @@ export type IsHeader = (
   path: string,
 ) => boolean | null | undefined;
 
-export type BrandHandling = Record<string | symbol, Overrider>;
+export type BrandHandling = Record<string | symbol, Depicter>;
 
 interface ReqResHandlingProps<S extends $ZodType>
   extends Omit<OpenAPIContext, "isResponse"> {
@@ -104,34 +104,36 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const onDefault: Overrider = ({ zodSchema, jsonSchema }) =>
-  (jsonSchema.default =
+export const onDefault: Depicter = ({ zodSchema, jsonSchema }) => ({
+  ...jsonSchema,
+  default:
     globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
-    jsonSchema.default);
+    jsonSchema.default,
+});
 
-export const onUpload: Overrider = ({ jsonSchema }, ctx) => {
+export const onUpload: Depicter = ({}, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.upload() only for input.", ctx);
-  Object.assign(jsonSchema, { type: "string", format: "binary" });
+  return { type: "string", format: "binary" };
 };
 
-export const onFile: Overrider = ({ jsonSchema }) => {
-  delete jsonSchema.anyOf; // undo default
-  Object.assign(jsonSchema, {
-    type: "string",
-    format:
-      jsonSchema.type === "string"
-        ? jsonSchema.format === "base64"
-          ? "byte"
-          : "file"
-        : "binary",
-  });
-};
+export const onFile: Depicter = ({ jsonSchema }) => ({
+  type: "string",
+  format:
+    jsonSchema.type === "string"
+      ? jsonSchema.format === "base64"
+        ? "byte"
+        : "file"
+      : "binary",
+});
 
-export const onUnion: Overrider = ({ zodSchema, jsonSchema }) => {
-  if (!zodSchema._zod.disc) return;
+export const onUnion: Depicter = ({ zodSchema, jsonSchema }) => {
+  if (!zodSchema._zod.disc) return jsonSchema;
   const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
-  jsonSchema.discriminator ??= { propertyName };
+  return {
+    ...jsonSchema,
+    discriminator: jsonSchema.discriminator ?? { propertyName },
+  };
 };
 
 const propsMerger = (a: unknown, b: unknown) => {
@@ -180,22 +182,20 @@ const intersect = (
   return R.map((fn) => fn(left, right), suitable);
 };
 
-export const onIntersection: Overrider = ({ jsonSchema }) => {
-  if (!jsonSchema.allOf) return;
-  try {
-    const attempt = intersect(jsonSchema.allOf);
-    delete jsonSchema.allOf; // undo default
-    Object.assign(jsonSchema, attempt);
-  } catch {}
+export const onIntersection: Depicter = ({ jsonSchema }) => {
+  if (jsonSchema.allOf) {
+    try {
+      return intersect(jsonSchema.allOf);
+    } catch {}
+  }
+  return jsonSchema;
 };
 
 /** @since OAS 3.1 nullable replaced with type array having null */
-export const onNullable: Overrider = ({ jsonSchema }) => {
-  if (!jsonSchema.anyOf) return;
+export const onNullable: Depicter = ({ jsonSchema }) => {
+  if (!jsonSchema.anyOf) return jsonSchema;
   const original = jsonSchema.anyOf[0];
-  Object.assign(original, { type: makeNullableType(original.type) });
-  Object.assign(jsonSchema, original);
-  delete jsonSchema.anyOf;
+  return Object.assign(original, { type: makeNullableType(original.type) });
 };
 
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
@@ -226,11 +226,10 @@ const ensureCompliance = ({
   return valid;
 };
 
-export const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
+export const onDateIn: Depicter = ({}, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  delete jsonSchema.anyOf; // undo default
-  Object.assign(jsonSchema, {
+  return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
@@ -238,37 +237,36 @@ export const onDateIn: Overrider = ({ jsonSchema }, ctx) => {
     externalDocs: {
       url: isoDateDocumentationUrl,
     },
-  });
+  };
 };
 
-export const onDateOut: Overrider = ({ jsonSchema }, ctx) => {
+export const onDateOut: Depicter = ({}, ctx) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
-  Object.assign(jsonSchema, {
+  return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
     externalDocs: {
       url: isoDateDocumentationUrl,
     },
-  });
+  };
 };
 
-export const onBigInt: Overrider = ({ jsonSchema }) =>
-  Object.assign(jsonSchema, {
-    type: "string",
-    format: "bigint",
-    pattern: /^-?\d+$/.source,
-  });
+export const onBigInt: Depicter = () => ({
+  type: "string",
+  format: "bigint",
+  pattern: /^-?\d+$/.source,
+});
 
 /**
  * @since OAS 3.1 using prefixItems for depicting tuples
  * @since 17.5.0 added rest handling, fixed tuple type
  */
-export const onTuple: Overrider = ({ zodSchema, jsonSchema }) => {
-  if ((zodSchema as $ZodTuple)._zod.def.rest !== null) return;
+export const onTuple: Depicter = ({ zodSchema, jsonSchema }) => {
+  if ((zodSchema as $ZodTuple)._zod.def.rest !== null) return jsonSchema;
   // does not appear to support items:false, so not:{} is a recommended alias
-  jsonSchema.items = { not: {} };
+  return { ...jsonSchema, items: { not: {} } };
 };
 
 const makeSample = (depicted: SchemaObject) => {
@@ -292,44 +290,43 @@ const makeNullableType = (
   );
 };
 
-export const onPipeline: Overrider = ({ zodSchema, jsonSchema }, ctx) => {
+export const onPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
   const target = (zodSchema as $ZodPipe)._zod.def[
     ctx.isResponse ? "out" : "in"
   ];
   const opposite = (zodSchema as $ZodPipe)._zod.def[
     ctx.isResponse ? "in" : "out"
   ];
-  if (!isSchema<$ZodTransform>(target, "transform")) return;
+  if (!isSchema<$ZodTransform>(target, "transform")) return jsonSchema;
   const opposingDepiction = depict(opposite, { ctx });
   if (isSchemaObject(opposingDepiction)) {
     if (!ctx.isResponse) {
       const { type: opposingType, ...rest } = opposingDepiction;
-      Object.assign(jsonSchema, {
+      return {
         ...rest,
         format: `${rest.format || opposingType} (preprocessed)`,
-      });
+      };
     } else {
       const targetType = getTransformedType(
         target,
         makeSample(opposingDepiction),
       );
       if (targetType && ["number", "string", "boolean"].includes(targetType)) {
-        Object.assign(jsonSchema, {
+        return {
           type: targetType as "number" | "string" | "boolean",
-        });
+        };
       }
     }
   }
+  return jsonSchema;
 };
 
-export const onRaw: Overrider = ({ jsonSchema }) => {
-  if (jsonSchema.type !== "object") return;
+export const onRaw: Depicter = ({ jsonSchema }) => {
+  if (jsonSchema.type !== "object") return jsonSchema;
   const objSchema = jsonSchema as JSONSchema.ObjectSchema;
-  if (!objSchema.properties) return;
-  if (!("raw" in objSchema.properties)) return;
-  Object.assign(jsonSchema, objSchema.properties.raw);
-  delete jsonSchema.properties; // undo default
-  delete jsonSchema.required;
+  if (!objSchema.properties) return jsonSchema;
+  if (!("raw" in objSchema.properties)) return jsonSchema;
+  return objSchema.properties.raw;
 };
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
@@ -425,7 +422,7 @@ export const depictRequestParams = ({
             : undefined;
       if (!location) return acc;
       const depicted = depict(paramSchema, {
-        rules: { ...brandHandling, ...overrides },
+        rules: { ...brandHandling, ...depicters },
         ctx: { isResponse: false, makeRef, path, method },
       });
       const result =
@@ -446,7 +443,7 @@ export const depictRequestParams = ({
   );
 };
 
-const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
+const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
   {
     nullable: onNullable,
     default: onDefault,
@@ -462,15 +459,17 @@ const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Overrider>> =
     [ezRawBrand]: onRaw,
   };
 
-const onEach: Overrider = ({ zodSchema, jsonSchema }, { isResponse }) => {
+const onEach: Depicter = ({ zodSchema, jsonSchema }, { isResponse }) => {
+  const result = { ...jsonSchema };
   if (!isResponse && doesAccept(zodSchema, null))
-    Object.assign(jsonSchema, { type: makeNullableType(jsonSchema.type) });
+    Object.assign(result, { type: makeNullableType(jsonSchema.type) });
   const examples = getExamples({
     schema: zodSchema,
     variant: isResponse ? "parsed" : "original",
     validate: true,
   });
-  if (examples.length) jsonSchema.examples = examples.slice();
+  if (examples.length) result.examples = examples.slice();
+  return result;
 };
 
 /**
@@ -514,7 +513,7 @@ const unref = (
 
 const depict = (
   subject: $ZodType,
-  { ctx, rules = overrides }: { ctx: OpenAPIContext; rules?: BrandHandling },
+  { ctx, rules = depicters }: { ctx: OpenAPIContext; rules?: BrandHandling },
 ) => {
   const { $defs = {}, properties = {} } = z.toJSONSchema(
     z.object({ subject }), // avoiding "document root" references
@@ -525,10 +524,16 @@ const depict = (
         unref(zodCtx.jsonSchema);
         const { brand } =
           globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
-        rules[
-          brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type
-        ]?.(zodCtx, ctx);
-        onEach(zodCtx, ctx);
+        const depicter =
+          rules[
+            brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type
+          ];
+        if (depicter) {
+          const overrides = { ...depicter(zodCtx, ctx) };
+          for (const key in zodCtx.jsonSchema) delete zodCtx.jsonSchema[key];
+          Object.assign(zodCtx.jsonSchema, overrides);
+        }
+        Object.assign(zodCtx.jsonSchema, onEach(zodCtx, ctx));
       },
     },
   ) as JSONSchema.ObjectSchema;
@@ -587,7 +592,7 @@ export const depictResponse = ({
   if (!mimeTypes) return { description };
   const depictedSchema = excludeExamplesFromDepiction(
     depict(schema, {
-      rules: { ...brandHandling, ...overrides },
+      rules: { ...brandHandling, ...depicters },
       ctx: { isResponse: true, makeRef, path, method },
     }),
   );
@@ -709,7 +714,7 @@ export const depictBody = ({
 }) => {
   const [withoutParams, hasRequired] = excludeParamsFromDepiction(
     depict(schema, {
-      rules: { ...brandHandling, ...overrides },
+      rules: { ...brandHandling, ...depicters },
       ctx: { isResponse: false, makeRef, path, method },
     }),
     paramNames,

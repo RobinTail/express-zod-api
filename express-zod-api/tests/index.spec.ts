@@ -12,7 +12,7 @@ import {
   CommonConfig,
   CookieSecurity,
   HeaderSecurity,
-  Overrider,
+  Depicter,
   FlatObject,
   IOSchema,
   InputSecurity,
@@ -40,8 +40,13 @@ describe("Index Entrypoint", () => {
 
     test("Convenience types should be exposed", () => {
       expectTypeOf(
-        ({}: { zodSchema: $ZodType; jsonSchema: JSONSchema.BaseSchema }) => {},
-      ).toExtend<Overrider>();
+        ({
+          jsonSchema,
+        }: {
+          zodSchema: $ZodType;
+          jsonSchema: JSONSchema.BaseSchema;
+        }) => jsonSchema,
+      ).toExtend<Depicter>();
       expectTypeOf(() =>
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
       ).toExtend<Producer>();

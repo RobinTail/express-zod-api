@@ -127,8 +127,9 @@ describe("Documentation helpers", () => {
         default: "2025-05-21",
         format: "date-time",
       };
-      onDefault({ zodSchema, jsonSchema }, responseCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onDefault({ zodSchema, jsonSchema }, responseCtx),
+      ).toMatchSnapshot();
     });
   });
 
@@ -138,21 +139,21 @@ describe("Documentation helpers", () => {
         type: "object",
         properties: { raw: { format: "binary", type: "string" } },
       };
-      onRaw({ zodSchema: z.never(), jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onRaw({ zodSchema: z.never(), jsonSchema }, requestCtx),
+      ).toMatchSnapshot();
     });
   });
 
   describe("onUpload()", () => {
-    const jsonSchema: JSONSchema.BaseSchema = {};
-    const zodSchema = z.never();
     test("should set format:binary and type:string", () => {
-      onUpload({ zodSchema, jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onUpload({ zodSchema: z.never(), jsonSchema: {} }, requestCtx),
+      ).toMatchSnapshot();
     });
     test("should throw when using in response", () => {
       expect(() =>
-        onUpload({ zodSchema, jsonSchema }, responseCtx),
+        onUpload({ zodSchema: z.never(), jsonSchema: {} }, responseCtx),
       ).toThrowErrorMatchingSnapshot();
     });
   });
@@ -165,8 +166,9 @@ describe("Documentation helpers", () => {
       { anyOf: [], type: "string" },
       {},
     ])("should set type:string and format accordingly %#", (jsonSchema) => {
-      onFile({ zodSchema: z.never(), jsonSchema }, responseCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onFile({ zodSchema: z.never(), jsonSchema }, responseCtx),
+      ).toMatchSnapshot();
     });
   });
 
@@ -179,9 +181,9 @@ describe("Documentation helpers", () => {
           error: z.object({ message: z.string() }),
         }),
       ]);
-      const jsonSchema: JSONSchema.BaseSchema = {};
-      onUnion({ zodSchema, jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onUnion({ zodSchema, jsonSchema: {} }, requestCtx),
+      ).toMatchSnapshot();
     });
   });
 
@@ -197,8 +199,9 @@ describe("Documentation helpers", () => {
           { type: "object", properties: { two: { type: "number" } } },
         ],
       };
-      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx),
+      ).toMatchSnapshot();
     });
 
     test("should flatten objects with same prop of same type", () => {
@@ -208,8 +211,9 @@ describe("Documentation helpers", () => {
           { type: "object", properties: { one: { type: "number" } } },
         ],
       };
-      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx),
+      ).toMatchSnapshot();
     });
 
     test("should NOT flatten object schemas having conflicting props", () => {
@@ -219,8 +223,9 @@ describe("Documentation helpers", () => {
           { type: "object", properties: { one: { type: "string" } } },
         ],
       };
-      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx),
+      ).toMatchSnapshot();
     });
 
     test("should merge examples deeply", () => {
@@ -238,8 +243,9 @@ describe("Documentation helpers", () => {
           },
         ],
       };
-      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx),
+      ).toMatchSnapshot();
     });
 
     test("should maintain uniqueness in the array of required props", () => {
@@ -249,8 +255,9 @@ describe("Documentation helpers", () => {
           { type: "object", properties: { test: { const: 5 } } },
         ],
       };
-      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx),
+      ).toMatchSnapshot();
     });
 
     test.each<JSONSchema.BaseSchema>([
@@ -272,8 +279,9 @@ describe("Documentation helpers", () => {
         allOf: [{ type: "number" }, { const: 5 }], // not objects
       },
     ])("should fall back to allOf in other cases %#", (jsonSchema) => {
-      onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx);
-      expect(jsonSchema).toHaveProperty("allOf");
+      expect(
+        onIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx),
+      ).toHaveProperty("allOf");
     });
   });
 
@@ -284,8 +292,9 @@ describe("Documentation helpers", () => {
         const jsonSchema: JSONSchema.BaseSchema = {
           anyOf: [{ type: "string" }, { type: "null" }],
         };
-        onNullable({ zodSchema: z.never(), jsonSchema }, ctx);
-        expect(jsonSchema).toMatchSnapshot();
+        expect(
+          onNullable({ zodSchema: z.never(), jsonSchema }, ctx),
+        ).toMatchSnapshot();
       },
     );
 
@@ -293,16 +302,17 @@ describe("Documentation helpers", () => {
       const jsonSchema: JSONSchema.BaseSchema = {
         anyOf: [{ type: "null" }, { type: "null" }],
       };
-      onNullable({ zodSchema: z.never(), jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onNullable({ zodSchema: z.never(), jsonSchema }, requestCtx),
+      ).toMatchSnapshot();
     });
   });
 
   describe("onBigInt()", () => {
     test("should set type:string and format:bigint", () => {
-      const jsonSchema: JSONSchema.BaseSchema = {};
-      onBigInt({ zodSchema: z.never(), jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onBigInt({ zodSchema: z.never(), jsonSchema: {} }, requestCtx),
+      ).toMatchSnapshot();
     });
   });
 
@@ -311,9 +321,9 @@ describe("Documentation helpers", () => {
       z.tuple([z.boolean(), z.string(), z.literal("test")]),
       z.tuple([]),
     ])("should add items:not:{} when no rest %#", (zodSchema) => {
-      const jsonSchema: JSONSchema.BaseSchema = {};
-      onTuple({ zodSchema, jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onTuple({ zodSchema, jsonSchema: {} }, requestCtx),
+      ).toMatchSnapshot();
     });
   });
 
@@ -330,18 +340,16 @@ describe("Documentation helpers", () => {
         expected: "string (preprocess)",
       },
     ])("should depict as $expected", ({ zodSchema, ctx }) => {
-      const jsonSchema: JSONSchema.BaseSchema = {};
-      onPipeline({ zodSchema, jsonSchema }, ctx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(onPipeline({ zodSchema, jsonSchema: {} }, ctx)).toMatchSnapshot();
     });
 
     test.each([
       z.number().transform((num) => () => num),
       z.number().transform(() => assert.fail("this should be handled")),
     ])("should handle edge cases %#", (zodSchema) => {
-      const jsonSchema: JSONSchema.BaseSchema = {};
-      onPipeline({ zodSchema, jsonSchema }, responseCtx);
-      expect(jsonSchema).toEqual({});
+      expect(onPipeline({ zodSchema, jsonSchema: {} }, responseCtx)).toEqual(
+        {},
+      );
     });
   });
 
@@ -494,9 +502,12 @@ describe("Documentation helpers", () => {
 
   describe("onDateIn", () => {
     test("should set type:string, pattern and format", () => {
-      const jsonSchema: JSONSchema.BaseSchema = { anyOf: [] };
-      onDateIn({ zodSchema: z.never(), jsonSchema }, requestCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onDateIn(
+          { zodSchema: z.never(), jsonSchema: { anyOf: [] } },
+          requestCtx,
+        ),
+      ).toMatchSnapshot();
     });
     test("should throw when ZodDateIn in response", () => {
       expect(() =>
@@ -507,9 +518,9 @@ describe("Documentation helpers", () => {
 
   describe("onDateOut", () => {
     test("should set type:string, description and format", () => {
-      const jsonSchema: JSONSchema.BaseSchema = {};
-      onDateOut({ zodSchema: z.never(), jsonSchema }, responseCtx);
-      expect(jsonSchema).toMatchSnapshot();
+      expect(
+        onDateOut({ zodSchema: z.never(), jsonSchema: {} }, responseCtx),
+      ).toMatchSnapshot();
     });
     test("should throw when ZodDateOut in request", () => {
       expect(() =>
