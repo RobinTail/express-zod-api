@@ -55,6 +55,15 @@ const rangeWithComma = (
     node.range[1] + (ctx.sourceCode.getTokenAfter(node)?.value === "," ? 1 : 0),
   ] as const;
 
+const propRemover =
+  (ctx: TSESLint.RuleContext<string, unknown[]>) => (node: NamedProp) =>
+    ctx.report({
+      node,
+      messageId: "remove",
+      data: { subject: node.key.name },
+      fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
+    });
+
 const v24 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
@@ -70,20 +79,8 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
   defaultOptions: [],
   create: (ctx) =>
     listen({
-      numericRange: (node) =>
-        ctx.report({
-          node,
-          messageId: "remove",
-          data: { subject: node.key.name },
-          fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
-        }),
-      optionalPropStyle: (node) =>
-        ctx.report({
-          node,
-          messageId: "remove",
-          data: { subject: node.key.name },
-          fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
-        }),
+      numericRange: propRemover(ctx),
+      optionalPropStyle: propRemover(ctx),
       depicter: (node) => {
         const [first, second] = node.params;
         if (first?.type !== NT.Identifier) return;
