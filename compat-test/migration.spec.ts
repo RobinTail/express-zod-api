@@ -2,9 +2,8 @@ import { readFile } from "node:fs/promises";
 import { describe, test, expect } from "vitest";
 
 describe("Migration", () => {
-  // @todo update
-  test.skip("should fix the import", async () => {
+  test("should fix the import", async () => {
     const fixed = await readFile("./sample.ts", "utf-8");
-    expect(fixed).toBe("const test: HeaderSecurity = {};\n");
+    expect(fixed).toBe("new Documentation({  });\n");
   });
 });
