@@ -61,8 +61,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Deprecated schemas and routes](#deprecated-schemas-and-routes)
    6. [Customizable brands handling](#customizable-brands-handling)
 8. [Caveats](#caveats)
-   1. [Coercive schema of Zod](#coercive-schema-of-zod)
-   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
 
 You can find the release notes and migration guides in [Changelog](CHANGELOG.md).
@@ -1428,16 +1427,6 @@ new Integration({
 
 There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
-
-## Coercive schema of Zod
-
-Despite being supported by the framework, `z.coerce.*` schema
-[does not work intuitively](https://github.com/RobinTail/express-zod-api/issues/759).
-Please be aware that `z.coerce.number()` and `z.number({ coerce: true })` (being typed not well) still will NOT allow
-you to assign anything but number. Moreover, coercive schemas are not fail-safe and their methods `.isOptional()` and
-`.isNullable()` [are buggy](https://github.com/colinhacks/zod/issues/1911). If possible, try to avoid using this type
-of schema. This issue [will NOT be fixed](https://github.com/colinhacks/zod/issues/1760#issuecomment-1407816838) in
-Zod version 3.x.
 
 ## Excessive properties in endpoint output
 
