@@ -12,7 +12,9 @@ interface Queries {
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  numericRange: `${NT.NewExpression}[callee.name='Documentation'] > ${NT.ObjectExpression} > ${NT.Property}[key.name='numericRange']`,
+  numericRange:
+    `${NT.NewExpression}[callee.name='Documentation'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='numericRange']`,
 };
 
 const listen = <
