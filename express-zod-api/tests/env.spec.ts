@@ -96,6 +96,12 @@ describe("Environment checks", () => {
       expect(Object.keys(schema._zod.def.shape)).toEqual(["one", "two"]);
       expect(schema._zod.def.optional).toEqual(["two"]);
     });
+
+    test("coerce is safe for nullable and optional", () => {
+      const boolSchema = z.coerce.boolean();
+      expect(boolSchema.isOptional()).toBeTruthy();
+      expect(boolSchema.isNullable()).toBeTruthy();
+    });
   });
 
   describe("Vitest error comparison", () => {
