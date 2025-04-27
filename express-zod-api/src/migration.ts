@@ -1,16 +1,29 @@
 import {
   ESLintUtils,
-  // AST_NODE_TYPES as NT,
+  AST_NODE_TYPES as NT,
   type TSESLint,
-  // type TSESTree,
+  type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- special case
 
-/*
-interface Queries {}
+type NamedProp = TSESTree.PropertyNonComputedName & {
+  key: TSESTree.Identifier;
+};
+
+interface Queries {
+  numericRange: NamedProp;
+  optionalPropStyle: NamedProp;
+}
 
 type Listener = keyof Queries;
 
-const queries: Record<Listener, string> = {};
+const queries: Record<Listener, string> = {
+  numericRange:
+    `${NT.NewExpression}[callee.name='Documentation'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='numericRange']`,
+  optionalPropStyle:
+    `${NT.NewExpression}[callee.name='Integration'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='optionalPropStyle']`,
+};
 
 const listen = <
   S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
@@ -24,7 +37,15 @@ const listen = <
       }),
     {},
   );
-*/
+
+const rangeWithComma = (
+  node: TSESTree.Node,
+  ctx: TSESLint.RuleContext<string, unknown[]>,
+) =>
+  [
+    node.range[0],
+    node.range[1] + (ctx.sourceCode.getTokenAfter(node)?.value === "," ? 1 : 0),
+  ] as const;
 
 const v24 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
@@ -33,12 +54,29 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
     schema: [],
     messages: {
       change: "change {{ subject }} from {{ from }} to {{ to }}",
-      add: `add {{ subject }} to {{ to }}`,
+      add: "add {{ subject }} to {{ to }}",
       move: "move {{ subject }} to {{ to }}",
+      remove: "remove {{ subject }}",
     },
   },
   defaultOptions: [],
-  create: () => ({}),
+  create: (ctx) =>
+    listen({
+      numericRange: (node) =>
+        ctx.report({
+          node,
+          messageId: "remove",
+          data: { subject: node.key.name },
+          fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
+        }),
+      optionalPropStyle: (node) =>
+        ctx.report({
+          node,
+          messageId: "remove",
+          data: { subject: node.key.name },
+          fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
+        }),
+    }),
 });
 
 /**
@@ -50,7 +88,7 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
  *          import migration from "express-zod-api/migration";
  *          export default [
  *            { languageOptions: {parser}, plugins: {migration} },
- *            { files: ["**\/*.ts"], rules: { "migration/v21": "error" } }
+ *            { files: ["**\/*.ts"], rules: { "migration/v24": "error" } }
  *          ];
  * */
 export default {
