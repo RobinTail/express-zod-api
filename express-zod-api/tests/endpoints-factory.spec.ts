@@ -346,8 +346,9 @@ describe("EndpointsFactory", () => {
         output: z.object({}),
         handler: vi.fn(),
       });
-      /** @see $InferObjectOutput - external logic */
-      expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<object>();
+      expectTypeOf(
+        endpoint.inputSchema._zod.output,
+      ).toEqualTypeOf<EmptyObject>();
       expect(endpoint.isDeprecated).toBe(true);
     });
   });
@@ -359,7 +360,7 @@ describe("EndpointsFactory", () => {
         handler: async () => {},
       });
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.outputSchema).toExtend<EmptySchema>();
+      expectTypeOf(endpoint.outputSchema.shape).toExtend<EmptyObject>();
     });
   });
 });
