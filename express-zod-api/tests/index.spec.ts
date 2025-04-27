@@ -12,7 +12,7 @@ import {
   CommonConfig,
   CookieSecurity,
   HeaderSecurity,
-  Overrider,
+  Depicter,
   FlatObject,
   IOSchema,
   InputSecurity,
@@ -46,7 +46,7 @@ describe("Index Entrypoint", () => {
           zodSchema: $ZodType;
           jsonSchema: JSONSchema.BaseSchema;
         }) => jsonSchema,
-      ).toExtend<Overrider>();
+      ).toExtend<Depicter>();
       expectTypeOf(() =>
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
       ).toExtend<Producer>();

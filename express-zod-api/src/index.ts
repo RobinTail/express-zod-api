@@ -33,7 +33,7 @@ export { EventStreamFactory } from "./sse";
 export { ez } from "./proprietary-schemas";
 
 // Convenience types
-export type { Overrider } from "./documentation-helpers";
+export type { Depicter } from "./documentation-helpers";
 export type { Producer } from "./zts-helpers";
 
 // Interfaces exposed for augmentation

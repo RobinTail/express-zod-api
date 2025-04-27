@@ -9,7 +9,7 @@ import {
   defaultEndpointsFactory,
   ez,
   ResultHandler,
-  Overrider,
+  Depicter,
 } from "../src";
 import { contentTypes } from "../src/content-type";
 import { z } from "zod";
@@ -1185,7 +1185,7 @@ describe("Documentation", () => {
   describe("Feature #1470: Custom brands", () => {
     test("should be handled accordingly in request, response and params", () => {
       const deep = Symbol("DEEP");
-      const rule: Overrider = ({ jsonSchema }) => ({
+      const rule: Depicter = ({ jsonSchema }) => ({
         ...jsonSchema,
         type: "boolean",
       });
