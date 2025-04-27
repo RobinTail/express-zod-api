@@ -64,7 +64,7 @@ interface DocumentationParams {
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
-   * @example { MyBrand: ( schema: typeof myBrandSchema, { jsonSchema } ) => ({ type: "object" })
+   * @example { MyBrand: ( { zodSchema, jsonSchema } ) => ({ type: "object" })
    */
   brandHandling?: BrandHandling;
   /**
@@ -140,9 +140,9 @@ export class Documentation extends OpenApiBuilder {
     version,
     serverUrl,
     descriptions,
+    brandHandling,
     tags,
     isHeader,
-    brandHandling,
     hasSummaryFromDescription = true,
     composition = "inline",
   }: DocumentationParams) {
