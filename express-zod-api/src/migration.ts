@@ -12,6 +12,8 @@ type NamedProp = TSESTree.PropertyNonComputedName & {
 interface Queries {
   numericRange: NamedProp;
   optionalPropStyle: NamedProp;
+  depicter: TSESTree.ArrowFunctionExpression;
+  nextCall: TSESTree.CallExpression;
 }
 
 type Listener = keyof Queries;
@@ -23,6 +25,12 @@ const queries: Record<Listener, string> = {
   optionalPropStyle:
     `${NT.NewExpression}[callee.name='Integration'] > ` +
     `${NT.ObjectExpression} > ${NT.Property}[key.name='optionalPropStyle']`,
+  depicter:
+    `${NT.VariableDeclarator}[id.typeAnnotation.typeAnnotation.typeName.name='Depicter'] > ` +
+    `${NT.ArrowFunctionExpression}`,
+  nextCall:
+    `${NT.VariableDeclarator}[id.typeAnnotation.typeAnnotation.typeName.name='Depicter'] > ` +
+    `${NT.ArrowFunctionExpression} ${NT.CallExpression}[callee.name='next']`,
 };
 
 const listen = <
@@ -75,6 +83,45 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
           messageId: "remove",
           data: { subject: node.key.name },
           fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
+        }),
+      depicter: (node) => {
+        const [first, second] = node.params;
+        if (first?.type !== NT.Identifier) return;
+        const zodSchemaAlias = first.name;
+        if (second?.type !== NT.ObjectPattern) return;
+        const nextFn = second.properties.find(
+          (one) =>
+            one.type === NT.Property &&
+            one.key.type === NT.Identifier &&
+            one.key.name === "next",
+        );
+        ctx.report({
+          node,
+          messageId: "change",
+          data: {
+            subject: "arguments",
+            from: `[${zodSchemaAlias}, { next, ...rest }]`,
+            to: `[{ zodSchema: ${zodSchemaAlias}, jsonSchema }, { ...rest }]`,
+          },
+          fix: (fixer) => {
+            const fixes = [
+              fixer.replaceText(
+                first,
+                `{ zodSchema: ${zodSchemaAlias}, jsonSchema }`,
+              ),
+            ];
+            if (nextFn)
+              fixes.push(fixer.removeRange(rangeWithComma(nextFn, ctx)));
+            return fixes;
+          },
+        });
+      },
+      nextCall: (node) =>
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "statement", from: "next()", to: "jsonSchema" },
+          fix: (fixer) => fixer.replaceText(node, "jsonSchema"),
         }),
     }),
 });

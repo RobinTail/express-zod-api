@@ -18,7 +18,11 @@ describe("Migration", () => {
   });
 
   tester.run("v24", migration.rules.v24, {
-    valid: [`new Documentation({});`, `new Integration({})`],
+    valid: [
+      `new Documentation({});`,
+      `new Integration({})`,
+      `const rule: Depicter = () => {}`,
+    ],
     invalid: [
       {
         code: `new Documentation({ numericRange: {}, });`,
@@ -37,6 +41,28 @@ describe("Migration", () => {
           {
             messageId: "remove",
             data: { subject: "optionalPropStyle" },
+          },
+        ],
+      },
+      {
+        code:
+          `const rule: Depicter = (schema, { next, path, method, isResponse }) ` +
+          `=> ({ ...next(schema.unwrap()), summary: "test" })`,
+        output:
+          `const rule: Depicter = ({ zodSchema: schema, jsonSchema }, {  path, method, isResponse }) ` +
+          `=> ({ ...jsonSchema, summary: "test" })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "arguments",
+              from: "[schema, { next, ...rest }]",
+              to: "[{ zodSchema: schema, jsonSchema }, { ...rest }]",
+            },
+          },
+          {
+            messageId: "change",
+            data: { subject: "statement", from: "next()", to: "jsonSchema" },
           },
         ],
       },
