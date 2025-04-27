@@ -193,12 +193,9 @@ export const onIntersection: Depicter = ({ jsonSchema }) => {
 
 /** @since OAS 3.1 nullable replaced with type array having null */
 export const onNullable: Depicter = ({ jsonSchema }) => {
-  if (jsonSchema.anyOf) {
-    const original = jsonSchema.anyOf[0];
-    return Object.assign(original, { type: makeNullableType(original.type) });
-  }
-
-  return jsonSchema;
+  if (!jsonSchema.anyOf) return jsonSchema;
+  const original = jsonSchema.anyOf[0];
+  return Object.assign(original, { type: makeNullableType(original.type) });
 };
 
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
