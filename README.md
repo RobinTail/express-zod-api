@@ -1402,7 +1402,7 @@ import {
 const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for this purpose
 const myBrandedSchema = z.string().brand(myBrand);
 
-const ruleForDocs: Overrider = (
+const ruleForDocs: Depicter = (
   { zodSchema, jsonSchema }, // jsonSchema is the default depiction
   { path, method, isResponse },
 ) => ({
