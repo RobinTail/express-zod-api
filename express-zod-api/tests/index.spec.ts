@@ -40,7 +40,12 @@ describe("Index Entrypoint", () => {
 
     test("Convenience types should be exposed", () => {
       expectTypeOf(
-        ({}: { zodSchema: $ZodType; jsonSchema: JSONSchema.BaseSchema }) => {},
+        ({
+          jsonSchema,
+        }: {
+          zodSchema: $ZodType;
+          jsonSchema: JSONSchema.BaseSchema;
+        }) => jsonSchema,
       ).toExtend<Overrider>();
       expectTypeOf(() =>
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
