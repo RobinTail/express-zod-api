@@ -93,7 +93,7 @@ export class Documentation extends OpenApiBuilder {
     name = this.#references.get(key),
   ): ReferenceObject {
     if (!name) {
-      name = `Schema${Object.keys(this.rootDoc.components?.schemas || {}).length + 1}`;
+      name = `Schema${this.#references.size + 1}`;
       this.#references.set(key, name);
     }
     this.addSchema(name, subject);
