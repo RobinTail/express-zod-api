@@ -425,7 +425,7 @@ export const depictRequestParams = ({
             : undefined;
       if (!location) return acc;
       const depicted = depict(paramSchema, {
-        rules: { ...brandHandling, ...overrides },
+        rules: { ...brandHandling, ...depicters },
         ctx: { isResponse: false, makeRef, path, method },
       });
       const result =
@@ -446,7 +446,7 @@ export const depictRequestParams = ({
   );
 };
 
-const overrides: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
+const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
   {
     nullable: onNullable,
     default: onDefault,
@@ -516,7 +516,7 @@ const unref = (
 
 const depict = (
   subject: $ZodType,
-  { ctx, rules = overrides }: { ctx: OpenAPIContext; rules?: BrandHandling },
+  { ctx, rules = depicters }: { ctx: OpenAPIContext; rules?: BrandHandling },
 ) => {
   const { $defs = {}, properties = {} } = z.toJSONSchema(
     z.object({ subject }), // avoiding "document root" references
@@ -527,14 +527,14 @@ const depict = (
         unref(zodCtx.jsonSchema);
         const { brand } =
           globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
-        const overrider =
+        const depicter =
           rules[
             brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type
           ];
-        if (overrider) {
-          const tmp = { ...overrider(zodCtx, ctx) };
+        if (depicter) {
+          const overrides = { ...depicter(zodCtx, ctx) };
           for (const key in zodCtx.jsonSchema) delete zodCtx.jsonSchema[key];
-          Object.assign(zodCtx.jsonSchema, tmp);
+          Object.assign(zodCtx.jsonSchema, overrides);
         }
         Object.assign(zodCtx.jsonSchema, onEach(zodCtx, ctx));
       },
@@ -595,7 +595,7 @@ export const depictResponse = ({
   if (!mimeTypes) return { description };
   const depictedSchema = excludeExamplesFromDepiction(
     depict(schema, {
-      rules: { ...brandHandling, ...overrides },
+      rules: { ...brandHandling, ...depicters },
       ctx: { isResponse: true, makeRef, path, method },
     }),
   );
@@ -717,7 +717,7 @@ export const depictBody = ({
 }) => {
   const [withoutParams, hasRequired] = excludeParamsFromDepiction(
     depict(schema, {
-      rules: { ...brandHandling, ...overrides },
+      rules: { ...brandHandling, ...depicters },
       ctx: { isResponse: false, makeRef, path, method },
     }),
     paramNames,
