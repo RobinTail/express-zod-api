@@ -1185,7 +1185,10 @@ describe("Documentation", () => {
   describe("Feature #1470: Custom brands", () => {
     test("should be handled accordingly in request, response and params", () => {
       const deep = Symbol("DEEP");
-      const rule: Overrider = ({ jsonSchema }) => (jsonSchema.type = "boolean");
+      const rule: Overrider = ({ jsonSchema }) => ({
+        ...jsonSchema,
+        type: "boolean",
+      });
       const spec = new Documentation({
         config: sampleConfig,
         routing: {
@@ -1204,7 +1207,10 @@ describe("Documentation", () => {
           },
         },
         brandHandling: {
-          CUSTOM: ({ jsonSchema }) => (jsonSchema.summary = "My custom schema"),
+          CUSTOM: ({ jsonSchema }) => ({
+            ...jsonSchema,
+            summary: "My custom schema",
+          }),
           [deep]: rule,
         },
         version: "3.4.5",
