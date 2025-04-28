@@ -2,7 +2,7 @@ import { UploadedFile } from "express-fileupload";
 import { globalRegistry, z } from "zod";
 import type { $brand, $ZodType } from "@zod/core";
 import { ez } from "../src";
-import { hasNestedSchema } from "../src/deep-checks";
+import { hasNestedSchema } from "../src/deep-checks-2";
 import { metaSymbol } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
@@ -12,7 +12,9 @@ describe("Checks", () => {
       globalRegistry.get(subject)?.[metaSymbol]?.brand === ezUploadBrand;
 
     test("should return true for given argument satisfying condition", () => {
-      expect(hasNestedSchema(ez.upload(), { condition })).toBeTruthy();
+      expect(
+        hasNestedSchema(ez.upload(), { condition, io: "input" }),
+      ).toBeTruthy();
     });
 
     test.each([
@@ -26,7 +28,7 @@ describe("Checks", () => {
       ez.upload().refine(() => true),
       z.array(ez.upload()),
     ])("should return true for wrapped needle %#", (subject) => {
-      expect(hasNestedSchema(subject, { condition })).toBeTruthy();
+      expect(hasNestedSchema(subject, { condition, io: "input" })).toBeTruthy();
     });
 
     test.each([
@@ -36,10 +38,10 @@ describe("Checks", () => {
       z.boolean().and(z.literal(true)),
       z.number().or(z.string()),
     ])("should return false in other cases %#", (subject) => {
-      expect(hasNestedSchema(subject, { condition })).toBeFalsy();
+      expect(hasNestedSchema(subject, { condition, io: "input" })).toBeFalsy();
     });
 
-    test("should finish early", () => {
+    test("should finish early (from bottom to top)", () => {
       const subject = z.object({
         one: z.object({
           two: z.object({
@@ -47,9 +49,10 @@ describe("Checks", () => {
           }),
         }),
       });
-      const check = vi.fn((schema) => schema instanceof z.ZodObject);
+      const check = vi.fn((schema) => schema instanceof z.ZodNumber);
       hasNestedSchema(subject, {
         condition: check,
+        io: "input",
       });
       expect(check.mock.calls.length).toBe(1);
     });
