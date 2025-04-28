@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import * as R from "ramda";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
-import { hasForm, hasRaw, hasUpload } from "./deep-checks";
+import { findRequestTypeDefiningSchema } from "./deep-checks";
 import {
   FlatObject,
   getActualMethod,
@@ -15,16 +15,20 @@ import {
   OutputValidationError,
   ResultHandlerError,
 } from "./errors";
+import { ezFormBrand } from "./form-schema";
 import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer } from "./logical-container";
+import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
+import { ezRawBrand } from "./raw-schema";
 import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
+import { ezUploadBrand } from "./upload-schema";
 
 export type Handler<IN, OUT, OPT> = (params: {
   /** @desc The inputs from the enabled input sources validated against the final input schema (incl. Middlewares) */
@@ -137,13 +141,14 @@ export class Endpoint<
 
   /** @internal */
   public override get requestType() {
-    return hasUpload(this.#def.inputSchema)
-      ? "upload"
-      : hasRaw(this.#def.inputSchema)
-        ? "raw"
-        : hasForm(this.#def.inputSchema)
-          ? "form"
-          : "json";
+    const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
+    if (found) {
+      const { brand } = globalRegistry.get(found)?.[metaSymbol] || {};
+      if (brand === ezUploadBrand) return "upload";
+      if (brand === ezRawBrand) return "raw";
+      if (brand === ezFormBrand) return "form";
+    }
+    return "json";
   }
 
   /** @internal */
