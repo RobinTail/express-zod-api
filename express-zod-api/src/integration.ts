@@ -1,4 +1,3 @@
-import type { $ZodType } from "@zod/core";
 import * as R from "ramda";
 import ts from "typescript";
 import { z } from "zod";
@@ -67,22 +66,16 @@ interface FormattedPrintingOptions {
 
 export class Integration extends IntegrationBase {
   readonly #program: ts.Node[] = [this.someOfType];
-  readonly #aliases = new Map<
-    $ZodType | (() => $ZodType),
-    ts.TypeAliasDeclaration
-  >();
+  readonly #aliases = new Map<object, ts.TypeAliasDeclaration>();
   #usage: Array<ts.Node | string> = [];
 
-  #makeAlias(
-    schema: $ZodType | (() => $ZodType),
-    produce: () => ts.TypeNode,
-  ): ts.TypeNode {
-    let name = this.#aliases.get(schema)?.name?.text;
+  #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
+    let name = this.#aliases.get(key)?.name?.text;
     if (!name) {
       name = `Type${this.#aliases.size + 1}`;
       const temp = makeLiteralType(null);
-      this.#aliases.set(schema, makeType(name, temp));
-      this.#aliases.set(schema, makeType(name, produce()));
+      this.#aliases.set(key, makeType(name, temp));
+      this.#aliases.set(key, makeType(name, produce()));
     }
     return ensureTypeNode(name);
   }
