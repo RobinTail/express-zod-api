@@ -39,9 +39,9 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource } from "./config-type";
-import { contentTypes } from "./content-type";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
+import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { ezFileBrand } from "./file-schema";
 import { extractObjectSchema, IOSchema } from "./io-schema";
