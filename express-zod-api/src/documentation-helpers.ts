@@ -181,14 +181,13 @@ const intersect = (
   return R.map((fn) => fn(left, right), suitable);
 };
 
-export const depictIntersection: Depicter = ({ jsonSchema }) => {
-  if (jsonSchema.allOf) {
-    try {
-      return intersect(jsonSchema.allOf);
-    } catch {}
-  }
-  return jsonSchema;
-};
+export const depictIntersection = R.tryCatch<Depicter>(
+  ({ jsonSchema }) => {
+    if (!jsonSchema.allOf) throw new Error("Missing allOf");
+    return intersect(jsonSchema.allOf);
+  },
+  (_err, { jsonSchema }) => jsonSchema,
+);
 
 /** @since OAS 3.1 nullable replaced with type array having null */
 export const depictNullable: Depicter = ({ jsonSchema }) => {
