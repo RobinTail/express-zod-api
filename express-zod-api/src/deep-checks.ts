@@ -87,7 +87,7 @@ export const hasNestedSchema = (
 ): boolean => {
   if (condition?.(subject)) return true;
   if (depth >= maxDepth) return false;
-  const brand = globalRegistry.get(subject)?.[metaSymbol]?.brand;
+  const { brand } = globalRegistry.get(subject)?.[metaSymbol] ?? {};
   const handler =
     brand && brand in rules
       ? rules[brand as keyof typeof rules]
