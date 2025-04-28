@@ -1,17 +1,14 @@
-import * as R from "ramda";
 import type { $ZodShape } from "@zod/core";
 import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
-import { assertJsonCompatible } from "./deep-checks";
+import { findJsonIncompatible } from "./deep-checks";
 import { AbstractEndpoint } from "./endpoint";
 import { extractObjectSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 
 export class Diagnostics {
-  /** @desc (catcher)(...args) => bool | ReturnValue<typeof catcher> */
-  readonly #trier = R.tryCatch(assertJsonCompatible);
   #verifiedEndpoints = new WeakSet<AbstractEndpoint>();
   #verifiedPaths = new WeakMap<
     AbstractEndpoint,
@@ -35,23 +32,24 @@ export class Diagnostics {
       }
     }
     if (endpoint.requestType === "json") {
-      this.#trier((reason) =>
+      const reason = findJsonIncompatible(endpoint.inputSchema, "input");
+      if (reason) {
         this.logger.warn(
           "The final input schema of the endpoint contains an unsupported JSON payload type.",
           Object.assign(ctx, { reason }),
-        ),
-      )(endpoint.inputSchema, "input");
+        );
+      }
     }
     for (const variant of responseVariants) {
-      const catcher = this.#trier((reason) =>
-        this.logger.warn(
-          `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
-          Object.assign(ctx, { reason }),
-        ),
-      );
       for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
         if (!mimeTypes?.includes(contentTypes.json)) continue;
-        catcher(schema, "output");
+        const reason = findJsonIncompatible(schema, "output");
+        if (reason) {
+          this.logger.warn(
+            `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
+            Object.assign(ctx, { reason }),
+          );
+        }
       }
     }
     this.#verifiedEndpoints.add(endpoint);

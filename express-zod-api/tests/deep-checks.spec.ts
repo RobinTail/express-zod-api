@@ -2,18 +2,18 @@ import { UploadedFile } from "express-fileupload";
 import { globalRegistry, z } from "zod";
 import type { $brand, $ZodType } from "@zod/core";
 import { ez } from "../src";
-import { hasNestedSchema } from "../src/deep-checks";
+import { findNestedSchema } from "../src/deep-checks";
 import { metaSymbol } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("Checks", () => {
-  describe("hasNestedSchema()", () => {
+  describe("findNestedSchema()", () => {
     const condition = (subject: $ZodType) =>
       globalRegistry.get(subject)?.[metaSymbol]?.brand === ezUploadBrand;
 
     test("should return true for given argument satisfying condition", () => {
       expect(
-        hasNestedSchema(ez.upload(), { condition, io: "input" }),
+        findNestedSchema(ez.upload(), { condition, io: "input" }),
       ).toBeTruthy();
     });
 
@@ -28,7 +28,9 @@ describe("Checks", () => {
       ez.upload().refine(() => true),
       z.array(ez.upload()),
     ])("should return true for wrapped needle %#", (subject) => {
-      expect(hasNestedSchema(subject, { condition, io: "input" })).toBeTruthy();
+      expect(
+        findNestedSchema(subject, { condition, io: "input" }),
+      ).toBeTruthy();
     });
 
     test.each([
@@ -38,7 +40,9 @@ describe("Checks", () => {
       z.boolean().and(z.literal(true)),
       z.number().or(z.string()),
     ])("should return false in other cases %#", (subject) => {
-      expect(hasNestedSchema(subject, { condition, io: "input" })).toBeFalsy();
+      expect(
+        findNestedSchema(subject, { condition, io: "input" }),
+      ).toBeUndefined();
     });
 
     test("should finish early (from bottom to top)", () => {
@@ -50,7 +54,7 @@ describe("Checks", () => {
         }),
       });
       const check = vi.fn((schema) => schema instanceof z.ZodNumber);
-      hasNestedSchema(subject, {
+      findNestedSchema(subject, {
         condition: check,
         io: "input",
       });
