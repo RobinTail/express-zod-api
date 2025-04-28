@@ -21,8 +21,6 @@ import { globalRegistry } from "zod";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand } from "./file-schema";
-import { ezFormBrand } from "./form-schema";
-import { IOSchema } from "./io-schema";
 import { metaSymbol } from "./metadata";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
@@ -113,30 +111,6 @@ export const hasNestedSchema = (
   }
   return false;
 };
-
-export const hasUpload = (subject: IOSchema) =>
-  hasNestedSchema(subject, {
-    condition: (schema) =>
-      globalRegistry.get(schema)?.[metaSymbol]?.brand === ezUploadBrand,
-    rules: {
-      ...ioChecks,
-      [ezFormBrand]: ioChecks.object,
-    },
-  });
-
-export const hasRaw = (subject: IOSchema) =>
-  hasNestedSchema(subject, {
-    condition: (schema) =>
-      globalRegistry.get(schema)?.[metaSymbol]?.brand === ezRawBrand,
-    maxDepth: 3,
-  });
-
-export const hasForm = (subject: IOSchema) =>
-  hasNestedSchema(subject, {
-    condition: (schema) =>
-      globalRegistry.get(schema)?.[metaSymbol]?.brand === ezFormBrand,
-    maxDepth: 3,
-  });
 
 /** @throws AssertionError with incompatible schema constructor */
 export const assertJsonCompatible = (subject: $ZodType, dir: "in" | "out") =>
