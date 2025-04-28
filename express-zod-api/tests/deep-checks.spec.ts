@@ -2,7 +2,7 @@ import { UploadedFile } from "express-fileupload";
 import { globalRegistry, z } from "zod";
 import type { $brand, $ZodType } from "@zod/core";
 import { ez } from "../src";
-import { hasNestedSchema } from "../src/deep-checks-2";
+import { hasNestedSchema } from "../src/deep-checks";
 import { metaSymbol } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 

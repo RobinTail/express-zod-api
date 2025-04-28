@@ -41,7 +41,7 @@ import {
 import { InputSource } from "./config-type";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
-import { hasRaw } from "./deep-checks-2";
+import { hasRaw } from "./deep-checks";
 import { DocumentationError } from "./errors";
 import { ezFileBrand } from "./file-schema";
 import { extractObjectSchema, IOSchema } from "./io-schema";

@@ -40,7 +40,7 @@ export class Diagnostics {
           "The final input schema of the endpoint contains an unsupported JSON payload type.",
           Object.assign(ctx, { reason }),
         ),
-      )(endpoint.inputSchema, "in");
+      )(endpoint.inputSchema, "input");
     }
     for (const variant of responseVariants) {
       const catcher = this.#trier((reason) =>
@@ -51,7 +51,7 @@ export class Diagnostics {
       );
       for (const { mimeTypes, schema } of endpoint.getResponses(variant)) {
         if (!mimeTypes?.includes(contentTypes.json)) continue;
-        catcher(schema, "out");
+        catcher(schema, "output");
       }
     }
     this.#verifiedEndpoints.add(endpoint);

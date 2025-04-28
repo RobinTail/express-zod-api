@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as R from "ramda";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
-import { hasForm, hasRaw, hasUpload } from "./deep-checks-2";
+import { hasForm, hasRaw, hasUpload } from "./deep-checks";
 import {
   FlatObject,
   getActualMethod,
