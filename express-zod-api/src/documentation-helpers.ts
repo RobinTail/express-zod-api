@@ -27,7 +27,6 @@ import { ResponseVariant } from "./api-response";
 import {
   combinations,
   doesAccept,
-  FlatObject,
   getExamples,
   getRoutePathParams,
   getTransformedType,
@@ -343,12 +342,10 @@ export const depictExamples = (
   schema: $ZodType,
   isResponse: boolean,
   omitProps: string[] = [],
-): ExamplesObject | undefined => {
-  const isObject = (subj: unknown): subj is FlatObject =>
-    R.type(subj) === "Object";
-  return R.pipe(
+): ExamplesObject | undefined =>
+  R.pipe(
     getExamples,
-    R.map(R.when(isObject, R.omit(omitProps))),
+    R.map(R.when(R.is(Object), R.omit(omitProps))),
     enumerateExamples,
   )({
     schema,
@@ -356,21 +353,17 @@ export const depictExamples = (
     validate: true,
     pullProps: true,
   });
-};
 
 export const depictParamExamples = (
   schema: z.ZodType,
   param: string,
-): ExamplesObject | undefined => {
-  const isObject = (subj: unknown): subj is FlatObject =>
-    R.type(subj) === "Object";
-  return R.pipe(
+): ExamplesObject | undefined =>
+  R.pipe(
     getExamples,
-    R.filter(R.both(isObject, R.has(param))),
+    R.filter(R.both(R.is(Object), R.has(param))),
     R.pluck(param),
     enumerateExamples,
   )({ schema, variant: "original", validate: true, pullProps: true });
-};
 
 export const defaultIsHeader = (
   name: string,
