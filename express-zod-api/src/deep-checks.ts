@@ -34,32 +34,17 @@ export const findNestedSchema = (
     (err: DeepCheckError) => err.cause,
   )();
 
-export const hasUpload = (subject: IOSchema) =>
-  Boolean(
-    findNestedSchema(subject, {
-      condition: (schema) =>
-        globalRegistry.get(schema)?.[metaSymbol]?.brand === ezUploadBrand,
-      io: "input",
-    }),
-  );
-
-export const hasRaw = (subject: IOSchema) =>
-  Boolean(
-    findNestedSchema(subject, {
-      condition: (schema) =>
-        globalRegistry.get(schema)?.[metaSymbol]?.brand === ezRawBrand,
-      io: "input",
-    }),
-  );
-
-export const hasForm = (subject: IOSchema) =>
-  Boolean(
-    findNestedSchema(subject, {
-      condition: (schema) =>
-        globalRegistry.get(schema)?.[metaSymbol]?.brand === ezFormBrand,
-      io: "input",
-    }),
-  );
+export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
+  findNestedSchema(subject, {
+    condition: (schema) => {
+      const { brand } = globalRegistry.get(schema)?.[metaSymbol] || {};
+      return (
+        typeof brand === "symbol" &&
+        [ezUploadBrand, ezRawBrand, ezFormBrand].includes(brand)
+      );
+    },
+    io: "input",
+  });
 
 const unsupported: FirstPartyKind[] = [
   "nan",
