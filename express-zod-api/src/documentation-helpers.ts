@@ -39,9 +39,9 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource } from "./config-type";
+import { contentTypes } from "./content-type";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
-import { hasRaw } from "./deep-checks";
 import { DocumentationError } from "./errors";
 import { ezFileBrand } from "./file-schema";
 import { extractObjectSchema, IOSchema } from "./io-schema";
@@ -729,7 +729,7 @@ export const depictBody = ({
     description,
     content: { [mimeType]: media },
   };
-  if (hasRequired || hasRaw(schema)) body.required = true;
+  if (hasRequired || mimeType === contentTypes.raw) body.required = true;
   return body;
 };
 
