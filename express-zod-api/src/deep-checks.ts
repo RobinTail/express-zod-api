@@ -3,6 +3,7 @@ import type {
   $ZodCatch,
   $ZodDefault,
   $ZodDiscriminatedUnion,
+  $ZodInterface,
   $ZodIntersection,
   $ZodLazy,
   $ZodNullable,
@@ -17,7 +18,6 @@ import type {
 } from "@zod/core";
 import { fail } from "node:assert/strict"; // eslint-disable-line no-restricted-syntax -- acceptable
 import { globalRegistry } from "zod";
-import { EmptyObject } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { ezFileBrand } from "./file-schema";
@@ -34,8 +34,9 @@ import {
 } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
 
+type CheckContext = { visited: WeakSet<object> };
 /** @desc Check is a schema handling rule returning boolean */
-type Check = SchemaHandler<boolean>;
+type Check = SchemaHandler<boolean, CheckContext>;
 
 const onSomeUnion: Check = (
   { _zod }: $ZodUnion | $ZodDiscriminatedUnion,
@@ -52,9 +53,13 @@ const onWrapped: Check = (
   { next },
 ) => next(def.innerType);
 
-const ioChecks: HandlingRules<boolean, EmptyObject, FirstPartyKind> = {
+const ioChecks: HandlingRules<boolean, CheckContext, FirstPartyKind> = {
   object: ({ _zod }: $ZodObject, { next }) =>
     Object.values(_zod.def.shape).some(next),
+  interface: (int: $ZodInterface, { next, visited }) =>
+    visited.has(int)
+      ? false
+      : visited.add(int) && Object.values(int._zod.def.shape).some(next),
   union: onSomeUnion,
   intersection: onIntersection,
   optional: onWrapped,
@@ -64,11 +69,11 @@ const ioChecks: HandlingRules<boolean, EmptyObject, FirstPartyKind> = {
   array: ({ _zod }: $ZodArray, { next }) => next(_zod.def.element),
 };
 
-interface NestedSchemaLookupProps {
+interface NestedSchemaLookupProps extends Partial<CheckContext> {
   condition?: (schema: $ZodType) => boolean;
   rules?: HandlingRules<
     boolean,
-    EmptyObject,
+    CheckContext,
     FirstPartyKind | ProprietaryBrand
   >;
   maxDepth?: number;
@@ -83,6 +88,7 @@ export const hasNestedSchema = (
     rules = ioChecks,
     depth = 1,
     maxDepth = Number.POSITIVE_INFINITY,
+    visited = new WeakSet(),
   }: NestedSchemaLookupProps,
 ): boolean => {
   if (condition?.(subject)) return true;
@@ -94,14 +100,16 @@ export const hasNestedSchema = (
       : rules[subject._zod.def.type];
   if (handler) {
     return handler(subject, {
+      visited,
       next: (schema) =>
         hasNestedSchema(schema, {
           condition,
           rules,
           maxDepth,
+          visited,
           depth: depth + 1,
         }),
-    } as EmptyObject & NextHandlerInc<boolean>);
+    } as CheckContext & NextHandlerInc<boolean>);
   }
   return false;
 };
@@ -131,19 +139,18 @@ export const hasForm = (subject: IOSchema) =>
   });
 
 /** @throws AssertionError with incompatible schema constructor */
-export const assertJsonCompatible = (subject: $ZodType, dir: "in" | "out") => {
-  const lazies = new WeakSet<() => $ZodType>();
-  return hasNestedSchema(subject, {
+export const assertJsonCompatible = (subject: $ZodType, dir: "in" | "out") =>
+  hasNestedSchema(subject, {
     maxDepth: 300,
     rules: {
       ...ioChecks,
       readonly: onWrapped,
       catch: onWrapped,
       pipe: ({ _zod }: $ZodPipe, { next }) => next(_zod.def[dir]),
-      lazy: ({ _zod: { def } }: $ZodLazy, { next }) =>
-        lazies.has(def.getter)
+      lazy: ({ _zod: { def } }: $ZodLazy, { next, visited }) =>
+        visited.has(def.getter)
           ? false
-          : lazies.add(def.getter) && next(def.getter()),
+          : visited.add(def.getter) && next(def.getter()),
       tuple: ({ _zod: { def } }: $ZodTuple, { next }) =>
         [...def.items].concat(def.rest ?? []).some(next),
       nan: () => fail("z.nan()"),
@@ -162,4 +169,3 @@ export const assertJsonCompatible = (subject: $ZodType, dir: "in" | "out") => {
       [ezFileBrand]: () => false,
     },
   });
-};
