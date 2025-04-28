@@ -103,20 +103,20 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const onDefault: Depicter = ({ zodSchema, jsonSchema }) => ({
+export const depictDefault: Depicter = ({ zodSchema, jsonSchema }) => ({
   ...jsonSchema,
   default:
     globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
     jsonSchema.default,
 });
 
-export const onUpload: Depicter = ({}, ctx) => {
+export const depictUpload: Depicter = ({}, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.upload() only for input.", ctx);
   return { type: "string", format: "binary" };
 };
 
-export const onFile: Depicter = ({ jsonSchema }) => ({
+export const depictFile: Depicter = ({ jsonSchema }) => ({
   type: "string",
   format:
     jsonSchema.type === "string"
@@ -126,7 +126,7 @@ export const onFile: Depicter = ({ jsonSchema }) => ({
       : "binary",
 });
 
-export const onUnion: Depicter = ({ zodSchema, jsonSchema }) => {
+export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
   if (!zodSchema._zod.disc) return jsonSchema;
   const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
   return {
@@ -181,7 +181,7 @@ const intersect = (
   return R.map((fn) => fn(left, right), suitable);
 };
 
-export const onIntersection: Depicter = ({ jsonSchema }) => {
+export const depictIntersection: Depicter = ({ jsonSchema }) => {
   if (jsonSchema.allOf) {
     try {
       return intersect(jsonSchema.allOf);
@@ -191,7 +191,7 @@ export const onIntersection: Depicter = ({ jsonSchema }) => {
 };
 
 /** @since OAS 3.1 nullable replaced with type array having null */
-export const onNullable: Depicter = ({ jsonSchema }) => {
+export const depictNullable: Depicter = ({ jsonSchema }) => {
   if (!jsonSchema.anyOf) return jsonSchema;
   const original = jsonSchema.anyOf[0];
   return Object.assign(original, { type: makeNullableType(original.type) });
@@ -225,7 +225,7 @@ const ensureCompliance = ({
   return valid;
 };
 
-export const onDateIn: Depicter = ({}, ctx) => {
+export const depictDateIn: Depicter = ({}, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
   return {
@@ -239,7 +239,7 @@ export const onDateIn: Depicter = ({}, ctx) => {
   };
 };
 
-export const onDateOut: Depicter = ({}, ctx) => {
+export const depictDateOut: Depicter = ({}, ctx) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
   return {
@@ -252,7 +252,7 @@ export const onDateOut: Depicter = ({}, ctx) => {
   };
 };
 
-export const onBigInt: Depicter = () => ({
+export const depictBigInt: Depicter = () => ({
   type: "string",
   format: "bigint",
   pattern: /^-?\d+$/.source,
@@ -262,7 +262,7 @@ export const onBigInt: Depicter = () => ({
  * @since OAS 3.1 using prefixItems for depicting tuples
  * @since 17.5.0 added rest handling, fixed tuple type
  */
-export const onTuple: Depicter = ({ zodSchema, jsonSchema }) => {
+export const depictTuple: Depicter = ({ zodSchema, jsonSchema }) => {
   if ((zodSchema as $ZodTuple)._zod.def.rest !== null) return jsonSchema;
   // does not appear to support items:false, so not:{} is a recommended alias
   return { ...jsonSchema, items: { not: {} } };
@@ -289,7 +289,7 @@ const makeNullableType = (
   );
 };
 
-export const onPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
+export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
   const target = (zodSchema as $ZodPipe)._zod.def[
     ctx.isResponse ? "out" : "in"
   ];
@@ -320,7 +320,7 @@ export const onPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
   return jsonSchema;
 };
 
-export const onRaw: Depicter = ({ jsonSchema }) => {
+export const depictRaw: Depicter = ({ jsonSchema }) => {
   if (jsonSchema.type !== "object") return jsonSchema;
   const objSchema = jsonSchema as JSONSchema.ObjectSchema;
   if (!objSchema.properties) return jsonSchema;
@@ -438,18 +438,18 @@ export const depictRequestParams = ({
 
 const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
   {
-    nullable: onNullable,
-    default: onDefault,
-    union: onUnion,
-    bigint: onBigInt,
-    intersection: onIntersection,
-    tuple: onTuple,
-    pipe: onPipeline,
-    [ezDateInBrand]: onDateIn,
-    [ezDateOutBrand]: onDateOut,
-    [ezUploadBrand]: onUpload,
-    [ezFileBrand]: onFile,
-    [ezRawBrand]: onRaw,
+    nullable: depictNullable,
+    default: depictDefault,
+    union: depictUnion,
+    bigint: depictBigInt,
+    intersection: depictIntersection,
+    tuple: depictTuple,
+    pipe: depictPipeline,
+    [ezDateInBrand]: depictDateIn,
+    [ezDateOutBrand]: depictDateOut,
+    [ezUploadBrand]: depictUpload,
+    [ezFileBrand]: depictFile,
+    [ezRawBrand]: depictRaw,
   };
 
 const onEach: Depicter = ({ zodSchema, jsonSchema }, { isResponse }) => {

@@ -1,5 +1,57 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Documentation helpers > depictBigInt() > should set type:string and format:bigint 1`] = `
+{
+  "format": "bigint",
+  "pattern": "^-?\\d+$",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
+{
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictDateIn > should throw when ZodDateIn in response 1`] = `
+DocumentationError({
+  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.dateOut() for output.",
+})
+`;
+
+exports[`Documentation helpers > depictDateOut > should set type:string, description and format 1`] = `
+{
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictDateOut > should throw when ZodDateOut in request 1`] = `
+DocumentationError({
+  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.dateIn() for input.",
+})
+`;
+
+exports[`Documentation helpers > depictDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
+{
+  "default": "Today",
+  "format": "date-time",
+}
+`;
+
 exports[`Documentation helpers > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
   "example1": {
@@ -34,6 +86,146 @@ exports[`Documentation helpers > depictExamples() > should 'transform' examples 
 }
 `;
 
+exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 0 1`] = `
+{
+  "format": "file",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 1 1`] = `
+{
+  "format": "binary",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 2 1`] = `
+{
+  "format": "byte",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 3 1`] = `
+{
+  "format": "file",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 4 1`] = `
+{
+  "format": "binary",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictIntersection() > should NOT flatten object schemas having conflicting props 1`] = `
+{
+  "allOf": [
+    {
+      "properties": {
+        "one": {
+          "type": "number",
+        },
+      },
+      "type": "object",
+    },
+    {
+      "properties": {
+        "one": {
+          "type": "string",
+        },
+      },
+      "type": "object",
+    },
+  ],
+}
+`;
+
+exports[`Documentation helpers > depictIntersection() > should flatten objects with same prop of same type 1`] = `
+{
+  "properties": {
+    "one": {
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictIntersection() > should flatten two object schemas 1`] = `
+{
+  "description": "some",
+  "properties": {
+    "one": {
+      "type": "number",
+    },
+    "two": {
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictIntersection() > should maintain uniqueness in the array of required props 1`] = `
+{
+  "properties": {
+    "test": {
+      "const": 5,
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictIntersection() > should merge examples deeply 1`] = `
+{
+  "examples": [
+    {
+      "a": 123,
+      "b": 456,
+    },
+  ],
+  "properties": {
+    "a": {
+      "type": "number",
+    },
+    "b": {
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictNullable() > should add null type to the first of anyOf 0 1`] = `
+{
+  "type": [
+    "string",
+    "null",
+  ],
+}
+`;
+
+exports[`Documentation helpers > depictNullable() > should add null type to the first of anyOf 1 1`] = `
+{
+  "type": [
+    "string",
+    "null",
+  ],
+}
+`;
+
+exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 1`] = `
+{
+  "type": "null",
+}
+`;
+
 exports[`Documentation helpers > depictParamExamples() > should pass examples for the given parameter 1`] = `
 {
   "example1": {
@@ -42,6 +234,25 @@ exports[`Documentation helpers > depictParamExamples() > should pass examples fo
   "example2": {
     "value": 456,
   },
+}
+`;
+
+exports[`Documentation helpers > depictPipeline > should depict as 'number (out)' 1`] = `
+{
+  "type": "number",
+}
+`;
+
+exports[`Documentation helpers > depictPipeline > should depict as 'string (preprocess)' 1`] = `
+{
+  "format": "string (preprocessed)",
+}
+`;
+
+exports[`Documentation helpers > depictRaw() > should extract the raw property 1`] = `
+{
+  "format": "binary",
+  "type": "string",
 }
 `;
 
@@ -383,6 +594,44 @@ exports[`Documentation helpers > depictTags() > should accept plain descriptions
 ]
 `;
 
+exports[`Documentation helpers > depictTuple() > should add items:not:{} when no rest 0 1`] = `
+{
+  "items": {
+    "not": {},
+  },
+}
+`;
+
+exports[`Documentation helpers > depictTuple() > should add items:not:{} when no rest 1 1`] = `
+{
+  "items": {
+    "not": {},
+  },
+}
+`;
+
+exports[`Documentation helpers > depictUnion() > should set discriminator prop for such union 1`] = `
+{
+  "discriminator": {
+    "propertyName": "status",
+  },
+}
+`;
+
+exports[`Documentation helpers > depictUpload() > should set format:binary and type:string 1`] = `
+{
+  "format": "binary",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictUpload() > should throw when using in response 1`] = `
+DocumentationError({
+  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
+  "message": "Please use ez.upload() only for input.",
+})
+`;
+
 exports[`Documentation helpers > excludeExamplesFromDepiction() > should remove example property of supplied object 1`] = `
 {
   "description": "test",
@@ -479,252 +728,3 @@ exports[`Documentation helpers > excludeParamsFromDepiction() > should omit spec
 `;
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should omit specified params 3 2`] = `false`;
-
-exports[`Documentation helpers > onBigInt() > should set type:string and format:bigint 1`] = `
-{
-  "format": "bigint",
-  "pattern": "^-?\\d+$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > onDateIn > should set type:string, pattern and format 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > onDateIn > should throw when ZodDateIn in response 1`] = `
-DocumentationError({
-  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Please use ez.dateOut() for output.",
-})
-`;
-
-exports[`Documentation helpers > onDateOut > should set type:string, description and format 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > onDateOut > should throw when ZodDateOut in request 1`] = `
-DocumentationError({
-  "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Please use ez.dateIn() for input.",
-})
-`;
-
-exports[`Documentation helpers > onDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
-{
-  "default": "Today",
-  "format": "date-time",
-}
-`;
-
-exports[`Documentation helpers > onFile() > should set type:string and format accordingly 0 1`] = `
-{
-  "format": "file",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > onFile() > should set type:string and format accordingly 1 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > onFile() > should set type:string and format accordingly 2 1`] = `
-{
-  "format": "byte",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > onFile() > should set type:string and format accordingly 3 1`] = `
-{
-  "format": "file",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > onFile() > should set type:string and format accordingly 4 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > onIntersection() > should NOT flatten object schemas having conflicting props 1`] = `
-{
-  "allOf": [
-    {
-      "properties": {
-        "one": {
-          "type": "number",
-        },
-      },
-      "type": "object",
-    },
-    {
-      "properties": {
-        "one": {
-          "type": "string",
-        },
-      },
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`Documentation helpers > onIntersection() > should flatten objects with same prop of same type 1`] = `
-{
-  "properties": {
-    "one": {
-      "type": "number",
-    },
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > onIntersection() > should flatten two object schemas 1`] = `
-{
-  "description": "some",
-  "properties": {
-    "one": {
-      "type": "number",
-    },
-    "two": {
-      "type": "number",
-    },
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > onIntersection() > should maintain uniqueness in the array of required props 1`] = `
-{
-  "properties": {
-    "test": {
-      "const": 5,
-      "type": "number",
-    },
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > onIntersection() > should merge examples deeply 1`] = `
-{
-  "examples": [
-    {
-      "a": 123,
-      "b": 456,
-    },
-  ],
-  "properties": {
-    "a": {
-      "type": "number",
-    },
-    "b": {
-      "type": "number",
-    },
-  },
-  "type": "object",
-}
-`;
-
-exports[`Documentation helpers > onNullable() > should add null type to the first of anyOf 0 1`] = `
-{
-  "type": [
-    "string",
-    "null",
-  ],
-}
-`;
-
-exports[`Documentation helpers > onNullable() > should add null type to the first of anyOf 1 1`] = `
-{
-  "type": [
-    "string",
-    "null",
-  ],
-}
-`;
-
-exports[`Documentation helpers > onNullable() > should not add null type when it's already there 1`] = `
-{
-  "type": "null",
-}
-`;
-
-exports[`Documentation helpers > onPipeline > should depict as 'number (out)' 1`] = `
-{
-  "type": "number",
-}
-`;
-
-exports[`Documentation helpers > onPipeline > should depict as 'string (preprocess)' 1`] = `
-{
-  "format": "string (preprocessed)",
-}
-`;
-
-exports[`Documentation helpers > onRaw() > should extract the raw property 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > onTuple() > should add items:not:{} when no rest 0 1`] = `
-{
-  "items": {
-    "not": {},
-  },
-}
-`;
-
-exports[`Documentation helpers > onTuple() > should add items:not:{} when no rest 1 1`] = `
-{
-  "items": {
-    "not": {},
-  },
-}
-`;
-
-exports[`Documentation helpers > onUnion() > should set discriminator prop for such union 1`] = `
-{
-  "discriminator": {
-    "propertyName": "status",
-  },
-}
-`;
-
-exports[`Documentation helpers > onUpload() > should set format:binary and type:string 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > onUpload() > should throw when using in response 1`] = `
-DocumentationError({
-  "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
-  "message": "Please use ez.upload() only for input.",
-})
-`;
