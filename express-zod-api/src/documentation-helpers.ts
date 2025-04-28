@@ -31,6 +31,7 @@ import {
   getExamples,
   getRoutePathParams,
   getTransformedType,
+  isObject,
   isSchema,
   makeCleanId,
   routePathParamsRegex,
@@ -343,12 +344,15 @@ export const depictExamples = (
   schema: $ZodType,
   isResponse: boolean,
   omitProps: string[] = [],
-): ExamplesObject | undefined => {
-  const isObject = (subj: unknown): subj is FlatObject =>
-    R.type(subj) === "Object";
-  return R.pipe(
+): ExamplesObject | undefined =>
+  R.pipe(
     getExamples,
-    R.map(R.when(isObject, R.omit(omitProps))),
+    R.map(
+      R.when(
+        (one): one is FlatObject => isObject(one) && !Array.isArray(one),
+        R.omit(omitProps),
+      ),
+    ),
     enumerateExamples,
   )({
     schema,
@@ -356,14 +360,11 @@ export const depictExamples = (
     validate: true,
     pullProps: true,
   });
-};
 
 export const depictParamExamples = (
   schema: z.ZodType,
   param: string,
 ): ExamplesObject | undefined => {
-  const isObject = (subj: unknown): subj is FlatObject =>
-    R.type(subj) === "Object";
   return R.pipe(
     getExamples,
     R.filter(R.both(isObject, R.has(param))),
