@@ -119,10 +119,9 @@ describe("zod-to-ts", () => {
       union: z.union([z.object({ number: z.number() }), z.literal("hi")]),
       enum: z.enum(["hi", "bye"]),
       intersectionWithTransform: z
-        .intersection(
-          z.intersection(z.number(), z.bigint()),
-          z.intersection(z.number(), z.string()),
-        )
+        .number()
+        .and(z.bigint())
+        .and(z.number().and(z.string()))
         .transform((arg) => console.log(arg)),
       date: z.date(),
       undefined: z.undefined(),
@@ -154,16 +153,14 @@ describe("zod-to-ts", () => {
       ),
       map: z.map(z.string(), z.array(z.object({ string: z.string() }))),
       set: z.set(z.string()),
-      intersection: z.intersection(z.string(), z.number()).or(z.bigint()),
+      intersection: z.string().and(z.number()).or(z.bigint()),
       promise: z.promise(z.number()),
       optDefaultString: z.string().optional().default("hi"),
-      refinedStringWithSomeBullshit: z.intersection(
-        z
-          .string()
-          .refine((val) => val.length > 10)
-          .or(z.number()),
-        z.bigint().nullish().default(1000n),
-      ),
+      refinedStringWithSomeBullshit: z
+        .string()
+        .refine((val) => val.length > 10)
+        .or(z.number())
+        .and(z.bigint().nullish().default(1000n)),
       nativeEnum: z.enum(Fruits),
       lazy: z.lazy(() => z.string()),
       discUnion: z.discriminatedUnion("kind", [
@@ -303,10 +300,7 @@ describe("zod-to-ts", () => {
       ],
       [z.object({}), z.object({})],
     ])("should deduplicate the prop with a same name", (a, b) => {
-      const schema = z.intersection(
-        z.object({ query: a }),
-        z.object({ query: b }),
-      );
+      const schema = z.object({ query: a }).and(z.object({ query: b }));
       const node = zodToTs(schema, { ctx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
@@ -331,7 +325,7 @@ describe("zod-to-ts", () => {
     ])(
       "should not flatten the result for objects with a conflicting prop %#",
       (a, b) => {
-        const node = zodToTs(z.intersection(a, b), { ctx });
+        const node = zodToTs(a.and(b), { ctx });
         expect(printNodeTest(node)).toMatchSnapshot();
       },
     );

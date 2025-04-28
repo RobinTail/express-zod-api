@@ -18,10 +18,7 @@ describe("Checks", () => {
     test.each([
       z.object({ test: ez.upload() }),
       ez.upload().or(z.boolean()),
-      z.intersection(
-        z.object({ test: z.boolean() }),
-        z.object({ test2: ez.upload() }),
-      ),
+      z.object({ test: z.boolean() }).and(z.object({ test2: ez.upload() })),
       z.optional(ez.upload()),
       ez.upload().nullable(),
       ez.upload().default({} as UploadedFile & $brand<symbol>),
@@ -36,7 +33,7 @@ describe("Checks", () => {
       z.object({}),
       z.any(),
       z.literal("test"),
-      z.intersection(z.boolean(), z.literal(true)),
+      z.boolean().and(z.literal(true)),
       z.number().or(z.string()),
     ])("should return false in other cases %#", (subject) => {
       expect(hasNestedSchema(subject, { condition })).toBeFalsy();

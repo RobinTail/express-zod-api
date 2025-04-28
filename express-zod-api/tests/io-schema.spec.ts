@@ -45,22 +45,15 @@ describe("I/O Schema and related helpers", () => {
       ).not.toExtend<IOSchema>();
     });
     test("accepts intersection of objects", () => {
+      expectTypeOf(z.object({}).and(z.object({}))).toExtend<IOSchema>();
+      expectTypeOf(z.object({}).and(z.object({}))).toExtend<IOSchema>();
       expectTypeOf(
-        z.intersection(z.object({}), z.object({})),
-      ).toExtend<IOSchema>();
-      expectTypeOf(
-        z.intersection(z.object({}), z.object({})),
-      ).toExtend<IOSchema>();
-      expectTypeOf(
-        z.intersection(
-          z.intersection(z.object({}), z.object({})),
-          z.object({}),
-        ),
+        z.object({}).and(z.object({})).and(z.object({})),
       ).toExtend<IOSchema>();
     });
     test("does not accepts intersection of object with array of objects", () => {
       expectTypeOf(
-        z.intersection(z.object({}), z.array(z.object({}))),
+        z.object({}).and(z.array(z.object({}))),
       ).not.toExtend<IOSchema>();
     });
     test("accepts discriminated union of objects", () => {
@@ -73,10 +66,10 @@ describe("I/O Schema and related helpers", () => {
     });
     test("accepts a mix of types based on object", () => {
       expectTypeOf(
-        z.object({}).or(z.intersection(z.object({}), z.object({}))),
+        z.object({}).or(z.object({}).and(z.object({}))),
       ).toExtend<IOSchema>();
       expectTypeOf(
-        z.intersection(z.object({}), z.object({}).or(z.object({}))),
+        z.object({}).and(z.object({}).or(z.object({}))),
       ).toExtend<IOSchema>();
     });
     describe("Feature #600: Top level refinements", () => {
@@ -236,12 +229,8 @@ describe("I/O Schema and related helpers", () => {
       const right = z.object({
         id: z.string().transform((str) => parseInt(str)),
       });
-      const schema = z.intersection(left, right);
-      expect(() =>
-        schema.parse({
-          id: "123",
-        }),
-      ).toThrowErrorMatchingSnapshot();
+      const schema = left.and(right);
+      expect(() => schema.parse({ id: "123" })).toThrowErrorMatchingSnapshot();
     });
 
     test("Should merge mixed object schemas", () => {

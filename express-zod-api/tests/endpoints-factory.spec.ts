@@ -286,10 +286,7 @@ describe("EndpointsFactory", () => {
 
     test("Should create an endpoint with intersection middleware", () => {
       const middleware = new Middleware({
-        input: z.intersection(
-          z.object({ n1: z.number() }),
-          z.object({ n2: z.number() }),
-        ),
+        input: z.object({ n1: z.number() }).and(z.object({ n2: z.number() })),
         handler: vi.fn<any>(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(

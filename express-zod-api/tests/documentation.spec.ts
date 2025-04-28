@@ -112,14 +112,9 @@ describe("Documentation", () => {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
               input: z.object({
-                intersection: z.intersection(
-                  z.object({
-                    one: z.string(),
-                  }),
-                  z.object({
-                    two: z.string(),
-                  }),
-                ),
+                intersection: z
+                  .object({ one: z.string() })
+                  .and(z.object({ two: z.string() })),
               }),
               output: z.object({
                 and: z
