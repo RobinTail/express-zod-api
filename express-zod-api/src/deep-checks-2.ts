@@ -1,5 +1,4 @@
 import type { $ZodType } from "@zod/core";
-import assert from "node:assert/strict";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { ezFormBrand } from "./form-schema";
@@ -23,7 +22,8 @@ export const hasNestedSchema = (
         io,
         unrepresentable: "any",
         override: ({ zodSchema }) => {
-          assert.equal(condition(zodSchema), false, zodSchema._zod.def.type);
+          if (condition(zodSchema))
+            throw new Error("Early exit", { cause: zodSchema });
         },
       }) && false,
     () => true,
