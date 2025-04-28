@@ -2,6 +2,7 @@ import { JSONSchema } from "@zod/core";
 import { SchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
+import { ez } from "../src";
 import {
   OpenAPIContext,
   depictExamples,
@@ -27,6 +28,7 @@ import {
   depictPipeline,
   depictDateIn,
   depictDateOut,
+  depictBody,
 } from "../src/documentation-helpers";
 
 describe("Documentation helpers", () => {
@@ -499,6 +501,19 @@ describe("Documentation helpers", () => {
           examples: ["test"],
         }),
       ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictBody", () => {
+    test("should mark ez.raw() body as required", () => {
+      const body = depictBody({
+        ...requestCtx,
+        schema: ez.raw(),
+        composition: "inline",
+        mimeType: "application/octet-stream", // raw content type
+        paramNames: [],
+      });
+      expect(body.required).toBe(true);
     });
   });
 
