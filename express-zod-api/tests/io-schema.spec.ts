@@ -286,6 +286,7 @@ describe("I/O Schema and related helpers", () => {
     });
   });
 
+  // @todo change the name!
   describe("extractObjectSchema()", () => {
     test("should pass the object schema through", () => {
       const subject = extract2({
