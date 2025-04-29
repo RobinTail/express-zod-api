@@ -88,7 +88,7 @@ describe("ResultHandler", () => {
       subject.execute({
         error,
         input: { something: 453 },
-        output: { anything: 118 },
+        output: null,
         request: requestMock,
         response: responseMock,
         logger: loggerMock,
@@ -123,7 +123,7 @@ describe("ResultHandler", () => {
           ]),
         ),
         input: { something: 453 },
-        output: { anything: 118 },
+        output: null,
         options: {},
         request: requestMock,
         response: responseMock,
@@ -148,7 +148,7 @@ describe("ResultHandler", () => {
       subject.execute({
         error: createHttpError(404, "Something not found"),
         input: { something: 453 },
-        output: { anything: 118 },
+        output: null,
         options: {},
         request: requestMock,
         response: responseMock,

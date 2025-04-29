@@ -17,18 +17,26 @@ import {
   ResultSchema,
 } from "./result-helpers";
 
-type Handler<RES = unknown> = (params: {
-  /** null in case of failure to parse or to find the matching endpoint (error: not found) */
-  input: FlatObject | null;
-  /** null in case of errors or failures */
-  output: FlatObject | null;
-  /** can be empty: check presence of the required property using "in" operator */
-  options: FlatObject;
-  error: Error | null;
-  request: Request;
-  response: Response<RES>;
-  logger: ActualLogger;
-}) => void | Promise<void>;
+type Handler<RES = unknown> = (
+  params: {
+    /** null in case of failure to parse or to find the matching endpoint (error: not found) */
+    input: FlatObject | null;
+    /** can be empty: check presence of the required property using "in" operator */
+    options: FlatObject;
+    request: Request;
+    response: Response<RES>;
+    logger: ActualLogger;
+  } & (
+    | {
+        output: FlatObject;
+        error: null;
+      }
+    | {
+        output: null;
+        error: Error;
+      }
+  ),
+) => void | Promise<void>;
 
 export type Result<S extends z.ZodType = z.ZodType> =
   | S // plain schema, default status codes applied
@@ -117,8 +125,8 @@ export const defaultResultHandler = new ResultHandler({
       error: { message: "Sample error message" },
     }),
   handler: ({ error, input, output, request, response, logger }) => {
-    if (error || !output) {
-      const httpError = ensureHttpError(error || new Error("Missing output"));
+    if (error) {
+      const httpError = ensureHttpError(error);
       logServerError(httpError, logger, request, input);
       return void response
         .status(httpError.statusCode)
@@ -167,7 +175,7 @@ export const arrayResultHandler = new ResultHandler({
         .type("text/plain")
         .send(getPublicErrorMessage(httpError));
     }
-    if (output && "items" in output && Array.isArray(output.items)) {
+    if ("items" in output && Array.isArray(output.items)) {
       return void response
         .status(defaultStatusCodes.positive)
         .json(output.items);
