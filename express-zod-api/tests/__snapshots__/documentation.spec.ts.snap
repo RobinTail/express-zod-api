@@ -20,6 +20,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -36,6 +37,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -89,6 +91,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -105,6 +108,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -143,6 +147,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -159,6 +164,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -212,6 +218,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -228,6 +235,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -259,6 +267,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -275,6 +284,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -342,6 +352,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -361,6 +372,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -402,6 +414,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -418,6 +431,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -457,6 +471,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -473,6 +488,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -543,6 +559,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -562,6 +579,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -639,11 +657,13 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
                     properties:
                       literal:
+                        type: string
                         const: something
                       transformation:
                         type: number
@@ -661,6 +681,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -714,6 +735,7 @@ paths:
                 - type: object
                   properties:
                     type:
+                      type: string
                       const: a
                     a:
                       type: string
@@ -723,6 +745,7 @@ paths:
                 - type: object
                   properties:
                     type:
+                      type: string
                       const: b
                     b:
                       type: string
@@ -739,12 +762,14 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     anyOf:
                       - type: object
                         properties:
                           status:
+                            type: string
                             const: success
                           data: {}
                         required:
@@ -753,6 +778,7 @@ paths:
                       - type: object
                         properties:
                           status:
+                            type: string
                             const: error
                           error:
                             type: object
@@ -777,6 +803,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -848,6 +875,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -876,6 +904,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -1086,6 +1115,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -1108,6 +1138,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -1185,6 +1216,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -1211,6 +1243,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -1268,6 +1301,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -1287,6 +1321,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -1362,6 +1397,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: OK
                   result:
                     type: object
@@ -1379,6 +1415,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: NOT OK
                 required:
                   - status
@@ -1459,6 +1496,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -1480,6 +1518,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -1607,6 +1646,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -1627,6 +1667,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -1677,6 +1718,7 @@ paths:
               type: object
               properties:
                 regularEnum:
+                  type: string
                   enum:
                     - ABC
                     - DEF
@@ -1692,11 +1734,13 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
                     properties:
                       nativeEnum:
+                        type: number
                         enum:
                           - 1
                           - 2
@@ -1713,6 +1757,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -1772,6 +1817,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -1803,6 +1849,7 @@ paths:
                       literal:
                         type: object
                         propertyNames:
+                          type: string
                           const: only
                         additionalProperties:
                           type: boolean
@@ -1810,13 +1857,16 @@ paths:
                         type: object
                         propertyNames:
                           anyOf:
-                            - const: option1
-                            - const: option2
+                            - type: string
+                              const: option1
+                            - type: string
+                              const: option2
                         additionalProperties:
                           type: boolean
                       enum:
                         type: object
                         propertyNames:
+                          type: string
                           enum:
                             - option1
                             - option2
@@ -1840,6 +1890,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -1907,6 +1958,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -1926,6 +1978,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -2013,6 +2066,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -2035,6 +2089,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -2092,6 +2147,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -2110,6 +2166,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -2175,6 +2232,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -2194,6 +2252,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -2257,6 +2316,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: ok
                   data:
                     type: object
@@ -2276,6 +2336,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: kinda
                   data:
                     type: object
@@ -2292,12 +2353,14 @@ paths:
           content:
             application/json:
               schema:
+                type: string
                 const: error
         "500":
           description: POST /v1/mtpl Negative response 500
           content:
             application/json:
               schema:
+                type: string
                 const: failure
 components:
   schemas: {}
@@ -2352,6 +2415,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -2371,6 +2435,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -2440,6 +2505,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -2459,6 +2525,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -2517,6 +2584,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -2536,6 +2604,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -2600,6 +2669,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -2616,6 +2686,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -2688,6 +2759,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -2704,6 +2776,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -2774,6 +2847,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -2790,6 +2864,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -2851,6 +2926,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -2873,6 +2949,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -2916,6 +2993,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -2938,6 +3016,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -3014,6 +3093,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     anyOf:
@@ -3046,6 +3126,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -3107,6 +3188,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -3123,6 +3205,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -3190,6 +3273,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -3230,6 +3314,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -3309,6 +3394,7 @@ components:
       type: object
       properties:
         status:
+          type: string
           const: success
         data:
           type: object
@@ -3321,6 +3407,7 @@ components:
       type: object
       properties:
         status:
+          type: string
           const: error
         error:
           type: object
@@ -3379,6 +3466,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -3406,6 +3494,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -3467,6 +3556,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -3494,6 +3584,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -3561,6 +3652,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -3588,6 +3680,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -3651,6 +3744,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -3678,6 +3772,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -3737,6 +3832,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -3758,6 +3854,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -3807,8 +3904,10 @@ paths:
           description: parameter of post /v1/:name
           schema:
             anyOf:
-              - const: John
-              - const: Jane
+              - type: string
+                const: John
+              - type: string
+                const: Jane
       requestBody:
         description: the body of request
         content:
@@ -3830,6 +3929,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -3846,6 +3946,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -3925,12 +4026,15 @@ components:
   schemas:
     ParameterOfPostV1NameName:
       anyOf:
-        - const: John
-        - const: Jane
+        - type: string
+          const: John
+        - type: string
+          const: Jane
     SuperPositiveResponseOfV1Name:
       type: object
       properties:
         status:
+          type: string
           const: success
         data:
           type: object
@@ -3943,6 +4047,7 @@ components:
       type: object
       properties:
         status:
+          type: string
           const: error
         error:
           type: object
@@ -3991,8 +4096,10 @@ paths:
           description: GET /v1/:name Parameter
           schema:
             anyOf:
-              - const: John
-              - const: Jane
+              - type: string
+                const: John
+              - type: string
+                const: Jane
         - name: other
           in: query
           required: true
@@ -4008,6 +4115,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -4024,6 +4132,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -4073,8 +4182,10 @@ paths:
           description: POST /v1/:name Parameter
           schema:
             anyOf:
-              - const: John
-              - const: Jane
+              - type: string
+                const: John
+              - type: string
+                const: Jane
       requestBody:
         description: POST /v1/:name Request body
         content:
@@ -4096,6 +4207,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -4112,6 +4224,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
