@@ -91,11 +91,13 @@ describe("Documentation", () => {
               output: z.object({
                 nullable: z.string().nullable(),
                 literal: z.literal("test").nullable(),
+                multiliteral: z.literal(["one", "two"]).nullable(),
                 enum: z.enum(["test"]).nullable(),
               }),
               handler: async () => ({
                 nullable: null,
                 literal: "test" as const,
+                multiliteral: "one" as const,
                 enum: "test" as const,
               }),
             }),

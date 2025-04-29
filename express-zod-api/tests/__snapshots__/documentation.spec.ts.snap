@@ -959,6 +959,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -968,13 +969,27 @@ paths:
                           - string
                           - "null"
                       literal:
+                        type:
+                          - string
+                          - "null"
                         const: test
+                      multiliteral:
+                        type:
+                          - string
+                          - "null"
+                        enum:
+                          - one
+                          - two
                       enum:
+                        type:
+                          - string
+                          - "null"
                         enum:
                           - test
                     required:
                       - nullable
                       - literal
+                      - multiliteral
                       - enum
                 required:
                   - status
@@ -987,6 +1002,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
