@@ -29,6 +29,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -57,6 +58,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -174,6 +176,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -211,6 +214,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -255,6 +259,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: created
                   data:
                     type: object
@@ -275,6 +280,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: created
                   data:
                     type: object
@@ -295,6 +301,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   reason:
                     type: string
@@ -309,6 +316,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: exists
                   id:
                     type: integer
@@ -325,6 +333,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   reason:
                     type: string
@@ -455,6 +464,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -490,6 +500,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -529,6 +540,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -549,6 +561,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
@@ -593,6 +606,7 @@ paths:
                     type: integer
                     exclusiveMaximum: 9007199254740991
                   event:
+                    type: string
                     const: time
                   id:
                     type: string
@@ -644,6 +658,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: success
                   data:
                     type: object
@@ -664,6 +679,7 @@ paths:
                 type: object
                 properties:
                   status:
+                    type: string
                     const: error
                   error:
                     type: object
