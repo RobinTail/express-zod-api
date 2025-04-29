@@ -44,7 +44,7 @@ import { ezDateOutBrand } from "./date-out-schema";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { ezFileBrand } from "./file-schema";
-import { extract2, extractObjectSchema, IOSchema } from "./io-schema";
+import { extract2, IOSchema } from "./io-schema";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
@@ -727,11 +727,12 @@ export const depictBody = ({
   mimeType: string;
   paramNames: string[];
 }) => {
+  const full = depict(schema, {
+    rules: { ...brandHandling, ...depicters },
+    ctx: { isResponse: false, makeRef, path, method },
+  });
   const [withoutParams, hasRequired] = excludeParamsFromDepiction(
-    depict(schema, {
-      rules: { ...brandHandling, ...depicters },
-      ctx: { isResponse: false, makeRef, path, method },
-    }),
+    full,
     paramNames,
   );
   const bodyDepiction = excludeExamplesFromDepiction(withoutParams);
@@ -740,7 +741,14 @@ export const depictBody = ({
       composition === "components"
         ? makeRef(schema, bodyDepiction, makeCleanId(description))
         : bodyDepiction,
-    examples: depictExamples(extractObjectSchema(schema), false, paramNames),
+    // @todo these examples lack pullProps in onEach, that used to be done by depictExamples
+    // @todo maybe should refactor usage of excludeExamplesFromDepiction() above?
+    examples: enumerateExamples(
+      R.pluck(
+        "examples",
+        R.values(R.omit(paramNames, extract2(full as JSONSchema.BaseSchema))),
+      ).filter(R.isNotNil),
+    ),
   };
   const body: RequestBodyObject = {
     description,
