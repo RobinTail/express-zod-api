@@ -118,7 +118,7 @@ export class EndpointsFactory<
   }
 
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
-    input = z.object({}) as unknown as BIN,
+    input = z.object({}) as IOSchema as BIN, // @todo revisit
     output: outputSchema,
     operationId,
     scope,
