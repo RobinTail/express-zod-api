@@ -967,8 +967,15 @@ paths:
                         type:
                           - string
                           - "null"
+                      literal:
+                        const: test
+                      enum:
+                        enum:
+                          - test
                     required:
                       - nullable
+                      - literal
+                      - enum
                 required:
                   - status
                   - data

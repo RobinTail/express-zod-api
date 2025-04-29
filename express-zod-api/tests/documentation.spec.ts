@@ -90,9 +90,13 @@ describe("Documentation", () => {
               }),
               output: z.object({
                 nullable: z.string().nullable(),
+                literal: z.literal("test").nullable(),
+                enum: z.enum(["test"]).nullable(),
               }),
               handler: async () => ({
                 nullable: null,
+                literal: "test" as const,
+                enum: "test" as const,
               }),
             }),
           },
