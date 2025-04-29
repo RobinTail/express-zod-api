@@ -1,3 +1,4 @@
+import { IOSchemaError } from "../src/errors";
 import {
   appMock,
   expressMock,
@@ -461,9 +462,12 @@ describe("Routing", () => {
       ]);
     });
 
-    test("should warn about unused path params", () => {
+    test.each([
+      z.object({ id: z.string() }),
+      z.record(z.literal("id"), z.string()), // @todo should support records as an IOSchema compliant one
+    ])("should warn about unused path params %#", (input) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
-        input: z.object({ id: z.string() }),
+        input,
         output: z.object({}),
         handler: vi.fn(),
       });
@@ -475,11 +479,15 @@ describe("Routing", () => {
         config: configMock as CommonConfig,
         routing: { v1: { ":idx": endpoint } },
       });
-      expect(logger._getLogs().warn).toEqual([
-        [
-          "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
-          { method: "get", param: "idx", path: "/v1/:idx" },
-        ],
+      if (input instanceof z.ZodRecord) {
+        expect(logger._getLogs().warn).toContainEqual([
+          "Diagnostics::checkPathParams()",
+          expect.any(IOSchemaError),
+        ]);
+      }
+      expect(logger._getLogs().warn).toContainEqual([
+        "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
+        { method: "get", param: "idx", path: "/v1/:idx" },
       ]);
     });
   });

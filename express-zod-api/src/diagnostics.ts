@@ -1,4 +1,5 @@
 import type { $ZodShape } from "@zod/core";
+import * as R from "ramda";
 import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { FlatObject, getRoutePathParams } from "./common-helpers";
@@ -64,7 +65,12 @@ export class Diagnostics {
     if (ref?.paths.includes(path)) return;
     const params = getRoutePathParams(path);
     if (params.length === 0) return; // next statement can be expensive
-    const { shape } = ref || extractObjectSchema(endpoint.inputSchema);
+    const { shape } =
+      ref ||
+      R.tryCatch(extractObjectSchema, (err) => {
+        this.logger.warn("Diagnostics::checkPathParams()", err);
+        return z.object({});
+      })(endpoint.inputSchema);
     for (const param of params) {
       if (param in shape) continue;
       this.logger.warn(
