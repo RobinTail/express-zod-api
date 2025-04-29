@@ -291,7 +291,7 @@ exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344:
     "examples": undefined,
     "in": "header",
     "name": "x-request-id",
-    "required": false,
+    "required": true,
     "schema": {
       "type": "string",
     },
@@ -302,7 +302,7 @@ exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344:
     "examples": undefined,
     "in": "path",
     "name": "id",
-    "required": false,
+    "required": true,
     "schema": {
       "type": "string",
     },
@@ -313,7 +313,7 @@ exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344:
     "examples": undefined,
     "in": "query",
     "name": "test",
-    "required": false,
+    "required": true,
     "schema": {
       "type": "boolean",
     },
@@ -324,7 +324,7 @@ exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344:
     "examples": undefined,
     "in": "header",
     "name": "secure",
-    "required": false,
+    "required": true,
     "schema": {
       "type": "string",
     },
@@ -342,7 +342,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict only path
     "examples": undefined,
     "in": "path",
     "name": "id",
-    "required": false,
+    "required": true,
     "schema": {
       "type": "string",
     },
@@ -358,7 +358,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
     "examples": undefined,
     "in": "path",
     "name": "id",
-    "required": false,
+    "required": true,
     "schema": {
       "type": "string",
     },
@@ -369,7 +369,7 @@ exports[`Documentation helpers > depictRequestParams() > should depict query and
     "examples": undefined,
     "in": "query",
     "name": "test",
-    "required": false,
+    "required": true,
     "schema": {
       "type": "boolean",
     },

@@ -443,7 +443,7 @@ export const depictRequestParams = ({
         name,
         in: location,
         deprecated: jsonSchema.deprecated,
-        required: false, // @todo support it by extractor
+        required: flat.required.includes(name),
         description: depicted.description || description,
         schema: result,
         examples:

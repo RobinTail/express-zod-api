@@ -330,13 +330,13 @@ paths:
       parameters:
         - name: key
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             type: string
         - name: str
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             type: string
@@ -625,7 +625,7 @@ paths:
       parameters:
         - name: array
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             type: array
@@ -636,7 +636,7 @@ paths:
               exclusiveMaximum: 9007199254740991
         - name: unlimited
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             type: array
@@ -644,7 +644,7 @@ paths:
               type: boolean
         - name: transformer
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             type: string
@@ -956,7 +956,7 @@ paths:
             type: string
         - name: optDefault
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             type: string
@@ -971,7 +971,7 @@ paths:
               - "null"
         - name: nuDefault
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             type:
@@ -2147,7 +2147,7 @@ paths:
       parameters:
         - name: any
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema: {}
       responses:
@@ -2224,13 +2224,13 @@ paths:
       parameters:
         - name: string
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             format: string (preprocessed)
         - name: number
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             maximum: 9007199254740991
@@ -2402,19 +2402,19 @@ paths:
       parameters:
         - name: name
           in: path
-          required: false
+          required: true
           description: GET /v1/:name Parameter
           schema:
             summary: My custom schema
         - name: other
           in: query
-          required: false
+          required: true
           description: GET /v1/:name Parameter
           schema:
             summary: My custom schema
         - name: regular
           in: query
-          required: false
+          required: true
           description: GET /v1/:name Parameter
           schema:
             type: boolean
@@ -2493,13 +2493,13 @@ paths:
       parameters:
         - name: user_id
           in: query
-          required: false
+          required: true
           description: GET /v1/test Parameter
           schema:
             type: string
         - name: at
           in: query
-          required: false
+          required: true
           description: YYYY-MM-DDTHH:mm:ss.sssZ
           schema:
             type: string
@@ -2583,7 +2583,7 @@ paths:
       parameters:
         - name: user_id
           in: query
-          required: false
+          required: true
           description: GET /v1/test Parameter
           schema:
             type: string
@@ -2662,13 +2662,13 @@ paths:
       parameters:
         - name: id
           in: query
-          required: false
+          required: true
           description: GET /v1/test Parameter
           schema:
             type: string
         - name: x-request-id
           in: header
-          required: false
+          required: true
           description: GET /v1/test Parameter
           schema:
             type: string
@@ -2744,13 +2744,13 @@ paths:
       parameters:
         - name: id
           in: query
-          required: false
+          required: true
           description: POST /v1/test Parameter
           schema:
             type: string
         - name: x-request-id
           in: header
-          required: false
+          required: true
           description: POST /v1/test Parameter
           schema:
             type: string
@@ -2834,7 +2834,7 @@ paths:
       parameters:
         - name: x-request-id
           in: header
-          required: false
+          required: true
           description: PUT /v1/test Parameter
           schema:
             type: string
@@ -2922,7 +2922,7 @@ paths:
       parameters:
         - name: arr
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             type: array
@@ -3186,7 +3186,7 @@ paths:
         - name: str
           in: query
           deprecated: true
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             type: string
@@ -3548,7 +3548,7 @@ paths:
       parameters:
         - name: strNum
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             type: string
@@ -3727,7 +3727,7 @@ paths:
       parameters:
         - name: strNum
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             type: string
@@ -3819,7 +3819,7 @@ paths:
       parameters:
         - name: str
           in: query
-          required: false
+          required: true
           description: here is the test
           schema:
             type: string
@@ -3901,7 +3901,7 @@ paths:
       parameters:
         - name: name
           in: path
-          required: false
+          required: true
           description: parameter of post /v1/:name
           schema:
             anyOf:
@@ -3993,7 +3993,7 @@ paths:
       parameters:
         - name: name
           in: path
-          required: false
+          required: true
           description: parameter of post /v1/:name
           schema:
             $ref: "#/components/schemas/ParameterOfPostV1NameName"
@@ -4093,7 +4093,7 @@ paths:
       parameters:
         - name: name
           in: path
-          required: false
+          required: true
           description: GET /v1/:name Parameter
           schema:
             anyOf:
@@ -4103,7 +4103,7 @@ paths:
                 const: Jane
         - name: other
           in: query
-          required: false
+          required: true
           description: GET /v1/:name Parameter
           schema:
             type: boolean
@@ -4179,7 +4179,7 @@ paths:
       parameters:
         - name: name
           in: path
-          required: false
+          required: true
           description: POST /v1/:name Parameter
           schema:
             anyOf:
