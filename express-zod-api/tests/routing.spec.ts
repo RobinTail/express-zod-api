@@ -1,4 +1,3 @@
-import { IOSchemaError } from "../src/errors";
 import {
   appMock,
   expressMock,
