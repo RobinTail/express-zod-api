@@ -52,6 +52,16 @@ exports[`Documentation helpers > depictDefault() > Feature #1706: should overrid
 }
 `;
 
+exports[`Documentation helpers > depictEnum() > should set type 1`] = `
+{
+  "enum": [
+    "test",
+    "jest",
+  ],
+  "type": "string",
+}
+`;
+
 exports[`Documentation helpers > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
 {
   "example1": {
@@ -199,6 +209,23 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
     },
   },
   "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictLiteral() > should set type from either const or enum prop 0 1`] = `
+{
+  "const": "test",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictLiteral() > should set type from either const or enum prop 1 1`] = `
+{
+  "enum": [
+    "test",
+    "jest",
+  ],
+  "type": "string",
 }
 `;
 
