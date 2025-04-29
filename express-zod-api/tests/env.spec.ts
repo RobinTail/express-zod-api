@@ -1,5 +1,6 @@
 import createHttpError from "http-errors";
 import * as R from "ramda";
+import { expectTypeOf } from "vitest";
 import { z } from "zod";
 
 describe("Environment checks", () => {
@@ -84,6 +85,12 @@ describe("Environment checks", () => {
         .meta({ description: "some" })
         .meta({ title: "last" });
       expect(schema.meta()).toMatchSnapshot();
+    });
+
+    test("output of empty object schema is too abstract object", () => {
+      const schema = z.strictObject({});
+      expectTypeOf(schema._zod.output).toEqualTypeOf<object>();
+      expectTypeOf(schema._zod.output).not.toExtend<Record<string, never>>();
     });
   });
 
