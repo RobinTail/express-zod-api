@@ -25,6 +25,7 @@ import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
+import { DiscriminatedResult } from "./result-helpers";
 import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
@@ -273,15 +274,7 @@ export class Endpoint<
   }) {
     const method = getActualMethod(request);
     const options: Partial<OPT> = {};
-    let result:
-      | {
-          output: FlatObject;
-          error: null;
-        }
-      | {
-          output: null;
-          error: Error;
-        } = { output: {}, error: null };
+    let result: DiscriminatedResult = { output: {}, error: null };
     const input = getInput(request, config.inputSources);
     try {
       await this.#runMiddlewares({

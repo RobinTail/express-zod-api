@@ -10,6 +10,7 @@ import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 import {
+  DiscriminatedResult,
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
@@ -18,7 +19,7 @@ import {
 } from "./result-helpers";
 
 type Handler<RES = unknown> = (
-  params: {
+  params: DiscriminatedResult & {
     /** null in case of failure to parse or to find the matching endpoint (error: not found) */
     input: FlatObject | null;
     /** can be empty: check presence of the required property using "in" operator */
@@ -26,16 +27,7 @@ type Handler<RES = unknown> = (
     request: Request;
     response: Response<RES>;
     logger: ActualLogger;
-  } & (
-    | {
-        output: FlatObject;
-        error: null;
-      }
-    | {
-        output: null;
-        error: Error;
-      }
-  ),
+  },
 ) => void | Promise<void>;
 
 export type Result<S extends z.ZodType = z.ZodType> =
