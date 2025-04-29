@@ -118,6 +118,7 @@ if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
   for (const entry of Object.keys(z)) {
     if (!entry.startsWith("Zod")) continue;
+    if (/(Success|Error|Function)$/.test(entry)) continue;
     const Cls = z[entry as keyof typeof z];
     if (typeof Cls !== "function") continue;
     let originalCheck: z.ZodType["check"];
