@@ -25,6 +25,7 @@ import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
+import { DiscriminatedResult } from "./result-helpers";
 import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
@@ -238,24 +239,24 @@ export class Endpoint<
     return this.#def.handler({ ...rest, input: finalInput });
   }
 
-  async #handleResult({
-    error,
-    ...rest
-  }: {
-    error: Error | null;
-    request: Request;
-    response: Response;
-    logger: ActualLogger;
-    input: FlatObject;
-    output: FlatObject | null;
-    options: Partial<OPT>;
-  }) {
+  async #handleResult(
+    params: DiscriminatedResult & {
+      request: Request;
+      response: Response;
+      logger: ActualLogger;
+      input: FlatObject;
+      options: Partial<OPT>;
+    },
+  ) {
     try {
-      await this.#def.resultHandler.execute({ ...rest, error });
+      await this.#def.resultHandler.execute(params);
     } catch (e) {
       lastResortHandler({
-        ...rest,
-        error: new ResultHandlerError(ensureError(e), error || undefined),
+        ...params,
+        error: new ResultHandlerError(
+          ensureError(e),
+          params.error || undefined,
+        ),
       });
     }
   }
@@ -273,8 +274,7 @@ export class Endpoint<
   }) {
     const method = getActualMethod(request);
     const options: Partial<OPT> = {};
-    let output: FlatObject | null = null;
-    let error: Error | null = null;
+    let result: DiscriminatedResult = { output: {}, error: null };
     const input = getInput(request, config.inputSources);
     try {
       await this.#runMiddlewares({
@@ -287,22 +287,24 @@ export class Endpoint<
       });
       if (response.writableEnded) return;
       if (method === "options") return void response.status(200).end();
-      output = await this.#parseOutput(
-        await this.#parseAndRunHandler({
-          input,
-          logger,
-          options: options as OPT, // ensured the complete OPT by writableEnded condition and try-catch
-        }),
-      );
+      result = {
+        output: await this.#parseOutput(
+          await this.#parseAndRunHandler({
+            input,
+            logger,
+            options: options as OPT, // ensured the complete OPT by writableEnded condition and try-catch
+          }),
+        ),
+        error: null,
+      };
     } catch (e) {
-      error = ensureError(e);
+      result = { output: null, error: ensureError(e) };
     }
     await this.#handleResult({
+      ...result,
       input,
-      output,
       request,
       response,
-      error,
       logger,
       options,
     });
