@@ -175,7 +175,7 @@ if (!(metaSymbol in globalThis)) {
     "remap" satisfies keyof z.ZodObject,
     {
       get() {
-        return objectMapper.bind(this) as unknown as z.ZodObject["remap"];
+        return objectMapper.bind(this);
       },
     },
   );
