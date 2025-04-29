@@ -37,15 +37,22 @@ const isJsonObjectSchema = (
 ): subject is JSONSchema.ObjectSchema => subject.type === "object";
 
 export const extract2 = (jsonSchema: JSONSchema.BaseSchema) => {
-  const stack = [jsonSchema];
-  const flat: Required<Pick<JSONSchema.ObjectSchema, "type" | "properties">> = {
+  const stack = [{ entry: jsonSchema, isOptional: false }];
+  const flat: Required<
+    Pick<JSONSchema.ObjectSchema, "type" | "properties" | "required">
+  > = {
     type: "object",
     properties: {},
+    required: [],
   };
   while (stack.length) {
-    const entry = stack.shift()!;
+    const { entry, isOptional } = stack.shift()!;
     if (isJsonObjectSchema(entry)) {
-      if (entry.properties) Object.assign(flat.properties, entry.properties);
+      if (entry.properties) {
+        Object.assign(flat.properties, entry.properties);
+        if (!isOptional && entry.required)
+          flat.required.push(...entry.required);
+      }
       if (entry.propertyNames) {
         const keys: string[] = [];
         if (typeof entry.propertyNames.const === "string")
@@ -62,12 +69,21 @@ export const extract2 = (jsonSchema: JSONSchema.BaseSchema) => {
             ? entry.additionalProperties
             : {};
         for (const key of keys) flat.properties[key] = value;
+        if (!isOptional) flat.required.push(...keys);
       }
     }
-    if (entry.allOf) stack.push(...entry.allOf);
-    if (entry.anyOf) stack.push(...entry.anyOf);
-    if (entry.oneOf) stack.push(...entry.oneOf);
-    if (entry.not) stack.push(entry.not);
+    if (entry.allOf)
+      stack.push(...entry.allOf.map((one) => ({ entry: one, isOptional })));
+    if (entry.anyOf) {
+      stack.push(
+        ...entry.anyOf.map((one) => ({ entry: one, isOptional: true })),
+      );
+    }
+    if (entry.oneOf) {
+      stack.push(
+        ...entry.oneOf.map((one) => ({ entry: one, isOptional: true })),
+      );
+    }
   }
   return flat;
 };

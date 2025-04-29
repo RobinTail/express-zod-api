@@ -7,6 +7,9 @@ exports[`I/O Schema and related helpers > extractObjectSchema() > should pass th
       "type": "string",
     },
   },
+  "required": [
+    "one",
+  ],
   "type": "object",
 }
 `;
@@ -21,6 +24,10 @@ exports[`I/O Schema and related helpers > extractObjectSchema() > should return 
       "type": "number",
     },
   },
+  "required": [
+    "one",
+    "two",
+  ],
   "type": "object",
 }
 `;
@@ -35,6 +42,7 @@ exports[`I/O Schema and related helpers > extractObjectSchema() > should return 
       "type": "number",
     },
   },
+  "required": [],
   "type": "object",
 }
 `;

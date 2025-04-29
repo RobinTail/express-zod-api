@@ -297,7 +297,6 @@ describe("I/O Schema and related helpers", () => {
       expect(subject).toMatchSnapshot();
     });
 
-    // @todo should reflect none required
     test("should return object schema for the union of object schemas", () => {
       const subject = extract2({
         oneOf: [
