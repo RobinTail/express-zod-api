@@ -66,11 +66,7 @@ const isJsonObjectSchema = (
   subject: JSONSchema.BaseSchema,
 ): subject is JSONSchema.ObjectSchema => subject.type === "object";
 
-export const extract2 = (subject: IOSchema) => {
-  const jsonSchema = z.toJSONSchema(subject, {
-    unrepresentable: "any",
-    io: "input",
-  });
+export const extract2 = (jsonSchema: JSONSchema.BaseSchema) => {
   const stack = [jsonSchema];
   const props: Record<string, JSONSchema.BaseSchema> = {};
   while (stack.length) {

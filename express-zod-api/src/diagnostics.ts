@@ -63,7 +63,14 @@ export class Diagnostics {
     if (ref?.paths.includes(path)) return;
     const params = getRoutePathParams(path);
     if (params.length === 0) return; // next statement can be expensive
-    const flat = ref?.flat || extract2(endpoint.inputSchema);
+    const flat =
+      ref?.flat ||
+      extract2(
+        z.toJSONSchema(endpoint.inputSchema, {
+          unrepresentable: "any",
+          io: "input",
+        }),
+      );
     for (const param of params) {
       if (param in flat) continue;
       this.logger.warn(
