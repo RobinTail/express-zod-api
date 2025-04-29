@@ -240,13 +240,13 @@ export class Endpoint<
   }
 
   async #handleResult(
-    params: {
+    params: DiscriminatedResult & {
       request: Request;
       response: Response;
       logger: ActualLogger;
       input: FlatObject;
       options: Partial<OPT>;
-    } & ({ output: FlatObject; error: null } | { output: null; error: Error }),
+    },
   ) {
     try {
       await this.#def.resultHandler.execute(params);
