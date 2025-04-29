@@ -1,19 +1,17 @@
-import type { $ZodShape } from "@zod/core";
-import * as R from "ramda";
 import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { findJsonIncompatible } from "./deep-checks";
 import { AbstractEndpoint } from "./endpoint";
-import { extractObjectSchema } from "./io-schema";
+import { extract2 } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 
 export class Diagnostics {
   #verifiedEndpoints = new WeakSet<AbstractEndpoint>();
   #verifiedPaths = new WeakMap<
     AbstractEndpoint,
-    { shape: $ZodShape; paths: string[] }
+    { flat: ReturnType<typeof extract2>; paths: string[] }
   >();
 
   constructor(protected logger: ActualLogger) {}
@@ -65,20 +63,15 @@ export class Diagnostics {
     if (ref?.paths.includes(path)) return;
     const params = getRoutePathParams(path);
     if (params.length === 0) return; // next statement can be expensive
-    const { shape } =
-      ref ||
-      R.tryCatch(extractObjectSchema, (err) => {
-        this.logger.warn("Diagnostics::checkPathParams()", err);
-        return z.object({});
-      })(endpoint.inputSchema);
+    const flat = ref?.flat || extract2(endpoint.inputSchema);
     for (const param of params) {
-      if (param in shape) continue;
+      if (param in flat) continue;
       this.logger.warn(
         "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
         Object.assign(ctx, { path, param }),
       );
     }
     if (ref) ref.paths.push(path);
-    else this.#verifiedPaths.set(endpoint, { shape, paths: [path] });
+    else this.#verifiedPaths.set(endpoint, { flat, paths: [path] });
   }
 }

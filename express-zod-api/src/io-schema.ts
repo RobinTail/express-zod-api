@@ -1,3 +1,4 @@
+import type { JSONSchema } from "@zod/core";
 import * as R from "ramda";
 import { z } from "zod";
 import { IOSchemaError } from "./errors";
@@ -59,4 +60,45 @@ export const extractObjectSchema = (subject: IOSchema): z.ZodObject => {
     );
   }
   throw new IOSchemaError("Can not flatten IOSchema", { cause: subject });
+};
+
+const isJsonObjectSchema = (
+  subject: JSONSchema.BaseSchema,
+): subject is JSONSchema.ObjectSchema => subject.type === "object";
+
+export const extract2 = (subject: IOSchema) => {
+  const jsonSchema = z.toJSONSchema(subject, {
+    unrepresentable: "any",
+    io: "input",
+  });
+  const stack = [jsonSchema];
+  const props: Record<string, JSONSchema.BaseSchema> = {};
+  while (stack.length) {
+    const entry = stack.shift()!;
+    if (isJsonObjectSchema(entry)) {
+      if (entry.properties) Object.assign(props, entry.properties);
+      if (entry.propertyNames) {
+        const keys: string[] = [];
+        if (typeof entry.propertyNames.const === "string")
+          keys.push(entry.propertyNames.const);
+        if (entry.propertyNames.enum) {
+          keys.push(
+            ...entry.propertyNames.enum.filter(
+              (one) => typeof one === "string",
+            ),
+          );
+        }
+        const value =
+          typeof entry.additionalProperties === "object"
+            ? entry.additionalProperties
+            : {};
+        for (const key of keys) props[key] = value;
+      }
+    }
+    if (entry.allOf) stack.push(...entry.allOf);
+    if (entry.anyOf) stack.push(...entry.anyOf);
+    if (entry.oneOf) stack.push(...entry.oneOf);
+    if (entry.not) stack.push(entry.not);
+  }
+  return props;
 };
