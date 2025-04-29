@@ -4,14 +4,14 @@ import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { findJsonIncompatible } from "./deep-checks";
 import { AbstractEndpoint } from "./endpoint";
-import { extract2 } from "./io-schema";
+import { flattenIO } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 
 export class Diagnostics {
   #verifiedEndpoints = new WeakSet<AbstractEndpoint>();
   #verifiedPaths = new WeakMap<
     AbstractEndpoint,
-    { flat: ReturnType<typeof extract2>; paths: string[] }
+    { flat: ReturnType<typeof flattenIO>; paths: string[] }
   >();
 
   constructor(protected logger: ActualLogger) {}
@@ -65,7 +65,7 @@ export class Diagnostics {
     if (params.length === 0) return; // next statement can be expensive
     const flat =
       ref?.flat ||
-      extract2(
+      flattenIO(
         z.toJSONSchema(endpoint.inputSchema, {
           unrepresentable: "any",
           io: "input",

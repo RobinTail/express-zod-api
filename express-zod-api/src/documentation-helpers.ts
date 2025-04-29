@@ -44,7 +44,7 @@ import { ezDateOutBrand } from "./date-out-schema";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { ezFileBrand } from "./file-schema";
-import { extract2, IOSchema } from "./io-schema";
+import { flattenIO, IOSchema } from "./io-schema";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
@@ -404,7 +404,7 @@ export const depictRequestParams = ({
   isHeader?: IsHeader;
   security?: Alternatives<Security>;
 }) => {
-  const flat = extract2(
+  const flat = flattenIO(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
       ctx: { isResponse: false, makeRef, path, method },
@@ -749,7 +749,7 @@ export const depictBody = ({
         R.values(
           R.omit(
             paramNames,
-            extract2(full as JSONSchema.BaseSchema).properties,
+            flattenIO(full as JSONSchema.BaseSchema).properties,
           ),
         ),
       ).filter(R.isNotNil),

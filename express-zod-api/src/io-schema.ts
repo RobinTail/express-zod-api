@@ -36,7 +36,7 @@ const isJsonObjectSchema = (
   subject: JSONSchema.BaseSchema,
 ): subject is JSONSchema.ObjectSchema => subject.type === "object";
 
-export const extract2 = (jsonSchema: JSONSchema.BaseSchema) => {
+export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
   const stack = [{ entry: jsonSchema, isOptional: false }];
   const flat: Required<
     Pick<JSONSchema.ObjectSchema, "type" | "properties" | "required">

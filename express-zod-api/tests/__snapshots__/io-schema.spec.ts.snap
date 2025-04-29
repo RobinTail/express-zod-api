@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`I/O Schema and related helpers > extractObjectSchema() > should pass the object schema through 1`] = `
+exports[`I/O Schema and related helpers > flattenIO() > should pass the object schema through 1`] = `
 {
   "properties": {
     "one": {
@@ -14,7 +14,7 @@ exports[`I/O Schema and related helpers > extractObjectSchema() > should pass th
 }
 `;
 
-exports[`I/O Schema and related helpers > extractObjectSchema() > should return object schema for the intersection of object schemas 1`] = `
+exports[`I/O Schema and related helpers > flattenIO() > should return object schema for the intersection of object schemas 1`] = `
 {
   "properties": {
     "one": {
@@ -32,7 +32,7 @@ exports[`I/O Schema and related helpers > extractObjectSchema() > should return 
 }
 `;
 
-exports[`I/O Schema and related helpers > extractObjectSchema() > should return object schema for the union of object schemas 1`] = `
+exports[`I/O Schema and related helpers > flattenIO() > should return object schema for the union of object schemas 1`] = `
 {
   "properties": {
     "one": {

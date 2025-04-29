@@ -1,7 +1,7 @@
 import { expectTypeOf } from "vitest";
 import { z } from "zod";
 import { IOSchema, Middleware, ez } from "../src";
-import { extract2, getFinalEndpointInputSchema } from "../src/io-schema";
+import { flattenIO, getFinalEndpointInputSchema } from "../src/io-schema";
 import { metaSymbol } from "../src/metadata";
 import { AbstractMiddleware } from "../src/middleware";
 
@@ -286,10 +286,9 @@ describe("I/O Schema and related helpers", () => {
     });
   });
 
-  // @todo change the name!
-  describe("extractObjectSchema()", () => {
+  describe("flattenIO()", () => {
     test("should pass the object schema through", () => {
-      const subject = extract2({
+      const subject = flattenIO({
         type: "object",
         properties: { one: { type: "string" } },
         required: ["one"],
@@ -298,7 +297,7 @@ describe("I/O Schema and related helpers", () => {
     });
 
     test("should return object schema for the union of object schemas", () => {
-      const subject = extract2({
+      const subject = flattenIO({
         oneOf: [
           {
             type: "object",
@@ -316,7 +315,7 @@ describe("I/O Schema and related helpers", () => {
     });
 
     test("should return object schema for the intersection of object schemas", () => {
-      const subject = extract2({
+      const subject = flattenIO({
         allOf: [
           {
             type: "object",
