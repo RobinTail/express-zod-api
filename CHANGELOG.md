@@ -23,6 +23,11 @@
 
 ## Version 23
 
+### v23.1.2
+
+- Simplified implementation for generating Documentation of `z.enum()` and `z.literal()`;
+- Fixed duplication in the Documentation generator code determining the requirement for a request body.
+
 ### v23.1.1
 
 - Fixed response depiction in the generated Documentation:
