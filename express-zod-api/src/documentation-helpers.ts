@@ -44,7 +44,7 @@ import { ezDateOutBrand } from "./date-out-schema";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { ezFileBrand } from "./file-schema";
-import { extractObjectSchema, IOSchema } from "./io-schema";
+import { extract2, extractObjectSchema, IOSchema } from "./io-schema";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
@@ -404,7 +404,12 @@ export const depictRequestParams = ({
   isHeader?: IsHeader;
   security?: Alternatives<Security>;
 }) => {
-  const objectSchema = extractObjectSchema(schema);
+  const flat = extract2(
+    depict(schema, {
+      rules: { ...brandHandling, ...depicters },
+      ctx: { isResponse: false, makeRef, path, method },
+    }) as JSONSchema.BaseSchema, // @todo fix this, consider detaching it from ensureCompliance
+  );
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
@@ -419,8 +424,8 @@ export const depictRequestParams = ({
     areHeadersEnabled &&
     (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders));
 
-  return Object.entries(objectSchema.shape).reduce<ParameterObject[]>(
-    (acc, [name, paramSchema]) => {
+  return Object.entries(flat).reduce<ParameterObject[]>(
+    (acc, [name, jsonSchema]) => {
       const location = isPathParam(name)
         ? "path"
         : isHeaderParam(name)
@@ -429,22 +434,22 @@ export const depictRequestParams = ({
             ? "query"
             : undefined;
       if (!location) return acc;
-      const depicted = depict(paramSchema, {
-        rules: { ...brandHandling, ...depicters },
-        ctx: { isResponse: false, makeRef, path, method },
-      });
+      const depicted = ensureCompliance(jsonSchema);
       const result =
         composition === "components"
-          ? makeRef(paramSchema, depicted, makeCleanId(description, name))
+          ? makeRef(jsonSchema, depicted, makeCleanId(description, name))
           : depicted;
       return acc.concat({
         name,
         in: location,
-        deprecated: globalRegistry.get(paramSchema)?.deprecated,
-        required: !doesAccept(paramSchema, undefined),
+        deprecated: jsonSchema.deprecated,
+        required: false, // @todo support it by extractor
         description: depicted.description || description,
         schema: result,
-        examples: depictParamExamples(objectSchema, name),
+        examples:
+          isSchemaObject(depicted) && depicted.examples
+            ? enumerateExamples(depicted.examples)
+            : undefined,
       });
     },
     [],
