@@ -38,11 +38,14 @@ const isJsonObjectSchema = (
 
 export const extract2 = (jsonSchema: JSONSchema.BaseSchema) => {
   const stack = [jsonSchema];
-  const props: Record<string, JSONSchema.BaseSchema> = {};
+  const flat: Required<Pick<JSONSchema.ObjectSchema, "type" | "properties">> = {
+    type: "object",
+    properties: {},
+  };
   while (stack.length) {
     const entry = stack.shift()!;
     if (isJsonObjectSchema(entry)) {
-      if (entry.properties) Object.assign(props, entry.properties);
+      if (entry.properties) Object.assign(flat.properties, entry.properties);
       if (entry.propertyNames) {
         const keys: string[] = [];
         if (typeof entry.propertyNames.const === "string")
@@ -58,7 +61,7 @@ export const extract2 = (jsonSchema: JSONSchema.BaseSchema) => {
           typeof entry.additionalProperties === "object"
             ? entry.additionalProperties
             : {};
-        for (const key of keys) props[key] = value;
+        for (const key of keys) flat.properties[key] = value;
       }
     }
     if (entry.allOf) stack.push(...entry.allOf);
@@ -66,5 +69,5 @@ export const extract2 = (jsonSchema: JSONSchema.BaseSchema) => {
     if (entry.oneOf) stack.push(...entry.oneOf);
     if (entry.not) stack.push(entry.not);
   }
-  return props;
+  return flat;
 };

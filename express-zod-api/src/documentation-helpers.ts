@@ -424,7 +424,7 @@ export const depictRequestParams = ({
     areHeadersEnabled &&
     (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders));
 
-  return Object.entries(flat).reduce<ParameterObject[]>(
+  return Object.entries(flat.properties).reduce<ParameterObject[]>(
     (acc, [name, jsonSchema]) => {
       const location = isPathParam(name)
         ? "path"
@@ -746,7 +746,12 @@ export const depictBody = ({
     examples: enumerateExamples(
       R.pluck(
         "examples",
-        R.values(R.omit(paramNames, extract2(full as JSONSchema.BaseSchema))),
+        R.values(
+          R.omit(
+            paramNames,
+            extract2(full as JSONSchema.BaseSchema).properties,
+          ),
+        ),
       ).filter(R.isNotNil),
     ),
   };

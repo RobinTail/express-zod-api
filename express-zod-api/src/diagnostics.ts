@@ -72,7 +72,7 @@ export class Diagnostics {
         }),
       );
     for (const param of params) {
-      if (param in flat) continue;
+      if (param in flat.properties) continue;
       this.logger.warn(
         "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
         Object.assign(ctx, { path, param }),

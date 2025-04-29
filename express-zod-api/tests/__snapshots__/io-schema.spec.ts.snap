@@ -2,31 +2,40 @@
 
 exports[`I/O Schema and related helpers > extractObjectSchema() > should pass the object schema through 1`] = `
 {
-  "one": {
-    "type": "string",
+  "properties": {
+    "one": {
+      "type": "string",
+    },
   },
+  "type": "object",
 }
 `;
 
 exports[`I/O Schema and related helpers > extractObjectSchema() > should return object schema for the intersection of object schemas 1`] = `
 {
-  "one": {
-    "type": "string",
+  "properties": {
+    "one": {
+      "type": "string",
+    },
+    "two": {
+      "type": "number",
+    },
   },
-  "two": {
-    "type": "number",
-  },
+  "type": "object",
 }
 `;
 
 exports[`I/O Schema and related helpers > extractObjectSchema() > should return object schema for the union of object schemas 1`] = `
 {
-  "one": {
-    "type": "string",
+  "properties": {
+    "one": {
+      "type": "string",
+    },
+    "two": {
+      "type": "number",
+    },
   },
-  "two": {
-    "type": "number",
-  },
+  "type": "object",
 }
 `;
 
