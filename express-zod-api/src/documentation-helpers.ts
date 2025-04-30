@@ -28,6 +28,7 @@ import { ResponseVariant } from "./api-response";
 import {
   combinations,
   doesAccept,
+  FlatObject,
   getExamples,
   getRoutePathParams,
   getTransformedType,
@@ -739,10 +740,11 @@ export const depictBody = ({
     examples: enumerateExamples(
       examples.length
         ? examples
-        : R.pluck(
-            "examples",
-            R.values(R.omit(paramNames, flattenIO(request).properties)),
-          ).filter(R.isNotNil),
+        : flattenIO(request)
+            .examples.filter(
+              (one): one is FlatObject => isObject(one) && !Array.isArray(one),
+            )
+            .map(R.omit(paramNames)),
     ),
   };
   const body: RequestBodyObject = {
