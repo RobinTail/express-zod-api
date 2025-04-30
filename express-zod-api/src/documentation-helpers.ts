@@ -28,7 +28,6 @@ import { ResponseVariant } from "./api-response";
 import {
   combinations,
   doesAccept,
-  FlatObject,
   getExamples,
   getRoutePathParams,
   getTransformedType,
@@ -354,27 +353,6 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
       )
     : undefined;
 
-export const depictExamples = (
-  schema: $ZodType,
-  isResponse: boolean,
-  omitProps: string[] = [],
-): ExamplesObject | undefined =>
-  R.pipe(
-    getExamples,
-    R.map(
-      R.when(
-        (one): one is FlatObject => isObject(one) && !Array.isArray(one),
-        R.omit(omitProps),
-      ),
-    ),
-    enumerateExamples,
-  )({
-    schema,
-    variant: isResponse ? "parsed" : "original",
-    validate: true,
-    pullProps: true,
-  });
-
 export const defaultIsHeader = (
   name: string,
   familiar?: string[],
@@ -576,11 +554,6 @@ export const excludeParamsFromDepiction = (
   return [result, hasRequired || Boolean(result.required?.length)];
 };
 
-export const excludeExamplesFromDepiction = (
-  depicted: SchemaObject | ReferenceObject,
-): SchemaObject | ReferenceObject =>
-  isReferenceObject(depicted) ? depicted : R.omit(["examples"], depicted);
-
 export const depictResponse = ({
   method,
   path,
@@ -606,20 +579,21 @@ export const depictResponse = ({
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
   if (!mimeTypes) return { description };
-  const depictedSchema = excludeExamplesFromDepiction(
-    ensureCompliance(
-      depict(schema, {
-        rules: { ...brandHandling, ...depicters },
-        ctx: { isResponse: true, makeRef, path, method },
-      }),
-    ),
+  const response = ensureCompliance(
+    depict(schema, {
+      rules: { ...brandHandling, ...depicters },
+      ctx: { isResponse: true, makeRef, path, method },
+    }),
   );
+  const { examples = [], ...depictedSchema } = isSchemaObject(response)
+    ? response
+    : { ...response };
   const media: MediaTypeObject = {
     schema:
       composition === "components"
         ? makeRef(schema, depictedSchema, makeCleanId(description))
         : depictedSchema,
-    examples: depictExamples(schema, true),
+    examples: enumerateExamples(examples),
   };
   return { description, content: R.fromPairs(R.xprod(mimeTypes, [media])) };
 };
@@ -753,15 +727,17 @@ export const depictBody = ({
     ensureCompliance(request),
     paramNames,
   );
-  const bodyDepiction = excludeExamplesFromDepiction(withoutParams);
+  const { examples = [], ...bodyDepiction } = isSchemaObject(withoutParams)
+    ? withoutParams
+    : { ...withoutParams };
   const media: MediaTypeObject = {
     schema:
       composition === "components"
         ? makeRef(schema, bodyDepiction, makeCleanId(description))
         : bodyDepiction,
     examples: enumerateExamples(
-      isSchemaObject(withoutParams) && withoutParams.examples?.length
-        ? withoutParams.examples
+      examples.length
+        ? examples
         : R.pluck(
             "examples",
             R.values(R.omit(paramNames, flattenIO(request).properties)),

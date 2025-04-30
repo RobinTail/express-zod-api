@@ -5,13 +5,11 @@ import { z } from "zod";
 import { ez } from "../src";
 import {
   OpenAPIContext,
-  depictExamples,
   depictRequestParams,
   depictSecurity,
   depictSecurityRefs,
   depictTags,
   ensureShortDescription,
-  excludeExamplesFromDepiction,
   excludeParamsFromDepiction,
   defaultIsHeader,
   reformatParamsInPath,
@@ -381,36 +379,6 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictExamples()", () => {
-    test.each<{ isResponse: boolean } & Record<"case" | "action", string>>([
-      { isResponse: false, case: "request", action: "pass" },
-      { isResponse: true, case: "response", action: "transform" },
-    ])("should $action examples in case of $case", ({ isResponse }) => {
-      expect(
-        depictExamples(
-          z
-            .object({
-              one: z.string().transform((v) => v.length),
-              two: z.number().transform((v) => `${v}`),
-              three: z.boolean(),
-            })
-            .example({
-              one: "test",
-              two: 123,
-              three: true,
-            })
-            .example({
-              one: "test2",
-              two: 456,
-              three: false,
-            }),
-          isResponse,
-          ["three"],
-        ),
-      ).toMatchSnapshot();
-    });
-  });
-
   describe("defaultIsHeader()", () => {
     test.each([
       { name: "x-request-id", expected: true },
@@ -515,18 +483,6 @@ describe("Documentation helpers", () => {
           composition: "inline",
           security: [[{ type: "header", name: "secure" }]],
           ...requestCtx,
-        }),
-      ).toMatchSnapshot();
-    });
-  });
-
-  describe("excludeExamplesFromDepiction()", () => {
-    test("should remove example property of supplied object", () => {
-      expect(
-        excludeExamplesFromDepiction({
-          type: "string",
-          description: "test",
-          examples: ["test"],
         }),
       ).toMatchSnapshot();
     });
