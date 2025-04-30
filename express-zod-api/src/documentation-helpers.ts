@@ -381,19 +381,6 @@ export const depictExamples = (
     pullProps: true,
   });
 
-// @todo remove
-export const depictParamExamples = (
-  schema: z.ZodType,
-  param: string,
-): ExamplesObject | undefined => {
-  return R.pipe(
-    getExamples,
-    R.filter(R.both(isObject, R.has(param))),
-    R.pluck(param),
-    enumerateExamples,
-  )({ schema, variant: "original", validate: true, pullProps: true });
-};
-
 export const defaultIsHeader = (
   name: string,
   familiar?: string[],

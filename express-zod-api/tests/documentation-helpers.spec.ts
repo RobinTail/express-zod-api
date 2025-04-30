@@ -6,7 +6,6 @@ import { ez } from "../src";
 import {
   OpenAPIContext,
   depictExamples,
-  depictParamExamples,
   depictRequestParams,
   depictSecurity,
   depictSecurityRefs,
@@ -406,32 +405,6 @@ describe("Documentation helpers", () => {
             }),
           isResponse,
           ["three"],
-        ),
-      ).toMatchSnapshot();
-    });
-  });
-
-  describe("depictParamExamples()", () => {
-    test("should pass examples for the given parameter", () => {
-      expect(
-        depictParamExamples(
-          z
-            .object({
-              one: z.string().transform((v) => v.length),
-              two: z.number().transform((v) => `${v}`),
-              three: z.boolean(),
-            })
-            .example({
-              one: "test",
-              two: 123,
-              three: true,
-            })
-            .example({
-              one: "test2",
-              two: 456,
-              three: false,
-            }),
-          "two",
         ),
       ).toMatchSnapshot();
     });
