@@ -49,6 +49,7 @@ import {
   onEach,
   onMissing,
   reformatParamsInPath,
+  depictBody,
 } from "../src/documentation-helpers";
 import { walkSchema } from "../src/schema-walker";
 
@@ -728,6 +729,19 @@ describe("Documentation helpers", () => {
           examples: ["test"],
         }),
       ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictBody", () => {
+    test("should mark ez.raw() body as required", () => {
+      const body = depictBody({
+        ...requestCtx,
+        schema: ez.raw(),
+        composition: "inline",
+        mimeType: "application/octet-stream", // raw content type
+        paramNames: [],
+      });
+      expect(body.required).toBe(true);
     });
   });
 
