@@ -1,5 +1,40 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`I/O Schema and related helpers > flattenIO() > should handle records 1`] = `
+{
+  "examples": [
+    {
+      "one": "test",
+      "two": "jest",
+    },
+    {
+      "one": "some",
+      "two": "another",
+    },
+    {
+      "four": 456,
+      "three": 123,
+    },
+  ],
+  "properties": {
+    "four": {
+      "type": "number",
+    },
+    "one": {
+      "type": "string",
+    },
+    "three": {
+      "type": "number",
+    },
+    "two": {
+      "type": "string",
+    },
+  },
+  "required": [],
+  "type": "object",
+}
+`;
+
 exports[`I/O Schema and related helpers > flattenIO() > should pass the object schema through 1`] = `
 {
   "examples": [

@@ -59,6 +59,7 @@ export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
           flat.required.push(...entry.required);
       }
       if (entry.examples) {
+        console.log(entry.examples);
         if (isOptional) {
           flat.examples.push(...entry.examples);
         } else {

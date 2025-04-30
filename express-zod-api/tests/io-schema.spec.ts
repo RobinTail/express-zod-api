@@ -336,5 +336,24 @@ describe("I/O Schema and related helpers", () => {
       });
       expect(subject).toMatchSnapshot();
     });
+
+    test("should handle records", () => {
+      const subject = z.toJSONSchema(
+        z
+          .record(z.literal(["one", "two"]), z.string())
+          .meta({
+            examples: [
+              { one: "test", two: "jest" },
+              { one: "some", two: "another" },
+            ],
+          })
+          .or(
+            z
+              .record(z.enum(["three", "four"]), z.number())
+              .meta({ examples: [{ three: 123, four: 456 }] }),
+          ),
+      );
+      expect(flattenIO(subject)).toMatchSnapshot();
+    });
   });
 });
