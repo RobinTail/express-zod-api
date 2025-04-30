@@ -956,7 +956,7 @@ paths:
             type: string
         - name: optDefault
           in: query
-          required: true
+          required: false
           description: GET /v1/getSomething Parameter
           schema:
             type: string
@@ -971,7 +971,7 @@ paths:
               - "null"
         - name: nuDefault
           in: query
-          required: true
+          required: false
           description: GET /v1/getSomething Parameter
           schema:
             type:
@@ -2147,7 +2147,7 @@ paths:
       parameters:
         - name: any
           in: query
-          required: true
+          required: false
           description: GET /v1/getSomething Parameter
           schema: {}
       responses:
@@ -2224,7 +2224,7 @@ paths:
       parameters:
         - name: string
           in: query
-          required: true
+          required: false
           description: GET /v1/getSomething Parameter
           schema:
             format: string (preprocessed)
