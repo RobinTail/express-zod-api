@@ -319,7 +319,7 @@ export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
     ctx.isResponse ? "in" : "out"
   ];
   if (!isSchema<$ZodTransform>(target, "transform")) return jsonSchema;
-  const opposingDepiction = depict(opposite, { ctx });
+  const opposingDepiction = ensureCompliance(depict(opposite, { ctx }));
   if (isSchemaObject(opposingDepiction)) {
     if (!ctx.isResponse) {
       const { type: opposingType, ...rest } = opposingDepiction;
@@ -421,7 +421,7 @@ export const depictRequestParams = ({
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
       ctx: { isResponse: false, makeRef, path, method },
-    }) as JSONSchema.BaseSchema, // @todo fix this, consider detaching it from ensureCompliance
+    }),
   );
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
@@ -525,7 +525,7 @@ const fixReferences = (
     }
     if (R.is(Array, entry)) stack.push(...R.values(entry));
   }
-  return ensureCompliance(subject);
+  return subject;
 };
 
 /** @link https://github.com/colinhacks/zod/issues/4275 */
@@ -620,10 +620,12 @@ export const depictResponse = ({
 }): ResponseObject => {
   if (!mimeTypes) return { description };
   const depictedSchema = excludeExamplesFromDepiction(
-    depict(schema, {
-      rules: { ...brandHandling, ...depicters },
-      ctx: { isResponse: true, makeRef, path, method },
-    }),
+    ensureCompliance(
+      depict(schema, {
+        rules: { ...brandHandling, ...depicters },
+        ctx: { isResponse: true, makeRef, path, method },
+      }),
+    ),
   );
   const media: MediaTypeObject = {
     schema:
@@ -746,7 +748,7 @@ export const depictBody = ({
     ctx: { isResponse: false, makeRef, path, method },
   });
   const [withoutParams, hasRequired] = excludeParamsFromDepiction(
-    full,
+    ensureCompliance(full),
     paramNames,
   );
   const bodyDepiction = excludeExamplesFromDepiction(withoutParams);
@@ -760,12 +762,7 @@ export const depictBody = ({
     examples: enumerateExamples(
       R.pluck(
         "examples",
-        R.values(
-          R.omit(
-            paramNames,
-            flattenIO(full as JSONSchema.BaseSchema).properties,
-          ),
-        ),
+        R.values(R.omit(paramNames, flattenIO(full).properties)),
       ).filter(R.isNotNil),
     ),
   };
