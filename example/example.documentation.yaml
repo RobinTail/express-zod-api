@@ -137,12 +137,12 @@ paths:
                 key:
                   type: string
                   minLength: 1
-                  examples:
+                  examples: &a1
                     - 1234-5678-90
                 name:
                   type: string
                   minLength: 1
-                  examples:
+                  examples: &a2
                     - John Doe
                 birthday:
                   description: YYYY-MM-DDTHH:mm:ss.sssZ
@@ -151,7 +151,7 @@ paths:
                   pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
                   externalDocs:
                     url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                  examples:
+                  examples: &a3
                     - 1963-04-21
               required:
                 - key
@@ -159,10 +159,11 @@ paths:
                 - birthday
             examples:
               example1:
-                value:
-                  key: 1234-5678-90
-                  name: John Doe
-                  birthday: 1963-04-21
+                value: *a1
+              example2:
+                value: *a2
+              example3:
+                value: *a3
         required: true
       security:
         - APIKEY_1: []
