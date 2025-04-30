@@ -11,7 +11,7 @@ export const createUserEndpoint = statusDependingFactory.build({
     name: z.string().nonempty(),
   }),
   output: z.object({
-    id: z.number().int().positive(),
+    id: z.int().positive(),
   }),
   handler: async ({ input: { name } }) => {
     assert(name !== "Gimme Jimmy", createHttpError(500, "That went wrong"));

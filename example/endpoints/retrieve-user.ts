@@ -27,7 +27,7 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
         .describe("a numeric string containing the id of the user"),
     }),
     output: z.object({
-      id: z.number().int().nonnegative(),
+      id: z.int().nonnegative(),
       name: z.string(),
       features: feature.array(),
     }),
