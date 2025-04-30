@@ -1,7 +1,7 @@
 import type { JSONSchema } from "@zod/core";
 import * as R from "ramda";
 import { z } from "zod";
-import { combinations, FlatObject, isObject } from "./common-helpers";
+import { combinations, isObject } from "./common-helpers";
 import { mixExamples } from "./metadata";
 import { AbstractMiddleware } from "./middleware";
 
