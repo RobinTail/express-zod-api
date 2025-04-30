@@ -381,6 +381,7 @@ export const depictExamples = (
     pullProps: true,
   });
 
+// @todo remove
 export const depictParamExamples = (
   schema: z.ZodType,
   param: string,
@@ -459,10 +460,14 @@ export const depictRequestParams = ({
         required: flat.required.includes(name),
         description: depicted.description || description,
         schema: result,
-        examples:
-          isSchemaObject(depicted) && depicted.examples
-            ? enumerateExamples(depicted.examples)
-            : undefined,
+        examples: enumerateExamples(
+          isSchemaObject(depicted) && depicted.examples?.length
+            ? depicted.examples // own examples or from the flat:
+            : R.pluck(
+                name,
+                flat.examples.filter(R.both(isObject, R.has(name))),
+              ),
+        ),
       });
     },
     [],

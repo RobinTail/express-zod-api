@@ -1,6 +1,7 @@
 import type { JSONSchema } from "@zod/core";
 import * as R from "ramda";
 import { z } from "zod";
+import { combinations, FlatObject, isObject } from "./common-helpers";
 import { mixExamples } from "./metadata";
 import { AbstractMiddleware } from "./middleware";
 
@@ -39,11 +40,15 @@ const isJsonObjectSchema = (
 export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
   const stack = [{ entry: jsonSchema, isOptional: false }];
   const flat: Required<
-    Pick<JSONSchema.ObjectSchema, "type" | "properties" | "required">
+    Pick<
+      JSONSchema.ObjectSchema,
+      "type" | "properties" | "required" | "examples"
+    >
   > = {
     type: "object",
     properties: {},
     required: [],
+    examples: [],
   };
   while (stack.length) {
     const { entry, isOptional } = stack.shift()!;
@@ -52,6 +57,11 @@ export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
         Object.assign(flat.properties, entry.properties);
         if (!isOptional && entry.required)
           flat.required.push(...entry.required);
+        flat.examples = combinations(
+          flat.examples.filter(isObject),
+          entry.examples?.filter(isObject) || [],
+          ([a, b]) => ({ ...a, ...b }),
+        );
       }
       if (entry.propertyNames) {
         const keys: string[] = [];

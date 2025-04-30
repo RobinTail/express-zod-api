@@ -3552,6 +3552,9 @@ paths:
           description: GET /v1/getSomething Parameter
           schema:
             type: string
+          examples:
+            example1:
+              value: "123"
       responses:
         "200":
           description: GET /v1/getSomething Positive response
