@@ -81,13 +81,7 @@ export type IsHeader = (
 
 export type BrandHandling = Record<string | symbol, Depicter>;
 
-interface ReqResHandlingProps<S extends $ZodType>
-  extends Omit<OpenAPIContext, "isResponse"> {
-  schema: S;
-  composition: "inline" | "components";
-  description?: string;
-  brandHandling?: BrandHandling;
-}
+type ReqResCommons = Omit<OpenAPIContext, "isResponse">;
 
 const shortDescriptionLimit = 50;
 const isoDateDocumentationUrl =
@@ -392,25 +386,22 @@ export const defaultIsHeader = (
 export const depictRequestParams = ({
   path,
   method,
-  schema,
+  request,
   inputSources,
   makeRef,
   composition,
-  brandHandling,
   isHeader,
   security,
   description = `${method.toUpperCase()} ${path} Parameter`,
-}: ReqResHandlingProps<IOSchema> & {
+}: ReqResCommons & {
+  composition: "inline" | "components";
+  description?: string;
+  request: JSONSchema.BaseSchema;
   inputSources: InputSource[];
   isHeader?: IsHeader;
   security?: Alternatives<Security>;
 }) => {
-  const flat = flattenIO(
-    depict(schema, {
-      rules: { ...brandHandling, ...depicters },
-      ctx: { isResponse: false, makeRef, path, method },
-    }),
-  );
+  const flat = flattenIO(request);
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
@@ -604,7 +595,11 @@ export const depictResponse = ({
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
-}: ReqResHandlingProps<$ZodType> & {
+}: ReqResCommons & {
+  schema: $ZodType;
+  composition: "inline" | "components";
+  description?: string;
+  brandHandling?: BrandHandling;
   mimeTypes: ReadonlyArray<string> | null;
   variant: ResponseVariant;
   statusCode: number;
@@ -721,26 +716,41 @@ export const depictSecurityRefs = (
     }, {}),
   );
 
+export const depictRequest = ({
+  schema,
+  brandHandling,
+  makeRef,
+  path,
+  method,
+}: ReqResCommons & {
+  schema: IOSchema;
+  brandHandling?: BrandHandling;
+}) =>
+  depict(schema, {
+    rules: { ...brandHandling, ...depicters },
+    ctx: { isResponse: false, makeRef, path, method },
+  });
+
 export const depictBody = ({
   method,
   path,
   schema,
+  request,
   mimeType,
   makeRef,
   composition,
-  brandHandling,
   paramNames,
   description = `${method.toUpperCase()} ${path} Request body`,
-}: ReqResHandlingProps<IOSchema> & {
+}: ReqResCommons & {
+  schema: IOSchema;
+  composition: "inline" | "components";
+  description?: string;
+  request: JSONSchema.BaseSchema;
   mimeType: string;
   paramNames: string[];
 }) => {
-  const full = depict(schema, {
-    rules: { ...brandHandling, ...depicters },
-    ctx: { isResponse: false, makeRef, path, method },
-  });
   const [withoutParams, hasRequired] = excludeParamsFromDepiction(
-    ensureCompliance(full),
+    ensureCompliance(request),
     paramNames,
   );
   const bodyDepiction = excludeExamplesFromDepiction(withoutParams);
@@ -754,7 +764,7 @@ export const depictBody = ({
         ? withoutParams.examples
         : R.pluck(
             "examples",
-            R.values(R.omit(paramNames, flattenIO(full).properties)),
+            R.values(R.omit(paramNames, flattenIO(request).properties)),
           ).filter(R.isNotNil),
     ),
   };

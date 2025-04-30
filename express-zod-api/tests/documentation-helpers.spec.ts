@@ -30,6 +30,7 @@ import {
   depictBody,
   depictEnum,
   depictLiteral,
+  depictRequest,
 } from "../src/documentation-helpers";
 
 describe("Documentation helpers", () => {
@@ -428,14 +429,32 @@ describe("Documentation helpers", () => {
     );
   });
 
-  describe("depictRequestParams()", () => {
-    test("should depict query and path params", () => {
+  describe("depictRequest", () => {
+    test("should simply delegate it all to Zod 4", () => {
       expect(
-        depictRequestParams({
+        depictRequest({
           schema: z.object({
             id: z.string(),
             test: z.boolean(),
           }),
+          ...requestCtx,
+        }),
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictRequestParams()", () => {
+    test("should depict query and path params", () => {
+      expect(
+        depictRequestParams({
+          request: {
+            properties: {
+              id: { type: "string" },
+              test: { type: "boolean" },
+            },
+            required: ["id", "test"],
+            type: "object",
+          },
           inputSources: ["query", "params"],
           composition: "inline",
           ...requestCtx,
@@ -446,10 +465,14 @@ describe("Documentation helpers", () => {
     test("should depict only path params if query is disabled", () => {
       expect(
         depictRequestParams({
-          schema: z.object({
-            id: z.string(),
-            test: z.boolean(),
-          }),
+          request: {
+            properties: {
+              id: { type: "string" },
+              test: { type: "boolean" },
+            },
+            required: ["id", "test"],
+            type: "object",
+          },
           inputSources: ["body", "params"],
           composition: "inline",
           ...requestCtx,
@@ -460,10 +483,14 @@ describe("Documentation helpers", () => {
     test("should depict none if both query and params are disabled", () => {
       expect(
         depictRequestParams({
-          schema: z.object({
-            id: z.string(),
-            test: z.boolean(),
-          }),
+          request: {
+            properties: {
+              id: { type: "string" },
+              test: { type: "boolean" },
+            },
+            required: ["id", "test"],
+            type: "object",
+          },
           inputSources: ["body"],
           composition: "inline",
           ...requestCtx,
@@ -474,12 +501,16 @@ describe("Documentation helpers", () => {
     test("Features 1180 and 2344: should depict header params when enabled", () => {
       expect(
         depictRequestParams({
-          schema: z.object({
-            "x-request-id": z.string(),
-            id: z.string(),
-            test: z.boolean(),
-            secure: z.string(),
-          }),
+          request: {
+            properties: {
+              "x-request-id": { type: "string" },
+              id: { type: "string" },
+              test: { type: "boolean" },
+              secure: { type: "string" },
+            },
+            required: ["x-request-id", "id", "test", "secure"],
+            type: "object",
+          },
           inputSources: ["query", "headers", "params"],
           composition: "inline",
           security: [[{ type: "header", name: "secure" }]],
@@ -506,6 +537,7 @@ describe("Documentation helpers", () => {
       const body = depictBody({
         ...requestCtx,
         schema: ez.raw(),
+        request: { type: "string", format: "binary" },
         composition: "inline",
         mimeType: "application/octet-stream", // raw content type
         paramNames: [],

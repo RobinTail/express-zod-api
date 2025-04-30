@@ -1291,7 +1291,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Schema3"
+              $ref: "#/components/schemas/Schema1"
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1362,18 +1362,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Schema2"
-      required:
-        - name
-        - subcategories
-    Schema3:
-      type: object
-      properties:
-        name:
-          type: string
-        subcategories:
-          type: array
-          items:
-            $ref: "#/components/schemas/Schema3"
       required:
         - name
         - subcategories

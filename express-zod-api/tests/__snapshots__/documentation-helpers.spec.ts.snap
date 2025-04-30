@@ -283,6 +283,24 @@ exports[`Documentation helpers > depictRaw() > should extract the raw property 1
 }
 `;
 
+exports[`Documentation helpers > depictRequest > should simply delegate it all to Zod 4 1`] = `
+{
+  "properties": {
+    "id": {
+      "type": "string",
+    },
+    "test": {
+      "type": "boolean",
+    },
+  },
+  "required": [
+    "id",
+    "test",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344: should depict header params when enabled 1`] = `
 [
   {
