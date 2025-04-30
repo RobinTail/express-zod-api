@@ -32,7 +32,7 @@ describe("ez.file()", () => {
 
     test("should create a base64 file", () => {
       const schema = ez.file("base64");
-      expect(schema).toBeInstanceOf(z.ZodString);
+      expect(schema).toBeInstanceOf(z.ZodBase64);
       expectTypeOf(schema._zod.output).toBeString();
     });
   });

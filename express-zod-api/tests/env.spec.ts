@@ -17,10 +17,6 @@ describe("Environment checks", () => {
     );
   });
 
-  /**
-   * @todo try z.int().max(1000) when it's fixed in Zod 4
-   * @link https://github.com/colinhacks/zod/issues/4162
-   */
   describe("Zod checks/refinements", () => {
     test.each([
       z.string().email(),
@@ -28,17 +24,10 @@ describe("Environment checks", () => {
       z.number().int(),
       z.int(),
       z.int32(),
+      z.int().max(1000),
     ])("Snapshot control $constructor.name definition", (schema) => {
       const snapshot = R.omit(["id", "version"], schema._zod);
       expect(snapshot).toMatchSnapshot();
-    });
-
-    /**
-     * @link https://github.com/colinhacks/zod/issues/4162
-     * @link https://github.com/colinhacks/zod/issues/4141
-     * */
-    test("This should fail when they fix it", () => {
-      expect(z.int()).not.toHaveProperty("max");
     });
   });
 
