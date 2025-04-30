@@ -3271,6 +3271,10 @@ paths:
                   type: string
               required:
                 - a
+            examples:
+              example1:
+                value:
+                  a: first
         required: true
       responses:
         "200":
@@ -3464,6 +3468,11 @@ paths:
               required:
                 - key
                 - str
+            examples:
+              example1:
+                value:
+                  key: 1234-56789-01
+                  str: test
         required: true
       responses:
         "200":
@@ -3646,6 +3655,10 @@ paths:
                   type: string
               required:
                 - strNum
+            examples:
+              example1:
+                value:
+                  strNum: "123"
         required: true
       responses:
         "200":

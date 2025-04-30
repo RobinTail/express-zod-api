@@ -762,13 +762,13 @@ export const depictBody = ({
       composition === "components"
         ? makeRef(schema, bodyDepiction, makeCleanId(description))
         : bodyDepiction,
-    // @todo these examples lack pullProps in onEach, that used to be done by depictExamples
-    // @todo maybe should refactor usage of excludeExamplesFromDepiction() above?
     examples: enumerateExamples(
-      R.pluck(
-        "examples",
-        R.values(R.omit(paramNames, flattenIO(full).properties)),
-      ).filter(R.isNotNil),
+      isSchemaObject(withoutParams) && withoutParams.examples?.length
+        ? withoutParams.examples
+        : R.pluck(
+            "examples",
+            R.values(R.omit(paramNames, flattenIO(full).properties)),
+          ).filter(R.isNotNil),
     ),
   };
   const body: RequestBodyObject = {
