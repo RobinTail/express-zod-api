@@ -3760,6 +3760,8 @@ paths:
                           - "123"
                     required:
                       - numericStr
+                    examples:
+                      - numericStr: "123"
                 required:
                   - status
                   - data

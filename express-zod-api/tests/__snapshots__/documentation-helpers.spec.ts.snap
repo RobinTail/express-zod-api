@@ -62,40 +62,6 @@ exports[`Documentation helpers > depictEnum() > should set type 1`] = `
 }
 `;
 
-exports[`Documentation helpers > depictExamples() > should 'pass' examples in case of 'request' 1`] = `
-{
-  "example1": {
-    "value": {
-      "one": "test",
-      "two": 123,
-    },
-  },
-  "example2": {
-    "value": {
-      "one": "test2",
-      "two": 456,
-    },
-  },
-}
-`;
-
-exports[`Documentation helpers > depictExamples() > should 'transform' examples in case of 'response' 1`] = `
-{
-  "example1": {
-    "value": {
-      "one": 4,
-      "two": "123",
-    },
-  },
-  "example2": {
-    "value": {
-      "one": 5,
-      "two": "456",
-    },
-  },
-}
-`;
-
 exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 0 1`] = `
 {
   "format": "file",
@@ -250,17 +216,6 @@ exports[`Documentation helpers > depictNullable() > should add null type to the 
 exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 1`] = `
 {
   "type": "null",
-}
-`;
-
-exports[`Documentation helpers > depictParamExamples() > should pass examples for the given parameter 1`] = `
-{
-  "example1": {
-    "value": 123,
-  },
-  "example2": {
-    "value": 456,
-  },
 }
 `;
 
@@ -675,13 +630,6 @@ DocumentationError({
   "cause": "Response schema of an Endpoint assigned to GET method of /v1/user/:id path.",
   "message": "Please use ez.upload() only for input.",
 })
-`;
-
-exports[`Documentation helpers > excludeExamplesFromDepiction() > should remove example property of supplied object 1`] = `
-{
-  "description": "test",
-  "type": "string",
-}
 `;
 
 exports[`Documentation helpers > excludeParamsFromDepiction() > should handle the ReferenceObject 1`] = `
