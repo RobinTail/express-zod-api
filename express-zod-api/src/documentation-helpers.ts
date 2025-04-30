@@ -457,6 +457,7 @@ const onEach: Depicter = ({ zodSchema, jsonSchema }, { isResponse }) => {
     schema: zodSchema,
     variant: isResponse ? "parsed" : "original",
     validate: true,
+    pullProps: true,
   });
   if (examples.length) result.examples = examples.slice();
   return result;
