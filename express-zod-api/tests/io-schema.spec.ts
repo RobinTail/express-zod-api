@@ -292,6 +292,7 @@ describe("I/O Schema and related helpers", () => {
         type: "object",
         properties: { one: { type: "string" } },
         required: ["one"],
+        examples: [{ one: "test" }],
       });
       expect(subject).toMatchSnapshot();
     });
@@ -303,11 +304,13 @@ describe("I/O Schema and related helpers", () => {
             type: "object",
             properties: { one: { type: "string" } },
             required: ["one"],
+            examples: [{ one: "test" }],
           },
           {
             type: "object",
             properties: { two: { type: "number" } },
             required: ["two"],
+            examples: [{ two: "jest" }],
           },
         ],
       });
@@ -321,11 +324,13 @@ describe("I/O Schema and related helpers", () => {
             type: "object",
             properties: { one: { type: "string" } },
             required: ["one"],
+            examples: [{ one: "test" }],
           },
           {
             type: "object",
             properties: { two: { type: "number" } },
             required: ["two"],
+            examples: [{ two: "jest" }],
           },
         ],
       });

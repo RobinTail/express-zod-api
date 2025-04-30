@@ -2,7 +2,11 @@
 
 exports[`I/O Schema and related helpers > flattenIO() > should pass the object schema through 1`] = `
 {
-  "examples": [],
+  "examples": [
+    {
+      "one": "test",
+    },
+  ],
   "properties": {
     "one": {
       "type": "string",
@@ -17,7 +21,12 @@ exports[`I/O Schema and related helpers > flattenIO() > should pass the object s
 
 exports[`I/O Schema and related helpers > flattenIO() > should return object schema for the intersection of object schemas 1`] = `
 {
-  "examples": [],
+  "examples": [
+    {
+      "one": "test",
+      "two": "jest",
+    },
+  ],
   "properties": {
     "one": {
       "type": "string",
@@ -36,7 +45,14 @@ exports[`I/O Schema and related helpers > flattenIO() > should return object sch
 
 exports[`I/O Schema and related helpers > flattenIO() > should return object schema for the union of object schemas 1`] = `
 {
-  "examples": [],
+  "examples": [
+    {
+      "one": "test",
+    },
+    {
+      "two": "jest",
+    },
+  ],
   "properties": {
     "one": {
       "type": "string",

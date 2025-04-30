@@ -57,11 +57,17 @@ export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
         Object.assign(flat.properties, entry.properties);
         if (!isOptional && entry.required)
           flat.required.push(...entry.required);
-        flat.examples = combinations(
-          flat.examples.filter(isObject),
-          entry.examples?.filter(isObject) || [],
-          ([a, b]) => ({ ...a, ...b }),
-        );
+        if (entry.examples) {
+          if (isOptional) {
+            flat.examples.push(...entry.examples);
+          } else {
+            flat.examples = combinations(
+              flat.examples.filter(isObject),
+              entry.examples.filter(isObject),
+              ([a, b]) => ({ ...a, ...b }),
+            );
+          }
+        }
       }
       if (entry.propertyNames) {
         const keys: string[] = [];
