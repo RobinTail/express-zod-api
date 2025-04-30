@@ -25,7 +25,7 @@ export const makeEventSchema = (event: string, data: z.ZodType) =>
     data,
     event: z.literal(event),
     id: z.string().optional(),
-    retry: z.number().int().positive().optional(),
+    retry: z.int().positive().optional(),
   });
 
 export const formatEvent = <E extends EventsMap>(

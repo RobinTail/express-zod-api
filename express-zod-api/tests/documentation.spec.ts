@@ -54,7 +54,7 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               input: z.object({
-                array: z.array(z.number().int().positive()).min(1).max(3),
+                array: z.array(z.int().positive()).min(1).max(3),
                 unlimited: z.array(z.boolean()),
                 transformer: z.string().transform((str) => str.length),
               }),
@@ -86,7 +86,7 @@ describe("Documentation", () => {
                 optional: z.string().optional(),
                 optDefault: z.string().optional().default("test"),
                 nullish: z.boolean().nullish(),
-                nuDefault: z.number().int().positive().nullish().default(123),
+                nuDefault: z.int().positive().nullish().default(123),
               }),
               output: z.object({
                 nullable: z.string().nullable(),
@@ -124,14 +124,8 @@ describe("Documentation", () => {
               }),
               output: z.object({
                 and: z
-                  .object({
-                    five: z.number().int().gte(0),
-                  })
-                  .and(
-                    z.object({
-                      six: z.string(),
-                    }),
-                  ),
+                  .object({ five: z.int().gte(0) })
+                  .and(z.object({ six: z.string() })),
               }),
               handler: async () => ({
                 and: {
@@ -158,19 +152,11 @@ describe("Documentation", () => {
               method: "post",
               input: z.object({
                 union: z.union([
-                  z.object({
-                    one: z.string(),
-                    two: z.number().int().positive(),
-                  }),
-                  z.object({
-                    two: z.number().int().negative(),
-                    three: z.string(),
-                  }),
+                  z.object({ one: z.string(), two: z.int().positive() }),
+                  z.object({ two: z.int().negative(), three: z.string() }),
                 ]),
               }),
-              output: z.object({
-                or: z.string().or(z.number().int().positive()),
-              }),
+              output: z.object({ or: z.string().or(z.int().positive()) }),
               handler: async () => ({
                 or: 554,
               }),
@@ -223,10 +209,7 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
-              input: z.object({
-                one: z.string(),
-                two: z.number().int().positive(),
-              }),
+              input: z.object({ one: z.string(), two: z.int().positive() }),
               output: z.object({
                 transform: z.string().transform((str) => str.length),
               }),
@@ -338,10 +321,10 @@ describe("Documentation", () => {
                 doubleNegative: z.number().negative(),
                 doubleLimited: z.number().min(-0.5).max(0.5),
                 int: z.int(),
-                intPositive: z.number().int().positive(),
-                intNegative: z.number().int().negative(),
-                intLimited: z.number().int().min(-100).max(100),
-                zero: z.number().int().nonnegative().nonpositive().optional(),
+                intPositive: z.int().positive(),
+                intNegative: z.int().negative(),
+                intLimited: z.int().min(-100).max(100),
+                zero: z.int().nonnegative().nonpositive().optional(),
               }),
               output: z.object({
                 bigint: z.bigint(),
@@ -406,11 +389,7 @@ describe("Documentation", () => {
               input: z.object({
                 ofOne: z.tuple([z.boolean()]),
                 ofStrings: z.tuple([z.string(), z.string().nullable()]),
-                complex: z.tuple([
-                  z.boolean(),
-                  z.string(),
-                  z.number().int().positive(),
-                ]),
+                complex: z.tuple([z.boolean(), z.string(), z.int().positive()]),
               }),
               output: z.object({
                 empty: z.tuple([]),
@@ -456,7 +435,7 @@ describe("Documentation", () => {
       const string = z.preprocess((arg) => String(arg), z.string());
       const number = z.preprocess(
         (arg) => parseInt(String(arg), 16),
-        z.number().int().nonnegative(),
+        z.int().nonnegative(),
       );
       const boolean = z.preprocess((arg) => !!arg, z.boolean());
       const spec = new Documentation({

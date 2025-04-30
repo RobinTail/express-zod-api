@@ -107,5 +107,5 @@ export const noContentFactory = new EndpointsFactory(
 
 /** @desc This factory is for producing event streams of server-sent events (SSE) */
 export const eventsFactory = new EventStreamFactory({
-  time: z.number().int().positive(),
+  time: z.int().positive(),
 });
