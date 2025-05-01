@@ -152,7 +152,7 @@ export const depictIntersection = R.tryCatch<Depicter>(
       if (entry.type !== "object") throw "not objects";
       if (!canMerge(entry)) throw "can not merge";
     }
-    return flattenIO(jsonSchema, "suggestive");
+    return flattenIO(jsonSchema, "throw");
   },
   (_err, { jsonSchema }) => jsonSchema,
 );

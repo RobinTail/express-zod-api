@@ -12,10 +12,9 @@ const propsMerger = R.mergeDeepWith((a: unknown, b: unknown) => {
   throw new Error("Can not flatten properties");
 });
 
-/** @todo DNRY with intersect() */
 export const flattenIO = (
   jsonSchema: JSONSchema.BaseSchema,
-  mode: "coercive" | "suggestive" = "coercive", // throws in suggestive mode
+  mode: "coerce" | "throw" = "coerce",
 ) => {
   const stack = [{ entry: jsonSchema, isOptional: false }];
   const flat: Required<
@@ -45,7 +44,7 @@ export const flattenIO = (
     }
     if (!isJsonObjectSchema(entry)) continue;
     if (entry.properties) {
-      flat.properties = (mode === "coercive" ? R.mergeDeepRight : propsMerger)(
+      flat.properties = (mode === "throw" ? propsMerger : R.mergeDeepRight)(
         flat.properties,
         entry.properties,
       );
