@@ -146,7 +146,7 @@ const approaches = {
     R.union(left, right),
   examples: ({ examples: left = [] }, { examples: right = [] }) =>
     combinations(left.filter(isObject), right.filter(isObject), ([a, b]) =>
-      R.mergeDeepRight({ ...a }, { ...b }),
+      R.mergeDeepRight(a, b),
     ),
   description: ({ description: left }, { description: right }) => left || right,
 } satisfies {
