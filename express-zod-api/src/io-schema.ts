@@ -94,5 +94,6 @@ export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
       if (!isOptional) flat.required.push(...keys);
     }
   }
+  if (flat.required.length > 1) flat.required = [...new Set(flat.required)]; // drop duplicates
   return flat;
 };
