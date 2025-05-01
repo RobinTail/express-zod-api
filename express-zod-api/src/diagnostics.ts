@@ -4,7 +4,7 @@ import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { findJsonIncompatible } from "./deep-checks";
 import { AbstractEndpoint } from "./endpoint";
-import { flattenIO } from "./io-schema";
+import { flattenIO } from "./json-schema-helpers";
 import { ActualLogger } from "./logger-helpers";
 
 export class Diagnostics {
