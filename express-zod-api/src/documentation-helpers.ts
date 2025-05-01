@@ -204,7 +204,10 @@ export const depictLiteral: Depicter = ({ jsonSchema }) => ({
   ...jsonSchema,
 });
 
-const depictObject: Depicter = ({ zodSchema, jsonSchema }, { isResponse }) => {
+export const depictObject: Depicter = (
+  { zodSchema, jsonSchema },
+  { isResponse },
+) => {
   if (isResponse) return jsonSchema;
   if (!isSchema<$ZodObject>(zodSchema, "object")) return jsonSchema;
   const { required = [] } = jsonSchema as JSONSchema.ObjectSchema;

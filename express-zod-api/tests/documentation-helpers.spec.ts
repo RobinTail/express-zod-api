@@ -29,6 +29,7 @@ import {
   depictEnum,
   depictLiteral,
   depictRequest,
+  depictObject,
 } from "../src/documentation-helpers";
 
 describe("Documentation helpers", () => {
@@ -327,6 +328,34 @@ describe("Documentation helpers", () => {
       (jsonSchema) => {
         expect(
           depictLiteral({ zodSchema: z.never(), jsonSchema }, requestCtx),
+        ).toMatchSnapshot();
+      },
+    );
+  });
+
+  describe("depictObject()", () => {
+    test.each([
+      {
+        zodSchema: z.object({ a: z.number(), b: z.string() }),
+        jsonSchema: {
+          type: "object",
+          properties: { a: { type: "number" }, b: { type: "string" } },
+          required: ["a", "b"],
+        },
+      },
+      {
+        zodSchema: z.object({ a: z.number().optional(), b: z.coerce.string() }),
+        jsonSchema: {
+          type: "object",
+          properties: { a: { type: "number" }, b: { type: "string" } },
+          required: ["b"],
+        },
+      },
+    ])(
+      "should remove optional props from required for request %#",
+      ({ zodSchema, jsonSchema }) => {
+        expect(
+          depictObject({ zodSchema, jsonSchema }, requestCtx),
         ).toMatchSnapshot();
       },
     );

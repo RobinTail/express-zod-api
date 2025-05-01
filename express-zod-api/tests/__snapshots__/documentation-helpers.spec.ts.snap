@@ -219,6 +219,39 @@ exports[`Documentation helpers > depictNullable() > should not add null type whe
 }
 `;
 
+exports[`Documentation helpers > depictObject() > should remove optional props from required for request 0 1`] = `
+{
+  "properties": {
+    "a": {
+      "type": "number",
+    },
+    "b": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "a",
+    "b",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`Documentation helpers > depictObject() > should remove optional props from required for request 1 1`] = `
+{
+  "properties": {
+    "a": {
+      "type": "number",
+    },
+    "b": {
+      "type": "string",
+    },
+  },
+  "required": [],
+  "type": "object",
+}
+`;
+
 exports[`Documentation helpers > depictPipeline > should depict as 'number (out)' 1`] = `
 {
   "type": "number",
