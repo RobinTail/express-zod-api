@@ -52,39 +52,6 @@ export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
   };
   while (stack.length) {
     const { entry, isOptional } = stack.shift()!;
-    if (isJsonObjectSchema(entry)) {
-      if (entry.properties) {
-        Object.assign(flat.properties, entry.properties);
-        if (!isOptional && entry.required)
-          flat.required.push(...entry.required);
-      }
-      if (entry.examples) {
-        if (isOptional) {
-          flat.examples.push(...entry.examples);
-        } else {
-          flat.examples = combinations(
-            flat.examples.filter(isObject),
-            entry.examples.filter(isObject),
-            ([a, b]) => ({ ...a, ...b }),
-          );
-        }
-      }
-      if (entry.propertyNames) {
-        const keys: string[] = [];
-        if (typeof entry.propertyNames.const === "string")
-          keys.push(entry.propertyNames.const);
-        if (entry.propertyNames.enum) {
-          keys.push(
-            ...entry.propertyNames.enum.filter(
-              (one) => typeof one === "string",
-            ),
-          );
-        }
-        const value = { ...Object(entry.additionalProperties) }; // it can be bool
-        for (const key of keys) flat.properties[key] = value;
-        if (!isOptional) flat.required.push(...keys);
-      }
-    }
     if (entry.allOf)
       stack.push(...entry.allOf.map((one) => ({ entry: one, isOptional })));
     if (entry.anyOf) {
@@ -96,6 +63,35 @@ export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
       stack.push(
         ...entry.oneOf.map((one) => ({ entry: one, isOptional: true })),
       );
+    }
+    if (!isJsonObjectSchema(entry)) continue;
+    if (entry.properties) {
+      Object.assign(flat.properties, entry.properties);
+      if (!isOptional && entry.required) flat.required.push(...entry.required);
+    }
+    if (entry.examples) {
+      if (isOptional) {
+        flat.examples.push(...entry.examples);
+      } else {
+        flat.examples = combinations(
+          flat.examples.filter(isObject),
+          entry.examples.filter(isObject),
+          ([a, b]) => ({ ...a, ...b }),
+        );
+      }
+    }
+    if (entry.propertyNames) {
+      const keys: string[] = [];
+      if (typeof entry.propertyNames.const === "string")
+        keys.push(entry.propertyNames.const);
+      if (entry.propertyNames.enum) {
+        keys.push(
+          ...entry.propertyNames.enum.filter((one) => typeof one === "string"),
+        );
+      }
+      const value = { ...Object(entry.additionalProperties) }; // it can be bool
+      for (const key of keys) flat.properties[key] = value;
+      if (!isOptional) flat.required.push(...keys);
     }
   }
   return flat;
