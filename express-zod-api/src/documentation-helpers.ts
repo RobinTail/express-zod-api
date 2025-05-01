@@ -731,14 +731,16 @@ export const depictBody = ({
     ensureCompliance(request),
     paramNames,
   );
-  const { examples = [], ...bodyDepiction } = isSchemaObject(withoutParams)
-    ? withoutParams
-    : { ...withoutParams };
+  const examples = [];
+  if (isSchemaObject(withoutParams) && withoutParams.examples) {
+    examples.push(...withoutParams.examples);
+    delete withoutParams.examples; // pull up
+  }
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, bodyDepiction, makeCleanId(description))
-        : bodyDepiction,
+        ? makeRef(schema, withoutParams, makeCleanId(description))
+        : withoutParams,
     examples: enumerateExamples(
       examples.length
         ? examples
