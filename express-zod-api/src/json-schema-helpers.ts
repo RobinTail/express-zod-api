@@ -61,10 +61,9 @@ export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
         );
       }
       const value = { ...Object(entry.additionalProperties) }; // it can be bool
-      for (const key of keys) flat.properties[key] = value;
-      if (!isOptional) flat.required.push(...keys);
+      for (const key of keys) flat.properties[key] ??= value;
+      if (!isOptional) flat.required = R.union(flat.required, keys);
     }
   }
-  if (flat.required.length > 1) flat.required = [...new Set(flat.required)]; // drop duplicates
   return flat;
 };
