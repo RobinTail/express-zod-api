@@ -160,6 +160,7 @@ const canMerge = R.pipe(
   R.isEmpty,
 );
 
+/** @todo DNRY with flattenIO() */
 const intersect = (
   children: Array<JSONSchema.BaseSchema>,
 ): JSONSchema.ObjectSchema => {

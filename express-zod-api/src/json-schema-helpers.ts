@@ -5,6 +5,7 @@ const isJsonObjectSchema = (
   subject: JSONSchema.BaseSchema,
 ): subject is JSONSchema.ObjectSchema => subject.type === "object";
 
+/** @todo DNRY with intersect() */
 export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
   const stack = [{ entry: jsonSchema, isOptional: false }];
   const flat: Required<
