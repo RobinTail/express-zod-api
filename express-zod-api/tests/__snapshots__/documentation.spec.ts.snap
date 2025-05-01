@@ -1291,7 +1291,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Schema2"
+              $ref: "#/components/schemas/Schema1"
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1307,7 +1307,7 @@ paths:
                     type: object
                     properties:
                       zodExample:
-                        $ref: "#/components/schemas/Schema1"
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - zodExample
                 required:
@@ -3456,6 +3456,11 @@ paths:
               required:
                 - key
                 - str
+            examples:
+              example1:
+                value:
+                  key: 1234-56789-01
+                  str: test
         required: true
       responses:
         "200":
@@ -3755,6 +3760,8 @@ paths:
                           - "123"
                     required:
                       - numericStr
+                    examples:
+                      - numericStr: "123"
                 required:
                   - status
                   - data

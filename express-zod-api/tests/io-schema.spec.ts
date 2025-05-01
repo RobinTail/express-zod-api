@@ -1,10 +1,7 @@
 import { expectTypeOf } from "vitest";
 import { z } from "zod";
 import { IOSchema, Middleware, ez } from "../src";
-import {
-  extractObjectSchema,
-  getFinalEndpointInputSchema,
-} from "../src/io-schema";
+import { getFinalEndpointInputSchema } from "../src/io-schema";
 import { metaSymbol } from "../src/metadata";
 import { AbstractMiddleware } from "../src/middleware";
 
@@ -286,72 +283,6 @@ describe("I/O Schema and related helpers", () => {
           five: "some",
         },
       ]);
-    });
-  });
-
-  describe("extractObjectSchema()", () => {
-    test("should pass the object schema through", () => {
-      const subject = extractObjectSchema(z.object({ one: z.string() }));
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    test("should return object schema for the union of object schemas", () => {
-      const subject = extractObjectSchema(
-        z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    test("should return object schema for the intersection of object schemas", () => {
-      const subject = extractObjectSchema(
-        z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    test("should support ez.raw()", () => {
-      const subject = extractObjectSchema(ez.raw());
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    describe("Feature #600: Top level refinements", () => {
-      test("should handle refined object schema", () => {
-        const subject = extractObjectSchema(
-          z.object({ one: z.string() }).refine(() => true),
-        );
-        expect(subject).toBeInstanceOf(z.ZodObject);
-        expect(subject).toMatchSnapshot();
-      });
-    });
-
-    describe("Feature #1869: Top level transformations", () => {
-      test("should handle transformations to another object", () => {
-        const subject = extractObjectSchema(
-          z.object({ one: z.string() }).transform(({ one }) => ({ two: one })),
-        );
-        expect(subject).toBeInstanceOf(z.ZodObject);
-        expect(subject).toMatchSnapshot();
-      });
-    });
-
-    describe("Zod 4", () => {
-      test("should handle interfaces with optional props", () => {
-        expect(
-          extractObjectSchema(
-            z.interface({ one: z.boolean(), "two?": z.boolean() }),
-          ),
-        ).toMatchSnapshot();
-      });
-
-      test("should throw for incompatible ones", () => {
-        expect(() =>
-          extractObjectSchema(z.string() as unknown as IOSchema),
-        ).toThrowErrorMatchingSnapshot();
-      });
     });
   });
 });

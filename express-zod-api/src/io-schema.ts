@@ -1,6 +1,5 @@
 import * as R from "ramda";
 import { z } from "zod";
-import { IOSchemaError } from "./errors";
 import { mixExamples } from "./metadata";
 import { AbstractMiddleware } from "./middleware";
 
@@ -30,33 +29,4 @@ export const getFinalEndpointInputSchema = <
     (acc, schema) => mixExamples(schema, acc),
     finalSchema,
   ) as z.ZodIntersection<MIN, IN>;
-};
-
-export const extractObjectSchema = (subject: IOSchema): z.ZodObject => {
-  if (subject instanceof z.ZodObject) return subject;
-  if (subject instanceof z.ZodInterface) {
-    const { optional } = subject._zod.def;
-    const mask = R.zipObj(optional, Array(optional.length).fill(true));
-    const partial = subject.pick(mask);
-    const required = subject.omit(mask);
-    return z
-      .object(required._zod.def.shape)
-      .extend(z.object(partial._zod.def.shape).partial());
-  }
-  if (
-    subject instanceof z.ZodUnion ||
-    subject instanceof z.ZodDiscriminatedUnion
-  ) {
-    return subject._zod.def.options
-      .map((option) => extractObjectSchema(option as IOSchema))
-      .reduce((acc, option) => acc.extend(option.partial()), z.object({}));
-  }
-  if (subject instanceof z.ZodPipe)
-    return extractObjectSchema(subject.in as IOSchema);
-  if (subject instanceof z.ZodIntersection) {
-    return extractObjectSchema(subject._zod.def.left as IOSchema).extend(
-      extractObjectSchema(subject._zod.def.right as IOSchema),
-    );
-  }
-  throw new IOSchemaError("Can not flatten IOSchema", { cause: subject });
 };

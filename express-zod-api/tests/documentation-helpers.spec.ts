@@ -5,14 +5,11 @@ import { z } from "zod";
 import { ez } from "../src";
 import {
   OpenAPIContext,
-  depictExamples,
-  depictParamExamples,
   depictRequestParams,
   depictSecurity,
   depictSecurityRefs,
   depictTags,
   ensureShortDescription,
-  excludeExamplesFromDepiction,
   excludeParamsFromDepiction,
   defaultIsHeader,
   reformatParamsInPath,
@@ -31,6 +28,8 @@ import {
   depictBody,
   depictEnum,
   depictLiteral,
+  depictRequest,
+  depictObject,
 } from "../src/documentation-helpers";
 
 describe("Documentation helpers", () => {
@@ -334,6 +333,34 @@ describe("Documentation helpers", () => {
     );
   });
 
+  describe("depictObject()", () => {
+    test.each([
+      {
+        zodSchema: z.object({ a: z.number(), b: z.string() }),
+        jsonSchema: {
+          type: "object",
+          properties: { a: { type: "number" }, b: { type: "string" } },
+          required: ["a", "b"],
+        },
+      },
+      {
+        zodSchema: z.object({ a: z.number().optional(), b: z.coerce.string() }),
+        jsonSchema: {
+          type: "object",
+          properties: { a: { type: "number" }, b: { type: "string" } },
+          required: ["b"],
+        },
+      },
+    ])(
+      "should remove optional props from required for request %#",
+      ({ zodSchema, jsonSchema }) => {
+        expect(
+          depictObject({ zodSchema, jsonSchema }, requestCtx),
+        ).toMatchSnapshot();
+      },
+    );
+  });
+
   describe("depictBigInt()", () => {
     test("should set type:string and format:bigint", () => {
       expect(
@@ -381,62 +408,6 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictExamples()", () => {
-    test.each<{ isResponse: boolean } & Record<"case" | "action", string>>([
-      { isResponse: false, case: "request", action: "pass" },
-      { isResponse: true, case: "response", action: "transform" },
-    ])("should $action examples in case of $case", ({ isResponse }) => {
-      expect(
-        depictExamples(
-          z
-            .object({
-              one: z.string().transform((v) => v.length),
-              two: z.number().transform((v) => `${v}`),
-              three: z.boolean(),
-            })
-            .example({
-              one: "test",
-              two: 123,
-              three: true,
-            })
-            .example({
-              one: "test2",
-              two: 456,
-              three: false,
-            }),
-          isResponse,
-          ["three"],
-        ),
-      ).toMatchSnapshot();
-    });
-  });
-
-  describe("depictParamExamples()", () => {
-    test("should pass examples for the given parameter", () => {
-      expect(
-        depictParamExamples(
-          z
-            .object({
-              one: z.string().transform((v) => v.length),
-              two: z.number().transform((v) => `${v}`),
-              three: z.boolean(),
-            })
-            .example({
-              one: "test",
-              two: 123,
-              three: true,
-            })
-            .example({
-              one: "test2",
-              two: 456,
-              three: false,
-            }),
-          "two",
-        ),
-      ).toMatchSnapshot();
-    });
-  });
-
   describe("defaultIsHeader()", () => {
     test.each([
       { name: "x-request-id", expected: true },
@@ -455,14 +426,32 @@ describe("Documentation helpers", () => {
     );
   });
 
-  describe("depictRequestParams()", () => {
-    test("should depict query and path params", () => {
+  describe("depictRequest", () => {
+    test("should simply delegate it all to Zod 4", () => {
       expect(
-        depictRequestParams({
+        depictRequest({
           schema: z.object({
             id: z.string(),
             test: z.boolean(),
           }),
+          ...requestCtx,
+        }),
+      ).toMatchSnapshot();
+    });
+  });
+
+  describe("depictRequestParams()", () => {
+    test("should depict query and path params", () => {
+      expect(
+        depictRequestParams({
+          request: {
+            properties: {
+              id: { type: "string" },
+              test: { type: "boolean" },
+            },
+            required: ["id", "test"],
+            type: "object",
+          },
           inputSources: ["query", "params"],
           composition: "inline",
           ...requestCtx,
@@ -473,10 +462,14 @@ describe("Documentation helpers", () => {
     test("should depict only path params if query is disabled", () => {
       expect(
         depictRequestParams({
-          schema: z.object({
-            id: z.string(),
-            test: z.boolean(),
-          }),
+          request: {
+            properties: {
+              id: { type: "string" },
+              test: { type: "boolean" },
+            },
+            required: ["id", "test"],
+            type: "object",
+          },
           inputSources: ["body", "params"],
           composition: "inline",
           ...requestCtx,
@@ -487,10 +480,14 @@ describe("Documentation helpers", () => {
     test("should depict none if both query and params are disabled", () => {
       expect(
         depictRequestParams({
-          schema: z.object({
-            id: z.string(),
-            test: z.boolean(),
-          }),
+          request: {
+            properties: {
+              id: { type: "string" },
+              test: { type: "boolean" },
+            },
+            required: ["id", "test"],
+            type: "object",
+          },
           inputSources: ["body"],
           composition: "inline",
           ...requestCtx,
@@ -501,28 +498,20 @@ describe("Documentation helpers", () => {
     test("Features 1180 and 2344: should depict header params when enabled", () => {
       expect(
         depictRequestParams({
-          schema: z.object({
-            "x-request-id": z.string(),
-            id: z.string(),
-            test: z.boolean(),
-            secure: z.string(),
-          }),
+          request: {
+            properties: {
+              "x-request-id": { type: "string" },
+              id: { type: "string" },
+              test: { type: "boolean" },
+              secure: { type: "string" },
+            },
+            required: ["x-request-id", "id", "test", "secure"],
+            type: "object",
+          },
           inputSources: ["query", "headers", "params"],
           composition: "inline",
           security: [[{ type: "header", name: "secure" }]],
           ...requestCtx,
-        }),
-      ).toMatchSnapshot();
-    });
-  });
-
-  describe("excludeExamplesFromDepiction()", () => {
-    test("should remove example property of supplied object", () => {
-      expect(
-        excludeExamplesFromDepiction({
-          type: "string",
-          description: "test",
-          examples: ["test"],
         }),
       ).toMatchSnapshot();
     });
@@ -533,6 +522,7 @@ describe("Documentation helpers", () => {
       const body = depictBody({
         ...requestCtx,
         schema: ez.raw(),
+        request: { type: "string", format: "binary" },
         composition: "inline",
         mimeType: "application/octet-stream", // raw content type
         paramNames: [],

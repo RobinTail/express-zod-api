@@ -27,6 +27,7 @@ import {
   IsHeader,
   nonEmpty,
   BrandHandling,
+  depictRequest,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
@@ -173,13 +174,14 @@ export class Documentation extends OpenApiBuilder {
         endpoint.getOperationId(method),
       );
 
+      const request = depictRequest({ ...commons, schema: inputSchema });
       const security = processContainers(endpoint.security);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         isHeader,
         security,
-        schema: inputSchema,
+        request,
         description: descriptions?.requestParameter?.call(null, {
           method,
           path,
@@ -214,6 +216,7 @@ export class Documentation extends OpenApiBuilder {
       const requestBody = inputSources.includes("body")
         ? depictBody({
             ...commons,
+            request,
             paramNames: R.pluck("name", depictedParams),
             schema: inputSchema,
             mimeType: contentTypes[endpoint.requestType],

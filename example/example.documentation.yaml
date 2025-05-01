@@ -196,6 +196,9 @@ paths:
                     required:
                       - name
                       - createdAt
+                    examples:
+                      - name: John Doe
+                        createdAt: 2021-12-31T00:00:00.000Z
                 required:
                   - status
                   - data

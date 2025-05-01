@@ -1,4 +1,5 @@
 import type {
+  $ZodObject,
   $ZodPipe,
   $ZodTransform,
   $ZodTuple,
@@ -44,7 +45,8 @@ import { ezDateOutBrand } from "./date-out-schema";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { ezFileBrand } from "./file-schema";
-import { extractObjectSchema, IOSchema } from "./io-schema";
+import { IOSchema } from "./io-schema";
+import { flattenIO } from "./json-schema-helpers";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
@@ -80,13 +82,7 @@ export type IsHeader = (
 
 export type BrandHandling = Record<string | symbol, Depicter>;
 
-interface ReqResHandlingProps<S extends $ZodType>
-  extends Omit<OpenAPIContext, "isResponse"> {
-  schema: S;
-  composition: "inline" | "components";
-  description?: string;
-  brandHandling?: BrandHandling;
-}
+type ReqResCommons = Omit<OpenAPIContext, "isResponse">;
 
 const shortDescriptionLimit = 50;
 const isoDateDocumentationUrl =
@@ -164,6 +160,7 @@ const canMerge = R.pipe(
   R.isEmpty,
 );
 
+/** @todo DNRY with flattenIO() */
 const intersect = (
   children: Array<JSONSchema.BaseSchema>,
 ): JSONSchema.ObjectSchema => {
@@ -208,6 +205,21 @@ export const depictLiteral: Depicter = ({ jsonSchema }) => ({
   type: typeof (jsonSchema.const || jsonSchema.enum?.[0]),
   ...jsonSchema,
 });
+
+export const depictObject: Depicter = (
+  { zodSchema, jsonSchema },
+  { isResponse },
+) => {
+  if (isResponse) return jsonSchema;
+  if (!isSchema<$ZodObject>(zodSchema, "object")) return jsonSchema;
+  const { required = [] } = jsonSchema as JSONSchema.ObjectSchema;
+  const result: string[] = [];
+  for (const key of required) {
+    const valueSchema = zodSchema._zod.def.shape[key];
+    if (valueSchema && !doesAccept(valueSchema, undefined)) result.push(key);
+  }
+  return { ...jsonSchema, required: result };
+};
 
 const ensureCompliance = ({
   $ref,
@@ -306,7 +318,7 @@ export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
     ctx.isResponse ? "in" : "out"
   ];
   if (!isSchema<$ZodTransform>(target, "transform")) return jsonSchema;
-  const opposingDepiction = depict(opposite, { ctx });
+  const opposingDepiction = ensureCompliance(depict(opposite, { ctx }));
   if (isSchemaObject(opposingDepiction)) {
     if (!ctx.isResponse) {
       const { type: opposingType, ...rest } = opposingDepiction;
@@ -347,39 +359,6 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
       )
     : undefined;
 
-export const depictExamples = (
-  schema: $ZodType,
-  isResponse: boolean,
-  omitProps: string[] = [],
-): ExamplesObject | undefined =>
-  R.pipe(
-    getExamples,
-    R.map(
-      R.when(
-        (one): one is FlatObject => isObject(one) && !Array.isArray(one),
-        R.omit(omitProps),
-      ),
-    ),
-    enumerateExamples,
-  )({
-    schema,
-    variant: isResponse ? "parsed" : "original",
-    validate: true,
-    pullProps: true,
-  });
-
-export const depictParamExamples = (
-  schema: z.ZodType,
-  param: string,
-): ExamplesObject | undefined => {
-  return R.pipe(
-    getExamples,
-    R.filter(R.both(isObject, R.has(param))),
-    R.pluck(param),
-    enumerateExamples,
-  )({ schema, variant: "original", validate: true, pullProps: true });
-};
-
 export const defaultIsHeader = (
   name: string,
   familiar?: string[],
@@ -391,20 +370,22 @@ export const defaultIsHeader = (
 export const depictRequestParams = ({
   path,
   method,
-  schema,
+  request,
   inputSources,
   makeRef,
   composition,
-  brandHandling,
   isHeader,
   security,
   description = `${method.toUpperCase()} ${path} Parameter`,
-}: ReqResHandlingProps<IOSchema> & {
+}: ReqResCommons & {
+  composition: "inline" | "components";
+  description?: string;
+  request: JSONSchema.BaseSchema;
   inputSources: InputSource[];
   isHeader?: IsHeader;
   security?: Alternatives<Security>;
 }) => {
-  const objectSchema = extractObjectSchema(schema);
+  const flat = flattenIO(request);
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
@@ -419,8 +400,8 @@ export const depictRequestParams = ({
     areHeadersEnabled &&
     (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders));
 
-  return Object.entries(objectSchema.shape).reduce<ParameterObject[]>(
-    (acc, [name, paramSchema]) => {
+  return Object.entries(flat.properties).reduce<ParameterObject[]>(
+    (acc, [name, jsonSchema]) => {
       const location = isPathParam(name)
         ? "path"
         : isHeaderParam(name)
@@ -429,22 +410,26 @@ export const depictRequestParams = ({
             ? "query"
             : undefined;
       if (!location) return acc;
-      const depicted = depict(paramSchema, {
-        rules: { ...brandHandling, ...depicters },
-        ctx: { isResponse: false, makeRef, path, method },
-      });
+      const depicted = ensureCompliance(jsonSchema);
       const result =
         composition === "components"
-          ? makeRef(paramSchema, depicted, makeCleanId(description, name))
+          ? makeRef(jsonSchema, depicted, makeCleanId(description, name))
           : depicted;
       return acc.concat({
         name,
         in: location,
-        deprecated: globalRegistry.get(paramSchema)?.deprecated,
-        required: !doesAccept(paramSchema, undefined),
+        deprecated: jsonSchema.deprecated,
+        required: flat.required.includes(name),
         description: depicted.description || description,
         schema: result,
-        examples: depictParamExamples(objectSchema, name),
+        examples: enumerateExamples(
+          isSchemaObject(depicted) && depicted.examples?.length
+            ? depicted.examples // own examples or from the flat:
+            : R.pluck(
+                name,
+                flat.examples.filter(R.both(isObject, R.has(name))),
+              ),
+        ),
       });
     },
     [],
@@ -462,6 +447,7 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     pipe: depictPipeline,
     literal: depictLiteral,
     enum: depictEnum,
+    object: depictObject,
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,
@@ -477,6 +463,7 @@ const onEach: Depicter = ({ zodSchema, jsonSchema }, { isResponse }) => {
     schema: zodSchema,
     variant: isResponse ? "parsed" : "original",
     validate: true,
+    pullProps: true,
   });
   if (examples.length) result.examples = examples.slice();
   return result;
@@ -506,7 +493,7 @@ const fixReferences = (
     }
     if (R.is(Array, entry)) stack.push(...R.values(entry));
   }
-  return ensureCompliance(subject);
+  return subject;
 };
 
 /** @link https://github.com/colinhacks/zod/issues/4275 */
@@ -574,11 +561,6 @@ export const excludeParamsFromDepiction = (
   return [result, hasRequired || Boolean(result.required?.length)];
 };
 
-export const excludeExamplesFromDepiction = (
-  depicted: SchemaObject | ReferenceObject,
-): SchemaObject | ReferenceObject =>
-  isReferenceObject(depicted) ? depicted : R.omit(["examples"], depicted);
-
 export const depictResponse = ({
   method,
   path,
@@ -593,25 +575,34 @@ export const depictResponse = ({
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
-}: ReqResHandlingProps<$ZodType> & {
+}: ReqResCommons & {
+  schema: $ZodType;
+  composition: "inline" | "components";
+  description?: string;
+  brandHandling?: BrandHandling;
   mimeTypes: ReadonlyArray<string> | null;
   variant: ResponseVariant;
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
   if (!mimeTypes) return { description };
-  const depictedSchema = excludeExamplesFromDepiction(
+  const response = ensureCompliance(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
       ctx: { isResponse: true, makeRef, path, method },
     }),
   );
+  const examples = [];
+  if (isSchemaObject(response) && response.examples) {
+    examples.push(...response.examples);
+    delete response.examples; // moving them up
+  }
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, depictedSchema, makeCleanId(description))
-        : depictedSchema,
-    examples: depictExamples(schema, true),
+        ? makeRef(schema, response, makeCleanId(description))
+        : response,
+    examples: enumerateExamples(examples),
   };
   return { description, content: R.fromPairs(R.xprod(mimeTypes, [media])) };
 };
@@ -708,34 +699,62 @@ export const depictSecurityRefs = (
     }, {}),
   );
 
+export const depictRequest = ({
+  schema,
+  brandHandling,
+  makeRef,
+  path,
+  method,
+}: ReqResCommons & {
+  schema: IOSchema;
+  brandHandling?: BrandHandling;
+}) =>
+  depict(schema, {
+    rules: { ...brandHandling, ...depicters },
+    ctx: { isResponse: false, makeRef, path, method },
+  });
+
 export const depictBody = ({
   method,
   path,
   schema,
+  request,
   mimeType,
   makeRef,
   composition,
-  brandHandling,
   paramNames,
   description = `${method.toUpperCase()} ${path} Request body`,
-}: ReqResHandlingProps<IOSchema> & {
+}: ReqResCommons & {
+  schema: IOSchema;
+  composition: "inline" | "components";
+  description?: string;
+  request: JSONSchema.BaseSchema;
   mimeType: string;
   paramNames: string[];
 }) => {
   const [withoutParams, hasRequired] = excludeParamsFromDepiction(
-    depict(schema, {
-      rules: { ...brandHandling, ...depicters },
-      ctx: { isResponse: false, makeRef, path, method },
-    }),
+    ensureCompliance(request),
     paramNames,
   );
-  const bodyDepiction = excludeExamplesFromDepiction(withoutParams);
+  const examples = [];
+  if (isSchemaObject(withoutParams) && withoutParams.examples) {
+    examples.push(...withoutParams.examples);
+    delete withoutParams.examples; // pull up
+  }
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, bodyDepiction, makeCleanId(description))
-        : bodyDepiction,
-    examples: depictExamples(extractObjectSchema(schema), false, paramNames),
+        ? makeRef(schema, withoutParams, makeCleanId(description))
+        : withoutParams,
+    examples: enumerateExamples(
+      examples.length
+        ? examples
+        : flattenIO(request)
+            .examples.filter(
+              (one): one is FlatObject => isObject(one) && !Array.isArray(one),
+            )
+            .map(R.omit(paramNames)),
+    ),
   };
   const body: RequestBodyObject = {
     description,
