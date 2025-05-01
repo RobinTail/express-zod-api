@@ -12,6 +12,18 @@ const propsMerger = R.mergeDeepWith((a: unknown, b: unknown) => {
   throw new Error("Can not flatten properties");
 });
 
+const canMerge = R.pipe(
+  Object.keys,
+  R.without([
+    "type",
+    "properties",
+    "required",
+    "examples",
+    "description",
+  ] satisfies Array<keyof JSONSchema.ObjectSchema>),
+  R.isEmpty,
+);
+
 export const flattenIO = (
   jsonSchema: JSONSchema.BaseSchema,
   mode: "coerce" | "throw" = "coerce",
@@ -30,8 +42,15 @@ export const flattenIO = (
   };
   while (stack.length) {
     const { entry, isOptional } = stack.shift()!;
-    if (entry.allOf)
-      stack.push(...entry.allOf.map((one) => ({ entry: one, isOptional })));
+    if (entry.allOf) {
+      stack.push(
+        ...entry.allOf.map((one) => {
+          if (mode === "throw" && !(one.type == "object" && canMerge(one)))
+            throw new Error("Can not merge");
+          return { entry: one, isOptional };
+        }),
+      );
+    }
     if (entry.anyOf) {
       stack.push(
         ...entry.anyOf.map((one) => ({ entry: one, isOptional: true })),

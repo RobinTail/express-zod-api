@@ -132,26 +132,10 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
   };
 };
 
-const canMerge = R.pipe(
-  Object.keys,
-  R.without([
-    "type",
-    "properties",
-    "required",
-    "examples",
-    "description",
-  ] satisfies Array<keyof JSONSchema.ObjectSchema>),
-  R.isEmpty,
-);
-
 export const depictIntersection = R.tryCatch<Depicter>(
   ({ jsonSchema }) => {
     if (!jsonSchema.allOf) throw "no allOf";
-    for (const entry of jsonSchema.allOf) {
-      unref(entry); // @todo move those things into flattenIO under suggestive flag
-      if (entry.type !== "object") throw "not objects";
-      if (!canMerge(entry)) throw "can not merge";
-    }
+    for (const entry of jsonSchema.allOf) unref(entry);
     return flattenIO(jsonSchema, "throw");
   },
   (_err, { jsonSchema }) => jsonSchema,
