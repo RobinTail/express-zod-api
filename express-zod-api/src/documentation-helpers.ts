@@ -132,15 +132,6 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
   };
 };
 
-// @todo reuse somehow to fix last test
-/*
-const propsMerger = (a: unknown, b: unknown) => {
-  if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
-  if (a === b) return b;
-  throw new Error("Can not flatten properties");
-};
- */
-
 const canMerge = R.pipe(
   Object.keys,
   R.without([
@@ -153,15 +144,18 @@ const canMerge = R.pipe(
   R.isEmpty,
 );
 
-export const depictIntersection: Depicter = ({ jsonSchema }) => {
-  if (!jsonSchema.allOf) return jsonSchema;
-  for (const entry of jsonSchema.allOf) {
-    unref(entry);
-    if (entry.type !== "object") return jsonSchema;
-    if (!canMerge(entry)) return jsonSchema;
-  }
-  return flattenIO(jsonSchema);
-};
+export const depictIntersection = R.tryCatch<Depicter>(
+  ({ jsonSchema }) => {
+    if (!jsonSchema.allOf) throw "no allOf";
+    for (const entry of jsonSchema.allOf) {
+      unref(entry); // @todo move those things into flattenIO under suggestive flag
+      if (entry.type !== "object") throw "not objects";
+      if (!canMerge(entry)) throw "can not merge";
+    }
+    return flattenIO(jsonSchema, "suggestive");
+  },
+  (_err, { jsonSchema }) => jsonSchema,
+);
 
 /** @since OAS 3.1 nullable replaced with type array having null */
 export const depictNullable: Depicter = ({ jsonSchema }) => {

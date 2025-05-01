@@ -6,8 +6,17 @@ const isJsonObjectSchema = (
   subject: JSONSchema.BaseSchema,
 ): subject is JSONSchema.ObjectSchema => subject.type === "object";
 
+const propsMerger = R.mergeDeepWith((a: unknown, b: unknown) => {
+  if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
+  if (a === b) return b;
+  throw new Error("Can not flatten properties");
+});
+
 /** @todo DNRY with intersect() */
-export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
+export const flattenIO = (
+  jsonSchema: JSONSchema.BaseSchema,
+  mode: "coercive" | "suggestive" = "coercive", // throws in suggestive mode
+) => {
   const stack = [{ entry: jsonSchema, isOptional: false }];
   const flat: Required<
     Pick<
@@ -36,7 +45,10 @@ export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
     }
     if (!isJsonObjectSchema(entry)) continue;
     if (entry.properties) {
-      flat.properties = R.mergeDeepRight(flat.properties, entry.properties); // @todo or mergeDeepWith?
+      flat.properties = (mode === "coercive" ? R.mergeDeepRight : propsMerger)(
+        flat.properties,
+        entry.properties,
+      );
       if (!isOptional && entry.required)
         flat.required = R.union(flat.required, entry.required);
     }
