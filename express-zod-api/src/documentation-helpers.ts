@@ -26,7 +26,6 @@ import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  combinations,
   doesAccept,
   FlatObject,
   getExamples,
@@ -133,58 +132,36 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
   };
 };
 
+// @todo reuse somehow to fix last test
+/*
 const propsMerger = (a: unknown, b: unknown) => {
   if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
   if (a === b) return b;
   throw new Error("Can not flatten properties");
 };
-const approaches = {
-  type: R.always("object"),
-  properties: ({ properties: left = {} }, { properties: right = {} }) =>
-    R.mergeDeepWith(propsMerger, left, right),
-  required: ({ required: left = [] }, { required: right = [] }) =>
-    R.union(left, right),
-  examples: ({ examples: left = [] }, { examples: right = [] }) =>
-    combinations(left.filter(isObject), right.filter(isObject), ([a, b]) =>
-      R.mergeDeepRight(a, b),
-    ),
-  description: ({ description: left }, { description: right }) => left || right,
-} satisfies {
-  [K in keyof JSONSchema.ObjectSchema]: (
-    ...subj: JSONSchema.ObjectSchema[]
-  ) => JSONSchema.ObjectSchema[K];
-};
+ */
+
 const canMerge = R.pipe(
   Object.keys,
-  R.without(Object.keys(approaches)),
+  R.without([
+    "type",
+    "properties",
+    "required",
+    "examples",
+    "description",
+  ] satisfies Array<keyof JSONSchema.ObjectSchema>),
   R.isEmpty,
 );
 
-/** @todo DNRY with flattenIO() */
-const intersect = (
-  children: Array<JSONSchema.BaseSchema>,
-): JSONSchema.ObjectSchema => {
-  const [left, right] = children
-    .map(unref)
-    .filter(
-      (schema): schema is JSONSchema.ObjectSchema => schema.type === "object",
-    )
-    .filter(canMerge);
-  if (!left || !right) throw new Error("Can not flatten objects");
-  const suitable: typeof approaches = R.pickBy(
-    (_, prop) => (left[prop] || right[prop]) !== undefined,
-    approaches,
-  );
-  return R.map((fn) => fn(left, right), suitable);
+export const depictIntersection: Depicter = ({ jsonSchema }) => {
+  if (!jsonSchema.allOf) return jsonSchema;
+  for (const entry of jsonSchema.allOf) {
+    unref(entry);
+    if (entry.type !== "object") return jsonSchema;
+    if (!canMerge(entry)) return jsonSchema;
+  }
+  return flattenIO(jsonSchema);
 };
-
-export const depictIntersection = R.tryCatch<Depicter>(
-  ({ jsonSchema }) => {
-    if (!jsonSchema.allOf) throw new Error("Missing allOf");
-    return intersect(jsonSchema.allOf);
-  },
-  (_err, { jsonSchema }) => jsonSchema,
-);
 
 /** @since OAS 3.1 nullable replaced with type array having null */
 export const depictNullable: Depicter = ({ jsonSchema }) => {

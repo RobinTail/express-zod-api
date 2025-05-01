@@ -863,6 +863,7 @@ paths:
                   required:
                     - one
                     - two
+                  examples: []
               required:
                 - intersection
         required: true
@@ -891,6 +892,7 @@ paths:
                         required:
                           - five
                           - six
+                        examples: []
                     required:
                       - and
                 required:

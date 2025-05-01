@@ -122,18 +122,20 @@ exports[`Documentation helpers > depictIntersection() > should NOT flatten objec
 
 exports[`Documentation helpers > depictIntersection() > should flatten objects with same prop of same type 1`] = `
 {
+  "examples": [],
   "properties": {
     "one": {
       "type": "number",
     },
   },
+  "required": [],
   "type": "object",
 }
 `;
 
 exports[`Documentation helpers > depictIntersection() > should flatten two object schemas 1`] = `
 {
-  "description": "some",
+  "examples": [],
   "properties": {
     "one": {
       "type": "number",
@@ -142,18 +144,23 @@ exports[`Documentation helpers > depictIntersection() > should flatten two objec
       "type": "number",
     },
   },
+  "required": [],
   "type": "object",
 }
 `;
 
 exports[`Documentation helpers > depictIntersection() > should maintain uniqueness in the array of required props 1`] = `
 {
+  "examples": [],
   "properties": {
     "test": {
       "const": 5,
       "type": "number",
     },
   },
+  "required": [
+    "test",
+  ],
   "type": "object",
 }
 `;
@@ -174,6 +181,7 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
       "type": "number",
     },
   },
+  "required": [],
   "type": "object",
 }
 `;
