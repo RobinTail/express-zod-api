@@ -81,10 +81,7 @@ export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
             ),
           );
         }
-        const value =
-          typeof entry.additionalProperties === "object"
-            ? entry.additionalProperties
-            : {};
+        const value = { ...Object(entry.additionalProperties) }; // it can be bool
         for (const key of keys) flat.properties[key] = value;
         if (!isOptional) flat.required.push(...keys);
       }
