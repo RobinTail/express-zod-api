@@ -587,14 +587,16 @@ export const depictResponse = ({
       ctx: { isResponse: true, makeRef, path, method },
     }),
   );
-  const { examples = [], ...depictedSchema } = isSchemaObject(response)
-    ? response
-    : { ...response };
+  const examples = [];
+  if (isSchemaObject(response) && response.examples) {
+    examples.push(...response.examples);
+    delete response.examples; // moving them up
+  }
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, depictedSchema, makeCleanId(description))
-        : depictedSchema,
+        ? makeRef(schema, response, makeCleanId(description))
+        : response,
     examples: enumerateExamples(examples),
   };
   return { description, content: R.fromPairs(R.xprod(mimeTypes, [media])) };
