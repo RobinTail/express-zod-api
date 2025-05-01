@@ -29,11 +29,8 @@ export const flattenIO = (
   mode: "coerce" | "throw" = "coerce",
 ) => {
   const stack = [{ entry: jsonSchema, isOptional: false }];
-  const flat: Pick<
-    JSONSchema.ObjectSchema,
-    "description" | "examples" | "required"
-  > &
-    Required<Pick<JSONSchema.ObjectSchema, "type" | "properties">> = {
+  const flat: JSONSchema.ObjectSchema &
+    Required<Pick<JSONSchema.ObjectSchema, "properties">> = {
     type: "object",
     properties: {},
   };
