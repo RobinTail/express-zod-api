@@ -127,7 +127,6 @@ exports[`Documentation helpers > depictIntersection() > should flatten objects w
       "type": "number",
     },
   },
-  "required": [],
   "type": "object",
 }
 `;
@@ -143,7 +142,6 @@ exports[`Documentation helpers > depictIntersection() > should flatten two objec
       "type": "number",
     },
   },
-  "required": [],
   "type": "object",
 }
 `;
@@ -179,7 +177,6 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
       "type": "number",
     },
   },
-  "required": [],
   "type": "object",
 }
 `;

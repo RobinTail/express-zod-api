@@ -374,7 +374,7 @@ export const depictRequestParams = ({
         name,
         in: location,
         deprecated: jsonSchema.deprecated,
-        required: flat.required.includes(name),
+        required: flat.required?.includes(name) || false,
         description: depicted.description || description,
         schema: result,
         examples: enumerateExamples(

@@ -30,7 +30,6 @@ exports[`JSON Schema helpers > flattenIO() > should handle records 1`] = `
       "type": "string",
     },
   },
-  "required": [],
   "type": "object",
 }
 `;
@@ -96,7 +95,6 @@ exports[`JSON Schema helpers > flattenIO() > should return object schema for the
       "type": "number",
     },
   },
-  "required": [],
   "type": "object",
 }
 `;

@@ -400,7 +400,6 @@ paths:
             schema:
               type: object
               properties: {}
-              required: []
       security:
         - HTTP_1: []
           OAUTH2_1:
@@ -459,7 +458,6 @@ paths:
             schema:
               type: object
               properties: {}
-              required: []
       security:
         - HTTP_2: []
       responses:

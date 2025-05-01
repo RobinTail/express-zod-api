@@ -29,13 +29,13 @@ export const flattenIO = (
   mode: "coerce" | "throw" = "coerce",
 ) => {
   const stack = [{ entry: jsonSchema, isOptional: false }];
-  const flat: Pick<JSONSchema.ObjectSchema, "description" | "examples"> &
-    Required<
-      Pick<JSONSchema.ObjectSchema, "type" | "properties" | "required">
-    > = {
+  const flat: Pick<
+    JSONSchema.ObjectSchema,
+    "description" | "examples" | "required"
+  > &
+    Required<Pick<JSONSchema.ObjectSchema, "type" | "properties">> = {
     type: "object",
     properties: {},
-    required: [],
   };
   while (stack.length) {
     const { entry, isOptional } = stack.shift()!;
@@ -65,8 +65,8 @@ export const flattenIO = (
         flat.properties,
         entry.properties,
       );
-      if (!isOptional && entry.required)
-        flat.required = R.union(flat.required, entry.required);
+      if (!isOptional && entry.required?.length)
+        flat.required = R.union(flat.required || [], entry.required);
     }
     if (entry.examples?.length) {
       if (isOptional) {
@@ -90,7 +90,7 @@ export const flattenIO = (
       }
       const value = { ...Object(entry.additionalProperties) }; // it can be bool
       for (const key of keys) flat.properties[key] ??= value;
-      if (!isOptional) flat.required = R.union(flat.required, keys);
+      if (!isOptional) flat.required = R.union(flat.required || [], keys);
     }
   }
   return flat;
