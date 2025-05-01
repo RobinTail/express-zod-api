@@ -254,8 +254,16 @@ describe("Documentation helpers", () => {
     test("should maintain uniqueness in the array of required props", () => {
       const jsonSchema: JSONSchema.BaseSchema = {
         allOf: [
-          { type: "object", properties: { test: { type: "number" } } },
-          { type: "object", properties: { test: { const: 5 } } },
+          {
+            type: "object",
+            properties: { test: { type: "number" } },
+            required: ["test"],
+          },
+          {
+            type: "object",
+            properties: { test: { const: 5 } },
+            required: ["test"],
+          },
         ],
       };
       expect(

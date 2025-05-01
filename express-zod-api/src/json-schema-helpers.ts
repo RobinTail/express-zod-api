@@ -1,28 +1,51 @@
 import type { JSONSchema } from "@zod/core";
+import * as R from "ramda";
 import { combinations, isObject } from "./common-helpers";
 
 const isJsonObjectSchema = (
   subject: JSONSchema.BaseSchema,
 ): subject is JSONSchema.ObjectSchema => subject.type === "object";
 
-/** @todo DNRY with intersect() */
-export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
+const propsMerger = R.mergeDeepWith((a: unknown, b: unknown) => {
+  if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
+  if (a === b) return b;
+  throw new Error("Can not flatten properties");
+});
+
+const canMerge = R.pipe(
+  Object.keys,
+  R.without([
+    "type",
+    "properties",
+    "required",
+    "examples",
+    "description",
+  ] satisfies Array<keyof JSONSchema.ObjectSchema>),
+  R.isEmpty,
+);
+
+export const flattenIO = (
+  jsonSchema: JSONSchema.BaseSchema,
+  mode: "coerce" | "throw" = "coerce",
+) => {
   const stack = [{ entry: jsonSchema, isOptional: false }];
-  const flat: Required<
-    Pick<
-      JSONSchema.ObjectSchema,
-      "type" | "properties" | "required" | "examples"
-    >
-  > = {
+  const flat: JSONSchema.ObjectSchema &
+    Required<Pick<JSONSchema.ObjectSchema, "properties">> = {
     type: "object",
     properties: {},
-    required: [],
-    examples: [],
   };
   while (stack.length) {
     const { entry, isOptional } = stack.shift()!;
-    if (entry.allOf)
-      stack.push(...entry.allOf.map((one) => ({ entry: one, isOptional })));
+    if (entry.description) flat.description ??= entry.description;
+    if (entry.allOf) {
+      stack.push(
+        ...entry.allOf.map((one) => {
+          if (mode === "throw" && !(one.type == "object" && canMerge(one)))
+            throw new Error("Can not merge");
+          return { entry: one, isOptional };
+        }),
+      );
+    }
     if (entry.anyOf) {
       stack.push(
         ...entry.anyOf.map((one) => ({ entry: one, isOptional: true })),
@@ -35,17 +58,21 @@ export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
     }
     if (!isJsonObjectSchema(entry)) continue;
     if (entry.properties) {
-      Object.assign(flat.properties, entry.properties);
-      if (!isOptional && entry.required) flat.required.push(...entry.required);
+      flat.properties = (mode === "throw" ? propsMerger : R.mergeDeepRight)(
+        flat.properties,
+        entry.properties,
+      );
+      if (!isOptional && entry.required?.length)
+        flat.required = R.union(flat.required || [], entry.required);
     }
-    if (entry.examples) {
+    if (entry.examples?.length) {
       if (isOptional) {
-        flat.examples.push(...entry.examples);
+        flat.examples = R.concat(flat.examples || [], entry.examples);
       } else {
         flat.examples = combinations(
-          flat.examples.filter(isObject),
+          flat.examples?.filter(isObject) || [],
           entry.examples.filter(isObject),
-          ([a, b]) => ({ ...a, ...b }),
+          ([a, b]) => R.mergeDeepRight(a, b),
         );
       }
     }
@@ -59,10 +86,9 @@ export const flattenIO = (jsonSchema: JSONSchema.BaseSchema) => {
         );
       }
       const value = { ...Object(entry.additionalProperties) }; // it can be bool
-      for (const key of keys) flat.properties[key] = value;
-      if (!isOptional) flat.required.push(...keys);
+      for (const key of keys) flat.properties[key] ??= value;
+      if (!isOptional) flat.required = R.union(flat.required || [], keys);
     }
   }
-  if (flat.required.length > 1) flat.required = [...new Set(flat.required)]; // drop duplicates
   return flat;
 };

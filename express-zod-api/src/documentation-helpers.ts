@@ -26,7 +26,6 @@ import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  combinations,
   doesAccept,
   FlatObject,
   getExamples,
@@ -133,55 +132,11 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
   };
 };
 
-const propsMerger = (a: unknown, b: unknown) => {
-  if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
-  if (a === b) return b;
-  throw new Error("Can not flatten properties");
-};
-const approaches = {
-  type: R.always("object"),
-  properties: ({ properties: left = {} }, { properties: right = {} }) =>
-    R.mergeDeepWith(propsMerger, left, right),
-  required: ({ required: left = [] }, { required: right = [] }) =>
-    R.union(left, right),
-  examples: ({ examples: left = [] }, { examples: right = [] }) =>
-    combinations(left.filter(isObject), right.filter(isObject), ([a, b]) =>
-      R.mergeDeepRight({ ...a }, { ...b }),
-    ),
-  description: ({ description: left }, { description: right }) => left || right,
-} satisfies {
-  [K in keyof JSONSchema.ObjectSchema]: (
-    ...subj: JSONSchema.ObjectSchema[]
-  ) => JSONSchema.ObjectSchema[K];
-};
-const canMerge = R.pipe(
-  Object.keys,
-  R.without(Object.keys(approaches)),
-  R.isEmpty,
-);
-
-/** @todo DNRY with flattenIO() */
-const intersect = (
-  children: Array<JSONSchema.BaseSchema>,
-): JSONSchema.ObjectSchema => {
-  const [left, right] = children
-    .map(unref)
-    .filter(
-      (schema): schema is JSONSchema.ObjectSchema => schema.type === "object",
-    )
-    .filter(canMerge);
-  if (!left || !right) throw new Error("Can not flatten objects");
-  const suitable: typeof approaches = R.pickBy(
-    (_, prop) => (left[prop] || right[prop]) !== undefined,
-    approaches,
-  );
-  return R.map((fn) => fn(left, right), suitable);
-};
-
 export const depictIntersection = R.tryCatch<Depicter>(
   ({ jsonSchema }) => {
-    if (!jsonSchema.allOf) throw new Error("Missing allOf");
-    return intersect(jsonSchema.allOf);
+    if (!jsonSchema.allOf) throw "no allOf";
+    for (const entry of jsonSchema.allOf) unref(entry);
+    return flattenIO(jsonSchema, "throw");
   },
   (_err, { jsonSchema }) => jsonSchema,
 );
@@ -419,7 +374,7 @@ export const depictRequestParams = ({
         name,
         in: location,
         deprecated: jsonSchema.deprecated,
-        required: flat.required.includes(name),
+        required: flat.required?.includes(name) || false,
         description: depicted.description || description,
         schema: result,
         examples: enumerateExamples(
@@ -427,7 +382,7 @@ export const depictRequestParams = ({
             ? depicted.examples // own examples or from the flat:
             : R.pluck(
                 name,
-                flat.examples.filter(R.both(isObject, R.has(name))),
+                flat.examples?.filter(R.both(isObject, R.has(name))) || [],
               ),
         ),
       });
@@ -750,10 +705,10 @@ export const depictBody = ({
       examples.length
         ? examples
         : flattenIO(request)
-            .examples.filter(
+            .examples?.filter(
               (one): one is FlatObject => isObject(one) && !Array.isArray(one),
             )
-            .map(R.omit(paramNames)),
+            .map(R.omit(paramNames)) || [],
     ),
   };
   const body: RequestBodyObject = {

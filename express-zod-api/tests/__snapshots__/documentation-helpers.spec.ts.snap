@@ -154,6 +154,9 @@ exports[`Documentation helpers > depictIntersection() > should maintain uniquene
       "type": "number",
     },
   },
+  "required": [
+    "test",
+  ],
   "type": "object",
 }
 `;
