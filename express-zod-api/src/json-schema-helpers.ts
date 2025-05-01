@@ -29,17 +29,13 @@ export const flattenIO = (
   mode: "coerce" | "throw" = "coerce",
 ) => {
   const stack = [{ entry: jsonSchema, isOptional: false }];
-  const flat: Pick<JSONSchema.ObjectSchema, "description"> &
+  const flat: Pick<JSONSchema.ObjectSchema, "description" | "examples"> &
     Required<
-      Pick<
-        JSONSchema.ObjectSchema,
-        "type" | "properties" | "required" | "examples"
-      >
+      Pick<JSONSchema.ObjectSchema, "type" | "properties" | "required">
     > = {
     type: "object",
     properties: {},
     required: [],
-    examples: [],
   };
   while (stack.length) {
     const { entry, isOptional } = stack.shift()!;
@@ -72,12 +68,12 @@ export const flattenIO = (
       if (!isOptional && entry.required)
         flat.required = R.union(flat.required, entry.required);
     }
-    if (entry.examples) {
+    if (entry.examples?.length) {
       if (isOptional) {
-        flat.examples.push(...entry.examples);
+        flat.examples = R.concat(flat.examples || [], entry.examples);
       } else {
         flat.examples = combinations(
-          flat.examples.filter(isObject),
+          flat.examples?.filter(isObject) || [],
           entry.examples.filter(isObject),
           ([a, b]) => R.mergeDeepRight(a, b),
         );

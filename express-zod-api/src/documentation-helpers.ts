@@ -382,7 +382,7 @@ export const depictRequestParams = ({
             ? depicted.examples // own examples or from the flat:
             : R.pluck(
                 name,
-                flat.examples.filter(R.both(isObject, R.has(name))),
+                flat.examples?.filter(R.both(isObject, R.has(name))) || [],
               ),
         ),
       });
@@ -705,10 +705,10 @@ export const depictBody = ({
       examples.length
         ? examples
         : flattenIO(request)
-            .examples.filter(
+            .examples?.filter(
               (one): one is FlatObject => isObject(one) && !Array.isArray(one),
             )
-            .map(R.omit(paramNames)),
+            .map(R.omit(paramNames)) || [],
     ),
   };
   const body: RequestBodyObject = {
