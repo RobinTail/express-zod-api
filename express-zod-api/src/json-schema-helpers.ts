@@ -29,12 +29,13 @@ export const flattenIO = (
   mode: "coerce" | "throw" = "coerce",
 ) => {
   const stack = [{ entry: jsonSchema, isOptional: false }];
-  const flat: Required<
-    Pick<
-      JSONSchema.ObjectSchema,
-      "type" | "properties" | "required" | "examples"
-    >
-  > = {
+  const flat: Pick<JSONSchema.ObjectSchema, "description"> &
+    Required<
+      Pick<
+        JSONSchema.ObjectSchema,
+        "type" | "properties" | "required" | "examples"
+      >
+    > = {
     type: "object",
     properties: {},
     required: [],
@@ -42,6 +43,7 @@ export const flattenIO = (
   };
   while (stack.length) {
     const { entry, isOptional } = stack.shift()!;
+    if (entry.description) flat.description ??= entry.description;
     if (entry.allOf) {
       stack.push(
         ...entry.allOf.map((one) => {

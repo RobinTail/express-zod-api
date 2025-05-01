@@ -135,6 +135,7 @@ exports[`Documentation helpers > depictIntersection() > should flatten objects w
 
 exports[`Documentation helpers > depictIntersection() > should flatten two object schemas 1`] = `
 {
+  "description": "some",
   "examples": [],
   "properties": {
     "one": {
