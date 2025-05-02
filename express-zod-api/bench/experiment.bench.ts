@@ -1,7 +1,7 @@
 import * as R from "ramda";
 import { bench } from "vitest";
 
-describe("Experiment for key lookup", () => {
+describe("Experiment for unique elements", () => {
   const current = ["one", "two"];
 
   bench("set", () => {
