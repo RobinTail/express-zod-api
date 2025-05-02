@@ -36,6 +36,7 @@ export const flattenIO = (
     type: "object",
     properties: {},
   };
+  const flatRequired: string[] = [];
   while (stack.length) {
     const [isOptional, entry] = stack.shift()!;
     if (entry.description) flat.description ??= entry.description;
@@ -56,8 +57,7 @@ export const flattenIO = (
         flat.properties,
         entry.properties,
       );
-      if (!isOptional && entry.required?.length)
-        flat.required = R.union(flat.required || [], entry.required);
+      if (!isOptional && entry.required) flatRequired.push(...entry.required);
     }
     if (entry.examples?.length) {
       if (isOptional) {
@@ -81,8 +81,9 @@ export const flattenIO = (
       }
       const value = { ...Object(entry.additionalProperties) }; // it can be bool
       for (const key of keys) flat.properties[key] ??= value;
-      if (!isOptional) flat.required = R.union(flat.required || [], keys);
+      if (!isOptional) flatRequired.push(...keys);
     }
   }
+  if (flatRequired.length) flat.required = [...new Set(flatRequired)];
   return flat;
 };

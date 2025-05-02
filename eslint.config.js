@@ -49,6 +49,10 @@ const performanceConcerns = [
     selector: "CallExpression[callee.property.name='flatMap']", // #2209
     message: "flatMap() is about 1.3x slower than R.chain()",
   },
+  {
+    selector: "MemberExpression[object.name='R'] > Identifier[name='union']", // #2599
+    message: "R.union() is 1.5x slower than [...Set().add()]",
+  },
 ];
 
 const tsFactoryConcerns = [
