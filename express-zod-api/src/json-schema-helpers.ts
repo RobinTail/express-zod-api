@@ -24,38 +24,32 @@ const canMerge = R.pipe(
   R.isEmpty,
 );
 
+const nestOptional = R.pair(true);
+
 export const flattenIO = (
   jsonSchema: JSONSchema.BaseSchema,
   mode: "coerce" | "throw" = "coerce",
 ) => {
-  const stack = [{ entry: jsonSchema, isOptional: false }];
+  const stack = [R.pair(false, jsonSchema)]; // [isOptional, JSON Schema]
   const flat: JSONSchema.ObjectSchema &
     Required<Pick<JSONSchema.ObjectSchema, "properties">> = {
     type: "object",
     properties: {},
   };
   while (stack.length) {
-    const { entry, isOptional } = stack.shift()!;
+    const [isOptional, entry] = stack.shift()!;
     if (entry.description) flat.description ??= entry.description;
     if (entry.allOf) {
       stack.push(
         ...entry.allOf.map((one) => {
           if (mode === "throw" && !(one.type == "object" && canMerge(one)))
             throw new Error("Can not merge");
-          return { entry: one, isOptional };
+          return R.pair(isOptional, one);
         }),
       );
     }
-    if (entry.anyOf) {
-      stack.push(
-        ...entry.anyOf.map((one) => ({ entry: one, isOptional: true })),
-      );
-    }
-    if (entry.oneOf) {
-      stack.push(
-        ...entry.oneOf.map((one) => ({ entry: one, isOptional: true })),
-      );
-    }
+    if (entry.anyOf) stack.push(...R.map(nestOptional, entry.anyOf));
+    if (entry.oneOf) stack.push(...R.map(nestOptional, entry.oneOf));
     if (!isJsonObjectSchema(entry)) continue;
     if (entry.properties) {
       flat.properties = (mode === "throw" ? propsMerger : R.mergeDeepRight)(
