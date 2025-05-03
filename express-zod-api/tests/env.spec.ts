@@ -52,7 +52,7 @@ describe("Environment checks", () => {
       );
     });
 
-    /** now input examples are broken */
+    /** @link https://github.com/colinhacks/zod/issues/4274 */
     test.each(["input", "output"] as const)(
       "%s examples of transformations",
       (io) => {
