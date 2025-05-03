@@ -39,13 +39,13 @@ import {
   ucFirst,
 } from "./common-helpers";
 import { InputSource } from "./config-type";
+import { contentTypes } from "./content-type";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
-import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
-import { flattenIO } from "./json-schema-helpers";
+import { flattenIO, unref } from "./json-schema-helpers";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
@@ -135,7 +135,6 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
 export const depictIntersection = R.tryCatch<Depicter>(
   ({ jsonSchema }) => {
     if (!jsonSchema.allOf) throw "no allOf";
-    for (const entry of jsonSchema.allOf) unref(entry);
     return flattenIO(jsonSchema, "throw");
   },
   (_err, { jsonSchema }) => jsonSchema,
@@ -447,18 +446,6 @@ const fixReferences = (
       stack.push(...R.values(entry));
     }
     if (R.is(Array, entry)) stack.push(...R.values(entry));
-  }
-  return subject;
-};
-
-/** @link https://github.com/colinhacks/zod/issues/4275 */
-const unref = (
-  subject: JSONSchema.BaseSchema,
-): Omit<JSONSchema.BaseSchema, "_ref"> => {
-  while (subject._ref) {
-    const copy = { ...subject._ref };
-    delete subject._ref;
-    Object.assign(subject, copy);
   }
   return subject;
 };
