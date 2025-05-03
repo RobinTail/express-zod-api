@@ -34,18 +34,18 @@ import {
 
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
-  const requestCtx = {
+  const requestCtx: OpenAPIContext = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: false,
     makeRef: makeRefMock,
-  } satisfies OpenAPIContext;
-  const responseCtx = {
+  };
+  const responseCtx: OpenAPIContext = {
     path: "/v1/user/:id",
     method: "get",
     isResponse: true,
     makeRef: makeRefMock,
-  } satisfies OpenAPIContext;
+  };
 
   beforeEach(() => {
     makeRefMock.mockClear();

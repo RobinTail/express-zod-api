@@ -56,8 +56,7 @@ import { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers.json";
 
-export interface OpenAPIContext {
-  isResponse: boolean;
+interface ReqResCommons {
   makeRef: (
     key: object,
     subject: SchemaObject | ReferenceObject,
@@ -65,6 +64,10 @@ export interface OpenAPIContext {
   ) => ReferenceObject;
   path: string;
   method: Method;
+}
+
+export interface OpenAPIContext extends ReqResCommons {
+  isResponse: boolean;
 }
 
 export type Depicter = (
@@ -80,8 +83,6 @@ export type IsHeader = (
 ) => boolean | null | undefined;
 
 export type BrandHandling = Record<string | symbol, Depicter>;
-
-type ReqResCommons = Omit<OpenAPIContext, "isResponse">;
 
 const shortDescriptionLimit = 50;
 const isoDateDocumentationUrl =
