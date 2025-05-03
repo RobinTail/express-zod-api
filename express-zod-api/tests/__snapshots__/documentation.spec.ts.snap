@@ -1597,7 +1597,7 @@ paths:
                 ulid:
                   type: string
                   format: ulid
-                  pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+                  pattern: ^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$
                 ip:
                   type: string
                   format: ipv4
