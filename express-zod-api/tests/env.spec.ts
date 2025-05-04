@@ -87,13 +87,15 @@ describe("Environment checks", () => {
   });
 
   describe("Zod new features", () => {
-    test("interface shape does not contain question marks, but there is a list of them", () => {
-      const schema = z.interface({
+    test("retention: object shape conveys the keys optionality", () => {
+      const schema = z.object({
         one: z.boolean(),
-        "two?": z.boolean(),
+        two: z.boolean().optional(),
       });
       expect(Object.keys(schema._zod.def.shape)).toEqual(["one", "two"]);
-      expect(schema._zod.def.optional).toEqual(["two"]);
+      expect(schema._zod.def.shape.one).toBeInstanceOf(z.ZodBoolean);
+      expect(schema._zod.def.shape.two).toBeInstanceOf(z.ZodOptional);
+      expect(schema._zod.def.shape.two.isOptional()).toBe(true);
     });
 
     test("coerce is safe for nullable and optional", () => {
