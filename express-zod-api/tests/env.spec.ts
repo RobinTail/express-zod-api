@@ -81,13 +81,6 @@ describe("Environment checks", () => {
       expectTypeOf(schema._zod.output).toEqualTypeOf<object>();
       expectTypeOf(schema._zod.output).not.toExtend<Record<string, never>>();
     });
-
-    /** @link https://github.com/colinhacks/zod/issues/4152 */
-    test("qin presence", () => {
-      const s = z.number().optional();
-      expect(s._zod.qout).toBe("true");
-      expect(s._zod.qin).toBeUndefined();
-    });
   });
 
   describe("Zod new features", () => {
