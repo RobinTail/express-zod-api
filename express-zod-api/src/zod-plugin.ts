@@ -13,7 +13,7 @@ import { z, globalRegistry } from "zod";
 import { FlatObject } from "./common-helpers";
 import { Metadata, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
-import type { $ZodType, $ZodShape } from "@zod/core";
+import type { $ZodType, $ZodShape, $ZodLooseShape } from "@zod/core";
 
 declare module "@zod/core" {
   interface GlobalMeta {
@@ -34,8 +34,9 @@ declare module "zod" {
   }
   interface ZodObject<
     // @ts-expect-error -- external issue
-    out Shape extends $ZodShape = $ZodShape,
-    Extra extends Record<string, unknown> = Record<string, unknown>,
+    out Shape extends $ZodShape = $ZodLooseShape,
+    OutExtra extends Record<string, unknown> = Record<string, unknown>,
+    InExtra extends Record<string, unknown> = Record<string, unknown>,
   > extends ZodType {
     remap<V extends string, U extends { [P in keyof Shape]?: V }>(
       mapping: U,
@@ -44,7 +45,7 @@ declare module "zod" {
         this,
         z.ZodTransform<FlatObject, FlatObject> // internal type simplified
       >,
-      z.ZodObject<Remap<Shape, U, V> & Intact<Shape, U>, Extra>
+      z.ZodObject<Remap<Shape, U, V> & Intact<Shape, U>, OutExtra, InExtra>
     >;
     remap<U extends $ZodShape>(
       mapper: (subject: Shape) => U,
@@ -110,7 +111,6 @@ const objectMapper = function (
   const nextShape = transformer(R.clone(this._zod.def.shape)); // immutable
   const hasPassThrough = this._zod.def.catchall instanceof z.ZodUnknown;
   const output = (hasPassThrough ? z.looseObject : z.object)(nextShape); // proxies unknown keys when set to "passthrough"
-  // @ts-expect-error -- ignoring inconsistency of Extra type
   return this.transform(transformer).pipe(output);
 };
 
