@@ -16,7 +16,7 @@ describe("Middleware", () => {
         handler: vi.fn(),
       });
       expect(mw).toBeInstanceOf(AbstractMiddleware);
-      expectTypeOf(mw.schema._zod.output).toEqualTypeOf<{
+      expectTypeOf<z.output<typeof mw.schema>>().toEqualTypeOf<{
         something: number;
       }>();
     });
