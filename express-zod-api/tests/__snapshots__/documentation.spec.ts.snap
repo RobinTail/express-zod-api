@@ -1281,7 +1281,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Basic cases > should handle circular schemas via z.interface() 1`] = `
+exports[`Documentation > Basic cases > should handle circular schemas via z.object() 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Lazy
