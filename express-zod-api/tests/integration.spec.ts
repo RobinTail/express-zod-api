@@ -15,7 +15,7 @@ describe("Integration", () => {
       features: recursive1,
     }),
   );
-  const recursive2 = z.interface({
+  const recursive2 = z.object({
     name: z.string(),
     get features() {
       return recursive2;
