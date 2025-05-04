@@ -30,7 +30,7 @@ describe("I/O Schema and related helpers", () => {
     test("does not accept union of object and array of objects", () => {
       expectTypeOf(
         z.object({}).or(z.array(z.object({}))),
-      ).not.toExtend<IOSchema>();
+      ).not.toExtend<IOSchema>(); // @todo blocking: external bug https://github.com/colinhacks/zod/issues/4318
     });
     test("accepts intersection of objects", () => {
       expectTypeOf(z.object({}).and(z.object({}))).toExtend<IOSchema>();
