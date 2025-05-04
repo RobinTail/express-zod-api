@@ -77,9 +77,12 @@ describe("Environment checks", () => {
     });
 
     test("output of empty object schema is too abstract object", () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- this is fine
       const schema = z.strictObject({});
-      expectTypeOf(schema._zod.output).toEqualTypeOf<object>();
-      expectTypeOf(schema._zod.output).not.toExtend<Record<string, never>>();
+      expectTypeOf<z.output<typeof schema>>().toEqualTypeOf<object>();
+      expectTypeOf<z.output<typeof schema>>().not.toExtend<
+        Record<string, never>
+      >();
     });
   });
 
