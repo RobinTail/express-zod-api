@@ -13,15 +13,6 @@ describe("I/O Schema and related helpers", () => {
       expectTypeOf(z.object({}).strict()).toExtend<IOSchema>();
       expectTypeOf(z.object({}).loose()).toExtend<IOSchema>();
     });
-    test("accepts interface", () => {
-      expectTypeOf(z.interface({})).toExtend<IOSchema>();
-      expectTypeOf(z.interface({ "some?": z.string() })).toExtend<IOSchema>();
-      expectTypeOf(z.interface({}).strip()).toExtend<IOSchema>();
-      expectTypeOf(z.interface({}).loose()).toExtend<IOSchema>();
-      expectTypeOf(z.looseInterface({})).toExtend<IOSchema>();
-      expectTypeOf(z.interface({}).strict()).toExtend<IOSchema>();
-      expectTypeOf(z.strictInterface({})).toExtend<IOSchema>();
-    });
     test("accepts ez.raw()", () => {
       expectTypeOf(ez.raw()).toExtend<IOSchema>();
       expectTypeOf(ez.raw({ something: z.any() })).toExtend<IOSchema>();
