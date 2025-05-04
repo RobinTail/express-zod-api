@@ -69,6 +69,10 @@ const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
   return values.length === 1 ? values[0] : f.createUnionTypeNode(values);
 };
 
+/**
+ * @todo determine of makeAlias needed
+ * @see https://stackoverflow.com/questions/8591873/determine-if-a-javascript-property-has-a-getter-or-setter-defined
+ */
 const onObject: Producer = (obj: $ZodObject, { isResponse, next, makeAlias }) =>
   makeAlias(obj, () => {
     const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
