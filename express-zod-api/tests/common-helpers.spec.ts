@@ -202,10 +202,14 @@ describe("Common Helpers", () => {
 
   describe("pullExampleProps()", () => {
     test("handles multiple examples per property", () => {
-      const schema = z.object({
-        a: z.string().example("one").example("two").example("three"),
-        b: z.number().example(1).example(2),
-        c: z.boolean().example(false),
+      /**
+       * @todo remove type when fixed
+       * @link https://github.com/colinhacks/zod/issues/4317
+       */
+      const schema: z.ZodObject = z.object({
+        a: z.string(),
+        b: z.number(),
+        c: z.boolean(),
       });
       expect(pullExampleProps(schema)).toEqual([
         { a: "one", b: 1, c: false },
