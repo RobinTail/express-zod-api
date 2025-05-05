@@ -16,7 +16,11 @@
   - The `numericRange` option removed from `Documentation` class constructor argument;
   - The `brandHandling` should consist of postprocessing functions altering the depiction made by Zod 4;
   - The `Depicter` type signature changed;
-- The `optionalPropStyle` option removed from `Integration` class constructor.
+- The `optionalPropStyle` option removed from `Integration` class constructor:
+  - Use `.optional()` to add question mark to the object property;
+  - Use `.or(z.undefined())` to add `undefined` to the type of the object property;
+  - Reasoning: https://x.com/colinhacks/status/1919292504861491252;
+  - `z.any()` and `z.unknown()` are not optional, details: https://v4.zod.dev/v4/changelog#changes-zunknown-optionality.
 - Changes to the plugin:
   - Brand is the only kind of metadata that withstands refinements and checks.
 
