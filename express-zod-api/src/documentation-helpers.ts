@@ -416,16 +416,8 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     [ezRawBrand]: depictRaw,
   };
 
-/** @link https://github.com/colinhacks/zod/issues/4159 */
-export const acceptsNull = R.tryCatch((schema: $ZodType) => {
-  z.parse(schema, null);
-  return true;
-}, R.always(false));
-
 const onEach: Depicter = ({ zodSchema, jsonSchema }, { isResponse }) => {
   const result = { ...jsonSchema };
-  if (!isResponse && acceptsNull(zodSchema))
-    Object.assign(result, { type: makeNullableType(jsonSchema.type) });
   const examples = getExamples({
     schema: zodSchema,
     variant: isResponse ? "parsed" : "original",
