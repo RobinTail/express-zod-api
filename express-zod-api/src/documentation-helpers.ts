@@ -101,12 +101,15 @@ const samples = {
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
 
-export const depictDefault: Depicter = ({ zodSchema, jsonSchema }) => ({
-  ...jsonSchema,
-  default:
+export const depictDefault: Depicter = ({ zodSchema, jsonSchema }) => {
+  const value =
     globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
-    jsonSchema.default,
-});
+    jsonSchema.default;
+  return {
+    ...jsonSchema,
+    default: typeof value === "bigint" ? String(value) : value,
+  };
+};
 
 export const depictUpload: Depicter = ({}, ctx) => {
   if (ctx.isResponse)
