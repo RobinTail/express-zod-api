@@ -250,7 +250,9 @@ exports[`Documentation helpers > depictObject() > should remove optional props f
       "type": "string",
     },
   },
-  "required": [],
+  "required": [
+    "b",
+  ],
   "type": "object",
 }
 `;

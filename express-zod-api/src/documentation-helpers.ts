@@ -174,7 +174,11 @@ export const depictObject: Depicter = (
   const result: string[] = [];
   for (const key of required) {
     const valueSchema = zodSchema._zod.def.shape[key];
-    if (valueSchema && !doesAccept(valueSchema, undefined)) result.push(key);
+    const { optionality } = valueSchema._zod;
+    const isOptional = isResponse
+      ? optionality === "optional"
+      : optionality === "optional" || optionality === "defaulted";
+    if (valueSchema && !isOptional) result.push(key);
   }
   return { ...jsonSchema, required: result };
 };

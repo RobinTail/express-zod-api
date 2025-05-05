@@ -356,7 +356,7 @@ describe("Documentation helpers", () => {
         jsonSchema: {
           type: "object",
           properties: { a: { type: "number" }, b: { type: "string" } },
-          required: ["b"],
+          required: ["b"], // Zod 4: coerce remains
         },
       },
     ])(
