@@ -1,6 +1,5 @@
 import createHttpError from "http-errors";
 import * as R from "ramda";
-import { expectTypeOf } from "vitest";
 import { z } from "zod";
 
 describe("Environment checks", () => {
@@ -74,15 +73,6 @@ describe("Environment checks", () => {
         .meta({ description: "some" })
         .meta({ title: "last" });
       expect(schema.meta()).toMatchSnapshot();
-    });
-
-    test("output of empty object schema is too abstract object", () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- this is fine
-      const schema = z.strictObject({});
-      expectTypeOf<z.output<typeof schema>>().toEqualTypeOf<object>();
-      expectTypeOf<z.output<typeof schema>>().not.toExtend<
-        Record<string, never>
-      >();
     });
   });
 
