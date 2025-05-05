@@ -2147,7 +2147,7 @@ paths:
       parameters:
         - name: any
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema: {}
       responses:
@@ -2224,7 +2224,7 @@ paths:
       parameters:
         - name: string
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             format: string (preprocessed)

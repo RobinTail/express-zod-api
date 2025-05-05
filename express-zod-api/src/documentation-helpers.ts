@@ -26,12 +26,12 @@ import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { ResponseVariant } from "./api-response";
 import {
-  doesAccept,
   FlatObject,
   getExamples,
   getRoutePathParams,
   getTransformedType,
   isObject,
+  isOptional,
   isSchema,
   makeCleanId,
   routePathParamsRegex,
@@ -174,7 +174,8 @@ export const depictObject: Depicter = (
   const result: string[] = [];
   for (const key of required) {
     const valueSchema = zodSchema._zod.def.shape[key];
-    if (valueSchema && !doesAccept(valueSchema, undefined)) result.push(key);
+    if (valueSchema && !isOptional(valueSchema, { isResponse }))
+      result.push(key);
   }
   return { ...jsonSchema, required: result };
 };
@@ -415,8 +416,6 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
 
 const onEach: Depicter = ({ zodSchema, jsonSchema }, { isResponse }) => {
   const result = { ...jsonSchema };
-  if (!isResponse && doesAccept(zodSchema, null))
-    Object.assign(result, { type: makeNullableType(jsonSchema.type) });
   const examples = getExamples({
     schema: zodSchema,
     variant: isResponse ? "parsed" : "original",

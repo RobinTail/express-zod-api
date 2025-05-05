@@ -21,7 +21,7 @@ import type {
 import * as R from "ramda";
 import ts from "typescript";
 import { globalRegistry, z } from "zod";
-import { doesAccept, getTransformedType, isSchema } from "./common-helpers";
+import { getTransformedType, isOptional, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { hasCycle } from "./deep-checks";
@@ -77,15 +77,12 @@ const onObject: Producer = (
   const fn = () => {
     const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
       ([key, value]) => {
-        const isOptional = isResponse
-          ? isSchema<$ZodOptional>(value, "optional")
-          : doesAccept(value, undefined);
         const { description: comment, deprecated: isDeprecated } =
           globalRegistry.get(value) || {};
         return makeInterfaceProp(key, next(value), {
           comment,
           isDeprecated,
-          isOptional,
+          isOptional: isOptional(value, { isResponse }),
         });
       },
     );
@@ -118,10 +115,7 @@ const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
 
 const onOptional: Producer = ({ _zod: { def } }: $ZodOptional, { next }) =>
-  f.createUnionTypeNode([
-    next(def.innerType),
-    ensureTypeNode(ts.SyntaxKind.UndefinedKeyword),
-  ]);
+  next(def.innerType);
 
 const onNullable: Producer = ({ _zod: { def } }: $ZodNullable, { next }) =>
   f.createUnionTypeNode([next(def.innerType), makeLiteralType(null)]);

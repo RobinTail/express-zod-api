@@ -1,4 +1,9 @@
-import type { $ZodObject, $ZodTransform, $ZodType } from "@zod/core";
+import type {
+  $ZodObject,
+  $ZodTransform,
+  $ZodType,
+  $ZodTypeInternals,
+} from "@zod/core";
 import { Request } from "express";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
@@ -170,19 +175,17 @@ export const getTransformedType = R.tryCatch(
   R.always(undefined),
 );
 
-/**
- * @link https://github.com/colinhacks/zod/issues/4159
- * @todo replace undefined check with using using ._zod.optionality
- * @see https://github.com/RobinTail/express-zod-api/pull/2600/files#r2073174475
- * @link https://v4.zod.dev/v4/changelog#changes-zunknown-optionality
- * */
-export const doesAccept = R.tryCatch(
-  (schema: $ZodType, value: undefined | null) => {
-    z.parse(schema, value);
-    return true;
-  },
-  R.always(false),
-);
+const requestOptionality: Array<$ZodTypeInternals["optionality"]> = [
+  "optional",
+  "defaulted",
+];
+export const isOptional = (
+  { _zod: { optionality } }: $ZodType,
+  { isResponse }: { isResponse: boolean },
+) =>
+  isResponse
+    ? optionality === "optional"
+    : optionality && requestOptionality.includes(optionality);
 
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
 export const isObject = (subject: unknown) =>
