@@ -825,10 +825,10 @@
     loupe "^3.1.3"
     tinyrainbow "^2.0.0"
 
-"@zod/core@0.11.1":
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/@zod/core/-/core-0.11.1.tgz#adb00b0e675cd3b62815c0724e5d030f221c1c9e"
-  integrity sha512-yH4Zexl5Epl40nP3whP6NMS/sI6KxpLQ34ZLnaIu3w1TjQHpUOJXquiG1xDAWk2tO3xKy3UmazIiiyaK1GwbGw==
+"@zod/core@0.11.4":
+  version "0.11.4"
+  resolved "https://registry.yarnpkg.com/@zod/core/-/core-0.11.4.tgz#c3715dde26a00c303aae43463b5e7b578a85d00f"
+  integrity sha512-ezfAaaxgjSXZw9sH5QJ4/uqFmg8PbwBFtdSlzz1OoXWcSUR4fj4meS491+lk9ZGxCymjJ/pbOSu7nzcxvHtG0g==
 
 accepts@^1.3.7:
   version "1.3.8"
@@ -3079,9 +3079,9 @@ yocto-queue@^0.1.0:
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
-zod@^4.0.0-beta.20250504T224201:
-  version "4.0.0-beta.20250504T224201"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-4.0.0-beta.20250504T224201.tgz#4f5aa08501d47ca2c02edc866dc9e96d0912c258"
-  integrity sha512-9x9slmB7LZwsJxq9NdEuQwSczWtYY3hJyVA5JH8+sqmXEKoy7f1kBkrG3trLIPkFmrGo8YjGupoH0pqTRNcyoQ==
+zod@^4.0.0-beta.20250505T012514:
+  version "4.0.0-beta.20250505T012514"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-4.0.0-beta.20250505T012514.tgz#f9f1f8b337efdd7123ff83f9606357ec76052e3a"
+  integrity sha512-b9Oif/j2uIFuimTO3xqTZP71cfNcv49G7sSDF8wp4+MH2tSCDgRDy5RKEMbLtD0LTrmGznL/gYqqDW7U80PudA==
   dependencies:
-    "@zod/core" "0.11.1"
+    "@zod/core" "0.11.4"

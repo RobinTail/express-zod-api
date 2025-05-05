@@ -73,8 +73,11 @@ const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
  * @todo determine of makeAlias needed
  * @see https://stackoverflow.com/questions/8591873/determine-if-a-javascript-property-has-a-getter-or-setter-defined
  */
-const onObject: Producer = (obj: $ZodObject, { isResponse, next, makeAlias }) =>
-  makeAlias(obj, () => {
+const onObject: Producer = (
+  obj: $ZodObject,
+  { isResponse, next, makeAlias },
+) => {
+  const fn = () => {
     const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
       ([key, value]) => {
         const isOptional = isResponse
@@ -90,7 +93,25 @@ const onObject: Producer = (obj: $ZodObject, { isResponse, next, makeAlias }) =>
       },
     );
     return f.createTypeLiteralNode(members);
+  };
+  const hasGetterProp = Object.keys(obj._zod.def.shape).some((key) => {
+    if (key === "subcategories" || key === "name") {
+      console.log(
+        key,
+        Object.getOwnPropertyDescriptor(obj._zod.def.shape, key)?.get,
+        Object.getOwnPropertyDescriptor(obj._zod.def.shape, key)?.set,
+        Object.getOwnPropertyDescriptor(obj._zod.def.shape, key)?.configurable,
+        Object.getOwnPropertyDescriptor(obj._zod.def.shape, key)?.enumerable,
+        Object.getOwnPropertyDescriptor(obj._zod.def.shape, key)?.writable,
+      );
+    }
+    return (
+      typeof Object.getOwnPropertyDescriptor(obj._zod.def.shape, key)?.get ===
+      "function"
+    );
   });
+  return hasGetterProp ? makeAlias(obj, fn) : fn();
+};
 
 const onArray: Producer = ({ _zod: { def } }: $ZodArray, { next }) =>
   f.createArrayTypeNode(next(def.element));
