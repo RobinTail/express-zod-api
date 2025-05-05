@@ -38,7 +38,7 @@
     "eslint": "^9.25.1",
     "eslint-config-prettier": "^10.1.2",
     "eslint-plugin-allowed-dependencies": "^1.2.0",
-    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-prettier": "^5.3.1",
     "express": "^5.1.0",
     "express-fileupload": "^1.5.0",
     "http-errors": "^2.0.0",
