@@ -461,8 +461,8 @@ describe("Documentation", () => {
       expect(boolean.parse(null)).toBe(false);
     });
 
-    test("should handle circular schemas via z.interface()", () => {
-      const category = z.interface({
+    test("should handle circular schemas via z.object()", () => {
+      const category = z.object({
         name: z.string(),
         get subcategories() {
           return z.array(category);

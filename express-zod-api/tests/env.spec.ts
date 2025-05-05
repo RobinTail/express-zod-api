@@ -1,6 +1,5 @@
 import createHttpError from "http-errors";
 import * as R from "ramda";
-import { expectTypeOf } from "vitest";
 import { z } from "zod";
 
 describe("Environment checks", () => {
@@ -76,28 +75,53 @@ describe("Environment checks", () => {
       expect(schema.meta()).toMatchSnapshot();
     });
 
-    test("output of empty object schema is too abstract object", () => {
-      const schema = z.strictObject({});
-      expectTypeOf(schema._zod.output).toEqualTypeOf<object>();
-      expectTypeOf(schema._zod.output).not.toExtend<Record<string, never>>();
+    /** @link https://github.com/colinhacks/zod/issues/4320 */
+    test("input type of a loose object does not allow extra keys", () => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- this is fine
+      const schema = z.looseObject({});
+      expectTypeOf<z.output<typeof schema>>().toEqualTypeOf<
+        Record<string, never> // ok
+      >();
+      expectTypeOf<z.input<typeof schema>>().not.toEqualTypeOf<
+        Record<string, unknown> // not ok
+      >();
     });
 
-    /** @link https://github.com/colinhacks/zod/issues/4152 */
-    test("qin presence", () => {
-      const s = z.number().optional();
-      expect(s._zod.qout).toBe("true");
-      expect(s._zod.qin).toBeUndefined();
+    test("circular object schema has no sign of getter in its shape", () => {
+      const schema = z.object({
+        name: z.string(),
+        get features() {
+          return schema.array();
+        },
+      });
+      expect(
+        Object.getOwnPropertyDescriptors(schema._zod.def.shape),
+      ).toMatchSnapshot();
     });
   });
 
   describe("Zod new features", () => {
-    test("interface shape does not contain question marks, but there is a list of them", () => {
-      const schema = z.interface({
+    test("object shape conveys the keys optionality", () => {
+      const schema = z.object({
         one: z.boolean(),
-        "two?": z.boolean(),
+        two: z.boolean().optional(),
+        three: z.boolean().default(true),
+        four: z
+          .boolean()
+          .optional()
+          .transform(() => false),
       });
-      expect(Object.keys(schema._zod.def.shape)).toEqual(["one", "two"]);
-      expect(schema._zod.def.optional).toEqual(["two"]);
+      expect(Object.keys(schema._zod.def.shape)).toEqual([
+        "one",
+        "two",
+        "three",
+        "four",
+      ]);
+      expect(schema._zod.def.shape.one._zod.optionality).toBeUndefined();
+      expect(schema._zod.def.shape.two._zod.optionality).toBe("optional");
+      expect(schema._zod.def.shape.three._zod.optionality).toBe("defaulted");
+      /** @link https://github.com/colinhacks/zod/issues/4322 */
+      expect(schema._zod.def.shape.four._zod.optionality).not.toBe("optional"); // <— undefined
     });
 
     test("coerce is safe for nullable and optional", () => {

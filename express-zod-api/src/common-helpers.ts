@@ -170,7 +170,12 @@ export const getTransformedType = R.tryCatch(
   R.always(undefined),
 );
 
-/** @link https://github.com/colinhacks/zod/issues/4159 */
+/**
+ * @link https://github.com/colinhacks/zod/issues/4159
+ * @todo replace undefined check with using using ._zod.optionality
+ * @see https://github.com/RobinTail/express-zod-api/pull/2600/files#r2073174475
+ * @link https://v4.zod.dev/v4/changelog#changes-zunknown-optionality
+ * */
 export const doesAccept = R.tryCatch(
   (schema: $ZodType, value: undefined | null) => {
     z.parse(schema, value);

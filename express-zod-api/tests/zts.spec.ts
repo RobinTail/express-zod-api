@@ -98,7 +98,7 @@ describe("zod-to-ts", () => {
       }),
     );
 
-    const circular2 = z.interface({
+    const circular2 = z.object({
       name: z.string(),
       get subcategories() {
         return z.array(circular2);

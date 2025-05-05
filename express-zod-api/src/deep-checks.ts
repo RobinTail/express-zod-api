@@ -1,4 +1,4 @@
-import type { $ZodType } from "@zod/core";
+import type { $ZodType, JSONSchema } from "@zod/core";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { ezDateInBrand } from "./date-in-schema";
@@ -33,6 +33,30 @@ export const findNestedSchema = (
     },
     (err: DeepCheckError) => err.cause,
   )();
+
+/** not using cycle:"throw" because it also affects parenting objects */
+export const hasCycle = (
+  subject: $ZodType,
+  { io }: Pick<NestedSchemaLookupProps, "io">,
+) => {
+  const json = z.toJSONSchema(subject, {
+    io,
+    unrepresentable: "any",
+    override: ({ jsonSchema }) => {
+      if (typeof jsonSchema.default === "bigint") delete jsonSchema.default;
+    },
+  });
+  const stack: unknown[] = [json];
+  while (stack.length) {
+    const entry = stack.shift()!;
+    if (R.is(Object, entry)) {
+      if ((entry as JSONSchema.BaseSchema).$ref === "#") return true;
+      stack.push(...R.values(entry));
+    }
+    if (R.is(Array, entry)) stack.push(...R.values(entry));
+  }
+  return false;
+};
 
 export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
   findNestedSchema(subject, {

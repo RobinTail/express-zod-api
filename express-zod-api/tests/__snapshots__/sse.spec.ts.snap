@@ -14,6 +14,7 @@ exports[`SSE > makeEventSchema() > should make a valid schema of SSE event 1`] =
     },
     "retry": {
       "exclusiveMaximum": 9007199254740991,
+      "exclusiveMinimum": 0,
       "type": "integer",
     },
   },
@@ -46,6 +47,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
             },
             "retry": {
               "exclusiveMaximum": 9007199254740991,
+              "exclusiveMinimum": 0,
               "type": "integer",
             },
           },
@@ -68,6 +70,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
             },
             "retry": {
               "exclusiveMaximum": 9007199254740991,
+              "exclusiveMinimum": 0,
               "type": "integer",
             },
           },
@@ -121,6 +124,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
         },
         "retry": {
           "exclusiveMaximum": 9007199254740991,
+          "exclusiveMinimum": 0,
           "type": "integer",
         },
       },
