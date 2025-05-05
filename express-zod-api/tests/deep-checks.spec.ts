@@ -2,7 +2,7 @@ import { UploadedFile } from "express-fileupload";
 import { globalRegistry, z } from "zod";
 import type { $brand, $ZodType } from "@zod/core";
 import { ez } from "../src";
-import { findNestedSchema } from "../src/deep-checks";
+import { findNestedSchema, hasCycle } from "../src/deep-checks";
 import { metaSymbol } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
@@ -60,5 +60,21 @@ describe("Checks", () => {
       });
       expect(check.mock.calls.length).toBe(1);
     });
+  });
+
+  describe("hasCycle()", () => {
+    test.each(["input", "output"] as const)(
+      "can find circular references %#",
+      (io) => {
+        const schema = z.object({
+          name: z.string(),
+          get features() {
+            return schema.array();
+          },
+        });
+        const result = hasCycle(schema, { io });
+        expect(result).toBeTruthy();
+      },
+    );
   });
 });

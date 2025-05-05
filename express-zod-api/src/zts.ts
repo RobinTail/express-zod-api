@@ -24,6 +24,7 @@ import { globalRegistry, z } from "zod";
 import { doesAccept, getTransformedType, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
+import { hasCycle } from "./deep-checks";
 import { ezFileBrand, FileSchema } from "./file-schema";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand, RawSchema } from "./raw-schema";
@@ -69,12 +70,11 @@ const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
   return values.length === 1 ? values[0] : f.createUnionTypeNode(values);
 };
 
-/**
- * @todo how to avoid making alias for every object? this one does not work:
- * @see https://stackoverflow.com/questions/8591873/determine-if-a-javascript-property-has-a-getter-or-setter-defined
- */
-const onObject: Producer = (obj: $ZodObject, { isResponse, next, makeAlias }) =>
-  makeAlias(obj, () => {
+const onObject: Producer = (
+  obj: $ZodObject,
+  { isResponse, next, makeAlias },
+) => {
+  const fn = () => {
     const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
       ([key, value]) => {
         const isOptional = isResponse
@@ -90,7 +90,11 @@ const onObject: Producer = (obj: $ZodObject, { isResponse, next, makeAlias }) =>
       },
     );
     return f.createTypeLiteralNode(members);
-  });
+  };
+  return hasCycle(obj, { io: isResponse ? "output" : "input" })
+    ? makeAlias(obj, fn)
+    : fn();
+};
 
 const onArray: Producer = ({ _zod: { def } }: $ZodArray, { next }) =>
   f.createArrayTypeNode(next(def.element));
