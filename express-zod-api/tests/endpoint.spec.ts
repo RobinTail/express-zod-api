@@ -526,6 +526,10 @@ describe("Endpoint", () => {
             path: ["dynamicValue"],
           },
         ),
+      /**
+       * @todo revert to looseObject when fixed
+       * @link https://github.com/colinhacks/zod/issues/4320
+       */
       output: z
         .record(z.string(), z.unknown())
         .refine((obj) => !("emitOutputValidationFailure" in obj), {
