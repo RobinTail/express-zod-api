@@ -74,6 +74,18 @@ describe("Environment checks", () => {
         .meta({ title: "last" });
       expect(schema.meta()).toMatchSnapshot();
     });
+
+    test("circular object schema has no sign of getter in its shape", () => {
+      const schema = z.object({
+        name: z.string(),
+        get features() {
+          return schema.array();
+        },
+      });
+      expect(
+        Object.getOwnPropertyDescriptors(schema._zod.def.shape),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("Zod new features", () => {
