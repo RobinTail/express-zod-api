@@ -203,9 +203,9 @@ describe("Common Helpers", () => {
   describe("pullExampleProps()", () => {
     test("handles multiple examples per property", () => {
       const schema = z.object({
-        a: z.string(),
-        b: z.number(),
-        c: z.boolean(),
+        a: z.string().example("one").example("two").example("three"),
+        b: z.number().example(1).example(2),
+        c: z.boolean().example(false),
       });
       expect(pullExampleProps(schema)).toEqual([
         { a: "one", b: 1, c: false },
