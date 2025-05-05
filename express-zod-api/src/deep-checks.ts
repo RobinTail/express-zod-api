@@ -1,4 +1,4 @@
-import { $ZodType, JSONSchema } from "@zod/core";
+import type { $ZodType, JSONSchema } from "@zod/core";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { ezDateInBrand } from "./date-in-schema";
