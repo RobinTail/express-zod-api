@@ -216,9 +216,24 @@ exports[`Documentation helpers > depictNullable() > should add null type to the 
 }
 `;
 
-exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 1`] = `
+exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 0 1`] = `
 {
   "type": "null",
+}
+`;
+
+exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 1 1`] = `
+{
+  "type": "null",
+}
+`;
+
+exports[`Documentation helpers > depictNullable() > should not add null type when it's already there 2 1`] = `
+{
+  "type": [
+    "string",
+    "null",
+  ],
 }
 `;
 

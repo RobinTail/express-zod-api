@@ -309,10 +309,18 @@ describe("Documentation helpers", () => {
       },
     );
 
-    test("should not add null type when it's already there", () => {
-      const jsonSchema: JSONSchema.BaseSchema = {
+    test.each([
+      { type: "null" },
+      {
         anyOf: [{ type: "null" }, { type: "null" }],
-      };
+      },
+      {
+        anyOf: [
+          { type: ["string", "null"] as unknown as string }, // nullable of nullable case
+          { type: "null" },
+        ],
+      },
+    ])("should not add null type when it's already there %#", (jsonSchema) => {
       expect(
         depictNullable({ zodSchema: z.never(), jsonSchema }, requestCtx),
       ).toMatchSnapshot();
