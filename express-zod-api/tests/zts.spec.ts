@@ -202,7 +202,7 @@ describe("zod-to-ts", () => {
         .optional(),
     });
 
-    test("outputs correct typescript", () => {
+    test("Zod 4: does not add undefined to it, unwrap as is", () => {
       const node = zodToTs(optionalStringSchema, { ctx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });

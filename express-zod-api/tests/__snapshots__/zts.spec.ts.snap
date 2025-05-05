@@ -22,14 +22,14 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     any: any;
     unknown: any;
     never: any;
-    optionalString?: string | undefined;
+    optionalString?: string;
     nullablePartialObject: {
-        string?: string | undefined;
-        number?: number | undefined;
-        fixedArrayOfString?: string[] | undefined;
+        string?: string;
+        number?: number;
+        fixedArrayOfString?: string[];
         object?: {
             string: string;
-        } | undefined;
+        };
     } | null;
     tuple: [
         string,
@@ -57,8 +57,8 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     set: any;
     intersection: (string & number) | bigint;
     promise: any;
-    optDefaultString?: string | undefined;
-    refinedStringWithSomeBullshit: (string | number) & ((bigint | null) | undefined);
+    optDefaultString?: string;
+    refinedStringWithSomeBullshit: (string | number) & (bigint | null);
     nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
     lazy: SomeType;
     discUnion: {
@@ -127,7 +127,7 @@ exports[`zod-to-ts > Issue #2352: intersection of objects having same prop %# > 
 "{
     query: string;
 } & {
-    query?: string | undefined;
+    query?: string;
 }"
 `;
 
@@ -135,7 +135,7 @@ exports[`zod-to-ts > Issue #2352: intersection of objects having same prop %# > 
 "{
     query: string;
 } & {
-    query?: string | undefined;
+    query?: string;
 }"
 `;
 
@@ -268,21 +268,21 @@ exports[`zod-to-ts > z.object() > supports zod.describe() 1`] = `
 }"
 `;
 
+exports[`zod-to-ts > z.optional() > Zod 4: does not add undefined to it, unwrap as is 1`] = `"string"`;
+
 exports[`zod-to-ts > z.optional() > Zod 4: should add question mark only to optional props 1`] = `
 "{
-    optional?: string | undefined;
+    optional?: string;
     required: string;
-    transform: number | undefined;
-    or: (number | undefined) | string;
+    transform: number;
+    or: number | string;
     tuple?: [
-        string | undefined,
+        string,
         number,
         {
-            optional?: string | undefined;
+            optional?: string;
             required: string;
         }
-    ] | undefined;
+    ];
 }"
 `;
-
-exports[`zod-to-ts > z.optional() > outputs correct typescript 1`] = `"string | undefined"`;

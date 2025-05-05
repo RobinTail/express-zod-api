@@ -1,6 +1,6 @@
 type Type1 = {
   title: string;
-  features?: Type1[] | undefined;
+  features?: Type1[];
 };
 
 type SomeOf<T> = T[keyof T];
@@ -265,15 +265,15 @@ interface PostV1AvatarRawNegativeResponseVariants {
 /** get /v1/events/stream */
 type GetV1EventsStreamInput = {
   /** @deprecated for testing error response */
-  trigger?: string | undefined;
+  trigger?: string;
 };
 
 /** get /v1/events/stream */
 type GetV1EventsStreamPositiveVariant1 = {
   data: number;
   event: "time";
-  id?: string | undefined;
-  retry?: number | undefined;
+  id?: string;
+  retry?: number;
 };
 
 /** get /v1/events/stream */

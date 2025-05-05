@@ -119,10 +119,7 @@ const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
 
 const onOptional: Producer = ({ _zod: { def } }: $ZodOptional, { next }) =>
-  f.createUnionTypeNode([
-    next(def.innerType),
-    ensureTypeNode(ts.SyntaxKind.UndefinedKeyword),
-  ]);
+  next(def.innerType);
 
 const onNullable: Producer = ({ _zod: { def } }: $ZodNullable, { next }) =>
   f.createUnionTypeNode([next(def.innerType), makeLiteralType(null)]);
