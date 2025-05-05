@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "ansis": "^4.0.0-rc.7",
-    "node-mocks-http": "^1.17.0",
+    "node-mocks-http": "^1.17.2",
     "openapi3-ts": "^4.4.0",
     "ramda": "^0.30.1"
   },
