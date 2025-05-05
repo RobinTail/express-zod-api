@@ -1,4 +1,9 @@
-import type { $ZodObject, $ZodTransform, $ZodType } from "@zod/core";
+import type {
+  $ZodObject,
+  $ZodTransform,
+  $ZodType,
+  $ZodTypeInternals,
+} from "@zod/core";
 import { Request } from "express";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
@@ -170,15 +175,17 @@ export const getTransformedType = R.tryCatch(
   R.always(undefined),
 );
 
+const requestOptionality: Array<$ZodTypeInternals["optionality"]> = [
+  "optional",
+  "defaulted",
+];
 export const isOptional = (
-  subject: $ZodType,
+  { _zod: { optionality } }: $ZodType,
   { isResponse }: { isResponse: boolean },
-) => {
-  const { optionality } = subject._zod;
-  return isResponse
+) =>
+  isResponse
     ? optionality === "optional"
-    : optionality === "optional" || optionality === "defaulted";
-};
+    : optionality && requestOptionality.includes(optionality);
 
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
 export const isObject = (subject: unknown) =>
