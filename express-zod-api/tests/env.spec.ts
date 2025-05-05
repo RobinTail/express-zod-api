@@ -101,15 +101,27 @@ describe("Environment checks", () => {
   });
 
   describe("Zod new features", () => {
-    test("retention: object shape conveys the keys optionality", () => {
+    test("object shape conveys the keys optionality", () => {
       const schema = z.object({
         one: z.boolean(),
         two: z.boolean().optional(),
+        three: z.boolean().default(true),
+        four: z
+          .boolean()
+          .optional()
+          .transform(() => false),
       });
-      expect(Object.keys(schema._zod.def.shape)).toEqual(["one", "two"]);
-      expect(schema._zod.def.shape.one).toBeInstanceOf(z.ZodBoolean);
-      expect(schema._zod.def.shape.two).toBeInstanceOf(z.ZodOptional);
-      expect(schema._zod.def.shape.two.isOptional()).toBe(true);
+      expect(Object.keys(schema._zod.def.shape)).toEqual([
+        "one",
+        "two",
+        "three",
+        "four",
+      ]);
+      expect(schema._zod.def.shape.one._zod.optionality).toBeUndefined();
+      expect(schema._zod.def.shape.two._zod.optionality).toBe("optional");
+      expect(schema._zod.def.shape.three._zod.optionality).toBe("defaulted");
+      /** @link https://github.com/colinhacks/zod/issues/4322 */
+      expect(schema._zod.def.shape.four._zod.optionality).not.toBe("optional"); // <— undefined
     });
 
     test("coerce is safe for nullable and optional", () => {
