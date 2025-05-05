@@ -5,10 +5,10 @@ import { defaultEndpointsFactory } from "express-zod-api";
 import { methodProviderMiddleware } from "../middlewares";
 
 // Demonstrating circular schemas using z.interface()
-const feature = z.interface({
+const feature = z.object({
   title: z.string(),
-  get "features?"() {
-    return z.array(feature);
+  get features() {
+    return z.array(feature).optional();
   },
 });
 
