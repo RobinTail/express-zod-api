@@ -170,6 +170,16 @@ export const getTransformedType = R.tryCatch(
   R.always(undefined),
 );
 
+export const isOptional = (
+  subject: $ZodType,
+  { isResponse }: { isResponse: boolean },
+) => {
+  const { optionality } = subject._zod;
+  return isResponse
+    ? optionality === "optional"
+    : optionality === "optional" || optionality === "defaulted";
+};
+
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
 export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;

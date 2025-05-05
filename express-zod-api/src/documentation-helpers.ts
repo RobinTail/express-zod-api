@@ -31,6 +31,7 @@ import {
   getRoutePathParams,
   getTransformedType,
   isObject,
+  isOptional,
   isSchema,
   makeCleanId,
   routePathParamsRegex,
@@ -173,11 +174,8 @@ export const depictObject: Depicter = (
   const result: string[] = [];
   for (const key of required) {
     const valueSchema = zodSchema._zod.def.shape[key];
-    const { optionality } = valueSchema._zod;
-    const isOptional = isResponse
-      ? optionality === "optional"
-      : optionality === "optional" || optionality === "defaulted";
-    if (valueSchema && !isOptional) result.push(key);
+    if (valueSchema && !isOptional(valueSchema, { isResponse }))
+      result.push(key);
   }
   return { ...jsonSchema, required: result };
 };
