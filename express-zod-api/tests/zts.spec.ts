@@ -207,7 +207,11 @@ describe("zod-to-ts", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
-    test("should output `?:` and undefined union for optional properties", () => {
+    /**
+     * @todo revisit when optional+transform fixed
+     * @link https://github.com/colinhacks/zod/issues/4322
+     * */
+    test("Zod 4: should add question mark only to optional props", () => {
       const node = zodToTs(objectWithOptionals, { ctx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });

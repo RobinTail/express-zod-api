@@ -16,11 +16,11 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     enum: "hi" | "bye";
     intersectionWithTransform: (number & bigint) & (number & string);
     date: any;
-    undefined?: undefined;
+    undefined: undefined;
     null: null;
-    void?: any;
-    any?: any;
-    unknown?: any;
+    void: any;
+    any: any;
+    unknown: any;
     never: any;
     optionalString?: string | undefined;
     nullablePartialObject: {
@@ -73,7 +73,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
         y: number;
     };
     branded: string;
-    catch?: number;
+    catch: number;
     pipeline: string;
     readonly: string;
 }"
@@ -145,11 +145,11 @@ exports[`zod-to-ts > PrimitiveSchema > outputs correct typescript 1`] = `
     number: number;
     boolean: boolean;
     date: any;
-    undefined?: undefined;
+    undefined: undefined;
     null: null;
-    void?: any;
-    any?: any;
-    unknown?: any;
+    void: any;
+    any: any;
+    unknown: any;
     never: any;
 }"
 `;
@@ -230,10 +230,10 @@ exports[`zod-to-ts > z.object() > escapes correctly 1`] = `
     "'": string;
     "\`": string;
     "\\n": number;
-    $e?: any;
-    "4t"?: any;
-    _r?: any;
-    "-r"?: undefined;
+    $e: any;
+    "4t": any;
+    _r: any;
+    "-r": undefined;
 }"
 `;
 
@@ -268,14 +268,12 @@ exports[`zod-to-ts > z.object() > supports zod.describe() 1`] = `
 }"
 `;
 
-exports[`zod-to-ts > z.optional() > outputs correct typescript 1`] = `"string | undefined"`;
-
-exports[`zod-to-ts > z.optional() > should output \`?:\` and undefined union for optional properties 1`] = `
+exports[`zod-to-ts > z.optional() > Zod 4: should add question mark only to optional props 1`] = `
 "{
     optional?: string | undefined;
     required: string;
-    transform?: number | undefined;
-    or?: (number | undefined) | string;
+    transform: number | undefined;
+    or: (number | undefined) | string;
     tuple?: [
         string | undefined,
         number,
@@ -286,3 +284,5 @@ exports[`zod-to-ts > z.optional() > should output \`?:\` and undefined union for
     ] | undefined;
 }"
 `;
+
+exports[`zod-to-ts > z.optional() > outputs correct typescript 1`] = `"string | undefined"`;

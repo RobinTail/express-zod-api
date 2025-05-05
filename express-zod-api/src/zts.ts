@@ -21,7 +21,7 @@ import type {
 import * as R from "ramda";
 import ts from "typescript";
 import { globalRegistry, z } from "zod";
-import { doesAccept, getTransformedType, isSchema } from "./common-helpers";
+import { getTransformedType, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { hasCycle } from "./deep-checks";
@@ -77,9 +77,10 @@ const onObject: Producer = (
   const fn = () => {
     const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
       ([key, value]) => {
+        const { optionality } = value._zod;
         const isOptional = isResponse
-          ? isSchema<$ZodOptional>(value, "optional")
-          : doesAccept(value, undefined);
+          ? optionality === "optional"
+          : optionality === "optional" || optionality === "defaulted";
         const { description: comment, deprecated: isDeprecated } =
           globalRegistry.get(value) || {};
         return makeInterfaceProp(key, next(value), {
