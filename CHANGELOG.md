@@ -2,6 +2,10 @@
 
 ## Version 22
 
+### v22.14.0
+
+- Supporting Node 24.
+
 ### v22.13.2
 
 - Fixed inconsistency between the actual catcher behavior and the error handling documentation:
