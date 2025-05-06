@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20.9.0, 20.x, 22.0.0, 22.x, 24-nightly]
+        node-version: [20.9.0, 20.x, 22.0.0, 22.x, 24.0.0, 24.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Get yarn cache dir
