@@ -122,6 +122,18 @@ describe("Environment checks", () => {
       expect(schema._zod.def.shape.three._zod.optionality).toBe("defaulted");
       /** @link https://github.com/colinhacks/zod/issues/4322 */
       expect(schema._zod.def.shape.four._zod.optionality).not.toBe("optional"); // <— undefined
+      expectTypeOf<z.input<typeof schema>>().toEqualTypeOf<{
+        one: boolean;
+        two?: boolean | undefined;
+        three?: boolean | undefined;
+        four: boolean | undefined;
+      }>();
+      expectTypeOf<z.output<typeof schema>>().toEqualTypeOf<{
+        one: boolean;
+        two?: boolean | undefined;
+        three: boolean;
+        four: boolean;
+      }>();
     });
 
     test("coerce is safe for nullable and optional", () => {

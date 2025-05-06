@@ -142,11 +142,17 @@ export const makeInterfaceProp = (
     comment,
   }: { isOptional?: boolean; isDeprecated?: boolean; comment?: string } = {},
 ) => {
+  const propType = ensureTypeNode(value);
   const node = f.createPropertySignature(
     undefined,
     makePropertyIdentifier(name),
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-    ensureTypeNode(value),
+    isOptional
+      ? f.createUnionTypeNode([
+          propType,
+          ensureTypeNode(ts.SyntaxKind.UndefinedKeyword),
+        ])
+      : propType,
   );
   const jsdoc = R.reject(R.isNil, [
     isDeprecated ? "@deprecated" : undefined,

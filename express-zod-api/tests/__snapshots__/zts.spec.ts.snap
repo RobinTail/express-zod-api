@@ -22,14 +22,14 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     any: any;
     unknown: any;
     never: any;
-    optionalString?: string;
+    optionalString?: string | undefined;
     nullablePartialObject: {
-        string?: string;
-        number?: number;
-        fixedArrayOfString?: string[];
+        string?: string | undefined;
+        number?: number | undefined;
+        fixedArrayOfString?: string[] | undefined;
         object?: {
             string: string;
-        };
+        } | undefined;
     } | null;
     tuple: [
         string,
@@ -57,7 +57,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     set: any;
     intersection: (string & number) | bigint;
     promise: any;
-    optDefaultString?: string;
+    optDefaultString?: string | undefined;
     refinedStringWithSomeBullshit: (string | number) & (bigint | null);
     nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
     lazy: SomeType;
@@ -127,7 +127,7 @@ exports[`zod-to-ts > Issue #2352: intersection of objects having same prop %# > 
 "{
     query: string;
 } & {
-    query?: string;
+    query?: string | undefined;
 }"
 `;
 
@@ -135,7 +135,7 @@ exports[`zod-to-ts > Issue #2352: intersection of objects having same prop %# > 
 "{
     query: string;
 } & {
-    query?: string;
+    query?: string | undefined;
 }"
 `;
 
@@ -272,7 +272,7 @@ exports[`zod-to-ts > z.optional() > Zod 4: does not add undefined to it, unwrap 
 
 exports[`zod-to-ts > z.optional() > Zod 4: should add question mark only to optional props 1`] = `
 "{
-    optional?: string;
+    optional?: string | undefined;
     required: string;
     transform: number;
     or: number | string;
@@ -280,9 +280,9 @@ exports[`zod-to-ts > z.optional() > Zod 4: should add question mark only to opti
         string,
         number,
         {
-            optional?: string;
+            optional?: string | undefined;
             required: string;
         }
-    ];
+    ] | undefined;
 }"
 `;

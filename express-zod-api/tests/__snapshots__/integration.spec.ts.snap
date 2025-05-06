@@ -282,14 +282,14 @@ exports[`Integration > Should treat optionals the same way as z.infer() by defau
 
 /** post /v1/test-with-dashes */
 type PostV1TestWithDashesInput = {
-  opt?: string;
+  opt?: string | undefined;
 };
 
 /** post /v1/test-with-dashes */
 type PostV1TestWithDashesPositiveVariant1 = {
   status: "success";
   data: {
-    similar?: number;
+    similar?: number | undefined;
   };
 };
 
