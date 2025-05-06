@@ -1,6 +1,5 @@
 import createHttpError from "http-errors";
 import * as R from "ramda";
-import { expectTypeOf } from "vitest";
 import { z } from "zod";
 
 describe("Environment checks", () => {
