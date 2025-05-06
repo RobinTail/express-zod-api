@@ -26,6 +26,10 @@
 
 ## Version 23
 
+### v23.2.0
+
+- Supporting Node 24.
+
 ### v23.1.2
 
 - Simplified implementation for generating Documentation of `z.enum()` and `z.literal()`;
