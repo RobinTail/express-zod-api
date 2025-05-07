@@ -19,7 +19,7 @@ describe("Example", async () => {
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
 
   beforeAll(() => {
-    // @todo revisit when Node 24 released (currently behind a flag, Node 22.3.0 and 23x)
+    // @todo revisit when unflagged https://nodejs.org/docs/v24.0.0/api/globals.html#eventsource
     vi.stubGlobal("EventSource", EventSource);
   });
 
