@@ -9,6 +9,7 @@ import {
   Severity,
   styles,
 } from "./logger-helpers";
+import { Ack, TypescriptWorker } from "./typescript-worker";
 
 interface Context extends FlatObject {
   requestId?: string;
@@ -33,6 +34,8 @@ export interface BuiltinLoggerConfig {
    * @see childLoggerProvider
    * */
   ctx: Context;
+  /** @desc Enables asynchronous logging in a dedicated worker thread */
+  async: boolean;
 }
 
 interface ProfilerOptions {
@@ -44,17 +47,26 @@ interface ProfilerOptions {
 }
 
 /** @desc Built-in console logger with optional colorful inspections */
-export class BuiltinLogger implements AbstractLogger {
+export class BuiltinLogger implements AbstractLogger, AsyncDisposable {
   protected readonly config: BuiltinLoggerConfig;
+  protected static worker?: TypescriptWorker;
 
   /** @example new BuiltinLogger({ level: "debug", color: true, depth: 4 }) */
   public constructor({
     color = ansis.isSupported(),
     level = isProduction() ? "warn" : "debug",
+    async = false, // @todo make it isProduction() in v23
     depth = 2,
     ctx = {},
   }: Partial<BuiltinLoggerConfig> = {}) {
-    this.config = { color, level, depth, ctx };
+    this.config = { color, level, depth, ctx, async };
+    BuiltinLogger.worker ??= this.config.async
+      ? new TypescriptWorker({
+          interval: 500,
+          maxBufferSize: 1000,
+          fd: process.stdout.fd,
+        })
+      : undefined;
   }
 
   protected format(subject: unknown) {
@@ -67,11 +79,30 @@ export class BuiltinLogger implements AbstractLogger {
     });
   }
 
+  protected postpone(line: string) {
+    BuiltinLogger.worker?.postMessage({ command: "log", line });
+  }
+
+  public async [Symbol.asyncDispose]() {
+    if (!BuiltinLogger.worker) return;
+    const done = new Promise<void>((resolve) => {
+      setTimeout(resolve, 500);
+      BuiltinLogger.worker!.once(
+        "message",
+        (ack) => ack === ("done" satisfies Ack) && resolve(),
+      );
+    });
+    BuiltinLogger.worker.postMessage({ command: "close" });
+    await done;
+    await BuiltinLogger.worker.terminate();
+  }
+
   protected print(method: Severity, message: string, meta?: unknown) {
     const {
       level,
       ctx: { requestId, ...ctx },
       color: hasColor,
+      async: isAsync,
     } = this.config;
     if (level === "silent" || isHidden(method, level)) return;
     const output: string[] = [new Date().toISOString()];
@@ -82,7 +113,7 @@ export class BuiltinLogger implements AbstractLogger {
     );
     if (meta !== undefined) output.push(this.format(meta));
     if (Object.keys(ctx).length > 0) output.push(this.format(ctx));
-    console.log(output.join(" "));
+    (isAsync ? this.postpone.bind(this) : console.log)(output.join(" "));
   }
 
   public debug(message: string, meta?: unknown) {
