@@ -10,11 +10,7 @@ const variants = {
   buffer: () => bufferSchema.brand(ezFileBrand as symbol),
   string: () => z.string().brand(ezFileBrand as symbol),
   binary: () => bufferSchema.or(z.string()).brand(ezFileBrand as symbol),
-  base64: () =>
-    z
-      .string()
-      .base64()
-      .brand(ezFileBrand as symbol),
+  base64: () => z.base64().brand(ezFileBrand as symbol),
 };
 
 type Variants = typeof variants;

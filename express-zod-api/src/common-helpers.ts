@@ -1,6 +1,12 @@
+import type {
+  $ZodObject,
+  $ZodTransform,
+  $ZodType,
+  $ZodTypeInternals,
+} from "@zod/core";
 import { Request } from "express";
 import * as R from "ramda";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import { OutputValidationError } from "./errors";
@@ -8,8 +14,8 @@ import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
-export type EmptyObject = Record<string, never>;
-export type EmptySchema = z.ZodObject<EmptyObject, "strip">;
+export type EmptyObject = z.output<EmptySchema>;
+export type EmptySchema = z.ZodRecord<z.ZodString, z.ZodNever>;
 export type FlatObject = Record<string, unknown>;
 
 /** @link https://stackoverflow.com/a/65492934 */
@@ -63,7 +69,11 @@ export const getInput = (
 };
 
 export const ensureError = (subject: unknown): Error =>
-  subject instanceof Error ? subject : new Error(String(subject));
+  subject instanceof Error
+    ? subject
+    : subject instanceof z.ZodError
+      ? new Error(getMessageFromError(subject), { cause: subject })
+      : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
   if (error instanceof z.ZodError) {
@@ -80,22 +90,27 @@ export const getMessageFromError = (error: Error): string => {
   return error.message;
 };
 
+/** Faster replacement to instanceof for code operating core types (traversing schemas) */
+export const isSchema = <T extends $ZodType>(
+  subject: $ZodType,
+  type: T["_zod"]["def"]["type"],
+): subject is T => subject._zod.def.type === type;
+
 /** Takes the original unvalidated examples from the properties of ZodObject schema shape */
-export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
-  Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
+export const pullExampleProps = <T extends $ZodObject>(subject: T) =>
+  Object.entries(subject._zod.def.shape).reduce<Partial<z.input<T>>[]>(
     (acc, [key, schema]) => {
-      const { _def } = schema as z.ZodType;
-      return combinations(
-        acc,
-        (_def[metaSymbol]?.examples || []).map(R.objOf(key)),
-        ([left, right]) => ({ ...left, ...right }),
-      );
+      const { examples = [] } = globalRegistry.get(schema)?.[metaSymbol] || {};
+      return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
+        ...left,
+        ...right,
+      }));
     },
     [],
   );
 
 export const getExamples = <
-  T extends z.ZodType,
+  T extends $ZodType,
   V extends "original" | "parsed" | undefined,
 >({
   schema,
@@ -122,13 +137,13 @@ export const getExamples = <
    * */
   pullProps?: boolean;
 }): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  let examples = schema._def[metaSymbol]?.examples || [];
-  if (!examples.length && pullProps && schema instanceof z.ZodObject)
+  let examples = globalRegistry.get(schema)?.[metaSymbol]?.examples || [];
+  if (!examples.length && pullProps && isSchema<$ZodObject>(schema, "object"))
     examples = pullExampleProps(schema);
   if (!validate && variant === "original") return examples;
   const result: Array<z.input<T> | z.output<T>> = [];
   for (const example of examples) {
-    const parsedExample = schema.safeParse(example);
+    const parsedExample = z.safeParse(schema, example);
     if (parsedExample.success)
       result.push(variant === "parsed" ? parsedExample.data : example);
   }
@@ -155,10 +170,22 @@ export const makeCleanId = (...args: string[]) => {
 };
 
 export const getTransformedType = R.tryCatch(
-  <T>(schema: z.ZodEffects<z.ZodTypeAny, unknown, T>, sample: T) =>
-    typeof schema.parse(sample),
+  <T>(schema: $ZodTransform<unknown, T>, sample: T) =>
+    typeof z.parse(schema, sample),
   R.always(undefined),
 );
+
+const requestOptionality: Array<$ZodTypeInternals["optionality"]> = [
+  "optional",
+  "defaulted",
+];
+export const isOptional = (
+  { _zod: { optionality } }: $ZodType,
+  { isResponse }: { isResponse: boolean },
+) =>
+  isResponse
+    ? optionality === "optional"
+    : optionality && requestOptionality.includes(optionality);
 
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
 export const isObject = (subject: unknown) =>

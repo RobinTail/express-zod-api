@@ -14,6 +14,16 @@ import type { LazyResult, Result } from "./result-handler";
 export type ResultSchema<R extends Result> =
   R extends Result<infer S> ? S : never;
 
+export type DiscriminatedResult =
+  | {
+      output: FlatObject;
+      error: null;
+    }
+  | {
+      output: null;
+      error: Error;
+    };
+
 /** @throws ResultHandlerError when Result is an empty array */
 export const normalize = <A extends unknown[]>(
   subject: Result | LazyResult<Result, A>,

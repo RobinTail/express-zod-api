@@ -9,17 +9,18 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     }[];
     boolean: boolean;
     circular: SomeType;
+    circular2: SomeType;
     union: {
         number: number;
     } | "hi";
     enum: "hi" | "bye";
     intersectionWithTransform: (number & bigint) & (number & string);
     date: any;
-    undefined?: undefined;
+    undefined: undefined;
     null: null;
-    void?: any;
-    any?: any;
-    unknown?: any;
+    void: any;
+    any: any;
+    unknown: any;
     never: any;
     optionalString?: string | undefined;
     nullablePartialObject: {
@@ -56,9 +57,8 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     set: any;
     intersection: (string & number) | bigint;
     promise: any;
-    function: any;
     optDefaultString?: string | undefined;
-    refinedStringWithSomeBullshit: (string | number) & ((bigint | null) | undefined);
+    refinedStringWithSomeBullshit: (string | number) & (bigint | null);
     nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
     lazy: SomeType;
     discUnion: {
@@ -73,7 +73,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
         y: number;
     };
     branded: string;
-    catch?: number;
+    catch: number;
     pipeline: string;
     readonly: string;
 }"
@@ -145,11 +145,11 @@ exports[`zod-to-ts > PrimitiveSchema > outputs correct typescript 1`] = `
     number: number;
     boolean: boolean;
     date: any;
-    undefined?: undefined;
+    undefined: undefined;
     null: null;
-    void?: any;
-    any?: any;
-    unknown?: any;
+    void: any;
+    any: any;
+    unknown: any;
     never: any;
 }"
 `;
@@ -207,6 +207,8 @@ exports[`zod-to-ts > z.literal() > Should produce the correct typescript 2 1`] =
 
 exports[`zod-to-ts > z.literal() > Should produce the correct typescript 3 1`] = `"123"`;
 
+exports[`zod-to-ts > z.literal() > Should produce the correct typescript 4 1`] = `"undefined"`;
+
 exports[`zod-to-ts > z.nullable() > outputs correct typescript 1`] = `
 "{
     username: string | null;
@@ -228,10 +230,10 @@ exports[`zod-to-ts > z.object() > escapes correctly 1`] = `
     "'": string;
     "\`": string;
     "\\n": number;
-    $e?: any;
-    "4t"?: any;
-    _r?: any;
-    "-r"?: undefined;
+    $e: any;
+    "4t": any;
+    _r: any;
+    "-r": undefined;
 }"
 `;
 
@@ -266,16 +268,16 @@ exports[`zod-to-ts > z.object() > supports zod.describe() 1`] = `
 }"
 `;
 
-exports[`zod-to-ts > z.optional() > outputs correct typescript 1`] = `"string | undefined"`;
+exports[`zod-to-ts > z.optional() > Zod 4: does not add undefined to it, unwrap as is 1`] = `"string"`;
 
-exports[`zod-to-ts > z.optional() > should output \`?:\` and undefined union for optional properties 1`] = `
+exports[`zod-to-ts > z.optional() > Zod 4: should add question mark only to optional props 1`] = `
 "{
     optional?: string | undefined;
     required: string;
-    transform?: number | undefined;
-    or?: (number | undefined) | string;
+    transform: number;
+    or: number | string;
     tuple?: [
-        string | undefined,
+        string,
         number,
         {
             optional?: string | undefined;

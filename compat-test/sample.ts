@@ -1,1 +1,1 @@
-const test: HeaderSecurity = {};
+new Documentation({ numericRange: {}, });

@@ -111,15 +111,15 @@ describe("Example", async () => {
           features: [
             {
               title: "Tall",
-              features: [{ title: "Above 180cm", features: [] }],
+              features: [{ title: "Above 180cm" }],
             },
-            { title: "Young", features: [] },
+            { title: "Young" },
             {
               title: "Cute",
               features: [
                 {
                   title: "Tells funny jokes",
-                  features: [{ title: "About Typescript", features: [] }],
+                  features: [{ title: "About Typescript" }],
                 },
               ],
             },

@@ -24,6 +24,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -93,6 +95,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -132,6 +136,8 @@ paths:
           application/json:
             schema:
               type: object
+              properties: {}
+              required: []
       responses:
         "200":
           description: POST /v1/getSome/thing Positive response
@@ -145,6 +151,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -214,6 +222,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -261,6 +271,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -347,9 +359,6 @@ paths:
                     properties:
                       num:
                         type: number
-                        format: double
-                        minimum: -1.7976931348623157e+308
-                        maximum: 1.7976931348623157e+308
                     required:
                       - num
                 required:
@@ -390,6 +399,7 @@ paths:
           application/json:
             schema:
               type: object
+              properties: {}
       security:
         - HTTP_1: []
           OAUTH2_1:
@@ -407,6 +417,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -445,6 +457,7 @@ paths:
           application/json:
             schema:
               type: object
+              properties: {}
       security:
         - HTTP_2: []
       responses:
@@ -460,6 +473,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -549,7 +564,6 @@ paths:
                     properties:
                       whatever:
                         type: number
-                        format: double
                     required:
                       - whatever
                 required:
@@ -613,13 +627,12 @@ paths:
           description: GET /v1/getSomething Parameter
           schema:
             type: array
-            items:
-              type: integer
-              format: int64
-              exclusiveMinimum: 0
-              maximum: 9007199254740991
             minItems: 1
             maxItems: 3
+            items:
+              type: integer
+              exclusiveMinimum: 0
+              exclusiveMaximum: 9007199254740991
         - name: unlimited
           in: query
           required: true
@@ -653,9 +666,6 @@ paths:
                         const: something
                       transformation:
                         type: number
-                        format: double
-                        minimum: -1.7976931348623157e+308
-                        maximum: 1.7976931348623157e+308
                     required:
                       - literal
                       - transformation
@@ -720,7 +730,7 @@ paths:
             schema:
               discriminator:
                 propertyName: type
-              oneOf:
+              anyOf:
                 - type: object
                   properties:
                     type:
@@ -754,16 +764,13 @@ paths:
                     type: string
                     const: success
                   data:
-                    discriminator:
-                      propertyName: status
-                    oneOf:
+                    anyOf:
                       - type: object
                         properties:
                           status:
                             type: string
                             const: success
-                          data:
-                            format: any
+                          data: {}
                         required:
                           - status
                           - data
@@ -782,6 +789,8 @@ paths:
                         required:
                           - status
                           - error
+                    discriminator:
+                      propertyName: status
                 required:
                   - status
                   - data
@@ -875,7 +884,6 @@ paths:
                         properties:
                           five:
                             type: integer
-                            format: int64
                             minimum: 0
                             maximum: 9007199254740991
                           six:
@@ -969,9 +977,8 @@ paths:
             type:
               - integer
               - "null"
-            format: int64
             exclusiveMinimum: 0
-            maximum: 9007199254740991
+            exclusiveMaximum: 9007199254740991
             default: 123
       responses:
         "200":
@@ -991,8 +998,29 @@ paths:
                         type:
                           - string
                           - "null"
+                      literal:
+                        type:
+                          - string
+                          - "null"
+                        const: test
+                      multiliteral:
+                        type:
+                          - string
+                          - "null"
+                        enum:
+                          - one
+                          - two
+                      enum:
+                        type:
+                          - string
+                          - "null"
+                        enum:
+                          - test
                     required:
                       - nullable
+                      - literal
+                      - multiliteral
+                      - enum
                 required:
                   - status
                   - data
@@ -1055,16 +1083,15 @@ paths:
               type: object
               properties:
                 union:
-                  oneOf:
+                  anyOf:
                     - type: object
                       properties:
                         one:
                           type: string
                         two:
                           type: integer
-                          format: int64
                           exclusiveMinimum: 0
-                          maximum: 9007199254740991
+                          exclusiveMaximum: 9007199254740991
                       required:
                         - one
                         - two
@@ -1072,8 +1099,7 @@ paths:
                       properties:
                         two:
                           type: integer
-                          format: int64
-                          minimum: -9007199254740991
+                          exclusiveMinimum: -9007199254740991
                           exclusiveMaximum: 0
                         three:
                           type: string
@@ -1098,12 +1124,11 @@ paths:
                     type: object
                     properties:
                       or:
-                        oneOf:
+                        anyOf:
                           - type: string
                           - type: integer
-                            format: int64
                             exclusiveMinimum: 0
-                            maximum: 9007199254740991
+                            exclusiveMaximum: 9007199254740991
                     required:
                       - or
                 required:
@@ -1168,9 +1193,11 @@ paths:
               type: object
               properties:
                 bigint:
-                  type: integer
+                  type: string
                   format: bigint
+                  pattern: ^-?\\d+$
                 boolean:
+                  readOnly: true
                   type: boolean
                 dateIn:
                   description: YYYY-MM-DDTHH:mm:ss.sssZ
@@ -1254,7 +1281,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Basic cases > should handle circular schemas via z.lazy() 1`] = `
+exports[`Documentation > Basic cases > should handle circular schemas via z.object() 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Lazy
@@ -1268,13 +1295,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-              required:
-                - name
-        required: true
+              $ref: "#/components/schemas/Schema1"
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1290,15 +1311,7 @@ paths:
                     type: object
                     properties:
                       zodExample:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          subcategories:
-                            $ref: "#/components/schemas/Schema1"
-                        required:
-                          - name
-                          - subcategories
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - zodExample
                 required:
@@ -1333,17 +1346,29 @@ paths:
 components:
   schemas:
     Schema1:
-      type: array
-      items:
-        type: object
-        properties:
-          name:
-            type: string
-          subcategories:
+      type: object
+      properties:
+        name:
+          type: string
+        subcategories:
+          type: array
+          items:
             $ref: "#/components/schemas/Schema1"
-        required:
-          - name
-          - subcategories
+      required:
+        - name
+        - subcategories
+    Schema2:
+      type: object
+      properties:
+        name:
+          type: string
+        subcategories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema2"
+      required:
+        - name
+        - subcategories
   responses: {}
   parameters: {}
   examples: {}
@@ -1380,6 +1405,8 @@ paths:
                     const: OK
                   result:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - result
@@ -1430,47 +1457,34 @@ paths:
               properties:
                 double:
                   type: number
-                  format: double
-                  minimum: -1.7976931348623157e+308
-                  maximum: 1.7976931348623157e+308
                 doublePositive:
                   type: number
-                  format: double
                   exclusiveMinimum: 0
-                  maximum: 1.7976931348623157e+308
                 doubleNegative:
                   type: number
-                  format: double
-                  minimum: -1.7976931348623157e+308
                   exclusiveMaximum: 0
                 doubleLimited:
                   type: number
-                  format: double
                   minimum: -0.5
                   maximum: 0.5
                 int:
                   type: integer
-                  format: int64
                   minimum: -9007199254740991
                   maximum: 9007199254740991
                 intPositive:
                   type: integer
-                  format: int64
                   exclusiveMinimum: 0
-                  maximum: 9007199254740991
+                  exclusiveMaximum: 9007199254740991
                 intNegative:
                   type: integer
-                  format: int64
-                  minimum: -9007199254740991
+                  exclusiveMinimum: -9007199254740991
                   exclusiveMaximum: 0
                 intLimited:
                   type: integer
-                  format: int64
                   minimum: -100
                   maximum: 100
                 zero:
                   type: integer
-                  format: int64
                   minimum: 0
                   maximum: 0
               required:
@@ -1498,8 +1512,9 @@ paths:
                     type: object
                     properties:
                       bigint:
-                        type: integer
+                        type: string
                         format: bigint
+                        pattern: ^-?\\d+$
                     required:
                       - bigint
                 required:
@@ -1578,35 +1593,43 @@ paths:
                 email:
                   type: string
                   format: email
+                  pattern: ^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$
                 uuid:
                   type: string
                   format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
                 cuid:
                   type: string
                   format: cuid
+                  pattern: ^[cC][^\\s-]{8,}$
                 cuid2:
                   type: string
                   format: cuid2
+                  pattern: ^[0-9a-z]+$
                 ulid:
                   type: string
                   format: ulid
+                  pattern: ^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$
                 ip:
                   type: string
-                  format: ip
+                  format: ipv4
+                  pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$
                 emoji:
                   type: string
                   format: emoji
+                  pattern: ^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$
                 url:
                   type: string
-                  format: url
+                  format: uri
                 numeric:
                   type: string
+                  format: regex
                   pattern: \\d+
                 combined:
                   type: string
-                  format: email
                   minLength: 1
                   maxLength: 90
+                  format: regex
                   pattern: .*@example\\.com
               required:
                 - regular
@@ -1793,6 +1816,8 @@ paths:
           application/json:
             schema:
               type: object
+              properties: {}
+              required: []
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1813,13 +1838,13 @@ paths:
                           type: string
                         additionalProperties:
                           type: integer
-                          format: int64
                           minimum: -9007199254740991
                           maximum: 9007199254740991
                       stringy:
                         type: object
                         propertyNames:
                           type: string
+                          format: regex
                           pattern: "[A-Z]+"
                         additionalProperties:
                           type: boolean
@@ -1827,38 +1852,36 @@ paths:
                         type: object
                         propertyNames:
                           type: integer
-                          format: int64
                           minimum: -9007199254740991
                           maximum: 9007199254740991
                         additionalProperties:
                           type: boolean
                       literal:
                         type: object
-                        properties:
-                          only:
-                            type: boolean
-                        required:
-                          - only
+                        propertyNames:
+                          type: string
+                          const: only
+                        additionalProperties:
+                          type: boolean
                       union:
                         type: object
-                        properties:
-                          option1:
-                            type: boolean
-                          option2:
-                            type: boolean
-                        required:
-                          - option1
-                          - option2
+                        propertyNames:
+                          anyOf:
+                            - type: string
+                              const: option1
+                            - type: string
+                              const: option2
+                        additionalProperties:
+                          type: boolean
                       enum:
                         type: object
-                        properties:
-                          option1:
-                            type: boolean
-                          option2:
-                            type: boolean
-                        required:
-                          - option1
-                          - option2
+                        propertyNames:
+                          type: string
+                          enum:
+                            - option1
+                            - option2
+                        additionalProperties:
+                          type: boolean
                     required:
                       - simple
                       - stringy
@@ -1931,9 +1954,8 @@ paths:
                   type: string
                 two:
                   type: integer
-                  format: int64
                   exclusiveMinimum: 0
-                  maximum: 9007199254740991
+                  exclusiveMaximum: 9007199254740991
               required:
                 - one
                 - two
@@ -2038,9 +2060,8 @@ paths:
                     - type: boolean
                     - type: string
                     - type: integer
-                      format: int64
                       exclusiveMinimum: 0
-                      maximum: 9007199254740991
+                      exclusiveMaximum: 9007199254740991
                   items:
                     not: {}
               required:
@@ -2126,10 +2147,9 @@ paths:
       parameters:
         - name: any
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
-          schema:
-            format: any
+          schema: {}
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -2144,8 +2164,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      any:
-                        format: any
+                      any: {}
                     required:
                       - any
                 required:
@@ -2205,7 +2224,7 @@ paths:
       parameters:
         - name: string
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             format: string (preprocessed)
@@ -2214,9 +2233,9 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
-            format: int64 (preprocessed)
             minimum: 0
             maximum: 9007199254740991
+            format: integer (preprocessed)
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -2298,9 +2317,6 @@ paths:
               properties:
                 test:
                   type: number
-                  format: double
-                  minimum: -1.7976931348623157e+308
-                  maximum: 1.7976931348623157e+308
               required:
                 - test
         required: true
@@ -2487,8 +2503,8 @@ paths:
           required: true
           description: YYYY-MM-DDTHH:mm:ss.sssZ
           schema:
-            description: YYYY-MM-DDTHH:mm:ss.sssZ
             type: string
+            description: YYYY-MM-DDTHH:mm:ss.sssZ
             format: date-time
             pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
             externalDocs:
@@ -2670,6 +2686,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -2758,6 +2776,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -2844,6 +2864,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -2905,9 +2927,9 @@ paths:
           description: GET /v1/getSomething Parameter
           schema:
             type: array
+            minItems: 1
             items:
               type: string
-            minItems: 1
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -2923,10 +2945,10 @@ paths:
                     type: object
                     properties:
                       arr:
+                        minItems: 1
                         type: array
                         items:
                           type: string
-                        minItems: 1
                     required:
                       - arr
                 required:
@@ -2968,10 +2990,10 @@ paths:
               type: object
               properties:
                 arr:
+                  minItems: 1
                   type: array
                   items:
                     type: string
-                  minItems: 1
               required:
                 - arr
         required: true
@@ -2990,10 +3012,10 @@ paths:
                     type: object
                     properties:
                       arr:
+                        minItems: 1
                         type: array
                         items:
                           type: string
-                        minItems: 1
                     required:
                       - arr
                 required:
@@ -3055,7 +3077,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
+              anyOf:
                 - type: object
                   properties:
                     id:
@@ -3087,7 +3109,7 @@ paths:
                     type: string
                     const: success
                   data:
-                    oneOf:
+                    anyOf:
                       - type: object
                         properties:
                           id:
@@ -3183,6 +3205,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -3387,6 +3411,8 @@ components:
           const: success
         data:
           type: object
+          properties: {}
+          required: []
       required:
         - status
         - data
@@ -3443,6 +3469,11 @@ paths:
               required:
                 - key
                 - str
+            examples:
+              example1:
+                value:
+                  key: 1234-56789-01
+                  str: test
         required: true
       responses:
         "200":
@@ -3460,9 +3491,6 @@ paths:
                     properties:
                       num:
                         type: number
-                        format: double
-                        minimum: -1.7976931348623157e+308
-                        maximum: 1.7976931348623157e+308
                     required:
                       - num
                     examples:
@@ -3745,6 +3773,8 @@ paths:
                           - "123"
                     required:
                       - numericStr
+                    examples:
+                      - numericStr: "123"
                 required:
                   - status
                   - data
@@ -3828,11 +3858,10 @@ paths:
                     type: object
                     properties:
                       result:
-                        type: integer
-                        format: int64
-                        exclusiveMinimum: 0
-                        maximum: 9007199254740991
                         description: some positive integer
+                        type: integer
+                        exclusiveMinimum: 0
+                        exclusiveMaximum: 9007199254740991
                     required:
                       - result
                 required:
@@ -3895,7 +3924,7 @@ paths:
           required: true
           description: parameter of post /v1/:name
           schema:
-            oneOf:
+            anyOf:
               - type: string
                 const: John
               - type: string
@@ -3925,6 +3954,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -4015,7 +4046,7 @@ paths:
 components:
   schemas:
     ParameterOfPostV1NameName:
-      oneOf:
+      anyOf:
         - type: string
           const: John
         - type: string
@@ -4028,6 +4059,8 @@ components:
           const: success
         data:
           type: object
+          properties: {}
+          required: []
       required:
         - status
         - data
@@ -4083,7 +4116,7 @@ paths:
           required: true
           description: GET /v1/:name Parameter
           schema:
-            oneOf:
+            anyOf:
               - type: string
                 const: John
               - type: string
@@ -4107,6 +4140,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
@@ -4167,7 +4202,7 @@ paths:
           required: true
           description: POST /v1/:name Parameter
           schema:
-            oneOf:
+            anyOf:
               - type: string
                 const: John
               - type: string
@@ -4197,6 +4232,8 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
                 required:
                   - status
                   - data
