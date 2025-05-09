@@ -2,6 +2,18 @@
 
 ## Version 19
 
+### v19.3.2
+
+- Fixed behavior of error catching handler:
+  - Removed conversion of non-`HttpError`s to `BadRequest` before passing them to `errorHandler`;
+  - A `ResultHandler` configured as `errorHandler` is responsible to handling all errors and responding accordingly.
+  - The default `errorHandler` is `defaultResultHandler`:
+    - Using `getStatusCodeFromError()` it treats non-`HttpError`s as internal ones and responds with status code `500`;
+
+### v19.3.1
+
+- Fixed: the output type of the `ez.raw()` schema (without an argument) was missing the `raw` property (since v19.0.0).
+
 ### v19.3.0
 
 - Feat: Supporting `vitest` version 2:

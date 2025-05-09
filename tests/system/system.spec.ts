@@ -1,5 +1,7 @@
 import cors from "cors";
 import assert from "node:assert/strict";
+import express from "express";
+import { readFile } from "node:fs/promises";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -8,6 +10,7 @@ import {
   createResultHandler,
   createServer,
   defaultResultHandler,
+  ez,
 } from "../../src";
 import { givePort, waitFor } from "../helpers";
 import { afterAll, describe, expect, test, vi } from "vitest";
@@ -124,6 +127,18 @@ describe("App", async () => {
             };
           },
         }),
+      raw: new EndpointsFactory(defaultResultHandler).build({
+        method: "post",
+        input: ez.raw(),
+        output: z.object({ crc: z.number() }),
+        handler: async ({ input: { raw } }) => ({ crc: raw.length }),
+      }),
+      upload: new EndpointsFactory(defaultResultHandler).build({
+        method: "post",
+        input: z.object({ avatar: ez.upload() }),
+        output: z.object({}),
+        handler: async () => ({}),
+      }),
     },
   };
   vi.spyOn(global.console, "log").mockImplementation(vi.fn());
@@ -133,6 +148,20 @@ describe("App", async () => {
         server: {
           listen: port,
           compression: { threshold: 1 },
+          rawParser: express.raw({ limit: 20 }),
+          upload: {
+            beforeUpload: ({ request }) => {
+              if ("trigger" in request.query)
+                throw new Error("beforeUpload failure");
+            },
+          },
+          beforeRouting: ({ app }) => {
+            app.use((req, {}, next) => {
+              if (req.path === "/trigger/beforeRouting")
+                return next(new Error("Failure of beforeRouting triggered"));
+              next();
+            });
+          },
         },
         cors: false,
         startupLogo: true,
@@ -254,6 +283,35 @@ describe("App", async () => {
         "Content-Range,X-Content-Range",
       );
     });
+
+    test("Should handle raw request", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/raw`, {
+        method: "POST",
+        headers: { "content-type": "application/octet-stream" },
+        body: Buffer.from("testing"),
+      });
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({ status: "success", data: { crc: 7 } });
+    });
+
+    test("Should handle upload request", async () => {
+      const filename = "logo.svg";
+      const logo = await readFile(filename, "utf-8");
+      const data = new FormData();
+      data.append(
+        "avatar",
+        new Blob([logo], { type: "image/svg+xml" }),
+        filename,
+      );
+      const response = await fetch(`http://localhost:${port}/v1/upload`, {
+        method: "POST",
+        body: data,
+      });
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toEqual({ data: {}, status: "success" });
+    });
   });
 
   describe("Negative", () => {
@@ -306,6 +364,38 @@ describe("App", async () => {
           "Original error: Custom error in the Endpoint input validation.",
       );
     });
+
+    test("Should treat beforeRouting error as internal", async () => {
+      const response = await fetch(
+        `http://127.0.0.1:${port}/trigger/beforeRouting`,
+      );
+      expect(await response.json()).toEqual({
+        status: "error",
+        error: { message: "Failure of beforeRouting triggered" },
+      });
+      expect(response.status).toBe(500);
+    });
+
+    test("Should treat beforeUpload error as internal", async () => {
+      const filename = "logo.svg";
+      const logo = await readFile(filename, "utf-8");
+      const data = new FormData();
+      data.append(
+        "avatar",
+        new Blob([logo], { type: "image/svg+xml" }),
+        filename,
+      );
+      const response = await fetch(
+        `http://localhost:${port}/v1/upload?trigger=beforeUpload`,
+        { method: "POST", body: data },
+      );
+      expect(response.status).toBe(500);
+      const json = await response.json();
+      expect(json).toEqual({
+        error: { message: "beforeUpload failure" },
+        status: "error",
+      });
+    });
   });
 
   describe("Protocol", () => {
@@ -325,7 +415,7 @@ describe("App", async () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("Should fail on malformed body", async () => {
+    test("Should handle JSON parser failures", async () => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
         method: "POST", // valid method this time
         headers: {
@@ -343,6 +433,20 @@ describe("App", async () => {
             /(Unexpected end of JSON input|Unterminated string in JSON at position 25)/,
           ),
         },
+      });
+    });
+
+    test("Should handle Raw parser failures", async () => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/raw`, {
+        method: "POST",
+        headers: { "content-type": "application/octet-stream" },
+        body: Buffer.alloc(100),
+      });
+      expect(response.status).toBe(413);
+      const json = await response.json();
+      expect(json).toEqual({
+        status: "error",
+        error: { message: "request entity too large" },
       });
     });
 

@@ -11,7 +11,7 @@ import { Parsers, Routing, initRouting } from "./routing";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,
-  createParserFailureHandler,
+  createCatcher,
   createUploadParsers,
   moveRaw,
 } from "./server-helpers";
@@ -28,7 +28,7 @@ const makeCommonEntities = (config: CommonConfig) => {
   rootLogger.debug("Running", process.env.TSUP_BUILD || "from sources");
   const loggingMiddleware = createLoggingMiddleware({ rootLogger, config });
   const notFoundHandler = createNotFoundHandler({ rootLogger, errorHandler });
-  const parserFailureHandler = createParserFailureHandler({
+  const catcher = createCatcher({
     rootLogger,
     errorHandler,
   });
@@ -36,7 +36,7 @@ const makeCommonEntities = (config: CommonConfig) => {
     rootLogger,
     errorHandler,
     notFoundHandler,
-    parserFailureHandler,
+    catcher,
     loggingMiddleware,
   };
 };
@@ -54,12 +54,8 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
 };
 
 export const createServer = async (config: ServerConfig, routing: Routing) => {
-  const {
-    rootLogger,
-    notFoundHandler,
-    parserFailureHandler,
-    loggingMiddleware,
-  } = makeCommonEntities(config);
+  const { rootLogger, notFoundHandler, catcher, loggingMiddleware } =
+    makeCommonEntities(config);
   const app = express().disable("x-powered-by").use(loggingMiddleware);
 
   if (config.server.compression) {
@@ -85,7 +81,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     await config.server.beforeRouting({ app, logger: rootLogger });
   }
   initRouting({ app, routing, rootLogger, config, parsers });
-  app.use(parserFailureHandler, notFoundHandler);
+  app.use(catcher, notFoundHandler);
 
   const starter = <T extends http.Server | https.Server>(
     server: T,
