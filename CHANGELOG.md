@@ -26,6 +26,10 @@
 
 ## Version 23
 
+### v23.3.0
+
+- Upgraded `ansis` (direct dependency) to `^4.0.0`.
+
 ### v23.2.0
 
 - Supporting Node 24.
