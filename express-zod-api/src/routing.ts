@@ -14,7 +14,7 @@ import { GetLogger } from "./server-helpers";
 export type Routing = {
   [K in string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
 } & {
-  [K in `${Method} /${string}`]: AbstractEndpoint;
+  [K in `${Method} ${string}`]: AbstractEndpoint;
 };
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;

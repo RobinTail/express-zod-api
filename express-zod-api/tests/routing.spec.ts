@@ -51,6 +51,9 @@ describe("Routing", () => {
       expectTypeOf<{
         "get /v1/one": DependsOnMethod;
       }>().not.toExtend<Routing>();
+      expectTypeOf<{
+        "get v1/one": DependsOnMethod;
+      }>().not.toExtend<Routing>();
     });
   });
 
