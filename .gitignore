@@ -2,7 +2,6 @@ node_modules
 dist
 *.tgz
 migration
-yarn-error.log
 .idea
 .npmrc
 coverage

@@ -5,5 +5,10 @@
   "scripts": {
     "test": "tsc -p tsconfig.json",
     "posttest": "rm *.d.ts"
+  },
+  "dependencies": {
+    "express-zod-api": "workspace:*",
+    "express": "^5.0.1",
+    "express-fileupload": "^1.5.1"
   }
 }
