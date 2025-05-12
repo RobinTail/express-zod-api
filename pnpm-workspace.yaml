@@ -6,3 +6,10 @@ packages:
   - issue952-test
 onlyBuiltDependencies:
   - esbuild
+publicHoistPattern:
+  - "@typescript-eslint/*"
+  - "@vitest/*"
+  - "@eslint/*"
+  - globals
+  - "@types/qs"
+  - "@types/express-serve-static-core"
