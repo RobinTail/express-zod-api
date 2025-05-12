@@ -11,9 +11,9 @@ import { OnEndpoint, walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { GetLogger } from "./server-helpers";
 
-export interface Routing {
+export type Routing = {
   [SEGMENT: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
-}
+};
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
