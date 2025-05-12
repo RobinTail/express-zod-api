@@ -3,6 +3,7 @@ dist
 *.tgz
 migration
 .idea
+.npmrc
 coverage
 *-test/quick-start.ts
 issue952-test/*.d.ts
