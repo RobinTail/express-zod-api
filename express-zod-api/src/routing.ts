@@ -12,11 +12,9 @@ import { ServeStatic } from "./serve-static";
 import { GetLogger } from "./server-helpers";
 
 export type Routing = {
-  [SEGMENT in string]:
-    | Routing
-    | DependsOnMethod
-    | AbstractEndpoint
-    | ServeStatic;
+  [K in string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
+} & {
+  [K in `${Method} /${string}`]: AbstractEndpoint;
 };
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;

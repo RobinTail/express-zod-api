@@ -1,3 +1,4 @@
+import { AbstractEndpoint } from "../src/endpoint";
 import {
   appMock,
   expressMock,
@@ -24,6 +25,35 @@ import type { IRouter, RequestHandler } from "express";
 import createHttpError from "http-errors";
 
 describe("Routing", () => {
+  describe("Routing type", () => {
+    test("should accept nesting and terminal assignments", () => {
+      expectTypeOf<{
+        v1: { one: { two: AbstractEndpoint; three: DependsOnMethod } };
+      }>().toExtend<Routing>();
+    });
+    test("should accept slashes", () => {
+      expectTypeOf<{
+        "v1/one/two": {
+          "": AbstractEndpoint;
+          three: DependsOnMethod;
+        };
+      }>().toExtend<Routing>();
+    });
+    test("should accept flat structure", () => {
+      expectTypeOf<{
+        "get v1/one/two": AbstractEndpoint;
+      }>().toExtend<Routing>();
+    });
+    test("should not accept nesting when method is specified in the key", () => {
+      expectTypeOf<{
+        "get /v1/one": { two: DependsOnMethod };
+      }>().not.toExtend<Routing>();
+      expectTypeOf<{
+        "get /v1/one": DependsOnMethod;
+      }>().not.toExtend<Routing>();
+    });
+  });
+
   describe("initRouting()", () => {
     beforeAll(() => {
       expressMock();
