@@ -4,3 +4,5 @@ packages:
   - cjs-test
   - esm-test
   - issue952-test
+onlyBuiltDependencies:
+  - esbuild
