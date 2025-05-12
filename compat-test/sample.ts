@@ -1,1 +1,1 @@
-client.provide("get", "/v1/test", { id: 10 });
+const test: HeaderSecurity = {};

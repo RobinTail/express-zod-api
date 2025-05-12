@@ -19,7 +19,7 @@ describe("Example", async () => {
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
 
   beforeAll(() => {
-    // @todo revisit when Node 24 released (currently behind a flag, Node 22.3.0 and 23x)
+    // @todo revisit when unflagged https://nodejs.org/docs/v24.0.0/api/globals.html#eventsource
     vi.stubGlobal("EventSource", EventSource);
   });
 
@@ -250,6 +250,26 @@ describe("Example", async () => {
       expect(json).toMatchSnapshot();
     });
 
+    test("Should accept URL encoded HTML form", async () => {
+      const data = new URLSearchParams();
+      data.append("name", "John Doe");
+      data.append("email", "john@example.com");
+      data.append("message", "All good");
+      const response = await fetch(
+        `http://localhost:${port}/v1/forms/feedback`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: data.toString(),
+        },
+      );
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({
+        status: "success",
+        data: { crc: 32 },
+      });
+    });
+
     test("Should handle no content", async () => {
       const response = await fetch(
         `http://localhost:${port}/v1/user/50/remove`,
@@ -455,7 +475,7 @@ describe("Example", async () => {
         id: "10",
       });
       expect(response).toMatchSnapshot();
-      expectTypeOf(response).toMatchTypeOf<
+      expectTypeOf(response).toExtend<
         | { status: "success"; data: { id: number; name: string } }
         | { status: "error"; error: { message: string } }
       >();
@@ -471,10 +491,14 @@ describe("Example", async () => {
       });
       expect(typeof response).toBe("object");
       expect(response).toMatchSnapshot();
-      expectTypeOf(response).toMatchTypeOf<
-        | { status: "success"; data: { name: string; createdAt: string } }
-        | { status: "error"; error: { message: string } }
-      >();
+      expectTypeOf<{
+        status: "success";
+        data: { name: string; createdAt: string };
+      }>().toExtend<typeof response>();
+      expectTypeOf<{
+        status: "error";
+        error: { message: string };
+      }>().toExtend<typeof response>();
     });
 
     test("Issue #2182: should deny unlisted combination of path and method", async () => {

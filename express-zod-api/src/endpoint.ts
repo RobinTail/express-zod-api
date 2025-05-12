@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
+import * as R from "ramda";
 import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
-import { hasRaw, hasUpload } from "./deep-checks";
+import { hasForm, hasRaw, hasUpload } from "./deep-checks";
 import {
   FlatObject,
   getActualMethod,
@@ -26,15 +27,14 @@ import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
 
 export type Handler<IN, OUT, OPT> = (params: {
+  /** @desc The inputs from the enabled input sources validated against the final input schema (incl. Middlewares) */
   input: IN;
+  /** @desc The returns of the assigned Middlewares */
   options: OPT;
+  /** @desc The instance of the configured logger */
   logger: ActualLogger;
 }) => Promise<OUT>;
 
-type DescriptionVariant = "short" | "long";
-type IOVariant = "input" | "output";
-
-// @todo consider getters in v23
 export abstract class AbstractEndpoint extends Routable {
   public abstract execute(params: {
     request: Request;
@@ -42,19 +42,31 @@ export abstract class AbstractEndpoint extends Routable {
     logger: ActualLogger;
     config: CommonConfig;
   }): Promise<void>;
-  public abstract getDescription(
-    variant: DescriptionVariant,
-  ): string | undefined;
-  public abstract getMethods(): ReadonlyArray<Method> | undefined;
-  public abstract getSchema(variant: IOVariant): IOSchema;
+  /** @internal */
   public abstract getResponses(
     variant: ResponseVariant,
   ): ReadonlyArray<NormalizedResponse>;
-  public abstract getSecurity(): LogicalContainer<Security>[];
-  public abstract getScopes(): ReadonlyArray<string>;
-  public abstract getTags(): ReadonlyArray<string>;
+  /** @internal */
   public abstract getOperationId(method: Method): string | undefined;
-  public abstract getRequestType(): ContentType;
+  /** @internal */
+  public abstract get description(): string | undefined;
+  /** @internal */
+  public abstract get shortDescription(): string | undefined;
+  /** @internal */
+  public abstract get methods(): ReadonlyArray<Method> | undefined;
+  /** @internal */
+  public abstract get inputSchema(): IOSchema;
+  /** @internal */
+  public abstract get outputSchema(): IOSchema;
+  /** @internal */
+  public abstract get security(): LogicalContainer<Security>[];
+  /** @internal */
+  public abstract get scopes(): ReadonlyArray<string>;
+  /** @internal */
+  public abstract get tags(): ReadonlyArray<string>;
+  /** @internal */
+  public abstract get requestType(): ContentType;
+  /** @internal */
   public abstract get isDeprecated(): boolean;
 }
 
@@ -93,32 +105,48 @@ export class Endpoint<
     return this.#clone({ deprecated: true }) as this;
   }
 
+  /** @internal */
   public override get isDeprecated(): boolean {
     return this.#def.deprecated || false;
   }
 
-  public override getDescription(variant: DescriptionVariant) {
-    return this.#def[variant === "short" ? "shortDescription" : "description"];
+  /** @internal */
+  public override get description() {
+    return this.#def.description;
   }
 
-  public override getMethods() {
+  /** @internal */
+  public override get shortDescription() {
+    return this.#def.shortDescription;
+  }
+
+  /** @internal */
+  public override get methods() {
     return Object.freeze(this.#def.methods);
   }
 
-  public override getSchema(variant: "input"): IN;
-  public override getSchema(variant: "output"): OUT;
-  public override getSchema(variant: IOVariant) {
-    return this.#def[variant === "output" ? "outputSchema" : "inputSchema"];
+  /** @internal */
+  public override get inputSchema(): IN {
+    return this.#def.inputSchema;
   }
 
-  public override getRequestType() {
+  /** @internal */
+  public override get outputSchema(): OUT {
+    return this.#def.outputSchema;
+  }
+
+  /** @internal */
+  public override get requestType() {
     return hasUpload(this.#def.inputSchema)
       ? "upload"
       : hasRaw(this.#def.inputSchema)
         ? "raw"
-        : "json";
+        : hasForm(this.#def.inputSchema)
+          ? "form"
+          : "json";
   }
 
+  /** @internal */
   public override getResponses(variant: ResponseVariant) {
     return Object.freeze(
       variant === "negative"
@@ -127,20 +155,23 @@ export class Endpoint<
     );
   }
 
-  public override getSecurity() {
-    return (this.#def.middlewares || [])
-      .map((middleware) => middleware.getSecurity())
-      .filter((entry) => entry !== undefined);
+  /** @internal */
+  public override get security() {
+    const entries = R.pluck("security", this.#def.middlewares || []);
+    return R.reject(R.isNil, entries);
   }
 
-  public override getScopes() {
+  /** @internal */
+  public override get scopes() {
     return Object.freeze(this.#def.scopes || []);
   }
 
-  public override getTags() {
+  /** @internal */
+  public override get tags() {
     return Object.freeze(this.#def.tags || []);
   }
 
+  /** @internal */
   public override getOperationId(method: Method): string | undefined {
     return this.#def.getOperationId?.(method);
   }

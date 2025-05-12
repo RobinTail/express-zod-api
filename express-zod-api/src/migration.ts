@@ -4,52 +4,19 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- special case
-import { Method, methods } from "./method";
-import { name as self } from "../package.json";
 
 interface Queries {
-  provide: TSESTree.CallExpression & {
-    arguments: [
-      TSESTree.Literal & { value: Method },
-      TSESTree.Literal,
-      TSESTree.ObjectExpression,
-    ];
-  };
-  splitResponse: TSESTree.Property & { key: TSESTree.Identifier };
-  methodPath: TSESTree.ImportSpecifier & { imported: TSESTree.Identifier };
-  createConfig: TSESTree.Property & {
-    key: TSESTree.Identifier;
-    value: TSESTree.ObjectExpression;
-  };
-  newDocs: TSESTree.ObjectExpression;
-  newFactory: TSESTree.Property & { key: TSESTree.Identifier };
-  newSSE: TSESTree.Property & { key: TSESTree.Identifier };
-  newClient: TSESTree.NewExpression;
+  headerSecurity: TSESTree.Identifier;
+  createConfig: TSESTree.ObjectExpression;
+  testMiddleware: TSESTree.ObjectExpression;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  provide:
-    `${NT.CallExpression}[callee.property.name='provide'][arguments.length=3]` +
-    `:has(${NT.Literal}[value=/^${methods.join("|")}$/] + ${NT.Literal} + ${NT.ObjectExpression})`,
-  splitResponse:
-    `${NT.NewExpression}[callee.name='Integration'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='splitResponse']`,
-  methodPath: `${NT.ImportDeclaration} > ${NT.ImportSpecifier}[imported.name='MethodPath']`,
-  createConfig:
-    `${NT.CallExpression}[callee.name='createConfig'] > ${NT.ObjectExpression} > ` +
-    `${NT.Property}[key.name='tags'][value.type='ObjectExpression']`,
-  newDocs:
-    `${NT.NewExpression}[callee.name='Documentation'] > ` +
-    `${NT.ObjectExpression}[properties.length>0]:not(:has(>Property[key.name='tags']))`,
-  newFactory:
-    `${NT.NewExpression}[callee.name='EndpointsFactory'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='resultHandler']`,
-  newSSE:
-    `${NT.NewExpression}[callee.name='EventStreamFactory'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='events']`,
-  newClient: `${NT.NewExpression}[callee.name='ExpressZodAPIClient']`,
+  headerSecurity: `${NT.Identifier}[name='CustomHeaderSecurity']`,
+  createConfig: `${NT.CallExpression}[callee.name='createConfig'] > ${NT.ObjectExpression}`,
+  testMiddleware: `${NT.CallExpression}[callee.name='testMiddleware'] > ${NT.ObjectExpression}`,
 };
 
 const listen = <
@@ -65,115 +32,97 @@ const listen = <
     {},
   );
 
-const v22 = ESLintUtils.RuleCreator.withoutDocs({
+const v23 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     fixable: "code",
     schema: [],
     messages: {
-      add: `Add {{subject}} to {{to}}`,
-      change: "Change {{subject}} {{from}} to {{to}}.",
-      remove: "Remove {{subject}} {{name}}.",
+      change: "change {{ subject }} from {{ from }} to {{ to }}",
+      add: `add {{ subject }} to {{ to }}`,
+      move: "move {{ subject }} to {{ to }}",
     },
   },
   defaultOptions: [],
   create: (ctx) =>
     listen({
-      provide: (node) => {
-        const {
-          arguments: [method, path],
-        } = node;
-        const request = `"${method.value} ${path.value}"`;
+      headerSecurity: (node) =>
         ctx.report({
+          node,
           messageId: "change",
-          node,
-          data: {
-            subject: "arguments",
-            from: `"${method.value}", "${path.value}"`,
-            to: request,
-          },
-          fix: (fixer) =>
-            fixer.replaceTextRange([method.range[0], path.range[1]], request),
-        });
-      },
-      splitResponse: (node) =>
-        ctx.report({
-          messageId: "remove",
-          node,
-          data: { subject: "property", name: node.key.name },
-          fix: (fixer) => fixer.remove(node),
+          data: { subject: "interface", from: node.name, to: "HeaderSecurity" },
+          fix: (fixer) => fixer.replaceText(node, "HeaderSecurity"),
         }),
-      methodPath: (node) => {
-        const replacement = "Request";
-        ctx.report({
-          messageId: "change",
-          node: node.imported,
-          data: { subject: "type", from: node.imported.name, to: replacement },
-          fix: (fixer) => fixer.replaceText(node.imported, replacement),
-        });
-      },
       createConfig: (node) => {
-        const props = node.value.properties
-          .filter(
-            (prop): prop is TSESTree.Property & { key: TSESTree.Identifier } =>
-              "key" in prop && "name" in prop.key,
-          )
-          .map((prop) => `    "${prop.key.name}": unknown,\n`);
+        const wmProp = node.properties.find(
+          (prop) =>
+            prop.type === NT.Property &&
+            prop.key.type === NT.Identifier &&
+            prop.key.name === "wrongMethodBehavior",
+        );
+        if (wmProp) return;
         ctx.report({
-          messageId: "remove",
           node,
-          data: { subject: "property", name: node.key.name },
-          fix: (fixer) => [
-            fixer.remove(node),
-            fixer.insertTextAfter(
-              ctx.sourceCode.ast,
-              `\n// Declaring tag constraints\ndeclare module "${self}" {\n  interface TagOverrides {\n${props}  }\n}`,
+          messageId: "add",
+          data: {
+            subject: "wrongMethodBehavior property",
+            to: "configuration",
+          },
+          fix: (fixer) =>
+            fixer.insertTextAfterRange(
+              [node.range[0], node.range[0] + 1],
+              "wrongMethodBehavior: 404,",
             ),
-          ],
         });
       },
-      newDocs: (node) =>
-        ctx.report({
-          messageId: "add",
-          node,
-          data: { subject: "tags", to: "Documentation" },
-          fix: (fixer) =>
-            fixer.insertTextBefore(
-              node.properties[0],
-              "tags: { /* move from createConfig() argument if any */ }, ",
+      testMiddleware: (node) => {
+        const ehProp = node.properties.find(
+          (
+            prop,
+          ): prop is TSESTree.Property & {
+            value:
+              | TSESTree.ArrowFunctionExpression
+              | TSESTree.FunctionExpression;
+          } =>
+            prop.type === NT.Property &&
+            prop.key.type === NT.Identifier &&
+            prop.key.name === "errorHandler" &&
+            [NT.ArrowFunctionExpression, NT.FunctionExpression].includes(
+              prop.value.type,
             ),
-        }),
-      newFactory: (node) =>
+        );
+        if (!ehProp) return;
+        const hasComma = ctx.sourceCode.getTokenAfter(ehProp)?.value === ",";
+        const { body } = ehProp.value;
+        const configProp = node.properties.find(
+          (
+            prop,
+          ): prop is TSESTree.Property & { value: TSESTree.ObjectExpression } =>
+            prop.type === NT.Property &&
+            prop.key.type === NT.Identifier &&
+            prop.key.name === "configProps" &&
+            prop.value.type === NT.ObjectExpression,
+        );
+        const replacement = `errorHandler: new ResultHandler({ positive: [], negative: [], handler: ({ error, response }) => {${ctx.sourceCode.getText(body)}} }),`;
         ctx.report({
-          messageId: "change",
-          node: node.parent,
-          data: {
-            subject: "argument",
-            from: "object",
-            to: "ResultHandler instance",
-          },
-          fix: (fixer) =>
-            fixer.replaceText(node.parent, ctx.sourceCode.getText(node.value)),
-        }),
-      newSSE: (node) =>
-        ctx.report({
-          messageId: "change",
-          node: node.parent,
-          data: { subject: "argument", from: "object", to: "events map" },
-          fix: (fixer) =>
-            fixer.replaceText(node.parent, ctx.sourceCode.getText(node.value)),
-        }),
-      newClient: (node) => {
-        const replacement = "Client";
-        ctx.report({
-          messageId: "change",
-          node: node.callee,
-          data: {
-            subject: "class",
-            from: "ExpressZodAPIClient",
-            to: replacement,
-          },
-          fix: (fixer) => fixer.replaceText(node.callee, replacement),
+          node: ehProp,
+          messageId: "move",
+          data: { subject: "errorHandler", to: "configProps" },
+          fix: (fixer) => [
+            fixer.removeRange([
+              ehProp.range[0],
+              ehProp.range[1] + (hasComma ? 1 : 0),
+            ]),
+            configProp
+              ? fixer.insertTextAfterRange(
+                  [configProp.value.range[0], configProp.value.range[0] + 1],
+                  replacement,
+                )
+              : fixer.insertTextAfterRange(
+                  [node.range[0], node.range[0] + 1],
+                  `configProps: {${replacement}},`,
+                ),
+          ],
         });
       },
     }),
@@ -192,5 +141,5 @@ const v22 = ESLintUtils.RuleCreator.withoutDocs({
  *          ];
  * */
 export default {
-  rules: { v22 },
+  rules: { v23 },
 } satisfies TSESLint.Linter.Plugin;

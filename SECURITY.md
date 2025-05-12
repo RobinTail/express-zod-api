@@ -4,11 +4,12 @@
 
 | Version | Code name     | Release |     Supported      |
 | ------: | :------------ | :------ | :----------------: |
+|  23.x.x | Sonia         | 04.2025 | :white_check_mark: |
 |  22.x.x | Tai           | 01.2025 | :white_check_mark: |
 |  21.x.x | Kesaria       | 11.2024 | :white_check_mark: |
 |  20.x.x | Zoey          | 06.2024 | :white_check_mark: |
 |  19.x.x | Dime          | 05.2024 | :white_check_mark: |
-|  18.x.x | Victoria      | 04.2024 | :white_check_mark: |
+|  18.x.x | Victoria      | 04.2024 |        :x:         |
 |  17.x.x | Tonya         | 02.2024 |        :x:         |
 |  16.x.x | Nina          | 12.2023 |        :x:         |
 |  15.x.x | Vika          | 12.2023 |        :x:         |
@@ -32,6 +33,6 @@
 Found a vulnerability or other security issue?
 
 Please urgently inform me privately by
-[email](https://github.com/RobinTail/express-zod-api/blob/master/package.json#L14).
+[email](https://github.com/RobinTail/express-zod-api/blob/master/express-zod-api/package.json#L14).
 
 I will try to fix it as soon as possible.

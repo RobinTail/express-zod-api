@@ -49,7 +49,7 @@ export const initRouting = ({
       doc?.checkJsonCompat(endpoint, { path, method });
       doc?.checkPathParams(path, endpoint, { method });
     }
-    const matchingParsers = parsers?.[endpoint.getRequestType()] || [];
+    const matchingParsers = parsers?.[endpoint.requestType] || [];
     const handler: RequestHandler = async (request, response) => {
       const logger = getLogger(request);
       if (config.cors) {
@@ -84,7 +84,7 @@ export const initRouting = ({
   };
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
   doc = undefined; // hint for garbage collector
-  if (config.wrongMethodBehavior !== 405) return;
+  if (config.wrongMethodBehavior === 404) return;
   for (const [path, allowedMethods] of familiar.entries())
     app.all(path, createWrongMethodHandler(allowedMethods));
 };

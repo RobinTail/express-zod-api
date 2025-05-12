@@ -41,11 +41,12 @@ Start your API server with I/O schema validation and custom middlewares in minut
    8. [Error handling](#error-handling)
    9. [Production mode](#production-mode)
    10. [Non-object response](#non-object-response) including file downloads
-   11. [File uploads](#file-uploads)
-   12. [Serving static files](#serving-static-files)
-   13. [Connect to your own express app](#connect-to-your-own-express-app)
-   14. [Testing endpoints](#testing-endpoints)
-   15. [Testing middlewares](#testing-middlewares)
+   11. [HTML Forms (URL encoded)](#html-forms-url-encoded)
+   12. [File uploads](#file-uploads)
+   13. [Serving static files](#serving-static-files)
+   14. [Connect to your own express app](#connect-to-your-own-express-app)
+   15. [Testing endpoints](#testing-endpoints)
+   16. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -87,6 +88,10 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/gmorgen1.png" alt="@gmorgen1" width="50px" />](https://github.com/gmorgen1)
+[<img src="https://github.com/crgeary.png" alt="@crgeary" width="50px" />](https://github.com/crgeary)
+[<img src="https://github.com/danmichaelo.png" alt="@danmichaelo" width="50px" />](https://github.com/danmichaelo)
+[<img src="https://github.com/james10424.png" alt="@james10424" width="50px" />](https://github.com/james10424)
 [<img src="https://github.com/APTy.png" alt="@APTy" width="50px" />](https://github.com/APTy)
 [<img src="https://github.com/LufyCZ.png" alt="@LufyCZ" width="50px" />](https://github.com/LufyCZ)
 [<img src="https://github.com/mlms13.png" alt="@mlms13" width="50px" />](https://github.com/mlms13)
@@ -147,7 +152,7 @@ Much can be customized to fit your needs.
 ## Technologies
 
 - [Typescript](https://www.typescriptlang.org/) first.
-- Web server — [Express.js](https://expressjs.com/) v4 or v5.
+- Web server — [Express.js](https://expressjs.com/) v5.
 - Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin).
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
@@ -165,9 +170,9 @@ Install the framework, its peer dependencies and type assistance packages using 
 [package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/).
 
 ```shell
-# example for yarn and express 5 (recommended):
-yarn add express-zod-api express@^5 zod typescript http-errors
-yarn add -D @types/express@^5 @types/node @types/http-errors
+# example for yarn:
+yarn add express-zod-api express zod@3 typescript http-errors
+yarn add -D @types/express @types/node @types/http-errors
 ```
 
 Ensure having the following options in your `tsconfig.json` file in order to make it work as expected:
@@ -695,7 +700,7 @@ done(); // error: expensive operation '555.55ms'
 According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
 it might be a good idea to enable GZIP and Brotli compression for your API responses.
 
-Install `compression` (version 1.8 supports Brotli) and `@types/compression`, and enable or configure compression:
+Install `compression` and `@types/compression`, and enable or configure compression:
 
 ```typescript
 import { createConfig } from "express-zod-api";
@@ -894,26 +899,25 @@ const resultHandler = new ResultHandler({
 
 ## Error handling
 
-`ResultHandler` is designed to be the entity responsible for centralized error handling. By default, that center is
-the `defaultResultHandler`, however, since much can be customized, you should be aware that there are three possible
-origins of errors that could happen in runtime and be handled the following way:
+All runtime errors are handled by a `ResultHandler`. The default is `defaultResultHandler`. Using `ensureHttpError()`
+it normalizes errors into consistent HTTP responses with sensible status codes. Errors can originate from three layers:
 
-- Ones related to `Endpoint` execution — handled by a `ResultHandler` assigned to the `EndpointsFactory` produced it:
-  - The following proprietary classes are available to you for customizing error handling in your `ResultHandler`:
-    - `InputValidationError` — when request payload does not match the `input` schema of the endpoint or middleware.
-      The default response status code is `400`, `cause` property contains the original `ZodError`;
-    - `OutputValidationError` — when returns of the endpoint's `handler` does not match its `output` schema (`500`);
-  - Errors thrown within endpoint's `handler`:
-    - `HttpError`, made by `createHttpError()` method of `http-errors` (required peer dependency). The default response
-      status code is taken from `error.statusCode`;
-    - Others, inheriting from `Error` class (`500`);
-- Ones related to routing, parsing and upload issues — handled by `ResultHandler` assigned to `errorHandler` in config:
-  - Default is `defaultResultHandler` — it sets the response status code from the corresponding `HttpError`:
-    `400` for parsing, `404` for routing, `config.upload.limitError.statusCode` for upload issues, or `500` for others;
-  - You can also set `wrongMethodBehavior` config option to `405` (Method not allowed) for requests having wrong method;
-  - `ResultHandler` must handle possible `error` and avoid throwing its own errors, otherwise:
-- Ones related to `ResultHandler` execution — handled by `LastResortHandler`:
-  - Response status code is always `500` and the response itself is a plain text.
+- `Endpoint` execution (including attached `Middleware`):
+  - Handled by a `ResultHandler` used by `EndpointsFactory` (`defaultEndpointsFactory` uses `defaultResultHandler`);
+  - `InputValidationError`: request violates `input` schema, the default status code is `400`;
+  - `OutputValidationError`: handler violates `output` schema, the default status code is `500`;
+  - `HttpError`: can be thrown in handlers with help of `createHttpError()`, its `.statusCode` is used for response;
+  - For other errors the default status code is `500`;
+- Routing, parsing and upload issues:
+  - Handled by `ResultHandler` configured as `errorHandler` (the defaults is `defaultResultHandler`);
+  - Parsing errors: passed through as-is (typically `HttpError` with `4XX` code used for response by default);
+  - Routing errors: `404` or `405`, based on `wrongMethodBehavior` configuration;
+  - Upload issues: thrown only if `upload.limitError` is configured (`HttpError::statusCode` can be used for response);
+  - For other errors the default status code is `500`;
+- `ResultHandler` failures:
+  - Handled by `LastResortHandler` with status code `500` and a plain text response.
+
+You can customize it by passing a custom `ResultHandler` to `EndpointsFactory` and by configuring `errorHandler`.
 
 ## Production mode
 
@@ -964,43 +968,53 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
 );
 ```
 
-## File uploads
+## HTML Forms (URL encoded)
 
-Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and enable or
-configure file uploads:
+Use the proprietary schema `ez.form()` with an object shape or a custom `z.object()` with form fields in order to
+describe the `input` schema of an Endpoint. Requests to the Endpoint are parsed using the `formParser` config option,
+which is `express.urlencoded()` by default. The request content type should be `application/x-www-form-urlencoded`
+(default for HTML forms without uploads).
 
-```typescript
-import { createConfig } from "express-zod-api";
+```ts
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
 
-const config = createConfig({
-  upload: true, // or options
+export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.form({
+    name: z.string().min(1),
+    email: z.string().email(),
+    message: z.string().min(1),
+  }),
 });
 ```
 
-Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on available options.
-Some options are forced in order to ensure the correct workflow: `abortOnLimit: false`, `parseNested: true`, `logger`
-is assigned with `.debug()` method of the configured logger, and `debug` is enabled by default.
-The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional middleware for
-restricting the ability to upload using the `beforeUpload` option. So the configuration for the limited and restricted
-upload might look this way:
+_Hint: for unlisted extra fields use the following syntax: `ez.form( z.object({}).passthrough() )`._
+
+## File uploads
+
+Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and enable or
+configure file uploads. Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on
+available options. The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional
+middleware for restricting the ability to upload using the `beforeUpload` option. So the configuration for the limited
+and restricted upload might look this way:
 
 ```typescript
 import createHttpError from "http-errors";
 
 const config = createConfig({
-  upload: {
+  upload: /* true or options: */ {
     limits: { fileSize: 51200 }, // 50 KB
     limitError: createHttpError(413, "The file is too large"), // handled by errorHandler in config
     beforeUpload: ({ request, logger }) => {
       if (!canUpload(request)) throw createHttpError(403, "Not authorized");
     },
+    debug: true, // default
   },
 });
 ```
 
-Then you can change the `Endpoint` to handle requests having the `multipart/form-data` content type instead of JSON by
-using `ez.upload()` schema. Together with a corresponding configuration option, this makes it possible to handle file
-uploads. Here is a simplified example:
+Then use `ez.upload()` schema for a corresponding property. The request content type must be `multipart/form-data`:
 
 ```typescript
 import { z } from "zod";
@@ -1097,8 +1111,8 @@ test("should respond successfully", async () => {
 ## Testing middlewares
 
 Middlewares can also be tested individually using the `testMiddleware()` method. You can also pass `options` collected
-from outputs of previous middlewares, if the one being tested somehow depends on them. There is `errorHandler` option
-for catching a middleware error and transforming into a response to assert in test along with other returned entities.
+from outputs of previous middlewares, if the one being tested somehow depends on them. Possible errors would be handled
+either by `errorHandler` configured within given `configProps` or `defaultResultHandler`.
 
 ```typescript
 import { z } from "zod";
@@ -1116,7 +1130,6 @@ const { output, responseMock, loggerMock } = await testMiddleware({
   middleware,
   requestProps: { method: "POST", body: { test: "something" } },
   options: { prev: "accumulated" }, // responseOptions, configProps, loggerProps
-  // errorHandler: (error, response) => response.end(error.message),
 });
 expect(loggerMock._getLogs().error).toHaveLength(0);
 expect(output).toEqual({ collectedOptions: ["prev"], testLength: 9 });

@@ -3,6 +3,7 @@ import { rawAcceptingEndpoint } from "./endpoints/accept-raw";
 import { createUserEndpoint } from "./endpoints/create-user";
 import { deleteUserEndpoint } from "./endpoints/delete-user";
 import { listUsersEndpoint } from "./endpoints/list-users";
+import { submitFeedbackEndpoint } from "./endpoints/submit-feedback";
 import { subscriptionEndpoint } from "./endpoints/time-subscription";
 import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
 import { retrieveUserEndpoint } from "./endpoints/retrieve-user";
@@ -37,6 +38,9 @@ export const routing: Routing = {
     },
     events: {
       stream: subscriptionEndpoint,
+    },
+    forms: {
+      feedback: submitFeedbackEndpoint,
     },
   },
   // path /public serves static files from /assets

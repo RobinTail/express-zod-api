@@ -22,7 +22,6 @@ import {
   combinations,
   getExamples,
   getRoutePathParams,
-  hasCoercion,
   makeCleanId,
   routePathParamsRegex,
   getTransformedType,
@@ -32,7 +31,7 @@ import {
 import { InputSource } from "./config-type";
 import { DateInSchema, ezDateInBrand } from "./date-in-schema";
 import { DateOutSchema, ezDateOutBrand } from "./date-out-schema";
-import { hasRaw } from "./deep-checks";
+import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { FileSchema, ezFileBrand } from "./file-schema";
 import { extractObjectSchema, IOSchema } from "./io-schema";
@@ -95,7 +94,7 @@ const samples = {
   object: {},
   null: null,
   array: [],
-} satisfies Record<Extract<SchemaObjectType, string>, unknown>;
+} satisfies Record<SchemaObjectType, unknown>;
 
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 const timeRegex = /^\d{2}:\d{2}:\d{2}(\.\d+)?$/;
@@ -219,18 +218,14 @@ export const depictNullable: Depicter = (
   return nested;
 };
 
+const isSupportedType = (subject: string): subject is SchemaObjectType =>
+  subject in samples;
+
 const getSupportedType = (value: unknown): SchemaObjectType | undefined => {
   const detected = R.toLower(R.type(value)); // toLower is typed well unlike .toLowerCase()
-  const isSupported =
-    detected === "number" ||
-    detected === "string" ||
-    detected === "boolean" ||
-    detected === "object" ||
-    detected === "null" ||
-    detected === "array";
   return typeof value === "bigint"
     ? "integer"
-    : isSupported
+    : isSupportedType(detected)
       ? detected
       : undefined;
 };
@@ -253,9 +248,7 @@ export const depictObject: Depicter = (
 ) => {
   const keys = Object.keys(schema.shape);
   const isOptionalProp = (prop: z.ZodTypeAny) =>
-    isResponse && hasCoercion(prop)
-      ? prop instanceof z.ZodOptional
-      : prop.isOptional();
+    isResponse ? prop instanceof z.ZodOptional : prop.isOptional();
   const required = keys.filter((key) => !isOptionalProp(schema.shape[key]));
   const result: SchemaObject = { type: "object" };
   if (keys.length) result.properties = depictObjectProperties(schema, next);
@@ -355,14 +348,23 @@ export const depictRecord: Depicter = (
       required,
     };
   }
-  return { type: "object", additionalProperties: next(valueSchema) };
+  return {
+    type: "object",
+    propertyNames: next(keySchema),
+    additionalProperties: next(valueSchema),
+  };
 };
 
 export const depictArray: Depicter = (
-  { _def: { minLength, maxLength }, element }: z.ZodArray<z.ZodTypeAny>,
+  {
+    _def: { minLength, maxLength, exactLength },
+    element,
+  }: z.ZodArray<z.ZodTypeAny>,
   { next },
 ) => {
   const result: SchemaObject = { type: "array", items: next(element) };
+  if (exactLength)
+    [result.minItems, result.maxItems] = Array(2).fill(exactLength.value);
   if (minLength) result.minItems = minLength.value;
   if (maxLength) result.maxItems = maxLength.value;
   return result;
@@ -694,16 +696,15 @@ export const onEach: SchemaHandler<
   const { description, _def } = schema;
   const shouldAvoidParsing = schema instanceof z.ZodLazy;
   const hasTypePropertyInDepiction = prev.type !== undefined;
-  const isResponseHavingCoercion = isResponse && hasCoercion(schema);
-  const isActuallyNullable =
+  const acceptsNull =
+    !isResponse &&
     !shouldAvoidParsing &&
     hasTypePropertyInDepiction &&
-    !isResponseHavingCoercion &&
     schema.isNullable();
   const result: SchemaObject = {};
   if (description) result.description = description;
   if (_def[metaSymbol]?.isDeprecated) result.deprecated = true;
-  if (isActuallyNullable) result.type = makeNullableType(prev);
+  if (acceptsNull) result.type = makeNullableType(prev);
   if (!shouldAvoidParsing) {
     const examples = getExamples({
       schema,
@@ -922,7 +923,7 @@ export const depictBody = ({
     description,
     content: { [mimeType]: media },
   };
-  if (hasRequired || hasRaw(schema)) body.required = true;
+  if (hasRequired || mimeType === contentTypes.raw) body.required = true;
   return body;
 };
 

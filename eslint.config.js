@@ -1,7 +1,7 @@
 import globals from "globals";
 import jsPlugin from "@eslint/js";
 import tsPlugin from "typescript-eslint";
-import prettierOverrides from "eslint-config-prettier";
+import prettierOverrides from "eslint-config-prettier/flat";
 import prettierRules from "eslint-plugin-prettier/recommended";
 import allowedDepsPlugin from "eslint-plugin-allowed-dependencies";
 import { fileURLToPath } from "node:url";
@@ -168,6 +168,7 @@ export default tsPlugin.config(
       "express-zod-api/dist/",
       "express-zod-api/coverage/",
       "express-zod-api/migration/",
+      "compat-test/sample.ts",
     ],
   },
   {

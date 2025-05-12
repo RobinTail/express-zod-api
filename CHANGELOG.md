@@ -1,6 +1,116 @@
 # Changelog
 
+## Version 23
+
+### v23.3.0
+
+- Upgraded `ansis` (direct dependency) to `^4.0.0`.
+
+### v23.2.0
+
+- Supporting Node 24.
+
+### v23.1.2
+
+- Simplified implementation for generating Documentation of `z.enum()` and `z.literal()`;
+- Fixed duplication in the Documentation generator code determining the requirement for a request body.
+
+### v23.1.1
+
+- Fixed response depiction in the generated Documentation:
+  - coerced types were marked as nullable;
+  - coerced, preprocessed and `z.any()` schemas were marked as optional.
+
+### v23.1.0
+
+- Improved generated Documentation:
+  - Arrays having fixed length: `z.boolean().array().length(2)`;
+  - Records with non-literal keys (added `propertyNames`): `z.record(z.string().regex(/x-\w+/), z.boolean())`.
+
+### v23.0.0
+
+- Minimum version of `express` (required peer dependency) is `5.1.0` (first release of v5 marked as `latest`);
+- Minimum version of `compression` (optional peer dependency) is `1.8.0` (it supports Brotli);
+- The default value for `wrongMethodBehavior` config option is changed to `405`;
+- Publicly exposed interfaces: `CustomHeaderSecurity` renamed to `HeaderSecurity`, `NormalizedResponse` removed.
+- The `errorHandler` property removed from `testMiddleware()` argument in favor of config option having same name;
+- Only the following methods remained public, while other methods and properties were marked internal or removed:
+  - `Endpoint`: `.execute()` and `.deprecated()`;
+  - `Middleware`: `.execute()`;
+  - `ResultHandler`: `.execute()`;
+  - `DependsOnMethod`: `.deprecated()`;
+  - `Documentation`: constructor only;
+  - `Integration`: `.print()` and `.printFormatted()`;
+  - `ServeStatic`: constructor only;
+- Consider the automated migration using the built-in ESLint rule.
+
+```js
+// eslint.config.mjs — minimal ESLint 9 config to apply migrations automatically using "eslint --fix"
+import parser from "@typescript-eslint/parser";
+import migration from "express-zod-api/migration";
+
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v23": "error" } },
+];
+```
+
 ## Version 22
+
+### v22.13.2
+
+- Fixed inconsistency between the actual catcher behavior and the error handling documentation:
+  - Removed conversion of non-`HttpError`s to `BadRequest` before passing them to `errorHandler`;
+  - A `ResultHandler` configured as `errorHandler` is responsible to handling all errors and responding accordingly.
+  - The default `errorHandler` is `defaultResultHandler`:
+    - Using `ensureHttpError()` it coverts non-`HttpError`s to `InternalServerError` and responds with status code `500`;
+  - The issue has occurred since [v19.0.0](#v1900).
+
+### v22.13.1
+
+- Fixed: the output type of the `ez.raw()` schema (without an argument) was missing the `raw` property (since v19.0.0).
+
+### v22.13.0
+
+- Ability to configure and disable access logging:
+  - New config option: `accessLogger` — the function for producing access logs;
+  - The default value is the function writing messages similar to `GET: /v1/path` having `debug` severity;
+  - The option can be assigned with `null` to disable writing of access logs;
+  - Thanks to the contributions of [@gmorgen1](https://github.com/gmorgen1) and [@crgeary](https://github.com/crgeary);
+- [@danmichaelo](https://github.com/danmichaelo) fixed a broken link in the Security policy;
+- Added JSDoc for several types involved into creating Middlewares and producing Endpoints.
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  accessLogger: (request, logger) => logger.info(request.path), // or null to disable
+});
+```
+
+### v22.12.0
+
+- Featuring HTML forms support (URL Encoded request body):
+  - Introducing the new proprietary schema `ez.form()` accepting an object shape or a custom `z.object()` schema;
+  - Introducing the new config option `formParser` having `express.urlencoded()` as the default value;
+  - Requests to Endpoints having `input` schema assigned with `ez.form()` are parsed using `formParser`;
+    - Exception: requests to Endpoints having `ez.upload()` within `ez.form()` are still parsed by `express-fileupload`;
+  - The lack of this feature was reported by [@james10424](https://github.com/james10424).
+
+```ts
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
+
+// The request content type should be "application/x-www-form-urlencoded"
+export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.form({
+    name: z.string().min(1),
+    email: z.string().email(),
+    message: z.string().min(1),
+  }),
+});
+```
 
 ### v22.11.2
 
@@ -724,7 +834,7 @@ const after: Routing = {
 - Introducing `errorHandler` option for `testMiddleware()` method:
   - If your middleware throws an error there was no ability to make assertions other than the thrown error;
   - New option can be assigned with a function for transforming the error into response, so that `testMiddlware` itself
-    would not throw, enabling usage of all returned entities for mutiple assertions in test;
+    would not throw, enabling usage of all returned entities for multiple assertions in test;
   - The feature suggested by [@williamgcampbell](https://github.com/williamgcampbell).
 
 ```ts
@@ -1371,7 +1481,7 @@ new Integration({
     - This makes all requests eligible for the assigned parsers and reverts changes made in [v18.5.2](#v1852);
     - Specifying `rawParser` in config is no longer needed to enable the feature.
 - Non-breaking significant changes:
-  - Request logging reflects the actual path instead of the configured route, and it's placed in front of parsing:
+  - Access logging reflects the actual path instead of the configured route, and it's placed in front of parsing:
     - The severity of those messaged reduced from `info` to `debug`;
   - The debug messages from uploader are enabled by default when the logger level is set to `debug`;
 - How to migrate confidently:

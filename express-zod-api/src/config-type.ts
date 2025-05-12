@@ -30,6 +30,8 @@ type ChildLoggerProvider = (params: {
   parent: ActualLogger;
 }) => ActualLogger | Promise<ActualLogger>;
 
+type LogAccess = (request: Request, logger: ActualLogger) => void;
+
 export interface CommonConfig {
   /**
    * @desc Enables cross-origin resource sharing.
@@ -41,8 +43,7 @@ export interface CommonConfig {
    * @desc How to respond to a request that uses a wrong method to an existing endpoint
    * @example 404 — Not found
    * @example 405 — Method not allowed, incl. the "Allow" header with a list of methods
-   * @default 404
-   * @todo consider changing default to 405 in v23
+   * @default 405
    * */
   wrongMethodBehavior?: 404 | 405;
   /**
@@ -62,6 +63,12 @@ export interface CommonConfig {
    * @example ({ parent }) => parent.child({ requestId: uuid() })
    * */
   childLoggerProvider?: ChildLoggerProvider;
+  /**
+   * @desc The function for producing access logs
+   * @default ({ method, path }, logger) => logger.debug(`${method}: ${path}`)
+   * @example null — disables the feature
+   * */
+  accessLogger?: null | LogAccess;
   /**
    * @desc You can disable the startup logo.
    * @default true
@@ -102,7 +109,6 @@ type UploadOptions = Pick<
   limitError?: Error;
   /**
    * @desc A handler to execute before uploading — it can be used for restrictions by throwing an error.
-   * @default undefined
    * @example ({ request }) => { throw createHttpError(403, "Not authorized"); }
    * */
   beforeUpload?: BeforeUpload;
@@ -156,13 +162,11 @@ export interface ServerConfig extends CommonConfig {
   jsonParser?: RequestHandler;
   /**
    * @desc Enable or configure uploads handling.
-   * @default undefined
    * @requires express-fileupload
    * */
   upload?: boolean | UploadOptions;
   /**
    * @desc Enable or configure response compression.
-   * @default undefined
    * @requires compression
    */
   compression?: boolean | CompressionOptions;
@@ -173,16 +177,20 @@ export interface ServerConfig extends CommonConfig {
    * */
   rawParser?: RequestHandler;
   /**
+   * @desc Custom parser for URL Encoded requests used for submitting HTML forms
+   * @default express.urlencoded()
+   * @link https://expressjs.com/en/4x/api.html#express.urlencoded
+   * */
+  formParser?: RequestHandler;
+  /**
    * @desc A code to execute before processing the Routing of your API (and before parsing).
    * @desc This can be a good place for express middlewares establishing their own routes.
    * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
-   * @default undefined
    * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
    * */
   beforeRouting?: BeforeRouting;
   /**
    * @desc Rejects new connections and attempts to finish ongoing ones in the specified time before exit.
-   * @default undefined
    * */
   gracefulShutdown?: boolean | GracefulOptions;
 }

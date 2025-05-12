@@ -766,6 +766,7 @@ paths:
                             format: any
                         required:
                           - status
+                          - data
                       - type: object
                         properties:
                           status:
@@ -1808,6 +1809,8 @@ paths:
                     properties:
                       simple:
                         type: object
+                        propertyNames:
+                          type: string
                         additionalProperties:
                           type: integer
                           format: int64
@@ -1815,10 +1818,18 @@ paths:
                           maximum: 9007199254740991
                       stringy:
                         type: object
+                        propertyNames:
+                          type: string
+                          pattern: "[A-Z]+"
                         additionalProperties:
                           type: boolean
                       numeric:
                         type: object
+                        propertyNames:
+                          type: integer
+                          format: int64
+                          minimum: -9007199254740991
+                          maximum: 9007199254740991
                         additionalProperties:
                           type: boolean
                       literal:
@@ -2135,6 +2146,8 @@ paths:
                     properties:
                       any:
                         format: any
+                    required:
+                      - any
                 required:
                   - status
                   - data
@@ -2219,9 +2232,9 @@ paths:
                     type: object
                     properties:
                       boolean:
-                        type:
-                          - boolean
-                          - "null"
+                        type: boolean
+                    required:
+                      - boolean
                 required:
                   - status
                   - data

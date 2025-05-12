@@ -49,6 +49,7 @@ import {
   onEach,
   onMissing,
   reformatParamsInPath,
+  depictBody,
 } from "../src/documentation-helpers";
 import { walkSchema } from "../src/schema-walker";
 
@@ -397,6 +398,7 @@ describe("Documentation helpers", () => {
       z.record(z.literal("testing"), z.boolean()),
       z.record(z.literal("one").or(z.literal("two")), z.boolean()),
       z.record(z.any()), // Issue #900
+      z.record(z.string().regex(/x-\w+/), z.boolean()),
     ])(
       "should set properties+required or additionalProperties props %#",
       (schema) => {
@@ -408,6 +410,16 @@ describe("Documentation helpers", () => {
   describe("depictArray()", () => {
     test("should set type:array and pass items depiction", () => {
       expect(depictArray(z.array(z.boolean()), requestCtx)).toMatchSnapshot();
+    });
+
+    test.each([
+      z.boolean().array().min(3),
+      z.boolean().array().max(5),
+      z.boolean().array().min(3).max(5),
+      z.boolean().array().length(4),
+      z.array(z.boolean()).nonempty(),
+    ])("should reflect min/max/exact length of the array %#", (schema) => {
+      expect(depictArray(schema, requestCtx)).toMatchSnapshot();
     });
   });
 
@@ -720,6 +732,19 @@ describe("Documentation helpers", () => {
     });
   });
 
+  describe("depictBody", () => {
+    test("should mark ez.raw() body as required", () => {
+      const body = depictBody({
+        ...requestCtx,
+        schema: ez.raw(),
+        composition: "inline",
+        mimeType: "application/octet-stream", // raw content type
+        paramNames: [],
+      });
+      expect(body.required).toBe(true);
+    });
+  });
+
   describe("depictDateIn", () => {
     test("should set type:string, pattern and format", () => {
       expect(depictDateIn(ez.dateIn(), requestCtx)).toMatchSnapshot();
@@ -795,7 +820,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictSecurity()", () => {
-    test("should handle Basic, Bearer and CustomHeader Securities", () => {
+    test("should handle Basic, Bearer and Header Securities", () => {
       expect(
         depictSecurity([
           [{ type: "basic" }, { type: "bearer" }],

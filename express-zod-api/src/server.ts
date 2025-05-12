@@ -75,16 +75,16 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       ),
     );
   }
+  await config.beforeRouting?.({ app, getLogger });
 
   const parsers: Parsers = {
     json: [config.jsonParser || express.json()],
     raw: [config.rawParser || express.raw(), moveRaw],
+    form: [config.formParser || express.urlencoded()],
     upload: config.upload
       ? await createUploadParsers({ config, getLogger })
       : [],
   };
-
-  await config.beforeRouting?.({ app, getLogger });
   initRouting({ app, routing, getLogger, config, parsers });
   app.use(catcher, notFoundHandler);
 
