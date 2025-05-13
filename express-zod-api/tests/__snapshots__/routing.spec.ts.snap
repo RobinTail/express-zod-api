@@ -12,6 +12,12 @@ RoutingError({
 })
 `;
 
+exports[`Routing > initRouting() > Should prohibit ServeStatic for a route having explicit method 1`] = `
+RoutingError({
+  "message": "Explicit method (get) is not allowed for /v1/user/retrieve when assigned with ServeStatic",
+})
+`;
+
 exports[`Routing > initRouting() > Should prohibit nested routing within a route having explicit method 1`] = `
 RoutingError({
   "message": "Nested routing is not allowed for /v1/user/retrieve due to the explicitly specified method (get)",

@@ -52,7 +52,11 @@ export const walkRouting = ({
       const { methods = [explicitMethod || "get"] } = element;
       for (const method of methods) onEndpoint(element, path, method);
     } else if (element instanceof ServeStatic) {
-      // @todo explicit method is not "get"
+      if (explicitMethod) {
+        throw new RoutingError(
+          `Explicit method (${explicitMethod}) is not allowed for ${path} when assigned with ServeStatic`,
+        );
+      }
       if (onStatic) element.apply(path, onStatic);
     } else if (element instanceof DependsOnMethod) {
       if (explicitMethod) {

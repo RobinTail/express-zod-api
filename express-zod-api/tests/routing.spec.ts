@@ -240,10 +240,9 @@ describe("Routing", () => {
     });
 
     test("Should accept parameters", () => {
-      const handlerMock = vi.fn();
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         output: z.object({}),
-        handler: handlerMock,
+        handler: vi.fn(),
       });
       const routing: Routing = {
         v1: {
@@ -264,10 +263,9 @@ describe("Routing", () => {
     });
 
     test("Should handle empty paths and trim spaces", () => {
-      const handlerMock = vi.fn();
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         output: z.object({}),
-        handler: handlerMock,
+        handler: vi.fn(),
       });
       const routing: Routing = {
         v1: {
@@ -297,10 +295,9 @@ describe("Routing", () => {
     });
 
     test("Should handle slashes in routing keys", () => {
-      const handlerMock = vi.fn();
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         output: z.object({}),
-        handler: handlerMock,
+        handler: vi.fn(),
       });
       const logger = makeLoggerMock();
       initRouting({
@@ -324,10 +321,9 @@ describe("Routing", () => {
     });
 
     test("Should handle explicitly specified method", () => {
-      const handlerMock = vi.fn();
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         output: z.object({}),
-        handler: handlerMock,
+        handler: vi.fn(),
       });
       const logger = makeLoggerMock();
       initRouting({
@@ -354,10 +350,9 @@ describe("Routing", () => {
     });
 
     test("Should prohibit nested routing within a route having explicit method", () => {
-      const handlerMock = vi.fn();
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         output: z.object({}),
-        handler: handlerMock,
+        handler: vi.fn(),
       });
       const logger = makeLoggerMock();
       expect(() =>
@@ -375,11 +370,6 @@ describe("Routing", () => {
     });
 
     test("Should prohibit DependsOnMethod for a route having explicit method", () => {
-      const handlerMock = vi.fn();
-      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        output: z.object({}),
-        handler: handlerMock,
-      });
       const logger = makeLoggerMock();
       expect(() =>
         initRouting({
@@ -388,7 +378,23 @@ describe("Routing", () => {
           config: { cors: false },
           routing: {
             v1: {
-              "get /user/retrieve": new DependsOnMethod({ get: endpointMock }),
+              "get /user/retrieve": new DependsOnMethod({}),
+            },
+          },
+        }),
+      ).toThrowErrorMatchingSnapshot();
+    });
+
+    test("Should prohibit ServeStatic for a route having explicit method", () => {
+      const logger = makeLoggerMock();
+      expect(() =>
+        initRouting({
+          app: appMock as unknown as IRouter,
+          getLogger: () => logger,
+          config: { cors: false },
+          routing: {
+            v1: {
+              "get /user/retrieve": new ServeStatic("."),
             },
           },
         }),
