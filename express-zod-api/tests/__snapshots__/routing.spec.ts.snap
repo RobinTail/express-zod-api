@@ -1,5 +1,11 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Routing > initRouting() > Should check if endpoint supports an explicitly specified method 1`] = `
+RoutingError({
+  "message": "Endpoint assigned to get /v1/user/retrieve must support that method.",
+})
+`;
+
 exports[`Routing > initRouting() > Should check if endpoint supports the method it's assigned to within DependsOnMethod 1`] = `
 RoutingError({
   "message": "Endpoint assigned to post method of /v1/user must support that method.",

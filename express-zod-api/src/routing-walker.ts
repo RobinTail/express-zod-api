@@ -48,10 +48,17 @@ export const walkRouting = ({
   while (stack.length) {
     const [path, element, explicitMethod] = stack.shift()!;
     if (element instanceof AbstractEndpoint) {
-      // @todo explicit method should be prioritized over the ones supported by endpoint
-      // @todo explicit method does not match the endpoint capability
-      const { methods = [explicitMethod || "get"] } = element;
-      for (const method of methods) onEndpoint(element, path, method);
+      if (explicitMethod) {
+        if (element.methods && !element.methods.includes(explicitMethod)) {
+          throw new RoutingError(
+            `Endpoint assigned to ${explicitMethod} ${path} must support that method.`,
+          );
+        }
+        onEndpoint(element, path, explicitMethod);
+      } else {
+        for (const method of element.methods || ["get"])
+          onEndpoint(element, path, method);
+      }
     } else if (element instanceof ServeStatic) {
       if (explicitMethod) {
         throw new RoutingError(

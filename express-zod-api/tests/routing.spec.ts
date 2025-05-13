@@ -349,6 +349,27 @@ describe("Routing", () => {
       );
     });
 
+    test("Should check if endpoint supports an explicitly specified method", () => {
+      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
+        method: "post",
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      expect(() =>
+        initRouting({
+          app: appMock as unknown as IRouter,
+          getLogger: () => logger,
+          config: { cors: false },
+          routing: {
+            v1: {
+              "get ///user/retrieve///": endpointMock,
+            },
+          },
+        }),
+      ).toThrowErrorMatchingSnapshot();
+    });
+
     test("Should prohibit nested routing within a route having explicit method", () => {
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
         output: z.object({}),
