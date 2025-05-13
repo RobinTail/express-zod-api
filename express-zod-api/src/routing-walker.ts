@@ -1,7 +1,7 @@
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
-import { Method } from "./method";
+import { isMethod, Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
 import * as R from "ramda";
@@ -20,22 +20,31 @@ interface RoutingWalkerParams {
   parentPath?: string;
 }
 
+/** @example delete /v1/user/retrieve —> [/v1/user/retrieve, delete] */
+const detachMethod = (subject: string): [string, Method?] => {
+  const [method, rest] = subject.trim().split(/ (.+)/, 2);
+  if (rest && isMethod(method)) return [rest, method];
+  return [subject];
+};
+
 /** Removes whitespace and slashes from the edges of the string */
 const trimPath = R.pipe(R.trim, R.split("/"), R.reject(R.isEmpty), R.join("/"));
 
-const makePairs = (subject: Routing, parent?: string) =>
-  Object.entries(subject).map<[string, Routing[string]]>(([_key, item]) => {
-    const key = trimPath(_key);
-    const path = [parent || ""].concat(key || []).join("/");
-    return [path, item];
-  });
+const processEntries = (subject: Routing, parent?: string) =>
+  Object.entries(subject).map<[string, Routing[string], Method?]>(
+    ([_key, item]) => {
+      const [_path, method] = detachMethod(_key);
+      const path = [parent || ""].concat(trimPath(_path) || []).join("/");
+      return [path, item, method];
+    },
+  );
 
 export const walkRouting = ({
   routing,
   onEndpoint,
   onStatic,
 }: RoutingWalkerParams) => {
-  const stack = makePairs(routing);
+  const stack = processEntries(routing);
   while (stack.length) {
     const [path, element] = stack.shift()!;
     if (element instanceof AbstractEndpoint) {
@@ -54,7 +63,7 @@ export const walkRouting = ({
         onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
-      stack.unshift(...makePairs(element, path));
+      stack.unshift(...processEntries(element, path));
     }
   }
 };
