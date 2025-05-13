@@ -11,11 +11,9 @@ import { OnEndpoint, walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { GetLogger } from "./server-helpers";
 
-export type Routing = {
-  [K in string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
-} & {
-  [K in `${Method} ${string}`]: AbstractEndpoint;
-};
+export interface Routing {
+  [K: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
+}
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
