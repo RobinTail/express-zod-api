@@ -51,7 +51,9 @@ export const walkRouting = ({
       if (explicitMethod) {
         if (element.methods && !element.methods.includes(explicitMethod)) {
           throw new RoutingError(
-            `Endpoint assigned to ${explicitMethod} ${path} must support that method.`,
+            `Endpoint must support ${explicitMethod} method.`,
+            explicitMethod,
+            path,
           );
         }
         onEndpoint(element, path, explicitMethod);
@@ -62,21 +64,27 @@ export const walkRouting = ({
     } else if (element instanceof ServeStatic) {
       if (explicitMethod) {
         throw new RoutingError(
-          `Explicit method (${explicitMethod}) is not allowed for ${path} when assigned with ServeStatic`,
+          "Explicit method can not be combined with ServeStatic",
+          explicitMethod,
+          path,
         );
       }
       if (onStatic) element.apply(path, onStatic);
     } else if (element instanceof DependsOnMethod) {
       if (explicitMethod) {
         throw new RoutingError(
-          `DependsOnMethod is not allowed for ${path} due to the explicitly specified ${explicitMethod} method`,
+          "Explicit method can not be combined with DependsOnMethod",
+          explicitMethod,
+          path,
         );
       }
       for (const [method, endpoint, siblingMethods] of element.entries) {
         const { methods } = endpoint;
         if (methods && !methods.includes(method)) {
           throw new RoutingError(
-            `Endpoint assigned to ${method} method of ${path} must support that method.`,
+            `Endpoint must support ${method} method.`,
+            method,
+            path,
           );
         }
         onEndpoint(endpoint, path, method, siblingMethods);
@@ -84,7 +92,9 @@ export const walkRouting = ({
     } else {
       if (explicitMethod) {
         throw new RoutingError(
-          `Nested routing is not allowed for ${path} due to the explicitly specified method (${explicitMethod})`,
+          "Nested routing is not allowed due explicit method",
+          explicitMethod,
+          path,
         );
       }
       stack.unshift(...processEntries(element, path));

@@ -2,30 +2,50 @@
 
 exports[`Routing > initRouting() > Should check if endpoint supports an explicitly specified method 1`] = `
 RoutingError({
-  "message": "Endpoint assigned to get /v1/user/retrieve must support that method.",
+  "cause": {
+    "method": "get",
+    "path": "/v1/user/retrieve",
+  },
+  "message": "Endpoint must support get method.",
 })
 `;
 
 exports[`Routing > initRouting() > Should check if endpoint supports the method it's assigned to within DependsOnMethod 1`] = `
 RoutingError({
-  "message": "Endpoint assigned to post method of /v1/user must support that method.",
+  "cause": {
+    "method": "post",
+    "path": "/v1/user",
+  },
+  "message": "Endpoint must support post method.",
 })
 `;
 
 exports[`Routing > initRouting() > Should prohibit DependsOnMethod for a route having explicit method 1`] = `
 RoutingError({
-  "message": "DependsOnMethod is not allowed for /v1/user/retrieve due to the explicitly specified get method",
+  "cause": {
+    "method": "get",
+    "path": "/v1/user/retrieve",
+  },
+  "message": "Explicit method can not be combined with DependsOnMethod",
 })
 `;
 
 exports[`Routing > initRouting() > Should prohibit ServeStatic for a route having explicit method 1`] = `
 RoutingError({
-  "message": "Explicit method (get) is not allowed for /v1/user/retrieve when assigned with ServeStatic",
+  "cause": {
+    "method": "get",
+    "path": "/v1/user/retrieve",
+  },
+  "message": "Explicit method can not be combined with ServeStatic",
 })
 `;
 
 exports[`Routing > initRouting() > Should prohibit nested routing within a route having explicit method 1`] = `
 RoutingError({
-  "message": "Nested routing is not allowed for /v1/user/retrieve due to the explicitly specified method (get)",
+  "cause": {
+    "method": "get",
+    "path": "/v1/user/retrieve",
+  },
+  "message": "Nested routing is not allowed due explicit method",
 })
 `;
