@@ -4,6 +4,7 @@ import { RoutingError } from "./errors";
 import { Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
+import * as R from "ramda";
 
 export type OnEndpoint = (
   endpoint: AbstractEndpoint,
@@ -19,13 +20,12 @@ interface RoutingWalkerParams {
   parentPath?: string;
 }
 
+/** Removes whitespace and slashes from the edges of the string */
+const trimPath = R.pipe(R.trim, R.split("/"), R.reject(R.isEmpty), R.join("/"));
+
 const makePairs = (subject: Routing, parent?: string) =>
   Object.entries(subject).map<[string, Routing[string]]>(([_key, item]) => {
-    const key = _key
-      .trim()
-      .split("/") // trim slashes
-      .filter((one) => one !== "")
-      .join("/");
+    const key = trimPath(_key);
     const path = [parent || ""].concat(key || []).join("/");
     return [path, item];
   });
