@@ -33,8 +33,8 @@ const trimPath = (path: string) =>
 const processEntries = (subject: Routing, parent?: string) =>
   Object.entries(subject).map<[string, Routing[string], Method?]>(
     ([_key, item]) => {
-      const [_path, method] = detachMethod(_key);
-      const path = [parent || ""].concat(trimPath(_path) || []).join("/");
+      const [segment, method] = detachMethod(_key);
+      const path = [parent || ""].concat(trimPath(segment) || []).join("/");
       return [path, item, method];
     },
   );
