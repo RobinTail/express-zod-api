@@ -47,6 +47,14 @@ const prohibit = (entity: string, method: Method, path: string) => {
   );
 };
 
+const unsupported = (method: Method, path: string) => {
+  throw new RoutingError(
+    `Endpoint must support ${method} method.`,
+    method,
+    path,
+  );
+};
+
 export const walkRouting = ({
   routing,
   onEndpoint,
@@ -57,13 +65,8 @@ export const walkRouting = ({
     const [path, element, explicitMethod] = stack.shift()!;
     if (element instanceof AbstractEndpoint) {
       if (explicitMethod) {
-        if (element.methods && !element.methods.includes(explicitMethod)) {
-          throw new RoutingError(
-            `Endpoint must support ${explicitMethod} method.`,
-            explicitMethod,
-            path,
-          );
-        }
+        if (element.methods && !element.methods.includes(explicitMethod))
+          unsupported(explicitMethod, path);
         onEndpoint(element, path, explicitMethod);
       } else {
         for (const method of element.methods || ["get"])
@@ -76,13 +79,7 @@ export const walkRouting = ({
       if (explicitMethod) prohibit("DependsOnMethod", explicitMethod, path);
       for (const [method, endpoint, siblingMethods] of element.entries) {
         const { methods } = endpoint;
-        if (methods && !methods.includes(method)) {
-          throw new RoutingError(
-            `Endpoint must support ${method} method.`,
-            method,
-            path,
-          );
-        }
+        if (methods && !methods.includes(method)) unsupported(method, path);
         onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
