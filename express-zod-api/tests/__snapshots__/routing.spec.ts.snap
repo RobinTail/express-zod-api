@@ -6,6 +6,12 @@ RoutingError({
 })
 `;
 
+exports[`Routing > initRouting() > Should prohibit DependsOnMethod for a route having explicit method 1`] = `
+RoutingError({
+  "message": "DependsOnMethod is not allowed for /v1/user/retrieve due to the explicitly specified get method",
+})
+`;
+
 exports[`Routing > initRouting() > Should prohibit nested routing within a route having explicit method 1`] = `
 RoutingError({
   "message": "Nested routing is not allowed for /v1/user/retrieve due to the explicitly specified method (get)",

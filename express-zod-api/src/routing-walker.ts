@@ -55,7 +55,11 @@ export const walkRouting = ({
       // @todo explicit method is not "get"
       if (onStatic) element.apply(path, onStatic);
     } else if (element instanceof DependsOnMethod) {
-      // @todo explicit method should not be allowed here
+      if (explicitMethod) {
+        throw new RoutingError(
+          `DependsOnMethod is not allowed for ${path} due to the explicitly specified ${explicitMethod} method`,
+        );
+      }
       for (const [method, endpoint, siblingMethods] of element.entries) {
         const { methods } = endpoint;
         if (methods && !methods.includes(method)) {

@@ -374,6 +374,27 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
+    test("Should prohibit DependsOnMethod for a route having explicit method", () => {
+      const handlerMock = vi.fn();
+      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
+        output: z.object({}),
+        handler: handlerMock,
+      });
+      const logger = makeLoggerMock();
+      expect(() =>
+        initRouting({
+          app: appMock as unknown as IRouter,
+          getLogger: () => logger,
+          config: { cors: false },
+          routing: {
+            v1: {
+              "get /user/retrieve": new DependsOnMethod({ get: endpointMock }),
+            },
+          },
+        }),
+      ).toThrowErrorMatchingSnapshot();
+    });
+
     test("Should execute endpoints with right arguments", async () => {
       const handlerMock = vi
         .fn()
