@@ -6,7 +6,7 @@ RoutingError({
     "method": "get",
     "path": "/v1/user/retrieve",
   },
-  "message": "Endpoint must support get method.",
+  "message": "Method get is not supported by the assigned Endpoint.",
 })
 `;
 
@@ -16,7 +16,7 @@ RoutingError({
     "method": "post",
     "path": "/v1/user",
   },
-  "message": "Endpoint must support post method.",
+  "message": "Method post is not supported by the assigned Endpoint.",
 })
 `;
 

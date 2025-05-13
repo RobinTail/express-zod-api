@@ -49,7 +49,7 @@ const prohibit = (entity: string, method: Method, path: string) => {
 
 const unsupported = (method: Method, path: string) => {
   throw new RoutingError(
-    `Endpoint must support ${method} method.`,
+    `Method ${method} is not supported by the assigned Endpoint.`,
     method,
     path,
   );
