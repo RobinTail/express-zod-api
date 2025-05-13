@@ -26,7 +26,7 @@ RoutingError({
     "method": "get",
     "path": "/v1/user/retrieve",
   },
-  "message": "Explicit method can not be combined with DependsOnMethod.",
+  "message": "Explicitly specified method can not be combined with DependsOnMethod.",
 })
 `;
 
@@ -36,7 +36,7 @@ RoutingError({
     "method": "get",
     "path": "/v1/user/retrieve",
   },
-  "message": "Explicit method can not be combined with ServeStatic.",
+  "message": "Explicitly specified method can not be combined with ServeStatic.",
 })
 `;
 
@@ -46,6 +46,6 @@ RoutingError({
     "method": "get",
     "path": "/v1/user/retrieve",
   },
-  "message": "Explicit method can not be combined with nested routing.",
+  "message": "Explicitly specified method can not be combined with nested routing.",
 })
 `;

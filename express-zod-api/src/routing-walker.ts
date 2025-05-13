@@ -41,7 +41,7 @@ const processEntries = (subject: Routing, parent?: string) =>
 
 const prohibit = (entity: string, method: Method, path: string) => {
   throw new RoutingError(
-    `Explicit method can not be combined with ${entity}.`,
+    `Explicitly specified method can not be combined with ${entity}.`,
     method,
     path,
   );
