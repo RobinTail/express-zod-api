@@ -2,6 +2,30 @@
 
 ## Version 23
 
+### v23.4.0
+
+- Feature: flat routing syntax with explicit method support:
+  - `Routing` now supports slashes within keys, so that nested segments could be flattened;
+  - `Routing` also supports explicitly specified `Method` for the keys assigned with `Endpoint`;
+  - Leading slash is optional;
+  - The feature suggested by [@williamgcampbell](https://github.com/williamgcampbell).
+
+```ts
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  // flat syntax:
+  "v1/books/:bookId": getBookEndpoint,
+  // with method:
+  "post /v1/books": addBookEndpoint,
+  // nested:
+  v1: {
+    "delete /books/:bookId": deleteBookEndpoint,
+    "patch /books/:bookId": changeBookEndpoint,
+  },
+};
+```
+
 ### v23.3.0
 
 - Upgraded `ansis` (direct dependency) to `^4.0.0`.
