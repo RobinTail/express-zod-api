@@ -48,6 +48,7 @@ export const walkRouting = ({
   while (stack.length) {
     const [path, element, explicitMethod] = stack.shift()!;
     if (element instanceof AbstractEndpoint) {
+      // @todo explicit method should be prioritized over the ones supported by endpoint
       // @todo explicit method does not match the endpoint capability
       const { methods = [explicitMethod || "get"] } = element;
       for (const method of methods) onEndpoint(element, path, method);
