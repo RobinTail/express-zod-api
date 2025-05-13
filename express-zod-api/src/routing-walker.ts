@@ -4,7 +4,6 @@ import { RoutingError } from "./errors";
 import { isMethod, Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
-import * as R from "ramda";
 
 export type OnEndpoint = (
   endpoint: AbstractEndpoint,
@@ -28,7 +27,8 @@ const detachMethod = (subject: string): [string, Method?] => {
 };
 
 /** Removes whitespace and slashes from the edges of the string */
-const trimPath = R.pipe(R.trim, R.split("/"), R.reject(R.isEmpty), R.join("/"));
+const trimPath = (path: string) =>
+  path.trim().split("/").filter(Boolean).join("/");
 
 const processEntries = (subject: Routing, parent?: string) =>
   Object.entries(subject).map<[string, Routing[string], Method?]>(

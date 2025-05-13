@@ -1,31 +1,24 @@
 import * as R from "ramda";
 import { bench } from "vitest";
 
-describe("Experiment for key lookup", () => {
-  const subject = {
-    a: 1,
-    b: 2,
-    c: 3,
-  };
+describe("Experiment on path trimming", () => {
+  const current = R.pipe(
+    R.trim,
+    R.split("/"),
+    R.reject(R.isEmpty),
+    R.join("/"),
+  );
 
-  bench("in", () => {
-    return void ("a" in subject && "b" in subject && "c" in subject);
+  const featured = (str: string) =>
+    str.trim().split("/").filter(Boolean).join("/");
+
+  const sample = "   ///v1/one/two/three///   ";
+
+  bench("current (ramda)", () => {
+    return void current(sample);
   });
 
-  bench("R.has", () => {
-    return void (
-      R.has("a", subject) &&
-      R.has("b", subject) &&
-      R.has("c", subject)
-    );
-  });
-
-  bench("Object.keys + includes", () => {
-    const keys = Object.keys(subject);
-    return void (
-      keys.includes("a") &&
-      keys.includes("b") &&
-      keys.includes("c")
-    );
+  bench("featured (native)", () => {
+    return void featured(sample);
   });
 });
