@@ -309,7 +309,7 @@ describe("Routing", () => {
       );
     });
 
-    test("Should throw an error in case of slashes in route", () => {
+    test("Should handle slashes in routing keys", () => {
       const handlerMock = vi.fn();
       const configMock = { startupLogo: false };
       const endpointMock = new EndpointsFactory(defaultResultHandler).build({
@@ -317,28 +317,34 @@ describe("Routing", () => {
         handler: handlerMock,
       });
       const logger = makeLoggerMock();
-      expect(() =>
-        initRouting({
-          app: appMock as unknown as IRouter,
-          getLogger: () => logger,
-          config: configMock as CommonConfig,
-          routing: {
-            v1: {
-              "user/retrieve": endpointMock,
-            },
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: configMock as CommonConfig,
+        routing: {
+          v1: {
+            "///user/retrieve///": endpointMock,
           },
-        }),
-      ).toThrowErrorMatchingSnapshot();
-      expect(() =>
-        initRouting({
-          app: appMock as unknown as IRouter,
-          getLogger: () => logger,
-          config: configMock as CommonConfig,
-          routing: {
-            "v1/user/retrieve": endpointMock,
-          },
-        }),
-      ).toThrowErrorMatchingSnapshot();
+        },
+      });
+      expect(appMock.get).toHaveBeenCalledOnce();
+      expect(appMock.get).toHaveBeenCalledWith(
+        "/v1/user/retrieve",
+        expect.any(Function),
+      );
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: configMock as CommonConfig,
+        routing: {
+          "v1/user/delete": endpointMock,
+        },
+      });
+      expect(appMock.get).toHaveBeenCalledTimes(2);
+      expect(appMock.get).toHaveBeenCalledWith(
+        "/v1/user/delete",
+        expect.any(Function),
+      );
     });
 
     test("Should execute endpoints with right arguments", async () => {

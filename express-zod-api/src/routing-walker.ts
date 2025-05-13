@@ -20,14 +20,14 @@ interface RoutingWalkerParams {
 }
 
 const makePairs = (subject: Routing, parent?: string) =>
-  Object.entries(subject).map(([segment, item]) => {
-    if (segment.includes("/")) {
-      throw new RoutingError(
-        `The entry '${segment}' must avoid having slashes — use nesting instead.`,
-      );
-    }
-    const trimmed = segment.trim();
-    return [`${parent || ""}${trimmed ? `/${trimmed}` : ""}`, item] as const;
+  Object.entries(subject).map<[string, Routing[string]]>(([_key, item]) => {
+    const key = _key
+      .trim()
+      .split("/") // trim slashes
+      .filter((one) => one !== "")
+      .join("/");
+    const path = [parent || ""].concat(key || []).join("/");
+    return [path, item];
   });
 
 export const walkRouting = ({
