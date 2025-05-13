@@ -46,13 +46,16 @@ export const walkRouting = ({
 }: RoutingWalkerParams) => {
   const stack = processEntries(routing);
   while (stack.length) {
-    const [path, element] = stack.shift()!;
+    const [path, element, explicitMethod] = stack.shift()!;
     if (element instanceof AbstractEndpoint) {
-      const { methods = ["get"] } = element;
+      // @todo explicit method does not match the endpoint capability
+      const { methods = [explicitMethod || "get"] } = element;
       for (const method of methods) onEndpoint(element, path, method);
     } else if (element instanceof ServeStatic) {
+      // @todo explicit method is not "get"
       if (onStatic) element.apply(path, onStatic);
     } else if (element instanceof DependsOnMethod) {
+      // @todo explicit method should not be allowed here
       for (const [method, endpoint, siblingMethods] of element.entries) {
         const { methods } = endpoint;
         if (methods && !methods.includes(method)) {
@@ -63,6 +66,7 @@ export const walkRouting = ({
         onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
+      // @todo explicit method should not be allowed here
       stack.unshift(...processEntries(element, path));
     }
   }

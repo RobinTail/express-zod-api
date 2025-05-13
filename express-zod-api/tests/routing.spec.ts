@@ -347,6 +347,37 @@ describe("Routing", () => {
       );
     });
 
+    test("Should handle explicitly specified method", () => {
+      const handlerMock = vi.fn();
+      const configMock = { startupLogo: false };
+      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
+        output: z.object({}),
+        handler: handlerMock,
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: configMock as CommonConfig,
+        routing: {
+          v1: {
+            "get ///user/retrieve///": endpointMock,
+          },
+          "post another": endpointMock,
+        },
+      });
+      expect(appMock.get).toHaveBeenCalledOnce();
+      expect(appMock.get).toHaveBeenCalledWith(
+        "/v1/user/retrieve",
+        expect.any(Function),
+      );
+      expect(appMock.post).toHaveBeenCalledOnce();
+      expect(appMock.post).toHaveBeenCalledWith(
+        "/another",
+        expect.any(Function),
+      );
+    });
+
     test("Should execute endpoints with right arguments", async () => {
       const handlerMock = vi
         .fn()
