@@ -11,3 +11,6 @@ export const methods = [
 export type Method = (typeof methods)[number];
 
 export type AuxMethod = Extract<keyof IRouter, "options">;
+
+export const isMethod = (subject: string): subject is Method =>
+  (methods as string[]).includes(subject);
