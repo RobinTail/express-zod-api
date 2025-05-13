@@ -308,25 +308,15 @@ describe("Routing", () => {
         getLogger: () => logger,
         config: { cors: false },
         routing: {
-          v1: {
-            "///user/retrieve///": endpointMock,
-          },
-        },
-      });
-      expect(appMock.get).toHaveBeenCalledOnce();
-      expect(appMock.get).toHaveBeenCalledWith(
-        "/v1/user/retrieve",
-        expect.any(Function),
-      );
-      initRouting({
-        app: appMock as unknown as IRouter,
-        getLogger: () => logger,
-        config: { cors: false },
-        routing: {
+          v1: { "///user/retrieve///": endpointMock },
           "v1/user/delete": endpointMock,
         },
       });
       expect(appMock.get).toHaveBeenCalledTimes(2);
+      expect(appMock.get).toHaveBeenCalledWith(
+        "/v1/user/retrieve",
+        expect.any(Function),
+      );
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/user/delete",
         expect.any(Function),
