@@ -47,7 +47,12 @@ const prohibit = (entity: string, method: Method, path: string) => {
   );
 };
 
-const unsupported = (method: Method, path: string) => {
+const checkMethodSupported = (
+  method: Method,
+  path: string,
+  methods?: ReadonlyArray<Method>,
+) => {
+  if (!methods || methods.includes(method)) return;
   throw new RoutingError(
     `Method ${method} is not supported by the assigned Endpoint.`,
     method,
@@ -65,12 +70,11 @@ export const walkRouting = ({
     const [path, element, explicitMethod] = stack.shift()!;
     if (element instanceof AbstractEndpoint) {
       if (explicitMethod) {
-        if (element.methods && !element.methods.includes(explicitMethod))
-          unsupported(explicitMethod, path);
+        checkMethodSupported(explicitMethod, path, element.methods);
         onEndpoint(element, path, explicitMethod);
       } else {
-        for (const method of element.methods || ["get"])
-          onEndpoint(element, path, method);
+        const { methods = ["get"] } = element;
+        for (const method of methods) onEndpoint(element, path, method);
       }
     } else if (element instanceof ServeStatic) {
       if (explicitMethod) prohibit("ServeStatic", explicitMethod, path);
@@ -79,7 +83,7 @@ export const walkRouting = ({
       if (explicitMethod) prohibit("DependsOnMethod", explicitMethod, path);
       for (const [method, endpoint, siblingMethods] of element.entries) {
         const { methods } = endpoint;
-        if (methods && !methods.includes(method)) unsupported(method, path);
+        checkMethodSupported(method, path, methods);
         onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
