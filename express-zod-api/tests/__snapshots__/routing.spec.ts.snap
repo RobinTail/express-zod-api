@@ -2,7 +2,7 @@
 
 exports[`Routing > initRouting() > Should check if endpoint supports the method it's assigned to within DependsOnMethod 1`] = `
 RoutingError({
-  "message": "Endpoint assigned to post method of /v1/user must support post method.",
+  "message": "Endpoint assigned to post method of /v1/user must support that method.",
 })
 `;
 

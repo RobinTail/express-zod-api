@@ -60,8 +60,7 @@ export const walkRouting = ({
         const { methods } = endpoint;
         if (methods && !methods.includes(method)) {
           throw new RoutingError(
-            // @todo DNRY method
-            `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
+            `Endpoint assigned to ${method} method of ${path} must support that method.`,
           );
         }
         onEndpoint(endpoint, path, method, siblingMethods);
