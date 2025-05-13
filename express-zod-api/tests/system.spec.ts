@@ -131,8 +131,8 @@ describe("App in production mode", async () => {
       long: longEndpoint,
       form: formEndpoint,
       raw: rawEndpoint,
-      upload: uploadEndpoint,
-    },
+    }, // flat syntax test
+    "post /v1/upload": uploadEndpoint,
   };
   vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
   const config = createConfig({
