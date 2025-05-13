@@ -11,6 +11,12 @@ import { OnEndpoint, walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { GetLogger } from "./server-helpers";
 
+/**
+ * @example { v1: { books: { ":bookId": getBookEndpoint } } }
+ * @example { "v1/books/:bookId": getBookEndpoint }
+ * @example { "get /v1/books/:bookId": getBookEndpoint }
+ * @example { v1: { "patch /books/:bookId": changeBookEndpoint } }
+ * */
 export interface Routing {
   [K: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
 }
