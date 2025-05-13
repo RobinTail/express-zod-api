@@ -60,13 +60,18 @@ export const walkRouting = ({
         const { methods } = endpoint;
         if (methods && !methods.includes(method)) {
           throw new RoutingError(
+            // @todo DNRY method
             `Endpoint assigned to ${method} method of ${path} must support ${method} method.`,
           );
         }
         onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
-      // @todo explicit method should not be allowed here
+      if (explicitMethod) {
+        throw new RoutingError(
+          `Nested routing is not allowed for ${path} due to the explicitly specified method (${explicitMethod})`,
+        );
+      }
       stack.unshift(...processEntries(element, path));
     }
   }
