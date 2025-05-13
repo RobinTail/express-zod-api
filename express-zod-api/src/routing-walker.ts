@@ -39,6 +39,14 @@ const processEntries = (subject: Routing, parent?: string) =>
     },
   );
 
+const prohibit = (entity: string, method: Method, path: string) => {
+  throw new RoutingError(
+    `Explicit method can not be combined with ${entity}`,
+    method,
+    path,
+  );
+};
+
 export const walkRouting = ({
   routing,
   onEndpoint,
@@ -62,22 +70,10 @@ export const walkRouting = ({
           onEndpoint(element, path, method);
       }
     } else if (element instanceof ServeStatic) {
-      if (explicitMethod) {
-        throw new RoutingError(
-          "Explicit method can not be combined with ServeStatic",
-          explicitMethod,
-          path,
-        );
-      }
+      if (explicitMethod) prohibit("ServeStatic", explicitMethod, path);
       if (onStatic) element.apply(path, onStatic);
     } else if (element instanceof DependsOnMethod) {
-      if (explicitMethod) {
-        throw new RoutingError(
-          "Explicit method can not be combined with DependsOnMethod",
-          explicitMethod,
-          path,
-        );
-      }
+      if (explicitMethod) prohibit("DependsOnMethod", explicitMethod, path);
       for (const [method, endpoint, siblingMethods] of element.entries) {
         const { methods } = endpoint;
         if (methods && !methods.includes(method)) {
@@ -90,13 +86,7 @@ export const walkRouting = ({
         onEndpoint(endpoint, path, method, siblingMethods);
       }
     } else {
-      if (explicitMethod) {
-        throw new RoutingError(
-          "Nested routing is not allowed due explicit method",
-          explicitMethod,
-          path,
-        );
-      }
+      if (explicitMethod) prohibit("nested routing", explicitMethod, path);
       stack.unshift(...processEntries(element, path));
     }
   }

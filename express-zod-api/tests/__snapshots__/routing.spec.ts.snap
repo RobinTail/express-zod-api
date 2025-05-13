@@ -46,6 +46,6 @@ RoutingError({
     "method": "get",
     "path": "/v1/user/retrieve",
   },
-  "message": "Nested routing is not allowed due explicit method",
+  "message": "Explicit method can not be combined with nested routing",
 })
 `;
