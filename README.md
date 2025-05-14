@@ -35,18 +35,19 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Headers as input source](#headers-as-input-source)
    3. [Nested routes](#nested-routes)
    4. [Route path params](#route-path-params)
-   5. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   6. [Response customization](#response-customization)
-   7. [Empty response](#empty-response)
-   8. [Error handling](#error-handling)
-   9. [Production mode](#production-mode)
-   10. [Non-object response](#non-object-response) including file downloads
-   11. [HTML Forms (URL encoded)](#html-forms-url-encoded)
-   12. [File uploads](#file-uploads)
-   13. [Serving static files](#serving-static-files)
-   14. [Connect to your own express app](#connect-to-your-own-express-app)
-   15. [Testing endpoints](#testing-endpoints)
-   16. [Testing middlewares](#testing-middlewares)
+   5. [Flat routing syntax](#flat-routing-syntax)
+   6. [Multiple schemas for one route](#multiple-schemas-for-one-route)
+   7. [Response customization](#response-customization)
+   8. [Empty response](#empty-response)
+   9. [Error handling](#error-handling)
+   10. [Production mode](#production-mode)
+   11. [Non-object response](#non-object-response) including file downloads
+   12. [HTML Forms (URL encoded)](#html-forms-url-encoded)
+   13. [File uploads](#file-uploads)
+   14. [Serving static files](#serving-static-files)
+   15. [Connect to your own express app](#connect-to-your-own-express-app)
+   16. [Testing endpoints](#testing-endpoints)
+   17. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -802,14 +803,25 @@ You then need to specify these parameters in the endpoint input schema in the us
 ```typescript
 const getUserEndpoint = endpointsFactory.build({
   input: z.object({
-    // id is the route path param, always string
-    id: z.string().transform((value) => parseInt(value, 10)),
-    // other inputs (in query):
-    withExtendedInformation: z.boolean().optional(),
-  }),
-  output: z.object({}),
-  handler: async ({ input: { id } }) => ({}), // id is number,
+    id: z.string().transform(Number), // path params are always strings
+  }), // ...
 });
+```
+
+## Flat routing syntax
+
+Alternatively, a flat routing syntax is also supported. Mixing syntaxes for nesting is allowed. Properties with
+assigned endpoints can explicitly declare a method.
+
+```ts
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  "/v1/user/:id": getUserEndpoint,
+  v1: {
+    "delete /user/:id": deleteUserEndpoint,
+  },
+};
 ```
 
 ## Multiple schemas for one route
@@ -819,7 +831,7 @@ It can also be the same Endpoint that handles multiple methods as well. The `met
 `EndpointsFactory::build()` so that the method determination would be delegated to the `Routing`.
 
 ```typescript
-import { DependsOnMethod } from "express-zod-api";
+import { DependsOnMethod, Routing } from "express-zod-api";
 
 // the route /v1/user has two Endpoints
 // which handle a couple of methods each
