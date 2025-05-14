@@ -17,36 +17,33 @@ Start your API server with I/O schema validation and custom middlewares in minut
 2. [How it works](#how-it-works)
 3. [Quick start](#quick-start) — **Fast Track**
 4. [Basic features](#basic-features)
-   1. [Middlewares](#middlewares)
-   2. [Options](#options)
-   3. [Using native express middlewares](#using-native-express-middlewares)
-   4. [Refinements](#refinements)
-   5. [Transformations](#transformations)
-   6. [Top level transformations and mapping](#top-level-transformations-and-mapping)
-   7. [Dealing with dates](#dealing-with-dates)
-   8. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
-   9. [Enabling HTTPS](#enabling-https)
-   10. [Customizing logger](#customizing-logger)
-   11. [Child logger](#child-logger)
-   12. [Profiling](#profiling)
-   13. [Enabling compression](#enabling-compression)
+   1. [Routing](#routing) including static file serving
+   2. [Middlewares](#middlewares)
+   3. [Options](#options)
+   4. [Using native express middlewares](#using-native-express-middlewares)
+   5. [Refinements](#refinements)
+   6. [Transformations](#transformations)
+   7. [Top level transformations and mapping](#top-level-transformations-and-mapping)
+   8. [Dealing with dates](#dealing-with-dates)
+   9. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   10. [Enabling HTTPS](#enabling-https)
+   11. [Customizing logger](#customizing-logger)
+   12. [Child logger](#child-logger)
+   13. [Profiling](#profiling)
+   14. [Enabling compression](#enabling-compression)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Headers as input source](#headers-as-input-source)
-   3. [Nested routes](#nested-routes)
-   4. [Route path params](#route-path-params)
-   5. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   6. [Response customization](#response-customization)
-   7. [Empty response](#empty-response)
-   8. [Error handling](#error-handling)
-   9. [Production mode](#production-mode)
-   10. [Non-object response](#non-object-response) including file downloads
-   11. [HTML Forms (URL encoded)](#html-forms-url-encoded)
-   12. [File uploads](#file-uploads)
-   13. [Serving static files](#serving-static-files)
-   14. [Connect to your own express app](#connect-to-your-own-express-app)
-   15. [Testing endpoints](#testing-endpoints)
-   16. [Testing middlewares](#testing-middlewares)
+   3. [Response customization](#response-customization)
+   4. [Empty response](#empty-response)
+   5. [Error handling](#error-handling)
+   6. [Production mode](#production-mode)
+   7. [Non-object response](#non-object-response) including file downloads
+   8. [HTML Forms (URL encoded)](#html-forms-url-encoded)
+   9. [File uploads](#file-uploads)
+   10. [Connect to your own express app](#connect-to-your-own-express-app)
+   11. [Testing endpoints](#testing-endpoints)
+   12. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -88,6 +85,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/gmorgen1.png" alt="@gmorgen1" width="50px" />](https://github.com/gmorgen1)
 [<img src="https://github.com/crgeary.png" alt="@crgeary" width="50px" />](https://github.com/crgeary)
 [<img src="https://github.com/danmichaelo.png" alt="@danmichaelo" width="50px" />](https://github.com/danmichaelo)
@@ -99,7 +97,6 @@ These people contributed to the improvement of the framework by reporting bugs, 
 [<img src="https://github.com/LucWag.png" alt="@LucWag" width="50px" />](https://github.com/LucWag)
 [<img src="https://github.com/HenriJ.png" alt="@HenriJ" width="50px" />](https://github.com/HenriJ)
 [<img src="https://github.com/JonParton.png" alt="@JonParton" width="50px" />](https://github.com/JonParton)
-[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/t1nky.png" alt="@t1nky" width="50px" />](https://github.com/t1nky)
 [<img src="https://github.com/Tomtec331.png" alt="@Tomtec331" width="50px" />](https://github.com/Tomtec331)
 [<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
@@ -272,6 +269,53 @@ You should receive the following response:
 ```
 
 # Basic features
+
+## Routing
+
+The framework offers flexible ways to define your routes, supporting both nested and flat syntaxes, dynamic path
+parameters, method-based routing, and static file serving. This example brings together all supported routing styles
+in one place, illustrating how you can structure your API using whichever method best fits your application’s
+architecture — or even mix them seamlessly.
+
+```ts
+import { Routing, DependsOnMethod, ServeStatic } from "express-zod-api";
+
+const routing: Routing = {
+  // flax syntax — /v1/users
+  "/v1/users": listUsersEndpoint,
+  // nested syntax
+  v1: {
+    // the way to have both — /v1/path and /v1/path/subpath
+    path: endpointA.nest({
+      subpath: endpointB,
+    }),
+    // path parameters — /v1/user/:id
+    user: {
+      ":id": getUserEndpoint,
+    },
+    // mixed syntax with explicit method — /v1/user/:id
+    "delete /user/:id": deleteUserEndpoint,
+    // method-based routing — /v1/account
+    account: new DependsOnMethod({
+      get: endpointA,
+      delete: endpointA,
+      post: endpointB,
+      patch: endpointB,
+    }),
+  },
+  // static file serving — /public serves files from ./assets
+  public: new ServeStatic("assets", {
+    /** @see https://expressjs.com/en/5x/api.html#express.static */
+    dotfiles: "deny",
+    index: false,
+    redirect: false,
+  }),
+};
+```
+
+Same Endpoint can be reused on different routes or handle multiple methods if needed. Path parameters (the `:id` above)
+should be declared in the endpoint’s input schema. Properties assigned with Endpoint can explicitly declare a method.
+When the method is not specified, the one(s) supported by the Endpoint applied (or `get` as a fallback).
 
 ## Middlewares
 
@@ -697,7 +741,7 @@ done(); // error: expensive operation '555.55ms'
 
 ## Enabling compression
 
-According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
+According to [Express.js best practices guide](https://expressjs.com/en/advanced/best-practice-performance.html)
 it might be a good idea to enable GZIP and Brotli compression for your API responses.
 
 Install `compression` and `@types/compression`, and enable or configure compression:
@@ -766,76 +810,6 @@ factory.build({
   }), // ...
 });
 ```
-
-## Nested routes
-
-Suppose you want to assign both `/v1/path` and `/v1/path/subpath` routes with Endpoints:
-
-```typescript
-import { Routing } from "express-zod-api";
-
-const routing: Routing = {
-  v1: {
-    path: endpointA.nest({
-      subpath: endpointB,
-    }),
-  },
-};
-```
-
-## Route path params
-
-You can assign your Endpoint to a route like `/v1/user/:id` where `:id` is the path parameter:
-
-```typescript
-import { Routing } from "express-zod-api";
-
-const routing: Routing = {
-  v1: {
-    user: { ":id": getUserEndpoint },
-  },
-};
-```
-
-You then need to specify these parameters in the endpoint input schema in the usual way:
-
-```typescript
-const getUserEndpoint = endpointsFactory.build({
-  input: z.object({
-    // id is the route path param, always string
-    id: z.string().transform((value) => parseInt(value, 10)),
-    // other inputs (in query):
-    withExtendedInformation: z.boolean().optional(),
-  }),
-  output: z.object({}),
-  handler: async ({ input: { id } }) => ({}), // id is number,
-});
-```
-
-## Multiple schemas for one route
-
-Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
-It can also be the same Endpoint that handles multiple methods as well. The `method` property can be omitted for
-`EndpointsFactory::build()` so that the method determination would be delegated to the `Routing`.
-
-```typescript
-import { DependsOnMethod } from "express-zod-api";
-
-// the route /v1/user has two Endpoints
-// which handle a couple of methods each
-const routing: Routing = {
-  v1: {
-    user: new DependsOnMethod({
-      get: endpointA,
-      delete: endpointA,
-      post: endpointB,
-      patch: endpointB,
-    }),
-  },
-};
-```
-
-_See also [Different responses for different status codes](#different-responses-for-different-status-codes)_.
 
 ## Response customization
 
@@ -1034,26 +1008,6 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
 ```
 
 _You can still send other data and specify additional `input` parameters, including arrays and objects._
-
-## Serving static files
-
-In case you want your server to serve static files, you can use `new ServeStatic()` in `Routing` using the arguments
-similar to `express.static()`.
-The documentation on these arguments you may find [here](http://expressjs.com/en/4x/api.html#express.static).
-
-```typescript
-import { Routing, ServeStatic } from "express-zod-api";
-import { join } from "node:path";
-
-const routing: Routing = {
-  // path /public serves static files from ./assets
-  public: new ServeStatic(join(__dirname, "assets"), {
-    dotfiles: "deny",
-    index: false,
-    redirect: false,
-  }),
-};
-```
 
 ## Connect to your own express app
 

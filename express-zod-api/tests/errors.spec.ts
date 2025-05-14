@@ -40,7 +40,7 @@ describe("Errors", () => {
   });
 
   describe("RoutingError", () => {
-    const error = new RoutingError("test");
+    const error = new RoutingError("test", "get", "/v1/test");
 
     test("should be an instance of Error", () => {
       expect(error).toBeInstanceOf(Error);
@@ -48,6 +48,10 @@ describe("Errors", () => {
 
     test("should have the name matching its class", () => {
       expect(error.name).toBe("RoutingError");
+    });
+
+    test("should have the cause prop including method and path", () => {
+      expect(error.cause).toEqual({ method: "get", path: "/v1/test" });
     });
   });
 
