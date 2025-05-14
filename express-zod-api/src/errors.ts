@@ -2,10 +2,17 @@ import type { $ZodType } from "@zod/core";
 import { z } from "zod";
 import { getMessageFromError } from "./common-helpers";
 import { OpenAPIContext } from "./documentation-helpers";
+import type { Method } from "./method";
 
 /** @desc An error related to the wrong Routing declaration */
 export class RoutingError extends Error {
   public override name = "RoutingError";
+  public override readonly cause: { method: Method; path: string };
+
+  constructor(message: string, method: Method, path: string) {
+    super(message);
+    this.cause = { method, path };
+  }
 }
 
 /**
