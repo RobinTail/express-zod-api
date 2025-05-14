@@ -38,9 +38,9 @@ const processEntries = (subject: Routing, parent?: string) =>
     },
   );
 
-const prohibit = (entity: string, method: Method, path: string) => {
+const prohibit = (method: Method, path: string) => {
   throw new RoutingError(
-    `Explicitly specified method can not be combined with ${entity}.`,
+    "Route with explicit method can only be assigned with Endpoint",
     method,
     path,
   );
@@ -87,20 +87,20 @@ export const walkRouting = ({
           onEndpoint(element, path, method);
         }
       }
-    } else if (element instanceof ServeStatic) {
-      if (explicitMethod) prohibit("ServeStatic", explicitMethod, path);
-      if (onStatic) element.apply(path, onStatic);
-    } else if (element instanceof DependsOnMethod) {
-      if (explicitMethod) prohibit("DependsOnMethod", explicitMethod, path);
-      for (const [method, endpoint, siblingMethods] of element.entries) {
-        const { methods } = endpoint;
-        checkDuplicate(method, path, visited);
-        checkMethodSupported(method, path, methods);
-        onEndpoint(endpoint, path, method, siblingMethods);
-      }
     } else {
-      if (explicitMethod) prohibit("nested routing", explicitMethod, path);
-      stack.unshift(...processEntries(element, path));
+      if (explicitMethod) prohibit(explicitMethod, path);
+      if (element instanceof ServeStatic) {
+        if (onStatic) element.apply(path, onStatic);
+      } else if (element instanceof DependsOnMethod) {
+        for (const [method, endpoint, siblingMethods] of element.entries) {
+          const { methods } = endpoint;
+          checkDuplicate(method, path, visited);
+          checkMethodSupported(method, path, methods);
+          onEndpoint(endpoint, path, method, siblingMethods);
+        }
+      } else {
+        stack.unshift(...processEntries(element, path));
+      }
     }
   }
 };
