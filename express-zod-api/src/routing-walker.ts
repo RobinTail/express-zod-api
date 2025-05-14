@@ -59,21 +59,33 @@ const checkMethodSupported = (
   );
 };
 
+const checkDuplicate = (method: Method, path: string, visited: Set<string>) => {
+  const key = `${method} ${path}`;
+  if (visited.has(key))
+    throw new RoutingError("Route has a duplicate", method, path);
+  visited.add(key);
+};
+
 export const walkRouting = ({
   routing,
   onEndpoint,
   onStatic,
 }: RoutingWalkerParams) => {
   const stack = processEntries(routing);
+  const visited = new Set<string>();
   while (stack.length) {
     const [path, element, explicitMethod] = stack.shift()!;
     if (element instanceof AbstractEndpoint) {
       if (explicitMethod) {
+        checkDuplicate(explicitMethod, path, visited);
         checkMethodSupported(explicitMethod, path, element.methods);
         onEndpoint(element, path, explicitMethod);
       } else {
         const { methods = ["get"] } = element;
-        for (const method of methods) onEndpoint(element, path, method);
+        for (const method of methods) {
+          checkDuplicate(method, path, visited);
+          onEndpoint(element, path, method);
+        }
       }
     } else if (element instanceof ServeStatic) {
       if (explicitMethod) prohibit("ServeStatic", explicitMethod, path);
@@ -82,6 +94,7 @@ export const walkRouting = ({
       if (explicitMethod) prohibit("DependsOnMethod", explicitMethod, path);
       for (const [method, endpoint, siblingMethods] of element.entries) {
         const { methods } = endpoint;
+        checkDuplicate(method, path, visited);
         checkMethodSupported(method, path, methods);
         onEndpoint(endpoint, path, method, siblingMethods);
       }

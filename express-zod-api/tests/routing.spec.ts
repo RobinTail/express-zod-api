@@ -422,6 +422,26 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
+    test("Should prohibit duplicated routes", () => {
+      const logger = makeLoggerMock();
+      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      const routing: Routing = {
+        v1: { test: endpointMock },
+        "/v1/test": endpointMock,
+      };
+      expect(() =>
+        initRouting({
+          app: appMock as unknown as IRouter,
+          getLogger: () => logger,
+          config: { cors: false },
+          routing,
+        }),
+      ).toThrowErrorMatchingSnapshot();
+    });
+
     test("Should execute endpoints with right arguments", async () => {
       const handlerMock = vi
         .fn()

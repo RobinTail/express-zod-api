@@ -40,6 +40,16 @@ RoutingError({
 })
 `;
 
+exports[`Routing > initRouting() > Should prohibit duplicated routes 1`] = `
+RoutingError({
+  "cause": {
+    "method": "get",
+    "path": "/v1/test",
+  },
+  "message": "Route has a duplicate",
+})
+`;
+
 exports[`Routing > initRouting() > Should prohibit nested routing within a route having explicit method 1`] = `
 RoutingError({
   "cause": {
