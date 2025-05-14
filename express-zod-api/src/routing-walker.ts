@@ -16,7 +16,6 @@ interface RoutingWalkerParams {
   routing: Routing;
   onEndpoint: OnEndpoint;
   onStatic?: (path: string, handler: StaticHandler) => void;
-  parentPath?: string;
 }
 
 /** @example delete /v1/user/retrieve —> [/v1/user/retrieve, delete] */
