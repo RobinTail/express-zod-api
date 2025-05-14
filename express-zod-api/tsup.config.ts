@@ -9,7 +9,6 @@ const commons: Options = {
   splitting: false,
   sourcemap: false,
   clean: true,
-  dts: true,
   minify: true,
   target: `node${minNode.major}.${minNode.minor}.${minNode.patch}`,
   removeNodeProtocol: false, // @todo will be default in v9
@@ -18,6 +17,8 @@ const commons: Options = {
 export default defineConfig([
   {
     ...commons,
+    shims: true, // used by TypescriptWorker
+    dts: true,
     name,
     entry: ["src/index.ts"],
     esbuildOptions: (options, { format }) => {
@@ -33,11 +34,18 @@ export default defineConfig([
       options.define = {
         "process.env.TSUP_BUILD": `"v${version} (${format.toUpperCase()})"`,
         "process.env.TSUP_STATIC": `"static"`, // used by isProduction()
+        "process.env.TSUP_EXT": `"${format === "esm" ? "js" : "cjs"}"`, // used by TypescriptWorker
       };
     },
   },
   {
     ...commons,
+    name: "./worker".padStart(name.length),
+    entry: ["src/worker.ts"],
+  },
+  {
+    ...commons,
+    dts: true,
     name: "./migration".padStart(name.length),
     entry: { index: "src/migration.ts" },
     outDir: "migration",
