@@ -16,7 +16,6 @@ interface RoutingWalkerParams {
   routing: Routing;
   onEndpoint: OnEndpoint;
   onStatic?: (path: string, handler: StaticHandler) => void;
-  parentPath?: string;
 }
 
 const makePairs = (subject: Routing, parent?: string) =>
