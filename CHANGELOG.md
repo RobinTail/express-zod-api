@@ -7,7 +7,7 @@
 - Switched to Zod 4:
   - Minimum supported version of `zod` is 4.0.0;
   - ⚠️This version might not support all new features of Zod 4;
-  - `IOSchema` type had to be simplified down to a schema resulting in a `object`, but not an `array`;
+  - `IOSchema` type had to be simplified down to a schema resulting to an `object`, but not an `array`;
   - Despite supporting examples by the new Zod method `.meta()`, users should still use `.example()` to set them;
   - Refer to [Migration guide on Zod 4](https://v4.zod.dev/v4/changelog) for adjusting your schemas;
 - Generating Documentation is partially delegated to Zod 4 `z.toJSONSchema()`:
