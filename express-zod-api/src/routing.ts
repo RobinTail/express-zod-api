@@ -10,6 +10,7 @@ import { AuxMethod, Method } from "./method";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { GetLogger } from "./server-helpers";
+import * as R from "ramda";
 
 /**
  * @example { v1: { books: { ":bookId": getBookEndpoint } } }
@@ -59,10 +60,10 @@ export const initRouting = ({
       doc?.checkPathParams(path, endpoint, { method });
     }
     const matchingParsers = parsers?.[endpoint.requestType] || [];
+    const value = R.pair(matchingParsers, endpoint);
     if (!familiar.has(path)) familiar.set(path, new Map());
-    if (config.cors)
-      familiar.get(path)?.set("options", [matchingParsers, endpoint]); // @todo DNRY? or move into new Map()
-    familiar.get(path)?.set(method, [matchingParsers, endpoint]);
+    if (config.cors) familiar.get(path)?.set("options", value); // @todo DNRY? or move into new Map()
+    familiar.get(path)?.set(method, value);
   };
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
   doc = undefined; // hint for garbage collector
