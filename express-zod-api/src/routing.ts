@@ -50,7 +50,7 @@ export const initRouting = ({
 }) => {
   let doc = isProduction() ? undefined : new Diagnostics(getLogger()); // disposable
   const familiar = new Map<string, Array<Method | AuxMethod>>();
-  const onEndpoint: OnEndpoint = (endpoint, path, method, siblingMethods) => {
+  const onEndpoint: OnEndpoint = (endpoint, path, method) => {
     if (!isProduction()) {
       doc?.checkJsonCompat(endpoint, { path, method });
       doc?.checkPathParams(path, endpoint, { method });
@@ -58,6 +58,8 @@ export const initRouting = ({
     const matchingParsers = parsers?.[endpoint.requestType] || [];
     const handler: RequestHandler = async (request, response) => {
       const logger = getLogger(request);
+      // @todo move
+      /*
       if (config.cors) {
         const accessMethods: Array<Method | AuxMethod> = [
           method,
@@ -75,11 +77,12 @@ export const initRouting = ({
             ? await config.cors({ request, endpoint, logger, defaultHeaders })
             : defaultHeaders;
         for (const key in headers) response.set(key, headers[key]);
-      }
+      }*/
       return endpoint.execute({ request, response, logger, config });
     };
     if (!familiar.has(path)) {
       familiar.set(path, []);
+      // @todo move
       if (config.cors) {
         app.options(path, ...matchingParsers, handler);
         familiar.get(path)?.push("options");
