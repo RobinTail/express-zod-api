@@ -232,7 +232,7 @@ describe("Routing", () => {
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getHeaders()).toEqual({
         "access-control-allow-origin": "*",
-        "access-control-allow-methods": "GET, POST, PUT, PATCH, OPTIONS",
+        "access-control-allow-methods": "OPTIONS, GET, POST, PUT, PATCH",
         "access-control-allow-headers": "content-type",
         "content-type": "application/json",
         "x-custom-header": "Testing",
@@ -360,7 +360,7 @@ describe("Routing", () => {
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getHeaders()).toEqual({
         "access-control-allow-origin": "*",
-        "access-control-allow-methods": "GET, POST, OPTIONS",
+        "access-control-allow-methods": "OPTIONS, GET, POST",
         "access-control-allow-headers": "content-type",
         "content-type": "application/json",
       });
