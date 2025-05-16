@@ -86,7 +86,7 @@ export const initRouting = ({
                   logger: getLogger(request),
                 })
               : defaultHeaders;
-          for (const key in headers) response.set(key, headers[key]); // @todo how about response.set(headers) ?
+          response.set(headers);
         }
         return endpoint.execute({
           request,
