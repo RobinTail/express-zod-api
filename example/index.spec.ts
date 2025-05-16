@@ -48,7 +48,7 @@ describe("Example", async () => {
       expect(response.headers.has("access-control-allow-headers")).toBeTruthy();
       expect(response.headers.get("access-control-allow-origin")).toBe("*");
       expect(response.headers.get("access-control-allow-methods")).toBe(
-        "PATCH, OPTIONS",
+        "OPTIONS, PATCH",
       );
       expect(response.headers.get("access-control-allow-headers")).toBe(
         "content-type",

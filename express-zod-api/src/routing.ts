@@ -97,7 +97,10 @@ export const initRouting = ({
       };
       app[method](path, ...matchingParsers, handler);
     }
-    if (config.wrongMethodBehavior === 404) continue;
+  }
+  if (config.wrongMethodBehavior === 404) return;
+  for (const [path, methods] of familiar) {
+    const accessMethods = Array.from(methods.keys()); // @todo it has to go after, but DNRY?
     app.all(path, createWrongMethodHandler(accessMethods));
   }
 };
