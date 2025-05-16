@@ -61,8 +61,8 @@ export const initRouting = ({
     }
     const matchingParsers = parsers?.[endpoint.requestType] || [];
     const value = R.pair(matchingParsers, endpoint);
-    if (!familiar.has(path)) familiar.set(path, new Map());
-    if (config.cors) familiar.get(path)?.set("options", value); // @todo DNRY? or move into new Map()
+    if (!familiar.has(path))
+      familiar.set(path, new Map(config.cors ? [["options", value]] : []));
     familiar.get(path)?.set(method, value);
   };
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
