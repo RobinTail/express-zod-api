@@ -72,6 +72,7 @@ export const initRouting = ({
     const accessMethods = Array.from(methods.keys());
     for (const [method, [matchingParsers, endpoint]] of methods) {
       const handler: RequestHandler = async (request, response) => {
+        const logger = getLogger(request);
         if (config.cors) {
           const methodsLine = accessMethods.join(", ").toUpperCase();
           const defaultHeaders: Record<string, string> = {
@@ -81,21 +82,11 @@ export const initRouting = ({
           };
           const headers =
             typeof config.cors === "function"
-              ? await config.cors({
-                  request,
-                  endpoint,
-                  defaultHeaders,
-                  logger: getLogger(request),
-                })
+              ? await config.cors({ request, endpoint, logger, defaultHeaders })
               : defaultHeaders;
           response.set(headers);
         }
-        return endpoint.execute({
-          request,
-          response,
-          config,
-          logger: getLogger(request),
-        });
+        return endpoint.execute({ request, response, logger, config });
       };
       app[method](path, ...matchingParsers, handler);
     }
