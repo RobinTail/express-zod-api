@@ -25,7 +25,10 @@ export interface Routing {
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
 const lineUp = (methods: Array<Method | AuxMethod>) =>
-  methods.join(", ").toUpperCase();
+  methods // options is last:
+    .toSorted((a, b) => +(a === "options") - +(b === "options"))
+    .join(", ")
+    .toUpperCase();
 
 /** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405 */
 export const createWrongMethodHandler =
@@ -78,8 +81,6 @@ export const initRouting = ({
   doc = undefined; // hint for garbage collector
   const deprioritized = new Map<string, RequestHandler>();
   for (const [path, methods] of familiar) {
-    const aux = methods.get("options");
-    if (aux && methods.delete("options")) methods.set("options", aux); // mv to the end
     const accessMethods = Array.from(methods.keys());
     for (const [method, [matchingParsers, endpoint]] of methods) {
       const handler: RequestHandler = async (request, response) => {
