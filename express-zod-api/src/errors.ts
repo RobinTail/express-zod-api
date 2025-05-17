@@ -1,5 +1,5 @@
-import type { $ZodType } from "@zod/core";
-import { z } from "zod";
+import type { $ZodType } from "zod/v4/core";
+import { z } from "zod/v4";
 import { getMessageFromError } from "./common-helpers";
 import { OpenAPIContext } from "./documentation-helpers";
 import type { Method } from "./method";

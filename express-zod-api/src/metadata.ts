@@ -1,5 +1,5 @@
 import { combinations } from "./common-helpers";
-import { z } from "zod";
+import { z } from "zod/v4";
 import * as R from "ramda";
 
 export const metaSymbol = Symbol.for("express-zod-api");

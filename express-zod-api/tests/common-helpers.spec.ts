@@ -10,7 +10,7 @@ import {
   pullExampleProps,
   getRoutePathParams,
 } from "../src/common-helpers";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { makeRequestMock } from "../src/testing";
 
 describe("Common Helpers", () => {

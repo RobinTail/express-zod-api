@@ -1,6 +1,6 @@
-import type { $ZodType, JSONSchema } from "@zod/core";
+import type { $ZodType, JSONSchema } from "zod/v4/core";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod";
+import { globalRegistry, z } from "zod/v4";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { DeepCheckError } from "./errors";

@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import * as R from "ramda";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 describe("Environment checks", () => {
   describe("Zod Dates", () => {
@@ -73,18 +73,6 @@ describe("Environment checks", () => {
         .meta({ description: "some" })
         .meta({ title: "last" });
       expect(schema.meta()).toMatchSnapshot();
-    });
-
-    /** @link https://github.com/colinhacks/zod/issues/4320 */
-    test("input type of a loose object does not allow extra keys", () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- this is fine
-      const schema = z.looseObject({});
-      expectTypeOf<z.output<typeof schema>>().toEqualTypeOf<
-        Record<string, never> // ok
-      >();
-      expectTypeOf<z.input<typeof schema>>().not.toEqualTypeOf<
-        Record<string, unknown> // not ok
-      >();
     });
 
     test("circular object schema has no sign of getter in its shape", () => {

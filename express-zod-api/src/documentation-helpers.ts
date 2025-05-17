@@ -5,7 +5,7 @@ import type {
   $ZodTuple,
   $ZodType,
   JSONSchema,
-} from "@zod/core";
+} from "zod/v4/core";
 import {
   ExamplesObject,
   isReferenceObject,
@@ -23,7 +23,7 @@ import {
   TagObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod";
+import { globalRegistry, z } from "zod/v4";
 import { ResponseVariant } from "./api-response";
 import {
   FlatObject,

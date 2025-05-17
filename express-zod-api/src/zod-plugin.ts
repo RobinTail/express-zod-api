@@ -9,20 +9,25 @@
  * @desc Ensures that the brand withstands additional refinements or checks
  * */
 import * as R from "ramda";
-import { z, globalRegistry } from "zod";
+import { z, globalRegistry } from "zod/v4";
 import { FlatObject } from "./common-helpers";
 import { Metadata, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
-import type { $ZodType, $ZodShape, $ZodLooseShape } from "@zod/core";
+import type {
+  $ZodType,
+  $ZodShape,
+  $ZodLooseShape,
+  $ZodObjectConfig,
+} from "zod/v4/core";
 
-declare module "@zod/core" {
+declare module "zod/v4/core" {
   interface GlobalMeta {
     [metaSymbol]?: Metadata;
     deprecated?: boolean;
   }
 }
 
-declare module "zod" {
+declare module "zod/v4" {
   interface ZodType {
     /** @desc Add an example value (before any transformations, can be called multiple times) */
     example(example: z.input<this>): this;
@@ -35,8 +40,7 @@ declare module "zod" {
   interface ZodObject<
     // @ts-expect-error -- external issue
     out Shape extends $ZodShape = $ZodLooseShape,
-    OutExtra extends Record<string, unknown> = Record<string, unknown>,
-    InExtra extends Record<string, unknown> = Record<string, unknown>,
+    out Config extends $ZodObjectConfig = $ZodObjectConfig,
   > extends ZodType {
     remap<V extends string, U extends { [P in keyof Shape]?: V }>(
       mapping: U,
@@ -45,7 +49,7 @@ declare module "zod" {
         this,
         z.ZodTransform<FlatObject, FlatObject> // internal type simplified
       >,
-      z.ZodObject<Remap<Shape, U, V> & Intact<Shape, U>, OutExtra, InExtra>
+      z.ZodObject<Remap<Shape, U, V> & Intact<Shape, U>, Config>
     >;
     remap<U extends $ZodShape>(
       mapper: (subject: Shape) => U,

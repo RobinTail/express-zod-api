@@ -1,4 +1,4 @@
-import type { JSONSchema } from "@zod/core";
+import type { JSONSchema } from "zod/v4/core";
 import * as R from "ramda";
 import { combinations, isObject } from "./common-helpers";
 

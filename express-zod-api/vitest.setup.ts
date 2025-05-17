@@ -1,6 +1,6 @@
 import "./src/zod-plugin"; // required for tests importing sources using the plugin methods
 import type { NewPlugin } from "@vitest/pretty-format";
-import { globalRegistry, z } from "zod";
+import { globalRegistry, z } from "zod/v4";
 import { ResultHandlerError } from "./src/errors";
 import { metaSymbol } from "./src/metadata";
 
