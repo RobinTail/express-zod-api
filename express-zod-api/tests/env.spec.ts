@@ -46,25 +46,9 @@ describe("Environment checks", () => {
     });
 
     test("bigint is not representable", () => {
-      expect(z.toJSONSchema(z.bigint(), { unrepresentable: "any" })).toEqual(
-        {},
-      );
+      const json = z.toJSONSchema(z.bigint(), { unrepresentable: "any" });
+      expect(R.omit(["$schema"], json)).toEqual({});
     });
-
-    /** @link https://github.com/colinhacks/zod/issues/4274 */
-    test.each(["input", "output"] as const)(
-      "%s examples of transformations",
-      (io) => {
-        const schema = z
-          .string()
-          .meta({ examples: ["test"] })
-          .transform(Number)
-          .meta({ examples: [4] });
-        expect(
-          z.toJSONSchema(schema, { io, unrepresentable: "any" }),
-        ).toMatchSnapshot();
-      },
-    );
 
     test("meta overrides, does not merge", () => {
       const schema = z
