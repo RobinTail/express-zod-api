@@ -2,6 +2,27 @@
 
 ## Version 23
 
+### v23.4.1
+
+- Fixed headers for an edge case of flat routing with explicit methods:
+  - Routes resolved into same path but using different methods had incomplete CORS headers (when enabled);
+  - Similarly, could affect `Allow` header when `wrongMethodBehavior` set to `405` (default).
+
+```ts
+// reproduction sample
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  v1: {
+    "get /user/retrieve": endpointA,
+    user: {
+      // same /v1/user/retrieve, but another method:
+      "post retrieve": endpointB, // POST was missing in response headers to OPTIONS request
+    },
+  },
+};
+```
+
 ### v23.4.0
 
 - Feature: flat routing syntax with explicit method support:
