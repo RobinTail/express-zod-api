@@ -48,6 +48,8 @@ const makeCorsHeaders = (accessMethods: Array<Method | AuxMethod>) => ({
   "Access-Control-Allow-Headers": "content-type",
 });
 
+type Siblings = Map<Method | AuxMethod, [RequestHandler[], AbstractEndpoint]>;
+
 export const initRouting = ({
   app,
   getLogger,
@@ -62,10 +64,7 @@ export const initRouting = ({
   parsers?: Parsers;
 }) => {
   let doc = isProduction() ? undefined : new Diagnostics(getLogger()); // disposable
-  const familiar = new Map<
-    string,
-    Map<Method | AuxMethod, [RequestHandler[], AbstractEndpoint]>
-  >();
+  const familiar = new Map<string, Siblings>();
   const onEndpoint: OnEndpoint = (endpoint, path, method) => {
     if (!isProduction()) {
       doc?.checkJsonCompat(endpoint, { path, method });
