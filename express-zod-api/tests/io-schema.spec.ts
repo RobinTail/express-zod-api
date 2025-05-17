@@ -1,5 +1,5 @@
 import { expectTypeOf } from "vitest";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { IOSchema, Middleware, ez } from "../src";
 import { getFinalEndpointInputSchema } from "../src/io-schema";
 import { metaSymbol } from "../src/metadata";
@@ -119,7 +119,7 @@ describe("I/O Schema and related helpers", () => {
         expectTypeOf(z.object({}).transform(() => [])).not.toExtend<IOSchema>();
       });
       test("does not accept piping into another kind of schema", () => {
-        expectTypeOf(z.unknown({}).pipe(z.string())).not.toExtend<IOSchema>();
+        expectTypeOf(z.unknown().pipe(z.string())).not.toExtend<IOSchema>();
         expectTypeOf(
           z
             .object({ s: z.string() })

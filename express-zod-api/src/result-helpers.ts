@@ -1,6 +1,6 @@
 import { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import {
   FlatObject,

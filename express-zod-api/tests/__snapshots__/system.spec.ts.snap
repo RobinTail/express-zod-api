@@ -122,7 +122,7 @@ exports[`App in production mode > Validation > Problem 787: Should NOT treat Zod
   "Server side error",
   {
     "error": InternalServerError({
-      "cause": ZodError {
+      "cause": ZodError({
         "issues": [
           {
             "code": "invalid_type",
@@ -131,7 +131,7 @@ exports[`App in production mode > Validation > Problem 787: Should NOT treat Zod
             "path": [],
           },
         ],
-      },
+      }),
       "message": "Invalid input: expected number, received string",
     }),
     "payload": {
@@ -166,7 +166,7 @@ exports[`App in production mode > Validation > Should fail on handler output typ
   "Server side error",
   {
     "error": InternalServerError({
-      "cause": ZodError {
+      "cause": ZodError({
         "issues": [
           {
             "code": "too_small",
@@ -179,7 +179,7 @@ exports[`App in production mode > Validation > Should fail on handler output typ
             ],
           },
         ],
-      },
+      }),
       "message": "output/anything: Too small: expected number to be >0",
     }),
     "payload": {

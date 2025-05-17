@@ -5,7 +5,7 @@ import type {
   $ZodTuple,
   $ZodType,
   JSONSchema,
-} from "@zod/core";
+} from "zod/v4/core";
 import {
   ExamplesObject,
   isReferenceObject,
@@ -23,7 +23,7 @@ import {
   TagObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod";
+import { globalRegistry, z } from "zod/v4";
 import { ResponseVariant } from "./api-response";
 import {
   FlatObject,
@@ -45,7 +45,7 @@ import { ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
-import { flattenIO, unref } from "./json-schema-helpers";
+import { flattenIO } from "./json-schema-helpers";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
@@ -463,7 +463,6 @@ const depict = (
       unrepresentable: "any",
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
-        unref(zodCtx.jsonSchema);
         const { brand } =
           globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
         const depicter =

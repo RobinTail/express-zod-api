@@ -2,6 +2,7 @@
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with intersection middleware 1`] = `
 {
+  "$schema": "https://json-schema.org/draft-2020-12/schema",
   "allOf": [
     {
       "allOf": [
@@ -46,6 +47,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with intersecti
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with intersection middleware 2`] = `
 {
+  "$schema": "https://json-schema.org/draft-2020-12/schema",
   "properties": {
     "b": {
       "type": "boolean",
@@ -60,6 +62,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with intersecti
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with refined object middleware 1`] = `
 {
+  "$schema": "https://json-schema.org/draft-2020-12/schema",
   "allOf": [
     {
       "properties": {
@@ -90,6 +93,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with refined ob
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with refined object middleware 2`] = `
 {
+  "$schema": "https://json-schema.org/draft-2020-12/schema",
   "properties": {
     "o": {
       "type": "boolean",
@@ -104,6 +108,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with refined ob
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with simple middleware 1`] = `
 {
+  "$schema": "https://json-schema.org/draft-2020-12/schema",
   "allOf": [
     {
       "properties": {
@@ -133,6 +138,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with simple mid
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with simple middleware 2`] = `
 {
+  "$schema": "https://json-schema.org/draft-2020-12/schema",
   "properties": {
     "b": {
       "type": "boolean",
@@ -147,6 +153,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with simple mid
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with union middleware 1`] = `
 {
+  "$schema": "https://json-schema.org/draft-2020-12/schema",
   "allOf": [
     {
       "anyOf": [
@@ -191,6 +198,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with union midd
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with union middleware 2`] = `
 {
+  "$schema": "https://json-schema.org/draft-2020-12/schema",
   "properties": {
     "b": {
       "type": "boolean",
@@ -205,6 +213,7 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with union midd
 
 exports[`EndpointsFactory > .buildVoid() > Should be a shorthand for empty object output 1`] = `
 {
+  "$schema": "https://json-schema.org/draft-2020-12/schema",
   "properties": {},
   "required": [],
   "type": "object",

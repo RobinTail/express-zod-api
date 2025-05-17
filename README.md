@@ -213,7 +213,7 @@ import { defaultEndpointsFactory } from "express-zod-api";
 The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supplied within `GET` request payload.
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
   // method: "get" (default) or array ["get", "post", ...]
@@ -325,7 +325,7 @@ Inputs of middlewares are also available to endpoint handlers within `input`.
 Here is an example of the authentication middleware, that checks a `key` from input and `token` from headers:
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import createHttpError from "http-errors";
 import { Middleware } from "express-zod-api";
 
@@ -455,7 +455,7 @@ You can implement additional validations within schemas using refinements.
 Validation errors are reported in a response with a status code `400`.
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import { Middleware } from "express-zod-api";
 
 const nicknameConstraintMiddleware = new Middleware({
@@ -496,7 +496,7 @@ Since parameters of GET requests come in the form of strings, there is often a n
 arrays of numbers.
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const getUserEndpoint = endpointsFactory.build({
   input: z.object({
@@ -527,7 +527,7 @@ Here is a recommended solution: it is important to use shallow transformations o
 ```ts
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const endpoint = endpointsFactory.build({
   input: z
@@ -580,7 +580,7 @@ provides your endpoint handler or middleware with a `Date`. It supports the foll
 format for the response transmission. Consider the following simplified example for better understanding:
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const updateUserEndpoint = defaultEndpointsFactory.build({
@@ -790,7 +790,7 @@ In a similar way you can enable request headers as the input source. This is an 
 
 ```typescript
 import { createConfig, Middleware } from "express-zod-api";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 createConfig({
   inputSources: {
@@ -825,7 +825,7 @@ type DefaultResponse<OUT> =
 You can create your own result handler by using this example as a template:
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   ResultHandler,
   ensureHttpError,
@@ -951,7 +951,7 @@ which is `express.urlencoded()` by default. The request content type should be `
 
 ```ts
 import { defaultEndpointsFactory, ez } from "express-zod-api";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
   method: "post",
@@ -991,7 +991,7 @@ const config = createConfig({
 Then use `ez.upload()` schema for a corresponding property. The request content type must be `multipart/form-data`:
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const fileUploadEndpoint = defaultEndpointsFactory.build({
@@ -1069,7 +1069,7 @@ from outputs of previous middlewares, if the one being tested somehow depends on
 either by `errorHandler` configured within given `configProps` or `defaultResultHandler`.
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import { Middleware, testMiddleware } from "express-zod-api";
 
 const middleware = new Middleware({
@@ -1180,7 +1180,7 @@ Client application can subscribe to the event stream using `EventSource` class i
 the implementation emitting the `time` event each second.
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import { EventStreamFactory } from "express-zod-api";
 import { setTimeout } from "node:timers/promises";
 
@@ -1320,7 +1320,7 @@ You can also deprecate all routes the `Endpoint` assigned to by setting `Endpoin
 
 ```ts
 import { Routing, DependsOnMethod } from "express-zod-api";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const someEndpoint = factory.build({
   deprecated: true, // deprecates all routes the endpoint assigned to
@@ -1345,7 +1345,7 @@ need to reuse a handling rule for multiple brands, use the exposed types `Depict
 
 ```ts
 import ts from "typescript";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   Documentation,
   Integration,
@@ -1391,7 +1391,7 @@ in this case during development. You can achieve this verification by assigning 
 reusing it in forced type of the output:
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const output = z.object({
   anything: z.number(),

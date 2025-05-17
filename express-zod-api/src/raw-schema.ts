@@ -1,5 +1,5 @@
-import { z } from "zod";
-import type { $ZodShape } from "@zod/core";
+import { z } from "zod/v4";
+import type { $ZodShape } from "zod/v4/core";
 import { file } from "./file-schema";
 
 export const ezRawBrand = Symbol("Raw");

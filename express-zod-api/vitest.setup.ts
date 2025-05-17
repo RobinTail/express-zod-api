@@ -1,6 +1,6 @@
 import "./src/zod-plugin"; // required for tests importing sources using the plugin methods
 import type { NewPlugin } from "@vitest/pretty-format";
-import { globalRegistry, z } from "zod";
+import { globalRegistry, z } from "zod/v4";
 import { ResultHandlerError } from "./src/errors";
 import { metaSymbol } from "./src/metadata";
 
@@ -10,12 +10,16 @@ const errorSerializer: NewPlugin = {
   serialize: (error: Error, config, indentation, depth, refs, printer) => {
     const { name, message, cause } = error;
     const { handled } = error instanceof ResultHandlerError ? error : {};
+    const { issues } = error instanceof z.ZodError ? error : {};
     const obj = Object.assign(
-      { message },
+      {},
+      message && { message },
       cause && { cause },
       handled && { handled },
+      issues && { issues },
     );
-    return `${name}(${printer(obj, config, indentation, depth, refs)})`;
+    // @todo external issue with ZodError.name
+    return `${issues ? "ZodError" : name}(${printer(obj, config, indentation, depth, refs)})`;
   },
 };
 

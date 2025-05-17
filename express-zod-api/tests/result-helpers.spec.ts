@@ -1,5 +1,5 @@
 import createHttpError from "http-errors";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { InputValidationError, OutputValidationError } from "../src";
 import {
   ensureHttpError,

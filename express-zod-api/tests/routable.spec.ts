@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { defaultEndpointsFactory, DependsOnMethod } from "../src";
 
 const endpoint = defaultEndpointsFactory.build({

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ezFileBrand } from "../src/file-schema";
 import { ez } from "../src";
 import { readFile } from "node:fs/promises";

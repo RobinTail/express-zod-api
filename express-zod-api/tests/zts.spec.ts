@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ez } from "../src";
 import { f, printNode } from "../src/typescript-api";
 import { zodToTs } from "../src/zts";

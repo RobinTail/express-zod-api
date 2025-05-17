@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { InputValidationError, Middleware } from "../src";
 import { EmptyObject } from "../src/common-helpers";
 import { AbstractMiddleware, ExpressMiddleware } from "../src/middleware";

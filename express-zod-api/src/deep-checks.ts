@@ -1,6 +1,6 @@
-import type { $ZodType, JSONSchema } from "@zod/core";
+import type { $ZodType, JSONSchema } from "zod/v4/core";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod";
+import { globalRegistry, z } from "zod/v4";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { DeepCheckError } from "./errors";
@@ -58,13 +58,18 @@ export const hasCycle = (
   return false;
 };
 
+/** @todo can simplify that? */
 export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
+  findNestedSchema(subject, {
+    condition: (schema) =>
+      globalRegistry.get(schema)?.[metaSymbol]?.brand === ezUploadBrand,
+    io: "input",
+  }) ||
   findNestedSchema(subject, {
     condition: (schema) => {
       const { brand } = globalRegistry.get(schema)?.[metaSymbol] || {};
       return (
-        typeof brand === "symbol" &&
-        [ezUploadBrand, ezRawBrand, ezFormBrand].includes(brand)
+        typeof brand === "symbol" && [ezRawBrand, ezFormBrand].includes(brand)
       );
     },
     io: "input",

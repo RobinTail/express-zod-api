@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ez } from "../src";
 import { metaSymbol } from "../src/metadata";
 import { ezRawBrand } from "../src/raw-schema";

@@ -1,5 +1,5 @@
 import { defaultEndpointsFactory, ez } from "express-zod-api";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
   method: "post",

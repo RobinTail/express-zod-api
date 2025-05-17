@@ -17,10 +17,10 @@ import type {
   $ZodTransform,
   $ZodTuple,
   $ZodUnion,
-} from "@zod/core";
+} from "zod/v4/core";
 import * as R from "ramda";
 import ts from "typescript";
-import { globalRegistry, z } from "zod";
+import { globalRegistry, z } from "zod/v4";
 import { getTransformedType, isOptional, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";

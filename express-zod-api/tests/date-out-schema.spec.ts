@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ezDateOutBrand } from "../src/date-out-schema";
 import { ez } from "../src";
 import { metaSymbol } from "../src/metadata";

@@ -3,10 +3,10 @@ import type {
   $ZodTransform,
   $ZodType,
   $ZodTypeInternals,
-} from "@zod/core";
+} from "zod/v4/core";
 import { Request } from "express";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod";
+import { globalRegistry, z } from "zod/v4";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import { OutputValidationError } from "./errors";

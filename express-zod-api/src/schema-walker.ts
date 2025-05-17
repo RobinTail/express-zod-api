@@ -1,5 +1,5 @@
-import type { $ZodType, $ZodTypeDef } from "@zod/core";
-import { globalRegistry } from "zod";
+import type { $ZodType, $ZodTypeDef } from "zod/v4/core";
+import { globalRegistry } from "zod/v4";
 import type { EmptyObject, FlatObject } from "./common-helpers";
 import { metaSymbol } from "./metadata";
 

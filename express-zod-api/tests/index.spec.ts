@@ -1,8 +1,8 @@
-import type { $ZodType, JSONSchema } from "@zod/core";
+import type { $ZodType, JSONSchema } from "zod/v4/core";
 import { IRouter } from "express";
 import ts from "typescript";
 import { expectTypeOf } from "vitest";
-import { z } from "zod";
+import { z } from "zod/v4";
 import * as entrypoint from "../src";
 import {
   ApiResponse,

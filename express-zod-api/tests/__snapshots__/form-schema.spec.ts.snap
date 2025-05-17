@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`ez.form() > parsing > should throw for missing props as a regular object schema 1`] = `
-ZodError {
+ZodError({
   "issues": [
     {
       "code": "invalid_type",
@@ -12,5 +12,5 @@ ZodError {
       ],
     },
   ],
-}
+})
 `;

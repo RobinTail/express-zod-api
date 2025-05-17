@@ -1,6 +1,6 @@
 import * as R from "ramda";
 import ts from "typescript";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ResponseVariant, responseVariants } from "./api-response";
 import { IntegrationBase } from "./integration-base";
 import {
