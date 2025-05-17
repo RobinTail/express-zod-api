@@ -9,7 +9,6 @@ export type OnEndpoint = (
   endpoint: AbstractEndpoint,
   path: string,
   method: Method,
-  siblingMethods?: ReadonlyArray<Method>,
 ) => void;
 
 interface RoutingWalkerParams {
@@ -92,11 +91,11 @@ export const walkRouting = ({
       if (element instanceof ServeStatic) {
         if (onStatic) element.apply(path, onStatic);
       } else if (element instanceof DependsOnMethod) {
-        for (const [method, endpoint, siblingMethods] of element.entries) {
+        for (const [method, endpoint] of element.entries) {
           const { methods } = endpoint;
           checkDuplicate(method, path, visited);
           checkMethodSupported(method, path, methods);
-          onEndpoint(endpoint, path, method, siblingMethods);
+          onEndpoint(endpoint, path, method);
         }
       } else {
         stack.unshift(...processEntries(element, path));
