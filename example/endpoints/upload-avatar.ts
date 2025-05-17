@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { defaultEndpointsFactory, ez } from "express-zod-api";
 import { createHash } from "node:crypto";
 

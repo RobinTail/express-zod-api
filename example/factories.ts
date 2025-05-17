@@ -9,7 +9,7 @@ import {
 } from "express-zod-api";
 import { authMiddleware } from "./middlewares";
 import { createReadStream } from "node:fs";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 /** @desc This factory extends the default one by enforcing the authentication using the specified middleware */
 export const keyAndTokenAuthenticatedEndpointsFactory =
