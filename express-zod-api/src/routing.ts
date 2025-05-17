@@ -68,8 +68,8 @@ export const initRouting = ({
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
   doc = undefined; // hint for garbage collector
   for (const [path, methods] of familiar) {
-    const options = methods.get("options");
-    if (options && methods.delete("options")) methods.set("options", options); // mv to the end
+    const aux = methods.get("options");
+    if (aux && methods.delete("options")) methods.set("options", aux); // mv to the end
     const accessMethods = Array.from(methods.keys());
     for (const [method, [matchingParsers, endpoint]] of methods) {
       const handler: RequestHandler = async (request, response) => {
