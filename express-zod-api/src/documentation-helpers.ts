@@ -45,7 +45,7 @@ import { ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
 import { ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
-import { flattenIO, unref } from "./json-schema-helpers";
+import { flattenIO } from "./json-schema-helpers";
 import { Alternatives } from "./logical-container";
 import { metaSymbol } from "./metadata";
 import { Method } from "./method";
@@ -463,7 +463,6 @@ const depict = (
       unrepresentable: "any",
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
-        unref(zodCtx.jsonSchema);
         const { brand } =
           globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
         const depicter =

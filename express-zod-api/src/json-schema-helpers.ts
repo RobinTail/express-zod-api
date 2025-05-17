@@ -2,18 +2,6 @@ import type { JSONSchema } from "zod/v4/core";
 import * as R from "ramda";
 import { combinations, isObject } from "./common-helpers";
 
-/** @link https://github.com/colinhacks/zod/issues/4275 */
-export const unref = (
-  subject: JSONSchema.BaseSchema,
-): Omit<JSONSchema.BaseSchema, "_ref"> => {
-  while (subject._ref) {
-    const copy = { ...subject._ref };
-    delete subject._ref;
-    Object.assign(subject, copy);
-  }
-  return subject;
-};
-
 const isJsonObjectSchema = (
   subject: JSONSchema.BaseSchema,
 ): subject is JSONSchema.ObjectSchema => subject.type === "object";
@@ -36,7 +24,7 @@ const canMerge = R.pipe(
   R.isEmpty,
 );
 
-const nestOptional = R.pipe(unref, R.pair(true));
+const nestOptional = R.pair(true);
 
 export const flattenIO = (
   jsonSchema: JSONSchema.BaseSchema,
@@ -54,8 +42,8 @@ export const flattenIO = (
     if (entry.description) flat.description ??= entry.description;
     if (entry.allOf) {
       stack.push(
-        ...entry.allOf.map(unref).map((one) => {
-          if (mode === "throw" && !(one.type == "object" && canMerge(one)))
+        ...entry.allOf.map((one) => {
+          if (mode === "throw" && !(one.type === "object" && canMerge(one)))
             throw new Error("Can not merge");
           return R.pair(isOptional, one);
         }),
