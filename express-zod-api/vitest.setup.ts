@@ -10,12 +10,16 @@ const errorSerializer: NewPlugin = {
   serialize: (error: Error, config, indentation, depth, refs, printer) => {
     const { name, message, cause } = error;
     const { handled } = error instanceof ResultHandlerError ? error : {};
+    const { issues } = error instanceof z.ZodError ? error : {};
     const obj = Object.assign(
-      { message },
+      {},
+      message && { message },
       cause && { cause },
       handled && { handled },
+      issues && { issues },
     );
-    return `${name}(${printer(obj, config, indentation, depth, refs)})`;
+    // @todo external issue with ZodError.name
+    return `${issues ? "ZodError" : name}(${printer(obj, config, indentation, depth, refs)})`;
   },
 };
 
