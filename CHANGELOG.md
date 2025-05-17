@@ -1,5 +1,29 @@
 # Changelog
 
+## Version 24
+
+### v24.0.0
+
+- Switched to Zod 4:
+  - Minimum supported version of `zod` is 4.0.0;
+  - ⚠️This version might not support all new features of Zod 4;
+  - `IOSchema` type had to be simplified down to a schema resulting to an `object`, but not an `array`;
+  - Despite supporting examples by the new Zod method `.meta()`, users should still use `.example()` to set them;
+  - Refer to [Migration guide on Zod 4](https://v4.zod.dev/v4/changelog) for adjusting your schemas;
+- Generating Documentation is partially delegated to Zod 4 `z.toJSONSchema()`:
+  - The basic depiction of each schema is now natively performed by Zod 4;
+  - Express Zod API implements some overrides and improvements to fit it into OpenAPI 3.1 that extends JSON Schema;
+  - The `numericRange` option removed from `Documentation` class constructor argument;
+  - The `brandHandling` should consist of postprocessing functions altering the depiction made by Zod 4;
+  - The `Depicter` type signature changed;
+- The `optionalPropStyle` option removed from `Integration` class constructor:
+  - Use `.optional()` to add question mark to the object property as well as `undefined` to its type;
+  - Use `.or(z.undefined())` to add `undefined` to the type of the object property;
+  - Reasoning: https://x.com/colinhacks/status/1919292504861491252;
+  - `z.any()` and `z.unknown()` are not optional, details: https://v4.zod.dev/v4/changelog#changes-zunknown-optionality.
+- Changes to the plugin:
+  - Brand is the only kind of metadata that withstands refinements and checks.
+
 ## Version 23
 
 ### v23.4.1

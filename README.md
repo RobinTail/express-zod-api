@@ -58,8 +58,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Deprecated schemas and routes](#deprecated-schemas-and-routes)
    6. [Customizable brands handling](#customizable-brands-handling)
 8. [Caveats](#caveats)
-   1. [Coercive schema of Zod](#coercive-schema-of-zod)
-   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
 
 You can find the release notes and migration guides in [Changelog](CHANGELOG.md).
@@ -150,7 +149,8 @@ Much can be customized to fit your needs.
 
 - [Typescript](https://www.typescriptlang.org/) first.
 - Web server — [Express.js](https://expressjs.com/) v5.
-- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin).
+- Schema validation — [Zod 4.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin):
+  - For using with Zod 3.x install the framework versions below 24.0.0.
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
@@ -1223,7 +1223,6 @@ import { Integration } from "express-zod-api";
 const client = new Integration({
   routing,
   variant: "client", // <— optional, see also "types" for a DIY solution
-  optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
 });
 
 const prettierFormattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted
@@ -1358,12 +1357,12 @@ const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for
 const myBrandedSchema = z.string().brand(myBrand);
 
 const ruleForDocs: Depicter = (
-  schema: typeof myBrandedSchema, // you should assign type yourself
-  { next, path, method, isResponse }, // handle a nested schema using next()
-) => {
-  const defaultDepiction = next(schema.unwrap()); // { type: string }
-  return { summary: "Special type of data" };
-};
+  { zodSchema, jsonSchema }, // jsonSchema is the default depiction
+  { path, method, isResponse },
+) => ({
+  ...jsonSchema,
+  summary: "Special type of data",
+});
 
 const ruleForClient: Producer = (
   schema: typeof myBrandedSchema, // you should assign type yourself
@@ -1383,16 +1382,6 @@ new Integration({
 
 There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
-
-## Coercive schema of Zod
-
-Despite being supported by the framework, `z.coerce.*` schema
-[does not work intuitively](https://github.com/RobinTail/express-zod-api/issues/759).
-Please be aware that `z.coerce.number()` and `z.number({ coerce: true })` (being typed not well) still will NOT allow
-you to assign anything but number. Moreover, coercive schemas are not fail-safe and their methods `.isOptional()` and
-`.isNullable()` [are buggy](https://github.com/colinhacks/zod/issues/1911). If possible, try to avoid using this type
-of schema. This issue [will NOT be fixed](https://github.com/colinhacks/zod/issues/1760#issuecomment-1407816838) in
-Zod version 3.x.
 
 ## Excessive properties in endpoint output
 

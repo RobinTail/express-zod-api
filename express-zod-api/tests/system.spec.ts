@@ -83,7 +83,7 @@ describe("App in production mode", async () => {
     .build({
       method: ["get", "post"],
       input: z.object({ something: z.string() }),
-      output: z.object({ anything: z.number().positive() }).passthrough(), // allow excessive keys
+      output: z.looseObject({ anything: z.number().positive() }), // allow excessive keys
       handler: async ({
         input: { key, something },
         options: { user, permissions, method },

@@ -22,7 +22,7 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) return void response.status(400).send(error.message);
-      if (output && "data" in output && typeof output.data === "string")
+      if ("data" in output && typeof output.data === "string")
         response.type("svg").send(output.data);
       else response.status(400).send("Data is missing");
     },
@@ -37,7 +37,6 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory(
     handler: ({ response, error, output }) => {
       if (error) return void response.status(400).send(error.message);
       if (
-        output &&
         "filename" in output &&
         typeof output.filename === "string" &&
         output.filename.includes(".")
@@ -68,7 +67,7 @@ export const statusDependingFactory = new EndpointsFactory(
     negative: [
       {
         statusCode: 409,
-        schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
+        schema: z.object({ status: z.literal("exists"), id: z.int() }),
       },
       {
         statusCode: [400, 500],
@@ -108,5 +107,5 @@ export const noContentFactory = new EndpointsFactory(
 
 /** @desc This factory is for producing event streams of server-sent events (SSE) */
 export const eventsFactory = new EventStreamFactory({
-  time: z.number().int().positive(),
+  time: z.int().positive(),
 });

@@ -10,6 +10,7 @@ import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 import {
+  DiscriminatedResult,
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
@@ -17,20 +18,19 @@ import {
   ResultSchema,
 } from "./result-helpers";
 
-type Handler<RES = unknown> = (params: {
-  /** null in case of failure to parse or to find the matching endpoint (error: not found) */
-  input: FlatObject | null;
-  /** null in case of errors or failures */
-  output: FlatObject | null;
-  /** can be empty: check presence of the required property using "in" operator */
-  options: FlatObject;
-  error: Error | null;
-  request: Request;
-  response: Response<RES>;
-  logger: ActualLogger;
-}) => void | Promise<void>;
+type Handler<RES = unknown> = (
+  params: DiscriminatedResult & {
+    /** null in case of failure to parse or to find the matching endpoint (error: not found) */
+    input: FlatObject | null;
+    /** can be empty: check presence of the required property using "in" operator */
+    options: FlatObject;
+    request: Request;
+    response: Response<RES>;
+    logger: ActualLogger;
+  },
+) => void | Promise<void>;
 
-export type Result<S extends z.ZodTypeAny = z.ZodTypeAny> =
+export type Result<S extends z.ZodType = z.ZodType> =
   | S // plain schema, default status codes applied
   | ApiResponse<S> // single response definition, status code(s) customizable
   | ApiResponse<S>[]; // Feature #1431: different responses for different status codes (non-empty, prog. check!)
@@ -144,10 +144,10 @@ export const arrayResultHandler = new ResultHandler({
     // Examples are taken for pulling down: no validation needed for this, no pulling up
     const examples = getExamples({ schema: output });
     const responseSchema =
-      "shape" in output &&
+      output instanceof z.ZodObject &&
       "items" in output.shape &&
       output.shape.items instanceof z.ZodArray
-        ? (output.shape.items as z.ZodArray<z.ZodTypeAny>)
+        ? output.shape.items
         : z.array(z.any());
     return examples.reduce<typeof responseSchema>(
       (acc, example) =>
@@ -167,7 +167,7 @@ export const arrayResultHandler = new ResultHandler({
         .type("text/plain")
         .send(getPublicErrorMessage(httpError));
     }
-    if (output && "items" in output && Array.isArray(output.items)) {
+    if ("items" in output && Array.isArray(output.items)) {
       return void response
         .status(defaultStatusCodes.positive)
         .json(output.items);

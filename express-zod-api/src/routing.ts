@@ -67,7 +67,7 @@ export const initRouting = ({
   const familiar = new Map<string, Siblings>();
   const onEndpoint: OnEndpoint = (endpoint, path, method) => {
     if (!isProduction()) {
-      doc?.checkJsonCompat(endpoint, { path, method });
+      doc?.checkSchema(endpoint, { path, method });
       doc?.checkPathParams(path, endpoint, { method });
     }
     const matchingParsers = parsers?.[endpoint.requestType] || [];
