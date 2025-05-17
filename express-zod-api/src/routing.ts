@@ -25,8 +25,8 @@ export interface Routing {
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
 const lineUp = (methods: Array<Method | AuxMethod>) =>
-  methods // options is last:
-    .toSorted((a, b) => +(a === "options") - +(b === "options"))
+  methods // options is last, fine to sort in-place
+    .sort((a, b) => +(a === "options") - +(b === "options"))
     .join(", ")
     .toUpperCase();
 
