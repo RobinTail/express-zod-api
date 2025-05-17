@@ -76,6 +76,7 @@ export const initRouting = ({
   };
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
   doc = undefined; // hint for garbage collector
+  const deprioritized = new Map<string, RequestHandler>();
   for (const [path, methods] of familiar) {
     const aux = methods.get("options");
     if (aux && methods.delete("options")) methods.set("options", aux); // mv to the end
@@ -95,10 +96,8 @@ export const initRouting = ({
       };
       app[method](path, ...matchingParsers, handler);
     }
+    if (config.wrongMethodBehavior === 404) continue;
+    deprioritized.set(path, createWrongMethodHandler(accessMethods));
   }
-  if (config.wrongMethodBehavior === 404) return;
-  for (const [path, methods] of familiar) {
-    const accessMethods = Array.from(methods.keys()); // @todo it has to go after, but DNRY?
-    app.all(path, createWrongMethodHandler(accessMethods));
-  }
+  for (const [path, handler] of deprioritized) app.all(path, handler);
 };
