@@ -24,11 +24,14 @@ export interface Routing {
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
+const lineUp = (methods: Array<Method | AuxMethod>) =>
+  methods.join(", ").toUpperCase();
+
 /** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405 */
 export const createWrongMethodHandler =
   (allowedMethods: Array<Method | AuxMethod>): RequestHandler =>
   ({ method }, res, next) => {
-    const Allow = allowedMethods.join(", ").toUpperCase();
+    const Allow = lineUp(allowedMethods);
     res.set({ Allow }); // in case of a custom errorHandler configured that does not care about headers in error
     const error = createHttpError(405, `${method} is not allowed`, {
       headers: { Allow },
@@ -75,10 +78,9 @@ export const initRouting = ({
       const handler: RequestHandler = async (request, response) => {
         const logger = getLogger(request);
         if (config.cors) {
-          const methodsLine = accessMethods.join(", ").toUpperCase();
           const defaultHeaders: Record<string, string> = {
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": methodsLine,
+            "Access-Control-Allow-Methods": lineUp(accessMethods),
             "Access-Control-Allow-Headers": "content-type",
           };
           const headers =
