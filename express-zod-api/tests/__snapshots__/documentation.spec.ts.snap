@@ -632,7 +632,7 @@ paths:
             items:
               type: integer
               exclusiveMinimum: 0
-              exclusiveMaximum: 9007199254740991
+              maximum: 9007199254740991
         - name: unlimited
           in: query
           required: true
@@ -1091,7 +1091,7 @@ paths:
                         two:
                           type: integer
                           exclusiveMinimum: 0
-                          exclusiveMaximum: 9007199254740991
+                          maximum: 9007199254740991
                       required:
                         - one
                         - two
@@ -1099,7 +1099,7 @@ paths:
                       properties:
                         two:
                           type: integer
-                          exclusiveMinimum: -9007199254740991
+                          minimum: -9007199254740991
                           exclusiveMaximum: 0
                         three:
                           type: string
@@ -1128,7 +1128,7 @@ paths:
                           - type: string
                           - type: integer
                             exclusiveMinimum: 0
-                            exclusiveMaximum: 9007199254740991
+                            maximum: 9007199254740991
                     required:
                       - or
                 required:
@@ -1474,10 +1474,10 @@ paths:
                 intPositive:
                   type: integer
                   exclusiveMinimum: 0
-                  exclusiveMaximum: 9007199254740991
+                  maximum: 9007199254740991
                 intNegative:
                   type: integer
-                  exclusiveMinimum: -9007199254740991
+                  minimum: -9007199254740991
                   exclusiveMaximum: 0
                 intLimited:
                   type: integer
@@ -1955,7 +1955,7 @@ paths:
                 two:
                   type: integer
                   exclusiveMinimum: 0
-                  exclusiveMaximum: 9007199254740991
+                  maximum: 9007199254740991
               required:
                 - one
                 - two
@@ -2061,7 +2061,7 @@ paths:
                     - type: string
                     - type: integer
                       exclusiveMinimum: 0
-                      exclusiveMaximum: 9007199254740991
+                      maximum: 9007199254740991
                   items:
                     not: {}
               required:
@@ -3861,7 +3861,7 @@ paths:
                         description: some positive integer
                         type: integer
                         exclusiveMinimum: 0
-                        exclusiveMaximum: 9007199254740991
+                        maximum: 9007199254740991
                     required:
                       - result
                 required:
