@@ -320,21 +320,22 @@ describe("Routing", () => {
       );
     });
 
-    test("Should handle explicitly specified method", () => {
-      const endpointMock = new EndpointsFactory(defaultResultHandler).build({
-        output: z.object({}),
+    test("Should handle explicitly specified method", async () => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).buildVoid({
         handler: vi.fn(),
       });
       const logger = makeLoggerMock();
       initRouting({
         app: appMock as unknown as IRouter,
         getLogger: () => logger,
-        config: { cors: false },
+        config: { cors: true },
         routing: {
           v1: {
-            "get ///user/retrieve///": endpointMock,
+            "get ///user/retrieve///": endpoint,
+            user: {
+              "post retrieve": endpoint,
+            },
           },
-          "post another": endpointMock,
         },
       });
       expect(appMock.get).toHaveBeenCalledOnce();
@@ -344,9 +345,25 @@ describe("Routing", () => {
       );
       expect(appMock.post).toHaveBeenCalledOnce();
       expect(appMock.post).toHaveBeenCalledWith(
-        "/another",
+        "/v1/user/retrieve",
         expect.any(Function),
       );
+      expect(appMock.options).toHaveBeenCalledTimes(1);
+      expect(appMock.options.mock.calls[0]).toEqual([
+        "/v1/user/retrieve",
+        expect.any(Function),
+      ]);
+      const fn = appMock.options.mock.calls[0][1]; // similar to issue 705
+      const requestMock = makeRequestMock({ method: "POST" });
+      const responseMock = makeResponseMock();
+      await fn(requestMock, responseMock);
+      expect(responseMock._getStatusCode()).toBe(200);
+      expect(responseMock._getHeaders()).toEqual({
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET, POST, OPTIONS",
+        "access-control-allow-headers": "content-type",
+        "content-type": "application/json",
+      });
     });
 
     test("Should check if endpoint supports an explicitly specified method", () => {

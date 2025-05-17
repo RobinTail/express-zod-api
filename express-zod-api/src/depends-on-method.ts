@@ -12,18 +12,15 @@ export class DependsOnMethod extends Routable {
   }
 
   /**
-   * @desc [method, endpoint, siblingMethods]
+   * @desc [method, endpoint]
    * @internal
    * */
-  public get entries(): ReadonlyArray<[Method, AbstractEndpoint, Method[]]> {
-    const entries: Array<(typeof this.entries)[number]> = [];
-    const methods = R.keys(this.#endpoints); // eslint-disable-line no-restricted-syntax -- literal type required
-    for (const method of methods) {
-      const endpoint = this.#endpoints[method];
-      if (endpoint)
-        entries.push([method, endpoint, R.reject(R.equals(method), methods)]);
-    }
-    return Object.freeze(entries);
+  public get entries() {
+    const nonempty = R.filter(
+      (pair): pair is [Method, AbstractEndpoint] => Boolean(pair[1]),
+      Object.entries(this.#endpoints),
+    );
+    return Object.freeze(nonempty);
   }
 
   public override deprecated() {
