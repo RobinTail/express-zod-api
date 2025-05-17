@@ -45,7 +45,7 @@ describe("Checks", () => {
       ).toBeUndefined();
     });
 
-    test("should finish early (from bottom to top)", () => {
+    test("should finish early (from top to bottom)", () => {
       const subject = z.object({
         one: z.object({
           two: z.object({
@@ -53,7 +53,7 @@ describe("Checks", () => {
           }),
         }),
       });
-      const check = vi.fn((schema) => schema instanceof z.ZodNumber);
+      const check = vi.fn((schema) => schema instanceof z.ZodObject);
       findNestedSchema(subject, {
         condition: check,
         io: "input",
