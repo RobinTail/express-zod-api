@@ -39,6 +39,12 @@ export const createWrongMethodHandler =
     next(error);
   };
 
+const makeCorsHeaders = (accessMethods: Array<Method | AuxMethod>) => ({
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": lineUp(accessMethods),
+  "Access-Control-Allow-Headers": "content-type",
+});
+
 export const initRouting = ({
   app,
   getLogger,
@@ -78,11 +84,7 @@ export const initRouting = ({
       const handler: RequestHandler = async (request, response) => {
         const logger = getLogger(request);
         if (config.cors) {
-          const defaultHeaders: Record<string, string> = {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": lineUp(accessMethods),
-            "Access-Control-Allow-Headers": "content-type",
-          };
+          const defaultHeaders = makeCorsHeaders(accessMethods);
           const headers =
             typeof config.cors === "function"
               ? await config.cors({ request, endpoint, logger, defaultHeaders })
