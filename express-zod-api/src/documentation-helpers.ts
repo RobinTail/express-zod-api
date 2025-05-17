@@ -144,13 +144,6 @@ export const depictIntersection = R.tryCatch<Depicter>(
   (_err, { jsonSchema }) => jsonSchema,
 );
 
-/** @since OAS 3.1 nullable replaced with type array having null */
-export const depictNullable: Depicter = ({ jsonSchema }) => {
-  if (!jsonSchema.anyOf) return jsonSchema;
-  const original = jsonSchema.anyOf[0];
-  return Object.assign(original, { type: makeNullableType(original.type) });
-};
-
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
   subject in samples;
 
@@ -191,11 +184,7 @@ const ensureCompliance = ({
 }: JSONSchema.BaseSchema): SchemaObject | ReferenceObject => {
   if ($ref) return { $ref };
   const valid: SchemaObject = {
-    type: Array.isArray(type)
-      ? type.filter(isSupportedType)
-      : type && isSupportedType(type)
-        ? type
-        : undefined,
+    type: type && isSupportedType(type) ? type : undefined,
     ...rest,
   };
   // eslint-disable-next-line no-restricted-syntax -- need typed key here
@@ -253,20 +242,6 @@ const makeSample = (depicted: SchemaObject) => {
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
   return samples?.[firstType];
-};
-
-/** @since v24.0.0 does not return null for undefined */
-const makeNullableType = (
-  current:
-    | JSONSchema.BaseSchema["type"]
-    | Array<NonNullable<JSONSchema.BaseSchema["type"]>>,
-): typeof current => {
-  if (current === ("null" satisfies SchemaObjectType)) return current;
-  if (typeof current === "string")
-    return [current, "null" satisfies SchemaObjectType];
-  return (
-    current && [...new Set(current).add("null" satisfies SchemaObjectType)]
-  );
 };
 
 export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
@@ -397,7 +372,6 @@ export const depictRequestParams = ({
 
 const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
   {
-    nullable: depictNullable,
     default: depictDefault,
     union: depictUnion,
     bigint: depictBigInt,
