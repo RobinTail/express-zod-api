@@ -6,7 +6,12 @@
 
 - Switched to Zod 4:
   - Minimum supported version of `zod` is 3.25.0, BUT imports MUST be from `zod/v4`;
-  - Find out why it's so weird here: https://github.com/colinhacks/zod/issues/4371
+    - Explanation of the versioning strategy: https://github.com/colinhacks/zod/issues/4371;
+    - Express Zod API, however, is not aiming to support both Zod 3 and Zod 4 simultaneously due to:
+      - incompatibility of data structures;
+      - operating composite schemas (need to avoid mixing schemas of different versions);
+      - the temporary nature of this transition;
+      - the advantages of Zod 4 that provide opportunities to simplifications and corrections of known issues.
   - `IOSchema` type had to be simplified down to a schema resulting to an `object`, but not an `array`;
   - Despite supporting examples by the new Zod method `.meta()`, users should still use `.example()` to set them;
   - Refer to [Migration guide on Zod 4](https://v4.zod.dev/v4/changelog) for adjusting your schemas;
@@ -23,6 +28,23 @@
   - `z.any()` and `z.unknown()` are not optional, details: https://v4.zod.dev/v4/changelog#changes-zunknown-optionality.
 - Changes to the plugin:
   - Brand is the only kind of metadata that withstands refinements and checks.
+- Consider the automated migration using the built-in ESLint rule.
+
+```js
+// eslint.config.mjs — minimal ESLint 9 config to apply migrations automatically using "eslint --fix"
+import parser from "@typescript-eslint/parser";
+import migration from "express-zod-api/migration";
+
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v24": "error" } },
+];
+```
+
+```diff
+- import { z } from "zod";
++ import { z } from "zod/v4";
+```
 
 ## Version 23
 
