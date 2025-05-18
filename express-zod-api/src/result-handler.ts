@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { z } from "zod/v4";
+import { globalRegistry, z } from "zod/v4";
 import {
   ApiResponse,
   defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
-import { FlatObject, getExamples, isObject } from "./common-helpers";
+import { FlatObject, isObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
@@ -96,8 +96,7 @@ export class ResultHandler<
 
 export const defaultResultHandler = new ResultHandler({
   positive: (output) => {
-    // Examples are taken for proxying: no validation needed for this
-    const examples = getExamples({ schema: output, pullProps: true });
+    const { examples = [] } = globalRegistry.get(output) || {};
     const responseSchema = z.object({
       status: z.literal("success"),
       data: output,
@@ -141,8 +140,7 @@ export const defaultResultHandler = new ResultHandler({
  * */
 export const arrayResultHandler = new ResultHandler({
   positive: (output) => {
-    // Examples are taken for pulling down: no validation needed for this, no pulling up
-    const examples = getExamples({ schema: output });
+    const { examples = [] } = globalRegistry.get(output) || {};
     const responseSchema =
       output instanceof z.ZodObject &&
       "items" in output.shape &&

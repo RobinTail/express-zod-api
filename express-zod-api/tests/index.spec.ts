@@ -102,9 +102,7 @@ describe("Index Entrypoint", () => {
         .toEqualTypeOf<(value: any) => z.ZodAny>();
       expectTypeOf<z.ZodDefault<z.ZodString>>()
         .toHaveProperty("example")
-        .toEqualTypeOf<
-          (value: string | undefined) => z.ZodDefault<z.ZodString>
-        >();
+        .toEqualTypeOf<(value: string) => z.ZodDefault<z.ZodString>>();
       expectTypeOf<z.ZodDefault<z.ZodString>>()
         .toHaveProperty("label")
         .toEqualTypeOf<(value: string) => z.ZodDefault<z.ZodString>>();

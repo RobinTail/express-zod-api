@@ -27,7 +27,6 @@ import { globalRegistry, z } from "zod/v4";
 import { ResponseVariant } from "./api-response";
 import {
   FlatObject,
-  getExamples,
   getRoutePathParams,
   getTransformedType,
   isObject,
@@ -414,15 +413,17 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     [ezRawBrand]: depictRaw,
   };
 
-const onEach: Depicter = ({ zodSchema, jsonSchema }, { isResponse }) => {
+// @todo might no longer be needed
+const onEach: Depicter = ({ jsonSchema }) => {
   const result = { ...jsonSchema };
+  /*
   const examples = getExamples({
     schema: zodSchema,
-    variant: isResponse ? "parsed" : "original",
     validate: true,
     pullProps: true,
   });
   if (examples.length) result.examples = examples.slice();
+   */
   return result;
 };
 
