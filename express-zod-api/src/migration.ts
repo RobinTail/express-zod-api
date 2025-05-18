@@ -14,6 +14,7 @@ interface Queries {
   optionalPropStyle: NamedProp;
   depicter: TSESTree.ArrowFunctionExpression;
   nextCall: TSESTree.CallExpression;
+  zod: TSESTree.ImportDeclaration;
 }
 
 type Listener = keyof Queries;
@@ -31,6 +32,7 @@ const queries: Record<Listener, string> = {
   nextCall:
     `${NT.VariableDeclarator}[id.typeAnnotation.typeAnnotation.typeName.name='Depicter'] > ` +
     `${NT.ArrowFunctionExpression} ${NT.CallExpression}[callee.name='next']`,
+  zod: `${NT.ImportDeclaration}[source.value='zod']`,
 };
 
 const listen = <
@@ -119,6 +121,13 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
           messageId: "change",
           data: { subject: "statement", from: "next()", to: "jsonSchema" },
           fix: (fixer) => fixer.replaceText(node, "jsonSchema"),
+        }),
+      zod: (node) =>
+        ctx.report({
+          node: node.source,
+          messageId: "change",
+          data: { subject: "import", from: "zod", to: "zod/v4" },
+          fix: (fixer) => fixer.replaceText(node.source, `"zod/v4"`),
         }),
     }),
 });
