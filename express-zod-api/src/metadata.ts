@@ -5,7 +5,6 @@ import * as R from "ramda";
 export const metaSymbol = Symbol.for("express-zod-api");
 
 export interface Metadata {
-  examples: unknown[];
   /** @override ZodDefault::_zod.def.defaultValue() in depictDefault */
   defaultLabel?: string;
   brand?: string | number | symbol;
@@ -17,10 +16,10 @@ export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
 ): B => {
   const srcMeta = src.meta();
   const destMeta = dest.meta();
-  if (!srcMeta?.[metaSymbol]) return dest; // ensures srcMeta[metaSymbol]
-  const examples = combinations(
-    destMeta?.[metaSymbol]?.examples || [],
-    srcMeta[metaSymbol].examples || [],
+  if (!srcMeta?.examples) return dest; // ensures srcMeta[metaSymbol]
+  const examples = combinations<z.output<A> & z.output<B>>(
+    destMeta?.examples || [],
+    srcMeta.examples || [],
     ([destExample, srcExample]) =>
       typeof destExample === "object" &&
       typeof srcExample === "object" &&
@@ -29,8 +28,5 @@ export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
         ? R.mergeDeepRight(destExample, srcExample)
         : srcExample, // not supposed to be called on non-object schemas
   );
-  return dest.meta({
-    ...destMeta,
-    [metaSymbol]: { ...destMeta?.[metaSymbol], examples },
-  });
+  return dest.meta({ ...destMeta, examples });
 };
