@@ -20,8 +20,9 @@ describe("Migration", () => {
   tester.run("v24", migration.rules.v24, {
     valid: [
       `new Documentation({});`,
-      `new Integration({})`,
-      `const rule: Depicter = () => {}`,
+      `new Integration({});`,
+      `const rule: Depicter = () => {};`,
+      `import {} from "zod/v4";`,
     ],
     invalid: [
       {
@@ -63,6 +64,16 @@ describe("Migration", () => {
           {
             messageId: "change",
             data: { subject: "statement", from: "next()", to: "jsonSchema" },
+          },
+        ],
+      },
+      {
+        code: `import {} from "zod";`,
+        output: `import {} from "zod/v4";`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "import", from: "zod", to: "zod/v4" },
           },
         ],
       },

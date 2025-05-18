@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { responseVariants } from "./api-response";
 import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";

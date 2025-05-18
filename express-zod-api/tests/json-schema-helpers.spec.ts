@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { flattenIO } from "../src/json-schema-helpers";
 
 describe("JSON Schema helpers", () => {

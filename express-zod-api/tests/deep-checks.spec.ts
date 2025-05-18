@@ -1,6 +1,6 @@
 import { UploadedFile } from "express-fileupload";
-import { globalRegistry, z } from "zod";
-import type { $brand, $ZodType } from "@zod/core";
+import { globalRegistry, z } from "zod/v4";
+import type { $brand, $ZodType } from "zod/v4/core";
 import { ez } from "../src";
 import { findNestedSchema, hasCycle } from "../src/deep-checks";
 import { metaSymbol } from "../src/metadata";

@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { mixExamples } from "./metadata";
 import { AbstractMiddleware } from "./middleware";
 

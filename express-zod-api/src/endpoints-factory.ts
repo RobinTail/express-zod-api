@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { EmptyObject, EmptySchema, FlatObject, Tag } from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
 import { IOSchema, getFinalEndpointInputSchema } from "./io-schema";

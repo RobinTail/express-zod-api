@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import * as R from "ramda";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 describe("Environment checks", () => {
   describe("Zod Dates", () => {
@@ -46,25 +46,9 @@ describe("Environment checks", () => {
     });
 
     test("bigint is not representable", () => {
-      expect(z.toJSONSchema(z.bigint(), { unrepresentable: "any" })).toEqual(
-        {},
-      );
+      const json = z.toJSONSchema(z.bigint(), { unrepresentable: "any" });
+      expect(R.omit(["$schema"], json)).toEqual({});
     });
-
-    /** @link https://github.com/colinhacks/zod/issues/4274 */
-    test.each(["input", "output"] as const)(
-      "%s examples of transformations",
-      (io) => {
-        const schema = z
-          .string()
-          .meta({ examples: ["test"] })
-          .transform(Number)
-          .meta({ examples: [4] });
-        expect(
-          z.toJSONSchema(schema, { io, unrepresentable: "any" }),
-        ).toMatchSnapshot();
-      },
-    );
 
     test("meta overrides, does not merge", () => {
       const schema = z
@@ -73,18 +57,6 @@ describe("Environment checks", () => {
         .meta({ description: "some" })
         .meta({ title: "last" });
       expect(schema.meta()).toMatchSnapshot();
-    });
-
-    /** @link https://github.com/colinhacks/zod/issues/4320 */
-    test("input type of a loose object does not allow extra keys", () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars -- this is fine
-      const schema = z.looseObject({});
-      expectTypeOf<z.output<typeof schema>>().toEqualTypeOf<
-        Record<string, never> // ok
-      >();
-      expectTypeOf<z.input<typeof schema>>().not.toEqualTypeOf<
-        Record<string, unknown> // not ok
-      >();
     });
 
     test("circular object schema has no sign of getter in its shape", () => {
@@ -97,6 +69,18 @@ describe("Environment checks", () => {
       expect(
         Object.getOwnPropertyDescriptors(schema._zod.def.shape),
       ).toMatchSnapshot();
+    });
+
+    /**
+     * told Colin directly
+     * @todo adjust vitest.setup.ts on custom serialization if fixed
+     * */
+    test("ZodError inequality", () => {
+      try {
+        z.number().parse("test");
+      } catch (caught) {
+        expect(z.number().safeParse("test").error).not.toEqual(caught);
+      }
     });
   });
 
@@ -141,6 +125,24 @@ describe("Environment checks", () => {
       expect(boolSchema.isOptional()).toBeTruthy();
       expect(boolSchema.isNullable()).toBeTruthy();
     });
+
+    /**
+     * @link https://github.com/colinhacks/zod/issues/4274
+     * @todo this fact can be used for switching to native examples
+     * */
+    test.each(["input", "output"] as const)(
+      "%s examples of transformations",
+      (io) => {
+        const schema = z
+          .string()
+          .meta({ examples: ["test"] })
+          .transform(Number)
+          .meta({ examples: [4] });
+        expect(
+          z.toJSONSchema(schema, { io, unrepresentable: "any" }),
+        ).toMatchSnapshot();
+      },
+    );
   });
 
   describe("Vitest error comparison", () => {

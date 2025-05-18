@@ -12,7 +12,7 @@ import {
   Depicter,
 } from "../src";
 import { contentTypes } from "../src/content-type";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { givePort } from "../../tools/ports";
 
 describe("Documentation", () => {

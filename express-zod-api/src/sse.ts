@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { EmptySchema, FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { EndpointsFactory } from "./endpoints-factory";

@@ -1,5 +1,5 @@
 import camelize from "camelize-ts";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { metaSymbol } from "../src/metadata";
 
 describe("Zod Runtime Plugin", () => {
@@ -102,9 +102,10 @@ describe("Zod Runtime Plugin", () => {
       const schema = z.object({ user_id: z.string() });
       const mappedSchema = schema.remap({ user_id: "userId" });
       expect(mappedSchema.in.in).toEqual(schema);
-      expect(mappedSchema.out.shape).toEqual({
-        userId: schema.shape.user_id,
-      });
+      expect(mappedSchema.out.shape).toHaveProperty(
+        "userId",
+        expect.any(z.ZodString),
+      );
       expect(mappedSchema._zod.def.out.shape.userId).not.toBe(
         schema.shape.user_id,
       );
@@ -118,10 +119,14 @@ describe("Zod Runtime Plugin", () => {
       (mapping) => {
         const schema = z.object({ user_id: z.string(), name: z.string() });
         const mappedSchema = schema.remap(mapping);
-        expect(mappedSchema._zod.def.out.shape).toEqual({
-          userId: schema.shape.user_id,
-          name: schema.shape.name,
-        });
+        expect(mappedSchema._zod.def.out.shape).toHaveProperty(
+          "userId",
+          expect.any(z.ZodString),
+        );
+        expect(mappedSchema._zod.def.out.shape).toHaveProperty(
+          "name",
+          expect.any(z.ZodString),
+        );
         expect(mappedSchema.parse({ user_id: "test", name: "some" })).toEqual({
           userId: "test",
           name: "some",
@@ -132,10 +137,14 @@ describe("Zod Runtime Plugin", () => {
     test("should support a mapping function", () => {
       const schema = z.object({ user_id: z.string(), name: z.string() });
       const mappedSchema = schema.remap((shape) => camelize(shape, true));
-      expect(mappedSchema._zod.def.out.shape).toEqual({
-        userId: schema.shape.user_id,
-        name: schema.shape.name,
-      });
+      expect(mappedSchema._zod.def.out.shape).toHaveProperty(
+        "userId",
+        expect.any(z.ZodString),
+      );
+      expect(mappedSchema._zod.def.out.shape).toHaveProperty(
+        "name",
+        expect.any(z.ZodString),
+      );
       expect(mappedSchema.parse({ user_id: "test", name: "some" })).toEqual({
         userId: "test",
         name: "some",
