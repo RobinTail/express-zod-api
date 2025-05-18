@@ -13,6 +13,7 @@ import {
   excludeParamsFromDepiction,
   defaultIsHeader,
   reformatParamsInPath,
+  depictNullable,
   depictDefault,
   depictRaw,
   depictUpload,
@@ -292,6 +293,37 @@ describe("Documentation helpers", () => {
       expect(
         depictIntersection({ zodSchema: z.never(), jsonSchema }, requestCtx),
       ).toHaveProperty("allOf");
+    });
+  });
+
+  describe("depictNullable()", () => {
+    test.each([requestCtx, responseCtx])(
+      "should add null type to the first of anyOf %#",
+      (ctx) => {
+        const jsonSchema: JSONSchema.BaseSchema = {
+          anyOf: [{ type: "string" }, { type: "null" }],
+        };
+        expect(
+          depictNullable({ zodSchema: z.never(), jsonSchema }, ctx),
+        ).toMatchSnapshot();
+      },
+    );
+
+    test.each([
+      { type: "null" },
+      {
+        anyOf: [{ type: "null" }, { type: "null" }],
+      },
+      {
+        anyOf: [
+          { type: ["string", "null"] as unknown as string }, // nullable of nullable case
+          { type: "null" },
+        ],
+      },
+    ])("should not add null type when it's already there %#", (jsonSchema) => {
+      expect(
+        depictNullable({ zodSchema: z.never(), jsonSchema }, requestCtx),
+      ).toMatchSnapshot();
     });
   });
 
