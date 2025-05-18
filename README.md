@@ -168,7 +168,7 @@ Install the framework, its peer dependencies and type assistance packages using 
 
 ```shell
 # example for yarn:
-yarn add express-zod-api express zod@3 typescript http-errors
+yarn add express-zod-api express zod typescript http-errors
 yarn add -D @types/express @types/node @types/http-errors
 ```
 
