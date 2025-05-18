@@ -79,7 +79,10 @@ describe("Environment checks", () => {
       try {
         z.number().parse("test");
       } catch (caught) {
-        expect(z.number().safeParse("test").error).not.toEqual(caught);
+        const returned = z.number().safeParse("test").error;
+        expect(returned).not.toEqual(caught);
+        expect(returned).toBeInstanceOf(z.ZodError);
+        expect(caught).toBeInstanceOf(z.ZodError);
       }
     });
   });
