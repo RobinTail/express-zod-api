@@ -70,6 +70,18 @@ describe("Environment checks", () => {
         Object.getOwnPropertyDescriptors(schema._zod.def.shape),
       ).toMatchSnapshot();
     });
+
+    /**
+     * told Colin directly
+     * @todo adjust vitest.setup.ts on custom serialization if fixed
+     * */
+    test("ZodError inequality", () => {
+      try {
+        z.number().parse("test");
+      } catch (caught) {
+        expect(z.number().safeParse("test").error).not.toEqual(caught);
+      }
+    });
   });
 
   describe("Zod new features", () => {
