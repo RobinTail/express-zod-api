@@ -125,6 +125,24 @@ describe("Environment checks", () => {
       expect(boolSchema.isOptional()).toBeTruthy();
       expect(boolSchema.isNullable()).toBeTruthy();
     });
+
+    /**
+     * @link https://github.com/colinhacks/zod/issues/4274
+     * @todo this fact can be used for switching to native examples
+     * */
+    test.each(["input", "output"] as const)(
+      "%s examples of transformations",
+      (io) => {
+        const schema = z
+          .string()
+          .meta({ examples: ["test"] })
+          .transform(Number)
+          .meta({ examples: [4] });
+        expect(
+          z.toJSONSchema(schema, { io, unrepresentable: "any" }),
+        ).toMatchSnapshot();
+      },
+    );
   });
 
   describe("Vitest error comparison", () => {
