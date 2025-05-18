@@ -58,18 +58,13 @@ export const hasCycle = (
   return false;
 };
 
-/** @todo can simplify that? */
 export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
-  findNestedSchema(subject, {
-    condition: (schema) =>
-      globalRegistry.get(schema)?.[metaSymbol]?.brand === ezUploadBrand,
-    io: "input",
-  }) ||
   findNestedSchema(subject, {
     condition: (schema) => {
       const { brand } = globalRegistry.get(schema)?.[metaSymbol] || {};
       return (
-        typeof brand === "symbol" && [ezRawBrand, ezFormBrand].includes(brand)
+        typeof brand === "symbol" &&
+        [ezUploadBrand, ezRawBrand, ezFormBrand].includes(brand)
       );
     },
     io: "input",
