@@ -49,7 +49,7 @@ jobs:
           name: dist
       - name: Add dependencies
         run: |
-          yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod@^4.0.0-beta.20250505T195954
+          yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod@next
           yarn add -D eslint@9.0 typescript-eslint@8.0 vitest tsx
           yarn add express-zod-api@./dist.tgz
       - name: Run tests
