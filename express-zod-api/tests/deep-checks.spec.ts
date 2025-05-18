@@ -45,7 +45,7 @@ describe("Checks", () => {
       ).toBeUndefined();
     });
 
-    test("should finish early bottom to top", () => {
+    test("should finish early (from bottom to top)", () => {
       const subject = z.object({
         one: z.object({
           two: z.object({
