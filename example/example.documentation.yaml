@@ -271,7 +271,7 @@ paths:
                       id:
                         type: integer
                         exclusiveMinimum: 0
-                        exclusiveMaximum: 9007199254740991
+                        maximum: 9007199254740991
                     required:
                       - id
                 required:
@@ -293,7 +293,7 @@ paths:
                       id:
                         type: integer
                         exclusiveMinimum: 0
-                        exclusiveMaximum: 9007199254740991
+                        maximum: 9007199254740991
                     required:
                       - id
                 required:
@@ -613,7 +613,7 @@ paths:
                   data:
                     type: integer
                     exclusiveMinimum: 0
-                    exclusiveMaximum: 9007199254740991
+                    maximum: 9007199254740991
                   event:
                     type: string
                     const: time
@@ -622,7 +622,7 @@ paths:
                   retry:
                     type: integer
                     exclusiveMinimum: 0
-                    exclusiveMaximum: 9007199254740991
+                    maximum: 9007199254740991
                 required:
                   - data
                   - event
@@ -676,7 +676,7 @@ paths:
                       crc:
                         type: integer
                         exclusiveMinimum: 0
-                        exclusiveMaximum: 9007199254740991
+                        maximum: 9007199254740991
                     required:
                       - crc
                 required:
