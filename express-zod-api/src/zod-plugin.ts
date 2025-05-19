@@ -93,7 +93,7 @@ const brandSetter = function (
   const { [metaSymbol]: internal = { examples: [] }, ...rest } =
     this.meta() || {};
   return this.meta({
-    ...rest,
+    ...rest, // @todo this may no longer be required since it seems that .meta() merges now, not just overrides
     [metaSymbol]: { ...internal, brand },
   });
 };
