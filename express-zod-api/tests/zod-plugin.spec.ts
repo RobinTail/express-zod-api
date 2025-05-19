@@ -79,7 +79,7 @@ describe("Zod Runtime Plugin", () => {
       );
     });
 
-    test("should withstand refinements", () => {
+    test.skip("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = schema.brand("test");
       expect(schemaWithMeta.meta()?.[metaSymbol]).toHaveProperty(

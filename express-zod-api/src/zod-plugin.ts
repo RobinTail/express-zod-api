@@ -6,10 +6,9 @@
  * @desc Enables .label() on ZodDefault
  * @desc Enables .remap() on ZodObject
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
- * @desc Ensures that the brand withstands additional refinements or checks
  * */
 import * as R from "ramda";
-import { z, globalRegistry } from "zod/v4";
+import { z } from "zod/v4";
 import { FlatObject } from "./common-helpers";
 import { Metadata, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
@@ -127,7 +126,6 @@ if (!(metaSymbol in globalThis)) {
     if (/(Success|Error|Function)$/.test(entry)) continue;
     const Cls = z[entry as keyof typeof z];
     if (typeof Cls !== "function") continue;
-    let originalCheck: z.ZodType["check"];
     Object.defineProperties(Cls.prototype, {
       ["example" satisfies keyof z.ZodType]: {
         get(): z.ZodType["example"] {
@@ -143,25 +141,6 @@ if (!(metaSymbol in globalThis)) {
         set() {}, // this is required to override the existing method
         get() {
           return brandSetter.bind(this) as z.ZodType["brand"];
-        },
-      },
-      ["check" satisfies keyof z.ZodType]: {
-        set(fn) {
-          originalCheck = fn;
-        },
-        get(): z.ZodType["check"] {
-          return function (
-            this: z.ZodType,
-            ...args: Parameters<z.ZodType["check"]>
-          ) {
-            /** @link https://v4.zod.dev/metadata#register */
-            return originalCheck.apply(this, args).register(globalRegistry, {
-              [metaSymbol]: {
-                examples: [],
-                brand: this.meta()?.[metaSymbol]?.brand,
-              },
-            });
-          };
         },
       },
     });

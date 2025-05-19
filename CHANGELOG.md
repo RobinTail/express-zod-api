@@ -26,8 +26,6 @@
   - Use `.or(z.undefined())` to add `undefined` to the type of the object property;
   - Reasoning: https://x.com/colinhacks/status/1919292504861491252;
   - `z.any()` and `z.unknown()` are not optional, details: https://v4.zod.dev/v4/changelog#changes-zunknown-optionality.
-- Changes to the plugin:
-  - Brand is the only kind of metadata that withstands refinements and checks.
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
