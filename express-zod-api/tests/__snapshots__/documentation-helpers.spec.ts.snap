@@ -657,7 +657,7 @@ exports[`Documentation helpers > depictNumber() > should not use numericRange wh
 
 exports[`Documentation helpers > depictNumber() > should not use numericRange when it is null 1 1`] = `
 {
-  "format": "int64",
+  "format": undefined,
   "maximum": undefined,
   "minimum": undefined,
   "type": "integer",
@@ -693,7 +693,7 @@ exports[`Documentation helpers > depictNumber() > should use numericRange when s
 
 exports[`Documentation helpers > depictNumber() > should use numericRange when set 1 1`] = `
 {
-  "format": "int64",
+  "format": "int32",
   "maximum": 100,
   "minimum": -100,
   "type": "integer",

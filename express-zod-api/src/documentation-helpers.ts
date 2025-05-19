@@ -447,6 +447,8 @@ export const depictString: Depicter = ({
   return result;
 };
 
+const maxUInt32 = 2 ** 32 - 1;
+
 /** @since OAS 3.1: exclusive min/max are numbers */
 export const depictNumber: Depicter = (
   { isInt, maxValue, minValue, _def: { checks } }: z.ZodNumber,
@@ -471,7 +473,13 @@ export const depictNumber: Depicter = (
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
   const result: SchemaObject = {
     type: isInt ? "integer" : "number",
-    format: isInt ? "int64" : "double",
+    format: isInt
+      ? intRange
+        ? intRange[1] - intRange[0] <= maxUInt32
+          ? "int32"
+          : "int64"
+        : undefined
+      : "double",
   };
   if (isMinInclusive) result.minimum = minimum;
   else result.exclusiveMinimum = minimum;
