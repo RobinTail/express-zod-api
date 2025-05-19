@@ -1,4 +1,5 @@
-import { combinations } from "./common-helpers";
+import type { $ZodObject } from "zod/v4/core";
+import { combinations, isSchema, pullExampleProps } from "./common-helpers";
 import { z } from "zod/v4";
 import * as R from "ramda";
 
@@ -16,10 +17,10 @@ export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
 ): B => {
   const srcMeta = src.meta();
   const destMeta = dest.meta();
-  if (!srcMeta?.examples) return dest; // ensures srcMeta[metaSymbol]
   const examples = combinations<z.output<A> & z.output<B>>(
     destMeta?.examples || [],
-    srcMeta.examples || [],
+    srcMeta?.examples ||
+      (isSchema<$ZodObject>(src, "object") ? pullExampleProps(src) : []),
     ([destExample, srcExample]) =>
       typeof destExample === "object" &&
       typeof srcExample === "object" &&

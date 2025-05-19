@@ -125,6 +125,7 @@ if (!(metaSymbol in globalThis)) {
     const Cls = z[entry as keyof typeof z];
     if (typeof Cls !== "function") continue;
     let originalCheck: z.ZodType["check"];
+    let originalTransform: z.ZodType["transform"];
     Object.defineProperties(Cls.prototype, {
       ["example" satisfies keyof z.ZodType]: {
         get(): z.ZodType["example"] {
@@ -156,6 +157,22 @@ if (!(metaSymbol in globalThis)) {
               [metaSymbol]: { brand: this.meta()?.[metaSymbol]?.brand },
             });
           };
+        },
+      },
+      ["transform" satisfies keyof z.ZodType]: {
+        set(fn) {
+          originalTransform = fn;
+        },
+        get(): z.ZodType["transform"] {
+          return function (this: z.ZodType, ...args) {
+            const { examples } = globalRegistry.get(this) || {};
+            const result = originalTransform.apply(this, args);
+            return result.register(globalRegistry, {
+              examples: examples?.map(
+                (one) => result.parse(one) as ReturnType<(typeof args)[0]>,
+              ) as z.$output[],
+            });
+          } as z.ZodType["transform"];
         },
       },
     });

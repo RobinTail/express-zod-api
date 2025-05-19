@@ -3289,6 +3289,11 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - a: first
+                        b: prefix_first
+                      - a: second
+                        b: prefix_second
                     type: object
                     properties:
                       a:
@@ -3298,11 +3303,6 @@ paths:
                     required:
                       - a
                       - b
-                    examples:
-                      - a: first
-                        b: prefix_first
-                      - a: second
-                        b: prefix_second
                 required:
                   - status
                   - data
@@ -3487,14 +3487,14 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - num: 123
                     type: object
                     properties:
                       num:
                         type: number
                     required:
                       - num
-                    examples:
-                      - num: 123
                 required:
                   - status
                   - data
@@ -3577,14 +3577,14 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
                         type: string
                     required:
                       - numericStr
-                    examples:
-                      - numericStr: "123"
                 required:
                   - status
                   - data
@@ -3673,14 +3673,14 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
                         type: string
                     required:
                       - numericStr
-                    examples:
-                      - numericStr: "123"
                 required:
                   - status
                   - data
