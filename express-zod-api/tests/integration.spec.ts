@@ -108,7 +108,7 @@ describe("Integration", () => {
         schema: ReturnType<z.ZodType["brand"]>,
         { next },
       ) => {
-        globalRegistry.remove(schema);
+        delete schema._zod.bag.brand;
         return next(schema);
       };
       const client = new Integration({

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod/v4";
+import { z } from "zod/v4";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { findRequestTypeDefiningSchema } from "./deep-checks";
 import {
@@ -20,7 +20,6 @@ import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer } from "./logical-container";
-import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
@@ -144,7 +143,7 @@ export class Endpoint<
   public override get requestType() {
     const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
     if (found) {
-      const { brand } = globalRegistry.get(found)?.[metaSymbol] || {};
+      const { brand } = found._zod.bag;
       if (brand === ezUploadBrand) return "upload";
       if (brand === ezRawBrand) return "raw";
       if (brand === ezFormBrand) return "form";

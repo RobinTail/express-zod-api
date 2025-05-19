@@ -463,8 +463,7 @@ const depict = (
       unrepresentable: "any",
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
-        const { brand } =
-          globalRegistry.get(zodCtx.zodSchema)?.[metaSymbol] ?? {};
+        const { brand } = zodCtx.zodSchema._zod.bag;
         const depicter =
           rules[
             brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type

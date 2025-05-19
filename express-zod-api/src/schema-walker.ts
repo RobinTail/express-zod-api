@@ -1,7 +1,5 @@
 import type { $ZodType, $ZodTypeDef } from "zod/v4/core";
-import { globalRegistry } from "zod/v4";
 import type { EmptyObject, FlatObject } from "./common-helpers";
-import { metaSymbol } from "./metadata";
 
 export type FirstPartyKind = $ZodTypeDef["type"];
 
@@ -51,7 +49,7 @@ export const walkSchema = <
     onMissing: SchemaHandler<U, Context, "last">;
   },
 ): U => {
-  const brand = globalRegistry.get(schema)?.[metaSymbol]?.brand;
+  const { brand } = schema._zod.bag;
   const handler =
     brand && brand in rules
       ? rules[brand as keyof typeof rules]
