@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { globalRegistry, z } from "zod/v4";
+import { z } from "zod/v4";
 import {
   EndpointsFactory,
   Integration,
