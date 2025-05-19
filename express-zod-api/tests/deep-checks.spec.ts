@@ -3,12 +3,13 @@ import { z } from "zod/v4";
 import type { $brand, $ZodType } from "zod/v4/core";
 import { ez } from "../src";
 import { findNestedSchema, hasCycle } from "../src/deep-checks";
+import { getBrand } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("Checks", () => {
   describe("findNestedSchema()", () => {
     const condition = (subject: $ZodType) =>
-      subject._zod.bag.brand === ezUploadBrand;
+      getBrand(subject) === ezUploadBrand;
 
     test("should return true for given argument satisfying condition", () => {
       expect(

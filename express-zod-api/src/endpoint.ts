@@ -20,6 +20,7 @@ import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer } from "./logical-container";
+import { getBrand } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
@@ -143,7 +144,7 @@ export class Endpoint<
   public override get requestType() {
     const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
     if (found) {
-      const { brand } = found._zod.bag;
+      const brand = getBrand(found);
       if (brand === ezUploadBrand) return "upload";
       if (brand === ezRawBrand) return "raw";
       if (brand === ezFormBrand) return "form";

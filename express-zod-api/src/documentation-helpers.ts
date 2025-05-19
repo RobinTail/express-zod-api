@@ -47,7 +47,7 @@ import { ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { flattenIO } from "./json-schema-helpers";
 import { Alternatives } from "./logical-container";
-import { metaSymbol } from "./metadata";
+import { getBrand, metaSymbol } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
@@ -463,15 +463,10 @@ const depict = (
       unrepresentable: "any",
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
-        const { brand } = zodCtx.zodSchema._zod.bag;
+        const brand = getBrand(zodCtx.zodSchema);
         const depicter =
           rules[
-            (typeof brand === "symbol" ||
-              typeof brand === "string" ||
-              typeof brand === "number") &&
-            brand in rules
-              ? brand
-              : zodCtx.zodSchema._zod.def.type
+            brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type
           ];
         if (depicter) {
           const overrides = { ...depicter(zodCtx, ctx) };

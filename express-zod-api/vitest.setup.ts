@@ -2,6 +2,7 @@ import "./src/zod-plugin"; // required for tests importing sources using the plu
 import type { NewPlugin } from "@vitest/pretty-format";
 import { z } from "zod/v4";
 import { ResultHandlerError } from "./src/errors";
+import { getBrand } from "./src/metadata";
 
 /** Takes cause and certain props of custom errors into account */
 const errorSerializer: NewPlugin = {
@@ -29,7 +30,7 @@ const schemaSerializer: NewPlugin = {
       unrepresentable: "any",
       override: ({ zodSchema, jsonSchema }) => {
         if (zodSchema._zod.def.type === "custom")
-          jsonSchema["x-brand"] = zodSchema._zod.bag.brand;
+          jsonSchema["x-brand"] = getBrand(zodSchema);
       },
     });
     return printer(serialization, config, indentation, depth, refs);

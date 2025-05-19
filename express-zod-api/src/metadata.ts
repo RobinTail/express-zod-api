@@ -1,3 +1,4 @@
+import type { $ZodType } from "zod/v4/core";
 import { combinations } from "./common-helpers";
 import { z } from "zod/v4";
 import * as R from "ramda";
@@ -32,4 +33,17 @@ export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
     ...destMeta,
     [metaSymbol]: { ...destMeta?.[metaSymbol], examples },
   });
+};
+
+export const getBrand = (
+  subject: $ZodType,
+): string | number | symbol | undefined => {
+  const { brand } = subject._zod.bag;
+  if (
+    typeof brand === "symbol" ||
+    typeof brand === "string" ||
+    typeof brand === "number"
+  )
+    return brand;
+  return undefined;
 };

@@ -6,6 +6,7 @@ import { ezDateOutBrand } from "./date-out-schema";
 import { DeepCheckError } from "./errors";
 import { ezFormBrand } from "./form-schema";
 import { IOSchema } from "./io-schema";
+import { getBrand } from "./metadata";
 import { FirstPartyKind } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
 import { ezRawBrand } from "./raw-schema";
@@ -60,7 +61,7 @@ export const hasCycle = (
 export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
   findNestedSchema(subject, {
     condition: (schema) => {
-      const { brand } = schema._zod.bag;
+      const brand = getBrand(schema);
       return (
         typeof brand === "symbol" &&
         [ezUploadBrand, ezRawBrand, ezFormBrand].includes(brand)
@@ -87,7 +88,7 @@ export const findJsonIncompatible = (
   findNestedSchema(subject, {
     io,
     condition: (zodSchema) => {
-      const { brand } = zodSchema._zod.bag;
+      const brand = getBrand(zodSchema);
       const { type } = zodSchema._zod.def;
       if (unsupported.includes(type)) return true;
       if (io === "input") {

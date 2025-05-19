@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 import { ez } from "../src";
+import { getBrand } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("ez.upload()", () => {
@@ -7,7 +8,7 @@ describe("ez.upload()", () => {
     test("should create an instance", () => {
       const schema = ez.upload();
       expect(schema).toBeInstanceOf(z.ZodCustom);
-      expect(schema._zod.bag).toHaveProperty("brand", ezUploadBrand);
+      expect(getBrand(schema)).toBe(ezUploadBrand);
     });
   });
 

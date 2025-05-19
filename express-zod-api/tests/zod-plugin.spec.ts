@@ -1,6 +1,6 @@
 import camelize from "camelize-ts";
 import { z } from "zod/v4";
-import { metaSymbol } from "../src/metadata";
+import { getBrand, metaSymbol } from "../src/metadata";
 
 describe("Zod Runtime Plugin", () => {
   describe(".example()", () => {
@@ -74,22 +74,19 @@ describe("Zod Runtime Plugin", () => {
 
   describe(".brand()", () => {
     test("should set the brand", () => {
-      expect(z.string().brand("test")._zod.bag).toHaveProperty("brand", "test");
+      expect(getBrand(z.string().brand("test"))).toBe("test");
     });
 
     test("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = schema.brand("test");
-      expect(schemaWithMeta._zod.bag).toHaveProperty("brand", "test");
-      expect(schemaWithMeta.regex(/@example.com$/)._zod.bag).toHaveProperty(
-        "brand",
-        "test",
-      );
+      expect(getBrand(schemaWithMeta)).toBe("test");
+      expect(getBrand(schemaWithMeta.regex(/@example.com$/))).toBe("test");
     });
 
     test("should withstand describing", () => {
       const schema = z.string().brand("test").describe("something");
-      expect(schema._zod.bag).toHaveProperty("brand", "test");
+      expect(getBrand(schema)).toBe("test");
     });
   });
 

@@ -2,13 +2,14 @@ import { z } from "zod/v4";
 import { ezFileBrand } from "../src/file-schema";
 import { ez } from "../src";
 import { readFile } from "node:fs/promises";
+import { getBrand } from "../src/metadata";
 
 describe("ez.file()", () => {
   describe("creation", () => {
     test("should create an instance being string by default", () => {
       const schema = ez.file();
       expect(schema).toBeInstanceOf(z.ZodString);
-      expect(schema._zod.bag).toHaveProperty("brand", ezFileBrand);
+      expect(getBrand(schema)).toBe(ezFileBrand);
     });
 
     test("should create a string file", () => {
