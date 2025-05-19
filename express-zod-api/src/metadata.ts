@@ -35,9 +35,7 @@ export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
   });
 };
 
-export const getBrand = (
-  subject: $ZodType,
-): string | number | symbol | undefined => {
+export const getBrand = (subject: $ZodType) => {
   const { brand } = subject._zod.bag;
   if (
     typeof brand === "symbol" ||
