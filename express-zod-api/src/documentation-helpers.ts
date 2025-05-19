@@ -466,7 +466,12 @@ const depict = (
         const { brand } = zodCtx.zodSchema._zod.bag;
         const depicter =
           rules[
-            brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type
+            (typeof brand === "symbol" ||
+              typeof brand === "string" ||
+              typeof brand === "number") &&
+            brand in rules
+              ? brand
+              : zodCtx.zodSchema._zod.def.type
           ];
         if (depicter) {
           const overrides = { ...depicter(zodCtx, ctx) };

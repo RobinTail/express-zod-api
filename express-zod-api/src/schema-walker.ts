@@ -51,7 +51,10 @@ export const walkSchema = <
 ): U => {
   const { brand } = schema._zod.bag;
   const handler =
-    brand && brand in rules
+    (typeof brand === "symbol" ||
+      typeof brand === "string" ||
+      typeof brand === "number") &&
+    brand in rules
       ? rules[brand as keyof typeof rules]
       : rules[schema._zod.def.type];
   const next = (subject: $ZodType) =>
