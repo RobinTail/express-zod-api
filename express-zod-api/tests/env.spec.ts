@@ -50,15 +50,6 @@ describe("Environment checks", () => {
       expect(R.omit(["$schema"], json)).toEqual({});
     });
 
-    test("meta overrides, does not merge", () => {
-      const schema = z
-        .string()
-        .meta({ examples: ["test"] })
-        .meta({ description: "some" })
-        .meta({ title: "last" });
-      expect(schema.meta()).toMatchSnapshot();
-    });
-
     test("circular object schema has no sign of getter in its shape", () => {
       const schema = z.object({
         name: z.string(),
@@ -88,6 +79,15 @@ describe("Environment checks", () => {
   });
 
   describe("Zod new features", () => {
+    test("meta() merge, not just overrides", () => {
+      const schema = z
+        .string()
+        .meta({ examples: ["test"] })
+        .meta({ description: "some" })
+        .meta({ title: "last" });
+      expect(schema.meta()).toMatchSnapshot();
+    });
+
     test("object shape conveys the keys optionality", () => {
       const schema = z.object({
         one: z.boolean(),
