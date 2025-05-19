@@ -6,10 +6,9 @@
  * @desc Enables .label() on ZodDefault
  * @desc Enables .remap() on ZodObject
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
- * @desc Ensures that the brand withstands additional refinements or checks
  * */
 import * as R from "ramda";
-import { z, globalRegistry } from "zod/v4";
+import { z } from "zod/v4";
 import { FlatObject } from "./common-helpers";
 import { Metadata, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
@@ -18,6 +17,9 @@ import type {
   $ZodShape,
   $ZodLooseShape,
   $ZodObjectConfig,
+  $ZodCheck,
+  $ZodCheckInternals,
+  $ZodCheckDef,
 } from "zod/v4/core";
 
 declare module "zod/v4/core" {
@@ -60,6 +62,32 @@ declare module "zod/v4" {
   }
 }
 
+interface $EZBrandCheckDef extends $ZodCheckDef {
+  check: "$EZBrandCheck";
+  brand?: string | number | symbol;
+}
+
+interface $EZBrandCheckInternals extends $ZodCheckInternals<unknown> {
+  def: $EZBrandCheckDef;
+}
+
+interface $EZBrandCheck extends $ZodCheck {
+  _zod: $EZBrandCheckInternals;
+}
+
+/**
+ * This approach was suggested to me by Colin in a PM on Twitter.
+ * Refrained from storing the brand in Metadata because it should withstand refinements.
+ * */
+const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
+  "$EZBrandCheck",
+  (inst, def) => {
+    z.core.$ZodCheck.init(inst, def);
+    inst._zod.onattach.push((schema) => (schema._zod.bag.brand = def.brand));
+    inst._zod.check = () => {};
+  },
+);
+
 const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
   const { [metaSymbol]: internal, ...rest } = this.meta() || {};
   const copy = internal?.examples.slice() || [];
@@ -81,7 +109,7 @@ const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
   const { [metaSymbol]: internal = { examples: [] }, ...rest } =
     this.meta() || {};
   return this.meta({
-    ...rest,
+    ...rest, // @todo this may no longer be required since it seems that .meta() merges now, not just overrides
     [metaSymbol]: { ...internal, defaultLabel },
   });
 };
@@ -90,12 +118,7 @@ const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
 ) {
-  const { [metaSymbol]: internal = { examples: [] }, ...rest } =
-    this.meta() || {};
-  return this.meta({
-    ...rest, // @todo this may no longer be required since it seems that .meta() merges now, not just overrides
-    [metaSymbol]: { ...internal, brand },
-  });
+  return this.check(new $EZBrandCheck({ brand, check: "$EZBrandCheck" }));
 };
 
 const objectMapper = function (
@@ -127,7 +150,6 @@ if (!(metaSymbol in globalThis)) {
     if (/(Success|Error|Function)$/.test(entry)) continue;
     const Cls = z[entry as keyof typeof z];
     if (typeof Cls !== "function") continue;
-    let originalCheck: z.ZodType["check"];
     Object.defineProperties(Cls.prototype, {
       ["example" satisfies keyof z.ZodType]: {
         get(): z.ZodType["example"] {
@@ -143,25 +165,6 @@ if (!(metaSymbol in globalThis)) {
         set() {}, // this is required to override the existing method
         get() {
           return brandSetter.bind(this) as z.ZodType["brand"];
-        },
-      },
-      ["check" satisfies keyof z.ZodType]: {
-        set(fn) {
-          originalCheck = fn;
-        },
-        get(): z.ZodType["check"] {
-          return function (
-            this: z.ZodType,
-            ...args: Parameters<z.ZodType["check"]>
-          ) {
-            /** @link https://v4.zod.dev/metadata#register */
-            return originalCheck.apply(this, args).register(globalRegistry, {
-              [metaSymbol]: {
-                examples: [],
-                brand: this.meta()?.[metaSymbol]?.brand,
-              },
-            });
-          };
         },
       },
     });
