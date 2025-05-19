@@ -1,9 +1,4 @@
-import type {
-  $ZodObject,
-  $ZodTransform,
-  $ZodType,
-  $ZodTypeInternals,
-} from "zod/v4/core";
+import type { $ZodObject, $ZodTransform, $ZodType } from "zod/v4/core";
 import { Request } from "express";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod/v4";
