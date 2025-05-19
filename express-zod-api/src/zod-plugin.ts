@@ -62,6 +62,32 @@ declare module "zod/v4" {
   }
 }
 
+interface $EZBrandCheckDef extends $ZodCheckDef {
+  check: "$EZBrandCheck";
+  brand?: string | number | symbol;
+}
+
+interface $EZBrandCheckInternals extends $ZodCheckInternals<unknown> {
+  def: $EZBrandCheckDef;
+}
+
+interface $EZBrandCheck extends $ZodCheck {
+  _zod: $EZBrandCheckInternals;
+}
+
+/**
+ * This approach was suggested to me by Colin in a PM on Twitter.
+ * Refrained from storing the brand in Metadata because it should withstand refinements.
+ * */
+const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
+  "$EZBrandCheck",
+  (inst, def) => {
+    z.core.$ZodCheck.init(inst, def);
+    inst._zod.onattach.push((schema) => (schema._zod.bag.brand = def.brand));
+    inst._zod.check = () => {};
+  },
+);
+
 const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
   const { [metaSymbol]: internal, ...rest } = this.meta() || {};
   const copy = internal?.examples.slice() || [];
@@ -88,29 +114,11 @@ const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
   });
 };
 
-interface EZBRAND_Definition extends $ZodCheckDef {
-  check: "EZBRAND";
-  brand?: string | number | symbol;
-}
-
-interface EZBRAND_Internals extends $ZodCheckInternals<unknown> {
-  def: EZBRAND_Definition;
-}
-
-interface EZBRAND extends $ZodCheck {
-  _zod: EZBRAND_Internals;
-}
-
 const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
 ) {
-  const Cls = z.core.$constructor<EZBRAND>("EZBRAND", (inst, def) => {
-    z.core.$ZodCheck.init(inst, def);
-    inst._zod.onattach.push((inst2) => (inst2._zod.bag.brand = brand));
-    inst._zod.check = () => {};
-  });
-  return this.check(new Cls({ brand, check: "EZBRAND" }));
+  return this.check(new $EZBrandCheck({ brand, check: "$EZBrandCheck" }));
 };
 
 const objectMapper = function (
