@@ -175,17 +175,10 @@ export const getTransformedType = R.tryCatch(
   R.always(undefined),
 );
 
-const requestOptionality: Array<$ZodTypeInternals["optionality"]> = [
-  "optional",
-  "defaulted",
-];
 export const isOptional = (
-  { _zod: { optionality } }: $ZodType,
+  { _zod: { optin, optout } }: $ZodType,
   { isResponse }: { isResponse: boolean },
-) =>
-  isResponse
-    ? optionality === "optional"
-    : optionality && requestOptionality.includes(optionality);
+) => (isResponse ? optout : optin) === "optional";
 
 /** @desc can still be an array, use Array.isArray() or rather R.type() to exclude that case */
 export const isObject = (subject: unknown) =>
