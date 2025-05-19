@@ -74,26 +74,22 @@ describe("Zod Runtime Plugin", () => {
 
   describe(".brand()", () => {
     test("should set the brand", () => {
-      expect(z.string().brand("test").meta()?.[metaSymbol]?.brand).toEqual(
-        "test",
-      );
+      expect(z.string().brand("test")._zod.bag).toHaveProperty("brand", "test");
     });
 
-    test.skip("should withstand refinements", () => {
+    test("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = schema.brand("test");
-      expect(schemaWithMeta.meta()?.[metaSymbol]).toHaveProperty(
+      expect(schemaWithMeta._zod.bag).toHaveProperty("brand", "test");
+      expect(schemaWithMeta.regex(/@example.com$/)._zod.bag).toHaveProperty(
         "brand",
         "test",
       );
-      expect(
-        schemaWithMeta.regex(/@example.com$/).meta()?.[metaSymbol],
-      ).toHaveProperty("brand", "test");
     });
 
     test("should withstand describing", () => {
       const schema = z.string().brand("test").describe("something");
-      expect(schema.meta()?.[metaSymbol]?.brand).toBe("test");
+      expect(schema._zod.bag).toHaveProperty("brand", "test");
     });
   });
 

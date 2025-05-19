@@ -1,12 +1,11 @@
 import type { $ZodType, JSONSchema } from "zod/v4/core";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod/v4";
+import { z } from "zod/v4";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { DeepCheckError } from "./errors";
 import { ezFormBrand } from "./form-schema";
 import { IOSchema } from "./io-schema";
-import { metaSymbol } from "./metadata";
 import { FirstPartyKind } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
 import { ezRawBrand } from "./raw-schema";
@@ -61,7 +60,7 @@ export const hasCycle = (
 export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
   findNestedSchema(subject, {
     condition: (schema) => {
-      const { brand } = globalRegistry.get(schema)?.[metaSymbol] || {};
+      const { brand } = schema._zod.bag;
       return (
         typeof brand === "symbol" &&
         [ezUploadBrand, ezRawBrand, ezFormBrand].includes(brand)
@@ -88,7 +87,7 @@ export const findJsonIncompatible = (
   findNestedSchema(subject, {
     io,
     condition: (zodSchema) => {
-      const { brand } = globalRegistry.get(zodSchema)?.[metaSymbol] || {};
+      const { brand } = zodSchema._zod.bag;
       const { type } = zodSchema._zod.def;
       if (unsupported.includes(type)) return true;
       if (io === "input") {

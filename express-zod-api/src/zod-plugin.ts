@@ -17,6 +17,9 @@ import type {
   $ZodShape,
   $ZodLooseShape,
   $ZodObjectConfig,
+  $ZodCheck,
+  $ZodCheckInternals,
+  $ZodCheckDef,
 } from "zod/v4/core";
 
 declare module "zod/v4/core" {
@@ -80,21 +83,34 @@ const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
   const { [metaSymbol]: internal = { examples: [] }, ...rest } =
     this.meta() || {};
   return this.meta({
-    ...rest,
+    ...rest, // @todo this may no longer be required since it seems that .meta() merges now, not just overrides
     [metaSymbol]: { ...internal, defaultLabel },
   });
 };
+
+interface EZBRAND_Definition extends $ZodCheckDef {
+  check: "EZBRAND";
+  brand?: string | number | symbol;
+}
+
+interface EZBRAND_Internals extends $ZodCheckInternals<unknown> {
+  def: EZBRAND_Definition;
+}
+
+interface EZBRAND extends $ZodCheck {
+  _zod: EZBRAND_Internals;
+}
 
 const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
 ) {
-  const { [metaSymbol]: internal = { examples: [] }, ...rest } =
-    this.meta() || {};
-  return this.meta({
-    ...rest, // @todo this may no longer be required since it seems that .meta() merges now, not just overrides
-    [metaSymbol]: { ...internal, brand },
+  const Cls = z.core.$constructor<EZBRAND>("EZBRAND", (inst, def) => {
+    z.core.$ZodCheck.init(inst, def);
+    inst._zod.onattach.push((inst2) => (inst2._zod.bag.brand = brand));
+    inst._zod.check = () => {};
   });
+  return this.check(new Cls({ brand, check: "EZBRAND" }));
 };
 
 const objectMapper = function (

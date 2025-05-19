@@ -8,7 +8,6 @@ export interface Metadata {
   examples: unknown[];
   /** @override ZodDefault::_zod.def.defaultValue() in depictDefault */
   defaultLabel?: string;
-  brand?: string | number | symbol;
 }
 
 export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(

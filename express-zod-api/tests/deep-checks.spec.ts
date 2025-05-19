@@ -1,15 +1,14 @@
 import { UploadedFile } from "express-fileupload";
-import { globalRegistry, z } from "zod/v4";
+import { z } from "zod/v4";
 import type { $brand, $ZodType } from "zod/v4/core";
 import { ez } from "../src";
 import { findNestedSchema, hasCycle } from "../src/deep-checks";
-import { metaSymbol } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("Checks", () => {
   describe("findNestedSchema()", () => {
     const condition = (subject: $ZodType) =>
-      globalRegistry.get(subject)?.[metaSymbol]?.brand === ezUploadBrand;
+      subject._zod.bag.brand === ezUploadBrand;
 
     test("should return true for given argument satisfying condition", () => {
       expect(
@@ -25,7 +24,7 @@ describe("Checks", () => {
       ez.upload().nullable(),
       ez.upload().default({} as UploadedFile & $brand<symbol>),
       z.record(z.string(), ez.upload()),
-      // ez.upload().refine(() => true), // @todo skipped
+      ez.upload().refine(() => true),
       z.array(ez.upload()),
     ])("should return true for wrapped needle %#", (subject) => {
       expect(
