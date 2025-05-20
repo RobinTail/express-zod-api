@@ -402,20 +402,6 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     [ezRawBrand]: depictRaw,
   };
 
-// @todo might no longer be needed
-const onEach: Depicter = ({ jsonSchema }) => {
-  const result = { ...jsonSchema };
-  /*
-  const examples = getExamples({
-    schema: zodSchema,
-    validate: true,
-    pullProps: true,
-  });
-  if (examples.length) result.examples = examples.slice();
-   */
-  return result;
-};
-
 /**
  * postprocessing refs: specifying "uri" function and custom registries didn't allow to customize ref name
  * @todo is there a less hacky way to do that?
@@ -463,7 +449,6 @@ const depict = (
           for (const key in zodCtx.jsonSchema) delete zodCtx.jsonSchema[key];
           Object.assign(zodCtx.jsonSchema, overrides);
         }
-        Object.assign(zodCtx.jsonSchema, onEach(zodCtx, ctx));
       },
     },
   ) as JSONSchema.ObjectSchema;
