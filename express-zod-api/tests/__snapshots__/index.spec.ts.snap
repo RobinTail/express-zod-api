@@ -77,7 +77,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "EndpointsFactory",
   "defaultEndpointsFactory",
   "arrayEndpointsFactory",
-  "getExamples",
   "getMessageFromError",
   "ensureHttpError",
   "BuiltinLogger",
