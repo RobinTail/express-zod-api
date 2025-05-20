@@ -471,15 +471,15 @@ export const depictNumber: Depicter = (
   const maximum =
     maxValue === null ? (isInt ? intRange?.[1] : floatRange?.[1]) : maxValue;
   const isMaxInclusive = maxCheck ? maxCheck.inclusive : true;
+  const intFormat = intRange
+    ? intRange[1] - intRange[0] <= maxUInt32
+      ? "int32"
+      : "int64"
+    : undefined;
+  const format = isInt ? intFormat : "double";
   const result: SchemaObject = {
     type: isInt ? "integer" : "number",
-    format: isInt
-      ? intRange
-        ? intRange[1] - intRange[0] <= maxUInt32
-          ? "int32"
-          : "int64"
-        : undefined
-      : "double",
+    format,
   };
   if (isMinInclusive) result.minimum = minimum;
   else result.exclusiveMinimum = minimum;
