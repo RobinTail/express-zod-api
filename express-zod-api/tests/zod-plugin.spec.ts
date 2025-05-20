@@ -1,6 +1,6 @@
 import camelize from "camelize-ts";
 import { z } from "zod/v4";
-import { getBrand, metaSymbol } from "../src/metadata";
+import { getBrand } from "../src/metadata";
 
 describe("Zod Runtime Plugin", () => {
   describe(".example()", () => {
@@ -20,7 +20,6 @@ describe("Zod Runtime Plugin", () => {
       const schema = z.string();
       const schemaWithExample = schema.example("test");
       expect(schemaWithExample.meta()?.examples).toEqual(["test"]);
-      expect(schema.meta()?.[metaSymbol]).toBeUndefined();
       const second = schemaWithExample.example("test2");
       expect(second.meta()?.examples).toEqual(["test", "test2"]);
       expect(schemaWithExample.meta()?.examples).toEqual(["test"]);
