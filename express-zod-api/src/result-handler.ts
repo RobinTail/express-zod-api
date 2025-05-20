@@ -1,11 +1,17 @@
 import { Request, Response } from "express";
 import { globalRegistry, z } from "zod/v4";
+import type { $ZodObject } from "zod/v4/core";
 import {
   ApiResponse,
   defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
-import { FlatObject, isObject } from "./common-helpers";
+import {
+  FlatObject,
+  isObject,
+  isSchema,
+  pullExampleProps,
+} from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
@@ -97,6 +103,10 @@ export class ResultHandler<
 export const defaultResultHandler = new ResultHandler({
   positive: (output) => {
     const { examples = [] } = globalRegistry.get(output) || {};
+    if (!examples.length && isSchema<$ZodObject>(output, "object"))
+      examples.push(...pullExampleProps(output as $ZodObject));
+    if (examples.length && !globalRegistry.has(output))
+      globalRegistry.add(output, { examples });
     const responseSchema = z.object({
       status: z.literal("success"),
       data: output,
