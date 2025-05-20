@@ -131,6 +131,14 @@ exports[`App in production mode > Validation > Problem 787: Should NOT treat Zod
             "path": [],
           },
         ],
+        "message": "[
+  {
+    "expected": "number",
+    "code": "invalid_type",
+    "path": [],
+    "message": "Invalid input: expected number, received string"
+  }
+]",
       }),
       "message": "Invalid input: expected number, received string",
     }),
@@ -179,6 +187,18 @@ exports[`App in production mode > Validation > Should fail on handler output typ
             ],
           },
         ],
+        "message": "[
+  {
+    "origin": "number",
+    "code": "too_small",
+    "minimum": 0,
+    "inclusive": false,
+    "path": [
+      "anything"
+    ],
+    "message": "Too small: expected number to be >0"
+  }
+]",
       }),
       "message": "output/anything: Too small: expected number to be >0",
     }),

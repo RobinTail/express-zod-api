@@ -84,9 +84,9 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/crgeary.png" alt="@crgeary" width="50px" />](https://github.com/crgeary)
 [<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/gmorgen1.png" alt="@gmorgen1" width="50px" />](https://github.com/gmorgen1)
-[<img src="https://github.com/crgeary.png" alt="@crgeary" width="50px" />](https://github.com/crgeary)
 [<img src="https://github.com/danmichaelo.png" alt="@danmichaelo" width="50px" />](https://github.com/danmichaelo)
 [<img src="https://github.com/james10424.png" alt="@james10424" width="50px" />](https://github.com/james10424)
 [<img src="https://github.com/APTy.png" alt="@APTy" width="50px" />](https://github.com/APTy)

@@ -61,24 +61,20 @@ describe("Environment checks", () => {
         Object.getOwnPropertyDescriptors(schema._zod.def.shape),
       ).toMatchSnapshot();
     });
+  });
 
-    /**
-     * told Colin directly
-     * @todo adjust vitest.setup.ts on custom serialization if fixed
-     * */
-    test("ZodError inequality", () => {
+  describe("Zod new features", () => {
+    test("ZodError equality", () => {
       try {
         z.number().parse("test");
       } catch (caught) {
         const returned = z.number().safeParse("test").error;
-        expect(returned).not.toEqual(caught);
+        expect(returned).toEqual(caught);
         expect(returned).toBeInstanceOf(z.ZodError);
         expect(caught).toBeInstanceOf(z.ZodError);
       }
     });
-  });
 
-  describe("Zod new features", () => {
     test("meta() merge, not just overrides", () => {
       const schema = z
         .string()

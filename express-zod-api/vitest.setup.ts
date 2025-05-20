@@ -18,8 +18,7 @@ const errorSerializer: NewPlugin = {
       handled && { handled },
       issues && { issues },
     );
-    // @todo external issue with ZodError.name
-    return `${issues ? "ZodError" : name}(${printer(obj, config, indentation, depth, refs)})`;
+    return `${name}(${printer(obj, config, indentation, depth, refs)})`;
   },
 };
 
