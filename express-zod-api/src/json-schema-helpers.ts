@@ -51,14 +51,6 @@ export const flattenIO = (
     }
     if (entry.anyOf) stack.push(...R.map(nestOptional, entry.anyOf));
     if (entry.oneOf) stack.push(...R.map(nestOptional, entry.oneOf));
-    if (!isJsonObjectSchema(entry)) continue;
-    if (entry.properties) {
-      flat.properties = (mode === "throw" ? propsMerger : R.mergeDeepRight)(
-        flat.properties,
-        entry.properties,
-      );
-      if (!isOptional && entry.required) flatRequired.push(...entry.required);
-    }
     if (entry.examples?.length) {
       if (isOptional) {
         flat.examples = R.concat(flat.examples || [], entry.examples);
@@ -69,6 +61,14 @@ export const flattenIO = (
           ([a, b]) => R.mergeDeepRight(a, b),
         );
       }
+    }
+    if (!isJsonObjectSchema(entry)) continue;
+    if (entry.properties) {
+      flat.properties = (mode === "throw" ? propsMerger : R.mergeDeepRight)(
+        flat.properties,
+        entry.properties,
+      );
+      if (!isOptional && entry.required) flatRequired.push(...entry.required);
     }
     if (entry.propertyNames) {
       const keys: string[] = [];
