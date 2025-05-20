@@ -14,6 +14,11 @@
       - the advantages of Zod 4 that provide opportunities to simplifications and corrections of known issues.
   - `IOSchema` type had to be simplified down to a schema resulting to an `object`, but not an `array`;
   - Refer to [Migration guide on Zod 4](https://v4.zod.dev/v4/changelog) for adjusting your schemas;
+- Changes to `ZodType::example()` (Zod plugin method):
+  - Now acts as an alias for `ZodType::meta({ examples })`;
+  - The argument has to be the output type of the schema (used to be the opposite):
+    - This change is only breaking for transforming schemas;
+    - In order to specify an input example for a transforming schema the `.example()` method must be called before it;
 - Generating Documentation is mostly delegated to Zod 4 `z.toJSONSchema()`:
   - The basic depiction of each schema is now natively performed by Zod 4;
   - Express Zod API implements some overrides and improvements to fit it into OpenAPI 3.1 that extends JSON Schema;
@@ -42,6 +47,14 @@ export default [
 ```diff
 - import { z } from "zod";
 + import { z } from "zod/v4";
+```
+
+```diff
+  z.string()
++   .example("123")
+    .transform(Number)
+-   .example("123")
++   .example(123)
 ```
 
 ## Version 23
