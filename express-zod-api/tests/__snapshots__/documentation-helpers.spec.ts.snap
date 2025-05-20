@@ -8,9 +8,36 @@ exports[`Documentation helpers > depictBigInt() > should set type:string and for
 }
 `;
 
-exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1`] = `
+exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 0 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 1 1`] = `
+{
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "pattern": "^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 2 1`] = `
+{
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "examples": [
+    "2024-01-01T00:00:00.000Z",
+  ],
   "externalDocs": {
     "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
   },
@@ -27,9 +54,34 @@ DocumentationError({
 })
 `;
 
-exports[`Documentation helpers > depictDateOut > should set type:string, description and format 1`] = `
+exports[`Documentation helpers > depictDateOut > should set type:string, description and format 0 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictDateOut > should set type:string, description and format 1 1`] = `
+{
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "externalDocs": {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
+  },
+  "format": "date-time",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictDateOut > should set type:string, description and format 2 1`] = `
+{
+  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
+  "examples": [
+    "2024-01-01",
+  ],
   "externalDocs": {
     "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
   },

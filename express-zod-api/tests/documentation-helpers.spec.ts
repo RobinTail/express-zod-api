@@ -1,4 +1,4 @@
-import { JSONSchema } from "zod/v4/core";
+import { $brand, JSONSchema } from "zod/v4/core";
 import { SchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod/v4";
@@ -531,10 +531,19 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictDateIn", () => {
-    test("should set type:string, pattern and format", () => {
+    test.each([
+      { examples: undefined },
+      { examples: [] },
+      { examples: [new Date("2024-01-01")] },
+    ])("should set type:string, pattern and format %#", ({ examples }) => {
       expect(
         depictDateIn(
-          { zodSchema: z.never(), jsonSchema: { anyOf: [] } },
+          {
+            zodSchema: ez
+              .dateIn()
+              .meta({ examples: examples as Array<Date & $brand> }),
+            jsonSchema: { anyOf: [], examples },
+          },
           requestCtx,
         ),
       ).toMatchSnapshot();
@@ -547,9 +556,16 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictDateOut", () => {
-    test("should set type:string, description and format", () => {
+    test.each([
+      { examples: undefined },
+      { examples: [] },
+      { examples: ["2024-01-01"] },
+    ])("should set type:string, description and format %#", ({ examples }) => {
       expect(
-        depictDateOut({ zodSchema: z.never(), jsonSchema: {} }, responseCtx),
+        depictDateOut(
+          { zodSchema: z.never(), jsonSchema: { examples } },
+          responseCtx,
+        ),
       ).toMatchSnapshot();
     });
     test("should throw when ZodDateOut in request", () => {

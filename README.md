@@ -1271,7 +1271,11 @@ const exampleEndpoint = defaultEndpointsFactory.build({
   shortDescription: "Retrieves the user.", // <—— this becomes the summary line
   description: "The detailed explanaition on what this endpoint does.",
   input: z.object({
-    id: z.number().describe("the ID of the user").example(123),
+    id: z
+      .string()
+      .example("123") // input examples should be set before transformations
+      .transform(Number)
+      .describe("the ID of the user"),
   }),
   // ..., similarly for output and middlewares
 });

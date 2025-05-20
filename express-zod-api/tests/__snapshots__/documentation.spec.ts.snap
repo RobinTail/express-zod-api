@@ -3298,6 +3298,11 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - a: first
+                        b: prefix_first
+                      - a: second
+                        b: prefix_second
                     type: object
                     properties:
                       a:
@@ -3307,11 +3312,6 @@ paths:
                     required:
                       - a
                       - b
-                    examples:
-                      - a: first
-                        b: prefix_first
-                      - a: second
-                        b: prefix_second
                 required:
                   - status
                   - data
@@ -3496,14 +3496,14 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - num: 123
                     type: object
                     properties:
                       num:
                         type: number
                     required:
                       - num
-                    examples:
-                      - num: 123
                 required:
                   - status
                   - data
@@ -3586,14 +3586,14 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
                         type: string
                     required:
                       - numericStr
-                    examples:
-                      - numericStr: "123"
                 required:
                   - status
                   - data
@@ -3682,14 +3682,14 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
                         type: string
                     required:
                       - numericStr
-                    examples:
-                      - numericStr: "123"
                 required:
                   - status
                   - data
@@ -3777,13 +3777,13 @@ paths:
                     type: object
                     properties:
                       numericStr:
-                        type: string
                         examples:
-                          - "123"
+                          - "456"
+                        type: string
                     required:
                       - numericStr
                     examples:
-                      - numericStr: "123"
+                      - numericStr: "456"
                 required:
                   - status
                   - data
@@ -3792,7 +3792,7 @@ paths:
                   value:
                     status: success
                     data:
-                      numericStr: "123"
+                      numericStr: "456"
         "400":
           description: GET /v1/getSomething Negative response
           content:

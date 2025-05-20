@@ -23,11 +23,10 @@ import {
   TagObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { globalRegistry, z } from "zod/v4";
 import { ResponseVariant } from "./api-response";
 import {
   FlatObject,
-  getExamples,
   getRoutePathParams,
   getTransformedType,
   isObject,
@@ -154,6 +153,7 @@ export const depictLiteral: Depicter = ({ jsonSchema }) => ({
   ...jsonSchema,
 });
 
+/** @todo might no longer be required */
 export const depictObject: Depicter = (
   { zodSchema, jsonSchema },
   { isResponse },
@@ -195,31 +195,35 @@ const ensureCompliance = ({
   return valid;
 };
 
-export const depictDateIn: Depicter = ({}, ctx) => {
+export const depictDateIn: Depicter = ({ zodSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  return {
+  const jsonSchema: JSONSchema.StringSchema = {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
     pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
-    externalDocs: {
-      url: isoDateDocumentationUrl,
-    },
+    externalDocs: { url: isoDateDocumentationUrl },
   };
+  const examples = globalRegistry
+    .get(zodSchema) // zod::toJSONSchema() does not provide examples for the input size of a pipe
+    ?.examples?.filter((one) => one instanceof Date)
+    .map((one) => one.toISOString());
+  if (examples?.length) jsonSchema.examples = examples;
+  return jsonSchema;
 };
 
-export const depictDateOut: Depicter = ({}, ctx) => {
+export const depictDateOut: Depicter = ({ jsonSchema: { examples } }, ctx) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
-  return {
+  const jsonSchema: JSONSchema.StringSchema = {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
-    externalDocs: {
-      url: isoDateDocumentationUrl,
-    },
+    externalDocs: { url: isoDateDocumentationUrl },
   };
+  if (examples?.length) jsonSchema.examples = examples;
+  return jsonSchema;
 };
 
 export const depictBigInt: Depicter = () => ({
@@ -282,6 +286,7 @@ export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
       );
       if (targetType && ["number", "string", "boolean"].includes(targetType)) {
         return {
+          ...jsonSchema,
           type: targetType as "number" | "string" | "boolean",
         };
       }
@@ -373,7 +378,7 @@ export const depictRequestParams = ({
         schema: result,
         examples: enumerateExamples(
           isSchemaObject(depicted) && depicted.examples?.length
-            ? depicted.examples // own examples or from the flat:
+            ? depicted.examples // own examples or from the flat: // @todo check if both still needed
             : R.pluck(
                 name,
                 flat.examples?.filter(R.both(isObject, R.has(name))) || [],
@@ -402,18 +407,6 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     [ezFileBrand]: depictFile,
     [ezRawBrand]: depictRaw,
   };
-
-const onEach: Depicter = ({ zodSchema, jsonSchema }, { isResponse }) => {
-  const result = { ...jsonSchema };
-  const examples = getExamples({
-    schema: zodSchema,
-    variant: isResponse ? "parsed" : "original",
-    validate: true,
-    pullProps: true,
-  });
-  if (examples.length) result.examples = examples.slice();
-  return result;
-};
 
 /**
  * postprocessing refs: specifying "uri" function and custom registries didn't allow to customize ref name
@@ -462,7 +455,6 @@ const depict = (
           for (const key in zodCtx.jsonSchema) delete zodCtx.jsonSchema[key];
           Object.assign(zodCtx.jsonSchema, overrides);
         }
-        Object.assign(zodCtx.jsonSchema, onEach(zodCtx, ctx));
       },
     },
   ) as JSONSchema.ObjectSchema;
@@ -681,7 +673,7 @@ export const depictBody = ({
     examples: enumerateExamples(
       examples.length
         ? examples
-        : flattenIO(request)
+        : flattenIO(request) // @todo this branch might no longer be required
             .examples?.filter(
               (one): one is FlatObject => isObject(one) && !Array.isArray(one),
             )

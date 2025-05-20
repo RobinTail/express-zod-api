@@ -111,9 +111,9 @@ paths:
           description: PATCH /v1/user/:id Parameter
           schema:
             type: string
-            minLength: 1
             examples:
               - "1234567890"
+            minLength: 1
           examples:
             example1:
               value: "1234567890"
@@ -136,15 +136,15 @@ paths:
               type: object
               properties:
                 key:
-                  type: string
-                  minLength: 1
                   examples:
                     - 1234-5678-90
-                name:
                   type: string
                   minLength: 1
+                name:
                   examples:
                     - John Doe
+                  type: string
+                  minLength: 1
                 birthday:
                   description: YYYY-MM-DDTHH:mm:ss.sssZ
                   type: string
@@ -153,7 +153,7 @@ paths:
                   externalDocs:
                     url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                   examples:
-                    - 1963-04-21
+                    - 1963-04-21T00:00:00.000Z
               required:
                 - key
                 - name
@@ -163,7 +163,7 @@ paths:
                 value:
                   key: 1234-5678-90
                   name: John Doe
-                  birthday: 1963-04-21
+                  birthday: 1963-04-21T00:00:00.000Z
         required: true
       security:
         - APIKEY_1: []
@@ -183,9 +183,9 @@ paths:
                     type: object
                     properties:
                       name:
-                        type: string
                         examples:
                           - John Doe
+                        type: string
                       createdAt:
                         description: YYYY-MM-DDTHH:mm:ss.sssZ
                         type: string

@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { mixExamples, metaSymbol } from "../src/metadata";
+import { mixExamples } from "../src/metadata";
 
 describe("Metadata", () => {
   describe("mixExamples()", () => {
@@ -8,19 +8,16 @@ describe("Metadata", () => {
       const dest = z.number();
       const result = mixExamples(src, dest);
       expect(result).toEqual(dest);
-      expect(result.meta()?.[metaSymbol]).toBeFalsy();
-      expect(dest.meta()?.[metaSymbol]).toBeFalsy();
+      expect(result.meta()?.examples).toBeFalsy();
+      expect(dest.meta()?.examples).toBeFalsy();
     });
     test("should copy meta from src to dest in case meta is defined", () => {
       const src = z.string().example("some").describe("test");
       const dest = z.number().describe("another");
       const result = mixExamples(src, dest);
       expect(result).not.toEqual(dest); // immutable
-      expect(result.meta()?.[metaSymbol]).toBeTruthy();
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual(
-        src.meta()?.[metaSymbol]?.examples,
-      );
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual(["some"]);
+      expect(result.meta()?.examples).toEqual(src.meta()?.examples);
+      expect(result.meta()?.examples).toEqual(["some"]);
       expect(result.description).toBe("another"); // preserves it
     });
 
@@ -35,8 +32,7 @@ describe("Metadata", () => {
         .example({ b: 456 })
         .example({ b: 789 });
       const result = mixExamples(src, dest);
-      expect(result.meta()?.[metaSymbol]).toBeTruthy();
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual([
+      expect(result.meta()?.examples).toEqual([
         { a: "some", b: 123 },
         { a: "another", b: 123 },
         { a: "some", b: 456 },
@@ -57,8 +53,7 @@ describe("Metadata", () => {
         .example({ a: { c: 456 } })
         .example({ a: { c: 789 } });
       const result = mixExamples(src, dest);
-      expect(result.meta()?.[metaSymbol]).toBeTruthy();
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual([
+      expect(result.meta()?.examples).toEqual([
         { a: { b: "some", c: 123 } },
         { a: { b: "another", c: 123 } },
         { a: { b: "some", c: 456 } },
@@ -74,7 +69,7 @@ describe("Metadata", () => {
         .object({ items: z.array(z.string()) })
         .example({ items: ["e", "f", "g"] });
       const result = mixExamples(src, dest);
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual(["a", "b"]);
+      expect(result.meta()?.examples).toEqual(["a", "b"]);
     });
   });
 });

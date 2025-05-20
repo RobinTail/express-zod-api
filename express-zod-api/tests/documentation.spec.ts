@@ -14,6 +14,7 @@ import {
 import { contentTypes } from "../src/content-type";
 import { z } from "zod/v4";
 import { givePort } from "../../tools/ports";
+import * as R from "ramda";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({
@@ -1031,14 +1032,14 @@ describe("Documentation", () => {
               input: z.object({
                 strNum: z
                   .string()
-                  .transform((v) => parseInt(v, 10))
-                  .example("123"), // example is for input side of the transformation
+                  .example("123") // example for the input side of the transformation
+                  .transform((v) => parseInt(v, 10)),
               }),
               output: z.object({
                 numericStr: z
                   .number()
                   .transform((v) => `${v}`)
-                  .example(123), // example is for input side of the transformation
+                  .example("456"), // example for the output side of the transformation
               }),
               handler: async () => ({ numericStr: 123 }),
             }),
@@ -1058,18 +1059,15 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               input: z
-                .object({
-                  strNum: z.string().transform((v) => parseInt(v, 10)),
-                })
-                .example({
-                  strNum: "123", // example is for input side of the transformation
-                }),
+                .object({ strNum: z.string() })
+                .example({ strNum: "123" }) // example is for input side of the transformation
+                .transform(R.mapObjIndexed(Number)),
               output: z
                 .object({
                   numericStr: z.number().transform((v) => `${v}`),
                 })
                 .example({
-                  numericStr: 123, // example is for input side of the transformation
+                  numericStr: "123", // example is for input side of the transformation
                 }),
               handler: async () => ({ numericStr: 123 }),
             }),
@@ -1090,18 +1088,15 @@ describe("Documentation", () => {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
               input: z
-                .object({
-                  strNum: z.string().transform((v) => parseInt(v, 10)),
-                })
-                .example({
-                  strNum: "123", // example is for input side of the transformation
-                }),
+                .object({ strNum: z.string() })
+                .example({ strNum: "123" }) // example is for input side of the transformation
+                .transform(R.mapObjIndexed(Number)),
               output: z
                 .object({
                   numericStr: z.number().transform((v) => `${v}`),
                 })
                 .example({
-                  numericStr: 123, // example is for input side of the transformation
+                  numericStr: "123", // example is for output side of the transformation
                 }),
               handler: async () => ({ numericStr: 123 }),
             }),

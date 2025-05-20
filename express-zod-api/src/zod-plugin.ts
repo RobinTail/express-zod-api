@@ -10,7 +10,7 @@
 import * as R from "ramda";
 import { z } from "zod/v4";
 import { FlatObject } from "./common-helpers";
-import { Metadata, metaSymbol } from "./metadata";
+import { metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
 import type {
   $ZodType,
@@ -24,7 +24,6 @@ import type {
 
 declare module "zod/v4/core" {
   interface GlobalMeta {
-    [metaSymbol]?: Metadata;
     deprecated?: boolean;
     default?: unknown; // can be an actual value or a label like "Today"
   }
@@ -32,8 +31,8 @@ declare module "zod/v4/core" {
 
 declare module "zod/v4" {
   interface ZodType {
-    /** @desc Add an example value (before any transformations, can be called multiple times) */
-    example(example: z.input<this>): this;
+    /** @desc Shorthand for .meta({examples}), it can be called multiple times */
+    example(example: z.output<this>): this;
     deprecated(): this;
   }
   interface ZodDefault<T extends $ZodType = $ZodType> extends ZodType {
@@ -89,14 +88,11 @@ const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
   },
 );
 
-const exampleSetter = function (this: z.ZodType, value: z.input<typeof this>) {
-  const { [metaSymbol]: internal, ...rest } = this.meta() || {};
-  const copy = internal?.examples.slice() || [];
+const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
+  const { examples = [], ...rest } = this.meta() || {};
+  const copy = examples.slice();
   copy.push(value);
-  return this.meta({
-    ...rest,
-    [metaSymbol]: { ...internal, examples: copy },
-  });
+  return this.meta({ ...rest, examples: copy });
 };
 
 const deprecationSetter = function (this: z.ZodType) {

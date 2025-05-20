@@ -2,7 +2,6 @@ import { expectTypeOf } from "vitest";
 import { z } from "zod/v4";
 import { IOSchema, Middleware, ez } from "../src";
 import { getFinalEndpointInputSchema } from "../src/io-schema";
-import { metaSymbol } from "../src/metadata";
 import { AbstractMiddleware } from "../src/middleware";
 
 describe("I/O Schema and related helpers", () => {
@@ -244,7 +243,7 @@ describe("I/O Schema and related helpers", () => {
       expect(result).toMatchSnapshot();
     });
 
-    test("Should merge examples in case of using withMeta()", () => {
+    test("Should merge examples", () => {
       const middlewares: AbstractMiddleware[] = [
         new Middleware({
           input: z
@@ -265,7 +264,7 @@ describe("I/O Schema and related helpers", () => {
         .object({ five: z.string() })
         .example({ five: "some" });
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(result.meta()?.[metaSymbol]?.examples).toEqual([
+      expect(result.meta()?.examples).toEqual([
         {
           one: "test",
           two: 123,

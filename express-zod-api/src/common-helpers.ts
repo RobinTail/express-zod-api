@@ -5,7 +5,6 @@ import { globalRegistry, z } from "zod/v4";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import { OutputValidationError } from "./errors";
-import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
@@ -93,9 +92,9 @@ export const isSchema = <T extends $ZodType>(
 
 /** Takes the original unvalidated examples from the properties of ZodObject schema shape */
 export const pullExampleProps = <T extends $ZodObject>(subject: T) =>
-  Object.entries(subject._zod.def.shape).reduce<Partial<z.input<T>>[]>(
+  Object.entries(subject._zod.def.shape).reduce<Partial<z.output<T>>[]>(
     (acc, [key, schema]) => {
-      const { examples = [] } = globalRegistry.get(schema)?.[metaSymbol] || {};
+      const { examples = [] } = globalRegistry.get(schema) || {};
       return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
         ...left,
         ...right,
@@ -103,47 +102,6 @@ export const pullExampleProps = <T extends $ZodObject>(subject: T) =>
     },
     [],
   );
-
-export const getExamples = <
-  T extends $ZodType,
-  V extends "original" | "parsed" | undefined,
->({
-  schema,
-  variant = "original",
-  validate = variant === "parsed",
-  pullProps = false,
-}: {
-  schema: T;
-  /**
-   * @desc examples variant: original or parsed
-   * @example "parsed" — for the case when possible schema transformations should be applied
-   * @default "original"
-   * @override validate: variant "parsed" activates validation as well
-   * */
-  variant?: V;
-  /**
-   * @desc filters out the examples that do not match the schema
-   * @default variant === "parsed"
-   * */
-  validate?: boolean;
-  /**
-   * @desc should pull examples from properties — applicable to ZodObject only
-   * @default false
-   * */
-  pullProps?: boolean;
-}): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  let examples = globalRegistry.get(schema)?.[metaSymbol]?.examples || [];
-  if (!examples.length && pullProps && isSchema<$ZodObject>(schema, "object"))
-    examples = pullExampleProps(schema);
-  if (!validate && variant === "original") return examples;
-  const result: Array<z.input<T> | z.output<T>> = [];
-  for (const example of examples) {
-    const parsedExample = z.safeParse(schema, example);
-    if (parsedExample.success)
-      result.push(variant === "parsed" ? parsedExample.data : example);
-  }
-  return result;
-};
 
 export const combinations = <T>(
   a: T[],
