@@ -1096,7 +1096,7 @@ describe("Documentation", () => {
                   numericStr: z.number().transform((v) => `${v}`),
                 })
                 .example({
-                  numericStr: "123", // example is for input side of the transformation
+                  numericStr: "123", // example is for output side of the transformation
                 }),
               handler: async () => ({ numericStr: 123 }),
             }),
