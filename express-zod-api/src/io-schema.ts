@@ -13,6 +13,7 @@ export type IOSchema = z.ZodType<Base>;
  * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
  * @since 05.03.2023 is immutable to metadata
  * @since 26.05.2024 uses the regular ZodIntersection
+ * @since 20.05.2025 avoids mixing schema examples with itself
  * @see mixExamples
  */
 export const getFinalEndpointInputSchema = <
@@ -26,7 +27,7 @@ export const getFinalEndpointInputSchema = <
   allSchemas.push(input);
   const finalSchema = allSchemas.reduce((acc, schema) => acc.and(schema));
   return allSchemas.reduce(
-    (acc, schema) => mixExamples(schema, acc),
+    (acc, schema) => (schema === acc ? acc : mixExamples(schema, acc)),
     finalSchema,
   ) as z.ZodIntersection<MIN, IN>;
 };
