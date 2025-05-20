@@ -2,6 +2,14 @@
 
 ## Version 23
 
+### v23.5.0
+
+- Integer number `format` in generated Documentation now also depends on the `numericRange` option:
+  - `int64` is the default format for the range of JavaScript safe integers;
+  - `int32` is used when the specified range fits 32 bits (`4294967295`);
+  - omitted when `numericRange` is set to `null` (opt-out);
+  - The feature suggested by [@crgeary](https://github.com/crgeary).
+
 ### v23.4.1
 
 - Fixed headers for an edge case of flat routing with explicit methods:
