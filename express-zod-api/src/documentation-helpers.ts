@@ -205,7 +205,7 @@ export const depictDateIn: Depicter = ({ zodSchema }, ctx) => {
     externalDocs: { url: isoDateDocumentationUrl },
   };
   const examples = globalRegistry
-    .get(zodSchema)
+    .get(zodSchema) // zod::toJSONSchema() does not provide examples for the input size of a pipe
     ?.examples?.filter((one) => one instanceof Date)
     .map((one) => one.toISOString());
   if (examples?.length) jsonSchema.examples = examples;
