@@ -9,11 +9,13 @@ export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
   src: A,
   dest: B,
 ): B => {
-  const srcExamples =
-    src.meta()?.examples ||
-    (isSchema<$ZodObject>(src, "object") ? pullExampleProps(src) : undefined);
+  const {
+    examples: srcExamples = isSchema<$ZodObject>(src, "object")
+      ? pullExampleProps(src)
+      : undefined,
+  } = src.meta() || {};
   if (!srcExamples?.length) return dest;
-  const destExamples = dest.meta()?.examples || [];
+  const { examples: destExamples = [] } = dest.meta() || {};
   const examples = combinations<z.output<A> & z.output<B>>(
     destExamples,
     srcExamples,
