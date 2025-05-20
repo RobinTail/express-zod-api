@@ -96,10 +96,7 @@ const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
 };
 
 const deprecationSetter = function (this: z.ZodType) {
-  return this.meta({
-    ...this.meta(),
-    deprecated: true,
-  });
+  return this.meta({ deprecated: true });
 };
 
 const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
