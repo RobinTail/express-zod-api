@@ -23,7 +23,7 @@ import {
   TagObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { globalRegistry, z } from "zod/v4";
 import { ResponseVariant } from "./api-response";
 import {
   FlatObject,
@@ -194,7 +194,7 @@ const ensureCompliance = ({
   return valid;
 };
 
-export const depictDateIn: Depicter = ({}, ctx) => {
+export const depictDateIn: Depicter = ({ zodSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
   return {
@@ -202,22 +202,23 @@ export const depictDateIn: Depicter = ({}, ctx) => {
     type: "string",
     format: "date-time",
     pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
-    externalDocs: {
-      url: isoDateDocumentationUrl,
-    },
+    externalDocs: { url: isoDateDocumentationUrl },
+    examples: globalRegistry
+      .get(zodSchema)
+      ?.examples?.filter((one) => one instanceof Date)
+      .map((one) => one.toISOString()),
   };
 };
 
-export const depictDateOut: Depicter = ({}, ctx) => {
+export const depictDateOut: Depicter = ({ jsonSchema: { examples } }, ctx) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
   return {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
-    externalDocs: {
-      url: isoDateDocumentationUrl,
-    },
+    externalDocs: { url: isoDateDocumentationUrl },
+    examples,
   };
 };
 
