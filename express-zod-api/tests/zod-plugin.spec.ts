@@ -59,10 +59,7 @@ describe("Zod Runtime Plugin", () => {
       const schema = z.iso.datetime().default(() => new Date().toISOString());
       expect(schema).toHaveProperty("label");
       const schemaWithMeta = schema.label("Today");
-      expect(schemaWithMeta.meta()?.[metaSymbol]).toHaveProperty(
-        "defaultLabel",
-        "Today",
-      );
+      expect(schemaWithMeta.meta()).toHaveProperty("default", "Today");
     });
   });
 

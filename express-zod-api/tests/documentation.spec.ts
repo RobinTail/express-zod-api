@@ -88,6 +88,10 @@ describe("Documentation", () => {
                 optDefault: z.string().optional().default("test"),
                 nullish: z.boolean().nullish(),
                 nuDefault: z.int().positive().nullish().default(123),
+                labeledDate: z.iso
+                  .datetime()
+                  .default(() => new Date().toISOString())
+                  .label("Today"), // Feature #1706
               }),
               output: z.object({
                 nullable: z.string().nullable(),

@@ -45,13 +45,6 @@ DocumentationError({
 })
 `;
 
-exports[`Documentation helpers > depictDefault() > Feature #1706: should override the default value by a label from metadata 1`] = `
-{
-  "default": "Today",
-  "format": "date-time",
-}
-`;
-
 exports[`Documentation helpers > depictEnum() > should set type 1`] = `
 {
   "enum": [

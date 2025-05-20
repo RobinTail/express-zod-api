@@ -23,7 +23,7 @@ import {
   TagObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod/v4";
+import { z } from "zod/v4";
 import { ResponseVariant } from "./api-response";
 import {
   FlatObject,
@@ -46,7 +46,7 @@ import { ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { flattenIO } from "./json-schema-helpers";
 import { Alternatives } from "./logical-container";
-import { getBrand, metaSymbol } from "./metadata";
+import { getBrand } from "./metadata";
 import { Method } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
@@ -99,16 +99,6 @@ const samples = {
 
 export const reformatParamsInPath = (path: string) =>
   path.replace(routePathParamsRegex, (param) => `{${param.slice(1)}}`);
-
-export const depictDefault: Depicter = ({ zodSchema, jsonSchema }) => {
-  const value =
-    globalRegistry.get(zodSchema)?.[metaSymbol]?.defaultLabel ??
-    jsonSchema.default;
-  return {
-    ...jsonSchema,
-    default: typeof value === "bigint" ? String(value) : value,
-  };
-};
 
 export const depictUpload: Depicter = ({}, ctx) => {
   if (ctx.isResponse)
@@ -397,7 +387,6 @@ export const depictRequestParams = ({
 const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
   {
     nullable: depictNullable,
-    default: depictDefault,
     union: depictUnion,
     bigint: depictBigInt,
     intersection: depictIntersection,
