@@ -197,29 +197,32 @@ const ensureCompliance = ({
 export const depictDateIn: Depicter = ({ zodSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  return {
+  const jsonSchema: JSONSchema.StringSchema = {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
     pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
     externalDocs: { url: isoDateDocumentationUrl },
-    examples: globalRegistry
-      .get(zodSchema)
-      ?.examples?.filter((one) => one instanceof Date)
-      .map((one) => one.toISOString()),
   };
+  const examples = globalRegistry
+    .get(zodSchema)
+    ?.examples?.filter((one) => one instanceof Date)
+    .map((one) => one.toISOString());
+  if (examples?.length) jsonSchema.examples = examples;
+  return jsonSchema;
 };
 
 export const depictDateOut: Depicter = ({ jsonSchema: { examples } }, ctx) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
-  return {
+  const jsonSchema: JSONSchema.StringSchema = {
     description: "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
     externalDocs: { url: isoDateDocumentationUrl },
-    examples,
   };
+  if (examples?.length) jsonSchema.examples = examples;
+  return jsonSchema;
 };
 
 export const depictBigInt: Depicter = () => ({
