@@ -628,11 +628,15 @@ export const depictRequest = ({
 }: ReqResCommons & {
   schema: IOSchema;
   brandHandling?: BrandHandling;
-}) =>
-  depict(schema, {
+}) => {
+  const request = depict(schema, {
     rules: { ...brandHandling, ...depicters },
     ctx: { isResponse: false, makeRef, path, method },
   });
+  const { examples } = globalRegistry.get(schema) || {};
+  if (examples) request.examples = examples;
+  return request;
+};
 
 export const depictBody = ({
   method,
