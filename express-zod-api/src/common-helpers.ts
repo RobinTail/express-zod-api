@@ -92,7 +92,7 @@ export const isSchema = <T extends $ZodType>(
 
 /** Takes the original unvalidated examples from the properties of ZodObject schema shape */
 export const pullExampleProps = <T extends $ZodObject>(subject: T) =>
-  Object.entries(subject._zod.def.shape).reduce<Partial<z.input<T>>[]>(
+  Object.entries(subject._zod.def.shape).reduce<Partial<z.output<T>>[]>(
     (acc, [key, schema]) => {
       const { examples = [] } = globalRegistry.get(schema) || {};
       return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
