@@ -13,9 +13,9 @@ export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
     src.meta()?.examples ||
     (isSchema<$ZodObject>(src, "object") ? pullExampleProps(src) : undefined);
   if (!srcExamples?.length) return dest;
-  const destMeta = dest.meta();
+  const destExamples = dest.meta()?.examples || [];
   const examples = combinations<z.output<A> & z.output<B>>(
-    destMeta?.examples || [],
+    destExamples,
     srcExamples,
     ([destExample, srcExample]) =>
       typeof destExample === "object" &&
@@ -25,7 +25,7 @@ export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
         ? R.mergeDeepRight(destExample, srcExample)
         : srcExample, // not supposed to be called on non-object schemas
   );
-  return dest.meta({ ...destMeta, examples }); // @todo might not be required to spread since .meta() does it now
+  return dest.meta({ examples });
 };
 
 export const getBrand = (subject: $ZodType) => {
