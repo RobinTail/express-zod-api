@@ -377,7 +377,7 @@ export const depictRequestParams = ({
         schema: result,
         examples: enumerateExamples(
           isSchemaObject(depicted) && depicted.examples?.length
-            ? depicted.examples // own examples or from the flat:
+            ? depicted.examples // own examples or from the flat: // @todo check if both still needed
             : R.pluck(
                 name,
                 flat.examples?.filter(R.both(isObject, R.has(name))) || [],
@@ -672,7 +672,7 @@ export const depictBody = ({
     examples: enumerateExamples(
       examples.length
         ? examples
-        : flattenIO(request)
+        : flattenIO(request) // @todo this branch might no longer be required
             .examples?.filter(
               (one): one is FlatObject => isObject(one) && !Array.isArray(one),
             )
