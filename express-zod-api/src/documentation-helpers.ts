@@ -637,7 +637,7 @@ export const depictRequest = ({
     ctx: { isResponse: false, makeRef, path, method },
   });
   const { examples } = globalRegistry.get(schema) || {};
-  if (examples) request.examples = examples;
+  if (examples?.length) request.examples ??= examples;
   return request;
 };
 
