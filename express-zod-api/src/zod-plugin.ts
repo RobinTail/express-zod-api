@@ -103,10 +103,7 @@ const deprecationSetter = function (this: z.ZodType) {
 };
 
 const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
-  return this.meta({
-    ...this.meta(), // @todo this may no longer be required since it seems that .meta() merges now, not just overrides
-    default: defaultLabel,
-  });
+  return this.meta({ default: defaultLabel });
 };
 
 const brandSetter = function (
