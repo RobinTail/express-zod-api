@@ -26,6 +26,7 @@ declare module "zod/v4/core" {
   interface GlobalMeta {
     [metaSymbol]?: Metadata;
     deprecated?: boolean;
+    default?: unknown; // can be an actual value or a label like "Today"
   }
 }
 
@@ -36,7 +37,7 @@ declare module "zod/v4" {
     deprecated(): this;
   }
   interface ZodDefault<T extends $ZodType = $ZodType> extends ZodType {
-    /** @desc Change the default value in the generated Documentation to a label */
+    /** @desc Change the default value in the generated Documentation to a label, alias for .meta({ default }) */
     label(label: string): this;
   }
   interface ZodObject<
@@ -106,11 +107,9 @@ const deprecationSetter = function (this: z.ZodType) {
 };
 
 const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
-  const { [metaSymbol]: internal = { examples: [] }, ...rest } =
-    this.meta() || {};
   return this.meta({
-    ...rest, // @todo this may no longer be required since it seems that .meta() merges now, not just overrides
-    [metaSymbol]: { ...internal, defaultLabel },
+    ...this.meta(), // @todo this may no longer be required since it seems that .meta() merges now, not just overrides
+    default: defaultLabel,
   });
 };
 

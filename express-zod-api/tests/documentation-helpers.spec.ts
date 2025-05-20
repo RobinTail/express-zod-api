@@ -14,7 +14,6 @@ import {
   defaultIsHeader,
   reformatParamsInPath,
   depictNullable,
-  depictDefault,
   depictRaw,
   depictUpload,
   depictFile,
@@ -117,22 +116,6 @@ describe("Documentation helpers", () => {
       expect(reformatParamsInPath("/v1/flight/:from-:to/updates")).toBe(
         "/v1/flight/{from}-{to}/updates",
       );
-    });
-  });
-
-  describe("depictDefault()", () => {
-    test("Feature #1706: should override the default value by a label from metadata", () => {
-      const zodSchema = z.iso
-        .datetime()
-        .default(() => new Date().toISOString())
-        .label("Today");
-      const jsonSchema: JSONSchema.BaseSchema = {
-        default: "2025-05-21",
-        format: "date-time",
-      };
-      expect(
-        depictDefault({ zodSchema, jsonSchema }, responseCtx),
-      ).toMatchSnapshot();
     });
   });
 

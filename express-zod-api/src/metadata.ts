@@ -7,8 +7,6 @@ export const metaSymbol = Symbol.for("express-zod-api");
 
 export interface Metadata {
   examples: unknown[];
-  /** @override ZodDefault::_zod.def.defaultValue() in depictDefault */
-  defaultLabel?: string;
 }
 
 export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
