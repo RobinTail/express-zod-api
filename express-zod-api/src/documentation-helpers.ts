@@ -281,6 +281,7 @@ export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
       );
       if (targetType && ["number", "string", "boolean"].includes(targetType)) {
         return {
+          ...jsonSchema,
           type: targetType as "number" | "string" | "boolean",
         };
       }

@@ -3777,13 +3777,13 @@ paths:
                     type: object
                     properties:
                       numericStr:
-                        type: string
                         examples:
-                          - "123"
+                          - "456"
+                        type: string
                     required:
                       - numericStr
                     examples:
-                      - numericStr: "123"
+                      - numericStr: "456"
                 required:
                   - status
                   - data
@@ -3792,7 +3792,7 @@ paths:
                   value:
                     status: success
                     data:
-                      numericStr: "123"
+                      numericStr: "456"
         "400":
           description: GET /v1/getSomething Negative response
           content:

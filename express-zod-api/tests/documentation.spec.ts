@@ -1039,7 +1039,7 @@ describe("Documentation", () => {
                 numericStr: z
                   .number()
                   .transform((v) => `${v}`)
-                  .example("123"), // example for the output side of the transformation
+                  .example("456"), // example for the output side of the transformation
               }),
               handler: async () => ({ numericStr: 123 }),
             }),
