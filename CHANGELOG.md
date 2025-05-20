@@ -5,7 +5,7 @@
 ### v24.0.0
 
 - Switched to Zod 4:
-  - Minimum supported version of `zod` is 3.25.0, BUT imports MUST be from `zod/v4`;
+  - Minimum supported version of `zod` is 3.25.1, BUT imports MUST be from `zod/v4`;
     - Explanation of the versioning strategy: https://github.com/colinhacks/zod/issues/4371;
     - Express Zod API, however, is not aiming to support both Zod 3 and Zod 4 simultaneously due to:
       - incompatibility of data structures;
@@ -26,8 +26,6 @@
   - Use `.or(z.undefined())` to add `undefined` to the type of the object property;
   - Reasoning: https://x.com/colinhacks/status/1919292504861491252;
   - `z.any()` and `z.unknown()` are not optional, details: https://v4.zod.dev/v4/changelog#changes-zunknown-optionality.
-- Changes to the plugin:
-  - Brand is the only kind of metadata that withstands refinements and checks.
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
@@ -47,6 +45,14 @@ export default [
 ```
 
 ## Version 23
+
+### v23.5.0
+
+- Integer number `format` in generated Documentation now also depends on the `numericRange` option:
+  - `int64` is the default format for the range of JavaScript safe integers;
+  - `int32` is used when the specified range fits 32 bits (`4294967295`);
+  - omitted when `numericRange` is set to `null` (opt-out);
+  - The feature suggested by [@crgeary](https://github.com/crgeary).
 
 ### v23.4.1
 

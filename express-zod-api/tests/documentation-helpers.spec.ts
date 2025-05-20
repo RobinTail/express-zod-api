@@ -177,7 +177,7 @@ describe("Documentation helpers", () => {
 
   describe("depictUnion()", () => {
     test("should set discriminator prop for such union", () => {
-      const zodSchema = z.discriminatedUnion([
+      const zodSchema = z.discriminatedUnion("status", [
         z.object({ status: z.literal("success"), data: z.any() }),
         z.object({
           status: z.literal("error"),

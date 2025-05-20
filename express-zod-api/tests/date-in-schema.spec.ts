@@ -1,14 +1,14 @@
 import { z } from "zod/v4";
 import { ezDateInBrand } from "../src/date-in-schema";
 import { ez } from "../src";
-import { metaSymbol } from "../src/metadata";
+import { getBrand } from "../src/metadata";
 
 describe("ez.dateIn()", () => {
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.dateIn();
       expect(schema).toBeInstanceOf(z.ZodPipe);
-      expect(schema.meta()?.[metaSymbol]?.brand).toEqual(ezDateInBrand);
+      expect(getBrand(schema)).toBe(ezDateInBrand);
     });
   });
 

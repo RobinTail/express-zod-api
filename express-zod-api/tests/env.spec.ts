@@ -34,7 +34,7 @@ describe("Environment checks", () => {
     test("discriminated unions are not depicted well", () => {
       expect(
         z.toJSONSchema(
-          z.discriminatedUnion([
+          z.discriminatedUnion("status", [
             z.object({ status: z.literal("success"), data: z.any() }),
             z.object({
               status: z.literal("error"),
@@ -50,15 +50,6 @@ describe("Environment checks", () => {
       expect(R.omit(["$schema"], json)).toEqual({});
     });
 
-    test("meta overrides, does not merge", () => {
-      const schema = z
-        .string()
-        .meta({ examples: ["test"] })
-        .meta({ description: "some" })
-        .meta({ title: "last" });
-      expect(schema.meta()).toMatchSnapshot();
-    });
-
     test("circular object schema has no sign of getter in its shape", () => {
       const schema = z.object({
         name: z.string(),
@@ -70,24 +61,29 @@ describe("Environment checks", () => {
         Object.getOwnPropertyDescriptors(schema._zod.def.shape),
       ).toMatchSnapshot();
     });
+  });
 
-    /**
-     * told Colin directly
-     * @todo adjust vitest.setup.ts on custom serialization if fixed
-     * */
-    test("ZodError inequality", () => {
+  describe("Zod new features", () => {
+    test("ZodError equality", () => {
       try {
         z.number().parse("test");
       } catch (caught) {
         const returned = z.number().safeParse("test").error;
-        expect(returned).not.toEqual(caught);
+        expect(returned).toEqual(caught);
         expect(returned).toBeInstanceOf(z.ZodError);
         expect(caught).toBeInstanceOf(z.ZodError);
       }
     });
-  });
 
-  describe("Zod new features", () => {
+    test("meta() merge, not just overrides", () => {
+      const schema = z
+        .string()
+        .meta({ examples: ["test"] })
+        .meta({ description: "some" })
+        .meta({ title: "last" });
+      expect(schema.meta()).toMatchSnapshot();
+    });
+
     test("object shape conveys the keys optionality", () => {
       const schema = z.object({
         one: z.boolean(),
@@ -104,16 +100,19 @@ describe("Environment checks", () => {
         "three",
         "four",
       ]);
-      expect(schema._zod.def.shape.one._zod.optionality).toBeUndefined();
-      expect(schema._zod.def.shape.two._zod.optionality).toBe("optional");
-      expect(schema._zod.def.shape.three._zod.optionality).toBe("defaulted");
-      /** @link https://github.com/colinhacks/zod/issues/4322 */
-      expect(schema._zod.def.shape.four._zod.optionality).not.toBe("optional"); // <— undefined
+      expect(schema._zod.def.shape.one._zod.optin).toBeUndefined();
+      expect(schema._zod.def.shape.one._zod.optout).toBeUndefined();
+      expect(schema._zod.def.shape.two._zod.optin).toBe("optional");
+      expect(schema._zod.def.shape.two._zod.optout).toBe("optional");
+      expect(schema._zod.def.shape.three._zod.optin).toBe("optional");
+      expect(schema._zod.def.shape.three._zod.optout).toBe(undefined);
+      expect(schema._zod.def.shape.four._zod.optin).toBe("optional");
+      expect(schema._zod.def.shape.four._zod.optout).toBe(undefined);
       expectTypeOf<z.input<typeof schema>>().toEqualTypeOf<{
         one: boolean;
         two?: boolean | undefined;
         three?: boolean | undefined;
-        four: boolean | undefined;
+        four?: boolean | undefined;
       }>();
       expectTypeOf<z.output<typeof schema>>().toEqualTypeOf<{
         one: boolean;
