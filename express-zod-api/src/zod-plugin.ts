@@ -89,24 +89,18 @@ const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
 );
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
-  const { examples = [], ...rest } = this.meta() || {};
+  const { examples = [] } = this.meta() || {};
   const copy = examples.slice();
   copy.push(value);
-  return this.meta({ ...rest, examples: copy });
+  return this.meta({ examples: copy });
 };
 
 const deprecationSetter = function (this: z.ZodType) {
-  return this.meta({
-    ...this.meta(),
-    deprecated: true,
-  });
+  return this.meta({ deprecated: true });
 };
 
 const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
-  return this.meta({
-    ...this.meta(), // @todo this may no longer be required since it seems that .meta() merges now, not just overrides
-    default: defaultLabel,
-  });
+  return this.meta({ default: defaultLabel });
 };
 
 const brandSetter = function (

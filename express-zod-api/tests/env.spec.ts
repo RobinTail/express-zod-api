@@ -128,10 +128,7 @@ describe("Environment checks", () => {
       expect(boolSchema.isNullable()).toBeTruthy();
     });
 
-    /**
-     * @link https://github.com/colinhacks/zod/issues/4274
-     * @todo this fact can be used for switching to native examples
-     * */
+    /** @link https://github.com/colinhacks/zod/issues/4274 */
     test.each(["input", "output"] as const)(
       "%s examples of transformations",
       (io) => {
