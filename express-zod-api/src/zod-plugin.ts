@@ -89,10 +89,10 @@ const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
 );
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
-  const { examples = [], ...rest } = this.meta() || {};
+  const { examples = [] } = this.meta() || {};
   const copy = examples.slice();
   copy.push(value);
-  return this.meta({ ...rest, examples: copy });
+  return this.meta({ examples: copy });
 };
 
 const deprecationSetter = function (this: z.ZodType) {
