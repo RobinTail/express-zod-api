@@ -153,6 +153,7 @@ export const depictLiteral: Depicter = ({ jsonSchema }) => ({
   ...jsonSchema,
 });
 
+/** @todo might no longer be required */
 export const depictObject: Depicter = (
   { zodSchema, jsonSchema },
   { isResponse },
