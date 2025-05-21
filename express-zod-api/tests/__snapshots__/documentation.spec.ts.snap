@@ -3558,6 +3558,112 @@ servers:
 "
 `;
 
+exports[`Documentation > Metadata > should merge prop examples with middlewares 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing Metadata:example on IO schema + middleware
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  examples:
+                    - 1234-56789-01
+                  type: string
+                str:
+                  examples:
+                    - test
+                  type: string
+              required:
+                - key
+                - str
+            examples:
+              example1:
+                value:
+                  key: 1234-56789-01
+                  str: test
+        required: true
+      responses:
+        "200":
+          description: POST /v1/getSomething Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                    properties:
+                      num:
+                        examples:
+                          - 123
+                        type: number
+                    required:
+                      - num
+                    examples:
+                      - num: 123
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      num: 123
+        "400":
+          description: POST /v1/getSomething Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
 exports[`Documentation > Metadata > should pass over examples of each param from the whole IO schema examples (get method) 1`] = `
 "openapi: 3.1.0
 info:

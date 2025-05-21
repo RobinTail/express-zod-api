@@ -25,7 +25,6 @@ import * as R from "ramda";
 import { globalRegistry, z } from "zod/v4";
 import { ResponseVariant } from "./api-response";
 import {
-  FlatObject,
   getRoutePathParams,
   getTransformedType,
   isObject,
@@ -650,15 +649,7 @@ export const depictBody = ({
       composition === "components"
         ? makeRef(schema, withoutParams, makeCleanId(description))
         : withoutParams,
-    examples: enumerateExamples(
-      examples.length
-        ? examples
-        : flattenIO(request) // @todo this branch might no longer be required
-            .examples?.filter(
-              (one): one is FlatObject => isObject(one) && !Array.isArray(one),
-            )
-            .map(R.omit(paramNames)) || [],
-    ),
+    examples: enumerateExamples(examples),
   };
   const body: RequestBodyObject = {
     description,
