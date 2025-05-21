@@ -53,6 +53,25 @@ describe("JSON Schema helpers", () => {
       expect(subject).toMatchSnapshot();
     });
 
+    test("should use top level examples of the intersection", () => {
+      const subject = flattenIO({
+        examples: [{ one: "test", two: "jest" }],
+        allOf: [
+          {
+            type: "object",
+            properties: { one: { type: "string" } },
+            required: ["one"],
+          },
+          {
+            type: "object",
+            properties: { two: { type: "number" } },
+            required: ["two"],
+          },
+        ],
+      });
+      expect(subject).toMatchSnapshot();
+    });
+
     test("should handle records", () => {
       const subject = z.toJSONSchema(
         z

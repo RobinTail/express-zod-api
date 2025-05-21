@@ -98,3 +98,27 @@ exports[`JSON Schema helpers > flattenIO() > should return object schema for the
   "type": "object",
 }
 `;
+
+exports[`JSON Schema helpers > flattenIO() > should use top level examples of the intersection 1`] = `
+{
+  "examples": [
+    {
+      "one": "test",
+      "two": "jest",
+    },
+  ],
+  "properties": {
+    "one": {
+      "type": "string",
+    },
+    "two": {
+      "type": "number",
+    },
+  },
+  "required": [
+    "one",
+    "two",
+  ],
+  "type": "object",
+}
+`;
