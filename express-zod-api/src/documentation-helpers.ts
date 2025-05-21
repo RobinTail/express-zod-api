@@ -359,7 +359,7 @@ export const depictRequestParams = ({
         schema: result,
         examples: enumerateExamples(
           isSchemaObject(depicted) && depicted.examples?.length
-            ? depicted.examples // own examples or from the flat: // @todo check if both still needed
+            ? depicted.examples // own examples or from the flat:
             : R.pluck(
                 name,
                 flat.examples?.filter(R.both(isObject, R.has(name))) || [],
