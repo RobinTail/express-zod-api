@@ -191,11 +191,14 @@ paths:
                         format: date-time
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                        examples:
+                          - 2021-12-31
                     required:
                       - name
                       - createdAt
                     examples:
                       - name: John Doe
+                        createdAt: 2021-12-31
                 required:
                   - status
                   - data
@@ -205,6 +208,7 @@ paths:
                     status: success
                     data:
                       name: John Doe
+                      createdAt: 2021-12-31
         "400":
           description: PATCH /v1/user/:id Negative response
           content:
