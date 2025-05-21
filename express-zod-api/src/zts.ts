@@ -21,7 +21,7 @@ import type {
 import * as R from "ramda";
 import ts from "typescript";
 import { globalRegistry, z } from "zod/v4";
-import { getTransformedType, isOptional, isSchema } from "./common-helpers";
+import { getTransformedType, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { hasCycle } from "./deep-checks";
@@ -82,7 +82,8 @@ const onObject: Producer = (
         return makeInterfaceProp(key, next(value), {
           comment,
           isDeprecated,
-          isOptional: isOptional(value, { isResponse }),
+          isOptional:
+            (isResponse ? value._zod.optout : value._zod.optin) === "optional",
         });
       },
     );
