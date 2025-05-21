@@ -128,6 +128,7 @@ export const getTransformedType = R.tryCatch(
   R.always(undefined),
 );
 
+/** @todo check usage */
 export const isOptional = (
   { _zod: { optin, optout } }: $ZodType,
   { isResponse }: { isResponse: boolean },

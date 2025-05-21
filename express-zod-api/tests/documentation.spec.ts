@@ -330,6 +330,7 @@ describe("Documentation", () => {
                 intNegative: z.int().negative(),
                 intLimited: z.int().min(-100).max(100),
                 zero: z.int().nonnegative().nonpositive().optional(),
+                coercedNum: z.coerce.number(), // required prop in zod 4
               }),
               output: z.object({
                 bigint: z.bigint(),

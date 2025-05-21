@@ -1496,6 +1496,8 @@ paths:
                   type: integer
                   minimum: 0
                   maximum: 0
+                coercedNum:
+                  type: number
               required:
                 - double
                 - doublePositive
@@ -1505,6 +1507,7 @@ paths:
                 - intPositive
                 - intNegative
                 - intLimited
+                - coercedNum
         required: true
       responses:
         "200":
