@@ -1,8 +1,21 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
-import { $brand, z } from "zod/v4";
+import { z } from "zod/v4";
 import { ez } from "express-zod-api";
 import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
+
+/**
+ * Examples on branded schemas have also to be branded
+ * @see https://zod.dev/api?id=branded-types
+ * @todo remove if fixed:
+ * @see https://github.com/colinhacks/zod/issues/4441
+ * */
+const birthdaySchema = ez.dateIn();
+const birthday = birthdaySchema.example(birthdaySchema.parse("1963-04-21"));
+const createdAtSchema = ez.dateOut();
+const createdAt = createdAtSchema.example(
+  createdAtSchema.parse(new Date("2021-12-31")),
+);
 
 export const updateUserEndpoint =
   keyAndTokenAuthenticatedEndpointsFactory.build({
@@ -16,13 +29,11 @@ export const updateUserEndpoint =
         .transform((value) => parseInt(value, 10))
         .refine((value) => value >= 0, "should be greater than or equal to 0"),
       name: z.string().nonempty().example("John Doe"),
-      birthday: ez.dateIn().example(new Date("1963-04-21") as Date & $brand),
+      birthday,
     }),
     output: z.object({
       name: z.string().example("John Doe"),
-      createdAt: ez
-        .dateOut()
-        .example("2021-12-31T00:00:00.000Z" as string & $brand),
+      createdAt,
     }),
     handler: async ({
       input: { id, name },
