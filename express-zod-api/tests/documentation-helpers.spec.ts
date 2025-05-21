@@ -509,10 +509,7 @@ describe("Documentation helpers", () => {
     ])("should set type:string, pattern and format %#", ({ examples }) => {
       expect(
         depictDateIn(
-          {
-            zodSchema: ez.dateIn({ examples }),
-            jsonSchema: { anyOf: [], examples },
-          },
+          { zodSchema: z.never(), jsonSchema: { anyOf: [], examples } },
           requestCtx,
         ),
       ).toMatchSnapshot();
