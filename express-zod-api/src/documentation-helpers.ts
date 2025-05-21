@@ -1,5 +1,4 @@
 import type {
-  $ZodObject,
   $ZodPipe,
   $ZodTransform,
   $ZodTuple,
@@ -30,7 +29,6 @@ import {
   getRoutePathParams,
   getTransformedType,
   isObject,
-  isOptional,
   isSchema,
   makeCleanId,
   routePathParamsRegex,
@@ -152,23 +150,6 @@ export const depictLiteral: Depicter = ({ jsonSchema }) => ({
   type: typeof (jsonSchema.const || jsonSchema.enum?.[0]),
   ...jsonSchema,
 });
-
-/** @todo might no longer be required */
-export const depictObject: Depicter = (
-  { zodSchema, jsonSchema },
-  { isResponse },
-) => {
-  if (isResponse) return jsonSchema;
-  if (!isSchema<$ZodObject>(zodSchema, "object")) return jsonSchema;
-  const { required = [] } = jsonSchema as JSONSchema.ObjectSchema;
-  const result: string[] = [];
-  for (const key of required) {
-    const valueSchema = zodSchema._zod.def.shape[key];
-    if (valueSchema && !isOptional(valueSchema, { isResponse }))
-      result.push(key);
-  }
-  return { ...jsonSchema, required: result };
-};
 
 const ensureCompliance = ({
   $ref,
@@ -400,7 +381,6 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     pipe: depictPipeline,
     literal: depictLiteral,
     enum: depictEnum,
-    object: depictObject,
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,
