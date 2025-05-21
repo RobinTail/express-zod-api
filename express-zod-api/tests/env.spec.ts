@@ -79,7 +79,7 @@ describe("Environment checks", () => {
       const schema = z
         .string()
         .meta({ examples: ["test"] })
-        .meta({ description: "some" })
+        .describe("some")
         .meta({ title: "last" });
       expect(schema.meta()).toMatchSnapshot();
     });
