@@ -3558,7 +3558,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Metadata > should pass over examples of each param from the whole IO schema examples (GET) 1`] = `
+exports[`Documentation > Metadata > should pass over examples of each param from the whole IO schema examples (get method) 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO schema
@@ -3648,7 +3648,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Metadata > should pass over examples of the whole IO schema (POST) 1`] = `
+exports[`Documentation > Metadata > should pass over examples of each param from the whole IO schema examples (post method) 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO schema

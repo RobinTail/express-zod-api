@@ -1,4 +1,5 @@
 import camelize from "camelize-ts";
+import { Method } from "example/example.client";
 import snakify from "snakify-ts";
 import {
   Documentation,
@@ -1053,62 +1054,37 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("should pass over examples of each param from the whole IO schema examples (GET)", () => {
-      const spec = new Documentation({
-        config: sampleConfig,
-        routing: {
-          v1: {
-            getSomething: defaultEndpointsFactory.build({
-              input: z
-                .object({ strNum: z.string() })
-                .example({ strNum: "123" }) // example is for input side of the transformation
-                .transform(R.mapObjIndexed(Number)),
-              output: z
-                .object({
-                  numericStr: z.number().transform((v) => `${v}`),
-                })
-                .example({
-                  numericStr: "123", // example is for input side of the transformation
-                }),
-              handler: async () => ({ numericStr: 123 }),
-            }),
+    test.each<Method>(["get", "post"])(
+      "should pass over examples of each param from the whole IO schema examples (%s method)",
+      (method) => {
+        const spec = new Documentation({
+          config: sampleConfig,
+          routing: {
+            v1: {
+              getSomething: defaultEndpointsFactory.build({
+                method,
+                input: z
+                  .object({ strNum: z.string() })
+                  .example({ strNum: "123" }) // example is for input side of the transformation
+                  .transform(R.mapObjIndexed(Number)),
+                output: z
+                  .object({
+                    numericStr: z.number().transform((v) => `${v}`),
+                  })
+                  .example({
+                    numericStr: "123", // example is for output side of the transformation
+                  }),
+                handler: async () => ({ numericStr: 123 }),
+              }),
+            },
           },
-        },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO schema",
-        serverUrl: "https://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
-
-    test("should pass over examples of the whole IO schema (POST)", () => {
-      const spec = new Documentation({
-        config: sampleConfig,
-        routing: {
-          v1: {
-            getSomething: defaultEndpointsFactory.build({
-              method: "post",
-              input: z
-                .object({ strNum: z.string() })
-                .example({ strNum: "123" }) // example is for input side of the transformation
-                .transform(R.mapObjIndexed(Number)),
-              output: z
-                .object({
-                  numericStr: z.number().transform((v) => `${v}`),
-                })
-                .example({
-                  numericStr: "123", // example is for output side of the transformation
-                }),
-              handler: async () => ({ numericStr: 123 }),
-            }),
-          },
-        },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO schema",
-        serverUrl: "https://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
+          version: "3.4.5",
+          title: "Testing Metadata:example on IO schema",
+          serverUrl: "https://example.com",
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
+      },
+    );
 
     test("should merge endpoint handler examples with its middleware examples", () => {
       const spec = new Documentation({
