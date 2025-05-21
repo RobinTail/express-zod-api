@@ -153,7 +153,7 @@ paths:
                   externalDocs:
                     url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
                   examples:
-                    - 1963-04-21T00:00:00.000Z
+                    - 1963-04-21
               required:
                 - key
                 - name
@@ -163,7 +163,6 @@ paths:
                 value:
                   key: 1234-5678-90
                   name: John Doe
-                  birthday: 1963-04-21T00:00:00.000Z
         required: true
       security:
         - APIKEY_1: []

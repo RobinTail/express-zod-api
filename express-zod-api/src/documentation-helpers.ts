@@ -22,7 +22,7 @@ import {
   TagObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod/v4";
+import { z } from "zod/v4";
 import { ResponseVariant } from "./api-response";
 import {
   getRoutePathParams,
@@ -175,7 +175,7 @@ const ensureCompliance = ({
   return valid;
 };
 
-export const depictDateIn: Depicter = ({ zodSchema }, ctx) => {
+export const depictDateIn: Depicter = ({ jsonSchema: { examples } }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
   const jsonSchema: JSONSchema.StringSchema = {
@@ -185,10 +185,6 @@ export const depictDateIn: Depicter = ({ zodSchema }, ctx) => {
     pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
     externalDocs: { url: isoDateDocumentationUrl },
   };
-  const examples = globalRegistry
-    .get(zodSchema) // zod::toJSONSchema() does not provide examples for the input size of a pipe
-    ?.examples?.filter((one) => one instanceof Date)
-    .map((one) => one.toISOString());
   if (examples?.length) jsonSchema.examples = examples;
   return jsonSchema;
 };
