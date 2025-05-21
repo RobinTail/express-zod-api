@@ -4,17 +4,6 @@ import { z } from "zod/v4";
 import { ez } from "express-zod-api";
 import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
 
-/**
- * Examples on branded schemas have also to be branded
- * @see https://zod.dev/api?id=branded-types
- * @todo remove if fixed:
- * @see https://github.com/colinhacks/zod/issues/4441
- * */
-const createdAtSchema = ez.dateOut();
-const createdAt = createdAtSchema.example(
-  createdAtSchema.parse(new Date("2021-12-31")),
-);
-
 export const updateUserEndpoint =
   keyAndTokenAuthenticatedEndpointsFactory.build({
     tag: "users",
@@ -31,7 +20,7 @@ export const updateUserEndpoint =
     }),
     output: z.object({
       name: z.string().example("John Doe"),
-      createdAt,
+      createdAt: ez.dateOut({ examples: ["2021-12-31"] }),
     }),
     handler: async ({
       input: { id, name },
