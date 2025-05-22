@@ -6,6 +6,7 @@ import {
   getPublicErrorMessage,
   logServerError,
   normalize,
+  pullResponseExamples,
 } from "../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../src/testing";
 
@@ -90,6 +91,24 @@ describe("Result helpers", () => {
       new OutputValidationError(z.string().safeParse(123).error!),
     ])("should handle %s", (error) => {
       expect(ensureHttpError(error)).toMatchSnapshot();
+    });
+  });
+
+  describe("pullResponseExamples()", () => {
+    test("handles multiple examples per property", () => {
+      const schema = z.object({
+        a: z.string().example("one").example("two").example("three"),
+        b: z.number().example(1).example(2),
+        c: z.boolean().example(false),
+      });
+      expect(pullResponseExamples(schema)).toEqual([
+        { a: "one", b: 1, c: false },
+        { a: "one", b: 2, c: false },
+        { a: "two", b: 1, c: false },
+        { a: "two", b: 2, c: false },
+        { a: "three", b: 1, c: false },
+        { a: "three", b: 2, c: false },
+      ]);
     });
   });
 
