@@ -91,8 +91,9 @@ export const isSchema = <T extends $ZodType>(
 ): subject is T => subject._zod.def.type === type;
 
 /**
- * Takes the original unvalidated examples from the properties of ZodObject schema shape
- * @todo replace with using pullExamplesUp() postprocessor
+ * This one is for response only; for requests:
+ * @see pullExamplesUp
+ * @todo mv to result helpers
  * */
 export const pullExampleProps = <T extends $ZodObject>(subject: T) =>
   Object.entries(subject._zod.def.shape).reduce<Partial<z.output<T>>[]>(

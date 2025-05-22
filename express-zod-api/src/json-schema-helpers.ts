@@ -89,6 +89,10 @@ export const flattenIO = (
   return flat;
 };
 
+/**
+ * For requests only; for responses:
+ * @see pullExampleProps
+ * */
 export const pullExamplesUp = (subject: JSONSchema.ObjectSchema) =>
   Object.entries(subject.properties || {}).reduce<FlatObject[]>(
     (acc, [key, { examples = [] }]) =>
