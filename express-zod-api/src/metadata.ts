@@ -5,6 +5,7 @@ import * as R from "ramda";
 
 export const metaSymbol = Symbol.for("express-zod-api");
 
+/** @todo move or remove */
 export const mixExamples = <A extends z.ZodType, B extends z.ZodType>(
   src: A,
   dest: B,

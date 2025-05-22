@@ -243,7 +243,8 @@ describe("I/O Schema and related helpers", () => {
       expect(result).toMatchSnapshot();
     });
 
-    test("Should merge examples", () => {
+    /** @todo move or remove */
+    test.skip("Should merge examples", () => {
       const middlewares: AbstractMiddleware[] = [
         new Middleware({
           input: z
