@@ -19,6 +19,8 @@
   - The argument has to be the output type of the schema (used to be the opposite):
     - This change is only breaking for transforming schemas;
     - In order to specify an input example for a transforming schema the `.example()` method must be called before it;
+- The transforming proprietary schemas `ez.dateIn()` and `ez.dateOut()` now accept metadata as its argument:
+  - This allows to set examples before transformation (`ez.dateIn()`) and to avoid the examples "branding";
 - Generating Documentation is mostly delegated to Zod 4 `z.toJSONSchema()`:
   - The basic depiction of each schema is now natively performed by Zod 4;
   - Express Zod API implements some overrides and improvements to fit it into OpenAPI 3.1 that extends JSON Schema;
@@ -55,6 +57,11 @@ export default [
     .transform(Number)
 -   .example("123")
 +   .example(123)
+```
+
+```diff
+- ez.dateIn().example("2021-12-31");
++ ez.dateIn({ examples: ["2021-12-31"] });
 ```
 
 ## Version 23
