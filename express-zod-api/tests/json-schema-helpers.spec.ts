@@ -72,6 +72,24 @@ describe("JSON Schema helpers", () => {
       expect(subject).toMatchSnapshot();
     });
 
+    test("should pull examples up from object schema props", () => {
+      const subject = flattenIO({
+        allOf: [
+          {
+            type: "object",
+            properties: { one: { type: "string", examples: ["test", "jest"] } },
+            required: ["one"],
+          },
+          {
+            type: "object",
+            properties: { two: { type: "number", examples: [123] } },
+            required: ["two"],
+          },
+        ],
+      });
+      expect(subject).toMatchSnapshot();
+    });
+
     test("should handle records", () => {
       const subject = z.toJSONSchema(
         z

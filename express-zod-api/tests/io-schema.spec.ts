@@ -242,37 +242,5 @@ describe("I/O Schema and related helpers", () => {
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
     });
-
-    test("Should merge examples", () => {
-      const middlewares: AbstractMiddleware[] = [
-        new Middleware({
-          input: z
-            .object({ one: z.string() })
-            .and(z.object({ two: z.number() }))
-            .example({ one: "test", two: 123 }),
-          handler: vi.fn(),
-        }),
-        new Middleware({
-          input: z
-            .object({ three: z.null() })
-            .or(z.object({ four: z.boolean() }))
-            .example({ three: null, four: true }),
-          handler: vi.fn(),
-        }),
-      ];
-      const endpointInput = z
-        .object({ five: z.string() })
-        .example({ five: "some" });
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(result.meta()?.examples).toEqual([
-        {
-          one: "test",
-          two: 123,
-          three: null,
-          four: true,
-          five: "some",
-        },
-      ]);
-    });
   });
 });

@@ -1025,34 +1025,38 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("should pass over the example of an individual parameter", () => {
-      const spec = new Documentation({
-        config: sampleConfig,
-        routing: {
-          v1: {
-            getSomething: defaultEndpointsFactory.build({
-              input: z.object({
-                strNum: z
-                  .string()
-                  .example("123") // example for the input side of the transformation
-                  .transform((v) => parseInt(v, 10)),
+    test.each<Method>(["get", "post"])(
+      "should pass over the example of an individual prop in %s request",
+      (method) => {
+        const spec = new Documentation({
+          config: sampleConfig,
+          routing: {
+            v1: {
+              getSomething: defaultEndpointsFactory.build({
+                method,
+                input: z.object({
+                  strNum: z
+                    .string()
+                    .example("123") // example for the input side of the transformation
+                    .transform((v) => parseInt(v, 10)),
+                }),
+                output: z.object({
+                  numericStr: z
+                    .number()
+                    .transform((v) => `${v}`)
+                    .example("456"), // example for the output side of the transformation
+                }),
+                handler: async () => ({ numericStr: 123 }),
               }),
-              output: z.object({
-                numericStr: z
-                  .number()
-                  .transform((v) => `${v}`)
-                  .example("456"), // example for the output side of the transformation
-              }),
-              handler: async () => ({ numericStr: 123 }),
-            }),
+            },
           },
-        },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO parameter",
-        serverUrl: "https://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
+          version: "3.4.5",
+          title: "Testing Metadata:example on IO parameter",
+          serverUrl: "https://example.com",
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
+      },
+    );
 
     test.each<Method>(["get", "post"])(
       "should pass over examples of each param from the whole IO schema examples (%s method)",

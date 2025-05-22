@@ -6,12 +6,7 @@ import {
   defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
-import {
-  FlatObject,
-  isObject,
-  isSchema,
-  pullExampleProps,
-} from "./common-helpers";
+import { FlatObject, isObject, isSchema } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
@@ -21,6 +16,7 @@ import {
   getPublicErrorMessage,
   logServerError,
   normalize,
+  pullResponseExamples,
   ResultSchema,
 } from "./result-helpers";
 
@@ -104,7 +100,7 @@ export const defaultResultHandler = new ResultHandler({
   positive: (output) => {
     const { examples = [] } = globalRegistry.get(output) || {};
     if (!examples.length && isSchema<$ZodObject>(output, "object"))
-      examples.push(...pullExampleProps(output as $ZodObject));
+      examples.push(...pullResponseExamples(output as $ZodObject));
     if (examples.length && !globalRegistry.has(output))
       globalRegistry.add(output, { examples });
     const responseSchema = z.object({

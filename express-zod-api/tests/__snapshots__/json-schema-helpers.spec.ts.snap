@@ -53,6 +53,41 @@ exports[`JSON Schema helpers > flattenIO() > should pass the object schema throu
 }
 `;
 
+exports[`JSON Schema helpers > flattenIO() > should pull examples up from object schema props 1`] = `
+{
+  "examples": [
+    {
+      "one": "test",
+      "two": 123,
+    },
+    {
+      "one": "jest",
+      "two": 123,
+    },
+  ],
+  "properties": {
+    "one": {
+      "examples": [
+        "test",
+        "jest",
+      ],
+      "type": "string",
+    },
+    "two": {
+      "examples": [
+        123,
+      ],
+      "type": "number",
+    },
+  },
+  "required": [
+    "one",
+    "two",
+  ],
+  "type": "object",
+}
+`;
+
 exports[`JSON Schema helpers > flattenIO() > should return object schema for the intersection of object schemas 1`] = `
 {
   "examples": [
