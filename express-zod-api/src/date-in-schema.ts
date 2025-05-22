@@ -2,7 +2,10 @@ import { z } from "zod/v4";
 
 export const ezDateInBrand = Symbol("DateIn");
 
-export const dateIn = (meta: Parameters<z.ZodString["meta"]>[0] = {}) => {
+export const dateIn = ({
+  examples,
+  ...rest
+}: Parameters<z.ZodString["meta"]>[0] = {}) => {
   const schema = z.union([
     z.iso.date(),
     z.iso.datetime(),
@@ -10,10 +13,11 @@ export const dateIn = (meta: Parameters<z.ZodString["meta"]>[0] = {}) => {
   ]) as unknown as z.ZodUnion<[z.ZodString, z.ZodString, z.ZodString]>; // this fixes DTS build for ez export
 
   return schema
-    .meta(meta)
+    .meta({ examples })
     .transform((str) => new Date(str))
     .pipe(z.date())
-    .brand(ezDateInBrand as symbol);
+    .brand(ezDateInBrand as symbol)
+    .meta(rest);
 };
 
 export type DateInSchema = ReturnType<typeof dateIn>;

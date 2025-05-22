@@ -67,6 +67,7 @@ type PatchV1UserIdInput = {
   token: string;
   id: string;
   name: string;
+  /** the day of birth */
   birthday: string;
 };
 
@@ -75,6 +76,7 @@ type PatchV1UserIdPositiveVariant1 = {
   status: "success";
   data: {
     name: string;
+    /** account creation date */
     createdAt: string;
   };
 };

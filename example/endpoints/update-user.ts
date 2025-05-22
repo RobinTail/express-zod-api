@@ -16,11 +16,17 @@ export const updateUserEndpoint =
         .transform((value) => parseInt(value, 10))
         .refine((value) => value >= 0, "should be greater than or equal to 0"),
       name: z.string().nonempty().example("John Doe"),
-      birthday: ez.dateIn({ examples: ["1963-04-21"] }),
+      birthday: ez.dateIn({
+        description: "the day of birth",
+        examples: ["1963-04-21"],
+      }),
     }),
     output: z.object({
       name: z.string().example("John Doe"),
-      createdAt: ez.dateOut({ examples: ["2021-12-31"] }),
+      createdAt: ez.dateOut({
+        description: "account creation date",
+        examples: ["2021-12-31"],
+      }),
     }),
     handler: async ({
       input: { id, name },

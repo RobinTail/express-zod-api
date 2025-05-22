@@ -146,7 +146,7 @@ paths:
                   type: string
                   minLength: 1
                 birthday:
-                  description: YYYY-MM-DDTHH:mm:ss.sssZ
+                  description: the day of birth
                   type: string
                   format: date-time
                   pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
@@ -187,7 +187,7 @@ paths:
                           - John Doe
                         type: string
                       createdAt:
-                        description: YYYY-MM-DDTHH:mm:ss.sssZ
+                        description: account creation date
                         type: string
                         format: date-time
                         externalDocs:

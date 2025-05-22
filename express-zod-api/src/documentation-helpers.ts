@@ -176,11 +176,14 @@ const ensureCompliance = ({
   return valid;
 };
 
-export const depictDateIn: Depicter = ({ jsonSchema: { examples } }, ctx) => {
+export const depictDateIn: Depicter = (
+  { jsonSchema: { examples, description } },
+  ctx,
+) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
   const jsonSchema: JSONSchema.StringSchema = {
-    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
+    description: description || "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
     pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
@@ -190,11 +193,14 @@ export const depictDateIn: Depicter = ({ jsonSchema: { examples } }, ctx) => {
   return jsonSchema;
 };
 
-export const depictDateOut: Depicter = ({ jsonSchema: { examples } }, ctx) => {
+export const depictDateOut: Depicter = (
+  { jsonSchema: { examples, description } },
+  ctx,
+) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
   const jsonSchema: JSONSchema.StringSchema = {
-    description: "YYYY-MM-DDTHH:mm:ss.sssZ",
+    description: description || "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
     externalDocs: { url: isoDateDocumentationUrl },
