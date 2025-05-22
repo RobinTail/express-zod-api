@@ -65,7 +65,7 @@ export const getInput = (
 export const ensureError = (subject: unknown): Error =>
   subject instanceof Error
     ? subject
-    : subject instanceof z.ZodError
+    : subject instanceof z.ZodError // its message is a JSON serialization of issues, so that I'm making it readable:
       ? new Error(getMessageFromError(subject), { cause: subject })
       : new Error(String(subject));
 

@@ -72,6 +72,8 @@ describe("Environment checks", () => {
         expect(returned).toEqual(caught);
         expect(returned).toBeInstanceOf(z.ZodError);
         expect(caught).toBeInstanceOf(z.ZodError);
+        expect(returned).toBeInstanceOf(Error);
+        expect(caught).toBeInstanceOf(Error);
       }
     });
 
