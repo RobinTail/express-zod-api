@@ -163,6 +163,7 @@ paths:
                 value:
                   key: 1234-5678-90
                   name: John Doe
+                  birthday: 1963-04-21
         required: true
       security:
         - APIKEY_1: []
