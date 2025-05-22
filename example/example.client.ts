@@ -76,6 +76,7 @@ type PatchV1UserIdPositiveVariant1 = {
   status: "success";
   data: {
     name: string;
+    /** account creation date */
     createdAt: string;
   };
 };

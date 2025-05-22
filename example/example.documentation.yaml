@@ -187,7 +187,7 @@ paths:
                           - John Doe
                         type: string
                       createdAt:
-                        description: YYYY-MM-DDTHH:mm:ss.sssZ
+                        description: account creation date
                         type: string
                         format: date-time
                         externalDocs:

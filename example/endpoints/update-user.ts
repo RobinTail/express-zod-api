@@ -23,7 +23,10 @@ export const updateUserEndpoint =
     }),
     output: z.object({
       name: z.string().example("John Doe"),
-      createdAt: ez.dateOut({ examples: ["2021-12-31"] }),
+      createdAt: ez.dateOut({
+        description: "account creation date",
+        examples: ["2021-12-31"],
+      }),
     }),
     handler: async ({
       input: { id, name },
