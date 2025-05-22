@@ -64,7 +64,7 @@ interface DocumentationParams {
   /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
-   * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
+   * @desc Values: functions having Zod context as first argument, second one is the framework context.
    * @example { MyBrand: ( { zodSchema, jsonSchema } ) => ({ type: "object" })
    */
   brandHandling?: BrandHandling;
