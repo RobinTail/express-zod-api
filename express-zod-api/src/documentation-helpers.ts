@@ -645,7 +645,6 @@ export const depictBody = ({
     examples.push(...withoutParams.examples);
     delete withoutParams.examples; // pull up
   }
-  console.log(examples, flattenIO(request));
   const media: MediaTypeObject = {
     schema:
       composition === "components"

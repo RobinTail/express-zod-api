@@ -1,6 +1,6 @@
 import type { JSONSchema } from "zod/v4/core";
 import * as R from "ramda";
-import { combinations, isObject } from "./common-helpers";
+import { combinations, FlatObject, isObject } from "./common-helpers";
 
 const isJsonObjectSchema = (
   subject: JSONSchema.BaseSchema,
@@ -63,6 +63,7 @@ export const flattenIO = (
       }
     }
     if (!isJsonObjectSchema(entry)) continue;
+    stack.push([isOptional, { examples: pullExamplesUp(entry) }]);
     if (entry.properties) {
       flat.properties = (mode === "throw" ? propsMerger : R.mergeDeepRight)(
         flat.properties,
@@ -87,3 +88,13 @@ export const flattenIO = (
   if (flatRequired.length) flat.required = [...new Set(flatRequired)];
   return flat;
 };
+
+export const pullExamplesUp = (subject: JSONSchema.ObjectSchema) =>
+  Object.entries(subject.properties || {}).reduce<FlatObject[]>(
+    (acc, [key, { examples = [] }]) =>
+      combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
+        ...left,
+        ...right,
+      })),
+    [],
+  );

@@ -3966,6 +3966,10 @@ paths:
                   type: string
               required:
                 - strNum
+            examples:
+              example1:
+                value:
+                  strNum: "123"
         required: true
       responses:
         "200":
