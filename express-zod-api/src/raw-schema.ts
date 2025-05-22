@@ -18,4 +18,4 @@ export function raw(extra?: $ZodShape) {
   return extra ? extended(extra) : base.brand(ezRawBrand as symbol);
 }
 
-export type RawSchema = ReturnType<typeof raw>;
+export type RawSchema = ReturnType<typeof base.brand<symbol>>;

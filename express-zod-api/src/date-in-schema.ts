@@ -19,5 +19,3 @@ export const dateIn = ({
     .brand(ezDateInBrand as symbol)
     .meta(rest);
 };
-
-export type DateInSchema = ReturnType<typeof dateIn>;

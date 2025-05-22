@@ -14,5 +14,3 @@ export const dateOut = ({
       ...rest,
       examples: examples as Array<string & z.$brand> | undefined,
     });
-
-export type DateOutSchema = ReturnType<typeof dateOut>;

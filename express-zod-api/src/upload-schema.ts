@@ -34,5 +34,3 @@ export const upload = () =>
       },
     )
     .brand(ezUploadBrand as symbol);
-
-export type UploadSchema = ReturnType<typeof upload>;
