@@ -3850,7 +3850,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Metadata > should pass over the example of an individual parameter 1`] = `
+exports[`Documentation > Metadata > should pass over the example of an individual prop in get request 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO parameter
@@ -3904,6 +3904,102 @@ paths:
                       numericStr: "456"
         "400":
           description: GET /v1/getSomething Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                required:
+                  - status
+                  - error
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`Documentation > Metadata > should pass over the example of an individual prop in post request 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing Metadata:example on IO parameter
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                strNum:
+                  examples:
+                    - "123"
+                  type: string
+              required:
+                - strNum
+        required: true
+      responses:
+        "200":
+          description: POST /v1/getSomething Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                    properties:
+                      numericStr:
+                        examples:
+                          - "456"
+                        type: string
+                    required:
+                      - numericStr
+                    examples:
+                      - numericStr: "456"
+                required:
+                  - status
+                  - data
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      numericStr: "456"
+        "400":
+          description: POST /v1/getSomething Negative response
           content:
             application/json:
               schema:
