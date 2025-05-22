@@ -20,10 +20,7 @@ export const getFinalEndpointInputSchema = <
 >(
   middlewares: AbstractMiddleware[],
   input: IN,
-): z.ZodIntersection<MIN, IN> => {
-  const allSchemas: IOSchema[] = R.pluck("schema", middlewares);
-  allSchemas.push(input);
-  return allSchemas.reduce((acc, schema) =>
-    acc.and(schema),
-  ) as z.ZodIntersection<MIN, IN>;
-};
+) =>
+  R.pluck("schema", middlewares)
+    .concat(input)
+    .reduce((acc, schema) => acc.and(schema)) as z.ZodIntersection<MIN, IN>;
