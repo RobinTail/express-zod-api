@@ -6,7 +6,7 @@ import {
   getMessageFromError,
   makeCleanId,
   ensureError,
-  pullExampleProps,
+  pullResponseExamples,
   getRoutePathParams,
 } from "../src/common-helpers";
 import { z } from "zod/v4";
@@ -199,14 +199,14 @@ describe("Common Helpers", () => {
     });
   });
 
-  describe("pullExampleProps()", () => {
+  describe("pullResponseExamples()", () => {
     test("handles multiple examples per property", () => {
       const schema = z.object({
         a: z.string().example("one").example("two").example("three"),
         b: z.number().example(1).example(2),
         c: z.boolean().example(false),
       });
-      expect(pullExampleProps(schema)).toEqual([
+      expect(pullResponseExamples(schema)).toEqual([
         { a: "one", b: 1, c: false },
         { a: "one", b: 2, c: false },
         { a: "two", b: 1, c: false },
