@@ -36,7 +36,7 @@ exports[`Documentation helpers > depictDateIn > should set type:string, pattern 
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
   "examples": [
-    "2024-01-01T00:00:00.000Z",
+    "2024-01-01",
   ],
   "externalDocs": {
     "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",

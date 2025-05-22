@@ -1,4 +1,4 @@
-import { $brand, JSONSchema } from "zod/v4/core";
+import { JSONSchema } from "zod/v4/core";
 import { SchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod/v4";
@@ -505,16 +505,11 @@ describe("Documentation helpers", () => {
     test.each([
       { examples: undefined },
       { examples: [] },
-      { examples: [new Date("2024-01-01")] },
+      { examples: ["2024-01-01"] },
     ])("should set type:string, pattern and format %#", ({ examples }) => {
       expect(
         depictDateIn(
-          {
-            zodSchema: ez
-              .dateIn()
-              .meta({ examples: examples as Array<Date & $brand> }),
-            jsonSchema: { anyOf: [], examples },
-          },
+          { zodSchema: z.never(), jsonSchema: { anyOf: [], examples } },
           requestCtx,
         ),
       ).toMatchSnapshot();
