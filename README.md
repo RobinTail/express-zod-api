@@ -561,7 +561,7 @@ in actual response by calling
 which in turn calls
 [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString).
 It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
-confusion with original method ~~z.date()~~ that should not be used within IO schemas of your API.
+confusion with original method ~~z.date()~~ that is not recommended to use without transformations.
 
 In order to solve this problem, the framework provides two custom methods for dealing with dates: `ez.dateIn()` and
 `ez.dateOut()` for using within input and output schemas accordingly.
@@ -577,7 +577,7 @@ provides your endpoint handler or middleware with a `Date`. It supports the foll
 ```
 
 `ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHandler` with a `string` representation in ISO
-format for the response transmission. Consider the following simplified example for better understanding:
+format for the response transmission. Both schemas accept metadata as an argument. Consider the following example:
 
 ```typescript
 import { z } from "zod/v4";
@@ -587,10 +587,10 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
     userId: z.string(),
-    birthday: ez.dateIn(), // string -> Date in handler
+    birthday: ez.dateIn({ examples: ["1963-04-21"] }), // string -> Date in handler
   }),
   output: z.object({
-    createdAt: ez.dateOut(), // Date -> string in response
+    createdAt: ez.dateOut({ examples: ["2021-12-31"] }), // Date -> string in response
   }),
   handler: async ({ input }) => ({
     createdAt: new Date("2022-01-22"), // 2022-01-22T00:00:00.000Z
