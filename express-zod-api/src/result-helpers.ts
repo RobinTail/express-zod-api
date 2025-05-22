@@ -1,8 +1,11 @@
 import { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
-import { z } from "zod/v4";
+import * as R from "ramda";
+import { globalRegistry, z } from "zod/v4";
+import type { $ZodObject } from "zod/v4/core";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import {
+  combinations,
   FlatObject,
   getMessageFromError,
   isProduction,
@@ -84,3 +87,16 @@ export const getPublicErrorMessage = (error: HttpError): string =>
   isProduction() && !error.expose
     ? createHttpError(error.statusCode).message // default message for that code
     : error.message;
+
+/** @see pullRequestExamples */
+export const pullResponseExamples = <T extends $ZodObject>(subject: T) =>
+  Object.entries(subject._zod.def.shape).reduce<Partial<z.output<T>>[]>(
+    (acc, [key, schema]) => {
+      const { examples = [] } = globalRegistry.get(schema) || {};
+      return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
+        ...left,
+        ...right,
+      }));
+    },
+    [],
+  );

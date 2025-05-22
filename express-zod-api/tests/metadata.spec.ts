@@ -1,75 +1,14 @@
-import { z } from "zod/v4";
-import { mixExamples } from "../src/metadata";
+import type { $ZodType } from "zod/v4/core";
+import { getBrand } from "../src/metadata";
 
 describe("Metadata", () => {
-  describe("mixExamples()", () => {
-    test("should return the same dest schema in case src one has no meta", () => {
-      const src = z.string();
-      const dest = z.number();
-      const result = mixExamples(src, dest);
-      expect(result).toEqual(dest);
-      expect(result.meta()?.examples).toBeFalsy();
-      expect(dest.meta()?.examples).toBeFalsy();
-    });
-    test("should copy meta from src to dest in case meta is defined", () => {
-      const src = z.string().example("some").describe("test");
-      const dest = z.number().describe("another");
-      const result = mixExamples(src, dest);
-      expect(result).not.toEqual(dest); // immutable
-      expect(result.meta()?.examples).toEqual(src.meta()?.examples);
-      expect(result.meta()?.examples).toEqual(["some"]);
-      expect(result.description).toBe("another"); // preserves it
-    });
-
-    test("should merge the meta from src to dest", () => {
-      const src = z
-        .object({ a: z.string() })
-        .example({ a: "some" })
-        .example({ a: "another" });
-      const dest = z
-        .object({ b: z.number() })
-        .example({ b: 123 })
-        .example({ b: 456 })
-        .example({ b: 789 });
-      const result = mixExamples(src, dest);
-      expect(result.meta()?.examples).toEqual([
-        { a: "some", b: 123 },
-        { a: "another", b: 123 },
-        { a: "some", b: 456 },
-        { a: "another", b: 456 },
-        { a: "some", b: 789 },
-        { a: "another", b: 789 },
-      ]);
-    });
-
-    test("should merge deeply", () => {
-      const src = z
-        .object({ a: z.object({ b: z.string() }) })
-        .example({ a: { b: "some" } })
-        .example({ a: { b: "another" } });
-      const dest = z
-        .object({ a: z.object({ c: z.number() }) })
-        .example({ a: { c: 123 } })
-        .example({ a: { c: 456 } })
-        .example({ a: { c: 789 } });
-      const result = mixExamples(src, dest);
-      expect(result.meta()?.examples).toEqual([
-        { a: { b: "some", c: 123 } },
-        { a: { b: "another", c: 123 } },
-        { a: { b: "some", c: 456 } },
-        { a: { b: "another", c: 456 } },
-        { a: { b: "some", c: 789 } },
-        { a: { b: "another", c: 789 } },
-      ]);
-    });
-
-    test("should avoid non-object examples", () => {
-      const src = z.string().example("a").example("b");
-      const dest = z
-        .object({ items: z.array(z.string()) })
-        .example({ items: ["e", "f", "g"] });
-      const result = mixExamples(src, dest);
-      expect(result.meta()?.examples).toEqual(["a", "b"]);
-    });
+  describe("getBrand", () => {
+    test.each([{ brand: "test" }, {}, undefined])(
+      "should take it from bag",
+      (bag) => {
+        const mock = { _zod: { bag } };
+        expect(getBrand(mock as unknown as $ZodType)).toBe(bag?.brand);
+      },
+    );
   });
 });

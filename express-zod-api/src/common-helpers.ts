@@ -1,7 +1,7 @@
-import type { $ZodObject, $ZodTransform, $ZodType } from "zod/v4/core";
 import { Request } from "express";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod/v4";
+import { z } from "zod/v4";
+import type { $ZodTransform, $ZodType } from "zod/v4/core";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import { OutputValidationError } from "./errors";
@@ -89,19 +89,6 @@ export const isSchema = <T extends $ZodType>(
   subject: $ZodType,
   type: T["_zod"]["def"]["type"],
 ): subject is T => subject._zod.def.type === type;
-
-/** Takes the original unvalidated examples from the properties of ZodObject schema shape */
-export const pullExampleProps = <T extends $ZodObject>(subject: T) =>
-  Object.entries(subject._zod.def.shape).reduce<Partial<z.output<T>>[]>(
-    (acc, [key, schema]) => {
-      const { examples = [] } = globalRegistry.get(schema) || {};
-      return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
-        ...left,
-        ...right,
-      }));
-    },
-    [],
-  );
 
 export const combinations = <T>(
   a: T[],
