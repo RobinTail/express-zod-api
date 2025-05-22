@@ -67,6 +67,7 @@ type PatchV1UserIdInput = {
   token: string;
   id: string;
   name: string;
+  /** the day of birth */
   birthday: string;
 };
 
