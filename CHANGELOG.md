@@ -60,8 +60,8 @@ export default [
 ```
 
 ```diff
-- ez.dateIn().describe("birthday").example("1963-04-21");
-+ ez.dateIn({ description: "birthday", examples: ["1963-04-21"] });
+- ez.dateIn().example("2021-12-31");
++ ez.dateIn({ examples: ["2021-12-31"] });
 ```
 
 ## Version 23
