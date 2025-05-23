@@ -1,5 +1,5 @@
 import camelize from "camelize-ts";
-import { Method } from "example/example.client";
+import type { Method } from "../src/method";
 import snakify from "snakify-ts";
 import {
   Documentation,
