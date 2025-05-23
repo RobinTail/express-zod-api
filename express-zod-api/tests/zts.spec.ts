@@ -153,7 +153,7 @@ describe("zod-to-ts", () => {
       ),
       map: z.map(z.string(), z.array(z.object({ string: z.string() }))),
       set: z.set(z.string()),
-      intersection: z.string().and(z.number()).or(z.bigint()),
+      intersection: z.intersection(z.string(), z.number()).or(z.bigint()),
       promise: z.promise(z.number()),
       optDefaultString: z.string().optional().default("hi"),
       refinedStringWithSomeBullshit: z
