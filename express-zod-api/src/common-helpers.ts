@@ -66,12 +66,7 @@ export const ensureError = (subject: unknown): Error =>
   subject instanceof Error
     ? subject
     : subject instanceof z.ZodError
-      ? /**
-         * its message is a serialization of issues, so that I'm making it readable here
-         * @todo rm if fixed:
-         * @link https://github.com/colinhacks/zod/pull/4436/
-         * */
-        new Error(getMessageFromError(subject), { cause: subject })
+      ? new z.ZodRealError(subject.issues) // ZodError is not an instance of Error, unlike ZodRealError that is
       : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
