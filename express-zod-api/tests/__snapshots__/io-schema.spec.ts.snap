@@ -2,7 +2,7 @@
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should handle no middlewares 1`] = `
 {
-  "$schema": "https://json-schema.org/draft-2020-12/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "properties": {
     "four": {
       "type": "boolean",
@@ -17,7 +17,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge input object schemas 1`] = `
 {
-  "$schema": "https://json-schema.org/draft-2020-12/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
     {
       "allOf": [
@@ -77,7 +77,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge intersection object schemas 1`] = `
 {
-  "$schema": "https://json-schema.org/draft-2020-12/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
     {
       "allOf": [
@@ -167,7 +167,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge mixed object schemas 1`] = `
 {
-  "$schema": "https://json-schema.org/draft-2020-12/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
     {
       "allOf": [
@@ -242,7 +242,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge union object schemas 1`] = `
 {
-  "$schema": "https://json-schema.org/draft-2020-12/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
     {
       "allOf": [
