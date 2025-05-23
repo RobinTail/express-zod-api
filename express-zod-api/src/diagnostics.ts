@@ -27,7 +27,7 @@ export class Diagnostics {
         if (entry.type && entry.type !== "object")
           this.logger.warn(`Endpoint ${dir} schema is not object-based`, ctx);
         for (const prop of ["allOf", "oneOf", "anyOf"] as const)
-          if (entry[prop]) stack.push(...entry[prop]);
+          if (entry[prop]) stack.unshift(...entry[prop]);
       }
     }
     if (endpoint.requestType === "json") {
