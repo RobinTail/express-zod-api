@@ -410,9 +410,9 @@ const fixReferences = (
           entry.$ref = ctx.makeRef(depiction, ensureCompliance(depiction)).$ref;
         continue;
       }
-      stack.unshift(...R.values(entry));
+      stack.push(...R.values(entry));
     }
-    if (R.is(Array, entry)) stack.unshift(...R.values(entry));
+    if (R.is(Array, entry)) stack.push(...R.values(entry));
   }
   return subject;
 };

@@ -51,9 +51,9 @@ export const hasCycle = (
     const entry = stack.shift()!;
     if (R.is(Object, entry)) {
       if ((entry as JSONSchema.BaseSchema).$ref === "#") return true;
-      stack.unshift(...R.values(entry));
+      stack.push(...R.values(entry));
     }
-    if (R.is(Array, entry)) stack.unshift(...R.values(entry));
+    if (R.is(Array, entry)) stack.push(...R.values(entry));
   }
   return false;
 };

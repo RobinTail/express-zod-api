@@ -41,7 +41,7 @@ export const flattenIO = (
     const [isOptional, entry] = stack.shift()!;
     if (entry.description) flat.description ??= entry.description;
     if (entry.allOf) {
-      stack.unshift(
+      stack.push(
         ...entry.allOf.map((one) => {
           if (mode === "throw" && !(one.type === "object" && canMerge(one)))
             throw new Error("Can not merge");
@@ -49,8 +49,8 @@ export const flattenIO = (
         }),
       );
     }
-    if (entry.anyOf) stack.unshift(...R.map(nestOptional, entry.anyOf));
-    if (entry.oneOf) stack.unshift(...R.map(nestOptional, entry.oneOf));
+    if (entry.anyOf) stack.push(...R.map(nestOptional, entry.anyOf));
+    if (entry.oneOf) stack.push(...R.map(nestOptional, entry.oneOf));
     if (entry.examples?.length) {
       if (isOptional) {
         flat.examples = R.concat(flat.examples || [], entry.examples);
@@ -63,7 +63,7 @@ export const flattenIO = (
       }
     }
     if (!isJsonObjectSchema(entry)) continue;
-    stack.unshift([isOptional, { examples: pullRequestExamples(entry) }]);
+    stack.push([isOptional, { examples: pullRequestExamples(entry) }]);
     if (entry.properties) {
       flat.properties = (mode === "throw" ? propsMerger : R.mergeDeepRight)(
         flat.properties,
