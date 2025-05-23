@@ -25,8 +25,7 @@
   - The basic depiction of each schema is now natively performed by Zod 4;
   - Express Zod API implements some overrides and improvements to fit it into OpenAPI 3.1 that extends JSON Schema;
   - The `numericRange` option removed from `Documentation` class constructor argument;
-  - The `brandHandling` should consist of postprocessing functions altering the depiction made by Zod 4;
-  - The `Depicter` type signature changed;
+  - The `Depicter` type signature changed: became a postprocessing function returning an overridden JSON Schema;
 - The `optionalPropStyle` option removed from `Integration` class constructor:
   - Use `.optional()` to add question mark to the object property as well as `undefined` to its type;
   - Use `.or(z.undefined())` to add `undefined` to the type of the object property;
