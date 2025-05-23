@@ -12,15 +12,5 @@ ZodError({
       ],
     },
   ],
-  "message": "[
-  {
-    "expected": "string",
-    "code": "invalid_type",
-    "path": [
-      "name"
-    ],
-    "message": "Invalid input: expected string, received undefined"
-  }
-]",
 })
 `;

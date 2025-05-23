@@ -20,14 +20,6 @@ BadRequestError({
         "path": [],
       },
     ],
-    "message": "[
-  {
-    "expected": "string",
-    "code": "invalid_type",
-    "path": [],
-    "message": "Invalid input: expected string, received number"
-  }
-]",
   }),
   "message": "Invalid input: expected string, received number",
 })
@@ -50,14 +42,6 @@ InternalServerError({
         "path": [],
       },
     ],
-    "message": "[
-  {
-    "expected": "string",
-    "code": "invalid_type",
-    "path": [],
-    "message": "Invalid input: expected string, received number"
-  }
-]",
   }),
   "message": "output: Invalid input: expected string, received number",
 })

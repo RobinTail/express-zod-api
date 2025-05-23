@@ -13,7 +13,7 @@ const errorSerializer: NewPlugin = {
     const { issues } = error instanceof z.ZodError ? error : {};
     const obj = Object.assign(
       {},
-      message && { message },
+      message && !issues && { message }, // @todo undo if merged https://github.com/colinhacks/zod/pull/4436
       cause && { cause },
       handled && { handled },
       issues && { issues },
