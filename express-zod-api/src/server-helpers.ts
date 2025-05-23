@@ -162,7 +162,7 @@ export const installTerminationListener = ({
   const graceful = monitor(servers, { logger, timeout });
   const onTerm = async () => {
     await graceful.shutdown();
-    await beforeExit;
+    await beforeExit?.();
     process.exit();
   };
   for (const trigger of events) process.on(trigger, onTerm);
