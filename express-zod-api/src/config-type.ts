@@ -131,7 +131,7 @@ interface GracefulOptions {
    * @default [SIGINT, SIGTERM]
    * */
   events?: string[];
-  /** @desc The hook to call after the server closed, but before terminating the process. */
+  /** @desc The hook to call after the server was closed, but before terminating the process. */
   beforeExit?: () => void | Promise<void>;
 }
 
