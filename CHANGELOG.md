@@ -18,7 +18,7 @@
   - Now acts as an alias for `ZodType::meta({ examples })`;
   - The argument has to be the output type of the schema (used to be the opposite):
     - This change is only breaking for transforming schemas;
-    - In order to specify an input example for a transforming schema the `.example()` method must be called before it;
+    - In order to specify an example for an input schema the `.example()` method must be called before `.transform()`;
 - The transforming proprietary schemas `ez.dateIn()` and `ez.dateOut()` now accept metadata as its argument:
   - This allows to set examples before transformation (`ez.dateIn()`) and to avoid the examples "branding";
 - Generating Documentation is mostly delegated to Zod 4 `z.toJSONSchema()`:
