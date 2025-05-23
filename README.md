@@ -1168,7 +1168,7 @@ createConfig({
   gracefulShutdown: {
     timeout: 1000,
     events: ["SIGINT", "SIGTERM"],
-    beforeExit: async () => {},
+    beforeExit: /* async */ () => {},
   },
 });
 ```
