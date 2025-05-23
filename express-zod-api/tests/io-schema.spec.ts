@@ -31,10 +31,12 @@ describe("I/O Schema and related helpers", () => {
       ).not.toExtend<IOSchema>();
     });
     test("accepts intersection of objects", () => {
-      expectTypeOf(z.object({}).and(z.object({}))).toExtend<IOSchema>();
+      expectTypeOf(
+        z.intersection(z.object({}), z.object({})),
+      ).toExtend<IOSchema>();
       expectTypeOf(z.object({}).and(z.object({}))).toExtend<IOSchema>();
       expectTypeOf(
-        z.object({}).and(z.object({})).and(z.object({})),
+        z.object({}).and(z.object({}).and(z.object({}))),
       ).toExtend<IOSchema>();
     });
     test("does not accepts intersection of object with array of objects", () => {
