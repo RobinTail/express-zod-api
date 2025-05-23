@@ -52,11 +52,10 @@ export default [
 ```
 
 ```diff
-  z.string()
+  input: z.string()
 +   .example("123")
     .transform(Number)
 -   .example("123")
-+   .example(123)
 ```
 
 ```diff
