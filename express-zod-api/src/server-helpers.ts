@@ -153,13 +153,17 @@ export const installDeprecationListener = (logger: ActualLogger) =>
 export const installTerminationListener = ({
   servers,
   logger,
-  options: { timeout, events = ["SIGINT", "SIGTERM"] },
+  options: { timeout, beforeExit, events = ["SIGINT", "SIGTERM"] },
 }: {
   servers: Parameters<typeof monitor>[0];
   options: Extract<ServerConfig["gracefulShutdown"], object>;
   logger: ActualLogger;
 }) => {
   const graceful = monitor(servers, { logger, timeout });
-  const onTerm = () => graceful.shutdown().then(() => process.exit());
+  const onTerm = async () => {
+    await graceful.shutdown();
+    await beforeExit;
+    process.exit();
+  };
   for (const trigger of events) process.on(trigger, onTerm);
 };
