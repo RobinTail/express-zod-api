@@ -135,6 +135,7 @@ describe("App in production mode", async () => {
     "post /v1/upload": uploadEndpoint,
   };
   vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
+  const beforeExit = vi.fn();
   const config = createConfig({
     http: { listen: port },
     compression: { threshold: 1 },
@@ -165,7 +166,7 @@ describe("App in production mode", async () => {
     },
     cors: false,
     startupLogo: true,
-    gracefulShutdown: { events: ["FAKE"] },
+    gracefulShutdown: { events: ["FAKE"], beforeExit },
     logger,
     childLoggerProvider: ({ parent }) =>
       Object.defineProperty(parent, "isChild", { value: true }),
@@ -592,7 +593,7 @@ describe("App in production mode", async () => {
 
   describe("Shutdown", () => {
     test("should terminate suspended request gracefully on signal", async () => {
-      const spy = vi
+      const exitSpy = vi
         .spyOn(process, "exit")
         .mockImplementation(vi.fn<typeof process.exit>());
       fetch(`http://127.0.0.1:${port}/v1/long`).catch((err) =>
@@ -606,7 +607,8 @@ describe("App in production mode", async () => {
       });
       await setTimeout(1500);
       expect(server.listening).toBeFalsy();
-      expect(spy).toHaveBeenCalled();
+      expect(beforeExit).toHaveBeenCalledOnce();
+      expect(exitSpy).toHaveBeenCalled();
     });
   });
 });
