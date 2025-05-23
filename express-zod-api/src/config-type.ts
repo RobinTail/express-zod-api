@@ -121,7 +121,7 @@ type CompressionOptions = Pick<
 
 interface GracefulOptions {
   /**
-   * @desc Time given to drain ongoing requests before exit.
+   * @desc Time given to drain ongoing requests before closing the server.
    * @default 1000
    * */
   timeout?: number;
@@ -131,6 +131,8 @@ interface GracefulOptions {
    * @default [SIGINT, SIGTERM]
    * */
   events?: string[];
+  /** @desc The hook to call after the server was closed, but before terminating the process. */
+  beforeExit?: () => void | Promise<void>;
 }
 
 type BeforeRouting = (params: {

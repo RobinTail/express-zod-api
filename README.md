@@ -84,6 +84,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/HeikoOsigus.png" alt="@HeikoOsigus" width="50px" />](https://github.com/HeikoOsigus)
 [<img src="https://github.com/crgeary.png" alt="@crgeary" width="50px" />](https://github.com/crgeary)
 [<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/gmorgen1.png" alt="@gmorgen1" width="50px" />](https://github.com/gmorgen1)
@@ -1167,6 +1168,7 @@ createConfig({
   gracefulShutdown: {
     timeout: 1000,
     events: ["SIGINT", "SIGTERM"],
+    beforeExit: /* async */ () => {},
   },
 });
 ```

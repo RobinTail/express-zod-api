@@ -66,6 +66,12 @@ export default [
 
 ## Version 23
 
+### v23.6.0
+
+- Featuring `gracefulShutdown.beforeExit()` hook:
+  - The function to execute after the server was closed, but before terminating the process (can be asynchronous);
+  - The feature suggested by [@HeikoOsigus](https://github.com/HeikoOsigus).
+
 ### v23.5.0
 
 - Integer number `format` in generated Documentation now also depends on the `numericRange` option:
