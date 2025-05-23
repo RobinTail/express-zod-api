@@ -478,7 +478,7 @@ By the way, you can also refine the whole I/O object, for example in case you ne
 const endpoint = endpointsFactory.build({
   input: z
     .object({
-      email: z.string().email().optional(),
+      email: z.email().optional(),
       id: z.string().optional(),
       otherThing: z.string().optional(),
     })
@@ -957,7 +957,7 @@ export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: ez.form({
     name: z.string().min(1),
-    email: z.string().email(),
+    email: z.email(),
     message: z.string().min(1),
   }),
 });
@@ -1109,7 +1109,7 @@ new ResultHandler({
   negative: [
     {
       statusCode: 409, // conflict: entity already exists
-      schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
+      schema: z.object({ status: z.literal("exists"), id: z.int() }),
     },
     {
       statusCode: [400, 500], // validation or internal error
@@ -1147,7 +1147,7 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
   input: ez.raw({
     /* the place for additional inputs, like route params, if needed */
   }),
-  output: z.object({ length: z.number().int().nonnegative() }),
+  output: z.object({ length: z.int().nonnegative() }),
   handler: async ({ input: { raw } }) => ({
     length: raw.length, // raw is Buffer
   }),
@@ -1185,7 +1185,7 @@ import { EventStreamFactory } from "express-zod-api";
 import { setTimeout } from "node:timers/promises";
 
 const subscriptionEndpoint = new EventStreamFactory({
-  time: z.number().int().positive(),
+  time: z.int().positive(),
 }).buildVoid({
   input: z.object({}), // optional input schema
   handler: async ({ options: { emit, isClosed } }) => {
