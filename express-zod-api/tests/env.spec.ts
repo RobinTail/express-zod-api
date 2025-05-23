@@ -61,6 +61,23 @@ describe("Environment checks", () => {
         Object.getOwnPropertyDescriptors(schema._zod.def.shape),
       ).toMatchSnapshot();
     });
+
+    test("ZodError inequality", () => {
+      const issue: z.core.$ZodIssue = {
+        code: "invalid_type",
+        expected: "string",
+        input: 123,
+        path: [],
+        message: "expected string, received number",
+      };
+      const error = new z.ZodError([issue]);
+      const real = new z.ZodRealError([issue]);
+      expect(error).not.toBeInstanceOf(Error); // and this is important
+      expect(real).toBeInstanceOf(Error);
+      expect(real).toBeInstanceOf(z.ZodError); // important inheritance
+      expect(error).toHaveProperty("message");
+      expect(real).toHaveProperty("message");
+    });
   });
 
   describe("Zod new features", () => {
