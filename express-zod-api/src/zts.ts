@@ -14,6 +14,7 @@ import type {
   $ZodReadonly,
   $ZodRecord,
   $ZodString,
+  $ZodTemplateLiteral,
   $ZodTransform,
   $ZodTuple,
   $ZodUnion,
@@ -68,6 +69,29 @@ const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
       : makeLiteralType(entry),
   );
   return values.length === 1 ? values[0] : f.createUnionTypeNode(values);
+};
+
+const onTemplateLiteral: Producer = (
+  { _zod: { def } }: $ZodTemplateLiteral,
+  { next },
+) => {
+  const [first, ...rest] = def.parts;
+  const head = f.createTemplateHead(
+    isSchema(first) ? String(rest.unshift(first)) && "" : `${first}`,
+  );
+  const spans: ts.TemplateLiteralTypeSpan[] = [];
+  while (rest.length) {
+    const a = rest.shift();
+    const b = rest.shift();
+    const second = isSchema(b) ? String(rest.unshift(b)) && "" : `${b || ""}`;
+    spans.push(
+      f.createTemplateLiteralTypeSpan(
+        next(isSchema(a) ? a : z.literal(a)),
+        (rest.length ? f.createTemplateMiddle : f.createTemplateTail)(second),
+      ),
+    );
+  }
+  return f.createTemplateLiteralType(head, spans);
 };
 
 const onObject: Producer = (
@@ -223,6 +247,7 @@ const producers: HandlingRules<
   record: onRecord,
   object: onObject,
   literal: onLiteral,
+  template_literal: onTemplateLiteral,
   intersection: onIntersection,
   union: onSomeUnion,
   default: onWrapped,
