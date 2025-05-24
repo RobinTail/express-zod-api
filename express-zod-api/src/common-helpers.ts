@@ -70,16 +70,16 @@ export const ensureError = (subject: unknown): Error =>
       : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
-  if (error instanceof z.ZodError) {
-    return error.issues
-      .map(({ path, message }) =>
-        (path.length ? [path.join("/")] : []).concat(message).join(": "),
-      )
-      .join("; ");
-  }
+  if (error instanceof z.ZodError) return z.prettifyError(error);
   if (error instanceof OutputValidationError) {
-    const hasFirstField = error.cause.issues[0]?.path.length > 0;
-    return `output${hasFirstField ? "/" : ": "}${error.message}`;
+    return z.prettifyError(
+      new z.ZodError(
+        error.cause.issues.map((one) => ({
+          ...one,
+          path: ["output", ...one.path],
+        })),
+      ),
+    );
   }
   return error.message;
 };

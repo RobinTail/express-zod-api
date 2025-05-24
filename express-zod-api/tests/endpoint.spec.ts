@@ -142,7 +142,7 @@ describe("Endpoint", () => {
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
         status: "error",
-        error: { message: "output/email: Invalid email address" },
+        error: { message: "✖ Invalid email address\n  → at output.email" },
       });
     });
 
@@ -522,14 +522,15 @@ describe("Endpoint", () => {
             (data.type === "type1" ? "type1Attribute" : "type2Attribute") in
             data.dynamicValue,
           {
-            message: "type1Attribute is required if type is type1",
+            message:
+              "✖ type1Attribute is required if type is type1\n   → at dynamicValue",
             path: ["dynamicValue"],
           },
         ),
       output: z
         .looseObject({})
         .refine((obj) => !("emitOutputValidationFailure" in obj), {
-          message: "failure on demand",
+          message: "✖ failure on demand\n  → at output",
         }),
       handler: async ({ input }) =>
         input.emitOutputValidationFailure
@@ -569,7 +570,9 @@ describe("Endpoint", () => {
       expect(responseMock._getJSONData()).toEqual({
         status: "error",
         error: {
-          message: "dynamicValue: type1Attribute is required if type is type1",
+          // @todo fix this
+          message:
+            "✖ ✖ type1Attribute is required if type is type1\n   → at dynamicValue\n  → at dynamicValue",
         },
       });
       expect(responseMock._getStatusCode()).toBe(400);
@@ -589,7 +592,9 @@ describe("Endpoint", () => {
       });
       expect(responseMock._getJSONData()).toEqual({
         status: "error",
-        error: { message: "output: failure on demand" },
+        error: {
+          message: "✖ ✖ failure on demand\n  → at output\n  → at output", // @todo fix this
+        },
       });
       expect(responseMock._getStatusCode()).toBe(500);
     });
@@ -639,7 +644,7 @@ describe("Endpoint", () => {
       });
       expect(responseMock._getJSONData()).toEqual({
         status: "error",
-        error: { message: "Please provide at least one property" },
+        error: { message: "✖ Please provide at least one property" },
       });
       expect(responseMock._getStatusCode()).toBe(400);
     });

@@ -9,7 +9,7 @@ InternalServerError({
 })
 `;
 
-exports[`Result helpers > ensureHttpError() > should handle InputValidationError: Invalid input: expected string, received number 1`] = `
+exports[`Result helpers > ensureHttpError() > should handle InputValidationError: ✖ Invalid input: expected string, received number 1`] = `
 BadRequestError({
   "cause": ZodError({
     "issues": [
@@ -21,7 +21,7 @@ BadRequestError({
       },
     ],
   }),
-  "message": "Invalid input: expected string, received number",
+  "message": "✖ Invalid input: expected string, received number",
 })
 `;
 
@@ -31,7 +31,7 @@ NotFoundError({
 })
 `;
 
-exports[`Result helpers > ensureHttpError() > should handle OutputValidationError: Invalid input: expected string, received number 1`] = `
+exports[`Result helpers > ensureHttpError() > should handle OutputValidationError: ✖ Invalid input: expected string, received number 1`] = `
 InternalServerError({
   "cause": ZodError({
     "issues": [
@@ -43,6 +43,7 @@ InternalServerError({
       },
     ],
   }),
-  "message": "output: Invalid input: expected string, received number",
+  "message": "✖ Invalid input: expected string, received number
+  → at output",
 })
 `;
