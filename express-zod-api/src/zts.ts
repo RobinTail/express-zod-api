@@ -15,6 +15,7 @@ import type {
   $ZodRecord,
   $ZodString,
   $ZodTemplateLiteral,
+  $ZodTemplateLiteralPart,
   $ZodTransform,
   $ZodTuple,
   $ZodUnion,
@@ -76,19 +77,22 @@ const onTemplateLiteral: Producer = (
   { next },
 ) => {
   const [first, ...rest] = def.parts;
-  const head = f.createTemplateHead(
-    isSchema(first) ? String(rest.unshift(first)) && "" : `${first || ""}`,
-  );
+  /** has side effect on rest.length */
+  const ensureString = (part: $ZodTemplateLiteralPart) => {
+    if (!isSchema(part)) return `${part || ""}`;
+    rest.unshift(part);
+    return "";
+  };
+  const head = f.createTemplateHead(ensureString(first));
   if (!rest.length) return makeLiteralType(head.text);
   const spans: ts.TemplateLiteralTypeSpan[] = [];
   while (rest.length) {
     const a = rest.shift();
-    const b = rest.shift();
-    const second = isSchema(b) ? String(rest.unshift(b)) && "" : `${b || ""}`;
+    const b = ensureString(rest.shift());
     spans.push(
       f.createTemplateLiteralTypeSpan(
         next(isSchema(a) ? a : z.literal(a)),
-        (rest.length ? f.createTemplateMiddle : f.createTemplateTail)(second),
+        (rest.length ? f.createTemplateMiddle : f.createTemplateTail)(b),
       ),
     );
   }
