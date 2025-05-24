@@ -2,6 +2,10 @@
 
 ## Version 23
 
+### v23.6.1
+
+- `createServer()` displays a warning when no server is configured.
+
 ### v23.6.0
 
 - Featuring `gracefulShutdown.beforeExit()` hook:
