@@ -79,6 +79,7 @@ const onTemplateLiteral: Producer = (
   const head = f.createTemplateHead(
     isSchema(first) ? String(rest.unshift(first)) && "" : `${first}`,
   );
+  if (!rest.length) return makeLiteralType(head.text);
   const spans: ts.TemplateLiteralTypeSpan[] = [];
   while (rest.length) {
     const a = rest.shift();
