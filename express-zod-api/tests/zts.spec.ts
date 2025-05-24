@@ -386,6 +386,7 @@ describe("zod-to-ts", () => {
       z.templateLiteral(["only"]),
       z.templateLiteral([z.number(), "more"]),
       z.templateLiteral(["leading", z.boolean()]),
+      z.templateLiteral([]),
     ])("should produce the correct typescript %#", (schema) => {
       expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });
