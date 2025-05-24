@@ -13,7 +13,6 @@ import type {
   $ZodPipe,
   $ZodReadonly,
   $ZodRecord,
-  $ZodString,
   $ZodTemplateLiteral,
   $ZodTemplateLiteralPart,
   $ZodTransform,
@@ -84,18 +83,22 @@ const onTemplateLiteral: Producer = (
     return "";
   };
   const head = f.createTemplateHead(ensureString(first));
-  if (!rest.length) return makeLiteralType(head.text);
   const spans: ts.TemplateLiteralTypeSpan[] = [];
   while (rest.length) {
     const a = rest.shift();
+    if (!isSchema(a)) {
+      (spans[spans.length - 1]?.literal || head).text += `${a}`;
+      continue;
+    }
     const b = ensureString(rest.shift());
     spans.push(
       f.createTemplateLiteralTypeSpan(
-        next(isSchema(a) ? a : z.literal(a)),
+        next(a),
         (rest.length ? f.createTemplateMiddle : f.createTemplateTail)(b),
       ),
     );
   }
+  if (!spans.length) return makeLiteralType(head.text);
   return f.createTemplateLiteralType(head, spans);
 };
 
