@@ -1,18 +1,15 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { defaultEndpointsFactory } from "express-zod-api";
 import { methodProviderMiddleware } from "../middlewares";
 
-// Demonstrating circular schemas using z.lazy()
-const baseFeature = z.object({
+// Demonstrating circular schemas using z.object()
+const feature = z.object({
   title: z.string(),
-});
-type Feature = z.infer<typeof baseFeature> & {
-  features: Feature[];
-};
-const feature: z.ZodType<Feature> = baseFeature.extend({
-  features: z.lazy(() => feature.array()),
+  get features() {
+    return z.array(feature).optional();
+  },
 });
 
 export const retrieveUserEndpoint = defaultEndpointsFactory
@@ -30,7 +27,7 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
         .describe("a numeric string containing the id of the user"),
     }),
     output: z.object({
-      id: z.number().int().nonnegative(),
+      id: z.int().nonnegative(),
       name: z.string(),
       features: feature.array(),
     }),
@@ -42,14 +39,14 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
         id,
         name,
         features: [
-          { title: "Tall", features: [{ title: "Above 180cm", features: [] }] },
-          { title: "Young", features: [] },
+          { title: "Tall", features: [{ title: "Above 180cm" }] },
+          { title: "Young" },
           {
             title: "Cute",
             features: [
               {
                 title: "Tells funny jokes",
-                features: [{ title: "About Typescript", features: [] }],
+                features: [{ title: "About Typescript" }],
               },
             ],
           },

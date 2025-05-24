@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   FlatObject,
   Middleware,
@@ -118,13 +118,13 @@ describe("SSE", () => {
         const positiveResponse = makeResponseMock();
         const commons = {
           input: {},
-          output: {},
           options: {},
           request: makeRequestMock(),
           logger: makeLoggerMock(),
         };
         resultHandler.execute({
           ...commons,
+          output: {},
           response: positiveResponse,
           error: null,
         });
@@ -134,6 +134,7 @@ describe("SSE", () => {
         const negativeResponse = makeResponseMock();
         resultHandler.execute({
           ...commons,
+          output: null,
           response: negativeResponse,
           error: new Error("failure"),
         });

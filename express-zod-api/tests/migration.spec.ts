@@ -17,57 +17,63 @@ describe("Migration", () => {
     expect(migration).toMatchSnapshot();
   });
 
-  tester.run("v23", migration.rules.v23, {
+  tester.run("v24", migration.rules.v24, {
     valid: [
-      `import { HeaderSecurity } from "express-zod-api";`,
-      `createConfig({ wrongMethodBehavior: 405 });`,
-      `testMiddleware({ middleware })`,
+      `new Documentation({});`,
+      `new Integration({});`,
+      `const rule: Depicter = () => {};`,
+      `import {} from "zod/v4";`,
     ],
     invalid: [
       {
-        code: `const security: CustomHeaderSecurity = {};`,
-        output: `const security: HeaderSecurity = {};`,
+        code: `new Documentation({ numericRange: {}, });`,
+        output: `new Documentation({  });`,
+        errors: [
+          {
+            messageId: "remove",
+            data: { subject: "numericRange" },
+          },
+        ],
+      },
+      {
+        code: `new Integration({ optionalPropStyle: {}, });`,
+        output: `new Integration({  });`,
+        errors: [
+          {
+            messageId: "remove",
+            data: { subject: "optionalPropStyle" },
+          },
+        ],
+      },
+      {
+        code:
+          `const rule: Depicter = (schema, { next, path, method, isResponse }) ` +
+          `=> ({ ...next(schema.unwrap()), summary: "test" })`,
+        output:
+          `const rule: Depicter = ({ zodSchema: schema, jsonSchema }, {  path, method, isResponse }) ` +
+          `=> ({ ...jsonSchema, summary: "test" })`,
         errors: [
           {
             messageId: "change",
             data: {
-              subject: "interface",
-              from: "CustomHeaderSecurity",
-              to: "HeaderSecurity",
+              subject: "arguments",
+              from: "[schema, { next, ...rest }]",
+              to: "[{ zodSchema: schema, jsonSchema }, { ...rest }]",
             },
           },
-        ],
-      },
-      {
-        code: `createConfig({});`,
-        output: `createConfig({wrongMethodBehavior: 404,});`,
-        errors: [
           {
-            messageId: "add",
-            data: {
-              subject: "wrongMethodBehavior property",
-              to: "configuration",
-            },
+            messageId: "change",
+            data: { subject: "statement", from: "next()", to: "jsonSchema" },
           },
         ],
       },
       {
-        code: `testMiddleware({ errorHandler: (error, response) => response.end(error.message) })`,
-        output: `testMiddleware({configProps: {errorHandler: new ResultHandler({ positive: [], negative: [], handler: ({ error, response }) => {response.end(error.message)} }),},  })`,
+        code: `import {} from "zod";`,
+        output: `import {} from "zod/v4";`,
         errors: [
           {
-            messageId: "move",
-            data: { subject: "errorHandler", to: "configProps" },
-          },
-        ],
-      },
-      {
-        code: `testMiddleware({ errorHandler(error, response) { response.end(error.message) }, configProps: { wrongMethodBehavior: 404 } })`,
-        output: `testMiddleware({  configProps: {errorHandler: new ResultHandler({ positive: [], negative: [], handler: ({ error, response }) => {{ response.end(error.message) }} }), wrongMethodBehavior: 404 } })`,
-        errors: [
-          {
-            messageId: "move",
-            data: { subject: "errorHandler", to: "configProps" },
+            messageId: "change",
+            data: { subject: "import", from: "zod", to: "zod/v4" },
           },
         ],
       },

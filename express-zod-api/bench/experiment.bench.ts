@@ -1,24 +1,14 @@
 import * as R from "ramda";
 import { bench } from "vitest";
 
-describe("Experiment on path trimming", () => {
-  const current = R.pipe(
-    R.trim,
-    R.split("/"),
-    R.reject(R.isEmpty),
-    R.join("/"),
-  );
+describe("Experiment for unique elements", () => {
+  const current = ["one", "two"];
 
-  const featured = (str: string) =>
-    str.trim().split("/").filter(Boolean).join("/");
-
-  const sample = "   ///v1/one/two/three///   ";
-
-  bench("current (ramda)", () => {
-    return void current(sample);
+  bench("set", () => {
+    return void [...new Set(current).add("null")];
   });
 
-  bench("featured (native)", () => {
-    return void featured(sample);
+  bench("R.union", () => {
+    return void R.union(current, ["null"]);
   });
 });

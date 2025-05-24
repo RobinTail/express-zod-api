@@ -1,15 +1,15 @@
 import { Request } from "express";
 import * as R from "ramda";
-import { z } from "zod";
+import { z } from "zod/v4";
+import type { $ZodTransform, $ZodType } from "zod/v4/core";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import { OutputValidationError } from "./errors";
-import { metaSymbol } from "./metadata";
 import { AuxMethod, Method } from "./method";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
-export type EmptyObject = Record<string, never>;
-export type EmptySchema = z.ZodObject<EmptyObject, "strip">;
+export type EmptyObject = z.output<EmptySchema>;
+export type EmptySchema = z.ZodRecord<z.ZodString, z.ZodNever>;
 export type FlatObject = Record<string, unknown>;
 
 /** @link https://stackoverflow.com/a/65492934 */
@@ -63,7 +63,11 @@ export const getInput = (
 };
 
 export const ensureError = (subject: unknown): Error =>
-  subject instanceof Error ? subject : new Error(String(subject));
+  subject instanceof Error
+    ? subject
+    : subject instanceof z.ZodError
+      ? new z.ZodRealError(subject.issues) // ZodError is not an instance of Error, unlike ZodRealError that is
+      : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
   if (error instanceof z.ZodError) {
@@ -80,60 +84,11 @@ export const getMessageFromError = (error: Error): string => {
   return error.message;
 };
 
-/** Takes the original unvalidated examples from the properties of ZodObject schema shape */
-export const pullExampleProps = <T extends z.SomeZodObject>(subject: T) =>
-  Object.entries(subject.shape).reduce<Partial<z.input<T>>[]>(
-    (acc, [key, schema]) => {
-      const { _def } = schema as z.ZodType;
-      return combinations(
-        acc,
-        (_def[metaSymbol]?.examples || []).map(R.objOf(key)),
-        ([left, right]) => ({ ...left, ...right }),
-      );
-    },
-    [],
-  );
-
-export const getExamples = <
-  T extends z.ZodType,
-  V extends "original" | "parsed" | undefined,
->({
-  schema,
-  variant = "original",
-  validate = variant === "parsed",
-  pullProps = false,
-}: {
-  schema: T;
-  /**
-   * @desc examples variant: original or parsed
-   * @example "parsed" — for the case when possible schema transformations should be applied
-   * @default "original"
-   * @override validate: variant "parsed" activates validation as well
-   * */
-  variant?: V;
-  /**
-   * @desc filters out the examples that do not match the schema
-   * @default variant === "parsed"
-   * */
-  validate?: boolean;
-  /**
-   * @desc should pull examples from properties — applicable to ZodObject only
-   * @default false
-   * */
-  pullProps?: boolean;
-}): ReadonlyArray<V extends "parsed" ? z.output<T> : z.input<T>> => {
-  let examples = schema._def[metaSymbol]?.examples || [];
-  if (!examples.length && pullProps && schema instanceof z.ZodObject)
-    examples = pullExampleProps(schema);
-  if (!validate && variant === "original") return examples;
-  const result: Array<z.input<T> | z.output<T>> = [];
-  for (const example of examples) {
-    const parsedExample = schema.safeParse(example);
-    if (parsedExample.success)
-      result.push(variant === "parsed" ? parsedExample.data : example);
-  }
-  return result;
-};
+/** Faster replacement to instanceof for code operating core types (traversing schemas) */
+export const isSchema = <T extends $ZodType>(
+  subject: $ZodType,
+  type: T["_zod"]["def"]["type"],
+): subject is T => subject._zod.def.type === type;
 
 export const combinations = <T>(
   a: T[],
@@ -155,8 +110,8 @@ export const makeCleanId = (...args: string[]) => {
 };
 
 export const getTransformedType = R.tryCatch(
-  <T>(schema: z.ZodEffects<z.ZodTypeAny, unknown, T>, sample: T) =>
-    typeof schema.parse(sample),
+  <T>(schema: $ZodTransform<unknown, T>, sample: T) =>
+    typeof z.parse(schema, sample),
   R.always(undefined),
 );
 

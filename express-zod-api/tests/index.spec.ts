@@ -1,6 +1,7 @@
+import type { $ZodType, JSONSchema } from "zod/v4/core";
 import { IRouter } from "express";
 import ts from "typescript";
-import { z } from "zod";
+import { z } from "zod/v4";
 import * as entrypoint from "../src";
 import {
   ApiResponse,
@@ -37,9 +38,14 @@ describe("Index Entrypoint", () => {
     });
 
     test("Convenience types should be exposed", () => {
-      expectTypeOf(() => ({
-        type: "number" as const,
-      })).toExtend<Depicter>();
+      expectTypeOf(
+        ({
+          jsonSchema,
+        }: {
+          zodSchema: $ZodType;
+          jsonSchema: JSONSchema.BaseSchema;
+        }) => jsonSchema,
+      ).toExtend<Depicter>();
       expectTypeOf(() =>
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
       ).toExtend<Producer>();
@@ -86,9 +92,7 @@ describe("Index Entrypoint", () => {
         type: "openid";
         url: string;
       }>().toEqualTypeOf<OpenIdSecurity>();
-      expectTypeOf({ schema: z.string() }).toExtend<
-        ApiResponse<z.ZodTypeAny>
-      >();
+      expectTypeOf({ schema: z.string() }).toExtend<ApiResponse<z.ZodString>>();
     });
 
     test("Extended Zod prototypes", () => {
@@ -97,19 +101,11 @@ describe("Index Entrypoint", () => {
         .toEqualTypeOf<(value: any) => z.ZodAny>();
       expectTypeOf<z.ZodDefault<z.ZodString>>()
         .toHaveProperty("example")
-        .toEqualTypeOf<
-          (value: string | undefined) => z.ZodDefault<z.ZodString>
-        >();
+        .toEqualTypeOf<(value: string) => z.ZodDefault<z.ZodString>>();
       expectTypeOf<z.ZodDefault<z.ZodString>>()
         .toHaveProperty("label")
         .toEqualTypeOf<(value: string) => z.ZodDefault<z.ZodString>>();
-      expectTypeOf({
-        remap: () =>
-          z.pipeline(
-            z.object({}).transform(() => ({})),
-            z.object({}),
-          ),
-      }).toExtend<Partial<z.ZodObject<z.ZodRawShape>>>();
+      expectTypeOf<z.ZodObject>().toHaveProperty("remap");
     });
   });
 });

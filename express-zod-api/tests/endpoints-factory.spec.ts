@@ -9,7 +9,7 @@ import {
 } from "../src";
 import { EmptyObject, EmptySchema } from "../src/common-helpers";
 import { Endpoint } from "../src/endpoint";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 describe("EndpointsFactory", () => {
   const resultHandlerMock = new ResultHandler({
@@ -101,7 +101,7 @@ describe("EndpointsFactory", () => {
       expect(newFactory["middlewares"].length).toBe(1);
       expect(newFactory["middlewares"][0].schema).toBeInstanceOf(z.ZodObject);
       expect(
-        (newFactory["middlewares"][0].schema as z.AnyZodObject).shape,
+        (newFactory["middlewares"][0].schema as z.ZodObject).shape,
       ).toEqual({});
       const { output: options } = await testMiddleware({
         middleware: newFactory["middlewares"][0],
@@ -129,7 +129,7 @@ describe("EndpointsFactory", () => {
         expect(newFactory["middlewares"].length).toBe(1);
         expect(newFactory["middlewares"][0].schema).toBeInstanceOf(z.ZodObject);
         expect(
-          (newFactory["middlewares"][0].schema as z.AnyZodObject).shape,
+          (newFactory["middlewares"][0].schema as z.ZodObject).shape,
         ).toEqual({});
         const {
           output: options,
@@ -249,7 +249,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toExtend<{
+      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<{
         n: number;
         s: string;
       }>();
@@ -277,7 +277,7 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toExtend<{
+      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<{
         a?: number;
         b?: string;
         i: string;
@@ -302,7 +302,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toExtend<{
+      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<{
         n1: number;
         n2: number;
         s: string;
@@ -330,7 +330,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._output).toExtend<
+      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<
         { s: string } & ({ n1: number } | { n2: number })
       >();
     });
@@ -343,7 +343,9 @@ describe("EndpointsFactory", () => {
         output: z.object({}),
         handler: vi.fn(),
       });
-      expectTypeOf(endpoint.inputSchema._output).toEqualTypeOf<EmptyObject>();
+      expectTypeOf(
+        endpoint.inputSchema._zod.output,
+      ).toEqualTypeOf<EmptyObject>();
       expect(endpoint.isDeprecated).toBe(true);
     });
   });
@@ -355,7 +357,7 @@ describe("EndpointsFactory", () => {
         handler: async () => {},
       });
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.outputSchema).toExtend<EmptySchema>();
+      expectTypeOf(endpoint.outputSchema.shape).toExtend<EmptyObject>();
     });
   });
 });

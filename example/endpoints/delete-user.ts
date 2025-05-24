@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { noContentFactory } from "../factories";
 
 /** @desc The endpoint demonstrates no content response established by its factory */

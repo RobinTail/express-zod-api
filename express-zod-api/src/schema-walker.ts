@@ -1,9 +1,11 @@
-import { z } from "zod";
+import type { $ZodType, $ZodTypeDef } from "zod/v4/core";
 import type { EmptyObject, FlatObject } from "./common-helpers";
-import { metaSymbol } from "./metadata";
+import { getBrand } from "./metadata";
+
+export type FirstPartyKind = $ZodTypeDef["type"];
 
 export interface NextHandlerInc<U> {
-  next: (schema: z.ZodTypeAny) => U;
+  next: (schema: $ZodType) => U;
 }
 
 interface PrevInc<U> {
@@ -35,7 +37,7 @@ export const walkSchema = <
   U extends object,
   Context extends FlatObject = EmptyObject,
 >(
-  schema: z.ZodType,
+  schema: $ZodType,
   {
     onEach,
     rules,
@@ -48,11 +50,12 @@ export const walkSchema = <
     onMissing: SchemaHandler<U, Context, "last">;
   },
 ): U => {
+  const brand = getBrand(schema);
   const handler =
-    rules[schema._def[metaSymbol]?.brand as keyof typeof rules] ||
-    ("typeName" in schema._def &&
-      rules[schema._def.typeName as keyof typeof rules]);
-  const next = (subject: z.ZodTypeAny) =>
+    brand && brand in rules
+      ? rules[brand as keyof typeof rules]
+      : rules[schema._zod.def.type];
+  const next = (subject: $ZodType) =>
     walkSchema(subject, { ctx, onEach, rules, onMissing });
   const result = handler
     ? handler(schema, { ...ctx, next })

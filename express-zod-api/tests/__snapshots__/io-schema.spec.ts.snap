@@ -1,342 +1,359 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`I/O Schema and related helpers > extractObjectSchema() > Feature #600: Top level refinements > should handle refined object schema 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "one": {
-      "_type": "ZodString",
-    },
-  },
-}
-`;
-
-exports[`I/O Schema and related helpers > extractObjectSchema() > Feature #1869: Top level transformations > should handle transformations to another object 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "one": {
-      "_type": "ZodString",
-    },
-  },
-}
-`;
-
-exports[`I/O Schema and related helpers > extractObjectSchema() > should pass the object schema through 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "one": {
-      "_type": "ZodString",
-    },
-  },
-}
-`;
-
-exports[`I/O Schema and related helpers > extractObjectSchema() > should return object schema for the intersection of object schemas 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "one": {
-      "_type": "ZodString",
-    },
-    "two": {
-      "_type": "ZodNumber",
-    },
-  },
-}
-`;
-
-exports[`I/O Schema and related helpers > extractObjectSchema() > should return object schema for the union of object schemas 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "one": {
-      "_type": "ZodOptional",
-      "value": {
-        "_type": "ZodString",
-      },
-    },
-    "two": {
-      "_type": "ZodOptional",
-      "value": {
-        "_type": "ZodNumber",
-      },
-    },
-  },
-}
-`;
-
-exports[`I/O Schema and related helpers > extractObjectSchema() > should support ez.raw() 1`] = `
-{
-  "_type": "ZodObject",
-  "shape": {
-    "raw": {
-      "_type": "ZodBranded",
-      "brand": Symbol(File),
-    },
-  },
-}
-`;
-
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should handle no middlewares 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
     "four": {
-      "_type": "ZodBoolean",
+      "type": "boolean",
     },
   },
+  "required": [
+    "four",
+  ],
+  "type": "object",
 }
 `;
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge input object schemas 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodIntersection",
-    "left": {
-      "_type": "ZodIntersection",
-      "left": {
-        "_type": "ZodObject",
-        "shape": {
-          "one": {
-            "_type": "ZodString",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "allOf": [
+        {
+          "allOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "one": {
+                  "type": "string",
+                },
+              },
+              "required": [
+                "one",
+              ],
+              "type": "object",
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "two": {
+                  "type": "number",
+                },
+              },
+              "required": [
+                "two",
+              ],
+              "type": "object",
+            },
+          ],
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "three": {
+              "type": "null",
+            },
           },
+          "required": [
+            "three",
+          ],
+          "type": "object",
+        },
+      ],
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "four": {
+          "type": "boolean",
         },
       },
-      "right": {
-        "_type": "ZodObject",
-        "shape": {
-          "two": {
-            "_type": "ZodNumber",
-          },
-        },
-      },
+      "required": [
+        "four",
+      ],
+      "type": "object",
     },
-    "right": {
-      "_type": "ZodObject",
-      "shape": {
-        "three": {
-          "_type": "ZodNull",
-        },
-      },
-    },
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "four": {
-        "_type": "ZodBoolean",
-      },
-    },
-  },
+  ],
 }
 `;
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge intersection object schemas 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodIntersection",
-    "left": {
-      "_type": "ZodIntersection",
-      "left": {
-        "_type": "ZodObject",
-        "shape": {
-          "one": {
-            "_type": "ZodString",
-          },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "allOf": [
+        {
+          "allOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "one": {
+                  "type": "string",
+                },
+              },
+              "required": [
+                "one",
+              ],
+              "type": "object",
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "two": {
+                  "type": "number",
+                },
+              },
+              "required": [
+                "two",
+              ],
+              "type": "object",
+            },
+          ],
         },
-      },
-      "right": {
-        "_type": "ZodObject",
-        "shape": {
-          "two": {
-            "_type": "ZodNumber",
-          },
+        {
+          "allOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "three": {
+                  "type": "null",
+                },
+              },
+              "required": [
+                "three",
+              ],
+              "type": "object",
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "four": {
+                  "type": "boolean",
+                },
+              },
+              "required": [
+                "four",
+              ],
+              "type": "object",
+            },
+          ],
         },
-      },
+      ],
     },
-    "right": {
-      "_type": "ZodIntersection",
-      "left": {
-        "_type": "ZodObject",
-        "shape": {
-          "three": {
-            "_type": "ZodNull",
+    {
+      "allOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "five": {
+              "type": "string",
+            },
           },
+          "required": [
+            "five",
+          ],
+          "type": "object",
         },
-      },
-      "right": {
-        "_type": "ZodObject",
-        "shape": {
-          "four": {
-            "_type": "ZodBoolean",
+        {
+          "additionalProperties": false,
+          "properties": {
+            "six": {
+              "type": "number",
+            },
           },
+          "required": [
+            "six",
+          ],
+          "type": "object",
         },
-      },
+      ],
     },
-  },
-  "right": {
-    "_type": "ZodIntersection",
-    "left": {
-      "_type": "ZodObject",
-      "shape": {
-        "five": {
-          "_type": "ZodString",
-        },
-      },
-    },
-    "right": {
-      "_type": "ZodObject",
-      "shape": {
-        "six": {
-          "_type": "ZodNumber",
-        },
-      },
-    },
-  },
+  ],
 }
 `;
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge mixed object schemas 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodIntersection",
-    "left": {
-      "_type": "ZodIntersection",
-      "left": {
-        "_type": "ZodObject",
-        "shape": {
-          "one": {
-            "_type": "ZodString",
-          },
-        },
-      },
-      "right": {
-        "_type": "ZodObject",
-        "shape": {
-          "two": {
-            "_type": "ZodNumber",
-          },
-        },
-      },
-    },
-    "right": {
-      "_type": "ZodUnion",
-      "options": [
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "allOf": [
         {
-          "_type": "ZodObject",
-          "shape": {
-            "three": {
-              "_type": "ZodNull",
+          "allOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "one": {
+                  "type": "string",
+                },
+              },
+              "required": [
+                "one",
+              ],
+              "type": "object",
             },
-          },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "two": {
+                  "type": "number",
+                },
+              },
+              "required": [
+                "two",
+              ],
+              "type": "object",
+            },
+          ],
         },
         {
-          "_type": "ZodObject",
-          "shape": {
-            "four": {
-              "_type": "ZodBoolean",
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "three": {
+                  "type": "null",
+                },
+              },
+              "required": [
+                "three",
+              ],
+              "type": "object",
             },
-          },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "four": {
+                  "type": "boolean",
+                },
+              },
+              "required": [
+                "four",
+              ],
+              "type": "object",
+            },
+          ],
         },
       ],
     },
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "five": {
-        "_type": "ZodString",
+    {
+      "additionalProperties": false,
+      "properties": {
+        "five": {
+          "type": "string",
+        },
       },
+      "required": [
+        "five",
+      ],
+      "type": "object",
     },
-  },
+  ],
 }
 `;
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge union object schemas 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodIntersection",
-    "left": {
-      "_type": "ZodUnion",
-      "options": [
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "allOf": [
         {
-          "_type": "ZodObject",
-          "shape": {
-            "one": {
-              "_type": "ZodString",
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "one": {
+                  "type": "string",
+                },
+              },
+              "required": [
+                "one",
+              ],
+              "type": "object",
             },
-          },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "two": {
+                  "type": "number",
+                },
+              },
+              "required": [
+                "two",
+              ],
+              "type": "object",
+            },
+          ],
         },
         {
-          "_type": "ZodObject",
-          "shape": {
-            "two": {
-              "_type": "ZodNumber",
+          "anyOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "three": {
+                  "type": "null",
+                },
+              },
+              "required": [
+                "three",
+              ],
+              "type": "object",
             },
-          },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "four": {
+                  "type": "boolean",
+                },
+              },
+              "required": [
+                "four",
+              ],
+              "type": "object",
+            },
+          ],
         },
       ],
     },
-    "right": {
-      "_type": "ZodUnion",
-      "options": [
+    {
+      "anyOf": [
         {
-          "_type": "ZodObject",
-          "shape": {
-            "three": {
-              "_type": "ZodNull",
+          "additionalProperties": false,
+          "properties": {
+            "five": {
+              "type": "string",
             },
           },
+          "required": [
+            "five",
+          ],
+          "type": "object",
         },
         {
-          "_type": "ZodObject",
-          "shape": {
-            "four": {
-              "_type": "ZodBoolean",
+          "additionalProperties": false,
+          "properties": {
+            "six": {
+              "type": "number",
             },
           },
+          "required": [
+            "six",
+          ],
+          "type": "object",
         },
       ],
     },
-  },
-  "right": {
-    "_type": "ZodUnion",
-    "options": [
-      {
-        "_type": "ZodObject",
-        "shape": {
-          "five": {
-            "_type": "ZodString",
-          },
-        },
-      },
-      {
-        "_type": "ZodObject",
-        "shape": {
-          "six": {
-            "_type": "ZodNumber",
-          },
-        },
-      },
-    ],
-  },
+  ],
 }
 `;
 
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Zod Issue #600: can not intersect object schema with passthrough and transformation 1`] = `
-ZodError({
-  "message": "[
-  {
-    "code": "invalid_intersection_types",
-    "path": [],
-    "message": "Intersection results could not be merged"
-  }
-]",
+Error({
+  "message": "Unmergable intersection. Error path: ["id"]",
 })
 `;

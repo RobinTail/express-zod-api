@@ -2,175 +2,235 @@
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with intersection middleware 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodIntersection",
-    "left": {
-      "_type": "ZodObject",
-      "shape": {
-        "n1": {
-          "_type": "ZodNumber",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "allOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "n1": {
+              "type": "number",
+            },
+          },
+          "required": [
+            "n1",
+          ],
+          "type": "object",
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "n2": {
+              "type": "number",
+            },
+          },
+          "required": [
+            "n2",
+          ],
+          "type": "object",
+        },
+      ],
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "s": {
+          "type": "string",
         },
       },
+      "required": [
+        "s",
+      ],
+      "type": "object",
     },
-    "right": {
-      "_type": "ZodObject",
-      "shape": {
-        "n2": {
-          "_type": "ZodNumber",
-        },
-      },
-    },
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "s": {
-        "_type": "ZodString",
-      },
-    },
-  },
+  ],
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with intersection middleware 2`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
     "b": {
-      "_type": "ZodBoolean",
+      "type": "boolean",
     },
   },
+  "required": [
+    "b",
+  ],
+  "type": "object",
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with refined object middleware 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodEffects",
-    "value": {
-      "_type": "ZodObject",
-      "shape": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
         "a": {
-          "_type": "ZodOptional",
-          "value": {
-            "_type": "ZodNumber",
-          },
+          "type": "number",
         },
         "b": {
-          "_type": "ZodOptional",
-          "value": {
-            "_type": "ZodString",
-          },
+          "type": "string",
         },
       },
+      "required": [],
+      "type": "object",
     },
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "i": {
-        "_type": "ZodString",
+    {
+      "additionalProperties": false,
+      "properties": {
+        "i": {
+          "type": "string",
+        },
       },
+      "required": [
+        "i",
+      ],
+      "type": "object",
     },
-  },
+  ],
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with refined object middleware 2`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
     "o": {
-      "_type": "ZodBoolean",
+      "type": "boolean",
     },
   },
+  "required": [
+    "o",
+  ],
+  "type": "object",
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with simple middleware 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodObject",
-    "shape": {
-      "n": {
-        "_type": "ZodNumber",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "n": {
+          "type": "number",
+        },
       },
+      "required": [
+        "n",
+      ],
+      "type": "object",
     },
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "s": {
-        "_type": "ZodString",
+    {
+      "additionalProperties": false,
+      "properties": {
+        "s": {
+          "type": "string",
+        },
       },
+      "required": [
+        "s",
+      ],
+      "type": "object",
     },
-  },
+  ],
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with simple middleware 2`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
     "b": {
-      "_type": "ZodBoolean",
+      "type": "boolean",
     },
   },
+  "required": [
+    "b",
+  ],
+  "type": "object",
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with union middleware 1`] = `
 {
-  "_type": "ZodIntersection",
-  "left": {
-    "_type": "ZodUnion",
-    "options": [
-      {
-        "_type": "ZodObject",
-        "shape": {
-          "n1": {
-            "_type": "ZodNumber",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "n1": {
+              "type": "number",
+            },
           },
+          "required": [
+            "n1",
+          ],
+          "type": "object",
         },
-      },
-      {
-        "_type": "ZodObject",
-        "shape": {
-          "n2": {
-            "_type": "ZodNumber",
+        {
+          "additionalProperties": false,
+          "properties": {
+            "n2": {
+              "type": "number",
+            },
           },
+          "required": [
+            "n2",
+          ],
+          "type": "object",
         },
-      },
-    ],
-  },
-  "right": {
-    "_type": "ZodObject",
-    "shape": {
-      "s": {
-        "_type": "ZodString",
-      },
+      ],
     },
-  },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "s": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "s",
+      ],
+      "type": "object",
+    },
+  ],
 }
 `;
 
 exports[`EndpointsFactory > .build() > Should create an endpoint with union middleware 2`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
     "b": {
-      "_type": "ZodBoolean",
+      "type": "boolean",
     },
   },
+  "required": [
+    "b",
+  ],
+  "type": "object",
 }
 `;
 
 exports[`EndpointsFactory > .buildVoid() > Should be a shorthand for empty object output 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {},
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {},
+  "required": [],
+  "type": "object",
 }
 `;

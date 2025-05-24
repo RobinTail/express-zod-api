@@ -1,4 +1,5 @@
-import { z } from "zod";
+import type { $ZodType } from "zod/v4/core";
+import { z } from "zod/v4";
 import { getMessageFromError } from "./common-helpers";
 import { OpenAPIContext } from "./documentation-helpers";
 import type { Method } from "./method";
@@ -39,6 +40,14 @@ export class DocumentationError extends Error {
 /** @desc An error related to the input and output schemas declaration */
 export class IOSchemaError extends Error {
   public override name = "IOSchemaError";
+}
+
+export class DeepCheckError extends IOSchemaError {
+  public override name = "DeepCheckError";
+
+  constructor(public override readonly cause: $ZodType) {
+    super("Found", { cause });
+  }
 }
 
 /** @desc An error of validating the Endpoint handler's returns against the Endpoint output schema */

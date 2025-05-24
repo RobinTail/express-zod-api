@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ez } from "../src";
 import { f, printNode } from "../src/typescript-api";
 import { zodToTs } from "../src/zts";
@@ -11,7 +11,6 @@ describe("zod-to-ts", () => {
   const ctx: ZTSContext = {
     isResponse: false,
     makeAlias: vi.fn(() => f.createTypeReferenceNode("SomeType")),
-    optionalPropStyle: { withQuestionMark: true, withUndefined: true },
   };
 
   describe("z.array()", () => {
@@ -64,9 +63,9 @@ describe("zod-to-ts", () => {
     }
 
     test.each([
-      { schema: z.nativeEnum(Color), feature: "numeric" },
-      { schema: z.nativeEnum(Fruit), feature: "string" },
-      { schema: z.nativeEnum(StringLiteral), feature: "quoted string" },
+      { schema: z.enum(Color), feature: "numeric" },
+      { schema: z.enum(Fruit), feature: "string" },
+      { schema: z.enum(StringLiteral), feature: "quoted string" },
     ])("handles $feature literals", ({ schema }) => {
       expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });
@@ -92,12 +91,19 @@ describe("zod-to-ts", () => {
       })
       .partial();
 
-    const circular: z.ZodLazy<z.ZodTypeAny> = z.lazy(() =>
+    const circular: z.ZodLazy = z.lazy(() =>
       z.object({
         a: z.string(),
         b: circular,
       }),
     );
+
+    const circular2 = z.object({
+      name: z.string(),
+      get subcategories() {
+        return z.array(circular2);
+      },
+    });
 
     const example = z.object({
       string: z.string(),
@@ -109,6 +115,7 @@ describe("zod-to-ts", () => {
       ),
       boolean: z.boolean(),
       circular,
+      circular2,
       union: z.union([z.object({ number: z.number() }), z.literal("hi")]),
       enum: z.enum(["hi", "bye"]),
       intersectionWithTransform: z
@@ -132,6 +139,7 @@ describe("zod-to-ts", () => {
       ]),
       tupleRest: z.tuple([z.string(), z.number()]).rest(z.boolean()),
       record: z.record(
+        z.string(),
         z.object({
           object: z.object({
             arrayOfUnions: z
@@ -147,17 +155,13 @@ describe("zod-to-ts", () => {
       set: z.set(z.string()),
       intersection: z.intersection(z.string(), z.number()).or(z.bigint()),
       promise: z.promise(z.number()),
-      function: z
-        .function()
-        .args(z.string().nullish().default("heo"), z.boolean(), z.boolean())
-        .returns(z.string()),
       optDefaultString: z.string().optional().default("hi"),
       refinedStringWithSomeBullshit: z
         .string()
         .refine((val) => val.length > 10)
         .or(z.number())
         .and(z.bigint().nullish().default(1000n)),
-      nativeEnum: z.nativeEnum(Fruits),
+      nativeEnum: z.enum(Fruits),
       lazy: z.lazy(() => z.string()),
       discUnion: z.discriminatedUnion("kind", [
         z.object({ kind: z.literal("circle"), radius: z.number() }),
@@ -166,7 +170,7 @@ describe("zod-to-ts", () => {
       ]),
       branded: z.string().brand("BRAND"),
       catch: z.number().catch(123),
-      pipeline: z.string().regex(/\d+/).pipe(z.coerce.number()),
+      pipeline: z.string().regex(/\d+/).transform(Number).pipe(z.number()),
       readonly: z.string().readonly(),
     });
 
@@ -198,12 +202,12 @@ describe("zod-to-ts", () => {
         .optional(),
     });
 
-    test("outputs correct typescript", () => {
+    test("Zod 4: does not add undefined to it, unwrap as is", () => {
       const node = zodToTs(optionalStringSchema, { ctx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
-    test("should output `?:` and undefined union for optional properties", () => {
+    test("Zod 4: should add question mark only to optional props", () => {
       const node = zodToTs(objectWithOptionals, { ctx });
       expect(printNodeTest(node)).toMatchSnapshot();
     });
@@ -286,8 +290,14 @@ describe("zod-to-ts", () => {
   describe("Issue #2352: intersection of objects having same prop %#", () => {
     test.each([
       [z.string(), z.string()],
-      [z.string().nonempty(), z.string().email()],
-      [z.string().transform(Number), z.string().pipe(z.coerce.date())],
+      [z.string().nonempty(), z.email()],
+      [
+        z.string().transform(Number),
+        z
+          .string()
+          .transform((str) => new Date(str))
+          .pipe(z.date()),
+      ],
       [z.object({}), z.object({})],
     ])("should deduplicate the prop with a same name", (a, b) => {
       const schema = z.object({ query: a }).and(z.object({ query: b }));
@@ -360,6 +370,7 @@ describe("zod-to-ts", () => {
       z.literal(true),
       z.literal(false),
       z.literal(123),
+      z.literal(undefined),
     ])("Should produce the correct typescript %#", (schema) => {
       expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });

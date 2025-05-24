@@ -1,6 +1,6 @@
 import * as R from "ramda";
 import ts from "typescript";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ResponseVariant, responseVariants } from "./api-response";
 import { IntegrationBase } from "./integration-base";
 import {
@@ -41,26 +41,10 @@ interface IntegrationParams {
    * */
   serverUrl?: string;
   /**
-   * @desc configures the style of object's optional properties
-   * @default { withQuestionMark: true, withUndefined: true }
-   */
-  optionalPropStyle?: {
-    /**
-     * @desc add question mark to the optional property definition
-     * @example { someProp?: boolean }
-     * */
-    withQuestionMark?: boolean;
-    /**
-     * @desc add undefined to the property union type
-     * @example { someProp: boolean | undefined }
-     */
-    withUndefined?: boolean;
-  };
-  /**
    * @desc The schema to use for responses without body such as 204
    * @default z.undefined()
    * */
-  noContent?: z.ZodTypeAny;
+  noContent?: z.ZodType;
   /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
@@ -82,16 +66,16 @@ interface FormattedPrintingOptions {
 
 export class Integration extends IntegrationBase {
   readonly #program: ts.Node[] = [this.someOfType];
-  readonly #aliases = new Map<z.ZodTypeAny, ts.TypeAliasDeclaration>();
+  readonly #aliases = new Map<object, ts.TypeAliasDeclaration>();
   #usage: Array<ts.Node | string> = [];
 
-  #makeAlias(schema: z.ZodTypeAny, produce: () => ts.TypeNode): ts.TypeNode {
-    let name = this.#aliases.get(schema)?.name?.text;
+  #makeAlias(key: object, produce: () => ts.TypeNode): ts.TypeNode {
+    let name = this.#aliases.get(key)?.name?.text;
     if (!name) {
       name = `Type${this.#aliases.size + 1}`;
       const temp = makeLiteralType(null);
-      this.#aliases.set(schema, makeType(name, temp));
-      this.#aliases.set(schema, makeType(name, produce()));
+      this.#aliases.set(key, makeType(name, temp));
+      this.#aliases.set(key, makeType(name, produce()));
     }
     return ensureTypeNode(name);
   }
@@ -103,14 +87,10 @@ export class Integration extends IntegrationBase {
     clientClassName = "Client",
     subscriptionClassName = "Subscription",
     serverUrl = "https://example.com",
-    optionalPropStyle = { withQuestionMark: true, withUndefined: true },
     noContent = z.undefined(),
   }: IntegrationParams) {
     super(serverUrl);
-    const commons = {
-      makeAlias: this.#makeAlias.bind(this),
-      optionalPropStyle,
-    };
+    const commons = { makeAlias: this.#makeAlias.bind(this) };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint = (endpoint, path, method) => {

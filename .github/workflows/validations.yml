@@ -2,9 +2,9 @@ name: Validations
 
 on:
   push:
-    branches: [ master, v19, v20, v21, v22 ]
+    branches: [ master, v20, v21, v22, v23, make-v24 ]
   pull_request:
-    branches: [ master, v19, v20, v21, v22 ]
+    branches: [ master, v20, v21, v22, v23, make-v24 ]
 
 
 jobs:
