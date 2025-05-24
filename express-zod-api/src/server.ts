@@ -104,6 +104,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     created.push(httpsServer);
     starters.push(makeStarter(httpsServer, config.https.listen));
   }
+  if (!created.length) logger.warn("No servers configured.");
 
   if (config.gracefulShutdown) {
     installTerminationListener({
