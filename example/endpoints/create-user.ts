@@ -3,12 +3,16 @@ import assert from "node:assert/strict";
 import { z } from "zod/v4";
 import { statusDependingFactory } from "../factories";
 
+const namePart = z.string().trim().min(1);
+
 /** @desc depending on the thrown error, the custom result handler of the factory responds slightly differently */
 export const createUserEndpoint = statusDependingFactory.build({
   method: "post",
   tag: "users",
   input: z.object({
-    name: z.string().nonempty(),
+    name: z
+      .templateLiteral([namePart, " ", namePart])
+      .describe("first name and last name"),
   }),
   output: z.object({
     id: z.int().positive(),
