@@ -20,6 +20,7 @@ const canMerge = R.pipe(
     "required",
     "examples",
     "description",
+    "additionalProperties",
   ] satisfies Array<keyof JSONSchema.ObjectSchema>),
   R.isEmpty,
 );

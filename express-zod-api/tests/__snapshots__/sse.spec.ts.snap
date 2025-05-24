@@ -3,6 +3,7 @@
 exports[`SSE > makeEventSchema() > should make a valid schema of SSE event 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "properties": {
     "data": {
       "type": "string",
@@ -37,6 +38,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "anyOf": [
         {
+          "additionalProperties": false,
           "properties": {
             "data": {
               "type": "string",
@@ -60,6 +62,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
           "type": "object",
         },
         {
+          "additionalProperties": false,
           "properties": {
             "data": {
               "type": "number",
@@ -116,6 +119,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
     ],
     "schema": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
       "properties": {
         "data": {
           "type": "string",

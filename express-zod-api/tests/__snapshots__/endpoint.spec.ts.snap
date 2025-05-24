@@ -22,6 +22,7 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
     ],
     "schema": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
       "examples": [
         {
           "error": {
@@ -32,6 +33,7 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
       ],
       "properties": {
         "error": {
+          "additionalProperties": false,
           "properties": {
             "message": {
               "type": "string",
@@ -67,8 +69,10 @@ exports[`Endpoint > .getResponses() > should return the positive responses (read
     ],
     "schema": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
       "properties": {
         "data": {
+          "additionalProperties": false,
           "properties": {
             "something": {
               "type": "number",

@@ -26,9 +26,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSome/thing Negative response
           content:
@@ -46,9 +48,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -97,9 +101,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSome/thing Negative response
           content:
@@ -117,9 +123,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -153,9 +161,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSome/thing Negative response
           content:
@@ -173,9 +183,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -224,9 +236,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSome/thing Negative response
           content:
@@ -244,9 +258,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -273,9 +289,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSome/:thing Negative response
           content:
@@ -293,9 +311,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -361,9 +381,11 @@ paths:
                         type: number
                     required:
                       - num
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -381,9 +403,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -419,9 +443,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/setSomething Negative response
           content:
@@ -439,9 +465,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -475,9 +503,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: PUT /v1/updateSomething Negative response
           content:
@@ -495,9 +525,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -566,9 +598,11 @@ paths:
                         type: number
                     required:
                       - whatever
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: DELETE /v1/deleteSomething Negative response
           content:
@@ -586,9 +620,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -669,9 +705,11 @@ paths:
                     required:
                       - literal
                       - transformation
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -689,9 +727,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -774,6 +814,7 @@ paths:
                         required:
                           - status
                           - data
+                        additionalProperties: false
                       - type: object
                         properties:
                           status:
@@ -786,14 +827,17 @@ paths:
                                 type: string
                             required:
                               - message
+                            additionalProperties: false
                         required:
                           - status
                           - error
+                        additionalProperties: false
                     discriminator:
                       propertyName: status
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -811,9 +855,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -893,9 +939,11 @@ paths:
                           - six
                     required:
                       - and
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -913,9 +961,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1030,9 +1080,11 @@ paths:
                       - literal
                       - multiliteral
                       - enum
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -1050,9 +1102,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1140,9 +1194,11 @@ paths:
                             maximum: 9007199254740991
                     required:
                       - or
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1160,9 +1216,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1245,9 +1303,11 @@ paths:
                     required:
                       - "null"
                       - dateOut
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1265,9 +1325,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1323,9 +1385,11 @@ paths:
                         $ref: "#/components/schemas/Schema2"
                     required:
                       - zodExample
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1343,9 +1407,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1378,6 +1444,7 @@ components:
       required:
         - name
         - subcategories
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1416,9 +1483,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - result
+                additionalProperties: false
             text/vnd.yaml: *a1
         "403":
           description: GET /v1/getSomething Negative response
@@ -1432,6 +1501,7 @@ paths:
                     const: NOT OK
                 required:
                   - status
+                additionalProperties: false
 components:
   schemas: {}
   responses: {}
@@ -1529,9 +1599,11 @@ paths:
                         pattern: ^-?\\d+$
                     required:
                       - bigint
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1549,9 +1621,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1678,9 +1752,11 @@ paths:
                         minLength: 1
                     required:
                       - nonempty
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1698,9 +1774,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1768,9 +1846,11 @@ paths:
                           - 2
                     required:
                       - nativeEnum
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1788,9 +1868,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1901,9 +1983,11 @@ paths:
                       - literal
                       - union
                       - enum
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1921,9 +2005,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1990,9 +2076,11 @@ paths:
                         type: number
                     required:
                       - transform
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -2010,9 +2098,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2102,9 +2192,11 @@ paths:
                           not: {}
                     required:
                       - empty
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -2122,9 +2214,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2179,9 +2273,11 @@ paths:
                       any: {}
                     required:
                       - any
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -2199,9 +2295,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2266,9 +2364,11 @@ paths:
                         type: boolean
                     required:
                       - boolean
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -2286,9 +2386,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2350,9 +2452,11 @@ paths:
                         type: string
                     required:
                       - payload
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "201":
           description: POST /v1/mtpl Positive response 201
           content:
@@ -2370,9 +2474,11 @@ paths:
                         type: string
                     required:
                       - payload
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/mtpl Negative response 400
           content:
@@ -2449,9 +2555,11 @@ paths:
                         summary: My custom schema
                     required:
                       - number
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/:name Negative response
           content:
@@ -2469,9 +2577,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2539,9 +2649,11 @@ paths:
                         type: string
                     required:
                       - user_name
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/test Negative response
           content:
@@ -2559,9 +2671,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2618,9 +2732,11 @@ paths:
                         type: string
                     required:
                       - user_name
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/test Negative response
           content:
@@ -2638,9 +2754,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2700,9 +2818,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/test Negative response
           content:
@@ -2720,9 +2840,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2790,9 +2912,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/test Negative response
           content:
@@ -2810,9 +2934,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2878,9 +3004,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: PUT /v1/test Negative response
           content:
@@ -2898,9 +3026,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2963,9 +3093,11 @@ paths:
                           type: string
                     required:
                       - arr
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -2983,9 +3115,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3030,9 +3164,11 @@ paths:
                           type: string
                     required:
                       - arr
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -3050,9 +3186,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3131,6 +3269,7 @@ paths:
                         required:
                           - id
                           - field1
+                        additionalProperties: false
                       - type: object
                         properties:
                           id:
@@ -3140,9 +3279,11 @@ paths:
                         required:
                           - id
                           - field2
+                        additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -3160,9 +3301,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3219,9 +3362,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -3239,9 +3384,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3315,9 +3462,11 @@ paths:
                     required:
                       - a
                       - b
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3348,9 +3497,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3425,9 +3576,11 @@ components:
           type: object
           properties: {}
           required: []
+          additionalProperties: false
       required:
         - status
         - data
+      additionalProperties: false
     GetHrisEmployeesNegativeResponse:
       type: object
       properties:
@@ -3441,9 +3594,11 @@ components:
               type: string
           required:
             - message
+          additionalProperties: false
       required:
         - status
         - error
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3507,9 +3662,11 @@ paths:
                         type: number
                     required:
                       - num
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3533,9 +3690,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3611,11 +3770,13 @@ paths:
                         type: number
                     required:
                       - num
+                    additionalProperties: false
                     examples:
                       - num: 123
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3639,9 +3800,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3703,9 +3866,11 @@ paths:
                         type: string
                     required:
                       - numericStr
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3729,9 +3894,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3799,9 +3966,11 @@ paths:
                         type: string
                     required:
                       - numericStr
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3825,9 +3994,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3891,11 +4062,13 @@ paths:
                         type: string
                     required:
                       - numericStr
+                    additionalProperties: false
                     examples:
                       - numericStr: "456"
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3919,9 +4092,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3991,11 +4166,13 @@ paths:
                         type: string
                     required:
                       - numericStr
+                    additionalProperties: false
                     examples:
                       - numericStr: "456"
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -4019,9 +4196,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -4082,9 +4261,11 @@ paths:
                         maximum: 9007199254740991
                     required:
                       - result
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -4102,9 +4283,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -4174,9 +4357,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: very negative response of PostV1Name
           content:
@@ -4194,9 +4379,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -4279,9 +4466,11 @@ components:
           type: object
           properties: {}
           required: []
+          additionalProperties: false
       required:
         - status
         - data
+      additionalProperties: false
     VeryNegativeResponseOfPostV1Name:
       type: object
       properties:
@@ -4295,9 +4484,11 @@ components:
               type: string
           required:
             - message
+          additionalProperties: false
       required:
         - status
         - error
+      additionalProperties: false
     TheBodyOfRequest:
       type: object
       properties:
@@ -4360,9 +4551,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/:name Negative response
           content:
@@ -4380,9 +4573,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -4452,9 +4647,11 @@ paths:
                     type: object
                     properties: {}
                     required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/:name Negative response
           content:
@@ -4472,9 +4669,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:

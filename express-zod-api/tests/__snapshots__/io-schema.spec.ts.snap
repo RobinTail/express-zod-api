@@ -3,6 +3,7 @@
 exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should handle no middlewares 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "properties": {
     "four": {
       "type": "boolean",
@@ -24,6 +25,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
         {
           "allOf": [
             {
+              "additionalProperties": false,
               "properties": {
                 "one": {
                   "type": "string",
@@ -35,6 +37,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
               "type": "object",
             },
             {
+              "additionalProperties": false,
               "properties": {
                 "two": {
                   "type": "number",
@@ -48,6 +51,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
           ],
         },
         {
+          "additionalProperties": false,
           "properties": {
             "three": {
               "type": "null",
@@ -61,6 +65,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
       ],
     },
     {
+      "additionalProperties": false,
       "properties": {
         "four": {
           "type": "boolean",
@@ -84,6 +89,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
         {
           "allOf": [
             {
+              "additionalProperties": false,
               "properties": {
                 "one": {
                   "type": "string",
@@ -95,6 +101,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
               "type": "object",
             },
             {
+              "additionalProperties": false,
               "properties": {
                 "two": {
                   "type": "number",
@@ -110,6 +117,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
         {
           "allOf": [
             {
+              "additionalProperties": false,
               "properties": {
                 "three": {
                   "type": "null",
@@ -121,6 +129,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
               "type": "object",
             },
             {
+              "additionalProperties": false,
               "properties": {
                 "four": {
                   "type": "boolean",
@@ -138,6 +147,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
     {
       "allOf": [
         {
+          "additionalProperties": false,
           "properties": {
             "five": {
               "type": "string",
@@ -149,6 +159,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
           "type": "object",
         },
         {
+          "additionalProperties": false,
           "properties": {
             "six": {
               "type": "number",
@@ -174,6 +185,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
         {
           "allOf": [
             {
+              "additionalProperties": false,
               "properties": {
                 "one": {
                   "type": "string",
@@ -185,6 +197,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
               "type": "object",
             },
             {
+              "additionalProperties": false,
               "properties": {
                 "two": {
                   "type": "number",
@@ -200,6 +213,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
         {
           "anyOf": [
             {
+              "additionalProperties": false,
               "properties": {
                 "three": {
                   "type": "null",
@@ -211,6 +225,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
               "type": "object",
             },
             {
+              "additionalProperties": false,
               "properties": {
                 "four": {
                   "type": "boolean",
@@ -226,6 +241,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
       ],
     },
     {
+      "additionalProperties": false,
       "properties": {
         "five": {
           "type": "string",
@@ -249,6 +265,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
         {
           "anyOf": [
             {
+              "additionalProperties": false,
               "properties": {
                 "one": {
                   "type": "string",
@@ -260,6 +277,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
               "type": "object",
             },
             {
+              "additionalProperties": false,
               "properties": {
                 "two": {
                   "type": "number",
@@ -275,6 +293,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
         {
           "anyOf": [
             {
+              "additionalProperties": false,
               "properties": {
                 "three": {
                   "type": "null",
@@ -286,6 +305,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
               "type": "object",
             },
             {
+              "additionalProperties": false,
               "properties": {
                 "four": {
                   "type": "boolean",
@@ -303,6 +323,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
     {
       "anyOf": [
         {
+          "additionalProperties": false,
           "properties": {
             "five": {
               "type": "string",
@@ -314,6 +335,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
           "type": "object",
         },
         {
+          "additionalProperties": false,
           "properties": {
             "six": {
               "type": "number",

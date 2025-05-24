@@ -48,9 +48,11 @@ paths:
                       - id
                       - name
                       - features
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/user/retrieve Negative response
           content:
@@ -68,9 +70,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -197,12 +201,14 @@ paths:
                     required:
                       - name
                       - createdAt
+                    additionalProperties: false
                     examples:
                       - name: John Doe
                         createdAt: 2021-12-31T00:00:00.000Z
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -227,9 +233,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -274,9 +282,11 @@ paths:
                         maximum: 9007199254740991
                     required:
                       - id
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "202":
           description: POST /v1/user/create Positive response 202
           content:
@@ -296,9 +306,11 @@ paths:
                         maximum: 9007199254740991
                     required:
                       - id
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/user/create Negative response 400
           content:
@@ -314,6 +326,7 @@ paths:
                 required:
                   - status
                   - reason
+                additionalProperties: false
         "409":
           description: POST /v1/user/create Negative response 409
           content:
@@ -331,6 +344,7 @@ paths:
                 required:
                   - status
                   - id
+                additionalProperties: false
         "500":
           description: POST /v1/user/create Negative response 500
           content:
@@ -346,6 +360,7 @@ paths:
                 required:
                   - status
                   - reason
+                additionalProperties: false
   /v1/user/list:
     get:
       operationId: GetV1UserList
@@ -365,6 +380,7 @@ paths:
                       type: string
                   required:
                     - name
+                  additionalProperties: false
               examples:
                 example1:
                   value:
@@ -496,9 +512,11 @@ paths:
                       - mime
                       - hash
                       - otherInputs
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/avatar/upload Negative response
           content:
@@ -516,9 +534,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -558,9 +578,11 @@ paths:
                         maximum: 9007199254740991
                     required:
                       - length
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/avatar/raw Negative response
           content:
@@ -578,9 +600,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -626,6 +650,7 @@ paths:
                 required:
                   - data
                   - event
+                additionalProperties: false
         "400":
           description: GET /v1/events/stream Negative response
           content:
@@ -679,9 +704,11 @@ paths:
                         maximum: 9007199254740991
                     required:
                       - crc
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/forms/feedback Negative response
           content:
@@ -699,9 +726,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -721,6 +750,7 @@ components:
             $ref: "#/components/schemas/Schema1"
       required:
         - title
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
