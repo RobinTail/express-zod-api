@@ -142,7 +142,7 @@ describe("Endpoint", () => {
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
         status: "error",
-        error: { message: "✖ Invalid email address\n  → at output.email" },
+        error: { message: "Invalid email address at output.email" },
       });
     });
 
@@ -570,7 +570,7 @@ describe("Endpoint", () => {
         status: "error",
         error: {
           message:
-            "✖ type1Attribute is required if type is type1\n  → at dynamicValue",
+            "type1Attribute is required if type is type1 at dynamicValue",
         },
       });
       expect(responseMock._getStatusCode()).toBe(400);
@@ -590,7 +590,7 @@ describe("Endpoint", () => {
       });
       expect(responseMock._getJSONData()).toEqual({
         status: "error",
-        error: { message: "✖ failure on demand\n  → at output" },
+        error: { message: "failure on demand at output" },
       });
       expect(responseMock._getStatusCode()).toBe(500);
     });
@@ -640,7 +640,7 @@ describe("Endpoint", () => {
       });
       expect(responseMock._getJSONData()).toEqual({
         status: "error",
-        error: { message: "✖ Please provide at least one property" },
+        error: { message: "Please provide at least one property" },
       });
       expect(responseMock._getStatusCode()).toBe(400);
     });

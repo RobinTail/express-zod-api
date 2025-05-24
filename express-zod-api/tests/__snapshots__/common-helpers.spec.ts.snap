@@ -26,14 +26,9 @@ exports[`Common Helpers > defaultInputSources > should be declared in a certain 
 }
 `;
 
-exports[`Common Helpers > getMessageFromError() > should compile a string from ZodError 1`] = `
-"✖ expected number, got string
-  → at user.id
-✖ expected string, got number
-  → at user.name"
-`;
+exports[`Common Helpers > getMessageFromError() > should compile a string from ZodError 1`] = `"expected number, got string at user.id; expected string, got number at user.name"`;
 
-exports[`Common Helpers > getMessageFromError() > should handle empty path in ZodIssue 1`] = `"✖ Top level refinement issue"`;
+exports[`Common Helpers > getMessageFromError() > should handle empty path in ZodIssue 1`] = `"Top level refinement issue"`;
 
 exports[`Common Helpers > getMessageFromError() > should pass message from other error types 1`] = `"something went wrong"`;
 

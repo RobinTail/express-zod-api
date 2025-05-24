@@ -93,8 +93,7 @@ exports[`App in production mode > Protocol > Should fail on invalid path 1`] = `
 exports[`App in production mode > Protocol > Should fail when missing content type header 1`] = `
 {
   "error": {
-    "message": "✖ Invalid input: expected string, received undefined
-  → at key",
+    "message": "Invalid input: expected string, received undefined at key",
   },
   "status": "error",
 }
@@ -133,7 +132,7 @@ exports[`App in production mode > Validation > Problem 787: Should NOT treat Zod
           },
         ],
       }),
-      "message": "✖ Invalid input: expected number, received string",
+      "message": "Invalid input: expected number, received string",
     }),
     "payload": {
       "key": "123",
@@ -147,8 +146,7 @@ exports[`App in production mode > Validation > Problem 787: Should NOT treat Zod
 exports[`App in production mode > Validation > Should fail on handler input type mismatch 1`] = `
 {
   "error": {
-    "message": "✖ Invalid input: expected string, received number
-  → at something",
+    "message": "Invalid input: expected string, received number at something",
   },
   "status": "error",
 }
@@ -182,8 +180,7 @@ exports[`App in production mode > Validation > Should fail on handler output typ
           },
         ],
       }),
-      "message": "✖ Too small: expected number to be >0
-  → at output.anything",
+      "message": "Too small: expected number to be >0 at output.anything",
     }),
     "payload": {
       "key": "123",
@@ -197,8 +194,7 @@ exports[`App in production mode > Validation > Should fail on handler output typ
 exports[`App in production mode > Validation > Should fail on middleware input type mismatch 1`] = `
 {
   "error": {
-    "message": "✖ Invalid input: expected string, received number
-  → at key",
+    "message": "Invalid input: expected string, received number at key",
   },
   "status": "error",
 }
@@ -207,8 +203,7 @@ exports[`App in production mode > Validation > Should fail on middleware input t
 exports[`App in production mode > Validation > Should fail on middleware refinement mismatch 1`] = `
 {
   "error": {
-    "message": "✖ Invalid key
-  → at key",
+    "message": "Invalid key at key",
   },
   "status": "error",
 }

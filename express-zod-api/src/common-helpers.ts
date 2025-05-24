@@ -70,9 +70,19 @@ export const ensureError = (subject: unknown): Error =>
       : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
-  if (error instanceof z.ZodError) return z.prettifyError(error);
+  if (error instanceof z.ZodError) {
+    return z
+      .prettifyError(error)
+      .replace("✖", "") // first
+      .split("✖")
+      .join(";")
+      .replaceAll("→", "")
+      .replaceAll("\n", "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
   if (error instanceof OutputValidationError) {
-    return z.prettifyError(
+    return getMessageFromError(
       new z.ZodError(
         error.cause.issues.map((one) => ({
           ...one,

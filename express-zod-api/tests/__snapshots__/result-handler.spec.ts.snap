@@ -32,10 +32,7 @@ exports[`ResultHandler > 'arrayResultHandler' > Should handle regular response 1
 ]
 `;
 
-exports[`ResultHandler > 'arrayResultHandler' > Should handle schema error 1`] = `
-"✖ Expected string, got number
-  → at something"
-`;
+exports[`ResultHandler > 'arrayResultHandler' > Should handle schema error 1`] = `"Expected string, got number at something"`;
 
 exports[`ResultHandler > 'arrayResultHandler' > should forward output schema examples 1`] = `
 {
@@ -112,8 +109,7 @@ exports[`ResultHandler > 'defaultResultHandler' > Should handle regular response
 exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`] = `
 {
   "error": {
-    "message": "✖ Expected string, got number
-  → at something",
+    "message": "Expected string, got number at something",
   },
   "status": "error",
 }
