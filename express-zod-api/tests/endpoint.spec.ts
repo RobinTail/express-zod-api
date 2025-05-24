@@ -522,15 +522,14 @@ describe("Endpoint", () => {
             (data.type === "type1" ? "type1Attribute" : "type2Attribute") in
             data.dynamicValue,
           {
-            message:
-              "✖ type1Attribute is required if type is type1\n   → at dynamicValue",
+            message: "type1Attribute is required if type is type1",
             path: ["dynamicValue"],
           },
         ),
       output: z
         .looseObject({})
         .refine((obj) => !("emitOutputValidationFailure" in obj), {
-          message: "✖ failure on demand\n  → at output",
+          message: "failure on demand",
         }),
       handler: async ({ input }) =>
         input.emitOutputValidationFailure
@@ -570,9 +569,8 @@ describe("Endpoint", () => {
       expect(responseMock._getJSONData()).toEqual({
         status: "error",
         error: {
-          // @todo fix this
           message:
-            "✖ ✖ type1Attribute is required if type is type1\n   → at dynamicValue\n  → at dynamicValue",
+            "✖ type1Attribute is required if type is type1\n  → at dynamicValue",
         },
       });
       expect(responseMock._getStatusCode()).toBe(400);
@@ -592,9 +590,7 @@ describe("Endpoint", () => {
       });
       expect(responseMock._getJSONData()).toEqual({
         status: "error",
-        error: {
-          message: "✖ ✖ failure on demand\n  → at output\n  → at output", // @todo fix this
-        },
+        error: { message: "✖ failure on demand\n  → at output" },
       });
       expect(responseMock._getStatusCode()).toBe(500);
     });
