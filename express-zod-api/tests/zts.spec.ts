@@ -376,6 +376,17 @@ describe("zod-to-ts", () => {
     });
   });
 
+  describe("z.templateLiteral()", () => {
+    test.each([
+      z.templateLiteral(["start", z.number(), "mid", z.boolean(), "end"]),
+      z.templateLiteral([z.number(), "one", z.boolean(), "two"]),
+      z.templateLiteral(["one", "two", "three"]),
+      z.templateLiteral([z.string(), z.number(), z.boolean()]),
+    ])("should produce the correct typescript %#", (schema) => {
+      expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
+    });
+  });
+
   describe("z.pipe()", () => {
     describe("transformations", () => {
       test.each([

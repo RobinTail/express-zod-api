@@ -295,3 +295,11 @@ exports[`zod-to-ts > z.pipe() > transformations > should handle unsupported tran
 exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type 'intact' 1`] = `"number"`;
 
 exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type 'transformed' 1`] = `"string"`;
+
+exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 0 1`] = `"\`start\${number}mid\${boolean}end\`"`;
+
+exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 1 1`] = `"\`\${number}one\${boolean}two\`"`;
+
+exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 2 1`] = `"\`one\${"two"}three\`"`;
+
+exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 3 1`] = `"\`\${string}\${number}\${boolean}\`"`;

@@ -82,10 +82,13 @@ export const getMessageFromError = (error: Error): string => {
 };
 
 /** Faster replacement to instanceof for code operating core types (traversing schemas) */
-export const isSchema = <T extends $ZodType>(
-  subject: $ZodType,
-  type: T["_zod"]["def"]["type"],
-): subject is T => subject._zod.def.type === type;
+export const isSchema = <T extends $ZodType = $ZodType>(
+  subject: unknown,
+  type?: T["_zod"]["def"]["type"],
+): subject is T =>
+  isObject(subject) &&
+  "_zod" in subject &&
+  (type ? R.path(["_zod", "def", "type"], subject) === type : true);
 
 export const combinations = <T>(
   a: T[],
