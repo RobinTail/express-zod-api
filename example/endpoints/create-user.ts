@@ -12,7 +12,8 @@ export const createUserEndpoint = statusDependingFactory.build({
   input: z.object({
     name: z
       .templateLiteral([namePart, " ", namePart])
-      .describe("first name and last name"),
+      .describe("first name and last name")
+      .example("John Doe"),
   }),
   output: z.object({
     id: z.int().positive(),
