@@ -242,6 +242,16 @@ describe("Server", () => {
       expect(servers[1]).toBeTruthy();
     });
 
+    test("should warn when neigher configured", async () => {
+      const customLogger = new BuiltinLogger({ level: "silent" });
+      const errorMethod = vi.spyOn(customLogger, "error");
+      await createServer(
+        { cors: false, startupLogo: false, logger: customLogger },
+        {},
+      );
+      expect(errorMethod).toHaveBeenCalledWith("No servers configured.");
+    });
+
     test("should enable compression on request", async () => {
       const configMock = {
         http: { listen: givePort() },
