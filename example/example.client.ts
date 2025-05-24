@@ -101,7 +101,8 @@ interface PatchV1UserIdNegativeResponseVariants {
 
 /** post /v1/user/create */
 type PostV1UserCreateInput = {
-  name: string;
+  /** first name and last name */
+  name: `${string} ${string}`;
 };
 
 /** post /v1/user/create */

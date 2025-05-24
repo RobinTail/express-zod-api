@@ -14,6 +14,8 @@ import type {
   $ZodReadonly,
   $ZodRecord,
   $ZodString,
+  $ZodTemplateLiteral,
+  $ZodTemplateLiteralPart,
   $ZodTransform,
   $ZodTuple,
   $ZodUnion,
@@ -68,6 +70,37 @@ const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
       : makeLiteralType(entry),
   );
   return values.length === 1 ? values[0] : f.createUnionTypeNode(values);
+};
+
+const onTemplateLiteral: Producer = (
+  { _zod: { def } }: $ZodTemplateLiteral,
+  { next },
+) => {
+  const [first, ...rest] = def.parts;
+  /** has side effect on rest.length */
+  const ensureString = (part: $ZodTemplateLiteralPart) => {
+    if (!isSchema(part)) return `${part || ""}`;
+    rest.unshift(part);
+    return "";
+  };
+  const head = f.createTemplateHead(ensureString(first));
+  const spans: ts.TemplateLiteralTypeSpan[] = [];
+  while (rest.length) {
+    const a = rest.shift();
+    if (!isSchema(a)) {
+      (spans[spans.length - 1]?.literal || head).text += `${a}`;
+      continue;
+    }
+    const b = ensureString(rest.shift());
+    spans.push(
+      f.createTemplateLiteralTypeSpan(
+        next(a),
+        (rest.length ? f.createTemplateMiddle : f.createTemplateTail)(b),
+      ),
+    );
+  }
+  if (!spans.length) return makeLiteralType(head.text);
+  return f.createTemplateLiteralType(head, spans);
 };
 
 const onObject: Producer = (
@@ -223,6 +256,7 @@ const producers: HandlingRules<
   record: onRecord,
   object: onObject,
   literal: onLiteral,
+  template_literal: onTemplateLiteral,
   intersection: onIntersection,
   union: onSomeUnion,
   default: onWrapped,
