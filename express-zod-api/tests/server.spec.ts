@@ -244,12 +244,12 @@ describe("Server", () => {
 
     test("should warn when neigher configured", async () => {
       const customLogger = new BuiltinLogger({ level: "silent" });
-      const errorMethod = vi.spyOn(customLogger, "error");
+      const warnMethod = vi.spyOn(customLogger, "warn");
       await createServer(
         { cors: false, startupLogo: false, logger: customLogger },
         {},
       );
-      expect(errorMethod).toHaveBeenCalledWith("No servers configured.");
+      expect(warnMethod).toHaveBeenCalledWith("No servers configured.");
     });
 
     test("should enable compression on request", async () => {
