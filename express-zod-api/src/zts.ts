@@ -77,7 +77,7 @@ const onTemplateLiteral: Producer = (
 ) => {
   const [first, ...rest] = def.parts;
   const head = f.createTemplateHead(
-    isSchema(first) ? String(rest.unshift(first)) && "" : `${first}`,
+    isSchema(first) ? String(rest.unshift(first)) && "" : `${first || ""}`,
   );
   if (!rest.length) return makeLiteralType(head.text);
   const spans: ts.TemplateLiteralTypeSpan[] = [];

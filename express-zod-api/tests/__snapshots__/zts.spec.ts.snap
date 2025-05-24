@@ -312,4 +312,4 @@ exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript
 
 exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 7 1`] = `"\`leading\${boolean}\`"`;
 
-exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 8 1`] = `""undefined""`;
+exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 8 1`] = `""""`;
