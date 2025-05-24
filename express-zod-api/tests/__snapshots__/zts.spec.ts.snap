@@ -303,3 +303,11 @@ exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript
 exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 2 1`] = `"\`one\${"two"}three\`"`;
 
 exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 3 1`] = `"\`\${string}\${number}\${boolean}\`"`;
+
+exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 4 1`] = `"\`\${number}\`"`;
+
+exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 5 1`] = `"\`only\${"`;
+
+exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 6 1`] = `"\`\${number}more\`"`;
+
+exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 7 1`] = `"\`leading\${boolean}\`"`;
