@@ -380,7 +380,7 @@ describe("zod-to-ts", () => {
     test.each([
       z.templateLiteral(["start", z.number(), "mid", z.boolean(), "end"]),
       z.templateLiteral([z.number(), "one", z.boolean(), "two"]),
-      z.templateLiteral(["one", "two", "three"]),
+      z.templateLiteral(["one-", "two-", "three"]),
       z.templateLiteral([z.string(), z.number(), z.boolean()]),
       z.templateLiteral([z.number()]),
       z.templateLiteral(["only"]),
