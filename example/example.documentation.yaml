@@ -255,8 +255,9 @@ paths:
               type: object
               properties:
                 name:
+                  description: first name and last name
                   type: string
-                  minLength: 1
+                  pattern: ^[\s\S]{1,} [\s\S]{1,}$
               required:
                 - name
         required: true
