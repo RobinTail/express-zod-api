@@ -256,10 +256,16 @@ paths:
               properties:
                 name:
                   description: first name and last name
+                  examples:
+                    - John Doe
                   type: string
                   pattern: ^[\s\S]{1,} [\s\S]{1,}$
               required:
                 - name
+            examples:
+              example1:
+                value:
+                  name: John Doe
         required: true
       responses:
         "201":
