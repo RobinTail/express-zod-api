@@ -55,7 +55,7 @@ import wellKnownHeaders from "./well-known-headers.json";
 
 interface ReqResCommons {
   makeRef: (
-    key: object,
+    key: object | string,
     subject: SchemaObject | ReferenceObject,
     name?: string,
   ) => ReferenceObject;
@@ -406,8 +406,12 @@ const fixReferences = (
       if (isReferenceObject(entry) && !entry.$ref.startsWith("#/components")) {
         const actualName = entry.$ref.split("/").pop()!;
         const depiction = defs[actualName];
-        if (depiction)
-          entry.$ref = ctx.makeRef(depiction, ensureCompliance(depiction)).$ref;
+        if (depiction) {
+          entry.$ref = ctx.makeRef(
+            depiction.id || JSON.stringify(depiction), // id is unique, serialization here is safe
+            ensureCompliance(depiction),
+          ).$ref;
+        }
         continue;
       }
       stack.push(...R.values(entry));
