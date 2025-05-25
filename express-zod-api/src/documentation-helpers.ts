@@ -350,7 +350,11 @@ export const depictRequestParams = ({
       const depicted = ensureCompliance(jsonSchema);
       const result =
         composition === "components"
-          ? makeRef(jsonSchema, depicted, makeCleanId(description, name))
+          ? makeRef(
+              jsonSchema.id || JSON.stringify(jsonSchema),
+              depicted,
+              makeCleanId(description, name),
+            )
           : depicted;
       return acc.concat({
         name,
@@ -408,7 +412,7 @@ const fixReferences = (
         const depiction = defs[actualName];
         if (depiction) {
           entry.$ref = ctx.makeRef(
-            depiction.id || depiction,
+            depiction.id || depiction, // avoiding serialization, because changing $ref
             ensureCompliance(depiction),
           ).$ref;
         }
