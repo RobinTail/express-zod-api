@@ -50,6 +50,16 @@ exports[`Example > Negative > GET request should fail on missing input param 1`]
 {
   "error": {
     "message": "id: Invalid input: expected string, received undefined",
+    "tree": {
+      "errors": [],
+      "properties": {
+        "id": {
+          "errors": [
+            "Invalid input: expected string, received undefined",
+          ],
+        },
+      },
+    },
   },
   "status": "error",
 }
@@ -59,6 +69,16 @@ exports[`Example > Negative > PATCH request should fail on schema validation 1`]
 {
   "error": {
     "message": "id: should be greater than or equal to 0",
+    "tree": {
+      "errors": [],
+      "properties": {
+        "id": {
+          "errors": [
+            "should be greater than or equal to 0",
+          ],
+        },
+      },
+    },
   },
   "status": "error",
 }
