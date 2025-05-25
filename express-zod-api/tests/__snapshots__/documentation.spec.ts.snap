@@ -46,6 +46,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -60,7 +62,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -121,6 +143,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -181,6 +205,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
@@ -195,7 +221,47 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
+    Schema2:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema2"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema2"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -256,6 +322,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -309,6 +377,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
@@ -323,7 +393,47 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
+    Schema2:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema2"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema2"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -401,6 +511,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -463,6 +575,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
@@ -523,6 +637,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema3"
                     required:
                       - message
                     additionalProperties: false
@@ -537,7 +653,67 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
+    Schema2:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema2"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema2"
+      required:
+        - errors
+      additionalProperties: false
+    Schema3:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema3"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema3"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -618,6 +794,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -632,7 +810,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -725,6 +923,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -739,7 +939,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -853,6 +1073,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -867,7 +1089,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -959,6 +1201,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -973,7 +1217,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1100,6 +1364,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -1114,7 +1380,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1214,6 +1500,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -1228,7 +1516,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1334,6 +1642,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -1348,7 +1658,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1416,6 +1746,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema3"
                     required:
                       - message
                     additionalProperties: false
@@ -1455,6 +1787,26 @@ components:
       required:
         - name
         - subcategories
+      additionalProperties: false
+    Schema3:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema3"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema3"
+      required:
+        - errors
       additionalProperties: false
   responses: {}
   parameters: {}
@@ -1630,6 +1982,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -1644,7 +1998,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1783,6 +2157,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -1797,7 +2173,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1877,6 +2273,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -1891,7 +2289,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2013,6 +2431,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -2027,7 +2447,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2106,6 +2546,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -2120,7 +2562,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2222,6 +2684,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -2236,7 +2700,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2303,6 +2787,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -2317,7 +2803,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2394,6 +2900,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -2408,7 +2916,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2585,6 +3113,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -2599,7 +3129,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2679,6 +3229,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -2693,7 +3245,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2762,6 +3334,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -2776,7 +3350,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2848,6 +3442,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -2862,7 +3458,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2942,6 +3558,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -2956,7 +3574,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3034,6 +3672,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -3048,7 +3688,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3123,6 +3783,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -3194,6 +3856,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
@@ -3208,7 +3872,47 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
+    Schema2:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema2"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema2"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3309,6 +4013,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -3323,7 +4029,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3392,6 +4118,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -3406,7 +4134,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3505,6 +4253,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -3519,7 +4269,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3591,6 +4361,26 @@ components:
         - status
         - data
       additionalProperties: false
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
     GetHrisEmployeesNegativeResponse:
       type: object
       properties:
@@ -3602,6 +4392,8 @@ components:
           properties:
             message:
               type: string
+            tree:
+              $ref: "#/components/schemas/Schema1"
           required:
             - message
           additionalProperties: false
@@ -3698,6 +4490,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -3712,7 +4506,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3808,6 +4622,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -3822,7 +4638,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3902,6 +4738,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -3916,7 +4754,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4002,6 +4860,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -4016,7 +4876,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4100,6 +4980,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -4114,7 +4996,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4204,6 +5106,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -4218,7 +5122,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4291,6 +5215,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -4305,7 +5231,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4387,6 +5333,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -4401,7 +5349,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4481,6 +5449,26 @@ components:
         - status
         - data
       additionalProperties: false
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
     VeryNegativeResponseOfPostV1Name:
       type: object
       properties:
@@ -4492,6 +5480,8 @@ components:
           properties:
             message:
               type: string
+            tree:
+              $ref: "#/components/schemas/Schema1"
           required:
             - message
           additionalProperties: false
@@ -4581,6 +5571,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -4595,7 +5587,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4677,6 +5689,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -4691,7 +5705,27 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}

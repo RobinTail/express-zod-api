@@ -3,6 +3,12 @@ type Type1 = {
   features?: Type1[] | undefined;
 };
 
+type Type2 = {
+  errors: string[];
+  items?: Type2[] | undefined;
+  properties?: Record<string, Type2> | undefined;
+};
+
 type SomeOf<T> = T[keyof T];
 
 /** get /v1/user/retrieve */
@@ -31,6 +37,7 @@ type GetV1UserRetrieveNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
+    tree?: Type2 | undefined;
   };
 };
 
@@ -91,6 +98,7 @@ type PatchV1UserIdNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
+    tree?: Type2 | undefined;
   };
 };
 
@@ -227,6 +235,7 @@ type PostV1AvatarUploadNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
+    tree?: Type2 | undefined;
   };
 };
 
@@ -256,6 +265,7 @@ type PostV1AvatarRawNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
+    tree?: Type2 | undefined;
   };
 };
 
@@ -316,6 +326,7 @@ type PostV1FormsFeedbackNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
+    tree?: Type2 | undefined;
   };
 };
 

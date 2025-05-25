@@ -67,6 +67,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
@@ -229,6 +231,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema3"
                     required:
                       - message
                     additionalProperties: false
@@ -529,6 +533,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema4"
                     required:
                       - message
                     additionalProperties: false
@@ -596,6 +602,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema5"
                     required:
                       - message
                     additionalProperties: false
@@ -722,6 +730,8 @@ paths:
                     properties:
                       message:
                         type: string
+                      tree:
+                        $ref: "#/components/schemas/Schema6"
                     required:
                       - message
                     additionalProperties: false
@@ -748,6 +758,106 @@ components:
             $ref: "#/components/schemas/Schema1"
       required:
         - title
+      additionalProperties: false
+    Schema2:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema2"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema2"
+      required:
+        - errors
+      additionalProperties: false
+    Schema3:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema3"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema3"
+      required:
+        - errors
+      additionalProperties: false
+    Schema4:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema4"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema4"
+      required:
+        - errors
+      additionalProperties: false
+    Schema5:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema5"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema5"
+      required:
+        - errors
+      additionalProperties: false
+    Schema6:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema6"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema6"
+      required:
+        - errors
       additionalProperties: false
   responses: {}
   parameters: {}

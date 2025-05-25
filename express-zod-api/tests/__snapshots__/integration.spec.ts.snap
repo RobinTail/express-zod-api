@@ -1,7 +1,13 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Integration > Feature #1470: Custom brands > should by handled accordingly 1`] = `
-"type SomeOf<T> = T[keyof T];
+"type Type1 = {
+  errors: string[];
+  items?: Type1[] | undefined;
+  properties?: Record<string, Type1> | undefined;
+};
+
+type SomeOf<T> = T[keyof T];
 
 /** post /v1/custom */
 type PostV1CustomInput = {
@@ -27,6 +33,7 @@ type PostV1CustomNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
+    tree?: Type1 | undefined;
   };
 };
 
@@ -145,6 +152,12 @@ exports[`Integration > Should support types variant and handle recursive schemas
     features: Type1;
 };
 
+type Type2 = {
+    errors: string[];
+    items?: Type2[] | undefined;
+    properties?: Record<string, Type2> | undefined;
+};
+
 type SomeOf<T> = T[keyof T];
 
 /** post /v1/test */
@@ -168,6 +181,7 @@ type PostV1TestNegativeVariant1 = {
     status: "error";
     error: {
         message: string;
+        tree?: Type2 | undefined;
     };
 };
 
@@ -214,6 +228,12 @@ exports[`Integration > Should support types variant and handle recursive schemas
     features: Type1;
 };
 
+type Type2 = {
+    errors: string[];
+    items?: Type2[] | undefined;
+    properties?: Record<string, Type2> | undefined;
+};
+
 type SomeOf<T> = T[keyof T];
 
 /** post /v1/test */
@@ -237,6 +257,7 @@ type PostV1TestNegativeVariant1 = {
     status: "error";
     error: {
         message: string;
+        tree?: Type2 | undefined;
     };
 };
 
@@ -278,7 +299,13 @@ export type Request = keyof Input;"
 `;
 
 exports[`Integration > Should treat optionals the same way as z.infer() by default 1`] = `
-"type SomeOf<T> = T[keyof T];
+"type Type1 = {
+  errors: string[];
+  items?: Type1[] | undefined;
+  properties?: Record<string, Type1> | undefined;
+};
+
+type SomeOf<T> = T[keyof T];
 
 /** post /v1/test-with-dashes */
 type PostV1TestWithDashesInput = {
@@ -303,6 +330,7 @@ type PostV1TestWithDashesNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
+    tree?: Type1 | undefined;
   };
 };
 

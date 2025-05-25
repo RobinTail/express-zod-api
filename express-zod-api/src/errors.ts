@@ -1,4 +1,4 @@
-import type { $ZodType } from "zod/v4/core";
+import type { $ZodType, $ZodErrorTree } from "zod/v4/core";
 import { z } from "zod/v4";
 import { getMessageFromError } from "./common-helpers";
 import { OpenAPIContext } from "./documentation-helpers";
@@ -68,9 +68,11 @@ export class OutputValidationError extends IOSchemaError {
 /** @desc An error of validating the input sources against the Middleware or Endpoint input schema */
 export class InputValidationError extends IOSchemaError {
   public override name = "InputValidationError";
+  public tree: $ZodErrorTree<unknown>;
 
   constructor(public override readonly cause: z.ZodError) {
     super(getMessageFromError(cause), { cause });
+    this.tree = z.treeifyError(cause);
   }
 }
 
