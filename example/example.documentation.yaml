@@ -42,7 +42,7 @@ paths:
                       features:
                         type: array
                         items:
-                          $ref: "#/components/schemas/Schema2"
+                          $ref: "#/components/schemas/Schema1"
                     required:
                       - id
                       - name
@@ -68,7 +68,7 @@ paths:
                       message:
                         type: string
                       tree:
-                        $ref: "#/components/schemas/Schema3"
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
@@ -232,7 +232,7 @@ paths:
                       message:
                         type: string
                       tree:
-                        $ref: "#/components/schemas/Schema3"
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
@@ -534,7 +534,7 @@ paths:
                       message:
                         type: string
                       tree:
-                        $ref: "#/components/schemas/Schema3"
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
@@ -603,7 +603,7 @@ paths:
                       message:
                         type: string
                       tree:
-                        $ref: "#/components/schemas/Schema3"
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
@@ -731,7 +731,7 @@ paths:
                       message:
                         type: string
                       tree:
-                        $ref: "#/components/schemas/Schema3"
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
@@ -749,22 +749,17 @@ components:
   schemas:
     Schema1:
       type: object
-      properties: &a1
+      properties:
         title:
           type: string
         features:
           type: array
           items:
             $ref: "#/components/schemas/Schema1"
-      required: &a2
+      required:
         - title
       additionalProperties: false
     Schema2:
-      type: object
-      properties: *a1
-      required: *a2
-      additionalProperties: false
-    Schema3:
       type: object
       id: errorTreeSchema
       properties:
@@ -775,13 +770,13 @@ components:
         items:
           type: array
           items:
-            $ref: "#/components/schemas/Schema3"
+            $ref: "#/components/schemas/Schema2"
         properties:
           type: object
           propertyNames:
             type: string
           additionalProperties:
-            $ref: "#/components/schemas/Schema3"
+            $ref: "#/components/schemas/Schema2"
       required:
         - errors
       additionalProperties: false
