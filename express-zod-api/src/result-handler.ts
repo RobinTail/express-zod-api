@@ -118,7 +118,7 @@ export const defaultResultHandler = new ResultHandler({
       status: z.literal("error"),
       error: z.object({
         message: z.string(),
-        tree: errorTreeSchema.optional(),
+        tree: errorTreeSchema,
       }),
     })
     .example({
