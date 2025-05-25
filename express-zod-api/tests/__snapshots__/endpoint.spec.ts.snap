@@ -80,9 +80,6 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
             "message": {
               "type": "string",
             },
-            "tree": {
-              "$ref": "#/$defs/errorTreeSchema",
-            },
           },
           "required": [
             "message",
@@ -91,6 +88,9 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
         },
         "status": {
           "const": "error",
+        },
+        "tree": {
+          "$ref": "#/$defs/errorTreeSchema",
         },
       },
       "required": [
@@ -149,13 +149,13 @@ exports[`Endpoint > Feature #600: Top level refinements > should fail during the
 {
   "error": {
     "message": "Please provide at least one property",
-    "tree": {
-      "errors": [
-        "Please provide at least one property",
-      ],
-    },
   },
   "status": "error",
+  "tree": {
+    "errors": [
+      "Please provide at least one property",
+    ],
+  },
 }
 `;
 
@@ -177,17 +177,17 @@ exports[`Endpoint > Issue #654: Top level refinements > should fail during the r
 {
   "error": {
     "message": "dynamicValue: type1Attribute is required if type is type1",
-    "tree": {
-      "errors": [],
-      "properties": {
-        "dynamicValue": {
-          "errors": [
-            "type1Attribute is required if type is type1",
-          ],
-        },
+  },
+  "status": "error",
+  "tree": {
+    "errors": [],
+    "properties": {
+      "dynamicValue": {
+        "errors": [
+          "type1Attribute is required if type is type1",
+        ],
       },
     },
   },
-  "status": "error",
 }
 `;

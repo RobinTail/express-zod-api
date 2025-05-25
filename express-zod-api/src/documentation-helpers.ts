@@ -410,7 +410,7 @@ const fixReferences = (
         const depiction = defs[actualName];
         if (depiction) {
           entry.$ref = ctx.makeRef(
-            depiction.id || JSON.stringify(depiction), // id is unique, serialization here is safe
+            depiction.id || depiction, // avoiding serialization, because changing $ref
             ensureCompliance(depiction),
           ).$ref;
         }

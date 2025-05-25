@@ -33,8 +33,8 @@ type PostV1CustomNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
-    tree?: Type1 | undefined;
   };
+  tree?: Type1 | undefined;
 };
 
 /** post /v1/custom */
@@ -181,8 +181,8 @@ type PostV1TestNegativeVariant1 = {
     status: "error";
     error: {
         message: string;
-        tree?: Type2 | undefined;
     };
+    tree?: Type2 | undefined;
 };
 
 /** post /v1/test */
@@ -257,8 +257,8 @@ type PostV1TestNegativeVariant1 = {
     status: "error";
     error: {
         message: string;
-        tree?: Type2 | undefined;
     };
+    tree?: Type2 | undefined;
 };
 
 /** post /v1/test */
@@ -330,8 +330,8 @@ type PostV1TestWithDashesNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
-    tree?: Type1 | undefined;
   };
+  tree?: Type1 | undefined;
 };
 
 /** post /v1/test-with-dashes */

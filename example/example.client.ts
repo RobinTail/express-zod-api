@@ -37,8 +37,8 @@ type GetV1UserRetrieveNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
-    tree?: Type2 | undefined;
   };
+  tree?: Type2 | undefined;
 };
 
 /** get /v1/user/retrieve */
@@ -98,8 +98,8 @@ type PatchV1UserIdNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
-    tree?: Type2 | undefined;
   };
+  tree?: Type2 | undefined;
 };
 
 /** patch /v1/user/:id */
@@ -235,8 +235,8 @@ type PostV1AvatarUploadNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
-    tree?: Type2 | undefined;
   };
+  tree?: Type2 | undefined;
 };
 
 /** post /v1/avatar/upload */
@@ -265,8 +265,8 @@ type PostV1AvatarRawNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
-    tree?: Type2 | undefined;
   };
+  tree?: Type2 | undefined;
 };
 
 /** post /v1/avatar/raw */
@@ -326,8 +326,8 @@ type PostV1FormsFeedbackNegativeVariant1 = {
   status: "error";
   error: {
     message: string;
-    tree?: Type2 | undefined;
   };
+  tree?: Type2 | undefined;
 };
 
 /** post /v1/forms/feedback */

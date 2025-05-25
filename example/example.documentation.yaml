@@ -67,11 +67,11 @@ paths:
                     properties:
                       message:
                         type: string
-                      tree:
-                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema2"
                 required:
                   - status
                   - error
@@ -231,11 +231,11 @@ paths:
                     properties:
                       message:
                         type: string
-                      tree:
-                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema2"
                 required:
                   - status
                   - error
@@ -533,11 +533,11 @@ paths:
                     properties:
                       message:
                         type: string
-                      tree:
-                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema2"
                 required:
                   - status
                   - error
@@ -602,11 +602,11 @@ paths:
                     properties:
                       message:
                         type: string
-                      tree:
-                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema2"
                 required:
                   - status
                   - error
@@ -730,11 +730,11 @@ paths:
                     properties:
                       message:
                         type: string
-                      tree:
-                        $ref: "#/components/schemas/Schema2"
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema2"
                 required:
                   - status
                   - error

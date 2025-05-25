@@ -116,10 +116,8 @@ export const defaultResultHandler = new ResultHandler({
   negative: z
     .object({
       status: z.literal("error"),
-      error: z.object({
-        message: z.string(),
-        tree: errorTreeSchema.optional(),
-      }),
+      error: z.object({ message: z.string() }),
+      tree: errorTreeSchema.optional(),
     })
     .example({
       status: "error",
@@ -134,11 +132,11 @@ export const defaultResultHandler = new ResultHandler({
         .set(httpError.headers)
         .json({
           status: "error",
-          error: {
-            message: getPublicErrorMessage(httpError),
-            tree:
-              error instanceof InputValidationError ? error.tree : undefined,
-          },
+          error: { message: getPublicErrorMessage(httpError) },
+          tree:
+            error instanceof InputValidationError
+              ? z.treeifyError(error.cause)
+              : undefined,
         });
     }
     response
