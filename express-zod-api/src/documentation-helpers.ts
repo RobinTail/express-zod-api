@@ -410,7 +410,9 @@ const fixReferences = (
         const depiction = defs[actualName];
         if (depiction) {
           entry.$ref = ctx.makeRef(
-            depiction.id || depiction, // avoiding serialization, because changing $ref
+            // @todo perhaps id is enough (no equality check needed)
+            // @todo perhaps otherwise should serialize because it's always different by reference
+            depiction.id === actualName ? depiction.id : depiction,
             ensureCompliance(depiction),
           ).$ref;
         }

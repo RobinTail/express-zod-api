@@ -101,13 +101,15 @@ export const pullResponseExamples = <T extends $ZodObject>(subject: T) =>
     [],
   );
 
-const _errorTreeSchema = z.object({
-  errors: z.string().array(),
-  get items() {
-    return _errorTreeSchema.array().optional();
-  },
-  get properties() {
-    return z.record(z.string(), _errorTreeSchema).optional();
-  },
-});
+const _errorTreeSchema = z
+  .object({
+    errors: z.string().array(),
+    get items() {
+      return _errorTreeSchema.array().optional();
+    },
+    get properties() {
+      return z.record(z.string(), _errorTreeSchema).optional();
+    },
+  })
+  .meta({ id: "errorTreeSchema" });
 export const errorTreeSchema = _errorTreeSchema.optional();

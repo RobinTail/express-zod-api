@@ -31,8 +31,9 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
     ],
     "schema": {
       "$defs": {
-        "__schema0": {
+        "errorTreeSchema": {
           "additionalProperties": false,
+          "id": "errorTreeSchema",
           "properties": {
             "errors": {
               "items": {
@@ -42,13 +43,13 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
             },
             "items": {
               "items": {
-                "$ref": "#/$defs/__schema0",
+                "$ref": "#/$defs/errorTreeSchema",
               },
               "type": "array",
             },
             "properties": {
               "additionalProperties": {
-                "$ref": "#/$defs/__schema0",
+                "$ref": "#/$defs/errorTreeSchema",
               },
               "propertyNames": {
                 "type": "string",
@@ -80,7 +81,7 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
               "type": "string",
             },
             "tree": {
-              "$ref": "#/$defs/__schema0",
+              "$ref": "#/$defs/errorTreeSchema",
             },
           },
           "required": [

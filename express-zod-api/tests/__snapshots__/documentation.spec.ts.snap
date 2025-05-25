@@ -65,6 +65,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -206,7 +207,7 @@ paths:
                       message:
                         type: string
                       tree:
-                        $ref: "#/components/schemas/Schema2"
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -224,6 +225,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -239,26 +241,6 @@ components:
             type: string
           additionalProperties:
             $ref: "#/components/schemas/Schema1"
-      required:
-        - errors
-      additionalProperties: false
-    Schema2:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: string
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/Schema2"
-        properties:
-          type: object
-          propertyNames:
-            type: string
-          additionalProperties:
-            $ref: "#/components/schemas/Schema2"
       required:
         - errors
       additionalProperties: false
@@ -378,7 +360,7 @@ paths:
                       message:
                         type: string
                       tree:
-                        $ref: "#/components/schemas/Schema2"
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -396,6 +378,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -411,26 +394,6 @@ components:
             type: string
           additionalProperties:
             $ref: "#/components/schemas/Schema1"
-      required:
-        - errors
-      additionalProperties: false
-    Schema2:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: string
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/Schema2"
-        properties:
-          type: object
-          propertyNames:
-            type: string
-          additionalProperties:
-            $ref: "#/components/schemas/Schema2"
       required:
         - errors
       additionalProperties: false
@@ -576,7 +539,7 @@ paths:
                       message:
                         type: string
                       tree:
-                        $ref: "#/components/schemas/Schema2"
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -638,7 +601,7 @@ paths:
                       message:
                         type: string
                       tree:
-                        $ref: "#/components/schemas/Schema3"
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -656,6 +619,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -671,46 +635,6 @@ components:
             type: string
           additionalProperties:
             $ref: "#/components/schemas/Schema1"
-      required:
-        - errors
-      additionalProperties: false
-    Schema2:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: string
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/Schema2"
-        properties:
-          type: object
-          propertyNames:
-            type: string
-          additionalProperties:
-            $ref: "#/components/schemas/Schema2"
-      required:
-        - errors
-      additionalProperties: false
-    Schema3:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: string
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/Schema3"
-        properties:
-          type: object
-          propertyNames:
-            type: string
-          additionalProperties:
-            $ref: "#/components/schemas/Schema3"
       required:
         - errors
       additionalProperties: false
@@ -813,6 +737,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -942,6 +867,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -1092,6 +1018,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -1220,6 +1147,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -1383,6 +1311,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -1519,6 +1448,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -1661,6 +1591,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -1790,6 +1721,7 @@ components:
       additionalProperties: false
     Schema3:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -2001,6 +1933,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -2176,6 +2109,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -2292,6 +2226,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -2450,6 +2385,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -2565,6 +2501,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -2703,6 +2640,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -2806,6 +2744,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -2919,6 +2858,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -3132,6 +3072,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -3248,6 +3189,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -3353,6 +3295,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -3461,6 +3404,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -3577,6 +3521,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -3691,6 +3636,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -3857,7 +3803,7 @@ paths:
                       message:
                         type: string
                       tree:
-                        $ref: "#/components/schemas/Schema2"
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - message
                     additionalProperties: false
@@ -3875,6 +3821,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -3890,26 +3837,6 @@ components:
             type: string
           additionalProperties:
             $ref: "#/components/schemas/Schema1"
-      required:
-        - errors
-      additionalProperties: false
-    Schema2:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: string
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/Schema2"
-        properties:
-          type: object
-          propertyNames:
-            type: string
-          additionalProperties:
-            $ref: "#/components/schemas/Schema2"
       required:
         - errors
       additionalProperties: false
@@ -4032,6 +3959,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -4137,6 +4065,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -4272,6 +4201,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -4363,6 +4293,7 @@ components:
       additionalProperties: false
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -4509,6 +4440,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -4641,6 +4573,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -4757,6 +4690,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -4879,6 +4813,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -4999,6 +4934,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -5125,6 +5061,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -5234,6 +5171,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -5352,6 +5290,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -5451,6 +5390,7 @@ components:
       additionalProperties: false
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -5590,6 +5530,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
@@ -5708,6 +5649,7 @@ components:
   schemas:
     Schema1:
       type: object
+      id: errorTreeSchema
       properties:
         errors:
           type: array
