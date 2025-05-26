@@ -14,6 +14,15 @@ exports[`Endpoint > #handleResult > Should handle errors within ResultHandler 1`
 ]
 `;
 
+exports[`Endpoint > #parseOutput > Should throw on output validation failure 1`] = `
+{
+  "error": {
+    "message": "output.email: Invalid email address",
+  },
+  "status": "error",
+}
+`;
+
 exports[`Endpoint > .getResponses() > should return the negative responses (readonly) 1`] = `
 [
   {

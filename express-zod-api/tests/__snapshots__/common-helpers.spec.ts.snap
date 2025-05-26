@@ -30,7 +30,7 @@ exports[`Common Helpers > getMessageFromError() > should compile a string from Z
 
 exports[`Common Helpers > getMessageFromError() > should handle composite error 0 1`] = `"user.id: expected number, got string; user.name: expected string, got number"`;
 
-exports[`Common Helpers > getMessageFromError() > should handle composite error 1 1`] = `"output/user.id: expected number, got string; user.name: expected string, got number"`;
+exports[`Common Helpers > getMessageFromError() > should handle composite error 1 1`] = `"output.user.id: expected number, got string; output.user.name: expected string, got number"`;
 
 exports[`Common Helpers > getMessageFromError() > should handle empty path in ZodIssue 1`] = `"Top level refinement issue"`;
 
