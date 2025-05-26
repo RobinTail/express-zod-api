@@ -23,15 +23,12 @@ describe("zod-to-ts", () => {
     });
   });
 
-  describe.each(["string", "base64", "binary", "buffer"] as const)(
-    "ez.file(%s)",
-    (variant) => {
-      test("should depend on variant", () => {
-        const node = zodToTs(ez.file(variant), { ctx });
-        expect(printNodeTest(node)).toMatchSnapshot();
-      });
-    },
-  );
+  describe("ez.buffer()", () => {
+    test("should be Buffer", () => {
+      const node = zodToTs(ez.buffer(), { ctx });
+      expect(printNodeTest(node)).toMatchSnapshot();
+    });
+  });
 
   describe("ez.raw()", () => {
     test("should depict the raw property", () => {
