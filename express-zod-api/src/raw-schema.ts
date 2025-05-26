@@ -10,7 +10,6 @@ type Base = ReturnType<typeof base.brand<symbol>>;
 const extended = <S extends $ZodShape>(extra: S) =>
   base.extend(extra).brand(ezRawBrand as symbol);
 
-/** Shorthand for z.object({ raw: ez.file("buffer") }) */
 export function raw(): Base;
 export function raw<S extends $ZodShape>(
   extra: S,
