@@ -1300,9 +1300,25 @@ paths:
                         format: date-time
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                      strOut:
+                        type: string
+                        format: file
+                      buffer:
+                        type: string
+                        format: binary
+                      stream:
+                        type: string
+                        format: binary
+                      based:
+                        type: string
+                        format: byte
                     required:
                       - "null"
                       - dateOut
+                      - strOut
+                      - buffer
+                      - stream
+                      - based
                     additionalProperties: false
                 required:
                   - status

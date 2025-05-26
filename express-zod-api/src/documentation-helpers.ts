@@ -104,6 +104,7 @@ export const depictUpload: Depicter = ({}, ctx) => {
   return { type: "string", format: "binary" };
 };
 
+// @todo improve: https://swagger.io/specification/#working-with-binary-data
 export const depictDownload: Depicter = ({ jsonSchema }) => ({
   type: "string",
   format:
