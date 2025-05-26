@@ -55,17 +55,13 @@ export class OutputValidationError extends IOSchemaError {
   public override name = "OutputValidationError";
 
   constructor(public override readonly cause: z.ZodError) {
-    super(
-      getMessageFromError(
-        new z.ZodError(
-          cause.issues.map(({ path, ...rest }) => ({
-            ...rest,
-            path: ["output", ...path],
-          })),
-        ),
-      ),
-      { cause },
+    const prefixedPath = new z.ZodError(
+      cause.issues.map(({ path, ...rest }) => ({
+        ...rest,
+        path: ["output", ...path],
+      })),
     );
+    super(getMessageFromError(prefixedPath), { cause });
   }
 }
 
