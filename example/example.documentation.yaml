@@ -554,9 +554,7 @@ paths:
         description: POST /v1/avatar/raw Request body
         content:
           application/octet-stream:
-            schema:
-              type: string
-              format: binary
+            schema: {}
         required: true
       responses:
         "200":
