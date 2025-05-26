@@ -71,10 +71,10 @@ export const ensureError = (subject: unknown): Error =>
 export const getMessageFromError = (error: Error): string => {
   if (error instanceof z.ZodError) {
     return error.issues
-      .map(
-        ({ path, message }) =>
-          `${path.length ? z.core.toDotPath(path) + ": " : ""}${message}`,
-      )
+      .map(({ path, message }) => {
+        const prefix = path.length ? `${z.core.toDotPath(path)}: ` : "";
+        return `${prefix}${message}`;
+      })
       .join("; ");
   }
   return error.message;
