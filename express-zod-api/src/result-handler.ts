@@ -5,7 +5,7 @@ import {
   defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
-import { FlatObject, hasExamples, isObject } from "./common-helpers";
+import { FlatObject, isObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
@@ -146,7 +146,7 @@ export const arrayResultHandler = new ResultHandler({
       output.shape.items instanceof z.ZodArray
         ? output.shape.items
         : z.array(z.any());
-    if (hasExamples(responseSchema)) return responseSchema;
+    if (responseSchema.meta()?.examples?.length) return responseSchema; // has examples on the items, or pull down:
     return (globalRegistry.get(output)?.examples || []).reduce(
       (acc, example) =>
         isObject(example) && "items" in example && Array.isArray(example.items)

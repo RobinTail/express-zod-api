@@ -86,9 +86,6 @@ export const isSchema = <T extends $ZodType>(
   type: T["_zod"]["def"]["type"],
 ): subject is T => subject._zod.def.type === type;
 
-export const hasExamples = (schema: z.ZodType) =>
-  Boolean(schema.meta()?.examples?.length);
-
 export const combinations = <T>(
   a: T[],
   b: T[],
