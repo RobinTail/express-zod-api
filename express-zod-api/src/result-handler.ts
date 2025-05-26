@@ -96,15 +96,20 @@ export class ResultHandler<
 
 export const defaultResultHandler = new ResultHandler({
   positive: (output) => {
-    const { examples = [] } = globalRegistry.get(output) || {};
     const responseSchema = z.object({
       status: z.literal("success"),
       data: output,
     });
-    return examples.reduce<typeof responseSchema>(
-      (acc, example) => acc.example({ status: "success", data: example }),
-      responseSchema,
-    );
+    const { examples = [] } = globalRegistry.get(output) || {}; // pulling down:
+    if (examples.length) {
+      globalRegistry.add(responseSchema, {
+        examples: examples.map((data) => ({
+          status: "success" as const,
+          data,
+        })),
+      });
+    }
+    return responseSchema;
   },
   negative: z
     .object({
