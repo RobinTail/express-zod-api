@@ -1300,9 +1300,20 @@ paths:
                         format: date-time
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                      buffer:
+                        externalDocs:
+                          description: raw binary data
+                          url: https://swagger.io/specification/#working-with-binary-data
+                      based:
+                        type: string
+                        format: base64
+                        pattern: ^$|^(?:[0-9a-zA-Z+/]{4})*(?:(?:[0-9a-zA-Z+/]{2}==)|(?:[0-9a-zA-Z+/]{3}=))?$
+                        contentEncoding: base64
                     required:
                       - "null"
                       - dateOut
+                      - buffer
+                      - based
                     additionalProperties: false
                 required:
                   - status

@@ -15,6 +15,7 @@ interface Queries {
   depicter: TSESTree.ArrowFunctionExpression;
   nextCall: TSESTree.CallExpression;
   zod: TSESTree.ImportDeclaration;
+  ezFile: TSESTree.CallExpression & { arguments: [TSESTree.Literal] };
 }
 
 type Listener = keyof Queries;
@@ -33,6 +34,7 @@ const queries: Record<Listener, string> = {
     `${NT.VariableDeclarator}[id.typeAnnotation.typeAnnotation.typeName.name='Depicter'] > ` +
     `${NT.ArrowFunctionExpression} ${NT.CallExpression}[callee.name='next']`,
   zod: `${NT.ImportDeclaration}[source.value='zod']`,
+  ezFile: `${NT.CallExpression}[arguments.0.type='${NT.Literal}']:has( ${NT.MemberExpression}[object.name='ez'][property.name='file'] )`,
 };
 
 const listen = <
@@ -129,6 +131,23 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
           data: { subject: "import", from: "zod", to: "zod/v4" },
           fix: (fixer) => fixer.replaceText(node.source, `"zod/v4"`),
         }),
+      ezFile: (node) => {
+        const [variant] = node.arguments;
+        const replacement =
+          variant.value === "buffer"
+            ? "ez.buffer()"
+            : variant.value === "base64"
+              ? "z.base64()"
+              : variant.value === "binary"
+                ? "ez.buffer().or(z.string())"
+                : "z.string()";
+        ctx.report({
+          node: node,
+          messageId: "change",
+          data: { subject: "schema", from: "ez.file()", to: replacement },
+          fix: (fixer) => fixer.replaceText(node, replacement),
+        });
+      },
     }),
 });
 

@@ -8,6 +8,15 @@ exports[`Documentation helpers > depictBigInt() > should set type:string and for
 }
 `;
 
+exports[`Documentation helpers > depictBuffer() > should set hint with external docs 1`] = `
+{
+  "externalDocs": {
+    "description": "raw binary data",
+    "url": "https://swagger.io/specification/#working-with-binary-data",
+  },
+}
+`;
+
 exports[`Documentation helpers > depictDateIn > should set type:string, pattern and format 0 1`] = `
 {
   "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
@@ -103,41 +112,6 @@ exports[`Documentation helpers > depictEnum() > should set type 1`] = `
     "test",
     "jest",
   ],
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 0 1`] = `
-{
-  "format": "file",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 1 1`] = `
-{
-  "format": "binary",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 2 1`] = `
-{
-  "format": "byte",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 3 1`] = `
-{
-  "format": "file",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 4 1`] = `
-{
-  "format": "binary",
   "type": "string",
 }
 `;

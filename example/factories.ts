@@ -32,17 +32,14 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
 /** @desc This one streams the file using the "filename" property of the endpoint's output */
 export const fileStreamingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
-    positive: { schema: ez.file("buffer"), mimeType: "image/*" },
+    positive: { schema: ez.buffer(), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) return void response.status(400).send(error.message);
-      if (
-        "filename" in output &&
-        typeof output.filename === "string" &&
-        output.filename.includes(".")
-      ) {
-        const extension = output.filename.split(".").pop()!;
-        createReadStream(output.filename).pipe(response.type(extension));
+      if ("filename" in output && typeof output.filename === "string") {
+        createReadStream(output.filename).pipe(
+          response.attachment(output.filename),
+        );
       } else {
         response.status(400).send("Filename is missing");
       }

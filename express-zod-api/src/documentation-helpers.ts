@@ -24,6 +24,7 @@ import {
 import * as R from "ramda";
 import { z } from "zod/v4";
 import { ResponseVariant } from "./api-response";
+import { ezBufferBrand } from "./buffer-schema";
 import {
   FlatObject,
   getRoutePathParams,
@@ -40,7 +41,6 @@ import { contentTypes } from "./content-type";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { flattenIO } from "./json-schema-helpers";
 import { Alternatives } from "./logical-container";
@@ -104,14 +104,12 @@ export const depictUpload: Depicter = ({}, ctx) => {
   return { type: "string", format: "binary" };
 };
 
-export const depictFile: Depicter = ({ jsonSchema }) => ({
-  type: "string",
-  format:
-    jsonSchema.type === "string"
-      ? jsonSchema.format === "base64"
-        ? "byte"
-        : "file"
-      : "binary",
+export const depictBuffer: Depicter = ({ jsonSchema }) => ({
+  ...jsonSchema,
+  externalDocs: {
+    description: "raw binary data",
+    url: "https://swagger.io/specification/#working-with-binary-data",
+  },
 });
 
 export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
@@ -390,8 +388,8 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,
-    [ezFileBrand]: depictFile,
     [ezRawBrand]: depictRaw,
+    [ezBufferBrand]: depictBuffer,
   };
 
 /**

@@ -1,6 +1,7 @@
 import type { $ZodType, JSONSchema } from "zod/v4/core";
 import * as R from "ramda";
 import { z } from "zod/v4";
+import { ezBufferBrand } from "./buffer-schema";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { DeepCheckError } from "./errors";
@@ -91,6 +92,7 @@ export const findJsonIncompatible = (
       const brand = getBrand(zodSchema);
       const { type } = zodSchema._zod.def;
       if (unsupported.includes(type)) return true;
+      if (brand === ezBufferBrand) return true;
       if (io === "input") {
         if (type === "date") return true;
         if (brand === ezDateOutBrand) return true;

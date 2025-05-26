@@ -58,9 +58,9 @@ exports[`Index Entrypoint > exports > ensureHttpError should have certain value 
 
 exports[`Index Entrypoint > exports > ez should have certain value 1`] = `
 {
+  "buffer": [Function],
   "dateIn": [Function],
   "dateOut": [Function],
-  "file": [Function],
   "form": [Function],
   "raw": [Function],
   "upload": [Function],

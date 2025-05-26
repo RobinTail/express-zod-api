@@ -521,8 +521,8 @@ describe("Routing", () => {
       [ez.dateOut(), ez.dateIn()],
       [z.lazy(() => z.void()), ez.raw()],
       [z.promise(z.any()), ez.upload()],
-      [z.never(), z.tuple([ez.file()]).rest(z.nan())],
-      [z.nan().pipe(z.any()), circular],
+      [z.never(), z.tuple([ez.buffer()]).rest(z.nan())],
+      [ez.buffer().pipe(z.any()), circular],
     ])("should warn about JSON incompatible schemas %#", (input, output) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
         input: z.object({ input }),
