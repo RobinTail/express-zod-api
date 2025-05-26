@@ -935,7 +935,7 @@ const fileStreamingEndpointsFactory = new EndpointsFactory(
       if (error) return void response.status(400).send(error.message);
       if ("filename" in output)
         fs.createReadStream(output.filename).pipe(
-          response.type(output.filename),
+          response.attachment(output.filename),
         );
       else response.status(400).send("Filename is missing");
     },
