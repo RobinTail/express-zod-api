@@ -448,8 +448,9 @@ paths:
           content:
             image/*:
               schema:
-                type: string
-                format: binary
+                externalDocs:
+                  description: raw binary data
+                  url: https://swagger.io/specification/#working-with-binary-data
         "400":
           description: GET /v1/avatar/stream Negative response
           content:
@@ -554,7 +555,10 @@ paths:
         description: POST /v1/avatar/raw Request body
         content:
           application/octet-stream:
-            schema: {}
+            schema:
+              externalDocs:
+                description: raw binary data
+                url: https://swagger.io/specification/#working-with-binary-data
         required: true
       responses:
         "200":

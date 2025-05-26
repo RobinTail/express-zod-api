@@ -104,7 +104,13 @@ export const depictUpload: Depicter = ({}, ctx) => {
   return { type: "string", format: "binary" };
 };
 
-export const depictBuffer: Depicter = () => ({ format: "binary" });
+export const depictBuffer: Depicter = ({ jsonSchema }) => ({
+  ...jsonSchema,
+  externalDocs: {
+    description: "raw binary data",
+    url: "https://swagger.io/specification/#working-with-binary-data",
+  },
+});
 
 export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
   if (!zodSchema._zod.disc) return jsonSchema;

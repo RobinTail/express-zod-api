@@ -8,9 +8,12 @@ exports[`Documentation helpers > depictBigInt() > should set type:string and for
 }
 `;
 
-exports[`Documentation helpers > depictBuffer() > should set hint as format:binary 1`] = `
+exports[`Documentation helpers > depictBuffer() > should set hint with external docs 1`] = `
 {
-  "format": "binary",
+  "externalDocs": {
+    "description": "raw binary data",
+    "url": "https://swagger.io/specification/#working-with-binary-data",
+  },
 }
 `;
 

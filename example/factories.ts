@@ -32,7 +32,7 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
 /** @desc This one streams the file using the "filename" property of the endpoint's output */
 export const fileStreamingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
-    positive: { schema: ez.file("buffer"), mimeType: "image/*" },
+    positive: { schema: ez.buffer(), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) return void response.status(400).send(error.message);

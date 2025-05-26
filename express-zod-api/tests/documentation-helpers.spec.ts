@@ -144,7 +144,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictBuffer()", () => {
-    test("should set hint as format:binary", () => {
+    test("should set hint with external docs", () => {
       expect(
         depictBuffer({ zodSchema: z.never(), jsonSchema: {} }, responseCtx),
       ).toMatchSnapshot();
