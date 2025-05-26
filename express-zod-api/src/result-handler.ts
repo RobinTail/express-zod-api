@@ -17,6 +17,7 @@ import {
   normalize,
   ResultSchema,
 } from "./result-helpers";
+import * as R from "ramda";
 
 type Handler<RES = unknown> = (
   params: DiscriminatedResult & {
@@ -140,20 +141,25 @@ export const defaultResultHandler = new ResultHandler({
  * */
 export const arrayResultHandler = new ResultHandler({
   positive: (output) => {
-    const { examples = [] } = globalRegistry.get(output) || {};
     const responseSchema =
       output instanceof z.ZodObject &&
       "items" in output.shape &&
       output.shape.items instanceof z.ZodArray
         ? output.shape.items
         : z.array(z.any());
-    return examples.reduce<typeof responseSchema>(
-      (acc, example) =>
-        isObject(example) && "items" in example && Array.isArray(example.items)
-          ? acc.example(example.items)
-          : acc,
-      responseSchema,
-    );
+    if (!globalRegistry.has(responseSchema)) {
+      const examples = R.filter(
+        (one): one is { items: unknown[] } =>
+          isObject(one) && "items" in one && Array.isArray(one.items),
+        globalRegistry.get(output)?.examples || [],
+      );
+      if (examples.length) {
+        globalRegistry.add(responseSchema, {
+          examples: R.pluck("items", examples),
+        });
+      }
+    }
+    return responseSchema;
   },
   negative: z.string().example("Sample error message"),
   handler: ({ response, output, error, logger, request, input }) => {
