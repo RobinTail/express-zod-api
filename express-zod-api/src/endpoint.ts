@@ -100,17 +100,12 @@ export class Endpoint<
   }) {
     super();
     this.#def = def;
-    if (
-      !globalRegistry.has(this.#def.outputSchema) &&
-      isSchema<$ZodObject>(this.#def.outputSchema, "object")
-    ) {
-      const pulled = pullResponseExamples(this.#def.outputSchema as $ZodObject);
-      if (pulled.length) {
-        globalRegistry.add(this.#def.outputSchema as $ZodObject, {
-          examples: pulled,
-        });
-      }
-    }
+    // Examples pulling for the output schema:
+    if (globalRegistry.has(this.#def.outputSchema)) return;
+    if (!isSchema<$ZodObject>(this.#def.outputSchema, "object")) return;
+    const examples = pullResponseExamples(this.#def.outputSchema as $ZodObject);
+    if (!examples.length) return;
+    globalRegistry.add(this.#def.outputSchema as $ZodObject, { examples });
   }
 
   #clone(
