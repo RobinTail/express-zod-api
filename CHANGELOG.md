@@ -33,6 +33,7 @@
   - `z.any()` and `z.unknown()` are not optional, details: https://v4.zod.dev/v4/changelog#changes-zunknown-optionality.
 - The argument of `ResultHandler::handler` is now discriminated: either `output` or `error` is null, not both;
 - The `getExamples()` public helper removed — use `.meta()?.examples` instead;
+- The proprietary schema `ez.file()` renamed to `ez.download()` (to avoid confusion with new `z.file()` of Zod 4);
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
@@ -61,6 +62,8 @@ export default [
 ```diff
 - ez.dateIn().example("2021-12-31");
 + ez.dateIn({ examples: ["2021-12-31"] });
+- ez.file();
++ ez.download();
 ```
 
 ## Version 23
