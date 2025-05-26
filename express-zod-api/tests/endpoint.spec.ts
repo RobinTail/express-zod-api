@@ -140,10 +140,7 @@ describe("Endpoint", () => {
       });
       const { responseMock } = await testEndpoint({ endpoint });
       expect(responseMock._getStatusCode()).toBe(500);
-      expect(responseMock._getJSONData()).toEqual({
-        status: "error",
-        error: { message: "output/email: Invalid email address" },
-      });
+      expect(responseMock._getJSONData()).toMatchSnapshot();
     });
 
     test("Should throw on output parsing non-Zod error", async () => {

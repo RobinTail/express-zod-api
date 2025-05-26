@@ -31,7 +31,7 @@ NotFoundError({
 })
 `;
 
-exports[`Result helpers > ensureHttpError() > should handle OutputValidationError: Invalid input: expected string, received number 1`] = `
+exports[`Result helpers > ensureHttpError() > should handle OutputValidationError: output: Invalid input: expected string, received number 1`] = `
 InternalServerError({
   "cause": ZodError({
     "issues": [

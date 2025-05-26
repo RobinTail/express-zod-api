@@ -4,7 +4,6 @@ import { z } from "zod/v4";
 import type { $ZodTransform, $ZodType } from "zod/v4/core";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
-import { OutputValidationError } from "./errors";
 import { AuxMethod, Method } from "./method";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
@@ -72,14 +71,11 @@ export const ensureError = (subject: unknown): Error =>
 export const getMessageFromError = (error: Error): string => {
   if (error instanceof z.ZodError) {
     return error.issues
-      .map(({ path, message }) =>
-        (path.length ? [path.join("/")] : []).concat(message).join(": "),
-      )
+      .map(({ path, message }) => {
+        const prefix = path.length ? `${z.core.toDotPath(path)}: ` : "";
+        return `${prefix}${message}`;
+      })
       .join("; ");
-  }
-  if (error instanceof OutputValidationError) {
-    const hasFirstField = error.cause.issues[0]?.path.length > 0;
-    return `output${hasFirstField ? "/" : ": "}${error.message}`;
   }
   return error.message;
 };
