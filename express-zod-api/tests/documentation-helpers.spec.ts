@@ -16,7 +16,7 @@ import {
   depictNullable,
   depictRaw,
   depictUpload,
-  depictFile,
+  depictBuffer,
   depictUnion,
   depictIntersection,
   depictBigInt,
@@ -143,16 +143,10 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictFile()", () => {
-    test.each<JSONSchema.BaseSchema>([
-      { type: "string" },
-      { anyOf: [{}, { type: "string" }] },
-      { type: "string", format: "base64" },
-      { anyOf: [], type: "string" },
-      {},
-    ])("should set type:string and format accordingly %#", (jsonSchema) => {
+  describe("depictBuffer()", () => {
+    test("should set hint as format:binary", () => {
       expect(
-        depictFile({ zodSchema: z.never(), jsonSchema }, responseCtx),
+        depictBuffer({ zodSchema: z.never(), jsonSchema: {} }, responseCtx),
       ).toMatchSnapshot();
     });
   });

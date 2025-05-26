@@ -24,6 +24,7 @@ import {
 import * as R from "ramda";
 import { z } from "zod/v4";
 import { ResponseVariant } from "./api-response";
+import { ezBufferBrand } from "./buffer-schema";
 import {
   FlatObject,
   getRoutePathParams,
@@ -103,15 +104,7 @@ export const depictUpload: Depicter = ({}, ctx) => {
   return { type: "string", format: "binary" };
 };
 
-export const depictFile: Depicter = ({ jsonSchema }) => ({
-  type: "string",
-  format:
-    jsonSchema.type === "string"
-      ? jsonSchema.format === "base64"
-        ? "byte"
-        : "file"
-      : "binary",
-});
+export const depictBuffer: Depicter = () => ({ format: "binary" });
 
 export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
   if (!zodSchema._zod.disc) return jsonSchema;
@@ -390,6 +383,7 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,
     [ezRawBrand]: depictRaw,
+    [ezBufferBrand]: depictBuffer,
   };
 
 /**
