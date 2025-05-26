@@ -5,7 +5,6 @@ export const ezRawBrand = Symbol("Raw");
 
 const base = z.object({ raw: file("buffer") });
 
-/** Shorthand for z.object({ raw: ez.file("buffer") }) */
 export function raw(): z.ZodBranded<typeof base, symbol>;
 export function raw<S extends z.ZodRawShape>(
   extra: S,
