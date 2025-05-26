@@ -23,6 +23,7 @@ describe("Migration", () => {
       `new Integration({});`,
       `const rule: Depicter = () => {};`,
       `import {} from "zod/v4";`,
+      `ez.download();`,
     ],
     invalid: [
       {
@@ -74,6 +75,16 @@ describe("Migration", () => {
           {
             messageId: "change",
             data: { subject: "import", from: "zod", to: "zod/v4" },
+          },
+        ],
+      },
+      {
+        code: `ez.file("buffer");`,
+        output: `ez.download("buffer");`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "schema", from: "ez.file()", to: "ez.download()" },
           },
         ],
       },

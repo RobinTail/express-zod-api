@@ -15,6 +15,7 @@ interface Queries {
   depicter: TSESTree.ArrowFunctionExpression;
   nextCall: TSESTree.CallExpression;
   zod: TSESTree.ImportDeclaration;
+  ezFile: TSESTree.MemberExpression;
 }
 
 type Listener = keyof Queries;
@@ -33,6 +34,7 @@ const queries: Record<Listener, string> = {
     `${NT.VariableDeclarator}[id.typeAnnotation.typeAnnotation.typeName.name='Depicter'] > ` +
     `${NT.ArrowFunctionExpression} ${NT.CallExpression}[callee.name='next']`,
   zod: `${NT.ImportDeclaration}[source.value='zod']`,
+  ezFile: `${NT.MemberExpression}[object.name='ez'][property.name='file']`,
 };
 
 const listen = <
@@ -128,6 +130,13 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
           messageId: "change",
           data: { subject: "import", from: "zod", to: "zod/v4" },
           fix: (fixer) => fixer.replaceText(node.source, `"zod/v4"`),
+        }),
+      ezFile: (node) =>
+        ctx.report({
+          node: node,
+          messageId: "change",
+          data: { subject: "schema", from: "ez.file()", to: "ez.download()" },
+          fix: (fixer) => fixer.replaceText(node.property, "download"),
         }),
     }),
 });
