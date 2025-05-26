@@ -1,10 +1,7 @@
 import { z } from "zod/v4";
+import { bufferSchema } from "./buffer-schema";
 
 export const ezFileBrand = Symbol("File");
-
-const bufferSchema = z.custom<Buffer>((subject) => Buffer.isBuffer(subject), {
-  message: "Expected Buffer",
-});
 
 const variants = {
   buffer: () => bufferSchema.brand(ezFileBrand as symbol),
