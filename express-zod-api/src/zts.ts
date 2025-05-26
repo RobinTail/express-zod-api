@@ -21,6 +21,7 @@ import type {
 import * as R from "ramda";
 import ts from "typescript";
 import { globalRegistry, z } from "zod/v4";
+import { ezBufferBrand } from "./buffer-schema";
 import { getTransformedType, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
@@ -201,6 +202,8 @@ const onFile: Producer = (schema: FileSchema) => {
       : bufferType;
 };
 
+const onBuffer = () => ensureTypeNode("Buffer");
+
 const onRaw: Producer = (schema: RawSchema, { next }) =>
   next(schema._zod.def.shape.raw);
 
@@ -234,6 +237,7 @@ const producers: HandlingRules<
   lazy: onLazy,
   readonly: onWrapped,
   [ezFileBrand]: onFile,
+  [ezBufferBrand]: onBuffer,
   [ezRawBrand]: onRaw,
 };
 

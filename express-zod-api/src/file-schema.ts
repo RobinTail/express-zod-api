@@ -1,12 +1,15 @@
 import { z } from "zod/v4";
-import { bufferSchema } from "./buffer-schema";
+import { buffer } from "./buffer-schema";
 
 export const ezFileBrand = Symbol("File");
 
 const variants = {
-  buffer: () => bufferSchema.brand(ezFileBrand as symbol),
+  buffer: () => buffer().brand(ezFileBrand as symbol),
   string: () => z.string().brand(ezFileBrand as symbol),
-  binary: () => bufferSchema.or(z.string()).brand(ezFileBrand as symbol),
+  binary: () =>
+    buffer()
+      .or(z.string())
+      .brand(ezFileBrand as symbol),
   base64: () => z.base64().brand(ezFileBrand as symbol),
 };
 
