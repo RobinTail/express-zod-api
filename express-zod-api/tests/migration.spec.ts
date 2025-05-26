@@ -23,6 +23,7 @@ describe("Migration", () => {
       `new Integration({});`,
       `const rule: Depicter = () => {};`,
       `import {} from "zod/v4";`,
+      `ez.buffer();`,
     ],
     invalid: [
       {
@@ -74,6 +75,50 @@ describe("Migration", () => {
           {
             messageId: "change",
             data: { subject: "import", from: "zod", to: "zod/v4" },
+          },
+        ],
+      },
+      {
+        code: `ez.file("string");`,
+        output: `z.string();`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "schema", from: "ez.file()", to: "z.string()" },
+          },
+        ],
+      },
+      {
+        code: `ez.file("buffer");`,
+        output: `ez.buffer();`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "schema", from: "ez.file()", to: "ez.buffer()" },
+          },
+        ],
+      },
+      {
+        code: `ez.file("base64");`,
+        output: `z.base64();`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "schema", from: "ez.file()", to: "z.base64()" },
+          },
+        ],
+      },
+      {
+        code: `ez.file("binary");`,
+        output: `ez.buffer().or(z.string());`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "schema",
+              from: "ez.file()",
+              to: "ez.buffer().or(z.string())",
+            },
           },
         ],
       },
