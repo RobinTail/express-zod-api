@@ -83,7 +83,21 @@ export class Endpoint<
   OPT extends FlatObject,
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0];
-  #didPull = false;
+
+  /** considered expensive operation, only required for generators */
+  #ensureOutputExamples = R.once(() => {
+    const meta = this.#def.outputSchema.meta();
+    if (meta?.examples?.length) return; // has examples on the output schema, or pull up:
+    if (!isSchema<$ZodObject>(this.#def.outputSchema, "object")) return;
+    const examples = pullResponseExamples(this.#def.outputSchema as $ZodObject);
+    if (!examples.length) return;
+    globalRegistry
+      .remove(this.#def.outputSchema) // reassign to avoid cloning
+      .add(this.#def.outputSchema as $ZodObject, {
+        ...meta,
+        examples,
+      });
+  });
 
   constructor(def: {
     deprecated?: boolean;
@@ -185,23 +199,6 @@ export class Endpoint<
   /** @internal */
   public override getOperationId(method: Method): string | undefined {
     return this.#def.getOperationId?.(method);
-  }
-
-  /** considered expensive operation, only required for generators */
-  #ensureOutputExamples() {
-    if (this.#didPull) return;
-    this.#didPull = true;
-    const meta = this.#def.outputSchema.meta();
-    if (meta?.examples?.length) return; // has examples on the output schema, or pull up:
-    if (!isSchema<$ZodObject>(this.#def.outputSchema, "object")) return;
-    const examples = pullResponseExamples(this.#def.outputSchema as $ZodObject);
-    if (!examples.length) return;
-    globalRegistry
-      .remove(this.#def.outputSchema) // reassign to avoid cloning
-      .add(this.#def.outputSchema as $ZodObject, {
-        ...meta,
-        examples,
-      });
   }
 
   async #parseOutput(output: z.input<OUT>) {
