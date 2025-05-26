@@ -922,14 +922,13 @@ Thus, you can configure non-object responses too, for example, to send an image 
 You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation
 [in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts).
 One of them implements file streaming, in this case the endpoint just has to provide the filename.
-The response schema generally may be just `z.string()`, but I made more specific `ez.file()` that also supports
-`ez.file("binary")` and `ez.file("base64")` variants which are reflected in the
+The response schema can be `z.string()`, `z.base64()` or `ez.buffer()` to reflect the data accordingly in the
 [generated documentation](#creating-a-documentation).
 
 ```typescript
 const fileStreamingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
-    positive: { schema: ez.file("buffer"), mimeType: "image/*" },
+    positive: { schema: ez.buffer(), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) return void response.status(400).send(error.message);
