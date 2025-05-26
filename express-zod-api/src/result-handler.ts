@@ -5,7 +5,7 @@ import {
   defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
-import { FlatObject, isObject } from "./common-helpers";
+import { FlatObject, hasExamples, isObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
@@ -17,7 +17,6 @@ import {
   normalize,
   ResultSchema,
 } from "./result-helpers";
-import * as R from "ramda";
 
 type Handler<RES = unknown> = (
   params: DiscriminatedResult & {
@@ -147,19 +146,14 @@ export const arrayResultHandler = new ResultHandler({
       output.shape.items instanceof z.ZodArray
         ? output.shape.items
         : z.array(z.any());
-    if (!globalRegistry.has(responseSchema)) {
-      const examples = R.filter(
-        (one): one is { items: unknown[] } =>
-          isObject(one) && "items" in one && Array.isArray(one.items),
-        globalRegistry.get(output)?.examples || [],
-      );
-      if (examples.length) {
-        globalRegistry.add(responseSchema, {
-          examples: R.pluck("items", examples),
-        });
-      }
-    }
-    return responseSchema;
+    if (hasExamples(responseSchema)) return responseSchema;
+    return (globalRegistry.get(output)?.examples || []).reduce(
+      (acc, example) =>
+        isObject(example) && "items" in example && Array.isArray(example.items)
+          ? acc.example(example.items)
+          : acc,
+      responseSchema,
+    );
   },
   negative: z.string().example("Sample error message"),
   handler: ({ response, output, error, logger, request, input }) => {

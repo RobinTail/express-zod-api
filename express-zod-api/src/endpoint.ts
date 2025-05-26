@@ -101,7 +101,7 @@ export class Endpoint<
     super();
     this.#def = def;
     // Examples pulling for the output schema:
-    if (globalRegistry.has(this.#def.outputSchema)) return;
+    if (globalRegistry.has(this.#def.outputSchema)) return; // @todo check for examples specifically, avoid loosing other meta
     if (!isSchema<$ZodObject>(this.#def.outputSchema, "object")) return;
     const examples = pullResponseExamples(this.#def.outputSchema as $ZodObject);
     if (!examples.length) return;

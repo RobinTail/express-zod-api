@@ -1,6 +1,6 @@
 import { Request } from "express";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { globalRegistry, z } from "zod/v4";
 import type { $ZodTransform, $ZodType } from "zod/v4/core";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
@@ -85,6 +85,9 @@ export const isSchema = <T extends $ZodType>(
   subject: $ZodType,
   type: T["_zod"]["def"]["type"],
 ): subject is T => subject._zod.def.type === type;
+
+export const hasExamples = (schema: $ZodType) =>
+  Boolean(globalRegistry.get(schema)?.examples?.length);
 
 export const combinations = <T>(
   a: T[],
