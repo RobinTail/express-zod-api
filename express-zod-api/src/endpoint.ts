@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z, globalRegistry } from "zod/v4";
+import type { $ZodObject } from "zod/v4/core";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { findRequestTypeDefiningSchema } from "./deep-checks";
 import {
@@ -8,6 +9,7 @@ import {
   getActualMethod,
   getInput,
   ensureError,
+  isSchema,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import {
@@ -25,7 +27,7 @@ import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
-import { DiscriminatedResult } from "./result-helpers";
+import { DiscriminatedResult, pullResponseExamples } from "./result-helpers";
 import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
@@ -98,6 +100,17 @@ export class Endpoint<
   }) {
     super();
     this.#def = def;
+    if (
+      !globalRegistry.has(this.#def.outputSchema) &&
+      isSchema<$ZodObject>(this.#def.outputSchema, "object")
+    ) {
+      const pulled = pullResponseExamples(this.#def.outputSchema as $ZodObject);
+      if (pulled.length) {
+        globalRegistry.add(this.#def.outputSchema as $ZodObject, {
+          examples: pulled,
+        });
+      }
+    }
   }
 
   #clone(

@@ -387,6 +387,11 @@ paths:
                     - name: Hunter Schafer
                     - name: Laverne Cox
                     - name: Patti Harrison
+                example2:
+                  value:
+                    - name: Hunter Schafer
+                    - name: Laverne Cox
+                    - name: Patti Harrison
         "400":
           description: GET /v1/user/list Negative response
           content:

@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
 import { globalRegistry, z } from "zod/v4";
-import type { $ZodObject } from "zod/v4/core";
 import {
   ApiResponse,
   defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
-import { FlatObject, isObject, isSchema } from "./common-helpers";
+import { FlatObject, isObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
@@ -16,7 +15,6 @@ import {
   getPublicErrorMessage,
   logServerError,
   normalize,
-  pullResponseExamples,
   ResultSchema,
 } from "./result-helpers";
 
@@ -98,11 +96,6 @@ export class ResultHandler<
 
 export const defaultResultHandler = new ResultHandler({
   positive: (output) => {
-    if (!globalRegistry.has(output) && isSchema<$ZodObject>(output, "object")) {
-      const pulled = pullResponseExamples(output as $ZodObject);
-      if (pulled.length)
-        globalRegistry.add(output as $ZodObject, { examples: pulled });
-    }
     const { examples = [] } = globalRegistry.get(output) || {};
     const responseSchema = z.object({
       status: z.literal("success"),
