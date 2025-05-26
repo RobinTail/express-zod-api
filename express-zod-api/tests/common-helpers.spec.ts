@@ -1,4 +1,5 @@
 import createHttpError from "http-errors";
+import { InputValidationError, OutputValidationError } from "../src";
 import {
   combinations,
   defaultInputSources,
@@ -156,36 +157,47 @@ describe("Common Helpers", () => {
   });
 
   describe("getMessageFromError()", () => {
+    const error = new z.ZodError([
+      {
+        code: "invalid_type",
+        path: ["user", "id"],
+        message: "expected number, got string",
+        expected: "number",
+        input: "test",
+      },
+      {
+        code: "invalid_type",
+        path: ["user", "name"],
+        message: "expected string, got number",
+        expected: "string",
+        input: 123,
+      },
+    ]);
+
     test("should compile a string from ZodError", () => {
-      const error = new z.ZodError([
-        {
-          code: "invalid_type",
-          path: ["user", "id"],
-          message: "expected number, got string",
-          expected: "number",
-          input: "test",
-        },
-        {
-          code: "invalid_type",
-          path: ["user", "name"],
-          message: "expected string, got number",
-          expected: "string",
-          input: 123,
-        },
-      ]);
       expect(getMessageFromError(error)).toMatchSnapshot();
     });
 
+    test.each([InputValidationError, OutputValidationError])(
+      "should handle composite error %#",
+      (Cls) => {
+        expect(getMessageFromError(new Cls(error))).toMatchSnapshot();
+      },
+    );
+
     test("should handle empty path in ZodIssue", () => {
-      const error = new z.ZodError([
-        {
-          code: "custom",
-          path: [],
-          message: "Top level refinement issue",
-          input: "test",
-        },
-      ]);
-      expect(getMessageFromError(error)).toMatchSnapshot();
+      expect(
+        getMessageFromError(
+          new z.ZodError([
+            {
+              code: "custom",
+              path: [],
+              message: "Top level refinement issue",
+              input: "test",
+            },
+          ]),
+        ),
+      ).toMatchSnapshot();
     });
 
     test("should pass message from other error types", () => {

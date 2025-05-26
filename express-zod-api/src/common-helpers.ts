@@ -72,8 +72,9 @@ export const ensureError = (subject: unknown): Error =>
 export const getMessageFromError = (error: Error): string => {
   if (error instanceof z.ZodError) {
     return error.issues
-      .map(({ path, message }) =>
-        (path.length ? [path.join("/")] : []).concat(message).join(": "),
+      .map(
+        ({ path, message }) =>
+          `${path.length ? z.core.toDotPath(path) + ": " : ""}${message}`,
       )
       .join("; ");
   }
