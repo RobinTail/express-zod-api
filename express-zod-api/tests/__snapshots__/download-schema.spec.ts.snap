@@ -1,0 +1,12 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ez.download() > parsing > should perform additional check for base64 download 1`] = `
+[
+  {
+    "code": "invalid_format",
+    "format": "base64",
+    "message": "Invalid base64-encoded string",
+    "path": [],
+  },
+]
+`;

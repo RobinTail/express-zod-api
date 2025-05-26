@@ -97,47 +97,47 @@ DocumentationError({
 })
 `;
 
-exports[`Documentation helpers > depictEnum() > should set type 1`] = `
-{
-  "enum": [
-    "test",
-    "jest",
-  ],
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 0 1`] = `
+exports[`Documentation helpers > depictDownload() > should set type:string and format accordingly 0 1`] = `
 {
   "format": "file",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 1 1`] = `
+exports[`Documentation helpers > depictDownload() > should set type:string and format accordingly 1 1`] = `
 {
   "format": "binary",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 2 1`] = `
+exports[`Documentation helpers > depictDownload() > should set type:string and format accordingly 2 1`] = `
 {
   "format": "byte",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 3 1`] = `
+exports[`Documentation helpers > depictDownload() > should set type:string and format accordingly 3 1`] = `
 {
   "format": "file",
   "type": "string",
 }
 `;
 
-exports[`Documentation helpers > depictFile() > should set type:string and format accordingly 4 1`] = `
+exports[`Documentation helpers > depictDownload() > should set type:string and format accordingly 4 1`] = `
 {
   "format": "binary",
+  "type": "string",
+}
+`;
+
+exports[`Documentation helpers > depictEnum() > should set type 1`] = `
+{
+  "enum": [
+    "test",
+    "jest",
+  ],
   "type": "string",
 }
 `;

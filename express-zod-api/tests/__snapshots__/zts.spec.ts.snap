@@ -160,13 +160,13 @@ exports[`zod-to-ts > enums > handles 'quoted string' literals 1`] = `""Two Words
 
 exports[`zod-to-ts > enums > handles 'string' literals 1`] = `""apple" | "banana" | "cantaloupe""`;
 
-exports[`zod-to-ts > ez.file(base64) > should depend on variant 1`] = `"string"`;
+exports[`zod-to-ts > ez.download(base64) > should depend on variant 1`] = `"string"`;
 
-exports[`zod-to-ts > ez.file(binary) > should depend on variant 1`] = `"string | Buffer"`;
+exports[`zod-to-ts > ez.download(binary) > should depend on variant 1`] = `"string | Buffer"`;
 
-exports[`zod-to-ts > ez.file(buffer) > should depend on variant 1`] = `"Buffer"`;
+exports[`zod-to-ts > ez.download(buffer) > should depend on variant 1`] = `"Buffer"`;
 
-exports[`zod-to-ts > ez.file(string) > should depend on variant 1`] = `"string"`;
+exports[`zod-to-ts > ez.download(string) > should depend on variant 1`] = `"string"`;
 
 exports[`zod-to-ts > ez.raw() > should depict the raw property 1`] = `"Buffer"`;
 

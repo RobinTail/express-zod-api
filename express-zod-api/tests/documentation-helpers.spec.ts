@@ -16,7 +16,7 @@ import {
   depictNullable,
   depictRaw,
   depictUpload,
-  depictFile,
+  depictDownload,
   depictUnion,
   depictIntersection,
   depictBigInt,
@@ -143,7 +143,7 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("depictFile()", () => {
+  describe("depictDownload()", () => {
     test.each<JSONSchema.BaseSchema>([
       { type: "string" },
       { anyOf: [{}, { type: "string" }] },
@@ -152,7 +152,7 @@ describe("Documentation helpers", () => {
       {},
     ])("should set type:string and format accordingly %#", (jsonSchema) => {
       expect(
-        depictFile({ zodSchema: z.never(), jsonSchema }, responseCtx),
+        depictDownload({ zodSchema: z.never(), jsonSchema }, responseCtx),
       ).toMatchSnapshot();
     });
   });

@@ -1,37 +1,37 @@
 import { z } from "zod/v4";
-import { ezFileBrand } from "../src/file-schema";
+import { ezDownloadBrand } from "../src/download-schema";
 import { ez } from "../src";
 import { readFile } from "node:fs/promises";
 import { getBrand } from "../src/metadata";
 
-describe("ez.file()", () => {
+describe("ez.download()", () => {
   describe("creation", () => {
     test("should create an instance being string by default", () => {
-      const schema = ez.file();
+      const schema = ez.download();
       expect(schema).toBeInstanceOf(z.ZodString);
-      expect(getBrand(schema)).toBe(ezFileBrand);
+      expect(getBrand(schema)).toBe(ezDownloadBrand);
     });
 
-    test("should create a string file", () => {
-      const schema = ez.file("string");
+    test("should create a string download", () => {
+      const schema = ez.download("string");
       expect(schema).toBeInstanceOf(z.ZodString);
       expectTypeOf(schema._zod.output).toBeString();
     });
 
-    test("should create a buffer file", () => {
-      const schema = ez.file("buffer");
+    test("should create a buffer download", () => {
+      const schema = ez.download("buffer");
       expect(schema).toBeInstanceOf(z.ZodCustom);
       expectTypeOf(schema._zod.output).toExtend<Buffer>();
     });
 
-    test("should create a binary file", () => {
-      const schema = ez.file("binary");
+    test("should create a binary download", () => {
+      const schema = ez.download("binary");
       expect(schema).toBeInstanceOf(z.ZodUnion);
       expectTypeOf(schema._zod.output).toExtend<Buffer | string>();
     });
 
-    test("should create a base64 file", () => {
-      const schema = ez.file("base64");
+    test("should create a base64 download", () => {
+      const schema = ez.download("base64");
       expect(schema).toBeInstanceOf(z.ZodBase64);
       expectTypeOf(schema._zod.output).toBeString();
     });
@@ -40,14 +40,14 @@ describe("ez.file()", () => {
   describe("parsing", () => {
     test.each([
       {
-        schema: ez.file(),
+        schema: ez.download(),
         subject: 123,
         code: "invalid_type",
         expected: "string",
         message: "Invalid input: expected string, received number",
       },
       {
-        schema: ez.file("buffer"),
+        schema: ez.download("buffer"),
         subject: "123",
         code: "custom",
         message: "Expected Buffer",
@@ -68,15 +68,15 @@ describe("ez.file()", () => {
       },
     );
 
-    test("should perform additional check for base64 file", () => {
-      const schema = ez.file("base64");
+    test("should perform additional check for base64 download", () => {
+      const schema = ez.download("base64");
       const result = schema.safeParse("~~~~");
       expect(result.success).toBeFalsy();
       if (!result.success) expect(result.error.issues).toMatchSnapshot();
     });
 
     test("should accept string", () => {
-      const schema = ez.file();
+      const schema = ez.download();
       const result = schema.safeParse("some string");
       expect(result).toEqual({
         success: true,
@@ -85,7 +85,7 @@ describe("ez.file()", () => {
     });
 
     test("should accept Buffer", () => {
-      const schema = ez.file("buffer");
+      const schema = ez.download("buffer");
       const subject = Buffer.from("test", "utf-8");
       const result = schema.safeParse(subject);
       expect(result).toEqual({
@@ -95,7 +95,7 @@ describe("ez.file()", () => {
     });
 
     test("should accept binary read string", async () => {
-      const schema = ez.file("binary");
+      const schema = ez.download("binary");
       const data = await readFile("../logo.svg", "binary");
       const result = schema.safeParse(data);
       expect(result).toEqual({
@@ -105,7 +105,7 @@ describe("ez.file()", () => {
     });
 
     test("should accept base64 read string", async () => {
-      const schema = ez.file("base64");
+      const schema = ez.download("base64");
       const data = await readFile("../logo.svg", "base64");
       const result = schema.safeParse(data);
       expect(result).toEqual({

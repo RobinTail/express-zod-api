@@ -24,10 +24,10 @@ describe("zod-to-ts", () => {
   });
 
   describe.each(["string", "base64", "binary", "buffer"] as const)(
-    "ez.file(%s)",
+    "ez.download(%s)",
     (variant) => {
       test("should depend on variant", () => {
-        const node = zodToTs(ez.file(variant), { ctx });
+        const node = zodToTs(ez.download(variant), { ctx });
         expect(printNodeTest(node)).toMatchSnapshot();
       });
     },

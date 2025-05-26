@@ -40,7 +40,7 @@ import { contentTypes } from "./content-type";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { ezFileBrand } from "./file-schema";
+import { ezDownloadBrand } from "./download-schema";
 import { IOSchema } from "./io-schema";
 import { flattenIO } from "./json-schema-helpers";
 import { Alternatives } from "./logical-container";
@@ -104,7 +104,7 @@ export const depictUpload: Depicter = ({}, ctx) => {
   return { type: "string", format: "binary" };
 };
 
-export const depictFile: Depicter = ({ jsonSchema }) => ({
+export const depictDownload: Depicter = ({ jsonSchema }) => ({
   type: "string",
   format:
     jsonSchema.type === "string"
@@ -390,7 +390,7 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,
-    [ezFileBrand]: depictFile,
+    [ezDownloadBrand]: depictDownload,
     [ezRawBrand]: depictRaw,
   };
 

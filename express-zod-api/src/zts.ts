@@ -25,7 +25,7 @@ import { getTransformedType, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { hasCycle } from "./deep-checks";
-import { ezFileBrand, FileSchema } from "./file-schema";
+import { ezDownloadBrand, DownloadSchema } from "./download-schema";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand, RawSchema } from "./raw-schema";
 import { FirstPartyKind, HandlingRules, walkSchema } from "./schema-walker";
@@ -190,7 +190,7 @@ const onNull: Producer = () => makeLiteralType(null);
 const onLazy: Producer = ({ _zod: { def } }: $ZodLazy, { makeAlias, next }) =>
   makeAlias(def.getter, () => next(def.getter()));
 
-const onFile: Producer = (schema: FileSchema) => {
+const onDownload: Producer = (schema: DownloadSchema) => {
   const stringType = ensureTypeNode(ts.SyntaxKind.StringKeyword);
   const bufferType = ensureTypeNode("Buffer");
   const unionType = f.createUnionTypeNode([stringType, bufferType]);
@@ -233,7 +233,7 @@ const producers: HandlingRules<
   pipe: onPipeline,
   lazy: onLazy,
   readonly: onWrapped,
-  [ezFileBrand]: onFile,
+  [ezDownloadBrand]: onDownload,
   [ezRawBrand]: onRaw,
 };
 
