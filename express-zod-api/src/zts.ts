@@ -189,7 +189,7 @@ const onNull: Producer = () => makeLiteralType(null);
 const onLazy: Producer = ({ _zod: { def } }: $ZodLazy, { makeAlias, next }) =>
   makeAlias(def.getter, () => next(def.getter()));
 
-const onBuffer = () => ensureTypeNode("Buffer");
+const onBuffer: Producer = () => ensureTypeNode("Buffer");
 
 const onRaw: Producer = (schema: RawSchema, { next }) =>
   next(schema._zod.def.shape.raw);
