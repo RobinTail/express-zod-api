@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
 import { globalRegistry, z } from "zod/v4";
-import type { $ZodObject } from "zod/v4/core";
 import {
   ApiResponse,
   defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
-import { FlatObject, isObject, isSchema } from "./common-helpers";
+import { FlatObject, isObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
@@ -16,7 +15,6 @@ import {
   getPublicErrorMessage,
   logServerError,
   normalize,
-  pullResponseExamples,
   ResultSchema,
 } from "./result-helpers";
 
@@ -98,19 +96,20 @@ export class ResultHandler<
 
 export const defaultResultHandler = new ResultHandler({
   positive: (output) => {
-    const { examples = [] } = globalRegistry.get(output) || {};
-    if (!examples.length && isSchema<$ZodObject>(output, "object"))
-      examples.push(...pullResponseExamples(output as $ZodObject));
-    if (examples.length && !globalRegistry.has(output))
-      globalRegistry.add(output, { examples });
     const responseSchema = z.object({
       status: z.literal("success"),
       data: output,
     });
-    return examples.reduce<typeof responseSchema>(
-      (acc, example) => acc.example({ status: "success", data: example }),
-      responseSchema,
-    );
+    const { examples = [] } = globalRegistry.get(output) || {}; // pulling down:
+    if (examples.length) {
+      globalRegistry.add(responseSchema, {
+        examples: examples.map((data) => ({
+          status: "success" as const,
+          data,
+        })),
+      });
+    }
+    return responseSchema;
   },
   negative: z
     .object({
@@ -146,20 +145,28 @@ export const defaultResultHandler = new ResultHandler({
  * */
 export const arrayResultHandler = new ResultHandler({
   positive: (output) => {
-    const { examples = [] } = globalRegistry.get(output) || {};
     const responseSchema =
       output instanceof z.ZodObject &&
       "items" in output.shape &&
       output.shape.items instanceof z.ZodArray
         ? output.shape.items
         : z.array(z.any());
-    return examples.reduce<typeof responseSchema>(
-      (acc, example) =>
-        isObject(example) && "items" in example && Array.isArray(example.items)
-          ? acc.example(example.items)
-          : acc,
-      responseSchema,
-    );
+    const meta = responseSchema.meta();
+    if (meta?.examples?.length) return responseSchema; // has examples on the items, or pull down:
+    const examples = (globalRegistry.get(output)?.examples || [])
+      .filter(
+        (example): example is { items: unknown[] } =>
+          isObject(example) &&
+          "items" in example &&
+          Array.isArray(example.items),
+      )
+      .map((example) => example.items);
+    if (examples.length) {
+      globalRegistry
+        .remove(responseSchema) // reassign to avoid cloning
+        .add(responseSchema, { ...meta, examples });
+    }
+    return responseSchema;
   },
   negative: z.string().example("Sample error message"),
   handler: ({ response, output, error, logger, request, input }) => {

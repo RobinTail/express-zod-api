@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z, globalRegistry } from "zod/v4";
+import type { $ZodObject } from "zod/v4/core";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { findRequestTypeDefiningSchema } from "./deep-checks";
 import {
@@ -8,6 +9,7 @@ import {
   getActualMethod,
   getInput,
   ensureError,
+  isSchema,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import {
@@ -25,7 +27,7 @@ import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
-import { DiscriminatedResult } from "./result-helpers";
+import { DiscriminatedResult, pullResponseExamples } from "./result-helpers";
 import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
@@ -82,6 +84,21 @@ export class Endpoint<
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0];
 
+  /** considered expensive operation, only required for generators */
+  #ensureOutputExamples = R.once(() => {
+    const meta = this.#def.outputSchema.meta();
+    if (meta?.examples?.length) return; // has examples on the output schema, or pull up:
+    if (!isSchema<$ZodObject>(this.#def.outputSchema, "object")) return;
+    const examples = pullResponseExamples(this.#def.outputSchema as $ZodObject);
+    if (!examples.length) return;
+    globalRegistry
+      .remove(this.#def.outputSchema) // reassign to avoid cloning
+      .add(this.#def.outputSchema as $ZodObject, {
+        ...meta,
+        examples,
+      });
+  });
+
   constructor(def: {
     deprecated?: boolean;
     middlewares?: AbstractMiddleware[];
@@ -137,6 +154,7 @@ export class Endpoint<
 
   /** @internal */
   public override get outputSchema(): OUT {
+    this.#ensureOutputExamples();
     return this.#def.outputSchema;
   }
 
@@ -154,6 +172,7 @@ export class Endpoint<
 
   /** @internal */
   public override getResponses(variant: ResponseVariant) {
+    if (variant === "positive") this.#ensureOutputExamples();
     return Object.freeze(
       variant === "negative"
         ? this.#def.resultHandler.getNegativeResponse()
