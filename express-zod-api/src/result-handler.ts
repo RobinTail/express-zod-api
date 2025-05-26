@@ -98,11 +98,12 @@ export class ResultHandler<
 
 export const defaultResultHandler = new ResultHandler({
   positive: (output) => {
+    if (!globalRegistry.has(output) && isSchema<$ZodObject>(output, "object")) {
+      const pulled = pullResponseExamples(output as $ZodObject);
+      if (pulled.length)
+        globalRegistry.add(output as $ZodObject, { examples: pulled });
+    }
     const { examples = [] } = globalRegistry.get(output) || {};
-    if (!examples.length && isSchema<$ZodObject>(output, "object"))
-      examples.push(...pullResponseExamples(output as $ZodObject));
-    if (examples.length && !globalRegistry.has(output))
-      globalRegistry.add(output, { examples });
     const responseSchema = z.object({
       status: z.literal("success"),
       data: output,
