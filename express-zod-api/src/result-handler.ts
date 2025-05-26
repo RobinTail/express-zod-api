@@ -151,14 +151,22 @@ export const arrayResultHandler = new ResultHandler({
       output.shape.items instanceof z.ZodArray
         ? output.shape.items
         : z.array(z.any());
-    if (responseSchema.meta()?.examples?.length) return responseSchema; // has examples on the items, or pull down:
-    return (globalRegistry.get(output)?.examples || []).reduce(
-      (acc, example) =>
-        isObject(example) && "items" in example && Array.isArray(example.items)
-          ? acc.example(example.items)
-          : acc,
-      responseSchema,
-    );
+    const meta = responseSchema.meta();
+    if (meta?.examples?.length) return responseSchema; // has examples on the items, or pull down:
+    const examples = (globalRegistry.get(output)?.examples || [])
+      .filter(
+        (example): example is { items: unknown[] } =>
+          isObject(example) &&
+          "items" in example &&
+          Array.isArray(example.items),
+      )
+      .map((example) => example.items);
+    if (examples.length) {
+      globalRegistry
+        .remove(responseSchema) // reassign to avoid cloning
+        .add(responseSchema, { ...meta, examples });
+    }
+    return responseSchema;
   },
   negative: z.string().example("Sample error message"),
   handler: ({ response, output, error, logger, request, input }) => {
