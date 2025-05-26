@@ -10,6 +10,16 @@ import {
 } from "../src/errors";
 
 describe("Errors", () => {
+  const zodError = new z.ZodError([
+    {
+      code: "invalid_type",
+      path: ["test"],
+      message: "expected string, received number",
+      expected: "string",
+      input: 123,
+    },
+  ]);
+
   describe("RoutingError", () => {
     const error = new RoutingError("test", "get", "/v1/test");
 
@@ -83,15 +93,6 @@ describe("Errors", () => {
   });
 
   describe("OutputValidationError", () => {
-    const zodError = new z.ZodError([
-      {
-        code: "invalid_type",
-        path: ["test"],
-        message: "expected string, received number",
-        expected: "string",
-        input: 123,
-      },
-    ]);
     const error = new OutputValidationError(zodError);
 
     test("should be an instance of IOSchemaError and Error", () => {
@@ -115,15 +116,6 @@ describe("Errors", () => {
   });
 
   describe("InputValidationError", () => {
-    const zodError = new z.ZodError([
-      {
-        code: "invalid_type",
-        path: ["test"],
-        message: "expected string, received number",
-        expected: "string",
-        input: 123,
-      },
-    ]);
     const error = new InputValidationError(zodError);
 
     test("should be an instance of IOSchemaError and Error", () => {
