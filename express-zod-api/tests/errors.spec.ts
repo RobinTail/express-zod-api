@@ -83,7 +83,15 @@ describe("Errors", () => {
   });
 
   describe("OutputValidationError", () => {
-    const zodError = new z.ZodError([]);
+    const zodError = new z.ZodError([
+      {
+        code: "invalid_type",
+        path: ["test"],
+        message: "expected string, received number",
+        expected: "string",
+        input: 123,
+      },
+    ]);
     const error = new OutputValidationError(zodError);
 
     test("should be an instance of IOSchemaError and Error", () => {
@@ -95,13 +103,27 @@ describe("Errors", () => {
       expect(error.name).toBe("OutputValidationError");
     });
 
+    test("the message should be formatted and contain prefixed path", () => {
+      expect(error.message).toBe(
+        "output.test: expected string, received number",
+      );
+    });
+
     test("should have .cause property matching the one used for constructing", () => {
       expect(error.cause).toEqual(zodError);
     });
   });
 
   describe("InputValidationError", () => {
-    const zodError = new z.ZodError([]);
+    const zodError = new z.ZodError([
+      {
+        code: "invalid_type",
+        path: ["test"],
+        message: "expected string, received number",
+        expected: "string",
+        input: 123,
+      },
+    ]);
     const error = new InputValidationError(zodError);
 
     test("should be an instance of IOSchemaError and Error", () => {
@@ -111,6 +133,10 @@ describe("Errors", () => {
 
     test("should have the name matching its class", () => {
       expect(error.name).toBe("InputValidationError");
+    });
+
+    test("the message should be formatted", () => {
+      expect(error.message).toBe("test: expected string, received number");
     });
 
     test("should have .cause property matching the one used for constructing", () => {
