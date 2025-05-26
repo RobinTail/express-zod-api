@@ -100,7 +100,7 @@ export class Endpoint<
   }) {
     super();
     this.#def = def;
-    const meta = this.#def.outputSchema.meta() || {};
+    const meta = this.#def.outputSchema.meta();
     if (meta?.examples?.length) return; // has examples on the output schema, or pull up:
     if (!isSchema<$ZodObject>(this.#def.outputSchema, "object")) return;
     const examples = pullResponseExamples(this.#def.outputSchema as $ZodObject);
