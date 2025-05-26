@@ -248,10 +248,14 @@ describe("Documentation", () => {
               output: z.object({
                 null: z.null(),
                 dateOut: ez.dateOut(),
+                buffer: ez.buffer(),
+                based: z.base64(),
               }),
               handler: async () => ({
                 null: null,
                 dateOut: new Date("2021-12-31"),
+                buffer: Buffer.from("test"),
+                based: btoa("test"),
               }),
             }),
           },
