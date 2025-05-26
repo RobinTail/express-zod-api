@@ -40,7 +40,6 @@ import { contentTypes } from "./content-type";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { ezFileBrand } from "./file-schema";
 import { IOSchema } from "./io-schema";
 import { flattenIO } from "./json-schema-helpers";
 import { Alternatives } from "./logical-container";
@@ -390,7 +389,6 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,
-    [ezFileBrand]: depictFile,
     [ezRawBrand]: depictRaw,
   };
 
