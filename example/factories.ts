@@ -41,8 +41,9 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory(
         typeof output.filename === "string" &&
         output.filename.includes(".")
       ) {
-        const extension = output.filename.split(".").pop()!;
-        createReadStream(output.filename).pipe(response.type(extension));
+        createReadStream(output.filename).pipe(
+          response.attachment(output.filename),
+        );
       } else {
         response.status(400).send("Filename is missing");
       }
