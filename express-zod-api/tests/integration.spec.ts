@@ -108,7 +108,7 @@ describe("Integration", () => {
         schema: ReturnType<z.ZodType["brand"]>,
         { next },
       ) => {
-        delete schema._zod.bag.brand;
+        schema._zod.bag.brand = undefined;
         return next(schema);
       };
       const client = new Integration({
