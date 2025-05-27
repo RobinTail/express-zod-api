@@ -12,5 +12,7 @@ export const dateOut = ({
     .brand(ezDateOutBrand as symbol)
     .meta({
       ...rest,
-      examples: examples as Array<string & z.$brand> | undefined,
+      examples: examples as
+        | Array<NonNullable<typeof examples>[number] & z.$brand>
+        | undefined,
     });
