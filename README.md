@@ -36,9 +36,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Headers as input source](#headers-as-input-source)
    3. [Response customization](#response-customization)
    4. [Empty response](#empty-response)
-   5. [Error handling](#error-handling)
-   6. [Production mode](#production-mode)
-   7. [Non-object response](#non-object-response) including file downloads
+   5. [Non-JSON response](#non-json-response) including file downloads
+   6. [Error handling](#error-handling)
+   7. [Production mode](#production-mode)
    8. [HTML Forms (URL encoded)](#html-forms-url-encoded)
    9. [File uploads](#file-uploads)
    10. [Connect to your own express app](#connect-to-your-own-express-app)
@@ -872,6 +872,33 @@ const resultHandler = new ResultHandler({
 });
 ```
 
+## Non-JSON response
+
+To configure a non-JSON responses (for example, to send an image file) you should specify its MIME type.
+
+You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation
+[in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts).
+One of them implements file streaming, in this case the endpoint just has to provide the filename.
+The response schema can be `z.string()`, `z.base64()` or `ez.buffer()` to reflect the data accordingly in the
+[generated documentation](#creating-a-documentation).
+
+```typescript
+const fileStreamingEndpointsFactory = new EndpointsFactory(
+  new ResultHandler({
+    positive: { schema: ez.buffer(), mimeType: "image/*" },
+    negative: { schema: z.string(), mimeType: "text/plain" },
+    handler: ({ response, error, output }) => {
+      if (error) return void response.status(400).send(error.message);
+      if ("filename" in output)
+        fs.createReadStream(output.filename).pipe(
+          response.attachment(output.filename),
+        );
+      else response.status(400).send("Filename is missing");
+    },
+  }),
+);
+```
+
 ## Error handling
 
 All runtime errors are handled by a `ResultHandler`. The default is `defaultResultHandler`. Using `ensureHttpError()`
@@ -913,33 +940,6 @@ createHttpError(401, "Token expired"); // —> "Token expired"
 createHttpError(401, "Token expired", { expose: false }); // —> "Unauthorized"
 createHttpError(500, "Something is broken"); // —> "Internal Server Error"
 createHttpError(501, "We didn't make it yet", { expose: true }); // —> "We didn't make it yet"
-```
-
-## Non-object response
-
-Thus, you can configure non-object responses too, for example, to send an image file.
-
-You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation
-[in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts).
-One of them implements file streaming, in this case the endpoint just has to provide the filename.
-The response schema can be `z.string()`, `z.base64()` or `ez.buffer()` to reflect the data accordingly in the
-[generated documentation](#creating-a-documentation).
-
-```typescript
-const fileStreamingEndpointsFactory = new EndpointsFactory(
-  new ResultHandler({
-    positive: { schema: ez.buffer(), mimeType: "image/*" },
-    negative: { schema: z.string(), mimeType: "text/plain" },
-    handler: ({ response, error, output }) => {
-      if (error) return void response.status(400).send(error.message);
-      if ("filename" in output)
-        fs.createReadStream(output.filename).pipe(
-          response.attachment(output.filename),
-        );
-      else response.status(400).send("Filename is missing");
-    },
-  }),
-);
 ```
 
 ## HTML Forms (URL encoded)
