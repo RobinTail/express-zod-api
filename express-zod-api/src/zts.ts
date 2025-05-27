@@ -73,7 +73,7 @@ const onObject: Producer = (
   obj: $ZodObject,
   { isResponse, next, makeAlias },
 ) => {
-  const fn = () => {
+  const produce = () => {
     const members = Object.entries(obj._zod.def.shape).map<ts.TypeElement>(
       ([key, value]) => {
         const { description: comment, deprecated: isDeprecated } =
@@ -89,8 +89,8 @@ const onObject: Producer = (
     return f.createTypeLiteralNode(members);
   };
   return hasCycle(obj, { io: isResponse ? "output" : "input" })
-    ? makeAlias(obj, fn)
-    : fn();
+    ? makeAlias(obj, produce)
+    : produce();
 };
 
 const onArray: Producer = ({ _zod: { def } }: $ZodArray, { next }) =>
