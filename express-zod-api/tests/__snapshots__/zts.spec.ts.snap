@@ -9,18 +9,19 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     }[];
     boolean: boolean;
     circular: SomeType;
+    circular2: SomeType;
     union: {
         number: number;
     } | "hi";
     enum: "hi" | "bye";
     intersectionWithTransform: (number & bigint) & (number & string);
     date: any;
-    undefined?: undefined;
+    undefined: undefined;
     null: null;
-    void?: any;
-    any?: any;
-    unknown?: any;
-    never: any;
+    void: undefined;
+    any: any;
+    unknown: unknown;
+    never: never;
     optionalString?: string | undefined;
     nullablePartialObject: {
         string?: string | undefined;
@@ -56,9 +57,8 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     set: any;
     intersection: (string & number) | bigint;
     promise: any;
-    function: any;
     optDefaultString?: string | undefined;
-    refinedStringWithSomeBullshit: (string | number) & ((bigint | null) | undefined);
+    refinedStringWithSomeBullshit: (string | number) & (bigint | null);
     nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
     lazy: SomeType;
     discUnion: {
@@ -73,7 +73,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
         y: number;
     };
     branded: string;
-    catch?: number;
+    catch: number;
     pipeline: string;
     readonly: string;
 }"
@@ -139,18 +139,33 @@ exports[`zod-to-ts > Issue #2352: intersection of objects having same prop %# > 
 }"
 `;
 
-exports[`zod-to-ts > PrimitiveSchema > outputs correct typescript 1`] = `
+exports[`zod-to-ts > PrimitiveSchema (isResponse=false) > outputs correct typescript 1`] = `
 "{
     string: string;
     number: number;
     boolean: boolean;
     date: any;
-    undefined?: undefined;
+    undefined: undefined;
     null: null;
-    void?: any;
-    any?: any;
-    unknown?: any;
-    never: any;
+    void: undefined;
+    any: any;
+    unknown: unknown;
+    never: never;
+}"
+`;
+
+exports[`zod-to-ts > PrimitiveSchema (isResponse=true) > outputs correct typescript 1`] = `
+"{
+    string: string;
+    number: number;
+    boolean: boolean;
+    date: unknown;
+    undefined: undefined;
+    null: null;
+    void: undefined;
+    any: any;
+    unknown: unknown;
+    never: never;
 }"
 `;
 
@@ -160,13 +175,7 @@ exports[`zod-to-ts > enums > handles 'quoted string' literals 1`] = `""Two Words
 
 exports[`zod-to-ts > enums > handles 'string' literals 1`] = `""apple" | "banana" | "cantaloupe""`;
 
-exports[`zod-to-ts > ez.file(base64) > should depend on variant 1`] = `"string"`;
-
-exports[`zod-to-ts > ez.file(binary) > should depend on variant 1`] = `"string | Buffer"`;
-
-exports[`zod-to-ts > ez.file(buffer) > should depend on variant 1`] = `"Buffer"`;
-
-exports[`zod-to-ts > ez.file(string) > should depend on variant 1`] = `"string"`;
+exports[`zod-to-ts > ez.buffer() > should be Buffer 1`] = `"Buffer"`;
 
 exports[`zod-to-ts > ez.raw() > should depict the raw property 1`] = `"Buffer"`;
 
@@ -191,14 +200,6 @@ exports[`zod-to-ts > z.discriminatedUnion() > outputs correct typescript 1`] = `
 }"
 `;
 
-exports[`zod-to-ts > z.effect() > transformations > should handle an error within the transformation 1`] = `"any"`;
-
-exports[`zod-to-ts > z.effect() > transformations > should handle unsupported transformation in response 1`] = `"any"`;
-
-exports[`zod-to-ts > z.effect() > transformations > should produce the schema type 'intact' 1`] = `"number"`;
-
-exports[`zod-to-ts > z.effect() > transformations > should produce the schema type 'transformed' 1`] = `"string"`;
-
 exports[`zod-to-ts > z.literal() > Should produce the correct typescript 0 1`] = `""test""`;
 
 exports[`zod-to-ts > z.literal() > Should produce the correct typescript 1 1`] = `"true"`;
@@ -206,6 +207,8 @@ exports[`zod-to-ts > z.literal() > Should produce the correct typescript 1 1`] =
 exports[`zod-to-ts > z.literal() > Should produce the correct typescript 2 1`] = `"false"`;
 
 exports[`zod-to-ts > z.literal() > Should produce the correct typescript 3 1`] = `"123"`;
+
+exports[`zod-to-ts > z.literal() > Should produce the correct typescript 4 1`] = `"undefined"`;
 
 exports[`zod-to-ts > z.nullable() > outputs correct typescript 1`] = `
 "{
@@ -228,10 +231,10 @@ exports[`zod-to-ts > z.object() > escapes correctly 1`] = `
     "'": string;
     "\`": string;
     "\\n": number;
-    $e?: any;
-    "4t"?: any;
-    _r?: any;
-    "-r"?: undefined;
+    $e: any;
+    "4t": any;
+    _r: any;
+    "-r": undefined;
 }"
 `;
 
@@ -266,16 +269,14 @@ exports[`zod-to-ts > z.object() > supports zod.describe() 1`] = `
 }"
 `;
 
-exports[`zod-to-ts > z.optional() > outputs correct typescript 1`] = `"string | undefined"`;
-
-exports[`zod-to-ts > z.optional() > should output \`?:\` and undefined union for optional properties 1`] = `
+exports[`zod-to-ts > z.optional() > Zod 4: should add question mark only to optional props 1`] = `
 "{
     optional?: string | undefined;
     required: string;
     transform?: number | undefined;
-    or?: (number | undefined) | string;
+    or: number | string;
     tuple?: [
-        string | undefined,
+        string,
         number,
         {
             optional?: string | undefined;
@@ -284,3 +285,13 @@ exports[`zod-to-ts > z.optional() > should output \`?:\` and undefined union for
     ] | undefined;
 }"
 `;
+
+exports[`zod-to-ts > z.pipe() > transformations > should handle an error within the transformation 1`] = `"unknown"`;
+
+exports[`zod-to-ts > z.pipe() > transformations > should handle preprocess error in request 1`] = `"any"`;
+
+exports[`zod-to-ts > z.pipe() > transformations > should handle unsupported transformation in response 1`] = `"unknown"`;
+
+exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type 'intact' 1`] = `"number"`;
+
+exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type 'transformed' 1`] = `"string"`;

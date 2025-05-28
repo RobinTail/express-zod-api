@@ -1,22 +1,15 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { IOSchema, Middleware, ez } from "../src";
-import {
-  extractObjectSchema,
-  getFinalEndpointInputSchema,
-} from "../src/io-schema";
-import { metaSymbol } from "../src/metadata";
+import { getFinalEndpointInputSchema } from "../src/io-schema";
 import { AbstractMiddleware } from "../src/middleware";
 
 describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {
     test("accepts object", () => {
       expectTypeOf(z.object({})).toExtend<IOSchema>();
-      expectTypeOf(z.object({})).toExtend<IOSchema<"strip">>();
-      expectTypeOf(z.object({}).strict()).toExtend<IOSchema<"strict">>();
-      expectTypeOf(z.object({}).passthrough()).toExtend<
-        IOSchema<"passthrough">
-      >();
-      expectTypeOf(z.object({}).strip()).toExtend<IOSchema<"strip">>();
+      expectTypeOf(z.object({}).strip()).toExtend<IOSchema>();
+      expectTypeOf(z.object({}).strict()).toExtend<IOSchema>();
+      expectTypeOf(z.object({}).loose()).toExtend<IOSchema>();
     });
     test("accepts ez.raw()", () => {
       expectTypeOf(ez.raw()).toExtend<IOSchema>();
@@ -24,9 +17,6 @@ describe("I/O Schema and related helpers", () => {
     });
     test("accepts ez.form()", () => {
       expectTypeOf(ez.form({})).toExtend<IOSchema>();
-    });
-    test("respects the UnknownKeys type argument", () => {
-      expectTypeOf(z.object({})).not.toExtend<IOSchema<"passthrough">>();
     });
     test("accepts union of objects", () => {
       expectTypeOf(z.union([z.object({}), z.object({})])).toExtend<IOSchema>();
@@ -73,12 +63,9 @@ describe("I/O Schema and related helpers", () => {
     describe("Feature #600: Top level refinements", () => {
       test("accepts a refinement of object", () => {
         expectTypeOf(z.object({}).refine(() => true)).toExtend<IOSchema>();
-        expectTypeOf(z.object({}).superRefine(() => true)).toExtend<IOSchema>();
+        expectTypeOf(z.object({}).check(() => void 0)).toExtend<IOSchema>();
         expectTypeOf(
-          z.object({}).refinement(() => true, {
-            code: "custom",
-            message: "test",
-          }),
+          z.object({}).refine(() => true, { error: "test" }),
         ).toExtend<IOSchema>();
       });
       test("Issue 662: accepts nested refinements", () => {
@@ -92,9 +79,9 @@ describe("I/O Schema and related helpers", () => {
         expectTypeOf(
           z
             .object({})
-            .superRefine(() => true)
-            .superRefine(() => true)
-            .superRefine(() => true),
+            .check(() => void 0)
+            .check(() => void 0)
+            .check(() => void 0),
         ).toExtend<IOSchema>();
       });
     });
@@ -128,19 +115,16 @@ describe("I/O Schema and related helpers", () => {
         expectTypeOf(
           z.object({}).transform(() => true),
         ).not.toExtend<IOSchema>();
+        expectTypeOf(z.object({}).transform(String)).not.toExtend<IOSchema>();
         expectTypeOf(z.object({}).transform(() => [])).not.toExtend<IOSchema>();
       });
       test("does not accept piping into another kind of schema", () => {
-        expectTypeOf(
-          z.object({ s: z.string() }).pipe(z.array(z.string())),
-        ).not.toExtend<IOSchema>();
-      });
-      test("does not accept nested piping", () => {
+        expectTypeOf(z.unknown().pipe(z.string())).not.toExtend<IOSchema>();
         expectTypeOf(
           z
-            .object({ a: z.string() })
-            .remap({ a: "b" })
-            .pipe(z.object({ b: z.string() })),
+            .object({ s: z.string() })
+            .transform(Object.values)
+            .pipe(z.array(z.string())),
         ).not.toExtend<IOSchema>();
       });
     });
@@ -228,17 +212,13 @@ describe("I/O Schema and related helpers", () => {
 
     test("Zod Issue #600: can not intersect object schema with passthrough and transformation", () => {
       // @see https://github.com/colinhacks/zod/issues/600
-      // this is the reason why IOSchema is generic and middlewares have to be "strip"
-      const left = z.object({}).passthrough();
+      // Limitation: IOSchema in middlewares must be of "strip" kind
+      const left = z.looseObject({});
       const right = z.object({
         id: z.string().transform((str) => parseInt(str)),
       });
-      const schema = z.intersection(left, right);
-      const result = schema.safeParse({
-        id: "123",
-      });
-      expect(result.success).toBeFalsy();
-      expect(result.error).toMatchSnapshot();
+      const schema = left.and(right);
+      expect(() => schema.parse({ id: "123" })).toThrowErrorMatchingSnapshot();
     });
 
     test("Should merge mixed object schemas", () => {
@@ -262,88 +242,6 @@ describe("I/O Schema and related helpers", () => {
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
-    });
-
-    test("Should merge examples in case of using withMeta()", () => {
-      const middlewares: AbstractMiddleware[] = [
-        new Middleware({
-          input: z
-            .object({ one: z.string() })
-            .and(z.object({ two: z.number() }))
-            .example({ one: "test", two: 123 }),
-          handler: vi.fn(),
-        }),
-        new Middleware({
-          input: z
-            .object({ three: z.null() })
-            .or(z.object({ four: z.boolean() }))
-            .example({ three: null, four: true }),
-          handler: vi.fn(),
-        }),
-      ];
-      const endpointInput = z
-        .object({ five: z.string() })
-        .example({ five: "some" });
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(result._def[metaSymbol]?.examples).toEqual([
-        {
-          one: "test",
-          two: 123,
-          three: null,
-          four: true,
-          five: "some",
-        },
-      ]);
-    });
-  });
-
-  describe("extractObjectSchema()", () => {
-    test("should pass the object schema through", () => {
-      const subject = extractObjectSchema(z.object({ one: z.string() }));
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    test("should return object schema for the union of object schemas", () => {
-      const subject = extractObjectSchema(
-        z.object({ one: z.string() }).or(z.object({ two: z.number() })),
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    test("should return object schema for the intersection of object schemas", () => {
-      const subject = extractObjectSchema(
-        z.object({ one: z.string() }).and(z.object({ two: z.number() })),
-      );
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    test("should support ez.raw()", () => {
-      const subject = extractObjectSchema(ez.raw());
-      expect(subject).toBeInstanceOf(z.ZodObject);
-      expect(subject).toMatchSnapshot();
-    });
-
-    describe("Feature #600: Top level refinements", () => {
-      test("should handle refined object schema", () => {
-        const subject = extractObjectSchema(
-          z.object({ one: z.string() }).refine(() => true),
-        );
-        expect(subject).toBeInstanceOf(z.ZodObject);
-        expect(subject).toMatchSnapshot();
-      });
-    });
-
-    describe("Feature #1869: Top level transformations", () => {
-      test("should handle transformations to another object", () => {
-        const subject = extractObjectSchema(
-          z.object({ one: z.string() }).transform(({ one }) => ({ two: one })),
-        );
-        expect(subject).toBeInstanceOf(z.ZodObject);
-        expect(subject).toMatchSnapshot();
-      });
     });
   });
 });

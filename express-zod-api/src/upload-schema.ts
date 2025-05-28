@@ -1,5 +1,5 @@
 import type { UploadedFile } from "express-fileupload";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const ezUploadBrand = Symbol("Upload");
 
@@ -27,10 +27,10 @@ export const upload = () =>
         typeof subject.size === "number" &&
         typeof subject.md5 === "string" &&
         typeof subject.mv === "function",
-      (input) => ({
-        message: `Expected file upload, received ${typeof input}`,
-      }),
+      {
+        error: ({ input }) => ({
+          message: `Expected file upload, received ${typeof input}`,
+        }),
+      },
     )
     .brand(ezUploadBrand as symbol);
-
-export type UploadSchema = ReturnType<typeof upload>;

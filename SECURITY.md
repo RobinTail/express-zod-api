@@ -4,6 +4,7 @@
 
 | Version | Code name     | Release |     Supported      |
 | ------: | :------------ | :------ | :----------------: |
+|  24.x.x | Ashley        | 06.2025 | :white_check_mark: |
 |  23.x.x | Sonia         | 04.2025 | :white_check_mark: |
 |  22.x.x | Tai           | 01.2025 | :white_check_mark: |
 |  21.x.x | Kesaria       | 11.2024 | :white_check_mark: |

@@ -111,15 +111,15 @@ describe("Example", async () => {
           features: [
             {
               title: "Tall",
-              features: [{ title: "Above 180cm", features: [] }],
+              features: [{ title: "Above 180cm" }],
             },
-            { title: "Young", features: [] },
+            { title: "Young" },
             {
               title: "Cute",
               features: [
                 {
                   title: "Tells funny jokes",
-                  features: [{ title: "About Typescript", features: [] }],
+                  features: [{ title: "About Typescript" }],
                 },
               ],
             },
@@ -175,6 +175,9 @@ describe("Example", async () => {
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
       expect(response.headers.get("Content-type")).toBe("image/svg+xml");
+      expect(response.headers.get("Content-Disposition")).toBe(
+        `attachment; filename="logo.svg"`,
+      );
       expect(response.headers.has("Transfer-encoding")).toBeTruthy();
       expect(response.headers.get("Transfer-encoding")).toBe("chunked");
       expect(response.headers.has("Content-Encoding")).toBeTruthy();

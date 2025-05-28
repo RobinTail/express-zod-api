@@ -14,6 +14,15 @@ exports[`Endpoint > #handleResult > Should handle errors within ResultHandler 1`
 ]
 `;
 
+exports[`Endpoint > #parseOutput > Should throw on output validation failure 1`] = `
+{
+  "error": {
+    "message": "output.email: Invalid email address",
+  },
+  "status": "error",
+}
+`;
+
 exports[`Endpoint > .getResponses() > should return the negative responses (readonly) 1`] = `
 [
   {
@@ -21,21 +30,38 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
       "application/json",
     ],
     "schema": {
-      "_type": "ZodObject",
-      "shape": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "examples": [
+        {
+          "error": {
+            "message": "Sample error message",
+          },
+          "status": "error",
+        },
+      ],
+      "properties": {
         "error": {
-          "_type": "ZodObject",
-          "shape": {
+          "additionalProperties": false,
+          "properties": {
             "message": {
-              "_type": "ZodString",
+              "type": "string",
             },
           },
+          "required": [
+            "message",
+          ],
+          "type": "object",
         },
         "status": {
-          "_type": "ZodLiteral",
-          "value": "error",
+          "const": "error",
         },
       },
+      "required": [
+        "status",
+        "error",
+      ],
+      "type": "object",
     },
     "statusCodes": [
       400,
@@ -51,21 +77,30 @@ exports[`Endpoint > .getResponses() > should return the positive responses (read
       "application/json",
     ],
     "schema": {
-      "_type": "ZodObject",
-      "shape": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
         "data": {
-          "_type": "ZodObject",
-          "shape": {
+          "additionalProperties": false,
+          "properties": {
             "something": {
-              "_type": "ZodNumber",
+              "type": "number",
             },
           },
+          "required": [
+            "something",
+          ],
+          "type": "object",
         },
         "status": {
-          "_type": "ZodLiteral",
-          "value": "success",
+          "const": "success",
         },
       },
+      "required": [
+        "status",
+        "data",
+      ],
+      "type": "object",
     },
     "statusCodes": [
       200,

@@ -20,6 +20,14 @@ const importConcerns = [
       "ImportDeclaration[source.value='ramda'] > ImportDefaultSpecifier",
     message: "use import * as R from 'ramda'",
   },
+  {
+    selector: "ImportDeclaration[source.value=/^zod/] > ImportDefaultSpecifier",
+    message: "do import { z } instead",
+  },
+  {
+    selector: "ImportDeclaration[source.value='zod'] > ImportSpecifier",
+    message: "should import from zod/v4", // @todo remove when zod version changed to 4.0.0
+  },
   ...builtinModules.map((mod) => ({
     selector: `ImportDeclaration[source.value='${mod}']`,
     message: `use node:${mod} for the built-in module`,
@@ -48,6 +56,10 @@ const performanceConcerns = [
   {
     selector: "CallExpression[callee.property.name='flatMap']", // #2209
     message: "flatMap() is about 1.3x slower than R.chain()",
+  },
+  {
+    selector: "MemberExpression[object.name='R'] > Identifier[name='union']", // #2599
+    message: "R.union() is 1.5x slower than [...Set().add()]",
   },
 ];
 

@@ -1,14 +1,14 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ezDateOutBrand } from "../src/date-out-schema";
 import { ez } from "../src";
-import { metaSymbol } from "../src/metadata";
+import { getBrand } from "../src/metadata";
 
 describe("ez.dateOut()", () => {
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.dateOut();
-      expect(schema).toBeInstanceOf(z.ZodBranded);
-      expect(schema._def[metaSymbol]?.brand).toEqual(ezDateOutBrand);
+      expect(schema).toBeInstanceOf(z.ZodPipe);
+      expect(getBrand(schema)).toBe(ezDateOutBrand);
     });
   });
 
@@ -22,9 +22,8 @@ describe("ez.dateOut()", () => {
           {
             code: "invalid_type",
             expected: "date",
-            message: "Expected date, received string",
+            message: "Invalid input: expected date, received string",
             path: [],
-            received: "string",
           },
         ]);
       }
@@ -46,9 +45,11 @@ describe("ez.dateOut()", () => {
       if (!result.success) {
         expect(result.error.issues).toEqual([
           {
-            code: "invalid_date",
-            message: "Invalid date",
+            code: "invalid_type",
+            expected: "date",
+            message: "Invalid input: expected date, received Date",
             path: [],
+            received: "Invalid Date",
           },
         ]);
       }

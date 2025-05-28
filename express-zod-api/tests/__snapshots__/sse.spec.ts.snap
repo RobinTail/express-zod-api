@@ -2,28 +2,29 @@
 
 exports[`SSE > makeEventSchema() > should make a valid schema of SSE event 1`] = `
 {
-  "_type": "ZodObject",
-  "shape": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
     "data": {
-      "_type": "ZodString",
+      "type": "string",
     },
     "event": {
-      "_type": "ZodLiteral",
-      "value": "test",
+      "const": "test",
     },
     "id": {
-      "_type": "ZodOptional",
-      "value": {
-        "_type": "ZodString",
-      },
+      "type": "string",
     },
     "retry": {
-      "_type": "ZodOptional",
-      "value": {
-        "_type": "ZodNumber",
-      },
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991,
+      "type": "integer",
     },
   },
+  "required": [
+    "data",
+    "event",
+  ],
+  "type": "object",
 }
 `;
 
@@ -34,56 +35,55 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
       "text/event-stream",
     ],
     "schema": {
-      "_type": "ZodDiscriminatedUnion",
-      "discriminator": "event",
-      "options": [
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "anyOf": [
         {
-          "_type": "ZodObject",
-          "shape": {
+          "additionalProperties": false,
+          "properties": {
             "data": {
-              "_type": "ZodString",
+              "type": "string",
             },
             "event": {
-              "_type": "ZodLiteral",
-              "value": "test",
+              "const": "test",
             },
             "id": {
-              "_type": "ZodOptional",
-              "value": {
-                "_type": "ZodString",
-              },
+              "type": "string",
             },
             "retry": {
-              "_type": "ZodOptional",
-              "value": {
-                "_type": "ZodNumber",
-              },
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer",
             },
           },
+          "required": [
+            "data",
+            "event",
+          ],
+          "type": "object",
         },
         {
-          "_type": "ZodObject",
-          "shape": {
+          "additionalProperties": false,
+          "properties": {
             "data": {
-              "_type": "ZodNumber",
+              "type": "number",
             },
             "event": {
-              "_type": "ZodLiteral",
-              "value": "another",
+              "const": "another",
             },
             "id": {
-              "_type": "ZodOptional",
-              "value": {
-                "_type": "ZodString",
-              },
+              "type": "string",
             },
             "retry": {
-              "_type": "ZodOptional",
-              "value": {
-                "_type": "ZodNumber",
-              },
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer",
             },
           },
+          "required": [
+            "data",
+            "event",
+          ],
+          "type": "object",
         },
       ],
     },
@@ -101,7 +101,8 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
       "text/plain",
     ],
     "schema": {
-      "_type": "ZodString",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "string",
     },
     "statusCodes": [
       400,
@@ -117,28 +118,29 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
       "text/event-stream",
     ],
     "schema": {
-      "_type": "ZodObject",
-      "shape": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": false,
+      "properties": {
         "data": {
-          "_type": "ZodString",
+          "type": "string",
         },
         "event": {
-          "_type": "ZodLiteral",
-          "value": "single",
+          "const": "single",
         },
         "id": {
-          "_type": "ZodOptional",
-          "value": {
-            "_type": "ZodString",
-          },
+          "type": "string",
         },
         "retry": {
-          "_type": "ZodOptional",
-          "value": {
-            "_type": "ZodNumber",
-          },
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991,
+          "type": "integer",
         },
       },
+      "required": [
+        "data",
+        "event",
+      ],
+      "type": "object",
     },
     "statusCodes": [
       200,
@@ -154,7 +156,8 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
       "text/plain",
     ],
     "schema": {
-      "_type": "ZodString",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "string",
     },
     "statusCodes": [
       400,

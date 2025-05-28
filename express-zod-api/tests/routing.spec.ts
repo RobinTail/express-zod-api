@@ -4,7 +4,7 @@ import {
   staticHandler,
   staticMock,
 } from "./express-mock";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   DependsOnMethod,
   EndpointsFactory,
@@ -510,15 +510,19 @@ describe("Routing", () => {
       });
     });
 
+    const circular: z.ZodType = z.lazy(() => z.tuple([circular, z.nan()]));
     test.each([
       [z.bigint(), z.set(z.string())],
       [z.nan(), z.map(z.string(), z.boolean())],
-      [z.date().pipe(z.string()), z.symbol().catch(Symbol("test"))],
-      [z.function().transform(() => "test"), z.tuple([z.function()])],
+      [
+        z.date().transform(String).pipe(z.string()),
+        z.symbol().catch(Symbol("test")),
+      ],
       [ez.dateOut(), ez.dateIn()],
       [z.lazy(() => z.void()), ez.raw()],
       [z.promise(z.any()), ez.upload()],
-      [z.never(), z.tuple([ez.file()]).rest(z.nan())],
+      [z.never(), z.tuple([ez.buffer()]).rest(z.nan())],
+      [ez.buffer().pipe(z.any()), circular],
     ])("should warn about JSON incompatible schemas %#", (input, output) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
         input: z.object({ input }),
@@ -535,18 +539,49 @@ describe("Routing", () => {
       expect(logger._getLogs().warn).toEqual([
         [
           "The final input schema of the endpoint contains an unsupported JSON payload type.",
-          { method: "get", path: "/path", reason: expect.any(Error) },
+          { method: "get", path: "/path", reason: expect.any(z.ZodType) },
         ],
         [
           "The final positive response schema of the endpoint contains an unsupported JSON payload type.",
-          { method: "get", path: "/path", reason: expect.any(Error) },
+          { method: "get", path: "/path", reason: expect.any(z.ZodType) },
         ],
       ]);
     });
 
-    test("should warn about unused path params", () => {
+    test.each([
+      [z.string().array(), z.string()],
+      [z.lazy(() => z.number()), z.object({}).pipe(z.array(z.string()))],
+    ])("should warn about non-object based schemas I/O %#", (input, output) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
-        input: z.object({ id: z.string() }),
+        input: input as unknown as z.ZodObject,
+        output: output as unknown as z.ZodObject,
+        handler: vi.fn(),
+      });
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: false },
+        routing: { path: endpoint },
+      });
+      expect(logger._getLogs().warn).toEqual([
+        [
+          "Endpoint input schema is not object-based",
+          { method: "get", path: "/path" },
+        ],
+        [
+          "Endpoint output schema is not object-based",
+          { method: "get", path: "/path" },
+        ],
+      ]);
+    });
+
+    test.each([
+      z.object({ id: z.string() }),
+      z.record(z.literal("id"), z.string()),
+    ])("should warn about unused path params %#", (input) => {
+      const endpoint = new EndpointsFactory(defaultResultHandler).build({
+        input,
         output: z.object({}),
         handler: vi.fn(),
       });
@@ -557,11 +592,9 @@ describe("Routing", () => {
         config: { cors: false },
         routing: { v1: { ":idx": endpoint } },
       });
-      expect(logger._getLogs().warn).toEqual([
-        [
-          "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
-          { method: "get", param: "idx", path: "/v1/:idx" },
-        ],
+      expect(logger._getLogs().warn).toContainEqual([
+        "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
+        { method: "get", param: "idx", path: "/v1/:idx" },
       ]);
     });
   });

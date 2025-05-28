@@ -1,6 +1,6 @@
 import { Response } from "express";
 import createHttpError from "http-errors";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   InputValidationError,
   arrayResultHandler,
@@ -8,7 +8,6 @@ import {
   ResultHandler,
 } from "../src";
 import { ResultHandlerError } from "../src/errors";
-import { metaSymbol } from "../src/metadata";
 import { AbstractResultHandler, Result } from "../src/result-handler";
 import {
   makeLoggerMock,
@@ -88,7 +87,7 @@ describe("ResultHandler", () => {
       subject.execute({
         error,
         input: { something: 453 },
-        output: { anything: 118 },
+        output: null,
         request: requestMock,
         response: responseMock,
         logger: loggerMock,
@@ -118,12 +117,12 @@ describe("ResultHandler", () => {
               message: "Expected string, got number",
               path: ["something"],
               expected: "string",
-              received: "number",
+              input: 453,
             },
           ]),
         ),
         input: { something: 453 },
-        output: { anything: 118 },
+        output: null,
         options: {},
         request: requestMock,
         response: responseMock,
@@ -148,7 +147,7 @@ describe("ResultHandler", () => {
       subject.execute({
         error: createHttpError(404, "Something not found"),
         input: { something: 453 },
-        output: { anything: 118 },
+        output: null,
         options: {},
         request: requestMock,
         response: responseMock,
@@ -197,13 +196,13 @@ describe("ResultHandler", () => {
           }),
       );
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema._def[metaSymbol]).toMatchSnapshot();
+      expect(apiResponse[0].schema.meta()).toMatchSnapshot();
     });
 
     test("should generate negative response example", () => {
       const apiResponse = subject.getNegativeResponse();
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema._def[metaSymbol]).toMatchSnapshot();
+      expect(apiResponse[0].schema.meta()).toMatchSnapshot();
     });
   });
 
@@ -215,10 +214,10 @@ describe("ResultHandler", () => {
         z.object({ anything: z.number() }).example({ anything: 118 }),
       )
       .pop()?.schema;
-    expect(positiveSchema?._def).toHaveProperty("typeName", "ZodArray");
+    expect(positiveSchema).toHaveProperty(["_zod", "def", "type"], "array");
     expect(positiveSchema).toHaveProperty(
-      ["element", "_def", "typeName"],
-      "ZodAny",
+      ["_zod", "def", "element", "_zod", "def", "type"],
+      "any",
     );
     expect(() =>
       arrayResultHandler.execute({

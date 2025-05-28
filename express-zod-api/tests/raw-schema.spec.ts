@@ -1,31 +1,34 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ez } from "../src";
-import { metaSymbol } from "../src/metadata";
+import { getBrand } from "../src/metadata";
 import { ezRawBrand } from "../src/raw-schema";
 
 describe("ez.raw()", () => {
   describe("creation", () => {
     test("should be an instance of branded object", () => {
       const schema = ez.raw();
-      expect(schema).toBeInstanceOf(z.ZodBranded);
-      expect(schema._def[metaSymbol]?.brand).toBe(ezRawBrand);
+      expect(schema).toBeInstanceOf(z.ZodObject);
+      expect(getBrand(schema)).toBe(ezRawBrand);
     });
   });
 
   describe("types", () => {
     test("without extension", () => {
       const schema = ez.raw();
-      expectTypeOf(schema._output).toExtend<{ raw: Buffer }>();
+      expectTypeOf(schema._zod.output).toExtend<{ raw: Buffer }>();
     });
 
     test("with empty extension", () => {
       const schema = ez.raw({});
-      expectTypeOf(schema._output).toExtend<{ raw: Buffer }>();
+      expectTypeOf(schema._zod.output).toExtend<{ raw: Buffer }>();
     });
 
     test("with populated extension", () => {
       const schema = ez.raw({ extra: z.number() });
-      expectTypeOf(schema._output).toExtend<{ raw: Buffer; extra: number }>();
+      expectTypeOf(schema._zod.output).toExtend<{
+        raw: Buffer;
+        extra: number;
+      }>();
     });
   });
 

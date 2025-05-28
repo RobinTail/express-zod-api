@@ -1,7 +1,7 @@
 type Type1 = {
   title: string;
-  features: Type1;
-}[];
+  features?: Type1[] | undefined;
+};
 
 type SomeOf<T> = T[keyof T];
 
@@ -17,10 +17,7 @@ type GetV1UserRetrievePositiveVariant1 = {
   data: {
     id: number;
     name: string;
-    features: {
-      title: string;
-      features: Type1;
-    }[];
+    features: Type1[];
   };
 };
 
@@ -70,6 +67,7 @@ type PatchV1UserIdInput = {
   token: string;
   id: string;
   name: string;
+  /** the day of birth */
   birthday: string;
 };
 
@@ -78,6 +76,7 @@ type PatchV1UserIdPositiveVariant1 = {
   status: "success";
   data: {
     name: string;
+    /** account creation date */
     createdAt: string;
   };
 };

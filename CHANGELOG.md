@@ -1,5 +1,77 @@
 # Changelog
 
+## Version 24
+
+### v24.0.0
+
+- Switched to Zod 4:
+  - Minimum supported version of `zod` is 3.25.1, BUT imports MUST be from `zod/v4`;
+    - Read the [Explanation of the versioning strategy](https://github.com/colinhacks/zod/issues/4371);
+    - Express Zod API, however, is not aiming to support both Zod 3 and Zod 4 simultaneously due to:
+      - incompatibility of data structures;
+      - operating composite schemas (need to avoid mixing schemas of different versions);
+      - the temporary nature of this transition;
+      - the advantages of Zod 4 that provide opportunities to simplifications and corrections of known issues.
+  - `IOSchema` type had to be simplified down to a schema resulting to an `object`, but not an `array`;
+  - Refer to [Migration guide on Zod 4](https://v4.zod.dev/v4/changelog) for adjusting your schemas;
+- Changes to `ZodType::example()` (Zod plugin method):
+  - Now acts as an alias for `ZodType::meta({ examples })`;
+  - The argument has to be the output type of the schema (used to be the opposite):
+    - This change is only breaking for transforming schemas;
+    - In order to specify an example for an input schema the `.example()` method must be called before `.transform()`;
+- The transforming proprietary schemas `ez.dateIn()` and `ez.dateOut()` now accept metadata as its argument:
+  - This allows to set examples before transformation (`ez.dateIn()`) and to avoid the examples "branding";
+- Changes to `Documentation`:
+  - Generating Documentation is mostly delegated to Zod 4 `z.toJSONSchema()`;
+  - Express Zod API implements some overrides and improvements to fit it into OpenAPI 3.1 that extends JSON Schema;
+  - The `numericRange` option removed from `Documentation` class constructor argument;
+  - The `Depicter` type signature changed: became a postprocessing function returning an overridden JSON Schema;
+- Changes to `Integration`:
+  - The `optionalPropStyle` option removed from `Integration` class constructor:
+  - Use `.optional()` to add question mark to the object property as well as `undefined` to its type;
+  - Use `.or(z.undefined())` to add `undefined` to the type of the object property;
+  - See the [reasoning](https://x.com/colinhacks/status/1919292504861491252);
+  - `z.any()` and `z.unknown()` are required: [details](https://v4.zod.dev/v4/changelog#changes-zunknown-optionality);
+  - Added types generation for `z.never()`, `z.void()` and `z.unknown()` schemas;
+  - The fallback type for unsupported schemas and unclear transformations in response changed from `any` to `unknown`;
+- The argument of `ResultHandler::handler` is now discriminated: either `output` or `error` is `null`, not both;
+- The `getExamples()` public helper removed — use `.meta()?.examples` instead;
+- Added the new proprietary schema `ez.buffer()`;
+- The `ez.file()` schema removed: use `z.string()`, `z.base64()`, `ez.buffer()` or their union;
+- Consider the automated migration using the built-in ESLint rule.
+
+```js
+// eslint.config.mjs — minimal ESLint 9 config to apply migrations automatically using "eslint --fix"
+import parser from "@typescript-eslint/parser";
+import migration from "express-zod-api/migration";
+
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v24": "error" } },
+];
+```
+
+```diff
+- import { z } from "zod";
++ import { z } from "zod/v4";
+```
+
+```diff
+  input: z.string()
++   .example("123")
+    .transform(Number)
+-   .example("123")
+```
+
+```diff
+- ez.dateIn().example("2021-12-31");
++ ez.dateIn({ examples: ["2021-12-31"] });
+- ez.file("base64");
++ z.base64();
+- ez.file("buffer");
++ ez.buffer();
+```
+
 ## Version 23
 
 ### v23.6.1

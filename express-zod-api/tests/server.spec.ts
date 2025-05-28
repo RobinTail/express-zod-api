@@ -13,7 +13,7 @@ import {
   httpListenSpy,
   httpsListenSpy,
 } from "./http-mock";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   AppConfig,
   BuiltinLogger,

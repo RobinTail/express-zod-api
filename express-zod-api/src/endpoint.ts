@@ -1,13 +1,15 @@
 import { Request, Response } from "express";
 import * as R from "ramda";
-import { z } from "zod";
+import { z, globalRegistry } from "zod/v4";
+import type { $ZodObject } from "zod/v4/core";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
-import { hasForm, hasRaw, hasUpload } from "./deep-checks";
+import { findRequestTypeDefiningSchema } from "./deep-checks";
 import {
   FlatObject,
   getActualMethod,
   getInput,
   ensureError,
+  isSchema,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import {
@@ -15,16 +17,21 @@ import {
   OutputValidationError,
   ResultHandlerError,
 } from "./errors";
+import { ezFormBrand } from "./form-schema";
 import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer } from "./logical-container";
+import { getBrand } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
+import { ezRawBrand } from "./raw-schema";
+import { DiscriminatedResult, pullResponseExamples } from "./result-helpers";
 import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
+import { ezUploadBrand } from "./upload-schema";
 
 export type Handler<IN, OUT, OPT> = (params: {
   /** @desc The inputs from the enabled input sources validated against the final input schema (incl. Middlewares) */
@@ -76,6 +83,21 @@ export class Endpoint<
   OPT extends FlatObject,
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0];
+
+  /** considered expensive operation, only required for generators */
+  #ensureOutputExamples = R.once(() => {
+    const meta = this.#def.outputSchema.meta();
+    if (meta?.examples?.length) return; // has examples on the output schema, or pull up:
+    if (!isSchema<$ZodObject>(this.#def.outputSchema, "object")) return;
+    const examples = pullResponseExamples(this.#def.outputSchema as $ZodObject);
+    if (!examples.length) return;
+    globalRegistry
+      .remove(this.#def.outputSchema) // reassign to avoid cloning
+      .add(this.#def.outputSchema as $ZodObject, {
+        ...meta,
+        examples,
+      });
+  });
 
   constructor(def: {
     deprecated?: boolean;
@@ -132,22 +154,25 @@ export class Endpoint<
 
   /** @internal */
   public override get outputSchema(): OUT {
+    this.#ensureOutputExamples();
     return this.#def.outputSchema;
   }
 
   /** @internal */
   public override get requestType() {
-    return hasUpload(this.#def.inputSchema)
-      ? "upload"
-      : hasRaw(this.#def.inputSchema)
-        ? "raw"
-        : hasForm(this.#def.inputSchema)
-          ? "form"
-          : "json";
+    const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
+    if (found) {
+      const brand = getBrand(found);
+      if (brand === ezUploadBrand) return "upload";
+      if (brand === ezRawBrand) return "raw";
+      if (brand === ezFormBrand) return "form";
+    }
+    return "json";
   }
 
   /** @internal */
   public override getResponses(variant: ResponseVariant) {
+    if (variant === "positive") this.#ensureOutputExamples();
     return Object.freeze(
       variant === "negative"
         ? this.#def.resultHandler.getNegativeResponse()
@@ -233,24 +258,24 @@ export class Endpoint<
     return this.#def.handler({ ...rest, input: finalInput });
   }
 
-  async #handleResult({
-    error,
-    ...rest
-  }: {
-    error: Error | null;
-    request: Request;
-    response: Response;
-    logger: ActualLogger;
-    input: FlatObject;
-    output: FlatObject | null;
-    options: Partial<OPT>;
-  }) {
+  async #handleResult(
+    params: DiscriminatedResult & {
+      request: Request;
+      response: Response;
+      logger: ActualLogger;
+      input: FlatObject;
+      options: Partial<OPT>;
+    },
+  ) {
     try {
-      await this.#def.resultHandler.execute({ ...rest, error });
+      await this.#def.resultHandler.execute(params);
     } catch (e) {
       lastResortHandler({
-        ...rest,
-        error: new ResultHandlerError(ensureError(e), error || undefined),
+        ...params,
+        error: new ResultHandlerError(
+          ensureError(e),
+          params.error || undefined,
+        ),
       });
     }
   }
@@ -268,8 +293,7 @@ export class Endpoint<
   }) {
     const method = getActualMethod(request);
     const options: Partial<OPT> = {};
-    let output: FlatObject | null = null;
-    let error: Error | null = null;
+    let result: DiscriminatedResult = { output: {}, error: null };
     const input = getInput(request, config.inputSources);
     try {
       await this.#runMiddlewares({
@@ -282,22 +306,24 @@ export class Endpoint<
       });
       if (response.writableEnded) return;
       if (method === "options") return void response.status(200).end();
-      output = await this.#parseOutput(
-        await this.#parseAndRunHandler({
-          input,
-          logger,
-          options: options as OPT, // ensured the complete OPT by writableEnded condition and try-catch
-        }),
-      );
+      result = {
+        output: await this.#parseOutput(
+          await this.#parseAndRunHandler({
+            input,
+            logger,
+            options: options as OPT, // ensured the complete OPT by writableEnded condition and try-catch
+          }),
+        ),
+        error: null,
+      };
     } catch (e) {
-      error = ensureError(e);
+      result = { output: null, error: ensureError(e) };
     }
     await this.#handleResult({
+      ...result,
       input,
-      output,
       request,
       response,
-      error,
       logger,
       options,
     });

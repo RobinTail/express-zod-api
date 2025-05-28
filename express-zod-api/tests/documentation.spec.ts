@@ -1,7 +1,6 @@
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
 import {
-  Depicter,
   Documentation,
   DocumentationError,
   EndpointsFactory,
@@ -10,10 +9,13 @@ import {
   defaultEndpointsFactory,
   ez,
   ResultHandler,
+  Depicter,
+  Method,
 } from "../src";
 import { contentTypes } from "../src/content-type";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { givePort } from "../../tools/ports";
+import * as R from "ramda";
 
 describe("Documentation", () => {
   const sampleConfig = createConfig({
@@ -38,7 +40,6 @@ describe("Documentation", () => {
             }),
           },
         },
-        numericRange: null,
         config: sampleConfig,
         version: "3.4.5",
         title: "Testing DELETE request without body",
@@ -55,7 +56,7 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               input: z.object({
-                array: z.array(z.number().int().positive()).min(1).max(3),
+                array: z.array(z.int().positive()).min(1).max(3),
                 unlimited: z.array(z.boolean()),
                 transformer: z.string().transform((str) => str.length),
               }),
@@ -87,13 +88,23 @@ describe("Documentation", () => {
                 optional: z.string().optional(),
                 optDefault: z.string().optional().default("test"),
                 nullish: z.boolean().nullish(),
-                nuDefault: z.number().int().positive().nullish().default(123),
+                nuDefault: z.int().positive().nullish().default(123),
+                labeledDate: z.iso
+                  .datetime()
+                  .default(() => new Date().toISOString())
+                  .label("Today"), // Feature #1706
               }),
               output: z.object({
                 nullable: z.string().nullable(),
+                literal: z.literal("test").nullable(),
+                multiliteral: z.literal(["one", "two"]).nullable(),
+                enum: z.enum(["test"]).nullable(),
               }),
               handler: async () => ({
                 nullable: null,
+                literal: "test" as const,
+                multiliteral: "one" as const,
+                enum: "test" as const,
               }),
             }),
           },
@@ -114,24 +125,14 @@ describe("Documentation", () => {
               method: "post",
               input: z.object({
                 intersection: z.intersection(
-                  z.object({
-                    one: z.string(),
-                  }),
-                  z.object({
-                    two: z.string(),
-                  }),
+                  z.object({ one: z.string() }),
+                  z.object({ two: z.string() }),
                 ),
               }),
               output: z.object({
                 and: z
-                  .object({
-                    five: z.number().int().gte(0),
-                  })
-                  .and(
-                    z.object({
-                      six: z.string(),
-                    }),
-                  ),
+                  .object({ five: z.int().gte(0) })
+                  .and(z.object({ six: z.string() })),
               }),
               handler: async () => ({
                 and: {
@@ -158,19 +159,11 @@ describe("Documentation", () => {
               method: "post",
               input: z.object({
                 union: z.union([
-                  z.object({
-                    one: z.string(),
-                    two: z.number().int().positive(),
-                  }),
-                  z.object({
-                    two: z.number().int().negative(),
-                    three: z.string(),
-                  }),
+                  z.object({ one: z.string(), two: z.int().positive() }),
+                  z.object({ two: z.int().negative(), three: z.string() }),
                 ]),
               }),
-              output: z.object({
-                or: z.string().or(z.number().int().positive()),
-              }),
+              output: z.object({ or: z.string().or(z.int().positive()) }),
               handler: async () => ({
                 or: 554,
               }),
@@ -223,10 +216,7 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
-              input: z.object({
-                one: z.string(),
-                two: z.number().int().positive(),
-              }),
+              input: z.object({ one: z.string(), two: z.int().positive() }),
               output: z.object({
                 transform: z.string().transform((str) => str.length),
               }),
@@ -258,10 +248,14 @@ describe("Documentation", () => {
               output: z.object({
                 null: z.null(),
                 dateOut: ez.dateOut(),
+                buffer: ez.buffer(),
+                based: z.base64(),
               }),
               handler: async () => ({
                 null: null,
                 dateOut: new Date("2021-12-31"),
+                buffer: Buffer.from("test"),
+                based: btoa("test"),
               }),
             }),
           },
@@ -281,9 +275,9 @@ describe("Documentation", () => {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
               output: z.object({
-                simple: z.record(z.number().int()),
+                simple: z.record(z.string(), z.int()),
                 stringy: z.record(z.string().regex(/[A-Z]+/), z.boolean()),
-                numeric: z.record(z.number().int(), z.boolean()),
+                numeric: z.record(z.int(), z.boolean()),
                 literal: z.record(z.literal("only"), z.boolean()),
                 union: z.record(
                   z.literal("option1").or(z.literal("option2")),
@@ -337,11 +331,12 @@ describe("Documentation", () => {
                 doublePositive: z.number().positive(),
                 doubleNegative: z.number().negative(),
                 doubleLimited: z.number().min(-0.5).max(0.5),
-                int: z.number().int(),
-                intPositive: z.number().int().positive(),
-                intNegative: z.number().int().negative(),
-                intLimited: z.number().int().min(-100).max(100),
-                zero: z.number().int().nonnegative().nonpositive().optional(),
+                int: z.int(),
+                intPositive: z.int().positive(),
+                intNegative: z.int().negative(),
+                intLimited: z.int().min(-100).max(100),
+                zero: z.int().nonnegative().nonpositive().optional(),
+                coercedNum: z.coerce.number(), // required prop in zod 4
               }),
               output: z.object({
                 bigint: z.bigint(),
@@ -369,19 +364,18 @@ describe("Documentation", () => {
                 min: z.string().nonempty(),
                 max: z.string().max(15),
                 range: z.string().min(2).max(3),
-                email: z.string().email(),
-                uuid: z.string().uuid(),
-                cuid: z.string().cuid(),
-                cuid2: z.string().cuid2(),
-                ulid: z.string().ulid(),
-                ip: z.string().ip(),
-                emoji: z.string().emoji(),
-                url: z.string().url(),
+                email: z.email(),
+                uuid: z.uuid(),
+                cuid: z.cuid(),
+                cuid2: z.cuid2(),
+                ulid: z.ulid(),
+                ip: z.ipv4(),
+                emoji: z.emoji(),
+                url: z.url(),
                 numeric: z.string().regex(/\d+/),
                 combined: z
-                  .string()
-                  .min(1)
                   .email()
+                  .min(1)
                   .regex(/.*@example\.com/is)
                   .max(90),
               }),
@@ -407,11 +401,7 @@ describe("Documentation", () => {
               input: z.object({
                 ofOne: z.tuple([z.boolean()]),
                 ofStrings: z.tuple([z.string(), z.string().nullable()]),
-                complex: z.tuple([
-                  z.boolean(),
-                  z.string(),
-                  z.number().int().positive(),
-                ]),
+                complex: z.tuple([z.boolean(), z.string(), z.int().positive()]),
               }),
               output: z.object({
                 empty: z.tuple([]),
@@ -438,10 +428,10 @@ describe("Documentation", () => {
                 regularEnum: z.enum(["ABC", "DEF"]),
               }),
               output: z.object({
-                nativeEnum: z.nativeEnum({ FEG: 1, XYZ: 2 }),
+                nativeEnum: z.enum({ FEG: 1, XYZ: 2 }),
               }),
               handler: async () => ({
-                nativeEnum: 1,
+                nativeEnum: 1 as const,
               }),
             }),
           },
@@ -457,7 +447,7 @@ describe("Documentation", () => {
       const string = z.preprocess((arg) => String(arg), z.string());
       const number = z.preprocess(
         (arg) => parseInt(String(arg), 16),
-        z.number().int().nonnegative(),
+        z.int().nonnegative(),
       );
       const boolean = z.preprocess((arg) => !!arg, z.boolean());
       const spec = new Documentation({
@@ -483,15 +473,12 @@ describe("Documentation", () => {
       expect(boolean.parse(null)).toBe(false);
     });
 
-    test("should handle circular schemas via z.lazy()", () => {
-      const baseCategorySchema = z.object({
+    test("should handle circular schemas via z.object()", () => {
+      const category = z.object({
         name: z.string(),
-      });
-      type Category = z.infer<typeof baseCategorySchema> & {
-        subcategories: Category[];
-      };
-      const categorySchema: z.ZodType<Category> = baseCategorySchema.extend({
-        subcategories: z.lazy(() => categorySchema.array()),
+        get subcategories() {
+          return z.array(category);
+        },
       });
       const spec = new Documentation({
         config: sampleConfig,
@@ -499,9 +486,9 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory.build({
               method: "post",
-              input: baseCategorySchema,
+              input: category,
               output: z.object({
-                zodExample: categorySchema,
+                zodExample: category,
               }),
               handler: async () => ({
                 zodExample: {
@@ -524,50 +511,6 @@ describe("Documentation", () => {
         serverUrl: "https://example.com",
       }).getSpecAsYaml();
       expect(spec).toMatchSnapshot();
-    });
-
-    test.each([
-      z.undefined(),
-      z.map(z.any(), z.any()),
-      z.set(z.any()),
-      z.function(),
-      z.promise(z.any()),
-      z.nan(),
-      z.symbol(),
-      z.unknown(),
-      z.never(),
-      z.void(),
-    ])("should throw on unsupported types %#", (zodType) => {
-      expect(
-        () =>
-          new Documentation({
-            config: sampleConfig,
-            routing: {
-              v1: {
-                getSomething: defaultEndpointsFactory.build({
-                  method: "post",
-                  input: z.object({
-                    property: zodType,
-                  }),
-                  output: z.object({}),
-                  handler: async () => ({}),
-                }),
-              },
-            },
-            version: "3.4.5",
-            title: "Testing unsupported types",
-            serverUrl: "https://example.com",
-          }),
-      ).toThrow(
-        new DocumentationError(
-          `Zod type ${zodType._def.typeName} is unsupported.`,
-          {
-            method: "post",
-            path: "/v1/getSomething",
-            isResponse: false,
-          },
-        ),
-      );
     });
 
     test("should ensure uniq security schema names", () => {
@@ -1087,97 +1030,70 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
-    test("should pass over the example of an individual parameter", () => {
-      const spec = new Documentation({
-        config: sampleConfig,
-        routing: {
-          v1: {
-            getSomething: defaultEndpointsFactory.build({
-              input: z.object({
-                strNum: z
-                  .string()
-                  .transform((v) => parseInt(v, 10))
-                  .example("123"), // example is for input side of the transformation
+    test.each<Method>(["get", "post"])(
+      "should pass over the example of an individual prop in %s request",
+      (method) => {
+        const spec = new Documentation({
+          config: sampleConfig,
+          routing: {
+            v1: {
+              getSomething: defaultEndpointsFactory.build({
+                method,
+                input: z.object({
+                  strNum: z
+                    .string()
+                    .example("123") // example for the input side of the transformation
+                    .transform((v) => parseInt(v, 10)),
+                }),
+                output: z.object({
+                  numericStr: z
+                    .number()
+                    .transform((v) => `${v}`)
+                    .example("456"), // example for the output side of the transformation
+                }),
+                handler: async () => ({ numericStr: 123 }),
               }),
-              output: z.object({
-                numericStr: z
-                  .number()
-                  .transform((v) => `${v}`)
-                  .example(123), // example is for input side of the transformation
+            },
+          },
+          version: "3.4.5",
+          title: "Testing Metadata:example on IO parameter",
+          serverUrl: "https://example.com",
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
+      },
+    );
+
+    test.each<Method>(["get", "post"])(
+      "should pass over examples of each param from the whole IO schema examples (%s method)",
+      (method) => {
+        const spec = new Documentation({
+          config: sampleConfig,
+          routing: {
+            v1: {
+              getSomething: defaultEndpointsFactory.build({
+                method,
+                input: z
+                  .object({ strNum: z.string() })
+                  .example({ strNum: "123" }) // example is for input side of the transformation
+                  .transform(R.mapObjIndexed(Number)),
+                output: z
+                  .object({
+                    numericStr: z.number().transform((v) => `${v}`),
+                  })
+                  .example({
+                    numericStr: "123", // example is for output side of the transformation
+                  }),
+                handler: async () => ({ numericStr: 123 }),
               }),
-              handler: async () => ({ numericStr: 123 }),
-            }),
+            },
           },
-        },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO parameter",
-        serverUrl: "https://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
-
-    test("should pass over examples of each param from the whole IO schema examples (GET)", () => {
-      const spec = new Documentation({
-        config: sampleConfig,
-        routing: {
-          v1: {
-            getSomething: defaultEndpointsFactory.build({
-              input: z
-                .object({
-                  strNum: z.string().transform((v) => parseInt(v, 10)),
-                })
-                .example({
-                  strNum: "123", // example is for input side of the transformation
-                }),
-              output: z
-                .object({
-                  numericStr: z.number().transform((v) => `${v}`),
-                })
-                .example({
-                  numericStr: 123, // example is for input side of the transformation
-                }),
-              handler: async () => ({ numericStr: 123 }),
-            }),
-          },
-        },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO schema",
-        serverUrl: "https://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
-
-    test("should pass over examples of the whole IO schema (POST)", () => {
-      const spec = new Documentation({
-        config: sampleConfig,
-        routing: {
-          v1: {
-            getSomething: defaultEndpointsFactory.build({
-              method: "post",
-              input: z
-                .object({
-                  strNum: z.string().transform((v) => parseInt(v, 10)),
-                })
-                .example({
-                  strNum: "123", // example is for input side of the transformation
-                }),
-              output: z
-                .object({
-                  numericStr: z.number().transform((v) => `${v}`),
-                })
-                .example({
-                  numericStr: 123, // example is for input side of the transformation
-                }),
-              handler: async () => ({ numericStr: 123 }),
-            }),
-          },
-        },
-        version: "3.4.5",
-        title: "Testing Metadata:example on IO schema",
-        serverUrl: "https://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
+          version: "3.4.5",
+          title: "Testing Metadata:example on IO schema",
+          serverUrl: "https://example.com",
+        }).getSpecAsYaml();
+        expect(spec).toMatchSnapshot();
+      },
+    );
 
     test("should merge endpoint handler examples with its middleware examples", () => {
       const spec = new Documentation({
@@ -1195,6 +1111,31 @@ describe("Documentation", () => {
                 method: "post",
                 input: z.object({ str: z.string() }).example({ str: "test" }),
                 output: z.object({ num: z.number() }).example({ num: 123 }),
+                handler: async () => ({ num: 123 }),
+              }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing Metadata:example on IO schema + middleware",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("should merge prop examples with middlewares", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory
+              .addMiddleware({
+                input: z.object({ key: z.string().example("1234-56789-01") }),
+                handler: vi.fn(),
+              })
+              .build({
+                method: "post",
+                input: z.object({ str: z.string().example("test") }),
+                output: z.object({ num: z.number().example(123) }),
                 handler: async () => ({ num: 123 }),
               }),
           },
@@ -1234,10 +1175,7 @@ describe("Documentation", () => {
   describe("Feature #1470: Custom brands", () => {
     test("should be handled accordingly in request, response and params", () => {
       const deep = Symbol("DEEP");
-      const rule: Depicter = (
-        schema: z.ZodBranded<z.ZodTypeAny, PropertyKey>,
-        { next },
-      ) => next(schema.unwrap());
+      const rule: Depicter = ({ jsonSchema }) => jsonSchema;
       const spec = new Documentation({
         config: sampleConfig,
         routing: {

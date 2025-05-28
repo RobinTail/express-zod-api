@@ -9,7 +9,7 @@ import {
 } from "express-zod-api";
 import { authMiddleware } from "./middlewares";
 import { createReadStream } from "node:fs";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 /** @desc This factory extends the default one by enforcing the authentication using the specified middleware */
 export const keyAndTokenAuthenticatedEndpointsFactory =
@@ -22,7 +22,7 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) return void response.status(400).send(error.message);
-      if (output && "data" in output && typeof output.data === "string")
+      if ("data" in output && typeof output.data === "string")
         response.type("svg").send(output.data);
       else response.status(400).send("Data is missing");
     },
@@ -32,18 +32,14 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
 /** @desc This one streams the file using the "filename" property of the endpoint's output */
 export const fileStreamingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
-    positive: { schema: ez.file("buffer"), mimeType: "image/*" },
+    positive: { schema: ez.buffer(), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) return void response.status(400).send(error.message);
-      if (
-        output &&
-        "filename" in output &&
-        typeof output.filename === "string" &&
-        output.filename.includes(".")
-      ) {
-        const extension = output.filename.split(".").pop()!;
-        createReadStream(output.filename).pipe(response.type(extension));
+      if ("filename" in output && typeof output.filename === "string") {
+        createReadStream(output.filename).pipe(
+          response.attachment(output.filename),
+        );
       } else {
         response.status(400).send("Filename is missing");
       }
@@ -68,7 +64,7 @@ export const statusDependingFactory = new EndpointsFactory(
     negative: [
       {
         statusCode: 409,
-        schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
+        schema: z.object({ status: z.literal("exists"), id: z.int() }),
       },
       {
         statusCode: [400, 500],
@@ -108,5 +104,5 @@ export const noContentFactory = new EndpointsFactory(
 
 /** @desc This factory is for producing event streams of server-sent events (SSE) */
 export const eventsFactory = new EventStreamFactory({
-  time: z.number().int().positive(),
+  time: z.int().positive(),
 });

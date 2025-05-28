@@ -58,16 +58,14 @@ exports[`Index Entrypoint > exports > ensureHttpError should have certain value 
 
 exports[`Index Entrypoint > exports > ez should have certain value 1`] = `
 {
+  "buffer": [Function],
   "dateIn": [Function],
   "dateOut": [Function],
-  "file": [Function],
   "form": [Function],
   "raw": [Function],
   "upload": [Function],
 }
 `;
-
-exports[`Index Entrypoint > exports > getExamples should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > getMessageFromError should have certain value 1`] = `[Function]`;
 
@@ -77,7 +75,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "EndpointsFactory",
   "defaultEndpointsFactory",
   "arrayEndpointsFactory",
-  "getExamples",
   "getMessageFromError",
   "ensureHttpError",
   "BuiltinLogger",

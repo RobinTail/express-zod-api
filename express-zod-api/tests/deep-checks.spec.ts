@@ -1,17 +1,20 @@
 import { UploadedFile } from "express-fileupload";
-import { z } from "zod";
+import { z } from "zod/v4";
+import type { $brand, $ZodType } from "zod/v4/core";
 import { ez } from "../src";
-import { hasNestedSchema } from "../src/deep-checks";
-import { metaSymbol } from "../src/metadata";
+import { findNestedSchema, hasCycle } from "../src/deep-checks";
+import { getBrand } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("Checks", () => {
-  describe("hasNestedSchema()", () => {
-    const condition = (subject: z.ZodTypeAny) =>
-      subject._def[metaSymbol]?.brand === ezUploadBrand;
+  describe("findNestedSchema()", () => {
+    const condition = (subject: $ZodType) =>
+      getBrand(subject) === ezUploadBrand;
 
     test("should return true for given argument satisfying condition", () => {
-      expect(hasNestedSchema(ez.upload(), { condition })).toBeTruthy();
+      expect(
+        findNestedSchema(ez.upload(), { condition, io: "input" }),
+      ).toBeTruthy();
     });
 
     test.each([
@@ -20,12 +23,14 @@ describe("Checks", () => {
       z.object({ test: z.boolean() }).and(z.object({ test2: ez.upload() })),
       z.optional(ez.upload()),
       ez.upload().nullable(),
-      ez.upload().default({} as UploadedFile),
-      z.record(ez.upload()),
+      ez.upload().default({} as UploadedFile & $brand<symbol>),
+      z.record(z.string(), ez.upload()),
       ez.upload().refine(() => true),
       z.array(ez.upload()),
     ])("should return true for wrapped needle %#", (subject) => {
-      expect(hasNestedSchema(subject, { condition })).toBeTruthy();
+      expect(
+        findNestedSchema(subject, { condition, io: "input" }),
+      ).toBeTruthy();
     });
 
     test.each([
@@ -35,10 +40,12 @@ describe("Checks", () => {
       z.boolean().and(z.literal(true)),
       z.number().or(z.string()),
     ])("should return false in other cases %#", (subject) => {
-      expect(hasNestedSchema(subject, { condition })).toBeFalsy();
+      expect(
+        findNestedSchema(subject, { condition, io: "input" }),
+      ).toBeUndefined();
     });
 
-    test("should finish early", () => {
+    test("should finish early (from bottom to top)", () => {
       const subject = z.object({
         one: z.object({
           two: z.object({
@@ -46,11 +53,28 @@ describe("Checks", () => {
           }),
         }),
       });
-      const check = vi.fn((schema) => schema instanceof z.ZodObject);
-      hasNestedSchema(subject, {
+      const check = vi.fn((schema) => schema instanceof z.ZodNumber);
+      findNestedSchema(subject, {
         condition: check,
+        io: "input",
       });
       expect(check.mock.calls.length).toBe(1);
     });
+  });
+
+  describe("hasCycle()", () => {
+    test.each(["input", "output"] as const)(
+      "can find circular references %#",
+      (io) => {
+        const schema = z.object({
+          name: z.string(),
+          get features() {
+            return schema.array();
+          },
+        });
+        const result = hasCycle(schema, { io });
+        expect(result).toBeTruthy();
+      },
+    );
   });
 });
