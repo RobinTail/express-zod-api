@@ -212,6 +212,9 @@ const producers: HandlingRules<
   undefined: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
   [ezDateInBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
   [ezDateOutBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
+  never: onPrimitive(ts.SyntaxKind.NeverKeyword),
+  void: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
+  unknown: onPrimitive(ts.SyntaxKind.UnknownKeyword),
   null: onNull,
   array: onArray,
   tuple: onTuple,
@@ -244,6 +247,6 @@ export const zodToTs = (
 ) =>
   walkSchema(schema, {
     rules: { ...brandHandling, ...producers },
-    onMissing: () => ensureTypeNode(ts.SyntaxKind.AnyKeyword), // @todo UnknownKeyword
+    onMissing: ({}, { isResponse }) => getFallback(isResponse),
     ctx,
   });
