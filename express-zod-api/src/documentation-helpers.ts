@@ -393,8 +393,8 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
   };
 
 /**
- * postprocessing refs: specifying "uri" function and custom registries didn't allow to customize ref name
- * @todo is there a less hacky way to do that?
+ * @todo simplify if fixed (unable to customize references):
+ * @link https://github.com/colinhacks/zod/issues/4281
  * */
 const fixReferences = (
   subject: JSONSchema.BaseSchema,
