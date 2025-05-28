@@ -262,8 +262,6 @@ exports[`zod-to-ts > z.object() > supports zod.describe() 1`] = `
 }"
 `;
 
-exports[`zod-to-ts > z.optional() > Zod 4: does not add undefined to it, unwrap as is 1`] = `"string"`;
-
 exports[`zod-to-ts > z.optional() > Zod 4: should add question mark only to optional props 1`] = `
 "{
     optional?: string | undefined;

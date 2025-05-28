@@ -201,7 +201,7 @@ describe("zod-to-ts", () => {
 
     test("Zod 4: does not add undefined to it, unwrap as is", () => {
       const node = zodToTs(optionalStringSchema, { ctx });
-      expect(printNodeTest(node)).toMatchSnapshot();
+      expect(printNodeTest(node)).toEqual("string");
     });
 
     test("Zod 4: should add question mark only to optional props", () => {
