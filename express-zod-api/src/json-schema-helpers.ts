@@ -9,7 +9,7 @@ const isJsonObjectSchema = (
 const propsMerger = R.mergeDeepWith((a: unknown, b: unknown) => {
   if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
   if (a === b) return b;
-  throw new Error("Can not flatten properties");
+  throw new Error("Can not flatten properties", { cause: { a, b } });
 });
 
 const canMerge = R.pipe(
