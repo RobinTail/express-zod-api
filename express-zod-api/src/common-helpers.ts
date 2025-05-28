@@ -8,6 +8,7 @@ import { AuxMethod, Method } from "./method";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = z.output<EmptySchema>;
+/** Avoiding z.ZodObject<Record<string, never>, $strip>, because its z.output<> is generic "object" (external issue) */
 export type EmptySchema = z.ZodRecord<z.ZodString, z.ZodNever>;
 export type FlatObject = Record<string, unknown>;
 
