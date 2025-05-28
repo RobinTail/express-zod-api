@@ -64,8 +64,8 @@ export const getInput = (
 export const ensureError = (subject: unknown): Error =>
   subject instanceof Error
     ? subject
-    : subject instanceof z.ZodError
-      ? new z.ZodRealError(subject.issues) // ZodError is not an instance of Error, unlike ZodRealError that is
+    : subject instanceof z.ZodError // ZodError does not extend Error, unlike ZodRealError that does
+      ? new z.ZodRealError(subject.issues)
       : new Error(String(subject));
 
 export const getMessageFromError = (error: Error): string => {
