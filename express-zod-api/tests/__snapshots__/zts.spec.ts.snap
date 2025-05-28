@@ -18,10 +18,10 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     date: any;
     undefined: undefined;
     null: null;
-    void: any;
+    void: undefined;
     any: any;
-    unknown: any;
-    never: any;
+    unknown: unknown;
+    never: never;
     optionalString?: string | undefined;
     nullablePartialObject: {
         string?: string | undefined;
@@ -139,7 +139,7 @@ exports[`zod-to-ts > Issue #2352: intersection of objects having same prop %# > 
 }"
 `;
 
-exports[`zod-to-ts > PrimitiveSchema > outputs correct typescript 1`] = `
+exports[`zod-to-ts > PrimitiveSchema (isResponse=false) > outputs correct typescript 1`] = `
 "{
     string: string;
     number: number;
@@ -147,10 +147,25 @@ exports[`zod-to-ts > PrimitiveSchema > outputs correct typescript 1`] = `
     date: any;
     undefined: undefined;
     null: null;
-    void: any;
+    void: undefined;
     any: any;
-    unknown: any;
-    never: any;
+    unknown: unknown;
+    never: never;
+}"
+`;
+
+exports[`zod-to-ts > PrimitiveSchema (isResponse=true) > outputs correct typescript 1`] = `
+"{
+    string: string;
+    number: number;
+    boolean: boolean;
+    date: unknown;
+    undefined: undefined;
+    null: null;
+    void: undefined;
+    any: any;
+    unknown: unknown;
+    never: never;
 }"
 `;
 
@@ -184,14 +199,6 @@ exports[`zod-to-ts > z.discriminatedUnion() > outputs correct typescript 1`] = `
     y: number;
 }"
 `;
-
-exports[`zod-to-ts > z.effect() > transformations > should handle an error within the transformation 1`] = `"any"`;
-
-exports[`zod-to-ts > z.effect() > transformations > should handle unsupported transformation in response 1`] = `"any"`;
-
-exports[`zod-to-ts > z.effect() > transformations > should produce the schema type 'intact' 1`] = `"number"`;
-
-exports[`zod-to-ts > z.effect() > transformations > should produce the schema type 'transformed' 1`] = `"string"`;
 
 exports[`zod-to-ts > z.literal() > Should produce the correct typescript 0 1`] = `""test""`;
 
@@ -278,3 +285,13 @@ exports[`zod-to-ts > z.optional() > Zod 4: should add question mark only to opti
     ] | undefined;
 }"
 `;
+
+exports[`zod-to-ts > z.pipe() > transformations > should handle an error within the transformation 1`] = `"unknown"`;
+
+exports[`zod-to-ts > z.pipe() > transformations > should handle preprocess error in request 1`] = `"any"`;
+
+exports[`zod-to-ts > z.pipe() > transformations > should handle unsupported transformation in response 1`] = `"unknown"`;
+
+exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type 'intact' 1`] = `"number"`;
+
+exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type 'transformed' 1`] = `"string"`;

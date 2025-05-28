@@ -160,6 +160,11 @@ const onWrapped: Producer = (
   { next },
 ) => next(def.innerType);
 
+const getFallback = (isResponse: boolean) =>
+  ensureTypeNode(
+    isResponse ? ts.SyntaxKind.UnknownKeyword : ts.SyntaxKind.AnyKeyword,
+  );
+
 const onPipeline: Producer = (
   { _zod: { def } }: $ZodPipe,
   { next, isResponse },
@@ -180,7 +185,7 @@ const onPipeline: Producer = (
     object: ts.SyntaxKind.ObjectKeyword,
   };
   return ensureTypeNode(
-    (targetType && resolutions[targetType]) || ts.SyntaxKind.AnyKeyword,
+    (targetType && resolutions[targetType]) || getFallback(isResponse),
   );
 };
 
@@ -207,6 +212,9 @@ const producers: HandlingRules<
   undefined: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
   [ezDateInBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
   [ezDateOutBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
+  never: onPrimitive(ts.SyntaxKind.NeverKeyword),
+  void: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
+  unknown: onPrimitive(ts.SyntaxKind.UnknownKeyword),
   null: onNull,
   array: onArray,
   tuple: onTuple,
@@ -239,6 +247,6 @@ export const zodToTs = (
 ) =>
   walkSchema(schema, {
     rules: { ...brandHandling, ...producers },
-    onMissing: () => ensureTypeNode(ts.SyntaxKind.AnyKeyword),
+    onMissing: ({}, { isResponse }) => getFallback(isResponse),
     ctx,
   });

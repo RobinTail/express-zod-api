@@ -328,25 +328,28 @@ describe("zod-to-ts", () => {
     );
   });
 
-  describe("PrimitiveSchema", () => {
-    const primitiveSchema = z.object({
-      string: z.string(),
-      number: z.number(),
-      boolean: z.boolean(),
-      date: z.date(),
-      undefined: z.undefined(),
-      null: z.null(),
-      void: z.void(),
-      any: z.any(),
-      unknown: z.unknown(),
-      never: z.never(),
-    });
-    const node = zodToTs(primitiveSchema, { ctx });
+  describe.each([true, false])(
+    "PrimitiveSchema (isResponse=%s)",
+    (isResponse) => {
+      const primitiveSchema = z.object({
+        string: z.string(),
+        number: z.number(),
+        boolean: z.boolean(),
+        date: z.date(),
+        undefined: z.undefined(),
+        null: z.null(),
+        void: z.void(),
+        any: z.any(),
+        unknown: z.unknown(),
+        never: z.never(),
+      });
+      const node = zodToTs(primitiveSchema, { ctx: { ...ctx, isResponse } });
 
-    test("outputs correct typescript", () => {
-      expect(printNodeTest(node)).toMatchSnapshot();
-    });
-  });
+      test("outputs correct typescript", () => {
+        expect(printNodeTest(node)).toMatchSnapshot();
+      });
+    },
+  );
 
   describe("z.discriminatedUnion()", () => {
     const shapeSchema = z.discriminatedUnion("kind", [
@@ -373,7 +376,7 @@ describe("zod-to-ts", () => {
     });
   });
 
-  describe("z.effect()", () => {
+  describe("z.pipe()", () => {
     describe("transformations", () => {
       test.each([
         { isResponse: false, expected: "intact" },
@@ -390,6 +393,13 @@ describe("zod-to-ts", () => {
         expect(
           printNodeTest(zodToTs(schema, { ctx: { ...ctx, isResponse: true } })),
         ).toMatchSnapshot();
+      });
+
+      test("should handle preprocess error in request", () => {
+        const schema = z.preprocess(() => {
+          throw new Error("intentional");
+        }, z.number());
+        expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
       });
 
       test("should handle an error within the transformation", () => {
