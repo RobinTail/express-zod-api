@@ -48,7 +48,7 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.1",
     "vitest": "^3.1.4",
-    "zod": "^3.25.30"
+    "zod": "^3.25.32"
   },
   "resolutions": {
     "**/@scarf/scarf": "npm:empty-npm-package@1.0.0"
