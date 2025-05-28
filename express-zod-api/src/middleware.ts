@@ -50,7 +50,7 @@ export class Middleware<
   readonly #handler: Handler<z.output<IN>, OPT, OUT>;
 
   constructor({
-    input = z.object({}) as IOSchema as IN, // @todo revisit
+    input = z.object({}) as unknown as IN,
     security,
     handler,
   }: {
