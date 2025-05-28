@@ -141,14 +141,12 @@ if (!(metaSymbol in globalThis)) {
     if (typeof Cls !== "function") continue;
     Object.defineProperties(Cls.prototype, {
       ["example" satisfies keyof z.ZodType]: {
-        get(): z.ZodType["example"] {
-          return exampleSetter.bind(this);
-        },
+        value: exampleSetter,
+        writable: false,
       },
       ["deprecated" satisfies keyof z.ZodType]: {
-        get(): z.ZodType["deprecated"] {
-          return deprecationSetter.bind(this);
-        },
+        value: deprecationSetter,
+        writable: false,
       },
       ["brand" satisfies keyof z.ZodType]: {
         set() {}, // this is required to override the existing method
@@ -162,19 +160,11 @@ if (!(metaSymbol in globalThis)) {
   Object.defineProperty(
     z.ZodDefault.prototype,
     "label" satisfies keyof z.ZodDefault,
-    {
-      get(): z.ZodDefault["label"] {
-        return labelSetter.bind(this);
-      },
-    },
+    { value: labelSetter, writable: false },
   );
   Object.defineProperty(
     z.ZodObject.prototype,
     "remap" satisfies keyof z.ZodObject,
-    {
-      get() {
-        return objectMapper.bind(this);
-      },
-    },
+    { value: objectMapper, writable: false },
   );
 }
