@@ -29,8 +29,7 @@ jobs:
       - name: Build distribution
         run: pnpm -F express-zod-api build
       - name: Pack artifact
-        working-directory: express-zod-api # https://github.com/pnpm/pnpm/issues/4351
-        run: pnpm pack --out ../compat-test/dist.tgz
+        run: pnpm -F express-zod-api pack --out compat-test/dist.tgz
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
