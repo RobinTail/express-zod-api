@@ -185,14 +185,6 @@ exports[`zod-to-ts > z.discriminatedUnion() > outputs correct typescript 1`] = `
 }"
 `;
 
-exports[`zod-to-ts > z.effect() > transformations > should handle an error within the transformation 1`] = `"any"`;
-
-exports[`zod-to-ts > z.effect() > transformations > should handle unsupported transformation in response 1`] = `"any"`;
-
-exports[`zod-to-ts > z.effect() > transformations > should produce the schema type 'intact' 1`] = `"number"`;
-
-exports[`zod-to-ts > z.effect() > transformations > should produce the schema type 'transformed' 1`] = `"string"`;
-
 exports[`zod-to-ts > z.literal() > Should produce the correct typescript 0 1`] = `""test""`;
 
 exports[`zod-to-ts > z.literal() > Should produce the correct typescript 1 1`] = `"true"`;
@@ -278,3 +270,11 @@ exports[`zod-to-ts > z.optional() > Zod 4: should add question mark only to opti
     ] | undefined;
 }"
 `;
+
+exports[`zod-to-ts > z.pipe() > transformations > should handle an error within the transformation 1`] = `"unknown"`;
+
+exports[`zod-to-ts > z.pipe() > transformations > should handle unsupported transformation in response 1`] = `"unknown"`;
+
+exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type 'intact' 1`] = `"number"`;
+
+exports[`zod-to-ts > z.pipe() > transformations > should produce the schema type 'transformed' 1`] = `"string"`;

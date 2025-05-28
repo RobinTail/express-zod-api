@@ -180,7 +180,7 @@ const onPipeline: Producer = (
     object: ts.SyntaxKind.ObjectKeyword,
   };
   return ensureTypeNode(
-    (targetType && resolutions[targetType]) || ts.SyntaxKind.AnyKeyword,
+    (targetType && resolutions[targetType]) || ts.SyntaxKind.UnknownKeyword,
   );
 };
 
@@ -239,6 +239,6 @@ export const zodToTs = (
 ) =>
   walkSchema(schema, {
     rules: { ...brandHandling, ...producers },
-    onMissing: () => ensureTypeNode(ts.SyntaxKind.AnyKeyword),
+    onMissing: () => ensureTypeNode(ts.SyntaxKind.AnyKeyword), // @todo UnknownKeyword
     ctx,
   });

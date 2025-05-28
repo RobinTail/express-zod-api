@@ -373,7 +373,7 @@ describe("zod-to-ts", () => {
     });
   });
 
-  describe("z.effect()", () => {
+  describe("z.pipe()", () => {
     describe("transformations", () => {
       test.each([
         { isResponse: false, expected: "intact" },
