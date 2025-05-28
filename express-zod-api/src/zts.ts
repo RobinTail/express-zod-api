@@ -160,6 +160,11 @@ const onWrapped: Producer = (
   { next },
 ) => next(def.innerType);
 
+const getFallback = (isResponse: boolean) =>
+  ensureTypeNode(
+    isResponse ? ts.SyntaxKind.UnknownKeyword : ts.SyntaxKind.AnyKeyword,
+  );
+
 const onPipeline: Producer = (
   { _zod: { def } }: $ZodPipe,
   { next, isResponse },
@@ -180,7 +185,7 @@ const onPipeline: Producer = (
     object: ts.SyntaxKind.ObjectKeyword,
   };
   return ensureTypeNode(
-    (targetType && resolutions[targetType]) || ts.SyntaxKind.UnknownKeyword,
+    (targetType && resolutions[targetType]) || getFallback(isResponse),
   );
 };
 
