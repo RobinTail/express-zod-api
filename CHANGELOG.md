@@ -21,19 +21,23 @@
     - In order to specify an example for an input schema the `.example()` method must be called before `.transform()`;
 - The transforming proprietary schemas `ez.dateIn()` and `ez.dateOut()` now accept metadata as its argument:
   - This allows to set examples before transformation (`ez.dateIn()`) and to avoid the examples "branding";
-- Generating Documentation is mostly delegated to Zod 4 `z.toJSONSchema()`:
-  - The basic depiction of each schema is now natively performed by Zod 4;
+- Changes to `Documentation`:
+  - Generating Documentation is mostly delegated to Zod 4 `z.toJSONSchema()`;
   - Express Zod API implements some overrides and improvements to fit it into OpenAPI 3.1 that extends JSON Schema;
   - The `numericRange` option removed from `Documentation` class constructor argument;
   - The `Depicter` type signature changed: became a postprocessing function returning an overridden JSON Schema;
-- The `optionalPropStyle` option removed from `Integration` class constructor:
+- Changes to `Integration`:
+  - The `optionalPropStyle` option removed from `Integration` class constructor:
   - Use `.optional()` to add question mark to the object property as well as `undefined` to its type;
   - Use `.or(z.undefined())` to add `undefined` to the type of the object property;
   - Reasoning: https://x.com/colinhacks/status/1919292504861491252;
-  - `z.any()` and `z.unknown()` are not optional, details: https://v4.zod.dev/v4/changelog#changes-zunknown-optionality.
+  - `z.any()` and `z.unknown()` are not optional, details: https://v4.zod.dev/v4/changelog#changes-zunknown-optionality;
+  - Added types generation for `z.never()`, `z.void()` and `z.unknown()` schemas;
+  - The fallback type for unsupported schemas and unclear transformations in response changed from `any` to `unknown`;
 - The argument of `ResultHandler::handler` is now discriminated: either `output` or `error` is null, not both;
 - The `getExamples()` public helper removed — use `.meta()?.examples` instead;
-- The `ez.file()` schema removed: use `z.string()`, `z.base64()` or the new `ez.buffer()` instead;
+- Added the new proprietary schema `ez.buffer()`;
+- The `ez.file()` schema removed: use `z.string()`, `z.base64()`, `ez.buffer()` or their union;
 - Consider the automated migration using the built-in ESLint rule.
 
 ```js
