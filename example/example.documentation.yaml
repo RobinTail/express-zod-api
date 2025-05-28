@@ -18,7 +18,6 @@ paths:
           schema:
             type: string
             description: a numeric string containing the id of the user
-            format: regex
             pattern: \d+
       responses:
         "200":
@@ -94,7 +93,6 @@ paths:
           schema:
             type: string
             description: numeric string
-            format: regex
             pattern: \d+
       responses:
         "204":
@@ -411,7 +409,6 @@ paths:
           description: GET /v1/avatar/send Parameter
           schema:
             type: string
-            format: regex
             pattern: \d+
       responses:
         "200":
@@ -440,7 +437,6 @@ paths:
           description: GET /v1/avatar/stream Parameter
           schema:
             type: string
-            format: regex
             pattern: \d+
       responses:
         "200":

@@ -1307,8 +1307,8 @@ paths:
                       based:
                         type: string
                         format: base64
-                        pattern: ^$|^(?:[0-9a-zA-Z+/]{4})*(?:(?:[0-9a-zA-Z+/]{2}==)|(?:[0-9a-zA-Z+/]{3}=))?$
                         contentEncoding: base64
+                        pattern: ^$|^(?:[0-9a-zA-Z+/]{4})*(?:(?:[0-9a-zA-Z+/]{2}==)|(?:[0-9a-zA-Z+/]{3}=))?$
                     required:
                       - "null"
                       - dateOut
@@ -1720,14 +1720,14 @@ paths:
                   format: uri
                 numeric:
                   type: string
-                  format: regex
                   pattern: \\d+
                 combined:
                   type: string
                   minLength: 1
                   maxLength: 90
-                  format: regex
-                  pattern: .*@example\\.com
+                  allOf:
+                    - pattern: ^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$
+                    - pattern: .*@example\\.com
               required:
                 - regular
                 - min
@@ -1949,7 +1949,6 @@ paths:
                         type: object
                         propertyNames:
                           type: string
-                          format: regex
                           pattern: "[A-Z]+"
                         additionalProperties:
                           type: boolean

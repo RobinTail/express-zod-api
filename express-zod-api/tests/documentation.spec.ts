@@ -1,5 +1,4 @@
 import camelize from "camelize-ts";
-import type { Method } from "../src/method";
 import snakify from "snakify-ts";
 import {
   Documentation,
@@ -11,6 +10,7 @@ import {
   ez,
   ResultHandler,
   Depicter,
+  Method,
 } from "../src";
 import { contentTypes } from "../src/content-type";
 import { z } from "zod/v4";
