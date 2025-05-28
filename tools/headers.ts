@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 /**
  * @link https://chatgpt.com/c/6795dae3-8a10-800e-96af-fd0d01579f39

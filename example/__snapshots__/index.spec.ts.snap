@@ -17,14 +17,12 @@ exports[`Example > Client > Should perform the request with a positive response 
       {
         "features": [
           {
-            "features": [],
             "title": "Above 180cm",
           },
         ],
         "title": "Tall",
       },
       {
-        "features": [],
         "title": "Young",
       },
       {
@@ -32,7 +30,6 @@ exports[`Example > Client > Should perform the request with a positive response 
           {
             "features": [
               {
-                "features": [],
                 "title": "About Typescript",
               },
             ],
@@ -52,7 +49,7 @@ exports[`Example > Client > Should perform the request with a positive response 
 exports[`Example > Negative > GET request should fail on missing input param 1`] = `
 {
   "error": {
-    "message": "id: Required",
+    "message": "id: Invalid input: expected string, received undefined",
   },
   "status": "error",
 }

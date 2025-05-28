@@ -13,7 +13,7 @@ import {
   httpListenSpy,
   httpsListenSpy,
 } from "./http-mock";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   AppConfig,
   BuiltinLogger,
@@ -240,6 +240,16 @@ describe("Server", () => {
       expect(servers).toHaveLength(2);
       expect(servers[0]).toBeTruthy();
       expect(servers[1]).toBeTruthy();
+    });
+
+    test("should warn when neigher configured", async () => {
+      const customLogger = new BuiltinLogger({ level: "silent" });
+      const warnMethod = vi.spyOn(customLogger, "warn");
+      await createServer(
+        { cors: false, startupLogo: false, logger: customLogger },
+        {},
+      );
+      expect(warnMethod).toHaveBeenCalledWith("No servers configured.");
     });
 
     test("should enable compression on request", async () => {

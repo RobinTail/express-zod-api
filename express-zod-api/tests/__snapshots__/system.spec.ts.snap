@@ -93,7 +93,7 @@ exports[`App in production mode > Protocol > Should fail on invalid path 1`] = `
 exports[`App in production mode > Protocol > Should fail when missing content type header 1`] = `
 {
   "error": {
-    "message": "key: Required",
+    "message": "key: Invalid input: expected string, received undefined",
   },
   "status": "error",
 }
@@ -123,17 +123,16 @@ exports[`App in production mode > Validation > Problem 787: Should NOT treat Zod
   {
     "error": InternalServerError({
       "cause": ZodError({
-        "message": "[
-  {
-    "code": "invalid_type",
-    "expected": "number",
-    "received": "string",
-    "path": [],
-    "message": "Expected number, received string"
-  }
-]",
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "number",
+            "message": "Invalid input: expected number, received string",
+            "path": [],
+          },
+        ],
       }),
-      "message": "Expected number, received string",
+      "message": "Invalid input: expected number, received string",
     }),
     "payload": {
       "key": "123",
@@ -147,7 +146,7 @@ exports[`App in production mode > Validation > Problem 787: Should NOT treat Zod
 exports[`App in production mode > Validation > Should fail on handler input type mismatch 1`] = `
 {
   "error": {
-    "message": "something: Expected string, received number",
+    "message": "something: Invalid input: expected string, received number",
   },
   "status": "error",
 }
@@ -168,21 +167,20 @@ exports[`App in production mode > Validation > Should fail on handler output typ
   {
     "error": InternalServerError({
       "cause": ZodError({
-        "message": "[
-  {
-    "code": "too_small",
-    "minimum": 0,
-    "type": "number",
-    "inclusive": false,
-    "exact": false,
-    "message": "Number must be greater than 0",
-    "path": [
-      "anything"
-    ]
-  }
-]",
+        "issues": [
+          {
+            "code": "too_small",
+            "inclusive": false,
+            "message": "Too small: expected number to be >0",
+            "minimum": 0,
+            "origin": "number",
+            "path": [
+              "anything",
+            ],
+          },
+        ],
       }),
-      "message": "output/anything: Number must be greater than 0",
+      "message": "output.anything: Too small: expected number to be >0",
     }),
     "payload": {
       "key": "123",
@@ -196,7 +194,7 @@ exports[`App in production mode > Validation > Should fail on handler output typ
 exports[`App in production mode > Validation > Should fail on middleware input type mismatch 1`] = `
 {
   "error": {
-    "message": "key: Expected string, received number",
+    "message": "key: Invalid input: expected string, received number",
   },
   "status": "error",
 }

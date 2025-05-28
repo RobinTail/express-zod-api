@@ -6,7 +6,7 @@ export {
   defaultEndpointsFactory,
   arrayEndpointsFactory,
 } from "./endpoints-factory";
-export { getExamples, getMessageFromError } from "./common-helpers";
+export { getMessageFromError } from "./common-helpers";
 export { ensureHttpError } from "./result-helpers";
 export { BuiltinLogger } from "./builtin-logger";
 export { Middleware } from "./middleware";

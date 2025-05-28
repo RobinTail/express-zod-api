@@ -1,17 +1,21 @@
-import { z } from "zod";
-import { file } from "./file-schema";
+import { z } from "zod/v4";
+import type { $ZodShape } from "zod/v4/core";
+import { buffer } from "./buffer-schema";
 
 export const ezRawBrand = Symbol("Raw");
 
-const base = z.object({ raw: file("buffer") });
+const base = z.object({ raw: buffer() });
+type Base = ReturnType<typeof base.brand<symbol>>;
 
-/** Shorthand for z.object({ raw: ez.file("buffer") }) */
-export function raw(): z.ZodBranded<typeof base, symbol>;
-export function raw<S extends z.ZodRawShape>(
+const extended = <S extends $ZodShape>(extra: S) =>
+  base.extend(extra).brand(ezRawBrand as symbol);
+
+export function raw(): Base;
+export function raw<S extends $ZodShape>(
   extra: S,
-): z.ZodBranded<ReturnType<typeof base.extend<S>>, symbol>;
-export function raw(extra?: z.ZodRawShape) {
-  return (extra ? base.extend(extra) : base).brand(ezRawBrand);
+): ReturnType<typeof extended<S>>;
+export function raw(extra?: $ZodShape) {
+  return extra ? extended(extra) : base.brand(ezRawBrand as symbol);
 }
 
-export type RawSchema = ReturnType<typeof raw>;
+export type RawSchema = Base;

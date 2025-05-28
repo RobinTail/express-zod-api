@@ -17,57 +17,108 @@ describe("Migration", () => {
     expect(migration).toMatchSnapshot();
   });
 
-  tester.run("v23", migration.rules.v23, {
+  tester.run("v24", migration.rules.v24, {
     valid: [
-      `import { HeaderSecurity } from "express-zod-api";`,
-      `createConfig({ wrongMethodBehavior: 405 });`,
-      `testMiddleware({ middleware })`,
+      `new Documentation({});`,
+      `new Integration({});`,
+      `const rule: Depicter = () => {};`,
+      `import {} from "zod/v4";`,
+      `ez.buffer();`,
     ],
     invalid: [
       {
-        code: `const security: CustomHeaderSecurity = {};`,
-        output: `const security: HeaderSecurity = {};`,
+        code: `new Documentation({ numericRange: {}, });`,
+        output: `new Documentation({  });`,
+        errors: [
+          {
+            messageId: "remove",
+            data: { subject: "numericRange" },
+          },
+        ],
+      },
+      {
+        code: `new Integration({ optionalPropStyle: {}, });`,
+        output: `new Integration({  });`,
+        errors: [
+          {
+            messageId: "remove",
+            data: { subject: "optionalPropStyle" },
+          },
+        ],
+      },
+      {
+        code:
+          `const rule: Depicter = (schema, { next, path, method, isResponse }) ` +
+          `=> ({ ...next(schema.unwrap()), summary: "test" })`,
+        output:
+          `const rule: Depicter = ({ zodSchema: schema, jsonSchema }, {  path, method, isResponse }) ` +
+          `=> ({ ...jsonSchema, summary: "test" })`,
         errors: [
           {
             messageId: "change",
             data: {
-              subject: "interface",
-              from: "CustomHeaderSecurity",
-              to: "HeaderSecurity",
+              subject: "arguments",
+              from: "[schema, { next, ...rest }]",
+              to: "[{ zodSchema: schema, jsonSchema }, { ...rest }]",
             },
+          },
+          {
+            messageId: "change",
+            data: { subject: "statement", from: "next()", to: "jsonSchema" },
           },
         ],
       },
       {
-        code: `createConfig({});`,
-        output: `createConfig({wrongMethodBehavior: 404,});`,
+        code: `import {} from "zod";`,
+        output: `import {} from "zod/v4";`,
         errors: [
           {
-            messageId: "add",
+            messageId: "change",
+            data: { subject: "import", from: "zod", to: "zod/v4" },
+          },
+        ],
+      },
+      {
+        code: `ez.file("string");`,
+        output: `z.string();`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "schema", from: "ez.file()", to: "z.string()" },
+          },
+        ],
+      },
+      {
+        code: `ez.file("buffer");`,
+        output: `ez.buffer();`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "schema", from: "ez.file()", to: "ez.buffer()" },
+          },
+        ],
+      },
+      {
+        code: `ez.file("base64");`,
+        output: `z.base64();`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "schema", from: "ez.file()", to: "z.base64()" },
+          },
+        ],
+      },
+      {
+        code: `ez.file("binary");`,
+        output: `ez.buffer().or(z.string());`,
+        errors: [
+          {
+            messageId: "change",
             data: {
-              subject: "wrongMethodBehavior property",
-              to: "configuration",
+              subject: "schema",
+              from: "ez.file()",
+              to: "ez.buffer().or(z.string())",
             },
-          },
-        ],
-      },
-      {
-        code: `testMiddleware({ errorHandler: (error, response) => response.end(error.message) })`,
-        output: `testMiddleware({configProps: {errorHandler: new ResultHandler({ positive: [], negative: [], handler: ({ error, response }) => {response.end(error.message)} }),},  })`,
-        errors: [
-          {
-            messageId: "move",
-            data: { subject: "errorHandler", to: "configProps" },
-          },
-        ],
-      },
-      {
-        code: `testMiddleware({ errorHandler(error, response) { response.end(error.message) }, configProps: { wrongMethodBehavior: 404 } })`,
-        output: `testMiddleware({  configProps: {errorHandler: new ResultHandler({ positive: [], negative: [], handler: ({ error, response }) => {{ response.end(error.message) }} }), wrongMethodBehavior: 404 } })`,
-        errors: [
-          {
-            messageId: "move",
-            data: { subject: "errorHandler", to: "configProps" },
           },
         ],
       },

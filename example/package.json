@@ -8,6 +8,7 @@
     "build": "pnpm build:docs && pnpm build:client",
     "build:docs": "tsx generate-documentation.ts",
     "build:client": "tsx generate-client.ts",
+    "pretest": "tsc --noEmit",
     "test": "vitest run --globals index.spec.ts",
     "validate": "vitest run --globals validate.spec.ts"
   },

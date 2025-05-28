@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   DependsOnMethod,
   EndpointsFactory,
@@ -21,9 +21,7 @@ describe("DependsOnMethod", () => {
         handler: async () => ({}),
       }),
     });
-    expect(instance.entries).toEqual([
-      ["post", expect.any(AbstractEndpoint), []],
-    ]);
+    expect(instance.entries).toEqual([["post", expect.any(AbstractEndpoint)]]);
   });
 
   test.each([{ methods: ["get", "post"] } as const, {}])(
@@ -36,8 +34,8 @@ describe("DependsOnMethod", () => {
       });
       const instance = new DependsOnMethod({ get: endpoint, post: endpoint });
       expect(instance.entries).toEqual([
-        ["get", expect.any(AbstractEndpoint), ["post"]],
-        ["post", expect.any(AbstractEndpoint), ["get"]],
+        ["get", expect.any(AbstractEndpoint)],
+        ["post", expect.any(AbstractEndpoint)],
       ]);
     },
   );

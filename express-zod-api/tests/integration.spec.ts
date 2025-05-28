@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   EndpointsFactory,
   Integration,
@@ -9,33 +9,42 @@ import {
 } from "../src";
 
 describe("Integration", () => {
-  test("Should support types variant and handle recursive schemas", () => {
-    const recursiveSchema: z.ZodTypeAny = z.lazy(() =>
-      z.object({
-        name: z.string(),
-        features: recursiveSchema,
-      }),
-    );
-
-    const client = new Integration({
-      variant: "types",
-      routing: {
-        v1: {
-          test: defaultEndpointsFactory
-            .build({
-              method: "post",
-              input: z.object({
-                features: recursiveSchema,
-              }),
-              output: z.object({}),
-              handler: async () => ({}),
-            })
-            .deprecated(),
-        },
-      },
-    });
-    expect(client.print()).toMatchSnapshot();
+  const recursive1: z.ZodType = z.lazy(() =>
+    z.object({
+      name: z.string(),
+      features: recursive1,
+    }),
+  );
+  const recursive2 = z.object({
+    name: z.string(),
+    get features() {
+      return recursive2;
+    },
   });
+
+  test.each([recursive1, recursive2])(
+    "Should support types variant and handle recursive schemas %#",
+    (recursiveSchema) => {
+      const client = new Integration({
+        variant: "types",
+        routing: {
+          v1: {
+            test: defaultEndpointsFactory
+              .build({
+                method: "post",
+                input: z.object({
+                  features: recursiveSchema,
+                }),
+                output: z.object({}),
+                handler: async () => ({}),
+              })
+              .deprecated(),
+          },
+        },
+      });
+      expect(client.print()).toMatchSnapshot();
+    },
+  );
 
   test("Should treat optionals the same way as z.infer() by default", async () => {
     const client = new Integration({
@@ -56,30 +65,6 @@ describe("Integration", () => {
     });
     expect(await client.printFormatted()).toMatchSnapshot();
   });
-
-  test.each([{ withQuestionMark: true }, { withUndefined: true }, {}])(
-    "Feature #945: should have configurable treatment of optionals %#",
-    async (optionalPropStyle) => {
-      const client = new Integration({
-        optionalPropStyle,
-        routing: {
-          v1: {
-            "test-with-dashes": defaultEndpointsFactory.build({
-              method: "post",
-              input: z.object({
-                opt: z.string().optional(),
-              }),
-              output: z.object({
-                similar: z.number().optional(),
-              }),
-              handler: async () => ({}),
-            }),
-          },
-        },
-      });
-      expect(await client.printFormatted()).toMatchSnapshot();
-    },
-  );
 
   test("Should support multiple response schemas depending on status code", async () => {
     const factory = new EndpointsFactory(
@@ -120,9 +105,12 @@ describe("Integration", () => {
   describe("Feature #1470: Custom brands", () => {
     test("should by handled accordingly", async () => {
       const rule: Producer = (
-        schema: z.ZodBranded<z.ZodTypeAny, PropertyKey>,
+        schema: ReturnType<z.ZodType["brand"]>,
         { next },
-      ) => next(schema.unwrap());
+      ) => {
+        schema._zod.bag.brand = undefined;
+        return next(schema);
+      };
       const client = new Integration({
         variant: "types",
         brandHandling: {

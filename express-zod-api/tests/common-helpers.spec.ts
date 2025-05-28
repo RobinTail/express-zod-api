@@ -2,15 +2,13 @@ import createHttpError from "http-errors";
 import {
   combinations,
   defaultInputSources,
-  getExamples,
   getInput,
   getMessageFromError,
   makeCleanId,
   ensureError,
-  pullExampleProps,
   getRoutePathParams,
 } from "../src/common-helpers";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { makeRequestMock } from "../src/testing";
 
 describe("Common Helpers", () => {
@@ -165,14 +163,14 @@ describe("Common Helpers", () => {
           path: ["user", "id"],
           message: "expected number, got string",
           expected: "number",
-          received: "string",
+          input: "test",
         },
         {
           code: "invalid_type",
           path: ["user", "name"],
           message: "expected string, got number",
           expected: "string",
-          received: "number",
+          input: 123,
         },
       ]);
       expect(getMessageFromError(error)).toMatchSnapshot();
@@ -180,7 +178,12 @@ describe("Common Helpers", () => {
 
     test("should handle empty path in ZodIssue", () => {
       const error = new z.ZodError([
-        { code: "custom", path: [], message: "Top level refinement issue" },
+        {
+          code: "custom",
+          path: [],
+          message: "Top level refinement issue",
+          input: "test",
+        },
       ]);
       expect(getMessageFromError(error)).toMatchSnapshot();
     });
@@ -192,132 +195,6 @@ describe("Common Helpers", () => {
       expect(
         getMessageFromError(new Error("something went wrong")),
       ).toMatchSnapshot();
-    });
-  });
-
-  describe("pullExampleProps()", () => {
-    test("handles multiple examples per property", () => {
-      const schema = z.object({
-        a: z.string().example("one").example("two").example("three"),
-        b: z.number().example(1).example(2),
-        c: z.boolean().example(false),
-      });
-      expect(pullExampleProps(schema)).toEqual([
-        { a: "one", b: 1, c: false },
-        { a: "one", b: 2, c: false },
-        { a: "two", b: 1, c: false },
-        { a: "two", b: 2, c: false },
-        { a: "three", b: 1, c: false },
-        { a: "three", b: 2, c: false },
-      ]);
-    });
-  });
-
-  describe("getExamples()", () => {
-    test("should return an empty array in case examples are not set", () => {
-      expect(getExamples({ schema: z.string(), variant: "parsed" })).toEqual(
-        [],
-      );
-      expect(getExamples({ schema: z.string() })).toEqual([]);
-      expect(getExamples({ schema: z.string(), variant: "parsed" })).toEqual(
-        [],
-      );
-      expect(getExamples({ schema: z.string() })).toEqual([]);
-    });
-    test("should return original examples by default", () => {
-      expect(
-        getExamples({
-          schema: z.string().example("some").example("another"),
-        }),
-      ).toEqual(["some", "another"]);
-    });
-    test("should return parsed examples on demand", () => {
-      expect(
-        getExamples({
-          schema: z
-            .string()
-            .transform((v) => parseInt(v, 10))
-            .example("123")
-            .example("456"),
-          variant: "parsed",
-        }),
-      ).toEqual([123, 456]);
-    });
-    test("should not filter out invalid examples by default", () => {
-      expect(
-        getExamples({
-          schema: z
-            .string()
-            .example("some")
-            .example(123 as unknown as string)
-            .example("another"),
-        }),
-      ).toEqual(["some", 123, "another"]);
-    });
-    test("should filter out invalid examples on demand", () => {
-      expect(
-        getExamples({
-          schema: z
-            .string()
-            .example("some")
-            .example(123 as unknown as string)
-            .example("another"),
-          validate: true,
-        }),
-      ).toEqual(["some", "another"]);
-    });
-    test("should filter out invalid examples for the parsed variant", () => {
-      expect(
-        getExamples({
-          schema: z
-            .string()
-            .transform((v) => parseInt(v, 10))
-            .example("123")
-            .example(null as unknown as string)
-            .example("456"),
-          variant: "parsed",
-        }),
-      ).toEqual([123, 456]);
-    });
-    test.each([z.array(z.number().int()), z.tuple([z.number(), z.number()])])(
-      "Issue #892: should handle examples of arrays and tuples %#",
-      (schema) => {
-        expect(
-          getExamples({
-            schema: schema.example([1, 2]).example([3, 4]),
-          }),
-        ).toEqual([
-          [1, 2],
-          [3, 4],
-        ]);
-      },
-    );
-
-    describe("Feature #2324: pulling examples up from the object props", () => {
-      test("opt-in", () => {
-        expect(
-          getExamples({
-            pullProps: true,
-            schema: z.object({
-              a: z.string().example("one"),
-              b: z.number().example(1),
-            }),
-          }),
-        ).toEqual([{ a: "one", b: 1 }]);
-      });
-      test("only when the object level is empty", () => {
-        expect(
-          getExamples({
-            pullProps: true,
-            schema: z
-              .object({
-                a: z.string().example("one"),
-                b: z.number().example(1),
-              })
-              .example({ a: "two", b: 2 }), // higher priority
-          }),
-        ).toEqual([{ a: "two", b: 2 }]);
-      });
     });
   });
 
@@ -343,14 +220,20 @@ describe("Common Helpers", () => {
           {
             code: "invalid_type",
             expected: "string",
-            received: "number",
-            path: [""],
+            input: 123,
+            path: [],
             message: "invalid type",
           },
         ]),
-        `[\n  {\n    "code": "invalid_type",\n    "expected": "string",\n` +
-          `    "received": "number",\n    "path": [\n      ""\n` +
-          `    ],\n    "message": "invalid type"\n  }\n]`,
+        "[\n" +
+          "  {\n" +
+          '    "code": "invalid_type",\n' +
+          '    "expected": "string",\n' +
+          '    "input": 123,\n' +
+          '    "path": [],\n' +
+          '    "message": "invalid type"\n' +
+          "  }\n" +
+          "]",
       ],
       [createHttpError(500, "Internal Server Error"), "Internal Server Error"],
       [undefined, "undefined"],

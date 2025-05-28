@@ -24,9 +24,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSome/thing Negative response
           content:
@@ -44,9 +48,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -93,9 +99,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSome/thing Negative response
           content:
@@ -113,9 +123,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -132,6 +144,8 @@ paths:
           application/json:
             schema:
               type: object
+              properties: {}
+              required: []
       responses:
         "200":
           description: POST /v1/getSome/thing Positive response
@@ -145,9 +159,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSome/thing Negative response
           content:
@@ -165,9 +183,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -214,9 +234,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSome/thing Negative response
           content:
@@ -234,9 +258,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -261,9 +287,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSome/:thing Negative response
           content:
@@ -281,9 +311,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -347,14 +379,13 @@ paths:
                     properties:
                       num:
                         type: number
-                        format: double
-                        minimum: -1.7976931348623157e+308
-                        maximum: 1.7976931348623157e+308
                     required:
                       - num
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -372,9 +403,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -390,6 +423,7 @@ paths:
           application/json:
             schema:
               type: object
+              properties: {}
       security:
         - HTTP_1: []
           OAUTH2_1:
@@ -407,9 +441,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/setSomething Negative response
           content:
@@ -427,9 +465,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -445,6 +485,7 @@ paths:
           application/json:
             schema:
               type: object
+              properties: {}
       security:
         - HTTP_2: []
       responses:
@@ -460,9 +501,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: PUT /v1/updateSomething Negative response
           content:
@@ -480,9 +525,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -549,12 +596,13 @@ paths:
                     properties:
                       whatever:
                         type: number
-                        format: double
                     required:
                       - whatever
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: DELETE /v1/deleteSomething Negative response
           content:
@@ -572,9 +620,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -613,13 +663,12 @@ paths:
           description: GET /v1/getSomething Parameter
           schema:
             type: array
-            items:
-              type: integer
-              format: int64
-              exclusiveMinimum: 0
-              maximum: 9007199254740991
             minItems: 1
             maxItems: 3
+            items:
+              type: integer
+              exclusiveMinimum: 0
+              maximum: 9007199254740991
         - name: unlimited
           in: query
           required: true
@@ -653,15 +702,14 @@ paths:
                         const: something
                       transformation:
                         type: number
-                        format: double
-                        minimum: -1.7976931348623157e+308
-                        maximum: 1.7976931348623157e+308
                     required:
                       - literal
                       - transformation
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -679,9 +727,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -720,7 +770,7 @@ paths:
             schema:
               discriminator:
                 propertyName: type
-              oneOf:
+              anyOf:
                 - type: object
                   properties:
                     type:
@@ -754,19 +804,17 @@ paths:
                     type: string
                     const: success
                   data:
-                    discriminator:
-                      propertyName: status
-                    oneOf:
+                    anyOf:
                       - type: object
                         properties:
                           status:
                             type: string
                             const: success
-                          data:
-                            format: any
+                          data: {}
                         required:
                           - status
                           - data
+                        additionalProperties: false
                       - type: object
                         properties:
                           status:
@@ -779,12 +827,17 @@ paths:
                                 type: string
                             required:
                               - message
+                            additionalProperties: false
                         required:
                           - status
                           - error
+                        additionalProperties: false
+                    discriminator:
+                      propertyName: status
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -802,9 +855,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -875,7 +930,6 @@ paths:
                         properties:
                           five:
                             type: integer
-                            format: int64
                             minimum: 0
                             maximum: 9007199254740991
                           six:
@@ -885,9 +939,11 @@ paths:
                           - six
                     required:
                       - and
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -905,9 +961,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -969,10 +1027,18 @@ paths:
             type:
               - integer
               - "null"
-            format: int64
+            default: 123
             exclusiveMinimum: 0
             maximum: 9007199254740991
-            default: 123
+        - name: labeledDate
+          in: query
+          required: false
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: string
+            default: Today
+            format: date-time
+            pattern: ^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z)$
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -991,11 +1057,34 @@ paths:
                         type:
                           - string
                           - "null"
+                      literal:
+                        type:
+                          - string
+                          - "null"
+                        const: test
+                      multiliteral:
+                        type:
+                          - string
+                          - "null"
+                        enum:
+                          - one
+                          - two
+                      enum:
+                        type:
+                          - string
+                          - "null"
+                        enum:
+                          - test
                     required:
                       - nullable
+                      - literal
+                      - multiliteral
+                      - enum
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -1013,9 +1102,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1055,14 +1146,13 @@ paths:
               type: object
               properties:
                 union:
-                  oneOf:
+                  anyOf:
                     - type: object
                       properties:
                         one:
                           type: string
                         two:
                           type: integer
-                          format: int64
                           exclusiveMinimum: 0
                           maximum: 9007199254740991
                       required:
@@ -1072,7 +1162,6 @@ paths:
                       properties:
                         two:
                           type: integer
-                          format: int64
                           minimum: -9007199254740991
                           exclusiveMaximum: 0
                         three:
@@ -1098,17 +1187,18 @@ paths:
                     type: object
                     properties:
                       or:
-                        oneOf:
+                        anyOf:
                           - type: string
                           - type: integer
-                            format: int64
                             exclusiveMinimum: 0
                             maximum: 9007199254740991
                     required:
                       - or
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1126,9 +1216,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1168,9 +1260,11 @@ paths:
               type: object
               properties:
                 bigint:
-                  type: integer
+                  type: string
                   format: bigint
+                  pattern: ^-?\\d+$
                 boolean:
+                  readOnly: true
                   type: boolean
                 dateIn:
                   description: YYYY-MM-DDTHH:mm:ss.sssZ
@@ -1206,12 +1300,25 @@ paths:
                         format: date-time
                         externalDocs:
                           url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                      buffer:
+                        externalDocs:
+                          description: raw binary data
+                          url: https://swagger.io/specification/#working-with-binary-data
+                      based:
+                        type: string
+                        format: base64
+                        contentEncoding: base64
+                        pattern: ^$|^(?:[0-9a-zA-Z+/]{4})*(?:(?:[0-9a-zA-Z+/]{2}==)|(?:[0-9a-zA-Z+/]{3}=))?$
                     required:
                       - "null"
                       - dateOut
+                      - buffer
+                      - based
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1229,9 +1336,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1254,7 +1363,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Basic cases > should handle circular schemas via z.lazy() 1`] = `
+exports[`Documentation > Basic cases > should handle circular schemas via z.object() 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Lazy
@@ -1268,13 +1377,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-              required:
-                - name
-        required: true
+              $ref: "#/components/schemas/Schema1"
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1290,20 +1393,14 @@ paths:
                     type: object
                     properties:
                       zodExample:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          subcategories:
-                            $ref: "#/components/schemas/Schema1"
-                        required:
-                          - name
-                          - subcategories
+                        $ref: "#/components/schemas/Schema2"
                     required:
                       - zodExample
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1321,9 +1418,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1333,17 +1432,30 @@ paths:
 components:
   schemas:
     Schema1:
-      type: array
-      items:
-        type: object
-        properties:
-          name:
-            type: string
-          subcategories:
+      type: object
+      properties:
+        name:
+          type: string
+        subcategories:
+          type: array
+          items:
             $ref: "#/components/schemas/Schema1"
-        required:
-          - name
-          - subcategories
+      required:
+        - name
+        - subcategories
+    Schema2:
+      type: object
+      properties:
+        name:
+          type: string
+        subcategories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema2"
+      required:
+        - name
+        - subcategories
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1380,9 +1492,13 @@ paths:
                     const: OK
                   result:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - result
+                additionalProperties: false
             text/vnd.yaml: *a1
         "403":
           description: GET /v1/getSomething Negative response
@@ -1396,6 +1512,7 @@ paths:
                     const: NOT OK
                 required:
                   - status
+                additionalProperties: false
 components:
   schemas: {}
   responses: {}
@@ -1430,49 +1547,38 @@ paths:
               properties:
                 double:
                   type: number
-                  format: double
-                  minimum: -1.7976931348623157e+308
-                  maximum: 1.7976931348623157e+308
                 doublePositive:
                   type: number
-                  format: double
                   exclusiveMinimum: 0
-                  maximum: 1.7976931348623157e+308
                 doubleNegative:
                   type: number
-                  format: double
-                  minimum: -1.7976931348623157e+308
                   exclusiveMaximum: 0
                 doubleLimited:
                   type: number
-                  format: double
                   minimum: -0.5
                   maximum: 0.5
                 int:
                   type: integer
-                  format: int64
                   minimum: -9007199254740991
                   maximum: 9007199254740991
                 intPositive:
                   type: integer
-                  format: int64
                   exclusiveMinimum: 0
                   maximum: 9007199254740991
                 intNegative:
                   type: integer
-                  format: int64
                   minimum: -9007199254740991
                   exclusiveMaximum: 0
                 intLimited:
                   type: integer
-                  format: int64
                   minimum: -100
                   maximum: 100
                 zero:
                   type: integer
-                  format: int64
                   minimum: 0
                   maximum: 0
+                coercedNum:
+                  type: number
               required:
                 - double
                 - doublePositive
@@ -1482,6 +1588,7 @@ paths:
                 - intPositive
                 - intNegative
                 - intLimited
+                - coercedNum
         required: true
       responses:
         "200":
@@ -1498,13 +1605,16 @@ paths:
                     type: object
                     properties:
                       bigint:
-                        type: integer
+                        type: string
                         format: bigint
+                        pattern: ^-?\\d+$
                     required:
                       - bigint
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1522,9 +1632,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1578,36 +1690,44 @@ paths:
                 email:
                   type: string
                   format: email
+                  pattern: ^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$
                 uuid:
                   type: string
                   format: uuid
+                  pattern: ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
                 cuid:
                   type: string
                   format: cuid
+                  pattern: ^[cC][^\\s-]{8,}$
                 cuid2:
                   type: string
                   format: cuid2
+                  pattern: ^[0-9a-z]+$
                 ulid:
                   type: string
                   format: ulid
+                  pattern: ^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$
                 ip:
                   type: string
-                  format: ip
+                  format: ipv4
+                  pattern: ^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$
                 emoji:
                   type: string
                   format: emoji
+                  pattern: ^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$
                 url:
                   type: string
-                  format: url
+                  format: uri
                 numeric:
                   type: string
                   pattern: \\d+
                 combined:
                   type: string
-                  format: email
                   minLength: 1
                   maxLength: 90
-                  pattern: .*@example\\.com
+                  allOf:
+                    - pattern: ^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$
+                    - pattern: .*@example\\.com
               required:
                 - regular
                 - min
@@ -1643,9 +1763,11 @@ paths:
                         minLength: 1
                     required:
                       - nonempty
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1663,9 +1785,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1733,9 +1857,11 @@ paths:
                           - 2
                     required:
                       - nativeEnum
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1753,9 +1879,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1793,6 +1921,8 @@ paths:
           application/json:
             schema:
               type: object
+              properties: {}
+              required: []
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -1813,7 +1943,6 @@ paths:
                           type: string
                         additionalProperties:
                           type: integer
-                          format: int64
                           minimum: -9007199254740991
                           maximum: 9007199254740991
                       stringy:
@@ -1827,38 +1956,36 @@ paths:
                         type: object
                         propertyNames:
                           type: integer
-                          format: int64
                           minimum: -9007199254740991
                           maximum: 9007199254740991
                         additionalProperties:
                           type: boolean
                       literal:
                         type: object
-                        properties:
-                          only:
-                            type: boolean
-                        required:
-                          - only
+                        propertyNames:
+                          type: string
+                          const: only
+                        additionalProperties:
+                          type: boolean
                       union:
                         type: object
-                        properties:
-                          option1:
-                            type: boolean
-                          option2:
-                            type: boolean
-                        required:
-                          - option1
-                          - option2
+                        propertyNames:
+                          anyOf:
+                            - type: string
+                              const: option1
+                            - type: string
+                              const: option2
+                        additionalProperties:
+                          type: boolean
                       enum:
                         type: object
-                        properties:
-                          option1:
-                            type: boolean
-                          option2:
-                            type: boolean
-                        required:
-                          - option1
-                          - option2
+                        propertyNames:
+                          type: string
+                          enum:
+                            - option1
+                            - option2
+                        additionalProperties:
+                          type: boolean
                     required:
                       - simple
                       - stringy
@@ -1866,9 +1993,11 @@ paths:
                       - literal
                       - union
                       - enum
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1886,9 +2015,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -1931,7 +2062,6 @@ paths:
                   type: string
                 two:
                   type: integer
-                  format: int64
                   exclusiveMinimum: 0
                   maximum: 9007199254740991
               required:
@@ -1956,9 +2086,11 @@ paths:
                         type: number
                     required:
                       - transform
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -1976,9 +2108,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2038,7 +2172,6 @@ paths:
                     - type: boolean
                     - type: string
                     - type: integer
-                      format: int64
                       exclusiveMinimum: 0
                       maximum: 9007199254740991
                   items:
@@ -2069,9 +2202,11 @@ paths:
                           not: {}
                     required:
                       - empty
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -2089,9 +2224,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2126,10 +2263,9 @@ paths:
       parameters:
         - name: any
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
-          schema:
-            format: any
+          schema: {}
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -2144,13 +2280,14 @@ paths:
                   data:
                     type: object
                     properties:
-                      any:
-                        format: any
+                      any: {}
                     required:
                       - any
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -2168,9 +2305,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2205,7 +2344,7 @@ paths:
       parameters:
         - name: string
           in: query
-          required: false
+          required: true
           description: GET /v1/getSomething Parameter
           schema:
             format: string (preprocessed)
@@ -2214,9 +2353,9 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
-            format: int64 (preprocessed)
             minimum: 0
             maximum: 9007199254740991
+            format: integer (preprocessed)
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -2235,9 +2374,11 @@ paths:
                         type: boolean
                     required:
                       - boolean
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -2255,9 +2396,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2298,9 +2441,6 @@ paths:
               properties:
                 test:
                   type: number
-                  format: double
-                  minimum: -1.7976931348623157e+308
-                  maximum: 1.7976931348623157e+308
               required:
                 - test
         required: true
@@ -2322,9 +2462,11 @@ paths:
                         type: string
                     required:
                       - payload
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "201":
           description: POST /v1/mtpl Positive response 201
           content:
@@ -2342,9 +2484,11 @@ paths:
                         type: string
                     required:
                       - payload
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/mtpl Negative response 400
           content:
@@ -2421,9 +2565,11 @@ paths:
                         summary: My custom schema
                     required:
                       - number
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/:name Negative response
           content:
@@ -2441,9 +2587,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2487,8 +2635,8 @@ paths:
           required: true
           description: YYYY-MM-DDTHH:mm:ss.sssZ
           schema:
-            description: YYYY-MM-DDTHH:mm:ss.sssZ
             type: string
+            description: YYYY-MM-DDTHH:mm:ss.sssZ
             format: date-time
             pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
             externalDocs:
@@ -2511,9 +2659,11 @@ paths:
                         type: string
                     required:
                       - user_name
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/test Negative response
           content:
@@ -2531,9 +2681,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2590,9 +2742,11 @@ paths:
                         type: string
                     required:
                       - user_name
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/test Negative response
           content:
@@ -2610,9 +2764,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2670,9 +2826,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/test Negative response
           content:
@@ -2690,9 +2850,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2758,9 +2920,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/test Negative response
           content:
@@ -2778,9 +2944,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2844,9 +3012,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: PUT /v1/test Negative response
           content:
@@ -2864,9 +3036,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2905,9 +3079,9 @@ paths:
           description: GET /v1/getSomething Parameter
           schema:
             type: array
+            minItems: 1
             items:
               type: string
-            minItems: 1
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -2923,15 +3097,17 @@ paths:
                     type: object
                     properties:
                       arr:
+                        minItems: 1
                         type: array
                         items:
                           type: string
-                        minItems: 1
                     required:
                       - arr
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -2949,9 +3125,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -2968,10 +3146,10 @@ paths:
               type: object
               properties:
                 arr:
+                  minItems: 1
                   type: array
                   items:
                     type: string
-                  minItems: 1
               required:
                 - arr
         required: true
@@ -2990,15 +3168,17 @@ paths:
                     type: object
                     properties:
                       arr:
+                        minItems: 1
                         type: array
                         items:
                           type: string
-                        minItems: 1
                     required:
                       - arr
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -3016,9 +3196,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3055,7 +3237,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
+              anyOf:
                 - type: object
                   properties:
                     id:
@@ -3087,7 +3269,7 @@ paths:
                     type: string
                     const: success
                   data:
-                    oneOf:
+                    anyOf:
                       - type: object
                         properties:
                           id:
@@ -3097,6 +3279,7 @@ paths:
                         required:
                           - id
                           - field1
+                        additionalProperties: false
                       - type: object
                         properties:
                           id:
@@ -3106,9 +3289,11 @@ paths:
                         required:
                           - id
                           - field2
+                        additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -3126,9 +3311,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3183,9 +3370,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -3203,9 +3394,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3265,6 +3458,11 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - a: first
+                        b: prefix_first
+                      - a: second
+                        b: prefix_second
                     type: object
                     properties:
                       a:
@@ -3274,14 +3472,11 @@ paths:
                     required:
                       - a
                       - b
-                    examples:
-                      - a: first
-                        b: prefix_first
-                      - a: second
-                        b: prefix_second
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3312,9 +3507,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3387,9 +3584,13 @@ components:
           const: success
         data:
           type: object
+          properties: {}
+          required: []
+          additionalProperties: false
       required:
         - status
         - data
+      additionalProperties: false
     GetHrisEmployeesNegativeResponse:
       type: object
       properties:
@@ -3403,9 +3604,11 @@ components:
               type: string
           required:
             - message
+          additionalProperties: false
       required:
         - status
         - error
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3443,6 +3646,11 @@ paths:
               required:
                 - key
                 - str
+            examples:
+              example1:
+                value:
+                  key: 1234-56789-01
+                  str: test
         required: true
       responses:
         "200":
@@ -3456,20 +3664,19 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - num: 123
                     type: object
                     properties:
                       num:
                         type: number
-                        format: double
-                        minimum: -1.7976931348623157e+308
-                        maximum: 1.7976931348623157e+308
                     required:
                       - num
-                    examples:
-                      - num: 123
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3493,9 +3700,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3518,7 +3727,117 @@ servers:
 "
 `;
 
-exports[`Documentation > Metadata > should pass over examples of each param from the whole IO schema examples (GET) 1`] = `
+exports[`Documentation > Metadata > should merge prop examples with middlewares 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing Metadata:example on IO schema + middleware
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  examples:
+                    - 1234-56789-01
+                  type: string
+                str:
+                  examples:
+                    - test
+                  type: string
+              required:
+                - key
+                - str
+            examples:
+              example1:
+                value:
+                  key: 1234-56789-01
+                  str: test
+        required: true
+      responses:
+        "200":
+          description: POST /v1/getSomething Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                    properties:
+                      num:
+                        examples:
+                          - 123
+                        type: number
+                    required:
+                      - num
+                    additionalProperties: false
+                    examples:
+                      - num: 123
+                required:
+                  - status
+                  - data
+                additionalProperties: false
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      num: 123
+        "400":
+          description: POST /v1/getSomething Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                    additionalProperties: false
+                required:
+                  - status
+                  - error
+                additionalProperties: false
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`Documentation > Metadata > should pass over examples of each param from the whole IO schema examples (get method) 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO schema
@@ -3549,17 +3868,19 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
                         type: string
                     required:
                       - numericStr
-                    examples:
-                      - numericStr: "123"
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3583,9 +3904,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3608,7 +3931,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Metadata > should pass over examples of the whole IO schema (POST) 1`] = `
+exports[`Documentation > Metadata > should pass over examples of each param from the whole IO schema examples (post method) 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO schema
@@ -3645,17 +3968,19 @@ paths:
                     type: string
                     const: success
                   data:
+                    examples:
+                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
                         type: string
                     required:
                       - numericStr
-                    examples:
-                      - numericStr: "123"
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3679,9 +4004,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3704,7 +4031,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Metadata > should pass over the example of an individual parameter 1`] = `
+exports[`Documentation > Metadata > should pass over the example of an individual prop in get request 1`] = `
 "openapi: 3.1.0
 info:
   title: Testing Metadata:example on IO parameter
@@ -3740,20 +4067,24 @@ paths:
                     type: object
                     properties:
                       numericStr:
-                        type: string
                         examples:
-                          - "123"
+                          - "456"
+                        type: string
                     required:
                       - numericStr
+                    additionalProperties: false
+                    examples:
+                      - numericStr: "456"
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
                     status: success
                     data:
-                      numericStr: "123"
+                      numericStr: "456"
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -3771,9 +4102,115 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
+exports[`Documentation > Metadata > should pass over the example of an individual prop in post request 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing Metadata:example on IO parameter
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    post:
+      operationId: PostV1GetSomething
+      requestBody:
+        description: POST /v1/getSomething Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                strNum:
+                  examples:
+                    - "123"
+                  type: string
+              required:
+                - strNum
+            examples:
+              example1:
+                value:
+                  strNum: "123"
+        required: true
+      responses:
+        "200":
+          description: POST /v1/getSomething Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                    properties:
+                      numericStr:
+                        examples:
+                          - "456"
+                        type: string
+                    required:
+                      - numericStr
+                    additionalProperties: false
+                    examples:
+                      - numericStr: "456"
+                required:
+                  - status
+                  - data
+                additionalProperties: false
+              examples:
+                example1:
+                  value:
+                    status: success
+                    data:
+                      numericStr: "456"
+        "400":
+          description: POST /v1/getSomething Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                    additionalProperties: false
+                required:
+                  - status
+                  - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3828,16 +4265,17 @@ paths:
                     type: object
                     properties:
                       result:
+                        description: some positive integer
                         type: integer
-                        format: int64
                         exclusiveMinimum: 0
                         maximum: 9007199254740991
-                        description: some positive integer
                     required:
                       - result
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -3855,9 +4293,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -3895,7 +4335,7 @@ paths:
           required: true
           description: parameter of post /v1/:name
           schema:
-            oneOf:
+            anyOf:
               - type: string
                 const: John
               - type: string
@@ -3925,9 +4365,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: very negative response of PostV1Name
           content:
@@ -3945,9 +4389,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -4015,7 +4461,7 @@ paths:
 components:
   schemas:
     ParameterOfPostV1NameName:
-      oneOf:
+      anyOf:
         - type: string
           const: John
         - type: string
@@ -4028,9 +4474,13 @@ components:
           const: success
         data:
           type: object
+          properties: {}
+          required: []
+          additionalProperties: false
       required:
         - status
         - data
+      additionalProperties: false
     VeryNegativeResponseOfPostV1Name:
       type: object
       properties:
@@ -4044,9 +4494,11 @@ components:
               type: string
           required:
             - message
+          additionalProperties: false
       required:
         - status
         - error
+      additionalProperties: false
     TheBodyOfRequest:
       type: object
       properties:
@@ -4083,7 +4535,7 @@ paths:
           required: true
           description: GET /v1/:name Parameter
           schema:
-            oneOf:
+            anyOf:
               - type: string
                 const: John
               - type: string
@@ -4107,9 +4559,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/:name Negative response
           content:
@@ -4127,9 +4583,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -4167,7 +4625,7 @@ paths:
           required: true
           description: POST /v1/:name Parameter
           schema:
-            oneOf:
+            anyOf:
               - type: string
                 const: John
               - type: string
@@ -4197,9 +4655,13 @@ paths:
                     const: success
                   data:
                     type: object
+                    properties: {}
+                    required: []
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/:name Negative response
           content:
@@ -4217,9 +4679,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:

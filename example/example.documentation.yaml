@@ -17,8 +17,8 @@ paths:
           description: a numeric string containing the id of the user
           schema:
             type: string
-            pattern: \d+
             description: a numeric string containing the id of the user
+            pattern: \d+
       responses:
         "200":
           description: GET /v1/user/retrieve Positive response
@@ -35,7 +35,6 @@ paths:
                     properties:
                       id:
                         type: integer
-                        format: int64
                         minimum: 0
                         maximum: 9007199254740991
                       name:
@@ -43,22 +42,16 @@ paths:
                       features:
                         type: array
                         items:
-                          type: object
-                          properties:
-                            title:
-                              type: string
-                            features:
-                              $ref: "#/components/schemas/Schema1"
-                          required:
-                            - title
-                            - features
+                          $ref: "#/components/schemas/Schema1"
                     required:
                       - id
                       - name
                       - features
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: GET /v1/user/retrieve Negative response
           content:
@@ -76,9 +69,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -97,8 +92,8 @@ paths:
           description: numeric string
           schema:
             type: string
-            pattern: \d+
             description: numeric string
+            pattern: \d+
       responses:
         "204":
           description: DELETE /v1/user/:id/remove Positive response
@@ -118,9 +113,9 @@ paths:
           description: PATCH /v1/user/:id Parameter
           schema:
             type: string
-            minLength: 1
             examples:
               - "1234567890"
+            minLength: 1
           examples:
             example1:
               value: "1234567890"
@@ -143,17 +138,17 @@ paths:
               type: object
               properties:
                 key:
-                  type: string
-                  minLength: 1
                   examples:
                     - 1234-5678-90
-                name:
                   type: string
                   minLength: 1
+                name:
                   examples:
                     - John Doe
+                  type: string
+                  minLength: 1
                 birthday:
-                  description: YYYY-MM-DDTHH:mm:ss.sssZ
+                  description: the day of birth
                   type: string
                   format: date-time
                   pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
@@ -190,11 +185,11 @@ paths:
                     type: object
                     properties:
                       name:
-                        type: string
                         examples:
                           - John Doe
+                        type: string
                       createdAt:
-                        description: YYYY-MM-DDTHH:mm:ss.sssZ
+                        description: account creation date
                         type: string
                         format: date-time
                         externalDocs:
@@ -204,9 +199,14 @@ paths:
                     required:
                       - name
                       - createdAt
+                    additionalProperties: false
+                    examples:
+                      - name: John Doe
+                        createdAt: 2021-12-31T00:00:00.000Z
                 required:
                   - status
                   - data
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -231,9 +231,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -274,14 +276,15 @@ paths:
                     properties:
                       id:
                         type: integer
-                        format: int64
                         exclusiveMinimum: 0
                         maximum: 9007199254740991
                     required:
                       - id
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "202":
           description: POST /v1/user/create Positive response 202
           content:
@@ -297,14 +300,15 @@ paths:
                     properties:
                       id:
                         type: integer
-                        format: int64
                         exclusiveMinimum: 0
                         maximum: 9007199254740991
                     required:
                       - id
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/user/create Negative response 400
           content:
@@ -320,6 +324,7 @@ paths:
                 required:
                   - status
                   - reason
+                additionalProperties: false
         "409":
           description: POST /v1/user/create Negative response 409
           content:
@@ -332,12 +337,12 @@ paths:
                     const: exists
                   id:
                     type: integer
-                    format: int64
                     minimum: -9007199254740991
                     maximum: 9007199254740991
                 required:
                   - status
                   - id
+                additionalProperties: false
         "500":
           description: POST /v1/user/create Negative response 500
           content:
@@ -353,6 +358,7 @@ paths:
                 required:
                   - status
                   - reason
+                additionalProperties: false
   /v1/user/list:
     get:
       operationId: GetV1UserList
@@ -372,6 +378,7 @@ paths:
                       type: string
                   required:
                     - name
+                  additionalProperties: false
               examples:
                 example1:
                   value:
@@ -437,8 +444,9 @@ paths:
           content:
             image/*:
               schema:
-                type: string
-                format: binary
+                externalDocs:
+                  description: raw binary data
+                  url: https://swagger.io/specification/#working-with-binary-data
         "400":
           description: GET /v1/avatar/stream Negative response
           content:
@@ -464,6 +472,7 @@ paths:
                   format: binary
               required:
                 - avatar
+              additionalProperties: {}
         required: true
       responses:
         "200":
@@ -483,7 +492,6 @@ paths:
                         type: string
                       size:
                         type: integer
-                        format: int64
                         minimum: 0
                         maximum: 9007199254740991
                       mime:
@@ -494,17 +502,18 @@ paths:
                         type: object
                         propertyNames:
                           type: string
-                        additionalProperties:
-                          format: any
+                        additionalProperties: {}
                     required:
                       - name
                       - size
                       - mime
                       - hash
                       - otherInputs
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/avatar/upload Negative response
           content:
@@ -522,9 +531,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -541,8 +552,9 @@ paths:
         content:
           application/octet-stream:
             schema:
-              type: string
-              format: binary
+              externalDocs:
+                description: raw binary data
+                url: https://swagger.io/specification/#working-with-binary-data
         required: true
       responses:
         "200":
@@ -560,14 +572,15 @@ paths:
                     properties:
                       length:
                         type: integer
-                        format: int64
                         minimum: 0
                         maximum: 9007199254740991
                     required:
                       - length
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/avatar/raw Negative response
           content:
@@ -585,9 +598,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -607,8 +622,8 @@ paths:
           description: for testing error response
           schema:
             type: string
-            description: for testing error response
             deprecated: true
+            description: for testing error response
       responses:
         "200":
           description: GET /v1/events/stream Positive response
@@ -619,7 +634,6 @@ paths:
                 properties:
                   data:
                     type: integer
-                    format: int64
                     exclusiveMinimum: 0
                     maximum: 9007199254740991
                   event:
@@ -629,12 +643,12 @@ paths:
                     type: string
                   retry:
                     type: integer
-                    format: int64
                     exclusiveMinimum: 0
                     maximum: 9007199254740991
                 required:
                   - data
                   - event
+                additionalProperties: false
         "400":
           description: GET /v1/events/stream Negative response
           content:
@@ -659,6 +673,7 @@ paths:
                 email:
                   type: string
                   format: email
+                  pattern: ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
                 message:
                   type: string
                   minLength: 1
@@ -683,14 +698,15 @@ paths:
                     properties:
                       crc:
                         type: integer
-                        format: int64
                         exclusiveMinimum: 0
                         maximum: 9007199254740991
                     required:
                       - crc
+                    additionalProperties: false
                 required:
                   - status
                   - data
+                additionalProperties: false
         "400":
           description: POST /v1/forms/feedback Negative response
           content:
@@ -708,9 +724,11 @@ paths:
                         type: string
                     required:
                       - message
+                    additionalProperties: false
                 required:
                   - status
                   - error
+                additionalProperties: false
               examples:
                 example1:
                   value:
@@ -720,17 +738,17 @@ paths:
 components:
   schemas:
     Schema1:
-      type: array
-      items:
-        type: object
-        properties:
-          title:
-            type: string
-          features:
+      type: object
+      properties:
+        title:
+          type: string
+        features:
+          type: array
+          items:
             $ref: "#/components/schemas/Schema1"
-        required:
-          - title
-          - features
+      required:
+        - title
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}

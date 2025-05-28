@@ -5,18 +5,36 @@ import {
   type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- special case
 
+type NamedProp = TSESTree.PropertyNonComputedName & {
+  key: TSESTree.Identifier;
+};
+
 interface Queries {
-  headerSecurity: TSESTree.Identifier;
-  createConfig: TSESTree.ObjectExpression;
-  testMiddleware: TSESTree.ObjectExpression;
+  numericRange: NamedProp;
+  optionalPropStyle: NamedProp;
+  depicter: TSESTree.ArrowFunctionExpression;
+  nextCall: TSESTree.CallExpression;
+  zod: TSESTree.ImportDeclaration;
+  ezFile: TSESTree.CallExpression & { arguments: [TSESTree.Literal] };
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  headerSecurity: `${NT.Identifier}[name='CustomHeaderSecurity']`,
-  createConfig: `${NT.CallExpression}[callee.name='createConfig'] > ${NT.ObjectExpression}`,
-  testMiddleware: `${NT.CallExpression}[callee.name='testMiddleware'] > ${NT.ObjectExpression}`,
+  numericRange:
+    `${NT.NewExpression}[callee.name='Documentation'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='numericRange']`,
+  optionalPropStyle:
+    `${NT.NewExpression}[callee.name='Integration'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='optionalPropStyle']`,
+  depicter:
+    `${NT.VariableDeclarator}[id.typeAnnotation.typeAnnotation.typeName.name='Depicter'] > ` +
+    `${NT.ArrowFunctionExpression}`,
+  nextCall:
+    `${NT.VariableDeclarator}[id.typeAnnotation.typeAnnotation.typeName.name='Depicter'] > ` +
+    `${NT.ArrowFunctionExpression} ${NT.CallExpression}[callee.name='next']`,
+  zod: `${NT.ImportDeclaration}[source.value='zod']`,
+  ezFile: `${NT.CallExpression}[arguments.0.type='${NT.Literal}']:has( ${NT.MemberExpression}[object.name='ez'][property.name='file'] )`,
 };
 
 const listen = <
@@ -32,97 +50,102 @@ const listen = <
     {},
   );
 
-const v23 = ESLintUtils.RuleCreator.withoutDocs({
+const rangeWithComma = (
+  node: TSESTree.Node,
+  ctx: TSESLint.RuleContext<string, unknown[]>,
+) =>
+  [
+    node.range[0],
+    node.range[1] + (ctx.sourceCode.getTokenAfter(node)?.value === "," ? 1 : 0),
+  ] as const;
+
+const propRemover =
+  (ctx: TSESLint.RuleContext<string, unknown[]>) => (node: NamedProp) =>
+    ctx.report({
+      node,
+      messageId: "remove",
+      data: { subject: node.key.name },
+      fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
+    });
+
+const v24 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     fixable: "code",
     schema: [],
     messages: {
       change: "change {{ subject }} from {{ from }} to {{ to }}",
-      add: `add {{ subject }} to {{ to }}`,
+      add: "add {{ subject }} to {{ to }}",
       move: "move {{ subject }} to {{ to }}",
+      remove: "remove {{ subject }}",
     },
   },
   defaultOptions: [],
   create: (ctx) =>
     listen({
-      headerSecurity: (node) =>
+      numericRange: propRemover(ctx),
+      optionalPropStyle: propRemover(ctx),
+      depicter: (node) => {
+        const [first, second] = node.params;
+        if (first?.type !== NT.Identifier) return;
+        const zodSchemaAlias = first.name;
+        if (second?.type !== NT.ObjectPattern) return;
+        const nextFn = second.properties.find(
+          (one) =>
+            one.type === NT.Property &&
+            one.key.type === NT.Identifier &&
+            one.key.name === "next",
+        );
         ctx.report({
           node,
           messageId: "change",
-          data: { subject: "interface", from: node.name, to: "HeaderSecurity" },
-          fix: (fixer) => fixer.replaceText(node, "HeaderSecurity"),
-        }),
-      createConfig: (node) => {
-        const wmProp = node.properties.find(
-          (prop) =>
-            prop.type === NT.Property &&
-            prop.key.type === NT.Identifier &&
-            prop.key.name === "wrongMethodBehavior",
-        );
-        if (wmProp) return;
-        ctx.report({
-          node,
-          messageId: "add",
           data: {
-            subject: "wrongMethodBehavior property",
-            to: "configuration",
+            subject: "arguments",
+            from: `[${zodSchemaAlias}, { next, ...rest }]`,
+            to: `[{ zodSchema: ${zodSchemaAlias}, jsonSchema }, { ...rest }]`,
           },
-          fix: (fixer) =>
-            fixer.insertTextAfterRange(
-              [node.range[0], node.range[0] + 1],
-              "wrongMethodBehavior: 404,",
-            ),
+          fix: (fixer) => {
+            const fixes = [
+              fixer.replaceText(
+                first,
+                `{ zodSchema: ${zodSchemaAlias}, jsonSchema }`,
+              ),
+            ];
+            if (nextFn)
+              fixes.push(fixer.removeRange(rangeWithComma(nextFn, ctx)));
+            return fixes;
+          },
         });
       },
-      testMiddleware: (node) => {
-        const ehProp = node.properties.find(
-          (
-            prop,
-          ): prop is TSESTree.Property & {
-            value:
-              | TSESTree.ArrowFunctionExpression
-              | TSESTree.FunctionExpression;
-          } =>
-            prop.type === NT.Property &&
-            prop.key.type === NT.Identifier &&
-            prop.key.name === "errorHandler" &&
-            [NT.ArrowFunctionExpression, NT.FunctionExpression].includes(
-              prop.value.type,
-            ),
-        );
-        if (!ehProp) return;
-        const hasComma = ctx.sourceCode.getTokenAfter(ehProp)?.value === ",";
-        const { body } = ehProp.value;
-        const configProp = node.properties.find(
-          (
-            prop,
-          ): prop is TSESTree.Property & { value: TSESTree.ObjectExpression } =>
-            prop.type === NT.Property &&
-            prop.key.type === NT.Identifier &&
-            prop.key.name === "configProps" &&
-            prop.value.type === NT.ObjectExpression,
-        );
-        const replacement = `errorHandler: new ResultHandler({ positive: [], negative: [], handler: ({ error, response }) => {${ctx.sourceCode.getText(body)}} }),`;
+      nextCall: (node) =>
         ctx.report({
-          node: ehProp,
-          messageId: "move",
-          data: { subject: "errorHandler", to: "configProps" },
-          fix: (fixer) => [
-            fixer.removeRange([
-              ehProp.range[0],
-              ehProp.range[1] + (hasComma ? 1 : 0),
-            ]),
-            configProp
-              ? fixer.insertTextAfterRange(
-                  [configProp.value.range[0], configProp.value.range[0] + 1],
-                  replacement,
-                )
-              : fixer.insertTextAfterRange(
-                  [node.range[0], node.range[0] + 1],
-                  `configProps: {${replacement}},`,
-                ),
-          ],
+          node,
+          messageId: "change",
+          data: { subject: "statement", from: "next()", to: "jsonSchema" },
+          fix: (fixer) => fixer.replaceText(node, "jsonSchema"),
+        }),
+      zod: (node) =>
+        ctx.report({
+          node: node.source,
+          messageId: "change",
+          data: { subject: "import", from: "zod", to: "zod/v4" },
+          fix: (fixer) => fixer.replaceText(node.source, `"zod/v4"`),
+        }),
+      ezFile: (node) => {
+        const [variant] = node.arguments;
+        const replacement =
+          variant.value === "buffer"
+            ? "ez.buffer()"
+            : variant.value === "base64"
+              ? "z.base64()"
+              : variant.value === "binary"
+                ? "ez.buffer().or(z.string())"
+                : "z.string()";
+        ctx.report({
+          node: node,
+          messageId: "change",
+          data: { subject: "schema", from: "ez.file()", to: replacement },
+          fix: (fixer) => fixer.replaceText(node, replacement),
         });
       },
     }),
@@ -137,9 +160,9 @@ const v23 = ESLintUtils.RuleCreator.withoutDocs({
  *          import migration from "express-zod-api/migration";
  *          export default [
  *            { languageOptions: {parser}, plugins: {migration} },
- *            { files: ["**\/*.ts"], rules: { "migration/v21": "error" } }
+ *            { files: ["**\/*.ts"], rules: { "migration/v24": "error" } }
  *          ];
  * */
 export default {
-  rules: { v23 },
+  rules: { v24 },
 } satisfies TSESLint.Linter.Plugin;

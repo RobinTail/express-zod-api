@@ -8,79 +8,110 @@
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
 import * as R from "ramda";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { FlatObject } from "./common-helpers";
-import { cloneSchema, Metadata, metaSymbol } from "./metadata";
+import { metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
+import type {
+  $ZodType,
+  $ZodShape,
+  $ZodLooseShape,
+  $ZodObjectConfig,
+  $ZodCheck,
+  $ZodCheckInternals,
+  $ZodCheckDef,
+} from "zod/v4/core";
 
-declare module "zod" {
-  interface ZodTypeDef {
-    [metaSymbol]?: Metadata;
-  }
-  interface ZodType {
-    /** @desc Add an example value (before any transformations, can be called multiple times) */
-    example(example: this["_input"]): this;
-    deprecated(): this;
-  }
-  interface ZodDefault<T extends z.ZodTypeAny> {
-    /** @desc Change the default value in the generated Documentation to a label */
-    label(label: string): this;
-  }
-  interface ZodObject<
-    T extends z.ZodRawShape,
-    UnknownKeys extends z.UnknownKeysParam = z.UnknownKeysParam,
-    Catchall extends z.ZodTypeAny = z.ZodTypeAny,
-    Output = z.objectOutputType<T, Catchall, UnknownKeys>,
-    Input = z.objectInputType<T, Catchall, UnknownKeys>,
-  > {
-    remap<V extends string, U extends { [P in keyof T]?: V }>(
-      mapping: U,
-    ): z.ZodPipeline<
-      z.ZodEffects<this, FlatObject>, // internal type simplified
-      z.ZodObject<Remap<T, U, V> & Intact<T, U>, UnknownKeys>
-    >;
-    remap<U extends z.ZodRawShape>(
-      mapper: (subject: T) => U,
-    ): z.ZodPipeline<z.ZodEffects<this, FlatObject>, z.ZodObject<U>>; // internal type simplified
+declare module "zod/v4/core" {
+  interface GlobalMeta {
+    deprecated?: boolean;
+    default?: unknown; // can be an actual value or a label like "Today"
   }
 }
 
-const exampleSetter = function (
-  this: z.ZodType,
-  value: (typeof this)["_input"],
-) {
-  const copy = cloneSchema(this);
-  copy._def[metaSymbol]!.examples.push(value);
-  return copy;
+declare module "zod/v4" {
+  interface ZodType {
+    /** @desc Shorthand for .meta({examples}), it can be called multiple times */
+    example(example: z.output<this>): this;
+    deprecated(): this;
+  }
+  interface ZodDefault<T extends $ZodType = $ZodType> extends ZodType {
+    /** @desc Change the default value in the generated Documentation to a label, alias for .meta({ default }) */
+    label(label: string): this;
+  }
+  interface ZodObject<
+    // @ts-expect-error -- external issue
+    out Shape extends $ZodShape = $ZodLooseShape,
+    out Config extends $ZodObjectConfig = $ZodObjectConfig,
+  > extends ZodType {
+    remap<V extends string, U extends { [P in keyof Shape]?: V }>(
+      mapping: U,
+    ): z.ZodPipe<
+      z.ZodPipe<
+        this,
+        z.ZodTransform<FlatObject, FlatObject> // internal type simplified
+      >,
+      z.ZodObject<Remap<Shape, U, V> & Intact<Shape, U>, Config>
+    >;
+    remap<U extends $ZodShape>(
+      mapper: (subject: Shape) => U,
+    ): z.ZodPipe<
+      z.ZodPipe<this, z.ZodTransform<FlatObject, FlatObject>>, // internal type simplified
+      z.ZodObject<U>
+    >;
+  }
+}
+
+interface $EZBrandCheckDef extends $ZodCheckDef {
+  check: "$EZBrandCheck";
+  brand?: string | number | symbol;
+}
+
+interface $EZBrandCheckInternals extends $ZodCheckInternals<unknown> {
+  def: $EZBrandCheckDef;
+}
+
+interface $EZBrandCheck extends $ZodCheck {
+  _zod: $EZBrandCheckInternals;
+}
+
+/**
+ * This approach was suggested to me by Colin in a PM on Twitter.
+ * Refrained from storing the brand in Metadata because it should withstand refinements.
+ * */
+const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
+  "$EZBrandCheck",
+  (inst, def) => {
+    z.core.$ZodCheck.init(inst, def);
+    inst._zod.onattach.push((schema) => (schema._zod.bag.brand = def.brand));
+    inst._zod.check = () => {};
+  },
+);
+
+const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
+  const { examples = [] } = this.meta() || {};
+  const copy = examples.slice();
+  copy.push(value);
+  return this.meta({ examples: copy });
 };
 
 const deprecationSetter = function (this: z.ZodType) {
-  const copy = cloneSchema(this);
-  copy._def[metaSymbol]!.isDeprecated = true;
-  return copy;
+  return this.meta({ deprecated: true });
 };
 
-const labelSetter = function (this: z.ZodDefault<z.ZodTypeAny>, label: string) {
-  const copy = cloneSchema(this);
-  copy._def[metaSymbol]!.defaultLabel = label;
-  return copy;
+const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
+  return this.meta({ default: defaultLabel });
 };
 
 const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
 ) {
-  return new z.ZodBranded({
-    typeName: z.ZodFirstPartyTypeKind.ZodBranded,
-    type: this,
-    description: this._def.description,
-    errorMap: this._def.errorMap,
-    [metaSymbol]: { examples: [], ...R.clone(this._def[metaSymbol]), brand },
-  });
+  return this.check(new $EZBrandCheck({ brand, check: "$EZBrandCheck" }));
 };
 
 const objectMapper = function (
-  this: z.ZodObject<z.ZodRawShape>,
+  this: z.ZodObject,
   tool:
     | Record<string, string>
     | (<T>(subject: T) => { [P in string | keyof T]: T[keyof T] }),
@@ -93,47 +124,47 @@ const objectMapper = function (
           R.map(([key, value]) => R.pair(tool[String(key)] || key, value)),
           R.fromPairs,
         );
-  const nextShape = transformer(R.clone(this.shape)); // immutable
-  const output = z.object(nextShape)[this._def.unknownKeys](); // proxies unknown keys when set to "passthrough"
+  const nextShape = transformer(
+    R.map(R.invoker(0, "clone"), this._zod.def.shape), // immutable, changed from R.clone due to failure
+  );
+  const hasPassThrough = this._zod.def.catchall instanceof z.ZodUnknown;
+  const output = (hasPassThrough ? z.looseObject : z.object)(nextShape); // proxies unknown keys when set to "passthrough"
   return this.transform(transformer).pipe(output);
 };
 
 if (!(metaSymbol in globalThis)) {
   (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
-  Object.defineProperties(z.ZodType.prototype, {
-    ["example" satisfies keyof z.ZodType]: {
-      get(): z.ZodType["example"] {
-        return exampleSetter.bind(this);
+  for (const entry of Object.keys(z)) {
+    if (!entry.startsWith("Zod")) continue;
+    if (/(Success|Error|Function)$/.test(entry)) continue;
+    const Cls = z[entry as keyof typeof z];
+    if (typeof Cls !== "function") continue;
+    Object.defineProperties(Cls.prototype, {
+      ["example" satisfies keyof z.ZodType]: {
+        value: exampleSetter,
+        writable: false,
       },
-    },
-    ["deprecated" satisfies keyof z.ZodType]: {
-      get(): z.ZodType["deprecated"] {
-        return deprecationSetter.bind(this);
+      ["deprecated" satisfies keyof z.ZodType]: {
+        value: deprecationSetter,
+        writable: false,
       },
-    },
-    ["brand" satisfies keyof z.ZodType]: {
-      set() {}, // this is required to override the existing method
-      get() {
-        return brandSetter.bind(this) as z.ZodType["brand"];
+      ["brand" satisfies keyof z.ZodType]: {
+        set() {}, // this is required to override the existing method
+        get() {
+          return brandSetter.bind(this) as z.ZodType["brand"];
+        },
       },
-    },
-  });
+    });
+  }
+
   Object.defineProperty(
     z.ZodDefault.prototype,
-    "label" satisfies keyof z.ZodDefault<z.ZodTypeAny>,
-    {
-      get(): z.ZodDefault<z.ZodTypeAny>["label"] {
-        return labelSetter.bind(this);
-      },
-    },
+    "label" satisfies keyof z.ZodDefault,
+    { value: labelSetter, writable: false },
   );
   Object.defineProperty(
     z.ZodObject.prototype,
-    "remap" satisfies keyof z.ZodObject<z.ZodRawShape>,
-    {
-      get() {
-        return objectMapper.bind(this) as z.ZodObject<z.ZodRawShape>["remap"];
-      },
-    },
+    "remap" satisfies keyof z.ZodObject,
+    { value: objectMapper, writable: false },
   );
 }

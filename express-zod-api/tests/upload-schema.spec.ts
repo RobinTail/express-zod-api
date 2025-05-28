@@ -1,14 +1,14 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ez } from "../src";
-import { metaSymbol } from "../src/metadata";
+import { getBrand } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("ez.upload()", () => {
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.upload();
-      expect(schema).toBeInstanceOf(z.ZodBranded);
-      expect(schema._def[metaSymbol]?.brand).toBe(ezUploadBrand);
+      expect(schema).toBeInstanceOf(z.ZodCustom);
+      expect(getBrand(schema)).toBe(ezUploadBrand);
     });
   });
 
@@ -21,7 +21,6 @@ describe("ez.upload()", () => {
         expect(result.error.issues).toEqual([
           {
             code: "custom",
-            fatal: true,
             message: "Expected file upload, received number",
             path: [],
           },

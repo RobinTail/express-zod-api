@@ -1,15 +1,16 @@
 import { Request, Response } from "express";
-import { z } from "zod";
+import { globalRegistry, z } from "zod/v4";
 import {
   ApiResponse,
   defaultStatusCodes,
   NormalizedResponse,
 } from "./api-response";
-import { FlatObject, getExamples, isObject } from "./common-helpers";
+import { FlatObject, isObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 import {
+  DiscriminatedResult,
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
@@ -17,20 +18,19 @@ import {
   ResultSchema,
 } from "./result-helpers";
 
-type Handler<RES = unknown> = (params: {
-  /** null in case of failure to parse or to find the matching endpoint (error: not found) */
-  input: FlatObject | null;
-  /** null in case of errors or failures */
-  output: FlatObject | null;
-  /** can be empty: check presence of the required property using "in" operator */
-  options: FlatObject;
-  error: Error | null;
-  request: Request;
-  response: Response<RES>;
-  logger: ActualLogger;
-}) => void | Promise<void>;
+type Handler<RES = unknown> = (
+  params: DiscriminatedResult & {
+    /** null in case of failure to parse or to find the matching endpoint (error: not found) */
+    input: FlatObject | null;
+    /** can be empty: check presence of the required property using "in" operator */
+    options: FlatObject;
+    request: Request;
+    response: Response<RES>;
+    logger: ActualLogger;
+  },
+) => void | Promise<void>;
 
-export type Result<S extends z.ZodTypeAny = z.ZodTypeAny> =
+export type Result<S extends z.ZodType = z.ZodType> =
   | S // plain schema, default status codes applied
   | ApiResponse<S> // single response definition, status code(s) customizable
   | ApiResponse<S>[]; // Feature #1431: different responses for different status codes (non-empty, prog. check!)
@@ -96,16 +96,20 @@ export class ResultHandler<
 
 export const defaultResultHandler = new ResultHandler({
   positive: (output) => {
-    // Examples are taken for proxying: no validation needed for this
-    const examples = getExamples({ schema: output, pullProps: true });
     const responseSchema = z.object({
       status: z.literal("success"),
       data: output,
     });
-    return examples.reduce<typeof responseSchema>(
-      (acc, example) => acc.example({ status: "success", data: example }),
-      responseSchema,
-    );
+    const { examples = [] } = globalRegistry.get(output) || {}; // pulling down:
+    if (examples.length) {
+      globalRegistry.add(responseSchema, {
+        examples: examples.map((data) => ({
+          status: "success" as const,
+          data,
+        })),
+      });
+    }
+    return responseSchema;
   },
   negative: z
     .object({
@@ -141,21 +145,28 @@ export const defaultResultHandler = new ResultHandler({
  * */
 export const arrayResultHandler = new ResultHandler({
   positive: (output) => {
-    // Examples are taken for pulling down: no validation needed for this, no pulling up
-    const examples = getExamples({ schema: output });
     const responseSchema =
-      "shape" in output &&
+      output instanceof z.ZodObject &&
       "items" in output.shape &&
       output.shape.items instanceof z.ZodArray
-        ? (output.shape.items as z.ZodArray<z.ZodTypeAny>)
+        ? output.shape.items
         : z.array(z.any());
-    return examples.reduce<typeof responseSchema>(
-      (acc, example) =>
-        isObject(example) && "items" in example && Array.isArray(example.items)
-          ? acc.example(example.items)
-          : acc,
-      responseSchema,
-    );
+    const meta = responseSchema.meta();
+    if (meta?.examples?.length) return responseSchema; // has examples on the items, or pull down:
+    const examples = (globalRegistry.get(output)?.examples || [])
+      .filter(
+        (example): example is { items: unknown[] } =>
+          isObject(example) &&
+          "items" in example &&
+          Array.isArray(example.items),
+      )
+      .map((example) => example.items);
+    if (examples.length) {
+      globalRegistry
+        .remove(responseSchema) // reassign to avoid cloning
+        .add(responseSchema, { ...meta, examples });
+    }
+    return responseSchema;
   },
   negative: z.string().example("Sample error message"),
   handler: ({ response, output, error, logger, request, input }) => {
@@ -167,7 +178,7 @@ export const arrayResultHandler = new ResultHandler({
         .type("text/plain")
         .send(getPublicErrorMessage(httpError));
     }
-    if (output && "items" in output && Array.isArray(output.items)) {
+    if ("items" in output && Array.isArray(output.items)) {
       return void response
         .status(defaultStatusCodes.positive)
         .json(output.items);

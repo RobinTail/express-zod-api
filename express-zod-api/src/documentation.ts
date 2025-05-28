@@ -8,7 +8,6 @@ import {
   SecuritySchemeType,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { z } from "zod";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
@@ -17,7 +16,6 @@ import { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
 import { Method } from "./method";
 import {
-  OpenAPIContext,
   depictBody,
   depictRequestParams,
   depictResponse,
@@ -28,11 +26,11 @@ import {
   reformatParamsInPath,
   IsHeader,
   nonEmpty,
-  NumericRange,
+  BrandHandling,
+  depictRequest,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting } from "./routing-walker";
-import { HandlingRules } from "./schema-walker";
 
 type Component =
   | "positiveResponse"
@@ -61,21 +59,15 @@ interface DocumentationParams {
   descriptions?: Partial<Record<Component, Descriptor>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
-  /**
-   * @desc Acceptable limits of z.number() that API can handle (default: the limits of JavaScript engine)
-   * @default {integer:[Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER], float:[-Number.MAX_VALUE, Number.MAX_VALUE]}
-   * @example null — to disable the feature
-   * @see depictNumber */
-  numericRange?: NumericRange | null;
   /** @default inline */
   composition?: "inline" | "components";
   /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
-   * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
-   * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => ({ type: "object" })
+   * @desc Values: functions having Zod context as first argument, second one is the framework context.
+   * @example { MyBrand: ( { zodSchema, jsonSchema } ) => ({ type: "object" })
    */
-  brandHandling?: HandlingRules<SchemaObject | ReferenceObject, OpenAPIContext>;
+  brandHandling?: BrandHandling;
   /**
    * @desc Ability to configure recognition of headers among other input data
    * @desc Only applicable when "headers" is present within inputSources config option
@@ -94,22 +86,18 @@ interface DocumentationParams {
 export class Documentation extends OpenApiBuilder {
   readonly #lastSecuritySchemaIds = new Map<SecuritySchemeType, number>();
   readonly #lastOperationIdSuffixes = new Map<string, number>();
-  readonly #references = new Map<z.ZodTypeAny, string>();
+  readonly #references = new Map<object | string, string>();
 
   #makeRef(
-    schema: z.ZodTypeAny,
-    subject:
-      | SchemaObject
-      | ReferenceObject
-      | (() => SchemaObject | ReferenceObject),
-    name = this.#references.get(schema),
+    key: object | string,
+    subject: SchemaObject | ReferenceObject,
+    name = this.#references.get(key),
   ): ReferenceObject {
     if (!name) {
       name = `Schema${this.#references.size + 1}`;
-      this.#references.set(schema, name);
-      if (typeof subject === "function") subject = subject();
+      this.#references.set(key, name);
     }
-    if (typeof subject === "object") this.addSchema(name, subject);
+    this.addSchema(name, subject);
     return { $ref: `#/components/schemas/${name}` };
   }
 
@@ -156,7 +144,6 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     tags,
     isHeader,
-    numericRange,
     hasSummaryFromDescription = true,
     composition = "inline",
   }: DocumentationParams) {
@@ -171,7 +158,6 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         brandHandling,
-        numericRange,
         makeRef: this.#makeRef.bind(this),
       };
       const { description, shortDescription, scopes, inputSchema } = endpoint;
@@ -188,13 +174,14 @@ export class Documentation extends OpenApiBuilder {
         endpoint.getOperationId(method),
       );
 
+      const request = depictRequest({ ...commons, schema: inputSchema });
       const security = processContainers(endpoint.security);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         isHeader,
         security,
-        schema: inputSchema,
+        request,
         description: descriptions?.requestParameter?.call(null, {
           method,
           path,
@@ -229,6 +216,7 @@ export class Documentation extends OpenApiBuilder {
       const requestBody = inputSources.includes("body")
         ? depictBody({
             ...commons,
+            request,
             paramNames: R.pluck("name", depictedParams),
             schema: inputSchema,
             mimeType: contentTypes[endpoint.requestType],

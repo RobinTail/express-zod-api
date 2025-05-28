@@ -1,19 +1,21 @@
-import { z } from "zod";
-import { isValidDate } from "./schema-helpers";
+import { z } from "zod/v4";
 
 export const ezDateInBrand = Symbol("DateIn");
 
-export const dateIn = () => {
+export const dateIn = ({
+  examples,
+  ...rest
+}: Parameters<z.ZodString["meta"]>[0] = {}) => {
   const schema = z.union([
-    z.string().date(),
-    z.string().datetime(),
-    z.string().datetime({ local: true }),
-  ]);
+    z.iso.date(),
+    z.iso.datetime(),
+    z.iso.datetime({ local: true }),
+  ]) as unknown as z.ZodUnion<[z.ZodString, z.ZodString, z.ZodString]>; // this fixes DTS build for ez export
 
   return schema
+    .meta({ examples })
     .transform((str) => new Date(str))
-    .pipe(z.date().refine(isValidDate))
-    .brand(ezDateInBrand as symbol);
+    .pipe(z.date())
+    .brand(ezDateInBrand as symbol)
+    .meta(rest);
 };
-
-export type DateInSchema = ReturnType<typeof dateIn>;

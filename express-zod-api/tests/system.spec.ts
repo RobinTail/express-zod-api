@@ -2,7 +2,7 @@ import cors from "cors";
 import depd from "depd";
 import express from "express";
 import { readFile } from "node:fs/promises";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   EndpointsFactory,
   Method,
@@ -83,7 +83,7 @@ describe("App in production mode", async () => {
     .build({
       method: ["get", "post"],
       input: z.object({ something: z.string() }),
-      output: z.object({ anything: z.number().positive() }).passthrough(), // allow excessive keys
+      output: z.looseObject({ anything: z.number().positive() }), // allow excessive keys
       handler: async ({
         input: { key, something },
         options: { user, permissions, method },
@@ -131,10 +131,11 @@ describe("App in production mode", async () => {
       long: longEndpoint,
       form: formEndpoint,
       raw: rawEndpoint,
-      upload: uploadEndpoint,
-    },
+    }, // flat syntax test
+    "post /v1/upload": uploadEndpoint,
   };
   vi.spyOn(process.stdout, "write").mockImplementation(vi.fn()); // mutes logo output
+  const beforeExit = vi.fn();
   const config = createConfig({
     http: { listen: port },
     compression: { threshold: 1 },
@@ -165,7 +166,7 @@ describe("App in production mode", async () => {
     },
     cors: false,
     startupLogo: true,
-    gracefulShutdown: { events: ["FAKE"] },
+    gracefulShutdown: { events: ["FAKE"], beforeExit },
     logger,
     childLoggerProvider: ({ parent }) =>
       Object.defineProperty(parent, "isChild", { value: true }),
@@ -592,7 +593,7 @@ describe("App in production mode", async () => {
 
   describe("Shutdown", () => {
     test("should terminate suspended request gracefully on signal", async () => {
-      const spy = vi
+      const exitSpy = vi
         .spyOn(process, "exit")
         .mockImplementation(vi.fn<typeof process.exit>());
       fetch(`http://127.0.0.1:${port}/v1/long`).catch((err) =>
@@ -606,7 +607,8 @@ describe("App in production mode", async () => {
       });
       await setTimeout(1500);
       expect(server.listening).toBeFalsy();
-      expect(spy).toHaveBeenCalled();
+      expect(beforeExit).toHaveBeenCalledOnce();
+      expect(exitSpy).toHaveBeenCalled();
     });
   });
 });

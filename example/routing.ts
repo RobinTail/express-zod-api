@@ -36,13 +36,11 @@ export const routing: Routing = {
       // raw body acceptance example
       raw: rawAcceptingEndpoint,
     },
-    events: {
-      stream: subscriptionEndpoint,
-    },
-    forms: {
-      feedback: submitFeedbackEndpoint,
-    },
+    // nested flat syntax:
+    "events/stream": subscriptionEndpoint,
   },
+  // flat syntax with explicitly specified method:
+  "post /v1/forms/feedback": submitFeedbackEndpoint,
   // path /public serves static files from /assets
   public: new ServeStatic("assets", {
     dotfiles: "deny",

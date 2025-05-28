@@ -17,36 +17,33 @@ Start your API server with I/O schema validation and custom middlewares in minut
 2. [How it works](#how-it-works)
 3. [Quick start](#quick-start) — **Fast Track**
 4. [Basic features](#basic-features)
-   1. [Middlewares](#middlewares)
-   2. [Options](#options)
-   3. [Using native express middlewares](#using-native-express-middlewares)
-   4. [Refinements](#refinements)
-   5. [Transformations](#transformations)
-   6. [Top level transformations and mapping](#top-level-transformations-and-mapping)
-   7. [Dealing with dates](#dealing-with-dates)
-   8. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
-   9. [Enabling HTTPS](#enabling-https)
-   10. [Customizing logger](#customizing-logger)
-   11. [Child logger](#child-logger)
-   12. [Profiling](#profiling)
-   13. [Enabling compression](#enabling-compression)
+   1. [Routing](#routing) including static file serving
+   2. [Middlewares](#middlewares)
+   3. [Options](#options)
+   4. [Using native express middlewares](#using-native-express-middlewares)
+   5. [Refinements](#refinements)
+   6. [Transformations](#transformations)
+   7. [Top level transformations and mapping](#top-level-transformations-and-mapping)
+   8. [Dealing with dates](#dealing-with-dates)
+   9. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   10. [Enabling HTTPS](#enabling-https)
+   11. [Customizing logger](#customizing-logger)
+   12. [Child logger](#child-logger)
+   13. [Profiling](#profiling)
+   14. [Enabling compression](#enabling-compression)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Headers as input source](#headers-as-input-source)
-   3. [Nested routes](#nested-routes)
-   4. [Route path params](#route-path-params)
-   5. [Multiple schemas for one route](#multiple-schemas-for-one-route)
-   6. [Response customization](#response-customization)
-   7. [Empty response](#empty-response)
-   8. [Error handling](#error-handling)
-   9. [Production mode](#production-mode)
-   10. [Non-object response](#non-object-response) including file downloads
-   11. [HTML Forms (URL encoded)](#html-forms-url-encoded)
-   12. [File uploads](#file-uploads)
-   13. [Serving static files](#serving-static-files)
-   14. [Connect to your own express app](#connect-to-your-own-express-app)
-   15. [Testing endpoints](#testing-endpoints)
-   16. [Testing middlewares](#testing-middlewares)
+   3. [Response customization](#response-customization)
+   4. [Empty response](#empty-response)
+   5. [Non-JSON response](#non-json-response) including file downloads
+   6. [Error handling](#error-handling)
+   7. [Production mode](#production-mode)
+   8. [HTML Forms (URL encoded)](#html-forms-url-encoded)
+   9. [File uploads](#file-uploads)
+   10. [Connect to your own express app](#connect-to-your-own-express-app)
+   11. [Testing endpoints](#testing-endpoints)
+   12. [Testing middlewares](#testing-middlewares)
 6. [Special needs](#special-needs)
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
@@ -61,8 +58,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Deprecated schemas and routes](#deprecated-schemas-and-routes)
    6. [Customizable brands handling](#customizable-brands-handling)
 8. [Caveats](#caveats)
-   1. [Coercive schema of Zod](#coercive-schema-of-zod)
-   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
 
 You can find the release notes and migration guides in [Changelog](CHANGELOG.md).
@@ -88,8 +84,10 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
-[<img src="https://github.com/gmorgen1.png" alt="@gmorgen1" width="50px" />](https://github.com/gmorgen1)
+[<img src="https://github.com/HeikoOsigus.png" alt="@HeikoOsigus" width="50px" />](https://github.com/HeikoOsigus)
 [<img src="https://github.com/crgeary.png" alt="@crgeary" width="50px" />](https://github.com/crgeary)
+[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
+[<img src="https://github.com/gmorgen1.png" alt="@gmorgen1" width="50px" />](https://github.com/gmorgen1)
 [<img src="https://github.com/danmichaelo.png" alt="@danmichaelo" width="50px" />](https://github.com/danmichaelo)
 [<img src="https://github.com/james10424.png" alt="@james10424" width="50px" />](https://github.com/james10424)
 [<img src="https://github.com/APTy.png" alt="@APTy" width="50px" />](https://github.com/APTy)
@@ -99,7 +97,6 @@ These people contributed to the improvement of the framework by reporting bugs, 
 [<img src="https://github.com/LucWag.png" alt="@LucWag" width="50px" />](https://github.com/LucWag)
 [<img src="https://github.com/HenriJ.png" alt="@HenriJ" width="50px" />](https://github.com/HenriJ)
 [<img src="https://github.com/JonParton.png" alt="@JonParton" width="50px" />](https://github.com/JonParton)
-[<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/t1nky.png" alt="@t1nky" width="50px" />](https://github.com/t1nky)
 [<img src="https://github.com/Tomtec331.png" alt="@Tomtec331" width="50px" />](https://github.com/Tomtec331)
 [<img src="https://github.com/rottmann.png" alt="@rottmann" width="50px" />](https://github.com/rottmann)
@@ -153,7 +150,8 @@ Much can be customized to fit your needs.
 
 - [Typescript](https://www.typescriptlang.org/) first.
 - Web server — [Express.js](https://expressjs.com/) v5.
-- Schema validation — [Zod 3.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin).
+- Schema validation — [Zod 4.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin):
+  - For using with Zod 3.x install the framework versions below 24.0.0.
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
@@ -171,7 +169,7 @@ Install the framework, its peer dependencies and type assistance packages using 
 
 ```shell
 # example for yarn:
-yarn add express-zod-api express zod@3 typescript http-errors
+yarn add express-zod-api express zod typescript http-errors
 yarn add -D @types/express @types/node @types/http-errors
 ```
 
@@ -216,7 +214,7 @@ import { defaultEndpointsFactory } from "express-zod-api";
 The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supplied within `GET` request payload.
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
   // method: "get" (default) or array ["get", "post", ...]
@@ -273,6 +271,53 @@ You should receive the following response:
 
 # Basic features
 
+## Routing
+
+The framework offers flexible ways to define your routes, supporting both nested and flat syntaxes, dynamic path
+parameters, method-based routing, and static file serving. This example brings together all supported routing styles
+in one place, illustrating how you can structure your API using whichever method best fits your application’s
+architecture — or even mix them seamlessly.
+
+```ts
+import { Routing, DependsOnMethod, ServeStatic } from "express-zod-api";
+
+const routing: Routing = {
+  // flax syntax — /v1/users
+  "/v1/users": listUsersEndpoint,
+  // nested syntax
+  v1: {
+    // the way to have both — /v1/path and /v1/path/subpath
+    path: endpointA.nest({
+      subpath: endpointB,
+    }),
+    // path parameters — /v1/user/:id
+    user: {
+      ":id": getUserEndpoint,
+    },
+    // mixed syntax with explicit method — /v1/user/:id
+    "delete /user/:id": deleteUserEndpoint,
+    // method-based routing — /v1/account
+    account: new DependsOnMethod({
+      get: endpointA,
+      delete: endpointA,
+      post: endpointB,
+      patch: endpointB,
+    }),
+  },
+  // static file serving — /public serves files from ./assets
+  public: new ServeStatic("assets", {
+    /** @see https://expressjs.com/en/5x/api.html#express.static */
+    dotfiles: "deny",
+    index: false,
+    redirect: false,
+  }),
+};
+```
+
+Same Endpoint can be reused on different routes or handle multiple methods if needed. Path parameters (the `:id` above)
+should be declared in the endpoint’s input schema. Properties assigned with Endpoint can explicitly declare a method.
+When the method is not specified, the one(s) supported by the Endpoint applied (or `get` as a fallback).
+
 ## Middlewares
 
 Middleware can authenticate using input or `request` headers, and can provide endpoint handlers with `options`.
@@ -281,7 +326,7 @@ Inputs of middlewares are also available to endpoint handlers within `input`.
 Here is an example of the authentication middleware, that checks a `key` from input and `token` from headers:
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import createHttpError from "http-errors";
 import { Middleware } from "express-zod-api";
 
@@ -411,7 +456,7 @@ You can implement additional validations within schemas using refinements.
 Validation errors are reported in a response with a status code `400`.
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import { Middleware } from "express-zod-api";
 
 const nicknameConstraintMiddleware = new Middleware({
@@ -434,7 +479,7 @@ By the way, you can also refine the whole I/O object, for example in case you ne
 const endpoint = endpointsFactory.build({
   input: z
     .object({
-      email: z.string().email().optional(),
+      email: z.email().optional(),
       id: z.string().optional(),
       otherThing: z.string().optional(),
     })
@@ -452,7 +497,7 @@ Since parameters of GET requests come in the form of strings, there is often a n
 arrays of numbers.
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const getUserEndpoint = endpointsFactory.build({
   input: z.object({
@@ -483,7 +528,7 @@ Here is a recommended solution: it is important to use shallow transformations o
 ```ts
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const endpoint = endpointsFactory.build({
   input: z
@@ -517,7 +562,7 @@ in actual response by calling
 which in turn calls
 [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString).
 It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
-confusion with original method ~~z.date()~~ that should not be used within IO schemas of your API.
+confusion with original method ~~z.date()~~ that is not recommended to use without transformations.
 
 In order to solve this problem, the framework provides two custom methods for dealing with dates: `ez.dateIn()` and
 `ez.dateOut()` for using within input and output schemas accordingly.
@@ -533,20 +578,20 @@ provides your endpoint handler or middleware with a `Date`. It supports the foll
 ```
 
 `ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHandler` with a `string` representation in ISO
-format for the response transmission. Consider the following simplified example for better understanding:
+format for the response transmission. Both schemas accept metadata as an argument. Consider the following example:
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const updateUserEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: z.object({
     userId: z.string(),
-    birthday: ez.dateIn(), // string -> Date in handler
+    birthday: ez.dateIn({ examples: ["1963-04-21"] }), // string -> Date in handler
   }),
   output: z.object({
-    createdAt: ez.dateOut(), // Date -> string in response
+    createdAt: ez.dateOut({ examples: ["2021-12-31"] }), // Date -> string in response
   }),
   handler: async ({ input }) => ({
     createdAt: new Date("2022-01-22"), // 2022-01-22T00:00:00.000Z
@@ -697,7 +742,7 @@ done(); // error: expensive operation '555.55ms'
 
 ## Enabling compression
 
-According to [Express.js best practices guide](http://expressjs.com/en/advanced/best-practice-performance.html)
+According to [Express.js best practices guide](https://expressjs.com/en/advanced/best-practice-performance.html)
 it might be a good idea to enable GZIP and Brotli compression for your API responses.
 
 Install `compression` and `@types/compression`, and enable or configure compression:
@@ -746,7 +791,7 @@ In a similar way you can enable request headers as the input source. This is an 
 
 ```typescript
 import { createConfig, Middleware } from "express-zod-api";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 createConfig({
   inputSources: {
@@ -767,76 +812,6 @@ factory.build({
 });
 ```
 
-## Nested routes
-
-Suppose you want to assign both `/v1/path` and `/v1/path/subpath` routes with Endpoints:
-
-```typescript
-import { Routing } from "express-zod-api";
-
-const routing: Routing = {
-  v1: {
-    path: endpointA.nest({
-      subpath: endpointB,
-    }),
-  },
-};
-```
-
-## Route path params
-
-You can assign your Endpoint to a route like `/v1/user/:id` where `:id` is the path parameter:
-
-```typescript
-import { Routing } from "express-zod-api";
-
-const routing: Routing = {
-  v1: {
-    user: { ":id": getUserEndpoint },
-  },
-};
-```
-
-You then need to specify these parameters in the endpoint input schema in the usual way:
-
-```typescript
-const getUserEndpoint = endpointsFactory.build({
-  input: z.object({
-    // id is the route path param, always string
-    id: z.string().transform((value) => parseInt(value, 10)),
-    // other inputs (in query):
-    withExtendedInformation: z.boolean().optional(),
-  }),
-  output: z.object({}),
-  handler: async ({ input: { id } }) => ({}), // id is number,
-});
-```
-
-## Multiple schemas for one route
-
-Thanks to the `DependsOnMethod` class a route may have multiple Endpoints attached depending on different methods.
-It can also be the same Endpoint that handles multiple methods as well. The `method` and `methods` properties can be
-omitted for `EndpointsFactory::build()` so that the method determination would be delegated to the `Routing`.
-
-```typescript
-import { DependsOnMethod } from "express-zod-api";
-
-// the route /v1/user has two Endpoints
-// which handle a couple of methods each
-const routing: Routing = {
-  v1: {
-    user: new DependsOnMethod({
-      get: endpointA,
-      delete: endpointA,
-      post: endpointB,
-      patch: endpointB,
-    }),
-  },
-};
-```
-
-_See also [Different responses for different status codes](#different-responses-for-different-status-codes)_.
-
 ## Response customization
 
 `ResultHandler` is responsible for transmitting consistent responses containing the endpoint output or an error.
@@ -851,7 +826,7 @@ type DefaultResponse<OUT> =
 You can create your own result handler by using this example as a template:
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   ResultHandler,
   ensureHttpError,
@@ -897,6 +872,33 @@ const resultHandler = new ResultHandler({
 });
 ```
 
+## Non-JSON response
+
+To configure a non-JSON responses (for example, to send an image file) you should specify its MIME type.
+
+You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation
+[in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts).
+One of them implements file streaming, in this case the endpoint just has to provide the filename.
+The response schema can be `z.string()`, `z.base64()` or `ez.buffer()` to reflect the data accordingly in the
+[generated documentation](#creating-a-documentation).
+
+```typescript
+const fileStreamingEndpointsFactory = new EndpointsFactory(
+  new ResultHandler({
+    positive: { schema: ez.buffer(), mimeType: "image/*" },
+    negative: { schema: z.string(), mimeType: "text/plain" },
+    handler: ({ response, error, output }) => {
+      if (error) return void response.status(400).send(error.message);
+      if ("filename" in output)
+        fs.createReadStream(output.filename).pipe(
+          response.attachment(output.filename),
+        );
+      else response.status(400).send("Filename is missing");
+    },
+  }),
+);
+```
+
 ## Error handling
 
 All runtime errors are handled by a `ResultHandler`. The default is `defaultResultHandler`. Using `ensureHttpError()`
@@ -940,34 +942,6 @@ createHttpError(500, "Something is broken"); // —> "Internal Server Error"
 createHttpError(501, "We didn't make it yet", { expose: true }); // —> "We didn't make it yet"
 ```
 
-## Non-object response
-
-Thus, you can configure non-object responses too, for example, to send an image file.
-
-You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation
-[in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts).
-One of them implements file streaming, in this case the endpoint just has to provide the filename.
-The response schema generally may be just `z.string()`, but I made more specific `ez.file()` that also supports
-`ez.file("binary")` and `ez.file("base64")` variants which are reflected in the
-[generated documentation](#creating-a-documentation).
-
-```typescript
-const fileStreamingEndpointsFactory = new EndpointsFactory(
-  new ResultHandler({
-    positive: { schema: ez.file("buffer"), mimeType: "image/*" },
-    negative: { schema: z.string(), mimeType: "text/plain" },
-    handler: ({ response, error, output }) => {
-      if (error) return void response.status(400).send(error.message);
-      if ("filename" in output)
-        fs.createReadStream(output.filename).pipe(
-          response.type(output.filename),
-        );
-      else response.status(400).send("Filename is missing");
-    },
-  }),
-);
-```
-
 ## HTML Forms (URL encoded)
 
 Use the proprietary schema `ez.form()` with an object shape or a custom `z.object()` with form fields in order to
@@ -977,13 +951,13 @@ which is `express.urlencoded()` by default. The request content type should be `
 
 ```ts
 import { defaultEndpointsFactory, ez } from "express-zod-api";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
   method: "post",
   input: ez.form({
     name: z.string().min(1),
-    email: z.string().email(),
+    email: z.email(),
     message: z.string().min(1),
   }),
 });
@@ -1017,7 +991,7 @@ const config = createConfig({
 Then use `ez.upload()` schema for a corresponding property. The request content type must be `multipart/form-data`:
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const fileUploadEndpoint = defaultEndpointsFactory.build({
@@ -1034,26 +1008,6 @@ const fileUploadEndpoint = defaultEndpointsFactory.build({
 ```
 
 _You can still send other data and specify additional `input` parameters, including arrays and objects._
-
-## Serving static files
-
-In case you want your server to serve static files, you can use `new ServeStatic()` in `Routing` using the arguments
-similar to `express.static()`.
-The documentation on these arguments you may find [here](http://expressjs.com/en/4x/api.html#express.static).
-
-```typescript
-import { Routing, ServeStatic } from "express-zod-api";
-import { join } from "node:path";
-
-const routing: Routing = {
-  // path /public serves static files from ./assets
-  public: new ServeStatic(join(__dirname, "assets"), {
-    dotfiles: "deny",
-    index: false,
-    redirect: false,
-  }),
-};
-```
 
 ## Connect to your own express app
 
@@ -1115,7 +1069,7 @@ from outputs of previous middlewares, if the one being tested somehow depends on
 either by `errorHandler` configured within given `configProps` or `defaultResultHandler`.
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import { Middleware, testMiddleware } from "express-zod-api";
 
 const middleware = new Middleware({
@@ -1155,7 +1109,7 @@ new ResultHandler({
   negative: [
     {
       statusCode: 409, // conflict: entity already exists
-      schema: z.object({ status: z.literal("exists"), id: z.number().int() }),
+      schema: z.object({ status: z.literal("exists"), id: z.int() }),
     },
     {
       statusCode: [400, 500], // validation or internal error
@@ -1193,7 +1147,7 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
   input: ez.raw({
     /* the place for additional inputs, like route params, if needed */
   }),
-  output: z.object({ length: z.number().int().nonnegative() }),
+  output: z.object({ length: z.int().nonnegative() }),
   handler: async ({ input: { raw } }) => ({
     length: raw.length, // raw is Buffer
   }),
@@ -1213,6 +1167,7 @@ createConfig({
   gracefulShutdown: {
     timeout: 1000,
     events: ["SIGINT", "SIGTERM"],
+    beforeExit: /* async */ () => {},
   },
 });
 ```
@@ -1226,12 +1181,12 @@ Client application can subscribe to the event stream using `EventSource` class i
 the implementation emitting the `time` event each second.
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 import { EventStreamFactory } from "express-zod-api";
 import { setTimeout } from "node:timers/promises";
 
-const subscriptionEndpoint = EventStreamFactory({
-  time: z.number().int().positive(),
+const subscriptionEndpoint = new EventStreamFactory({
+  time: z.int().positive(),
 }).buildVoid({
   input: z.object({}), // optional input schema
   handler: async ({ options: { emit, isClosed } }) => {
@@ -1269,7 +1224,6 @@ import { Integration } from "express-zod-api";
 const client = new Integration({
   routing,
   variant: "client", // <— optional, see also "types" for a DIY solution
-  optionalPropStyle: { withQuestionMark: true, withUndefined: true }, // optional
 });
 
 const prettierFormattedTypescriptCode = await client.printFormatted(); // or just .print() for unformatted
@@ -1318,7 +1272,11 @@ const exampleEndpoint = defaultEndpointsFactory.build({
   shortDescription: "Retrieves the user.", // <—— this becomes the summary line
   description: "The detailed explanaition on what this endpoint does.",
   input: z.object({
-    id: z.number().describe("the ID of the user").example(123),
+    id: z
+      .string()
+      .example("123") // input examples should be set before transformations
+      .transform(Number)
+      .describe("the ID of the user"),
   }),
   // ..., similarly for output and middlewares
 });
@@ -1367,7 +1325,7 @@ You can also deprecate all routes the `Endpoint` assigned to by setting `Endpoin
 
 ```ts
 import { Routing, DependsOnMethod } from "express-zod-api";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const someEndpoint = factory.build({
   deprecated: true, // deprecates all routes the endpoint assigned to
@@ -1392,7 +1350,7 @@ need to reuse a handling rule for multiple brands, use the exposed types `Depict
 
 ```ts
 import ts from "typescript";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   Documentation,
   Integration,
@@ -1404,12 +1362,12 @@ const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for
 const myBrandedSchema = z.string().brand(myBrand);
 
 const ruleForDocs: Depicter = (
-  schema: typeof myBrandedSchema, // you should assign type yourself
-  { next, path, method, isResponse }, // handle a nested schema using next()
-) => {
-  const defaultDepiction = next(schema.unwrap()); // { type: string }
-  return { summary: "Special type of data" };
-};
+  { zodSchema, jsonSchema }, // jsonSchema is the default depiction
+  { path, method, isResponse },
+) => ({
+  ...jsonSchema,
+  summary: "Special type of data",
+});
 
 const ruleForClient: Producer = (
   schema: typeof myBrandedSchema, // you should assign type yourself
@@ -1430,16 +1388,6 @@ new Integration({
 There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
 
-## Coercive schema of Zod
-
-Despite being supported by the framework, `z.coerce.*` schema
-[does not work intuitively](https://github.com/RobinTail/express-zod-api/issues/759).
-Please be aware that `z.coerce.number()` and `z.number({ coerce: true })` (being typed not well) still will NOT allow
-you to assign anything but number. Moreover, coercive schemas are not fail-safe and their methods `.isOptional()` and
-`.isNullable()` [are buggy](https://github.com/colinhacks/zod/issues/1911). If possible, try to avoid using this type
-of schema. This issue [will NOT be fixed](https://github.com/colinhacks/zod/issues/1760#issuecomment-1407816838) in
-Zod version 3.x.
-
 ## Excessive properties in endpoint output
 
 The schema validator removes excessive properties by default. However, Typescript
@@ -1448,7 +1396,7 @@ in this case during development. You can achieve this verification by assigning 
 reusing it in forced type of the output:
 
 ```typescript
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const output = z.object({
   anything: z.number(),
