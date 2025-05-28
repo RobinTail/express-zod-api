@@ -34,7 +34,7 @@
   - `z.any()` and `z.unknown()` are not optional, details: https://v4.zod.dev/v4/changelog#changes-zunknown-optionality;
   - Added types generation for `z.never()`, `z.void()` and `z.unknown()` schemas;
   - The fallback type for unsupported schemas and unclear transformations in response changed from `any` to `unknown`;
-- The argument of `ResultHandler::handler` is now discriminated: either `output` or `error` is null, not both;
+- The argument of `ResultHandler::handler` is now discriminated: either `output` or `error` is `null`, not both;
 - The `getExamples()` public helper removed — use `.meta()?.examples` instead;
 - Added the new proprietary schema `ez.buffer()`;
 - The `ez.file()` schema removed: use `z.string()`, `z.base64()`, `ez.buffer()` or their union;
