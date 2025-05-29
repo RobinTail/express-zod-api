@@ -113,20 +113,9 @@ export const depictBuffer: Depicter = ({ jsonSchema }) => ({
 });
 
 export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
-  let propertyName: PropertyKey | undefined = undefined;
-  /**
-   * backwards compatibility case (before 3.25.35)
-   * @todo remove when support of those versions dropped
-   * @link https://github.com/colinhacks/zod/commit/fe75806cbb64683f237ed0e4ee93b67a2c5e976d
-   */
-  if ("disc" in zodSchema._zod && zodSchema._zod.disc instanceof Map) {
-    propertyName = Array.from(
-      (zodSchema._zod.disc as Map<PropertyKey, unknown>).keys(),
-    ).pop();
-  }
   /** @since Zod 3.25.35, there was "disc" property before */
-  if (zodSchema._zod.propValues)
-    propertyName = Object.keys(zodSchema._zod.propValues).pop();
+  if (!zodSchema._zod.propValues) return jsonSchema;
+  const propertyName = Object.keys(zodSchema._zod.propValues).pop();
   if (!propertyName) return jsonSchema;
   return {
     ...jsonSchema,

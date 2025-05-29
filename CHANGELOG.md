@@ -5,7 +5,7 @@
 ### v24.0.0
 
 - Switched to Zod 4:
-  - Minimum supported version of `zod` is 3.25.1, BUT imports MUST be from `zod/v4`;
+  - Minimum supported version of `zod` is 3.25.35, BUT imports MUST be from `zod/v4`;
     - Read the [Explanation of the versioning strategy](https://github.com/colinhacks/zod/issues/4371);
     - Express Zod API, however, is not aiming to support both Zod 3 and Zod 4 simultaneously due to:
       - incompatibility of data structures;
