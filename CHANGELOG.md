@@ -4,7 +4,6 @@
 
 ### v24.0.0
 
-- Minimum Node.js version supported: 20.18.1;
 - Switched to Zod 4:
   - Minimum supported version of `zod` is 3.25.35, BUT imports MUST be from `zod/v4`;
     - Read the [Explanation of the versioning strategy](https://github.com/colinhacks/zod/issues/4371);
