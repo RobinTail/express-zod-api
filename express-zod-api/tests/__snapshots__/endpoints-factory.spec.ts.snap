@@ -78,7 +78,6 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with refined ob
           "type": "string",
         },
       },
-      "required": [],
       "type": "object",
     },
     {
@@ -230,7 +229,6 @@ exports[`EndpointsFactory > .buildVoid() > Should be a shorthand for empty objec
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {},
-  "required": [],
   "type": "object",
 }
 `;
