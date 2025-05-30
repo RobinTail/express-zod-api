@@ -1258,7 +1258,6 @@ const yamlString = new Documentation({
   serverUrl: "https://example.com",
   composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
   // descriptions: { positiveResponse, negativeResponse, requestParameter, requestBody }, // check out these features
-  // numericRange: null, // to disable printing min/max values for z.number() based on JS engine limits
 }).getSpecAsYaml();
 ```
 
