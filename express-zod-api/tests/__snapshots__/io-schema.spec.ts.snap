@@ -21,48 +21,40 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
     {
-      "allOf": [
-        {
-          "allOf": [
-            {
-              "additionalProperties": false,
-              "properties": {
-                "one": {
-                  "type": "string",
-                },
-              },
-              "required": [
-                "one",
-              ],
-              "type": "object",
-            },
-            {
-              "additionalProperties": false,
-              "properties": {
-                "two": {
-                  "type": "number",
-                },
-              },
-              "required": [
-                "two",
-              ],
-              "type": "object",
-            },
-          ],
+      "additionalProperties": false,
+      "properties": {
+        "one": {
+          "type": "string",
         },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "three": {
-              "type": "null",
-            },
-          },
-          "required": [
-            "three",
-          ],
-          "type": "object",
-        },
+      },
+      "required": [
+        "one",
       ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "two": {
+          "type": "number",
+        },
+      },
+      "required": [
+        "two",
+      ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "three": {
+          "type": "null",
+        },
+      },
+      "required": [
+        "three",
+      ],
+      "type": "object",
     },
     {
       "additionalProperties": false,
@@ -85,92 +77,76 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
     {
-      "allOf": [
-        {
-          "allOf": [
-            {
-              "additionalProperties": false,
-              "properties": {
-                "one": {
-                  "type": "string",
-                },
-              },
-              "required": [
-                "one",
-              ],
-              "type": "object",
-            },
-            {
-              "additionalProperties": false,
-              "properties": {
-                "two": {
-                  "type": "number",
-                },
-              },
-              "required": [
-                "two",
-              ],
-              "type": "object",
-            },
-          ],
+      "additionalProperties": false,
+      "properties": {
+        "one": {
+          "type": "string",
         },
-        {
-          "allOf": [
-            {
-              "additionalProperties": false,
-              "properties": {
-                "three": {
-                  "type": "null",
-                },
-              },
-              "required": [
-                "three",
-              ],
-              "type": "object",
-            },
-            {
-              "additionalProperties": false,
-              "properties": {
-                "four": {
-                  "type": "boolean",
-                },
-              },
-              "required": [
-                "four",
-              ],
-              "type": "object",
-            },
-          ],
-        },
+      },
+      "required": [
+        "one",
       ],
+      "type": "object",
     },
     {
-      "allOf": [
-        {
-          "additionalProperties": false,
-          "properties": {
-            "five": {
-              "type": "string",
-            },
-          },
-          "required": [
-            "five",
-          ],
-          "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "two": {
+          "type": "number",
         },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "six": {
-              "type": "number",
-            },
-          },
-          "required": [
-            "six",
-          ],
-          "type": "object",
-        },
+      },
+      "required": [
+        "two",
       ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "three": {
+          "type": "null",
+        },
+      },
+      "required": [
+        "three",
+      ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "four": {
+          "type": "boolean",
+        },
+      },
+      "required": [
+        "four",
+      ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "five": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "five",
+      ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "six": {
+          "type": "number",
+        },
+      },
+      "required": [
+        "six",
+      ],
+      "type": "object",
     },
   ],
 }
@@ -181,62 +157,54 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
     {
-      "allOf": [
+      "additionalProperties": false,
+      "properties": {
+        "one": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "one",
+      ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "two": {
+          "type": "number",
+        },
+      },
+      "required": [
+        "two",
+      ],
+      "type": "object",
+    },
+    {
+      "anyOf": [
         {
-          "allOf": [
-            {
-              "additionalProperties": false,
-              "properties": {
-                "one": {
-                  "type": "string",
-                },
-              },
-              "required": [
-                "one",
-              ],
-              "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "three": {
+              "type": "null",
             },
-            {
-              "additionalProperties": false,
-              "properties": {
-                "two": {
-                  "type": "number",
-                },
-              },
-              "required": [
-                "two",
-              ],
-              "type": "object",
-            },
+          },
+          "required": [
+            "three",
           ],
+          "type": "object",
         },
         {
-          "anyOf": [
-            {
-              "additionalProperties": false,
-              "properties": {
-                "three": {
-                  "type": "null",
-                },
-              },
-              "required": [
-                "three",
-              ],
-              "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "four": {
+              "type": "boolean",
             },
-            {
-              "additionalProperties": false,
-              "properties": {
-                "four": {
-                  "type": "boolean",
-                },
-              },
-              "required": [
-                "four",
-              ],
-              "type": "object",
-            },
+          },
+          "required": [
+            "four",
           ],
+          "type": "object",
         },
       ],
     },
@@ -261,62 +229,58 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
     {
-      "allOf": [
+      "anyOf": [
         {
-          "anyOf": [
-            {
-              "additionalProperties": false,
-              "properties": {
-                "one": {
-                  "type": "string",
-                },
-              },
-              "required": [
-                "one",
-              ],
-              "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "one": {
+              "type": "string",
             },
-            {
-              "additionalProperties": false,
-              "properties": {
-                "two": {
-                  "type": "number",
-                },
-              },
-              "required": [
-                "two",
-              ],
-              "type": "object",
-            },
+          },
+          "required": [
+            "one",
           ],
+          "type": "object",
         },
         {
-          "anyOf": [
-            {
-              "additionalProperties": false,
-              "properties": {
-                "three": {
-                  "type": "null",
-                },
-              },
-              "required": [
-                "three",
-              ],
-              "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "two": {
+              "type": "number",
             },
-            {
-              "additionalProperties": false,
-              "properties": {
-                "four": {
-                  "type": "boolean",
-                },
-              },
-              "required": [
-                "four",
-              ],
-              "type": "object",
-            },
+          },
+          "required": [
+            "two",
           ],
+          "type": "object",
+        },
+      ],
+    },
+    {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "three": {
+              "type": "null",
+            },
+          },
+          "required": [
+            "three",
+          ],
+          "type": "object",
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "four": {
+              "type": "boolean",
+            },
+          },
+          "required": [
+            "four",
+          ],
+          "type": "object",
         },
       ],
     },
