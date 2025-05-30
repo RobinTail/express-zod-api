@@ -112,6 +112,16 @@ exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`]
     "message": "something: Expected string, got number",
   },
   "status": "error",
+  "tree": {
+    "errors": [],
+    "properties": {
+      "something": {
+        "errors": [
+          "Expected string, got number",
+        ],
+      },
+    },
+  },
 }
 `;
 
