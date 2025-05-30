@@ -429,26 +429,24 @@ const depict = (
   subject: $ZodType,
   { ctx, rules = depicters }: { ctx: OpenAPIContext; rules?: BrandHandling },
 ) => {
-  const { $defs = {}, properties = {} } = z.toJSONSchema(
-    z.object({ subject }), // avoiding "document root" references
-    {
-      unrepresentable: "any",
-      io: ctx.isResponse ? "output" : "input",
-      override: (zodCtx) => {
-        const brand = getBrand(zodCtx.zodSchema);
-        const depicter =
-          rules[
-            brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type
-          ];
-        if (depicter) {
-          const overrides = { ...depicter(zodCtx, ctx) };
-          for (const key in zodCtx.jsonSchema) delete zodCtx.jsonSchema[key];
-          Object.assign(zodCtx.jsonSchema, overrides);
-        }
-      },
+  const self = "subject";
+  const reg = z.registry<{ id?: string }>().add(subject, { id: self });
+  const { schemas } = z.toJSONSchema(reg, {
+    unrepresentable: "any",
+    io: ctx.isResponse ? "output" : "input",
+    uri: (id) => `#/components/schemas/${id}`,
+    override: (zodCtx) => {
+      const brand = getBrand(zodCtx.zodSchema);
+      const depicter =
+        rules[brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type];
+      if (depicter) {
+        const overrides = { ...depicter(zodCtx, ctx) };
+        for (const key in zodCtx.jsonSchema) delete zodCtx.jsonSchema[key];
+        Object.assign(zodCtx.jsonSchema, overrides);
+      }
     },
-  ) as JSONSchema.ObjectSchema;
-  return fixReferences(properties["subject"], $defs, ctx);
+  });
+  return R.omit(["$schema"], schemas[self]);
 };
 
 export const excludeParamsFromDepiction = (
