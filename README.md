@@ -201,7 +201,7 @@ const config = createConfig({
 ## Create your first endpoint
 
 Use the default factory to make an endpoint that responds with "Hello, World" or "Hello, {name}" depending on inputs.
-Learn to make factories for [customizing response](#response-customization) and by [adding middlewares](#middlewares).
+Learn how to make factories for [custom response](#response-customization) and by [adding middlewares](#middlewares).
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
