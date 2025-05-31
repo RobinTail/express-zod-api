@@ -25,7 +25,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -100,7 +99,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -145,7 +143,6 @@ paths:
             schema:
               type: object
               properties: {}
-              required: []
       responses:
         "200":
           description: POST /v1/getSome/thing Positive response
@@ -160,7 +157,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -235,7 +231,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -288,7 +283,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -442,7 +436,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -502,7 +495,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -1493,7 +1485,6 @@ paths:
                   result:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -1922,7 +1913,6 @@ paths:
             schema:
               type: object
               properties: {}
-              required: []
       responses:
         "200":
           description: POST /v1/getSomething Positive response
@@ -2827,7 +2817,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -2921,7 +2910,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -3013,7 +3001,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -3371,7 +3358,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -3585,7 +3571,6 @@ components:
         data:
           type: object
           properties: {}
-          required: []
           additionalProperties: false
       required:
         - status
@@ -4366,7 +4351,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -4475,7 +4459,6 @@ components:
         data:
           type: object
           properties: {}
-          required: []
           additionalProperties: false
       required:
         - status
@@ -4560,7 +4543,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status
@@ -4656,7 +4638,6 @@ paths:
                   data:
                     type: object
                     properties: {}
-                    required: []
                     additionalProperties: false
                 required:
                   - status

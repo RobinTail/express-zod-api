@@ -5,7 +5,7 @@
 ### v24.0.0
 
 - Switched to Zod 4:
-  - Minimum supported version of `zod` is 3.25.1, BUT imports MUST be from `zod/v4`;
+  - Minimum supported version of `zod` is 3.25.35, BUT imports MUST be from `zod/v4`;
     - Read the [Explanation of the versioning strategy](https://github.com/colinhacks/zod/issues/4371);
     - Express Zod API, however, is not aiming to support both Zod 3 and Zod 4 simultaneously due to:
       - incompatibility of data structures;
@@ -31,7 +31,8 @@
   - Use `.optional()` to add question mark to the object property as well as `undefined` to its type;
   - Use `.or(z.undefined())` to add `undefined` to the type of the object property;
   - See the [reasoning](https://x.com/colinhacks/status/1919292504861491252);
-  - `z.any()` and `z.unknown()` are required: [details](https://v4.zod.dev/v4/changelog#changes-zunknown-optionality);
+  - Properties assigned with `z.any()` or `z.unknown()` schema are now typed as required:
+    - Read the [details here](https://v4.zod.dev/v4/changelog#changes-zunknown-optionality);
   - Added types generation for `z.never()`, `z.void()` and `z.unknown()` schemas;
   - The fallback type for unsupported schemas and unclear transformations in response changed from `any` to `unknown`;
 - The argument of `ResultHandler::handler` is now discriminated: either `output` or `error` is `null`, not both;

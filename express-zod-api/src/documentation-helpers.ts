@@ -113,8 +113,10 @@ export const depictBuffer: Depicter = ({ jsonSchema }) => ({
 });
 
 export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
-  if (!zodSchema._zod.disc) return jsonSchema;
-  const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
+  /** @since Zod 3.25.35, there was "disc" property before */
+  if (!zodSchema._zod.propValues) return jsonSchema;
+  const propertyName = Object.keys(zodSchema._zod.propValues).pop();
+  if (!propertyName) return jsonSchema;
   return {
     ...jsonSchema,
     discriminator: jsonSchema.discriminator ?? { propertyName },
@@ -393,8 +395,8 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
   };
 
 /**
- * postprocessing refs: specifying "uri" function and custom registries didn't allow to customize ref name
- * @todo is there a less hacky way to do that?
+ * @todo simplify if fixed (unable to customize references):
+ * @link https://github.com/colinhacks/zod/issues/4281
  * */
 const fixReferences = (
   subject: JSONSchema.BaseSchema,
