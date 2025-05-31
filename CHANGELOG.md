@@ -2,6 +2,15 @@
 
 ## Version 24
 
+### v24.1.0
+
+- Supporting the new `z.templateLiteral()` schema by the `Integration` (client side types generator).
+
+```ts
+// z.templateLiteral(["start", z.number(), "mid", z.boolean(), "end"])
+type Type1 = `start${number}mid${boolean}end`;
+```
+
 ### v24.0.0
 
 - Switched to Zod 4:
