@@ -13,8 +13,10 @@ import type {
   $ZodPipe,
   $ZodReadonly,
   $ZodRecord,
+  $ZodTemplateLiteral,
   $ZodTransform,
   $ZodTuple,
+  $ZodType,
   $ZodUnion,
 } from "zod/v4/core";
 import * as R from "ramda";
@@ -67,6 +69,37 @@ const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
       : makeLiteralType(entry),
   );
   return values.length === 1 ? values[0] : f.createUnionTypeNode(values);
+};
+
+const onTemplateLiteral: Producer = (
+  { _zod: { def } }: $ZodTemplateLiteral,
+  { next },
+) => {
+  const parts = [...def.parts];
+  const shiftText = () => {
+    let text = "";
+    while (parts.length) {
+      const part = parts.shift();
+      if (isSchema(part)) {
+        parts.unshift(part);
+        break;
+      }
+      text += part ?? ""; // Handle potential undefined values
+    }
+    return text;
+  };
+  const head = f.createTemplateHead(shiftText());
+  const spans: ts.TemplateLiteralTypeSpan[] = [];
+  while (parts.length) {
+    const schema = next(parts.shift() as $ZodType);
+    const text = shiftText();
+    const textWrapper = parts.length
+      ? f.createTemplateMiddle
+      : f.createTemplateTail;
+    spans.push(f.createTemplateLiteralTypeSpan(schema, textWrapper(text)));
+  }
+  if (!spans.length) return makeLiteralType(head.text);
+  return f.createTemplateLiteralType(head, spans);
 };
 
 const onObject: Producer = (
@@ -221,6 +254,7 @@ const producers: HandlingRules<
   record: onRecord,
   object: onObject,
   literal: onLiteral,
+  template_literal: onTemplateLiteral,
   intersection: onIntersection,
   union: onSomeUnion,
   default: onWrapped,
