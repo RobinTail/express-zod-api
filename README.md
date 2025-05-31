@@ -194,7 +194,7 @@ import { createConfig } from "express-zod-api";
 
 const config = createConfig({
   http: { listen: 8090 }, // port, UNIX socket or Net::ListenOptions
-  cors: true, // must be specified explicitly
+  cors: false, // @todo decide on CORS later
 });
 ```
 
@@ -592,18 +592,15 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
 
 ## Cross-Origin Resource Sharing
 
-You can enable your API for other domains using the corresponding configuration option `cors`.
-It's _not optional_ to draw your attention to making the appropriate decision, however, it's enabled in the
-[Quick start example](#set-up-config) above, assuming that in most cases you will want to enable this feature.
-See [MDN article](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) for more information.
-
-In addition to being a boolean, `cors` can also be assigned a function that overrides default CORS headers.
-That function has several parameters and can be asynchronous.
+You can enable your API for other domains using the corresponding configuration option `cors`. It's _not optional_ in
+order to draw your attention to making the appropriate decision. In addition to being a boolean, `cors` can also be
+assigned a function that overrides default CORS headers. That function has several parameters and can be asynchronous.
 
 ```typescript
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
+  /** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS */
   cors: ({ defaultHeaders, request, endpoint, logger }) => ({
     ...defaultHeaders,
     "Access-Control-Max-Age": "5000",
