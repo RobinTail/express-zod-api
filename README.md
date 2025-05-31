@@ -186,34 +186,25 @@ Ensure having the following options in your `tsconfig.json` file in order to mak
 
 ## Set up config
 
-Create a minimal configuration. _See all available options
-[in sources](https://github.com/RobinTail/express-zod-api/blob/master/express-zod-api/src/config-type.ts)._
+Create a minimal configuration. Find out all configurable options
+[in sources](https://github.com/RobinTail/express-zod-api/blob/master/express-zod-api/src/config-type.ts).
 
 ```typescript
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  http: {
-    listen: 8090, // port, UNIX socket or options
-  },
-  cors: true,
+  http: { listen: 8090 }, // port, UNIX socket or Net::ListenOptions
+  cors: true, // must be specified explicitly
 });
-```
-
-## Create an endpoints factory
-
-In the basic case, you can just import and use the default factory.
-_See also [Middlewares](#middlewares) and [Response customization](#response-customization)._
-
-```typescript
-import { defaultEndpointsFactory } from "express-zod-api";
 ```
 
 ## Create your first endpoint
 
-The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supplied within `GET` request payload.
+Use the default factory to make an endpoint that responds with "Hello, World" or "Hello, {name}" depending on inputs.
+Learn to make factories for [customizing response](#response-customization) and by [adding middlewares](#middlewares).
 
 ```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
 import { z } from "zod/v4";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
