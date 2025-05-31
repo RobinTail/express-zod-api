@@ -14,9 +14,9 @@ import type {
   $ZodReadonly,
   $ZodRecord,
   $ZodTemplateLiteral,
-  $ZodTemplateLiteralPart,
   $ZodTransform,
   $ZodTuple,
+  $ZodType,
   $ZodUnion,
 } from "zod/v4/core";
 import * as R from "ramda";
@@ -75,28 +75,27 @@ const onTemplateLiteral: Producer = (
   { _zod: { def } }: $ZodTemplateLiteral,
   { next },
 ) => {
-  const [first, ...rest] = def.parts;
-  /** has side effect on rest.length */
-  const ensureString = (part: $ZodTemplateLiteralPart) => {
-    if (!isSchema(part)) return `${part || ""}`;
-    rest.unshift(part);
-    return "";
-  };
-  const head = f.createTemplateHead(ensureString(first));
-  const spans: ts.TemplateLiteralTypeSpan[] = [];
-  while (rest.length) {
-    const a = rest.shift();
-    if (!isSchema(a)) {
-      (spans[spans.length - 1]?.literal || head).text += `${a}`;
-      continue;
+  const shiftText = (parts: typeof def.parts) => {
+    let text = "";
+    while (parts.length) {
+      const part = parts.shift();
+      if (isSchema(part)) {
+        parts.unshift(part);
+        break;
+      }
+      text += part;
     }
-    const b = ensureString(rest.shift());
-    spans.push(
-      f.createTemplateLiteralTypeSpan(
-        next(a),
-        (rest.length ? f.createTemplateMiddle : f.createTemplateTail)(b),
-      ),
-    );
+    return text;
+  };
+  const head = f.createTemplateHead(shiftText(def.parts));
+  const spans: ts.TemplateLiteralTypeSpan[] = [];
+  while (def.parts.length) {
+    const schema = next(def.parts.shift() as $ZodType);
+    const text = shiftText(def.parts);
+    const textWrapper = def.parts.length
+      ? f.createTemplateMiddle
+      : f.createTemplateTail;
+    spans.push(f.createTemplateLiteralTypeSpan(schema, textWrapper(text)));
   }
   if (!spans.length) return makeLiteralType(head.text);
   return f.createTemplateLiteralType(head, spans);
