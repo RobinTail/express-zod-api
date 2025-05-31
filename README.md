@@ -592,9 +592,9 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
 
 ## Cross-Origin Resource Sharing
 
-You can enable your API for other domains using the corresponding configuration option `cors`. It's _not optional_ in
-order to draw your attention to making the appropriate decision. In addition to being a boolean, `cors` can also be
-assigned a function that overrides default CORS headers. That function has several parameters and can be asynchronous.
+You can enable your API for other domains using the corresponding configuration option `cors`. The value is required to
+ensure you explicitly choose the correct setting. In addition to being a boolean, `cors` can also be assigned a
+function that overrides default CORS headers. That function has several parameters and can be asynchronous.
 
 ```typescript
 import { createConfig } from "express-zod-api";
