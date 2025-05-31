@@ -27,10 +27,10 @@ Start your API server with I/O schema validation and custom middlewares in minut
    8. [Dealing with dates](#dealing-with-dates)
    9. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
    10. [Enabling HTTPS](#enabling-https)
-   11. [Customizing logger](#customizing-logger)
-   12. [Child logger](#child-logger)
-   13. [Profiling](#profiling)
-   14. [Enabling compression](#enabling-compression)
+   11. [Enabling compression](#enabling-compression)
+   12. [Customizing logger](#customizing-logger)
+   13. [Child logger](#child-logger)
+   14. [Profiling](#profiling)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Headers as input source](#headers-as-input-source)
@@ -638,6 +638,25 @@ Ensure having `@types/node` package installed. At least you need to specify the 
 certificate and the key, issued by the certifying authority. For example, you can acquire a free TLS certificate for
 your API at [Let's Encrypt](https://letsencrypt.org/).
 
+## Enabling compression
+
+According to [Express.js best practices guide](https://expressjs.com/en/advanced/best-practice-performance.html)
+it might be a good idea to enable GZIP and Brotli compression for your API responses.
+
+Install `compression` and `@types/compression`, and enable or configure compression:
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  /** @link https://www.npmjs.com/package/compression#options */
+  compression: { threshold: "1kb" }, // or true
+});
+```
+
+In order to receive a compressed response the client should include the following header in the request:
+`Accept-Encoding: br, gzip, deflate`. Only responses with compressible content types are subject to compression.
+
 ## Customizing logger
 
 A simple built-in console logger is used by default with the following options that you can configure:
@@ -727,25 +746,6 @@ logger.profile({
 doExpensiveOperation();
 done(); // error: expensive operation '555.55ms'
 ```
-
-## Enabling compression
-
-According to [Express.js best practices guide](https://expressjs.com/en/advanced/best-practice-performance.html)
-it might be a good idea to enable GZIP and Brotli compression for your API responses.
-
-Install `compression` and `@types/compression`, and enable or configure compression:
-
-```typescript
-import { createConfig } from "express-zod-api";
-
-const config = createConfig({
-  /** @link https://www.npmjs.com/package/compression#options */
-  compression: { threshold: "1kb" }, // or true
-});
-```
-
-In order to receive a compressed response the client should include the following header in the request:
-`Accept-Encoding: br, gzip, deflate`. Only responses with compressible content types are subject to compression.
 
 # Advanced features
 
