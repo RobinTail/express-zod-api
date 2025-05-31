@@ -259,7 +259,7 @@ paths:
                   examples:
                     - John Doe
                   type: string
-                  pattern: ^[\s\S]{1,} [\s\S]{1,}$
+                  pattern: ^\w+ \w+$
               required:
                 - name
             examples:

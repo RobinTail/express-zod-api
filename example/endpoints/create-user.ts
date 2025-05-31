@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { z } from "zod/v4";
 import { statusDependingFactory } from "../factories";
 
-const namePart = z.string().trim().min(1);
+const namePart = z.string().regex(/^\w+$/);
 
 /** @desc depending on the thrown error, the custom result handler of the factory responds slightly differently */
 export const createUserEndpoint = statusDependingFactory.build({
