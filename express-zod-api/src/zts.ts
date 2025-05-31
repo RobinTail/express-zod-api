@@ -75,7 +75,8 @@ const onTemplateLiteral: Producer = (
   { _zod: { def } }: $ZodTemplateLiteral,
   { next },
 ) => {
-  const shiftText = (parts: typeof def.parts) => {
+  const parts = [...def.parts];
+  const shiftText = () => {
     let text = "";
     while (parts.length) {
       const part = parts.shift();
@@ -83,16 +84,16 @@ const onTemplateLiteral: Producer = (
         parts.unshift(part);
         break;
       }
-      text += part;
+      text += part ?? ""; // Handle potential undefined values
     }
     return text;
   };
-  const head = f.createTemplateHead(shiftText(def.parts));
+  const head = f.createTemplateHead(shiftText());
   const spans: ts.TemplateLiteralTypeSpan[] = [];
-  while (def.parts.length) {
-    const schema = next(def.parts.shift() as $ZodType);
-    const text = shiftText(def.parts);
-    const textWrapper = def.parts.length
+  while (parts.length) {
+    const schema = next(parts.shift() as $ZodType);
+    const text = shiftText();
+    const textWrapper = parts.length
       ? f.createTemplateMiddle
       : f.createTemplateTail;
     spans.push(f.createTemplateLiteralTypeSpan(schema, textWrapper(text)));

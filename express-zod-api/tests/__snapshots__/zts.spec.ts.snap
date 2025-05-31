@@ -313,3 +313,7 @@ exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript
 exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 7 1`] = `"\`leading\${boolean}\`"`;
 
 exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 8 1`] = `""""`;
+
+exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 9 1`] = `""head""`;
+
+exports[`zod-to-ts > z.templateLiteral() > should produce the correct typescript 10 1`] = `""head0""`;
