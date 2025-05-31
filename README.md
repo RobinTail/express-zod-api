@@ -30,7 +30,6 @@ Start your API server with I/O schema validation and custom middlewares in minut
    11. [Enabling compression](#enabling-compression)
    12. [Customizing logger](#customizing-logger)
    13. [Child logger](#child-logger)
-   14. [Profiling](#profiling)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Headers as input source](#headers-as-input-source)
@@ -48,8 +47,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
    1. [Different responses for different status codes](#different-responses-for-different-status-codes)
    2. [Array response](#array-response) for migrating legacy APIs
    3. [Accepting raw data](#accepting-raw-data)
-   4. [Graceful shutdown](#graceful-shutdown)
-   5. [Subscriptions](#subscriptions)
+   4. [Profiling](#profiling)
+   5. [Graceful shutdown](#graceful-shutdown)
+   6. [Subscriptions](#subscriptions)
 7. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [Generating a Frontend Client](#generating-a-frontend-client)
@@ -715,38 +715,6 @@ const config = createConfig({
 });
 ```
 
-## Profiling
-
-For debugging and performance testing purposes the framework offers a simple `.profile()` method on the built-in logger.
-It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
-invoke the returned callback. The default severity of those measurements is `debug`.
-
-```typescript
-import { createConfig, BuiltinLogger } from "express-zod-api";
-
-// This enables the .profile() method on built-in logger:
-declare module "express-zod-api" {
-  interface LoggerOverrides extends BuiltinLogger {}
-}
-
-// Inside a handler of Endpoint, Middleware or ResultHandler:
-const done = logger.profile("expensive operation");
-doExpensiveOperation();
-done(); // debug: expensive operation '555 milliseconds'
-```
-
-You can also customize the profiler with your own formatter, chosen severity or even performance assessment function:
-
-```typescript
-logger.profile({
-  message: "expensive operation",
-  severity: (ms) => (ms > 500 ? "error" : "info"), // assess immediately
-  formatter: (ms) => `${ms.toFixed(2)}ms`, // custom format
-});
-doExpensiveOperation();
-done(); // error: expensive operation '555.55ms'
-```
-
 # Advanced features
 
 ## Customizing input sources
@@ -1140,6 +1108,38 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
     length: raw.length, // raw is Buffer
   }),
 });
+```
+
+## Profiling
+
+For debugging and performance testing purposes the framework offers a simple `.profile()` method on the built-in logger.
+It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
+invoke the returned callback. The default severity of those measurements is `debug`.
+
+```typescript
+import { createConfig, BuiltinLogger } from "express-zod-api";
+
+// This enables the .profile() method on built-in logger:
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+
+// Inside a handler of Endpoint, Middleware or ResultHandler:
+const done = logger.profile("expensive operation");
+doExpensiveOperation();
+done(); // debug: expensive operation '555 milliseconds'
+```
+
+You can also customize the profiler with your own formatter, chosen severity or even performance assessment function:
+
+```typescript
+logger.profile({
+  message: "expensive operation",
+  severity: (ms) => (ms > 500 ? "error" : "info"), // assess immediately
+  formatter: (ms) => `${ms.toFixed(2)}ms`, // custom format
+});
+doExpensiveOperation();
+done(); // error: expensive operation '555.55ms'
 ```
 
 ## Graceful shutdown
