@@ -30,10 +30,7 @@ declare module "zod/v4/core" {
 
 declare module "zod/v4" {
   interface ZodType {
-    /**
-     * @desc Shorthand for .meta({examples}), it can be called multiple times
-     * @todo Colin made it "unknown" after all my efforts on adopting z.output ¯\_(ツ)_/¯
-     * */
+    /** @desc Alias for .meta({examples}), but argument is typed to ensure the correct placement for transformations */
     example(example: z.output<this>): this;
     deprecated(): this;
   }
