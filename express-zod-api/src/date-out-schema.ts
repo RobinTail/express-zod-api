@@ -10,7 +10,4 @@ export const dateOut = ({
     .date()
     .transform((date) => date.toISOString())
     .brand(ezDateOutBrand as symbol)
-    .meta({
-      ...rest,
-      examples: examples as Array<string & z.$brand> | undefined,
-    });
+    .meta({ ...rest, examples: examples });
