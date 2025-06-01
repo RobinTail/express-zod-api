@@ -10,7 +10,7 @@
 import * as R from "ramda";
 import { z } from "zod/v4";
 import { FlatObject } from "./common-helpers";
-import { metaSymbol } from "./metadata";
+import { getExamples, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
 import type {
   $ZodType,
@@ -30,7 +30,10 @@ declare module "zod/v4/core" {
 
 declare module "zod/v4" {
   interface ZodType {
-    /** @desc Shorthand for .meta({examples}), it can be called multiple times */
+    /**
+     * @desc Shorthand for .meta({examples}), it can be called multiple times
+     * @todo Colin made it "unknown" after all my efforts on adopting z.output ¯\_(ツ)_/¯
+     * */
     example(example: z.output<this>): this;
     deprecated(): this;
   }
@@ -88,10 +91,9 @@ const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
 );
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
-  const { examples = [] } = this.meta() || {};
-  const copy = examples.slice();
-  copy.push(value);
-  return this.meta({ examples: copy });
+  const examples = getExamples(this).slice();
+  examples.push(value);
+  return this.meta({ examples });
 };
 
 const deprecationSetter = function (this: z.ZodType) {
