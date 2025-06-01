@@ -1,8 +1,10 @@
 import type {
+  $ZodDiscriminatedUnion,
   $ZodPipe,
   $ZodTransform,
   $ZodTuple,
   $ZodType,
+  $ZodUnion,
   JSONSchema,
 } from "zod/v4/core";
 import {
@@ -113,8 +115,10 @@ export const depictBuffer: Depicter = ({ jsonSchema }) => ({
 });
 
 export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
-  if (!zodSchema._zod.disc) return jsonSchema;
-  const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
+  if (!isSchema<$ZodUnion | $ZodDiscriminatedUnion>(zodSchema, "union"))
+    return jsonSchema;
+  if (!("discriminator" in zodSchema._zod.def)) return jsonSchema;
+  const propertyName: string = zodSchema._zod.def.discriminator;
   return {
     ...jsonSchema,
     discriminator: jsonSchema.discriminator ?? { propertyName },
@@ -393,8 +397,8 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
   };
 
 /**
- * postprocessing refs: specifying "uri" function and custom registries didn't allow to customize ref name
- * @todo is there a less hacky way to do that?
+ * @todo simplify if fixed (unable to customize references):
+ * @link https://github.com/colinhacks/zod/issues/4281
  * */
 const fixReferences = (
   subject: JSONSchema.BaseSchema,

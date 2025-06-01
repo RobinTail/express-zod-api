@@ -550,7 +550,10 @@ describe("Routing", () => {
 
     test.each([
       [z.string().array(), z.string()],
-      [z.lazy(() => z.number()), z.object({}).pipe(z.array(z.string()))],
+      [
+        z.lazy(() => z.number()),
+        z.record(z.number(), z.string()).pipe(z.array(z.string())),
+      ],
     ])("should warn about non-object based schemas I/O %#", (input, output) => {
       const endpoint = new EndpointsFactory(defaultResultHandler).build({
         input: input as unknown as z.ZodObject,

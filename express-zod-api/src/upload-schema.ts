@@ -3,6 +3,7 @@ import { z } from "zod/v4";
 
 export const ezUploadBrand = Symbol("Upload");
 
+/** @todo add options to control size and mime type and then depict as z.file() */
 export const upload = () =>
   z
     .custom<UploadedFile>(

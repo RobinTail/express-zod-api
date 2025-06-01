@@ -10,6 +10,7 @@ import { contentTypes } from "./content-type";
 import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
+import { getExamples } from "./metadata";
 import {
   DiscriminatedResult,
   ensureHttpError,
@@ -102,7 +103,7 @@ export const defaultResultHandler = new ResultHandler({
       status: z.literal("success"),
       data: output,
     });
-    const { examples = [] } = globalRegistry.get(output) || {}; // pulling down:
+    const examples = getExamples(output); // pulling down:
     if (examples.length) {
       globalRegistry.add(responseSchema, {
         examples: examples.map((data) => ({
@@ -158,9 +159,8 @@ export const arrayResultHandler = new ResultHandler({
       output.shape.items instanceof z.ZodArray
         ? output.shape.items
         : z.array(z.any());
-    const meta = responseSchema.meta();
-    if (meta?.examples?.length) return responseSchema; // has examples on the items, or pull down:
-    const examples = (globalRegistry.get(output)?.examples || [])
+    if (getExamples(responseSchema).length) return responseSchema; // has examples on the items, or pull down:
+    const examples = getExamples(output)
       .filter(
         (example): example is { items: unknown[] } =>
           isObject(example) &&
@@ -169,9 +169,10 @@ export const arrayResultHandler = new ResultHandler({
       )
       .map((example) => example.items);
     if (examples.length) {
+      const current = responseSchema.meta();
       globalRegistry
         .remove(responseSchema) // reassign to avoid cloning
-        .add(responseSchema, { ...meta, examples });
+        .add(responseSchema, { ...current, examples });
     }
     return responseSchema;
   },
