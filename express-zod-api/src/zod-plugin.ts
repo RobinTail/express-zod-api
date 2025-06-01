@@ -24,7 +24,6 @@ import type {
 
 declare module "zod/v4/core" {
   interface GlobalMeta {
-    deprecated?: boolean;
     default?: unknown; // can be an actual value or a label like "Today"
   }
 }
