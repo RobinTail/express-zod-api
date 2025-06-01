@@ -152,9 +152,7 @@ export const arrayResultHandler = new ResultHandler({
       output.shape.items instanceof z.ZodArray
         ? output.shape.items
         : z.array(z.any());
-    const meta = responseSchema.meta();
-    // @todo this can be object now, use getExamples()
-    if (meta?.examples?.length) return responseSchema; // has examples on the items, or pull down:
+    if (getExamples(responseSchema).length) return responseSchema; // has examples on the items, or pull down:
     const examples = getExamples(output)
       .filter(
         (example): example is { items: unknown[] } =>
@@ -164,9 +162,10 @@ export const arrayResultHandler = new ResultHandler({
       )
       .map((example) => example.items);
     if (examples.length) {
+      const current = responseSchema.meta();
       globalRegistry
         .remove(responseSchema) // reassign to avoid cloning
-        .add(responseSchema, { ...meta, examples });
+        .add(responseSchema, { ...current, examples });
     }
     return responseSchema;
   },
