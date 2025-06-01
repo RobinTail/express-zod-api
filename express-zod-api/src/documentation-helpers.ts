@@ -1,8 +1,10 @@
 import type {
+  $ZodDiscriminatedUnion,
   $ZodPipe,
   $ZodTransform,
   $ZodTuple,
   $ZodType,
+  $ZodUnion,
   JSONSchema,
 } from "zod/v4/core";
 import {
@@ -112,12 +114,11 @@ export const depictBuffer: Depicter = ({ jsonSchema }) => ({
   },
 });
 
-/** @todo use def.discriminator instead */
 export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
-  /** @since Zod 3.25.35, there was "disc" property before */
-  if (!zodSchema._zod.propValues) return jsonSchema;
-  const propertyName = Object.keys(zodSchema._zod.propValues).pop();
-  if (!propertyName) return jsonSchema;
+  if (!isSchema<$ZodUnion | $ZodDiscriminatedUnion>(zodSchema, "union"))
+    return jsonSchema;
+  if (!("discriminator" in zodSchema._zod.def)) return jsonSchema;
+  const propertyName: string = zodSchema._zod.def.discriminator;
   return {
     ...jsonSchema,
     discriminator: jsonSchema.discriminator ?? { propertyName },
