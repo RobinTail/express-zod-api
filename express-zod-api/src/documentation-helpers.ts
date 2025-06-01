@@ -119,7 +119,6 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
     return jsonSchema;
   if (!("discriminator" in zodSchema._zod.def)) return jsonSchema;
   const propertyName: string = zodSchema._zod.def.discriminator;
-  if (!propertyName) return jsonSchema;
   return {
     ...jsonSchema,
     discriminator: jsonSchema.discriminator ?? { propertyName },
