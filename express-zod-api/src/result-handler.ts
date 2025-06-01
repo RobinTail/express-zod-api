@@ -9,6 +9,7 @@ import { FlatObject, isObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
+import { getExamples } from "./metadata";
 import {
   DiscriminatedResult,
   ensureHttpError,
@@ -100,7 +101,7 @@ export const defaultResultHandler = new ResultHandler({
       status: z.literal("success"),
       data: output,
     });
-    const { examples = [] } = globalRegistry.get(output) || {}; // pulling down:
+    const examples = getExamples(output); // pulling down:
     if (examples.length) {
       globalRegistry.add(responseSchema, {
         examples: examples.map((data) => ({
@@ -153,7 +154,7 @@ export const arrayResultHandler = new ResultHandler({
         : z.array(z.any());
     const meta = responseSchema.meta();
     if (meta?.examples?.length) return responseSchema; // has examples on the items, or pull down:
-    const examples = (globalRegistry.get(output)?.examples || [])
+    const examples = getExamples(output)
       .filter(
         (example): example is { items: unknown[] } =>
           isObject(example) &&
