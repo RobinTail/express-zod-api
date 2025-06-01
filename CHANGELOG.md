@@ -4,7 +4,9 @@
 
 ### v24.1.0
 
-- Supporting the new `z.templateLiteral()` schema by the `Integration` (client side types generator).
+- Supporting the new `z.templateLiteral()` schema by the `Integration` (client side types generator);
+- Compatibility improvements due to the recent changes in Zod 4:
+  - Restoring publicly exposed `getExamples()` helper (with a new signature);
 
 ```ts
 // z.templateLiteral(["start", z.number(), "mid", z.boolean(), "end"])

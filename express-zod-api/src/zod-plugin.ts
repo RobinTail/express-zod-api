@@ -10,7 +10,7 @@
 import * as R from "ramda";
 import { z } from "zod/v4";
 import { FlatObject } from "./common-helpers";
-import { metaSymbol } from "./metadata";
+import { getExamples, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
 import type {
   $ZodType,
@@ -24,14 +24,13 @@ import type {
 
 declare module "zod/v4/core" {
   interface GlobalMeta {
-    deprecated?: boolean;
     default?: unknown; // can be an actual value or a label like "Today"
   }
 }
 
 declare module "zod/v4" {
   interface ZodType {
-    /** @desc Shorthand for .meta({examples}), it can be called multiple times */
+    /** @desc Alias for .meta({examples}), but argument is typed to ensure the correct placement for transformations */
     example(example: z.output<this>): this;
     deprecated(): this;
   }
@@ -89,10 +88,9 @@ const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
 );
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
-  const { examples = [] } = this.meta() || {};
-  const copy = examples.slice();
-  copy.push(value);
-  return this.meta({ examples: copy });
+  const examples = getExamples(this).slice();
+  examples.push(value);
+  return this.meta({ examples });
 };
 
 const deprecationSetter = function (this: z.ZodType) {
@@ -129,7 +127,7 @@ const objectMapper = function (
   );
   const hasPassThrough = this._zod.def.catchall instanceof z.ZodUnknown;
   const output = (hasPassThrough ? z.looseObject : z.object)(nextShape); // proxies unknown keys when set to "passthrough"
-  return this.transform(transformer).pipe(output);
+  return this.transform(transformer as () => object).pipe(output); // @since zod 3.25.45 had to loosen transformer type
 };
 
 if (!(metaSymbol in globalThis)) {

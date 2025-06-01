@@ -46,7 +46,6 @@ paths:
                     required:
                       - id
                       - name
-                      - features
                     additionalProperties: false
                 required:
                   - status

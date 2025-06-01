@@ -29,7 +29,11 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
     output: z.object({
       id: z.int().nonnegative(),
       name: z.string(),
-      features: feature.array(),
+      /**
+       * @todo rm .optional() when external bug fixed
+       * @link https://github.com/colinhacks/zod/issues/4592
+       */
+      features: feature.array().optional(),
     }),
     handler: async ({ input: { id }, options: { method }, logger }) => {
       logger.debug(`Requested id: ${id}, method ${method}`);
