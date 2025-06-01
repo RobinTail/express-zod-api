@@ -87,6 +87,7 @@ export class Endpoint<
   /** considered expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
     const meta = this.#def.outputSchema.meta();
+    // @todo this can be object now, use getExamples()
     if (meta?.examples?.length) return; // has examples on the output schema, or pull up:
     if (!isSchema<$ZodObject>(this.#def.outputSchema, "object")) return;
     const examples = pullResponseExamples(this.#def.outputSchema as $ZodObject);
