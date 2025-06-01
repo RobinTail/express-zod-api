@@ -93,10 +93,7 @@ export class Endpoint<
     const current = this.#def.outputSchema.meta();
     globalRegistry
       .remove(this.#def.outputSchema) // reassign to avoid cloning
-      .add(this.#def.outputSchema as $ZodObject, {
-        ...current,
-        examples,
-      });
+      .add(this.#def.outputSchema as $ZodObject, { ...current, examples });
   });
 
   constructor(def: {
