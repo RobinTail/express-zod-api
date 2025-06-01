@@ -112,6 +112,7 @@ export const depictBuffer: Depicter = ({ jsonSchema }) => ({
   },
 });
 
+/** @todo use def.discriminator instead */
 export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
   /** @since Zod 3.25.35, there was "disc" property before */
   if (!zodSchema._zod.propValues) return jsonSchema;
