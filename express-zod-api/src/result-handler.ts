@@ -153,6 +153,7 @@ export const arrayResultHandler = new ResultHandler({
         ? output.shape.items
         : z.array(z.any());
     const meta = responseSchema.meta();
+    // @todo this can be object now, use getExamples()
     if (meta?.examples?.length) return responseSchema; // has examples on the items, or pull down:
     const examples = getExamples(output)
       .filter(
