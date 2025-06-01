@@ -20,8 +20,9 @@ export const getBrand = (subject: $ZodType) => {
  * @link https://github.com/colinhacks/zod/pull/4586
  * */
 export const getExamples = (subject: $ZodType): ReadonlyArray<unknown> => {
-  const { examples = [], example } = globalRegistry.get(subject) || {};
+  const { examples, example } = globalRegistry.get(subject) || {};
   if (Array.isArray(examples)) return examples;
-  if (isObject(examples)) return Object.values(examples);
+  if (isObject(examples))
+    return Object.values(examples).map(({ value }) => value);
   return example === undefined ? [] : [example];
 };
