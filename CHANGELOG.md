@@ -2,6 +2,10 @@
 
 ## Version 24
 
+### v24.2.0
+
+- Supporting `z.nonoptional()` schema by `Integration` generator.
+
 ### v24.1.0
 
 - Supporting the new `z.templateLiteral()` schema by the `Integration` (client side types generator);
