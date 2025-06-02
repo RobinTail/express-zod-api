@@ -106,16 +106,6 @@ DocumentationError({
 })
 `;
 
-exports[`Documentation helpers > depictEnum() > should set type 1`] = `
-{
-  "enum": [
-    "test",
-    "jest",
-  ],
-  "type": "string",
-}
-`;
-
 exports[`Documentation helpers > depictIntersection() > should NOT flatten object schemas having conflicting props 1`] = `
 {
   "allOf": [

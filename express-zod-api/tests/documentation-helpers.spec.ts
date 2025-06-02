@@ -25,7 +25,6 @@ import {
   depictDateIn,
   depictDateOut,
   depictBody,
-  depictEnum,
   depictLiteral,
   depictRequest,
 } from "../src/documentation-helpers";
@@ -299,17 +298,6 @@ describe("Documentation helpers", () => {
     ])("should not add null type when it's already there %#", (jsonSchema) => {
       expect(
         depictNullable({ zodSchema: z.never(), jsonSchema }, requestCtx),
-      ).toMatchSnapshot();
-    });
-  });
-
-  describe("depictEnum()", () => {
-    test("should set type", () => {
-      expect(
-        depictEnum(
-          { zodSchema: z.never(), jsonSchema: { enum: ["test", "jest"] } },
-          requestCtx,
-        ),
       ).toMatchSnapshot();
     });
   });
