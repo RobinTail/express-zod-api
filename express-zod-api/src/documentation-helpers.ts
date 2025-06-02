@@ -143,11 +143,6 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
   subject in samples;
 
-export const depictEnum: Depicter = ({ jsonSchema }) => ({
-  type: typeof jsonSchema.enum?.[0],
-  ...jsonSchema,
-});
-
 export const depictLiteral: Depicter = ({ jsonSchema }) => ({
   type: typeof (jsonSchema.const || jsonSchema.enum?.[0]),
   ...jsonSchema,
@@ -388,7 +383,6 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     tuple: depictTuple,
     pipe: depictPipeline,
     literal: depictLiteral,
-    enum: depictEnum,
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,
