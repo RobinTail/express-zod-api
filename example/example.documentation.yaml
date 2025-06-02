@@ -40,12 +40,11 @@ paths:
                       name:
                         type: string
                       features:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/Schema1"
+                        $ref: "#/components/schemas/Schema1"
                     required:
                       - id
                       - name
+                      - features
                     additionalProperties: false
                 required:
                   - status
@@ -744,17 +743,17 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
-      properties:
-        title:
-          type: string
-        features:
-          type: array
-          items:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+          features:
             $ref: "#/components/schemas/Schema1"
-      required:
-        - title
-      additionalProperties: false
+        required:
+          - title
+        additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
