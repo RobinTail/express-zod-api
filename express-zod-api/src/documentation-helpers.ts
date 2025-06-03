@@ -143,6 +143,24 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
   subject in samples;
 
+/**
+ * @todo remove in v25
+ * @since zod 3.25.45
+ */
+export const depictEnum: Depicter = ({ jsonSchema }) => {
+  jsonSchema.type ??= typeof jsonSchema.enum?.[0];
+  return jsonSchema;
+};
+
+/**
+ * @todo remove in v25
+ * @since zod 3.25.49
+ * */
+export const depictLiteral: Depicter = ({ jsonSchema }) => {
+  jsonSchema.type ??= typeof (jsonSchema.const || jsonSchema.enum?.[0]);
+  return jsonSchema;
+};
+
 const ensureCompliance = ({
   $ref,
   type,
@@ -377,6 +395,8 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     intersection: depictIntersection,
     tuple: depictTuple,
     pipe: depictPipeline,
+    literal: depictLiteral,
+    enum: depictEnum,
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,
