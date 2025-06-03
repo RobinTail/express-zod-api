@@ -190,23 +190,6 @@ exports[`Documentation helpers > depictIntersection() > should merge examples de
 }
 `;
 
-exports[`Documentation helpers > depictLiteral() > should set type from either const or enum prop 0 1`] = `
-{
-  "const": "test",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictLiteral() > should set type from either const or enum prop 1 1`] = `
-{
-  "enum": [
-    "test",
-    "jest",
-  ],
-  "type": "string",
-}
-`;
-
 exports[`Documentation helpers > depictNullable() > should add null type to the first of anyOf 0 1`] = `
 {
   "type": [
