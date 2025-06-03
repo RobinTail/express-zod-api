@@ -4,10 +4,9 @@
 
 ### v24.2.1
 
-- Removed overrides for depicting enums in the generated `Documentation`:
-  - The better implementation provided by [Zod v3.25.45](https://github.com/colinhacks/zod/releases/tag/v3.25.45);
-- Removed overrides for depicting literals in the generated `Documentation`:
-  - Fixed in [Zod v3.25.49](https://github.com/colinhacks/zod/releases/tag/v3.25.49).
+- Prioritizing Zod native depiction for `z.enum()` and `z.literal()` by the `Documentation` generator:
+  - Enum `type` implemented in [Zod v3.25.45](https://github.com/colinhacks/zod/releases/tag/v3.25.45);
+  - Literal `type` implemented in [Zod v3.25.49](https://github.com/colinhacks/zod/releases/tag/v3.25.49).
 
 ### v24.2.0
 
