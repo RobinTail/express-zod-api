@@ -143,11 +143,6 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
   subject in samples;
 
-export const depictLiteral: Depicter = ({ jsonSchema }) => ({
-  type: typeof (jsonSchema.const || jsonSchema.enum?.[0]),
-  ...jsonSchema,
-});
-
 const ensureCompliance = ({
   $ref,
   type,
@@ -382,7 +377,6 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     intersection: depictIntersection,
     tuple: depictTuple,
     pipe: depictPipeline,
-    literal: depictLiteral,
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,
