@@ -7,7 +7,7 @@ import { methodProviderMiddleware } from "../middlewares";
 // Demonstrating circular schemas using z.object()
 const feature = z.object({
   title: z.string(),
-  get features() {
+  get features(): z.ZodOptional<z.ZodArray<typeof feature>> {
     return z.array(feature).optional();
   },
 });
@@ -29,7 +29,7 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
     output: z.object({
       id: z.int().nonnegative(),
       name: z.string(),
-      features: feature.shape.features.nonoptional(), // @link https://github.com/colinhacks/zod/issues/4592
+      features: feature.array(),
     }),
     handler: async ({ input: { id }, options: { method }, logger }) => {
       logger.debug(`Requested id: ${id}, method ${method}`);
