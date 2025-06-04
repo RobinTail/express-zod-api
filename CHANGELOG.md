@@ -2,6 +2,10 @@
 
 ## Version 24
 
+### v24.2.2
+
+- Zod plugin compatibility fix for [Zod v3.25.50](https://github.com/colinhacks/zod/releases/tag/v3.25.50).
+
 ### v24.2.1
 
 - Prioritizing Zod native depiction for `z.enum()` and `z.literal()` by the `Documentation` generator:
