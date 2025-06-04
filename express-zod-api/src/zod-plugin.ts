@@ -9,7 +9,6 @@
  * */
 import * as R from "ramda";
 import { z } from "zod/v4";
-import { FlatObject } from "./common-helpers";
 import { getExamples, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
 import type {
@@ -62,18 +61,12 @@ declare module "zod/v4" {
     remap<V extends string, U extends { [P in keyof Shape]?: V }>(
       mapping: U,
     ): z.ZodPipe<
-      z.ZodPipe<
-        this,
-        z.ZodTransform<FlatObject, FlatObject> // internal type simplified
-      >,
+      z.ZodPipe<this, z.ZodTransform>, // internal type simplified
       z.ZodObject<Remap<Shape, U, V> & Intact<Shape, U>, Config>
     >;
     remap<U extends $ZodShape>(
       mapper: (subject: Shape) => U,
-    ): z.ZodPipe<
-      z.ZodPipe<this, z.ZodTransform<FlatObject, FlatObject>>, // internal type simplified
-      z.ZodObject<U>
-    >;
+    ): z.ZodPipe<z.ZodPipe<this, z.ZodTransform>, z.ZodObject<U>>; // internal type simplified
   }
 }
 
