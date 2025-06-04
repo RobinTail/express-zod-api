@@ -20,6 +20,12 @@ import type {
   $ZodCheck,
   $ZodCheckInternals,
   $ZodCheckDef,
+  SomeType,
+  $ZodDefaultInternals,
+  $ZodDefault,
+  $ZodObjectInternals,
+  $ZodObject,
+  $ZodTypeInternals,
 } from "zod/v4/core";
 
 declare module "zod/v4/core" {
@@ -29,12 +35,21 @@ declare module "zod/v4/core" {
 }
 
 declare module "zod/v4" {
-  interface ZodType {
+  interface ZodType<
+    out Output = unknown,
+    out Input = unknown,
+    out Internals extends $ZodTypeInternals<Output, Input> = $ZodTypeInternals<
+      Output,
+      Input
+    >,
+  > extends $ZodType<Output, Input, Internals> {
     /** @desc Alias for .meta({examples}), but argument is typed to ensure the correct placement for transformations */
     example(example: z.output<this>): this;
     deprecated(): this;
   }
-  interface ZodDefault<T extends $ZodType = $ZodType> extends ZodType {
+  interface ZodDefault<T extends SomeType = $ZodType>
+    extends z._ZodType<$ZodDefaultInternals<T>>,
+      $ZodDefault<T> {
     /** @desc Change the default value in the generated Documentation to a label, alias for .meta({ default }) */
     label(label: string): this;
   }
@@ -42,7 +57,8 @@ declare module "zod/v4" {
     // @ts-expect-error -- external issue
     out Shape extends $ZodShape = $ZodLooseShape,
     out Config extends $ZodObjectConfig = $ZodObjectConfig,
-  > extends ZodType {
+  > extends z._ZodType<$ZodObjectInternals<Shape, Config>>,
+      $ZodObject<Shape, Config> {
     remap<V extends string, U extends { [P in keyof Shape]?: V }>(
       mapping: U,
     ): z.ZodPipe<

@@ -29,7 +29,7 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
     output: z.object({
       id: z.int().nonnegative(),
       name: z.string(),
-      features: feature.shape.features.nonoptional(), // @link https://github.com/colinhacks/zod/issues/4592
+      features: feature.array(), // @link https://github.com/colinhacks/zod/issues/4592
     }),
     handler: async ({ input: { id }, options: { method }, logger }) => {
       logger.debug(`Requested id: ${id}, method ${method}`);
