@@ -297,6 +297,28 @@ describe("Example", async () => {
     });
   });
 
+  describe("Protocol", () => {
+    test("Issue #2706: Should handle parser failures but retain CORS headers", async () => {
+      const response = await fetch(`http://localhost:${port}/v1/user/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: '{"name": "Test', // no closing bracket
+      });
+      expect(response.status).toBe(400); // Issue #907
+      expect(response.headers.get("access-control-allow-methods")).toBe(
+        "POST, OPTIONS", // issue #2706
+      );
+      const json = await response.json();
+      expect(json).toMatchSnapshot({
+        error: {
+          message: expect.stringMatching(
+            /Unterminated string in JSON at position 14/,
+          ),
+        },
+      });
+    });
+  });
+
   describe("Negative", () => {
     test("GET request should fail on missing input param", async () => {
       const response = await fetch(
