@@ -2,6 +2,13 @@
 
 ## Version 23
 
+### v23.6.2
+
+- Fixed a bug about missing CORS headers in case of request parser errors:
+  - This includes the case where exceeding the configured `upload.limits` cause the configured `upload.limitError`;
+  - This bug was found and reported by [@james10424](https://github.com/james10424);
+  - The reproduction config is explained in [issue 2706](https://github.com/RobinTail/express-zod-api/issues/2706).
+
 ### v23.6.1
 
 - `createServer()` displays a warning when no server is configured.

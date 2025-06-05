@@ -216,6 +216,9 @@ describe("Example", async () => {
         `http://localhost:${port}/v1/avatar/upload`,
         { method: "POST", body: data },
       );
+      expect(response.headers.get("access-control-allow-methods")).toBe(
+        "POST, OPTIONS",
+      );
       const json = await response.json();
       expect(json).toEqual({
         data: {
@@ -288,6 +291,28 @@ describe("Example", async () => {
       );
       await vi.waitFor(() => assert(stack.length > 2), { timeout: 5e3 });
       subscription.source.close();
+    });
+  });
+
+  describe("Protocol", () => {
+    test("Issue #2706: Should handle parser failures but retain CORS headers", async () => {
+      const response = await fetch(`http://localhost:${port}/v1/user/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: '{"name": "Test', // no closing bracket
+      });
+      expect(response.status).toBe(400); // Issue #907
+      expect(response.headers.get("access-control-allow-methods")).toBe(
+        "POST, OPTIONS", // issue #2706
+      );
+      const json = await response.json();
+      expect(json).toMatchSnapshot({
+        error: {
+          message: expect.stringMatching(
+            /Unterminated string in JSON at position 14/,
+          ),
+        },
+      });
     });
   });
 
@@ -451,6 +476,9 @@ describe("Example", async () => {
         { method: "POST", body: data },
       );
       expect(response.status).toBe(413);
+      expect(response.headers.get("access-control-allow-methods")).toBe(
+        "POST, OPTIONS", // issue #2706
+      );
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });

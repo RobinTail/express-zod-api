@@ -108,3 +108,12 @@ exports[`Example > Positive > Should send an image with a correct header 1`] = `
 exports[`Example > Positive > Should serve static files 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;
 
 exports[`Example > Positive > Should stream an image with a correct header 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;
+
+exports[`Example > Protocol > Issue #2706: Should handle parser failures but retain CORS headers 1`] = `
+{
+  "error": {
+    "message": StringMatching /Unterminated string in JSON at position 14/,
+  },
+  "status": "error",
+}
+`;

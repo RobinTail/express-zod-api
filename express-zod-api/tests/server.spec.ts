@@ -67,18 +67,21 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
+        expect.any(Function), // cors
         expressJsonMock,
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledTimes(1);
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/test",
+        expect.any(Function), // cors
         expressJsonMock,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/test",
+        expect.any(Function), // cors
         expressJsonMock,
         expect.any(Function), // endpoint
       );
@@ -147,23 +150,27 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
+        expect.any(Function), // cors
         configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledTimes(2);
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/test",
+        expect.any(Function), // cors
         configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/form",
+        expect.any(Function), // cors
         configMock.formParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.patch).toHaveBeenCalledTimes(1);
       expect(appMock.patch).toHaveBeenCalledWith(
         "/v1/raw",
+        expect.any(Function), // cors
         configMock.rawParser,
         moveRaw,
         expect.any(Function), // endpoint
@@ -171,17 +178,20 @@ describe("Server", () => {
       expect(appMock.options).toHaveBeenCalledTimes(3);
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/test",
+        expect.any(Function), // cors
         configMock.jsonParser,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/raw",
+        expect.any(Function), // cors
         configMock.rawParser,
         moveRaw,
         expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledWith(
         "/v1/form",
+        expect.any(Function), // cors
         configMock.formParser,
         expect.any(Function), // endpoint
       );
@@ -302,6 +312,7 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
+        expect.any(Function), // cors
         expect.any(Function), // uploader with logger
         expect.any(Function), // createUploadFailureHandler()
         expect.any(Function), // endpoint
@@ -329,6 +340,7 @@ describe("Server", () => {
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/test",
+        expect.any(Function), // cors
         expressRawMock,
         moveRaw,
         expect.any(Function), // endpoint
@@ -338,7 +350,7 @@ describe("Server", () => {
     test("should enable urlencoded on request", async () => {
       const configMock = {
         http: { listen: givePort() },
-        cors: true,
+        cors: false,
         startupLogo: false,
         logger: { level: "warn" },
       } satisfies ServerConfig;
