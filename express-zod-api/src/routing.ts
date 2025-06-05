@@ -82,13 +82,12 @@ export const initRouting = ({
   for (const [path, methods] of familiar) {
     const accessMethods = Array.from(methods.keys());
     for (const [method, [matchingParsers, endpoint]] of methods) {
-      const handlers: typeof matchingParsers = [
-        ...matchingParsers, // must be immutable
-        async (request, response) => {
+      const handlers: typeof matchingParsers = matchingParsers
+        .slice() // immutable!
+        .concat(async (request, response) => {
           const logger = getLogger(request);
           return endpoint.execute({ request, response, logger, config });
-        },
-      ];
+        });
       if (config.cors) {
         // issue #2706, must go before parsers:
         handlers.unshift(async (request, response, next) => {
