@@ -2487,7 +2487,7 @@ reusify@^1.0.4:
   resolved "https://registry.yarnpkg.com/reusify/-/reusify-1.1.0.tgz#0fe13b9522e1473f51b558ee796e08f11f9b489f"
   integrity sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==
 
-rollup@^4.34.8, rollup@^4.34.9:
+rollup@^4.34.8, rollup@^4.40.0:
   version "4.41.1"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-4.41.1.tgz#46ddc1b33cf1b0baa99320d3b0b4973dc2253b6a"
   integrity sha512-cPmwD3FnFv8rKMBc1MxWCwVQFxwf1JEmSX3iQXrRVVG15zerAIXRjMFVWnd5Q5QvgKF7Aj+5ykXFhUl+QGnyOw==
@@ -2824,7 +2824,7 @@ tinyexec@^0.3.2:
   resolved "https://registry.yarnpkg.com/tinyexec/-/tinyexec-0.3.2.tgz#941794e657a85e496577995c6eef66f53f42b3d2"
   integrity sha512-KQQR9yN7R5+OSwaK0XQoj22pwHoTlgYqmUscPYoknOoWCWfj/5/ABTMRi69FrKU5ffPVh5QcFikpWJI/P1ocHA==
 
-tinyglobby@^0.2.11, tinyglobby@^0.2.13, tinyglobby@^0.2.14:
+tinyglobby@^0.2.11, tinyglobby@^0.2.14:
   version "0.2.14"
   resolved "https://registry.yarnpkg.com/tinyglobby/-/tinyglobby-0.2.14.tgz#5280b0cf3f972b050e74ae88406c0a6a58f4079d"
   integrity sha512-tX5e7OM1HnYr2+a2C/4V0htOcSQcoSTH9KgJnVvNm5zm/cyEWKJ7j7YutsH9CxMdtOkkLFy2AHrMci9IM8IPZQ==
@@ -3022,17 +3022,17 @@ vite-node@3.2.2:
     pathe "^2.0.3"
     vite "^5.0.0 || ^6.0.0 || ^7.0.0-0"
 
-"vite@^5.0.0 || ^6.0.0 || ^7.0.0-0":
-  version "6.3.5"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-6.3.5.tgz#fec73879013c9c0128c8d284504c6d19410d12a3"
-  integrity sha512-cZn6NDFE7wdTpINgs++ZJ4N49W2vRp8LCKrn3Ob1kYNtOo21vfDoaV5GzBfLU4MovSAB8uNRm4jgzVQZ+mBzPQ==
+"vite@^5.0.0 || ^6.0.0 || ^7.0.0-0", vite@^7.0.0-beta.0:
+  version "7.0.0-beta.0"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-7.0.0-beta.0.tgz#3ea304641d4c3db46b8bc0de3fc866ab8570d5ab"
+  integrity sha512-aW1su/Hrr35rHWviV72W3wXb5HfJOK21XGHHAthotTaE04zldBzjkUJUmk6EY6zFDrW5lk2Jw4ygZrJREkB+MA==
   dependencies:
     esbuild "^0.25.0"
     fdir "^6.4.4"
     picomatch "^4.0.2"
     postcss "^8.5.3"
-    rollup "^4.34.9"
-    tinyglobby "^0.2.13"
+    rollup "^4.40.0"
+    tinyglobby "^0.2.14"
   optionalDependencies:
     fsevents "~2.3.3"
 
