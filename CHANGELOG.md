@@ -665,7 +665,7 @@ export default [
 
 ```ts
 // new tagging approach
-import { defaultEndpointsFactory, Documentation } from "express-zod-api";
+import { Documentation } from "express-zod-api";
 
 // Add similar declaration once, somewhere in your code, preferably near config
 declare module "express-zod-api" {
