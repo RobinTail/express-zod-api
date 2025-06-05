@@ -82,8 +82,8 @@ export const initRouting = ({
   for (const [path, methods] of familiar) {
     const accessMethods = Array.from(methods.keys());
     for (const [method, [matchingParsers, endpoint]] of methods) {
-      const handlers: typeof matchingParsers = matchingParsers
-        .slice() // immutable!
+      const handlers = matchingParsers
+        .slice() // must be immutable
         .concat(async (request, response) => {
           const logger = getLogger(request);
           return endpoint.execute({ request, response, logger, config });
