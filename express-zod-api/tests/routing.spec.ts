@@ -225,16 +225,15 @@ describe("Routing", () => {
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0][0]).toBe("/hello");
       const fn = appMock.options.mock.calls[0][1];
-      expect(typeof fn).toBe("function"); // async (req, res) => void
+      expect(typeof fn).toBe("function"); // async RequestHandler, proprietary CORS middleware
       const requestMock = makeRequestMock({ method: "PUT" });
       const responseMock = makeResponseMock();
-      await fn(requestMock, responseMock);
+      await fn(requestMock, responseMock, vi.fn());
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getHeaders()).toEqual({
         "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, POST, PUT, PATCH, OPTIONS",
         "access-control-allow-headers": "content-type",
-        "content-type": "application/json",
         "x-custom-header": "Testing",
       });
     });
@@ -341,28 +340,30 @@ describe("Routing", () => {
       expect(appMock.get).toHaveBeenCalledOnce();
       expect(appMock.get).toHaveBeenCalledWith(
         "/v1/user/retrieve",
-        expect.any(Function),
+        expect.any(Function), // cors
+        expect.any(Function), // endpoint
       );
       expect(appMock.post).toHaveBeenCalledOnce();
       expect(appMock.post).toHaveBeenCalledWith(
         "/v1/user/retrieve",
-        expect.any(Function),
+        expect.any(Function), // cors
+        expect.any(Function), // endpoint
       );
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.options.mock.calls[0]).toEqual([
         "/v1/user/retrieve",
-        expect.any(Function),
+        expect.any(Function), // cors
+        expect.any(Function), // endpoint
       ]);
       const fn = appMock.options.mock.calls[0][1]; // similar to issue 705
       const requestMock = makeRequestMock({ method: "POST" });
       const responseMock = makeResponseMock();
-      await fn(requestMock, responseMock);
+      await fn(requestMock, responseMock, vi.fn());
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getHeaders()).toEqual({
         "access-control-allow-origin": "*",
         "access-control-allow-methods": "GET, POST, OPTIONS",
         "access-control-allow-headers": "content-type",
-        "content-type": "application/json",
       });
     });
 
@@ -484,7 +485,7 @@ describe("Routing", () => {
         routing,
       });
       expect(appMock.post).toHaveBeenCalledTimes(1);
-      const routeHandler = appMock.post.mock.calls[0][1] as RequestHandler;
+      const routeHandler = appMock.post.mock.calls[0][2] as RequestHandler; // 1 is CORS
       const requestMock = makeRequestMock({
         method: "POST",
         body: { test: 123 },
