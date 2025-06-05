@@ -219,6 +219,9 @@ describe("Example", async () => {
         `http://localhost:${port}/v1/avatar/upload`,
         { method: "POST", body: data },
       );
+      expect(response.headers.get("access-control-allow-methods")).toBe(
+        "POST, OPTIONS",
+      );
       const json = await response.json();
       expect(json).toEqual({
         data: {
@@ -454,6 +457,9 @@ describe("Example", async () => {
         { method: "POST", body: data },
       );
       expect(response.status).toBe(413);
+      expect(response.headers.get("access-control-allow-methods")).toBe(
+        "POST, OPTIONS", // issue #2706
+      );
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
