@@ -82,19 +82,26 @@ export const initRouting = ({
   for (const [path, methods] of familiar) {
     const accessMethods = Array.from(methods.keys());
     for (const [method, [matchingParsers, endpoint]] of methods) {
-      const handler: RequestHandler = async (request, response) => {
-        const logger = getLogger(request);
-        if (config.cors) {
+      const handlers = matchingParsers
+        .slice() // must be immutable
+        .concat(async (request, response) => {
+          const logger = getLogger(request);
+          return endpoint.execute({ request, response, logger, config });
+        });
+      if (config.cors) {
+        // issue #2706, must go before parsers:
+        handlers.unshift(async (request, response, next) => {
+          const logger = getLogger(request);
           const defaultHeaders = makeCorsHeaders(accessMethods);
           const headers =
             typeof config.cors === "function"
               ? await config.cors({ request, endpoint, logger, defaultHeaders })
               : defaultHeaders;
           response.set(headers);
-        }
-        return endpoint.execute({ request, response, logger, config });
-      };
-      app[method](path, ...matchingParsers, handler);
+          next();
+        });
+      }
+      app[method](path, ...handlers);
     }
     if (config.wrongMethodBehavior === 404) continue;
     deprioritized.set(path, createWrongMethodHandler(accessMethods));
