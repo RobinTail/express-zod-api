@@ -2,6 +2,13 @@
 
 ## Version 24
 
+### v24.2.3
+
+- Fixed a bug about missing CORS headers in case of request parser errors:
+  - This includes the case where exceeding the configured `upload.limits` cause the configured `upload.limitError`;
+  - This bug was found and reported by [@james10424](https://github.com/james10424);
+  - The reproduction config is explained in [issue 2706](https://github.com/RobinTail/express-zod-api/issues/2706).
+
 ### v24.2.2
 
 - Zod plugin compatibility fix for [Zod v3.25.50](https://github.com/colinhacks/zod/releases/tag/v3.25.50).
