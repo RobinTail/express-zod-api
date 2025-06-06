@@ -30,6 +30,39 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
       "application/json",
     ],
     "schema": {
+      "$defs": {
+        "errorTreeSchema": {
+          "additionalProperties": false,
+          "id": "errorTreeSchema",
+          "properties": {
+            "errors": {
+              "items": {
+                "type": "string",
+              },
+              "type": "array",
+            },
+            "items": {
+              "items": {
+                "$ref": "#/$defs/errorTreeSchema",
+              },
+              "type": "array",
+            },
+            "properties": {
+              "additionalProperties": {
+                "$ref": "#/$defs/errorTreeSchema",
+              },
+              "propertyNames": {
+                "type": "string",
+              },
+              "type": "object",
+            },
+          },
+          "required": [
+            "errors",
+          ],
+          "type": "object",
+        },
+      },
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "additionalProperties": false,
       "examples": [
@@ -56,6 +89,9 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
         "status": {
           "const": "error",
           "type": "string",
+        },
+        "tree": {
+          "$ref": "#/$defs/errorTreeSchema",
         },
       },
       "required": [
@@ -111,6 +147,20 @@ exports[`Endpoint > .getResponses() > should return the positive responses (read
 ]
 `;
 
+exports[`Endpoint > Feature #600: Top level refinements > should fail during the refinement of invalid inputs 1`] = `
+{
+  "error": {
+    "message": "Please provide at least one property",
+  },
+  "status": "error",
+  "tree": {
+    "errors": [
+      "Please provide at least one property",
+    ],
+  },
+}
+`;
+
 exports[`Endpoint > Issue #585: Handling non-Error exceptions > thrown in #handleResult() 1`] = `
 [
   [
@@ -123,4 +173,23 @@ exports[`Endpoint > Issue #585: Handling non-Error exceptions > thrown in #handl
     }),
   ],
 ]
+`;
+
+exports[`Endpoint > Issue #654: Top level refinements > should fail during the refinement of invalid inputs 1`] = `
+{
+  "error": {
+    "message": "dynamicValue: type1Attribute is required if type is type1",
+  },
+  "status": "error",
+  "tree": {
+    "errors": [],
+    "properties": {
+      "dynamicValue": {
+        "errors": [
+          "type1Attribute is required if type is type1",
+        ],
+      },
+    },
+  },
+}
 `;
