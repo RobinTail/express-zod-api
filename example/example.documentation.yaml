@@ -255,10 +255,17 @@ paths:
               type: object
               properties:
                 name:
+                  description: first name and last name
+                  examples:
+                    - John Doe
                   type: string
-                  minLength: 1
+                  pattern: ^\w+ \w+$
               required:
                 - name
+            examples:
+              example1:
+                value:
+                  name: John Doe
         required: true
       responses:
         "201":

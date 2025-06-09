@@ -9,8 +9,7 @@
  * */
 import * as R from "ramda";
 import { z } from "zod/v4";
-import { FlatObject } from "./common-helpers";
-import { metaSymbol } from "./metadata";
+import { getExamples, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
 import type {
   $ZodType,
@@ -20,22 +19,36 @@ import type {
   $ZodCheck,
   $ZodCheckInternals,
   $ZodCheckDef,
+  SomeType,
+  $ZodDefaultInternals,
+  $ZodDefault,
+  $ZodObjectInternals,
+  $ZodObject,
+  $ZodTypeInternals,
 } from "zod/v4/core";
 
 declare module "zod/v4/core" {
   interface GlobalMeta {
-    deprecated?: boolean;
     default?: unknown; // can be an actual value or a label like "Today"
   }
 }
 
 declare module "zod/v4" {
-  interface ZodType {
-    /** @desc Shorthand for .meta({examples}), it can be called multiple times */
+  interface ZodType<
+    out Output = unknown,
+    out Input = unknown,
+    out Internals extends $ZodTypeInternals<Output, Input> = $ZodTypeInternals<
+      Output,
+      Input
+    >,
+  > extends $ZodType<Output, Input, Internals> {
+    /** @desc Alias for .meta({examples}), but argument is typed to ensure the correct placement for transformations */
     example(example: z.output<this>): this;
     deprecated(): this;
   }
-  interface ZodDefault<T extends $ZodType = $ZodType> extends ZodType {
+  interface ZodDefault<T extends SomeType = $ZodType>
+    extends z._ZodType<$ZodDefaultInternals<T>>,
+      $ZodDefault<T> {
     /** @desc Change the default value in the generated Documentation to a label, alias for .meta({ default }) */
     label(label: string): this;
   }
@@ -43,22 +56,17 @@ declare module "zod/v4" {
     // @ts-expect-error -- external issue
     out Shape extends $ZodShape = $ZodLooseShape,
     out Config extends $ZodObjectConfig = $ZodObjectConfig,
-  > extends ZodType {
+  > extends z._ZodType<$ZodObjectInternals<Shape, Config>>,
+      $ZodObject<Shape, Config> {
     remap<V extends string, U extends { [P in keyof Shape]?: V }>(
       mapping: U,
     ): z.ZodPipe<
-      z.ZodPipe<
-        this,
-        z.ZodTransform<FlatObject, FlatObject> // internal type simplified
-      >,
+      z.ZodPipe<this, z.ZodTransform>, // internal type simplified
       z.ZodObject<Remap<Shape, U, V> & Intact<Shape, U>, Config>
     >;
     remap<U extends $ZodShape>(
       mapper: (subject: Shape) => U,
-    ): z.ZodPipe<
-      z.ZodPipe<this, z.ZodTransform<FlatObject, FlatObject>>, // internal type simplified
-      z.ZodObject<U>
-    >;
+    ): z.ZodPipe<z.ZodPipe<this, z.ZodTransform>, z.ZodObject<U>>; // internal type simplified
   }
 }
 
@@ -89,10 +97,9 @@ const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
 );
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
-  const { examples = [] } = this.meta() || {};
-  const copy = examples.slice();
-  copy.push(value);
-  return this.meta({ examples: copy });
+  const examples = getExamples(this).slice();
+  examples.push(value);
+  return this.meta({ examples });
 };
 
 const deprecationSetter = function (this: z.ZodType) {
@@ -129,7 +136,7 @@ const objectMapper = function (
   );
   const hasPassThrough = this._zod.def.catchall instanceof z.ZodUnknown;
   const output = (hasPassThrough ? z.looseObject : z.object)(nextShape); // proxies unknown keys when set to "passthrough"
-  return this.transform(transformer).pipe(output);
+  return this.transform(transformer as () => object).pipe(output); // @since zod 3.25.45 had to loosen transformer type
 };
 
 if (!(metaSymbol in globalThis)) {

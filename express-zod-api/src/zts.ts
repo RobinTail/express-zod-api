@@ -7,14 +7,17 @@ import type {
   $ZodIntersection,
   $ZodLazy,
   $ZodLiteral,
+  $ZodNonOptional,
   $ZodNullable,
   $ZodObject,
   $ZodOptional,
   $ZodPipe,
   $ZodReadonly,
   $ZodRecord,
+  $ZodTemplateLiteral,
   $ZodTransform,
   $ZodTuple,
+  $ZodType,
   $ZodUnion,
 } from "zod/v4/core";
 import * as R from "ramda";
@@ -69,6 +72,37 @@ const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
   return values.length === 1 ? values[0] : f.createUnionTypeNode(values);
 };
 
+const onTemplateLiteral: Producer = (
+  { _zod: { def } }: $ZodTemplateLiteral,
+  { next },
+) => {
+  const parts = [...def.parts];
+  const shiftText = () => {
+    let text = "";
+    while (parts.length) {
+      const part = parts.shift();
+      if (isSchema(part)) {
+        parts.unshift(part);
+        break;
+      }
+      text += part ?? ""; // Handle potential undefined values
+    }
+    return text;
+  };
+  const head = f.createTemplateHead(shiftText());
+  const spans: ts.TemplateLiteralTypeSpan[] = [];
+  while (parts.length) {
+    const schema = next(parts.shift() as $ZodType);
+    const text = shiftText();
+    const textWrapper = parts.length
+      ? f.createTemplateMiddle
+      : f.createTemplateTail;
+    spans.push(f.createTemplateLiteralTypeSpan(schema, textWrapper(text)));
+  }
+  if (!spans.length) return makeLiteralType(head.text);
+  return f.createTemplateLiteralType(head, spans);
+};
+
 const onObject: Producer = (
   obj: $ZodObject,
   { isResponse, next, makeAlias },
@@ -114,9 +148,6 @@ const onSomeUnion: Producer = (
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
 
-const onOptional: Producer = ({ _zod: { def } }: $ZodOptional, { next }) =>
-  next(def.innerType);
-
 const onNullable: Producer = ({ _zod: { def } }: $ZodNullable, { next }) =>
   f.createUnionTypeNode([next(def.innerType), makeLiteralType(null)]);
 
@@ -156,7 +187,9 @@ const onPrimitive =
     ensureTypeNode(syntaxKind);
 
 const onWrapped: Producer = (
-  { _zod: { def } }: $ZodReadonly | $ZodCatch | $ZodDefault,
+  {
+    _zod: { def },
+  }: $ZodReadonly | $ZodCatch | $ZodDefault | $ZodOptional | $ZodNonOptional,
   { next },
 ) => next(def.innerType);
 
@@ -221,11 +254,13 @@ const producers: HandlingRules<
   record: onRecord,
   object: onObject,
   literal: onLiteral,
+  template_literal: onTemplateLiteral,
   intersection: onIntersection,
   union: onSomeUnion,
   default: onWrapped,
   enum: onEnum,
-  optional: onOptional,
+  optional: onWrapped,
+  nonoptional: onWrapped,
   nullable: onNullable,
   catch: onWrapped,
   pipe: onPipeline,

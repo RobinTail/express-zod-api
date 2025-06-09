@@ -1,8 +1,10 @@
 import type {
+  $ZodDiscriminatedUnion,
   $ZodPipe,
   $ZodTransform,
   $ZodTuple,
   $ZodType,
+  $ZodUnion,
   JSONSchema,
 } from "zod/v4/core";
 import {
@@ -113,8 +115,10 @@ export const depictBuffer: Depicter = ({ jsonSchema }) => ({
 });
 
 export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
-  if (!zodSchema._zod.disc) return jsonSchema;
-  const propertyName = Array.from(zodSchema._zod.disc.keys()).pop();
+  if (!isSchema<$ZodUnion | $ZodDiscriminatedUnion>(zodSchema, "union"))
+    return jsonSchema;
+  if (!("discriminator" in zodSchema._zod.def)) return jsonSchema;
+  const propertyName: string = zodSchema._zod.def.discriminator;
   return {
     ...jsonSchema,
     discriminator: jsonSchema.discriminator ?? { propertyName },
@@ -139,15 +143,23 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
 const isSupportedType = (subject: string): subject is SchemaObjectType =>
   subject in samples;
 
-export const depictEnum: Depicter = ({ jsonSchema }) => ({
-  type: typeof jsonSchema.enum?.[0],
-  ...jsonSchema,
-});
+/**
+ * @todo remove in v25
+ * @since zod 3.25.45
+ */
+export const depictEnum: Depicter = ({ jsonSchema }) => {
+  jsonSchema.type ??= typeof jsonSchema.enum?.[0];
+  return jsonSchema;
+};
 
-export const depictLiteral: Depicter = ({ jsonSchema }) => ({
-  type: typeof (jsonSchema.const || jsonSchema.enum?.[0]),
-  ...jsonSchema,
-});
+/**
+ * @todo remove in v25
+ * @since zod 3.25.49
+ * */
+export const depictLiteral: Depicter = ({ jsonSchema }) => {
+  jsonSchema.type ??= typeof (jsonSchema.const || jsonSchema.enum?.[0]);
+  return jsonSchema;
+};
 
 const ensureCompliance = ({
   $ref,

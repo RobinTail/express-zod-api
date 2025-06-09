@@ -2,10 +2,42 @@
 
 ## Version 24
 
+### v24.2.3
+
+- Fixed a bug about missing CORS headers in case of request parser errors:
+  - This includes the case where exceeding the configured `upload.limits` cause the configured `upload.limitError`;
+  - This bug was found and reported by [@james10424](https://github.com/james10424);
+  - The reproduction config is explained in [issue 2706](https://github.com/RobinTail/express-zod-api/issues/2706).
+
+### v24.2.2
+
+- Zod plugin compatibility fix for [Zod v3.25.50](https://github.com/colinhacks/zod/releases/tag/v3.25.50).
+
+### v24.2.1
+
+- Prioritizing Zod native depiction for `z.enum()` and `z.literal()` by the `Documentation` generator:
+  - Enum `type` implemented in [Zod v3.25.45](https://github.com/colinhacks/zod/releases/tag/v3.25.45);
+  - Literal `type` implemented in [Zod v3.25.49](https://github.com/colinhacks/zod/releases/tag/v3.25.49).
+
+### v24.2.0
+
+- Supporting `z.nonoptional()` schema by `Integration` generator.
+
+### v24.1.0
+
+- Supporting the new `z.templateLiteral()` schema by the `Integration` (client side types generator);
+- Compatibility improvements due to the recent changes in Zod 4:
+  - Restoring publicly exposed `getExamples()` helper (with a new signature);
+
+```ts
+// z.templateLiteral(["start", z.number(), "mid", z.boolean(), "end"])
+type Type1 = `start${number}mid${boolean}end`;
+```
+
 ### v24.0.0
 
 - Switched to Zod 4:
-  - Minimum supported version of `zod` is 3.25.1, BUT imports MUST be from `zod/v4`;
+  - Minimum supported version of `zod` is 3.25.35, BUT imports MUST be from `zod/v4`;
     - Read the [Explanation of the versioning strategy](https://github.com/colinhacks/zod/issues/4371);
     - Express Zod API, however, is not aiming to support both Zod 3 and Zod 4 simultaneously due to:
       - incompatibility of data structures;
@@ -31,11 +63,12 @@
   - Use `.optional()` to add question mark to the object property as well as `undefined` to its type;
   - Use `.or(z.undefined())` to add `undefined` to the type of the object property;
   - See the [reasoning](https://x.com/colinhacks/status/1919292504861491252);
-  - `z.any()` and `z.unknown()` are required: [details](https://v4.zod.dev/v4/changelog#changes-zunknown-optionality);
+  - Properties assigned with `z.any()` or `z.unknown()` schema are now typed as required:
+    - Read the [details here](https://v4.zod.dev/v4/changelog#changes-zunknown-optionality);
   - Added types generation for `z.never()`, `z.void()` and `z.unknown()` schemas;
   - The fallback type for unsupported schemas and unclear transformations in response changed from `any` to `unknown`;
 - The argument of `ResultHandler::handler` is now discriminated: either `output` or `error` is `null`, not both;
-- The `getExamples()` public helper removed — use `.meta()?.examples` instead;
+- The `getExamples()` public helper removed — ~~use `.meta()?.examples` instead~~, restored in v24.1.0;
 - Added the new proprietary schema `ez.buffer()`;
 - The `ez.file()` schema removed: use `z.string()`, `z.base64()`, `ez.buffer()` or their union;
 - Consider the automated migration using the built-in ESLint rule.
@@ -632,7 +665,7 @@ export default [
 
 ```ts
 // new tagging approach
-import { defaultEndpointsFactory, Documentation } from "express-zod-api";
+import { Documentation } from "express-zod-api";
 
 // Add similar declaration once, somewhere in your code, preferably near config
 declare module "express-zod-api" {

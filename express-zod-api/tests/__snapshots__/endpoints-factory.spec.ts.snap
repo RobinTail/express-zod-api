@@ -5,32 +5,28 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with intersecti
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
     {
-      "allOf": [
-        {
-          "additionalProperties": false,
-          "properties": {
-            "n1": {
-              "type": "number",
-            },
-          },
-          "required": [
-            "n1",
-          ],
-          "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "n1": {
+          "type": "number",
         },
-        {
-          "additionalProperties": false,
-          "properties": {
-            "n2": {
-              "type": "number",
-            },
-          },
-          "required": [
-            "n2",
-          ],
-          "type": "object",
-        },
+      },
+      "required": [
+        "n1",
       ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "n2": {
+          "type": "number",
+        },
+      },
+      "required": [
+        "n2",
+      ],
+      "type": "object",
     },
     {
       "additionalProperties": false,
@@ -78,7 +74,6 @@ exports[`EndpointsFactory > .build() > Should create an endpoint with refined ob
           "type": "string",
         },
       },
-      "required": [],
       "type": "object",
     },
     {
@@ -230,7 +225,6 @@ exports[`EndpointsFactory > .buildVoid() > Should be a shorthand for empty objec
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {},
-  "required": [],
   "type": "object",
 }
 `;
