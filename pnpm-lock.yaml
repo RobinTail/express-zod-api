@@ -6,7 +6,6 @@ settings:
 
 overrides:
   '@scarf/scarf': npm:empty-npm-package@1.0.0
-  express: ^5.0.1
 
 importers:
 
@@ -52,7 +51,7 @@ importers:
         specifier: ^5.4.1
         version: 5.4.1(eslint-config-prettier@10.1.5(eslint@9.28.0))(eslint@9.28.0)(prettier@3.5.3)
       express:
-        specifier: ^5.0.1
+        specifier: ^5.1.0
         version: 5.1.0
       express-fileupload:
         specifier: ^1.5.0
@@ -131,7 +130,7 @@ importers:
         specifier: ^1.8.0
         version: 1.8.0
       express:
-        specifier: ^5.0.1
+        specifier: ^5.1.0
         version: 5.1.0
       express-fileupload:
         specifier: ^1.5.0
@@ -1909,7 +1908,7 @@ packages:
     resolution: {integrity: sha512-SrNU3RiBGTLLmFU8GIJdOdanJTl4TOmT27tt3bWWHppqYmAZ6IDuEuBvMU6nZq0zLEe6b/1rACXCgLZqO6ZfrA==}
     engines: {node: '>= v0.10.32'}
     peerDependencies:
-      express: ^5.0.1
+      express: '>=4.0.0 || >=5.0.0-beta'
 
   synckit@0.11.8:
     resolution: {integrity: sha512-+XZ+r1XGIJGeQk3VvXhT6xx/VpbHsRzsTkGgF6E5RX9TTXD0118l87puaEBZ566FhqblC6U0d4XnubznJDm30A==}
