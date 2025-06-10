@@ -10,6 +10,5 @@ publicHoistPattern:
   - "@typescript-eslint/*"
   - "@vitest/*"
   - "@eslint/*"
-  - globals
   - "@types/qs"
   - "@types/express-serve-static-core"
