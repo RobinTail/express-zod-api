@@ -31,5 +31,5 @@ jobs:
       - run: |
           pnpm install
           pnpm install_hooks
-      - run: npx bumpp pre${{ inputs.kind }} --preid beta -y
+      - run: pnpm dlx bumpp pre${{ inputs.kind }} --preid beta -y
         working-directory: express-zod-api
