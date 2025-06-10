@@ -2,6 +2,10 @@
 
 ## Version 19
 
+### v19.4.0
+
+- Supporting Jest 30.
+
 ### v19.3.2
 
 - Fixed behavior of error catching handler:
