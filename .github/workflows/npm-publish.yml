@@ -30,7 +30,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Publish with ${{ inputs.tag }}
-        run: pnpm publish --no-git-checks --provenance --tag ${{ inputs.tag }}
-        working-directory: express-zod-api
+        run: pnpm -F express-zod-api publish --no-git-checks --provenance --tag ${{ inputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_KEY}}
