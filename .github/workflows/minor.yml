@@ -19,5 +19,5 @@ jobs:
       - run: |
           pnpm install
           pnpm install_hooks
-      - run: npx bumpp minor -y
+      - run: pnpm dlx bumpp minor -y
         working-directory: express-zod-api
