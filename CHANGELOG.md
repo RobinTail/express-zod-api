@@ -2,6 +2,10 @@
 
 ## Version 24
 
+### v24.3.0
+
+- Technical update: switched to `pnpm`, no changes to the code.
+
 ### v24.2.3
 
 - Fixed a bug about missing CORS headers in case of request parser errors:
