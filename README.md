@@ -165,12 +165,12 @@ Much can be customized to fit your needs.
 ## Installation
 
 Install the framework, its peer dependencies and type assistance packages using your favorite
-[package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/).
+[package manager](https://tinyurl.com/package-manager).
 
 ```shell
-# example for yarn:
-yarn add express-zod-api express zod typescript http-errors
-yarn add -D @types/express @types/node @types/http-errors
+# example for pnpm:
+pnpm add express-zod-api express zod typescript http-errors
+pnpm add -D @types/express @types/node @types/http-errors
 ```
 
 Ensure having the following options in your `tsconfig.json` file in order to make it work as expected:
