@@ -165,7 +165,7 @@ Much can be customized to fit your needs.
 ## Installation
 
 Install the framework, its peer dependencies and type assistance packages using your favorite
-[package manager](https://tinyurl.com/package-manager).
+[package manager](https://medium.com/@mahernaija/choosing-the-best-javascript-package-manager-in-2025-77b912ab3eda).
 
 ```shell
 # example for pnpm:
