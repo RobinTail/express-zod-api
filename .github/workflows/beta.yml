@@ -33,4 +33,4 @@ jobs:
           pnpm install_hooks
       - run: |
           pnpm -F express-zod-api exec \
-            pnpm dlx bumpp pre${{ inputs.kind }} --preid beta -y 
+            pnpm dlx bumpp pre${{ inputs.kind }} --preid beta -y
