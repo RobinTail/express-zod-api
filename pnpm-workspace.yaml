@@ -6,6 +6,7 @@ packages:
   - issue952-test
 onlyBuiltDependencies:
   - esbuild
+gitChecks: false
 publicHoistPattern:
   - "@typescript-eslint/*" # used by migration.ts
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts

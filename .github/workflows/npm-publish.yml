@@ -34,4 +34,4 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_KEY}}
         run: |
           pnpm -F express-zod-api exec \
-            pnpm publish --no-git-checks --provenance --tag ${{ inputs.tag }}
+            pnpm publish --provenance --tag ${{ inputs.tag }}
