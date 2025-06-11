@@ -188,7 +188,7 @@ const ensureCompliance = ({
   // eslint-disable-next-line no-restricted-syntax -- need typed key here
   for (const [prop, entry] of R.toPairs({ allOf, oneOf, anyOf }))
     if (entry) valid[prop] = entry.map(ensureCompliance);
-  if (not) valid.not = ensureCompliance(not);
+  if (isObject(not)) valid.not = ensureCompliance(not);
   return valid;
 };
 
