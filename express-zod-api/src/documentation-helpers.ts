@@ -466,7 +466,11 @@ const depict = (
       },
     },
   ) as JSONSchema.ObjectSchema;
-  return fixReferences(properties["subject"], $defs, ctx);
+  return fixReferences(
+    isObject(properties["subject"]) ? properties["subject"] : {},
+    $defs,
+    ctx,
+  );
 };
 
 export const excludeParamsFromDepiction = (
