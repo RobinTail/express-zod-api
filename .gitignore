@@ -1,7 +1,6 @@
 node_modules
 dist
 *.tgz
-migration
 .idea
 .npmrc
 coverage
