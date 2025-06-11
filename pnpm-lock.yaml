@@ -78,8 +78,8 @@ importers:
         specifier: ^3.2.3
         version: 3.2.3(@types/node@24.0.0)(tsx@4.19.4)(yaml@2.8.0)
       zod:
-        specifier: ^3.25.60
-        version: 3.25.60
+        specifier: ^3.25.61
+        version: 3.25.61
 
   cjs-test:
     dependencies:
@@ -2190,6 +2190,9 @@ packages:
   zod@3.25.60:
     resolution: {integrity: sha512-VyPT/ZfyggoJtTnGCfPGx2OOW9idfmyqsqZCAvYscOlXKCGKPCeSfr44Ewp8fqvtfNMe1T88qjWIFKopTL9jSQ==}
 
+  zod@3.25.61:
+    resolution: {integrity: sha512-fzfJgUw78LTNnHujj9re1Ov/JJQkRZZGDMcYqSx7Hp4rPOkKywaFHq0S6GoHeXs0wGNE/sIOutkXgnwzrVOGCQ==}
+
 snapshots:
 
   '@ampproject/remapping@2.3.0':
@@ -4133,3 +4136,5 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zod@3.25.60: {}
+
+  zod@3.25.61: {}
