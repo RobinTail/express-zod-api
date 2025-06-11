@@ -11,6 +11,9 @@ importers:
 
   .:
     devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: ^0.18.2
+        version: 0.18.2
       '@tsconfig/node20':
         specifier: ^20.1.5
         version: 20.1.5
@@ -157,9 +160,6 @@ importers:
         specifier: ^3.25.35
         version: 3.25.62
     devDependencies:
-      '@arethetypeswrong/cli':
-        specifier: ^0.18.2
-        version: 0.18.2
       '@types/cors':
         specifier: ^2.8.19
         version: 2.8.19
