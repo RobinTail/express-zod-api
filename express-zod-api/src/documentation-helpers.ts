@@ -299,7 +299,9 @@ export const depictRaw: Depicter = ({ jsonSchema }) => {
   const objSchema = jsonSchema as JSONSchema.ObjectSchema;
   if (!objSchema.properties) return jsonSchema;
   if (!("raw" in objSchema.properties)) return jsonSchema;
-  return objSchema.properties.raw;
+  return isObject(objSchema.properties.raw)
+    ? objSchema.properties.raw
+    : jsonSchema;
 };
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
