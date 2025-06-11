@@ -149,9 +149,8 @@ const isSupportedType = (subject: string): subject is SchemaObjectType =>
  */
 export const depictEnum: Depicter = ({ jsonSchema }) => {
   const suggestedType = typeof jsonSchema.enum?.[0];
-  jsonSchema.type ??= isSupportedType(suggestedType)
-    ? suggestedType
-    : undefined;
+  if (!jsonSchema.type && isSupportedType(suggestedType))
+    jsonSchema.type = suggestedType;
   return jsonSchema;
 };
 
@@ -161,9 +160,8 @@ export const depictEnum: Depicter = ({ jsonSchema }) => {
  * */
 export const depictLiteral: Depicter = ({ jsonSchema }) => {
   const suggestedType = typeof (jsonSchema.const || jsonSchema.enum?.[0]);
-  jsonSchema.type ??= isSupportedType(suggestedType)
-    ? suggestedType
-    : undefined;
+  if (!jsonSchema.type && isSupportedType(suggestedType))
+    jsonSchema.type = suggestedType;
   return jsonSchema;
 };
 
@@ -278,9 +276,8 @@ export const depictRaw: Depicter = ({ jsonSchema }) => {
   const objSchema = jsonSchema as JSONSchema.ObjectSchema;
   if (!objSchema.properties) return jsonSchema;
   if (!("raw" in objSchema.properties)) return jsonSchema;
-  return isObject(objSchema.properties.raw)
-    ? objSchema.properties.raw
-    : jsonSchema;
+  if (!isObject(objSchema.properties.raw)) return jsonSchema;
+  return objSchema.properties.raw;
 };
 
 const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
