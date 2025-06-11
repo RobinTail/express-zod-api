@@ -1,28 +1,21 @@
 {
   "private": true,
   "type": "module",
-  "workspaces": [
-    "express-zod-api",
-    "example",
-    "cjs-test",
-    "esm-test",
-    "issue952-test"
-  ],
   "scripts": {
-    "start": "yarn workspace example start",
+    "start": "pnpm -F example start",
     "prebuild": "tsx tools/contributors.ts && tsx tools/license.ts",
-    "build": "yarn workspace express-zod-api build && yarn workspace example build",
+    "build": "pnpm -F express-zod-api build && pnpm -F example build",
     "postbuild": "tsx tools/make-tests.ts",
-    "test": "yarn workspace express-zod-api test",
-    "test:example": "yarn workspace example test",
-    "test:oas": "yarn workspace example validate",
-    "test:cjs": "yarn workspace cjs-test test",
-    "test:esm": "yarn workspace esm-test test",
-    "test:952": "yarn workspace issue952-test test",
-    "bench": "yarn workspace express-zod-api bench",
+    "test": "pnpm -F express-zod-api test",
+    "test:example": "pnpm -F example test",
+    "test:oas": "pnpm -F example validate",
+    "test:cjs": "pnpm -F cjs-test test",
+    "test:esm": "pnpm -F esm-test test",
+    "test:952": "pnpm -F issue952-test test",
+    "bench": "pnpm -F express-zod-api bench",
     "lint": "eslint && prettier *.md --check",
     "mdfix": "prettier *.md --write",
-    "precommit": "yarn lint && yarn test && yarn build && git add *.md example/example.* LICENSE",
+    "precommit": "pnpm lint && pnpm test && pnpm build && git add *.md example/example.* LICENSE",
     "install_hooks": "husky"
   },
   "devDependencies": {
@@ -51,7 +44,7 @@
     "zod": "^3.25.58"
   },
   "resolutions": {
-    "**/@scarf/scarf": "npm:empty-npm-package@1.0.0"
+    "@scarf/scarf": "npm:empty-npm-package@1.0.0"
   },
-  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+  "packageManager": "pnpm@10.12.1+sha256.889bac470ec93ccc3764488a19d6ba8f9c648ad5e50a9a6e4be3768a5de387a3"
 }

@@ -21,13 +21,17 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: pnpm
           registry-url: https://registry.npmjs.org/
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
       - name: Publish with ${{ inputs.tag }}
-        run: npm publish -w express-zod-api --provenance --tag ${{ inputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_KEY}}
+        run: |
+          pnpm -F express-zod-api exec \
+            pnpm publish --provenance --tag ${{ inputs.tag }}

@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "24.2.3",
+  "version": "24.3.0-beta.5",
   "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -17,13 +17,12 @@
   "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
     "build": "tsup",
-    "postbuild": "yarn pack --filename release.tgz && attw release.tgz && rm release.tgz",
+    "postbuild": "attw --pack",
     "pretest": "tsc --noEmit",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
-    "prepublishOnly": "eslint && yarn test && yarn build",
-    "prepack": "cp ../*.md ../LICENSE ./",
-    "postversion": "git push && git push --tags"
+    "prepublishOnly": "eslint && pnpm test && pnpm build",
+    "prepack": "cp ../*.md ../LICENSE ./"
   },
   "type": "module",
   "sideEffects": true,

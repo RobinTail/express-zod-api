@@ -1,0 +1,16 @@
+packages:
+  - express-zod-api
+  - example
+  - cjs-test
+  - esm-test
+  - issue952-test
+onlyBuiltDependencies:
+  - esbuild
+gitChecks: false
+publicHoistPattern:
+  - "@typescript-eslint/*" # used by migration.ts
+  - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
+  - "@eslint/*" # used by eslint.config.js
+  - "globals" # used by eslint.config.js
+  - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
+  - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting

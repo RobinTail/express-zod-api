@@ -17,18 +17,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: pnpm
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
 
       - name: Upgrade dependencies
         run: |
-          yarn workspace express-zod-api upgrade
-          git checkout -- express-zod-api/package.json
-          yarn install
+          pnpm -w upgrade
+          pnpm -F express-zod-api upgrade
+          pnpm dedupe
 
       - name: Branch name
         id: create-branch
