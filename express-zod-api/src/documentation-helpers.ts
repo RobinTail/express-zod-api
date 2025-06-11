@@ -148,7 +148,10 @@ const isSupportedType = (subject: string): subject is SchemaObjectType =>
  * @since zod 3.25.45
  */
 export const depictEnum: Depicter = ({ jsonSchema }) => {
-  jsonSchema.type ??= typeof jsonSchema.enum?.[0];
+  const suggestedType = typeof jsonSchema.enum?.[0];
+  jsonSchema.type ??= isSupportedType(suggestedType)
+    ? suggestedType
+    : undefined;
   return jsonSchema;
 };
 
@@ -157,7 +160,10 @@ export const depictEnum: Depicter = ({ jsonSchema }) => {
  * @since zod 3.25.49
  * */
 export const depictLiteral: Depicter = ({ jsonSchema }) => {
-  jsonSchema.type ??= typeof (jsonSchema.const || jsonSchema.enum?.[0]);
+  const suggestedType = typeof (jsonSchema.const || jsonSchema.enum?.[0]);
+  jsonSchema.type ??= isSupportedType(suggestedType)
+    ? suggestedType
+    : undefined;
   return jsonSchema;
 };
 
