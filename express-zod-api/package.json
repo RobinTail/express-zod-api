@@ -39,21 +39,10 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
-    },
-    "./migration": {
-      "import": {
-        "types": "./migration/index.d.ts",
-        "default": "./migration/index.js"
-      },
-      "require": {
-        "types": "./migration/index.d.cts",
-        "default": "./migration/index.cjs"
-      }
     }
   },
   "files": [
     "dist",
-    "migration",
     "*.md"
   ],
   "engines": {
