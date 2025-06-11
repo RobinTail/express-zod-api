@@ -2917,10 +2917,10 @@ tsup@^8.5.0:
     tinyglobby "^0.2.11"
     tree-kill "^1.2.2"
 
-tsx@^4.19.4:
-  version "4.19.4"
-  resolved "https://registry.yarnpkg.com/tsx/-/tsx-4.19.4.tgz#647b4141f4fdd9d773a9b564876773d2846901f4"
-  integrity sha512-gK5GVzDkJK1SI1zwHf32Mqxf2tSJkNx+eYcNly5+nHvWqXUJYUkWBQtKauoESz3ymezAI++ZwT855x5p5eop+Q==
+tsx@^4.20.0:
+  version "4.20.0"
+  resolved "https://registry.yarnpkg.com/tsx/-/tsx-4.20.0.tgz#269e97d9ade5b0d2a6ad684540793696d2bf3506"
+  integrity sha512-TsmdeXxcZYiJ2MKV7fdq38na0CKyLRtCeMqTeHMmrVXQ/gf5yTeJohh+sgr7MnMGsjeKXzHzy+TwOOTR1arl+Q==
   dependencies:
     esbuild "~0.25.0"
     get-tsconfig "^4.7.5"
