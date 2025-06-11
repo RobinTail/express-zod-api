@@ -27,10 +27,9 @@ Start your API server with I/O schema validation and custom middlewares in minut
    8. [Dealing with dates](#dealing-with-dates)
    9. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
    10. [Enabling HTTPS](#enabling-https)
-   11. [Customizing logger](#customizing-logger)
-   12. [Child logger](#child-logger)
-   13. [Profiling](#profiling)
-   14. [Enabling compression](#enabling-compression)
+   11. [Enabling compression](#enabling-compression)
+   12. [Customizing logger](#customizing-logger)
+   13. [Child logger](#child-logger)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Headers as input source](#headers-as-input-source)
@@ -44,19 +43,20 @@ Start your API server with I/O schema validation and custom middlewares in minut
    10. [Connect to your own express app](#connect-to-your-own-express-app)
    11. [Testing endpoints](#testing-endpoints)
    12. [Testing middlewares](#testing-middlewares)
-6. [Special needs](#special-needs)
-   1. [Different responses for different status codes](#different-responses-for-different-status-codes)
-   2. [Array response](#array-response) for migrating legacy APIs
-   3. [Accepting raw data](#accepting-raw-data)
-   4. [Graceful shutdown](#graceful-shutdown)
-   5. [Subscriptions](#subscriptions)
-7. [Integration and Documentation](#integration-and-documentation)
+6. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [Generating a Frontend Client](#generating-a-frontend-client)
    3. [Creating a documentation](#creating-a-documentation)
    4. [Tagging the endpoints](#tagging-the-endpoints)
    5. [Deprecated schemas and routes](#deprecated-schemas-and-routes)
    6. [Customizable brands handling](#customizable-brands-handling)
+7. [Special needs](#special-needs)
+   1. [Different responses for different status codes](#different-responses-for-different-status-codes)
+   2. [Array response](#array-response) for migrating legacy APIs
+   3. [Accepting raw data](#accepting-raw-data)
+   4. [Profiling](#profiling)
+   5. [Graceful shutdown](#graceful-shutdown)
+   6. [Subscriptions](#subscriptions)
 8. [Caveats](#caveats)
    1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
@@ -84,12 +84,12 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/james10424.png" alt="@james10424" width="50px" />](https://github.com/james10424)
 [<img src="https://github.com/HeikoOsigus.png" alt="@HeikoOsigus" width="50px" />](https://github.com/HeikoOsigus)
 [<img src="https://github.com/crgeary.png" alt="@crgeary" width="50px" />](https://github.com/crgeary)
 [<img src="https://github.com/williamgcampbell.png" alt="@williamgcampbell" width="50px" />](https://github.com/williamgcampbell)
 [<img src="https://github.com/gmorgen1.png" alt="@gmorgen1" width="50px" />](https://github.com/gmorgen1)
 [<img src="https://github.com/danmichaelo.png" alt="@danmichaelo" width="50px" />](https://github.com/danmichaelo)
-[<img src="https://github.com/james10424.png" alt="@james10424" width="50px" />](https://github.com/james10424)
 [<img src="https://github.com/APTy.png" alt="@APTy" width="50px" />](https://github.com/APTy)
 [<img src="https://github.com/LufyCZ.png" alt="@LufyCZ" width="50px" />](https://github.com/LufyCZ)
 [<img src="https://github.com/mlms13.png" alt="@mlms13" width="50px" />](https://github.com/mlms13)
@@ -165,12 +165,12 @@ Much can be customized to fit your needs.
 ## Installation
 
 Install the framework, its peer dependencies and type assistance packages using your favorite
-[package manager](https://nodesource.com/blog/nodejs-package-manager-comparative-guide-2024/).
+[package manager](https://medium.com/@mahernaija/choosing-the-best-javascript-package-manager-in-2025-77b912ab3eda).
 
 ```shell
-# example for yarn:
-yarn add express-zod-api express zod typescript http-errors
-yarn add -D @types/express @types/node @types/http-errors
+# example for pnpm:
+pnpm add express-zod-api express zod typescript http-errors
+pnpm add -D @types/express @types/node @types/http-errors
 ```
 
 Ensure having the following options in your `tsconfig.json` file in order to make it work as expected:
@@ -186,34 +186,25 @@ Ensure having the following options in your `tsconfig.json` file in order to mak
 
 ## Set up config
 
-Create a minimal configuration. _See all available options
-[in sources](https://github.com/RobinTail/express-zod-api/blob/master/express-zod-api/src/config-type.ts)._
+Create a minimal configuration. Find out all configurable options
+[in sources](https://github.com/RobinTail/express-zod-api/blob/master/express-zod-api/src/config-type.ts).
 
 ```typescript
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
-  http: {
-    listen: 8090, // port, UNIX socket or options
-  },
-  cors: true,
+  http: { listen: 8090 }, // port, UNIX socket or Net::ListenOptions
+  cors: false, // decide whether to enable CORS
 });
-```
-
-## Create an endpoints factory
-
-In the basic case, you can just import and use the default factory.
-_See also [Middlewares](#middlewares) and [Response customization](#response-customization)._
-
-```typescript
-import { defaultEndpointsFactory } from "express-zod-api";
 ```
 
 ## Create your first endpoint
 
-The endpoint responds with "Hello, World" or "Hello, {name}" if the name is supplied within `GET` request payload.
+Use the default factory to make an endpoint that responds with "Hello, World" or "Hello, {name}" depending on inputs.
+Learn how to make factories for [custom response](#response-customization) and by [adding middlewares](#middlewares).
 
 ```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
 import { z } from "zod/v4";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
@@ -601,18 +592,15 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
 
 ## Cross-Origin Resource Sharing
 
-You can enable your API for other domains using the corresponding configuration option `cors`.
-It's _not optional_ to draw your attention to making the appropriate decision, however, it's enabled in the
-[Quick start example](#set-up-config) above, assuming that in most cases you will want to enable this feature.
-See [MDN article](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) for more information.
-
-In addition to being a boolean, `cors` can also be assigned a function that overrides default CORS headers.
-That function has several parameters and can be asynchronous.
+You can enable your API for other domains using the corresponding configuration option `cors`. The value is required to
+ensure you explicitly choose the correct setting. In addition to being a boolean, `cors` can also be assigned a
+function that overrides default CORS headers. That function has several parameters and can be asynchronous.
 
 ```typescript
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
+  /** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS */
   cors: ({ defaultHeaders, request, endpoint, logger }) => ({
     ...defaultHeaders,
     "Access-Control-Max-Age": "5000",
@@ -649,6 +637,25 @@ const { app, servers, logger } = await createServer(config, routing);
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,
 certificate and the key, issued by the certifying authority. For example, you can acquire a free TLS certificate for
 your API at [Let's Encrypt](https://letsencrypt.org/).
+
+## Enabling compression
+
+According to [Express.js best practices guide](https://expressjs.com/en/advanced/best-practice-performance.html)
+it might be a good idea to enable GZIP and Brotli compression for your API responses.
+
+Install `compression` and `@types/compression`, and enable or configure compression:
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  /** @link https://www.npmjs.com/package/compression#options */
+  compression: { threshold: "1kb" }, // or true
+});
+```
+
+In order to receive a compressed response the client should include the following header in the request:
+`Accept-Encoding: br, gzip, deflate`. Only responses with compressible content types are subject to compression.
 
 ## Customizing logger
 
@@ -707,57 +714,6 @@ const config = createConfig({
     parent.child({ requestId: randomUUID() }), // accessible at logger.ctx.requestId later
 });
 ```
-
-## Profiling
-
-For debugging and performance testing purposes the framework offers a simple `.profile()` method on the built-in logger.
-It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
-invoke the returned callback. The default severity of those measurements is `debug`.
-
-```typescript
-import { createConfig, BuiltinLogger } from "express-zod-api";
-
-// This enables the .profile() method on built-in logger:
-declare module "express-zod-api" {
-  interface LoggerOverrides extends BuiltinLogger {}
-}
-
-// Inside a handler of Endpoint, Middleware or ResultHandler:
-const done = logger.profile("expensive operation");
-doExpensiveOperation();
-done(); // debug: expensive operation '555 milliseconds'
-```
-
-You can also customize the profiler with your own formatter, chosen severity or even performance assessment function:
-
-```typescript
-logger.profile({
-  message: "expensive operation",
-  severity: (ms) => (ms > 500 ? "error" : "info"), // assess immediately
-  formatter: (ms) => `${ms.toFixed(2)}ms`, // custom format
-});
-doExpensiveOperation();
-done(); // error: expensive operation '555.55ms'
-```
-
-## Enabling compression
-
-According to [Express.js best practices guide](https://expressjs.com/en/advanced/best-practice-performance.html)
-it might be a good idea to enable GZIP and Brotli compression for your API responses.
-
-Install `compression` and `@types/compression`, and enable or configure compression:
-
-```typescript
-import { createConfig } from "express-zod-api";
-
-const config = createConfig({
-  /** @link https://www.npmjs.com/package/compression#options */
-  compression: { threshold: "1kb" }, // or true
-});
-```
-
-In order to receive a compressed response the client should include the following header in the request:
-`Accept-Encoding: br, gzip, deflate`. Only responses with compressible content types are subject to compression.
 
 # Advanced features
 
@@ -1089,118 +1045,6 @@ expect(loggerMock._getLogs().error).toHaveLength(0);
 expect(output).toEqual({ collectedOptions: ["prev"], testLength: 9 });
 ```
 
-# Special needs
-
-## Different responses for different status codes
-
-In some special cases you may want the ResultHandler to respond slightly differently depending on the status code,
-for example if your API strictly follows REST standards. It may also be necessary to reflect this difference in the
-generated Documentation. For that purpose, the constructor of `ResultHandler` accepts flexible declaration of possible
-response schemas and their corresponding status codes.
-
-```typescript
-import { ResultHandler } from "express-zod-api";
-
-new ResultHandler({
-  positive: (data) => ({
-    statusCode: [201, 202], // created or will be created
-    schema: z.object({ status: z.literal("created"), data }),
-  }),
-  negative: [
-    {
-      statusCode: 409, // conflict: entity already exists
-      schema: z.object({ status: z.literal("exists"), id: z.int() }),
-    },
-    {
-      statusCode: [400, 500], // validation or internal error
-      schema: z.object({ status: z.literal("error"), reason: z.string() }),
-    },
-  ],
-  handler: ({ error, response, output }) => {
-    // your implementation here
-  },
-});
-```
-
-## Array response
-
-Please avoid doing this in new projects: responding with array is a bad practice keeping your endpoints from evolving
-in backward compatible way (without making breaking changes). Nevertheless, for the purpose of easier migration of
-legacy APIs to this framework consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
-or implement your own ones in a similar way.
-The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
-assigned to that property is used as the response. This approach also supports examples, as well as documentation and
-client generation. Check out [the example endpoint](/example/endpoints/list-users.ts) for more details.
-
-## Accepting raw data
-
-Some APIs may require an endpoint to be able to accept and process raw data, such as streaming or uploading a binary
-file as an entire body of request. Use the proprietary `ez.raw()` schema as the input schema of your endpoint.
-The default parser in this case is `express.raw()`. You can customize it by assigning the `rawParser` option in config.
-The raw data is placed into `request.body.raw` property, having type `Buffer`.
-
-```typescript
-import { defaultEndpointsFactory, ez } from "express-zod-api";
-
-const rawAcceptingEndpoint = defaultEndpointsFactory.build({
-  method: "post",
-  input: ez.raw({
-    /* the place for additional inputs, like route params, if needed */
-  }),
-  output: z.object({ length: z.int().nonnegative() }),
-  handler: async ({ input: { raw } }) => ({
-    length: raw.length, // raw is Buffer
-  }),
-});
-```
-
-## Graceful shutdown
-
-You can enable and configure a special request monitoring that, if it receives a signal to terminate a process, will
-first put the server into a mode that rejects new requests, attempt to complete started requests within the specified
-time, and then forcefully stop the server and terminate the process.
-
-```ts
-import { createConfig } from "express-zod-api";
-
-createConfig({
-  gracefulShutdown: {
-    timeout: 1000,
-    events: ["SIGINT", "SIGTERM"],
-    beforeExit: /* async */ () => {},
-  },
-});
-```
-
-## Subscriptions
-
-If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server,
-consider [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) feature.
-Client application can subscribe to the event stream using `EventSource` class instance or the
-[instance of the generated](#generating-a-frontend-client) `Subscription` class. The following example demonstrates
-the implementation emitting the `time` event each second.
-
-```typescript
-import { z } from "zod/v4";
-import { EventStreamFactory } from "express-zod-api";
-import { setTimeout } from "node:timers/promises";
-
-const subscriptionEndpoint = new EventStreamFactory({
-  time: z.int().positive(),
-}).buildVoid({
-  input: z.object({}), // optional input schema
-  handler: async ({ options: { emit, isClosed } }) => {
-    while (!isClosed()) {
-      emit("time", Date.now());
-      await setTimeout(1000);
-    }
-  },
-});
-```
-
-If you need more capabilities, such as bidirectional event sending, I have developed an additional websocket operating
-framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and capabilities.
-
 # Integration and Documentation
 
 ## Zod Plugin
@@ -1258,7 +1102,6 @@ const yamlString = new Documentation({
   serverUrl: "https://example.com",
   composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
   // descriptions: { positiveResponse, negativeResponse, requestParameter, requestBody }, // check out these features
-  // numericRange: null, // to disable printing min/max values for z.number() based on JS engine limits
 }).getSpecAsYaml();
 ```
 
@@ -1382,6 +1225,150 @@ new Integration({
   brandHandling: { [myBrand]: ruleForClient },
 });
 ```
+
+# Special needs
+
+## Different responses for different status codes
+
+In some special cases you may want the ResultHandler to respond slightly differently depending on the status code,
+for example if your API strictly follows REST standards. It may also be necessary to reflect this difference in the
+generated Documentation. For that purpose, the constructor of `ResultHandler` accepts flexible declaration of possible
+response schemas and their corresponding status codes.
+
+```typescript
+import { ResultHandler } from "express-zod-api";
+
+new ResultHandler({
+  positive: (data) => ({
+    statusCode: [201, 202], // created or will be created
+    schema: z.object({ status: z.literal("created"), data }),
+  }),
+  negative: [
+    {
+      statusCode: 409, // conflict: entity already exists
+      schema: z.object({ status: z.literal("exists"), id: z.int() }),
+    },
+    {
+      statusCode: [400, 500], // validation or internal error
+      schema: z.object({ status: z.literal("error"), reason: z.string() }),
+    },
+  ],
+  handler: ({ error, response, output }) => {
+    // your implementation here
+  },
+});
+```
+
+## Array response
+
+Please avoid doing this in new projects: responding with array is a bad practice keeping your endpoints from evolving
+in backward compatible way (without making breaking changes). Nevertheless, for the purpose of easier migration of
+legacy APIs to this framework consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
+or implement your own ones in a similar way.
+The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
+assigned to that property is used as the response. This approach also supports examples, as well as documentation and
+client generation. Check out [the example endpoint](/example/endpoints/list-users.ts) for more details.
+
+## Accepting raw data
+
+Some APIs may require an endpoint to be able to accept and process raw data, such as streaming or uploading a binary
+file as an entire body of request. Use the proprietary `ez.raw()` schema as the input schema of your endpoint.
+The default parser in this case is `express.raw()`. You can customize it by assigning the `rawParser` option in config.
+The raw data is placed into `request.body.raw` property, having type `Buffer`.
+
+```typescript
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+
+const rawAcceptingEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw({
+    /* the place for additional inputs, like route params, if needed */
+  }),
+  output: z.object({ length: z.int().nonnegative() }),
+  handler: async ({ input: { raw } }) => ({
+    length: raw.length, // raw is Buffer
+  }),
+});
+```
+
+## Profiling
+
+For debugging and performance testing purposes the framework offers a simple `.profile()` method on the built-in logger.
+It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
+invoke the returned callback. The default severity of those measurements is `debug`.
+
+```typescript
+import { createConfig, BuiltinLogger } from "express-zod-api";
+
+// This enables the .profile() method on built-in logger:
+declare module "express-zod-api" {
+  interface LoggerOverrides extends BuiltinLogger {}
+}
+
+// Inside a handler of Endpoint, Middleware or ResultHandler:
+const done = logger.profile("expensive operation");
+doExpensiveOperation();
+done(); // debug: expensive operation '555 milliseconds'
+```
+
+You can also customize the profiler with your own formatter, chosen severity or even performance assessment function:
+
+```typescript
+logger.profile({
+  message: "expensive operation",
+  severity: (ms) => (ms > 500 ? "error" : "info"), // assess immediately
+  formatter: (ms) => `${ms.toFixed(2)}ms`, // custom format
+});
+doExpensiveOperation();
+done(); // error: expensive operation '555.55ms'
+```
+
+## Graceful shutdown
+
+You can enable and configure a special request monitoring that, if it receives a signal to terminate a process, will
+first put the server into a mode that rejects new requests, attempt to complete started requests within the specified
+time, and then forcefully stop the server and terminate the process.
+
+```ts
+import { createConfig } from "express-zod-api";
+
+createConfig({
+  gracefulShutdown: {
+    timeout: 1000,
+    events: ["SIGINT", "SIGTERM"],
+    beforeExit: /* async */ () => {},
+  },
+});
+```
+
+## Subscriptions
+
+If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server,
+consider [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) feature.
+Client application can subscribe to the event stream using `EventSource` class instance or the
+[instance of the generated](#generating-a-frontend-client) `Subscription` class. The following example demonstrates
+the implementation emitting the `time` event each second.
+
+```typescript
+import { z } from "zod/v4";
+import { EventStreamFactory } from "express-zod-api";
+import { setTimeout } from "node:timers/promises";
+
+const subscriptionEndpoint = new EventStreamFactory({
+  time: z.int().positive(),
+}).buildVoid({
+  input: z.object({}), // optional input schema
+  handler: async ({ options: { emit, isClosed } }) => {
+    while (!isClosed()) {
+      emit("time", Date.now());
+      await setTimeout(1000);
+    }
+  },
+});
+```
+
+If you need more capabilities, such as bidirectional event sending, I have developed an additional websocket operating
+framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has similar principles and capabilities.
 
 # Caveats
 

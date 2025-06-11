@@ -161,6 +161,10 @@ describe("Environment checks", () => {
         ).toMatchSnapshot();
       },
     );
+
+    test("meta id goes directly to depiction", () => {
+      expect(z.toJSONSchema(z.string().meta({ id: "uniq" }))).toMatchSnapshot();
+    });
   });
 
   describe("Vitest error comparison", () => {

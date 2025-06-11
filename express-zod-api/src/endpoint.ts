@@ -22,7 +22,7 @@ import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer } from "./logical-container";
-import { getBrand } from "./metadata";
+import { getBrand, getExamples } from "./metadata";
 import { AuxMethod, Method } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
@@ -86,17 +86,14 @@ export class Endpoint<
 
   /** considered expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
-    const meta = this.#def.outputSchema.meta();
-    if (meta?.examples?.length) return; // has examples on the output schema, or pull up:
+    if (getExamples(this.#def.outputSchema).length) return; // has examples on the output schema, or pull up:
     if (!isSchema<$ZodObject>(this.#def.outputSchema, "object")) return;
     const examples = pullResponseExamples(this.#def.outputSchema as $ZodObject);
     if (!examples.length) return;
+    const current = this.#def.outputSchema.meta();
     globalRegistry
       .remove(this.#def.outputSchema) // reassign to avoid cloning
-      .add(this.#def.outputSchema as $ZodObject, {
-        ...meta,
-        examples,
-      });
+      .add(this.#def.outputSchema as $ZodObject, { ...current, examples });
   });
 
   constructor(def: {

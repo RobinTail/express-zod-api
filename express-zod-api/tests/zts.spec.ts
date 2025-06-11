@@ -157,7 +157,7 @@ describe("zod-to-ts", () => {
         .string()
         .refine((val) => val.length > 10)
         .or(z.number())
-        .and(z.bigint().nullish().default(1000n)),
+        .and(z.bigint().nullish()),
       nativeEnum: z.enum(Fruits),
       lazy: z.lazy(() => z.string()),
       discUnion: z.discriminatedUnion("kind", [
@@ -372,6 +372,24 @@ describe("zod-to-ts", () => {
       z.literal(123),
       z.literal(undefined),
     ])("Should produce the correct typescript %#", (schema) => {
+      expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
+    });
+  });
+
+  describe("z.templateLiteral()", () => {
+    test.each([
+      z.templateLiteral(["start", z.number(), "mid", z.boolean(), "end"]),
+      z.templateLiteral([z.number(), "one", z.boolean(), "two"]),
+      z.templateLiteral(["one-", "two-", "three"]),
+      z.templateLiteral([z.string(), z.number(), z.boolean()]),
+      z.templateLiteral([z.number()]),
+      z.templateLiteral(["only"]),
+      z.templateLiteral([z.number(), "more"]),
+      z.templateLiteral(["leading", z.boolean()]),
+      z.templateLiteral([]),
+      z.templateLiteral(["head", undefined]),
+      z.templateLiteral(["head", 0]),
+    ])("should produce the correct typescript %#", (schema) => {
       expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });
   });

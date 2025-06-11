@@ -1,6 +1,5 @@
 import { execSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
-import * as R from "ramda";
 import { z } from "zod/v4";
 
 /**
@@ -66,6 +65,18 @@ const responseOnlyHeaders = {
   "alt-svc": {
     proof: "Defined in RFC 7838, Section 3.",
     reason: "The server advertises alternative services in responses.",
+  },
+  "cache-group-invalidation": {
+    proof:
+      "Used in proprietary or CDN-specific caching systems (e.g., internal invalidation mechanisms). Not a standard IANA header, but appears only in server responses for cache control.",
+    reason:
+      "Used in responses to instruct cache systems to invalidate a group of cached resources.",
+  },
+  "cache-groups": {
+    proof:
+      "Appears in proprietary CDN and microservice architectures to define cache grouping in server responses. Not present in standard specifications.",
+    reason:
+      "Used in responses to tag content with logical cache groups for coordinated invalidation.",
   },
   "cache-status": {
     proof: "Defined in RFC 9211.",
@@ -199,10 +210,13 @@ const responseOnlyHeaders = {
 };
 
 const dest = "express-zod-api/src/well-known-headers.json";
-const mtime = R.tryCatch(
-  (cmd) => new Date(execSync(cmd, { encoding: "utf8" })),
-  () => undefined,
-)(`git log -1 --pretty="format:%ci" ${dest}`);
+
+let mtime: Date | undefined;
+try {
+  mtime = new Date(
+    execSync(`git log -1 --pretty="format:%ci" ${dest}`, { encoding: "utf8" }),
+  );
+} catch {}
 
 console.info("Current state", mtime);
 

@@ -20,11 +20,11 @@ Which is highly appreciated as well. Consider these steps:
 
 - Fork the repo,
 - Create a new branch in your fork of the repo (don't change `master`),
-- Install the dependencies using `yarn`,
-- Install the pre-commit hooks using `yarn install_hooks`,
+- Install the dependencies using `pnpm i`,
+- Install the pre-commit hooks using `pnpm install_hooks`,
 - Make changes,
-- Run the tests using `yarn test`,
-  - In case you wanna run tests from `example` and `*-test` workspaces, run `yarn build` first.
+- Run the tests using `pnpm test`,
+  - In case you wanna run tests from `example` and `*-test` workspaces, run `pnpm build` first.
 - Commit everything,
 - Push your branch into your fork,
 - Create a PR between the forks:

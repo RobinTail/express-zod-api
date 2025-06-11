@@ -10,7 +10,7 @@ export const dateIn = ({
     z.iso.date(),
     z.iso.datetime(),
     z.iso.datetime({ local: true }),
-  ]) as unknown as z.ZodUnion<[z.ZodString, z.ZodString, z.ZodString]>; // this fixes DTS build for ez export
+  ]);
 
   return schema
     .meta({ examples })
