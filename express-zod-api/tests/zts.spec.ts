@@ -157,7 +157,7 @@ describe("zod-to-ts", () => {
         .string()
         .refine((val) => val.length > 10)
         .or(z.number())
-        .and(z.bigint().nullish().default(1000n)),
+        .and(z.bigint().nullish()),
       nativeEnum: z.enum(Fruits),
       lazy: z.lazy(() => z.string()),
       discUnion: z.discriminatedUnion("kind", [

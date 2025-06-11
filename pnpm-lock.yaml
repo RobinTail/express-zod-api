@@ -78,8 +78,8 @@ importers:
         specifier: ^3.2.3
         version: 3.2.3(@types/node@24.0.0)(tsx@4.19.4)(yaml@2.8.0)
       zod:
-        specifier: ^3.25.58
-        version: 3.25.58
+        specifier: ^3.25.60
+        version: 3.25.60
 
   cjs-test:
     dependencies:
@@ -152,7 +152,7 @@ importers:
         version: 5.8.3
       zod:
         specifier: ^3.25.35
-        version: 3.25.58
+        version: 3.25.60
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.18.2
@@ -2187,8 +2187,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@3.25.58:
-    resolution: {integrity: sha512-DVLmMQzSZwNYzQoMaM3MQWnxr2eq+AtM9Hx3w1/Yl0pH8sLTSjN4jGP7w6f7uand6Hw44tsnSu1hz1AOA6qI2Q==}
+  zod@3.25.60:
+    resolution: {integrity: sha512-VyPT/ZfyggoJtTnGCfPGx2OOW9idfmyqsqZCAvYscOlXKCGKPCeSfr44Ewp8fqvtfNMe1T88qjWIFKopTL9jSQ==}
 
 snapshots:
 
@@ -4132,4 +4132,4 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod@3.25.58: {}
+  zod@3.25.60: {}
