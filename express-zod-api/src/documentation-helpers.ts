@@ -357,6 +357,7 @@ export const depictRequestParams = ({
 
   return Object.entries(flat.properties).reduce<ParameterObject[]>(
     (acc, [name, jsonSchema]) => {
+      if (!isObject(jsonSchema)) return acc;
       const location = isPathParam(name)
         ? "path"
         : isHeaderParam(name)
