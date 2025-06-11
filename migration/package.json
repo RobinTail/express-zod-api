@@ -1,0 +1,11 @@
+{
+  "name": "@express-zod-api/migration",
+  "version": "24.4.0",
+  "peerDependencies": {
+    "typescript-eslint": "^8.0.0",
+    "eslint": "^9.0.0"
+  },
+  "scripts": {
+    "test": "vitest run --globals"
+  }
+}

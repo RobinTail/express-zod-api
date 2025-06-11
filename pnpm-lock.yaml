@@ -209,6 +209,15 @@ importers:
         specifier: workspace:*
         version: link:../express-zod-api
 
+  migration:
+    dependencies:
+      eslint:
+        specifier: ^9.0.0
+        version: 9.28.0
+      typescript-eslint:
+        specifier: ^8.0.0
+        version: 8.34.0(eslint@9.28.0)(typescript@5.8.3)
+
 packages:
 
   '@ampproject/remapping@2.3.0':
