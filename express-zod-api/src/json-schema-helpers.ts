@@ -72,7 +72,7 @@ export const flattenIO = (
       );
       if (!isOptional && entry.required) flatRequired.push(...entry.required);
     }
-    if (entry.propertyNames) {
+    if (isObject(entry.propertyNames)) {
       const keys: string[] = [];
       if (typeof entry.propertyNames.const === "string")
         keys.push(entry.propertyNames.const);
