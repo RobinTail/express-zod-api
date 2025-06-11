@@ -121,7 +121,7 @@ importers:
         specifier: ^1.5.0
         version: 1.5.1
       '@types/http-errors':
-        specifier: ^2.0.2
+        specifier: ^2.0.5
         version: 2.0.5
       ansis:
         specifier: ^4.1.0
