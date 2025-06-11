@@ -179,7 +179,7 @@ export default tsPlugin.config(
     ignores: [
       "express-zod-api/dist/",
       "express-zod-api/coverage/",
-      "express-zod-api/migration/",
+      "migration/dist",
       "compat-test/sample.ts",
     ],
   },
