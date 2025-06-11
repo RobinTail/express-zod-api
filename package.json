@@ -4,7 +4,7 @@
   "scripts": {
     "start": "pnpm -F example start",
     "prebuild": "tsx tools/contributors.ts && tsx tools/license.ts",
-    "build": "pnpm -F express-zod-api build && pnpm -F example build",
+    "build": "pnpm -r build",
     "postbuild": "tsx tools/make-tests.ts",
     "test": "pnpm -F express-zod-api test",
     "test:example": "pnpm -F example test",
