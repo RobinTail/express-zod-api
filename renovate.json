@@ -2,6 +2,5 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "dependencyDashboard": false,
-  "postUpdateOptions": ["pnpmDedupe"],
-  "rangeStrategy": "bump"
+  "postUpdateOptions": ["pnpmDedupe"]
 }
