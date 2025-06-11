@@ -93,10 +93,12 @@ export const flattenIO = (
 /** @see pullResponseExamples */
 export const pullRequestExamples = (subject: JSONSchema.ObjectSchema) =>
   Object.entries(subject.properties || {}).reduce<FlatObject[]>(
-    (acc, [key, { examples = [] }]) =>
-      combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
+    (acc, [key, prop]) => {
+      const { examples = [] } = isObject(prop) ? prop : {};
+      return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
         ...left,
         ...right,
-      })),
+      }));
+    },
     [],
   );
