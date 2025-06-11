@@ -106,8 +106,8 @@ importers:
         specifier: ^4.1.8
         version: 4.1.8
       undici:
-        specifier: ^6.19.8
-        version: 6.21.3
+        specifier: ^7.0.0
+        version: 7.10.0
 
   express-zod-api:
     dependencies:
@@ -194,8 +194,8 @@ importers:
         specifier: ^8.5.0
         version: 8.5.0(postcss@8.5.4)(tsx@4.19.4)(typescript@5.8.3)(yaml@2.8.0)
       undici:
-        specifier: ^6.19.8
-        version: 6.21.3
+        specifier: ^7.0.0
+        version: 7.10.0
 
   issue952-test:
     dependencies:
@@ -2039,9 +2039,9 @@ packages:
   undici-types@7.8.0:
     resolution: {integrity: sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw==}
 
-  undici@6.21.3:
-    resolution: {integrity: sha512-gBLkYIlEnSp8pFbT64yFgGE6UIB9tAkhukC23PmMDCe5Nd+cRqKxSjw5y54MK2AZMgZfJWMaNE4nYUHgi1XEOw==}
-    engines: {node: '>=18.17'}
+  undici@7.10.0:
+    resolution: {integrity: sha512-u5otvFBOBZvmdjWLVW+5DAc9Nkq8f24g0O9oY7qw2JVIF1VocIFoyz9JFkuVOS2j41AufeO0xnlweJ2RLT8nGw==}
+    engines: {node: '>=20.18.1'}
 
   unicode-emoji-modifier-base@1.0.0:
     resolution: {integrity: sha512-yLSH4py7oFH3oG/9K+XWrz1pSi3dfUrWEnInbxMfArOfc1+33BlGPQtLsOYwvdMy11AwUBetYuaRxSPqgkq+8g==}
@@ -3991,7 +3991,7 @@ snapshots:
 
   undici-types@7.8.0: {}
 
-  undici@6.21.3: {}
+  undici@7.10.0: {}
 
   unicode-emoji-modifier-base@1.0.0: {}
 
