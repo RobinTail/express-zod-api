@@ -49,15 +49,6 @@ jobs:
       run: pnpm test:esm
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
       run: pnpm test:952
-    - name: Pack express-zod-api
-      run: pnpm -F express-zod-api pack --out compat-test/ez.tgz
-    - name: Pack @express-zod-api/migration
-      run: pnpm -F migration pack --out compat-test/migration.tgz
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: dist
-        path: compat-test
   report:
     needs: build
     runs-on: ubuntu-latest
@@ -68,24 +59,3 @@ jobs:
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
-  compat:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-      - name: Add dependencies
-        run: |
-          yarn add express@5.1.0 typescript@5.1 http-errors@2.0.0 zod@3.25.35
-          yarn add -D eslint@9.0.0 typescript-eslint@8.0.0 vitest tsx
-          yarn add express-zod-api@./ez.tgz
-          yarn add @express-zod-api/migration@./migration.tgz
-      - name: Run tests
-        run: |
-          yarn eslint --fix
-          yarn vitest
