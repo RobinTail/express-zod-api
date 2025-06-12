@@ -8,7 +8,6 @@
     "postbuild": "tsx tools/make-tests.ts",
     "test": "pnpm -F express-zod-api test",
     "test:example": "pnpm -F example test",
-    "test:oas": "pnpm -F example validate",
     "test:cjs": "pnpm -F cjs-test test",
     "test:esm": "pnpm -F esm-test test",
     "test:952": "pnpm -F issue952-test test",
