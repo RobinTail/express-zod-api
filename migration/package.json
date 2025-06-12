@@ -5,6 +5,9 @@
     "typescript-eslint": "^8.0.0",
     "eslint": "^9.0.0"
   },
+  "devDependencies": {
+    "@typescript-eslint/rule-tester": "^8.34.0"
+  },
   "type": "module",
   "exports": {
     ".": {

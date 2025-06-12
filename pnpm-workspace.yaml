@@ -10,7 +10,6 @@ onlyBuiltDependencies:
 gitChecks: false
 engineStrict: true
 publicHoistPattern:
-  - "@typescript-eslint/*" # used by migration.ts
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
   - "@eslint/*" # used by eslint.config.js
   - "globals" # used by eslint.config.js
