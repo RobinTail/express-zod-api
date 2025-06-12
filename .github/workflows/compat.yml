@@ -8,7 +8,7 @@ on:
 
 
 jobs:
-  OpenAPI:
+  Packing:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +19,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install
-      - run: pnpm build
+      - name: Build everything
+        run: pnpm build
       - name: Pack express-zod-api
         run: pnpm -F express-zod-api pack --out compat-test/ez.tgz
       - name: Pack @express-zod-api/migration
@@ -29,13 +30,9 @@ jobs:
         with:
           name: dist
           path: compat-test
-  Compatibility:
-    name: express@${{matrix.express-version}}
-    needs: OpenAPI
+  Minimum:
+    needs: Packing
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        express-version: [ 5 ]
     steps:
       - uses: actions/setup-node@v4
         with:
@@ -46,8 +43,8 @@ jobs:
           name: dist
       - name: Add dependencies
         run: |
-          yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod
-          yarn add -D eslint@9.0 typescript-eslint@8.0 vitest tsx
+          yarn add express@5.1.0 typescript@5.1 http-errors@2.0.0 zod@3.25.35
+          yarn add -D eslint@9.0.0 typescript-eslint@8.0.0 vitest tsx
           yarn add express-zod-api@./ez.tgz
           yarn add @express-zod-api/migration@./migration.tgz
       - name: Run tests
