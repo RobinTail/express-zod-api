@@ -85,7 +85,7 @@ importers:
         version: 3.2.3(@types/node@24.0.1)(tsx@4.19.4)(yaml@2.8.0)
       zod:
         specifier: ^3.25.61
-        version: 3.25.62
+        version: 3.25.63
 
   cjs-test:
     dependencies:
@@ -158,7 +158,7 @@ importers:
         version: 5.8.3
       zod:
         specifier: ^3.25.35
-        version: 3.25.62
+        version: 3.25.63
     devDependencies:
       '@types/cors':
         specifier: ^2.8.19
@@ -2196,8 +2196,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@3.25.62:
-    resolution: {integrity: sha512-YCxsr4DmhPcrKPC9R1oBHQNlQzlJEyPAId//qTau/vBee9uO8K6prmRq4eMkOyxvBfH4wDPIPdLx9HVMWIY3xA==}
+  zod@3.25.63:
+    resolution: {integrity: sha512-3ttCkqhtpncYXfP0f6dsyabbYV/nEUW+Xlu89jiXbTBifUfjaSqXOG6JnQPLtqt87n7KAmnMqcjay6c0Wq0Vbw==}
 
 snapshots:
 
@@ -4141,4 +4141,4 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod@3.25.62: {}
+  zod@3.25.63: {}
