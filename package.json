@@ -1,5 +1,6 @@
 {
   "private": true,
+  "version": "24.3.1",
   "type": "module",
   "scripts": {
     "start": "pnpm -F example start",
