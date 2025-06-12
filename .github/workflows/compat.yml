@@ -1,4 +1,4 @@
-name: Validations
+name: Compatibility test
 
 on:
   push:
@@ -12,10 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # - name: Validate against OpenAPI 3.1
-      #   uses: char0n/apidom-validate@v1
-      #   with:
-      #     definition-file: example/example.documentation.yaml
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -23,13 +19,11 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install
-      - run: pnpm test:oas
-      - name: Build tests
-        run: pnpm postbuild # builds the tests
-      - name: Build distribution
-        run: pnpm -F express-zod-api build
-      - name: Pack artifact
-        run: pnpm -F express-zod-api pack --out compat-test/dist.tgz
+      - run: pnpm build
+      - name: Pack express-zod-api
+        run: pnpm -F express-zod-api pack --out compat-test/ez.tgz
+      - name: Pack @express-zod-api/migration
+        run: pnpm -F migration pack --out compat-test/migration.tgz
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -54,7 +48,8 @@ jobs:
         run: |
           yarn add express@${{matrix.express-version}} typescript@5.1 http-errors zod
           yarn add -D eslint@9.0 typescript-eslint@8.0 vitest tsx
-          yarn add express-zod-api@./dist.tgz
+          yarn add express-zod-api@./ez.tgz
+          yarn add @express-zod-api/migration@./migration.tgz
       - name: Run tests
         run: |
           yarn eslint --fix
