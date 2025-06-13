@@ -140,51 +140,9 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
   return Object.assign(original, { type: makeNullableType(original.type) });
 };
 
-const isSupportedType = (subject: string): subject is SchemaObjectType =>
-  subject in samples;
-
-/**
- * @todo remove in v25
- * @since zod 3.25.45
- */
-export const depictEnum: Depicter = ({ jsonSchema }) => {
-  jsonSchema.type ??= typeof jsonSchema.enum?.[0];
-  return jsonSchema;
-};
-
-/**
- * @todo remove in v25
- * @since zod 3.25.49
- * */
-export const depictLiteral: Depicter = ({ jsonSchema }) => {
-  jsonSchema.type ??= typeof (jsonSchema.const || jsonSchema.enum?.[0]);
-  return jsonSchema;
-};
-
-const ensureCompliance = ({
-  $ref,
-  type,
-  allOf,
-  oneOf,
-  anyOf,
-  not,
-  ...rest
-}: JSONSchema.BaseSchema): SchemaObject | ReferenceObject => {
-  if ($ref) return { $ref };
-  const valid: SchemaObject = {
-    type: Array.isArray(type)
-      ? type.filter(isSupportedType)
-      : type && isSupportedType(type)
-        ? type
-        : undefined,
-    ...rest,
-  };
-  // eslint-disable-next-line no-restricted-syntax -- need typed key here
-  for (const [prop, entry] of R.toPairs({ allOf, oneOf, anyOf }))
-    if (entry) valid[prop] = entry.map(ensureCompliance);
-  if (not) valid.not = ensureCompliance(not);
-  return valid;
-};
+/** @since v24.3.1 schema compliance is fully delegated to Zod */
+const asOAS = (subject: JSONSchema.BaseSchema) =>
+  subject as SchemaObject | ReferenceObject;
 
 export const depictDateIn: Depicter = (
   { jsonSchema: { examples, description } },
@@ -264,7 +222,7 @@ export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
     ctx.isResponse ? "in" : "out"
   ];
   if (!isSchema<$ZodTransform>(target, "transform")) return jsonSchema;
-  const opposingDepiction = ensureCompliance(depict(opposite, { ctx }));
+  const opposingDepiction = asOAS(depict(opposite, { ctx }));
   if (isSchemaObject(opposingDepiction)) {
     if (!ctx.isResponse) {
       const { type: opposingType, ...rest } = opposingDepiction;
@@ -293,6 +251,7 @@ export const depictRaw: Depicter = ({ jsonSchema }) => {
   const objSchema = jsonSchema as JSONSchema.ObjectSchema;
   if (!objSchema.properties) return jsonSchema;
   if (!("raw" in objSchema.properties)) return jsonSchema;
+  if (!isObject(objSchema.properties.raw)) return jsonSchema;
   return objSchema.properties.raw;
 };
 
@@ -349,6 +308,7 @@ export const depictRequestParams = ({
 
   return Object.entries(flat.properties).reduce<ParameterObject[]>(
     (acc, [name, jsonSchema]) => {
+      if (!isObject(jsonSchema)) return acc;
       const location = isPathParam(name)
         ? "path"
         : isHeaderParam(name)
@@ -357,7 +317,7 @@ export const depictRequestParams = ({
             ? "query"
             : undefined;
       if (!location) return acc;
-      const depicted = ensureCompliance(jsonSchema);
+      const depicted = asOAS(jsonSchema);
       const result =
         composition === "components"
           ? makeRef(
@@ -395,8 +355,6 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     intersection: depictIntersection,
     tuple: depictTuple,
     pipe: depictPipeline,
-    literal: depictLiteral,
-    enum: depictEnum,
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,
@@ -423,7 +381,7 @@ const fixReferences = (
         if (depiction) {
           entry.$ref = ctx.makeRef(
             depiction.id || depiction, // avoiding serialization, because changing $ref
-            ensureCompliance(depiction),
+            asOAS(depiction),
           ).$ref;
         }
         continue;
@@ -458,7 +416,11 @@ const depict = (
       },
     },
   ) as JSONSchema.ObjectSchema;
-  return fixReferences(properties["subject"], $defs, ctx);
+  return fixReferences(
+    isObject(properties["subject"]) ? properties["subject"] : {},
+    $defs,
+    ctx,
+  );
 };
 
 export const excludeParamsFromDepiction = (
@@ -510,7 +472,7 @@ export const depictResponse = ({
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
   if (!mimeTypes) return { description };
-  const response = ensureCompliance(
+  const response = asOAS(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
       ctx: { isResponse: true, makeRef, path, method },
@@ -657,7 +619,7 @@ export const depictBody = ({
   paramNames: string[];
 }) => {
   const [withoutParams, hasRequired] = excludeParamsFromDepiction(
-    ensureCompliance(request),
+    asOAS(request),
     paramNames,
   );
   const examples = [];

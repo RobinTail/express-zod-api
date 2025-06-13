@@ -40,13 +40,7 @@ export const hasCycle = (
   subject: $ZodType,
   { io }: Pick<NestedSchemaLookupProps, "io">,
 ) => {
-  const json = z.toJSONSchema(subject, {
-    io,
-    unrepresentable: "any",
-    override: ({ jsonSchema }) => {
-      if (typeof jsonSchema.default === "bigint") delete jsonSchema.default;
-    },
-  });
+  const json = z.toJSONSchema(subject, { io, unrepresentable: "any" });
   const stack: unknown[] = [json];
   while (stack.length) {
     const entry = stack.shift()!;

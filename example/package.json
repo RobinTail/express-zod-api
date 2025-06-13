@@ -5,14 +5,15 @@
   "type": "module",
   "scripts": {
     "start": "tsx index.ts",
-    "build": "yarn build:docs && yarn build:client",
+    "build": "pnpm build:docs && pnpm build:client",
     "build:docs": "tsx generate-documentation.ts",
     "build:client": "tsx generate-client.ts",
     "pretest": "tsc --noEmit",
-    "test": "vitest run --globals index.spec.ts",
-    "validate": "vitest run --globals validate.spec.ts"
+    "test": "vitest run index.spec.ts",
+    "validate": "vitest run validate.spec.ts"
   },
   "dependencies": {
+    "express-zod-api": "workspace:*",
     "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {

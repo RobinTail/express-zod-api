@@ -2,9 +2,9 @@ name: Validations
 
 on:
   push:
-    branches: [ master, v20, v21, v22, v23 ]
+    branches: [ master, v21, v22, v23, make-v25 ]
   pull_request:
-    branches: [ master, v20, v21, v22, v23 ]
+    branches: [ master, v21, v22, v23, make-v25 ]
 
 
 jobs:
@@ -16,17 +16,20 @@ jobs:
       #   uses: char0n/apidom-validate@v1
       #   with:
       #     definition-file: example/example.documentation.yaml
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: yarn install
-      - run: yarn test:oas
-      - name: Build distribution
-        run: yarn workspace express-zod-api build
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install
+      - run: pnpm test:oas
       - name: Build tests
-        run: yarn postbuild # builds the tests
+        run: pnpm postbuild # builds the tests
+      - name: Build distribution
+        run: pnpm -F express-zod-api build
       - name: Pack artifact
-        run: yarn workspace express-zod-api pack --filename ../compat-test/dist.tgz
+        run: pnpm -F express-zod-api pack --out compat-test/dist.tgz
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
