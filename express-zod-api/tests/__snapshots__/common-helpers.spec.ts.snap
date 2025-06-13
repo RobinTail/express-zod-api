@@ -26,6 +26,15 @@ exports[`Common Helpers > defaultInputSources > should be declared in a certain 
 }
 `;
 
+exports[`Common Helpers > emptySchema > should be an object schema with empty shape and strip catcher 1`] = `
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {},
+  "type": "object",
+}
+`;
+
 exports[`Common Helpers > getMessageFromError() > should compile a string from ZodError 1`] = `"user.id: expected number, got string; user.name: expected string, got number"`;
 
 exports[`Common Helpers > getMessageFromError() > should handle empty path in ZodIssue 1`] = `"Top level refinement issue"`;

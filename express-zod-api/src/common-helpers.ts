@@ -6,10 +6,11 @@ import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import { AuxMethod, Method } from "./method";
 
+/** @since zod 3.25.61 output type fixed */
+export const emptySchema = z.object({});
+export type EmptySchema = typeof emptySchema;
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = z.output<EmptySchema>;
-/** Avoiding z.ZodObject<Record<string, never>, $strip>, because its z.output<> is generic "object" (external issue) */
-export type EmptySchema = z.ZodRecord<z.ZodString, z.ZodNever>;
 export type FlatObject = Record<string, unknown>;
 
 /** @link https://stackoverflow.com/a/65492934 */
