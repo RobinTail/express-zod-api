@@ -105,9 +105,6 @@ importers:
       '@types/swagger-ui-express':
         specifier: ^4.1.8
         version: 4.1.8
-      undici:
-        specifier: ^7.10.0
-        version: 7.10.0
 
   express-zod-api:
     dependencies:
