@@ -2,6 +2,10 @@
 
 ## Version 24
 
+### v24.3.2
+
+- Removed previously deprecated plural properties from `ApiResponse` interface: `statusCodes`, `mimeTypes`.
+
 ### v24.3.1
 
 - Compatibility fix for Zod 3.25.60.

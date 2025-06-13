@@ -20,10 +20,6 @@ export interface ApiResponse<S extends z.ZodType> {
    * @default "application/json"
    * */
   mimeType?: string | [string, ...string[]] | null;
-  /** @deprecated use statusCode */
-  statusCodes?: never;
-  /** @deprecated use mimeType */
-  mimeTypes?: never;
 }
 
 /**
