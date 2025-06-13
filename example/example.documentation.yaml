@@ -767,8 +767,8 @@ components:
         - title
       additionalProperties: false
     Schema2:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array

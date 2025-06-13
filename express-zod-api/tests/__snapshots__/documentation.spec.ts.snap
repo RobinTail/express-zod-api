@@ -63,8 +63,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -220,8 +220,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -371,8 +371,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -610,8 +610,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -728,8 +728,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -858,8 +858,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -1009,8 +1009,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -1138,8 +1138,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -1302,8 +1302,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -1439,8 +1439,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -1582,8 +1582,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -1712,8 +1712,8 @@ components:
         - subcategories
       additionalProperties: false
     Schema3:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -1923,8 +1923,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -2099,8 +2099,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -2216,8 +2216,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -2374,8 +2374,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -2490,8 +2490,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -2629,8 +2629,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -2733,8 +2733,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -2847,8 +2847,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -3061,8 +3061,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -3178,8 +3178,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -3284,8 +3284,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -3392,8 +3392,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -3508,8 +3508,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -3622,8 +3622,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -3807,8 +3807,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -3945,8 +3945,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -4050,8 +4050,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -4186,8 +4186,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -4277,8 +4277,8 @@ components:
         - data
       additionalProperties: false
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -4424,8 +4424,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -4557,8 +4557,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -4674,8 +4674,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -4797,8 +4797,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -4918,8 +4918,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -5045,8 +5045,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -5155,8 +5155,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -5273,8 +5273,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -5372,8 +5372,8 @@ components:
         - data
       additionalProperties: false
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -5511,8 +5511,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
@@ -5629,8 +5629,8 @@ paths:
 components:
   schemas:
     Schema1:
-      type: object
       id: errorTreeSchema
+      type: object
       properties:
         errors:
           type: array
