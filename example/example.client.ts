@@ -23,7 +23,7 @@ type GetV1UserRetrievePositiveVariant1 = {
   data: {
     id: number;
     name: string;
-    features?: Type1[] | undefined;
+    features: Type1[];
   };
 };
 

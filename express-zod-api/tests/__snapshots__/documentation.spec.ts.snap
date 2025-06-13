@@ -777,9 +777,9 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
-            type: array
             minItems: 1
             maxItems: 3
+            type: array
             items:
               type: integer
               exclusiveMinimum: 0
@@ -906,8 +906,6 @@ paths:
         content:
           application/json:
             schema:
-              discriminator:
-                propertyName: type
               anyOf:
                 - type: object
                   properties:
@@ -929,6 +927,8 @@ paths:
                   required:
                     - type
                     - b
+              discriminator:
+                propertyName: type
         required: true
       responses:
         "200":
@@ -1193,8 +1193,8 @@ paths:
           required: false
           description: GET /v1/getSomething Parameter
           schema:
-            type: string
             default: test
+            type: string
         - name: nullish
           in: query
           required: false
@@ -1208,10 +1208,10 @@ paths:
           required: false
           description: GET /v1/getSomething Parameter
           schema:
+            default: 123
             type:
               - integer
               - "null"
-            default: 123
             exclusiveMinimum: 0
             maximum: 9007199254740991
         - name: labeledDate
@@ -1219,10 +1219,10 @@ paths:
           required: false
           description: GET /v1/getSomething Parameter
           schema:
-            type: string
             default: Today
+            type: string
             format: date-time
-            pattern: ^((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d+)?(Z)$
+            pattern: ^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -3116,8 +3116,8 @@ paths:
           required: true
           description: YYYY-MM-DDTHH:mm:ss.sssZ
           schema:
-            type: string
             description: YYYY-MM-DDTHH:mm:ss.sssZ
+            type: string
             format: date-time
             pattern: ^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?)?Z?$
             externalDocs:
@@ -3671,8 +3671,8 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
-            type: array
             minItems: 1
+            type: array
             items:
               type: string
       responses:
@@ -3996,8 +3996,8 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
-            type: string
             deprecated: true
+            type: string
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -4259,9 +4259,9 @@ paths:
 components:
   schemas:
     GetHrisEmployeesParameterCursor:
-      type: string
       description: An optional cursor string used for pagination. This can be
         retrieved from the \`next\` property of the previous page response.
+      type: string
     GetHrisEmployeesPositiveResponse:
       type: object
       properties:
@@ -4846,9 +4846,9 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
-            type: string
             examples:
               - "123"
+            type: string
           examples:
             example1:
               value: "123"
@@ -5094,8 +5094,8 @@ paths:
           required: true
           description: here is the test
           schema:
-            type: string
             description: here is the test
+            type: string
       responses:
         "200":
           description: GET /v1/getSomething Positive response

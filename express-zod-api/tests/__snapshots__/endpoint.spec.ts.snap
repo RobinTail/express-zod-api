@@ -88,6 +88,7 @@ exports[`Endpoint > .getResponses() > should return the negative responses (read
         },
         "status": {
           "const": "error",
+          "type": "string",
         },
         "tree": {
           "$ref": "#/$defs/errorTreeSchema",
@@ -130,6 +131,7 @@ exports[`Endpoint > .getResponses() > should return the positive responses (read
         },
         "status": {
           "const": "success",
+          "type": "string",
         },
       },
       "required": [

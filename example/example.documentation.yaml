@@ -16,8 +16,8 @@ paths:
           required: true
           description: a numeric string containing the id of the user
           schema:
-            type: string
             description: a numeric string containing the id of the user
+            type: string
             pattern: \d+
       responses:
         "200":
@@ -46,6 +46,7 @@ paths:
                     required:
                       - id
                       - name
+                      - features
                     additionalProperties: false
                 required:
                   - status
@@ -92,8 +93,8 @@ paths:
           required: true
           description: numeric string
           schema:
-            type: string
             description: numeric string
+            type: string
             pattern: \d+
       responses:
         "204":
@@ -113,9 +114,9 @@ paths:
           required: true
           description: PATCH /v1/user/:id Parameter
           schema:
-            type: string
             examples:
               - "1234567890"
+            type: string
             minLength: 1
           examples:
             example1:
@@ -125,9 +126,9 @@ paths:
           required: true
           description: PATCH /v1/user/:id Parameter
           schema:
-            type: string
             examples:
               - "12"
+            type: string
           examples:
             example1:
               value: "12"
@@ -635,9 +636,9 @@ paths:
           required: false
           description: for testing error response
           schema:
-            type: string
             deprecated: true
             description: for testing error response
+            type: string
       responses:
         "200":
           description: GET /v1/events/stream Positive response

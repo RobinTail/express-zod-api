@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { z } from "zod/v4";
+import { z, $brand } from "zod/v4";
 import { ez } from "../src";
 
 describe("ez.buffer()", () => {
@@ -7,7 +7,7 @@ describe("ez.buffer()", () => {
     test("should create a Buffer", () => {
       const schema = ez.buffer();
       expect(schema).toBeInstanceOf(z.ZodCustom);
-      expectTypeOf(schema._zod.output).toEqualTypeOf<Buffer>();
+      expectTypeOf(schema._zod.output).toEqualTypeOf<Buffer & $brand<symbol>>();
     });
   });
 

@@ -9,7 +9,6 @@
  * */
 import * as R from "ramda";
 import { z } from "zod/v4";
-import { FlatObject } from "./common-helpers";
 import { getExamples, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
 import type {
@@ -20,6 +19,12 @@ import type {
   $ZodCheck,
   $ZodCheckInternals,
   $ZodCheckDef,
+  SomeType,
+  $ZodDefaultInternals,
+  $ZodDefault,
+  $ZodObjectInternals,
+  $ZodObject,
+  $ZodTypeInternals,
 } from "zod/v4/core";
 
 declare module "zod/v4/core" {
@@ -29,12 +34,21 @@ declare module "zod/v4/core" {
 }
 
 declare module "zod/v4" {
-  interface ZodType {
+  interface ZodType<
+    out Output = unknown,
+    out Input = unknown,
+    out Internals extends $ZodTypeInternals<Output, Input> = $ZodTypeInternals<
+      Output,
+      Input
+    >,
+  > extends $ZodType<Output, Input, Internals> {
     /** @desc Alias for .meta({examples}), but argument is typed to ensure the correct placement for transformations */
     example(example: z.output<this>): this;
     deprecated(): this;
   }
-  interface ZodDefault<T extends $ZodType = $ZodType> extends ZodType {
+  interface ZodDefault<T extends SomeType = $ZodType>
+    extends z._ZodType<$ZodDefaultInternals<T>>,
+      $ZodDefault<T> {
     /** @desc Change the default value in the generated Documentation to a label, alias for .meta({ default }) */
     label(label: string): this;
   }
@@ -42,22 +56,17 @@ declare module "zod/v4" {
     // @ts-expect-error -- external issue
     out Shape extends $ZodShape = $ZodLooseShape,
     out Config extends $ZodObjectConfig = $ZodObjectConfig,
-  > extends ZodType {
+  > extends z._ZodType<$ZodObjectInternals<Shape, Config>>,
+      $ZodObject<Shape, Config> {
     remap<V extends string, U extends { [P in keyof Shape]?: V }>(
       mapping: U,
     ): z.ZodPipe<
-      z.ZodPipe<
-        this,
-        z.ZodTransform<FlatObject, FlatObject> // internal type simplified
-      >,
+      z.ZodPipe<this, z.ZodTransform>, // internal type simplified
       z.ZodObject<Remap<Shape, U, V> & Intact<Shape, U>, Config>
     >;
     remap<U extends $ZodShape>(
       mapper: (subject: Shape) => U,
-    ): z.ZodPipe<
-      z.ZodPipe<this, z.ZodTransform<FlatObject, FlatObject>>, // internal type simplified
-      z.ZodObject<U>
-    >;
+    ): z.ZodPipe<z.ZodPipe<this, z.ZodTransform>, z.ZodObject<U>>; // internal type simplified
   }
 }
 

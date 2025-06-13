@@ -5,5 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "vitest run --globals"
+  },
+  "dependencies": {
+    "express-zod-api": "workspace:*"
   }
 }

@@ -20,16 +20,18 @@ jobs:
           fetch-depth: 0 # to figure out last change to the json file
 
       - uses: fregante/setup-git-user@v2
+      - uses: pnpm/action-setup@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: pnpm
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install
 
       - name: Check for new headers on IANA.ORG
-        run: yarn tsx tools/headers.ts
+        run: pnpm tsx tools/headers.ts
 
       - name: Check for changes
         id: git-state
@@ -49,7 +51,7 @@ jobs:
 
       - name: Create a pull request
         if: steps.git-state.outputs.changes == 'true'
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           base: master
           branch: ${{ steps.create-branch.outputs.branch-name }}

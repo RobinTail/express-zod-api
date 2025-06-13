@@ -285,20 +285,26 @@ describe("Documentation helpers", () => {
       },
     );
 
-    test.each([
+    test.each<SchemaObject>([
       { type: "null" },
       {
         anyOf: [{ type: "null" }, { type: "null" }],
       },
       {
         anyOf: [
-          { type: ["string", "null"] as unknown as string }, // nullable of nullable case
+          { type: ["string", "null"] }, // nullable of nullable case
           { type: "null" },
         ],
       },
     ])("should not add null type when it's already there %#", (jsonSchema) => {
       expect(
-        depictNullable({ zodSchema: z.never(), jsonSchema }, requestCtx),
+        depictNullable(
+          {
+            zodSchema: z.never(),
+            jsonSchema: jsonSchema as JSONSchema.BaseSchema,
+          },
+          requestCtx,
+        ),
       ).toMatchSnapshot();
     });
   });

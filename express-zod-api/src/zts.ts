@@ -7,6 +7,7 @@ import type {
   $ZodIntersection,
   $ZodLazy,
   $ZodLiteral,
+  $ZodNonOptional,
   $ZodNullable,
   $ZodObject,
   $ZodOptional,
@@ -147,9 +148,6 @@ const onSomeUnion: Producer = (
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
 
-const onOptional: Producer = ({ _zod: { def } }: $ZodOptional, { next }) =>
-  next(def.innerType);
-
 const onNullable: Producer = ({ _zod: { def } }: $ZodNullable, { next }) =>
   f.createUnionTypeNode([next(def.innerType), makeLiteralType(null)]);
 
@@ -189,7 +187,9 @@ const onPrimitive =
     ensureTypeNode(syntaxKind);
 
 const onWrapped: Producer = (
-  { _zod: { def } }: $ZodReadonly | $ZodCatch | $ZodDefault,
+  {
+    _zod: { def },
+  }: $ZodReadonly | $ZodCatch | $ZodDefault | $ZodOptional | $ZodNonOptional,
   { next },
 ) => next(def.innerType);
 
@@ -259,7 +259,8 @@ const producers: HandlingRules<
   union: onSomeUnion,
   default: onWrapped,
   enum: onEnum,
-  optional: onOptional,
+  optional: onWrapped,
+  nonoptional: onWrapped,
   nullable: onNullable,
   catch: onWrapped,
   pipe: onPipeline,

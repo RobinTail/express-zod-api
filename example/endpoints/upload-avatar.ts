@@ -16,13 +16,11 @@ export const uploadAvatarEndpoint = defaultEndpointsFactory.build({
     hash: z.string(),
     otherInputs: z.record(z.string(), z.any()),
   }),
-  handler: async ({ input: { avatar, ...rest } }) => {
-    return {
-      name: avatar.name,
-      size: avatar.size,
-      mime: avatar.mimetype,
-      hash: createHash("sha1").update(avatar.data).digest("hex"),
-      otherInputs: rest,
-    };
-  },
+  handler: async ({ input: { avatar, ...rest } }) => ({
+    name: avatar.name,
+    size: avatar.size,
+    mime: avatar.mimetype,
+    hash: createHash("sha1").update(avatar.data).digest("hex"),
+    otherInputs: rest,
+  }),
 });

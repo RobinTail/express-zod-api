@@ -10,6 +10,7 @@ exports[`SSE > makeEventSchema() > should make a valid schema of SSE event 1`] =
     },
     "event": {
       "const": "test",
+      "type": "string",
     },
     "id": {
       "type": "string",
@@ -45,6 +46,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
             },
             "event": {
               "const": "test",
+              "type": "string",
             },
             "id": {
               "type": "string",
@@ -69,6 +71,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
             },
             "event": {
               "const": "another",
+              "type": "string",
             },
             "id": {
               "type": "string",
@@ -126,6 +129,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
         },
         "event": {
           "const": "single",
+          "type": "string",
         },
         "id": {
           "type": "string",
