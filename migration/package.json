@@ -1,6 +1,7 @@
 {
   "name": "@express-zod-api/migration",
   "version": "24.0.0",
+  "license": "MIT",
   "peerDependencies": {
     "typescript-eslint": "^8.0.0",
     "eslint": "^9.0.0"
