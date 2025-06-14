@@ -42,4 +42,4 @@ jobs:
       - name: Bumpp ${{inputs.workspace}}
         run: |
           pnpm -F ${{inputs.workspace}} exec \
-            pnpm dlx bumpp pre${{ inputs.kind }} --preid beta --tag=${{inputs.workspace}}-%s -y
+            pnpm dlx bumpp pre${{ inputs.kind }} --preid beta --tag=${{inputs.workspace}}-v%s -y
