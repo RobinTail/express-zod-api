@@ -4,6 +4,25 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  dev:
+    '@typescript-eslint/rule-tester':
+      specifier: ^8.34.0
+      version: 8.34.0
+    eslint:
+      specifier: ^9.28.0
+      version: 9.29.0
+    typescript-eslint:
+      specifier: ^8.34.0
+      version: 8.34.0
+  min:
+    eslint:
+      specifier: ^9.0.0
+      version: 9.29.0
+    typescript-eslint:
+      specifier: ^8.0.0
+      version: 8.34.0
+
 overrides:
   '@scarf/scarf': npm:empty-npm-package@1.0.0
 
@@ -39,7 +58,7 @@ importers:
         specifier: ^1.8.0
         version: 1.8.0
       eslint:
-        specifier: ^9.28.0
+        specifier: catalog:dev
         version: 9.29.0
       eslint-config-prettier:
         specifier: ^10.1.5
@@ -75,7 +94,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       typescript-eslint:
-        specifier: ^8.34.0
+        specifier: catalog:dev
         version: 8.34.0(eslint@9.29.0)(typescript@5.8.3)
       vitest:
         specifier: ^3.2.3
@@ -209,14 +228,14 @@ importers:
   migration:
     dependencies:
       eslint:
-        specifier: ^9.0.0
+        specifier: catalog:min
         version: 9.29.0
       typescript-eslint:
-        specifier: ^8.0.0
+        specifier: catalog:min
         version: 8.34.0(eslint@9.29.0)(typescript@5.8.3)
     devDependencies:
       '@typescript-eslint/rule-tester':
-        specifier: ^8.34.0
+        specifier: catalog:dev
         version: 8.34.0(eslint@9.29.0)(typescript@5.8.3)
 
 packages:

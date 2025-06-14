@@ -42,10 +42,10 @@
     "*.md"
   ],
   "peerDependencies": {
-    "typescript-eslint": "^8.0.0",
-    "eslint": "^9.0.0"
+    "typescript-eslint": "catalog:min",
+    "eslint": "catalog:min"
   },
   "devDependencies": {
-    "@typescript-eslint/rule-tester": "^8.34.0"
+    "@typescript-eslint/rule-tester": "catalog:dev"
   }
 }
