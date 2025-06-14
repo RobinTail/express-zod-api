@@ -10,6 +10,10 @@
     "@typescript-eslint/rule-tester": "^8.34.0"
   },
   "type": "module",
+  "files": [
+    "dist",
+    "*.md"
+  ],
   "exports": {
     ".": {
       "import": {
@@ -26,6 +30,7 @@
     "pretest": "tsc --noEmit",
     "test": "vitest run --globals",
     "build": "tsup",
-    "postbuild": "attw --pack"
+    "postbuild": "attw --pack",
+    "prepublishOnly": "eslint && pnpm test && pnpm build"
   }
 }
