@@ -9,15 +9,14 @@
     "build:docs": "tsx generate-documentation.ts",
     "build:client": "tsx generate-client.ts",
     "pretest": "tsc --noEmit",
-    "test": "vitest run --globals index.spec.ts",
-    "validate": "vitest run --globals validate.spec.ts"
+    "test": "vitest run index.spec.ts",
+    "validate": "vitest run validate.spec.ts"
   },
   "dependencies": {
     "express-zod-api": "workspace:*",
     "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
-    "@types/swagger-ui-express": "^4.1.8",
-    "undici": "^6.19.8"
+    "@types/swagger-ui-express": "^4.1.8"
   }
 }

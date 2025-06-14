@@ -140,31 +140,6 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
   return Object.assign(original, { type: makeNullableType(original.type) });
 };
 
-const isSupportedType = (subject: string): subject is SchemaObjectType =>
-  subject in samples;
-
-/**
- * @todo remove in v25
- * @since zod 3.25.45
- */
-export const depictEnum: Depicter = ({ jsonSchema }) => {
-  const suggestedType = typeof jsonSchema.enum?.[0];
-  if (!jsonSchema.type && isSupportedType(suggestedType))
-    jsonSchema.type = suggestedType;
-  return jsonSchema;
-};
-
-/**
- * @todo remove in v25
- * @since zod 3.25.49
- * */
-export const depictLiteral: Depicter = ({ jsonSchema }) => {
-  const suggestedType = typeof (jsonSchema.const || jsonSchema.enum?.[0]);
-  if (!jsonSchema.type && isSupportedType(suggestedType))
-    jsonSchema.type = suggestedType;
-  return jsonSchema;
-};
-
 /** @since v24.3.1 schema compliance is fully delegated to Zod */
 const asOAS = (subject: JSONSchema.BaseSchema) =>
   subject as SchemaObject | ReferenceObject;
@@ -380,8 +355,6 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     intersection: depictIntersection,
     tuple: depictTuple,
     pipe: depictPipeline,
-    literal: depictLiteral,
-    enum: depictEnum,
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,

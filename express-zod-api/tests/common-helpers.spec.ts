@@ -7,11 +7,32 @@ import {
   makeCleanId,
   ensureError,
   getRoutePathParams,
+  emptySchema,
+  EmptySchema,
+  EmptyObject,
 } from "../src/common-helpers";
 import { z } from "zod/v4";
 import { makeRequestMock } from "../src/testing";
 
 describe("Common Helpers", () => {
+  describe("emptySchema", () => {
+    test("should be an object schema with empty shape and strip catcher", () => {
+      expect(emptySchema).toMatchSnapshot();
+    });
+  });
+
+  describe("EmptySchema", () => {
+    test("should be the type of emptySchema", () => {
+      expectTypeOf<EmptySchema>().toEqualTypeOf(emptySchema);
+    });
+  });
+
+  describe("EmptyObject", () => {
+    test("should be a Record of never", () => {
+      expectTypeOf<EmptyObject>().toEqualTypeOf<Record<string, never>>();
+    });
+  });
+
   describe("defaultInputSources", () => {
     test("should be declared in a certain way", () => {
       expect(defaultInputSources).toMatchSnapshot();
