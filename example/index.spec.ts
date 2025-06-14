@@ -502,7 +502,7 @@ describe("Example", async () => {
   });
 
   describe("OpenAPI Documentation", () => {
-    test("should be valid", async () => {
+    test("should be valid", { retry: 3 }, async () => {
       const data = await readFile("example.documentation.yaml", "utf-8");
       const response = await fetch(
         "https://validator.swagger.io/validator/debug",
@@ -521,7 +521,7 @@ describe("Example", async () => {
         Array.isArray(json.schemaValidationMessages) &&
         json.schemaValidationMessages.length
       ) {
-        console.debug(json);
+        console.warn(json);
         json.schemaValidationMessages.every(({ level }) =>
           expect(level).not.toBe("error"),
         );
