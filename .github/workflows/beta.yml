@@ -39,6 +39,7 @@ jobs:
       - run: |
           pnpm install
           pnpm install_hooks
-      - run: |
+      - name: Bumpp ${{inputs.workspace}}
+        run: |
           pnpm -F ${{inputs.workspace}} exec \
             pnpm dlx bumpp pre${{ inputs.kind }} --preid beta --tag=${{inputs.workspace}}-%s -y
