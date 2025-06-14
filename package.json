@@ -12,8 +12,8 @@
     "test:esm": "pnpm -F esm-test test",
     "test:952": "pnpm -F issue952-test test",
     "bench": "pnpm -F express-zod-api bench",
-    "lint": "eslint && prettier *.md --check",
-    "mdfix": "prettier *.md --write",
+    "lint": "eslint && prettier *.md **/*.md --check",
+    "mdfix": "prettier *.md **/*.md --write",
     "precommit": "pnpm lint && pnpm test && pnpm build && git add *.md example/example.* LICENSE",
     "install_hooks": "husky"
   },
