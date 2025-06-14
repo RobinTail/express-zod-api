@@ -2,18 +2,26 @@
   "name": "@express-zod-api/migration",
   "version": "24.0.0",
   "license": "MIT",
-  "peerDependencies": {
-    "typescript-eslint": "^8.0.0",
-    "eslint": "^9.0.0"
+  "description": "Migration scripts for express-zod-api",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobinTail/express-zod-api.git"
   },
-  "devDependencies": {
-    "@typescript-eslint/rule-tester": "^8.34.0"
+  "author": {
+    "name": "Anna Bocharova",
+    "url": "https://robintail.cz",
+    "email": "me@robintail.cz"
+  },
+  "bugs": "https://github.com/RobinTail/express-zod-api/issues",
+  "funding": "https://github.com/sponsors/RobinTail",
+  "scripts": {
+    "pretest": "tsc --noEmit",
+    "test": "vitest run --globals",
+    "build": "tsup",
+    "postbuild": "attw --pack",
+    "prepublishOnly": "eslint && pnpm test && pnpm build"
   },
   "type": "module",
-  "files": [
-    "dist",
-    "*.md"
-  ],
   "main": "dist/index.cjs",
   "types": "dist/index.d.cts",
   "module": "dist/index.js",
@@ -29,11 +37,15 @@
       }
     }
   },
-  "scripts": {
-    "pretest": "tsc --noEmit",
-    "test": "vitest run --globals",
-    "build": "tsup",
-    "postbuild": "attw --pack",
-    "prepublishOnly": "eslint && pnpm test && pnpm build"
+  "files": [
+    "dist",
+    "*.md"
+  ],
+  "peerDependencies": {
+    "typescript-eslint": "^8.0.0",
+    "eslint": "^9.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/rule-tester": "^8.34.0"
   }
 }
