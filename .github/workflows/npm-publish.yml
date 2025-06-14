@@ -5,6 +5,14 @@ name: Publish to NPM
 on:
   workflow_dispatch:
     inputs:
+      workspace:
+        description: 'Workspace'
+        required: true
+        default: 'express-zod-api'
+        type: choice
+        options:
+          - express-zod-api
+          - migration
       tag:
         description: 'Release channel'
         required: true
@@ -29,9 +37,9 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Install dependencies
         run: pnpm install
-      - name: Publish with ${{ inputs.tag }}
+      - name: Publish ${{inputs.workspace}} with ${{ inputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_KEY}}
         run: |
-          pnpm -F express-zod-api exec \
+          pnpm -F ${{inputs.workspace}} exec \
             pnpm publish --provenance --tag ${{ inputs.tag }}

@@ -8,10 +8,9 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { builtinModules } from "node:module";
 
-const releaseDir = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "express-zod-api",
-);
+const cwd = dirname(fileURLToPath(import.meta.url));
+const ezDir = join(cwd, "express-zod-api");
+const migrationDir = join(cwd, "migration");
 
 const importConcerns = [
   {
@@ -179,7 +178,7 @@ export default tsPlugin.config(
     ignores: [
       "express-zod-api/dist/",
       "express-zod-api/coverage/",
-      "express-zod-api/migration/",
+      "migration/dist",
       "compat-test/sample.ts",
     ],
   },
@@ -199,10 +198,22 @@ export default tsPlugin.config(
     },
   },
   {
-    name: "source/all",
+    name: "source/ez",
     files: ["express-zod-api/src/*.ts"],
     rules: {
-      "allowed/dependencies": ["error", { packageDir: releaseDir }],
+      "allowed/dependencies": ["error", { packageDir: ezDir }],
+      "no-restricted-syntax": [
+        "warn",
+        ...importConcerns,
+        ...performanceConcerns,
+      ],
+    },
+  },
+  {
+    name: "source/migration",
+    files: ["migration/index.ts"],
+    rules: {
+      "allowed/dependencies": ["error", { packageDir: migrationDir }],
       "no-restricted-syntax": [
         "warn",
         ...importConcerns,
@@ -235,7 +246,11 @@ export default tsPlugin.config(
   },
   {
     name: "tests/all",
-    files: ["express-zod-api/tests/*.ts", "express-zod-api/vitest.setup.ts"],
+    files: [
+      "express-zod-api/tests/*.ts",
+      "express-zod-api/vitest.setup.ts",
+      "migration/*.spec.ts",
+    ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": "warn",

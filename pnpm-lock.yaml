@@ -4,6 +4,25 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  dev:
+    '@typescript-eslint/rule-tester':
+      specifier: ^8.34.0
+      version: 8.34.0
+    eslint:
+      specifier: ^9.28.0
+      version: 9.29.0
+    typescript-eslint:
+      specifier: ^8.34.0
+      version: 8.34.0
+  min:
+    eslint:
+      specifier: ^9.0.0
+      version: 9.29.0
+    typescript-eslint:
+      specifier: ^8.0.0
+      version: 8.34.0
+
 overrides:
   '@scarf/scarf': npm:empty-npm-package@1.0.0
 
@@ -11,6 +30,9 @@ importers:
 
   .:
     devDependencies:
+      '@arethetypeswrong/cli':
+        specifier: ^0.18.2
+        version: 0.18.2
       '@tsconfig/node20':
         specifier: ^20.1.5
         version: 20.1.6
@@ -29,9 +51,6 @@ importers:
       '@types/node':
         specifier: ^24.0.0
         version: 24.0.1
-      '@typescript-eslint/rule-tester':
-        specifier: ^8.34.0
-        version: 8.34.0(eslint@9.29.0)(typescript@5.8.3)
       '@vitest/coverage-v8':
         specifier: ^3.2.3
         version: 3.2.3(vitest@3.2.3(@types/node@24.0.1)(tsx@4.20.3)(yaml@2.8.0))
@@ -39,7 +58,7 @@ importers:
         specifier: ^1.8.0
         version: 1.8.0
       eslint:
-        specifier: ^9.28.0
+        specifier: catalog:dev
         version: 9.29.0
       eslint-config-prettier:
         specifier: ^10.1.5
@@ -65,6 +84,9 @@ importers:
       prettier:
         specifier: 3.5.3
         version: 3.5.3
+      tsup:
+        specifier: ^8.5.0
+        version: 8.5.0(postcss@8.5.4)(tsx@4.20.3)(typescript@5.8.3)(yaml@2.8.0)
       tsx:
         specifier: ^4.19.4
         version: 4.20.3
@@ -72,7 +94,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       typescript-eslint:
-        specifier: ^8.34.0
+        specifier: catalog:dev
         version: 8.34.0(eslint@9.29.0)(typescript@5.8.3)
       vitest:
         specifier: ^3.2.3
@@ -154,9 +176,6 @@ importers:
         specifier: ^3.25.35
         version: 3.25.64
     devDependencies:
-      '@arethetypeswrong/cli':
-        specifier: ^0.18.2
-        version: 0.18.2
       '@types/cors':
         specifier: ^2.8.19
         version: 2.8.19
@@ -190,9 +209,6 @@ importers:
       snakify-ts:
         specifier: ^2.3.0
         version: 2.3.0
-      tsup:
-        specifier: ^8.5.0
-        version: 8.5.0(postcss@8.5.4)(tsx@4.20.3)(typescript@5.8.3)(yaml@2.8.0)
       undici:
         specifier: ^6.19.8
         version: 6.21.3
@@ -208,6 +224,19 @@ importers:
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
+
+  migration:
+    dependencies:
+      eslint:
+        specifier: catalog:min
+        version: 9.29.0
+      typescript-eslint:
+        specifier: catalog:min
+        version: 8.34.0(eslint@9.29.0)(typescript@5.8.3)
+    devDependencies:
+      '@typescript-eslint/rule-tester':
+        specifier: catalog:dev
+        version: 8.34.0(eslint@9.29.0)(typescript@5.8.3)
 
 packages:
 

@@ -3,7 +3,7 @@ import {
   AST_NODE_TYPES as NT,
   type TSESLint,
   type TSESTree,
-} from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- special case
+} from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
 
 type NamedProp = TSESTree.PropertyNonComputedName & {
   key: TSESTree.Identifier;
@@ -151,18 +151,6 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
     }),
 });
 
-/**
- * @desc ESLint plugin for migrating to this version (from previous), requires eslint v9 and typescript-eslint v8
- * @deprecated Single-use tool that can be removed and changed regardless SemVer. Remember to delete it after use.
- * @example
- *          // eslint.config.mjs:
- *          import parser from "@typescript-eslint/parser";
- *          import migration from "express-zod-api/migration";
- *          export default [
- *            { languageOptions: {parser}, plugins: {migration} },
- *            { files: ["**\/*.ts"], rules: { "migration/v24": "error" } }
- *          ];
- * */
 export default {
   rules: { v24 },
 } satisfies TSESLint.Linter.Plugin;
