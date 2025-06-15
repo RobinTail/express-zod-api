@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "express-zod-api": "workspace:*",
-    "express": "^5.0.1",
-    "express-fileupload": "^1.5.1"
+    "express": "catalog:peer",
+    "express-fileupload": "catalog:peer",
+    "zod": "catalog:peer"
   }
 }

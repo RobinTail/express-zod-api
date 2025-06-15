@@ -92,12 +92,18 @@ importers:
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
+      zod:
+        specifier: catalog:peer
+        version: 3.25.64
 
   esm-test:
     dependencies:
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
+      zod:
+        specifier: catalog:peer
+        version: 3.25.64
 
   example:
     dependencies:
@@ -212,14 +218,17 @@ importers:
   issue952-test:
     dependencies:
       express:
-        specifier: ^5.0.1
+        specifier: catalog:peer
         version: 5.1.0
       express-fileupload:
-        specifier: ^1.5.1
+        specifier: catalog:peer
         version: 1.5.1
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
+      zod:
+        specifier: catalog:peer
+        version: 3.25.64
 
 packages:
 
