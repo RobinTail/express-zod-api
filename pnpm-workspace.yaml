@@ -17,6 +17,11 @@ publicHoistPattern:
   - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting
 catalogs:
   peer:
+    "@types/compression": "^1.7.5"
+    "@types/express": "^5.0.0"
+    "@types/express-fileupload": "^1.5.0"
+    "@types/http-errors": "^2.0.2"
+    "compression": "^1.8.0"
     "express": "^5.1.0"
     "express-fileupload": "^1.5.0"
     "http-errors": "^2.0.0"

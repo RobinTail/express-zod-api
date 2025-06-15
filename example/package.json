@@ -19,6 +19,7 @@
     "zod": "catalog:peer"
   },
   "devDependencies": {
+    "@types/http-errors": "catalog:peer",
     "@types/swagger-ui-express": "^4.1.8",
     "undici": "^6.19.8"
   }
