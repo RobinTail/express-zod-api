@@ -4,6 +4,24 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  peer:
+    express:
+      specifier: ^5.1.0
+      version: 5.1.0
+    express-fileupload:
+      specifier: ^1.5.0
+      version: 1.5.1
+    http-errors:
+      specifier: ^2.0.0
+      version: 2.0.0
+    typescript:
+      specifier: ^5.1.3
+      version: 5.8.3
+    zod:
+      specifier: ^3.25.35
+      version: 3.25.64
+
 overrides:
   '@scarf/scarf': npm:empty-npm-package@1.0.0
 
@@ -60,7 +78,7 @@ importers:
         specifier: ^4.19.4
         version: 4.20.3
       typescript:
-        specifier: ^5.8.3
+        specifier: catalog:peer
         version: 5.8.3
       typescript-eslint:
         specifier: ^8.34.0
@@ -86,9 +104,15 @@ importers:
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
+      http-errors:
+        specifier: catalog:peer
+        version: 2.0.0
       swagger-ui-express:
         specifier: ^5.0.0
         version: 5.0.1(express@5.1.0)
+      zod:
+        specifier: catalog:peer
+        version: 3.25.64
     devDependencies:
       '@types/swagger-ui-express':
         specifier: ^4.1.8
@@ -118,13 +142,13 @@ importers:
         specifier: ^1.8.0
         version: 1.8.0
       express:
-        specifier: ^5.1.0
+        specifier: catalog:peer
         version: 5.1.0
       express-fileupload:
-        specifier: ^1.5.0
+        specifier: catalog:peer
         version: 1.5.1
       http-errors:
-        specifier: ^2.0.0
+        specifier: catalog:peer
         version: 2.0.0
       node-mocks-http:
         specifier: ^1.17.2
@@ -136,10 +160,10 @@ importers:
         specifier: ^0.30.1
         version: 0.30.1
       typescript:
-        specifier: ^5.1.3
+        specifier: catalog:peer
         version: 5.8.3
       zod:
-        specifier: ^3.25.35
+        specifier: catalog:peer
         version: 3.25.64
     devDependencies:
       '@arethetypeswrong/cli':
