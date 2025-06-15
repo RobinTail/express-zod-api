@@ -2,6 +2,10 @@
 
 ## Version 24
 
+### v24.4.0
+
+- Automated migration moved to the [dedicated package](https://www.npmjs.com/package/@express-zod-api/migration).
+
 ### v24.3.2
 
 - Removed previously deprecated plural properties from `ApiResponse` interface: `statusCodes`, `mimeTypes`.
