@@ -50,15 +50,6 @@ importers:
       eslint-plugin-prettier:
         specifier: ^5.4.1
         version: 5.4.1(eslint-config-prettier@10.1.5(eslint@9.29.0))(eslint@9.29.0)(prettier@3.5.3)
-      express:
-        specifier: ^5.1.0
-        version: 5.1.0
-      express-fileupload:
-        specifier: ^1.5.0
-        version: 1.5.1
-      http-errors:
-        specifier: ^2.0.0
-        version: 2.0.0
       husky:
         specifier: ^9.0.5
         version: 9.1.7
@@ -77,9 +68,6 @@ importers:
       vitest:
         specifier: ^3.2.3
         version: 3.2.3(@types/node@24.0.1)(tsx@4.20.3)(yaml@2.8.0)
-      zod:
-        specifier: ^3.25.61
-        version: 3.25.64
 
   cjs-test:
     dependencies:
