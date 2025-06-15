@@ -3,6 +3,14 @@ name: Beta
 on:
   workflow_dispatch:
     inputs:
+      workspace:
+        description: 'Workspace'
+        required: true
+        default: 'express-zod-api'
+        type: choice
+        options:
+          - express-zod-api
+          - migration
       kind:
         description: 'Making pre- what?'
         required: true
@@ -31,6 +39,7 @@ jobs:
       - run: |
           pnpm install
           pnpm install_hooks
-      - run: |
-          pnpm -F express-zod-api exec \
-            pnpm dlx bumpp pre${{ inputs.kind }} --preid beta -y
+      - name: Bumpp ${{inputs.workspace}}
+        run: |
+          pnpm -F ${{inputs.workspace}} exec \
+            pnpm dlx bumpp pre${{ inputs.kind }} --preid beta --tag=${{inputs.workspace}}-v%s -y

@@ -1,7 +1,7 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import migration from "../src/migration";
+import migration from "./index";
 import parser from "@typescript-eslint/parser";
-import { version } from "../package.json";
+import { version } from "./package.json";
 
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
