@@ -6,6 +6,7 @@
     "test": "vitest run --globals"
   },
   "dependencies": {
-    "express-zod-api": "workspace:*"
+    "express-zod-api": "workspace:*",
+    "zod": "catalog:peer"
   }
 }

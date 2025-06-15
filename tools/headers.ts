@@ -1,6 +1,5 @@
 import { execSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
-import { z } from "zod/v4";
 
 /**
  * @link https://chatgpt.com/c/6795dae3-8a10-800e-96af-fd0d01579f39
@@ -236,17 +235,7 @@ if (mtime && state <= mtime) process.exit(0);
 
 const csv = await response.text();
 
-const categories = [
-  "permanent",
-  "deprecated",
-  "provisional",
-  "obsoleted",
-] as const;
-
-const schema = z.object({
-  name: z.string().regex(/^[\w-]+$/),
-  category: z.enum(categories),
-});
+const categories = ["permanent", "deprecated", "provisional", "obsoleted"];
 
 const lines = csv.split("\n").slice(1, -1);
 const headers = lines
@@ -254,11 +243,10 @@ const headers = lines
     const [name, category] = line.split(",").slice(0, 2);
     return { name, category };
   })
-  .filter((entry) => {
-    const { success } = schema.safeParse(entry);
-    if (!success) console.debug("excluding", entry);
-    return success;
-  })
+  .filter(
+    ({ name, category }) =>
+      /^[\w-]+$/.test(name) && categories.includes(category),
+  )
   .map(({ name }) => name.toLowerCase())
   .filter((name) => !(name in responseOnlyHeaders));
 
