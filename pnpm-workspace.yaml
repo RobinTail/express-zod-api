@@ -17,7 +17,7 @@ publicHoistPattern:
   - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
   - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting
 catalogs:
-  min:
+  peer:
     "eslint": "^9.0.0"
     "typescript-eslint": "^8.0.0"
   dev:

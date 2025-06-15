@@ -15,7 +15,7 @@ catalogs:
     typescript-eslint:
       specifier: ^8.34.0
       version: 8.34.0
-  min:
+  peer:
     eslint:
       specifier: ^9.0.0
       version: 9.29.0
@@ -228,10 +228,10 @@ importers:
   migration:
     dependencies:
       eslint:
-        specifier: catalog:min
+        specifier: catalog:peer
         version: 9.29.0
       typescript-eslint:
-        specifier: catalog:min
+        specifier: catalog:peer
         version: 8.34.0(eslint@9.29.0)(typescript@5.8.3)
     devDependencies:
       '@typescript-eslint/rule-tester':

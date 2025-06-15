@@ -42,8 +42,8 @@
     "*.md"
   ],
   "peerDependencies": {
-    "typescript-eslint": "catalog:min",
-    "eslint": "catalog:min"
+    "typescript-eslint": "catalog:peer",
+    "eslint": "catalog:peer"
   },
   "devDependencies": {
     "@typescript-eslint/rule-tester": "catalog:dev"
