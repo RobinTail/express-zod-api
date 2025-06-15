@@ -1,4 +1,4 @@
-name: Minor
+name: Version Bump
 
 on:
   workflow_dispatch:
@@ -11,6 +11,19 @@ on:
         options:
           - express-zod-api
           - migration
+      kind:
+        description: 'Version bump kind'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+          - premajor
+          - preminor
+          - prepatch
+          - prerelease
 
 permissions:
   contents: write
@@ -32,4 +45,6 @@ jobs:
       - name: Bumpp ${{inputs.workspace}}
         run: |
           pnpm -F ${{inputs.workspace}} exec \
-            pnpm dlx bumpp minor --tag=${{inputs.workspace}}-v%s -y
+            pnpm dlx bumpp ${{inputs.kind}} \
+            ${{ startsWith(inputs.kind, 'pre') && '--preid beta' || '' }} \
+            --tag=${{inputs.workspace}}-v%s -y 
