@@ -41,6 +41,9 @@ catalogs:
     compression:
       specifier: ^1.8.0
       version: 1.8.0
+    eslint:
+      specifier: ^9.0.0
+      version: 9.29.0
     express:
       specifier: ^5.1.0
       version: 5.1.0
@@ -53,6 +56,9 @@ catalogs:
     typescript:
       specifier: ^5.1.3
       version: 5.8.3
+    typescript-eslint:
+      specifier: ^8.0.0
+      version: 8.34.0
     zod:
       specifier: ^3.25.35
       version: 3.25.64
@@ -284,10 +290,10 @@ importers:
   migration:
     dependencies:
       eslint:
-        specifier: ^9.0.0
+        specifier: catalog:peer
         version: 9.29.0
       typescript-eslint:
-        specifier: ^8.0.0
+        specifier: catalog:peer
         version: 8.34.0(eslint@9.29.0)(typescript@5.8.3)
     devDependencies:
       '@typescript-eslint/rule-tester':
