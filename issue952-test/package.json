@@ -10,6 +10,7 @@
     "@types/express": "catalog:peer",
     "@types/express-fileupload": "catalog:peer",
     "express-zod-api": "workspace:*",
+    "typescript": "catalog:peer",
     "zod": "catalog:peer"
   }
 }

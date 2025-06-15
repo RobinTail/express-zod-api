@@ -21,6 +21,7 @@
   "devDependencies": {
     "@types/http-errors": "catalog:peer",
     "@types/swagger-ui-express": "^4.1.8",
+    "typescript": "catalog:peer",
     "undici": "catalog:dev"
   }
 }

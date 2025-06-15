@@ -81,9 +81,6 @@ importers:
       tsx:
         specifier: ^4.19.4
         version: 4.20.3
-      typescript:
-        specifier: catalog:peer
-        version: 5.8.3
       typescript-eslint:
         specifier: ^8.34.0
         version: 8.34.0(eslint@9.29.0)(typescript@5.8.3)
@@ -130,6 +127,9 @@ importers:
       '@types/swagger-ui-express':
         specifier: ^4.1.8
         version: 4.1.8
+      typescript:
+        specifier: catalog:peer
+        version: 5.8.3
       undici:
         specifier: catalog:dev
         version: 6.21.3
@@ -233,6 +233,9 @@ importers:
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
+      typescript:
+        specifier: catalog:peer
+        version: 5.8.3
       zod:
         specifier: catalog:peer
         version: 3.25.64

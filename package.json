@@ -30,7 +30,6 @@
     "husky": "^9.0.5",
     "prettier": "3.5.3",
     "tsx": "^4.19.4",
-    "typescript": "catalog:peer",
     "typescript-eslint": "^8.34.0",
     "vitest": "^3.2.3"
   },
