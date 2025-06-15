@@ -2,5 +2,15 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "dependencyDashboard": false,
-  "postUpdateOptions": ["pnpmDedupe"]
+  "postUpdateOptions": ["pnpmDedupe"],
+  "packageRules": [
+    {
+      "groupName": "TypeScript-ESLint and its rule tester (used by migration)",
+      "matchPackageNames": ["typescript-eslint", "@typescript-eslint/*"]
+    },
+    {
+      "groupName": "Vitest and its coverage provider",
+      "matchPackageNames": ["vitest", "@vitest/*"]
+    }
+  ]
 }
