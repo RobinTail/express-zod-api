@@ -55,16 +55,16 @@
     "ramda": "^0.30.1"
   },
   "peerDependencies": {
-    "@types/compression": "^1.7.5",
-    "@types/express": "^5.0.0",
-    "@types/express-fileupload": "^1.5.0",
-    "@types/http-errors": "^2.0.2",
-    "compression": "^1.8.0",
-    "express": "^5.1.0",
-    "express-fileupload": "^1.5.0",
-    "http-errors": "^2.0.0",
-    "typescript": "^5.1.3",
-    "zod": "^3.25.35"
+    "@types/compression": "catalog:peer",
+    "@types/express": "catalog:peer",
+    "@types/express-fileupload": "catalog:peer",
+    "@types/http-errors": "catalog:peer",
+    "compression": "catalog:peer",
+    "express": "catalog:peer",
+    "express-fileupload": "catalog:peer",
+    "http-errors": "catalog:peer",
+    "typescript": "catalog:peer",
+    "zod": "catalog:peer"
   },
   "peerDependenciesMeta": {
     "@types/compression": {
@@ -98,7 +98,7 @@
     "node-forge": "^1.3.1",
     "semver": "^7.7.2",
     "snakify-ts": "^2.3.0",
-    "undici": "^6.19.8"
+    "undici": "catalog:dev"
   },
   "keywords": [
     "nodejs",

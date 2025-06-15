@@ -13,10 +13,14 @@
   },
   "dependencies": {
     "express-zod-api": "workspace:*",
-    "swagger-ui-express": "^5.0.0"
+    "http-errors": "catalog:peer",
+    "swagger-ui-express": "^5.0.0",
+    "zod": "catalog:peer"
   },
   "devDependencies": {
+    "@types/http-errors": "catalog:peer",
     "@types/swagger-ui-express": "^4.1.8",
-    "undici": "^6.19.8"
+    "typescript": "catalog:peer",
+    "undici": "catalog:dev"
   }
 }
