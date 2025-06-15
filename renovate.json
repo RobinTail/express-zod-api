@@ -17,6 +17,12 @@
       "matchPackageNames": ["eslint"],
       "matchCurrentVersion": "9.0.0",
       "allowedVersions": "9.0.0"
+    },
+    {
+      "groupName": "Disallow zod bump in compat-test",
+      "matchPackageNames": ["zod"],
+      "matchCurrentVersion": "3.25.35",
+      "allowedVersions": "3.25.35"
     }
   ]
 }
