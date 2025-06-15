@@ -13,7 +13,7 @@
     "express": "catalog:min",
     "typescript": "catalog:min",
     "http-errors": "catalog:min",
-    "zod": "3.25.35"
+    "zod": "3.25.64"
   },
   "devDependencies": {
     "eslint": "catalog:min",

@@ -140,8 +140,8 @@ importers:
         specifier: catalog:min
         version: 5.1.3
       zod:
-        specifier: 3.25.35
-        version: 3.25.35
+        specifier: 3.25.64
+        version: 3.25.64
     devDependencies:
       eslint:
         specifier: catalog:min
@@ -2407,9 +2407,6 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@3.25.35:
-    resolution: {integrity: sha512-Fe0Tz/mSbIraMd1/RR1jbtPMsrzX/SNwCmEpRqB0xB2YBnoRfQqyu4aIqWKWrx9C2XjF4SY47IVIt30+RVGSsw==}
-
   zod@3.25.64:
     resolution: {integrity: sha512-hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==}
 
@@ -4537,7 +4534,5 @@ snapshots:
       yargs-parser: 20.2.9
 
   yocto-queue@0.1.0: {}
-
-  zod@3.25.35: {}
 
   zod@3.25.64: {}
