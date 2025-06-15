@@ -5,9 +5,11 @@
   "postUpdateOptions": ["pnpmDedupe"],
   "packageRules": [
     {
+      "groupName": "TypeScript-ESLint and its rule tester (used by migration)",
       "matchPackageNames": ["typescript-eslint", "@typescript-eslint/*"]
     },
     {
+      "groupName": "Vitest and its coverage provider",
       "matchPackageNames": ["vitest", "@vitest/*"]
     }
   ]
