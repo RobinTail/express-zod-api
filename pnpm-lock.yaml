@@ -5,6 +5,10 @@ settings:
   excludeLinksFromLockfile: false
 
 catalogs:
+  dev:
+    undici:
+      specifier: ^6.19.8
+      version: 6.21.3
   peer:
     '@types/compression':
       specifier: ^1.7.5
@@ -127,7 +131,7 @@ importers:
         specifier: ^4.1.8
         version: 4.1.8
       undici:
-        specifier: ^6.19.8
+        specifier: catalog:dev
         version: 6.21.3
 
   express-zod-api:
@@ -215,7 +219,7 @@ importers:
         specifier: ^8.5.0
         version: 8.5.0(postcss@8.5.4)(tsx@4.20.3)(typescript@5.8.3)(yaml@2.8.0)
       undici:
-        specifier: ^6.19.8
+        specifier: catalog:dev
         version: 6.21.3
 
   issue952-test:

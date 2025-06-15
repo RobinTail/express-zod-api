@@ -27,3 +27,5 @@ catalogs:
     "http-errors": "^2.0.0"
     "typescript": "^5.1.3"
     "zod": "^3.25.35"
+  dev:
+    "undici": "^6.19.8"
