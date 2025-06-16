@@ -23,6 +23,18 @@
       "matchPackageNames": ["zod"],
       "matchCurrentVersion": "3.25.35",
       "allowedVersions": "3.25.35"
+    },
+    {
+      "groupName": "Disallow typescript bump in compat-test",
+      "matchPackageNames": ["typescript"],
+      "matchCurrentVersion": "5.1.3",
+      "allowedVersions": "5.1.3"
+    },
+    {
+      "groupName": "Disallow typescript-eslint bump in compat-test",
+      "matchPackageNames": ["typescript-eslint"],
+      "matchCurrentVersion": "8.0.0",
+      "allowedVersions": "8.0.0"
     }
   ]
 }
