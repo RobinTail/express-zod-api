@@ -273,7 +273,7 @@ architecture — or even mix them seamlessly.
 import { Routing, DependsOnMethod, ServeStatic } from "express-zod-api";
 
 const routing: Routing = {
-  // flax syntax — /v1/users
+  // flat syntax — /v1/users
   "/v1/users": listUsersEndpoint,
   // nested syntax
   v1: {
