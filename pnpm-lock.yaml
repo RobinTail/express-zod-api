@@ -96,7 +96,7 @@ importers:
         version: 1.3.0(eslint@9.29.0)(typescript-eslint@8.34.1(eslint@9.29.0)(typescript@5.8.3))
       eslint-plugin-prettier:
         specifier: ^5.4.1
-        version: 5.4.1(eslint-config-prettier@10.1.5(eslint@9.29.0))(eslint@9.29.0)(prettier@3.5.3)
+        version: 5.5.0(eslint-config-prettier@10.1.5(eslint@9.29.0))(eslint@9.29.0)(prettier@3.5.3)
       husky:
         specifier: ^9.0.5
         version: 9.1.7
@@ -619,8 +619,8 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@pkgr/core@0.2.4':
-    resolution: {integrity: sha512-ROFF39F6ZrnzSUEmQQZUar0Jt4xVoP9WnDRdWwF4NNcXs3xBTLgBUDoOwW141y1jP+S8nahIbdxbFC7IShw9Iw==}
+  '@pkgr/core@0.2.7':
+    resolution: {integrity: sha512-YLT9Zo3oNPJoBjBc4q8G2mjU4tqIbf5CEOORbUUr48dCD9q3umJ3IPlVqOqDakPfd2HuwccBaqlGhN4Gmr5OWg==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
   '@rollup/rollup-android-arm-eabi@4.41.1':
@@ -1288,8 +1288,8 @@ packages:
       eslint: ^9.0.0
       typescript-eslint: ^8.0.0
 
-  eslint-plugin-prettier@5.4.1:
-    resolution: {integrity: sha512-9dF+KuU/Ilkq27A8idRP7N2DH8iUR6qXcjF3FR2wETY21PZdBrIjwCau8oboyGj9b7etWmTGEeM8e7oOed6ZWg==}
+  eslint-plugin-prettier@5.5.0:
+    resolution: {integrity: sha512-8qsOYwkkGrahrgoUv76NZi23koqXOGiiEzXMrT8Q7VcYaUISR+5MorIUxfWqYXN0fN/31WbSrxCxFkVQ43wwrA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       '@types/eslint': '>=8.0.0'
@@ -2666,7 +2666,7 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@pkgr/core@0.2.4': {}
+  '@pkgr/core@0.2.7': {}
 
   '@rollup/rollup-android-arm-eabi@4.41.1':
     optional: true
@@ -3382,7 +3382,7 @@ snapshots:
       ramda: 0.30.1
       typescript-eslint: 8.34.1(eslint@9.29.0)(typescript@5.8.3)
 
-  eslint-plugin-prettier@5.4.1(eslint-config-prettier@10.1.5(eslint@9.29.0))(eslint@9.29.0)(prettier@3.5.3):
+  eslint-plugin-prettier@5.5.0(eslint-config-prettier@10.1.5(eslint@9.29.0))(eslint@9.29.0)(prettier@3.5.3):
     dependencies:
       eslint: 9.29.0
       prettier: 3.5.3
@@ -4258,7 +4258,7 @@ snapshots:
 
   synckit@0.11.8:
     dependencies:
-      '@pkgr/core': 0.2.4
+      '@pkgr/core': 0.2.7
 
   test-exclude@7.0.1:
     dependencies:
