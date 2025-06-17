@@ -1,0 +1,51 @@
+{
+  "name": "@express-zod-api/migration",
+  "version": "24.0.1",
+  "license": "MIT",
+  "description": "Migration scripts for express-zod-api",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobinTail/express-zod-api.git"
+  },
+  "author": {
+    "name": "Anna Bocharova",
+    "url": "https://robintail.cz",
+    "email": "me@robintail.cz"
+  },
+  "bugs": "https://github.com/RobinTail/express-zod-api/issues",
+  "funding": "https://github.com/sponsors/RobinTail",
+  "scripts": {
+    "pretest": "tsc --noEmit",
+    "test": "vitest run --globals",
+    "build": "tsup",
+    "postbuild": "attw --pack",
+    "prepublishOnly": "eslint && pnpm test && pnpm build"
+  },
+  "type": "module",
+  "main": "dist/index.cjs",
+  "types": "dist/index.d.cts",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "*.md"
+  ],
+  "peerDependencies": {
+    "eslint": "catalog:peer",
+    "typescript-eslint": "catalog:peer"
+  },
+  "devDependencies": {
+    "@typescript-eslint/rule-tester": "^8.34.1"
+  }
+}

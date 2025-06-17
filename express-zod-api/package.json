@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "24.3.1",
+  "version": "24.4.0",
   "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -39,21 +39,10 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
-    },
-    "./migration": {
-      "import": {
-        "types": "./migration/index.d.ts",
-        "default": "./migration/index.js"
-      },
-      "require": {
-        "types": "./migration/index.d.cts",
-        "default": "./migration/index.cjs"
-      }
     }
   },
   "files": [
     "dist",
-    "migration",
     "*.md"
   ],
   "engines": {
@@ -66,16 +55,16 @@
     "ramda": "^0.30.1"
   },
   "peerDependencies": {
-    "@types/compression": "^1.7.5",
-    "@types/express": "^5.0.0",
-    "@types/express-fileupload": "^1.5.0",
-    "@types/http-errors": "^2.0.2",
-    "compression": "^1.8.0",
-    "express": "^5.1.0",
-    "express-fileupload": "^1.5.0",
-    "http-errors": "^2.0.0",
-    "typescript": "^5.1.3",
-    "zod": "^3.25.61"
+    "@types/compression": "catalog:peer",
+    "@types/express": "catalog:peer",
+    "@types/express-fileupload": "catalog:peer",
+    "@types/http-errors": "catalog:peer",
+    "compression": "catalog:peer",
+    "express": "catalog:peer",
+    "express-fileupload": "catalog:peer",
+    "http-errors": "catalog:peer",
+    "typescript": "catalog:peer",
+    "zod": "catalog:peer"
   },
   "peerDependenciesMeta": {
     "@types/compression": {
@@ -98,7 +87,6 @@
     }
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.18.2",
     "@types/cors": "^2.8.19",
     "@types/depd": "^1.1.37",
     "@types/node-forge": "^1.3.11",
@@ -110,7 +98,6 @@
     "node-forge": "^1.3.1",
     "semver": "^7.7.2",
     "snakify-ts": "^2.3.0",
-    "tsup": "^8.5.0",
     "undici": "^7.10.0"
   },
   "keywords": [

@@ -47,6 +47,8 @@ jobs:
       run: pnpm test:cjs
     - name: ESM test
       run: pnpm test:esm
+    - name: Compatibility test
+      run: pnpm test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
       run: pnpm test:952
   report:
