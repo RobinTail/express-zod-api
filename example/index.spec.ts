@@ -21,7 +21,6 @@ describe("Example", async () => {
     example.stdout.removeListener("data", listener);
     example.kill();
     await vi.waitFor(() => assert(example.killed), { timeout: 1e4 });
-    vi.unstubAllGlobals();
   });
 
   afterEach(() => {
