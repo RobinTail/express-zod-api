@@ -36,7 +36,7 @@
   },
   "resolutions": {
     "@scarf/scarf": "npm:empty-npm-package@1.0.0",
-    "vite": "^7.0.0-beta.1"
+    "vite": "^7.0.0-beta.2"
   },
   "packageManager": "pnpm@10.12.1+sha256.889bac470ec93ccc3764488a19d6ba8f9c648ad5e50a9a6e4be3768a5de387a3"
 }
