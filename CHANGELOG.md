@@ -2,6 +2,14 @@
 
 ## Version 24
 
+### v24.4.0
+
+- Automated migration moved to the [dedicated package](https://www.npmjs.com/package/@express-zod-api/migration).
+
+### v24.3.2
+
+- Removed previously deprecated plural properties from `ApiResponse` interface: `statusCodes`, `mimeTypes`.
+
 ### v24.3.1
 
 - Compatibility fix for Zod 3.25.60.
@@ -79,18 +87,7 @@ type Type1 = `start${number}mid${boolean}end`;
 - The `getExamples()` public helper removed — ~~use `.meta()?.examples` instead~~, restored in v24.1.0;
 - Added the new proprietary schema `ez.buffer()`;
 - The `ez.file()` schema removed: use `z.string()`, `z.base64()`, `ez.buffer()` or their union;
-- Consider the automated migration using the built-in ESLint rule.
-
-```js
-// eslint.config.mjs — minimal ESLint 9 config to apply migrations automatically using "eslint --fix"
-import parser from "@typescript-eslint/parser";
-import migration from "express-zod-api/migration";
-
-export default [
-  { languageOptions: { parser }, plugins: { migration } },
-  { files: ["**/*.ts"], rules: { "migration/v24": "error" } },
-];
-```
+- Consider [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff
 - import { z } from "zod";

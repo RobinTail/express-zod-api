@@ -9,14 +9,17 @@
     "build:docs": "tsx generate-documentation.ts",
     "build:client": "tsx generate-client.ts",
     "pretest": "tsc --noEmit",
-    "test": "vitest run index.spec.ts",
-    "validate": "vitest run validate.spec.ts"
+    "test": "vitest run index.spec.ts"
   },
   "dependencies": {
     "express-zod-api": "workspace:*",
-    "swagger-ui-express": "^5.0.0"
+    "http-errors": "catalog:peer",
+    "swagger-ui-express": "^5.0.0",
+    "zod": "catalog:peer"
   },
   "devDependencies": {
-    "@types/swagger-ui-express": "^4.1.8"
+    "@types/http-errors": "catalog:peer",
+    "@types/swagger-ui-express": "^4.1.8",
+    "typescript": "catalog:peer"
   }
 }

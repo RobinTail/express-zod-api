@@ -1,5 +1,22 @@
 {
+  "name": "compat-test",
   "type": "module",
   "private": true,
-  "description": "This file is a subject for populating by a CI workflow"
+  "scripts": {
+    "pretest": "echo 'new Documentation({ numericRange: {}, });' > sample.ts",
+    "test": "eslint --fix && vitest --run",
+    "posttest": "rm sample.ts"
+  },
+  "dependencies": {
+    "@express-zod-api/migration": "workspace:*",
+    "express-zod-api": "workspace:*",
+    "express": "catalog:min",
+    "typescript": "catalog:min",
+    "http-errors": "catalog:min",
+    "zod": "catalog:min"
+  },
+  "devDependencies": {
+    "eslint": "catalog:min",
+    "typescript-eslint": "catalog:min"
+  }
 }
