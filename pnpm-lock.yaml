@@ -9,25 +9,6 @@ catalogs:
     undici:
       specifier: ^6.19.8
       version: 6.21.3
-  min:
-    eslint:
-      specifier: 9.0.0
-      version: 9.0.0
-    express:
-      specifier: 5.1.0
-      version: 5.1.0
-    http-errors:
-      specifier: 2.0.0
-      version: 2.0.0
-    typescript:
-      specifier: 5.1.3
-      version: 5.1.3
-    typescript-eslint:
-      specifier: 8.0.0
-      version: 8.0.0
-    zod:
-      specifier: 3.25.35
-      version: 3.25.35
   peer:
     '@types/compression':
       specifier: ^1.7.5
@@ -131,26 +112,26 @@ importers:
         specifier: workspace:*
         version: link:../migration
       express:
-        specifier: catalog:min
+        specifier: npm:express@5.1.0
         version: 5.1.0
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
       http-errors:
-        specifier: catalog:min
+        specifier: npm:http-errors@2.0.0
         version: 2.0.0
       typescript:
-        specifier: catalog:min
+        specifier: npm:typescript@5.1.3
         version: 5.1.3
       zod:
-        specifier: catalog:min
+        specifier: npm:zod@3.25.35
         version: 3.25.35
     devDependencies:
       eslint:
-        specifier: catalog:min
+        specifier: npm:eslint@9.0.0
         version: 9.0.0
       typescript-eslint:
-        specifier: catalog:min
+        specifier: npm:typescript-eslint@8.0.0
         version: 8.0.0(eslint@9.0.0)(typescript@5.1.3)
 
   esm-test:
