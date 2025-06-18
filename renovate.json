@@ -3,7 +3,6 @@
   "extends": ["config:recommended"],
   "dependencyDashboard": false,
   "postUpdateOptions": ["pnpmDedupe"],
-  "ignorePaths": ["compat-test"],
   "packageRules": [
     {
       "groupName": "TypeScript-ESLint and its rule tester (used by migration)",
@@ -12,6 +11,30 @@
     {
       "groupName": "Vitest and its coverage provider",
       "matchPackageNames": ["vitest", "@vitest/*"]
+    },
+    {
+      "groupName": "Disallow eslint bump in compat-test",
+      "matchPackageNames": ["eslint"],
+      "matchCurrentVersion": "9.0.0",
+      "allowedVersions": "9.0.0"
+    },
+    {
+      "groupName": "Disallow zod bump in compat-test",
+      "matchPackageNames": ["zod"],
+      "matchCurrentVersion": "3.25.35",
+      "allowedVersions": "3.25.35"
+    },
+    {
+      "groupName": "Disallow typescript bump in compat-test",
+      "matchPackageNames": ["typescript"],
+      "matchCurrentVersion": "5.1.3",
+      "allowedVersions": "5.1.3"
+    },
+    {
+      "groupName": "Disallow typescript-eslint bump in compat-test",
+      "matchPackageNames": ["typescript-eslint"],
+      "matchCurrentVersion": "8.0.0",
+      "allowedVersions": "8.0.0"
     }
   ]
 }
