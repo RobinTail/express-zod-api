@@ -64,7 +64,7 @@ catalogs:
       version: 8.34.1
     zod:
       specifier: ^3.25.35
-      version: 3.25.64
+      version: 3.25.67
 
 overrides:
   '@scarf/scarf': npm:empty-npm-package@1.0.0
@@ -123,7 +123,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:peer
-        version: 3.25.64
+        version: 3.25.67
 
   compat-test:
     dependencies:
@@ -160,7 +160,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:peer
-        version: 3.25.64
+        version: 3.25.67
 
   example:
     dependencies:
@@ -175,7 +175,7 @@ importers:
         version: 5.0.1(express@5.1.0)
       zod:
         specifier: catalog:peer
-        version: 3.25.64
+        version: 3.25.67
     devDependencies:
       '@types/http-errors':
         specifier: catalog:peer
@@ -233,7 +233,7 @@ importers:
         version: 5.8.3
       zod:
         specifier: catalog:peer
-        version: 3.25.64
+        version: 3.25.67
     devDependencies:
       '@types/cors':
         specifier: ^2.8.19
@@ -288,7 +288,7 @@ importers:
         version: 5.8.3
       zod:
         specifier: catalog:peer
-        version: 3.25.64
+        version: 3.25.67
 
   migration:
     dependencies:
@@ -2413,8 +2413,8 @@ packages:
   zod@3.25.35:
     resolution: {integrity: sha512-Fe0Tz/mSbIraMd1/RR1jbtPMsrzX/SNwCmEpRqB0xB2YBnoRfQqyu4aIqWKWrx9C2XjF4SY47IVIt30+RVGSsw==}
 
-  zod@3.25.64:
-    resolution: {integrity: sha512-hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==}
+  zod@3.25.67:
+    resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
 
 snapshots:
 
@@ -4543,4 +4543,4 @@ snapshots:
 
   zod@3.25.35: {}
 
-  zod@3.25.64: {}
+  zod@3.25.67: {}
