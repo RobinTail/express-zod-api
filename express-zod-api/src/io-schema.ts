@@ -1,5 +1,6 @@
 import * as R from "ramda";
 import { z } from "zod/v4";
+import { EmptySchema } from "./common-helpers";
 import { AbstractMiddleware } from "./middleware";
 
 type Base = object & { [Symbol.iterator]?: never };
@@ -23,4 +24,7 @@ export const getFinalEndpointInputSchema = <
 ) =>
   R.pluck("schema", middlewares)
     .concat(input)
-    .reduce((acc, schema) => acc.and(schema)) as z.ZodIntersection<MIN, IN>;
+    .reduce((acc, schema) => acc.and(schema)) as z.ZodIntersection<
+    MIN extends EmptySchema ? IN : MIN,
+    IN
+  >;

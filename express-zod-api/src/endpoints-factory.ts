@@ -31,7 +31,11 @@ interface BuildProps<
   /** @desc The schema by which the returns of the Endpoint handler is validated */
   output: OUT;
   /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (options) and a logger */
-  handler: Handler<z.output<z.ZodIntersection<MIN, IN>>, z.input<OUT>, OPT>;
+  handler: Handler<
+    z.output<z.ZodIntersection<MIN extends EmptySchema ? IN : MIN, IN>>,
+    z.input<OUT>,
+    OPT
+  >;
   /** @desc The operation description for the generated Documentation */
   description?: string;
   /** @desc The operation summary for the generated Documentation (50 symbols max) */
