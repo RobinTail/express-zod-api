@@ -25,6 +25,7 @@ import type {
   $ZodObjectInternals,
   $ZodObject,
   $ZodTypeInternals,
+  $strip,
 } from "zod/v4/core";
 
 declare module "zod/v4/core" {
@@ -55,7 +56,7 @@ declare module "zod/v4" {
   interface ZodObject<
     // @ts-expect-error -- external issue
     out Shape extends $ZodShape = $ZodLooseShape,
-    out Config extends $ZodObjectConfig = $ZodObjectConfig,
+    out Config extends $ZodObjectConfig = $strip,
   > extends z._ZodType<$ZodObjectInternals<Shape, Config>>,
       $ZodObject<Shape, Config> {
     remap<V extends string, U extends { [P in keyof Shape]?: V }>(
