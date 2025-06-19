@@ -5,10 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 catalogs:
-  dev:
-    undici:
-      specifier: ^6.19.8
-      version: 6.21.3
   peer:
     '@types/compression':
       specifier: ^1.7.5
@@ -44,7 +40,7 @@ catalogs:
       specifier: ^8.0.0
       version: 8.34.1
     zod:
-      specifier: ^3.25.35
+      specifier: ^3.25.61
       version: 3.25.67
 
 overrides:
@@ -125,7 +121,7 @@ importers:
         version: 5.1.3
       zod:
         specifier: npm:zod@3.25.35
-        version: 3.25.35
+        version: 3.25.61
     devDependencies:
       eslint:
         specifier: npm:eslint@9.0.0
@@ -167,9 +163,6 @@ importers:
       typescript:
         specifier: catalog:peer
         version: 5.8.3
-      undici:
-        specifier: catalog:dev
-        version: 6.21.3
 
   express-zod-api:
     dependencies:
@@ -250,8 +243,8 @@ importers:
         specifier: ^2.3.0
         version: 2.3.0
       undici:
-        specifier: catalog:dev
-        version: 6.21.3
+        specifier: ^7.10.0
+        version: 7.10.0
 
   issue952-test:
     dependencies:
@@ -2243,9 +2236,9 @@ packages:
   undici-types@7.8.0:
     resolution: {integrity: sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw==}
 
-  undici@6.21.3:
-    resolution: {integrity: sha512-gBLkYIlEnSp8pFbT64yFgGE6UIB9tAkhukC23PmMDCe5Nd+cRqKxSjw5y54MK2AZMgZfJWMaNE4nYUHgi1XEOw==}
-    engines: {node: '>=18.17'}
+  undici@7.10.0:
+    resolution: {integrity: sha512-u5otvFBOBZvmdjWLVW+5DAc9Nkq8f24g0O9oY7qw2JVIF1VocIFoyz9JFkuVOS2j41AufeO0xnlweJ2RLT8nGw==}
+    engines: {node: '>=20.18.1'}
 
   unicode-emoji-modifier-base@1.0.0:
     resolution: {integrity: sha512-yLSH4py7oFH3oG/9K+XWrz1pSi3dfUrWEnInbxMfArOfc1+33BlGPQtLsOYwvdMy11AwUBetYuaRxSPqgkq+8g==}
@@ -2391,8 +2384,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@3.25.35:
-    resolution: {integrity: sha512-Fe0Tz/mSbIraMd1/RR1jbtPMsrzX/SNwCmEpRqB0xB2YBnoRfQqyu4aIqWKWrx9C2XjF4SY47IVIt30+RVGSsw==}
+  zod@3.25.61:
+    resolution: {integrity: sha512-fzfJgUw78LTNnHujj9re1Ov/JJQkRZZGDMcYqSx7Hp4rPOkKywaFHq0S6GoHeXs0wGNE/sIOutkXgnwzrVOGCQ==}
 
   zod@3.25.67:
     resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
@@ -4381,7 +4374,7 @@ snapshots:
 
   undici-types@7.8.0: {}
 
-  undici@6.21.3: {}
+  undici@7.10.0: {}
 
   unicode-emoji-modifier-base@1.0.0: {}
 
@@ -4522,6 +4515,6 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod@3.25.35: {}
+  zod@3.25.61: {}
 
   zod@3.25.67: {}

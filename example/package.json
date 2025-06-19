@@ -9,7 +9,7 @@
     "build:docs": "tsx generate-documentation.ts",
     "build:client": "tsx generate-client.ts",
     "pretest": "tsc --noEmit",
-    "test": "vitest run --globals index.spec.ts"
+    "test": "vitest run index.spec.ts"
   },
   "dependencies": {
     "express-zod-api": "workspace:*",
@@ -20,7 +20,6 @@
   "devDependencies": {
     "@types/http-errors": "catalog:peer",
     "@types/swagger-ui-express": "^4.1.8",
-    "typescript": "catalog:peer",
-    "undici": "catalog:dev"
+    "typescript": "catalog:peer"
   }
 }

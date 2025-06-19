@@ -25,8 +25,6 @@ import {
   depictDateIn,
   depictDateOut,
   depictBody,
-  depictEnum,
-  depictLiteral,
   depictRequest,
 } from "../src/documentation-helpers";
 
@@ -307,28 +305,6 @@ describe("Documentation helpers", () => {
         ),
       ).toMatchSnapshot();
     });
-  });
-
-  describe("depictEnum()", () => {
-    test("should set type", () => {
-      expect(
-        depictEnum(
-          { zodSchema: z.never(), jsonSchema: { enum: ["test", "jest"] } },
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
-    });
-  });
-
-  describe("depictLiteral()", () => {
-    test.each([{ const: "test" }, { enum: ["test", "jest"] }])(
-      "should set type from either const or enum prop %#",
-      (jsonSchema) => {
-        expect(
-          depictLiteral({ zodSchema: z.never(), jsonSchema }, requestCtx),
-        ).toMatchSnapshot();
-      },
-    );
   });
 
   describe("depictBigInt()", () => {

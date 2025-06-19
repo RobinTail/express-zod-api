@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod/v4";
-import { EmptySchema, FlatObject } from "./common-helpers";
+import { emptySchema, EmptySchema, FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
@@ -50,7 +50,7 @@ export class Middleware<
   readonly #handler: Handler<z.output<IN>, OPT, OUT>;
 
   constructor({
-    input = z.object({}) as unknown as IN,
+    input = emptySchema as unknown as IN,
     security,
     handler,
   }: {
