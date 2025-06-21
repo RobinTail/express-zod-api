@@ -1,11 +1,18 @@
 import * as R from "ramda";
 import { z } from "zod/v4";
+import { EmptySchema } from "./common-helpers";
 import { AbstractMiddleware } from "./middleware";
 
 type Base = object & { [Symbol.iterator]?: never };
 
 /** @desc The type allowed on the top level of Middlewares and Endpoints */
 export type IOSchema = z.ZodType<Base>;
+
+// @todo lass magical naming please
+export type MagicIntersection<
+  Current extends IOSchema,
+  Inc extends IOSchema,
+> = z.ZodIntersection<Current extends EmptySchema ? Inc : Current, Inc>;
 
 /**
  * @description intersects input schemas of middlewares and the endpoint
@@ -23,4 +30,4 @@ export const getFinalEndpointInputSchema = <
 ) =>
   R.pluck("schema", middlewares)
     .concat(input)
-    .reduce((acc, schema) => acc.and(schema)) as z.ZodIntersection<MIN, IN>;
+    .reduce((acc, schema) => acc.and(schema)) as MagicIntersection<MIN, IN>;
