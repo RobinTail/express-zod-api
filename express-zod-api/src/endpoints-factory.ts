@@ -90,7 +90,7 @@ export class EndpointsFactory<
       | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
     return EndpointsFactory.#create<
-      z.ZodIntersection<IN, AIN>,
+      z.ZodIntersection<IN extends EmptySchema ? AIN : IN, AIN>,
       OUT & AOUT,
       SCO & ASCO
     >(
