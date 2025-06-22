@@ -1,6 +1,11 @@
 import { z } from "zod/v4";
+import type { $loose, $strip } from "zod/v4/core";
 import { IOSchema, Middleware, ez } from "../src";
-import { getFinalEndpointInputSchema } from "../src/io-schema";
+import { EmptySchema } from "../src/common-helpers";
+import {
+  getFinalEndpointInputSchema,
+  MagicIntersection,
+} from "../src/io-schema";
 import { AbstractMiddleware } from "../src/middleware";
 
 describe("I/O Schema and related helpers", () => {
@@ -242,6 +247,36 @@ describe("I/O Schema and related helpers", () => {
       const result = getFinalEndpointInputSchema(middlewares, endpointInput);
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
+    });
+  });
+
+  describe("MagicIntersection", () => {
+    test("should remove EmptySchema", () => {
+      expectTypeOf<MagicIntersection<EmptySchema, EmptySchema>>().toEqualTypeOf<
+        z.ZodIntersection<EmptySchema, EmptySchema>
+      >();
+      type StripObject = z.ZodObject<{ test: z.ZodString }, $strip>;
+      type StripIntersection = MagicIntersection<EmptySchema, StripObject>;
+      expectTypeOf<StripIntersection>().toEqualTypeOf<
+        z.ZodIntersection<StripObject, StripObject>
+      >();
+      expectTypeOf<z.output<StripIntersection>>()
+        .toHaveProperty("test")
+        .toEqualTypeOf<string>();
+      expectTypeOf<z.output<StripIntersection>>().not.toHaveProperty(
+        "excessive",
+      );
+      type LooseObject = z.ZodObject<{ test: z.ZodString }, $loose>;
+      type LooseIntersection = MagicIntersection<EmptySchema, LooseObject>;
+      expectTypeOf<LooseIntersection>().toEqualTypeOf<
+        z.ZodIntersection<LooseObject, LooseObject>
+      >();
+      expectTypeOf<z.output<LooseIntersection>>()
+        .toHaveProperty("test")
+        .toEqualTypeOf<string>();
+      expectTypeOf<z.output<LooseIntersection>>()
+        .toHaveProperty("excessive")
+        .toEqualTypeOf<unknown>();
     });
   });
 });
