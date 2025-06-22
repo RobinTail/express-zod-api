@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import createHttpError from "http-errors";
+import { expectTypeOf } from "vitest";
 import {
   EndpointsFactory,
   Middleware,
@@ -80,6 +81,28 @@ describe("EndpointsFactory", () => {
           EmptyObject & { test: string }
         >
       >();
+    });
+
+    test("Issue #2760: should strip excessive props by default", () => {
+      defaultEndpointsFactory.build({
+        input: z.object({ foo: z.string() }),
+        output: z.object({ foo: z.string() }),
+        handler: async ({ input }) => {
+          expectTypeOf(input).not.toHaveProperty("bar");
+          return input;
+        },
+      });
+    });
+
+    test("Issue #2760: should allow excessive props when using loose object schema", () => {
+      defaultEndpointsFactory.build({
+        input: z.looseObject({ foo: z.string() }),
+        output: z.object({ foo: z.string() }),
+        handler: async ({ input }) => {
+          expectTypeOf(input).toHaveProperty("bar").toEqualTypeOf<unknown>();
+          return input;
+        },
+      });
     });
   });
 
