@@ -73,8 +73,8 @@ importers:
         specifier: ^10.1.5
         version: 10.1.5(eslint@9.29.0)
       eslint-plugin-allowed-dependencies:
-        specifier: ^1.3.0
-        version: 1.3.0(eslint@9.29.0)(typescript-eslint@8.34.1(eslint@9.29.0)(typescript@5.8.3))
+        specifier: ^1.3.1
+        version: 1.3.1(eslint@9.29.0)(typescript-eslint@8.34.1(eslint@9.29.0)(typescript@5.8.3))
       eslint-plugin-prettier:
         specifier: ^5.4.1
         version: 5.5.0(eslint-config-prettier@10.1.5(eslint@9.29.0))(eslint@9.29.0)(prettier@3.5.3)
@@ -1262,8 +1262,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-allowed-dependencies@1.3.0:
-    resolution: {integrity: sha512-NBEqP63WnZwE8GZsV/GAQ3QFZ92wCWxJ/GXp/sPz40LDMKpW+gMiYkixheNm5ZpVWJtyg6XgUQZyJyaYXzqNfA==}
+  eslint-plugin-allowed-dependencies@1.3.1:
+    resolution: {integrity: sha512-AGv0PAY17xVRi0YKGl+q+DtgE+YY+8xyxZ5kGeHsIkKNEGyP1sAq3WflaG7SlrMm1AU9jZ7B1paEsU7UWyPAzg==}
     engines: {node: ^18.18.0 || ^20.9.0 || ^22.0.0 || ^24.0.0}
     peerDependencies:
       eslint: ^9.0.0
@@ -1918,6 +1918,9 @@ packages:
 
   ramda@0.30.1:
     resolution: {integrity: sha512-tEF5I22zJnuclswcZMc8bDIrwRHRzf+NqVEmqg50ShAZMP7MWeR/RGDthfM/p+BlqvF2fXAzpn8i+SJcYD3alw==}
+
+  ramda@0.31.3:
+    resolution: {integrity: sha512-xKADKRNnqmDdX59PPKLm3gGmk1ZgNnj3k7DryqWwkamp4TJ6B36DdpyKEQ0EoEYmH2R62bV4Q+S0ym2z8N2f3Q==}
 
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
@@ -3357,10 +3360,10 @@ snapshots:
     dependencies:
       eslint: 9.29.0
 
-  eslint-plugin-allowed-dependencies@1.3.0(eslint@9.29.0)(typescript-eslint@8.34.1(eslint@9.29.0)(typescript@5.8.3)):
+  eslint-plugin-allowed-dependencies@1.3.1(eslint@9.29.0)(typescript-eslint@8.34.1(eslint@9.29.0)(typescript@5.8.3)):
     dependencies:
       eslint: 9.29.0
-      ramda: 0.30.1
+      ramda: 0.31.3
       typescript-eslint: 8.34.1(eslint@9.29.0)(typescript@5.8.3)
 
   eslint-plugin-prettier@5.5.0(eslint-config-prettier@10.1.5(eslint@9.29.0))(eslint@9.29.0)(prettier@3.5.3):
@@ -4026,6 +4029,8 @@ snapshots:
   queue-microtask@1.2.3: {}
 
   ramda@0.30.1: {}
+
+  ramda@0.31.3: {}
 
   range-parser@1.2.1: {}
 
