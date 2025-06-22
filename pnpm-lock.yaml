@@ -207,8 +207,8 @@ importers:
         specifier: ^4.4.0
         version: 4.4.0
       ramda:
-        specifier: ^0.30.1
-        version: 0.30.1
+        specifier: ^0.31.3
+        version: 0.31.3
       typescript:
         specifier: catalog:peer
         version: 5.8.3
@@ -1915,9 +1915,6 @@ packages:
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
-
-  ramda@0.30.1:
-    resolution: {integrity: sha512-tEF5I22zJnuclswcZMc8bDIrwRHRzf+NqVEmqg50ShAZMP7MWeR/RGDthfM/p+BlqvF2fXAzpn8i+SJcYD3alw==}
 
   ramda@0.31.3:
     resolution: {integrity: sha512-xKADKRNnqmDdX59PPKLm3gGmk1ZgNnj3k7DryqWwkamp4TJ6B36DdpyKEQ0EoEYmH2R62bV4Q+S0ym2z8N2f3Q==}
@@ -4027,8 +4024,6 @@ snapshots:
       side-channel: 1.1.0
 
   queue-microtask@1.2.3: {}
-
-  ramda@0.30.1: {}
 
   ramda@0.31.3: {}
 
