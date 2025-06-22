@@ -52,7 +52,7 @@
     "ansis": "^4.1.0",
     "node-mocks-http": "^1.17.2",
     "openapi3-ts": "^4.4.0",
-    "ramda": "^0.30.1"
+    "ramda": "^0.31.0"
   },
   "peerDependencies": {
     "@types/compression": "catalog:peer",
