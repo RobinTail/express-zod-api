@@ -2,6 +2,10 @@
 
 ## Version 24
 
+### v24.4.1
+
+- Compatibility fix for Zod 3.25.67.
+
 ### v24.4.0
 
 - Automated migration moved to the [dedicated package](https://www.npmjs.com/package/@express-zod-api/migration).

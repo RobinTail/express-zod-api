@@ -24,14 +24,11 @@ jobs:
           node-version: 20
           cache: pnpm
 
+      - name: Remove lock
+        run: rm pnpm-lock.yaml
+
       - name: Install dependencies
         run: pnpm install
-
-      - name: Upgrade dependencies
-        run: |
-          pnpm -w upgrade
-          pnpm -F express-zod-api upgrade
-          pnpm dedupe
 
       - name: Branch name
         id: create-branch
