@@ -5,7 +5,7 @@ import { Endpoint, Handler } from "./endpoint";
 import {
   IOSchema,
   getFinalEndpointInputSchema,
-  AltIntersection,
+  ConditionalIntersection,
 } from "./io-schema";
 import { Method } from "./method";
 import {
@@ -35,7 +35,11 @@ interface BuildProps<
   /** @desc The schema by which the returns of the Endpoint handler is validated */
   output: OUT;
   /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (options) and a logger */
-  handler: Handler<z.output<AltIntersection<MIN, IN>>, z.input<OUT>, OPT>;
+  handler: Handler<
+    z.output<ConditionalIntersection<MIN, IN>>,
+    z.input<OUT>,
+    OPT
+  >;
   /** @desc The operation description for the generated Documentation */
   description?: string;
   /** @desc The operation summary for the generated Documentation (50 symbols max) */
@@ -90,7 +94,7 @@ export class EndpointsFactory<
       | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
     return EndpointsFactory.#create<
-      AltIntersection<IN, AIN>,
+      ConditionalIntersection<IN, AIN>,
       OUT & AOUT,
       SCO & ASCO
     >(

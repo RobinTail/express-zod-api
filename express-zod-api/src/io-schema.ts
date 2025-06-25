@@ -7,8 +7,7 @@ type Base = object & { [Symbol.iterator]?: never };
 /** @desc The type allowed on the top level of Middlewares and Endpoints */
 export type IOSchema = z.ZodType<Base>;
 
-// @todo naming?
-export type AltIntersection<
+export type ConditionalIntersection<
   Current extends IOSchema | undefined,
   Inc extends IOSchema,
 > = z.ZodIntersection<Current extends IOSchema ? Current : Inc, Inc>;
@@ -29,4 +28,7 @@ export const getFinalEndpointInputSchema = <
 ) =>
   R.pluck("schema", middlewares)
     .concat(input)
-    .reduce((acc, schema) => acc.and(schema)) as AltIntersection<MIN, IN>;
+    .reduce((acc, schema) => acc.and(schema)) as ConditionalIntersection<
+    MIN,
+    IN
+  >;
