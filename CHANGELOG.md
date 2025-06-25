@@ -5,8 +5,8 @@
 ### v24.4.2
 
 - Improved the type of the `input` argument for `Endpoint::handler()`:
-  - For `z.object()` based schema removed `never` for unknown properties;
-  - This also fixes the issue for excessive properties of the `z.looseObject()` based schema;
+  - For `z.object()`-based schema removed `never` for unknown properties;
+  - Fixed incorrect typing of excessive properties when using a `z.looseObject()`-based schema;
   - The issue reported by [@ThomasKientz](https://github.com/ThomasKientz).
 
 ```ts
