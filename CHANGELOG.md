@@ -2,6 +2,36 @@
 
 ## Version 24
 
+### v24.4.2
+
+- Improved the type of the `input` argument for `Endpoint::handler()`:
+  - For `z.object()` based schema removed `never` for unknown properties;
+  - This also fixes the issue for excessive properties of the `z.looseObject()` based schema;
+  - The issue reported by [@ThomasKientz](https://github.com/ThomasKientz).
+
+```ts
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod/v4";
+
+const endpoint1 = defaultEndpointsFactory.buildVoid({
+  input: z.object({
+    foo: z.string(),
+  }),
+  handler: async ({ input: { bar } }) => {
+    console.log(bar); // before: never, after: TypeScript Error
+  },
+});
+
+const endpoint2 = defaultEndpointsFactory.buildVoid({
+  input: z.looseObject({
+    foo: z.string(),
+  }),
+  handler: async ({ input: { bar } }) => {
+    console.log(bar); // before: never, after: unknown
+  },
+});
+```
+
 ### v24.4.1
 
 - Compatibility fix for Zod 3.25.67.
