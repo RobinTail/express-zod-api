@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import createHttpError from "http-errors";
+import { expectTypeOf } from "vitest";
 import {
   EndpointsFactory,
   Middleware,
@@ -81,6 +82,28 @@ describe("EndpointsFactory", () => {
         >
       >();
     });
+
+    test("Issue #2760: should strip excessive props by default", () => {
+      defaultEndpointsFactory.build({
+        input: z.object({ foo: z.string() }),
+        output: z.object({ foo: z.string() }),
+        handler: async ({ input }) => {
+          expectTypeOf(input).not.toHaveProperty("bar");
+          return input;
+        },
+      });
+    });
+
+    test("Issue #2760: should allow excessive props when using loose object schema", () => {
+      defaultEndpointsFactory.build({
+        input: z.looseObject({ foo: z.string() }),
+        output: z.object({ foo: z.string() }),
+        handler: async ({ input }) => {
+          expectTypeOf(input).toHaveProperty("bar").toEqualTypeOf<unknown>();
+          return input;
+        },
+      });
+    });
   });
 
   describe(".addOptions()", () => {
@@ -92,7 +115,7 @@ describe("EndpointsFactory", () => {
       }));
       expectTypeOf(newFactory).toEqualTypeOf<
         EndpointsFactory<
-          EmptySchema,
+          undefined,
           EmptyObject & { option1: string; option2: string }
         >
       >();
@@ -249,10 +272,9 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<{
-        n: number;
-        s: string;
-      }>();
+      expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<
+        { n: number } & { s: string }
+      >();
     });
 
     test("Should create an endpoint with refined object middleware", () => {
@@ -277,11 +299,9 @@ describe("EndpointsFactory", () => {
       });
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<{
-        a?: number;
-        b?: string;
-        i: string;
-      }>();
+      expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<
+        { a?: number; b?: string } & { i: string }
+      >();
     });
 
     test("Should create an endpoint with intersection middleware", () => {
@@ -302,11 +322,9 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<{
-        n1: number;
-        n2: number;
-        s: string;
-      }>();
+      expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<
+        { n1: number } & { n2: number } & { s: string }
+      >();
     });
 
     test("Should create an endpoint with union middleware", () => {
@@ -330,7 +348,7 @@ describe("EndpointsFactory", () => {
       expect(endpoint.methods).toBeUndefined();
       expect(endpoint.inputSchema).toMatchSnapshot();
       expect(endpoint.outputSchema).toMatchSnapshot();
-      expectTypeOf(endpoint.inputSchema._zod.output).toExtend<
+      expectTypeOf(endpoint.inputSchema._zod.output).toEqualTypeOf<
         { s: string } & ({ n1: number } | { n2: number })
       >();
     });

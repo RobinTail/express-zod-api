@@ -7,6 +7,11 @@ type Base = object & { [Symbol.iterator]?: never };
 /** @desc The type allowed on the top level of Middlewares and Endpoints */
 export type IOSchema = z.ZodType<Base>;
 
+export type ConditionalIntersection<
+  Current extends IOSchema | undefined,
+  Inc extends IOSchema,
+> = z.ZodIntersection<Current extends IOSchema ? Current : Inc, Inc>;
+
 /**
  * @description intersects input schemas of middlewares and the endpoint
  * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
@@ -15,7 +20,7 @@ export type IOSchema = z.ZodType<Base>;
  * @since 22.05.2025 does not mix examples in after switching to Zod 4
  */
 export const getFinalEndpointInputSchema = <
-  MIN extends IOSchema,
+  MIN extends IOSchema | undefined,
   IN extends IOSchema,
 >(
   middlewares: AbstractMiddleware[],
@@ -23,4 +28,7 @@ export const getFinalEndpointInputSchema = <
 ) =>
   R.pluck("schema", middlewares)
     .concat(input)
-    .reduce((acc, schema) => acc.and(schema)) as z.ZodIntersection<MIN, IN>;
+    .reduce((acc, schema) => acc.and(schema)) as ConditionalIntersection<
+    MIN,
+    IN
+  >;
