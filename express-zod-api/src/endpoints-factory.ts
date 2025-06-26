@@ -2,7 +2,11 @@ import { Request, Response } from "express";
 import { z } from "zod/v4";
 import { EmptyObject, EmptySchema, FlatObject, Tag } from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
-import { IOSchema, getFinalEndpointInputSchema } from "./io-schema";
+import {
+  IOSchema,
+  getFinalEndpointInputSchema,
+  ConditionalIntersection,
+} from "./io-schema";
 import { Method } from "./method";
 import {
   AbstractMiddleware,
@@ -18,7 +22,7 @@ import {
 interface BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema | z.ZodVoid,
-  MIN extends IOSchema,
+  MIN extends IOSchema | undefined,
   OPT extends FlatObject,
   SCO extends string,
 > {
@@ -31,7 +35,11 @@ interface BuildProps<
   /** @desc The schema by which the returns of the Endpoint handler is validated */
   output: OUT;
   /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (options) and a logger */
-  handler: Handler<z.output<z.ZodIntersection<MIN, IN>>, z.input<OUT>, OPT>;
+  handler: Handler<
+    z.output<ConditionalIntersection<MIN, IN>>,
+    z.input<OUT>,
+    OPT
+  >;
   /** @desc The operation description for the generated Documentation */
   description?: string;
   /** @desc The operation summary for the generated Documentation (50 symbols max) */
@@ -59,7 +67,7 @@ interface BuildProps<
 }
 
 export class EndpointsFactory<
-  IN extends IOSchema = EmptySchema,
+  IN extends IOSchema | undefined = undefined,
   OUT extends FlatObject = EmptyObject,
   SCO extends string = string,
 > {
@@ -67,7 +75,7 @@ export class EndpointsFactory<
   constructor(protected resultHandler: AbstractResultHandler) {}
 
   static #create<
-    CIN extends IOSchema,
+    CIN extends IOSchema | undefined,
     COUT extends FlatObject,
     CSCO extends string,
   >(middlewares: AbstractMiddleware[], resultHandler: AbstractResultHandler) {
@@ -86,7 +94,7 @@ export class EndpointsFactory<
       | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
     return EndpointsFactory.#create<
-      z.ZodIntersection<IN, AIN>,
+      ConditionalIntersection<IN, AIN>,
       OUT & AOUT,
       SCO & ASCO
     >(
