@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   dev:
+    '@typescript-eslint/rule-tester':
+      specifier: ^8.35.0
+      version: 8.35.0
     undici:
       specifier: ^6.19.8
       version: 6.21.3
@@ -281,7 +284,7 @@ importers:
         version: 8.35.0(eslint@9.29.0)(typescript@5.8.3)
     devDependencies:
       '@typescript-eslint/rule-tester':
-        specifier: ^8.35.0
+        specifier: catalog:dev
         version: 8.35.0(eslint@9.29.0)(typescript@5.8.3)
 
 packages:
