@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod/v4";
-import { emptySchema, EmptySchema, FlatObject } from "./common-helpers";
+import { FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
@@ -8,7 +8,7 @@ import { Security } from "./security";
 import { ActualLogger } from "./logger-helpers";
 
 type Handler<IN, OPT, OUT> = (params: {
-  /** @desc The inputs from the enabled input sources validated against final input schema of the Middleware */
+  /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware */
   input: IN;
   /**
    * @desc The returns of the previously executed Middlewares (typed when chaining Middlewares)
@@ -27,7 +27,7 @@ export abstract class AbstractMiddleware {
   /** @internal */
   public abstract get security(): LogicalContainer<Security> | undefined;
   /** @internal */
-  public abstract get schema(): IOSchema;
+  public abstract get schema(): IOSchema | undefined;
   public abstract execute(params: {
     input: unknown;
     options: FlatObject;
@@ -41,22 +41,26 @@ export class Middleware<
   OPT extends FlatObject,
   OUT extends FlatObject,
   SCO extends string,
-  IN extends IOSchema = EmptySchema,
+  IN extends IOSchema | undefined = undefined,
 > extends AbstractMiddleware {
   readonly #schema: IN;
   readonly #security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
-  readonly #handler: Handler<z.output<IN>, OPT, OUT>;
+  readonly #handler: Handler<
+    IN extends IOSchema ? z.output<IN> : undefined,
+    OPT,
+    OUT
+  >;
 
   constructor({
-    input = emptySchema as unknown as IN,
+    input,
     security,
     handler,
   }: {
     /**
      * @desc Input schema of the Middleware, combining properties from all the enabled input sources
-     * @default z.object({})
+     * @default undefined
      * @see defaultInputSources
      * */
     input?: IN;
@@ -65,10 +69,10 @@ export class Middleware<
       Security<Extract<keyof z.input<IN>, string>, SCO>
     >;
     /** @desc The handler returning options available to Endpoints */
-    handler: Handler<z.output<IN>, OPT, OUT>;
+    handler: Handler<IN extends IOSchema ? z.output<IN> : undefined, OPT, OUT>;
   }) {
     super();
-    this.#schema = input;
+    this.#schema = input as IN;
     this.#security = security;
     this.#handler = handler;
   }
@@ -78,7 +82,10 @@ export class Middleware<
     return this.#security;
   }
 
-  /** @internal */
+  /**
+   * @internal
+   * @todo consider removal, used only by getFinalEndpointInputSchema
+   * */
   public override get schema() {
     return this.#schema;
   }
@@ -95,7 +102,9 @@ export class Middleware<
     logger: ActualLogger;
   }) {
     try {
-      const validInput = (await this.#schema.parseAsync(input)) as z.output<IN>;
+      const validInput = (
+        this.#schema ? await this.#schema.parseAsync(input) : undefined
+      ) as IN extends IOSchema ? z.output<IN> : undefined;
       return this.#handler({ ...rest, input: validInput });
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
