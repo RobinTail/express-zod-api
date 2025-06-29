@@ -140,7 +140,7 @@ const objectMapper = function (
   );
   const hasPassThrough = this._zod.def.catchall instanceof z.ZodUnknown;
   const output = (hasPassThrough ? z.looseObject : z.object)(nextShape); // proxies unknown keys when set to "passthrough"
-  return this.transform(transformer as () => object).pipe(output); // @since zod 3.25.45 had to loosen transformer type
+  return this.transform(transformer).pipe(output);
 };
 
 if (!(metaSymbol in globalThis)) {
