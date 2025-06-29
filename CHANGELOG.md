@@ -2,6 +2,11 @@
 
 ## Version 24
 
+### v24.4.3
+
+- Externalized the code responsible for the Zod plugin's method `z.object().remap()`:
+  - Using the new method `R.renameKeys()` of `ramda@0.31`.
+
 ### v24.4.2
 
 - Improved the type of the `input` argument for `Endpoint::handler()`:

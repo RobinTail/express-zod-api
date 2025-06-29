@@ -28,6 +28,15 @@ import type {
   $strip,
 } from "zod/v4/core";
 
+/** @todo remove when typed, https://github.com/ramda/types/pull/140 */
+declare module "ramda" {
+  function renameKeys<
+    V extends string,
+    T extends object,
+    U extends { [P in keyof T]?: V },
+  >(mapping: U): (subject: T) => Remap<T, U, V>;
+}
+
 declare module "zod/v4/core" {
   interface GlobalMeta {
     default?: unknown; // can be an actual value or a label like "Today"
@@ -125,19 +134,13 @@ const objectMapper = function (
     | (<T>(subject: T) => { [P in string | keyof T]: T[keyof T] }),
 ) {
   const transformer =
-    typeof tool === "function"
-      ? tool
-      : R.pipe(
-          R.toPairs, // eslint-disable-line no-restricted-syntax -- strict key type required
-          R.map(([key, value]) => R.pair(tool[String(key)] || key, value)),
-          R.fromPairs,
-        );
+    typeof tool === "function" ? tool : R.renameKeys(R.reject(R.isNil, tool)); // rejecting undefined
   const nextShape = transformer(
     R.map(R.invoker(0, "clone"), this._zod.def.shape), // immutable, changed from R.clone due to failure
   );
   const hasPassThrough = this._zod.def.catchall instanceof z.ZodUnknown;
   const output = (hasPassThrough ? z.looseObject : z.object)(nextShape); // proxies unknown keys when set to "passthrough"
-  return this.transform(transformer as () => object).pipe(output); // @since zod 3.25.45 had to loosen transformer type
+  return this.transform(transformer).pipe(output);
 };
 
 if (!(metaSymbol in globalThis)) {
