@@ -7,6 +7,15 @@ type Base = object & { [Symbol.iterator]?: never };
 /** @desc The type allowed on the top level of Middlewares and Endpoints */
 export type IOSchema = z.ZodType<Base>;
 
+export type SelectiveIntersection<
+  Current extends IOSchema | undefined,
+  Inc extends IOSchema | undefined,
+> = Current extends IOSchema
+  ? Inc extends IOSchema
+    ? z.ZodIntersection<Current, Inc>
+    : Current
+  : Inc;
+
 export type ConditionalIntersection<
   Current extends IOSchema | undefined,
   Inc extends IOSchema,

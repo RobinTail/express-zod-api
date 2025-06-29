@@ -12,6 +12,7 @@ import {
   IOSchema,
   getFinalEndpointInputSchema,
   ConditionalIntersection,
+  SelectiveIntersection,
 } from "./io-schema";
 import { Method } from "./method";
 import {
@@ -93,17 +94,15 @@ export class EndpointsFactory<
   public addMiddleware<
     AOUT extends FlatObject,
     ASCO extends string,
-    AIN extends IOSchema = EmptySchema,
+    AIN extends IOSchema | undefined = undefined,
   >(
     subject:
       | Middleware<OUT, AOUT, ASCO, AIN>
       | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
-    return this.#create<
-      ConditionalIntersection<IN, AIN>,
-      OUT & AOUT,
-      SCO & ASCO
-    >(subject instanceof Middleware ? subject : new Middleware(subject));
+    return this.#create<SelectiveIntersection<IN, AIN>, OUT & AOUT, SCO & ASCO>(
+      subject instanceof Middleware ? subject : new Middleware(subject),
+    );
   }
 
   public use = this.addExpressMiddleware;
