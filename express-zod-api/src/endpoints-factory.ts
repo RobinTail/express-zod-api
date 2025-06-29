@@ -74,12 +74,12 @@ export class EndpointsFactory<
   protected middlewares: AbstractMiddleware[] = [];
   constructor(protected resultHandler: AbstractResultHandler) {}
 
-  static #create<
+  #create<
     CIN extends IOSchema | undefined,
     COUT extends FlatObject,
     CSCO extends string,
-  >(middlewares: AbstractMiddleware[], resultHandler: AbstractResultHandler) {
-    const factory = new EndpointsFactory<CIN, COUT, CSCO>(resultHandler);
+  >(middlewares: AbstractMiddleware[]) {
+    const factory = new EndpointsFactory<CIN, COUT, CSCO>(this.resultHandler);
     factory.middlewares = middlewares;
     return factory;
   }
@@ -93,7 +93,7 @@ export class EndpointsFactory<
       | Middleware<OUT, AOUT, ASCO, AIN>
       | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
-    return EndpointsFactory.#create<
+    return this.#create<
       ConditionalIntersection<IN, AIN>,
       OUT & AOUT,
       SCO & ASCO
@@ -101,7 +101,6 @@ export class EndpointsFactory<
       this.middlewares.concat(
         subject instanceof Middleware ? subject : new Middleware(subject),
       ),
-      this.resultHandler,
     );
   }
 
@@ -112,16 +111,14 @@ export class EndpointsFactory<
     S extends Response,
     AOUT extends FlatObject = EmptyObject,
   >(...params: ConstructorParameters<typeof ExpressMiddleware<R, S, AOUT>>) {
-    return EndpointsFactory.#create<IN, OUT & AOUT, SCO>(
+    return this.#create<IN, OUT & AOUT, SCO>(
       this.middlewares.concat(new ExpressMiddleware(...params)),
-      this.resultHandler,
     );
   }
 
   public addOptions<AOUT extends FlatObject>(getOptions: () => Promise<AOUT>) {
-    return EndpointsFactory.#create<IN, OUT & AOUT, SCO>(
+    return this.#create<IN, OUT & AOUT, SCO>(
       this.middlewares.concat(new Middleware({ handler: getOptions })),
-      this.resultHandler,
     );
   }
 
