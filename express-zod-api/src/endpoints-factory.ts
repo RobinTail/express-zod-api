@@ -1,6 +1,12 @@
 import { Request, Response } from "express";
 import { z } from "zod/v4";
-import { EmptyObject, EmptySchema, FlatObject, Tag } from "./common-helpers";
+import {
+  EmptyObject,
+  emptySchema,
+  EmptySchema,
+  FlatObject,
+  Tag,
+} from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
 import {
   IOSchema,
@@ -117,7 +123,7 @@ export class EndpointsFactory<
   }
 
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
-    input = z.object({}) as unknown as BIN,
+    input = emptySchema as unknown as BIN,
     output: outputSchema,
     operationId,
     scope,
@@ -151,7 +157,7 @@ export class EndpointsFactory<
   }: Omit<BuildProps<BIN, z.ZodVoid, IN, OUT, SCO>, "output">) {
     return this.build({
       ...rest,
-      output: z.object({}),
+      output: emptySchema,
       handler: async (props) => {
         await handler(props);
         return {};
