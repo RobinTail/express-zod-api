@@ -15,7 +15,7 @@ export type Extension<
     : Current
   : Inc;
 
-/** Make a schema for EndpointsFactory extended with a Middleware */
+/** Makes a schema for EndpointsFactory extended with a Middleware */
 export const ensureExtension = <
   Current extends IOSchema | undefined,
   Inc extends IOSchema | undefined,
