@@ -10,10 +10,10 @@ import {
 import { Endpoint, Handler } from "./endpoint";
 import {
   IOSchema,
-  getFinalEndpointInputSchema,
   ConditionalIntersection,
   SelectiveIntersection,
   ensureSelectiveIntersection,
+  ensureConditionalIntersection,
 } from "./io-schema";
 import { Method } from "./method";
 import {
@@ -153,7 +153,7 @@ export class EndpointsFactory<
       tags,
       methods,
       getOperationId,
-      inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
+      inputSchema: ensureConditionalIntersection(this.schema, input),
     });
   }
 
