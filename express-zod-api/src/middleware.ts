@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod/v4";
-import { emptySchema, EmptySchema, FlatObject } from "./common-helpers";
+import { emptySchema, FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
@@ -27,7 +27,7 @@ export abstract class AbstractMiddleware {
   /** @internal */
   public abstract get security(): LogicalContainer<Security> | undefined;
   /** @internal */
-  public abstract get schema(): IOSchema;
+  public abstract get schema(): IOSchema | undefined;
   public abstract execute(params: {
     input: unknown;
     options: FlatObject;
@@ -41,7 +41,7 @@ export class Middleware<
   OPT extends FlatObject,
   OUT extends FlatObject,
   SCO extends string,
-  IN extends IOSchema = EmptySchema,
+  IN extends IOSchema | undefined = undefined,
 > extends AbstractMiddleware {
   readonly #schema: IN;
   readonly #security?: LogicalContainer<
@@ -50,13 +50,13 @@ export class Middleware<
   readonly #handler: Handler<z.output<IN>, OPT, OUT>;
 
   constructor({
-    input = emptySchema as unknown as IN,
+    input,
     security,
     handler,
   }: {
     /**
      * @desc Input schema of the Middleware, combining properties from all the enabled input sources
-     * @default z.object({})
+     * @default undefined
      * @see defaultInputSources
      * */
     input?: IN;
@@ -68,7 +68,7 @@ export class Middleware<
     handler: Handler<z.output<IN>, OPT, OUT>;
   }) {
     super();
-    this.#schema = input;
+    this.#schema = input as IN;
     this.#security = security;
     this.#handler = handler;
   }
@@ -95,7 +95,9 @@ export class Middleware<
     logger: ActualLogger;
   }) {
     try {
-      const validInput = (await this.#schema.parseAsync(input)) as z.output<IN>;
+      const validInput = (await (this.#schema || emptySchema).parseAsync(
+        input,
+      )) as z.output<IN>;
       return this.#handler({ ...rest, input: validInput });
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
