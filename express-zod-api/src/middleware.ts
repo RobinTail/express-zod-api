@@ -82,10 +82,7 @@ export class Middleware<
     return this.#security;
   }
 
-  /**
-   * @internal
-   * @todo consider removal, used only by getFinalEndpointInputSchema
-   * */
+  /** @internal */
   public override get schema() {
     return this.#schema;
   }
