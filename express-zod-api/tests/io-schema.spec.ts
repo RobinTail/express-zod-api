@@ -1,7 +1,7 @@
 import { z } from "zod/v4";
 import { IOSchema, ez } from "../src";
 import {
-  makeFinalIntersection,
+  makeFinalInputSchema,
   ensureSelectiveIntersection,
 } from "../src/io-schema";
 
@@ -132,24 +132,24 @@ describe("I/O Schema and related helpers", () => {
     });
   });
 
-  describe("makeFinalIntersection()", () => {
-    test("Should handle no middlewares", () => {
-      const inc = z.object({
+  describe("makeFinalInputSchema()", () => {
+    test("Should handle no factory schema", () => {
+      const buildSchema = z.object({
         four: z.boolean(),
       });
-      const result = makeFinalIntersection(undefined, inc);
-      expect(result).toEqual(inc);
+      const result = makeFinalInputSchema(undefined, buildSchema);
+      expect(result).toEqual(buildSchema);
     });
 
     test("Should merge input object schemas", () => {
-      const current = z
+      const factorySchema = z
         .object({ one: z.string() })
         .and(z.object({ two: z.number() }))
         .and(z.object({ three: z.null() }));
-      const inc = z.object({
+      const buildSchema = z.object({
         four: z.boolean(),
       });
-      const result = makeFinalIntersection(current, inc);
+      const result = makeFinalInputSchema(factorySchema, buildSchema);
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
     });

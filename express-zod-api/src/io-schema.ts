@@ -29,16 +29,19 @@ export const ensureSelectiveIntersection = <
   >;
 
 /** The Endpoint input schema type, condition wrapped into schema to make it z.output-compatible */
-export type FinalIntersection<
-  Current extends IOSchema | undefined,
-  Inc extends IOSchema,
-> = z.ZodIntersection<Current extends IOSchema ? Current : Inc, Inc>;
+export type FinalInputSchema<
+  FIN extends IOSchema | undefined,
+  BIN extends IOSchema,
+> = z.ZodIntersection<FIN extends IOSchema ? FIN : BIN, BIN>;
 
 /** Makes the Endpoint input schema */
-export const makeFinalIntersection = <
-  Current extends IOSchema | undefined,
-  Inc extends IOSchema,
+export const makeFinalInputSchema = <
+  FIN extends IOSchema | undefined,
+  BIN extends IOSchema,
 >(
-  current: Current,
-  inc: Inc,
-) => (current ? current.and(inc) : inc) as FinalIntersection<Current, Inc>;
+  factorySchema: FIN,
+  buildSchema: BIN,
+) =>
+  (factorySchema
+    ? factorySchema.and(buildSchema)
+    : buildSchema) as FinalInputSchema<FIN, BIN>;

@@ -250,7 +250,7 @@ Error({
 })
 `;
 
-exports[`I/O Schema and related helpers > makeFinalIntersection() > Should merge input object schemas 1`] = `
+exports[`I/O Schema and related helpers > makeFinalInputSchema() > Should merge input object schemas 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
