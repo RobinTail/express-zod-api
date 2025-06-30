@@ -1,6 +1,4 @@
-import * as R from "ramda";
 import { z } from "zod/v4";
-import { AbstractMiddleware } from "./middleware";
 
 type Base = object & { [Symbol.iterator]?: never };
 
