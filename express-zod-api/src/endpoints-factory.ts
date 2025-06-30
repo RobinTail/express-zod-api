@@ -83,7 +83,7 @@ export class EndpointsFactory<
   protected middlewares: AbstractMiddleware[] = [];
   constructor(protected resultHandler: AbstractResultHandler) {}
 
-  #create<
+  #extend<
     AIN extends IOSchema | undefined,
     AOUT extends FlatObject,
     ASCO extends string,
@@ -110,7 +110,7 @@ export class EndpointsFactory<
       | Middleware<OUT, AOUT, ASCO, AIN>
       | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
-    return this.#create(
+    return this.#extend(
       subject instanceof Middleware ? subject : new Middleware(subject),
     );
   }
@@ -122,11 +122,11 @@ export class EndpointsFactory<
     S extends Response,
     AOUT extends FlatObject = EmptyObject,
   >(...params: ConstructorParameters<typeof ExpressMiddleware<R, S, AOUT>>) {
-    return this.#create(new ExpressMiddleware(...params));
+    return this.#extend(new ExpressMiddleware(...params));
   }
 
   public addOptions<AOUT extends FlatObject>(getOptions: () => Promise<AOUT>) {
-    return this.#create(new Middleware({ handler: getOptions }));
+    return this.#extend(new Middleware({ handler: getOptions }));
   }
 
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
