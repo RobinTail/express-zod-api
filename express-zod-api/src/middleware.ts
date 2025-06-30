@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod/v4";
-import { FlatObject } from "./common-helpers";
+import { emptySchema, FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
@@ -47,11 +47,7 @@ export class Middleware<
   readonly #security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
-  readonly #handler: Handler<
-    IN extends IOSchema ? z.output<IN> : undefined,
-    OPT,
-    OUT
-  >;
+  readonly #handler: Handler<z.output<IN>, OPT, OUT>;
 
   constructor({
     input,
@@ -69,7 +65,7 @@ export class Middleware<
       Security<Extract<keyof z.input<IN>, string>, SCO>
     >;
     /** @desc The handler returning options available to Endpoints */
-    handler: Handler<IN extends IOSchema ? z.output<IN> : undefined, OPT, OUT>;
+    handler: Handler<z.output<IN>, OPT, OUT>;
   }) {
     super();
     this.#schema = input as IN;
@@ -99,9 +95,9 @@ export class Middleware<
     logger: ActualLogger;
   }) {
     try {
-      const validInput = (
-        this.#schema ? await this.#schema.parseAsync(input) : undefined
-      ) as IN extends IOSchema ? z.output<IN> : undefined;
+      const validInput = (await (this.#schema || emptySchema).parseAsync(
+        input,
+      )) as z.output<IN>;
       return this.#handler({ ...rest, input: validInput });
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
