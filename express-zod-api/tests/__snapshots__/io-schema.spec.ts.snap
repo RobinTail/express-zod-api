@@ -1,61 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`I/O Schema and related helpers > ensureConditionalIntersection() > Should merge input object schemas 1`] = `
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "allOf": [
-    {
-      "additionalProperties": false,
-      "properties": {
-        "one": {
-          "type": "string",
-        },
-      },
-      "required": [
-        "one",
-      ],
-      "type": "object",
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "two": {
-          "type": "number",
-        },
-      },
-      "required": [
-        "two",
-      ],
-      "type": "object",
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "three": {
-          "type": "null",
-        },
-      },
-      "required": [
-        "three",
-      ],
-      "type": "object",
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "four": {
-          "type": "boolean",
-        },
-      },
-      "required": [
-        "four",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
 exports[`I/O Schema and related helpers > ensureSelectiveIntersection() > Should merge intersection object schemas 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -304,4 +248,60 @@ exports[`I/O Schema and related helpers > ensureSelectiveIntersection() > Zod Is
 Error({
   "message": "Unmergable intersection. Error path: ["id"]",
 })
+`;
+
+exports[`I/O Schema and related helpers > makeFinalIntersection() > Should merge input object schemas 1`] = `
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "one": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "one",
+      ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "two": {
+          "type": "number",
+        },
+      },
+      "required": [
+        "two",
+      ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "three": {
+          "type": "null",
+        },
+      },
+      "required": [
+        "three",
+      ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "four": {
+          "type": "boolean",
+        },
+      },
+      "required": [
+        "four",
+      ],
+      "type": "object",
+    },
+  ],
+}
 `;

@@ -1,7 +1,7 @@
 import { z } from "zod/v4";
 import { IOSchema, ez } from "../src";
 import {
-  ensureConditionalIntersection,
+  makeFinalIntersection,
   ensureSelectiveIntersection,
 } from "../src/io-schema";
 
@@ -132,12 +132,12 @@ describe("I/O Schema and related helpers", () => {
     });
   });
 
-  describe("ensureConditionalIntersection()", () => {
+  describe("makeFinalIntersection()", () => {
     test("Should handle no middlewares", () => {
       const inc = z.object({
         four: z.boolean(),
       });
-      const result = ensureConditionalIntersection(undefined, inc);
+      const result = makeFinalIntersection(undefined, inc);
       expect(result).toEqual(inc);
     });
 
@@ -149,7 +149,7 @@ describe("I/O Schema and related helpers", () => {
       const inc = z.object({
         four: z.boolean(),
       });
-      const result = ensureConditionalIntersection(current, inc);
+      const result = makeFinalIntersection(current, inc);
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
     });
