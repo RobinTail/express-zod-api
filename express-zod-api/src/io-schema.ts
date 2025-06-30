@@ -16,6 +16,18 @@ export type SelectiveIntersection<
     : Current
   : Inc;
 
+export const ensureSelectiveIntersection = <
+  Current extends IOSchema | undefined,
+  Inc extends IOSchema | undefined,
+>(
+  current: Current,
+  inc: Inc,
+) =>
+  (current ? (inc ? current.and(inc) : current) : inc) as SelectiveIntersection<
+    Current,
+    Inc
+  >;
+
 export type ConditionalIntersection<
   Current extends IOSchema | undefined,
   Inc extends IOSchema,

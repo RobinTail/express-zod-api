@@ -13,6 +13,7 @@ import {
   getFinalEndpointInputSchema,
   ConditionalIntersection,
   SelectiveIntersection,
+  ensureSelectiveIntersection,
 } from "./io-schema";
 import { Method } from "./method";
 import {
@@ -78,16 +79,25 @@ export class EndpointsFactory<
   OUT extends FlatObject = EmptyObject,
   SCO extends string = string,
 > {
+  protected schema = undefined as IN;
   protected middlewares: AbstractMiddleware[] = [];
   constructor(protected resultHandler: AbstractResultHandler) {}
 
   #create<
-    CIN extends IOSchema | undefined,
-    COUT extends FlatObject,
-    CSCO extends string,
-  >(middleware: AbstractMiddleware) {
-    const factory = new EndpointsFactory<CIN, COUT, CSCO>(this.resultHandler);
+    AIN extends IOSchema | undefined,
+    AOUT extends FlatObject,
+    ASCO extends string,
+  >(middleware: Middleware<OUT, AOUT, ASCO, AIN>) {
+    const factory = new EndpointsFactory<
+      SelectiveIntersection<IN, AIN>,
+      OUT & AOUT,
+      SCO & ASCO
+    >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);
+    factory.schema = ensureSelectiveIntersection(
+      this.schema,
+      middleware.schema,
+    );
     return factory;
   }
 
@@ -100,9 +110,9 @@ export class EndpointsFactory<
       | Middleware<OUT, AOUT, ASCO, AIN>
       | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
-    return this.#create<SelectiveIntersection<IN, AIN>, OUT & AOUT, SCO & ASCO>(
-      subject instanceof Middleware ? subject : new Middleware(subject),
-    );
+    const middleware =
+      subject instanceof Middleware ? subject : new Middleware(subject);
+    return this.#create(middleware);
   }
 
   public use = this.addExpressMiddleware;
@@ -112,13 +122,11 @@ export class EndpointsFactory<
     S extends Response,
     AOUT extends FlatObject = EmptyObject,
   >(...params: ConstructorParameters<typeof ExpressMiddleware<R, S, AOUT>>) {
-    return this.#create<IN, OUT & AOUT, SCO>(new ExpressMiddleware(...params));
+    return this.#create(new ExpressMiddleware(...params));
   }
 
   public addOptions<AOUT extends FlatObject>(getOptions: () => Promise<AOUT>) {
-    return this.#create<IN, OUT & AOUT, SCO>(
-      new Middleware({ handler: getOptions }),
-    );
+    return this.#create(new Middleware({ handler: getOptions }));
   }
 
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({

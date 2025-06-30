@@ -8,7 +8,7 @@ import {
   ResultHandler,
   testMiddleware,
 } from "../src";
-import { EmptyObject, EmptySchema } from "../src/common-helpers";
+import { EmptyObject } from "../src/common-helpers";
 import { Endpoint } from "../src/endpoint";
 import { z } from "zod/v4";
 
@@ -76,10 +76,7 @@ describe("EndpointsFactory", () => {
         handler: async () => ({ test: "fist option" }),
       });
       expectTypeOf(factory).toEqualTypeOf<
-        EndpointsFactory<
-          z.ZodIntersection<EmptySchema, EmptySchema>,
-          EmptyObject & { test: string }
-        >
+        EndpointsFactory<undefined, EmptyObject & { test: string }>
       >();
     });
 
