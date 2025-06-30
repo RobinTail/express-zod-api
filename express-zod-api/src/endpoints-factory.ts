@@ -110,9 +110,9 @@ export class EndpointsFactory<
       | Middleware<OUT, AOUT, ASCO, AIN>
       | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
-    const middleware =
-      subject instanceof Middleware ? subject : new Middleware(subject);
-    return this.#create(middleware);
+    return this.#create(
+      subject instanceof Middleware ? subject : new Middleware(subject),
+    );
   }
 
   public use = this.addExpressMiddleware;
