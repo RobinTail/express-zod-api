@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { z } from "zod/v4";
-import { EmptySchema, FlatObject } from "./common-helpers";
+import { FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { EndpointsFactory } from "./endpoints-factory";
 import { Middleware } from "./middleware";
@@ -100,7 +100,7 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
   });
 
 export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
-  EmptySchema,
+  undefined,
   Emitter<E>
 > {
   constructor(events: E) {

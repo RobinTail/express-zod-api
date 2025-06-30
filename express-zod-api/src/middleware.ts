@@ -8,7 +8,7 @@ import { Security } from "./security";
 import { ActualLogger } from "./logger-helpers";
 
 type Handler<IN, OPT, OUT> = (params: {
-  /** @desc The inputs from the enabled input sources validated against final input schema of the Middleware */
+  /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware */
   input: IN;
   /**
    * @desc The returns of the previously executed Middlewares (typed when chaining Middlewares)
