@@ -33,4 +33,4 @@ catalogs:
     "typescript-eslint": "^8.0.0"
   dev:
     "undici": "^6.19.8"
-    "@typescript-eslint/rule-tester": "^8.35.0"
+    "@typescript-eslint/rule-tester": "^8.35.1"
