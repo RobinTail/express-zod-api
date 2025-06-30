@@ -119,10 +119,7 @@ describe("EndpointsFactory", () => {
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"].length).toBe(1);
-      expect(newFactory["middlewares"][0].schema).toBeInstanceOf(z.ZodObject);
-      expect(
-        (newFactory["middlewares"][0].schema as z.ZodObject).shape,
-      ).toEqual({});
+      expect(newFactory["middlewares"][0].schema).toBeUndefined();
       const { output: options } = await testMiddleware({
         middleware: newFactory["middlewares"][0],
       });
@@ -147,10 +144,7 @@ describe("EndpointsFactory", () => {
           provider: (req) => ({ result: req.body.test }),
         });
         expect(newFactory["middlewares"].length).toBe(1);
-        expect(newFactory["middlewares"][0].schema).toBeInstanceOf(z.ZodObject);
-        expect(
-          (newFactory["middlewares"][0].schema as z.ZodObject).shape,
-        ).toEqual({});
+        expect(newFactory["middlewares"][0].schema).toBeUndefined();
         const {
           output: options,
           responseMock,
