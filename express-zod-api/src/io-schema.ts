@@ -6,7 +6,7 @@ type Base = object & { [Symbol.iterator]?: never };
 export type IOSchema = z.ZodType<Base>;
 
 /** EndpointsFactory schema extended type when adding a Middleware */
-export type SelectiveIntersection<
+export type Extension<
   Current extends IOSchema | undefined,
   Inc extends IOSchema | undefined,
 > = Current extends IOSchema
@@ -16,14 +16,14 @@ export type SelectiveIntersection<
   : Inc;
 
 /** Make a schema for EndpointsFactory extended with a Middleware */
-export const ensureSelectiveIntersection = <
+export const ensureExtension = <
   Current extends IOSchema | undefined,
   Inc extends IOSchema | undefined,
 >(
   current: Current,
   inc: Inc,
 ) =>
-  (current && inc ? current.and(inc) : current || inc) as SelectiveIntersection<
+  (current && inc ? current.and(inc) : current || inc) as Extension<
     Current,
     Inc
   >;

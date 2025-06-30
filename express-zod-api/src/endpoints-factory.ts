@@ -11,8 +11,8 @@ import { Endpoint, Handler } from "./endpoint";
 import {
   IOSchema,
   FinalInputSchema,
-  SelectiveIntersection,
-  ensureSelectiveIntersection,
+  Extension,
+  ensureExtension,
   makeFinalInputSchema,
 } from "./io-schema";
 import { Method } from "./method";
@@ -85,15 +85,12 @@ export class EndpointsFactory<
     ASCO extends string,
   >(middleware: Middleware<OUT, AOUT, ASCO, AIN>) {
     const factory = new EndpointsFactory<
-      SelectiveIntersection<IN, AIN>,
+      Extension<IN, AIN>,
       OUT & AOUT,
       SCO & ASCO
     >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);
-    factory.schema = ensureSelectiveIntersection(
-      this.schema,
-      middleware.schema,
-    );
+    factory.schema = ensureExtension(this.schema, middleware.schema);
     return factory;
   }
 

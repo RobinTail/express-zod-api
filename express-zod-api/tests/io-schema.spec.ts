@@ -1,9 +1,6 @@
 import { z } from "zod/v4";
 import { IOSchema, ez } from "../src";
-import {
-  makeFinalInputSchema,
-  ensureSelectiveIntersection,
-} from "../src/io-schema";
+import { makeFinalInputSchema, ensureExtension } from "../src/io-schema";
 
 describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {
@@ -155,13 +152,13 @@ describe("I/O Schema and related helpers", () => {
     });
   });
 
-  describe("ensureSelectiveIntersection()", () => {
+  describe("ensureExtension()", () => {
     test.each([
       [undefined, z.object({})],
       [z.object({}), undefined],
       [undefined, undefined],
     ])("should handle one or both undefined", (current, inc) => {
-      expect(ensureSelectiveIntersection(current, inc)).toEqual(current || inc);
+      expect(ensureExtension(current, inc)).toEqual(current || inc);
     });
 
     test("Should merge union object schemas", () => {
@@ -172,7 +169,7 @@ describe("I/O Schema and related helpers", () => {
       const inc = z
         .object({ five: z.string() })
         .or(z.object({ six: z.number() }));
-      const result = ensureSelectiveIntersection(current, inc);
+      const result = ensureExtension(current, inc);
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
     });
@@ -187,7 +184,7 @@ describe("I/O Schema and related helpers", () => {
       const inc = z
         .object({ five: z.string() })
         .and(z.object({ six: z.number() }));
-      const result = ensureSelectiveIntersection(current, inc);
+      const result = ensureExtension(current, inc);
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
     });
@@ -211,7 +208,7 @@ describe("I/O Schema and related helpers", () => {
       const inc = z.object({
         five: z.string(),
       });
-      const result = ensureSelectiveIntersection(current, inc);
+      const result = ensureExtension(current, inc);
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
     });

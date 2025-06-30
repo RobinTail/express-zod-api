@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`I/O Schema and related helpers > ensureSelectiveIntersection() > Should merge intersection object schemas 1`] = `
+exports[`I/O Schema and related helpers > ensureExtension() > Should merge intersection object schemas 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
@@ -80,7 +80,7 @@ exports[`I/O Schema and related helpers > ensureSelectiveIntersection() > Should
 }
 `;
 
-exports[`I/O Schema and related helpers > ensureSelectiveIntersection() > Should merge mixed object schemas 1`] = `
+exports[`I/O Schema and related helpers > ensureExtension() > Should merge mixed object schemas 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
@@ -152,7 +152,7 @@ exports[`I/O Schema and related helpers > ensureSelectiveIntersection() > Should
 }
 `;
 
-exports[`I/O Schema and related helpers > ensureSelectiveIntersection() > Should merge union object schemas 1`] = `
+exports[`I/O Schema and related helpers > ensureExtension() > Should merge union object schemas 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
@@ -244,7 +244,7 @@ exports[`I/O Schema and related helpers > ensureSelectiveIntersection() > Should
 }
 `;
 
-exports[`I/O Schema and related helpers > ensureSelectiveIntersection() > Zod Issue #600: can not intersect object schema with passthrough and transformation 1`] = `
+exports[`I/O Schema and related helpers > ensureExtension() > Zod Issue #600: can not intersect object schema with passthrough and transformation 1`] = `
 Error({
   "message": "Unmergable intersection. Error path: ["id"]",
 })
