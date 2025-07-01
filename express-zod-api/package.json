@@ -87,9 +87,9 @@
     }
   },
   "devDependencies": {
+    "@types/compression": "catalog:dev",
     "@types/cors": "^2.8.19",
     "@types/depd": "^1.1.37",
-    "@types/compression": "catalog:dev",
     "@types/express": "catalog:dev",
     "@types/express-fileupload": "catalog:dev",
     "@types/http-errors": "catalog:dev",
