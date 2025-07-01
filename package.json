@@ -12,6 +12,7 @@
     "test:esm": "pnpm -F esm-test test",
     "test:compat": "pnpm -F compat-test test",
     "test:952": "pnpm -F issue952-test test",
+    "test:migration": "pnpm -F migration test",
     "bench": "pnpm -F express-zod-api bench",
     "lint": "eslint && prettier *.md **/*.md --check",
     "mdfix": "prettier *.md **/*.md --write",
