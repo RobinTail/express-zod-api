@@ -10,6 +10,7 @@ onlyBuiltDependencies:
   - esbuild
 gitChecks: false
 engineStrict: true
+autoInstallPeers: false
 publicHoistPattern:
   - "@typescript-eslint/*" # used as an assumed transitive in migration
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
@@ -18,18 +19,16 @@ publicHoistPattern:
   - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
   - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting
 catalogs:
-  peer:
-    "@types/compression": "^1.7.5"
-    "@types/express": "^5.0.0"
-    "@types/express-fileupload": "^1.5.0"
-    "@types/http-errors": "^2.0.2"
+  dev:
+    "@types/compression": "^1.8.1"
+    "@types/express": "^5.0.3"
+    "@types/express-fileupload": "^1.5.1"
+    "@types/http-errors": "^2.0.5"
+    "@typescript-eslint/rule-tester": "^8.35.1"
     "compression": "^1.8.0"
     "express": "^5.1.0"
-    "express-fileupload": "^1.5.0"
+    "express-fileupload": "^1.5.1"
     "http-errors": "^2.0.0"
-    "typescript": "^5.1.3"
-    "zod": "^3.25.61"
-    "eslint": "^9.0.0"
-    "typescript-eslint": "^8.0.0"
-  dev:
-    "@typescript-eslint/rule-tester": "^8.35.1"
+    "typescript": "^5.8.3"
+    "typescript-eslint": "^8.35.1"
+    "zod": "^3.25.67"

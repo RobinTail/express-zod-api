@@ -11,15 +11,13 @@
     "pretest": "tsc --noEmit",
     "test": "vitest run index.spec.ts"
   },
-  "dependencies": {
-    "express-zod-api": "workspace:*",
-    "http-errors": "catalog:peer",
-    "swagger-ui-express": "^5.0.0",
-    "zod": "catalog:peer"
-  },
   "devDependencies": {
-    "@types/http-errors": "catalog:peer",
+    "@types/http-errors": "catalog:dev",
     "@types/swagger-ui-express": "^4.1.8",
-    "typescript": "catalog:peer"
+    "express-zod-api": "workspace:*",
+    "http-errors": "catalog:dev",
+    "swagger-ui-express": "^5.0.0",
+    "typescript": "catalog:dev",
+    "zod": "catalog:dev"
   }
 }
