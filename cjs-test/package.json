@@ -7,6 +7,6 @@
   },
   "dependencies": {
     "express-zod-api": "workspace:*",
-    "zod": "catalog:peer"
+    "zod": "catalog:dev"
   }
 }

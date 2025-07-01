@@ -10,6 +10,7 @@ onlyBuiltDependencies:
   - esbuild
 gitChecks: false
 engineStrict: true
+autoInstallPeers: false
 publicHoistPattern:
   - "@typescript-eslint/*" # used as an assumed transitive in migration
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
@@ -32,5 +33,16 @@ catalogs:
     "eslint": "^9.0.0"
     "typescript-eslint": "^8.0.0"
   dev:
-    "undici": "^6.19.8"
+    "typescript-eslint": "^8.35.1"
     "@typescript-eslint/rule-tester": "^8.35.1"
+    "@types/compression": "^1.8.1"
+    "@types/express": "^5.0.3"
+    "@types/express-fileupload": "^1.5.1"
+    "@types/http-errors": "^2.0.5"
+    "compression": "^1.8.0"
+    "http-errors": "^2.0.0"
+    "express": "^5.1.0"
+    "express-fileupload": "^1.5.1"
+    "typescript": "^5.8.3"
+    "zod": "^3.25.67"
+    "undici": "^6.19.8"
