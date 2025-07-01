@@ -51,6 +51,8 @@ jobs:
       run: pnpm test:compat
     - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
       run: pnpm test:952
+    - name: Migration test
+      run: pnpm test:migration
   report:
     needs: build
     runs-on: ubuntu-latest
