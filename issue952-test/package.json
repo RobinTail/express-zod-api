@@ -7,10 +7,10 @@
     "posttest": "rm *.d.ts"
   },
   "dependencies": {
-    "@types/express": "catalog:peer",
-    "@types/express-fileupload": "catalog:peer",
+    "@types/express": "catalog:dev",
+    "@types/express-fileupload": "catalog:dev",
     "express-zod-api": "workspace:*",
-    "typescript": "catalog:peer",
-    "zod": "catalog:peer"
+    "typescript": "catalog:dev",
+    "zod": "catalog:dev"
   }
 }

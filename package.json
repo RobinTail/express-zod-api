@@ -12,6 +12,7 @@
     "test:esm": "pnpm -F esm-test test",
     "test:compat": "pnpm -F compat-test test",
     "test:952": "pnpm -F issue952-test test",
+    "test:migration": "pnpm -F migration test",
     "bench": "pnpm -F express-zod-api bench",
     "lint": "eslint && prettier *.md **/*.md --check",
     "mdfix": "prettier *.md **/*.md --write",
@@ -31,7 +32,7 @@
     "prettier": "3.6.2",
     "tsup": "^8.5.0",
     "tsx": "^4.19.4",
-    "typescript-eslint": "^8.34.0",
+    "typescript-eslint": "catalog:dev",
     "vitest": "^3.2.3"
   },
   "resolutions": {

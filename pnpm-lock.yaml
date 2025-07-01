@@ -1,53 +1,49 @@
 lockfileVersion: '9.0'
 
 settings:
-  autoInstallPeers: true
+  autoInstallPeers: false
   excludeLinksFromLockfile: false
 
 catalogs:
   dev:
+    '@types/compression':
+      specifier: ^1.8.1
+      version: 1.8.1
+    '@types/express':
+      specifier: ^5.0.3
+      version: 5.0.3
+    '@types/express-fileupload':
+      specifier: ^1.5.1
+      version: 1.5.1
+    '@types/http-errors':
+      specifier: ^2.0.5
+      version: 2.0.5
     '@typescript-eslint/rule-tester':
       specifier: ^8.35.1
       version: 8.35.1
-    undici:
-      specifier: ^6.19.8
-      version: 6.21.3
-  peer:
-    '@types/compression':
-      specifier: ^1.7.5
-      version: 1.8.1
-    '@types/express':
-      specifier: ^5.0.0
-      version: 5.0.3
-    '@types/express-fileupload':
-      specifier: ^1.5.0
-      version: 1.5.1
-    '@types/http-errors':
-      specifier: ^2.0.2
-      version: 2.0.5
     compression:
       specifier: ^1.8.0
       version: 1.8.0
-    eslint:
-      specifier: ^9.0.0
-      version: 9.30.0
     express:
       specifier: ^5.1.0
       version: 5.1.0
     express-fileupload:
-      specifier: ^1.5.0
+      specifier: ^1.5.1
       version: 1.5.1
     http-errors:
       specifier: ^2.0.0
       version: 2.0.0
     typescript:
-      specifier: ^5.1.3
+      specifier: ^5.8.3
       version: 5.8.3
     typescript-eslint:
-      specifier: ^8.0.0
+      specifier: ^8.35.1
       version: 8.35.1
+    undici:
+      specifier: ^6.19.8
+      version: 6.21.3
     zod:
-      specifier: ^3.25.35
+      specifier: ^3.25.67
       version: 3.25.67
 
 overrides:
@@ -94,26 +90,29 @@ importers:
         specifier: ^4.19.4
         version: 4.20.3
       typescript-eslint:
-        specifier: ^8.34.0
+        specifier: catalog:dev
         version: 8.35.1(eslint@9.30.0)(typescript@5.8.3)
       vitest:
         specifier: ^3.2.3
         version: 3.2.4(@types/node@24.0.8)(tsx@4.20.3)(yaml@2.8.0)
 
   cjs-test:
-    dependencies:
+    devDependencies:
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
       zod:
-        specifier: catalog:peer
+        specifier: catalog:dev
         version: 3.25.67
 
   compat-test:
-    dependencies:
+    devDependencies:
       '@express-zod-api/migration':
         specifier: workspace:*
         version: link:../migration
+      eslint:
+        specifier: npm:eslint@9.0.0
+        version: 9.0.0
       express:
         specifier: npm:express@5.1.0
         version: 5.1.0
@@ -126,83 +125,54 @@ importers:
       typescript:
         specifier: npm:typescript@5.1.3
         version: 5.1.3
-      zod:
-        specifier: npm:zod@3.25.35
-        version: 3.25.35
-    devDependencies:
-      eslint:
-        specifier: npm:eslint@9.0.0
-        version: 9.0.0
       typescript-eslint:
         specifier: npm:typescript-eslint@8.0.0
         version: 8.0.0(eslint@9.0.0)(typescript@5.1.3)
+      zod:
+        specifier: npm:zod@3.25.35
+        version: 3.25.35
 
   esm-test:
-    dependencies:
+    devDependencies:
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
       zod:
-        specifier: catalog:peer
+        specifier: catalog:dev
         version: 3.25.67
 
   example:
-    dependencies:
-      express-zod-api:
-        specifier: workspace:*
-        version: link:../express-zod-api
-      http-errors:
-        specifier: catalog:peer
-        version: 2.0.0
-      swagger-ui-express:
-        specifier: ^5.0.0
-        version: 5.0.1(express@5.1.0)
-      zod:
-        specifier: catalog:peer
-        version: 3.25.67
     devDependencies:
       '@types/http-errors':
-        specifier: catalog:peer
+        specifier: catalog:dev
         version: 2.0.5
       '@types/swagger-ui-express':
         specifier: ^4.1.8
         version: 4.1.8
+      express-zod-api:
+        specifier: workspace:*
+        version: link:../express-zod-api
+      http-errors:
+        specifier: catalog:dev
+        version: 2.0.0
+      swagger-ui-express:
+        specifier: ^5.0.0
+        version: 5.0.1(express@5.1.0)
       typescript:
-        specifier: catalog:peer
+        specifier: catalog:dev
         version: 5.8.3
       undici:
         specifier: catalog:dev
         version: 6.21.3
+      zod:
+        specifier: catalog:dev
+        version: 3.25.67
 
   express-zod-api:
     dependencies:
-      '@types/compression':
-        specifier: catalog:peer
-        version: 1.8.1
-      '@types/express':
-        specifier: catalog:peer
-        version: 5.0.3
-      '@types/express-fileupload':
-        specifier: catalog:peer
-        version: 1.5.1
-      '@types/http-errors':
-        specifier: catalog:peer
-        version: 2.0.5
       ansis:
         specifier: ^4.1.0
         version: 4.1.0
-      compression:
-        specifier: catalog:peer
-        version: 1.8.0
-      express:
-        specifier: catalog:peer
-        version: 5.1.0
-      express-fileupload:
-        specifier: catalog:peer
-        version: 1.5.1
-      http-errors:
-        specifier: catalog:peer
-        version: 2.0.0
       node-mocks-http:
         specifier: ^1.17.2
         version: 1.17.2(@types/express@5.0.3)(@types/node@24.0.8)
@@ -212,19 +182,25 @@ importers:
       ramda:
         specifier: ^0.31.3
         version: 0.31.3
-      typescript:
-        specifier: catalog:peer
-        version: 5.8.3
-      zod:
-        specifier: catalog:peer
-        version: 3.25.67
     devDependencies:
+      '@types/compression':
+        specifier: catalog:dev
+        version: 1.8.1
       '@types/cors':
         specifier: ^2.8.19
         version: 2.8.19
       '@types/depd':
         specifier: ^1.1.37
         version: 1.1.37
+      '@types/express':
+        specifier: catalog:dev
+        version: 5.0.3
+      '@types/express-fileupload':
+        specifier: catalog:dev
+        version: 1.5.1
+      '@types/http-errors':
+        specifier: catalog:dev
+        version: 2.0.5
       '@types/node-forge':
         specifier: ^1.3.11
         version: 1.3.11
@@ -237,11 +213,23 @@ importers:
       camelize-ts:
         specifier: ^3.0.0
         version: 3.0.0
+      compression:
+        specifier: catalog:dev
+        version: 1.8.0
       cors:
         specifier: ^2.8.5
         version: 2.8.5
       depd:
         specifier: ^2.0.0
+        version: 2.0.0
+      express:
+        specifier: catalog:dev
+        version: 5.1.0
+      express-fileupload:
+        specifier: catalog:dev
+        version: 1.5.1
+      http-errors:
+        specifier: catalog:dev
         version: 2.0.0
       node-forge:
         specifier: ^1.3.1
@@ -252,36 +240,35 @@ importers:
       snakify-ts:
         specifier: ^2.3.0
         version: 2.3.0
+      typescript:
+        specifier: catalog:dev
+        version: 5.8.3
       undici:
         specifier: catalog:dev
         version: 6.21.3
+      zod:
+        specifier: catalog:dev
+        version: 3.25.67
 
   issue952-test:
     dependencies:
       '@types/express':
-        specifier: catalog:peer
+        specifier: catalog:dev
         version: 5.0.3
       '@types/express-fileupload':
-        specifier: catalog:peer
+        specifier: catalog:dev
         version: 1.5.1
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
       typescript:
-        specifier: catalog:peer
+        specifier: catalog:dev
         version: 5.8.3
       zod:
-        specifier: catalog:peer
+        specifier: catalog:dev
         version: 3.25.67
 
   migration:
-    dependencies:
-      eslint:
-        specifier: catalog:peer
-        version: 9.30.0
-      typescript-eslint:
-        specifier: catalog:peer
-        version: 8.35.1(eslint@9.30.0)(typescript@5.8.3)
     devDependencies:
       '@typescript-eslint/rule-tester':
         specifier: catalog:dev
