@@ -251,7 +251,7 @@ importers:
         version: 3.25.67
 
   issue952-test:
-    devDependencies:
+    dependencies:
       '@types/express':
         specifier: catalog:dev
         version: 5.0.3
