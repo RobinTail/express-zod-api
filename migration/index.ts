@@ -1,20 +1,25 @@
 import {
   ESLintUtils,
-  /*AST_NODE_TYPES as NT,*/
+  AST_NODE_TYPES as NT,
   type TSESLint,
-  /*type TSESTree,*/
+  type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
 
 /*
 type NamedProp = TSESTree.PropertyNonComputedName & {
   key: TSESTree.Identifier;
 };
+*/
 
-interface Queries {}
+interface Queries {
+  zod: TSESTree.ImportDeclaration;
+}
 
 type Listener = keyof Queries;
 
-const queries: Record<Listener, string> = {};
+const queries: Record<Listener, string> = {
+  zod: `${NT.ImportDeclaration}[source.value='zod']`,
+};
 
 const listen = <
   S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
@@ -29,6 +34,7 @@ const listen = <
     {},
   );
 
+/*
 const rangeWithComma = (
   node: TSESTree.Node,
   ctx: TSESLint.RuleContext<string, unknown[]>,
@@ -45,7 +51,8 @@ const propRemover =
       messageId: "remove",
       data: { subject: node.key.name },
       fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
-    });*/
+    });
+*/
 
 const v25 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
@@ -60,7 +67,16 @@ const v25 = ESLintUtils.RuleCreator.withoutDocs({
     },
   },
   defaultOptions: [],
-  create: (/*ctx*/) => ({}), // listen({}),
+  create: (ctx) =>
+    listen({
+      zod: (node) =>
+        ctx.report({
+          node: node.source,
+          messageId: "change",
+          data: { subject: "import", from: "zod", to: "zod/v4" },
+          fix: (fixer) => fixer.replaceText(node.source, `"zod/v4"`),
+        }),
+    }),
 });
 
 export default {

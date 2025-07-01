@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "pretest": "echo 'const sample = {};' > sample.ts",
+    "pretest": "echo 'import {} from \"zod\";' > sample.ts",
     "test": "eslint --fix && vitest --run",
     "posttest": "rm sample.ts"
   },

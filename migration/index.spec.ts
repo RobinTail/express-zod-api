@@ -18,7 +18,18 @@ describe("Migration", () => {
   });
 
   tester.run("v24", migration.rules.v25, {
-    valid: [`import {} from "express-zod-api";`],
-    invalid: [],
+    valid: [`import {} from "zod/v4";`],
+    invalid: [
+      {
+        code: `import {} from "zod";`,
+        output: `import {} from "zod/v4";`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "import", from: "zod", to: "zod/v4" },
+          },
+        ],
+      },
+    ],
   });
 });
