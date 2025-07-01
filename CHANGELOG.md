@@ -2,6 +2,10 @@
 
 ## Version 24
 
+### v24.5.0
+
+- `openapi3-ts` version is `^4.5.0`.
+
 ### v24.4.3
 
 - Externalized the code responsible for the Zod plugin's method `z.object().remap()`:

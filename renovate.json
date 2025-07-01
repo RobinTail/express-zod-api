@@ -6,7 +6,7 @@
   "ignorePaths": ["**/compat-test/**"],
   "packageRules": [
     {
-      "groupName": "TypeScript-ESLint and its rule tester (used by migration)",
+      "groupName": "TypeScript-ESLint and its rule tester",
       "matchPackageNames": ["typescript-eslint", "@typescript-eslint/*"]
     },
     {
