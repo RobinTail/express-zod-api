@@ -6,7 +6,7 @@
     "test": "tsc -p tsconfig.json",
     "posttest": "rm *.d.ts"
   },
-  "dependencies": {
+  "devDependencies": {
     "@types/express": "catalog:dev",
     "@types/express-fileupload": "catalog:dev",
     "express-zod-api": "workspace:*",

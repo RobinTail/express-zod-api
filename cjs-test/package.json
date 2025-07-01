@@ -5,7 +5,7 @@
   "scripts": {
     "test": "vitest run --globals"
   },
-  "dependencies": {
+  "devDependencies": {
     "express-zod-api": "workspace:*",
     "zod": "catalog:dev"
   }
