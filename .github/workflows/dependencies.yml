@@ -25,8 +25,8 @@ jobs:
           cache: pnpm
 
       - name: Upgrade dependencies
-        # except the compat-test
-        run: pnpm -F "\!compat-test" up
+        # recursive, except the compat-test
+        run: pnpm -F '\!compat-test' up
 
       - name: Branch name
         id: create-branch
