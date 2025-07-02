@@ -35,8 +35,5 @@
     "typescript-eslint": "catalog:dev",
     "vitest": "^3.2.3"
   },
-  "resolutions": {
-    "@scarf/scarf": "npm:empty-npm-package@1.0.0"
-  },
   "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184"
 }
