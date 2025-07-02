@@ -33,3 +33,6 @@ catalogs:
     "typescript-eslint": "^8.35.1"
     "undici": "^6.19.8"
     "zod": "^3.25.67"
+overrides:
+  "@scarf/scarf": "npm:empty-npm-package@1.0.0"
+  "vite": "^6" # @todo remove in v25

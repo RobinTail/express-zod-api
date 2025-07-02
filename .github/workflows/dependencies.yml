@@ -24,11 +24,9 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - name: Remove lock
-        run: rm pnpm-lock.yaml
-
-      - name: Install dependencies
-        run: pnpm install
+      - name: Upgrade dependencies
+        # recursive, except the compat-test
+        run: pnpm -F '\!compat-test' up
 
       - name: Branch name
         id: create-branch
