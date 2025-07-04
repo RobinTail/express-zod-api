@@ -202,9 +202,7 @@ export const makePublicLiteralType = (
   name: ts.Identifier | string,
   literals: string[],
 ) =>
-  makeType(name, f.createUnionTypeNode(R.map(makeLiteralType, literals)), {
-    expose: true,
-  });
+  makeType(name, makeUnion(R.map(makeLiteralType, literals)), { expose: true });
 
 export const makeType = (
   name: ts.Identifier | string,
@@ -379,7 +377,7 @@ export const makeIndexed = (subject: Typeable, index: Typeable) =>
   f.createIndexedAccessTypeNode(ensureTypeNode(subject), ensureTypeNode(index));
 
 export const makeMaybeAsync = (subj: Typeable) =>
-  f.createUnionTypeNode([ensureTypeNode(subj), makePromise(subj)]);
+  makeUnion([ensureTypeNode(subj), makePromise(subj)]);
 
 export const makeFnType = (
   params: Parameters<typeof makeParams>[0],
@@ -417,5 +415,6 @@ const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.UnknownKeyword,
   ts.SyntaxKind.VoidKeyword,
 ];
-export const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
+
+const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
   (primitives as ts.SyntaxKind[]).includes(node.kind);
