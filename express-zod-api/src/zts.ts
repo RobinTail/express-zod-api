@@ -69,7 +69,7 @@ const onLiteral: Producer = ({ _zod: { def } }: $ZodLiteral) => {
       ? ensureTypeNode(ts.SyntaxKind.UndefinedKeyword)
       : makeLiteralType(entry),
   );
-  return values.length === 1 ? values[0] : f.createUnionTypeNode(values);
+  return values.length === 1 ? values[0] : makeUnion(values);
 };
 
 const onTemplateLiteral: Producer = (
@@ -131,7 +131,7 @@ const onArray: Producer = ({ _zod: { def } }: $ZodArray, { next }) =>
   f.createArrayTypeNode(next(def.element));
 
 const onEnum: Producer = ({ _zod: { def } }: $ZodEnum) =>
-  f.createUnionTypeNode(Object.values(def.entries).map(makeLiteralType));
+  makeUnion(Object.values(def.entries).map(makeLiteralType));
 
 const onSomeUnion: Producer = (
   { _zod: { def } }: $ZodUnion | $ZodDiscriminatedUnion,
@@ -142,7 +142,7 @@ const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];
 
 const onNullable: Producer = ({ _zod: { def } }: $ZodNullable, { next }) =>
-  f.createUnionTypeNode([next(def.innerType), makeLiteralType(null)]);
+  makeUnion([next(def.innerType), makeLiteralType(null)]);
 
 const onTuple: Producer = ({ _zod: { def } }: $ZodTuple, { next }) =>
   f.createTupleTypeNode(
