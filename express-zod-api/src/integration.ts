@@ -12,6 +12,7 @@ import {
   ensureTypeNode,
   makeIndexed,
   makeLiteralType,
+  makeUnion,
 } from "./typescript-api";
 import { makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
@@ -131,7 +132,7 @@ export class Integration extends IntegrationBase {
         input: ensureTypeNode(input.name),
         positive: this.someOf(dictionaries.positive),
         negative: this.someOf(dictionaries.negative),
-        response: f.createUnionTypeNode([
+        response: makeUnion([
           makeIndexed(this.interfaces.positive, literalIdx),
           makeIndexed(this.interfaces.negative, literalIdx),
         ]),
