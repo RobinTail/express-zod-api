@@ -133,6 +133,14 @@ export const recordStringAny = ensureTypeNode("Record", [
   ts.SyntaxKind.AnyKeyword,
 ]);
 
+/** ensures distinct union (unique primitives) */
+export const makeUnion = (entries: ts.TypeNode[]) => {
+  const nodes = new Map<ts.TypeNode | ts.KeywordTypeSyntaxKind, ts.TypeNode>();
+  for (const entry of entries)
+    nodes.set(isPrimitive(entry) ? entry.kind : entry, entry);
+  return f.createUnionTypeNode(Array.from(nodes.values()));
+};
+
 export const makeInterfaceProp = (
   name: string | number,
   value: Typeable,
@@ -148,10 +156,7 @@ export const makeInterfaceProp = (
     makePropertyIdentifier(name),
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     isOptional
-      ? f.createUnionTypeNode([
-          propType,
-          ensureTypeNode(ts.SyntaxKind.UndefinedKeyword),
-        ])
+      ? makeUnion([propType, ensureTypeNode(ts.SyntaxKind.UndefinedKeyword)])
       : propType,
   );
   const jsdoc = R.reject(R.isNil, [

@@ -33,9 +33,9 @@ import { ezRawBrand, RawSchema } from "./raw-schema";
 import { FirstPartyKind, HandlingRules, walkSchema } from "./schema-walker";
 import {
   ensureTypeNode,
-  isPrimitive,
   makeInterfaceProp,
   makeLiteralType,
+  makeUnion,
 } from "./typescript-api";
 import { Producer, ZTSContext } from "./zts-helpers";
 
@@ -136,14 +136,7 @@ const onEnum: Producer = ({ _zod: { def } }: $ZodEnum) =>
 const onSomeUnion: Producer = (
   { _zod: { def } }: $ZodUnion | $ZodDiscriminatedUnion,
   { next },
-) => {
-  const nodes = new Map<ts.TypeNode | ts.KeywordTypeSyntaxKind, ts.TypeNode>();
-  for (const option of def.options) {
-    const node = next(option);
-    nodes.set(isPrimitive(node) ? node.kind : node, node);
-  }
-  return f.createUnionTypeNode(Array.from(nodes.values()));
-};
+) => makeUnion(def.options.map(next));
 
 const makeSample = (produced: ts.TypeNode) =>
   samples?.[produced.kind as keyof typeof samples];

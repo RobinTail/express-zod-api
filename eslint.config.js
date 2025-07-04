@@ -160,6 +160,10 @@ const tsFactoryConcerns = [
       "Identifier[name=/^create(NumericLiteral|StringLiteral|True|False|Null)$/]",
     message: "use literally() helper",
   },
+  {
+    selector: "Identifier[name='createUnionTypeNode']",
+    message: "use makeUnion() helper",
+  },
 ];
 
 export default tsPlugin.config(
