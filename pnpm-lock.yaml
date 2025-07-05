@@ -29,7 +29,7 @@ catalogs:
       version: 5.1.0
     express-fileupload:
       specifier: ^1.5.1
-      version: 1.5.1
+      version: 1.5.2
     http-errors:
       specifier: ^2.0.0
       version: 2.0.0
@@ -228,7 +228,7 @@ importers:
         version: 5.1.0
       express-fileupload:
         specifier: catalog:dev
-        version: 1.5.1
+        version: 1.5.2
       http-errors:
         specifier: catalog:dev
         version: 2.0.0
@@ -1329,8 +1329,8 @@ packages:
     resolution: {integrity: sha512-/kP8CAwxzLVEeFrMm4kMmy4CCDlpipyA7MYLVrdJIkV0fYF0UaigQHRsxHiuY/GEea+bh4KSv3TIlgr+2UL6bw==}
     engines: {node: '>=12.0.0'}
 
-  express-fileupload@1.5.1:
-    resolution: {integrity: sha512-LsYG1ALXEB7vlmjuSw8ABeOctMp8a31aUC5ZF55zuz7O2jLFnmJYrCv10py357ky48aEoBQ/9bVXgFynjvaPmA==}
+  express-fileupload@1.5.2:
+    resolution: {integrity: sha512-wxUJn2vTHvj/kZCVmc5/bJO15C7aSMyHeuXYY3geKpeKibaAoQGcEv5+sM6nHS2T7VF+QHS4hTWPiY2mKofEdg==}
     engines: {node: '>=12.0.0'}
 
   express@5.1.0:
@@ -3472,7 +3472,7 @@ snapshots:
 
   expect-type@1.2.1: {}
 
-  express-fileupload@1.5.1:
+  express-fileupload@1.5.2:
     dependencies:
       busboy: 1.6.0
 
