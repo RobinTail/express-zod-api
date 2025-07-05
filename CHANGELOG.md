@@ -13,7 +13,8 @@
 
 ### v24.5.0
 
-- `openapi3-ts` version is `^4.5.0`.
+- `openapi3-ts` version is `^4.5.0`;
+- Compatibility adjustment for Zod 3.25.72.
 
 ### v24.4.3
 
