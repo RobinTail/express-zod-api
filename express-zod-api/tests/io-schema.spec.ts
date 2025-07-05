@@ -1,7 +1,6 @@
 import { z } from "zod/v4";
-import { IOSchema, Middleware, ez } from "../src";
-import { getFinalEndpointInputSchema } from "../src/io-schema";
-import { AbstractMiddleware } from "../src/middleware";
+import { IOSchema, ez } from "../src";
+import { makeFinalInputSchema, ensureExtension } from "../src/io-schema";
 
 describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {
@@ -130,82 +129,62 @@ describe("I/O Schema and related helpers", () => {
     });
   });
 
-  describe("getFinalEndpointInputSchema()", () => {
-    test("Should handle no middlewares", () => {
-      const middlewares: AbstractMiddleware[] = [];
-      const endpointInput = z.object({
+  describe("makeFinalInputSchema()", () => {
+    test("Should handle no factory schema", () => {
+      const buildSchema = z.object({
         four: z.boolean(),
       });
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
-      expect(result).toBeInstanceOf(z.ZodObject);
-      expect(result).toMatchSnapshot();
+      const result = makeFinalInputSchema(undefined, buildSchema);
+      expect(result).toEqual(buildSchema);
     });
 
     test("Should merge input object schemas", () => {
-      const middlewares: AbstractMiddleware[] = [
-        new Middleware({
-          input: z.object({ one: z.string() }),
-          handler: vi.fn(),
-        }),
-        new Middleware({
-          input: z.object({ two: z.number() }),
-          handler: vi.fn(),
-        }),
-        new Middleware({
-          input: z.object({ three: z.null() }),
-          handler: vi.fn(),
-        }),
-      ];
-      const endpointInput = z.object({
+      const factorySchema = z
+        .object({ one: z.string() })
+        .and(z.object({ two: z.number() }))
+        .and(z.object({ three: z.null() }));
+      const buildSchema = z.object({
         four: z.boolean(),
       });
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      const result = makeFinalInputSchema(factorySchema, buildSchema);
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
     });
+  });
+
+  describe("ensureExtension()", () => {
+    test.each([
+      [undefined, z.object({})],
+      [z.object({}), undefined],
+      [undefined, undefined],
+    ])("should handle one or both undefined", (current, inc) => {
+      expect(ensureExtension(current, inc)).toEqual(current || inc);
+    });
 
     test("Should merge union object schemas", () => {
-      const middlewares: AbstractMiddleware[] = [
-        new Middleware({
-          input: z
-            .object({ one: z.string() })
-            .or(z.object({ two: z.number() })),
-          handler: vi.fn(),
-        }),
-        new Middleware({
-          input: z
-            .object({ three: z.null() })
-            .or(z.object({ four: z.boolean() })),
-          handler: vi.fn(),
-        }),
-      ];
-      const endpointInput = z
+      const current = z
+        .object({ one: z.string() })
+        .or(z.object({ two: z.number() }))
+        .and(z.object({ three: z.null() }).or(z.object({ four: z.boolean() })));
+      const inc = z
         .object({ five: z.string() })
         .or(z.object({ six: z.number() }));
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      const result = ensureExtension(current, inc);
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
     });
 
     test("Should merge intersection object schemas", () => {
-      const middlewares: AbstractMiddleware[] = [
-        new Middleware({
-          input: z
-            .object({ one: z.string() })
-            .and(z.object({ two: z.number() })),
-          handler: vi.fn(),
-        }),
-        new Middleware({
-          input: z
-            .object({ three: z.null() })
-            .and(z.object({ four: z.boolean() })),
-          handler: vi.fn(),
-        }),
-      ];
-      const endpointInput = z
+      const current = z
+        .object({ one: z.string() })
+        .and(z.object({ two: z.number() }))
+        .and(
+          z.object({ three: z.null() }).and(z.object({ four: z.boolean() })),
+        );
+      const inc = z
         .object({ five: z.string() })
         .and(z.object({ six: z.number() }));
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      const result = ensureExtension(current, inc);
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
     });
@@ -222,24 +201,14 @@ describe("I/O Schema and related helpers", () => {
     });
 
     test("Should merge mixed object schemas", () => {
-      const middlewares: AbstractMiddleware[] = [
-        new Middleware({
-          input: z
-            .object({ one: z.string() })
-            .and(z.object({ two: z.number() })),
-          handler: vi.fn(),
-        }),
-        new Middleware({
-          input: z
-            .object({ three: z.null() })
-            .or(z.object({ four: z.boolean() })),
-          handler: vi.fn(),
-        }),
-      ];
-      const endpointInput = z.object({
+      const current = z
+        .object({ one: z.string() })
+        .and(z.object({ two: z.number() }))
+        .and(z.object({ three: z.null() }).or(z.object({ four: z.boolean() })));
+      const inc = z.object({
         five: z.string(),
       });
-      const result = getFinalEndpointInputSchema(middlewares, endpointInput);
+      const result = ensureExtension(current, inc);
       expect(result).toBeInstanceOf(z.ZodIntersection);
       expect(result).toMatchSnapshot();
     });
