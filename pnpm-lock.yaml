@@ -41,7 +41,7 @@ catalogs:
       version: 8.35.1
     zod:
       specifier: ^3.25.67
-      version: 3.25.74
+      version: 3.25.75
 
 overrides:
   '@scarf/scarf': npm:empty-npm-package@1.0.0
@@ -100,7 +100,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 3.25.74
+        version: 3.25.75
 
   compat-test:
     devDependencies:
@@ -136,7 +136,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 3.25.74
+        version: 3.25.75
 
   example:
     devDependencies:
@@ -160,7 +160,7 @@ importers:
         version: 5.8.3
       zod:
         specifier: catalog:dev
-        version: 3.25.74
+        version: 3.25.75
 
   express-zod-api:
     dependencies:
@@ -242,7 +242,7 @@ importers:
         version: 7.11.0
       zod:
         specifier: catalog:dev
-        version: 3.25.74
+        version: 3.25.75
 
   issue952-test:
     dependencies:
@@ -260,7 +260,7 @@ importers:
         version: 5.8.3
       zod:
         specifier: catalog:dev
-        version: 3.25.74
+        version: 3.25.75
 
   migration:
     devDependencies:
@@ -2375,8 +2375,8 @@ packages:
   zod@3.25.61:
     resolution: {integrity: sha512-fzfJgUw78LTNnHujj9re1Ov/JJQkRZZGDMcYqSx7Hp4rPOkKywaFHq0S6GoHeXs0wGNE/sIOutkXgnwzrVOGCQ==}
 
-  zod@3.25.74:
-    resolution: {integrity: sha512-J8poo92VuhKjNknViHRAIuuN6li/EwFbAC8OedzI8uxpEPGiXHGQu9wemIAioIpqgfB4SySaJhdk0mH5Y4ICBg==}
+  zod@3.25.75:
+    resolution: {integrity: sha512-OhpzAmVzabPOL6C3A3gpAifqr9MqihV/Msx3gor2b2kviCgcb+HM9SEOpMWwwNp9MRunWnhtAKUoo0AHhjyPPg==}
 
 snapshots:
 
@@ -4503,4 +4503,4 @@ snapshots:
 
   zod@3.25.61: {}
 
-  zod@3.25.74: {}
+  zod@3.25.75: {}
