@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { IOSchema, ez } from "../src";
 import { makeFinalInputSchema, ensureExtension } from "../src/io-schema";
 

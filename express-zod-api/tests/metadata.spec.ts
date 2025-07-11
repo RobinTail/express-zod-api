@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { $ZodType, GlobalMeta } from "zod/v4/core";
 import { getBrand, getExamples } from "../src/metadata";
 

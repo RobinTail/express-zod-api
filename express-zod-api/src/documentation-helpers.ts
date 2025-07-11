@@ -24,7 +24,7 @@ import {
   TagObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
 import {

@@ -1,6 +1,6 @@
 import type { $ZodType, JSONSchema } from "zod/v4/core";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { ezBufferBrand } from "./buffer-schema";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";

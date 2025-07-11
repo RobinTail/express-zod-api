@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { $ZodShape } from "zod/v4/core";
 
 export const ezFormBrand = Symbol("Form");

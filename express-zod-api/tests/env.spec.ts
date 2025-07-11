@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 describe("Environment checks", () => {
   describe("Zod Dates", () => {

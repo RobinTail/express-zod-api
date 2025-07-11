@@ -1,6 +1,6 @@
 import { Request } from "express";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { $ZodTransform, $ZodType } from "zod/v4/core";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";

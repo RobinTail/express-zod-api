@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { defaultEndpointsFactory, ez } from "express-zod-api";
 
 export const rawAcceptingEndpoint = defaultEndpointsFactory.build({

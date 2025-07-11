@@ -11,7 +11,7 @@ import {
   EmptySchema,
   EmptyObject,
 } from "../src/common-helpers";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { makeRequestMock } from "../src/testing";
 
 describe("Common Helpers", () => {

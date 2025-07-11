@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { ezDateInBrand } from "../src/date-in-schema";
 import { ez } from "../src";
 import { getBrand } from "../src/metadata";
