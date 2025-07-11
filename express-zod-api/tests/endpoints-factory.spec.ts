@@ -10,7 +10,7 @@ import {
 } from "../src";
 import { EmptyObject } from "../src/common-helpers";
 import { Endpoint } from "../src/endpoint";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 describe("EndpointsFactory", () => {
   const resultHandlerMock = new ResultHandler({

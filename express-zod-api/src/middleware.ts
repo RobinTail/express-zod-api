@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { emptySchema, FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";

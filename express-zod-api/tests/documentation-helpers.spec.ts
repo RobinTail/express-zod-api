@@ -1,7 +1,7 @@
 import type { JSONSchema } from "zod/v4/core";
 import { SchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { ez } from "../src";
 import {
   OpenAPIContext,
