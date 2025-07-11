@@ -4,6 +4,8 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 type NamedProp = TSESTree.PropertyNonComputedName & {
   key: TSESTree.Identifier;
@@ -124,13 +126,28 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
           data: { subject: "statement", from: "next()", to: "jsonSchema" },
           fix: (fixer) => fixer.replaceText(node, "jsonSchema"),
         }),
-      zod: (node) =>
+      zod: (node) => {
+        try {
+          const path = fileURLToPath(
+            new URL("zod/package.json", import.meta.url),
+          );
+          const pkgJson: unknown = JSON.parse(readFileSync(path, "utf8"));
+          if (
+            typeof pkgJson === "object" &&
+            pkgJson !== null &&
+            "version" in pkgJson &&
+            typeof pkgJson.version === "string" &&
+            pkgJson.version.startsWith("4.")
+          )
+            return;
+        } catch {}
         ctx.report({
           node: node.source,
           messageId: "change",
           data: { subject: "import", from: "zod", to: "zod/v4" },
           fix: (fixer) => fixer.replaceText(node.source, `"zod/v4"`),
-        }),
+        });
+      },
       ezFile: (node) => {
         const [variant] = node.arguments;
         const replacement =
