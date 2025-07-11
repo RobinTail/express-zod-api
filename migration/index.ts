@@ -70,6 +70,20 @@ const propRemover =
       fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
     });
 
+const getZodVersion = () => {
+  try {
+    const path = fileURLToPath(new URL("zod/package.json", import.meta.url));
+    const pkgJson: unknown = JSON.parse(readFileSync(path, "utf8"));
+    if (
+      typeof pkgJson === "object" &&
+      pkgJson !== null &&
+      "version" in pkgJson &&
+      typeof pkgJson.version === "string"
+    )
+      return pkgJson.version;
+  } catch {}
+};
+
 const v24 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
@@ -127,20 +141,7 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
           fix: (fixer) => fixer.replaceText(node, "jsonSchema"),
         }),
       zod: (node) => {
-        try {
-          const path = fileURLToPath(
-            new URL("zod/package.json", import.meta.url),
-          );
-          const pkgJson: unknown = JSON.parse(readFileSync(path, "utf8"));
-          if (
-            typeof pkgJson === "object" &&
-            pkgJson !== null &&
-            "version" in pkgJson &&
-            typeof pkgJson.version === "string" &&
-            pkgJson.version.startsWith("4.")
-          )
-            return;
-        } catch {}
+        if (getZodVersion()?.startsWith("4.")) return;
         ctx.report({
           node: node.source,
           messageId: "change",
