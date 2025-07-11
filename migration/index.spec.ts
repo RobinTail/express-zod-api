@@ -18,15 +18,15 @@ describe("Migration", () => {
   });
 
   tester.run("v24", migration.rules.v25, {
-    valid: [`import {} from "zod/v4";`],
+    valid: [`import {} from "zod";`],
     invalid: [
       {
-        code: `import {} from "zod";`,
-        output: `import {} from "zod/v4";`,
+        code: `import {} from "zod/v4";`,
+        output: `import {} from "zod";`,
         errors: [
           {
             messageId: "change",
-            data: { subject: "import", from: "zod", to: "zod/v4" },
+            data: { subject: "import", from: "zod/v4", to: "zod" },
           },
         ],
       },
