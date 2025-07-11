@@ -5,11 +5,18 @@
 ### v25.0.0
 
 - Supported Node.js versions: `^20.19.0 || ^22.12.0 || ^24.0.0`;
-- Supported `zod` version: `^3.25.61` (imports still must be from `zod/v4`);
+- Supported `zod` version: `^4.0.0`;
 - Changes to the `Middleware` class:
   - When the `input` schema is not defined, the `input` argument of the `handler` method is now `unknown`;
 
 ## Version 24
+
+### v24.6.0
+
+- Supporting `zod` versions `^3.25.35 || ^4.0.0`:
+  - If you use `zod@^4.0.0` then `import { z } from "zod"`;
+  - If you use `zod@^3.25.35` then keep `import { z } from "zod/v4"`;
+  - For more details, see the [Explanation of the versioning strategy](https://github.com/colinhacks/zod/issues/4371).
 
 ### v24.5.0
 

@@ -18,7 +18,7 @@ interface Queries {
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  zod: `${NT.ImportDeclaration}[source.value='zod']`,
+  zod: `${NT.ImportDeclaration}[source.value='zod/v4']`,
 };
 
 const listen = <
@@ -73,8 +73,8 @@ const v25 = ESLintUtils.RuleCreator.withoutDocs({
         ctx.report({
           node: node.source,
           messageId: "change",
-          data: { subject: "import", from: "zod", to: "zod/v4" },
-          fix: (fixer) => fixer.replaceText(node.source, `"zod/v4"`),
+          data: { subject: "import", from: "zod/v4", to: "zod" },
+          fix: (fixer) => fixer.replaceText(node.source, `"zod"`),
         }),
     }),
 });
