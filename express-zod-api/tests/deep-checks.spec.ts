@@ -1,5 +1,5 @@
 import { UploadedFile } from "express-fileupload";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { $brand, $ZodType } from "zod/v4/core";
 import { ez } from "../src";
 import { findNestedSchema, hasCycle } from "../src/deep-checks";

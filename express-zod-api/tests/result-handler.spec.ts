@@ -1,6 +1,6 @@
 import { Response } from "express";
 import createHttpError from "http-errors";
-import { z } from "zod/v4";
+import { z } from "zod";
 import {
   InputValidationError,
   arrayResultHandler,

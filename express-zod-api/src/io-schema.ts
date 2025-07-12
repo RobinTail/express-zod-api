@@ -1,34 +1,47 @@
-import * as R from "ramda";
-import { z } from "zod/v4";
-import { AbstractMiddleware } from "./middleware";
+import { z } from "zod";
 
 type Base = object & { [Symbol.iterator]?: never };
 
 /** @desc The type allowed on the top level of Middlewares and Endpoints */
 export type IOSchema = z.ZodType<Base>;
 
-export type ConditionalIntersection<
+/** EndpointsFactory schema extended type when adding a Middleware */
+export type Extension<
   Current extends IOSchema | undefined,
-  Inc extends IOSchema,
-> = z.ZodIntersection<Current extends IOSchema ? Current : Inc, Inc>;
+  Inc extends IOSchema | undefined,
+> = Current extends IOSchema
+  ? Inc extends IOSchema
+    ? z.ZodIntersection<Current, Inc>
+    : Current
+  : Inc;
 
-/**
- * @description intersects input schemas of middlewares and the endpoint
- * @since 07.03.2022 former combineEndpointAndMiddlewareInputSchemas()
- * @since 05.03.2023 is immutable to metadata
- * @since 26.05.2024 uses the regular ZodIntersection
- * @since 22.05.2025 does not mix examples in after switching to Zod 4
- */
-export const getFinalEndpointInputSchema = <
-  MIN extends IOSchema | undefined,
-  IN extends IOSchema,
+/** Makes a schema for EndpointsFactory extended with a Middleware */
+export const ensureExtension = <
+  Current extends IOSchema | undefined,
+  Inc extends IOSchema | undefined,
 >(
-  middlewares: AbstractMiddleware[],
-  input: IN,
+  current: Current,
+  inc: Inc,
 ) =>
-  R.pluck("schema", middlewares)
-    .concat(input)
-    .reduce((acc, schema) => acc.and(schema)) as ConditionalIntersection<
-    MIN,
-    IN
+  (current && inc ? current.and(inc) : current || inc) as Extension<
+    Current,
+    Inc
   >;
+
+/** The Endpoint input schema type, condition wrapped into schema to make it z.output-compatible */
+export type FinalInputSchema<
+  FIN extends IOSchema | undefined,
+  BIN extends IOSchema,
+> = z.ZodIntersection<FIN extends IOSchema ? FIN : BIN, BIN>;
+
+/** Makes the Endpoint input schema */
+export const makeFinalInputSchema = <
+  FIN extends IOSchema | undefined,
+  BIN extends IOSchema,
+>(
+  factorySchema: FIN,
+  buildSchema: BIN,
+) =>
+  (factorySchema
+    ? factorySchema.and(buildSchema)
+    : buildSchema) as FinalInputSchema<FIN, BIN>;

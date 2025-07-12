@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { z } from "zod/v4";
+import { z } from "zod";
 import {
   EndpointsFactory,
   Integration,

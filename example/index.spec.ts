@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { EventSource } from "undici";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
 import { Client, Subscription } from "./example.client";
@@ -18,19 +17,10 @@ describe("Example", async () => {
   const port = givePort("example");
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
 
-  beforeAll(() => {
-    /**
-     * @todo when min Node v22.3.0 and 20.18.0, can use the --experimental-eventsource flag and remove undici
-     * @todo later, revisit when unflagged https://nodejs.org/docs/v24.0.0/api/globals.html#eventsource
-     */
-    vi.stubGlobal("EventSource", EventSource);
-  });
-
   afterAll(async () => {
     example.stdout.removeListener("data", listener);
     example.kill();
     await vi.waitFor(() => assert(example.killed), { timeout: 1e4 });
-    vi.unstubAllGlobals();
   });
 
   afterEach(() => {

@@ -4,7 +4,7 @@ import {
   staticHandler,
   staticMock,
 } from "./express-mock";
-import { z } from "zod/v4";
+import { z } from "zod";
 import {
   DependsOnMethod,
   EndpointsFactory,

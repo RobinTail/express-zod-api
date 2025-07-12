@@ -2,7 +2,7 @@ import cors from "cors";
 import depd from "depd";
 import express from "express";
 import { readFile } from "node:fs/promises";
-import { z } from "zod/v4";
+import { z } from "zod";
 import {
   EndpointsFactory,
   Method,

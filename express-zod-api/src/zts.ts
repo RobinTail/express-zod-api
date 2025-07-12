@@ -22,7 +22,7 @@ import type {
 } from "zod/v4/core";
 import * as R from "ramda";
 import ts from "typescript";
-import { globalRegistry, z } from "zod/v4";
+import { globalRegistry, z } from "zod";
 import { ezBufferBrand } from "./buffer-schema";
 import { getTransformedType, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";

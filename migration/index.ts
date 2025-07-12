@@ -4,39 +4,21 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 
+/*
 type NamedProp = TSESTree.PropertyNonComputedName & {
   key: TSESTree.Identifier;
 };
+*/
 
 interface Queries {
-  numericRange: NamedProp;
-  optionalPropStyle: NamedProp;
-  depicter: TSESTree.ArrowFunctionExpression;
-  nextCall: TSESTree.CallExpression;
   zod: TSESTree.ImportDeclaration;
-  ezFile: TSESTree.CallExpression & { arguments: [TSESTree.Literal] };
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  numericRange:
-    `${NT.NewExpression}[callee.name='Documentation'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='numericRange']`,
-  optionalPropStyle:
-    `${NT.NewExpression}[callee.name='Integration'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='optionalPropStyle']`,
-  depicter:
-    `${NT.VariableDeclarator}[id.typeAnnotation.typeAnnotation.typeName.name='Depicter'] > ` +
-    `${NT.ArrowFunctionExpression}`,
-  nextCall:
-    `${NT.VariableDeclarator}[id.typeAnnotation.typeAnnotation.typeName.name='Depicter'] > ` +
-    `${NT.ArrowFunctionExpression} ${NT.CallExpression}[callee.name='next']`,
-  zod: `${NT.ImportDeclaration}[source.value='zod']`,
-  ezFile: `${NT.CallExpression}[arguments.0.type='${NT.Literal}']:has( ${NT.MemberExpression}[object.name='ez'][property.name='file'] )`,
+  zod: `${NT.ImportDeclaration}[source.value='zod/v4']`,
 };
 
 const listen = <
@@ -52,6 +34,7 @@ const listen = <
     {},
   );
 
+/*
 const rangeWithComma = (
   node: TSESTree.Node,
   ctx: TSESLint.RuleContext<string, unknown[]>,
@@ -69,22 +52,9 @@ const propRemover =
       data: { subject: node.key.name },
       fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
     });
+*/
 
-const getZodVersion = () => {
-  try {
-    const path = fileURLToPath(new URL("zod/package.json", import.meta.url));
-    const pkgJson: unknown = JSON.parse(readFileSync(path, "utf8"));
-    if (
-      typeof pkgJson === "object" &&
-      pkgJson !== null &&
-      "version" in pkgJson &&
-      typeof pkgJson.version === "string"
-    )
-      return pkgJson.version;
-  } catch {}
-};
-
-const v24 = ESLintUtils.RuleCreator.withoutDocs({
+const v25 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     fixable: "code",
@@ -99,76 +69,16 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
   defaultOptions: [],
   create: (ctx) =>
     listen({
-      numericRange: propRemover(ctx),
-      optionalPropStyle: propRemover(ctx),
-      depicter: (node) => {
-        const [first, second] = node.params;
-        if (first?.type !== NT.Identifier) return;
-        const zodSchemaAlias = first.name;
-        if (second?.type !== NT.ObjectPattern) return;
-        const nextFn = second.properties.find(
-          (one) =>
-            one.type === NT.Property &&
-            one.key.type === NT.Identifier &&
-            one.key.name === "next",
-        );
-        ctx.report({
-          node,
-          messageId: "change",
-          data: {
-            subject: "arguments",
-            from: `[${zodSchemaAlias}, { next, ...rest }]`,
-            to: `[{ zodSchema: ${zodSchemaAlias}, jsonSchema }, { ...rest }]`,
-          },
-          fix: (fixer) => {
-            const fixes = [
-              fixer.replaceText(
-                first,
-                `{ zodSchema: ${zodSchemaAlias}, jsonSchema }`,
-              ),
-            ];
-            if (nextFn)
-              fixes.push(fixer.removeRange(rangeWithComma(nextFn, ctx)));
-            return fixes;
-          },
-        });
-      },
-      nextCall: (node) =>
-        ctx.report({
-          node,
-          messageId: "change",
-          data: { subject: "statement", from: "next()", to: "jsonSchema" },
-          fix: (fixer) => fixer.replaceText(node, "jsonSchema"),
-        }),
-      zod: (node) => {
-        if (getZodVersion()?.startsWith("4.")) return;
+      zod: (node) =>
         ctx.report({
           node: node.source,
           messageId: "change",
-          data: { subject: "import", from: "zod", to: "zod/v4" },
-          fix: (fixer) => fixer.replaceText(node.source, `"zod/v4"`),
-        });
-      },
-      ezFile: (node) => {
-        const [variant] = node.arguments;
-        const replacement =
-          variant.value === "buffer"
-            ? "ez.buffer()"
-            : variant.value === "base64"
-              ? "z.base64()"
-              : variant.value === "binary"
-                ? "ez.buffer().or(z.string())"
-                : "z.string()";
-        ctx.report({
-          node: node,
-          messageId: "change",
-          data: { subject: "schema", from: "ez.file()", to: replacement },
-          fix: (fixer) => fixer.replaceText(node, replacement),
-        });
-      },
+          data: { subject: "import", from: "zod/v4", to: "zod" },
+          fix: (fixer) => fixer.replaceText(node.source, `"zod"`),
+        }),
     }),
 });
 
 export default {
-  rules: { v24 },
+  rules: { v25 },
 } satisfies TSESLint.Linter.Plugin;

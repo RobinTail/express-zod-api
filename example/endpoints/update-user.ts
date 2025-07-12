@@ -1,6 +1,6 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { ez } from "express-zod-api";
 import { keyAndTokenAuthenticatedEndpointsFactory } from "../factories";
 
