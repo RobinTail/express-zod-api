@@ -4,7 +4,9 @@
 
 ### v25.0.0
 
-- Supported Node.js versions: `^20.19.0 || ^22.12.0 || ^24.0.0`;
+- Supported Node.js versions: `^20.19.0 || ^22.12.0 || ^24.0.0`:
+  - The framework distribution is now ESM-only (finally);
+  - All the Node.js versions listed above support `require(ESM)` syntax;
 - Supported `zod` version: `^4.0.0`;
 - Changes to the `Middleware` class:
   - When the `input` schema is not defined, the `input` argument of the `handler` method is now `unknown`;
