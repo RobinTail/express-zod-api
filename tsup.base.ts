@@ -1,7 +1,7 @@
 import type { Options } from "tsup";
 
 export const commons: Options = {
-  format: ["cjs", "esm"],
+  format: "esm",
   splitting: false,
   sourcemap: false,
   clean: true,
