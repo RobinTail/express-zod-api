@@ -198,7 +198,8 @@ export class Documentation extends OpenApiBuilder {
               ...commons,
               variant,
               schema,
-              mimeTypes,
+              mimeTypes:
+                method === "head" && variant === "positive" ? null : mimeTypes,
               statusCode,
               hasMultipleStatusCodes:
                 apiResponses.length > 1 || statusCodes.length > 1,

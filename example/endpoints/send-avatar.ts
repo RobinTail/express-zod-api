@@ -3,6 +3,7 @@ import { fileSendingEndpointsFactory } from "../factories";
 import { readFile } from "node:fs/promises";
 
 export const sendAvatarEndpoint = fileSendingEndpointsFactory.build({
+  method: ["get", "head"],
   shortDescription: "Sends a file content.",
   tag: ["files", "users"],
   input: z.object({

@@ -2,6 +2,7 @@ import { z } from "zod/v4";
 import { fileStreamingEndpointsFactory } from "../factories";
 
 export const streamAvatarEndpoint = fileStreamingEndpointsFactory.build({
+  method: ["get", "head"],
   shortDescription: "Streams a file content.",
   tag: ["users", "files"],
   input: z.object({
