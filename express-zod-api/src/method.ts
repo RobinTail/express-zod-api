@@ -6,6 +6,7 @@ export const methods = [
   "put",
   "delete",
   "patch",
+  "head",
 ] satisfies Array<keyof IRouter>;
 
 export type Method = (typeof methods)[number];

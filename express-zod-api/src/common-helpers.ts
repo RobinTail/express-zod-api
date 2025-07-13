@@ -37,6 +37,7 @@ const areFilesAvailable = (request: Request): boolean => {
 
 export const defaultInputSources: InputSources = {
   get: ["query", "params"],
+  head: ["query", "params"],
   post: ["body", "params", "files"],
   put: ["body", "params"],
   patch: ["body", "params"],

@@ -69,6 +69,13 @@ describe("Common Helpers", () => {
         param: 123,
       });
     });
+    test("should return query for HEAD requests by default", () => {
+      expect(
+        getInput(makeRequestMock({ method: "HEAD", query: { param: 123 } })),
+      ).toEqual({
+        param: 123,
+      });
+    });
     test("should return only query for DELETE requests by default", () => {
       expect(
         getInput(

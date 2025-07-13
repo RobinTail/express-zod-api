@@ -4,7 +4,14 @@ import { isMethod, methods, Method, AuxMethod } from "../src/method";
 describe("Method", () => {
   describe("methods array", () => {
     test("should be the list of selected keys of express router", () => {
-      expect(methods).toEqual(["get", "post", "put", "delete", "patch"]);
+      expect(methods).toEqual([
+        "get",
+        "post",
+        "put",
+        "delete",
+        "patch",
+        "head",
+      ]);
     });
   });
 
@@ -15,6 +22,7 @@ describe("Method", () => {
       expectTypeOf<"put">().toExtend<Method>();
       expectTypeOf<"delete">().toExtend<Method>();
       expectTypeOf<"patch">().toExtend<Method>();
+      expectTypeOf<"head">().toExtend<Method>();
       expectTypeOf<"wrong">().not.toExtend<Method>();
     });
   });

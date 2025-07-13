@@ -37,7 +37,7 @@ interface PostV1CustomNegativeResponseVariants {
 
 export type Path = "/v1/custom";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
 
 export interface Input {
   "post /v1/custom": PostV1CustomInput;
@@ -110,7 +110,7 @@ interface PostV1MtplNegativeResponseVariants {
 
 export type Path = "/v1/mtpl";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
 
 export interface Input {
   "post /v1/mtpl": PostV1MtplInput;
@@ -178,7 +178,7 @@ interface PostV1TestNegativeResponseVariants {
 
 export type Path = "/v1/test";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
 
 export interface Input {
     /** @deprecated */
@@ -247,7 +247,7 @@ interface PostV1TestNegativeResponseVariants {
 
 export type Path = "/v1/test";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
 
 export interface Input {
     /** @deprecated */
@@ -313,7 +313,7 @@ interface PostV1TestWithDashesNegativeResponseVariants {
 
 export type Path = "/v1/test-with-dashes";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
 
 export interface Input {
   "post /v1/test-with-dashes": PostV1TestWithDashesInput;

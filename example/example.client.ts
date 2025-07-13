@@ -338,7 +338,7 @@ export type Path =
   | "/v1/events/stream"
   | "/v1/forms/feedback";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch";
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
 
 export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
