@@ -133,6 +133,14 @@ export const recordStringAny = ensureTypeNode("Record", [
   ts.SyntaxKind.AnyKeyword,
 ]);
 
+/** ensures distinct union (unique primitives) */
+export const makeUnion = (entries: ts.TypeNode[]) => {
+  const nodes = new Map<ts.TypeNode | ts.KeywordTypeSyntaxKind, ts.TypeNode>();
+  for (const entry of entries)
+    nodes.set(isPrimitive(entry) ? entry.kind : entry, entry);
+  return f.createUnionTypeNode(Array.from(nodes.values()));
+};
+
 export const makeInterfaceProp = (
   name: string | number,
   value: Typeable,
@@ -148,10 +156,7 @@ export const makeInterfaceProp = (
     makePropertyIdentifier(name),
     isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
     isOptional
-      ? f.createUnionTypeNode([
-          propType,
-          ensureTypeNode(ts.SyntaxKind.UndefinedKeyword),
-        ])
+      ? makeUnion([propType, ensureTypeNode(ts.SyntaxKind.UndefinedKeyword)])
       : propType,
   );
   const jsdoc = R.reject(R.isNil, [
@@ -197,9 +202,7 @@ export const makePublicLiteralType = (
   name: ts.Identifier | string,
   literals: string[],
 ) =>
-  makeType(name, f.createUnionTypeNode(R.map(makeLiteralType, literals)), {
-    expose: true,
-  });
+  makeType(name, makeUnion(R.map(makeLiteralType, literals)), { expose: true });
 
 export const makeType = (
   name: ts.Identifier | string,
@@ -374,7 +377,7 @@ export const makeIndexed = (subject: Typeable, index: Typeable) =>
   f.createIndexedAccessTypeNode(ensureTypeNode(subject), ensureTypeNode(index));
 
 export const makeMaybeAsync = (subj: Typeable) =>
-  f.createUnionTypeNode([ensureTypeNode(subj), makePromise(subj)]);
+  makeUnion([ensureTypeNode(subj), makePromise(subj)]);
 
 export const makeFnType = (
   params: Parameters<typeof makeParams>[0],
@@ -412,5 +415,6 @@ const primitives: ts.KeywordTypeSyntaxKind[] = [
   ts.SyntaxKind.UnknownKeyword,
   ts.SyntaxKind.VoidKeyword,
 ];
-export const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
+
+const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
   (primitives as ts.SyntaxKind[]).includes(node.kind);

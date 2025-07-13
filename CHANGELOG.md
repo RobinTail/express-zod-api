@@ -2,9 +2,17 @@
 
 ## Version 24
 
+### v24.6.0
+
+- Supporting `zod` versions `^3.25.35 || ^4.0.0`:
+  - If you use `zod@^4.0.0` then `import { z } from "zod"`;
+  - If you use `zod@^3.25.35` then keep `import { z } from "zod/v4"`;
+  - For more details, see the [Explanation of the versioning strategy](https://github.com/colinhacks/zod/issues/4371).
+
 ### v24.5.0
 
-- `openapi3-ts` version is `^4.5.0`.
+- `openapi3-ts` version is `^4.5.0`;
+- Compatibility adjustment for Zod 3.25.72.
 
 ### v24.4.3
 

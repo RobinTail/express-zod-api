@@ -1,6 +1,6 @@
 {
   "name": "@express-zod-api/migration",
-  "version": "24.0.1",
+  "version": "24.1.0",
   "license": "MIT",
   "description": "Migration scripts for express-zod-api",
   "repository": {
@@ -42,8 +42,8 @@
     "*.md"
   ],
   "peerDependencies": {
-    "eslint": "catalog:peer",
-    "typescript-eslint": "catalog:peer"
+    "eslint": "^9.0.0",
+    "typescript-eslint": "^8.0.0"
   },
   "devDependencies": {
     "@typescript-eslint/rule-tester": "catalog:dev"
