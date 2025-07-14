@@ -51,10 +51,9 @@ export const getInput = (
   req: Request,
   userDefined: CommonConfig["inputSources"] = {},
 ): FlatObject => {
-  const method = getActualMethod(req);
-  if (method === "options") return {};
-  if (method === "head")
-    return getInput(Object.assign({}, req, { method: "GET" }), userDefined);
+  const actualMethod = getActualMethod(req);
+  if (actualMethod === "options") return {};
+  const method = actualMethod === "head" ? "get" : actualMethod;
   return (
     userDefined[method] ||
     defaultInputSources[method] ||
