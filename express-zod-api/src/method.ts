@@ -6,12 +6,11 @@ export const methods = [
   "put",
   "delete",
   "patch",
-  "head",
 ] satisfies Array<keyof IRouter>;
 
 export type Method = (typeof methods)[number];
 
-export type AuxMethod = Extract<keyof IRouter, "options">;
+export type AuxMethod = Extract<keyof IRouter, "options" | "head">;
 
 export const isMethod = (subject: string): subject is Method =>
   (methods as string[]).includes(subject);

@@ -37,7 +37,6 @@ const areFilesAvailable = (request: Request): boolean => {
 
 export const defaultInputSources: InputSources = {
   get: ["query", "params"],
-  head: ["query", "params"],
   post: ["body", "params", "files"],
   put: ["body", "params"],
   patch: ["body", "params"],
@@ -54,6 +53,8 @@ export const getInput = (
 ): FlatObject => {
   const method = getActualMethod(req);
   if (method === "options") return {};
+  if (method === "head")
+    return getInput(R.assoc("method", "GET", R.clone(req)), userDefined);
   return (
     userDefined[method] ||
     defaultInputSources[method] ||

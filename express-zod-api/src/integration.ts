@@ -106,12 +106,9 @@ export class Integration extends IntegrationBase {
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
           const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
-            const hasContent =
-              mimeTypes &&
-              !(method === "head" && responseVariant === "positive");
             const variantType = makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
-              zodToTs(hasContent ? schema : noContent, ctxOut),
+              zodToTs(mimeTypes ? schema : noContent, ctxOut),
               { comment: request },
             );
             this.#program.push(variantType);

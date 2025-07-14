@@ -180,27 +180,6 @@ interface GetV1AvatarSendNegativeResponseVariants {
   400: GetV1AvatarSendNegativeVariant1;
 }
 
-/** head /v1/avatar/send */
-type HeadV1AvatarSendInput = {
-  userId: string;
-};
-
-/** head /v1/avatar/send */
-type HeadV1AvatarSendPositiveVariant1 = undefined;
-
-/** head /v1/avatar/send */
-interface HeadV1AvatarSendPositiveResponseVariants {
-  200: HeadV1AvatarSendPositiveVariant1;
-}
-
-/** head /v1/avatar/send */
-type HeadV1AvatarSendNegativeVariant1 = string;
-
-/** head /v1/avatar/send */
-interface HeadV1AvatarSendNegativeResponseVariants {
-  400: HeadV1AvatarSendNegativeVariant1;
-}
-
 /** get /v1/avatar/stream */
 type GetV1AvatarStreamInput = {
   userId: string;
@@ -220,27 +199,6 @@ type GetV1AvatarStreamNegativeVariant1 = string;
 /** get /v1/avatar/stream */
 interface GetV1AvatarStreamNegativeResponseVariants {
   400: GetV1AvatarStreamNegativeVariant1;
-}
-
-/** head /v1/avatar/stream */
-type HeadV1AvatarStreamInput = {
-  userId: string;
-};
-
-/** head /v1/avatar/stream */
-type HeadV1AvatarStreamPositiveVariant1 = undefined;
-
-/** head /v1/avatar/stream */
-interface HeadV1AvatarStreamPositiveResponseVariants {
-  200: HeadV1AvatarStreamPositiveVariant1;
-}
-
-/** head /v1/avatar/stream */
-type HeadV1AvatarStreamNegativeVariant1 = string;
-
-/** head /v1/avatar/stream */
-interface HeadV1AvatarStreamNegativeResponseVariants {
-  400: HeadV1AvatarStreamNegativeVariant1;
 }
 
 /** post /v1/avatar/upload */
@@ -380,7 +338,7 @@ export type Path =
   | "/v1/events/stream"
   | "/v1/forms/feedback";
 
-export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
@@ -390,10 +348,7 @@ export interface Input {
   "get /v1/user/list": GetV1UserListInput;
   /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendInput;
-  /** @deprecated */
-  "head /v1/avatar/send": HeadV1AvatarSendInput;
   "get /v1/avatar/stream": GetV1AvatarStreamInput;
-  "head /v1/avatar/stream": HeadV1AvatarStreamInput;
   "post /v1/avatar/upload": PostV1AvatarUploadInput;
   "post /v1/avatar/raw": PostV1AvatarRawInput;
   "get /v1/events/stream": GetV1EventsStreamInput;
@@ -408,10 +363,7 @@ export interface PositiveResponse {
   "get /v1/user/list": SomeOf<GetV1UserListPositiveResponseVariants>;
   /** @deprecated */
   "get /v1/avatar/send": SomeOf<GetV1AvatarSendPositiveResponseVariants>;
-  /** @deprecated */
-  "head /v1/avatar/send": SomeOf<HeadV1AvatarSendPositiveResponseVariants>;
   "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamPositiveResponseVariants>;
-  "head /v1/avatar/stream": SomeOf<HeadV1AvatarStreamPositiveResponseVariants>;
   "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadPositiveResponseVariants>;
   "post /v1/avatar/raw": SomeOf<PostV1AvatarRawPositiveResponseVariants>;
   "get /v1/events/stream": SomeOf<GetV1EventsStreamPositiveResponseVariants>;
@@ -426,10 +378,7 @@ export interface NegativeResponse {
   "get /v1/user/list": SomeOf<GetV1UserListNegativeResponseVariants>;
   /** @deprecated */
   "get /v1/avatar/send": SomeOf<GetV1AvatarSendNegativeResponseVariants>;
-  /** @deprecated */
-  "head /v1/avatar/send": SomeOf<HeadV1AvatarSendNegativeResponseVariants>;
   "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamNegativeResponseVariants>;
-  "head /v1/avatar/stream": SomeOf<HeadV1AvatarStreamNegativeResponseVariants>;
   "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadNegativeResponseVariants>;
   "post /v1/avatar/raw": SomeOf<PostV1AvatarRawNegativeResponseVariants>;
   "get /v1/events/stream": SomeOf<GetV1EventsStreamNegativeResponseVariants>;
@@ -450,13 +399,8 @@ export interface EncodedResponse {
   /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendPositiveResponseVariants &
     GetV1AvatarSendNegativeResponseVariants;
-  /** @deprecated */
-  "head /v1/avatar/send": HeadV1AvatarSendPositiveResponseVariants &
-    HeadV1AvatarSendNegativeResponseVariants;
   "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponseVariants &
     GetV1AvatarStreamNegativeResponseVariants;
-  "head /v1/avatar/stream": HeadV1AvatarStreamPositiveResponseVariants &
-    HeadV1AvatarStreamNegativeResponseVariants;
   "post /v1/avatar/upload": PostV1AvatarUploadPositiveResponseVariants &
     PostV1AvatarUploadNegativeResponseVariants;
   "post /v1/avatar/raw": PostV1AvatarRawPositiveResponseVariants &
@@ -487,16 +431,9 @@ export interface Response {
   "get /v1/avatar/send":
     | PositiveResponse["get /v1/avatar/send"]
     | NegativeResponse["get /v1/avatar/send"];
-  /** @deprecated */
-  "head /v1/avatar/send":
-    | PositiveResponse["head /v1/avatar/send"]
-    | NegativeResponse["head /v1/avatar/send"];
   "get /v1/avatar/stream":
     | PositiveResponse["get /v1/avatar/stream"]
     | NegativeResponse["get /v1/avatar/stream"];
-  "head /v1/avatar/stream":
-    | PositiveResponse["head /v1/avatar/stream"]
-    | NegativeResponse["head /v1/avatar/stream"];
   "post /v1/avatar/upload":
     | PositiveResponse["post /v1/avatar/upload"]
     | NegativeResponse["post /v1/avatar/upload"];
@@ -520,9 +457,7 @@ export const endpointTags = {
   "post /v1/user/create": ["users"],
   "get /v1/user/list": ["users"],
   "get /v1/avatar/send": ["files", "users"],
-  "head /v1/avatar/send": ["files", "users"],
   "get /v1/avatar/stream": ["users", "files"],
-  "head /v1/avatar/stream": ["users", "files"],
   "post /v1/avatar/upload": ["files"],
   "post /v1/avatar/raw": ["files"],
   "get /v1/events/stream": ["subscriptions"],

@@ -430,30 +430,6 @@ paths:
             text/plain:
               schema:
                 type: string
-    head:
-      operationId: HeadV1AvatarSend
-      summary: Sends a file content.
-      deprecated: true
-      tags:
-        - files
-        - users
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          description: HEAD /v1/avatar/send Parameter
-          schema:
-            type: string
-            pattern: \d+
-      responses:
-        "200":
-          description: HEAD /v1/avatar/send Positive response
-        "400":
-          description: HEAD /v1/avatar/send Negative response
-          content:
-            text/plain:
-              schema:
-                type: string
   /v1/avatar/stream:
     get:
       operationId: GetV1AvatarStream
@@ -480,29 +456,6 @@ paths:
                   url: https://swagger.io/specification/#working-with-binary-data
         "400":
           description: GET /v1/avatar/stream Negative response
-          content:
-            text/plain:
-              schema:
-                type: string
-    head:
-      operationId: HeadV1AvatarStream
-      summary: Streams a file content.
-      tags:
-        - users
-        - files
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          description: HEAD /v1/avatar/stream Parameter
-          schema:
-            type: string
-            pattern: \d+
-      responses:
-        "200":
-          description: HEAD /v1/avatar/stream Positive response
-        "400":
-          description: HEAD /v1/avatar/stream Negative response
           content:
             text/plain:
               schema:

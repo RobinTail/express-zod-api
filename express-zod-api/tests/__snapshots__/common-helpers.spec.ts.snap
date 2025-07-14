@@ -10,10 +10,6 @@ exports[`Common Helpers > defaultInputSources > should be declared in a certain 
     "query",
     "params",
   ],
-  "head": [
-    "query",
-    "params",
-  ],
   "patch": [
     "body",
     "params",
