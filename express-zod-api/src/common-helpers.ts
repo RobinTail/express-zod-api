@@ -54,7 +54,7 @@ export const getInput = (
   const method = getActualMethod(req);
   if (method === "options") return {};
   if (method === "head")
-    return getInput(R.assoc("method", "GET", R.clone(req)), userDefined);
+    return getInput(Object.assign({}, req, { method: "GET" }), userDefined);
   return (
     userDefined[method] ||
     defaultInputSources[method] ||
