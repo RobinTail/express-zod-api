@@ -40,7 +40,7 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory(
         const target = response.attachment(output.filename);
         if (method === "HEAD") {
           const { size } = statSync(output.filename);
-          return void target.set({ "Content-Length": `${size}` }).end();
+          return void target.set("Content-Length", `${size}`).end();
         }
         createReadStream(output.filename).pipe(target);
       } else {
