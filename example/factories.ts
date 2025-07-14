@@ -8,7 +8,7 @@ import {
   defaultEndpointsFactory,
 } from "express-zod-api";
 import { authMiddleware } from "./middlewares";
-import { createReadStream } from "node:fs";
+import { createReadStream, statSync } from "node:fs";
 import { z } from "zod/v4";
 
 /** @desc This factory extends the default one by enforcing the authentication using the specified middleware */
@@ -34,12 +34,15 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
     positive: { schema: ez.buffer(), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
-    handler: ({ response, error, output }) => {
+    handler: ({ response, error, output, request: { method } }) => {
       if (error) return void response.status(400).send(error.message);
       if ("filename" in output && typeof output.filename === "string") {
-        createReadStream(output.filename).pipe(
-          response.attachment(output.filename),
-        );
+        const target = response.attachment(output.filename);
+        if (method === "HEAD") {
+          const { size } = statSync(output.filename);
+          return void target.set({ "Content-Length": `${size}` }).end();
+        }
+        createReadStream(output.filename).pipe(target);
       } else {
         response.status(400).send("Filename is missing");
       }
