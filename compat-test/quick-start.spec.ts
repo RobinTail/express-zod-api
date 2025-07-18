@@ -13,7 +13,6 @@ describe("ESM Test", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
-    console.log(chunk.toString());
   };
   const quickStart = spawn("tsx", ["quick-start.ts"]);
   quickStart.stdout.on("data", listener);
