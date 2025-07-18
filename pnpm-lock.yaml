@@ -71,13 +71,13 @@ importers:
         version: 9.31.0
       eslint-config-prettier:
         specifier: ^10.1.5
-        version: 10.1.7(eslint@9.31.0)
+        version: 10.1.8(eslint@9.31.0)
       eslint-plugin-allowed-dependencies:
         specifier: ^1.3.1
         version: 1.3.1(eslint@9.31.0)(typescript-eslint@8.37.0(eslint@9.31.0)(typescript@5.8.3))
       eslint-plugin-prettier:
         specifier: ^5.4.1
-        version: 5.5.1(eslint-config-prettier@10.1.7(eslint@9.31.0))(eslint@9.31.0)(prettier@3.6.2)
+        version: 5.5.1(eslint-config-prettier@10.1.8(eslint@9.31.0))(eslint@9.31.0)(prettier@3.6.2)
       husky:
         specifier: ^9.0.5
         version: 9.1.7
@@ -1241,8 +1241,8 @@ packages:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
 
-  eslint-config-prettier@10.1.7:
-    resolution: {integrity: sha512-xztdELuHs7grBM+qdMUF4M4SjPpeOMN3kx7sGU6ifl5yibck/GRa0+0d+m1lPsGNkd+2bIWh2lUUTzX7MX/obw==}
+  eslint-config-prettier@10.1.8:
+    resolution: {integrity: sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w==}
     hasBin: true
     peerDependencies:
       eslint: '>=7.0.0'
@@ -3334,7 +3334,7 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
-  eslint-config-prettier@10.1.7(eslint@9.31.0):
+  eslint-config-prettier@10.1.8(eslint@9.31.0):
     dependencies:
       eslint: 9.31.0
 
@@ -3344,14 +3344,14 @@ snapshots:
       ramda: 0.31.3
       typescript-eslint: 8.37.0(eslint@9.31.0)(typescript@5.8.3)
 
-  eslint-plugin-prettier@5.5.1(eslint-config-prettier@10.1.7(eslint@9.31.0))(eslint@9.31.0)(prettier@3.6.2):
+  eslint-plugin-prettier@5.5.1(eslint-config-prettier@10.1.8(eslint@9.31.0))(eslint@9.31.0)(prettier@3.6.2):
     dependencies:
       eslint: 9.31.0
       prettier: 3.6.2
       prettier-linter-helpers: 1.0.0
       synckit: 0.11.8
     optionalDependencies:
-      eslint-config-prettier: 10.1.7(eslint@9.31.0)
+      eslint-config-prettier: 10.1.8(eslint@9.31.0)
 
   eslint-scope@8.4.0:
     dependencies:
