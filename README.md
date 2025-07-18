@@ -88,6 +88,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/zoton2.png" alt="@zoton2" width="50px" />](https://github.com/zoton2)
 [<img src="https://github.com/gmorgen1.png" alt="@gmorgen1" width="50px" />](https://github.com/gmorgen1)
 [<img src="https://github.com/crgeary.png" alt="@crgeary" width="50px" />](https://github.com/crgeary)
 [<img src="https://github.com/danmichaelo.png" alt="@danmichaelo" width="50px" />](https://github.com/danmichaelo)
