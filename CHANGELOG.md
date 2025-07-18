@@ -2,6 +2,15 @@
 
 ## Version 24
 
+### v24.6.1
+
+- Compatibility fix for recently changed type of Express native middleware:
+  - Fixes error `TS2345` when passing over an Express middleware to:
+    - `EndpointsFactory::use()`;
+    - `EndpointsFactory::addExpressMiddleware()`;
+  - The issue caused by `@types/express-serve-static-core` v5.0.7;
+  - The issue reported by [@zoton2](https://github.com/zoton2).
+
 ### v24.6.0
 
 - Supporting `zod` versions `^3.25.35 || ^4.0.0`:
