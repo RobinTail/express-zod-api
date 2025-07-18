@@ -2,6 +2,15 @@
 
 ## Version 23
 
+### v23.6.3
+
+- Compatibility fix for recently changed type of Express native middleware:
+  - Fixes error `TS2345` when passing over an Express middleware to:
+    - `EndpointsFactory::use()`;
+    - `EndpointsFactory::addExpressMiddleware()`;
+  - The issue caused by `@types/express-serve-static-core` v5.0.7;
+  - The issue reported by [@zoton2](https://github.com/zoton2).
+
 ### v23.6.2
 
 - Fixed a bug about missing CORS headers in case of request parser errors:
