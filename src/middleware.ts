@@ -90,11 +90,8 @@ export class ExpressMiddleware<
   OUT extends FlatObject,
 > extends Middleware<FlatObject, OUT, string> {
   constructor(
-    nativeMw: (
-      request: R,
-      response: S,
-      next: NextFunction,
-    ) => void | Promise<void>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- issue #2824, assignment compatibility fix
+    nativeMw: (request: R, response: S, next: NextFunction) => any,
     {
       provider = () => ({}) as OUT,
       transformer = (err: Error) => err,

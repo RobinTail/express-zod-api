@@ -2,6 +2,15 @@
 
 ## Version 21
 
+### v21.11.7
+
+- Compatibility fix for recently changed type of Express native middleware:
+  - Fixes error `TS2345` when passing over an Express middleware to:
+    - `EndpointsFactory::use()`;
+    - `EndpointsFactory::addExpressMiddleware()`;
+  - The issue caused by `@types/express-serve-static-core` v5.0.7;
+  - The issue reported by [@zoton2](https://github.com/zoton2).
+
 ### v21.11.6
 
 - Fixed inconsistency between the actual catcher behavior and the error handling documentation:
