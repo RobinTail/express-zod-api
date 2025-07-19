@@ -44,6 +44,7 @@ export const defaultInputSources: InputSources = {
 };
 const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 
+/** @todo consider removing "as" to ensure more constraints and realistic handling */
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
 
