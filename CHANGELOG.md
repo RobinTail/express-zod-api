@@ -2,6 +2,22 @@
 
 ## Version 24
 
+### v24.7.0
+
+- Supporting `HEAD` method:
+  - The purpose of the `HEAD` method is to retrieve the headers without performing `GET` request;
+  - It is the built-in feature of Express to support `HEAD` method by request handlers for `GET` requests;
+  - Therefore, each `Endpoint` supporting `get` method also handles `head` requests (no changes required);
+  - Added `HEAD` method to CORS response headers, along with `OPTIONS`, for such endpoints;
+  - Positive response to `HEAD` request is the same as for `GET`, but without the body:
+    - Added `head` request depiction to the generated `Documentation`;
+    - Added `head` request types to the generated `Integration` client;
+  - The following customizable functions can now receive `head` as an argument:
+    - `operationId` supplied to `EndpointsFactory::build()`;
+    - `isHeader` supplied to `Documentation::constructor()`;
+- Caveat:
+  - If the `operationId` assigned with a string then it is appended with `__HEAD` for `head` method to avoid conflicts;
+
 ### v24.6.2
 
 - Correcting recommendations given in [v24.6.0](#v2460) regarding using with `zod@^4.0.0`:
