@@ -8,10 +8,12 @@ import {
   ensureError,
   getRoutePathParams,
   doesImplyContent,
+  getInputSources,
 } from "../src/common-helpers";
 import { z } from "zod/v4";
 import { makeRequestMock } from "../src/testing";
 import { methods } from "../src/method";
+import { InputSources } from "../src/config-type";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
@@ -46,6 +48,44 @@ describe("Common Helpers", () => {
       expect(getRoutePathParams("")).toEqual([]);
       expect(getRoutePathParams("\n")).toEqual([]);
     });
+  });
+
+  describe("getInputSources()", () => {
+    test.each([undefined, {}])(
+      "should return empty array for options %#",
+      (userDefined) => {
+        expect(getInputSources("options", userDefined)).toEqual([]);
+      },
+    );
+
+    test.each(methods)("should return user defined ones for %s", (method) => {
+      const userDefined: InputSources = {
+        get: ["headers"],
+        put: ["files"],
+        post: ["query"],
+        delete: ["params"],
+        patch: ["body"],
+      };
+      expect(getInputSources(method, userDefined)).toEqual(userDefined[method]);
+    });
+
+    test.each([undefined, {}])(
+      "should return default ones when missing user defined for %s",
+      (userDefined) => {
+        expect(getInputSources("get", userDefined)).toEqual(
+          defaultInputSources.get,
+        );
+      },
+    );
+
+    test.each([undefined, {}, { get: ["body" as const] }])(
+      "for HEAD should return the same as for GET",
+      (userDefined) => {
+        expect(getInputSources("head", userDefined)).toEqual(
+          getInputSources("get", userDefined),
+        );
+      },
+    );
   });
 
   describe("getInput()", () => {
