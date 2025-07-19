@@ -181,7 +181,7 @@ pnpm add -D @types/express @types/node @types/http-errors
 
 Consider using the recommended `tsconfig.json` base for your project according to your Node.js version,
 for example [the base for Node.js 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json).
-Ensure having the following options in your `tsconfig.json` file in order to make it work as expected:
+Ensure having the following options in order to make it work as expected:
 
 ```json
 {
@@ -192,7 +192,7 @@ Ensure having the following options in your `tsconfig.json` file in order to mak
 }
 ```
 
-See also how `moduleResoultion` may cause [Zod 4 schema assignment error](#zod-4-schema-assignment-error);
+See also how `moduleResoultion` may cause [Zod 4 schema assignment error](#zod-4-schema-assignment-error).
 
 ## Set up config
 
@@ -1387,7 +1387,7 @@ should be aware of them.
 
 ## Zod 4 schema assignment error
 
-When using `zod@^4` and doing `import { z } from "zod/v4"` you may encounter the following error:
+When using `zod@^4` and doing `import { z } from "zod"` you may encounter the following error:
 
 ```text
 TS2739: ZodObject<...> is missing the following properties from ZodType<...>: example, deprecated.
