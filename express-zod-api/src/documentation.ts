@@ -34,8 +34,7 @@ import {
   depictRequest,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
-import { walkRouting } from "./routing-walker";
-import { AbstractEndpoint } from "./endpoint";
+import { OnEndpoint, walkRouting, withHead } from "./routing-walker";
 
 type Component =
   | "positiveResponse"
@@ -160,11 +159,7 @@ export class Documentation extends OpenApiBuilder {
     this.addInfo({ title, version });
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
       this.addServer({ url });
-    const onEndpoint = (
-      endpoint: AbstractEndpoint,
-      path: string,
-      method: ClientMethod,
-    ) => {
+    const onEndpoint: OnEndpoint<ClientMethod> = (endpoint, path, method) => {
       const commons = {
         path,
         method,
@@ -265,10 +260,7 @@ export class Documentation extends OpenApiBuilder {
     };
     walkRouting({
       routing,
-      onEndpoint: (endpoint, path, method) => {
-        onEndpoint(endpoint, path, method);
-        if (method === "get") onEndpoint(endpoint, path, "head");
-      },
+      onEndpoint: withHead(onEndpoint),
     });
     if (tags) this.rootDoc.tags = depictTags(tags);
   }

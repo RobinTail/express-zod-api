@@ -17,12 +17,11 @@ import {
 import { doesImplyContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
-import { walkRouting } from "./routing-walker";
+import { OnEndpoint, walkRouting, withHead } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
 import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
-import { AbstractEndpoint } from "./endpoint";
 import { ClientMethod } from "./method";
 
 interface IntegrationParams {
@@ -96,11 +95,7 @@ export class Integration extends IntegrationBase {
     const commons = { makeAlias: this.#makeAlias.bind(this) };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
-    const onEndpoint = (
-      endpoint: AbstractEndpoint,
-      path: string,
-      method: ClientMethod,
-    ) => {
+    const onEndpoint: OnEndpoint<ClientMethod> = (endpoint, path, method) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
@@ -154,10 +149,7 @@ export class Integration extends IntegrationBase {
     };
     walkRouting({
       routing,
-      onEndpoint: (endpoint, path, method) => {
-        onEndpoint(endpoint, path, method);
-        if (method === "get") onEndpoint(endpoint, path, "head");
-      },
+      onEndpoint: withHead(onEndpoint),
     });
     this.#program.unshift(...this.#aliases.values());
     this.#program.push(

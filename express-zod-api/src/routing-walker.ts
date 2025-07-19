@@ -1,16 +1,23 @@
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
-import { isMethod, Method } from "./method";
+import { ClientMethod, isMethod, Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
 
-/** @todo check if still need to export */
-export type OnEndpoint = (
+export type OnEndpoint<M extends string = Method> = (
   endpoint: AbstractEndpoint,
   path: string,
-  method: Method,
+  method: M,
 ) => void;
+
+/** Calls the given hook with HEAD each time it's called with GET method */
+export const withHead =
+  (onEndpoint: OnEndpoint<ClientMethod>): OnEndpoint =>
+  (endpoint, path, method) => {
+    onEndpoint(endpoint, path, method);
+    if (method === "get") onEndpoint(endpoint, path, "head");
+  };
 
 interface RoutingWalkerParams {
   routing: Routing;
