@@ -2,7 +2,7 @@ import * as R from "ramda";
 import ts from "typescript";
 import { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
-import { Method, methods } from "./method";
+import { ClientMethod, clientMethods } from "./method";
 import type { makeEventSchema } from "./sse";
 import {
   accessModifiers,
@@ -96,10 +96,10 @@ export abstract class IntegrationBase {
   };
 
   /**
-   * @example export type Method = "get" | "post" | "put" | "delete" | "patch";
+   * @example export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
    * @internal
    * */
-  protected methodType = makePublicLiteralType("Method", methods);
+  protected methodType = makePublicLiteralType("Method", clientMethods);
 
   /**
    * @example type SomeOf<T> = T[keyof T];
@@ -416,8 +416,9 @@ export abstract class IntegrationBase {
       f.createLogicalNot(
         makeCall(
           f.createArrayLiteralExpression([
-            literally("get" satisfies Method),
-            literally("delete" satisfies Method),
+            literally("get" satisfies ClientMethod),
+            literally("head" satisfies ClientMethod),
+            literally("delete" satisfies ClientMethod),
           ]),
           propOf<string[]>("includes"),
         )(this.#ids.methodParameter),
@@ -625,7 +626,7 @@ export abstract class IntegrationBase {
     makeConst(this.#ids.clientConst, makeNew(clientClassName)), // const client = new Client();
     // client.provide("get /v1/user/retrieve", { id: "10" });
     makeCall(this.#ids.clientConst, this.#ids.provideMethod)(
-      literally(`${"get" satisfies Method} /v1/user/retrieve`),
+      literally(`${"get" satisfies ClientMethod} /v1/user/retrieve`),
       f.createObjectLiteralExpression([
         f.createPropertyAssignment("id", literally("10")),
       ]),
@@ -634,7 +635,7 @@ export abstract class IntegrationBase {
     makeCall(
       makeNew(
         subscriptionClassName,
-        literally(`${"get" satisfies Method} /v1/events/stream`),
+        literally(`${"get" satisfies ClientMethod} /v1/events/stream`),
         f.createObjectLiteralExpression(),
       ),
       this.#ids.onMethod,

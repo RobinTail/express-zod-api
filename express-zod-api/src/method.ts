@@ -12,5 +12,11 @@ export type Method = (typeof methods)[number];
 
 export type AuxMethod = Extract<keyof IRouter, "options" | "head">;
 
+export const clientMethods = [...methods, "head"] satisfies Array<
+  Method | Extract<AuxMethod, "head">
+>;
+
+export type ClientMethod = (typeof clientMethods)[number];
+
 export const isMethod = (subject: string): subject is Method =>
   (methods as string[]).includes(subject);

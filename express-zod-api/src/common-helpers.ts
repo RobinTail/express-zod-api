@@ -47,18 +47,23 @@ const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
 
+export const getInputSources = (
+  actualMethod: ReturnType<typeof getActualMethod>,
+  userDefined: CommonConfig["inputSources"] = {},
+) => {
+  if (actualMethod === "options") return [];
+  const method = actualMethod === "head" ? "get" : actualMethod;
+  return (
+    userDefined[method] || defaultInputSources[method] || fallbackInputSource
+  );
+};
+
 export const getInput = (
   req: Request,
   userDefined: CommonConfig["inputSources"] = {},
 ): FlatObject => {
   const actualMethod = getActualMethod(req);
-  if (actualMethod === "options") return {};
-  const method = actualMethod === "head" ? "get" : actualMethod;
-  return (
-    userDefined[method] ||
-    defaultInputSources[method] ||
-    fallbackInputSource
-  )
+  return getInputSources(actualMethod, userDefined)
     .filter((src) => (src === "files" ? areFilesAvailable(req) : true))
     .reduce<FlatObject>((agg, src) => Object.assign(agg, req[src]), {});
 };
