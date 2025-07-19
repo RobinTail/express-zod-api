@@ -15,6 +15,7 @@
   - The following customizable functions can now receive `head` as an argument:
     - `operationId` supplied to `EndpointsFactory::build()`;
     - `isHeader` supplied to `Documentation::constructor()`;
+  - This feature was suggested by [@pepegc](https://github.com/pepegc);
 - Caveat:
   - If the `operationId` assigned with a string then it is appended with `__HEAD` for `head` method to avoid conflicts;
 
