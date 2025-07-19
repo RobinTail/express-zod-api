@@ -13,7 +13,7 @@ import {
 import { z } from "zod/v4";
 import { makeRequestMock } from "../src/testing";
 import { methods } from "../src/method";
-import { InputSources } from "../src/config-type";
+import { CommonConfig, InputSources } from "../src/config-type";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
@@ -78,15 +78,14 @@ describe("Common Helpers", () => {
       },
     );
 
-    test.each<Partial<InputSources> | undefined>([
-      undefined,
-      {},
-      { get: ["body"] },
-    ])("for HEAD should return the same as for GET", (userDefined) => {
-      expect(getInputSources("head", userDefined)).toEqual(
-        getInputSources("get", userDefined),
-      );
-    });
+    test.each<CommonConfig["inputSources"]>([undefined, {}, { get: ["body"] }])(
+      "for HEAD should return the same as for GET",
+      (userDefined) => {
+        expect(getInputSources("head", userDefined)).toEqual(
+          getInputSources("get", userDefined),
+        );
+      },
+    );
   });
 
   describe("getInput()", () => {
