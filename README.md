@@ -58,7 +58,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Graceful shutdown](#graceful-shutdown)
    6. [Subscriptions](#subscriptions)
 8. [Caveats](#caveats)
-   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+   1. [Zod 4 schema assignment error](#zod-4-schema-assignment-error)
+   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
 
 See also [Changelog](CHANGELOG.md) and [automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
@@ -176,6 +177,10 @@ pnpm add express-zod-api express zod typescript http-errors
 pnpm add -D @types/express @types/node @types/http-errors
 ```
 
+## Environment preparation
+
+Consider using the recommended `tsconfig.json` base for your project according to your Node.js version,
+for example [the base for Node.js 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json).
 Ensure having the following options in your `tsconfig.json` file in order to make it work as expected:
 
 ```json
@@ -186,6 +191,8 @@ Ensure having the following options in your `tsconfig.json` file in order to mak
   }
 }
 ```
+
+See also how `moduleResoultion` may cause [Zod 4 schema assignment error](#zod-4-schema-assignment-error);
 
 ## Set up config
 
@@ -1377,6 +1384,18 @@ framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has si
 
 There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
+
+## Zod 4 schema assignment error
+
+When using `zod@^4` and doing `import { z } from "zod/v4"` you may encounter the following error:
+
+```text
+TS2739: ZodObject<...> is missing the following properties from ZodType<...>: example, deprecated.
+```
+
+In this case make sure the `moduleResolution` in your `tsconfig.json` is either `node16`, `nodenext` or `bundle`.
+Consider the [recommended tsconfig base, Node 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json).
+Otherwise, keep importing `from "zod/v4"` or consider upgrading the framework to v25.
 
 ## Excessive properties in endpoint output
 
