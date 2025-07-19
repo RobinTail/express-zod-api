@@ -84,6 +84,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/MichaelHindley.png" alt="@MichaelHindley" width="50px" />](https://github.com/MichaelHindley)
 [<img src="https://github.com/zoton2.png" alt="@zoton2" width="50px" />](https://github.com/zoton2)
 [<img src="https://github.com/ThomasKientz.png" alt="@ThomasKientz" width="50px" />](https://github.com/ThomasKientz)
 [<img src="https://github.com/james10424.png" alt="@james10424" width="50px" />](https://github.com/james10424)
@@ -175,7 +176,11 @@ pnpm add express-zod-api express zod typescript http-errors
 pnpm add -D @types/express @types/node @types/http-errors
 ```
 
-Ensure having the following options in your `tsconfig.json` file in order to make it work as expected:
+## Environment preparation
+
+Consider using the recommended `tsconfig.json` base for your project according to your Node.js version,
+for example [the base for Node.js 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json).
+Ensure having the following options in order to make it work as expected:
 
 ```json
 {
