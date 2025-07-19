@@ -58,7 +58,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Graceful shutdown](#graceful-shutdown)
    6. [Subscriptions](#subscriptions)
 8. [Caveats](#caveats)
-   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+   1. [Zod 4 schema assignment error](#zod-4-schema-assignment-error)
+   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
 
 See also [Changelog](CHANGELOG.md) and [automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
@@ -84,6 +85,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/MichaelHindley.png" alt="@MichaelHindley" width="50px" />](https://github.com/MichaelHindley)
 [<img src="https://github.com/zoton2.png" alt="@zoton2" width="50px" />](https://github.com/zoton2)
 [<img src="https://github.com/ThomasKientz.png" alt="@ThomasKientz" width="50px" />](https://github.com/ThomasKientz)
 [<img src="https://github.com/james10424.png" alt="@james10424" width="50px" />](https://github.com/james10424)
@@ -175,7 +177,11 @@ pnpm add express-zod-api express zod typescript http-errors
 pnpm add -D @types/express @types/node @types/http-errors
 ```
 
-Ensure having the following options in your `tsconfig.json` file in order to make it work as expected:
+## Environment preparation
+
+Consider using the recommended `tsconfig.json` base for your project according to your Node.js version,
+for example [the base for Node.js 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json).
+Ensure having the following options in order to make it work as expected:
 
 ```json
 {
@@ -185,6 +191,8 @@ Ensure having the following options in your `tsconfig.json` file in order to mak
   }
 }
 ```
+
+See also how `moduleResolution` may cause [Zod 4 schema assignment error](#zod-4-schema-assignment-error).
 
 ## Set up config
 
@@ -1376,6 +1384,18 @@ framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has si
 
 There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
+
+## Zod 4 schema assignment error
+
+When using `zod@^4` and doing `import { z } from "zod"` you may encounter the following error:
+
+```text
+TS2739: ZodObject<...> is missing the following properties from ZodType<...>: example, deprecated.
+```
+
+In this case make sure the `moduleResolution` in your `tsconfig.json` is either `node16`, `nodenext` or `bundler`.
+Consider the [recommended tsconfig base, Node 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json).
+Otherwise, keep importing `from "zod/v4"` or consider upgrading the framework to v25.
 
 ## Excessive properties in endpoint output
 

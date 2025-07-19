@@ -2,6 +2,18 @@
 
 ## Version 24
 
+### v24.6.2
+
+- Correcting recommendations given in [v24.6.0](#v2460) regarding using with `zod@^4.0.0`:
+  - Make sure the `moduleResolution` in your `tsconfig.json` is either `node16`, `nodenext` or `bundler`;
+  - Consider the [recommended tsconfig base, Node 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json);
+  - Then you MAY `import { z } from "zod"`;
+  - Otherwise, you MUST keep `import { z } from "zod/v4"`;
+  - In some cases module augmentation (Zod plugin) did not work and caused schema assignment errors for some users;
+  - The issue was reported by [@MichaelHindley](https://github.com/MichaelHindley);
+- This potential inconvenience will be resolved by dropping `zod@^3` in the next version of Express Zod API:
+  - If you're having troubles using the framework with `zod@^4.0.0`, consider upgrading to v25 (currently beta).
+
 ### v24.6.1
 
 - Compatibility fix for recently changed type of Express native middleware:
@@ -14,7 +26,8 @@
 ### v24.6.0
 
 - Supporting `zod` versions `^3.25.35 || ^4.0.0`:
-  - If you use `zod@^4.0.0` then `import { z } from "zod"`;
+  - If you use `zod@^4.0.0` then you MAY `import { z } from "zod"`:
+    - If facing error, ensure `moduleResolution` in your `tsconfig.json` is either `node16`, `nodenext` or `bundler`;
   - If you use `zod@^3.25.35` then keep `import { z } from "zod/v4"`;
   - For more details, see the [Explanation of the versioning strategy](https://github.com/colinhacks/zod/issues/4371).
 
