@@ -1,5 +1,5 @@
 import type { UploadedFile } from "express-fileupload";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const ezUploadBrand = Symbol("Upload");
 

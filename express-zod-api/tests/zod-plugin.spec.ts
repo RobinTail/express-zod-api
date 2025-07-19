@@ -1,5 +1,5 @@
 import camelize from "camelize-ts";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { getBrand } from "../src/metadata";
 
 describe("Zod Runtime Plugin", () => {

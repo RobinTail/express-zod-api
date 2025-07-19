@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { globalRegistry, z } from "zod/v4";
+import { globalRegistry, z } from "zod";
 import {
   ApiResponse,
   defaultStatusCodes,

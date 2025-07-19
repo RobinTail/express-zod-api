@@ -1,7 +1,7 @@
 import { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 import type { $ZodObject } from "zod/v4/core";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import {

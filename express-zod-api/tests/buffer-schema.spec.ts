@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { z, $brand } from "zod/v4";
+import { z, $brand } from "zod";
 import { ez } from "../src";
 
 describe("ez.buffer()", () => {

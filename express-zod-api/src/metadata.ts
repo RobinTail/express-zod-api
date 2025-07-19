@@ -1,4 +1,4 @@
-import { globalRegistry } from "zod/v4";
+import { globalRegistry } from "zod";
 import type { $ZodType } from "zod/v4/core";
 
 export const metaSymbol = Symbol.for("express-zod-api");

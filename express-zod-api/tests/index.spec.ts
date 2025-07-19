@@ -1,7 +1,7 @@
 import type { $ZodType, JSONSchema } from "zod/v4/core";
 import { IRouter } from "express";
 import ts from "typescript";
-import { z } from "zod/v4";
+import { z } from "zod";
 import * as entrypoint from "../src";
 import {
   ApiResponse,

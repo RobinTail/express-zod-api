@@ -8,9 +8,9 @@ import {
   ResultHandler,
   testMiddleware,
 } from "../src";
-import { EmptyObject, EmptySchema } from "../src/common-helpers";
+import { EmptyObject } from "../src/common-helpers";
 import { Endpoint } from "../src/endpoint";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 describe("EndpointsFactory", () => {
   const resultHandlerMock = new ResultHandler({
@@ -76,10 +76,7 @@ describe("EndpointsFactory", () => {
         handler: async () => ({ test: "fist option" }),
       });
       expectTypeOf(factory).toEqualTypeOf<
-        EndpointsFactory<
-          z.ZodIntersection<EmptySchema, EmptySchema>,
-          EmptyObject & { test: string }
-        >
+        EndpointsFactory<undefined, EmptyObject & { test: string }>
       >();
     });
 
@@ -122,10 +119,7 @@ describe("EndpointsFactory", () => {
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"].length).toBe(1);
-      expect(newFactory["middlewares"][0].schema).toBeInstanceOf(z.ZodObject);
-      expect(
-        (newFactory["middlewares"][0].schema as z.ZodObject).shape,
-      ).toEqual({});
+      expect(newFactory["middlewares"][0].schema).toBeUndefined();
       const { output: options } = await testMiddleware({
         middleware: newFactory["middlewares"][0],
       });
@@ -150,10 +144,7 @@ describe("EndpointsFactory", () => {
           provider: (req) => ({ result: req.body.test }),
         });
         expect(newFactory["middlewares"].length).toBe(1);
-        expect(newFactory["middlewares"][0].schema).toBeInstanceOf(z.ZodObject);
-        expect(
-          (newFactory["middlewares"][0].schema as z.ZodObject).shape,
-        ).toEqual({});
+        expect(newFactory["middlewares"][0].schema).toBeUndefined();
         const {
           output: options,
           responseMock,

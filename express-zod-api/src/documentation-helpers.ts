@@ -24,7 +24,7 @@ import {
   TagObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
 import {
@@ -138,31 +138,6 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
   if (!jsonSchema.anyOf) return jsonSchema;
   const original = jsonSchema.anyOf[0];
   return Object.assign(original, { type: makeNullableType(original.type) });
-};
-
-const isSupportedType = (subject: string): subject is SchemaObjectType =>
-  subject in samples;
-
-/**
- * @todo remove in v25
- * @since zod 3.25.45
- */
-export const depictEnum: Depicter = ({ jsonSchema }) => {
-  const suggestedType = typeof jsonSchema.enum?.[0];
-  if (!jsonSchema.type && isSupportedType(suggestedType))
-    jsonSchema.type = suggestedType;
-  return jsonSchema;
-};
-
-/**
- * @todo remove in v25
- * @since zod 3.25.49
- * */
-export const depictLiteral: Depicter = ({ jsonSchema }) => {
-  const suggestedType = typeof (jsonSchema.const || jsonSchema.enum?.[0]);
-  if (!jsonSchema.type && isSupportedType(suggestedType))
-    jsonSchema.type = suggestedType;
-  return jsonSchema;
 };
 
 /** @since v24.3.1 schema compliance is fully delegated to Zod */
@@ -380,8 +355,6 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     intersection: depictIntersection,
     tuple: depictTuple,
     pipe: depictPipeline,
-    literal: depictLiteral,
-    enum: depictEnum,
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import * as R from "ramda";
-import { z, globalRegistry } from "zod/v4";
+import { z, globalRegistry } from "zod";
 import type { $ZodObject } from "zod/v4/core";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { findRequestTypeDefiningSchema } from "./deep-checks";

@@ -8,7 +8,7 @@
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { getExamples, metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
 import type {
@@ -43,7 +43,7 @@ declare module "zod/v4/core" {
   }
 }
 
-declare module "zod/v4" {
+declare module "zod" {
   interface ZodType<
     out Output = unknown,
     out Input = unknown,
