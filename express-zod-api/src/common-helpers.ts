@@ -4,7 +4,8 @@ import { z } from "zod/v4";
 import type { $ZodTransform, $ZodType } from "zod/v4/core";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
-import { AuxMethod, Method } from "./method";
+import { AuxMethod, ClientMethod, Method } from "./method";
+import { ResponseVariant } from "./api-response";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = z.output<EmptySchema>;
@@ -130,3 +131,8 @@ export const isProduction = R.memoizeWith(
   () => process.env.TSUP_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSUP
   () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
 );
+
+export const doesImplyContent = (
+  method: ClientMethod,
+  responseVariant: ResponseVariant,
+) => !(method === "head" && responseVariant === "positive");

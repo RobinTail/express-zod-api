@@ -14,7 +14,7 @@ import {
   makeLiteralType,
   makeUnion,
 } from "./typescript-api";
-import { makeCleanId } from "./common-helpers";
+import { doesImplyContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { walkRouting } from "./routing-walker";
@@ -113,8 +113,7 @@ export class Integration extends IntegrationBase {
           const responses = endpoint.getResponses(responseVariant);
           const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
             const hasContent =
-              mimeTypes &&
-              !(method === "head" && responseVariant === "positive");
+              mimeTypes && doesImplyContent(method, responseVariant);
             const variantType = makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
               zodToTs(hasContent ? schema : noContent, ctxOut),
