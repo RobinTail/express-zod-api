@@ -20,8 +20,10 @@ describe("Method", () => {
   });
 
   describe("AuxMethod", () => {
-    test("should be options", () => {
-      expectTypeOf<AuxMethod>().toEqualTypeOf("options" as const);
+    test("should be options or head", () => {
+      expectTypeOf<"options">().toExtend<AuxMethod>();
+      expectTypeOf<"head">().toExtend<AuxMethod>();
+      expectTypeOf<"other">().not.toExtend<AuxMethod>();
     });
   });
 

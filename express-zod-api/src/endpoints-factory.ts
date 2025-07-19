@@ -7,7 +7,7 @@ import {
   getFinalEndpointInputSchema,
   ConditionalIntersection,
 } from "./io-schema";
-import { Method } from "./method";
+import { ClientMethod, Method } from "./method";
 import {
   AbstractMiddleware,
   ExpressMiddleware,
@@ -45,7 +45,7 @@ interface BuildProps<
   /** @desc The operation summary for the generated Documentation (50 symbols max) */
   shortDescription?: string;
   /** @desc The operation ID for the generated Documentation (must be unique) */
-  operationId?: string | ((method: Method) => string);
+  operationId?: string | ((method: ClientMethod) => string);
   /**
    * @desc HTTP method(s) this endpoint can handle
    * @default "get" unless the Endpoint is assigned within DependsOnMethod
@@ -128,7 +128,10 @@ export class EndpointsFactory<
     const { middlewares, resultHandler } = this;
     const methods = typeof method === "string" ? [method] : method;
     const getOperationId =
-      typeof operationId === "function" ? operationId : () => operationId;
+      typeof operationId === "function"
+        ? operationId
+        : (mtd: ClientMethod) =>
+            operationId && `${operationId}${mtd === "head" ? "__HEAD" : ""}`; // ensure non-breaking change
     const scopes = typeof scope === "string" ? [scope] : scope || [];
     const tags = typeof tag === "string" ? [tag] : tag || [];
     return new Endpoint({

@@ -7,9 +7,11 @@ import {
   makeCleanId,
   ensureError,
   getRoutePathParams,
+  doesImplyContent,
 } from "../src/common-helpers";
 import { z } from "zod/v4";
 import { makeRequestMock } from "../src/testing";
+import { methods } from "../src/method";
 
 describe("Common Helpers", () => {
   describe("defaultInputSources", () => {
@@ -66,6 +68,13 @@ describe("Common Helpers", () => {
     });
     test("should return query for GET requests by default", () => {
       expect(getInput(makeRequestMock({ query: { param: 123 } }), {})).toEqual({
+        param: 123,
+      });
+    });
+    test("should return query for HEAD requests by default", () => {
+      expect(
+        getInput(makeRequestMock({ method: "HEAD", query: { param: 123 } })),
+      ).toEqual({
         param: 123,
       });
     });
@@ -279,5 +288,17 @@ describe("Common Helpers", () => {
         expect(makeCleanId(...args)).toMatchSnapshot();
       },
     );
+  });
+
+  describe("doesImplyContent()", () => {
+    test.each(methods)("should return true for %s", (method) => {
+      expect(doesImplyContent(method, "positive")).toBe(true);
+      expect(doesImplyContent(method, "negative")).toBe(true);
+    });
+
+    test("should return false for positive response to HEAD request", () => {
+      expect(doesImplyContent("head", "positive")).toBe(false);
+      expect(doesImplyContent("head", "negative")).toBe(true);
+    });
   });
 });

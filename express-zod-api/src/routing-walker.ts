@@ -5,6 +5,7 @@ import { isMethod, Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
 
+/** @todo check if still need to export */
 export type OnEndpoint = (
   endpoint: AbstractEndpoint,
   path: string,

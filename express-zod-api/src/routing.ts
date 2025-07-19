@@ -6,7 +6,7 @@ import { ContentType } from "./content-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { Diagnostics } from "./diagnostics";
 import { AbstractEndpoint } from "./endpoint";
-import { AuxMethod, Method } from "./method";
+import { AuxMethod, isMethod, Method } from "./method";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { GetLogger } from "./server-helpers";
@@ -25,8 +25,8 @@ export interface Routing {
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
 const lineUp = (methods: Array<Method | AuxMethod>) =>
-  methods // options is last, fine to sort in-place
-    .sort((a, b) => +(a === "options") - +(b === "options"))
+  methods // auxiliary methods go last
+    .sort((a, b) => +isMethod(b) - +isMethod(a) || a.localeCompare(b))
     .join(", ")
     .toUpperCase();
 
@@ -81,6 +81,8 @@ export const initRouting = ({
   const deprioritized = new Map<string, RequestHandler>();
   for (const [path, methods] of familiar) {
     const accessMethods = Array.from(methods.keys());
+    /** @link https://github.com/RobinTail/express-zod-api/discussions/2791#discussioncomment-13745912 */
+    if (accessMethods.includes("get")) accessMethods.push("head");
     for (const [method, [matchingParsers, endpoint]] of methods) {
       const handlers = matchingParsers
         .slice() // must be immutable

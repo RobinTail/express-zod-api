@@ -4,7 +4,8 @@ import { z } from "zod/v4";
 import type { $ZodTransform, $ZodType } from "zod/v4/core";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
-import { AuxMethod, Method } from "./method";
+import { AuxMethod, ClientMethod, Method } from "./method";
+import { ResponseVariant } from "./api-response";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = z.output<EmptySchema>;
@@ -44,20 +45,27 @@ export const defaultInputSources: InputSources = {
 };
 const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 
+/** @todo consider removing "as" to ensure more constraints and realistic handling */
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as Method | AuxMethod;
+
+export const getInputSources = (
+  actualMethod: ReturnType<typeof getActualMethod>,
+  userDefined: CommonConfig["inputSources"] = {},
+) => {
+  if (actualMethod === "options") return [];
+  const method = actualMethod === "head" ? "get" : actualMethod;
+  return (
+    userDefined[method] || defaultInputSources[method] || fallbackInputSource
+  );
+};
 
 export const getInput = (
   req: Request,
   userDefined: CommonConfig["inputSources"] = {},
 ): FlatObject => {
-  const method = getActualMethod(req);
-  if (method === "options") return {};
-  return (
-    userDefined[method] ||
-    defaultInputSources[method] ||
-    fallbackInputSource
-  )
+  const actualMethod = getActualMethod(req);
+  return getInputSources(actualMethod, userDefined)
     .filter((src) => (src === "files" ? areFilesAvailable(req) : true))
     .reduce<FlatObject>((agg, src) => Object.assign(agg, req[src]), {});
 };
@@ -123,3 +131,8 @@ export const isProduction = R.memoizeWith(
   () => process.env.TSUP_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSUP
   () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
 );
+
+export const doesImplyContent = (
+  method: ClientMethod,
+  responseVariant: ResponseVariant,
+) => !(method === "head" && responseVariant === "positive");
