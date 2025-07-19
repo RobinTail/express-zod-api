@@ -12,6 +12,10 @@
   - Positive response to `HEAD` request is the same as for `GET`, but without the body:
     - Added `head` request depiction to the generated `Documentation`;
     - Added `head` request types to the generated `Integration` client;
+  - Regarding the expected `Content-Length` header in response to `HEAD` request:
+    - `ResultHandler`s using `response.send()` (as well as its shorthands such as `.json()`) automatically do that
+      instead of sending the response body (no changes needed);
+    - Other approaches, such as stream piping, might require to implement `Content-Length` header for `HEAD` requests;
   - The following customizable functions can now receive `head` as an argument:
     - `operationId` supplied to `EndpointsFactory::build()`;
     - `isHeader` supplied to `Documentation::constructor()`;
