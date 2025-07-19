@@ -78,14 +78,15 @@ describe("Common Helpers", () => {
       },
     );
 
-    test.each([undefined, {}, { get: ["body" as const] }])(
-      "for HEAD should return the same as for GET",
-      (userDefined) => {
-        expect(getInputSources("head", userDefined)).toEqual(
-          getInputSources("get", userDefined),
-        );
-      },
-    );
+    test.each<Partial<InputSources> | undefined>([
+      undefined,
+      {},
+      { get: ["body"] },
+    ])("for HEAD should return the same as for GET", (userDefined) => {
+      expect(getInputSources("head", userDefined)).toEqual(
+        getInputSources("get", userDefined),
+      );
+    });
   });
 
   describe("getInput()", () => {
