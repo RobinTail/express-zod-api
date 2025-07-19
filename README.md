@@ -192,7 +192,7 @@ Ensure having the following options in order to make it work as expected:
 }
 ```
 
-See also how `moduleResoultion` may cause [Zod 4 schema assignment error](#zod-4-schema-assignment-error).
+See also how `moduleResolution` may cause [Zod 4 schema assignment error](#zod-4-schema-assignment-error).
 
 ## Set up config
 
