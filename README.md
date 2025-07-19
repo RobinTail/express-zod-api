@@ -1393,7 +1393,7 @@ When using `zod@^4` and doing `import { z } from "zod"` you may encounter the fo
 TS2739: ZodObject<...> is missing the following properties from ZodType<...>: example, deprecated.
 ```
 
-In this case make sure the `moduleResolution` in your `tsconfig.json` is either `node16`, `nodenext` or `bundle`.
+In this case make sure the `moduleResolution` in your `tsconfig.json` is either `node16`, `nodenext` or `bundler`.
 Consider the [recommended tsconfig base, Node 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json).
 Otherwise, keep importing `from "zod/v4"` or consider upgrading the framework to v25.
 
