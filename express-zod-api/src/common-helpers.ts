@@ -43,8 +43,7 @@ export const defaultInputSources: InputSources = {
   patch: ["body", "params"],
   delete: ["query", "params"],
 };
-/** @todo pluralize name */
-const fallbackInputSource: InputSource[] = ["body", "query", "params"];
+const fallbackInputSources: InputSource[] = ["body", "query", "params"];
 
 export const getActualMethod = (request: Request) =>
   request.method.toLowerCase() as SomeMethod;
@@ -63,7 +62,7 @@ export const getInputSources = (
   const matchingSources = method
     ? userDefined[method] || defaultInputSources[method]
     : undefined;
-  return matchingSources || fallbackInputSource;
+  return matchingSources || fallbackInputSources;
 };
 
 export const getInput = (
