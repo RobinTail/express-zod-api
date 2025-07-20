@@ -4,7 +4,7 @@ import { z } from "zod/v4";
 import type { $ZodTransform, $ZodType } from "zod/v4/core";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
-import { AuxMethod, ClientMethod, Method } from "./method";
+import { ClientMethod, FamiliarMethod } from "./method";
 import { ResponseVariant } from "./api-response";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
@@ -47,7 +47,7 @@ const fallbackInputSource: InputSource[] = ["body", "query", "params"];
 
 /** @todo consider removing "as" to ensure more constraints and realistic handling */
 export const getActualMethod = (request: Request) =>
-  request.method.toLowerCase() as Method | AuxMethod;
+  request.method.toLowerCase() as FamiliarMethod;
 
 export const getInputSources = (
   actualMethod: ReturnType<typeof getActualMethod>,

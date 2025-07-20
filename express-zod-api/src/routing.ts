@@ -6,7 +6,7 @@ import { ContentType } from "./content-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { Diagnostics } from "./diagnostics";
 import { AbstractEndpoint } from "./endpoint";
-import { AuxMethod, isMethod, Method } from "./method";
+import { CORSMethod, isMethod } from "./method";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { GetLogger } from "./server-helpers";
@@ -24,7 +24,7 @@ export interface Routing {
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
-const lineUp = (methods: Array<Method | AuxMethod>) =>
+const lineUp = (methods: Array<CORSMethod>) =>
   methods // auxiliary methods go last
     .sort((a, b) => +isMethod(b) - +isMethod(a) || a.localeCompare(b))
     .join(", ")
@@ -32,7 +32,7 @@ const lineUp = (methods: Array<Method | AuxMethod>) =>
 
 /** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405 */
 export const createWrongMethodHandler =
-  (allowedMethods: Array<Method | AuxMethod>): RequestHandler =>
+  (allowedMethods: Array<CORSMethod>): RequestHandler =>
   ({ method }, res, next) => {
     const Allow = lineUp(allowedMethods);
     res.set({ Allow }); // in case of a custom errorHandler configured that does not care about headers in error
@@ -42,13 +42,13 @@ export const createWrongMethodHandler =
     next(error);
   };
 
-const makeCorsHeaders = (accessMethods: Array<Method | AuxMethod>) => ({
+const makeCorsHeaders = (accessMethods: Array<CORSMethod>) => ({
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": lineUp(accessMethods),
   "Access-Control-Allow-Headers": "content-type",
 });
 
-type Siblings = Map<Method | AuxMethod, [RequestHandler[], AbstractEndpoint]>;
+type Siblings = Map<CORSMethod, [RequestHandler[], AbstractEndpoint]>;
 
 export const initRouting = ({
   app,

@@ -3,7 +3,6 @@ import {
   isMethod,
   methods,
   Method,
-  AuxMethod,
   clientMethods,
   ClientMethod,
 } from "../src/method";
@@ -49,14 +48,6 @@ describe("Method", () => {
       expectTypeOf<"patch">().toExtend<ClientMethod>();
       expectTypeOf<"head">().toExtend<ClientMethod>();
       expectTypeOf<"wrong">().not.toExtend<ClientMethod>();
-    });
-  });
-
-  describe("AuxMethod", () => {
-    test("should be options or head", () => {
-      expectTypeOf<"options">().toExtend<AuxMethod>();
-      expectTypeOf<"head">().toExtend<AuxMethod>();
-      expectTypeOf<"other">().not.toExtend<AuxMethod>();
     });
   });
 
