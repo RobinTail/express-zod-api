@@ -160,6 +160,20 @@ describe("Example", async () => {
       expect(hash).toMatchSnapshot();
     });
 
+    test("Should inform on content length for sendable image", async () => {
+      const response = await fetch(
+        `http://localhost:${port}/v1/avatar/send?userId=123`,
+        { method: "HEAD" },
+      );
+      expect(response.status).toBe(200);
+      expect(response.headers.has("Content-type")).toBeTruthy();
+      expect(response.headers.get("Content-type")).toBe(
+        "image/svg+xml; charset=utf-8",
+      );
+      expect(response.headers.has("Content-Length")).toBeTruthy();
+      expect(response.headers.get("Content-Length")).toBe("48687");
+    });
+
     test("Should stream an image with a correct header", async () => {
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/stream?userId=123`,
@@ -182,6 +196,21 @@ describe("Example", async () => {
         .update(await response.text())
         .digest("hex");
       expect(hash).toMatchSnapshot();
+    });
+
+    test("Should inform on content length for streaming image", async () => {
+      const response = await fetch(
+        `http://localhost:${port}/v1/avatar/stream?userId=123`,
+        { method: "HEAD" },
+      );
+      expect(response.status).toBe(200);
+      expect(response.headers.has("Content-type")).toBeTruthy();
+      expect(response.headers.get("Content-type")).toBe("image/svg+xml");
+      expect(response.headers.get("Content-Disposition")).toBe(
+        `attachment; filename="logo.svg"`,
+      );
+      expect(response.headers.has("Content-Length")).toBeTruthy();
+      expect(response.headers.get("Content-Length")).toBe("48687");
     });
 
     test("Should serve static files", async () => {

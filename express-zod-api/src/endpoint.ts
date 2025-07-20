@@ -23,7 +23,7 @@ import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer } from "./logical-container";
 import { getBrand, getExamples } from "./metadata";
-import { AuxMethod, Method } from "./method";
+import { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
@@ -54,7 +54,7 @@ export abstract class AbstractEndpoint extends Routable {
     variant: ResponseVariant,
   ): ReadonlyArray<NormalizedResponse>;
   /** @internal */
-  public abstract getOperationId(method: Method): string | undefined;
+  public abstract getOperationId(method: ClientMethod): string | undefined;
   /** @internal */
   public abstract get description(): string | undefined;
   /** @internal */
@@ -105,7 +105,7 @@ export class Endpoint<
     resultHandler: AbstractResultHandler;
     description?: string;
     shortDescription?: string;
-    getOperationId?: (method: Method) => string | undefined;
+    getOperationId?: (method: ClientMethod) => string | undefined;
     methods?: Method[];
     scopes?: string[];
     tags?: string[];
@@ -194,7 +194,7 @@ export class Endpoint<
   }
 
   /** @internal */
-  public override getOperationId(method: Method): string | undefined {
+  public override getOperationId(method: ClientMethod): string | undefined {
     return this.#def.getOperationId?.(method);
   }
 
@@ -213,7 +213,7 @@ export class Endpoint<
     response,
     ...rest
   }: {
-    method: Method | AuxMethod;
+    method: SomeMethod;
     input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;
@@ -221,7 +221,11 @@ export class Endpoint<
     options: Partial<OPT>;
   }) {
     for (const mw of this.#def.middlewares || []) {
-      if (method === "options" && !(mw instanceof ExpressMiddleware)) continue;
+      if (
+        method === ("options" satisfies CORSMethod) &&
+        !(mw instanceof ExpressMiddleware)
+      )
+        continue;
       Object.assign(
         options,
         await mw.execute({ ...rest, options, response, logger }),
@@ -302,7 +306,8 @@ export class Endpoint<
         options,
       });
       if (response.writableEnded) return;
-      if (method === "options") return void response.status(200).end();
+      if (method === ("options" satisfies CORSMethod))
+        return void response.status(200).end();
       result = {
         output: await this.#parseOutput(
           await this.#parseAndRunHandler({

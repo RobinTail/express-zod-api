@@ -4,7 +4,14 @@ import { z } from "zod";
 import type { $ZodTransform, $ZodType } from "zod/v4/core";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
-import { AuxMethod, Method } from "./method";
+import {
+  ClientMethod,
+  SomeMethod,
+  isMethod,
+  Method,
+  CORSMethod,
+} from "./method";
+import { ResponseVariant } from "./api-response";
 
 /** @since zod 3.25.61 output type fixed */
 export const emptySchema = z.object({});
@@ -43,22 +50,34 @@ export const defaultInputSources: InputSources = {
   patch: ["body", "params"],
   delete: ["query", "params"],
 };
-const fallbackInputSource: InputSource[] = ["body", "query", "params"];
+const fallbackInputSources: InputSource[] = ["body", "query", "params"];
 
 export const getActualMethod = (request: Request) =>
-  request.method.toLowerCase() as Method | AuxMethod;
+  request.method.toLowerCase() as SomeMethod;
+
+export const getInputSources = (
+  actualMethod: SomeMethod,
+  userDefined: CommonConfig["inputSources"] = {},
+) => {
+  if (actualMethod === ("options" satisfies CORSMethod)) return [];
+  const method =
+    actualMethod === ("head" satisfies ClientMethod)
+      ? ("get" satisfies Method)
+      : isMethod(actualMethod)
+        ? actualMethod
+        : undefined;
+  const matchingSources = method
+    ? userDefined[method] || defaultInputSources[method]
+    : undefined;
+  return matchingSources || fallbackInputSources;
+};
 
 export const getInput = (
   req: Request,
   userDefined: CommonConfig["inputSources"] = {},
 ): FlatObject => {
-  const method = getActualMethod(req);
-  if (method === "options") return {};
-  return (
-    userDefined[method] ||
-    defaultInputSources[method] ||
-    fallbackInputSource
-  )
+  const actualMethod = getActualMethod(req);
+  return getInputSources(actualMethod, userDefined)
     .filter((src) => (src === "files" ? areFilesAvailable(req) : true))
     .reduce<FlatObject>((agg, src) => Object.assign(agg, req[src]), {});
 };
@@ -124,3 +143,8 @@ export const isProduction = R.memoizeWith(
   () => process.env.TSUP_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSUP
   () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
 );
+
+export const doesImplyContent = (
+  method: ClientMethod,
+  responseVariant: ResponseVariant,
+) => !(method === "head" && responseVariant === "positive");

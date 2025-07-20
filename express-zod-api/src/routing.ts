@@ -6,7 +6,7 @@ import { ContentType } from "./content-type";
 import { DependsOnMethod } from "./depends-on-method";
 import { Diagnostics } from "./diagnostics";
 import { AbstractEndpoint } from "./endpoint";
-import { AuxMethod, Method } from "./method";
+import { CORSMethod, isMethod } from "./method";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import { GetLogger } from "./server-helpers";
@@ -24,15 +24,15 @@ export interface Routing {
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
-const lineUp = (methods: Array<Method | AuxMethod>) =>
-  methods // options is last, fine to sort in-place
-    .sort((a, b) => +(a === "options") - +(b === "options"))
+const lineUp = (methods: CORSMethod[]) =>
+  methods // auxiliary methods go last
+    .sort((a, b) => +isMethod(b) - +isMethod(a) || a.localeCompare(b))
     .join(", ")
     .toUpperCase();
 
 /** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405 */
 export const createWrongMethodHandler =
-  (allowedMethods: Array<Method | AuxMethod>): RequestHandler =>
+  (allowedMethods: CORSMethod[]): RequestHandler =>
   ({ method }, res, next) => {
     const Allow = lineUp(allowedMethods);
     res.set({ Allow }); // in case of a custom errorHandler configured that does not care about headers in error
@@ -42,13 +42,13 @@ export const createWrongMethodHandler =
     next(error);
   };
 
-const makeCorsHeaders = (accessMethods: Array<Method | AuxMethod>) => ({
+const makeCorsHeaders = (accessMethods: CORSMethod[]) => ({
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": lineUp(accessMethods),
   "Access-Control-Allow-Headers": "content-type",
 });
 
-type Siblings = Map<Method | AuxMethod, [RequestHandler[], AbstractEndpoint]>;
+type Siblings = Map<CORSMethod, [RequestHandler[], AbstractEndpoint]>;
 
 export const initRouting = ({
   app,
@@ -65,7 +65,7 @@ export const initRouting = ({
 }) => {
   let doc = isProduction() ? undefined : new Diagnostics(getLogger()); // disposable
   const familiar = new Map<string, Siblings>();
-  const onEndpoint: OnEndpoint = (endpoint, path, method) => {
+  const onEndpoint: OnEndpoint = (method, path, endpoint) => {
     if (!isProduction()) {
       doc?.checkSchema(endpoint, { path, method });
       doc?.checkPathParams(path, endpoint, { method });
@@ -81,6 +81,8 @@ export const initRouting = ({
   const deprioritized = new Map<string, RequestHandler>();
   for (const [path, methods] of familiar) {
     const accessMethods = Array.from(methods.keys());
+    /** @link https://github.com/RobinTail/express-zod-api/discussions/2791#discussioncomment-13745912 */
+    if (accessMethods.includes("get")) accessMethods.push("head");
     for (const [method, [matchingParsers, endpoint]] of methods) {
       const handlers = matchingParsers
         .slice() // must be immutable

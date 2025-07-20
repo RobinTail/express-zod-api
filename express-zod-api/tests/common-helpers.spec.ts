@@ -7,12 +7,16 @@ import {
   makeCleanId,
   ensureError,
   getRoutePathParams,
+  doesImplyContent,
+  getInputSources,
   emptySchema,
   EmptySchema,
   EmptyObject,
 } from "../src/common-helpers";
 import { z } from "zod";
 import { makeRequestMock } from "../src/testing";
+import { methods } from "../src/method";
+import { CommonConfig, InputSources } from "../src/config-type";
 
 describe("Common Helpers", () => {
   describe("emptySchema", () => {
@@ -67,6 +71,44 @@ describe("Common Helpers", () => {
     });
   });
 
+  describe("getInputSources()", () => {
+    test.each([undefined, {}])(
+      "should return empty array for options %#",
+      (userDefined) => {
+        expect(getInputSources("options", userDefined)).toEqual([]);
+      },
+    );
+
+    test.each(methods)("should return user defined ones for %s", (method) => {
+      const userDefined: InputSources = {
+        get: ["headers"],
+        put: ["files"],
+        post: ["query"],
+        delete: ["params"],
+        patch: ["body"],
+      };
+      expect(getInputSources(method, userDefined)).toEqual(userDefined[method]);
+    });
+
+    test.each([undefined, {}])(
+      "should return default ones when missing user defined for %s",
+      (userDefined) => {
+        expect(getInputSources("get", userDefined)).toEqual(
+          defaultInputSources.get,
+        );
+      },
+    );
+
+    test.each<CommonConfig["inputSources"]>([undefined, {}, { get: ["body"] }])(
+      "for HEAD should return the same as for GET",
+      (userDefined) => {
+        expect(getInputSources("head", userDefined)).toEqual(
+          getInputSources("get", userDefined),
+        );
+      },
+    );
+  });
+
   describe("getInput()", () => {
     test("should return body for POST, PUT and PATCH requests by default", () => {
       expect(
@@ -87,6 +129,13 @@ describe("Common Helpers", () => {
     });
     test("should return query for GET requests by default", () => {
       expect(getInput(makeRequestMock({ query: { param: 123 } }), {})).toEqual({
+        param: 123,
+      });
+    });
+    test("should return query for HEAD requests by default", () => {
+      expect(
+        getInput(makeRequestMock({ method: "HEAD", query: { param: 123 } })),
+      ).toEqual({
         param: 123,
       });
     });
@@ -300,5 +349,17 @@ describe("Common Helpers", () => {
         expect(makeCleanId(...args)).toMatchSnapshot();
       },
     );
+  });
+
+  describe("doesImplyContent()", () => {
+    test.each(methods)("should return true for %s", (method) => {
+      expect(doesImplyContent(method, "positive")).toBe(true);
+      expect(doesImplyContent(method, "negative")).toBe(true);
+    });
+
+    test("should return false for positive response to HEAD request", () => {
+      expect(doesImplyContent("head", "positive")).toBe(false);
+      expect(doesImplyContent("head", "negative")).toBe(true);
+    });
   });
 });

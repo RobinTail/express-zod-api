@@ -28,6 +28,7 @@ import { z } from "zod";
 import { ResponseVariant } from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
 import {
+  doesImplyContent,
   FlatObject,
   getRoutePathParams,
   getTransformedType,
@@ -47,7 +48,7 @@ import { IOSchema } from "./io-schema";
 import { flattenIO } from "./json-schema-helpers";
 import { Alternatives } from "./logical-container";
 import { getBrand } from "./metadata";
-import { Method } from "./method";
+import { ClientMethod } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
 import { FirstPartyKind } from "./schema-walker";
@@ -62,7 +63,7 @@ interface ReqResCommons {
     name?: string,
   ) => ReferenceObject;
   path: string;
-  method: Method;
+  method: ClientMethod;
 }
 
 export interface OpenAPIContext extends ReqResCommons {
@@ -77,7 +78,7 @@ export type Depicter = (
 /** @desc Using defaultIsHeader when returns null or undefined */
 export type IsHeader = (
   name: string,
-  method: Method,
+  method: ClientMethod,
   path: string,
 ) => boolean | null | undefined;
 
@@ -471,7 +472,7 @@ export const depictResponse = ({
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
-  if (!mimeTypes) return { description };
+  if (!mimeTypes || !doesImplyContent(method, variant)) return { description };
   const response = asOAS(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
