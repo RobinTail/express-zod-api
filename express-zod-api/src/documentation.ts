@@ -11,11 +11,7 @@ import * as R from "ramda";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import {
-  doesImplyContent,
-  getInputSources,
-  makeCleanId,
-} from "./common-helpers";
+import { getInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
 import { ClientMethod } from "./method";
@@ -205,7 +201,7 @@ export class Documentation extends OpenApiBuilder {
               ...commons,
               variant,
               schema,
-              mimeTypes: doesImplyContent(method, variant) ? mimeTypes : null,
+              mimeTypes,
               statusCode,
               hasMultipleStatusCodes:
                 apiResponses.length > 1 || statusCodes.length > 1,

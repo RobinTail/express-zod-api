@@ -28,6 +28,7 @@ import { z } from "zod/v4";
 import { ResponseVariant } from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
 import {
+  doesImplyContent,
   FlatObject,
   getRoutePathParams,
   getTransformedType,
@@ -498,7 +499,7 @@ export const depictResponse = ({
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
-  if (!mimeTypes) return { description };
+  if (!mimeTypes || !doesImplyContent(method, variant)) return { description };
   const response = asOAS(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
