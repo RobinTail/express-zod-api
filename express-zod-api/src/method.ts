@@ -23,12 +23,14 @@ export const clientMethods = [
 /**
  * @desc Methods supported by the framework API to produce Endpoints on EndpointsFactory.
  * @see BuildProps
+ * @example "get" | "post" | "put" | "delete" | "patch"
  * */
 export type Method = (typeof methods)[number];
 
 /**
  * @desc Methods usable on the client side, available via generated Integration and Documentation
  * @see withHead
+ * @example Method | "head"
  * */
 export type ClientMethod = (typeof clientMethods)[number];
 
@@ -36,6 +38,7 @@ export type ClientMethod = (typeof clientMethods)[number];
  * @desc Methods supported in CORS headers
  * @see makeCorsHeaders
  * @see createWrongMethodHandler
+ * @example ClientMethod | "options"
  * */
 export type CORSMethod = ClientMethod | Extract<FamiliarMethod, "options">;
 
