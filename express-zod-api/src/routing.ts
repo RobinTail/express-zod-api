@@ -24,7 +24,7 @@ export interface Routing {
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
-const lineUp = (methods: Array<CORSMethod>) =>
+const lineUp = (methods: CORSMethod[]) =>
   methods // auxiliary methods go last
     .sort((a, b) => +isMethod(b) - +isMethod(a) || a.localeCompare(b))
     .join(", ")
@@ -32,7 +32,7 @@ const lineUp = (methods: Array<CORSMethod>) =>
 
 /** @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405 */
 export const createWrongMethodHandler =
-  (allowedMethods: Array<CORSMethod>): RequestHandler =>
+  (allowedMethods: CORSMethod[]): RequestHandler =>
   ({ method }, res, next) => {
     const Allow = lineUp(allowedMethods);
     res.set({ Allow }); // in case of a custom errorHandler configured that does not care about headers in error
@@ -42,7 +42,7 @@ export const createWrongMethodHandler =
     next(error);
   };
 
-const makeCorsHeaders = (accessMethods: Array<CORSMethod>) => ({
+const makeCorsHeaders = (accessMethods: CORSMethod[]) => ({
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": lineUp(accessMethods),
   "Access-Control-Allow-Headers": "content-type",
