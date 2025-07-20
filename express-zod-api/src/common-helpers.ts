@@ -4,7 +4,13 @@ import { z } from "zod/v4";
 import type { $ZodTransform, $ZodType } from "zod/v4/core";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
-import { ClientMethod, SomeMethod, isMethod, Method } from "./method";
+import {
+  ClientMethod,
+  SomeMethod,
+  isMethod,
+  Method,
+  CORSMethod,
+} from "./method";
 import { ResponseVariant } from "./api-response";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
@@ -52,9 +58,9 @@ export const getInputSources = (
   actualMethod: SomeMethod,
   userDefined: CommonConfig["inputSources"] = {},
 ) => {
-  if (actualMethod === "options") return [];
+  if (actualMethod === ("options" satisfies CORSMethod)) return [];
   const method =
-    actualMethod === "head"
+    actualMethod === ("head" satisfies ClientMethod)
       ? ("get" satisfies Method)
       : isMethod(actualMethod)
         ? actualMethod

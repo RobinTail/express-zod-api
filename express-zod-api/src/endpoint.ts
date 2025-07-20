@@ -23,7 +23,7 @@ import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer } from "./logical-container";
 import { getBrand, getExamples } from "./metadata";
-import { ClientMethod, Method, SomeMethod } from "./method";
+import { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
@@ -221,7 +221,11 @@ export class Endpoint<
     options: Partial<OPT>;
   }) {
     for (const mw of this.#def.middlewares || []) {
-      if (method === "options" && !(mw instanceof ExpressMiddleware)) continue;
+      if (
+        method === ("options" satisfies CORSMethod) &&
+        !(mw instanceof ExpressMiddleware)
+      )
+        continue;
       Object.assign(
         options,
         await mw.execute({ ...rest, options, response, logger }),
@@ -302,7 +306,8 @@ export class Endpoint<
         options,
       });
       if (response.writableEnded) return;
-      if (method === "options") return void response.status(200).end();
+      if (method === ("options" satisfies CORSMethod))
+        return void response.status(200).end();
       result = {
         output: await this.#parseOutput(
           await this.#parseAndRunHandler({
