@@ -6,7 +6,6 @@ import {
   clientMethods,
   ClientMethod,
 } from "../src/method";
-import { describe } from "node:test";
 
 describe("Method", () => {
   describe("methods array", () => {

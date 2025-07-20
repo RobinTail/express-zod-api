@@ -23,7 +23,7 @@ import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer } from "./logical-container";
 import { getBrand, getExamples } from "./metadata";
-import { ClientMethod, FamiliarMethod, Method } from "./method";
+import { ClientMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
@@ -213,7 +213,7 @@ export class Endpoint<
     response,
     ...rest
   }: {
-    method: FamiliarMethod /** @todo string */;
+    method: SomeMethod;
     input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
     request: Request;
     response: Response;

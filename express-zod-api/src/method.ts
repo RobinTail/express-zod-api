@@ -1,7 +1,8 @@
 import type { IRouter } from "express";
 
-/** @todo rm export */
-export type FamiliarMethod = Exclude<
+export type SomeMethod = Lowercase<string>;
+
+type FamiliarMethod = Exclude<
   keyof IRouter,
   "param" | "use" | "route" | "stack"
 >;
