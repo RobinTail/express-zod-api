@@ -3,13 +3,20 @@ import {
   isMethod,
   methods,
   Method,
-  AuxMethod,
   clientMethods,
   ClientMethod,
+  SomeMethod,
+  CORSMethod,
 } from "../src/method";
-import { describe } from "node:test";
 
 describe("Method", () => {
+  describe("SomeMethod type", () => {
+    test("should be a lowercase string", () => {
+      expectTypeOf<"test">().toExtend<SomeMethod>();
+      expectTypeOf<"TEST">().not.toExtend<SomeMethod>();
+    });
+  });
+
   describe("methods array", () => {
     test("should be the list of selected keys of express router", () => {
       expect(methods).toEqual(["get", "post", "put", "delete", "patch"]);
@@ -29,7 +36,7 @@ describe("Method", () => {
     });
   });
 
-  describe("the type", () => {
+  describe("Method type", () => {
     test("should match the entries of the methods array", () => {
       expectTypeOf<"get">().toExtend<Method>();
       expectTypeOf<"post">().toExtend<Method>();
@@ -37,6 +44,7 @@ describe("Method", () => {
       expectTypeOf<"delete">().toExtend<Method>();
       expectTypeOf<"patch">().toExtend<Method>();
       expectTypeOf<"wrong">().not.toExtend<Method>();
+      expectTypeOf<Method>().toExtend<SomeMethod>();
     });
   });
 
@@ -49,14 +57,21 @@ describe("Method", () => {
       expectTypeOf<"patch">().toExtend<ClientMethod>();
       expectTypeOf<"head">().toExtend<ClientMethod>();
       expectTypeOf<"wrong">().not.toExtend<ClientMethod>();
+      expectTypeOf<ClientMethod>().toExtend<SomeMethod>();
     });
   });
 
-  describe("AuxMethod", () => {
-    test("should be options or head", () => {
-      expectTypeOf<"options">().toExtend<AuxMethod>();
-      expectTypeOf<"head">().toExtend<AuxMethod>();
-      expectTypeOf<"other">().not.toExtend<AuxMethod>();
+  describe("CORSMethod type", () => {
+    test("should extends ClientMethod with options", () => {
+      expectTypeOf<"get">().toExtend<CORSMethod>();
+      expectTypeOf<"post">().toExtend<CORSMethod>();
+      expectTypeOf<"put">().toExtend<CORSMethod>();
+      expectTypeOf<"delete">().toExtend<CORSMethod>();
+      expectTypeOf<"patch">().toExtend<CORSMethod>();
+      expectTypeOf<"head">().toExtend<CORSMethod>();
+      expectTypeOf<"options">().toExtend<CORSMethod>();
+      expectTypeOf<"wrong">().not.toExtend<CORSMethod>();
+      expectTypeOf<CORSMethod>().toExtend<SomeMethod>();
     });
   });
 

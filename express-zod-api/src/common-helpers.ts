@@ -4,7 +4,13 @@ import { z } from "zod/v4";
 import type { $ZodTransform, $ZodType } from "zod/v4/core";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
-import { AuxMethod, ClientMethod, Method } from "./method";
+import {
+  ClientMethod,
+  SomeMethod,
+  isMethod,
+  Method,
+  CORSMethod,
+} from "./method";
 import { ResponseVariant } from "./api-response";
 
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
@@ -43,21 +49,26 @@ export const defaultInputSources: InputSources = {
   patch: ["body", "params"],
   delete: ["query", "params"],
 };
-const fallbackInputSource: InputSource[] = ["body", "query", "params"];
+const fallbackInputSources: InputSource[] = ["body", "query", "params"];
 
-/** @todo consider removing "as" to ensure more constraints and realistic handling */
 export const getActualMethod = (request: Request) =>
-  request.method.toLowerCase() as Method | AuxMethod;
+  request.method.toLowerCase() as SomeMethod;
 
 export const getInputSources = (
-  actualMethod: ReturnType<typeof getActualMethod>,
+  actualMethod: SomeMethod,
   userDefined: CommonConfig["inputSources"] = {},
 ) => {
-  if (actualMethod === "options") return [];
-  const method = actualMethod === "head" ? "get" : actualMethod;
-  return (
-    userDefined[method] || defaultInputSources[method] || fallbackInputSource
-  );
+  if (actualMethod === ("options" satisfies CORSMethod)) return [];
+  const method =
+    actualMethod === ("head" satisfies ClientMethod)
+      ? ("get" satisfies Method)
+      : isMethod(actualMethod)
+        ? actualMethod
+        : undefined;
+  const matchingSources = method
+    ? userDefined[method] || defaultInputSources[method]
+    : undefined;
+  return matchingSources || fallbackInputSources;
 };
 
 export const getInput = (
