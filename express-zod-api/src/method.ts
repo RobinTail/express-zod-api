@@ -17,6 +17,7 @@ export type Method = (typeof methods)[number];
 /**
  * @desc Additional methods having some technical handling in the framework
  * @see makeCorsHeaders
+ * @todo consider removing it and introducing CORSMethod = ClientMethod | "options"
  * */
 export type AuxMethod = Extract<keyof IRouter, "options" | "head">;
 
