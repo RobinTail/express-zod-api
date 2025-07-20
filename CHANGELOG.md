@@ -6,22 +6,22 @@
 
 - Supporting `HEAD` method:
   - The purpose of the `HEAD` method is to retrieve the headers without performing `GET` request;
-  - It is the built-in feature of Express to support `HEAD` method by request handlers for `GET` requests;
-  - Therefore, each `Endpoint` supporting `get` method also handles `head` requests (no changes required);
-  - Added `HEAD` method to CORS response headers, along with `OPTIONS`, for such endpoints;
-  - Positive response to `HEAD` request is the same as for `GET`, but without the body:
+  - It is the built-in feature of Express to handle `HEAD` requests by the handlers for `GET` requests;
+  - Therefore, each `Endpoint` supporting `get` method also handles `head` requests (no work needed);
+  - Added `HEAD` method to CORS response headers, along with `OPTIONS`, for `GET` method supporting endpoints;
+  - Positive response to `HEAD` request should contain same headers as `GET` would, but without the body:
     - Added `head` request depiction to the generated `Documentation`;
     - Added `head` request types to the generated `Integration` client;
-  - Regarding the expected `Content-Length` header in response to `HEAD` request:
+  - Positive response to `HEAD` request should contain the `Content-Length` header:
     - `ResultHandler`s using `response.send()` (as well as its shorthands such as `.json()`) automatically do that
-      instead of sending the response body (no changes needed);
+      instead of sending the response body (no work needed);
     - Other approaches, such as stream piping, might require to implement `Content-Length` header for `HEAD` requests;
-  - The following customizable functions can now receive `head` as an argument:
+  - This feature was suggested by [@pepegc](https://github.com/pepegc);
+- Caveats:
+  - The following properties, when assigned with functions, can now receive `head` as an argument:
     - `operationId` supplied to `EndpointsFactory::build()`;
     - `isHeader` supplied to `Documentation::constructor()`;
-  - This feature was suggested by [@pepegc](https://github.com/pepegc);
-- Caveat:
-  - If the `operationId` assigned with a string then it is appended with `__HEAD` for `head` method to avoid conflicts;
+  - If the `operationId` is assigned with a `string` then it may be appended with `__HEAD` for `head` method;
 
 ### v24.6.2
 
