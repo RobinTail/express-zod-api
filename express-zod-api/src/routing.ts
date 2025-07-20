@@ -65,7 +65,7 @@ export const initRouting = ({
 }) => {
   let doc = isProduction() ? undefined : new Diagnostics(getLogger()); // disposable
   const familiar = new Map<string, Siblings>();
-  const onEndpoint: OnEndpoint = (endpoint, path, method) => {
+  const onEndpoint: OnEndpoint = (method, path, endpoint) => {
     if (!isProduction()) {
       doc?.checkSchema(endpoint, { path, method });
       doc?.checkPathParams(path, endpoint, { method });

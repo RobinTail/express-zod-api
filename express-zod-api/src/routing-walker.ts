@@ -6,17 +6,17 @@ import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
 
 export type OnEndpoint<M extends string = Method> = (
-  endpoint: AbstractEndpoint,
-  path: string,
   method: M,
+  path: string,
+  endpoint: AbstractEndpoint,
 ) => void;
 
 /** Calls the given hook with HEAD each time it's called with GET method */
 export const withHead =
   (onEndpoint: OnEndpoint<ClientMethod>): OnEndpoint =>
-  (endpoint, path, method) => {
-    onEndpoint(endpoint, path, method);
-    if (method === "get") onEndpoint(endpoint, path, "head");
+  (method, ...rest) => {
+    onEndpoint(method, ...rest);
+    if (method === "get") onEndpoint("head", ...rest);
   };
 
 interface RoutingWalkerParams {
@@ -86,12 +86,12 @@ export const walkRouting = ({
       if (explicitMethod) {
         checkDuplicate(explicitMethod, path, visited);
         checkMethodSupported(explicitMethod, path, element.methods);
-        onEndpoint(element, path, explicitMethod);
+        onEndpoint(explicitMethod, path, element);
       } else {
         const { methods = ["get"] } = element;
         for (const method of methods) {
           checkDuplicate(method, path, visited);
-          onEndpoint(element, path, method);
+          onEndpoint(method, path, element);
         }
       }
     } else {
@@ -103,7 +103,7 @@ export const walkRouting = ({
           const { methods } = endpoint;
           checkDuplicate(method, path, visited);
           checkMethodSupported(method, path, methods);
-          onEndpoint(endpoint, path, method);
+          onEndpoint(method, path, endpoint);
         }
       } else {
         stack.unshift(...processEntries(element, path));

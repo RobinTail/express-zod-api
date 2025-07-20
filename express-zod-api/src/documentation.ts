@@ -159,7 +159,7 @@ export class Documentation extends OpenApiBuilder {
     this.addInfo({ title, version });
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
       this.addServer({ url });
-    const onEndpoint: OnEndpoint<ClientMethod> = (endpoint, path, method) => {
+    const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const commons = {
         path,
         method,

@@ -95,7 +95,7 @@ export class Integration extends IntegrationBase {
     const commons = { makeAlias: this.#makeAlias.bind(this) };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
-    const onEndpoint: OnEndpoint<ClientMethod> = (endpoint, path, method) => {
+    const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
