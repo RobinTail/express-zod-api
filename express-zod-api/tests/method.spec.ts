@@ -8,7 +8,6 @@ import {
   SomeMethod,
   CORSMethod,
 } from "../src/method";
-import { expectTypeOf } from "vitest";
 
 describe("Method", () => {
   describe("SomeMethod type", () => {
