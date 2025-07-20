@@ -80,6 +80,52 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+    head:
+      operationId: HeadV1UserRetrieve
+      summary: Retrieves the user.
+      description: Example user retrieval endpoint.
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: a numeric string containing the id of the user
+          schema:
+            description: a numeric string containing the id of the user
+            type: string
+            pattern: \d+
+      responses:
+        "200":
+          description: HEAD /v1/user/retrieve Positive response
+        "400":
+          description: HEAD /v1/user/retrieve Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                    additionalProperties: false
+                required:
+                  - status
+                  - error
+                additionalProperties: false
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
   /v1/user/{id}/remove:
     delete:
       operationId: DeleteV1UserIdRemove
@@ -401,6 +447,22 @@ paths:
               examples:
                 example1:
                   value: Sample error message
+    head:
+      operationId: HeadV1UserList
+      tags:
+        - users
+      responses:
+        "200":
+          description: HEAD /v1/user/list Positive response
+        "400":
+          description: HEAD /v1/user/list Negative response
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                example1:
+                  value: Sample error message
   /v1/avatar/send:
     get:
       operationId: GetV1AvatarSend
@@ -426,6 +488,30 @@ paths:
                 type: string
         "400":
           description: GET /v1/avatar/send Negative response
+          content:
+            text/plain:
+              schema:
+                type: string
+    head:
+      operationId: HeadV1AvatarSend
+      summary: Sends a file content.
+      deprecated: true
+      tags:
+        - files
+        - users
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: HEAD /v1/avatar/send Parameter
+          schema:
+            type: string
+            pattern: \d+
+      responses:
+        "200":
+          description: HEAD /v1/avatar/send Positive response
+        "400":
+          description: HEAD /v1/avatar/send Negative response
           content:
             text/plain:
               schema:
@@ -456,6 +542,29 @@ paths:
                   url: https://swagger.io/specification/#working-with-binary-data
         "400":
           description: GET /v1/avatar/stream Negative response
+          content:
+            text/plain:
+              schema:
+                type: string
+    head:
+      operationId: HeadV1AvatarStream
+      summary: Streams a file content.
+      tags:
+        - users
+        - files
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          description: HEAD /v1/avatar/stream Parameter
+          schema:
+            type: string
+            pattern: \d+
+      responses:
+        "200":
+          description: HEAD /v1/avatar/stream Positive response
+        "400":
+          description: HEAD /v1/avatar/stream Negative response
           content:
             text/plain:
               schema:
@@ -658,6 +767,29 @@ paths:
                 additionalProperties: false
         "400":
           description: GET /v1/events/stream Negative response
+          content:
+            text/plain:
+              schema:
+                type: string
+    head:
+      operationId: HeadV1EventsStream
+      tags:
+        - subscriptions
+      parameters:
+        - name: trigger
+          in: query
+          deprecated: true
+          required: false
+          description: for testing error response
+          schema:
+            deprecated: true
+            description: for testing error response
+            type: string
+      responses:
+        "200":
+          description: HEAD /v1/events/stream Positive response
+        "400":
+          description: HEAD /v1/events/stream Negative response
           content:
             text/plain:
               schema:

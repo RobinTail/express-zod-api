@@ -1,10 +1,31 @@
 import * as R from "ramda";
-import { isMethod, methods, Method, AuxMethod } from "../src/method";
+import {
+  isMethod,
+  methods,
+  Method,
+  AuxMethod,
+  clientMethods,
+  ClientMethod,
+} from "../src/method";
+import { describe } from "node:test";
 
 describe("Method", () => {
   describe("methods array", () => {
     test("should be the list of selected keys of express router", () => {
       expect(methods).toEqual(["get", "post", "put", "delete", "patch"]);
+    });
+  });
+
+  describe("clientMethods array", () => {
+    test("should be same methods and the head", () => {
+      expect(clientMethods).toEqual([
+        "get",
+        "post",
+        "put",
+        "delete",
+        "patch",
+        "head",
+      ]);
     });
   });
 
@@ -19,9 +40,23 @@ describe("Method", () => {
     });
   });
 
+  describe("ClientMethod type", () => {
+    test("should match the entries of the methods array", () => {
+      expectTypeOf<"get">().toExtend<ClientMethod>();
+      expectTypeOf<"post">().toExtend<ClientMethod>();
+      expectTypeOf<"put">().toExtend<ClientMethod>();
+      expectTypeOf<"delete">().toExtend<ClientMethod>();
+      expectTypeOf<"patch">().toExtend<ClientMethod>();
+      expectTypeOf<"head">().toExtend<ClientMethod>();
+      expectTypeOf<"wrong">().not.toExtend<ClientMethod>();
+    });
+  });
+
   describe("AuxMethod", () => {
-    test("should be options", () => {
-      expectTypeOf<AuxMethod>().toEqualTypeOf("options" as const);
+    test("should be options or head", () => {
+      expectTypeOf<"options">().toExtend<AuxMethod>();
+      expectTypeOf<"head">().toExtend<AuxMethod>();
+      expectTypeOf<"other">().not.toExtend<AuxMethod>();
     });
   });
 
