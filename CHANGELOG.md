@@ -8,15 +8,60 @@
   - The framework distribution is now ESM-only (finally);
   - All the Node.js versions listed above support `require(ESM)` syntax;
 - Supported `zod` version: `^4.0.0`;
+  - Compatibility with `zod@^3` is dropped;
+  - You SHOULD now `import { z } from "zod"` without the `/v4` suffix;
 - Changes to the `Middleware` class:
   - When the `input` schema is not defined, the `input` argument of the `handler` method is now `unknown`;
 
 ## Version 24
 
+### v24.7.0
+
+- Supporting `HEAD` method:
+  - The purpose of the `HEAD` method is to retrieve the headers without performing `GET` request;
+  - It is the built-in feature of Express to handle `HEAD` requests by the handlers for `GET` requests;
+  - Therefore, each `Endpoint` supporting `get` method also handles `head` requests (no work needed);
+  - Added `HEAD` method to CORS response headers, along with `OPTIONS`, for `GET` method supporting endpoints;
+  - Positive response to `HEAD` request should contain same headers as `GET` would, but without the body:
+    - Added `head` request depiction to the generated `Documentation`;
+    - Added `head` request types to the generated `Integration` client;
+  - Positive response to `HEAD` request should contain the `Content-Length` header:
+    - `ResultHandler`s using `response.send()` (as well as its shorthands such as `.json()`) automatically do that
+      instead of sending the response body (no work needed);
+    - Other approaches, such as stream piping, might require to implement `Content-Length` header for `HEAD` requests;
+  - This feature was suggested by [@pepegc](https://github.com/pepegc);
+- Caveats:
+  - The following properties, when assigned with functions, can now receive `head` as an argument:
+    - `operationId` supplied to `EndpointsFactory::build()`;
+    - `isHeader` supplied to `Documentation::constructor()`;
+  - If the `operationId` is assigned with a `string` then it may be appended with `__HEAD` for `head` method;
+
+### v24.6.2
+
+- Correcting recommendations given in [v24.6.0](#v2460) regarding using with `zod@^4.0.0`:
+  - Make sure the `moduleResolution` in your `tsconfig.json` is either `node16`, `nodenext` or `bundler`;
+  - Consider the [recommended tsconfig base, Node 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json);
+  - Then you MAY `import { z } from "zod"`;
+  - Otherwise, you MUST keep `import { z } from "zod/v4"`;
+  - In some cases module augmentation (Zod plugin) did not work and caused schema assignment errors for some users;
+  - The issue was reported by [@MichaelHindley](https://github.com/MichaelHindley);
+- This potential inconvenience will be resolved by dropping `zod@^3` in the next version of Express Zod API:
+  - If you're having troubles using the framework with `zod@^4.0.0`, consider upgrading to v25 (currently beta).
+
+### v24.6.1
+
+- Compatibility fix for recently changed type of Express native middleware:
+  - Fixes error `TS2345` when passing over an Express middleware to:
+    - `EndpointsFactory::use()`;
+    - `EndpointsFactory::addExpressMiddleware()`;
+  - The issue caused by `@types/express-serve-static-core` v5.0.7;
+  - The issue reported by [@zoton2](https://github.com/zoton2).
+
 ### v24.6.0
 
 - Supporting `zod` versions `^3.25.35 || ^4.0.0`:
-  - If you use `zod@^4.0.0` then `import { z } from "zod"`;
+  - If you use `zod@^4.0.0` then you MAY `import { z } from "zod"`:
+    - If facing error, ensure `moduleResolution` in your `tsconfig.json` is either `node16`, `nodenext` or `bundler`;
   - If you use `zod@^3.25.35` then keep `import { z } from "zod/v4"`;
   - For more details, see the [Explanation of the versioning strategy](https://github.com/colinhacks/zod/issues/4371).
 

@@ -14,14 +14,15 @@ import {
   makeLiteralType,
   makeUnion,
 } from "./typescript-api";
-import { makeCleanId } from "./common-helpers";
+import { doesImplyContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
-import { OnEndpoint, walkRouting } from "./routing-walker";
+import { OnEndpoint, walkRouting, withHead } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
 import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
+import { ClientMethod } from "./method";
 
 interface IntegrationParams {
   routing: Routing;
@@ -94,7 +95,7 @@ export class Integration extends IntegrationBase {
     const commons = { makeAlias: this.#makeAlias.bind(this) };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
-    const onEndpoint: OnEndpoint = (endpoint, path, method) => {
+    const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
@@ -106,9 +107,11 @@ export class Integration extends IntegrationBase {
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
           const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
+            const hasContent =
+              mimeTypes && doesImplyContent(method, responseVariant);
             const variantType = makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
-              zodToTs(mimeTypes ? schema : noContent, ctxOut),
+              zodToTs(hasContent ? schema : noContent, ctxOut),
               { comment: request },
             );
             this.#program.push(variantType);
@@ -144,7 +147,10 @@ export class Integration extends IntegrationBase {
       this.registry.set(request, { isDeprecated, store });
       this.tags.set(request, tags);
     };
-    walkRouting({ routing, onEndpoint });
+    walkRouting({
+      routing,
+      onEndpoint: withHead(onEndpoint),
+    });
     this.#program.unshift(...this.#aliases.values());
     this.#program.push(
       this.makePathType(),

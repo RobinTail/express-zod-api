@@ -11,10 +11,10 @@ import * as R from "ramda";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
-import { defaultInputSources, makeCleanId } from "./common-helpers";
+import { getInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
-import { Method } from "./method";
+import { ClientMethod } from "./method";
 import {
   depictBody,
   depictRequestParams,
@@ -30,7 +30,7 @@ import {
   depictRequest,
 } from "./documentation-helpers";
 import { Routing } from "./routing";
-import { OnEndpoint, walkRouting } from "./routing-walker";
+import { OnEndpoint, walkRouting, withHead } from "./routing-walker";
 
 type Component =
   | "positiveResponse"
@@ -101,7 +101,11 @@ export class Documentation extends OpenApiBuilder {
     return { $ref: `#/components/schemas/${name}` };
   }
 
-  #ensureUniqOperationId(path: string, method: Method, userDefined?: string) {
+  #ensureUniqOperationId(
+    path: string,
+    method: ClientMethod,
+    userDefined?: string,
+  ) {
     const operationId = userDefined || makeCleanId(method, path);
     let lastSuffix = this.#lastOperationIdSuffixes.get(operationId);
     if (lastSuffix === undefined) {
@@ -151,7 +155,7 @@ export class Documentation extends OpenApiBuilder {
     this.addInfo({ title, version });
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
       this.addServer({ url });
-    const onEndpoint: OnEndpoint = (endpoint, path, method) => {
+    const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const commons = {
         path,
         method,
@@ -166,8 +170,7 @@ export class Documentation extends OpenApiBuilder {
         : hasSummaryFromDescription && description
           ? ensureShortDescription(description)
           : undefined;
-      const inputSources =
-        config.inputSources?.[method] || defaultInputSources[method];
+      const inputSources = getInputSources(method, config.inputSources);
       const operationId = this.#ensureUniqOperationId(
         path,
         method,
@@ -251,7 +254,10 @@ export class Documentation extends OpenApiBuilder {
       };
       this.addPath(reformatParamsInPath(path), { [method]: operation });
     };
-    walkRouting({ routing, onEndpoint });
+    walkRouting({
+      routing,
+      onEndpoint: withHead(onEndpoint),
+    });
     if (tags) this.rootDoc.tags = depictTags(tags);
   }
 }

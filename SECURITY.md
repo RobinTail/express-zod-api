@@ -9,7 +9,7 @@
 |  23.x.x | Sonia         | 04.2025 | :white_check_mark: |
 |  22.x.x | Tai           | 01.2025 | :white_check_mark: |
 |  21.x.x | Kesaria       | 11.2024 | :white_check_mark: |
-|  20.x.x | Zoey          | 06.2024 | :white_check_mark: |
+|  20.x.x | Zoey          | 06.2024 |        :x:         |
 |  19.x.x | Dime          | 05.2024 |        :x:         |
 |  18.x.x | Victoria      | 04.2024 |        :x:         |
 |  17.x.x | Tonya         | 02.2024 |        :x:         |

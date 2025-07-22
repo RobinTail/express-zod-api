@@ -1,15 +1,23 @@
 import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
-import { isMethod, Method } from "./method";
+import { ClientMethod, isMethod, Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
 
-export type OnEndpoint = (
-  endpoint: AbstractEndpoint,
+export type OnEndpoint<M extends string = Method> = (
+  method: M,
   path: string,
-  method: Method,
+  endpoint: AbstractEndpoint,
 ) => void;
+
+/** Calls the given hook with HEAD each time it's called with GET method */
+export const withHead =
+  (onEndpoint: OnEndpoint<ClientMethod>): OnEndpoint =>
+  (method, ...rest) => {
+    onEndpoint(method, ...rest);
+    if (method === "get") onEndpoint("head", ...rest);
+  };
 
 interface RoutingWalkerParams {
   routing: Routing;
@@ -78,12 +86,12 @@ export const walkRouting = ({
       if (explicitMethod) {
         checkDuplicate(explicitMethod, path, visited);
         checkMethodSupported(explicitMethod, path, element.methods);
-        onEndpoint(element, path, explicitMethod);
+        onEndpoint(explicitMethod, path, element);
       } else {
         const { methods = ["get"] } = element;
         for (const method of methods) {
           checkDuplicate(method, path, visited);
-          onEndpoint(element, path, method);
+          onEndpoint(method, path, element);
         }
       }
     } else {
@@ -95,7 +103,7 @@ export const walkRouting = ({
           const { methods } = endpoint;
           checkDuplicate(method, path, visited);
           checkMethodSupported(method, path, methods);
-          onEndpoint(endpoint, path, method);
+          onEndpoint(method, path, endpoint);
         }
       } else {
         stack.unshift(...processEntries(element, path));
