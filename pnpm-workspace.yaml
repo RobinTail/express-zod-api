@@ -1,5 +1,6 @@
 packages:
   - express-zod-api
+  - traverse
   - migration
   - example
   - cjs-test

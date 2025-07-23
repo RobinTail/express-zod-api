@@ -268,6 +268,12 @@ importers:
         specifier: catalog:dev
         version: 8.38.0(eslint@9.31.0)(typescript@5.8.3)
 
+  traverse:
+    devDependencies:
+      zod:
+        specifier: catalog:dev
+        version: 4.0.5
+
 packages:
 
   '@ampproject/remapping@2.3.0':

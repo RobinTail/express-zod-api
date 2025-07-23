@@ -1,0 +1,44 @@
+{
+  "name": "@express-zod-api/traverse",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Zod schema traverse util for express-zod-api",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobinTail/express-zod-api.git"
+  },
+  "author": {
+    "name": "Anna Bocharova",
+    "url": "https://robintail.cz",
+    "email": "me@robintail.cz"
+  },
+  "bugs": "https://github.com/RobinTail/express-zod-api/issues",
+  "funding": "https://github.com/sponsors/RobinTail",
+  "scripts": {
+    "pretest": "tsc --noEmit",
+    "test": "vitest run --globals",
+    "build": "tsup",
+    "postbuild": "attw --pack --profile esm-only",
+    "prepublishOnly": "eslint && pnpm test && pnpm build"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "*.md"
+  ],
+  "peerDependencies": {
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "zod": "catalog:dev"
+  }
+}
