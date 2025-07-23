@@ -270,6 +270,9 @@ importers:
 
   traverse:
     devDependencies:
+      typescript:
+        specifier: catalog:dev
+        version: 5.8.3
       zod:
         specifier: catalog:dev
         version: 4.0.5
