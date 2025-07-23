@@ -1,6 +1,6 @@
 import type { $ZodType } from "zod/v4/core";
 
-export interface NextHandlerInc<U> {
+interface NextHandlerInc<U> {
   next: (schema: $ZodType) => U;
 }
 
