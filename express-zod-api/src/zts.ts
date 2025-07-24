@@ -28,9 +28,11 @@ import { getTransformedType, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { hasCycle } from "./deep-checks";
+import { getBrand } from "./metadata";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand, RawSchema } from "./raw-schema";
-import { FirstPartyKind, HandlingRules, walkSchema } from "./schema-walker";
+import { FirstPartyKind, HandlingRules } from "./schema-walker";
+import { walkSchema } from "@express-zod-api/traverse";
 import {
   ensureTypeNode,
   makeInterfaceProp,
@@ -272,9 +274,16 @@ export const zodToTs = (
     brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
     ctx: ZTSContext;
   },
-) =>
-  walkSchema(schema, {
-    rules: { ...brandHandling, ...producers },
+) => {
+  const rules = { ...brandHandling, ...producers };
+  return walkSchema(schema, {
+    getHandler: (subject) => {
+      const brand = getBrand(subject);
+      return brand && brand in rules
+        ? rules[brand as keyof typeof rules]
+        : producers[subject._zod.def.type];
+    },
     onMissing: ({}, { isResponse }) => getFallback(isResponse),
     ctx,
   });
+};
