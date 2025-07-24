@@ -73,7 +73,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
         y: number;
     };
     branded: string;
-    catch?: number | undefined;
+    catch: number;
     pipeline: string;
     readonly: string;
 }"
