@@ -9,7 +9,8 @@
  * */
 import * as R from "ramda";
 import { z } from "zod";
-import { getExamples, metaSymbol } from "./metadata";
+import { name } from "./package.json";
+import { getExamples } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
 import type {
   $ZodType,
@@ -27,6 +28,8 @@ import type {
   $ZodTypeInternals,
   $strip,
 } from "zod/v4/core";
+
+const pluginFlag = Symbol.for(name);
 
 /** @todo remove when typed, https://github.com/ramda/types/pull/140 */
 declare module "ramda" {
@@ -143,8 +146,8 @@ const objectMapper = function (
   return this.transform(transformer).pipe(output);
 };
 
-if (!(metaSymbol in globalThis)) {
-  (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
+if (!(pluginFlag in globalThis)) {
+  (globalThis as Record<symbol, unknown>)[pluginFlag] = true;
   for (const entry of Object.keys(z)) {
     if (!entry.startsWith("Zod")) continue;
     if (/(Success|Error|Function)$/.test(entry)) continue;
