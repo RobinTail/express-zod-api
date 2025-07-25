@@ -4,7 +4,13 @@
 
 ### v24.7.1
 
-
+- Compatibility fix for `zod@^3.25.68` and `^4.0.0`:
+  - Previously typed metadata properties `example` and `examples` were removed from `zod` core:
+    See [Commit ee5615d](https://github.com/colinhacks/zod/commit/ee5615d76b93aac15d7428a17b834a062235f6a1);
+  - This version restores those properties as a part of Zod plugin in order to comply to the existing implementation;
+  - The `example` property is marked as deprecated and will be removed in v25 — please refrain from using it;
+  - The `examples` property still supports an object for backward compatibility, but it will only array in v25;
+  - To avoid confusion, consider using the Zod plugin's method `.example()` where possible (except `ez.dateIn()`).
 
 ### v24.7.0
 
