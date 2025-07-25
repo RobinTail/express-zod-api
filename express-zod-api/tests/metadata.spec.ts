@@ -18,11 +18,6 @@ describe("Metadata", () => {
       { examples: [1, 2, 3] },
       { examples: [] },
       { examples: undefined },
-      { examples: { one: { value: 123 } } },
-      { example: 123 },
-      { example: 0 },
-      { example: undefined },
-      { examples: [1, 2, 3], example: 123 }, // priority
       {},
     ])("should handle %s", (meta) => {
       const schema = z.unknown().meta(meta);

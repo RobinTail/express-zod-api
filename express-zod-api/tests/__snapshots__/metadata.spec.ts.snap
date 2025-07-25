@@ -1,19 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Metadata > getExamples() > should handle { example: +0 } 1`] = `
-[
-  0,
-]
-`;
-
-exports[`Metadata > getExamples() > should handle { example: 123 } 1`] = `
-[
-  123,
-]
-`;
-
-exports[`Metadata > getExamples() > should handle { example: undefined } 1`] = `[]`;
-
 exports[`Metadata > getExamples() > should handle { examples: [ 1, 2, 3 ] } 1`] = `
 [
   1,
@@ -22,21 +8,7 @@ exports[`Metadata > getExamples() > should handle { examples: [ 1, 2, 3 ] } 1`] 
 ]
 `;
 
-exports[`Metadata > getExamples() > should handle { examples: [ 1, 2, 3 ], example: 123 } 1`] = `
-[
-  1,
-  2,
-  3,
-]
-`;
-
 exports[`Metadata > getExamples() > should handle { examples: [] } 1`] = `[]`;
-
-exports[`Metadata > getExamples() > should handle { examples: { one: { value: 123 } } } 1`] = `
-[
-  123,
-]
-`;
 
 exports[`Metadata > getExamples() > should handle { examples: undefined } 1`] = `[]`;
 

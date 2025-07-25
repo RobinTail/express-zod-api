@@ -40,11 +40,7 @@ declare module "ramda" {
 declare module "zod/v4/core" {
   interface GlobalMeta {
     default?: unknown; // can be an actual value or a label like "Today"
-    examples?:
-      | unknown[] // see zod commit ee5615d
-      | Record<string, { value: unknown; [k: string]: unknown }>; // @todo remove in v25
-    /** @deprecated use examples instead */
-    example?: unknown; // see zod commit ee5615d @todo remove in v25
+    examples?: unknown[]; // see zod commit ee5615d
   }
 }
 
