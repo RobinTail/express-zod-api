@@ -16,12 +16,20 @@
   - Use either `.example()` method or `.meta()` method with `examples` property being an array;
 - Changes to the `Middleware` class:
   - When the `input` schema is not defined, the `input` argument of the `handler` method is now `unknown`;
+- Changes to publicly exposed method:
+  - The `getExamples()` helper is removed, use `.meta().examples` or `globalRegistry.get().examples` instead.
 
 ```diff
 - z.string().meta({ example: "test" });
 - z.string().meta({ examples: { one: { value: "test" } } });
 + z.string().meta({ examples: ["test"] });
 + z.string().example("test").example("another"); // plugin method
+```
+
+```diff
+- getExamples(schema);
++ schema.meta()?.examples || [];
++ globalRegistry.get(schema)?.examples || [];
 ```
 
 ## Version 24

@@ -22,7 +22,7 @@ import { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import { ActualLogger } from "./logger-helpers";
 import { LogicalContainer } from "./logical-container";
-import { getBrand, getExamples } from "./metadata";
+import { getBrand } from "./metadata";
 import { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
@@ -86,7 +86,7 @@ export class Endpoint<
 
   /** considered expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
-    if (getExamples(this.#def.outputSchema).length) return; // has examples on the output schema, or pull up:
+    if (globalRegistry.get(this.#def.outputSchema)?.examples?.length) return; // examples on output schema, or pull up:
     if (!isSchema<$ZodObject>(this.#def.outputSchema, "object")) return;
     const examples = pullResponseExamples(this.#def.outputSchema as $ZodObject);
     if (!examples.length) return;

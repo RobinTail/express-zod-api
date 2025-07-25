@@ -1,6 +1,5 @@
-import { z } from "zod";
-import type { $ZodType, GlobalMeta } from "zod/v4/core";
-import { getBrand, getExamples } from "../src/metadata";
+import type { $ZodType } from "zod/v4/core";
+import { getBrand } from "../src/metadata";
 
 describe("Metadata", () => {
   describe("getBrand", () => {
@@ -11,17 +10,5 @@ describe("Metadata", () => {
         expect(getBrand(mock as unknown as $ZodType)).toBe(bag?.brand);
       },
     );
-  });
-
-  describe("getExamples()", () => {
-    test.each<GlobalMeta>([
-      { examples: [1, 2, 3] },
-      { examples: [] },
-      { examples: undefined },
-      {},
-    ])("should handle %s", (meta) => {
-      const schema = z.unknown().meta(meta);
-      expect(getExamples(schema)).toMatchSnapshot();
-    });
   });
 });
