@@ -25,7 +25,6 @@
     "prepack": "cp ../*.md ../LICENSE ./"
   },
   "type": "module",
-  "sideEffects": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "dist/index.js",
