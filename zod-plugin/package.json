@@ -36,8 +36,14 @@
     "dist",
     "*.md"
   ],
+  "dependencies": {
+    "ramda": "^0.31.3"
+  },
   "peerDependencies": {
+    "zod": "^4.0.0"
   },
   "devDependencies": {
+    "@types/ramda": "^0.30.2",
+    "zod": "catalog:dev"
   }
 }
