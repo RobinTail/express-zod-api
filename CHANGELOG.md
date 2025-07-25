@@ -10,8 +10,27 @@
 - Supported `zod` version: `^4.0.0`;
   - Compatibility with `zod@^3` is dropped;
   - You SHOULD now `import { z } from "zod"` without the `/v4` suffix;
+- Changes to the Zod plugin and metadata processing:
+  - Dropped support of examples that are given as `example` property of `.meta()` argument;
+  - Dropped support of examples given within an object-based value of `examples` property of `.meta()` argument;
+  - Use either `.example()` method or `.meta()` method with `examples` property being an array;
 - Changes to the `Middleware` class:
   - When the `input` schema is not defined, the `input` argument of the `handler` method is now `unknown`;
+- Changes to publicly exposed method:
+  - The `getExamples()` helper is removed, use `.meta().examples` or `globalRegistry.get().examples` instead.
+
+```diff
+- z.string().meta({ example: "test" });
+- z.string().meta({ examples: { one: { value: "test" } } });
++ z.string().meta({ examples: ["test"] });
++ z.string().example("test").example("another"); // plugin method
+```
+
+```diff
+- getExamples(schema);
++ schema.meta()?.examples || [];
++ globalRegistry.get(schema)?.examples || [];
+```
 
 ## Version 24
 

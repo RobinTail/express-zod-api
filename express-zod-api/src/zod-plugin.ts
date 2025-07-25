@@ -8,8 +8,8 @@
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
 import * as R from "ramda";
-import { z } from "zod";
-import { getExamples, metaSymbol } from "./metadata";
+import { globalRegistry, z } from "zod";
+import { metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
 import type {
   $ZodType,
@@ -40,11 +40,7 @@ declare module "ramda" {
 declare module "zod/v4/core" {
   interface GlobalMeta {
     default?: unknown; // can be an actual value or a label like "Today"
-    examples?:
-      | unknown[] // see zod commit ee5615d
-      | Record<string, { value: unknown; [k: string]: unknown }>; // @todo remove in v25
-    /** @deprecated use examples instead */
-    example?: unknown; // see zod commit ee5615d @todo remove in v25
+    examples?: unknown[]; // see zod commit ee5615d
   }
 }
 
@@ -112,7 +108,7 @@ const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
 );
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
-  const examples = getExamples(this).slice();
+  const examples = globalRegistry.get(this)?.examples?.slice() || [];
   examples.push(value);
   return this.meta({ examples });
 };
