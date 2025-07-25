@@ -1,6 +1,5 @@
 import { globalRegistry } from "zod/v4";
 import type { $ZodType } from "zod/v4/core";
-import { isObject } from "./common-helpers";
 
 export const metaSymbol = Symbol.for("express-zod-api");
 
@@ -27,9 +26,7 @@ export const getExamples = (subject: $ZodType): ReadonlyArray<unknown> => {
     return Array.isArray(examples)
       ? examples
       : /** @todo remove this branch in v25 */
-        Object.values(examples)
-          .filter((one) => isObject(one) && "value" in one)
-          .map(({ value }) => value);
+        Object.values(examples).map(({ value }) => value);
   }
   /** @todo remove this in v25 */
   return example === undefined ? [] : [example];
