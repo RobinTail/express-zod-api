@@ -2,6 +2,10 @@
 
 ## Version 24
 
+### v24.7.1
+
+
+
 ### v24.7.0
 
 - Supporting `HEAD` method:
