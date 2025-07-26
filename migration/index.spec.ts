@@ -18,7 +18,12 @@ describe("Migration", () => {
   });
 
   tester.run("v25", migration.rules.v25, {
-    valid: [`import {} from "zod";`],
+    valid: [
+      `import {} from "zod";`,
+      `ez.dateIn({ examples: ["1963-04-21"] });`,
+      `ez.dateOut({ examples: ["2021-12-31T00:00:00.000Z"] });`,
+      `schema.meta()?.examples;`,
+    ],
     invalid: [
       {
         code: `import {} from "zod/v4";`,
@@ -27,6 +32,40 @@ describe("Migration", () => {
           {
             messageId: "change",
             data: { subject: "import", from: "zod/v4", to: "zod" },
+          },
+        ],
+      },
+      {
+        code: `ez.dateIn({ example: "1963-04-21" });`,
+        output: `ez.dateIn({ examples: ["1963-04-21"] });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "example", to: "examples" },
+          },
+        ],
+      },
+      {
+        code: `ez.dateOut({ example: "2021-12-31T00:00:00.000Z" });`,
+        output: `ez.dateOut({ examples: ["2021-12-31T00:00:00.000Z"] });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "example", to: "examples" },
+          },
+        ],
+      },
+      {
+        code: `getExamples(schema);`,
+        output: `(schema.meta()?.examples || []);`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "method",
+              from: "getExamples()",
+              to: ".meta()?.examples || []",
+            },
           },
         ],
       },
