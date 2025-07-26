@@ -1,11 +1,19 @@
 import { Request, Response } from "express";
-import { z } from "zod/v4";
-import { EmptyObject, EmptySchema, FlatObject, Tag } from "./common-helpers";
+import { z } from "zod";
+import {
+  EmptyObject,
+  emptySchema,
+  EmptySchema,
+  FlatObject,
+  Tag,
+} from "./common-helpers";
 import { Endpoint, Handler } from "./endpoint";
 import {
   IOSchema,
-  getFinalEndpointInputSchema,
-  ConditionalIntersection,
+  FinalInputSchema,
+  Extension,
+  ensureExtension,
+  makeFinalInputSchema,
 } from "./io-schema";
 import { ClientMethod, Method } from "./method";
 import {
@@ -35,11 +43,7 @@ interface BuildProps<
   /** @desc The schema by which the returns of the Endpoint handler is validated */
   output: OUT;
   /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (options) and a logger */
-  handler: Handler<
-    z.output<ConditionalIntersection<MIN, IN>>,
-    z.input<OUT>,
-    OPT
-  >;
+  handler: Handler<z.output<FinalInputSchema<MIN, IN>>, z.input<OUT>, OPT>;
   /** @desc The operation description for the generated Documentation */
   description?: string;
   /** @desc The operation summary for the generated Documentation (50 symbols max) */
@@ -71,33 +75,37 @@ export class EndpointsFactory<
   OUT extends FlatObject = EmptyObject,
   SCO extends string = string,
 > {
+  protected schema = undefined as IN;
   protected middlewares: AbstractMiddleware[] = [];
   constructor(protected resultHandler: AbstractResultHandler) {}
 
-  #create<
-    CIN extends IOSchema | undefined,
-    COUT extends FlatObject,
-    CSCO extends string,
-  >(middleware: AbstractMiddleware) {
-    const factory = new EndpointsFactory<CIN, COUT, CSCO>(this.resultHandler);
+  #extend<
+    AIN extends IOSchema | undefined,
+    AOUT extends FlatObject,
+    ASCO extends string,
+  >(middleware: Middleware<OUT, AOUT, ASCO, AIN>) {
+    const factory = new EndpointsFactory<
+      Extension<IN, AIN>,
+      OUT & AOUT,
+      SCO & ASCO
+    >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);
+    factory.schema = ensureExtension(this.schema, middleware.schema);
     return factory;
   }
 
   public addMiddleware<
     AOUT extends FlatObject,
     ASCO extends string,
-    AIN extends IOSchema = EmptySchema,
+    AIN extends IOSchema | undefined = undefined,
   >(
     subject:
       | Middleware<OUT, AOUT, ASCO, AIN>
       | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
   ) {
-    return this.#create<
-      ConditionalIntersection<IN, AIN>,
-      OUT & AOUT,
-      SCO & ASCO
-    >(subject instanceof Middleware ? subject : new Middleware(subject));
+    return this.#extend(
+      subject instanceof Middleware ? subject : new Middleware(subject),
+    );
   }
 
   public use = this.addExpressMiddleware;
@@ -107,17 +115,15 @@ export class EndpointsFactory<
     S extends Response,
     AOUT extends FlatObject = EmptyObject,
   >(...params: ConstructorParameters<typeof ExpressMiddleware<R, S, AOUT>>) {
-    return this.#create<IN, OUT & AOUT, SCO>(new ExpressMiddleware(...params));
+    return this.#extend(new ExpressMiddleware(...params));
   }
 
   public addOptions<AOUT extends FlatObject>(getOptions: () => Promise<AOUT>) {
-    return this.#create<IN, OUT & AOUT, SCO>(
-      new Middleware({ handler: getOptions }),
-    );
+    return this.#extend(new Middleware({ handler: getOptions }));
   }
 
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
-    input = z.object({}) as unknown as BIN,
+    input = emptySchema as unknown as BIN,
     output: outputSchema,
     operationId,
     scope,
@@ -143,7 +149,7 @@ export class EndpointsFactory<
       tags,
       methods,
       getOperationId,
-      inputSchema: getFinalEndpointInputSchema<IN, BIN>(middlewares, input),
+      inputSchema: makeFinalInputSchema(this.schema, input),
     });
   }
 
@@ -154,7 +160,7 @@ export class EndpointsFactory<
   }: Omit<BuildProps<BIN, z.ZodVoid, IN, OUT, SCO>, "output">) {
     return this.build({
       ...rest,
-      output: z.object({}),
+      output: emptySchema,
       handler: async (props) => {
         await handler(props);
         return {};

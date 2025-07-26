@@ -13,7 +13,7 @@ import {
   Method,
 } from "../src";
 import { contentTypes } from "../src/content-type";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { givePort } from "../../tools/ports";
 import * as R from "ramda";
 

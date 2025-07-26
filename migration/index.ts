@@ -4,39 +4,25 @@ import {
   type TSESLint,
   type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 
 type NamedProp = TSESTree.PropertyNonComputedName & {
   key: TSESTree.Identifier;
 };
 
 interface Queries {
-  numericRange: NamedProp;
-  optionalPropStyle: NamedProp;
-  depicter: TSESTree.ArrowFunctionExpression;
-  nextCall: TSESTree.CallExpression;
   zod: TSESTree.ImportDeclaration;
-  ezFile: TSESTree.CallExpression & { arguments: [TSESTree.Literal] };
+  dateInOutExample: NamedProp;
+  getExamples: TSESTree.CallExpression;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  numericRange:
-    `${NT.NewExpression}[callee.name='Documentation'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='numericRange']`,
-  optionalPropStyle:
-    `${NT.NewExpression}[callee.name='Integration'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='optionalPropStyle']`,
-  depicter:
-    `${NT.VariableDeclarator}[id.typeAnnotation.typeAnnotation.typeName.name='Depicter'] > ` +
-    `${NT.ArrowFunctionExpression}`,
-  nextCall:
-    `${NT.VariableDeclarator}[id.typeAnnotation.typeAnnotation.typeName.name='Depicter'] > ` +
-    `${NT.ArrowFunctionExpression} ${NT.CallExpression}[callee.name='next']`,
-  zod: `${NT.ImportDeclaration}[source.value='zod']`,
-  ezFile: `${NT.CallExpression}[arguments.0.type='${NT.Literal}']:has( ${NT.MemberExpression}[object.name='ez'][property.name='file'] )`,
+  zod: `${NT.ImportDeclaration}[source.value='zod/v4']`,
+  dateInOutExample:
+    `${NT.CallExpression}[callee.object.name='ez'][callee.property.name=/date(In|Out)/] >` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='example']`,
+  getExamples: `${NT.CallExpression}[callee.name='getExamples']`,
 };
 
 const listen = <
@@ -52,39 +38,7 @@ const listen = <
     {},
   );
 
-const rangeWithComma = (
-  node: TSESTree.Node,
-  ctx: TSESLint.RuleContext<string, unknown[]>,
-) =>
-  [
-    node.range[0],
-    node.range[1] + (ctx.sourceCode.getTokenAfter(node)?.value === "," ? 1 : 0),
-  ] as const;
-
-const propRemover =
-  (ctx: TSESLint.RuleContext<string, unknown[]>) => (node: NamedProp) =>
-    ctx.report({
-      node,
-      messageId: "remove",
-      data: { subject: node.key.name },
-      fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
-    });
-
-const getZodVersion = () => {
-  try {
-    const path = fileURLToPath(new URL("zod/package.json", import.meta.url));
-    const pkgJson: unknown = JSON.parse(readFileSync(path, "utf8"));
-    if (
-      typeof pkgJson === "object" &&
-      pkgJson !== null &&
-      "version" in pkgJson &&
-      typeof pkgJson.version === "string"
-    )
-      return pkgJson.version;
-  } catch {}
-};
-
-const v24 = ESLintUtils.RuleCreator.withoutDocs({
+const v25 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     fixable: "code",
@@ -99,76 +53,42 @@ const v24 = ESLintUtils.RuleCreator.withoutDocs({
   defaultOptions: [],
   create: (ctx) =>
     listen({
-      numericRange: propRemover(ctx),
-      optionalPropStyle: propRemover(ctx),
-      depicter: (node) => {
-        const [first, second] = node.params;
-        if (first?.type !== NT.Identifier) return;
-        const zodSchemaAlias = first.name;
-        if (second?.type !== NT.ObjectPattern) return;
-        const nextFn = second.properties.find(
-          (one) =>
-            one.type === NT.Property &&
-            one.key.type === NT.Identifier &&
-            one.key.name === "next",
-        );
+      zod: (node) =>
+        ctx.report({
+          node: node.source,
+          messageId: "change",
+          data: { subject: "import", from: "zod/v4", to: "zod" },
+          fix: (fixer) => fixer.replaceText(node.source, `"zod"`),
+        }),
+      dateInOutExample: (node) =>
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "property", from: "example", to: "examples" },
+          fix: (fixer) =>
+            fixer.replaceText(
+              node,
+              `examples: [${ctx.sourceCode.getText(node.value)}]`,
+            ),
+        }),
+      getExamples: (node) =>
         ctx.report({
           node,
           messageId: "change",
           data: {
-            subject: "arguments",
-            from: `[${zodSchemaAlias}, { next, ...rest }]`,
-            to: `[{ zodSchema: ${zodSchemaAlias}, jsonSchema }, { ...rest }]`,
+            subject: "method",
+            from: "getExamples()",
+            to: ".meta()?.examples || []",
           },
-          fix: (fixer) => {
-            const fixes = [
-              fixer.replaceText(
-                first,
-                `{ zodSchema: ${zodSchemaAlias}, jsonSchema }`,
-              ),
-            ];
-            if (nextFn)
-              fixes.push(fixer.removeRange(rangeWithComma(nextFn, ctx)));
-            return fixes;
-          },
-        });
-      },
-      nextCall: (node) =>
-        ctx.report({
-          node,
-          messageId: "change",
-          data: { subject: "statement", from: "next()", to: "jsonSchema" },
-          fix: (fixer) => fixer.replaceText(node, "jsonSchema"),
+          fix: (fixer) =>
+            fixer.replaceText(
+              node,
+              `(${ctx.sourceCode.getText(node.arguments[0])}.meta()?.examples || [])`,
+            ),
         }),
-      zod: (node) => {
-        if (getZodVersion()?.startsWith("4.")) return;
-        ctx.report({
-          node: node.source,
-          messageId: "change",
-          data: { subject: "import", from: "zod", to: "zod/v4" },
-          fix: (fixer) => fixer.replaceText(node.source, `"zod/v4"`),
-        });
-      },
-      ezFile: (node) => {
-        const [variant] = node.arguments;
-        const replacement =
-          variant.value === "buffer"
-            ? "ez.buffer()"
-            : variant.value === "base64"
-              ? "z.base64()"
-              : variant.value === "binary"
-                ? "ez.buffer().or(z.string())"
-                : "z.string()";
-        ctx.report({
-          node: node,
-          messageId: "change",
-          data: { subject: "schema", from: "ez.file()", to: replacement },
-          fix: (fixer) => fixer.replaceText(node, replacement),
-        });
-      },
     }),
 });
 
 export default {
-  rules: { v24 },
+  rules: { v25 },
 } satisfies TSESLint.Linter.Plugin;

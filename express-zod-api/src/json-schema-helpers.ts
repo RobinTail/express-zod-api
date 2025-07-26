@@ -1,10 +1,10 @@
-import type { JSONSchema } from "zod/v4/core";
 import * as R from "ramda";
 import { combinations, FlatObject, isObject } from "./common-helpers";
+import type { z } from "zod";
 
 const isJsonObjectSchema = (
-  subject: JSONSchema.BaseSchema,
-): subject is JSONSchema.ObjectSchema => subject.type === "object";
+  subject: z.core.JSONSchema.BaseSchema,
+): subject is z.core.JSONSchema.ObjectSchema => subject.type === "object";
 
 const propsMerger = R.mergeDeepWith((a: unknown, b: unknown) => {
   if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
@@ -21,19 +21,19 @@ const canMerge = R.pipe(
     "examples",
     "description",
     "additionalProperties",
-  ] satisfies Array<keyof JSONSchema.ObjectSchema>),
+  ] satisfies Array<keyof z.core.JSONSchema.ObjectSchema>),
   R.isEmpty,
 );
 
 const nestOptional = R.pair(true);
 
 export const flattenIO = (
-  jsonSchema: JSONSchema.BaseSchema,
+  jsonSchema: z.core.JSONSchema.BaseSchema,
   mode: "coerce" | "throw" = "coerce",
 ) => {
   const stack = [R.pair(false, jsonSchema)]; // [isOptional, JSON Schema]
-  const flat: JSONSchema.ObjectSchema &
-    Required<Pick<JSONSchema.ObjectSchema, "properties">> = {
+  const flat: z.core.JSONSchema.ObjectSchema &
+    Required<Pick<z.core.JSONSchema.ObjectSchema, "properties">> = {
     type: "object",
     properties: {},
   };
@@ -91,7 +91,7 @@ export const flattenIO = (
 };
 
 /** @see pullResponseExamples */
-export const pullRequestExamples = (subject: JSONSchema.ObjectSchema) =>
+export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
   Object.entries(subject.properties || {}).reduce<FlatObject[]>(
     (acc, [key, prop]) => {
       const { examples = [] } = isObject(prop) ? prop : {};

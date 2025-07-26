@@ -1,78 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should handle no middlewares 1`] = `
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "additionalProperties": false,
-  "properties": {
-    "four": {
-      "type": "boolean",
-    },
-  },
-  "required": [
-    "four",
-  ],
-  "type": "object",
-}
-`;
-
-exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge input object schemas 1`] = `
-{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "allOf": [
-    {
-      "additionalProperties": false,
-      "properties": {
-        "one": {
-          "type": "string",
-        },
-      },
-      "required": [
-        "one",
-      ],
-      "type": "object",
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "two": {
-          "type": "number",
-        },
-      },
-      "required": [
-        "two",
-      ],
-      "type": "object",
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "three": {
-          "type": "null",
-        },
-      },
-      "required": [
-        "three",
-      ],
-      "type": "object",
-    },
-    {
-      "additionalProperties": false,
-      "properties": {
-        "four": {
-          "type": "boolean",
-        },
-      },
-      "required": [
-        "four",
-      ],
-      "type": "object",
-    },
-  ],
-}
-`;
-
-exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge intersection object schemas 1`] = `
+exports[`I/O Schema and related helpers > ensureExtension() > Should merge intersection object schemas 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
@@ -152,7 +80,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
 }
 `;
 
-exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge mixed object schemas 1`] = `
+exports[`I/O Schema and related helpers > ensureExtension() > Should merge mixed object schemas 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
@@ -224,7 +152,7 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
 }
 `;
 
-exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should merge union object schemas 1`] = `
+exports[`I/O Schema and related helpers > ensureExtension() > Should merge union object schemas 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "allOf": [
@@ -316,8 +244,64 @@ exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Should
 }
 `;
 
-exports[`I/O Schema and related helpers > getFinalEndpointInputSchema() > Zod Issue #600: can not intersect object schema with passthrough and transformation 1`] = `
+exports[`I/O Schema and related helpers > ensureExtension() > Zod Issue #600: can not intersect object schema with passthrough and transformation 1`] = `
 Error({
   "message": "Unmergable intersection. Error path: ["id"]",
 })
+`;
+
+exports[`I/O Schema and related helpers > makeFinalInputSchema() > Should merge input object schemas 1`] = `
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "one": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "one",
+      ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "two": {
+          "type": "number",
+        },
+      },
+      "required": [
+        "two",
+      ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "three": {
+          "type": "null",
+        },
+      },
+      "required": [
+        "three",
+      ],
+      "type": "object",
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "four": {
+          "type": "boolean",
+        },
+      },
+      "required": [
+        "four",
+      ],
+      "type": "object",
+    },
+  ],
+}
 `;
