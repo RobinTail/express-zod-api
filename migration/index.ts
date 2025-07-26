@@ -38,26 +38,6 @@ const listen = <
     {},
   );
 
-/*
-const rangeWithComma = (
-  node: TSESTree.Node,
-  ctx: TSESLint.RuleContext<string, unknown[]>,
-) =>
-  [
-    node.range[0],
-    node.range[1] + (ctx.sourceCode.getTokenAfter(node)?.value === "," ? 1 : 0),
-  ] as const;
-
-const propRemover =
-  (ctx: TSESLint.RuleContext<string, unknown[]>) => (node: NamedProp) =>
-    ctx.report({
-      node,
-      messageId: "remove",
-      data: { subject: node.key.name },
-      fix: (fixer) => fixer.removeRange(rangeWithComma(node, ctx)),
-    });
-*/
-
 const v25 = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
