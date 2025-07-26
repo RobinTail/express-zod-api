@@ -1,4 +1,3 @@
-import type { $ZodType, JSONSchema } from "zod/v4/core";
 import { IRouter } from "express";
 import ts from "typescript";
 import { z } from "zod";
@@ -42,8 +41,8 @@ describe("Index Entrypoint", () => {
         ({
           jsonSchema,
         }: {
-          zodSchema: $ZodType;
-          jsonSchema: JSONSchema.BaseSchema;
+          zodSchema: z.core.$ZodType;
+          jsonSchema: z.core.JSONSchema.BaseSchema;
         }) => jsonSchema,
       ).toExtend<Depicter>();
       expectTypeOf(() =>

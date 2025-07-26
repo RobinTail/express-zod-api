@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
-import type { $ZodObject } from "zod/v4/core";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { findRequestTypeDefiningSchema } from "./deep-checks";
 import {
@@ -87,13 +86,13 @@ export class Endpoint<
   /** considered expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
     if (globalRegistry.get(this.#def.outputSchema)?.examples?.length) return; // examples on output schema, or pull up:
-    if (!isSchema<$ZodObject>(this.#def.outputSchema, "object")) return;
-    const examples = pullResponseExamples(this.#def.outputSchema as $ZodObject);
+    if (!isSchema<z.core.$ZodObject>(this.#def.outputSchema, "object")) return;
+    const examples = pullResponseExamples(this.#def.outputSchema);
     if (!examples.length) return;
     const current = this.#def.outputSchema.meta();
     globalRegistry
       .remove(this.#def.outputSchema) // reassign to avoid cloning
-      .add(this.#def.outputSchema as $ZodObject, { ...current, examples });
+      .add(this.#def.outputSchema, { ...current, examples });
   });
 
   constructor(def: {

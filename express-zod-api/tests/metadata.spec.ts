@@ -1,5 +1,5 @@
-import type { $ZodType } from "zod/v4/core";
 import { getBrand } from "../src/metadata";
+import type { z } from "zod";
 
 describe("Metadata", () => {
   describe("getBrand", () => {
@@ -7,7 +7,7 @@ describe("Metadata", () => {
       "should take it from bag",
       (bag) => {
         const mock = { _zod: { bag } };
-        expect(getBrand(mock as unknown as $ZodType)).toBe(bag?.brand);
+        expect(getBrand(mock as unknown as z.core.$ZodType)).toBe(bag?.brand);
       },
     );
   });

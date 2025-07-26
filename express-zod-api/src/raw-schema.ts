@@ -1,5 +1,4 @@
 import { z } from "zod";
-import type { $ZodShape } from "zod/v4/core";
 import { buffer } from "./buffer-schema";
 
 export const ezRawBrand = Symbol("Raw");
@@ -7,14 +6,14 @@ export const ezRawBrand = Symbol("Raw");
 const base = z.object({ raw: buffer() });
 type Base = ReturnType<typeof base.brand<symbol>>;
 
-const extended = <S extends $ZodShape>(extra: S) =>
+const extended = <S extends z.core.$ZodShape>(extra: S) =>
   base.extend(extra).brand(ezRawBrand as symbol);
 
 export function raw(): Base;
-export function raw<S extends $ZodShape>(
+export function raw<S extends z.core.$ZodShape>(
   extra: S,
 ): ReturnType<typeof extended<S>>;
-export function raw(extra?: $ZodShape) {
+export function raw(extra?: z.core.$ZodShape) {
   return extra ? extended(extra) : base.brand(ezRawBrand as symbol);
 }
 
