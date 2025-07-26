@@ -22,6 +22,7 @@ describe("Migration", () => {
       `import {} from "zod";`,
       `ez.dateIn({ examples: ["1963-04-21"] });`,
       `ez.dateOut({ examples: ["2021-12-31T00:00:00.000Z"] });`,
+      `schema.meta()?.examples;`,
     ],
     invalid: [
       {
@@ -51,6 +52,20 @@ describe("Migration", () => {
           {
             messageId: "change",
             data: { subject: "property", from: "example", to: "examples" },
+          },
+        ],
+      },
+      {
+        code: `getExamples(schema);`,
+        output: `(schema.meta()?.examples || []);`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "method",
+              from: "getExamples()",
+              to: ".meta()?.examples || []",
+            },
           },
         ],
       },
