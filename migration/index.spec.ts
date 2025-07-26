@@ -17,7 +17,7 @@ describe("Migration", () => {
     expect(migration).toMatchSnapshot();
   });
 
-  tester.run("v24", migration.rules.v25, {
+  tester.run("v25", migration.rules.v25, {
     valid: [`import {} from "zod";`],
     invalid: [
       {
