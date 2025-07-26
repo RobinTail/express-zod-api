@@ -1,8 +1,8 @@
-import type { $ZodType } from "zod/v4/core";
+import type { z } from "zod";
 
 export const metaSymbol = Symbol.for("express-zod-api");
 
-export const getBrand = (subject: $ZodType) => {
+export const getBrand = (subject: z.core.$ZodType) => {
   const { brand } = subject._zod.bag || {};
   if (
     typeof brand === "symbol" ||

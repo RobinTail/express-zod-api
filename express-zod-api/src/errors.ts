@@ -1,4 +1,3 @@
-import type { $ZodType } from "zod/v4/core";
 import { z } from "zod";
 import { getMessageFromError } from "./common-helpers";
 import { OpenAPIContext } from "./documentation-helpers";
@@ -45,7 +44,7 @@ export class IOSchemaError extends Error {
 export class DeepCheckError extends IOSchemaError {
   public override name = "DeepCheckError";
 
-  constructor(public override readonly cause: $ZodType) {
+  constructor(public override readonly cause: z.core.$ZodType) {
     super("Found", { cause });
   }
 }

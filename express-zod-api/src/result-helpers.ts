@@ -2,7 +2,6 @@ import { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
-import type { $ZodObject } from "zod/v4/core";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import {
   combinations,
@@ -89,7 +88,7 @@ export const getPublicErrorMessage = (error: HttpError): string =>
     : error.message;
 
 /** @see pullRequestExamples */
-export const pullResponseExamples = <T extends $ZodObject>(subject: T) =>
+export const pullResponseExamples = <T extends z.core.$ZodObject>(subject: T) =>
   Object.entries(subject._zod.def.shape).reduce<FlatObject[]>(
     (acc, [key, schema]) => {
       const { examples = [] } = globalRegistry.get(schema) || {};

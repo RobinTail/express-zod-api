@@ -1,4 +1,3 @@
-import type { $ZodType, JSONSchema } from "zod/v4/core";
 import * as R from "ramda";
 import { z } from "zod";
 import { ezBufferBrand } from "./buffer-schema";
@@ -14,11 +13,11 @@ import { ezRawBrand } from "./raw-schema";
 
 interface NestedSchemaLookupProps {
   io: "input" | "output";
-  condition: (zodSchema: $ZodType) => boolean;
+  condition: (zodSchema: z.core.$ZodType) => boolean;
 }
 
 export const findNestedSchema = (
-  subject: $ZodType,
+  subject: z.core.$ZodType,
   { io, condition }: NestedSchemaLookupProps,
 ) =>
   R.tryCatch(
@@ -37,7 +36,7 @@ export const findNestedSchema = (
 
 /** not using cycle:"throw" because it also affects parenting objects */
 export const hasCycle = (
-  subject: $ZodType,
+  subject: z.core.$ZodType,
   { io }: Pick<NestedSchemaLookupProps, "io">,
 ) => {
   const json = z.toJSONSchema(subject, { io, unrepresentable: "any" });
@@ -45,7 +44,7 @@ export const hasCycle = (
   while (stack.length) {
     const entry = stack.shift()!;
     if (R.is(Object, entry)) {
-      if ((entry as JSONSchema.BaseSchema).$ref === "#") return true;
+      if ((entry as z.core.JSONSchema.BaseSchema).$ref === "#") return true;
       stack.push(...R.values(entry));
     }
     if (R.is(Array, entry)) stack.push(...R.values(entry));
@@ -77,7 +76,7 @@ const unsupported: FirstPartyKind[] = [
 ];
 
 export const findJsonIncompatible = (
-  subject: $ZodType,
+  subject: z.core.$ZodType,
   io: "input" | "output",
 ) =>
   findNestedSchema(subject, {
