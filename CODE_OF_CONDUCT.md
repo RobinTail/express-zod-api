@@ -86,3 +86,11 @@ communications related to project business. This includes, but is not limited to
 - Project-related chat platforms (e.g., Discord, Slack if applicable);
 - Any official project social media accounts;
 - Any future in-person events or workshops organized by the project.
+
+### License
+
+This Code of Conduct, being a derivative work of the Berlin Code of Conduct, is also licensed under
+the [CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/). You are free to share
+and adapt this work, provided you give appropriate credit, provide a link to the license, and
+indicate if changes were made. If you remix, transform, or build upon the material, you must
+distribute your contributions under the same license as the original.
