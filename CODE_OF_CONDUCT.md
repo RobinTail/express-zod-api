@@ -63,7 +63,7 @@ the project maintainers as soon as possible.
 
 **How to Report:**
 
-- **For private and sensitive reports:** Contact the core maintainers directly via email at
+- **For private and sensitive reports:** Contact the core maintainers directly via
   [email](https://github.com/RobinTail/express-zod-api/blob/master/express-zod-api/package.json#L14).
 - **For less sensitive or public issues:** You may open a GitHub issue, but be mindful of privacy and
   consider if direct email is more appropriate.
