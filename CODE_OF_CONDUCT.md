@@ -11,7 +11,7 @@ A supplemental goal is to promote **open-source citizenship** by encouraging all
 understand the impact of their actions on the community and to actively counteract inequality and
 abuses of power within our project spaces.
 
-### Key Expectations for Participants
+## Key Expectations for Participants
 
 The Express Zod API community expects participants to:
 
@@ -27,7 +27,7 @@ The Express Zod API community expects participants to:
   someone in distress, or violations of this Code of Conduct, please report it to the project
   maintainers.
 
-### Unacceptable Behaviors
+## Unacceptable Behaviors
 
 The following behaviors are considered unacceptable within the Express Zod API community:
 
@@ -46,7 +46,7 @@ The following behaviors are considered unacceptable within the Express Zod API c
   groping, and unwelcome sexual advances.
 - **Advocating for, or encouraging, any of the above behaviors.**
 
-### Consequences of Unacceptable Behavior
+## Consequences of Unacceptable Behavior
 
 Unacceptable behavior from any participant will not be tolerated.
 
@@ -56,7 +56,7 @@ Unacceptable behavior from any participant will not be tolerated.
   editing/deletion of offending content, without warning or refund (if applicable to any paid
   access/materials).
 
-### Reporting Guidelines
+## Reporting Guidelines
 
 If you are subject to, or witness, unacceptable behavior, or have any other concerns, please notify
 the project maintainers as soon as possible.
@@ -74,7 +74,7 @@ will be handled seriously and investigated according to existing project governi
 respect concerns about false accusations and will handle them according to our project's dispute
 resolution processes.
 
-### Scope and Applicability
+## Scope and Applicability
 
 This Code of Conduct applies to all Express Zod API community participants in all official project
 venues, both online and potentially in-person (e.g., meetups, sprints), and in one-on-one
@@ -87,7 +87,7 @@ communications related to project business. This includes, but is not limited to
 - Any official project social media accounts;
 - Any future in-person events or workshops organized by the project.
 
-### License
+## License
 
 This Code of Conduct, being a derivative work of the Berlin Code of Conduct, is also licensed under
 the [CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/). You are free to share
