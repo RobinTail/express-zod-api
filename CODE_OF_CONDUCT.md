@@ -1,132 +1,96 @@
-# Contributor Covenant Code of Conduct
+# Code of Conduct for the Express Zod API Community
 
-## Our Pledge
+This Code of Conduct is adapted from the [Berlin Code of Conduct](https://berlincodeofconduct.org/en),
+licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
-We as members, contributors, and leaders pledge to make participation in our
-community a harassment-free experience for everyone, regardless of age, body
-size, visible or invisible disability, ethnicity, sex characteristics, gender
-identity and expression, level of experience, education, socio-economic status,
-nationality, personal appearance, race, caste, color, religion, or sexual
-identity and orientation.
+Our primary goal is to foster an inclusive, friendly, safe, and welcoming environment for all
+contributors, users, and participants in the Express Zod API project, regardless of gender,
+sexual orientation, ability, ethnicity, socioeconomic status, or religion.
 
-We pledge to act and interact in ways that contribute to an open, welcoming,
-diverse, inclusive, and healthy community.
+A supplemental goal is to promote **open-source citizenship** by encouraging all participants to
+understand the impact of their actions on the community and to actively counteract inequality and
+abuses of power within our project spaces.
 
-## Our Standards
+## Key Expectations for Participants
 
-Examples of behavior that contributes to a positive environment for our
-community include:
+The Express Zod API community expects participants to:
 
-- Demonstrating empathy and kindness toward other people
-- Being respectful of differing opinions, viewpoints, and experiences
-- Giving and gracefully accepting constructive feedback
-- Accepting responsibility and apologizing to those affected by our mistakes,
-  and learning from the experience
-- Focusing on what is best not just for us as individuals, but for the overall
-  community
+- **Participate authentically and actively.** Your contributions should be genuine and made in good
+  faith towards the project's goals.
+- **Exercise consideration and respect** in your speech and actions within all project communications
+  (e.g., GitHub issues, pull requests, discussions, Discord/chat).
+- **Attempt collaboration before conflict.** When disagreements arise, seek to understand different
+  perspectives and find common ground respectfully before escalating.
+- **Refrain from demeaning, discriminatory, or harassing behavior and speech.** This applies to all
+  online interactions, written communication, and any in-person events related to the project.
+- **Be mindful of your surroundings** in shared online spaces. If you notice a dangerous situation,
+  someone in distress, or violations of this Code of Conduct, please report it to the project
+  maintainers.
 
-Examples of unacceptable behavior include:
+## Unacceptable Behaviors
 
-- The use of sexualized language or imagery, and sexual attention or advances of
-  any kind
-- Trolling, insulting or derogatory comments, and personal or political attacks
-- Public or private harassment
-- Publishing others' private information, such as a physical or email address,
-  without their explicit permission
-- Other conduct which could reasonably be considered inappropriate in a
-  professional setting
+The following behaviors are considered unacceptable within the Express Zod API community:
 
-## Enforcement Responsibilities
+- **Intimidating, harassing, abusive, discriminatory, derogatory, or demeaning speech or actions** by
+  any participant in our community online or in any related context.
+- **Harmful or prejudiced comments** related to gender, sexual orientation, disability, mental
+  illness, neuro(a)typicality, physical appearance, body size, race, ethnicity, age, religion, or
+  other personal attributes.
+- **Inappropriate use of nudity and/or sexual images** in public online spaces (e.g., as profile
+  pictures, in discussions).
+- **Deliberate intimidation, stalking, or following** of community members.
+- **Harassing photography or recording** of in-person interactions without explicit consent.
+- **Sustained disruption** of discussions, talks, or other online activities.
+- **Inappropriate physical contact** (in in-person contexts).
+- **Unwelcome sexual attention.** This includes sexualized comments or jokes, inappropriate touching,
+  groping, and unwelcome sexual advances.
+- **Advocating for, or encouraging, any of the above behaviors.**
 
-Community leaders are responsible for clarifying and enforcing our standards of
-acceptable behavior and will take appropriate and fair corrective action in
-response to any behavior that they deem inappropriate, threatening, offensive,
-or harmful.
+## Consequences of Unacceptable Behavior
 
-Community leaders have the right and responsibility to remove, edit, or reject
-comments, commits, code, wiki edits, issues, and other contributions that are
-not aligned to this Code of Conduct, and will communicate reasons for moderation
-decisions when appropriate.
+Unacceptable behavior from any participant will not be tolerated.
 
-## Scope
+- Anyone asked to stop unacceptable behavior is expected to comply **immediately**.
+- If a participant engages in unacceptable behavior, the project maintainers may take any action they
+  deem appropriate, including a temporary ban, permanent expulsion from the community, or
+  editing/deletion of offending content, without warning or refund (if applicable to any paid
+  access/materials).
 
-This Code of Conduct applies within all community spaces, and also applies when
-an individual is officially representing the community in public spaces.
-Examples of representing our community include using an official e-mail address,
-posting via an official social media account, or acting as an appointed
-representative at an online or offline event.
+## Reporting Guidelines
 
-## Enforcement
+If you are subject to, or witness, unacceptable behavior, or have any other concerns, please notify
+the project maintainers as soon as possible.
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement by
-[email](https://github.com/RobinTail/express-zod-api/blob/master/package.json#L14).
-All complaints will be reviewed and investigated promptly and fairly.
+**How to Report:**
 
-All community leaders are obligated to respect the privacy and security of the
-reporter of any incident.
+- **For private and sensitive reports:** Contact the core maintainers directly via
+  [email](https://github.com/RobinTail/express-zod-api/blob/master/express-zod-api/package.json#L14).
+- **For less sensitive or public issues:** You may open a GitHub issue, but be mindful of privacy and
+  consider if direct email is more appropriate.
 
-## Enforcement Guidelines
+Project maintainers will be available to help participants contact local law enforcement, provide
+escorts, or otherwise assist those experiencing unacceptable behavior to feel safe. Your grievance
+will be handled seriously and investigated according to existing project governing policies. We
+respect concerns about false accusations and will handle them according to our project's dispute
+resolution processes.
 
-Community leaders will follow these Community Impact Guidelines in determining
-the consequences for any action they deem in violation of this Code of Conduct:
+## Scope and Applicability
 
-### 1. Correction
+This Code of Conduct applies to all Express Zod API community participants in all official project
+venues, both online and potentially in-person (e.g., meetups, sprints), and in one-on-one
+communications related to project business. This includes, but is not limited to:
 
-**Community Impact**: Use of inappropriate language or other behavior deemed
-unprofessional or unwelcome in the community.
+- The [GitHub repository](https://github.com/RobinTail/express-zod-api);
+- GitHub Issues and Pull Requests;
+- GitHub Discussions;
+- Project-related chat platforms (e.g., Discord, Slack if applicable);
+- Any official project social media accounts;
+- Any future in-person events or workshops organized by the project.
 
-**Consequence**: A private, written warning from community leaders, providing
-clarity around the nature of the violation and an explanation of why the
-behavior was inappropriate. A public apology may be requested.
+## License
 
-### 2. Warning
-
-**Community Impact**: A violation through a single incident or series of
-actions.
-
-**Consequence**: A warning with consequences for continued behavior. No
-interaction with the people involved, including unsolicited interaction with
-those enforcing the Code of Conduct, for a specified period of time. This
-includes avoiding interactions in community spaces as well as external channels
-like social media. Violating these terms may lead to a temporary or permanent
-ban.
-
-### 3. Temporary Ban
-
-**Community Impact**: A serious violation of community standards, including
-sustained inappropriate behavior.
-
-**Consequence**: A temporary ban from any sort of interaction or public
-communication with the community for a specified period of time. No public or
-private interaction with the people involved, including unsolicited interaction
-with those enforcing the Code of Conduct, is allowed during this period.
-Violating these terms may lead to a permanent ban.
-
-### 4. Permanent Ban
-
-**Community Impact**: Demonstrating a pattern of violation of community
-standards, including sustained inappropriate behavior, harassment of an
-individual, or aggression toward or disparagement of classes of individuals.
-
-**Consequence**: A permanent ban from any sort of public interaction within the
-community.
-
-## Attribution
-
-This Code of Conduct is adapted from the [Contributor Covenant][homepage],
-version 2.1, available at
-[https://www.contributor-covenant.org/version/2/1/code_of_conduct.html][v2.1].
-
-Community Impact Guidelines were inspired by
-[Mozilla's code of conduct enforcement ladder][mozilla coc].
-
-For answers to common questions about this code of conduct, see the FAQ at
-[https://www.contributor-covenant.org/faq][faq]. Translations are available at
-[https://www.contributor-covenant.org/translations][translations].
-
-[homepage]: https://www.contributor-covenant.org
-[v2.1]: https://www.contributor-covenant.org/version/2/1/code_of_conduct.html
-[mozilla coc]: https://github.com/mozilla/diversity
-[faq]: https://www.contributor-covenant.org/faq
-[translations]: https://www.contributor-covenant.org/translations
+This Code of Conduct, being a derivative work of the Berlin Code of Conduct, is also licensed under
+the [CC BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/). You are free to share
+and adapt this work, provided you give appropriate credit, provide a link to the license, and
+indicate if changes were made. If you remix, transform, or build upon the material, you must
+distribute your contributions under the same license as the original.
