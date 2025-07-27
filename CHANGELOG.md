@@ -32,8 +32,8 @@
 
 ```diff
 - getExamples(schema);
-+ schema.meta()?.examples || [];
 + globalRegistry.get(schema)?.examples || [];
++ schema.meta()?.examples || []; // plugin method
 ```
 
 ## Version 24
