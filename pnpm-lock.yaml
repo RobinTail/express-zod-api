@@ -60,7 +60,7 @@ importers:
         specifier: ^24.0.0
         version: 24.1.0
       '@vitest/coverage-v8':
-        specifier: ^4.0.0-beta.4
+        specifier: ^4.0.0-beta.5
         version: 4.0.0-beta.5(vitest@4.0.0-beta.5(@types/node@24.1.0)(tsx@4.20.3)(yaml@2.8.0))
       eslint:
         specifier: ^9.28.0
@@ -90,7 +90,7 @@ importers:
         specifier: catalog:dev
         version: 8.38.0(eslint@9.32.0)(typescript@5.9.2)
       vitest:
-        specifier: ^4.0.0-beta.4
+        specifier: ^4.0.0-beta.5
         version: 4.0.0-beta.5(@types/node@24.1.0)(tsx@4.20.3)(yaml@2.8.0)
 
   cjs-test:
