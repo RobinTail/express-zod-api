@@ -1139,6 +1139,36 @@ const exampleEndpoint = defaultEndpointsFactory.build({
 _See the example of the generated documentation
 [here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.documentation.yaml)_
 
+## Serving documentation with Scalar
+
+Once you have generated your OpenAPI documentation, you can serve it with a beautiful UI using [Scalar](https://github.com/scalar/scalar). Scalar provides a modern, customizable interface for your API documentation. Install it like this:
+
+```bash
+npm install @scalar/express-api-reference
+```
+
+And then pass the URL to your OpenAPI document to the `apiReference` middleware:
+
+```typescript
+import { createConfig } from "express-zod-api";
+import { apiReference } from "@scalar/express-api-reference";
+
+const config = createConfig({
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+    logger.info("Serving the API reference at https://example.com/docs");
+
+    app.use(
+      "/docs",
+      apiReference({
+        // Pass your generated OpenAPI document
+        content: documentation.getSpecAsJson(),
+      }),
+    );
+  },
+});
+```
+
 ## Tagging the endpoints
 
 When generating documentation, you may find it necessary to classify endpoints into groups. The possibility of tagging
