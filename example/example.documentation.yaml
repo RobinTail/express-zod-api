@@ -100,32 +100,6 @@ paths:
           description: HEAD /v1/user/retrieve Positive response
         "400":
           description: HEAD /v1/user/retrieve Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
   /v1/user/{id}/remove:
     delete:
       operationId: DeleteV1UserIdRemove
@@ -456,13 +430,6 @@ paths:
           description: HEAD /v1/user/list Positive response
         "400":
           description: HEAD /v1/user/list Negative response
-          content:
-            text/plain:
-              schema:
-                type: string
-              examples:
-                example1:
-                  value: Sample error message
   /v1/avatar/send:
     get:
       operationId: GetV1AvatarSend
@@ -512,10 +479,6 @@ paths:
           description: HEAD /v1/avatar/send Positive response
         "400":
           description: HEAD /v1/avatar/send Negative response
-          content:
-            text/plain:
-              schema:
-                type: string
   /v1/avatar/stream:
     get:
       operationId: GetV1AvatarStream
@@ -565,10 +528,6 @@ paths:
           description: HEAD /v1/avatar/stream Positive response
         "400":
           description: HEAD /v1/avatar/stream Negative response
-          content:
-            text/plain:
-              schema:
-                type: string
   /v1/avatar/upload:
     post:
       operationId: PostV1AvatarUpload
@@ -790,10 +749,6 @@ paths:
           description: HEAD /v1/events/stream Positive response
         "400":
           description: HEAD /v1/events/stream Negative response
-          content:
-            text/plain:
-              schema:
-                type: string
   /v1/forms/feedback:
     post:
       operationId: PostV1FormsFeedback

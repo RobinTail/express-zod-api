@@ -499,7 +499,7 @@ export const depictResponse = ({
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
-  if (!mimeTypes || !doesImplyContent(method, variant)) return { description };
+  if (!mimeTypes || !doesImplyContent(method)) return { description };
   const response = asOAS(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
