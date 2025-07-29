@@ -10,7 +10,6 @@
 import * as R from "ramda";
 import { z } from "zod/v4";
 import { getExamples, metaSymbol } from "./metadata";
-import { Intact, Remap } from "./mapping-helpers";
 import type {
   $ZodType,
   $ZodShape,
@@ -38,6 +37,8 @@ declare module "zod/v4/core" {
     example?: unknown; // see zod commit ee5615d @todo remove in v25
   }
 }
+
+export type Intact<T, U> = { [K in Exclude<keyof T, keyof U>]: T[K] };
 
 declare module "zod/v4" {
   interface ZodType<
@@ -68,7 +69,7 @@ declare module "zod/v4" {
       mapping: U,
     ): z.ZodPipe<
       z.ZodPipe<this, z.ZodTransform>, // internal type simplified
-      z.ZodObject<Remap<Shape, U, V> & Intact<Shape, U>, Config>
+      z.ZodObject<R.Remap<Shape, U> & Intact<Shape, U>, Config>
     >;
     remap<U extends $ZodShape>(
       mapper: (subject: Shape) => U,
