@@ -2,6 +2,11 @@
 
 ## Version 24
 
+### v24.7.2
+
+- Fixed the negative response MIME type for ~~`arrayResultHandler`~~ (deprecated entity):
+  - Should have been `text/plain`.
+
 ### v24.7.1
 
 - Compatibility fix for `zod@^3.25.68` and `^4.0.0`:
