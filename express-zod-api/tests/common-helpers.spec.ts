@@ -7,7 +7,7 @@ import {
   makeCleanId,
   ensureError,
   getRoutePathParams,
-  doesImplyContent,
+  shouldHaveContent,
   getInputSources,
 } from "../src/common-helpers";
 import { z } from "zod/v4";
@@ -332,11 +332,15 @@ describe("Common Helpers", () => {
 
   describe("doesImplyContent()", () => {
     test.each(methods)("should return true for %s", (method) => {
-      expect(doesImplyContent(method)).toBe(true);
+      expect(shouldHaveContent(method, ["some"])).toBe(true);
     });
 
     test("should return false for HEAD request", () => {
-      expect(doesImplyContent("head")).toBe(false);
+      expect(shouldHaveContent("head", ["some"])).toBe(false);
+    });
+
+    test("should return false for no MIME types", () => {
+      expect(shouldHaveContent("get", null)).toBe(false);
     });
   });
 });
