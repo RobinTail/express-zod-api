@@ -333,7 +333,6 @@ describe("Common Helpers", () => {
   describe("doesImplyContent()", () => {
     test.each(methods)("should return true for %s", (method) => {
       expect(doesImplyContent(method)).toBe(true);
-      expect(doesImplyContent(method)).toBe(true);
     });
 
     test("should return false for HEAD request", () => {
