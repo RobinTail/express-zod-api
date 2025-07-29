@@ -28,15 +28,6 @@ import type {
   $strip,
 } from "zod/v4/core";
 
-/** @todo remove when typed, https://github.com/ramda/types/pull/140 */
-declare module "ramda" {
-  function renameKeys<
-    V extends string,
-    T extends object,
-    U extends { [P in keyof T]?: V },
-  >(mapping: U): (subject: T) => Remap<T, U, V>;
-}
-
 declare module "zod/v4/core" {
   interface GlobalMeta {
     default?: unknown; // can be an actual value or a label like "Today"
@@ -132,11 +123,13 @@ const brandSetter = function (
   return this.check(new $EZBrandCheck({ brand, check: "$EZBrandCheck" }));
 };
 
+type _Mapper = <T extends Record<string, unknown>>(
+  subject: T,
+) => { [P in string | keyof T]: T[keyof T] };
+
 const objectMapper = function (
   this: z.ZodObject,
-  tool:
-    | Record<string, string>
-    | (<T>(subject: T) => { [P in string | keyof T]: T[keyof T] }),
+  tool: Record<string, string> | _Mapper,
 ) {
   const transformer =
     typeof tool === "function" ? tool : R.renameKeys(R.reject(R.isNil, tool)); // rejecting undefined
