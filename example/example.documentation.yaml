@@ -441,7 +441,7 @@ paths:
         "400":
           description: GET /v1/user/list Negative response
           content:
-            application/json:
+            text/plain:
               schema:
                 type: string
               examples:
@@ -457,7 +457,7 @@ paths:
         "400":
           description: HEAD /v1/user/list Negative response
           content:
-            application/json:
+            text/plain:
               schema:
                 type: string
               examples:
