@@ -48,6 +48,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -68,7 +70,28 @@ paths:
         "400":
           description: HEAD /v1/getSome/thing Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -131,6 +154,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -198,6 +223,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -209,7 +236,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -272,6 +320,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -333,6 +383,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -353,7 +405,28 @@ paths:
         "400":
           description: HEAD /v1/getSome/:thing Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -434,6 +507,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -518,6 +593,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -577,6 +654,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -588,7 +667,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -672,6 +772,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -683,7 +785,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -779,6 +902,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -824,7 +949,28 @@ paths:
         "400":
           description: HEAD /v1/getSomething Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -941,6 +1087,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -952,7 +1100,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1047,6 +1216,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -1058,7 +1229,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1188,6 +1380,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -1248,7 +1442,28 @@ paths:
         "400":
           description: HEAD /v1/getSomething Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1351,6 +1566,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -1362,7 +1579,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1471,6 +1709,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -1482,7 +1722,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1553,6 +1814,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema3"
                 required:
                   - status
                   - error
@@ -1589,6 +1852,27 @@ components:
       required:
         - name
         - subcategories
+      additionalProperties: false
+    Schema3:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema3"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema3"
+      required:
+        - errors
       additionalProperties: false
   responses: {}
   parameters: {}
@@ -1773,6 +2057,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -1784,7 +2070,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -1926,6 +2233,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -1937,7 +2246,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2020,6 +2350,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -2031,7 +2363,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2155,6 +2508,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -2166,7 +2521,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2248,6 +2624,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -2259,7 +2637,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2364,6 +2763,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -2375,7 +2776,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2445,6 +2867,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -2469,7 +2893,28 @@ paths:
         "400":
           description: HEAD /v1/getSomething Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2549,6 +2994,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -2582,7 +3029,28 @@ paths:
         "400":
           description: HEAD /v1/getSomething Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2762,6 +3230,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -2799,7 +3269,28 @@ paths:
         "400":
           description: HEAD /v1/:name Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2882,6 +3373,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -2918,7 +3411,28 @@ paths:
         "400":
           description: HEAD /v1/test Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -2990,6 +3504,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -3015,7 +3531,28 @@ paths:
         "400":
           description: HEAD /v1/test Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3089,6 +3626,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -3120,7 +3659,28 @@ paths:
         "400":
           description: HEAD /v1/test Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3202,6 +3762,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -3213,7 +3775,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3293,6 +3876,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -3304,7 +3889,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3382,6 +3988,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -3470,6 +4078,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -3481,7 +4091,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3585,6 +4216,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -3596,7 +4229,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3667,6 +4321,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -3695,7 +4351,28 @@ paths:
         "400":
           description: HEAD /v1/getSomething Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3797,6 +4474,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -3808,7 +4487,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -3894,6 +4594,27 @@ components:
         - status
         - data
       additionalProperties: false
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
     GetHrisEmployeesNegativeResponse:
       type: object
       properties:
@@ -3908,6 +4629,8 @@ components:
           required:
             - message
           additionalProperties: false
+        tree:
+          $ref: "#/components/schemas/Schema1"
       required:
         - status
         - error
@@ -4008,6 +4731,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -4019,7 +4744,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4118,6 +4864,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -4129,7 +4877,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4212,6 +4981,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -4240,7 +5011,28 @@ paths:
         "400":
           description: HEAD /v1/getSomething Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4329,6 +5121,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -4340,7 +5134,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4427,6 +5242,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -4457,7 +5274,28 @@ paths:
         "400":
           description: HEAD /v1/getSomething Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4550,6 +5388,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -4561,7 +5401,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4637,6 +5498,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -4663,7 +5526,28 @@ paths:
         "400":
           description: HEAD /v1/getSomething Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4747,6 +5631,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -4758,7 +5644,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4837,6 +5744,27 @@ components:
         - status
         - data
       additionalProperties: false
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
     VeryNegativeResponseOfPostV1Name:
       type: object
       properties:
@@ -4851,6 +5779,8 @@ components:
           required:
             - message
           additionalProperties: false
+        tree:
+          $ref: "#/components/schemas/Schema1"
       required:
         - status
         - error
@@ -4939,6 +5869,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -4974,7 +5906,28 @@ paths:
         "400":
           description: HEAD /v1/:name Negative response
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -5058,6 +6011,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema1"
                 required:
                   - status
                   - error
@@ -5069,7 +6024,28 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    Schema1:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema1"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema1"
+      required:
+        - errors
+      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}

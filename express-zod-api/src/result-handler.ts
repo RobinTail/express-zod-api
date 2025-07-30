@@ -7,12 +7,14 @@ import {
 } from "./api-response";
 import { FlatObject, isObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
+import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 import { getExamples } from "./metadata";
 import {
   DiscriminatedResult,
   ensureHttpError,
+  errorTreeSchema,
   getPublicErrorMessage,
   logServerError,
   normalize,
@@ -116,6 +118,7 @@ export const defaultResultHandler = new ResultHandler({
     .object({
       status: z.literal("error"),
       error: z.object({ message: z.string() }),
+      tree: errorTreeSchema.optional(),
     })
     .example({
       status: "error",
@@ -131,6 +134,10 @@ export const defaultResultHandler = new ResultHandler({
         .json({
           status: "error",
           error: { message: getPublicErrorMessage(httpError) },
+          tree:
+            error instanceof InputValidationError
+              ? z.treeifyError(error.cause)
+              : undefined,
         });
     }
     response

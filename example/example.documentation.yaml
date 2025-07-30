@@ -70,6 +70,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema2"
                 required:
                   - status
                   - error
@@ -252,6 +254,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema2"
                 required:
                   - status
                   - error
@@ -607,6 +611,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema2"
                 required:
                   - status
                   - error
@@ -674,6 +680,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema2"
                 required:
                   - status
                   - error
@@ -819,6 +827,8 @@ paths:
                     required:
                       - message
                     additionalProperties: false
+                  tree:
+                    $ref: "#/components/schemas/Schema2"
                 required:
                   - status
                   - error
@@ -842,6 +852,27 @@ components:
             $ref: "#/components/schemas/Schema1"
       required:
         - title
+      additionalProperties: false
+    Schema2:
+      id: errorTreeSchema
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Schema2"
+        properties:
+          type: object
+          propertyNames:
+            type: string
+          additionalProperties:
+            $ref: "#/components/schemas/Schema2"
+      required:
+        - errors
       additionalProperties: false
   responses: {}
   parameters: {}
