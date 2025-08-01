@@ -6,33 +6,40 @@ packages:
   - esm-test
   - compat-test
   - issue952-test
-onlyBuiltDependencies:
-  - esbuild
-gitChecks: false
-engineStrict: true
+
 autoInstallPeers: false
-publicHoistPattern:
-  - "@typescript-eslint/*" # used as an assumed transitive in migration
-  - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
-  - "@eslint/*" # used by eslint.config.js
-  - "globals" # used by eslint.config.js
-  - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
-  - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting
+
 catalogs:
   dev:
-    "@types/compression": "^1.8.1"
-    "@types/express": "^5.0.3"
-    "@types/express-fileupload": "^1.5.1"
-    "@types/http-errors": "^2.0.5"
-    "@typescript-eslint/rule-tester": "^8.35.1"
-    "compression": "^1.8.0"
-    "express": "^5.1.0"
-    "express-fileupload": "^1.5.1"
-    "http-errors": "^2.0.0"
-    "typescript": "^5.8.3"
-    "typescript-eslint": "^8.35.1"
-    "undici": "^6.19.8"
-    "zod": "^4.0.0"
+    '@types/compression': ^1.8.1
+    '@types/express': ^5.0.3
+    '@types/express-fileupload': ^1.5.1
+    '@types/http-errors': ^2.0.5
+    '@typescript-eslint/rule-tester': ^8.38.0
+    compression: ^1.8.1
+    express: ^5.1.0
+    express-fileupload: ^1.5.2
+    http-errors: ^2.0.0
+    typescript: ^5.9.2
+    typescript-eslint: ^8.38.0
+    undici: ^6.21.3
+    zod: ^4.0.14
+
+engineStrict: true
+
+gitChecks: false
+
+onlyBuiltDependencies:
+  - esbuild
+
 overrides:
-  "@scarf/scarf": "npm:empty-npm-package@1.0.0"
-  "vite": "^6" # @todo remove in v25
+  '@scarf/scarf': npm:empty-npm-package@1.0.0
+  vite: ^6
+
+publicHoistPattern:
+  - '@typescript-eslint/*'
+  - '@vitest/*'
+  - '@eslint/*'
+  - globals
+  - '@types/qs'
+  - '@types/express-serve-static-core'
