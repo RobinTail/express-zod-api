@@ -8,7 +8,7 @@ import { methodProviderMiddleware } from "../middlewares";
 const feature = z.object({
   title: z.string(),
   get features() {
-    return z.array(feature).optional();
+    return z.array(feature);
   },
 });
 
@@ -39,14 +39,14 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
         id,
         name,
         features: [
-          { title: "Tall", features: [{ title: "Above 180cm" }] },
-          { title: "Young" },
+          { title: "Tall", features: [{ title: "Above 180cm", features: [] }] },
+          { title: "Young", features: [] },
           {
             title: "Cute",
             features: [
               {
                 title: "Tells funny jokes",
-                features: [{ title: "About Typescript" }],
+                features: [{ title: "About Typescript", features: [] }],
               },
             ],
           },

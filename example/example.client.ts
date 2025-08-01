@@ -1,6 +1,6 @@
 type Type1 = {
   title: string;
-  features?: Type1[] | undefined;
+  features: Type1[];
 };
 
 type SomeOf<T> = T[keyof T];
@@ -54,12 +54,7 @@ interface HeadV1UserRetrievePositiveResponseVariants {
 }
 
 /** head /v1/user/retrieve */
-type HeadV1UserRetrieveNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
-};
+type HeadV1UserRetrieveNegativeVariant1 = undefined;
 
 /** head /v1/user/retrieve */
 interface HeadV1UserRetrieveNegativeResponseVariants {
@@ -198,7 +193,7 @@ interface HeadV1UserListPositiveResponseVariants {
 }
 
 /** head /v1/user/list */
-type HeadV1UserListNegativeVariant1 = string;
+type HeadV1UserListNegativeVariant1 = undefined;
 
 /** head /v1/user/list */
 interface HeadV1UserListNegativeResponseVariants {
@@ -240,7 +235,7 @@ interface HeadV1AvatarSendPositiveResponseVariants {
 }
 
 /** head /v1/avatar/send */
-type HeadV1AvatarSendNegativeVariant1 = string;
+type HeadV1AvatarSendNegativeVariant1 = undefined;
 
 /** head /v1/avatar/send */
 interface HeadV1AvatarSendNegativeResponseVariants {
@@ -282,7 +277,7 @@ interface HeadV1AvatarStreamPositiveResponseVariants {
 }
 
 /** head /v1/avatar/stream */
-type HeadV1AvatarStreamNegativeVariant1 = string;
+type HeadV1AvatarStreamNegativeVariant1 = undefined;
 
 /** head /v1/avatar/stream */
 interface HeadV1AvatarStreamNegativeResponseVariants {
@@ -395,7 +390,7 @@ interface HeadV1EventsStreamPositiveResponseVariants {
 }
 
 /** head /v1/events/stream */
-type HeadV1EventsStreamNegativeVariant1 = string;
+type HeadV1EventsStreamNegativeVariant1 = undefined;
 
 /** head /v1/events/stream */
 interface HeadV1EventsStreamNegativeResponseVariants {

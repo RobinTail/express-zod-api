@@ -17,12 +17,14 @@ exports[`Example > Client > Should perform the request with a positive response 
       {
         "features": [
           {
+            "features": [],
             "title": "Above 180cm",
           },
         ],
         "title": "Tall",
       },
       {
+        "features": [],
         "title": "Young",
       },
       {
@@ -30,6 +32,7 @@ exports[`Example > Client > Should perform the request with a positive response 
           {
             "features": [
               {
+                "features": [],
                 "title": "About Typescript",
               },
             ],
@@ -95,6 +98,45 @@ exports[`Example > Positive > Should accept raw data 1 1`] = `
 {
   "data": {
     "length": 48687,
+  },
+  "status": "success",
+}
+`;
+
+exports[`Example > Positive > Should handle valid GET request 1`] = `
+{
+  "data": {
+    "features": [
+      {
+        "features": [
+          {
+            "features": [],
+            "title": "Above 180cm",
+          },
+        ],
+        "title": "Tall",
+      },
+      {
+        "features": [],
+        "title": "Young",
+      },
+      {
+        "features": [
+          {
+            "features": [
+              {
+                "features": [],
+                "title": "About Typescript",
+              },
+            ],
+            "title": "Tells funny jokes",
+          },
+        ],
+        "title": "Cute",
+      },
+    ],
+    "id": 50,
+    "name": "John Doe",
   },
   "status": "success",
 }

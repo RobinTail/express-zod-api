@@ -38,6 +38,17 @@
 
 ## Version 24
 
+### v24.7.3
+
+- Fixed the depiction of the negative response to `HEAD` requests:
+  - Should have no response body, exactly as the positive one;
+  - This version corrects the implementation introduced in [v24.7.0](#v2470).
+
+### v24.7.2
+
+- Fixed the negative response MIME type for ~~`arrayResultHandler`~~ (deprecated entity):
+  - Should have been `text/plain`.
+
 ### v24.7.1
 
 - Compatibility fix for `zod@^3.25.68` and `^4.0.0`:
@@ -55,10 +66,10 @@
   - It is the built-in feature of Express to handle `HEAD` requests by the handlers for `GET` requests;
   - Therefore, each `Endpoint` supporting `get` method also handles `head` requests (no work needed);
   - Added `HEAD` method to CORS response headers, along with `OPTIONS`, for `GET` method supporting endpoints;
-  - Positive response to `HEAD` request should contain same headers as `GET` would, but without the body:
+  - ~~Positive~~ Response to `HEAD` request should contain same headers as `GET` would, but without the body:
     - Added `head` request depiction to the generated `Documentation`;
     - Added `head` request types to the generated `Integration` client;
-  - Positive response to `HEAD` request should contain the `Content-Length` header:
+  - ~~Positive~~ Response to `HEAD` request should contain the `Content-Length` header:
     - `ResultHandler`s using `response.send()` (as well as its shorthands such as `.json()`) automatically do that
       instead of sending the response body (no work needed);
     - Other approaches, such as stream piping, might require to implement `Content-Length` header for `HEAD` requests;

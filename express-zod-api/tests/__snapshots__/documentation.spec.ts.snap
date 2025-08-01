@@ -67,32 +67,6 @@ paths:
           description: HEAD /v1/getSome/thing Positive response
         "400":
           description: HEAD /v1/getSome/thing Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -176,32 +150,6 @@ paths:
           description: HEAD /v1/getSome/thing Positive response
         "400":
           description: HEAD /v1/getSome/thing Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
     post:
       operationId: postCoolOperationId
       summary: thing is the path segment
@@ -343,32 +291,6 @@ paths:
           description: HEAD /v1/getSome/thing Positive response
         "400":
           description: HEAD /v1/getSome/thing Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
   /v1/getSome/{thing}:
     get:
       operationId: GetV1GetSomeThing2
@@ -430,32 +352,6 @@ paths:
           description: HEAD /v1/getSome/:thing Positive response
         "400":
           description: HEAD /v1/getSome/:thing Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -571,32 +467,6 @@ paths:
           description: HEAD /v1/getSomething Positive response
         "400":
           description: HEAD /v1/getSomething Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
   /v1/setSomething:
     post:
       operationId: PostV1SetSomething
@@ -953,32 +823,6 @@ paths:
           description: HEAD /v1/getSomething Positive response
         "400":
           description: HEAD /v1/getSomething Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -1403,32 +1247,6 @@ paths:
           description: HEAD /v1/getSomething Positive response
         "400":
           description: HEAD /v1/getSomething Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -1835,17 +1653,6 @@ paths:
           description: HEAD /v1/getSomething Positive response
         "403":
           description: HEAD /v1/getSomething Negative response
-          content:
-            text/vnd.yaml:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: NOT OK
-                required:
-                  - status
-                additionalProperties: false
 components:
   schemas: {}
   responses: {}
@@ -2661,32 +2468,6 @@ paths:
           description: HEAD /v1/getSomething Positive response
         "400":
           description: HEAD /v1/getSomething Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -2800,32 +2581,6 @@ paths:
           description: HEAD /v1/getSomething Positive response
         "400":
           description: HEAD /v1/getSomething Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -3043,32 +2798,6 @@ paths:
           description: HEAD /v1/:name Positive response
         "400":
           description: HEAD /v1/:name Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -3188,32 +2917,6 @@ paths:
           description: HEAD /v1/test Positive response
         "400":
           description: HEAD /v1/test Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -3311,32 +3014,6 @@ paths:
           description: HEAD /v1/test Positive response
         "400":
           description: HEAD /v1/test Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -3442,32 +3119,6 @@ paths:
           description: HEAD /v1/test Positive response
         "400":
           description: HEAD /v1/test Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -3758,32 +3409,6 @@ paths:
           description: HEAD /v1/getSomething Positive response
         "400":
           description: HEAD /v1/getSomething Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
     post:
       operationId: PostV1GetSomething
       requestBody:
@@ -4069,32 +3694,6 @@ paths:
           description: HEAD /v1/getSomething Positive response
         "400":
           description: HEAD /v1/getSomething Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -4275,16 +3874,6 @@ paths:
           description: HEAD /hris/employees Positive response
         "400":
           description: HEAD /hris/employees Negative response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HeadHrisEmployeesNegativeResponse"
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas:
     GetHrisEmployeesParameterCursor:
@@ -4327,24 +3916,6 @@ components:
       description: An optional cursor string used for pagination. This can be
         retrieved from the \`next\` property of the previous page response.
       type: string
-    HeadHrisEmployeesNegativeResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          const: error
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-          required:
-            - message
-          additionalProperties: false
-      required:
-        - status
-        - error
-      additionalProperties: false
   responses: {}
   parameters: {}
   examples: {}
@@ -4668,32 +4239,6 @@ paths:
           description: HEAD /v1/getSomething Positive response
         "400":
           description: HEAD /v1/getSomething Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -4911,32 +4456,6 @@ paths:
           description: HEAD /v1/getSomething Positive response
         "400":
           description: HEAD /v1/getSomething Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -5143,32 +4662,6 @@ paths:
           description: HEAD /v1/getSomething Positive response
         "400":
           description: HEAD /v1/getSomething Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -5480,32 +4973,6 @@ paths:
           description: HEAD /v1/:name Positive response
         "400":
           description: HEAD /v1/:name Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
-              examples:
-                example1:
-                  value:
-                    status: error
-                    error:
-                      message: Sample error message
 components:
   schemas: {}
   responses: {}

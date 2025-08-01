@@ -16,10 +16,10 @@ import {
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
-import { ResponseVariant } from "./api-response";
+import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
 import {
-  doesImplyContent,
+  shouldHaveContent,
   FlatObject,
   getRoutePathParams,
   getTransformedType,
@@ -466,12 +466,12 @@ export const depictResponse = ({
   composition: "inline" | "components";
   description?: string;
   brandHandling?: BrandHandling;
-  mimeTypes: ReadonlyArray<string> | null;
+  mimeTypes: NormalizedResponse["mimeTypes"];
   variant: ResponseVariant;
   statusCode: number;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
-  if (!mimeTypes || !doesImplyContent(method, variant)) return { description };
+  if (!shouldHaveContent(method, mimeTypes)) return { description };
   const response = asOAS(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },

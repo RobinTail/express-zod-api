@@ -10,7 +10,7 @@ import {
   Method,
   CORSMethod,
 } from "./method";
-import { ResponseVariant } from "./api-response";
+import { NormalizedResponse } from "./api-response";
 
 /** @since zod 3.25.61 output type fixed */
 export const emptySchema = z.object({});
@@ -143,7 +143,8 @@ export const isProduction = R.memoizeWith(
   () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
 );
 
-export const doesImplyContent = (
+export const shouldHaveContent = (
   method: ClientMethod,
-  responseVariant: ResponseVariant,
-) => !(method === "head" && responseVariant === "positive");
+  mimeTypes: NormalizedResponse["mimeTypes"],
+): mimeTypes is NonNullable<NormalizedResponse["mimeTypes"]> =>
+  Boolean(mimeTypes) && method !== "head";
