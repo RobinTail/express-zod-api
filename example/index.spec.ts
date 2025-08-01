@@ -106,29 +106,7 @@ describe("Example", async () => {
       );
       expect(response.status).toBe(200);
       const json = await response.json();
-      expect(json).toEqual({
-        status: "success",
-        data: {
-          id: 50,
-          name: "John Doe",
-          features: [
-            {
-              title: "Tall",
-              features: [{ title: "Above 180cm" }],
-            },
-            { title: "Young" },
-            {
-              title: "Cute",
-              features: [
-                {
-                  title: "Tells funny jokes",
-                  features: [{ title: "About Typescript" }],
-                },
-              ],
-            },
-          ],
-        },
-      });
+      expect(json).toMatchSnapshot();
       await vi.waitFor(() =>
         assert([/v1\/user\/retrieve/, /50, method get/].every(matchOut)),
       );

@@ -1,6 +1,6 @@
 type Type1 = {
   title: string;
-  features?: Type1[] | undefined;
+  features: Type1[];
 };
 
 type SomeOf<T> = T[keyof T];
