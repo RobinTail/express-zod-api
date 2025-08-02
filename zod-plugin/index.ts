@@ -9,7 +9,7 @@
  * */
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
-import { metaSymbol } from "./metadata";
+import { name } from "./package.json";
 import { Intact, Remap } from "./mapping-helpers";
 
 declare module "zod/v4/core" {
@@ -121,8 +121,9 @@ const objectMapper = function (
   return this.transform(transformer).pipe(output);
 };
 
-if (!(metaSymbol in globalThis)) {
-  (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
+const pluginFlag = Symbol.for(name);
+if (!(pluginFlag in globalThis)) {
+  (globalThis as Record<symbol, unknown>)[pluginFlag] = true;
   for (const entry of Object.keys(z)) {
     if (!entry.startsWith("Zod")) continue;
     if (/(Success|Error|Function)$/.test(entry)) continue;
