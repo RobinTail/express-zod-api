@@ -169,7 +169,10 @@ export const arrayResultHandler = new ResultHandler({
     }
     return responseSchema;
   },
-  negative: z.string().example("Sample error message"),
+  negative: {
+    schema: z.string().example("Sample error message"),
+    mimeType: "text/plain",
+  },
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const httpError = ensureHttpError(error);
