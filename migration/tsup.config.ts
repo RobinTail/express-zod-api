@@ -9,10 +9,5 @@ export default defineConfig({
    * @link https://github.com/arethetypeswrong/arethetypeswrong.github.io/blob/main/docs/problems/MissingExportEquals.md
    * */
   cjsInterop: true,
-  /**
-   * Used by zod version detection to address import declaration
-   * @todo remove in v25
-   * */
-  shims: true,
   skipNodeModulesBundle: true,
 });

@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ master, v20, v21, v22, v23 ]
+    branches: [ master, v21, v22, v23, v24 ]
   pull_request:
-    branches: [ master, v20, v21, v22, v23 ]
+    branches: [ master, v21, v22, v23, v24 ]
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20.9.0, 20.x, 22.0.0, 22.x, 24.0.0, 24.x]
+        node-version: [20.19.0, 20.x, 22.12.0, 22.x, 24.0.0, 24.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
     - name: Checkout

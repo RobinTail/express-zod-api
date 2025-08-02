@@ -1,12 +1,3 @@
-import type {
-  $ZodDiscriminatedUnion,
-  $ZodPipe,
-  $ZodTransform,
-  $ZodTuple,
-  $ZodType,
-  $ZodUnion,
-  JSONSchema,
-} from "zod/v4/core";
 import {
   ExamplesObject,
   isReferenceObject,
@@ -24,7 +15,7 @@ import {
   TagObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
 import {
@@ -71,9 +62,12 @@ export interface OpenAPIContext extends ReqResCommons {
 }
 
 export type Depicter = (
-  zodCtx: { zodSchema: $ZodType; jsonSchema: JSONSchema.BaseSchema },
+  zodCtx: {
+    zodSchema: z.core.$ZodType;
+    jsonSchema: z.core.JSONSchema.BaseSchema;
+  },
   oasCtx: OpenAPIContext,
-) => JSONSchema.BaseSchema | SchemaObject;
+) => z.core.JSONSchema.BaseSchema | SchemaObject;
 
 /** @desc Using defaultIsHeader when returns null or undefined */
 export type IsHeader = (
@@ -116,7 +110,12 @@ export const depictBuffer: Depicter = ({ jsonSchema }) => ({
 });
 
 export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
-  if (!isSchema<$ZodUnion | $ZodDiscriminatedUnion>(zodSchema, "union"))
+  if (
+    !isSchema<z.core.$ZodUnion | z.core.$ZodDiscriminatedUnion>(
+      zodSchema,
+      "union",
+    )
+  )
     return jsonSchema;
   if (!("discriminator" in zodSchema._zod.def)) return jsonSchema;
   const propertyName: string = zodSchema._zod.def.discriminator;
@@ -141,33 +140,8 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
   return Object.assign(original, { type: makeNullableType(original.type) });
 };
 
-const isSupportedType = (subject: string): subject is SchemaObjectType =>
-  subject in samples;
-
-/**
- * @todo remove in v25
- * @since zod 3.25.45
- */
-export const depictEnum: Depicter = ({ jsonSchema }) => {
-  const suggestedType = typeof jsonSchema.enum?.[0];
-  if (!jsonSchema.type && isSupportedType(suggestedType))
-    jsonSchema.type = suggestedType;
-  return jsonSchema;
-};
-
-/**
- * @todo remove in v25
- * @since zod 3.25.49
- * */
-export const depictLiteral: Depicter = ({ jsonSchema }) => {
-  const suggestedType = typeof (jsonSchema.const || jsonSchema.enum?.[0]);
-  if (!jsonSchema.type && isSupportedType(suggestedType))
-    jsonSchema.type = suggestedType;
-  return jsonSchema;
-};
-
 /** @since v24.3.1 schema compliance is fully delegated to Zod */
-const asOAS = (subject: JSONSchema.BaseSchema) =>
+const asOAS = (subject: z.core.JSONSchema.BaseSchema) =>
   subject as SchemaObject | ReferenceObject;
 
 export const depictDateIn: Depicter = (
@@ -176,7 +150,7 @@ export const depictDateIn: Depicter = (
 ) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  const jsonSchema: JSONSchema.StringSchema = {
+  const jsonSchema: z.core.JSONSchema.StringSchema = {
     description: description || "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
@@ -193,7 +167,7 @@ export const depictDateOut: Depicter = (
 ) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
-  const jsonSchema: JSONSchema.StringSchema = {
+  const jsonSchema: z.core.JSONSchema.StringSchema = {
     description: description || "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
     format: "date-time",
@@ -214,7 +188,7 @@ export const depictBigInt: Depicter = () => ({
  * @since 17.5.0 added rest handling, fixed tuple type
  */
 export const depictTuple: Depicter = ({ zodSchema, jsonSchema }) => {
-  if ((zodSchema as $ZodTuple)._zod.def.rest !== null) return jsonSchema;
+  if ((zodSchema as z.core.$ZodTuple)._zod.def.rest !== null) return jsonSchema;
   // does not appear to support items:false, so not:{} is a recommended alias
   return { ...jsonSchema, items: { not: {} } };
 };
@@ -229,8 +203,8 @@ const makeSample = (depicted: SchemaObject) => {
 /** @since v24.0.0 does not return null for undefined */
 const makeNullableType = (
   current:
-    | JSONSchema.BaseSchema["type"]
-    | Array<NonNullable<JSONSchema.BaseSchema["type"]>>,
+    | z.core.JSONSchema.BaseSchema["type"]
+    | Array<NonNullable<z.core.JSONSchema.BaseSchema["type"]>>,
 ): typeof current => {
   if (current === ("null" satisfies SchemaObjectType)) return current;
   if (typeof current === "string")
@@ -241,13 +215,13 @@ const makeNullableType = (
 };
 
 export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
-  const target = (zodSchema as $ZodPipe)._zod.def[
+  const target = (zodSchema as z.core.$ZodPipe)._zod.def[
     ctx.isResponse ? "out" : "in"
   ];
-  const opposite = (zodSchema as $ZodPipe)._zod.def[
+  const opposite = (zodSchema as z.core.$ZodPipe)._zod.def[
     ctx.isResponse ? "in" : "out"
   ];
-  if (!isSchema<$ZodTransform>(target, "transform")) return jsonSchema;
+  if (!isSchema<z.core.$ZodTransform>(target, "transform")) return jsonSchema;
   const opposingDepiction = asOAS(depict(opposite, { ctx }));
   if (isSchemaObject(opposingDepiction)) {
     if (!ctx.isResponse) {
@@ -274,7 +248,7 @@ export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
 
 export const depictRaw: Depicter = ({ jsonSchema }) => {
   if (jsonSchema.type !== "object") return jsonSchema;
-  const objSchema = jsonSchema as JSONSchema.ObjectSchema;
+  const objSchema = jsonSchema as z.core.JSONSchema.ObjectSchema;
   if (!objSchema.properties) return jsonSchema;
   if (!("raw" in objSchema.properties)) return jsonSchema;
   if (!isObject(objSchema.properties.raw)) return jsonSchema;
@@ -312,7 +286,7 @@ export const depictRequestParams = ({
 }: ReqResCommons & {
   composition: "inline" | "components";
   description?: string;
-  request: JSONSchema.BaseSchema;
+  request: z.core.JSONSchema.BaseSchema;
   inputSources: InputSource[];
   isHeader?: IsHeader;
   security?: Alternatives<Security>;
@@ -381,8 +355,6 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
     intersection: depictIntersection,
     tuple: depictTuple,
     pipe: depictPipeline,
-    literal: depictLiteral,
-    enum: depictEnum,
     [ezDateInBrand]: depictDateIn,
     [ezDateOutBrand]: depictDateOut,
     [ezUploadBrand]: depictUpload,
@@ -395,8 +367,8 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
  * @link https://github.com/colinhacks/zod/issues/4281
  * */
 const fixReferences = (
-  subject: JSONSchema.BaseSchema,
-  defs: Record<string, JSONSchema.BaseSchema>,
+  subject: z.core.JSONSchema.BaseSchema,
+  defs: Record<string, z.core.JSONSchema.BaseSchema>,
   ctx: OpenAPIContext,
 ) => {
   const stack: unknown[] = [subject, defs];
@@ -422,7 +394,7 @@ const fixReferences = (
 };
 
 const depict = (
-  subject: $ZodType,
+  subject: z.core.$ZodType,
   { ctx, rules = depicters }: { ctx: OpenAPIContext; rules?: BrandHandling },
 ) => {
   const { $defs = {}, properties = {} } = z.toJSONSchema(
@@ -443,7 +415,7 @@ const depict = (
         }
       },
     },
-  ) as JSONSchema.ObjectSchema;
+  ) as z.core.JSONSchema.ObjectSchema;
   return fixReferences(
     isObject(properties["subject"]) ? properties["subject"] : {},
     $defs,
@@ -490,7 +462,7 @@ export const depictResponse = ({
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
 }: ReqResCommons & {
-  schema: $ZodType;
+  schema: z.core.$ZodType;
   composition: "inline" | "components";
   description?: string;
   brandHandling?: BrandHandling;
@@ -642,7 +614,7 @@ export const depictBody = ({
   schema: IOSchema;
   composition: "inline" | "components";
   description?: string;
-  request: JSONSchema.BaseSchema;
+  request: z.core.JSONSchema.BaseSchema;
   mimeType: string;
   paramNames: string[];
 }) => {

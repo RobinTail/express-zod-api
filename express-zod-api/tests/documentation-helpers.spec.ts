@@ -1,7 +1,6 @@
-import type { JSONSchema } from "zod/v4/core";
 import { SchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { z } from "zod/v4";
+import { z } from "zod";
 import { ez } from "../src";
 import {
   OpenAPIContext,
@@ -25,8 +24,6 @@ import {
   depictDateIn,
   depictDateOut,
   depictBody,
-  depictEnum,
-  depictLiteral,
   depictRequest,
 } from "../src/documentation-helpers";
 
@@ -120,7 +117,7 @@ describe("Documentation helpers", () => {
 
   describe("depictRaw()", () => {
     test("should extract the raw property", () => {
-      const jsonSchema: JSONSchema.BaseSchema = {
+      const jsonSchema: z.core.JSONSchema.BaseSchema = {
         type: "object",
         properties: { raw: { format: "binary", type: "string" } },
       };
@@ -168,7 +165,7 @@ describe("Documentation helpers", () => {
 
   describe("depictIntersection()", () => {
     test("should flatten two object schemas", () => {
-      const jsonSchema: JSONSchema.BaseSchema = {
+      const jsonSchema: z.core.JSONSchema.BaseSchema = {
         allOf: [
           {
             type: "object",
@@ -184,7 +181,7 @@ describe("Documentation helpers", () => {
     });
 
     test("should flatten objects with same prop of same type", () => {
-      const jsonSchema: JSONSchema.BaseSchema = {
+      const jsonSchema: z.core.JSONSchema.BaseSchema = {
         allOf: [
           { type: "object", properties: { one: { type: "number" } } },
           { type: "object", properties: { one: { type: "number" } } },
@@ -196,7 +193,7 @@ describe("Documentation helpers", () => {
     });
 
     test("should NOT flatten object schemas having conflicting props", () => {
-      const jsonSchema: JSONSchema.BaseSchema = {
+      const jsonSchema: z.core.JSONSchema.BaseSchema = {
         allOf: [
           { type: "object", properties: { one: { type: "number" } } },
           { type: "object", properties: { one: { type: "string" } } },
@@ -208,7 +205,7 @@ describe("Documentation helpers", () => {
     });
 
     test("should merge examples deeply", () => {
-      const jsonSchema: JSONSchema.BaseSchema = {
+      const jsonSchema: z.core.JSONSchema.BaseSchema = {
         allOf: [
           {
             type: "object",
@@ -228,7 +225,7 @@ describe("Documentation helpers", () => {
     });
 
     test("should maintain uniqueness in the array of required props", () => {
-      const jsonSchema: JSONSchema.BaseSchema = {
+      const jsonSchema: z.core.JSONSchema.BaseSchema = {
         allOf: [
           {
             type: "object",
@@ -247,7 +244,7 @@ describe("Documentation helpers", () => {
       ).toMatchSnapshot();
     });
 
-    test.each<JSONSchema.BaseSchema>([
+    test.each<z.core.JSONSchema.BaseSchema>([
       {
         allOf: [
           {
@@ -276,7 +273,7 @@ describe("Documentation helpers", () => {
     test.each([requestCtx, responseCtx])(
       "should add null type to the first of anyOf %#",
       (ctx) => {
-        const jsonSchema: JSONSchema.BaseSchema = {
+        const jsonSchema: z.core.JSONSchema.BaseSchema = {
           anyOf: [{ type: "string" }, { type: "null" }],
         };
         expect(
@@ -301,34 +298,12 @@ describe("Documentation helpers", () => {
         depictNullable(
           {
             zodSchema: z.never(),
-            jsonSchema: jsonSchema as JSONSchema.BaseSchema,
+            jsonSchema: jsonSchema as z.core.JSONSchema.BaseSchema,
           },
           requestCtx,
         ),
       ).toMatchSnapshot();
     });
-  });
-
-  describe("depictEnum()", () => {
-    test("should set type", () => {
-      expect(
-        depictEnum(
-          { zodSchema: z.never(), jsonSchema: { enum: ["test", "jest"] } },
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
-    });
-  });
-
-  describe("depictLiteral()", () => {
-    test.each([{ const: "test" }, { enum: ["test", "jest"] }])(
-      "should set type from either const or enum prop %#",
-      (jsonSchema) => {
-        expect(
-          depictLiteral({ zodSchema: z.never(), jsonSchema }, requestCtx),
-        ).toMatchSnapshot();
-      },
-    );
   });
 
   describe("depictBigInt()", () => {

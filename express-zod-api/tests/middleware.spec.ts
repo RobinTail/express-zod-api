@@ -1,6 +1,5 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { InputValidationError, Middleware } from "../src";
-import { EmptyObject } from "../src/common-helpers";
 import { AbstractMiddleware, ExpressMiddleware } from "../src/middleware";
 import {
   makeLoggerMock,
@@ -23,7 +22,7 @@ describe("Middleware", () => {
 
     test("should allow to omit input schema", () => {
       const mw = new Middleware({ handler: vi.fn() });
-      expectTypeOf(mw.schema._zod.output).toEqualTypeOf<EmptyObject>();
+      expectTypeOf(mw.schema).toBeUndefined();
     });
 
     describe("#600: Top level refinements", () => {
@@ -87,6 +86,6 @@ describe("ExpressMiddleware", () => {
   test("should inherit from Middleware", () => {
     const mw = new ExpressMiddleware(vi.fn());
     expect(mw).toBeInstanceOf(Middleware);
-    expectTypeOf(mw.schema._zod.output).toEqualTypeOf<EmptyObject>();
+    expectTypeOf(mw.schema).toBeUndefined();
   });
 });

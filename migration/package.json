@@ -1,6 +1,6 @@
 {
   "name": "@express-zod-api/migration",
-  "version": "24.1.0",
+  "version": "25.0.0-beta.2",
   "license": "MIT",
   "description": "Migration scripts for express-zod-api",
   "repository": {
@@ -18,23 +18,17 @@
     "pretest": "tsc --noEmit",
     "test": "vitest run --globals",
     "build": "tsup",
-    "postbuild": "attw --pack",
+    "postbuild": "attw --pack --profile esm-only",
     "prepublishOnly": "eslint && pnpm test && pnpm build"
   },
   "type": "module",
-  "main": "dist/index.cjs",
-  "types": "dist/index.d.cts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "module": "dist/index.js",
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      }
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     }
   },
   "files": [

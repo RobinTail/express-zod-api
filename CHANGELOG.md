@@ -1,5 +1,41 @@
 # Changelog
 
+## Version 25
+
+### v25.0.0
+
+- Supported Node.js versions: `^20.19.0 || ^22.12.0 || ^24.0.0`:
+- The framework distribution is now ESM-only (finally);
+  - All the Node.js versions listed above support `require(ESM)` syntax;
+  - If facing TypeScript error `TS1479`, ensure either:
+    - using the [recommended tsconfig base for Node 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json);
+    - or switching your project to ESM by setting `"type": "module"` in `package.json`;
+- Supported `zod` version: `^4.0.0`;
+  - Compatibility with `zod@^3` is dropped;
+  - You SHOULD now `import { z } from "zod"` without the `/v4` suffix;
+- Changes to the Zod plugin and metadata processing:
+  - Dropped support of examples that are given as `example` property of `.meta()` argument;
+  - Dropped support of examples given within an object-based value of `examples` property of `.meta()` argument;
+  - Use either `.example()` method or `.meta()` method with `examples` property being an array;
+- Changes to the `Middleware` class:
+  - When the `input` schema is not defined, the `input` argument of the `handler` method is now `unknown`;
+- Changes to publicly exposed method:
+  - The `getExamples()` helper is removed, use `.meta().examples` or `globalRegistry.get().examples` instead.
+- Consider [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
+
+```diff
+- z.string().meta({ example: "test" });
+- z.string().meta({ examples: { one: { value: "test" } } });
++ z.string().meta({ examples: ["test"] });
++ z.string().example("test").example("another"); // plugin method
+```
+
+```diff
+- getExamples(schema);
++ schema.meta()?.examples || [];
++ globalRegistry.get(schema)?.examples || [];
+```
+
 ## Version 24
 
 ### v24.7.3

@@ -58,8 +58,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Graceful shutdown](#graceful-shutdown)
    6. [Subscriptions](#subscriptions)
 8. [Caveats](#caveats)
-   1. [Zod 4 schema assignment error](#zod-4-schema-assignment-error)
-   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
 
 See also [Changelog](CHANGELOG.md) and [automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
@@ -193,8 +192,6 @@ Ensure having the following options in order to make it work as expected:
 }
 ```
 
-See also how `moduleResolution` may cause [Zod 4 schema assignment error](#zod-4-schema-assignment-error).
-
 ## Set up config
 
 Create a minimal configuration. Find out all configurable options
@@ -216,7 +213,7 @@ Learn how to make factories for [custom response](#response-customization) and b
 
 ```typescript
 import { defaultEndpointsFactory } from "express-zod-api";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const helloWorldEndpoint = defaultEndpointsFactory.build({
   // method: "get" (default) or array ["get", "post", ...]
@@ -328,7 +325,7 @@ Inputs of middlewares are also available to endpoint handlers within `input`.
 Here is an example of the authentication middleware, that checks a `key` from input and `token` from headers:
 
 ```typescript
-import { z } from "zod/v4";
+import { z } from "zod";
 import createHttpError from "http-errors";
 import { Middleware } from "express-zod-api";
 
@@ -458,7 +455,7 @@ You can implement additional validations within schemas using refinements.
 Validation errors are reported in a response with a status code `400`.
 
 ```typescript
-import { z } from "zod/v4";
+import { z } from "zod";
 import { Middleware } from "express-zod-api";
 
 const nicknameConstraintMiddleware = new Middleware({
@@ -499,7 +496,7 @@ Since parameters of GET requests come in the form of strings, there is often a n
 arrays of numbers.
 
 ```typescript
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const getUserEndpoint = endpointsFactory.build({
   input: z.object({
@@ -530,7 +527,7 @@ Here is a recommended solution: it is important to use shallow transformations o
 ```ts
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const endpoint = endpointsFactory.build({
   input: z
@@ -583,7 +580,7 @@ provides your endpoint handler or middleware with a `Date`. It supports the foll
 format for the response transmission. Both schemas accept metadata as an argument. Consider the following example:
 
 ```typescript
-import { z } from "zod/v4";
+import { z } from "zod";
 import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const updateUserEndpoint = defaultEndpointsFactory.build({
@@ -758,7 +755,7 @@ In a similar way you can enable request headers as the input source. This is an 
 
 ```typescript
 import { createConfig, Middleware } from "express-zod-api";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 createConfig({
   inputSources: {
@@ -793,7 +790,7 @@ type DefaultResponse<OUT> =
 You can create your own result handler by using this example as a template:
 
 ```typescript
-import { z } from "zod/v4";
+import { z } from "zod";
 import {
   ResultHandler,
   ensureHttpError,
@@ -918,7 +915,7 @@ which is `express.urlencoded()` by default. The request content type should be `
 
 ```ts
 import { defaultEndpointsFactory, ez } from "express-zod-api";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const submitFeedbackEndpoint = defaultEndpointsFactory.build({
   method: "post",
@@ -958,7 +955,7 @@ const config = createConfig({
 Then use `ez.upload()` schema for a corresponding property. The request content type must be `multipart/form-data`:
 
 ```typescript
-import { z } from "zod/v4";
+import { z } from "zod";
 import { ez, defaultEndpointsFactory } from "express-zod-api";
 
 const fileUploadEndpoint = defaultEndpointsFactory.build({
@@ -1036,7 +1033,7 @@ from outputs of previous middlewares, if the one being tested somehow depends on
 either by `errorHandler` configured within given `configProps` or `defaultResultHandler`.
 
 ```typescript
-import { z } from "zod/v4";
+import { z } from "zod";
 import { Middleware, testMiddleware } from "express-zod-api";
 
 const middleware = new Middleware({
@@ -1179,7 +1176,7 @@ You can also deprecate all routes the `Endpoint` assigned to by setting `Endpoin
 
 ```ts
 import { Routing, DependsOnMethod } from "express-zod-api";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const someEndpoint = factory.build({
   deprecated: true, // deprecates all routes the endpoint assigned to
@@ -1204,7 +1201,7 @@ need to reuse a handling rule for multiple brands, use the exposed types `Depict
 
 ```ts
 import ts from "typescript";
-import { z } from "zod/v4";
+import { z } from "zod";
 import {
   Documentation,
   Integration,
@@ -1361,7 +1358,7 @@ Client application can subscribe to the event stream using `EventSource` class i
 the implementation emitting the `time` event each second.
 
 ```typescript
-import { z } from "zod/v4";
+import { z } from "zod";
 import { EventStreamFactory } from "express-zod-api";
 import { setTimeout } from "node:timers/promises";
 
@@ -1386,18 +1383,6 @@ framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has si
 There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
 
-## Zod 4 schema assignment error
-
-When using `zod@^4` and doing `import { z } from "zod"` you may encounter the following error:
-
-```text
-TS2739: ZodObject<...> is missing the following properties from ZodType<...>: example, deprecated.
-```
-
-In this case make sure the `moduleResolution` in your `tsconfig.json` is either `node16`, `nodenext` or `bundler`.
-Consider the [recommended tsconfig base, Node 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json).
-Otherwise, keep importing `from "zod/v4"` or consider upgrading the framework to v25.
-
 ## Excessive properties in endpoint output
 
 The schema validator removes excessive properties by default. However, Typescript
@@ -1406,7 +1391,7 @@ in this case during development. You can achieve this verification by assigning 
 reusing it in forced type of the output:
 
 ```typescript
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const output = z.object({
   anything: z.number(),

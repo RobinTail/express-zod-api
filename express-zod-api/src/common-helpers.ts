@@ -1,7 +1,6 @@
 import { Request } from "express";
 import * as R from "ramda";
-import { z } from "zod/v4";
-import type { $ZodTransform, $ZodType } from "zod/v4/core";
+import { z } from "zod";
 import { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import {
@@ -13,10 +12,11 @@ import {
 } from "./method";
 import { NormalizedResponse } from "./api-response";
 
+/** @since zod 3.25.61 output type fixed */
+export const emptySchema = z.object({});
+export type EmptySchema = typeof emptySchema;
 /** @desc this type does not allow props assignment, but it works for reading them when merged with another interface */
 export type EmptyObject = z.output<EmptySchema>;
-/** Avoiding z.ZodObject<Record<string, never>, $strip>, because its z.output<> is generic "object" (external issue) */
-export type EmptySchema = z.ZodRecord<z.ZodString, z.ZodNever>;
 export type FlatObject = Record<string, unknown>;
 
 /** @link https://stackoverflow.com/a/65492934 */
@@ -101,7 +101,7 @@ export const getMessageFromError = (error: Error): string => {
 };
 
 /** Faster replacement to instanceof for code operating core types (traversing schemas) */
-export const isSchema = <T extends $ZodType = $ZodType>(
+export const isSchema = <T extends z.core.$ZodType = z.core.$ZodType>(
   subject: unknown,
   type?: T["_zod"]["def"]["type"],
 ): subject is T =>
@@ -129,7 +129,7 @@ export const makeCleanId = (...args: string[]) => {
 };
 
 export const getTransformedType = R.tryCatch(
-  <T>(schema: $ZodTransform<unknown, T>, sample: T) =>
+  <T>(schema: z.core.$ZodTransform<unknown, T>, sample: T) =>
     typeof z.parse(schema, sample),
   R.always(undefined),
 );

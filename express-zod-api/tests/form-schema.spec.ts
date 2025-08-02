@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { ez } from "../src";
 import { ezFormBrand } from "../src/form-schema";
 import { getBrand } from "../src/metadata";

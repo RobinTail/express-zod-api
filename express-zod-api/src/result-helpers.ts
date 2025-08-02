@@ -1,8 +1,7 @@
 import { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import * as R from "ramda";
-import { z } from "zod/v4";
-import type { $ZodObject } from "zod/v4/core";
+import { globalRegistry, z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import {
   combinations,
@@ -12,7 +11,6 @@ import {
 } from "./common-helpers";
 import { InputValidationError, ResultHandlerError } from "./errors";
 import { ActualLogger } from "./logger-helpers";
-import { getExamples } from "./metadata";
 import type { LazyResult, Result } from "./result-handler";
 
 export type ResultSchema<R extends Result> =
@@ -90,16 +88,14 @@ export const getPublicErrorMessage = (error: HttpError): string =>
     : error.message;
 
 /** @see pullRequestExamples */
-export const pullResponseExamples = <T extends $ZodObject>(subject: T) =>
+export const pullResponseExamples = <T extends z.core.$ZodObject>(subject: T) =>
   Object.entries(subject._zod.def.shape).reduce<FlatObject[]>(
-    (acc, [key, schema]) =>
-      combinations(
-        acc,
-        getExamples(schema).map(R.objOf(key)),
-        ([left, right]) => ({
-          ...left,
-          ...right,
-        }),
-      ),
+    (acc, [key, schema]) => {
+      const { examples = [] } = globalRegistry.get(schema) || {};
+      return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
+        ...left,
+        ...right,
+      }));
+    },
     [],
   );

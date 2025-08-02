@@ -8,84 +8,64 @@
  * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
  * */
 import * as R from "ramda";
-import { z } from "zod/v4";
-import { getExamples, metaSymbol } from "./metadata";
+import { globalRegistry, z } from "zod";
+import { metaSymbol } from "./metadata";
 import { Intact, Remap } from "./mapping-helpers";
-import type {
-  $ZodType,
-  $ZodShape,
-  $ZodLooseShape,
-  $ZodObjectConfig,
-  $ZodCheck,
-  $ZodCheckInternals,
-  $ZodCheckDef,
-  SomeType,
-  $ZodDefaultInternals,
-  $ZodDefault,
-  $ZodObjectInternals,
-  $ZodObject,
-  $ZodTypeInternals,
-  $strip,
-} from "zod/v4/core";
 
 declare module "zod/v4/core" {
   interface GlobalMeta {
     default?: unknown; // can be an actual value or a label like "Today"
-    examples?:
-      | unknown[] // see zod commit ee5615d
-      | Record<string, { value: unknown; [k: string]: unknown }>; // @todo remove in v25
-    /** @deprecated use examples instead */
-    example?: unknown; // see zod commit ee5615d @todo remove in v25
+    examples?: unknown[]; // see zod commit ee5615d
   }
 }
 
-declare module "zod/v4" {
+declare module "zod" {
   interface ZodType<
     out Output = unknown,
     out Input = unknown,
-    out Internals extends $ZodTypeInternals<Output, Input> = $ZodTypeInternals<
+    out Internals extends z.core.$ZodTypeInternals<
       Output,
       Input
-    >,
-  > extends $ZodType<Output, Input, Internals> {
+    > = z.core.$ZodTypeInternals<Output, Input>,
+  > extends z.core.$ZodType<Output, Input, Internals> {
     /** @desc Alias for .meta({examples}), but argument is typed to ensure the correct placement for transformations */
     example(example: z.output<this>): this;
     deprecated(): this;
   }
-  interface ZodDefault<T extends SomeType = $ZodType>
-    extends z._ZodType<$ZodDefaultInternals<T>>,
-      $ZodDefault<T> {
+  interface ZodDefault<T extends z.core.SomeType = z.core.$ZodType>
+    extends z._ZodType<z.core.$ZodDefaultInternals<T>>,
+      z.core.$ZodDefault<T> {
     /** @desc Change the default value in the generated Documentation to a label, alias for .meta({ default }) */
     label(label: string): this;
   }
   interface ZodObject<
     // @ts-expect-error -- external issue
-    out Shape extends $ZodShape = $ZodLooseShape,
-    out Config extends $ZodObjectConfig = $strip,
-  > extends z._ZodType<$ZodObjectInternals<Shape, Config>>,
-      $ZodObject<Shape, Config> {
+    out Shape extends z.core.$ZodShape = z.core.$ZodLooseShape,
+    out Config extends z.core.$ZodObjectConfig = z.core.$strip,
+  > extends z._ZodType<z.core.$ZodObjectInternals<Shape, Config>>,
+      z.core.$ZodObject<Shape, Config> {
     remap<V extends string, U extends { [P in keyof Shape]?: V }>(
       mapping: U,
     ): z.ZodPipe<
       z.ZodPipe<this, z.ZodTransform>, // internal type simplified
       z.ZodObject<Remap<Shape, U, V> & Intact<Shape, U>, Config>
     >;
-    remap<U extends $ZodShape>(
+    remap<U extends z.core.$ZodShape>(
       mapper: (subject: Shape) => U,
     ): z.ZodPipe<z.ZodPipe<this, z.ZodTransform>, z.ZodObject<U>>; // internal type simplified
   }
 }
 
-interface $EZBrandCheckDef extends $ZodCheckDef {
+interface $EZBrandCheckDef extends z.core.$ZodCheckDef {
   check: "$EZBrandCheck";
   brand?: string | number | symbol;
 }
 
-interface $EZBrandCheckInternals extends $ZodCheckInternals<unknown> {
+interface $EZBrandCheckInternals extends z.core.$ZodCheckInternals<unknown> {
   def: $EZBrandCheckDef;
 }
 
-interface $EZBrandCheck extends $ZodCheck {
+interface $EZBrandCheck extends z.core.$ZodCheck {
   _zod: $EZBrandCheckInternals;
 }
 
@@ -103,7 +83,7 @@ const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
 );
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
-  const examples = getExamples(this).slice();
+  const examples = globalRegistry.get(this)?.examples?.slice() || [];
   examples.push(value);
   return this.meta({ examples });
 };

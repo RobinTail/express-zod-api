@@ -17,107 +17,54 @@ describe("Migration", () => {
     expect(migration).toMatchSnapshot();
   });
 
-  tester.run("v24", migration.rules.v24, {
+  tester.run("v25", migration.rules.v25, {
     valid: [
-      `new Documentation({});`,
-      `new Integration({});`,
-      `const rule: Depicter = () => {};`,
-      `import {} from "zod/v4";`,
-      `ez.buffer();`,
+      `import {} from "zod";`,
+      `ez.dateIn({ examples: ["1963-04-21"] });`,
+      `ez.dateOut({ examples: ["2021-12-31T00:00:00.000Z"] });`,
+      `schema.meta()?.examples;`,
     ],
     invalid: [
       {
-        code: `new Documentation({ numericRange: {}, });`,
-        output: `new Documentation({  });`,
+        code: `import {} from "zod/v4";`,
+        output: `import {} from "zod";`,
         errors: [
           {
-            messageId: "remove",
-            data: { subject: "numericRange" },
+            messageId: "change",
+            data: { subject: "import", from: "zod/v4", to: "zod" },
           },
         ],
       },
       {
-        code: `new Integration({ optionalPropStyle: {}, });`,
-        output: `new Integration({  });`,
+        code: `ez.dateIn({ example: "1963-04-21" });`,
+        output: `ez.dateIn({ examples: ["1963-04-21"] });`,
         errors: [
           {
-            messageId: "remove",
-            data: { subject: "optionalPropStyle" },
+            messageId: "change",
+            data: { subject: "property", from: "example", to: "examples" },
           },
         ],
       },
       {
-        code:
-          `const rule: Depicter = (schema, { next, path, method, isResponse }) ` +
-          `=> ({ ...next(schema.unwrap()), summary: "test" })`,
-        output:
-          `const rule: Depicter = ({ zodSchema: schema, jsonSchema }, {  path, method, isResponse }) ` +
-          `=> ({ ...jsonSchema, summary: "test" })`,
+        code: `ez.dateOut({ example: "2021-12-31T00:00:00.000Z" });`,
+        output: `ez.dateOut({ examples: ["2021-12-31T00:00:00.000Z"] });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "example", to: "examples" },
+          },
+        ],
+      },
+      {
+        code: `getExamples(schema);`,
+        output: `(schema.meta()?.examples || []);`,
         errors: [
           {
             messageId: "change",
             data: {
-              subject: "arguments",
-              from: "[schema, { next, ...rest }]",
-              to: "[{ zodSchema: schema, jsonSchema }, { ...rest }]",
-            },
-          },
-          {
-            messageId: "change",
-            data: { subject: "statement", from: "next()", to: "jsonSchema" },
-          },
-        ],
-      },
-      {
-        code: `import {} from "zod";`,
-        output: `import {} from "zod/v4";`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "import", from: "zod", to: "zod/v4" },
-          },
-        ],
-      },
-      {
-        code: `ez.file("string");`,
-        output: `z.string();`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "schema", from: "ez.file()", to: "z.string()" },
-          },
-        ],
-      },
-      {
-        code: `ez.file("buffer");`,
-        output: `ez.buffer();`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "schema", from: "ez.file()", to: "ez.buffer()" },
-          },
-        ],
-      },
-      {
-        code: `ez.file("base64");`,
-        output: `z.base64();`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "schema", from: "ez.file()", to: "z.base64()" },
-          },
-        ],
-      },
-      {
-        code: `ez.file("binary");`,
-        output: `ez.buffer().or(z.string());`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "schema",
-              from: "ez.file()",
-              to: "ez.buffer().or(z.string())",
+              subject: "method",
+              from: "getExamples()",
+              to: ".meta()?.examples || []",
             },
           },
         ],

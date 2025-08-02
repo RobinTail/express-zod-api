@@ -3,7 +3,7 @@
 exports[`Migration > should consist of one rule being the major version of the package 1`] = `
 {
   "rules": {
-    "v24": {
+    "v25": {
       "create": [Function],
       "defaultOptions": [],
       "meta": {
