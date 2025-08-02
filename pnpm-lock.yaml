@@ -275,11 +275,11 @@ importers:
         version: 0.31.3
     devDependencies:
       '@types/ramda':
-        specifier: ^0.30.2
-        version: 0.30.2
+        specifier: ^0.31.0
+        version: 0.31.0
       zod:
         specifier: catalog:dev
-        version: 4.0.10
+        version: 4.0.14
 
 packages:
 

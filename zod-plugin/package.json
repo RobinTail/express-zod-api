@@ -43,7 +43,7 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@types/ramda": "^0.30.2",
+    "@types/ramda": "^0.31.0",
     "zod": "catalog:dev"
   }
 }
