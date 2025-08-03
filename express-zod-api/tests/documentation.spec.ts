@@ -92,7 +92,7 @@ describe("Documentation", () => {
                 labeledDate: z.iso
                   .datetime()
                   .default(() => new Date().toISOString())
-                  .label("Today"), // Feature #1706
+                  .meta({ default: "Today" }), // Feature #1706
               }),
               output: z.object({
                 nullable: z.string().nullable(),
@@ -987,7 +987,7 @@ describe("Documentation", () => {
     test("Feature #2390: should support deprecations", () => {
       const endpoint = defaultEndpointsFactory.build({
         input: z.object({
-          str: z.string().deprecated(),
+          str: z.string().meta({ deprecated: true }),
         }),
         output: z.object({}),
         handler: vi.fn(),
@@ -1042,14 +1042,14 @@ describe("Documentation", () => {
                 input: z.object({
                   strNum: z
                     .string()
-                    .example("123") // example for the input side of the transformation
+                    .meta({ examples: ["123"] }) // example for the input side of the transformation
                     .transform((v) => parseInt(v, 10)),
                 }),
                 output: z.object({
                   numericStr: z
                     .number()
                     .transform((v) => `${v}`)
-                    .example("456"), // example for the output side of the transformation
+                    .meta({ examples: ["456"] }), // example for the output side of the transformation
                 }),
                 handler: async () => ({ numericStr: 123 }),
               }),
@@ -1074,14 +1074,14 @@ describe("Documentation", () => {
                 method,
                 input: z
                   .object({ strNum: z.string() })
-                  .example({ strNum: "123" }) // example is for input side of the transformation
+                  .meta({ examples: [{ strNum: "123" }] }) // example is for input side of the transformation
                   .transform(R.mapObjIndexed(Number)),
                 output: z
                   .object({
                     numericStr: z.number().transform((v) => `${v}`),
                   })
-                  .example({
-                    numericStr: "123", // example is for output side of the transformation
+                  .meta({
+                    examples: [{ numericStr: "123" }], // example is for output side of the transformation
                   }),
                 handler: async () => ({ numericStr: 123 }),
               }),
@@ -1104,13 +1104,17 @@ describe("Documentation", () => {
               .addMiddleware({
                 input: z
                   .object({ key: z.string() })
-                  .example({ key: "1234-56789-01" }),
+                  .meta({ examples: [{ key: "1234-56789-01" }] }),
                 handler: vi.fn(),
               })
               .build({
                 method: "post",
-                input: z.object({ str: z.string() }).example({ str: "test" }),
-                output: z.object({ num: z.number() }).example({ num: 123 }),
+                input: z
+                  .object({ str: z.string() })
+                  .meta({ examples: [{ str: "test" }] }),
+                output: z
+                  .object({ num: z.number() })
+                  .meta({ examples: [{ num: 123 }] }),
                 handler: async () => ({ num: 123 }),
               }),
           },
@@ -1129,13 +1133,17 @@ describe("Documentation", () => {
           v1: {
             getSomething: defaultEndpointsFactory
               .addMiddleware({
-                input: z.object({ key: z.string().example("1234-56789-01") }),
+                input: z.object({
+                  key: z.string().meta({ examples: ["1234-56789-01"] }),
+                }),
                 handler: vi.fn(),
               })
               .build({
                 method: "post",
-                input: z.object({ str: z.string().example("test") }),
-                output: z.object({ num: z.number().example(123) }),
+                input: z.object({
+                  str: z.string().meta({ examples: ["test"] }),
+                }),
+                output: z.object({ num: z.number().meta({ examples: [123] }) }),
                 handler: async () => ({ num: 123 }),
               }),
           },
@@ -1155,11 +1163,13 @@ describe("Documentation", () => {
           v1: {
             addSomething: defaultEndpointsFactory.build({
               method: "post",
-              input: zodSchema.example({ a: "first" }),
-              output: zodSchema
-                .extend({ b: z.string() })
-                .example({ a: "first", b: "prefix_first" })
-                .example({ a: "second", b: "prefix_second" }),
+              input: zodSchema.meta({ examples: [{ a: "first" }] }),
+              output: zodSchema.extend({ b: z.string() }).meta({
+                examples: [
+                  { a: "first", b: "prefix_first" },
+                  { a: "second", b: "prefix_second" },
+                ],
+              }),
               handler: async ({ input: { a } }) => ({ a, b: `prefix_${a}` }),
             }),
           },
