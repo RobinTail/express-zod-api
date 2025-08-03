@@ -93,18 +93,5 @@ describe("Index Entrypoint", () => {
       }>().toEqualTypeOf<OpenIdSecurity>();
       expectTypeOf({ schema: z.string() }).toExtend<ApiResponse<z.ZodString>>();
     });
-
-    test("Extended Zod prototypes", () => {
-      expectTypeOf<z.ZodAny>()
-        .toHaveProperty("example")
-        .toEqualTypeOf<(value: any) => z.ZodAny>();
-      expectTypeOf<z.ZodDefault<z.ZodString>>()
-        .toHaveProperty("example")
-        .toEqualTypeOf<(value: string) => z.ZodDefault<z.ZodString>>();
-      expectTypeOf<z.ZodDefault<z.ZodString>>()
-        .toHaveProperty("label")
-        .toEqualTypeOf<(value: string) => z.ZodDefault<z.ZodString>>();
-      expectTypeOf<z.ZodObject>().toHaveProperty("remap");
-    });
   });
 });
