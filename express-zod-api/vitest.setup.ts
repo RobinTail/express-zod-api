@@ -1,4 +1,3 @@
-import "./src/zod-plugin"; // required for tests importing sources using the plugin methods
 import type { NewPlugin } from "@vitest/pretty-format";
 import { z } from "zod";
 import { ResultHandlerError } from "./src/errors";
