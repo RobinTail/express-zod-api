@@ -239,7 +239,7 @@ importers:
         version: 5.9.2
       undici:
         specifier: ^7.10.0
-        version: 7.11.0
+        version: 7.13.0
       zod:
         specifier: catalog:dev
         version: 4.0.14
@@ -2210,8 +2210,8 @@ packages:
   undici-types@7.8.0:
     resolution: {integrity: sha512-9UJ2xGDvQ43tYyVMpuHlsgApydB8ZKfVYTsLDhXkFL/6gfkp+U8xTGdh8pMJv1SpZna0zxG1DwsKZsreLbXBxw==}
 
-  undici@7.11.0:
-    resolution: {integrity: sha512-heTSIac3iLhsmZhUCjyS3JQEkZELateufzZuBaVM5RHXdSBMb1LPMQf5x+FH7qjsZYDP0ttAc3nnVpUB+wYbOg==}
+  undici@7.13.0:
+    resolution: {integrity: sha512-l+zSMssRqrzDcb3fjMkjjLGmuiiK2pMIcV++mJaAc9vhjSGpvM7h43QgP+OAMb1GImHmbPyG2tBXeuyG5iY4gA==}
     engines: {node: '>=20.18.1'}
 
   unicode-emoji-modifier-base@1.0.0:
@@ -4325,7 +4325,7 @@ snapshots:
 
   undici-types@7.8.0: {}
 
-  undici@7.11.0: {}
+  undici@7.13.0: {}
 
   unicode-emoji-modifier-base@1.0.0: {}
 
