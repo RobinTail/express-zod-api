@@ -17,6 +17,7 @@ import {
   normalize,
   ResultSchema,
 } from "./result-helpers";
+import { getExamples } from "./metadata";
 
 type Handler<RES = unknown> = (
   params: DiscriminatedResult & {
@@ -100,8 +101,8 @@ export const defaultResultHandler = new ResultHandler({
       status: z.literal("success"),
       data: output,
     });
-    const { examples } = globalRegistry.get(output) || {}; // pulling down:
-    if (examples?.length) {
+    const examples = getExamples(output); // pulling down:
+    if (examples.length) {
       globalRegistry.add(responseSchema, {
         examples: examples.map((data) => ({
           status: "success" as const,
@@ -152,18 +153,16 @@ export const arrayResultHandler = new ResultHandler({
       output.shape.items instanceof z.ZodArray
         ? output.shape.items
         : z.array(z.any());
-    if (globalRegistry.get(responseSchema)?.examples?.length)
-      return responseSchema; // has examples on the items, or pull down:
-    const examples = globalRegistry
-      .get(output)
-      ?.examples?.filter(
+    if (getExamples(responseSchema).length) return responseSchema; // has examples on the items, or pull down:
+    const examples = getExamples(output)
+      .filter(
         (example): example is { items: unknown[] } =>
           isObject(example) &&
           "items" in example &&
           Array.isArray(example.items),
       )
       .map((example) => example.items);
-    if (examples?.length) {
+    if (examples.length) {
       const current = responseSchema.meta();
       globalRegistry
         .remove(responseSchema) // reassign to avoid cloning
