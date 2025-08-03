@@ -1229,7 +1229,8 @@ describe("Documentation", () => {
                 .transform((inputs) => camelize(inputs, true)),
               output: z
                 .object({ userName: z.string() })
-                .remap((outputs) => snakify(outputs, true)),
+                .transform((obj) => snakify(obj, true))
+                .pipe(z.object(snakify({ userName: z.string() }, true))),
               handler: async ({ input: { userId } }) => ({
                 userName: `User ${userId}`,
               }),
@@ -1251,10 +1252,20 @@ describe("Documentation", () => {
             test: defaultEndpointsFactory.build({
               input: z
                 .object({ user_id: z.string(), at: ez.dateIn() })
-                .remap({ user_id: "userId" }), // partial mapping
+                .transform(({ user_id: userId, ...rest }) => ({
+                  userId, // partial mapping
+                  ...rest,
+                }))
+                .pipe(
+                  z.object({
+                    userId: z.string(),
+                    at: z.custom<Date & z.$brand>(),
+                  }),
+                ),
               output: z
                 .object({ userName: z.string() })
-                .remap({ userName: "user_name" }),
+                .transform(({ userName: user_name }) => ({ user_name }))
+                .pipe(z.object({ user_name: z.string() })),
               handler: async ({ input: { userId, at } }) => ({
                 userName: `User ${userId} ${at}`,
               }),
