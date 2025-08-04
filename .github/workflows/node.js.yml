@@ -30,6 +30,8 @@ jobs:
       run: pnpm install
     - name: Lint
       run: pnpm lint
+    - name: Build plugin
+      run: pnpm -F zod-plugin build
     - name: Unit tests
       run: pnpm test
     - name: Coveralls
