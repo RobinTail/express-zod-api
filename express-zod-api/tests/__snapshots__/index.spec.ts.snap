@@ -1,6 +1,10 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Index Entrypoint > exports > _zodPlugin should have certain value 1`] = `{}`;
+exports[`Index Entrypoint > exports > _zodPlugin should have certain value 1`] = `
+{
+  "getBrand": [Function],
+}
+`;
 
 exports[`Index Entrypoint > exports > BuiltinLogger should have certain value 1`] = `[Function]`;
 

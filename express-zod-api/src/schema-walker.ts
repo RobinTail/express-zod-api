@@ -1,5 +1,5 @@
 import type { EmptyObject, FlatObject } from "./common-helpers";
-import { getBrand } from "./metadata";
+import { getBrand } from "@express-zod-api/zod-plugin";
 import type { z } from "zod";
 
 export type FirstPartyKind = z.core.$ZodTypeDef["type"];

@@ -1,7 +1,7 @@
-import { getBrand } from "../src/metadata";
+import { getBrand } from "./helpers";
 import type { z } from "zod";
 
-describe("Metadata", () => {
+describe("Helpers", () => {
   describe("getBrand", () => {
     test.each([{ brand: "test" }, {}, undefined])(
       "should take it from bag",
