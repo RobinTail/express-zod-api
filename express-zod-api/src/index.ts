@@ -1,4 +1,4 @@
-import "@express-zod-api/zod-plugin";
+export * as _zodPlugin from "@express-zod-api/zod-plugin";
 
 export { createConfig } from "./config-type";
 export {
