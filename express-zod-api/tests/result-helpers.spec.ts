@@ -97,9 +97,9 @@ describe("Result helpers", () => {
   describe("pullResponseExamples()", () => {
     test("handles multiple examples per property", () => {
       const schema = z.object({
-        a: z.string().meta({ examples: ["one", "two", "three"] }),
-        b: z.number().meta({ examples: [1, 2] }),
-        c: z.boolean().meta({ examples: [false] }),
+        a: z.string().example("one").example("two").example("three"),
+        b: z.number().example(1).example(2),
+        c: z.boolean().example(false),
       });
       expect(pullResponseExamples(schema)).toEqual([
         { a: "one", b: 1, c: false },
