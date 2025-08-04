@@ -223,13 +223,6 @@ export default tsPlugin.config(
     },
   },
   {
-    name: "source/plugin",
-    files: ["express-zod-api/src/zod-plugin.ts"],
-    rules: {
-      "@typescript-eslint/no-unused-vars": "off",
-    },
-  },
-  {
     name: "source/integration",
     files: [
       "express-zod-api/src/integration.ts",
