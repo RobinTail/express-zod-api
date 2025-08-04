@@ -47,6 +47,8 @@ interface IntegrationParams {
    * @default z.undefined()
    * */
   noContent?: z.ZodType;
+  /** @default true */
+  hasHeadMethod?: boolean;
   /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
@@ -90,6 +92,7 @@ export class Integration extends IntegrationBase {
     subscriptionClassName = "Subscription",
     serverUrl = "https://example.com",
     noContent = z.undefined(),
+    hasHeadMethod = true,
   }: IntegrationParams) {
     super(serverUrl);
     const commons = { makeAlias: this.#makeAlias.bind(this) };
@@ -148,7 +151,7 @@ export class Integration extends IntegrationBase {
     };
     walkRouting({
       routing,
-      onEndpoint: withHead(onEndpoint),
+      onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
     this.#program.unshift(...this.#aliases.values());
     this.#program.push(
