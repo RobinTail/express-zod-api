@@ -283,6 +283,9 @@ importers:
       camelize-ts:
         specifier: ^3.0.0
         version: 3.0.0
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.2
       zod:
         specifier: catalog:dev
         version: 4.0.14

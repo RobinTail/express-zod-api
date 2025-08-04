@@ -1,4 +1,3 @@
-import "./index";
 import { z } from "zod";
 
 describe("Entrypoint", () => {

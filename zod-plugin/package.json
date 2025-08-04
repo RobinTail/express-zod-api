@@ -45,6 +45,7 @@
   "devDependencies": {
     "@types/ramda": "^0.31.0",
     "camelize-ts": "^3.0.0",
+    "typescript": "catalog:dev",
     "zod": "catalog:dev"
   }
 }
