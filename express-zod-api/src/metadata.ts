@@ -1,4 +1,4 @@
-import { globalRegistry, z } from "zod";
+import type { z } from "zod";
 
 export const metaSymbol = Symbol.for("express-zod-api");
 
@@ -11,10 +11,4 @@ export const getBrand = (subject: z.core.$ZodType) => {
   )
     return brand;
   return undefined;
-};
-
-export const getExamples = (subject: z.core.$ZodType): unknown[] => {
-  const { examples } = globalRegistry.get(subject) || {};
-  if (Array.isArray(examples)) return examples;
-  return [];
 };
