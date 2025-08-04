@@ -9,9 +9,9 @@ import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
-import { name } from "../package.json";
+import { name as self } from "../package.json";
 
-export const localsID = Symbol.for(name);
+export const localsID = Symbol.for(self);
 
 type EquippedRequest = Request<
   unknown,
