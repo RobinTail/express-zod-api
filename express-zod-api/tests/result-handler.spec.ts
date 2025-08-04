@@ -190,8 +190,9 @@ describe("ResultHandler", () => {
             str: z.string(),
             items: z.array(z.string()),
           })
-          .meta({
-            examples: [{ str: "test", items: ["One", "Two", "Three"] }],
+          .example({
+            str: "test",
+            items: ["One", "Two", "Three"],
           }),
       );
       expect(apiResponse).toHaveLength(1);
@@ -210,9 +211,7 @@ describe("ResultHandler", () => {
     const loggerMock = makeLoggerMock();
     const positiveSchema = arrayResultHandler
       .getPositiveResponse(
-        z
-          .object({ anything: z.number() })
-          .meta({ examples: [{ anything: 118 }] }),
+        z.object({ anything: z.number() }).example({ anything: 118 }),
       )
       .pop()?.schema;
     expect(positiveSchema).toHaveProperty(["_zod", "def", "type"], "array");
