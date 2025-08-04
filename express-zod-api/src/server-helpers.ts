@@ -3,7 +3,7 @@ import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
 import { CommonConfig, ServerConfig } from "./config-type";
-import { ErrorRequestHandler, Request, RequestHandler } from "express";
+import { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError from "http-errors";
 import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
