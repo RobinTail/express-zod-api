@@ -10,7 +10,7 @@
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { name } from "./package.json";
-import { Intact, Remap } from "./mapping-helpers";
+import { Intact, Remap } from "./remap";
 
 declare module "zod/v4/core" {
   interface GlobalMeta {
