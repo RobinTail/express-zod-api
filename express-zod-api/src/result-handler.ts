@@ -116,10 +116,9 @@ export const defaultResultHandler = new ResultHandler({
       status: z.literal("error"),
       error: z.object({ message: z.string() }),
     })
-    .meta({
-      examples: [
-        { status: "error", error: { message: "Sample error message" } },
-      ],
+    .example({
+      status: "error",
+      error: { message: "Sample error message" },
     }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (error) {
@@ -172,7 +171,7 @@ export const arrayResultHandler = new ResultHandler({
     return responseSchema;
   },
   negative: {
-    schema: z.string().meta({ examples: ["Sample error message"] }),
+    schema: z.string().example("Sample error message"),
     mimeType: "text/plain",
   },
   handler: ({ response, output, error, logger, request, input }) => {
