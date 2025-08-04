@@ -1,6 +1,7 @@
 import "./augmentation";
 import camelize from "camelize-ts";
 import { z } from "zod";
+import { getBrand } from "./helpers";
 
 describe("Zod Runtime Plugin", () => {
   describe(".example()", () => {
@@ -64,25 +65,19 @@ describe("Zod Runtime Plugin", () => {
 
   describe(".brand()", () => {
     test("should set the brand", () => {
-      expect(z.string().brand("test")).toHaveProperty(
-        ["_zod", "bag", "brand"],
-        "test",
-      );
+      expect(getBrand(z.string().brand("test"))).toBe("test");
     });
 
     test("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = schema.brand("test");
-      expect(schemaWithMeta).toHaveProperty(["_zod", "bag", "brand"], "test");
-      expect(schemaWithMeta.regex(/@example.com$/)).toHaveProperty(
-        ["_zod", "bag", "brand"],
-        "test",
-      );
+      expect(getBrand(schemaWithMeta)).toBe("test");
+      expect(getBrand(schemaWithMeta.regex(/@example.com$/))).toBe("test");
     });
 
     test("should withstand describing", () => {
       const schema = z.string().brand("test").describe("something");
-      expect(schema).toHaveProperty(["_zod", "bag", "brand"], "test");
+      expect(getBrand(schema)).toBe("test");
     });
   });
 
