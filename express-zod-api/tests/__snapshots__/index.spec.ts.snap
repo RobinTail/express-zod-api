@@ -1,11 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Index Entrypoint > exports > _zodPlugin should have certain value 1`] = `
-{
-  "getBrand": [Function],
-}
-`;
-
 exports[`Index Entrypoint > exports > BuiltinLogger should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > DependsOnMethod should have certain value 1`] = `[Function]`;
@@ -79,7 +73,6 @@ exports[`Index Entrypoint > exports > getMessageFromError should have certain va
 
 exports[`Index Entrypoint > exports > should have certain entities exposed 1`] = `
 [
-  "_zodPlugin",
   "createConfig",
   "EndpointsFactory",
   "defaultEndpointsFactory",
