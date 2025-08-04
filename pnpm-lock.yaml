@@ -164,6 +164,9 @@ importers:
 
   express-zod-api:
     dependencies:
+      '@express-zod-api/zod-plugin':
+        specifier: workspace:^
+        version: link:../zod-plugin
       ansis:
         specifier: ^4.1.0
         version: 4.1.0
