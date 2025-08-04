@@ -2,6 +2,12 @@
 
 ## Version 25
 
+### v25.1.0
+
+- Featuring configurable depiction of the `HEAD` method:
+  - ...
+  - The feature suggested by [@GreaterTamarack](https://github.com/GreaterTamarack).
+
 ### v25.0.0
 
 - Supported Node.js versions: `^20.19.0 || ^22.12.0 || ^24.0.0`;
