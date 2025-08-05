@@ -2,7 +2,7 @@
 
 ## Overview
 
-This module extends Zod functionality once you import it:
+This module extends Zod functionality when it's imported:
 
 - Adds `.example()` method to all Zod schemas:
   - shorthand for `.meta({ examples: [...] })`;
