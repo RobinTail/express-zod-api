@@ -66,6 +66,25 @@ describe("Integration", () => {
     expect(await client.printFormatted()).toMatchSnapshot();
   });
 
+  test.each([undefined, false])(
+    "Should support HEAD method by default %#",
+    async (hasHeadMethod) => {
+      const client = new Integration({
+        hasHeadMethod,
+        variant: "types",
+        routing: {
+          v1: {
+            "get path": defaultEndpointsFactory.buildVoid({
+              input: z.object({ some: z.string() }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+      });
+      expect(await client.printFormatted()).toMatchSnapshot();
+    },
+  );
+
   test("Should support multiple response schemas depending on status code", async () => {
     const factory = new EndpointsFactory(
       new ResultHandler({

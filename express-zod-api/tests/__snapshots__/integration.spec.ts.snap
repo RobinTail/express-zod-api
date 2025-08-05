@@ -66,6 +66,161 @@ export type Request = keyof Input;
 "
 `;
 
+exports[`Integration > Should support HEAD method by default 0 1`] = `
+"type SomeOf<T> = T[keyof T];
+
+/** get /v1/path */
+type GetV1PathInput = {
+  some: string;
+};
+
+/** get /v1/path */
+type GetV1PathPositiveVariant1 = {
+  status: "success";
+  data: {};
+};
+
+/** get /v1/path */
+interface GetV1PathPositiveResponseVariants {
+  200: GetV1PathPositiveVariant1;
+}
+
+/** get /v1/path */
+type GetV1PathNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** get /v1/path */
+interface GetV1PathNegativeResponseVariants {
+  400: GetV1PathNegativeVariant1;
+}
+
+/** head /v1/path */
+type HeadV1PathInput = {
+  some: string;
+};
+
+/** head /v1/path */
+type HeadV1PathPositiveVariant1 = undefined;
+
+/** head /v1/path */
+interface HeadV1PathPositiveResponseVariants {
+  200: HeadV1PathPositiveVariant1;
+}
+
+/** head /v1/path */
+type HeadV1PathNegativeVariant1 = undefined;
+
+/** head /v1/path */
+interface HeadV1PathNegativeResponseVariants {
+  400: HeadV1PathNegativeVariant1;
+}
+
+export type Path = "/v1/path";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+
+export interface Input {
+  "get /v1/path": GetV1PathInput;
+  "head /v1/path": HeadV1PathInput;
+}
+
+export interface PositiveResponse {
+  "get /v1/path": SomeOf<GetV1PathPositiveResponseVariants>;
+  "head /v1/path": SomeOf<HeadV1PathPositiveResponseVariants>;
+}
+
+export interface NegativeResponse {
+  "get /v1/path": SomeOf<GetV1PathNegativeResponseVariants>;
+  "head /v1/path": SomeOf<HeadV1PathNegativeResponseVariants>;
+}
+
+export interface EncodedResponse {
+  "get /v1/path": GetV1PathPositiveResponseVariants &
+    GetV1PathNegativeResponseVariants;
+  "head /v1/path": HeadV1PathPositiveResponseVariants &
+    HeadV1PathNegativeResponseVariants;
+}
+
+export interface Response {
+  "get /v1/path":
+    | PositiveResponse["get /v1/path"]
+    | NegativeResponse["get /v1/path"];
+  "head /v1/path":
+    | PositiveResponse["head /v1/path"]
+    | NegativeResponse["head /v1/path"];
+}
+
+export type Request = keyof Input;
+"
+`;
+
+exports[`Integration > Should support HEAD method by default 1 1`] = `
+"type SomeOf<T> = T[keyof T];
+
+/** get /v1/path */
+type GetV1PathInput = {
+  some: string;
+};
+
+/** get /v1/path */
+type GetV1PathPositiveVariant1 = {
+  status: "success";
+  data: {};
+};
+
+/** get /v1/path */
+interface GetV1PathPositiveResponseVariants {
+  200: GetV1PathPositiveVariant1;
+}
+
+/** get /v1/path */
+type GetV1PathNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** get /v1/path */
+interface GetV1PathNegativeResponseVariants {
+  400: GetV1PathNegativeVariant1;
+}
+
+export type Path = "/v1/path";
+
+export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
+
+export interface Input {
+  "get /v1/path": GetV1PathInput;
+}
+
+export interface PositiveResponse {
+  "get /v1/path": SomeOf<GetV1PathPositiveResponseVariants>;
+}
+
+export interface NegativeResponse {
+  "get /v1/path": SomeOf<GetV1PathNegativeResponseVariants>;
+}
+
+export interface EncodedResponse {
+  "get /v1/path": GetV1PathPositiveResponseVariants &
+    GetV1PathNegativeResponseVariants;
+}
+
+export interface Response {
+  "get /v1/path":
+    | PositiveResponse["get /v1/path"]
+    | NegativeResponse["get /v1/path"];
+}
+
+export type Request = keyof Input;
+"
+`;
+
 exports[`Integration > Should support multiple response schemas depending on status code 1`] = `
 "type SomeOf<T> = T[keyof T];
 

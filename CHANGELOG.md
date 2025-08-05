@@ -2,6 +2,14 @@
 
 ## Version 25
 
+### v25.1.0
+
+- Ability to disable the depiction of the `HEAD` method:
+  - New option `hasHeadMethod` on the argument of `Documentation` and `Integration` constructors;
+  - Depicts the HEAD method for each Endpoint supporting the GET method;
+  - The option is enabled by default (the behaviour introduced in [v24.7.0](#v2470));
+  - The feature suggested by [@GreaterTamarack](https://github.com/GreaterTamarack).
+
 ### v25.0.0
 
 - Supported Node.js versions: `^20.19.0 || ^22.12.0 || ^24.0.0`;
