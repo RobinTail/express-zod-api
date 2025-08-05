@@ -52,6 +52,7 @@ describe("Documentation", () => {
       const literalValue = "something" as const;
       const spec = new Documentation({
         config: sampleConfig,
+        hasHeadMethod: false,
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
