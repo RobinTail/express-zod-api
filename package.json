@@ -5,7 +5,7 @@
     "start": "pnpm -F example start",
     "prebuild": "tsx tools/contributors.ts && tsx tools/license.ts",
     "build": "pnpm -r build",
-    "postbuild": "tsx tools/make-tests.ts",
+    "pretest": "tsx tools/make-tests.ts",
     "test": "pnpm -r test",
     "bench": "pnpm -F express-zod-api bench",
     "lint": "eslint && prettier *.md **/*.md --check",
