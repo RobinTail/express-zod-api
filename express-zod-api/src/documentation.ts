@@ -59,7 +59,10 @@ interface DocumentationParams {
   descriptions?: Partial<Record<Component, Descriptor>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
-  /** @default true */
+  /**
+   * @desc Depict HEAD method for each Endpoint supporting GET method (feature of Express)
+   * @default true
+   * */
   hasHeadMethod?: boolean;
   /** @default inline */
   composition?: "inline" | "components";

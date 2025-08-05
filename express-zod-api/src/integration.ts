@@ -47,7 +47,10 @@ interface IntegrationParams {
    * @default z.undefined()
    * */
   noContent?: z.ZodType;
-  /** @default true */
+  /**
+   * @desc Depict HEAD method for each Endpoint supporting GET method (feature of Express)
+   * @default true
+   * */
   hasHeadMethod?: boolean;
   /**
    * @desc Handling rules for your own branded schemas.
