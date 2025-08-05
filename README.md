@@ -1057,8 +1057,8 @@ expect(output).toEqual({ collectedOptions: ["prev"], testLength: 9 });
 
 ## Zod Plugin
 
-Express Zod API installs some [side effects on Zod schemas](https://www.npmjs.com/package/@express-zod-api/zod-plugin)
-in order to extend its functionality with some features that are required for the framework operation.
+Express Zod API augments Zod using [Zod Plugin](https://www.npmjs.com/package/@express-zod-api/zod-plugin),
+adding the runtime helpers the framework relies on.
 
 ## Generating a Frontend Client
 
