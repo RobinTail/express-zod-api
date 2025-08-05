@@ -1,3 +1,4 @@
+import "@express-zod-api/zod-plugin"; // side effects here
 export { createConfig } from "./config-type";
 export {
   EndpointsFactory,

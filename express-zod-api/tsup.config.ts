@@ -10,8 +10,15 @@ export default defineConfig({
   entry: ["src/index.ts"],
   target: `node${minNode.major}.${minNode.minor}.${minNode.patch}`,
   dts: {
-    banner: `import "@express-zod-api/zod-plugin";`,
-  },
+    /**
+     * This is a patched feature for preserving the import of the plugin in DTS
+     * @todo remove/rework if tsup upgrades hardcoded rollup-plugin-dts or merge the following PR:
+     * @link https://github.com/egoist/tsup/pull/827
+     * */
+    treeshake: {
+      moduleSideEffects: ["@express-zod-api/zod-plugin"],
+    },
+  } as unknown as true,
   esbuildOptions: (options) => {
     options.define = {
       "process.env.TSUP_BUILD": `"v${version}"`, // @since v25.0.0 is pure ESM

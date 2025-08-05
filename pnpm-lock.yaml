@@ -56,6 +56,11 @@ catalogs:
 overrides:
   '@scarf/scarf': npm:empty-npm-package@1.0.0
 
+patchedDependencies:
+  tsup:
+    hash: 587c5d0d1f7cd02926ef077e3376b3f5976c4b6b449697bdc0ec9edf835dd5b7
+    path: patches/tsup.patch
+
 importers:
 
   .:
@@ -92,7 +97,7 @@ importers:
         version: 3.6.2
       tsup:
         specifier: ^8.5.0
-        version: 8.5.0(postcss@8.5.6)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0)
+        version: 8.5.0(patch_hash=587c5d0d1f7cd02926ef077e3376b3f5976c4b6b449697bdc0ec9edf835dd5b7)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0)
       tsx:
         specifier: ^4.19.4
         version: 4.20.3
@@ -4303,7 +4308,7 @@ snapshots:
 
   ts-toolbelt@9.6.0: {}
 
-  tsup@8.5.0(postcss@8.5.6)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0):
+  tsup@8.5.0(patch_hash=587c5d0d1f7cd02926ef077e3376b3f5976c4b6b449697bdc0ec9edf835dd5b7)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.9.2)(yaml@2.8.0):
     dependencies:
       bundle-require: 5.1.0(esbuild@0.25.8)
       cac: 6.7.14

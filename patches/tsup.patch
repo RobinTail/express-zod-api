@@ -1,0 +1,32 @@
+diff --git a/dist/rollup.js b/dist/rollup.js
+index 65df1bfcedaf873043fd82492afbb7a2926654a5..b0a51bb8628a0d1618e59de3066bff6b70c604ce 100644
+--- a/dist/rollup.js
++++ b/dist/rollup.js
+@@ -6197,7 +6197,10 @@ export { ${[...exportedNames].join(", ")} };
+               }
+             },
+             treeshake: {
+-              moduleSideEffects: "no-external",
++              // moduleSideEffects: "no-external",
++              moduleSideEffects: options.treeshake
++                ? ((id, isExternal) => options.treeshake.moduleSideEffects?.includes(id) ? true : !isExternal)
++                : "no-external",
+               propertyReadSideEffects: true,
+               unknownGlobalSideEffects: false
+             }
+@@ -6307,6 +6310,7 @@ export { ${[...exportedNames].join(", ")} };
+         outputOptions: transformPlugin.outputOptions,
+         renderChunk: transformPlugin.renderChunk,
+         options(options2) {
++          options2.treeshake = options.treeshake;
+           let { input = [] } = options2;
+           if (!Array.isArray(input)) {
+             input = typeof input === "string" ? [input] : Object.values(input);
+@@ -6778,6 +6782,7 @@ var getRollupConfig = async (options) => {
+         json(),
+         ignoreFiles,
+         dtsPlugin.default({
++          treeshake: dtsOptions.treeshake,
+           tsconfig: options.tsconfig,
+           compilerOptions: {
+             ...compilerOptions,
