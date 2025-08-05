@@ -37,14 +37,14 @@
     "*.md"
   ],
   "dependencies": {
-    "ramda": "^0.31.3"
+    "ramda": "catalog:prod"
   },
   "peerDependencies": {
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@types/ramda": "^0.31.0",
-    "camelize-ts": "^3.0.0",
+    "@types/ramda": "catalog:dev",
+    "camelize-ts": "catalog:dev",
     "typescript": "catalog:dev",
     "zod": "catalog:dev"
   }

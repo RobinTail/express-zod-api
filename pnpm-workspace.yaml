@@ -21,12 +21,16 @@ publicHoistPattern:
   - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
   - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting
 catalogs:
+  prod:
+    "ramda": "^0.31.3"
   dev:
     "@types/compression": "^1.8.1"
     "@types/express": "^5.0.3"
     "@types/express-fileupload": "^1.5.1"
     "@types/http-errors": "^2.0.5"
+    "@types/ramda": "^0.31.0"
     "@typescript-eslint/rule-tester": "^8.35.1"
+    "camelize-ts": "^3.0.0"
     "compression": "^1.8.0"
     "express": "^5.1.0"
     "express-fileupload": "^1.5.1"
