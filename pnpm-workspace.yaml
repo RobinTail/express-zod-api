@@ -11,6 +11,7 @@ onlyBuiltDependencies:
 gitChecks: false
 engineStrict: true
 autoInstallPeers: false
+workspaceConcurrency: 1 # todo: find a way to have different ports in CJS, ESM, compat tests and remove it
 publicHoistPattern:
   - "@typescript-eslint/*" # used as an assumed transitive in migration
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
