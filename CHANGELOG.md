@@ -6,8 +6,8 @@
 
 - Ability to disable the depiction of the `HEAD` method:
   - New option `hasHeadMethod` on the argument of `Documentation` and `Integration` constructors;
-  - Depicts HEAD method for each Endpoint supporting GET method — introduced in [v24.7.0](#v2470);
-  - The option is enabled by default since handling the HEAD method the feature of Express;
+  - Depicts HEAD method for each Endpoint supporting GET method;
+  - The option is enabled by default (the behaviour introduced in [v24.7.0](#v2470));
   - The feature suggested by [@GreaterTamarack](https://github.com/GreaterTamarack).
 
 ### v25.0.0
