@@ -59,6 +59,11 @@ interface DocumentationParams {
   descriptions?: Partial<Record<Component, Descriptor>>;
   /** @default true */
   hasSummaryFromDescription?: boolean;
+  /**
+   * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
+   * @default true
+   * */
+  hasHeadMethod?: boolean;
   /** @default inline */
   composition?: "inline" | "components";
   /**
@@ -149,6 +154,7 @@ export class Documentation extends OpenApiBuilder {
     tags,
     isHeader,
     hasSummaryFromDescription = true,
+    hasHeadMethod = true,
     composition = "inline",
   }: DocumentationParams) {
     super();
@@ -256,7 +262,7 @@ export class Documentation extends OpenApiBuilder {
     };
     walkRouting({
       routing,
-      onEndpoint: withHead(onEndpoint),
+      onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
     if (tags) this.rootDoc.tags = depictTags(tags);
   }
