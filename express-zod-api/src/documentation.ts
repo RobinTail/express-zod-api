@@ -60,7 +60,7 @@ interface DocumentationParams {
   /** @default true */
   hasSummaryFromDescription?: boolean;
   /**
-   * @desc Depict HEAD method for each Endpoint supporting GET method (feature of Express)
+   * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
    * @default true
    * */
   hasHeadMethod?: boolean;
