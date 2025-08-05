@@ -1,5 +1,5 @@
 diff --git a/dist/rollup.js b/dist/rollup.js
-index 65df1bfcedaf873043fd82492afbb7a2926654a5..fe6503b58e8fa0c80cc4a72c2badf5e76beb6d4f 100644
+index 65df1bfcedaf873043fd82492afbb7a2926654a5..6016815127beae690a5471d2162dce68ebc8f2e2 100644
 --- a/dist/rollup.js
 +++ b/dist/rollup.js
 @@ -6197,7 +6197,9 @@ export { ${[...exportedNames].join(", ")} };
@@ -7,9 +7,9 @@ index 65df1bfcedaf873043fd82492afbb7a2926654a5..fe6503b58e8fa0c80cc4a72c2badf5e7
              },
              treeshake: {
 -              moduleSideEffects: "no-external",
-+              moduleSideEffects: options.treeshake
-+                ? ((id, isExternal) => options.treeshake.moduleSideEffects?.includes(id) ? true : !isExternal)
-+                : "no-external",
++              moduleSideEffects: options.treeshake?.moduleSideEffects === undefined
++                ? "no-external"
++                : options.treeshake.moduleSideEffects,
                propertyReadSideEffects: true,
                unknownGlobalSideEffects: false
              }
