@@ -11,6 +11,7 @@ on:
         options:
           - express-zod-api
           - migration
+          - zod-plugin
       kind:
         description: 'Version bump kind'
         required: true

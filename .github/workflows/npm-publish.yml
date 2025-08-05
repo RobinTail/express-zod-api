@@ -13,6 +13,7 @@ on:
         options:
           - express-zod-api
           - migration
+          - zod-plugin
       tag:
         description: 'Release channel'
         required: true
