@@ -48,6 +48,11 @@ interface IntegrationParams {
    * */
   noContent?: z.ZodType;
   /**
+   * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
+   * @default true
+   * */
+  hasHeadMethod?: boolean;
+  /**
    * @desc Handling rules for your own branded schemas.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
@@ -90,6 +95,7 @@ export class Integration extends IntegrationBase {
     subscriptionClassName = "Subscription",
     serverUrl = "https://example.com",
     noContent = z.undefined(),
+    hasHeadMethod = true,
   }: IntegrationParams) {
     super(serverUrl);
     const commons = { makeAlias: this.#makeAlias.bind(this) };
@@ -148,7 +154,7 @@ export class Integration extends IntegrationBase {
     };
     walkRouting({
       routing,
-      onEndpoint: withHead(onEndpoint),
+      onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
     this.#program.unshift(...this.#aliases.values());
     this.#program.push(
