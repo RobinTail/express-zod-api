@@ -3,9 +3,16 @@ const disposer = (function* () {
   while (true) yield port++;
 })();
 
-export const givePort = (test?: "example", reserved = 8090): number => {
-  if (test) return reserved;
+const reserved = {
+  example: 8090,
+  cjs: 8091,
+  esm: 8092,
+  compat: 8093,
+};
+
+export const givePort = (test?: keyof typeof reserved): number => {
+  if (test) return reserved[test];
   const { value } = disposer.next();
-  if (value === reserved) return givePort();
+  if (Object.values(reserved).includes(value)) return givePort();
   return value;
 };
