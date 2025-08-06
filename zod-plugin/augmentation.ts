@@ -28,14 +28,14 @@ declare module "zod" {
       Input
     > = z.core.$ZodTypeInternals<Output, Input>,
   > extends z.core.$ZodType<Output, Input, Internals> {
-    /** @desc Alias for .meta({examples}), but argument is typed to ensure the correct placement for transformations */
+    /** @desc Shorthand for .meta({ examples }) */
     example(example: z.output<this>): this;
     deprecated(): this;
   }
   interface ZodDefault<T extends z.core.SomeType = z.core.$ZodType>
     extends z._ZodType<z.core.$ZodDefaultInternals<T>>,
       z.core.$ZodDefault<T> {
-    /** @desc Change the default value in the generated Documentation to a label, alias for .meta({ default }) */
+    /** @desc Shorthand for .meta({ default }) */
     label(label: string): this;
   }
   interface ZodObject<
