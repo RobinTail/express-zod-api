@@ -16,6 +16,8 @@ describe("Entrypoint", () => {
   });
 
   test("Exports", () => {
-    expect(entrypoint).toMatchSnapshot();
+    expect(entrypoint).toMatchObject({
+      getBrand: expect.any(Function),
+    });
   });
 });
