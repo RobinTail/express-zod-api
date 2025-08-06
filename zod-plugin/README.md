@@ -11,7 +11,7 @@ This module extends Zod functionality when it's imported:
 - Adds `.label()` method to `ZodDefault`:
   - shorthand for `.meta({ default: ... })`;
 - Adds `.remap()` method to `ZodObject` for renaming object properties:
-  - Supports a mapping objects or an object transforming function as an argument;
+  - Supports a mapping object or an object transforming function as an argument;
   - Relies on `R.renameKeys()` from the `ramda` library;
 - Alters the `.brand()` method on all Zod schemas by making the assigned brand available in runtime:
   - The provided `getBrand()` method can retrieve the brand from the schema.
