@@ -1,12 +1,3 @@
-/**
- * @fileoverview Zod Runtime Plugin
- * @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31
- * @desc This code modifies and extends zod's functionality immediately when importing express-zod-api
- * @desc Enables .example() and .deprecated() on all schemas (ZodType)
- * @desc Enables .label() on ZodDefault
- * @desc Enables .remap() on ZodObject
- * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
- * */
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { name } from "./package.json";
@@ -19,6 +10,15 @@ declare module "zod/v4/core" {
   }
 }
 
+/**
+ * @fileoverview Zod Runtime Plugin
+ * @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31
+ * @desc This code modifies and extends zod's functionality immediately when importing the plugin.
+ * @desc Enables .example() and .deprecated() on all schemas (ZodType)
+ * @desc Enables .label() on ZodDefault
+ * @desc Enables .remap() on ZodObject
+ * @desc Stores the argument supplied to .brand() on all schemas (runtime distinguishable branded types)
+ * */
 declare module "zod" {
   interface ZodType<
     out Output = unknown,
@@ -122,6 +122,7 @@ const objectMapper = function (
 };
 
 const pluginFlag = Symbol.for(name);
+
 if (!(pluginFlag in globalThis)) {
   (globalThis as Record<symbol, unknown>)[pluginFlag] = true;
   for (const entry of Object.keys(z)) {
