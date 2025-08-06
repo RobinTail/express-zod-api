@@ -126,7 +126,7 @@ exports[`BuiltinLogger > constructor() > Should handle empty object meta 1 1`] =
 exports[`BuiltinLogger > constructor() > Should handle non-object meta 0 1`] = `
 [
   [
-    "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
+    "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m1234[39m",
   ],
 ]
 `;
@@ -134,7 +134,7 @@ exports[`BuiltinLogger > constructor() > Should handle non-object meta 0 1`] = `
 exports[`BuiltinLogger > constructor() > Should handle non-object meta 1 1`] = `
 [
   [
-    "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m8090[39m",
+    "2022-01-01T00:00:00.000Z [31merror[39m: Code [33m1234[39m",
   ],
 ]
 `;

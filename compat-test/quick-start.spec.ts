@@ -8,6 +8,7 @@ import {
   expect,
   test,
 } from "vitest";
+import { givePort } from "../tools/ports";
 
 describe("ESM Test", async () => {
   let out = "";
@@ -18,6 +19,7 @@ describe("ESM Test", async () => {
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
+  const port = givePort("compat");
 
   afterAll(async () => {
     quickStart.stdout.removeListener("data", listener);
@@ -33,7 +35,9 @@ describe("ESM Test", async () => {
 
   describe("Quick Start from Readme", () => {
     test("Should handle valid GET request", async () => {
-      const response = await fetch(`http://localhost:8090/v1/hello?name=Rick`);
+      const response = await fetch(
+        `http://localhost:${port}/v1/hello?name=Rick`,
+      );
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toEqual({

@@ -65,7 +65,7 @@ describe("BuiltinLogger", () => {
       "Should handle non-object meta %#",
       (level) => {
         const { logger, logSpy } = makeLogger({ level, color: true });
-        logger.error("Code", 8090);
+        logger.error("Code", 1234);
         expect(logSpy.mock.calls).toMatchSnapshot();
       },
     );

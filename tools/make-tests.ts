@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
+import { givePort } from "./ports";
 
 const extractQuickStartFromReadme = async () => {
   const readme = await readFile("README.md", "utf-8");
@@ -14,11 +15,17 @@ const extractQuickStartFromReadme = async () => {
 };
 
 const quickStart = await extractQuickStartFromReadme();
+const program = `
+import { givePort } from "../tools/ports";
+${quickStart}
+`;
+
+const examplePort = String(givePort("example"));
 
 const testContent = {
-  cjs: quickStart,
-  esm: quickStart,
-  compat: quickStart,
+  cjs: program.replace(examplePort, "givePort('cjs')"),
+  esm: program.replace(examplePort, "givePort('esm')"),
+  compat: program.replace(examplePort, "givePort('compat')"),
   issue952: quickStart.replace(/const/g, "export const"),
 };
 
