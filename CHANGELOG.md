@@ -2,6 +2,12 @@
 
 ## Version 25
 
+### v25.2.0
+
+- Zod Plugin extracted into a standalone package — `@express-zod-api/zod-plugin`:
+  - The framework declares the plugin as a runtime dependency, you don't need to install it;
+  - The plugin will continue to evolve independently and could now be used for developing other zod-based software.
+
 ### v25.1.0
 
 - Ability to disable the depiction of the `HEAD` method:
