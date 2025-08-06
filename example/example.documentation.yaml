@@ -842,7 +842,6 @@ components:
             $ref: "#/components/schemas/Schema1"
       required:
         - title
-        - features
       additionalProperties: false
   responses: {}
   parameters: {}
