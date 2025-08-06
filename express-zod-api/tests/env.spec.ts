@@ -50,7 +50,7 @@ describe("Environment checks", () => {
       expect(R.omit(["$schema"], json)).toEqual({});
     });
 
-    test("circular object schema has no sign of getter in its shape", () => {
+    test("circular object schema has a getter since 4.0.15", () => {
       const schema = z.object({
         name: z.string(),
         get features() {
@@ -58,8 +58,8 @@ describe("Environment checks", () => {
         },
       });
       expect(
-        Object.getOwnPropertyDescriptors(schema._zod.def.shape),
-      ).toMatchSnapshot();
+        Object.getOwnPropertyDescriptors(schema._zod.def.shape).features,
+      ).toHaveProperty("get", expect.any(Function));
     });
 
     test("ZodError inequality", () => {
