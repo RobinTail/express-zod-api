@@ -47,5 +47,12 @@
     "camelize-ts": "catalog:dev",
     "typescript": "catalog:dev",
     "zod": "catalog:dev"
-  }
+  },
+  "keywords": [
+    "zod",
+    "schema",
+    "validation",
+    "plugin",
+    "typescript"
+  ]
 }
