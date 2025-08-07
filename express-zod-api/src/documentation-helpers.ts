@@ -38,7 +38,7 @@ import { DocumentationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { flattenIO } from "./json-schema-helpers";
 import { Alternatives } from "./logical-container";
-import { getBrand } from "./metadata";
+import { getBrand } from "@express-zod-api/zod-plugin";
 import { ClientMethod } from "./method";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";

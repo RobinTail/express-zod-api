@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ezDateInBrand } from "../src/date-in-schema";
 import { ez } from "../src";
-import { getBrand } from "../src/metadata";
+import { getBrand } from "@express-zod-api/zod-plugin";
 
 describe("ez.dateIn()", () => {
   describe("creation", () => {

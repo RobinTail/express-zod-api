@@ -1,6 +1,5 @@
 import { fail } from "node:assert/strict";
 import { fileUploadMock } from "./express-mock";
-import { metaSymbol } from "../src/metadata";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,
@@ -12,6 +11,7 @@ import {
   moveRaw,
   installDeprecationListener,
   installTerminationListener,
+  localsID,
 } from "../src/server-helpers";
 import { CommonConfig, defaultResultHandler, ResultHandler } from "../src";
 import { Request } from "express";
@@ -265,7 +265,7 @@ describe("Server helpers", () => {
             (childLoggerProvider ? child : logger)._getLogs().debug.pop(),
           ).toEqual(["GET: /test"]);
           expect(request.res).toHaveProperty("locals", {
-            [metaSymbol]: { logger: childLoggerProvider ? child : logger },
+            [localsID]: { logger: childLoggerProvider ? child : logger },
           });
         },
       );
@@ -315,7 +315,7 @@ describe("Server helpers", () => {
       const request = makeRequestMock({
         res: {
           locals: {
-            [metaSymbol]: { logger: makeLoggerMock({ isChild: true }) },
+            [localsID]: { logger: makeLoggerMock({ isChild: true }) },
           },
         },
       });

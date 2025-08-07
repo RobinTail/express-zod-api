@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ez } from "../src";
-import { getBrand } from "../src/metadata";
+import { getBrand } from "@express-zod-api/zod-plugin";
 import { ezRawBrand } from "../src/raw-schema";
 
 describe("ez.raw()", () => {

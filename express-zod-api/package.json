@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "25.1.0",
+  "version": "25.2.0-beta.2",
   "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -21,7 +21,7 @@
     "pretest": "tsc --noEmit",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
-    "prepublishOnly": "eslint && pnpm test && pnpm build",
+    "prepublishOnly": "eslint && pnpm -r build && pnpm test",
     "prepack": "cp ../*.md ../LICENSE ./"
   },
   "type": "module",
@@ -43,10 +43,11 @@
     "node": "^20.19.0 || ^22.12.0 || ^24.0.0"
   },
   "dependencies": {
+    "@express-zod-api/zod-plugin": "workspace:^",
     "ansis": "^4.1.0",
     "node-mocks-http": "^1.17.2",
     "openapi3-ts": "^4.5.0",
-    "ramda": "^0.31.3"
+    "ramda": "catalog:prod"
   },
   "peerDependencies": {
     "@types/compression": "^1.7.5",
@@ -88,9 +89,9 @@
     "@types/express-fileupload": "catalog:dev",
     "@types/http-errors": "catalog:dev",
     "@types/node-forge": "^1.3.11",
-    "@types/ramda": "^0.31.0",
+    "@types/ramda": "catalog:dev",
     "@types/semver": "^7.7.0",
-    "camelize-ts": "^3.0.0",
+    "camelize-ts": "catalog:dev",
     "compression": "catalog:dev",
     "cors": "^2.8.5",
     "depd": "^2.0.0",

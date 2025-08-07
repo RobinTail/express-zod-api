@@ -1,8 +1,7 @@
-import "./src/zod-plugin"; // required for tests importing sources using the plugin methods
+import { getBrand } from "@express-zod-api/zod-plugin";
 import type { NewPlugin } from "@vitest/pretty-format";
 import { z } from "zod";
 import { ResultHandlerError } from "./src/errors";
-import { getBrand } from "./src/metadata";
 
 /** Takes cause and certain props of custom errors into account */
 const errorSerializer: NewPlugin = {

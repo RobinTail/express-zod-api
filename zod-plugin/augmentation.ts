@@ -1,16 +1,7 @@
-/**
- * @fileoverview Zod Runtime Plugin
- * @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31
- * @desc This code modifies and extends zod's functionality immediately when importing express-zod-api
- * @desc Enables .example() and .deprecated() on all schemas (ZodType)
- * @desc Enables .label() on ZodDefault
- * @desc Enables .remap() on ZodObject
- * @desc Stores the argument supplied to .brand() on all schema (runtime distinguishable branded types)
- * */
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
-import { metaSymbol } from "./metadata";
-import { Intact, Remap } from "./mapping-helpers";
+import { name } from "./package.json";
+import { Intact, Remap } from "./remap";
 
 declare module "zod/v4/core" {
   interface GlobalMeta {
@@ -19,6 +10,15 @@ declare module "zod/v4/core" {
   }
 }
 
+/**
+ * @fileoverview Zod Runtime Plugin
+ * @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31
+ * @desc This code modifies and extends zod's functionality immediately when importing the plugin.
+ * @desc Enables .example() and .deprecated() on all schemas (ZodType)
+ * @desc Enables .label() on ZodDefault
+ * @desc Enables .remap() on ZodObject
+ * @desc Stores the argument supplied to .brand() on all schemas (runtime distinguishable branded types)
+ * */
 declare module "zod" {
   interface ZodType<
     out Output = unknown,
@@ -28,14 +28,14 @@ declare module "zod" {
       Input
     > = z.core.$ZodTypeInternals<Output, Input>,
   > extends z.core.$ZodType<Output, Input, Internals> {
-    /** @desc Alias for .meta({examples}), but argument is typed to ensure the correct placement for transformations */
+    /** @desc Shorthand for .meta({ examples }) */
     example(example: z.output<this>): this;
     deprecated(): this;
   }
   interface ZodDefault<T extends z.core.SomeType = z.core.$ZodType>
     extends z._ZodType<z.core.$ZodDefaultInternals<T>>,
       z.core.$ZodDefault<T> {
-    /** @desc Change the default value in the generated Documentation to a label, alias for .meta({ default }) */
+    /** @desc Shorthand for .meta({ default }) */
     label(label: string): this;
   }
   interface ZodObject<
@@ -121,8 +121,10 @@ const objectMapper = function (
   return this.transform(transformer).pipe(output);
 };
 
-if (!(metaSymbol in globalThis)) {
-  (globalThis as Record<symbol, unknown>)[metaSymbol] = true;
+const pluginFlag = Symbol.for(name);
+
+if (!(pluginFlag in globalThis)) {
+  (globalThis as Record<symbol, unknown>)[pluginFlag] = true;
   for (const entry of Object.keys(z)) {
     if (!entry.startsWith("Zod")) continue;
     if (/(Success|Error|Function)$/.test(entry)) continue;

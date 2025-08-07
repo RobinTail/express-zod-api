@@ -1,7 +1,5 @@
 import type { z } from "zod";
 
-export const metaSymbol = Symbol.for("express-zod-api");
-
 export const getBrand = (subject: z.core.$ZodType) => {
   const { brand } = subject._zod.bag || {};
   if (

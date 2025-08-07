@@ -1,6 +1,7 @@
 /**
  * @fileoverview Mapping utils for Zod Runtime Plugin (remap)
  * @link https://stackoverflow.com/questions/55454125/typescript-remapping-object-properties-in-typesafe
+ * @todo try to reuse R.Remap from Ramda (requires to move its types to prod dependencies)
  */
 type TuplesFromObject<T> = {
   [P in keyof T]: [P, T[P]];

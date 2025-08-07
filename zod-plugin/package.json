@@ -1,0 +1,58 @@
+{
+  "name": "@express-zod-api/zod-plugin",
+  "version": "1.0.0-beta.3",
+  "license": "MIT",
+  "description": "Zod plugin for express-zod-api",
+  "sideEffects": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobinTail/express-zod-api.git"
+  },
+  "author": {
+    "name": "Anna Bocharova",
+    "url": "https://robintail.cz",
+    "email": "me@robintail.cz"
+  },
+  "bugs": "https://github.com/RobinTail/express-zod-api/issues",
+  "funding": "https://github.com/sponsors/RobinTail",
+  "scripts": {
+    "pretest": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "tsup",
+    "postbuild": "attw --pack --profile esm-only",
+    "prepublishOnly": "eslint && pnpm test && pnpm build"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "*.md"
+  ],
+  "dependencies": {
+    "ramda": "catalog:prod"
+  },
+  "peerDependencies": {
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/ramda": "catalog:dev",
+    "camelize-ts": "catalog:dev",
+    "typescript": "catalog:dev",
+    "zod": "catalog:dev"
+  },
+  "keywords": [
+    "zod",
+    "schema",
+    "validation",
+    "plugin",
+    "typescript"
+  ]
+}
