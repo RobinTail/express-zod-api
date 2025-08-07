@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as entrypoint from "./index";
 
 describe("Entrypoint", () => {
-  test("Extended Zod prototypes", () => {
+  test("Augmentation", () => {
     expectTypeOf<z.ZodAny>()
       .toHaveProperty("example")
       .toEqualTypeOf<(value: any) => z.ZodAny>();
