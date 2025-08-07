@@ -21,7 +21,7 @@
     "pretest": "tsc --noEmit",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
-    "prepublishOnly": "eslint && pnpm test && pnpm build",
+    "prepublishOnly": "eslint && pnpm -r build && pnpm test",
     "prepack": "cp ../*.md ../LICENSE ./"
   },
   "type": "module",
