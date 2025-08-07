@@ -1,5 +1,6 @@
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
+import { $EZBrandCheck } from "./brand-check";
 import { name } from "./package.json";
 import { Intact, Remap } from "./remap";
 
@@ -55,32 +56,6 @@ declare module "zod" {
     ): z.ZodPipe<z.ZodPipe<this, z.ZodTransform>, z.ZodObject<U>>; // internal type simplified
   }
 }
-
-interface $EZBrandCheckDef extends z.core.$ZodCheckDef {
-  check: "$EZBrandCheck";
-  brand?: string | number | symbol;
-}
-
-interface $EZBrandCheckInternals extends z.core.$ZodCheckInternals<unknown> {
-  def: $EZBrandCheckDef;
-}
-
-interface $EZBrandCheck extends z.core.$ZodCheck {
-  _zod: $EZBrandCheckInternals;
-}
-
-/**
- * This approach was suggested to me by Colin in a PM on Twitter.
- * Refrained from storing the brand in Metadata because it should withstand refinements.
- * */
-const $EZBrandCheck = z.core.$constructor<$EZBrandCheck>(
-  "$EZBrandCheck",
-  (inst, def) => {
-    z.core.$ZodCheck.init(inst, def);
-    inst._zod.onattach.push((schema) => (schema._zod.bag.brand = def.brand));
-    inst._zod.check = () => {};
-  },
-);
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
   const examples = globalRegistry.get(this)?.examples?.slice() || [];
