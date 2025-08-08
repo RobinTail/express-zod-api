@@ -2,7 +2,7 @@ import { z } from "zod";
 import { pack, unpack } from "./packer";
 
 /** The property within schema._zod.bag where we store the brand */
-export const brandProperty = "brand";
+export const brandProperty = "brand" as const;
 
 /** Used by runtime (bound) */
 export const setBrand = function (this: z.ZodType, brand?: PropertyKey) {
