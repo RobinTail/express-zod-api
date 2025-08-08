@@ -19,6 +19,19 @@ describe("Packer", () => {
         maximum: 5,
       });
     });
+
+    test("called multiples times merges the bag with last write priority", () => {
+      const s1 = pack(z.string(), { a: 1, b: 1 });
+      const s2 = pack(s1, { b: 2, c: 3 });
+      expect(s2._zod.bag).toMatchObject({ a: 1, b: 2, c: 3 });
+    });
+
+    test("does not change parse() method behavior", () => {
+      const base = z.string().min(2);
+      const packed = pack(base, { tag: "x" });
+      expect(() => packed.parse("x")).toThrow(); // still fails min(2)
+      expect(packed.parse("ok")).toBe("ok");
+    });
   });
 
   describe("unpack()", () => {
