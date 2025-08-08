@@ -25,6 +25,7 @@ export const pack = <T extends z.ZodType, B extends object>(
   const Cls = z.core.$constructor<$Packer<B>>("$Packer", (inst, def) => {
     z.core.$ZodCheck.init(inst, def);
     inst._zod.onattach.push((schema) => {
+      if (!schema._zod.bag) schema._zod.bag = {}; // Defensive init
       Object.assign(schema._zod.bag, def.bag);
     });
     inst._zod.check = () => {};
