@@ -2,6 +2,7 @@ import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { name } from "./package.json";
 import { pack } from "./packer";
+import { brandProperty } from "./brand";
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
   const examples = globalRegistry.get(this)?.examples?.slice() || [];
@@ -18,7 +19,7 @@ const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
 };
 
 const brandSetter = function (this: z.ZodType, brand?: PropertyKey) {
-  return pack(this, { brand });
+  return pack(this, { [brandProperty]: brand });
 };
 
 type _Mapper = <T extends Record<string, unknown>>(
