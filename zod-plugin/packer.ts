@@ -34,3 +34,6 @@ export const pack = <T extends z.ZodType, B extends object>(
     _zod: { bag: B };
   };
 };
+
+export const unpack = <T extends z.core.$ZodType>(subject: T) =>
+  subject._zod.bag;

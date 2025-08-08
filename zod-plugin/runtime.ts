@@ -17,10 +17,7 @@ const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
   return this.meta({ default: defaultLabel });
 };
 
-const brandSetter = function (
-  this: z.ZodType,
-  brand?: string | number | symbol,
-) {
+const brandSetter = function (this: z.ZodType, brand?: PropertyKey) {
   return pack(this, { brand });
 };
 
