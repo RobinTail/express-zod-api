@@ -15,10 +15,9 @@ interface $Packer<B extends object> extends z.core.$ZodCheck {
 }
 
 /**
- * This approach was suggested to me by Colin in a PM on Twitter.
- * Refrained from using Metadata because the data should withstand refinements.
- * @since 1.1.0 I generalized it to accept any object instead of only brand.
- * */
+ * Attaches an arbitrary metadata "bag" to a schema using a no-op $ZodCheck.
+ * We avoid using .meta() so the data survives .refine(), .describe() and .meta() itself.
+ */
 export const pack = <T extends z.ZodType, B extends object>(
   subject: T,
   bag: B,
