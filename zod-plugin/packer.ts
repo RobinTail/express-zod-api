@@ -31,7 +31,7 @@ export const pack = <T extends z.ZodType, B extends object>(
     inst._zod.check = () => {};
   });
   return subject.check(new Cls({ check: "$Packer", bag })) as T & {
-    _zod: { bag: B };
+    _zod: { bag: T["_zod"]["bag"] & B };
   };
 };
 
