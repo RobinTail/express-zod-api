@@ -27,6 +27,7 @@ type Mapper = <T extends Record<string, unknown>>(
   subject: T,
 ) => { [P in string | keyof T]: T[keyof T] };
 
+/** Used by runtime (bound) */
 export const remap = function (
   this: z.ZodObject,
   tool: Record<string, string> | Mapper,
