@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { pack, unpack } from "./packer";
+import { expectTypeOf } from "vitest";
 
 describe("Packer", () => {
   describe("pack()", () => {
@@ -22,9 +23,9 @@ describe("Packer", () => {
 
   describe("unpack()", () => {
     test("should return the bag from the schema", () => {
-      expect(unpack(pack(z.string(), { one: "test", two: 123 }))).toMatchObject(
-        { one: "test", two: 123 },
-      );
+      const subject = pack(z.string(), { one: "test", two: 123 });
+      expect(unpack(subject)).toMatchObject({ one: "test", two: 123 });
+      expectTypeOf(unpack(subject)).toExtend<{ one: string; two: number }>();
     });
   });
 });
