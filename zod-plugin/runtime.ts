@@ -1,7 +1,7 @@
-import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { name } from "./package.json";
 import { setBrand } from "./brand";
+import { remap } from "./remap";
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
   const examples = globalRegistry.get(this)?.examples?.slice() || [];
@@ -15,24 +15,6 @@ const deprecationSetter = function (this: z.ZodType) {
 
 const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
   return this.meta({ default: defaultLabel });
-};
-
-type _Mapper = <T extends Record<string, unknown>>(
-  subject: T,
-) => { [P in string | keyof T]: T[keyof T] };
-
-const objectMapper = function (
-  this: z.ZodObject,
-  tool: Record<string, string> | _Mapper,
-) {
-  const transformer =
-    typeof tool === "function" ? tool : R.renameKeys(R.reject(R.isNil, tool)); // rejecting undefined
-  const nextShape = transformer(
-    R.map(R.invoker(0, "clone"), this._zod.def.shape), // immutable, changed from R.clone due to failure
-  );
-  const hasPassThrough = this._zod.def.catchall instanceof z.ZodUnknown;
-  const output = (hasPassThrough ? z.looseObject : z.object)(nextShape); // proxies unknown keys when set to "passthrough"
-  return this.transform(transformer).pipe(output);
 };
 
 const pluginFlag = Symbol.for(name);
@@ -70,6 +52,6 @@ if (!(pluginFlag in globalThis)) {
   Object.defineProperty(
     z.ZodObject.prototype,
     "remap" satisfies keyof z.ZodObject,
-    { value: objectMapper, writable: false },
+    { value: remap, writable: false },
   );
 }
