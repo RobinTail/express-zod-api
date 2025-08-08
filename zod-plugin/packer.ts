@@ -15,8 +15,8 @@ interface $Packer<B extends object> extends z.core.$ZodCheck {
 }
 
 /**
- * Attaches an arbitrary metadata "bag" to a schema using a no-op $ZodCheck.
- * We avoid using .meta() so the data survives .refine(), .describe() and .meta() itself.
+ * @public
+ * @desc Attaches an inheritable metadata to the schema (withstands refinements).
  */
 export const pack = <T extends z.ZodType, B extends object>(
   subject: T,
@@ -34,6 +34,10 @@ export const pack = <T extends z.ZodType, B extends object>(
   };
 };
 
+/**
+ * @public
+ * @desc Retrieves the metadata attached to the schema by pack() method.
+ */
 export const unpack = <T extends z.core.$ZodType>(
   subject: T,
 ): T["_zod"]["bag"] => subject._zod.bag;
