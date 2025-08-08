@@ -10,7 +10,7 @@ interface $PackerInternals<B extends object>
   def: $PackerDef<B>;
 }
 
-export interface $Packer<B extends object> extends z.core.$ZodCheck {
+interface $Packer<B extends object> extends z.core.$ZodCheck {
   _zod: $PackerInternals<B>;
 }
 
