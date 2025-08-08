@@ -10,10 +10,15 @@ describe("Brand", () => {
   });
 
   describe("setBrand", () => {
+    const packMock = vi.spyOn(packer, "pack");
+
+    afterAll(() => {
+      packMock.mockRestore();
+    });
+
     test("calls pack() with given brand", () => {
-      const packMock = vi.spyOn(packer, "pack");
       const schema = z.string();
-      setBrand?.call(schema, "test");
+      setBrand.call(schema, "test");
       expect(packMock).toHaveBeenCalledWith(schema, { brand: "test" });
     });
   });
