@@ -1,8 +1,7 @@
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
 import { name } from "./package.json";
-import { pack } from "./packer";
-import { brandProperty } from "./brand";
+import { setBrand } from "./brand";
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
   const examples = globalRegistry.get(this)?.examples?.slice() || [];
@@ -16,10 +15,6 @@ const deprecationSetter = function (this: z.ZodType) {
 
 const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
   return this.meta({ default: defaultLabel });
-};
-
-const brandSetter = function (this: z.ZodType, brand?: PropertyKey) {
-  return pack(this, { [brandProperty]: brand });
 };
 
 type _Mapper = <T extends Record<string, unknown>>(
@@ -61,7 +56,7 @@ if (!(pluginFlag in globalThis)) {
       ["brand" satisfies keyof z.ZodType]: {
         set() {}, // this is required to override the existing method
         get() {
-          return brandSetter.bind(this) as z.ZodType["brand"];
+          return setBrand.bind(this) as z.ZodType["brand"];
         },
       },
     });

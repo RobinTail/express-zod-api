@@ -1,10 +1,20 @@
-import type { z } from "zod";
-import { brandProperty, getBrand } from "./brand";
+import { z } from "zod";
+import { brandProperty, getBrand, setBrand } from "./brand";
+import * as packer from "./packer";
 
 describe("Brand", () => {
   describe("brandProperty", () => {
     test("should be brand", () => {
       expect(brandProperty).toBe("brand");
+    });
+  });
+
+  describe("setBrand", () => {
+    test("calls pack() with given brand", () => {
+      const packMock = vi.spyOn(packer, "pack");
+      const schema = z.string();
+      setBrand?.call(schema, "test");
+      expect(packMock).toHaveBeenCalledWith(schema, { brand: "test" });
     });
   });
 
