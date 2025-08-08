@@ -1,7 +1,7 @@
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
-import { $EZBrandCheck } from "./brand-check";
 import { name } from "./package.json";
+import { pack } from "./packer";
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
   const examples = globalRegistry.get(this)?.examples?.slice() || [];
@@ -21,7 +21,7 @@ const brandSetter = function (
   this: z.ZodType,
   brand?: string | number | symbol,
 ) {
-  return this.check(new $EZBrandCheck({ brand, check: "$EZBrandCheck" }));
+  return pack(this, { brand });
 };
 
 type _Mapper = <T extends Record<string, unknown>>(
