@@ -1,0 +1,30 @@
+import { z } from "zod";
+import { pack, unpack } from "./packer";
+
+describe("Packer", () => {
+  describe("pack()", () => {
+    test("should add the bag to the schema", () => {
+      const schema = pack(z.string(), { one: "test", two: 123 });
+      expect(schema._zod.bag).toEqual({ one: "test", two: 123 });
+      expectTypeOf(schema._zod.bag).toExtend<{ one: string; two: number }>();
+    });
+
+    test("respects other bag properties", () => {
+      const schema = pack(z.string().min(2), { one: "test", two: 123 }).max(5);
+      expect(schema._zod.bag).toEqual({
+        one: "test",
+        two: 123,
+        minimum: 2,
+        maximum: 5,
+      });
+    });
+  });
+
+  describe("unpack()", () => {
+    test("should return the bag from the schema", () => {
+      expect(unpack(pack(z.string(), { one: "test", two: 123 }))).toMatchObject(
+        { one: "test", two: 123 },
+      );
+    });
+  });
+});
