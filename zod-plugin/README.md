@@ -35,5 +35,5 @@ schema.meta(); // { examples: ["test", "another"] }
 ## Helpers
 
 - `getBrand()` — retrieves the brand from the schema that was set by its `.brand()` method;
-- `pack()` — returns a cloned schema having inheritable metadata assigned (such as brand);
-- `unpack()` — retrieves the metadata from the schema that was set by `pack()` helper.
+- `pack()` — returns a cloned schema having inheritable attributes assigned (such as brand);
+- `unpack()` — retrieves the attributes from the schema that was set by `pack()` helper.

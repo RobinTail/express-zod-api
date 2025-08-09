@@ -16,7 +16,7 @@ interface $Packer<B extends object> extends z.core.$ZodCheck {
 
 /**
  * @public
- * @desc Attaches an inheritable metadata to the schema (withstands refinements).
+ * @desc Attaches an inheritable attributes to the schema (withstands refinements).
  */
 export const pack = <T extends z.ZodType, B extends object>(
   subject: T,
@@ -36,7 +36,7 @@ export const pack = <T extends z.ZodType, B extends object>(
 
 /**
  * @public
- * @desc Retrieves the metadata attached to the schema by pack() method.
+ * @desc Retrieves the attributes attached to the schema by pack() method.
  */
 export const unpack = <T extends z.core.$ZodType>(
   subject: T,

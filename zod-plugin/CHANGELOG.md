@@ -4,7 +4,7 @@
 
 ### v1.1.0
 
-- Added low-level helpers `pack()` and `unpack()` to handle inheritable metadata that withstands refinements:
+- Added low-level helpers `pack()` and `unpack()` to handle inheritable attributes that withstands refinements:
   - `schema.brand()` is a shorthand for `pack(schema, { brand })`;
   - `getBrand()` is a shorthand for `unpack(schema).brand`.
 
