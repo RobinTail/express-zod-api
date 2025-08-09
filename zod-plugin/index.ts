@@ -1,3 +1,4 @@
 import "./augmentation";
 import "./runtime"; // side effects here
-export { getBrand } from "./helpers";
+export { pack, unpack } from "./packer";
+export { getBrand } from "./brand";
