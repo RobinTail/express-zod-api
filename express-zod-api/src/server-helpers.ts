@@ -1,5 +1,4 @@
 import type fileUpload from "express-fileupload";
-import { metaSymbol } from "./metadata";
 import { loadPeer } from "./peer-helpers";
 import { AbstractResultHandler } from "./result-handler";
 import { ActualLogger } from "./logger-helpers";
@@ -10,13 +9,16 @@ import { lastResortHandler } from "./last-resort";
 import { ResultHandlerError } from "./errors";
 import { ensureError } from "./common-helpers";
 import { monitor } from "./graceful-shutdown";
+import { name as self } from "../package.json";
+
+export const localsID = Symbol.for(self);
 
 type EquippedRequest = Request<
   unknown,
   unknown,
   unknown,
   unknown,
-  { [metaSymbol]?: { logger: ActualLogger } }
+  { [localsID]?: { logger: ActualLogger } }
 >;
 
 /** @desc Returns child logger for the given request (if configured) or the configured logger otherwise */
@@ -132,14 +134,14 @@ export const createLoggingMiddleware =
     const logger = (await childLoggerProvider?.({ request, parent })) || parent;
     accessLogger?.(request, logger);
     if (request.res)
-      (request as EquippedRequest).res!.locals[metaSymbol] = { logger };
+      (request as EquippedRequest).res!.locals[localsID] = { logger };
     next();
   };
 
 export const makeGetLogger =
   (fallback: ActualLogger): GetLogger =>
   (request) =>
-    (request as EquippedRequest | undefined)?.res?.locals[metaSymbol]?.logger ||
+    (request as EquippedRequest | undefined)?.res?.locals[localsID]?.logger ||
     fallback;
 
 export const installDeprecationListener = (logger: ActualLogger) =>

@@ -9,7 +9,7 @@ describe("ESM Test", async () => {
   const quickStart = spawn("tsx", ["quick-start.ts"]);
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
-  const port = givePort("example");
+  const port = givePort("esm");
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
 
   afterAll(async () => {

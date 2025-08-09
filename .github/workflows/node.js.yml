@@ -30,7 +30,9 @@ jobs:
       run: pnpm install
     - name: Lint
       run: pnpm lint
-    - name: Unit tests
+    - name: Build
+      run: pnpm build
+    - name: Test
       run: pnpm test
     - name: Coveralls
       uses: coverallsapp/github-action@v2
@@ -39,20 +41,6 @@ jobs:
         github-token: ${{ secrets.github_token }}
         flag-name: run-${{ matrix.node-version }}
         parallel: true
-    - name: Migration test
-      run: pnpm test:migration
-    - name: Build
-      run: pnpm build
-    - name: Example test
-      run: pnpm test:example
-    - name: CJS test
-      run: pnpm test:cjs
-    - name: ESM test
-      run: pnpm test:esm
-    - name: Compatibility test
-      run: pnpm test:compat
-    - name: Issue 952 # see https://github.com/RobinTail/express-zod-api/issues/952
-      run: pnpm test:952
   report:
     needs: build
     runs-on: ubuntu-latest

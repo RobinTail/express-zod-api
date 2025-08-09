@@ -23,8 +23,8 @@ Which is highly appreciated as well. Consider these steps:
 - Install the dependencies using `pnpm i`,
 - Install the pre-commit hooks using `pnpm install_hooks`,
 - Make changes,
+- Run `pnpm build` (needed for some tests),
 - Run the tests using `pnpm test`,
-  - In case you wanna run tests from `example` and `*-test` workspaces, run `pnpm build` first.
 - Commit everything,
 - Push your branch into your fork,
 - Create a PR between the forks:

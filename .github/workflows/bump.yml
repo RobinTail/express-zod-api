@@ -11,6 +11,7 @@ on:
         options:
           - express-zod-api
           - migration
+          - zod-plugin
       kind:
         description: 'Version bump kind'
         required: true
@@ -33,6 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # for git describe --tags (used by bumpp internally)
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:

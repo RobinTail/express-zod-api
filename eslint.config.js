@@ -180,6 +180,7 @@ export default tsPlugin.config(
       "express-zod-api/coverage/",
       "migration/dist",
       "compat-test/sample.ts",
+      "zod-plugin/dist",
     ],
   },
   {
@@ -222,13 +223,6 @@ export default tsPlugin.config(
     },
   },
   {
-    name: "source/plugin",
-    files: ["express-zod-api/src/zod-plugin.ts"],
-    rules: {
-      "@typescript-eslint/no-unused-vars": "off",
-    },
-  },
-  {
     name: "source/integration",
     files: [
       "express-zod-api/src/integration.ts",
@@ -250,6 +244,7 @@ export default tsPlugin.config(
       "express-zod-api/tests/*.ts",
       "express-zod-api/vitest.setup.ts",
       "migration/*.spec.ts",
+      "zod-plugin/*.spec.ts",
     ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",

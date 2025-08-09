@@ -2,7 +2,7 @@ import { UploadedFile } from "express-fileupload";
 import { z } from "zod";
 import { ez } from "../src";
 import { findNestedSchema, hasCycle } from "../src/deep-checks";
-import { getBrand } from "../src/metadata";
+import { getBrand } from "@express-zod-api/zod-plugin";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("Checks", () => {

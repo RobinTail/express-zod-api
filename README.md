@@ -1058,13 +1058,8 @@ expect(output).toEqual({ collectedOptions: ["prev"], testLength: 9 });
 
 ## Zod Plugin
 
-Express Zod API acts as a plugin for Zod, extending its functionality once you import anything from `express-zod-api`:
-
-- Adds `.example()` method to all Zod schemas for storing examples and reflecting them in the generated documentation;
-- Adds `.deprecated()` method to all schemas for marking properties and request parameters as deprecated;
-- Adds `.label()` method to `ZodDefault` for replacing the default value in documentation with a label;
-- Adds `.remap()` method to `ZodObject` for renaming object properties in a suitable way for making documentation;
-- Alters the `.brand()` method on all Zod schemas by making the assigned brand available in runtime.
+Express Zod API augments Zod using [Zod Plugin](https://www.npmjs.com/package/@express-zod-api/zod-plugin),
+adding the runtime helpers the framework relies on.
 
 ## Generating a Frontend Client
 
