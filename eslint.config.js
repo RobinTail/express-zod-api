@@ -181,6 +181,7 @@ export default tsPlugin.config(
       "migration/dist",
       "compat-test/sample.ts",
       "zod-plugin/dist",
+      "zod-to-ts/dist",
     ],
   },
   {
