@@ -19,7 +19,7 @@ export type HandlingRules<
   K extends string | symbol = string | symbol,
 > = Partial<Record<K, SchemaHandler<U, Context>>>;
 
-export const traverse = <U extends object, Context extends object>(
+export const traverse = <U, Context extends object>(
   schema: z.core.$ZodType,
   {
     rules,
