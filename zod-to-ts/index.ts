@@ -1,1 +1,1 @@
-export { traverse } from "./traverse";
+export { traverse, SchemaHandler, HandlingRules } from "./traverse";

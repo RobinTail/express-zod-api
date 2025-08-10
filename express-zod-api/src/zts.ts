@@ -8,7 +8,7 @@ import { ezDateOutBrand } from "./date-out-schema";
 import { hasCycle } from "./deep-checks";
 import { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand, RawSchema } from "./raw-schema";
-import { FirstPartyKind, HandlingRules } from "./schema-walker";
+import { FirstPartyKind } from "./schema-walker";
 import {
   ensureTypeNode,
   makeInterfaceProp,
@@ -16,7 +16,7 @@ import {
   makeUnion,
 } from "./typescript-api";
 import { Producer, ZTSContext } from "./zts-helpers";
-import { traverse } from "@express-zod-api/zod-to-ts";
+import { traverse, HandlingRules } from "@express-zod-api/zod-to-ts";
 import { getBrand } from "@express-zod-api/zod-plugin";
 
 const { factory: f } = ts;

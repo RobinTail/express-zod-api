@@ -18,7 +18,7 @@ import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting, withHead } from "./routing-walker";
-import { HandlingRules } from "./schema-walker";
+import { HandlingRules } from "@express-zod-api/zod-to-ts";
 import { zodToTs } from "./zts";
 import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
