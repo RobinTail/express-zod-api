@@ -262,12 +262,11 @@ export const zodToTs = (
     ctx: ZTSContext;
   },
 ) => {
-  const rules = { ...brandHandling, ...producers };
+  const rules: typeof brandHandling = { ...brandHandling, ...producers };
   return traverse(schema, {
-    rules,
-    getRule: (one) => {
+    getHandler: (one) => {
       const brand = getBrand(one);
-      return brand && brand in rules ? brand : one._zod.def.type;
+      return brand && brand in rules ? rules[brand] : rules[one._zod.def.type];
     },
     onMissing: ({}, { isResponse }) => getFallback(isResponse),
     ctx,

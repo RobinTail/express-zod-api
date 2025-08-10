@@ -22,20 +22,19 @@ export type HandlingRules<
 export const traverse = <U, Context extends object>(
   schema: z.core.$ZodType,
   {
-    rules,
+    getHandler,
     onMissing,
     ctx = {} as Context,
-    getRule = (one) => one._zod.def.type,
   }: {
-    rules: HandlingRules<U, Context>;
+    getHandler: (
+      subject: typeof schema,
+    ) => SchemaHandler<U, Context> | undefined;
     onMissing: SchemaHandler<U, Context, "last">;
     ctx?: Context;
-    /** @todo consider combining/replacing rules */
-    getRule?: (subject: typeof schema) => keyof typeof rules;
   },
 ): U => {
-  const handler = rules[getRule(schema)];
+  const handler = getHandler(schema);
   const next = (subject: z.core.$ZodType) =>
-    traverse(subject, { ctx, rules, getRule, onMissing });
+    traverse(subject, { ctx, getHandler, onMissing });
   return handler ? handler(schema, { ...ctx, next }) : onMissing(schema, ctx);
 };
