@@ -305,6 +305,15 @@ importers:
         specifier: catalog:dev
         version: 4.0.17
 
+  zod-to-ts:
+    devDependencies:
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.2
+      zod:
+        specifier: catalog:dev
+        version: 4.0.17
+
 packages:
 
   '@ampproject/remapping@2.3.0':
