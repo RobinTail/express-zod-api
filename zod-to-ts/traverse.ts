@@ -16,7 +16,7 @@ export type SchemaHandler<
 export type HandlingRules<
   U,
   Context extends object,
-  K extends string | symbol = string | symbol,
+  K extends PropertyKey = PropertyKey,
 > = Partial<Record<K, SchemaHandler<U, Context>>>;
 
 export const traverse = <U, Context extends object>(
@@ -36,6 +36,6 @@ export const traverse = <U, Context extends object>(
 ): U => {
   const handler = rules[getRule(schema)];
   const next = (subject: z.core.$ZodType) =>
-    traverse(subject, { ctx, rules, onMissing });
+    traverse(subject, { ctx, rules, getRule, onMissing });
   return handler ? handler(schema, { ...ctx, next }) : onMissing(schema, ctx);
 };
