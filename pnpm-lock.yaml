@@ -182,6 +182,9 @@ importers:
       '@express-zod-api/zod-plugin':
         specifier: workspace:^
         version: link:../zod-plugin
+      '@express-zod-api/zod-to-ts':
+        specifier: workspace:^
+        version: link:../zod-to-ts
       ansis:
         specifier: ^4.1.0
         version: 4.1.0
