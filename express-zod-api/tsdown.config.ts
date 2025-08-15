@@ -1,5 +1,7 @@
 import { defineConfig } from "tsdown";
-import { version } from "./package.json";
+import { readFile } from "node:fs/promises";
+
+const { version } = JSON.parse(await readFile("./package.json", "utf8"));
 
 export default defineConfig({
   entry: ["src/index.ts"],
