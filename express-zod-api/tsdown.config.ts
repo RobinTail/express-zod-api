@@ -8,8 +8,7 @@ export default defineConfig({
   minify: true,
   attw: { profile: "esmOnly", level: "error" },
   define: {
-    // @todo rename prefix to TSDOWN
-    "process.env.TSUP_BUILD": `"v${version}"`, // @since v25.0.0 is pure ESM
-    "process.env.TSUP_STATIC": `"static"`, // used by isProduction()
+    "process.env.TSDOWN_BUILD": `"v${version}"`, // @since v25.0.0 is pure ESM
+    "process.env.TSDOWN_STATIC": `"static"`, // used by isProduction()
   },
 });

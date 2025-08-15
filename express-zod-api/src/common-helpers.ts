@@ -139,7 +139,7 @@ export const isObject = (subject: unknown) =>
   typeof subject === "object" && subject !== null;
 
 export const isProduction = R.memoizeWith(
-  () => process.env.TSUP_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSUP
+  () => process.env.TSDOWN_STATIC as string, // eslint-disable-line no-restricted-syntax -- substituted by TSDOWN
   () => process.env.NODE_ENV === "production", // eslint-disable-line no-restricted-syntax -- memoized
 );
 
