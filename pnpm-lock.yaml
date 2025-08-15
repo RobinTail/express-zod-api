@@ -222,9 +222,6 @@ importers:
       '@types/ramda':
         specifier: catalog:dev
         version: 0.31.0
-      '@types/semver':
-        specifier: ^7.7.0
-        version: 7.7.0
       camelize-ts:
         specifier: catalog:dev
         version: 3.0.0
@@ -249,9 +246,6 @@ importers:
       node-forge:
         specifier: ^1.3.1
         version: 1.3.1
-      semver:
-        specifier: ^7.7.2
-        version: 7.7.2
       snakify-ts:
         specifier: ^2.3.0
         version: 2.3.0
@@ -898,9 +892,6 @@ packages:
 
   '@types/range-parser@1.2.7':
     resolution: {integrity: sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==}
-
-  '@types/semver@7.7.0':
-    resolution: {integrity: sha512-k107IF4+Xr7UHjwDc7Cfd6PRQfbdkiRabXGRjo07b4WyPahFBZCZ1sE+BNxYIJPPg73UkfOsVOLwqVc/6ETrIA==}
 
   '@types/send@0.17.5':
     resolution: {integrity: sha512-z6F2D3cOStZvuk2SaP6YrwkNO65iTZcwA2ZkSABegdkAh/lf+Aa/YQndZVfmEXT5vgAp6zv06VQ3ejSVjAny4w==}
@@ -3095,8 +3086,6 @@ snapshots:
       types-ramda: 0.31.0
 
   '@types/range-parser@1.2.7': {}
-
-  '@types/semver@7.7.0': {}
 
   '@types/send@0.17.5':
     dependencies:
