@@ -2,7 +2,7 @@ import { defineConfig } from "tsdown";
 
 export default defineConfig([
   {
-    entry: ["index.ts"],
+    entry: "index.ts",
     minify: true,
     attw: { profile: "esmOnly", level: "error" },
     banner: {
@@ -10,7 +10,7 @@ export default defineConfig([
     },
   },
   {
-    entry: ["augmentation.ts"],
+    entry: "augmentation.ts",
     dts: { emitDtsOnly: true },
   },
 ]);

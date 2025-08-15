@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 const { version } = JSON.parse(await readFile("./package.json", "utf8"));
 
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry: "src/index.ts",
   minify: true,
   attw: { profile: "esmOnly", level: "error" },
   define: {
