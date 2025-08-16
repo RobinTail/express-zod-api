@@ -1,6 +1,6 @@
 {
   "name": "@express-zod-api/migration",
-  "version": "25.0.1",
+  "version": "25.1.0",
   "license": "MIT",
   "description": "Migration scripts for express-zod-api",
   "repository": {
