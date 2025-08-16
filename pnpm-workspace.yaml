@@ -39,5 +39,3 @@ catalogs:
     "zod": "^4.0.0"
 overrides:
   "@scarf/scarf": "npm:empty-npm-package@1.0.0"
-patchedDependencies:
-  tsup: patches/tsup.patch

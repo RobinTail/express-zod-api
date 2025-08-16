@@ -17,8 +17,7 @@
   "scripts": {
     "pretest": "tsc --noEmit",
     "test": "vitest run --globals",
-    "build": "tsup",
-    "postbuild": "attw --pack --profile esm-only",
+    "build": "tsdown",
     "prepublishOnly": "eslint && pnpm test && pnpm build"
   },
   "type": "module",
