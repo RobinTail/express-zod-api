@@ -2,6 +2,10 @@
 
 ## Version 25
 
+### v25.3.0
+
+- Changed bundler from `tsup` to `tsdown`.
+
 ### v25.2.0
 
 - Zod Plugin extracted into a standalone package — `@express-zod-api/zod-plugin`:
