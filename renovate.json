@@ -12,6 +12,10 @@
     {
       "groupName": "Vitest and its coverage provider",
       "matchPackageNames": ["vitest", "@vitest/*"]
+    },
+    {
+      "groupName": "ESLint and its core modules",
+      "matchPackageNames": ["eslint", "@eslint/*"]
     }
   ]
 }

@@ -63,6 +63,9 @@ importers:
       '@arethetypeswrong/core':
         specifier: ^0.18.2
         version: 0.18.2
+      '@eslint/js':
+        specifier: ^9.33.0
+        version: 9.33.0
       '@tsconfig/node20':
         specifier: ^20.1.5
         version: 20.1.6
@@ -73,7 +76,7 @@ importers:
         specifier: ^3.2.3
         version: 3.2.4(vitest@3.2.4(@types/node@24.3.0)(jiti@2.5.1)(tsx@4.20.4)(yaml@2.8.0))
       eslint:
-        specifier: ^9.28.0
+        specifier: ^9.33.0
         version: 9.33.0(jiti@2.5.1)
       eslint-config-prettier:
         specifier: ^10.1.5
