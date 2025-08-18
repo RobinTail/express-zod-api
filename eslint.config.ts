@@ -12,12 +12,7 @@ const cwd = dirname(fileURLToPath(import.meta.url));
 const ezDir = join(cwd, "express-zod-api");
 const migrationDir = join(cwd, "migration");
 
-interface RestrictedSyntax {
-  selector: string;
-  message: string;
-}
-
-const importConcerns: RestrictedSyntax[] = [
+const importConcerns = [
   {
     selector:
       "ImportDeclaration[source.value='ramda'] > ImportSpecifier, " +
@@ -34,7 +29,7 @@ const importConcerns: RestrictedSyntax[] = [
   })),
 ];
 
-const performanceConcerns: RestrictedSyntax[] = [
+const performanceConcerns = [
   {
     selector: "ImportDeclaration[source.value=/assert/]", // #2169
     message: "assert is slow, use throw",
@@ -63,7 +58,7 @@ const performanceConcerns: RestrictedSyntax[] = [
   },
 ];
 
-const tsFactoryConcerns: RestrictedSyntax[] = [
+const tsFactoryConcerns = [
   {
     selector: "Identifier[name='createConditionalExpression']",
     message: "use makeTernary() helper",
