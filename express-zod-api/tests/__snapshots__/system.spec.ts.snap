@@ -96,6 +96,16 @@ exports[`App in production mode > Protocol > Should fail when missing content ty
     "message": "key: Invalid input: expected string, received undefined",
   },
   "status": "error",
+  "tree": {
+    "errors": [],
+    "properties": {
+      "key": {
+        "errors": [
+          "Invalid input: expected string, received undefined",
+        ],
+      },
+    },
+  },
 }
 `;
 
@@ -149,6 +159,16 @@ exports[`App in production mode > Validation > Should fail on handler input type
     "message": "something: Invalid input: expected string, received number",
   },
   "status": "error",
+  "tree": {
+    "errors": [],
+    "properties": {
+      "something": {
+        "errors": [
+          "Invalid input: expected string, received number",
+        ],
+      },
+    },
+  },
 }
 `;
 
@@ -197,6 +217,16 @@ exports[`App in production mode > Validation > Should fail on middleware input t
     "message": "key: Invalid input: expected string, received number",
   },
   "status": "error",
+  "tree": {
+    "errors": [],
+    "properties": {
+      "key": {
+        "errors": [
+          "Invalid input: expected string, received number",
+        ],
+      },
+    },
+  },
 }
 `;
 
@@ -206,5 +236,15 @@ exports[`App in production mode > Validation > Should fail on middleware refinem
     "message": "key: Invalid key",
   },
   "status": "error",
+  "tree": {
+    "errors": [],
+    "properties": {
+      "key": {
+        "errors": [
+          "Invalid key",
+        ],
+      },
+    },
+  },
 }
 `;
