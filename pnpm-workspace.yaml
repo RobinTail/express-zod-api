@@ -7,35 +7,42 @@ packages:
   - esm-test
   - compat-test
   - issue952-test
+
+autoInstallPeers: false
+
+catalogs:
+  dev:
+    '@types/compression': ^1.8.1
+    '@types/express': ^5.0.3
+    '@types/express-fileupload': ^1.5.1
+    '@types/http-errors': ^2.0.5
+    '@types/ramda': ^0.31.0
+    '@typescript-eslint/rule-tester': ^8.40.0
+    camelize-ts: ^3.0.0
+    compression: ^1.8.1
+    express: ^5.1.0
+    express-fileupload: ^1.5.2
+    http-errors: ^2.0.0
+    typescript: ^5.9.2
+    typescript-eslint: ^8.40.0
+    zod: ^4.0.17
+  prod:
+    ramda: ^0.31.3
+
+engineStrict: true
+
+gitChecks: false
+
 onlyBuiltDependencies:
   - esbuild
-gitChecks: false
-engineStrict: true
-autoInstallPeers: false
-publicHoistPattern:
-  - "@typescript-eslint/*" # used as an assumed transitive in migration
-  - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
-  - "@eslint/*" # used by eslint.config.js
-  - "globals" # used by eslint.config.js
-  - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
-  - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting
-catalogs:
-  prod:
-    "ramda": "^0.31.3"
-  dev:
-    "@types/compression": "^1.8.1"
-    "@types/express": "^5.0.3"
-    "@types/express-fileupload": "^1.5.1"
-    "@types/http-errors": "^2.0.5"
-    "@types/ramda": "^0.31.0"
-    "@typescript-eslint/rule-tester": "^8.35.1"
-    "camelize-ts": "^3.0.0"
-    "compression": "^1.8.0"
-    "express": "^5.1.0"
-    "express-fileupload": "^1.5.1"
-    "http-errors": "^2.0.0"
-    "typescript": "^5.8.3"
-    "typescript-eslint": "^8.35.1"
-    "zod": "^4.0.0"
+
 overrides:
-  "@scarf/scarf": "npm:empty-npm-package@1.0.0"
+  '@scarf/scarf': npm:empty-npm-package@1.0.0
+
+publicHoistPattern:
+  - '@typescript-eslint/*'
+  - '@vitest/*'
+  - '@eslint/*'
+  - globals
+  - '@types/qs'
+  - '@types/express-serve-static-core'
