@@ -2,6 +2,10 @@
 
 ## Version 1
 
+### v1.2.0
+
+- Changed bundler from `tsup` to `tsdown`.
+
 ### v1.1.0
 
 - Added low-level helpers `pack()` and `unpack()` to handle inheritable attributes that withstands refinements:

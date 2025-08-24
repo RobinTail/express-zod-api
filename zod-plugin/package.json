@@ -1,6 +1,6 @@
 {
   "name": "@express-zod-api/zod-plugin",
-  "version": "1.1.0-beta.1",
+  "version": "1.2.0",
   "license": "MIT",
   "description": "Zod plugin for express-zod-api",
   "sideEffects": true,
@@ -18,8 +18,7 @@
   "scripts": {
     "pretest": "tsc --noEmit",
     "test": "vitest run",
-    "build": "tsup",
-    "postbuild": "attw --pack --profile esm-only",
+    "build": "tsdown",
     "prepublishOnly": "eslint && pnpm test && pnpm build"
   },
   "type": "module",
