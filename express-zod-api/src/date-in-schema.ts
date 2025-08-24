@@ -2,10 +2,12 @@ import { z } from "zod";
 
 export const ezDateInBrand = Symbol("DateIn");
 
-export const dateIn = ({
-  examples,
-  ...rest
-}: Parameters<z.ZodString["meta"]>[0] = {}) => {
+export interface DateInParams
+  extends Omit<Parameters<z.ZodString["meta"]>[0], "examples"> {
+  examples?: Array<NonNullable<Parameters<z.ZodString["example"]>[0]>>;
+}
+
+export const dateIn = ({ examples, ...rest }: DateInParams = {}) => {
   const schema = z.union([
     z.iso.date(),
     z.iso.datetime(),
