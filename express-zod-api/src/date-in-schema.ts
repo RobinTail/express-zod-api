@@ -4,7 +4,7 @@ export const ezDateInBrand = Symbol("DateIn");
 
 export interface DateInParams
   extends Omit<Parameters<z.ZodString["meta"]>[0], "examples"> {
-  examples?: Array<NonNullable<Parameters<z.ZodString["example"]>[0]>>;
+  examples?: string[];
 }
 
 export const dateIn = ({ examples, ...rest }: DateInParams = {}) => {
