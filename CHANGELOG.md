@@ -2,6 +2,10 @@
 
 ## Version 25
 
+### v25.3.1
+
+- Small optimization for running diagnostics (non-production mode).
+
 ### v25.3.0
 
 - Changed bundler from `tsup` to `tsdown`.
