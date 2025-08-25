@@ -24,6 +24,14 @@ export interface Routing {
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
+interface InitProps {
+  app: IRouter;
+  getLogger: GetLogger;
+  config: CommonConfig;
+  routing: Routing;
+  parsers?: Parsers;
+}
+
 const lineUp = (methods: CORSMethod[]) =>
   methods // auxiliary methods go last
     .sort((a, b) => +isMethod(b) - +isMethod(a) || a.localeCompare(b))
@@ -50,26 +58,19 @@ const makeCorsHeaders = (accessMethods: CORSMethod[]) => ({
 
 type Siblings = Map<CORSMethod, [RequestHandler[], AbstractEndpoint]>;
 
-export const initRouting = ({
+/** This fn exists to reduce the complexity of initRouting and to ensure the disposal of Diagnostics ASAP */
+const collectSiblings = ({
   app,
   getLogger,
   config,
   routing,
   parsers,
-}: {
-  app: IRouter;
-  getLogger: GetLogger;
-  config: CommonConfig;
-  routing: Routing;
-  parsers?: Parsers;
-}) => {
-  let doc = isProduction() ? undefined : new Diagnostics(getLogger()); // disposable
+}: InitProps) => {
+  const doc = isProduction() ? undefined : new Diagnostics(getLogger());
   const familiar = new Map<string, Siblings>();
   const onEndpoint: OnEndpoint = (method, path, endpoint) => {
-    if (!isProduction()) {
-      doc?.checkSchema(endpoint, { path, method });
-      doc?.checkPathParams(path, endpoint, { method });
-    }
+    doc?.checkSchema(endpoint, { path, method });
+    doc?.checkPathParams(path, endpoint, { method });
     const matchingParsers = parsers?.[endpoint.requestType] || [];
     const value = R.pair(matchingParsers, endpoint);
     if (!familiar.has(path))
@@ -77,7 +78,11 @@ export const initRouting = ({
     familiar.get(path)?.set(method, value);
   };
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
-  doc = undefined; // hint for garbage collector
+  return familiar;
+};
+
+export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
+  const familiar = collectSiblings({ app, getLogger, config, ...rest });
   const deprioritized = new Map<string, RequestHandler>();
   for (const [path, methods] of familiar) {
     const accessMethods = Array.from(methods.keys());
