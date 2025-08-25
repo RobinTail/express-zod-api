@@ -58,6 +58,7 @@ const makeCorsHeaders = (accessMethods: CORSMethod[]) => ({
 
 type Siblings = Map<CORSMethod, [RequestHandler[], AbstractEndpoint]>;
 
+/** This fn exists to reduce the complexity of initRouting and to ensure the disposal of Diagnostics ASAP */
 const collectSiblings = ({
   app,
   getLogger,
@@ -65,7 +66,7 @@ const collectSiblings = ({
   routing,
   parsers,
 }: InitProps) => {
-  using doc = isProduction() ? undefined : new Diagnostics(getLogger());
+  const doc = isProduction() ? undefined : new Diagnostics(getLogger());
   const familiar = new Map<string, Siblings>();
   const onEndpoint: OnEndpoint = (method, path, endpoint) => {
     if (!isProduction()) {

@@ -7,7 +7,7 @@ import { AbstractEndpoint } from "./endpoint";
 import { flattenIO } from "./json-schema-helpers";
 import { ActualLogger } from "./logger-helpers";
 
-export class Diagnostics implements Disposable {
+export class Diagnostics {
   #verifiedEndpoints = new WeakSet<AbstractEndpoint>();
   #verifiedPaths = new WeakMap<
     AbstractEndpoint,
@@ -15,8 +15,6 @@ export class Diagnostics implements Disposable {
   >();
 
   constructor(protected logger: ActualLogger) {}
-
-  public [Symbol.dispose]() {}
 
   public checkSchema(endpoint: AbstractEndpoint, ctx: FlatObject): void {
     if (this.#verifiedEndpoints.has(endpoint)) return;
