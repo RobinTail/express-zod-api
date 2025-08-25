@@ -50,7 +50,7 @@ const makeCorsHeaders = (accessMethods: CORSMethod[]) => ({
 
 type Siblings = Map<CORSMethod, [RequestHandler[], AbstractEndpoint]>;
 
-export const initRouting = ({
+const collectSiblings = ({
   app,
   getLogger,
   config,
@@ -63,7 +63,7 @@ export const initRouting = ({
   routing: Routing;
   parsers?: Parsers;
 }) => {
-  let doc = isProduction() ? undefined : new Diagnostics(getLogger()); // disposable
+  using doc = isProduction() ? undefined : new Diagnostics(getLogger());
   const familiar = new Map<string, Siblings>();
   const onEndpoint: OnEndpoint = (method, path, endpoint) => {
     if (!isProduction()) {
@@ -77,7 +77,29 @@ export const initRouting = ({
     familiar.get(path)?.set(method, value);
   };
   walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
-  doc = undefined; // hint for garbage collector
+  return familiar;
+};
+
+export const initRouting = ({
+  app,
+  getLogger,
+  config,
+  routing,
+  parsers,
+}: {
+  app: IRouter;
+  getLogger: GetLogger;
+  config: CommonConfig;
+  routing: Routing;
+  parsers?: Parsers;
+}) => {
+  const familiar = collectSiblings({
+    app,
+    getLogger,
+    config,
+    routing,
+    parsers,
+  });
   const deprioritized = new Map<string, RequestHandler>();
   for (const [path, methods] of familiar) {
     const accessMethods = Array.from(methods.keys());
