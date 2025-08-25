@@ -24,6 +24,14 @@ export interface Routing {
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
 
+interface InitProps {
+  app: IRouter;
+  getLogger: GetLogger;
+  config: CommonConfig;
+  routing: Routing;
+  parsers?: Parsers;
+}
+
 const lineUp = (methods: CORSMethod[]) =>
   methods // auxiliary methods go last
     .sort((a, b) => +isMethod(b) - +isMethod(a) || a.localeCompare(b))
@@ -56,13 +64,7 @@ const collectSiblings = ({
   config,
   routing,
   parsers,
-}: {
-  app: IRouter;
-  getLogger: GetLogger;
-  config: CommonConfig;
-  routing: Routing;
-  parsers?: Parsers;
-}) => {
+}: InitProps) => {
   using doc = isProduction() ? undefined : new Diagnostics(getLogger());
   const familiar = new Map<string, Siblings>();
   const onEndpoint: OnEndpoint = (method, path, endpoint) => {
@@ -80,26 +82,8 @@ const collectSiblings = ({
   return familiar;
 };
 
-export const initRouting = ({
-  app,
-  getLogger,
-  config,
-  routing,
-  parsers,
-}: {
-  app: IRouter;
-  getLogger: GetLogger;
-  config: CommonConfig;
-  routing: Routing;
-  parsers?: Parsers;
-}) => {
-  const familiar = collectSiblings({
-    app,
-    getLogger,
-    config,
-    routing,
-    parsers,
-  });
+export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
+  const familiar = collectSiblings({ app, getLogger, config, ...rest });
   const deprioritized = new Map<string, RequestHandler>();
   for (const [path, methods] of familiar) {
     const accessMethods = Array.from(methods.keys());
