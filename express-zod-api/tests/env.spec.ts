@@ -81,6 +81,23 @@ describe("Environment checks", () => {
   });
 
   describe("Zod new features", () => {
+    test("Codecs can be reversed", () => {
+      const schema = z.codec(z.iso.datetime(), z.date(), {
+        decode: (str) => new Date(str),
+        encode: (date) => date.toISOString(),
+      });
+      const {
+        in: to,
+        out: from,
+        transform: encode,
+        reverseTransform: decode,
+      } = schema._zod.def;
+      const reversed = z.codec(from, to, { decode, encode });
+      expect(reversed.parse(new Date("2022-01-01T00:00:00.000Z"))).toBe(
+        "2022-01-01T00:00:00.000Z",
+      );
+    });
+
     test("ZodError equality", () => {
       try {
         z.number().parse("test");
