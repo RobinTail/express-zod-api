@@ -87,7 +87,7 @@
     "@types/express": "catalog:dev",
     "@types/express-fileupload": "catalog:dev",
     "@types/http-errors": "catalog:dev",
-    "@types/node-forge": "^1.3.11",
+    "@types/node-forge": "^1.3.14",
     "@types/ramda": "catalog:dev",
     "camelize-ts": "catalog:dev",
     "compression": "catalog:dev",
@@ -99,7 +99,7 @@
     "node-forge": "^1.3.1",
     "snakify-ts": "^2.3.0",
     "typescript": "catalog:dev",
-    "undici": "^7.10.0",
+    "undici": "^7.15.0",
     "zod": "catalog:dev"
   },
   "keywords": [
