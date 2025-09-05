@@ -56,13 +56,14 @@ export abstract class AbstractResultHandler {
 export class ResultHandler<
   POS extends Result,
   NEG extends Result,
+  OUT extends IOSchema,
 > extends AbstractResultHandler {
-  readonly #positive: POS | LazyResult<POS, [IOSchema]>;
+  readonly #positive: POS | LazyResult<POS, [OUT]>;
   readonly #negative: NEG | LazyResult<NEG>;
 
   constructor(params: {
     /** @desc A description of the API response in case of success (schema, status code, MIME type) */
-    positive: POS | LazyResult<POS, [IOSchema]>;
+    positive: POS | LazyResult<POS, [OUT]>;
     /** @desc A description of the API response in case of error (schema, status code, MIME type) */
     negative: NEG | LazyResult<NEG>;
     /** @desc The actual implementation to transmit the response in any case */
@@ -74,7 +75,7 @@ export class ResultHandler<
   }
 
   /** @internal */
-  public override getPositiveResponse(output: IOSchema) {
+  public override getPositiveResponse(output: OUT) {
     return normalize(this.#positive, {
       variant: "positive",
       args: [output],
