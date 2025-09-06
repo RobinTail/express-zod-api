@@ -1,5 +1,6 @@
 import "@express-zod-api/zod-plugin"; // side effects here
 export { createConfig } from "./config-type";
+export { ApiResponse } from "./api-response";
 export {
   EndpointsFactory,
   defaultEndpointsFactory,
@@ -46,7 +47,6 @@ export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
 export type { IOSchema } from "./io-schema";
 export type { CommonConfig, AppConfig, ServerConfig } from "./config-type";
-export type { ApiResponse } from "./api-response";
 export type {
   BasicSecurity,
   BearerSecurity,

@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { isSchema } from "./common-helpers";
+import { contentTypes } from "./content-type";
 
 export const defaultStatusCodes = {
   positive: 200,
@@ -11,23 +13,44 @@ export const responseVariants = Object.keys(
 ) as ResponseVariant[];
 
 /** @public this is the user facing configuration */
-export interface ApiResponse<S extends z.ZodType> {
-  schema: S;
-  /** @default 200 for a positive and 400 for a negative response */
-  statusCode?: number | [number, ...number[]];
-  /**
-   * @example null is for no content, such as 204 and 302
-   * @default "application/json"
-   * */
-  mimeType?: string | [string, ...string[]] | null;
+export class ApiResponse<S extends z.ZodType> {
+  readonly #schema: S;
+  readonly #statusCodes?: [number, ...number[]];
+  readonly #mimeTypes?: [string, ...string[]] | null;
+
+  public constructor(
+    subject:
+      | S // shorthand for { schema: S }, default status codes and MIME types applied
+      | {
+          schema: S;
+          /** @default 200 for a positive and 400 for a negative response */
+          statusCode?: number | [number, ...number[]];
+          /**
+           * @example null is for no content, such as 204 and 302
+           * @default "application/json"
+           * */
+          mimeType?: string | [string, ...string[]] | null;
+        },
+  ) {
+    const { schema, statusCode, mimeType } = isSchema(subject)
+      ? { schema: subject }
+      : subject;
+    this.#schema = schema;
+    this.#statusCodes =
+      typeof statusCode === "number" ? [statusCode] : statusCode;
+    this.#mimeTypes = typeof mimeType === "string" ? [mimeType] : mimeType;
+  }
+
+  public normalize(fbStatus: number) {
+    return {
+      schema: this.#schema,
+      statusCodes: this.#statusCodes ?? [fbStatus],
+      mimeTypes:
+        this.#mimeTypes === undefined ? [contentTypes.json] : this.#mimeTypes,
+    };
+  }
 }
 
-/**
- * @private This is what the framework entities operate
- * @see normalize
- * */
-export interface NormalizedResponse {
-  schema: z.ZodType;
-  statusCodes: [number, ...number[]];
-  mimeTypes: [string, ...string[]] | null;
-}
+export type NormalizedResponse = ReturnType<
+  ApiResponse<z.ZodType>["normalize"]
+>;

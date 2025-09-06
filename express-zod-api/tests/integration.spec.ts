@@ -6,6 +6,7 @@ import {
   Producer,
   defaultEndpointsFactory,
   ResultHandler,
+  ApiResponse,
 } from "../src";
 
 describe("Integration", () => {
@@ -89,18 +90,18 @@ describe("Integration", () => {
     const factory = new EndpointsFactory(
       new ResultHandler({
         positive: (data) => [
-          {
+          new ApiResponse({
             statusCode: 200,
             schema: z.object({ status: z.literal("ok"), data }),
-          },
-          {
+          }),
+          new ApiResponse({
             statusCode: 201,
             schema: z.object({ status: z.literal("kinda"), data }),
-          },
+          }),
         ],
         negative: [
-          { statusCode: 400, schema: z.literal("error") },
-          { statusCode: 500, schema: z.literal("failure") },
+          new ApiResponse({ statusCode: 400, schema: z.literal("error") }),
+          new ApiResponse({ statusCode: 500, schema: z.literal("failure") }),
         ],
         handler: vi.fn(),
       }),

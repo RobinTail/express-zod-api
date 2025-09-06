@@ -6,7 +6,6 @@ import {
   NormalizedResponse,
 } from "./api-response";
 import { FlatObject, isObject } from "./common-helpers";
-import { contentTypes } from "./content-type";
 import { IOSchema } from "./io-schema";
 import { ActualLogger } from "./logger-helpers";
 import {
@@ -14,7 +13,6 @@ import {
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
-  normalize,
   ResultSchema,
 } from "./result-helpers";
 
@@ -58,10 +56,14 @@ export class ResultHandler<
   NEG extends Result,
   OUT extends IOSchema,
 > extends AbstractResultHandler {
-  readonly #positive: POS | LazyResult<POS, [OUT]>;
-  readonly #negative: NEG | LazyResult<NEG>;
+  readonly #positive: ApiResponse<z.ZodType>[] | LazyResult<Result, [OUT]>;
+  readonly #negative: ApiResponse<z.ZodType>[];
 
-  constructor(params: {
+  constructor({
+    handler,
+    positive,
+    negative,
+  }: {
     /** @desc A description of the API response in case of success (schema, status code, MIME type) */
     positive: POS | LazyResult<POS, [OUT]>;
     /** @desc A description of the API response in case of error (schema, status code, MIME type) */
@@ -69,29 +71,48 @@ export class ResultHandler<
     /** @desc The actual implementation to transmit the response in any case */
     handler: Handler<z.output<ResultSchema<POS> | ResultSchema<NEG>>>;
   }) {
-    super(params.handler);
-    this.#positive = params.positive;
-    this.#negative = params.negative;
+    super(handler);
+    this.#positive =
+      positive instanceof z.ZodType
+        ? [new ApiResponse(positive)]
+        : positive instanceof ApiResponse
+          ? [positive]
+          : positive;
+    const resolvedNeg = typeof negative === "function" ? negative() : negative;
+    this.#negative =
+      resolvedNeg instanceof z.ZodType
+        ? [new ApiResponse(resolvedNeg)]
+        : resolvedNeg instanceof ApiResponse
+          ? [resolvedNeg]
+          : resolvedNeg;
   }
 
-  /** @internal */
+  /**
+   * @internal
+   * @todo throw if empty
+   * */
   public override getPositiveResponse(output: OUT) {
-    return normalize(this.#positive, {
-      variant: "positive",
-      args: [output],
-      statusCodes: [defaultStatusCodes.positive],
-      mimeTypes: [contentTypes.json],
-    });
+    const resolvedPos =
+      typeof this.#positive === "function"
+        ? this.#positive(output)
+        : this.#positive;
+    const arr =
+      resolvedPos instanceof z.ZodType
+        ? [new ApiResponse(resolvedPos)]
+        : resolvedPos instanceof ApiResponse
+          ? [resolvedPos]
+          : resolvedPos;
+    return arr.map((one) => one.normalize(defaultStatusCodes.positive));
   }
 
-  /** @internal */
+  /**
+   * @internal
+   * @todo throw if empty
+   * */
   public override getNegativeResponse() {
-    return normalize(this.#negative, {
-      variant: "negative",
-      args: [],
-      statusCodes: [defaultStatusCodes.negative],
-      mimeTypes: [contentTypes.json],
-    });
+    return this.#negative.map((one) =>
+      one.normalize(defaultStatusCodes.negative),
+    );
   }
 }
 
@@ -171,10 +192,10 @@ export const arrayResultHandler = new ResultHandler({
     }
     return responseSchema;
   },
-  negative: {
+  negative: new ApiResponse({
     schema: z.string().example("Sample error message"),
     mimeType: "text/plain",
-  },
+  }),
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const httpError = ensureHttpError(error);

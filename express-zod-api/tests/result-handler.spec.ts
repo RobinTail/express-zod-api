@@ -6,6 +6,7 @@ import {
   arrayResultHandler,
   defaultResultHandler,
   ResultHandler,
+  ApiResponse,
 } from "../src";
 import { ResultHandlerError } from "../src/errors";
 import { AbstractResultHandler, Result } from "../src/result-handler";
@@ -20,12 +21,12 @@ describe("ResultHandler", () => {
     test("should support multiple response schemas depending on status codes", () => {
       const subject = new ResultHandler({
         positive: () => [
-          { statusCode: 200, schema: z.literal("ok") },
-          { statusCode: 201, schema: z.literal("kinda") },
+          new ApiResponse({ statusCode: 200, schema: z.literal("ok") }),
+          new ApiResponse({ statusCode: 201, schema: z.literal("kinda") }),
         ],
         negative: [
-          { statusCode: 400, schema: z.literal("error") },
-          { statusCode: 500, schema: z.literal("failure") },
+          new ApiResponse({ statusCode: 400, schema: z.literal("error") }),
+          new ApiResponse({ statusCode: 500, schema: z.literal("failure") }),
         ],
         handler: ({ response }) => {
           expectTypeOf(response).toEqualTypeOf<

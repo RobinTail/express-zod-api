@@ -5,12 +5,13 @@ import {
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
-  normalize,
   pullResponseExamples,
 } from "../src/result-helpers";
 import { makeLoggerMock, makeRequestMock } from "../src/testing";
 
 describe("Result helpers", () => {
+  /** @todo mv to ApiResponse or ResultHandler test */
+  /*
   describe("normalize()", () => {
     const schema = z.string();
 
@@ -67,6 +68,7 @@ describe("Result helpers", () => {
       expect(typeof subject).toBe("function");
     });
   });
+   */
 
   describe("logServerError()", () => {
     test("should log server side error", () => {

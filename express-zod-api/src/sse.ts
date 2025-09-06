@@ -10,6 +10,7 @@ import {
   getPublicErrorMessage,
   logServerError,
 } from "./result-helpers";
+import { ApiResponse } from "./api-response";
 
 type EventsMap = Record<string, z.ZodType>;
 
@@ -76,14 +77,14 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
       const [first, ...rest] = Object.entries(events).map(([event, schema]) =>
         makeEventSchema(event, schema),
       );
-      return {
+      return new ApiResponse({
         mimeType: contentTypes.sse,
         schema: rest.length
           ? z.discriminatedUnion("event", [first, ...rest])
           : first,
-      };
+      });
     },
-    negative: { mimeType: "text/plain", schema: z.string() },
+    negative: new ApiResponse({ mimeType: "text/plain", schema: z.string() }),
     handler: async ({ response, error, logger, request, input }) => {
       if (error) {
         const httpError = ensureHttpError(error);

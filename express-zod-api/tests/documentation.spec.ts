@@ -11,6 +11,7 @@ import {
   ResultHandler,
   Depicter,
   Method,
+  ApiResponse,
 } from "../src";
 import { contentTypes } from "../src/content-type";
 import { z } from "zod";
@@ -699,16 +700,17 @@ describe("Documentation", () => {
 
     test("should handle custom mime types and status codes", () => {
       const resultHandler = new ResultHandler({
-        positive: (result) => ({
-          schema: z.object({ status: z.literal("OK"), result }),
-          mimeType: [contentTypes.json, "text/vnd.yaml"],
-          statusCode: 201,
-        }),
-        negative: {
+        positive: (result) =>
+          new ApiResponse({
+            schema: z.object({ status: z.literal("OK"), result }),
+            mimeType: [contentTypes.json, "text/vnd.yaml"],
+            statusCode: 201,
+          }),
+        negative: new ApiResponse({
           schema: z.object({ status: z.literal("NOT OK") }),
           mimeType: "text/vnd.yaml",
           statusCode: 403,
-        },
+        }),
         handler: () => {},
       });
       const factory = new EndpointsFactory(resultHandler);
@@ -920,18 +922,18 @@ describe("Documentation", () => {
       const factory = new EndpointsFactory(
         new ResultHandler({
           positive: (data) => [
-            {
+            new ApiResponse({
               statusCode: 200,
               schema: z.object({ status: z.literal("ok"), data }),
-            },
-            {
+            }),
+            new ApiResponse({
               statusCode: 201,
               schema: z.object({ status: z.literal("kinda"), data }),
-            },
+            }),
           ],
           negative: [
-            { statusCode: 400, schema: z.literal("error") },
-            { statusCode: 500, schema: z.literal("failure") },
+            new ApiResponse({ statusCode: 400, schema: z.literal("error") }),
+            new ApiResponse({ statusCode: 500, schema: z.literal("failure") }),
           ],
           handler: vi.fn(),
         }),

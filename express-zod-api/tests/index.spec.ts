@@ -3,7 +3,6 @@ import ts from "typescript";
 import { z } from "zod";
 import * as entrypoint from "../src";
 import {
-  ApiResponse,
   AppConfig,
   BasicSecurity,
   BearerSecurity,
@@ -91,7 +90,6 @@ describe("Index Entrypoint", () => {
         type: "openid";
         url: string;
       }>().toEqualTypeOf<OpenIdSecurity>();
-      expectTypeOf({ schema: z.string() }).toExtend<ApiResponse<z.ZodString>>();
     });
   });
 });

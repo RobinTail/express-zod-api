@@ -1,5 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Index Entrypoint > exports > ApiResponse should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint > exports > BuiltinLogger should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > DependsOnMethod should have certain value 1`] = `[Function]`;
@@ -74,6 +76,7 @@ exports[`Index Entrypoint > exports > getMessageFromError should have certain va
 exports[`Index Entrypoint > exports > should have certain entities exposed 1`] = `
 [
   "createConfig",
+  "ApiResponse",
   "EndpointsFactory",
   "defaultEndpointsFactory",
   "arrayEndpointsFactory",
