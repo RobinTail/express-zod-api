@@ -72,7 +72,7 @@ interface BuildProps<
 
 export class EndpointsFactory<
   IN extends IOSchema | undefined = undefined,
-  OUT extends FlatObject = EmptyObject,
+  OPT extends FlatObject = EmptyObject,
   SCO extends string = string,
 > {
   protected schema = undefined as IN;
@@ -81,12 +81,12 @@ export class EndpointsFactory<
 
   #extend<
     AIN extends IOSchema | undefined,
-    AOUT extends FlatObject,
+    AOPT extends FlatObject,
     ASCO extends string,
-  >(middleware: Middleware<OUT, AOUT, ASCO, AIN>) {
+  >(middleware: Middleware<OPT, AOPT, ASCO, AIN>) {
     const factory = new EndpointsFactory<
       Extension<IN, AIN>,
-      OUT & AOUT,
+      OPT & AOPT,
       SCO & ASCO
     >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);
@@ -95,13 +95,13 @@ export class EndpointsFactory<
   }
 
   public addMiddleware<
-    AOUT extends FlatObject,
+    AOPT extends FlatObject,
     ASCO extends string,
     AIN extends IOSchema | undefined = undefined,
   >(
     subject:
-      | Middleware<OUT, AOUT, ASCO, AIN>
-      | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
+      | Middleware<OPT, AOPT, ASCO, AIN>
+      | ConstructorParameters<typeof Middleware<OPT, AOPT, ASCO, AIN>>[0],
   ) {
     return this.#extend(
       subject instanceof Middleware ? subject : new Middleware(subject),
@@ -113,12 +113,12 @@ export class EndpointsFactory<
   public addExpressMiddleware<
     R extends Request,
     S extends Response,
-    AOUT extends FlatObject = EmptyObject,
-  >(...params: ConstructorParameters<typeof ExpressMiddleware<R, S, AOUT>>) {
+    AOPT extends FlatObject = EmptyObject,
+  >(...params: ConstructorParameters<typeof ExpressMiddleware<R, S, AOPT>>) {
     return this.#extend(new ExpressMiddleware(...params));
   }
 
-  public addOptions<AOUT extends FlatObject>(getOptions: () => Promise<AOUT>) {
+  public addOptions<AOPT extends FlatObject>(getOptions: () => Promise<AOPT>) {
     return this.#extend(new Middleware({ handler: getOptions }));
   }
 
@@ -130,7 +130,7 @@ export class EndpointsFactory<
     tag,
     method,
     ...rest
-  }: BuildProps<BIN, BOUT, IN, OUT, SCO>) {
+  }: BuildProps<BIN, BOUT, IN, OPT, SCO>) {
     const { middlewares, resultHandler } = this;
     const methods = typeof method === "string" ? [method] : method;
     const getOperationId =
@@ -157,7 +157,7 @@ export class EndpointsFactory<
   public buildVoid<BIN extends IOSchema = EmptySchema>({
     handler,
     ...rest
-  }: Omit<BuildProps<BIN, z.ZodVoid, IN, OUT, SCO>, "output">) {
+  }: Omit<BuildProps<BIN, z.ZodVoid, IN, OPT, SCO>, "output">) {
     return this.build({
       ...rest,
       output: emptySchema,
