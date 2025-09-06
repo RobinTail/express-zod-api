@@ -244,7 +244,7 @@ export default tsPlugin.config(
       "express-zod-api/tests/*.ts",
       "express-zod-api/vitest.setup.ts",
       "migration/*.spec.ts",
-      "zod-plugin/*.spec.ts",
+      "zod-plugin/tests/*.ts",
     ],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
