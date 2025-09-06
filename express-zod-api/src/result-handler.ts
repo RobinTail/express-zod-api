@@ -15,6 +15,7 @@ import {
   logServerError,
   ResultSchema,
 } from "./result-helpers";
+import { ResultHandlerError } from "./errors";
 
 type Handler<RES = unknown> = (
   params: DiscriminatedResult & {
@@ -87,10 +88,7 @@ export class ResultHandler<
           : resolvedNeg;
   }
 
-  /**
-   * @internal
-   * @todo throw if empty
-   * */
+  /** @internal */
   public override getPositiveResponse(output: OUT) {
     const resolvedPos =
       typeof this.#positive === "function"
@@ -102,14 +100,21 @@ export class ResultHandler<
         : resolvedPos instanceof ApiResponse
           ? [resolvedPos]
           : resolvedPos;
+    if (arr.length === 0) {
+      throw new ResultHandlerError(
+        new Error("At least one positive response schema required."),
+      );
+    }
     return arr.map((one) => one.normalize(defaultStatusCodes.positive));
   }
 
-  /**
-   * @internal
-   * @todo throw if empty
-   * */
+  /** @internal */
   public override getNegativeResponse() {
+    if (this.#negative.length === 0) {
+      throw new ResultHandlerError(
+        new Error("At least one negative response schema required."),
+      );
+    }
     return this.#negative.map((one) =>
       one.normalize(defaultStatusCodes.negative),
     );
