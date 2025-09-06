@@ -53,9 +53,9 @@ export abstract class AbstractResultHandler {
 }
 
 export class ResultHandler<
+  OUT extends IOSchema,
   POS extends Result,
   NEG extends Result,
-  OUT extends IOSchema,
 > extends AbstractResultHandler {
   readonly #positive: ApiResponse<z.ZodType>[] | LazyResult<Result, [OUT]>;
   readonly #negative: ApiResponse<z.ZodType>[];
