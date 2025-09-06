@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { pack, unpack } from "./packer";
-import { expectTypeOf } from "vitest";
 
 describe("Packer", () => {
   describe("pack()", () => {
