@@ -1,4 +1,5 @@
 import {
+  ApiResponse,
   EndpointsFactory,
   arrayResultHandler,
   ResultHandler,
@@ -19,8 +20,11 @@ export const keyAndTokenAuthenticatedEndpointsFactory =
 /** @desc This factory sends the file as string located in the "data" property of the endpoint's output */
 export const fileSendingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
-    positive: { schema: z.string(), mimeType: "image/svg+xml" },
-    negative: { schema: z.string(), mimeType: "text/plain" },
+    positive: new ApiResponse({
+      schema: z.string(),
+      mimeType: "image/svg+xml",
+    }),
+    negative: new ApiResponse({ schema: z.string(), mimeType: "text/plain" }),
     handler: ({ response, error, output }) => {
       if (error) return void response.status(400).send(error.message);
       if ("data" in output && typeof output.data === "string")
@@ -33,8 +37,8 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
 /** @desc This one streams the file using the "filename" property of the endpoint's output */
 export const fileStreamingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
-    positive: { schema: ez.buffer(), mimeType: "image/*" },
-    negative: { schema: z.string(), mimeType: "text/plain" },
+    positive: new ApiResponse({ schema: ez.buffer(), mimeType: "image/*" }),
+    negative: new ApiResponse({ schema: z.string(), mimeType: "text/plain" }),
     handler: async ({ response, error, output, request: { method } }) => {
       if (error) return void response.status(400).send(error.message);
       if ("filename" in output && typeof output.filename === "string") {
@@ -61,19 +65,20 @@ export const arrayRespondingFactory = new EndpointsFactory(arrayResultHandler);
 /** @desc The factory demonstrates slightly different response schemas depending on the negative status code */
 export const statusDependingFactory = new EndpointsFactory(
   new ResultHandler({
-    positive: (data) => ({
-      statusCode: [201, 202],
-      schema: z.object({ status: z.literal("created"), data }),
-    }),
+    positive: (data) =>
+      new ApiResponse({
+        statusCode: [201, 202],
+        schema: z.object({ status: z.literal("created"), data }),
+      }),
     negative: [
-      {
+      new ApiResponse({
         statusCode: 409,
         schema: z.object({ status: z.literal("exists"), id: z.int() }),
-      },
-      {
+      }),
+      new ApiResponse({
         statusCode: [400, 500],
         schema: z.object({ status: z.literal("error"), reason: z.string() }),
-      },
+      }),
     ],
     handler: ({ error, response, output }) => {
       if (error) {
@@ -98,8 +103,16 @@ export const statusDependingFactory = new EndpointsFactory(
 /** @desc This factory demonstrates response without body, such as 204 No Content */
 export const noContentFactory = new EndpointsFactory(
   new ResultHandler({
-    positive: { statusCode: 204, mimeType: null, schema: z.never() },
-    negative: { statusCode: 404, mimeType: null, schema: z.never() },
+    positive: new ApiResponse({
+      statusCode: 204,
+      mimeType: null,
+      schema: z.never(),
+    }),
+    negative: new ApiResponse({
+      statusCode: 404,
+      mimeType: null,
+      schema: z.never(),
+    }),
     handler: ({ error, response }) => {
       response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
     },
