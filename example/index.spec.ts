@@ -107,16 +107,16 @@ describe("Example", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/list`);
       expect(response.status).toBe(200);
       const json = await response.json();
-      expect(json).toEqual([
-        { name: "Maria Merian" },
-        { name: "Mary Anning" },
-        { name: "Marie Skłodowska Curie" },
-        { name: "Henrietta Leavitt" },
-        { name: "Lise Meitner" },
-        { name: "Alice Ball" },
-        { name: "Gerty Cori" },
-        { name: "Helen Taussig" },
-      ]);
+      expect(json).toMatchSnapshot();
+    });
+
+    test("Should support comma-separated arrays in query", async () => {
+      const response = await fetch(
+        `http://localhost:${port}/v1/user/list?roles=admin,operator`,
+      );
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toMatchSnapshot();
     });
 
     test("Should send an image with a correct header", async () => {

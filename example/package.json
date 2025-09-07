@@ -16,6 +16,7 @@
     "@types/swagger-ui-express": "^4.1.8",
     "express-zod-api": "workspace:*",
     "http-errors": "catalog:dev",
+    "qs": "^6.14.0",
     "swagger-ui-express": "^5.0.0",
     "typescript": "catalog:dev",
     "zod": "catalog:dev"
