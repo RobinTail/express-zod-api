@@ -63,6 +63,7 @@ describe("Server", () => {
       expect(servers[0]).toBeTruthy();
       expect(appMock).toBeTruthy();
       expect(appMock.disable).toHaveBeenCalledWith("x-powered-by");
+      expect(appMock.set).toHaveBeenCalledWith("query parser", "simple");
       expect(appMock.use).toHaveBeenCalledTimes(2);
       expect(appMock.get).toHaveBeenCalledTimes(1);
       expect(appMock.get).toHaveBeenCalledWith(
@@ -95,6 +96,7 @@ describe("Server", () => {
       const port = givePort();
       const configMock = {
         http: { listen: { port } }, // testing Net::ListenOptions
+        queryParser: vi.fn(),
         jsonParser: vi.fn(),
         rawParser: vi.fn(),
         formParser: vi.fn(),
@@ -139,6 +141,10 @@ describe("Server", () => {
       expect(logger).toEqual(customLogger);
       expect(app).toEqual(appMock);
       expect(appMock).toBeTruthy();
+      expect(appMock.set).toHaveBeenCalledWith(
+        "query parser",
+        configMock.queryParser,
+      );
       expect(appMock.use).toHaveBeenCalledTimes(2);
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
       expect(configMock.beforeRouting).toHaveBeenCalledWith({
