@@ -2,6 +2,25 @@
 
 ## Version 25
 
+### v25.4.0
+
+- Feat: configurable query parser:
+  - In Express 5 the default query parser was changed from "extended" to "simple";
+  - The "extended" parser is the `qs` module, while the "simple" parser is the `node:querystring` module;
+  - This version introduces the new config option `queryParser` having the default value "simple" for compatibility;
+  - The "extended" parser supports nested objects and arrays with optional indexes in square brackets;
+  - You can now choose between "simple" and "extended" parsers as well as configure a custom implementation.
+
+```ts
+import { createConfig } from "express-zod-api";
+import qs from "qs";
+
+const config = createConfig({
+  // for comma-separated arrays: ?a=1,2,3
+  queryParser: (query) => qs.parse(query, { comma: true }),
+});
+```
+
 ### v25.3.1
 
 - Small optimization for running diagnostics (non-production mode);
