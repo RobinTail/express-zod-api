@@ -16,7 +16,7 @@ import { createConfig } from "express-zod-api";
 import qs from "qs";
 
 const config = createConfig({
-  // for comma-separated arrays: ?a=1,2,3
+  // for comma-separated arrays: ?values=1,2,3
   queryParser: (query) => qs.parse(query, { comma: true }),
 });
 ```

@@ -22,14 +22,15 @@ Start your API server with I/O schema validation and custom middlewares in minut
    3. [Options](#options)
    4. [Using native express middlewares](#using-native-express-middlewares)
    5. [Refinements](#refinements)
-   6. [Transformations](#transformations)
-   7. [Top level transformations and mapping](#top-level-transformations-and-mapping)
-   8. [Dealing with dates](#dealing-with-dates)
-   9. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
-   10. [Enabling HTTPS](#enabling-https)
-   11. [Enabling compression](#enabling-compression)
-   12. [Customizing logger](#customizing-logger)
-   13. [Child logger](#child-logger)
+   6. [Query string parser](#query-string-parser)
+   7. [Transformations](#transformations)
+   8. [Top level transformations and mapping](#top-level-transformations-and-mapping)
+   9. [Dealing with dates](#dealing-with-dates)
+   10. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   11. [Enabling HTTPS](#enabling-https)
+   12. [Enabling compression](#enabling-compression)
+   13. [Customizing logger](#customizing-logger)
+   14. [Child logger](#child-logger)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Headers as input source](#headers-as-input-source)
@@ -491,24 +492,35 @@ const endpoint = endpointsFactory.build({
 });
 ```
 
+## Query string parser
+
+In Express 5 the default query string parser was changes from "extended" (which is the `qs` module) to "simple" (which
+is the `node:querystring` module). The "extended" parser supports nested objects and arrays with optional indexes in
+square brackets. You can choose between those parsers as well as configure a custom implementation:
+
+```ts
+import { createConfig } from "express-zod-api";
+import qs from "qs";
+
+const config = createConfig({
+  // for comma-separated arrays: ?values=1,2,3
+  queryParser: (query) => qs.parse(query, { comma: true }),
+});
+```
+
 ## Transformations
 
-Since parameters of GET requests come in the form of strings, there is often a need to transform them into numbers or
-arrays of numbers.
+Since parameters of GET requests come in the form of strings, there is often a need to transform them into numbers.
 
 ```typescript
 import { z } from "zod";
 
-const getUserEndpoint = endpointsFactory.build({
+const getUserEndpoint = endpointsFactory.buildVoid({
   input: z.object({
     id: z.string().transform((id) => parseInt(id, 10)),
-    ids: z
-      .string()
-      .transform((ids) => ids.split(",").map((id) => parseInt(id, 10))),
   }),
-  handler: async ({ input: { id, ids }, logger }) => {
-    logger.debug("id", id); // type: number
-    logger.debug("ids", ids); // type: number[]
+  handler: async ({ input: { id }, logger }) => {
+    logger.debug("id", typeof id); // number
   },
 });
 ```
