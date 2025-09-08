@@ -5,7 +5,6 @@ import { Client, Subscription } from "./example.client";
 import { givePort } from "../tools/ports";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { expect } from "vitest";
 import { fail } from "node:assert";
 
 describe("Example", async () => {
