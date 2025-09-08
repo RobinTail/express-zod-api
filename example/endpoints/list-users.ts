@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { arrayRespondingFactory } from "../factories";
 
-const roleSchema = z.literal(["manager", "operator", "admin"]);
+const roleSchema = z.enum(["manager", "operator", "admin"]);
 
 const users = [
   { name: "Maria Merian", role: "manager" },
