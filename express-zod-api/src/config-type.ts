@@ -173,9 +173,10 @@ export interface ServerConfig extends CommonConfig {
    */
   compression?: boolean | CompressionOptions;
   /**
-   * @desc Choose the query parser or configure a custom one
+   * @desc Configure of customize the parser for request query string
    * @example "simple" — use Node.js native querystring.parse()
    * @example "extended" — use qs.parse()
+   * @example (query) => qs.parse(query, {comma: true}) // to enable comma-separated arrays
    * @default "simple"
    * @link https://expressjs.com/en/5x/api.html#req.query
    */
