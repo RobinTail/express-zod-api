@@ -174,9 +174,9 @@ export interface ServerConfig extends CommonConfig {
   compression?: boolean | CompressionOptions;
   /**
    * @desc Configure of customize the parser for request query string
-   * @example "simple" — use Node.js native querystring.parse()
-   * @example "extended" — use qs.parse()
-   * @example (query) => qs.parse(query, {comma: true}) // to enable comma-separated arrays
+   * @example "simple" // for "node:querystring" module, array elements must be repeated: ?a=1&a=2
+   * @example "extended" // for "qs" module, supports nested objects and arrays with brackets: ?a[]=1&a[]=2
+   * @example (query) => qs.parse(query, {comma: true}) // for comma-separated arrays: ?a=1,2,3
    * @default "simple"
    * @link https://expressjs.com/en/5x/api.html#req.query
    */
