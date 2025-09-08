@@ -12,6 +12,7 @@ const staticMock = vi.fn(() => staticHandler);
 
 const appMock = {
   disable: vi.fn(() => appMock),
+  set: vi.fn(() => appMock),
   use: vi.fn(() => appMock),
   get: vi.fn(),
   post: vi.fn(),

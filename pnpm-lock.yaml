@@ -162,6 +162,9 @@ importers:
       http-errors:
         specifier: catalog:dev
         version: 2.0.0
+      qs:
+        specifier: ^6.14.0
+        version: 6.14.0
       swagger-ui-express:
         specifier: ^5.0.0
         version: 5.0.1(express@5.1.0)

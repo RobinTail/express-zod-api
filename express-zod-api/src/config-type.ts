@@ -173,6 +173,15 @@ export interface ServerConfig extends CommonConfig {
    */
   compression?: boolean | CompressionOptions;
   /**
+   * @desc Configure or customize the parser for request query string
+   * @example "simple" // for "node:querystring" module, array elements must be repeated: ?a=1&a=2
+   * @example "extended" // for "qs" module, supports nested objects and arrays with brackets: ?a[]=1&a[]=2
+   * @example (query) => qs.parse(query, {comma: true}) // for comma-separated arrays: ?a=1,2,3
+   * @default "simple"
+   * @link https://expressjs.com/en/5x/api.html#req.query
+   */
+  queryParser?: "simple" | "extended" | ((query: string) => object);
+  /**
    * @desc Custom raw parser (assigns Buffer to request body)
    * @default express.raw()
    * @link https://expressjs.com/en/5x/api.html#express.raw

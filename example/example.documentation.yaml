@@ -391,6 +391,19 @@ paths:
       operationId: GetV1UserList
       tags:
         - users
+      parameters:
+        - name: roles
+          in: query
+          required: false
+          description: GET /v1/user/list Parameter
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - manager
+                - operator
+                - admin
       responses:
         "200":
           description: GET /v1/user/list Positive response
@@ -403,15 +416,25 @@ paths:
                   properties:
                     name:
                       type: string
+                    role:
+                      type: string
+                      enum:
+                        - manager
+                        - operator
+                        - admin
                   required:
                     - name
+                    - role
                   additionalProperties: false
               examples:
                 example1:
                   value:
                     - name: Hunter Schafer
+                      role: manager
                     - name: Laverne Cox
+                      role: operator
                     - name: Patti Harrison
+                      role: admin
         "400":
           description: GET /v1/user/list Negative response
           content:
@@ -425,6 +448,19 @@ paths:
       operationId: HeadV1UserList
       tags:
         - users
+      parameters:
+        - name: roles
+          in: query
+          required: false
+          description: HEAD /v1/user/list Parameter
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - manager
+                - operator
+                - admin
       responses:
         "200":
           description: HEAD /v1/user/list Positive response

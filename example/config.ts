@@ -2,9 +2,11 @@ import { BuiltinLogger, createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
 import createHttpError from "http-errors";
 import { givePort } from "../tools/ports";
+import qs from "qs";
 
 export const config = createConfig({
   http: { listen: givePort("example") },
+  queryParser: (query) => qs.parse(query, { comma: true }), // affects listUsersEndpoint
   upload: {
     limits: { fileSize: 51200 },
     limitError: createHttpError(413, "The file is too large"), // affects uploadAvatarEndpoint
