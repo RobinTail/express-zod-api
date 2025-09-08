@@ -494,7 +494,7 @@ const endpoint = endpointsFactory.build({
 
 ## Query string parser
 
-In Express 5 the default query string parser was changes from "extended" (which is the `qs` module) to "simple" (which
+In Express 5 the default query string parser was changed from "extended" (which is the `qs` module) to "simple" (which
 is the `node:querystring` module). The "extended" parser supports nested objects and arrays with optional indexes in
 square brackets. You can choose between those parsers as well as configure a custom implementation:
 
