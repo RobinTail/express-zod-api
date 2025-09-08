@@ -179,31 +179,6 @@ exports[`Example > Positive > Should serve static files 1`] = `"f39beeff92379dc9
 
 exports[`Example > Positive > Should stream an image with a correct header 1`] = `"f39beeff92379dc935586d726211c2620be6f879"`;
 
-exports[`Example > Positive > Should support comma-separated arrays in query 1`] = `
-[
-  {
-    "name": "Mary Anning",
-    "role": "operator",
-  },
-  {
-    "name": "Marie Skłodowska Curie",
-    "role": "admin",
-  },
-  {
-    "name": "Lise Meitner",
-    "role": "operator",
-  },
-  {
-    "name": "Alice Ball",
-    "role": "admin",
-  },
-  {
-    "name": "Helen Taussig",
-    "role": "operator",
-  },
-]
-`;
-
 exports[`Example > Protocol > Issue #2706: Should handle parser failures but retain CORS headers 1`] = `
 {
   "error": {
