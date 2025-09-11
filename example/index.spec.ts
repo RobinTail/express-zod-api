@@ -5,6 +5,7 @@ import { Client, Subscription } from "./example.client";
 import { givePort } from "../tools/ports";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
+import { fail } from "node:assert";
 
 describe("Example", async () => {
   let out = "";
@@ -107,16 +108,23 @@ describe("Example", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/list`);
       expect(response.status).toBe(200);
       const json = await response.json();
-      expect(json).toEqual([
-        { name: "Maria Merian" },
-        { name: "Mary Anning" },
-        { name: "Marie Skłodowska Curie" },
-        { name: "Henrietta Leavitt" },
-        { name: "Lise Meitner" },
-        { name: "Alice Ball" },
-        { name: "Gerty Cori" },
-        { name: "Helen Taussig" },
-      ]);
+      expect(json).toMatchSnapshot();
+    });
+
+    test.each([
+      "roles=admin,operator",
+      "roles[]=admin&roles[]=operator",
+      "roles=admin&roles=operator",
+    ])("Should support arrays in query %#", async (query) => {
+      const response = await fetch(
+        `http://localhost:${port}/v1/user/list?${query}`,
+      );
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      if (!Array.isArray(json)) fail("should be an array");
+      expect(
+        json.every((one) => ["admin", "operator"].includes(one.role)),
+      ).toBeTruthy();
     });
 
     test("Should send an image with a correct header", async () => {

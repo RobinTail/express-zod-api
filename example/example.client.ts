@@ -161,11 +161,14 @@ interface PostV1UserCreateNegativeResponseVariants {
 }
 
 /** get /v1/user/list */
-type GetV1UserListInput = {};
+type GetV1UserListInput = {
+  roles?: ("manager" | "operator" | "admin")[] | undefined;
+};
 
 /** get /v1/user/list */
 type GetV1UserListPositiveVariant1 = {
   name: string;
+  role: "manager" | "operator" | "admin";
 }[];
 
 /** get /v1/user/list */
@@ -182,7 +185,9 @@ interface GetV1UserListNegativeResponseVariants {
 }
 
 /** head /v1/user/list */
-type HeadV1UserListInput = {};
+type HeadV1UserListInput = {
+  roles?: ("manager" | "operator" | "admin")[] | undefined;
+};
 
 /** head /v1/user/list */
 type HeadV1UserListPositiveVariant1 = undefined;
