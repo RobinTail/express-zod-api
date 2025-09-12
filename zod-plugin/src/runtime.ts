@@ -1,5 +1,5 @@
 import { globalRegistry, z } from "zod";
-import { name } from "./package.json";
+import { name } from "../package.json";
 import { setBrand } from "./brand";
 import { remap } from "./remap";
 

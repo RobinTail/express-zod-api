@@ -1,1 +1,1 @@
-import "./runtime";
+import "./src/runtime";
