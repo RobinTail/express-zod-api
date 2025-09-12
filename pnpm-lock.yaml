@@ -47,7 +47,7 @@ catalogs:
       version: 8.43.0
     zod:
       specifier: ^4.0.0
-      version: 4.1.7
+      version: 4.1.8
   prod:
     ramda:
       specifier: ^0.31.3
@@ -110,7 +110,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 4.1.7
+        version: 4.1.8
 
   compat-test:
     devDependencies:
@@ -146,7 +146,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 4.1.7
+        version: 4.1.8
 
   example:
     devDependencies:
@@ -173,7 +173,7 @@ importers:
         version: 5.9.2
       zod:
         specifier: catalog:dev
-        version: 4.1.7
+        version: 4.1.8
 
   express-zod-api:
     dependencies:
@@ -252,7 +252,7 @@ importers:
         version: 7.16.0
       zod:
         specifier: catalog:dev
-        version: 4.1.7
+        version: 4.1.8
 
   issue952-test:
     dependencies:
@@ -270,7 +270,7 @@ importers:
         version: 5.9.2
       zod:
         specifier: catalog:dev
-        version: 4.1.7
+        version: 4.1.8
 
   migration:
     devDependencies:
@@ -295,7 +295,7 @@ importers:
         version: 5.9.2
       zod:
         specifier: catalog:dev
-        version: 4.1.7
+        version: 4.1.8
 
 packages:
 
@@ -821,8 +821,8 @@ packages:
   '@tsconfig/node20@20.1.6':
     resolution: {integrity: sha512-sz+Hqx9zwZDpZIV871WSbUzSqNIsXzghZydypnfgzPKLltVJfkINfUeTct31n/tTSa9ZE1ZOfKdRre1uHHquYQ==}
 
-  '@tybys/wasm-util@0.10.0':
-    resolution: {integrity: sha512-VyyPYFlOMNylG45GoAe0xDoLwWuowvf92F9kySqzYh8vmYm7D2u4iUJKa1tOUpS70Ku13ASrOkS4ScXFsTaCNQ==}
+  '@tybys/wasm-util@0.10.1':
+    resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
 
   '@types/body-parser@1.19.6':
     resolution: {integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==}
@@ -2372,8 +2372,8 @@ packages:
   zod@4.0.0:
     resolution: {integrity: sha512-9diLdTPc/L7w/5jI4C3gHYNiGHDV9IZYxo1e5LSD8cabi65WVTWWb+g2BGPEpUUCOxR4D+6O5B0AzyMdUAXwrw==}
 
-  zod@4.1.7:
-    resolution: {integrity: sha512-6qi6UYyzAl7W9uV29KvcSFXqK4QCYNYUz2YASPNBWpJE1RY6R1nArmmFPgGY/CBYWzpeMw3EOER+DR9a05O4IA==}
+  zod@4.1.8:
+    resolution: {integrity: sha512-5R1P+WwQqmmMIEACyzSvo4JXHY5WiAFHRMg+zBZKgKS+Q1viRa0C1hmUKtHltoIFKtIdki3pRxkmpP74jnNYHQ==}
 
 snapshots:
 
@@ -2619,7 +2619,7 @@ snapshots:
     dependencies:
       '@emnapi/core': 1.5.0
       '@emnapi/runtime': 1.5.0
-      '@tybys/wasm-util': 0.10.0
+      '@tybys/wasm-util': 0.10.1
     optional: true
 
   '@nodelib/fs.scandir@2.1.5':
@@ -2758,7 +2758,7 @@ snapshots:
 
   '@tsconfig/node20@20.1.6': {}
 
-  '@tybys/wasm-util@0.10.0':
+  '@tybys/wasm-util@0.10.1':
     dependencies:
       tslib: 2.8.1
     optional: true
@@ -4454,4 +4454,4 @@ snapshots:
 
   zod@4.0.0: {}
 
-  zod@4.1.7: {}
+  zod@4.1.8: {}
