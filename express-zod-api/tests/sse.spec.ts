@@ -76,7 +76,7 @@ describe("SSE", () => {
   describe("makeMiddleware()", () => {
     // with and without response.flush()
     test.each([vi.fn(), undefined])(
-      "should create a Middleware providing options for emission %#",
+      "should create a Middleware providing context for emission %#",
       async (flushMock) => {
         const middleware = makeMiddleware({ test: z.string() });
         expect(middleware).toBeInstanceOf(Middleware);

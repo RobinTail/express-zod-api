@@ -176,7 +176,7 @@ describe("EndpointsFactory", () => {
       expect(middleware).toHaveBeenCalledTimes(1);
     });
 
-    test("Should operate without options provider", async () => {
+    test("Should operate without context provider", async () => {
       const factory = new EndpointsFactory(resultHandlerMock);
       const middleware: RequestHandler = vi.fn((req, {}, next) => {
         req.body.test = "Here is the test";
