@@ -31,7 +31,7 @@ interface BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema | z.ZodVoid,
   MIN extends IOSchema | undefined,
-  OPT extends FlatObject,
+  CTX extends FlatObject,
   SCO extends string,
 > {
   /**
@@ -43,7 +43,7 @@ interface BuildProps<
   /** @desc The schema by which the returns of the Endpoint handler is validated */
   output: OUT;
   /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (ctx) and a logger */
-  handler: Handler<z.output<FinalInputSchema<MIN, IN>>, z.input<OUT>, OPT>;
+  handler: Handler<z.output<FinalInputSchema<MIN, IN>>, z.input<OUT>, CTX>;
   /** @desc The operation description for the generated Documentation */
   description?: string;
   /** @desc The operation summary for the generated Documentation (50 symbols max) */
