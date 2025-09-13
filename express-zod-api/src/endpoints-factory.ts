@@ -72,7 +72,7 @@ interface BuildProps<
 
 export class EndpointsFactory<
   IN extends IOSchema | undefined = undefined,
-  OUT extends FlatObject = EmptyObject,
+  CTX extends FlatObject = EmptyObject,
   SCO extends string = string,
 > {
   protected schema = undefined as IN;
@@ -81,12 +81,12 @@ export class EndpointsFactory<
 
   #extend<
     AIN extends IOSchema | undefined,
-    AOUT extends FlatObject,
+    RET extends FlatObject,
     ASCO extends string,
-  >(middleware: Middleware<OUT, AOUT, ASCO, AIN>) {
+  >(middleware: Middleware<CTX, RET, ASCO, AIN>) {
     const factory = new EndpointsFactory<
       Extension<IN, AIN>,
-      OUT & AOUT,
+      CTX & RET,
       SCO & ASCO
     >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);
@@ -95,13 +95,13 @@ export class EndpointsFactory<
   }
 
   public addMiddleware<
-    AOUT extends FlatObject,
+    RET extends FlatObject,
     ASCO extends string,
     AIN extends IOSchema | undefined = undefined,
   >(
     subject:
-      | Middleware<OUT, AOUT, ASCO, AIN>
-      | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
+      | Middleware<CTX, RET, ASCO, AIN>
+      | ConstructorParameters<typeof Middleware<CTX, RET, ASCO, AIN>>[0],
   ) {
     return this.#extend(
       subject instanceof Middleware ? subject : new Middleware(subject),
@@ -118,7 +118,7 @@ export class EndpointsFactory<
     return this.#extend(new ExpressMiddleware(...params));
   }
 
-  public addContext<AOUT extends FlatObject>(getContext: () => Promise<AOUT>) {
+  public addContext<RET extends FlatObject>(getContext: () => Promise<RET>) {
     return this.#extend(new Middleware({ handler: getContext }));
   }
 
@@ -130,7 +130,7 @@ export class EndpointsFactory<
     tag,
     method,
     ...rest
-  }: BuildProps<BIN, BOUT, IN, OUT, SCO>) {
+  }: BuildProps<BIN, BOUT, IN, CTX, SCO>) {
     const { middlewares, resultHandler } = this;
     const methods = typeof method === "string" ? [method] : method;
     const getOperationId =
@@ -157,7 +157,7 @@ export class EndpointsFactory<
   public buildVoid<BIN extends IOSchema = EmptySchema>({
     handler,
     ...rest
-  }: Omit<BuildProps<BIN, z.ZodVoid, IN, OUT, SCO>, "output">) {
+  }: Omit<BuildProps<BIN, z.ZodVoid, IN, CTX, SCO>, "output">) {
     return this.build({
       ...rest,
       output: emptySchema,
