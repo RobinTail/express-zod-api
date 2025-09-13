@@ -65,7 +65,7 @@ describe("Middleware", () => {
       expect(
         await mw.execute({
           input: { test: "something" },
-          ctx: { opt: "anything " },
+          ctx: { one: "anything " },
           logger: loggerMock,
           request: requestMock,
           response: responseMock,
@@ -73,7 +73,7 @@ describe("Middleware", () => {
       ).toEqual({ result: "test" });
       expect(handlerMock).toHaveBeenCalledWith({
         input: { test: "something" },
-        ctx: { opt: "anything " },
+        ctx: { one: "anything " },
         logger: loggerMock,
         request: requestMock,
         response: responseMock,
