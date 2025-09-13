@@ -42,7 +42,7 @@ interface BuildProps<
   input?: IN;
   /** @desc The schema by which the returns of the Endpoint handler is validated */
   output: OUT;
-  /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (options) and a logger */
+  /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (ctx) and a logger */
   handler: Handler<z.output<FinalInputSchema<MIN, IN>>, z.input<OUT>, OPT>;
   /** @desc The operation description for the generated Documentation */
   description?: string;
@@ -118,9 +118,15 @@ export class EndpointsFactory<
     return this.#extend(new ExpressMiddleware(...params));
   }
 
-  public addOptions<AOUT extends FlatObject>(getOptions: () => Promise<AOUT>) {
-    return this.#extend(new Middleware({ handler: getOptions }));
+  public addContext<AOUT extends FlatObject>(getContext: () => Promise<AOUT>) {
+    return this.#extend(new Middleware({ handler: getContext }));
   }
+
+  /**
+   * @deprecated use addContext instead
+   * @todo rm in v26
+   * */
+  public addOptions = this.addContext;
 
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
     input = emptySchema as unknown as BIN,
