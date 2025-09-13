@@ -23,7 +23,7 @@ type Handler<RES = unknown> = (
     /** null in case of failure to parse or to find the matching endpoint (error: not found) */
     input: FlatObject | null;
     /** can be empty: check presence of the required property using "in" operator */
-    options: FlatObject;
+    ctx: FlatObject;
     request: Request;
     response: Response<RES>;
     logger: ActualLogger;

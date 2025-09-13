@@ -118,7 +118,7 @@ describe("SSE", () => {
         const positiveResponse = makeResponseMock();
         const commons = {
           input: {},
-          options: {},
+          ctx: {},
           request: makeRequestMock(),
           logger: makeLoggerMock(),
         };

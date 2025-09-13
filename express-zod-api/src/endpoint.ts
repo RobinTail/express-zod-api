@@ -265,7 +265,7 @@ export class Endpoint<
     },
   ) {
     try {
-      await this.#def.resultHandler.execute({ ...params, options: params.ctx }); // @todo mv
+      await this.#def.resultHandler.execute(params);
     } catch (e) {
       lastResortHandler({
         ...params,

@@ -148,7 +148,6 @@ export const testMiddleware = async <
   } catch (e) {
     await errorHandler.execute({
       ...commons,
-      options: ctx, // @todo mv
       error: ensureError(e),
       output: null,
     });
