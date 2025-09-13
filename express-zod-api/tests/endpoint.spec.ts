@@ -82,6 +82,7 @@ describe("Endpoint", () => {
       expect(handlerMock).toHaveBeenCalledTimes(1);
       expect(handlerMock).toHaveBeenCalledWith({
         input: { n: 453 },
+        ctx: { inc: 454 },
         options: { inc: 454 },
         logger: loggerMock,
       });
@@ -90,6 +91,7 @@ describe("Endpoint", () => {
         error: null,
         input: { n: 453 },
         logger: loggerMock,
+        ctx: { inc: 454 },
         options: { inc: 454 },
         output: { inc2: 455, str: "453.00", transform: 4 },
         request: requestMock,
@@ -197,7 +199,7 @@ describe("Endpoint", () => {
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(loggerMock._getLogs().warn).toEqual([
         [
-          "A middleware has closed the stream. Accumulated options:",
+          "A middleware has closed the stream. Accumulated context:",
           { inc: 454 },
         ],
       ]);
@@ -227,6 +229,7 @@ describe("Endpoint", () => {
         error: null,
         logger: loggerMock,
         input: {},
+        ctx: {},
         options: {},
         output: { test: "OK" },
         request: requestMock,

@@ -501,6 +501,7 @@ describe("Routing", () => {
       ).toHaveLength(0);
       expect(handlerMock).toHaveBeenCalledWith({
         input: { test: 123 },
+        ctx: {},
         options: {},
         logger: getLoggerMock.mock.results.pop()!.value,
       });

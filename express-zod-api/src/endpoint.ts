@@ -36,6 +36,11 @@ export type Handler<IN, OUT, CTX> = (params: {
   /** @desc The inputs from the enabled input sources validated against the final input schema (incl. Middlewares) */
   input: IN;
   /** @desc The returns of the assigned Middlewares */
+  ctx: CTX;
+  /**
+   * @deprecated use ctx instead
+   * @todo rm in v26
+   * */
   options: CTX;
   /** @desc The instance of the configured logger */
   logger: ActualLogger;
@@ -208,7 +213,7 @@ export class Endpoint<
   async #runMiddlewares({
     method,
     logger,
-    options,
+    ctx,
     response,
     ...rest
   }: {
@@ -217,7 +222,7 @@ export class Endpoint<
     request: Request;
     response: Response;
     logger: ActualLogger;
-    options: Partial<CTX>;
+    ctx: Partial<CTX>;
   }) {
     for (const mw of this.#def.middlewares || []) {
       if (
@@ -225,14 +230,11 @@ export class Endpoint<
         !(mw instanceof ExpressMiddleware)
       )
         continue;
-      Object.assign(
-        options,
-        await mw.execute({ ...rest, ctx: options, response, logger }), // @todo mv
-      );
+      Object.assign(ctx, await mw.execute({ ...rest, ctx, response, logger }));
       if (response.writableEnded) {
         logger.warn(
-          "A middleware has closed the stream. Accumulated options:",
-          options,
+          "A middleware has closed the stream. Accumulated context:",
+          ctx,
         );
         break;
       }
@@ -244,7 +246,7 @@ export class Endpoint<
     ...rest
   }: {
     input: Readonly<FlatObject>;
-    options: CTX;
+    ctx: CTX;
     logger: ActualLogger;
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
@@ -255,7 +257,7 @@ export class Endpoint<
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
-    return this.#def.handler({ ...rest, input: finalInput });
+    return this.#def.handler({ ...rest, input: finalInput, options: rest.ctx }); // @todo rm options in v26
   }
 
   async #handleResult(
@@ -264,11 +266,11 @@ export class Endpoint<
       response: Response;
       logger: ActualLogger;
       input: FlatObject;
-      options: Partial<CTX>;
+      ctx: Partial<CTX>;
     },
   ) {
     try {
-      await this.#def.resultHandler.execute(params);
+      await this.#def.resultHandler.execute({ ...params, options: params.ctx }); // @todo mv
     } catch (e) {
       lastResortHandler({
         ...params,
@@ -292,7 +294,7 @@ export class Endpoint<
     config: CommonConfig;
   }) {
     const method = getActualMethod(request);
-    const options: Partial<CTX> = {};
+    const ctx: Partial<CTX> = {};
     let result: DiscriminatedResult = { output: {}, error: null };
     const input = getInput(request, config.inputSources);
     try {
@@ -302,7 +304,7 @@ export class Endpoint<
         request,
         response,
         logger,
-        options,
+        ctx,
       });
       if (response.writableEnded) return;
       if (method === ("options" satisfies CORSMethod))
@@ -312,7 +314,7 @@ export class Endpoint<
           await this.#parseAndRunHandler({
             input,
             logger,
-            options: options as CTX, // ensured the complete CTX by writableEnded condition and try-catch
+            ctx: ctx as CTX, // ensured the complete CTX by writableEnded condition and try-catch
           }),
         ),
         error: null,
@@ -326,7 +328,7 @@ export class Endpoint<
       request,
       response,
       logger,
-      options,
+      ctx,
     });
   }
 }
