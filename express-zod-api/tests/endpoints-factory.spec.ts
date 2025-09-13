@@ -57,15 +57,13 @@ describe("EndpointsFactory", () => {
     test("Should maintain the chain of context", () => {
       defaultEndpointsFactory
         .addMiddleware(
-          new Middleware({
-            handler: async () => ({ test: "fist option" }),
-          }),
+          new Middleware({ handler: async () => ({ test: "fist" }) }),
         )
         .addMiddleware(
           new Middleware({
             handler: async ({ ctx }) => {
               expectTypeOf(ctx.test).toEqualTypeOf<string>();
-              return { second: `another option, ${ctx.test}` };
+              return { second: `another, ${ctx.test}` };
             },
           }),
         );
@@ -73,7 +71,7 @@ describe("EndpointsFactory", () => {
 
     test("Should accept creation props without input schema", () => {
       const factory = defaultEndpointsFactory.addMiddleware({
-        handler: async () => ({ test: "fist option" }),
+        handler: async () => ({ test: "fist" }),
       });
       expectTypeOf(factory).toEqualTypeOf<
         EndpointsFactory<undefined, EmptyObject & { test: string }>
