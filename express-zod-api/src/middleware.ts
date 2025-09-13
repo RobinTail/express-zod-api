@@ -14,6 +14,11 @@ type Handler<IN, CTX, RET> = (params: {
    * @desc The returns of the previously executed Middlewares (typed when chaining Middlewares)
    * @link https://github.com/RobinTail/express-zod-api/discussions/1250
    * */
+  ctx: CTX;
+  /**
+   * @deprecated use ctx instead
+   * @todo rm in v26
+   * */
   options: CTX;
   /** @link https://expressjs.com/en/5x/api.html#req */
   request: Request;
@@ -30,7 +35,7 @@ export abstract class AbstractMiddleware {
   public abstract get schema(): IOSchema | undefined;
   public abstract execute(params: {
     input: unknown;
-    options: FlatObject;
+    ctx: FlatObject;
     request: Request;
     response: Response;
     logger: ActualLogger;
@@ -89,7 +94,7 @@ export class Middleware<
     ...rest
   }: {
     input: unknown;
-    options: CTX;
+    ctx: CTX;
     request: Request;
     response: Response;
     logger: ActualLogger;
@@ -98,7 +103,8 @@ export class Middleware<
       const validInput = (await (this.#schema || emptySchema).parseAsync(
         input,
       )) as z.output<IN>;
-      return this.#handler({ ...rest, input: validInput });
+      /** @todo rm options in v26 */
+      return this.#handler({ ...rest, input: validInput, options: rest.ctx });
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }

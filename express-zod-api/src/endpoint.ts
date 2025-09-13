@@ -227,7 +227,7 @@ export class Endpoint<
         continue;
       Object.assign(
         options,
-        await mw.execute({ ...rest, options, response, logger }),
+        await mw.execute({ ...rest, ctx: options, response, logger }), // @todo mv
       );
       if (response.writableEnded) {
         logger.warn(

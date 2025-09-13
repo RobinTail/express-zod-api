@@ -121,11 +121,17 @@ export const testMiddleware = async <
 >({
   middleware,
   options = {},
+  ctx = options,
   ...rest
 }: TestingProps<REQ, LOG> & {
   /** @desc The middleware to test */
   middleware: AbstractMiddleware;
-  /** @desc The aggregated output from previously executed middlewares */
+  /** @desc The aggregated returns of previously executed middlewares */
+  ctx?: FlatObject;
+  /**
+   * @deprecated use ctx instead
+   * @todo rm in v26
+   * */
   options?: FlatObject;
 }) => {
   const {
@@ -140,7 +146,7 @@ export const testMiddleware = async <
     response: responseMock,
     logger: loggerMock,
     input,
-    options,
+    ctx,
   };
   try {
     const output = await middleware.execute(commons);
@@ -148,6 +154,7 @@ export const testMiddleware = async <
   } catch (e) {
     await errorHandler.execute({
       ...commons,
+      options: ctx, // @todo mv
       error: ensureError(e),
       output: null,
     });

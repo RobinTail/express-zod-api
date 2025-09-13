@@ -71,9 +71,10 @@ describe("Endpoint", () => {
       expect(middlewareMock).toHaveBeenCalledTimes(1);
       expect(middlewareMock).toHaveBeenCalledWith({
         input: { n: 453 },
-        options: {
-          inc: 454, // due to reassignment of options
+        ctx: {
+          inc: 454, // due to reassignment
         },
+        options: { inc: 454 },
         request: requestMock,
         response: responseMock,
         logger: loggerMock,
