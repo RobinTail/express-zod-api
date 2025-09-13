@@ -120,19 +120,13 @@ export const testMiddleware = async <
   REQ extends RequestOptions,
 >({
   middleware,
-  options = {},
-  ctx = options,
+  ctx = {},
   ...rest
 }: TestingProps<REQ, LOG> & {
   /** @desc The middleware to test */
   middleware: AbstractMiddleware;
   /** @desc The aggregated returns of previously executed middlewares */
   ctx?: FlatObject;
-  /**
-   * @deprecated use ctx instead
-   * @todo rm in v26
-   * */
-  options?: FlatObject;
 }) => {
   const {
     requestMock,

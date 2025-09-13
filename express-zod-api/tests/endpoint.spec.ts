@@ -74,7 +74,6 @@ describe("Endpoint", () => {
         ctx: {
           inc: 454, // due to reassignment
         },
-        options: { inc: 454 },
         request: requestMock,
         response: responseMock,
         logger: loggerMock,

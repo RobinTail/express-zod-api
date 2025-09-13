@@ -74,7 +74,6 @@ describe("Middleware", () => {
       expect(handlerMock).toHaveBeenCalledWith({
         input: { test: "something" },
         ctx: { opt: "anything " },
-        options: { opt: "anything " },
         logger: loggerMock,
         request: requestMock,
         response: responseMock,

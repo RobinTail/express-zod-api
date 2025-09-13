@@ -54,7 +54,7 @@ describe("EndpointsFactory", () => {
       expect(newFactory["resultHandler"]).toStrictEqual(resultHandlerMock);
     });
 
-    test("Should maintain the chain of options", () => {
+    test("Should maintain the chain of context", () => {
       defaultEndpointsFactory
         .addMiddleware(
           new Middleware({
@@ -63,9 +63,9 @@ describe("EndpointsFactory", () => {
         )
         .addMiddleware(
           new Middleware({
-            handler: async ({ options }) => {
-              expectTypeOf(options.test).toEqualTypeOf<string>();
-              return { second: `another option, ${options.test}` };
+            handler: async ({ ctx }) => {
+              expectTypeOf(ctx.test).toEqualTypeOf<string>();
+              return { second: `another option, ${ctx.test}` };
             },
           }),
         );

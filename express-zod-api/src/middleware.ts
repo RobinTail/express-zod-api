@@ -15,11 +15,6 @@ type Handler<IN, CTX, RET> = (params: {
    * @link https://github.com/RobinTail/express-zod-api/discussions/1250
    * */
   ctx: CTX;
-  /**
-   * @deprecated use ctx instead
-   * @todo rm in v26
-   * */
-  options: CTX;
   /** @link https://expressjs.com/en/5x/api.html#req */
   request: Request;
   /** @link https://expressjs.com/en/5x/api.html#res */
@@ -103,8 +98,7 @@ export class Middleware<
       const validInput = (await (this.#schema || emptySchema).parseAsync(
         input,
       )) as z.output<IN>;
-      /** @todo rm options in v26 */
-      return this.#handler({ ...rest, input: validInput, options: rest.ctx });
+      return this.#handler({ ...rest, input: validInput });
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
