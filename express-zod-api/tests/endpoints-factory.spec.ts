@@ -103,10 +103,10 @@ describe("EndpointsFactory", () => {
     });
   });
 
-  describe.each(["addContext", "addOptions"] as const)(".%s()", (method) => {
+  describe(".addContext()", () => {
     test("Should create a new factory with an empty-input middleware and the same result handler", async () => {
       const factory = new EndpointsFactory(resultHandlerMock);
-      const newFactory = factory[method](async () => ({
+      const newFactory = factory.addContext(async () => ({
         option1: "some value",
         option2: "other value",
       }));

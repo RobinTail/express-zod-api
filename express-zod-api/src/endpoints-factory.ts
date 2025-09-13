@@ -122,12 +122,6 @@ export class EndpointsFactory<
     return this.#extend(new Middleware({ handler: getContext }));
   }
 
-  /**
-   * @deprecated use addContext instead
-   * @todo rm in v26
-   * */
-  public addOptions = this.addContext;
-
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
     input = emptySchema as unknown as BIN,
     output: outputSchema,

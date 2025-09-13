@@ -46,8 +46,8 @@ describe("Endpoint", () => {
       });
       const handlerMock = vi
         .fn()
-        .mockImplementationOnce(async ({ input, options }) => ({
-          inc2: (options as { inc: number }).inc + 1,
+        .mockImplementationOnce(async ({ input, ctx }) => ({
+          inc2: (ctx as { inc: number }).inc + 1,
           str: input.n.toFixed(2),
           transform: "test",
         }));
@@ -82,7 +82,6 @@ describe("Endpoint", () => {
       expect(handlerMock).toHaveBeenCalledWith({
         input: { n: 453 },
         ctx: { inc: 454 },
-        options: { inc: 454 },
         logger: loggerMock,
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);

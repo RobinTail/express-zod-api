@@ -37,11 +37,6 @@ export type Handler<IN, OUT, CTX> = (params: {
   input: IN;
   /** @desc The returns of the assigned Middlewares */
   ctx: CTX;
-  /**
-   * @deprecated use ctx instead
-   * @todo rm in v26
-   * */
-  options: CTX;
   /** @desc The instance of the configured logger */
   logger: ActualLogger;
 }) => Promise<OUT>;
@@ -257,7 +252,7 @@ export class Endpoint<
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
-    return this.#def.handler({ ...rest, input: finalInput, options: rest.ctx }); // @todo rm options in v26
+    return this.#def.handler({ ...rest, input: finalInput });
   }
 
   async #handleResult(
