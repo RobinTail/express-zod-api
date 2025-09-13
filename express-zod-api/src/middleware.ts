@@ -6,6 +6,7 @@ import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
 import { ActualLogger } from "./logger-helpers";
+import * as R from "ramda";
 
 type Handler<IN, OPT, OUT> = (params: {
   /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware */
@@ -114,8 +115,8 @@ export class ExpressMiddleware<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- issue #2824, assignment compatibility fix
     nativeMw: (request: R, response: S, next: NextFunction) => any,
     {
-      provider = () => ({}) as OUT,
-      transformer = (err: Error) => err,
+      provider = R.always({} as OUT),
+      transformer = R.identity,
     }: {
       provider?: (request: R, response: S) => OUT | Promise<OUT>;
       transformer?: (err: Error) => Error;
