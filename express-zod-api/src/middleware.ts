@@ -7,21 +7,21 @@ import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
 import { ActualLogger } from "./logger-helpers";
 
-type Handler<IN, OPT, OUT> = (params: {
+type Handler<IN, CTX, RET> = (params: {
   /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware */
   input: IN;
   /**
    * @desc The returns of the previously executed Middlewares (typed when chaining Middlewares)
    * @link https://github.com/RobinTail/express-zod-api/discussions/1250
    * */
-  options: OPT;
+  ctx: CTX;
   /** @link https://expressjs.com/en/5x/api.html#req */
   request: Request;
   /** @link https://expressjs.com/en/5x/api.html#res */
   response: Response;
   /** @desc The instance of the configured logger */
   logger: ActualLogger;
-}) => Promise<OUT>;
+}) => Promise<RET>;
 
 export abstract class AbstractMiddleware {
   /** @internal */
@@ -30,7 +30,7 @@ export abstract class AbstractMiddleware {
   public abstract get schema(): IOSchema | undefined;
   public abstract execute(params: {
     input: unknown;
-    options: FlatObject;
+    ctx: FlatObject;
     request: Request;
     response: Response;
     logger: ActualLogger;
@@ -38,8 +38,8 @@ export abstract class AbstractMiddleware {
 }
 
 export class Middleware<
-  OPT extends FlatObject,
-  OUT extends FlatObject,
+  CTX extends FlatObject,
+  RET extends FlatObject,
   SCO extends string,
   IN extends IOSchema | undefined = undefined,
 > extends AbstractMiddleware {
@@ -47,7 +47,7 @@ export class Middleware<
   readonly #security?: LogicalContainer<
     Security<Extract<keyof z.input<IN>, string>, SCO>
   >;
-  readonly #handler: Handler<z.output<IN>, OPT, OUT>;
+  readonly #handler: Handler<z.output<IN>, CTX, RET>;
 
   constructor({
     input,
@@ -64,8 +64,8 @@ export class Middleware<
     security?: LogicalContainer<
       Security<Extract<keyof z.input<IN>, string>, SCO>
     >;
-    /** @desc The handler returning options available to Endpoints */
-    handler: Handler<z.output<IN>, OPT, OUT>;
+    /** @desc The handler returning a context available to Endpoints */
+    handler: Handler<z.output<IN>, CTX, RET>;
   }) {
     super();
     this.#schema = input as IN;
@@ -89,7 +89,7 @@ export class Middleware<
     ...rest
   }: {
     input: unknown;
-    options: OPT;
+    ctx: CTX;
     request: Request;
     response: Response;
     logger: ActualLogger;
@@ -108,22 +108,22 @@ export class Middleware<
 export class ExpressMiddleware<
   R extends Request,
   S extends Response,
-  OUT extends FlatObject,
-> extends Middleware<FlatObject, OUT, string> {
+  RET extends FlatObject,
+> extends Middleware<FlatObject, RET, string> {
   constructor(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- issue #2824, assignment compatibility fix
     nativeMw: (request: R, response: S, next: NextFunction) => any,
     {
-      provider = () => ({}) as OUT,
+      provider = () => ({}) as RET,
       transformer = (err: Error) => err,
     }: {
-      provider?: (request: R, response: S) => OUT | Promise<OUT>;
+      provider?: (request: R, response: S) => RET | Promise<RET>;
       transformer?: (err: Error) => Error;
     } = {},
   ) {
     super({
       handler: async ({ request, response }) =>
-        new Promise<OUT>((resolve, reject) => {
+        new Promise<RET>((resolve, reject) => {
           const next = (err?: unknown) => {
             if (err && err instanceof Error) return reject(transformer(err));
             resolve(provider(request as R, response as S));
