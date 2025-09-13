@@ -32,11 +32,11 @@ import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 
-export type Handler<IN, OUT, OPT> = (params: {
+export type Handler<IN, OUT, CTX> = (params: {
   /** @desc The inputs from the enabled input sources validated against the final input schema (incl. Middlewares) */
   input: IN;
   /** @desc The returns of the assigned Middlewares */
-  options: OPT;
+  options: CTX;
   /** @desc The instance of the configured logger */
   logger: ActualLogger;
 }) => Promise<OUT>;
@@ -79,9 +79,9 @@ export abstract class AbstractEndpoint extends Routable {
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
-  OPT extends FlatObject,
+  CTX extends FlatObject,
 > extends AbstractEndpoint {
-  readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0];
+  readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
 
   /** considered expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
@@ -100,7 +100,7 @@ export class Endpoint<
     middlewares?: AbstractMiddleware[];
     inputSchema: IN;
     outputSchema: OUT;
-    handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
+    handler: Handler<z.output<IN>, z.input<OUT>, CTX>;
     resultHandler: AbstractResultHandler;
     description?: string;
     shortDescription?: string;
@@ -114,7 +114,7 @@ export class Endpoint<
   }
 
   #clone(
-    inc?: Partial<ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0]>,
+    inc?: Partial<ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0]>,
   ) {
     return new Endpoint({ ...this.#def, ...inc });
   }
@@ -217,7 +217,7 @@ export class Endpoint<
     request: Request;
     response: Response;
     logger: ActualLogger;
-    options: Partial<OPT>;
+    options: Partial<CTX>;
   }) {
     for (const mw of this.#def.middlewares || []) {
       if (
@@ -244,7 +244,7 @@ export class Endpoint<
     ...rest
   }: {
     input: Readonly<FlatObject>;
-    options: OPT;
+    options: CTX;
     logger: ActualLogger;
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
@@ -264,7 +264,7 @@ export class Endpoint<
       response: Response;
       logger: ActualLogger;
       input: FlatObject;
-      options: Partial<OPT>;
+      options: Partial<CTX>;
     },
   ) {
     try {
@@ -292,7 +292,7 @@ export class Endpoint<
     config: CommonConfig;
   }) {
     const method = getActualMethod(request);
-    const options: Partial<OPT> = {};
+    const options: Partial<CTX> = {};
     let result: DiscriminatedResult = { output: {}, error: null };
     const input = getInput(request, config.inputSources);
     try {
@@ -312,7 +312,7 @@ export class Endpoint<
           await this.#parseAndRunHandler({
             input,
             logger,
-            options: options as OPT, // ensured the complete OPT by writableEnded condition and try-catch
+            options: options as CTX, // ensured the complete CTX by writableEnded condition and try-catch
           }),
         ),
         error: null,
