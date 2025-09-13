@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { emptySchema, FlatObject } from "./common-helpers";
+import { EmptyObject, emptySchema, FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
@@ -108,7 +108,7 @@ export class Middleware<
 export class ExpressMiddleware<
   R extends Request,
   S extends Response,
-  OUT extends FlatObject,
+  OUT extends FlatObject = EmptyObject,
 > extends Middleware<FlatObject, OUT, string> {
   constructor(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- issue #2824, assignment compatibility fix
