@@ -27,8 +27,8 @@ import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
 import { DiscriminatedResult, pullResponseExamples } from "./result-helpers";
-import { Routable } from "./routable";
 import { AbstractResultHandler } from "./result-handler";
+import type { Routing } from "./routing";
 import { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 
@@ -41,7 +41,13 @@ export type Handler<IN, OUT, OPT> = (params: {
   logger: ActualLogger;
 }) => Promise<OUT>;
 
-export abstract class AbstractEndpoint extends Routable {
+export abstract class AbstractEndpoint {
+  /** @desc Enables nested routes within the path assigned to the subject */
+  public nest(routing: Routing): Routing {
+    return Object.assign(routing, { "": this });
+  }
+  /** @desc Marks the route as deprecated (makes a copy of the endpoint) */
+  public abstract deprecated(): this;
   public abstract execute(params: {
     request: Request;
     response: Response;

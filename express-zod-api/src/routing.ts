@@ -4,7 +4,7 @@ import { isProduction } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { ContentType } from "./content-type";
 import { Diagnostics } from "./diagnostics";
-import { AbstractEndpoint } from "./endpoint";
+import type { AbstractEndpoint } from "./endpoint";
 import { CORSMethod, isMethod } from "./method";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
