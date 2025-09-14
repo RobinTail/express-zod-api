@@ -6,7 +6,6 @@ import {
 } from "./express-mock";
 import { z } from "zod";
 import {
-  DependsOnMethod,
   EndpointsFactory,
   Routing,
   ServeStatic,
@@ -109,6 +108,7 @@ describe("Routing", () => {
       expect(appMock.use).toHaveBeenCalledWith("/public", staticHandler);
     });
 
+    // @todo rename
     test("Should accept DependsOnMethod", () => {
       const handlerMock = vi.fn();
       const factory = new EndpointsFactory(defaultResultHandler);
@@ -126,12 +126,12 @@ describe("Routing", () => {
       });
       const routing: Routing = {
         v1: {
-          user: new DependsOnMethod({
-            get: getEndpoint,
-            post: postEndpoint,
-            put: putAndPatchEndpoint,
-            patch: putAndPatchEndpoint,
-          }),
+          user: {
+            "get /": getEndpoint,
+            "post /": postEndpoint,
+            "put /": putAndPatchEndpoint,
+            "patch /": putAndPatchEndpoint,
+          },
         },
       };
       const logger = makeLoggerMock();
@@ -154,6 +154,7 @@ describe("Routing", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/user");
     });
 
+    // @todo rename
     test("Should check if endpoint supports the method it's assigned to within DependsOnMethod", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const putAndPatchEndpoint = factory.build({
@@ -163,11 +164,11 @@ describe("Routing", () => {
       });
       const routing: Routing = {
         v1: {
-          user: new DependsOnMethod({
-            put: putAndPatchEndpoint,
-            patch: putAndPatchEndpoint,
-            post: putAndPatchEndpoint, // intentional
-          }),
+          user: {
+            "put /": putAndPatchEndpoint,
+            "patch /": putAndPatchEndpoint,
+            "post /": putAndPatchEndpoint, // intentional
+          },
         },
       };
       const logger = makeLoggerMock();
@@ -181,6 +182,7 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
+    // @todo rename
     test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
       const handler = vi.fn(async () => ({}));
       const configMock = {
@@ -208,12 +210,12 @@ describe("Routing", () => {
         handler,
       });
       const routing: Routing = {
-        hello: new DependsOnMethod({
-          get: getEndpoint,
-          post: postEndpoint,
-          put: putAndPatchEndpoint,
-          patch: putAndPatchEndpoint,
-        }),
+        hello: {
+          "get /": getEndpoint,
+          "post /": postEndpoint,
+          "put /": putAndPatchEndpoint,
+          "patch /": putAndPatchEndpoint,
+        },
       };
       const logger = makeLoggerMock();
       initRouting({
@@ -408,6 +410,7 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
+    // @todo rename
     test("Should prohibit DependsOnMethod for a route having explicit method", () => {
       const logger = makeLoggerMock();
       expect(() =>
@@ -417,7 +420,7 @@ describe("Routing", () => {
           config: { cors: false },
           routing: {
             v1: {
-              "get /user/retrieve": new DependsOnMethod({}),
+              "get /user/retrieve": {},
             },
           },
         }),
