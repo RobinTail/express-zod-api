@@ -108,8 +108,7 @@ describe("Routing", () => {
       expect(appMock.use).toHaveBeenCalledWith("/public", staticHandler);
     });
 
-    // @todo rename
-    test("Should accept DependsOnMethod", () => {
+    test("Should handle method depending assignments", () => {
       const handlerMock = vi.fn();
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
@@ -154,8 +153,7 @@ describe("Routing", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/user");
     });
 
-    // @todo rename
-    test("Should check if endpoint supports the method it's assigned to within DependsOnMethod", () => {
+    test("Should check if endpoint supports the method it's assigned to", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const putAndPatchEndpoint = factory.build({
         method: ["put", "patch"],
@@ -182,8 +180,7 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
-    // @todo rename
-    test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
+    test("Issue 705: should set all assigned methods to CORS response header", async () => {
       const handler = vi.fn(async () => ({}));
       const configMock = {
         cors: (params: { defaultHeaders: Record<string, string> }) => ({
@@ -410,8 +407,7 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
-    // @todo rename
-    test("Should prohibit DependsOnMethod for a route having explicit method", () => {
+    test("Should prohibit nesting for a route having explicit method", () => {
       const logger = makeLoggerMock();
       expect(() =>
         initRouting({
