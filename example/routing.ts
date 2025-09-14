@@ -16,10 +16,11 @@ export const routing: Routing = {
     user: {
       // syntax 1: methods are defined within the endpoint
       retrieve: retrieveUserEndpoint, // path: /v1/user/retrieve
-      // syntax 2: methods are defined within the route (id is the route path param by the way)
+      // id is the route path param
       ":id": {
-        "patch /": updateUserEndpoint, // demonstrates authentication
         remove: deleteUserEndpoint, // nested path: /v1/user/:id/remove
+        // syntax 2: methods are defined within the route
+        "patch /": updateUserEndpoint, // demonstrates authentication
       },
       // demonstrates different response schemas depending on status code
       create: createUserEndpoint,

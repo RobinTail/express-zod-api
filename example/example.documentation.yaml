@@ -100,6 +100,25 @@ paths:
           description: HEAD /v1/user/retrieve Positive response
         "400":
           description: HEAD /v1/user/retrieve Negative response
+  /v1/user/{id}/remove:
+    delete:
+      operationId: DeleteV1UserIdRemove
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: numeric string
+          schema:
+            description: numeric string
+            type: string
+            pattern: \d+
+      responses:
+        "204":
+          description: DELETE /v1/user/:id/remove Positive response
+        "404":
+          description: DELETE /v1/user/:id/remove Negative response
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -243,25 +262,6 @@ paths:
                     status: error
                     error:
                       message: Sample error message
-  /v1/user/{id}/remove:
-    delete:
-      operationId: DeleteV1UserIdRemove
-      tags:
-        - users
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: numeric string
-          schema:
-            description: numeric string
-            type: string
-            pattern: \d+
-      responses:
-        "204":
-          description: DELETE /v1/user/:id/remove Positive response
-        "404":
-          description: DELETE /v1/user/:id/remove Negative response
   /v1/user/create:
     post:
       operationId: PostV1UserCreate

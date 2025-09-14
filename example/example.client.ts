@@ -61,6 +61,28 @@ interface HeadV1UserRetrieveNegativeResponseVariants {
   400: HeadV1UserRetrieveNegativeVariant1;
 }
 
+/** delete /v1/user/:id/remove */
+type DeleteV1UserIdRemoveInput = {
+  /** numeric string */
+  id: string;
+};
+
+/** delete /v1/user/:id/remove */
+type DeleteV1UserIdRemovePositiveVariant1 = undefined;
+
+/** delete /v1/user/:id/remove */
+interface DeleteV1UserIdRemovePositiveResponseVariants {
+  204: DeleteV1UserIdRemovePositiveVariant1;
+}
+
+/** delete /v1/user/:id/remove */
+type DeleteV1UserIdRemoveNegativeVariant1 = undefined;
+
+/** delete /v1/user/:id/remove */
+interface DeleteV1UserIdRemoveNegativeResponseVariants {
+  404: DeleteV1UserIdRemoveNegativeVariant1;
+}
+
 /** patch /v1/user/:id */
 type PatchV1UserIdInput = {
   key: string;
@@ -97,28 +119,6 @@ type PatchV1UserIdNegativeVariant1 = {
 /** patch /v1/user/:id */
 interface PatchV1UserIdNegativeResponseVariants {
   400: PatchV1UserIdNegativeVariant1;
-}
-
-/** delete /v1/user/:id/remove */
-type DeleteV1UserIdRemoveInput = {
-  /** numeric string */
-  id: string;
-};
-
-/** delete /v1/user/:id/remove */
-type DeleteV1UserIdRemovePositiveVariant1 = undefined;
-
-/** delete /v1/user/:id/remove */
-interface DeleteV1UserIdRemovePositiveResponseVariants {
-  204: DeleteV1UserIdRemovePositiveVariant1;
-}
-
-/** delete /v1/user/:id/remove */
-type DeleteV1UserIdRemoveNegativeVariant1 = undefined;
-
-/** delete /v1/user/:id/remove */
-interface DeleteV1UserIdRemoveNegativeResponseVariants {
-  404: DeleteV1UserIdRemoveNegativeVariant1;
 }
 
 /** post /v1/user/create */
@@ -437,8 +437,8 @@ interface PostV1FormsFeedbackNegativeResponseVariants {
 
 export type Path =
   | "/v1/user/retrieve"
-  | "/v1/user/:id"
   | "/v1/user/:id/remove"
+  | "/v1/user/:id"
   | "/v1/user/create"
   | "/v1/user/list"
   | "/v1/avatar/send"
@@ -453,8 +453,8 @@ export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
 export interface Input {
   "get /v1/user/retrieve": GetV1UserRetrieveInput;
   "head /v1/user/retrieve": HeadV1UserRetrieveInput;
-  "patch /v1/user/:id": PatchV1UserIdInput;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveInput;
+  "patch /v1/user/:id": PatchV1UserIdInput;
   "post /v1/user/create": PostV1UserCreateInput;
   "get /v1/user/list": GetV1UserListInput;
   "head /v1/user/list": HeadV1UserListInput;
@@ -474,8 +474,8 @@ export interface Input {
 export interface PositiveResponse {
   "get /v1/user/retrieve": SomeOf<GetV1UserRetrievePositiveResponseVariants>;
   "head /v1/user/retrieve": SomeOf<HeadV1UserRetrievePositiveResponseVariants>;
-  "patch /v1/user/:id": SomeOf<PatchV1UserIdPositiveResponseVariants>;
   "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemovePositiveResponseVariants>;
+  "patch /v1/user/:id": SomeOf<PatchV1UserIdPositiveResponseVariants>;
   "post /v1/user/create": SomeOf<PostV1UserCreatePositiveResponseVariants>;
   "get /v1/user/list": SomeOf<GetV1UserListPositiveResponseVariants>;
   "head /v1/user/list": SomeOf<HeadV1UserListPositiveResponseVariants>;
@@ -495,8 +495,8 @@ export interface PositiveResponse {
 export interface NegativeResponse {
   "get /v1/user/retrieve": SomeOf<GetV1UserRetrieveNegativeResponseVariants>;
   "head /v1/user/retrieve": SomeOf<HeadV1UserRetrieveNegativeResponseVariants>;
-  "patch /v1/user/:id": SomeOf<PatchV1UserIdNegativeResponseVariants>;
   "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemoveNegativeResponseVariants>;
+  "patch /v1/user/:id": SomeOf<PatchV1UserIdNegativeResponseVariants>;
   "post /v1/user/create": SomeOf<PostV1UserCreateNegativeResponseVariants>;
   "get /v1/user/list": SomeOf<GetV1UserListNegativeResponseVariants>;
   "head /v1/user/list": SomeOf<HeadV1UserListNegativeResponseVariants>;
@@ -518,10 +518,10 @@ export interface EncodedResponse {
     GetV1UserRetrieveNegativeResponseVariants;
   "head /v1/user/retrieve": HeadV1UserRetrievePositiveResponseVariants &
     HeadV1UserRetrieveNegativeResponseVariants;
-  "patch /v1/user/:id": PatchV1UserIdPositiveResponseVariants &
-    PatchV1UserIdNegativeResponseVariants;
   "delete /v1/user/:id/remove": DeleteV1UserIdRemovePositiveResponseVariants &
     DeleteV1UserIdRemoveNegativeResponseVariants;
+  "patch /v1/user/:id": PatchV1UserIdPositiveResponseVariants &
+    PatchV1UserIdNegativeResponseVariants;
   "post /v1/user/create": PostV1UserCreatePositiveResponseVariants &
     PostV1UserCreateNegativeResponseVariants;
   "get /v1/user/list": GetV1UserListPositiveResponseVariants &
@@ -557,12 +557,12 @@ export interface Response {
   "head /v1/user/retrieve":
     | PositiveResponse["head /v1/user/retrieve"]
     | NegativeResponse["head /v1/user/retrieve"];
-  "patch /v1/user/:id":
-    | PositiveResponse["patch /v1/user/:id"]
-    | NegativeResponse["patch /v1/user/:id"];
   "delete /v1/user/:id/remove":
     | PositiveResponse["delete /v1/user/:id/remove"]
     | NegativeResponse["delete /v1/user/:id/remove"];
+  "patch /v1/user/:id":
+    | PositiveResponse["patch /v1/user/:id"]
+    | NegativeResponse["patch /v1/user/:id"];
   "post /v1/user/create":
     | PositiveResponse["post /v1/user/create"]
     | NegativeResponse["post /v1/user/create"];
@@ -608,8 +608,8 @@ export type Request = keyof Input;
 export const endpointTags = {
   "get /v1/user/retrieve": ["users"],
   "head /v1/user/retrieve": ["users"],
-  "patch /v1/user/:id": ["users"],
   "delete /v1/user/:id/remove": ["users"],
+  "patch /v1/user/:id": ["users"],
   "post /v1/user/create": ["users"],
   "get /v1/user/list": ["users"],
   "head /v1/user/list": ["users"],
