@@ -1,9 +1,6 @@
 import { z } from "zod";
-import {
-  DependsOnMethod,
-  EndpointsFactory,
-  defaultResultHandler,
-} from "../src";
+import { EndpointsFactory, defaultResultHandler } from "../src";
+import { DependsOnMethod } from "../src/depends-on-method";
 import { AbstractEndpoint } from "../src/endpoint";
 
 describe("DependsOnMethod", () => {

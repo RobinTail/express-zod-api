@@ -84,7 +84,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "ResultHandler",
   "defaultResultHandler",
   "arrayResultHandler",
-  "DependsOnMethod",
   "ServeStatic",
   "createServer",
   "attachRouting",
