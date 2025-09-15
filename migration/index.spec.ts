@@ -18,7 +18,22 @@ describe("Migration", () => {
   });
 
   tester.run("v26", migration.rules.v26, {
-    valid: [`import {} from "zod";`],
-    invalid: [],
+    valid: [`const routing = { "get /": someEndpoint };`],
+    invalid: [
+      {
+        code: `const routing = new DependsOnMethod({ get: someEndpoint });`,
+        output: `const routing = {\n"get /": someEndpoint,\n};`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "value",
+              from: "new DependsOnMethod(...)",
+              to: "its argument object and append its keys with ' /'",
+            },
+          },
+        ],
+      },
+    ],
   });
 });
