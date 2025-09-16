@@ -12,6 +12,15 @@ onlyBuiltDependencies:
 gitChecks: false
 engineStrict: true
 autoInstallPeers: false
+minimumReleaseAge: 2880
+minimumReleaseAgeExclude:
+  - eslint
+  - express
+  - http-errors
+  - typescript
+  - tsx
+  - vitest
+  - zod
 publicHoistPattern:
   - "@typescript-eslint/*" # used as an assumed transitive in migration
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
