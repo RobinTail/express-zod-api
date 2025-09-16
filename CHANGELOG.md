@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 26
+
+### v26.0.0
+
+- TODO: Add stuff here
+
 ## Version 25
 
 ### v25.4.0
