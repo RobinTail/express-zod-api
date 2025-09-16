@@ -21,8 +21,39 @@ describe("Migration", () => {
     valid: [`const routing = { "get /": someEndpoint };`],
     invalid: [
       {
+        name: "basic DependsOnMethod",
         code: `const routing = new DependsOnMethod({ get: someEndpoint });`,
         output: `const routing = {\n"get /": someEndpoint,\n};`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "value",
+              from: "new DependsOnMethod(...)",
+              to: "its argument object and append its keys with ' /'",
+            },
+          },
+        ],
+      },
+      {
+        name: "deprecated DependsOnMethod",
+        code: `const routing = new DependsOnMethod({ get: someEndpoint }).deprecated();`,
+        output: `const routing = {\n"get /": someEndpoint.deprecated(),\n};`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "value",
+              from: "new DependsOnMethod(...)",
+              to: "its argument object and append its keys with ' /'",
+            },
+          },
+        ],
+      },
+      {
+        name: "DependsOnMethod with nesting",
+        code: `const routing = new DependsOnMethod({ get: someEndpoint }).nest({ some: otherEndpoint });`,
+        output: `const routing = {\n"get /": someEndpoint,\n"some": otherEndpoint,\n};`,
         errors: [
           {
             messageId: "change",

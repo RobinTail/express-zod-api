@@ -56,8 +56,25 @@ const v26 = ESLintUtils.RuleCreator.withoutDocs({
         if (node.arguments.length !== 1) return;
         const argument = node.arguments[0];
         if (argument.type !== NT.ObjectExpression) return;
+        let isDeprecated = false;
+        let nested: TSESTree.ObjectExpression | undefined = undefined;
+        let target: TSESTree.Node = node;
+        if (
+          node.parent.type === NT.MemberExpression &&
+          node.parent.property.type === NT.Identifier &&
+          node.parent.parent.type === NT.CallExpression
+        ) {
+          target = node.parent.parent;
+          if (node.parent.property.name === "deprecated") isDeprecated = true;
+          if (
+            node.parent.property.name === "nest" &&
+            node.parent.parent.arguments[0] &&
+            node.parent.parent.arguments[0].type === NT.ObjectExpression
+          )
+            nested = node.parent.parent.arguments[0];
+        }
         ctx.report({
-          node,
+          node: target,
           messageId: "change",
           data: {
             subject: "value",
@@ -65,14 +82,17 @@ const v26 = ESLintUtils.RuleCreator.withoutDocs({
             to: "its argument object and append its keys with ' /'",
           },
           fix: (fixer) => {
-            const nextProps = argument.properties
-              .map((prop) =>
+            const makeMapper =
+              (feat?: "deprecated" | "nest") =>
+              (prop: TSESTree.ObjectLiteralElement) =>
                 isNamedProp(prop)
-                  ? `"${prop.key.name} /": ${ctx.sourceCode.getText(prop.value)},`
-                  : `${ctx.sourceCode.getText(prop)}, /** @todo migrate manually */`,
-              )
+                  ? `"${prop.key.name}${feat === "nest" ? "" : " /"}": ${ctx.sourceCode.getText(prop.value)}${feat === "deprecated" ? ".deprecated()" : ""},`
+                  : `${ctx.sourceCode.getText(prop)}, /** @todo migrate manually */`;
+            const nextProps = argument.properties
+              .map(makeMapper(isDeprecated ? "deprecated" : undefined))
+              .concat(nested?.properties.map(makeMapper("nest")) ?? [])
               .join("\n");
-            return fixer.replaceText(node, `{\n${nextProps}\n}`);
+            return fixer.replaceText(target, `{\n${nextProps}\n}`);
           },
         });
       },
