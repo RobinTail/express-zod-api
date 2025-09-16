@@ -92,7 +92,7 @@ importers:
         version: 3.6.2
       tsdown:
         specifier: ^0.15.0
-        version: 0.15.1(@arethetypeswrong/core@0.18.2)(typescript@5.9.2)
+        version: 0.15.2(@arethetypeswrong/core@0.18.2)(typescript@5.9.2)
       tsx:
         specifier: ^4.19.4
         version: 4.20.5
@@ -2160,8 +2160,8 @@ packages:
   ts-toolbelt@9.6.0:
     resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
 
-  tsdown@0.15.1:
-    resolution: {integrity: sha512-USTr2wS5OIyohR8Sp09rp5mXVwOX4YvVRqarS9I9jIhF+PqgtVSMXG4vBrHGY1OficNcLT5Z75pSoxd2uU+BYg==}
+  tsdown@0.15.2:
+    resolution: {integrity: sha512-qPbWcVnI7Ekq5p4xPiLwuS9siczCGPAyZYsAzcS1xTcFvkkZIsDbh3ejlmUoe/ypLJl5+oQ4Rbwp63Zf+eWiMw==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
@@ -4240,7 +4240,7 @@ snapshots:
 
   ts-toolbelt@9.6.0: {}
 
-  tsdown@0.15.1(@arethetypeswrong/core@0.18.2)(typescript@5.9.2):
+  tsdown@0.15.2(@arethetypeswrong/core@0.18.2)(typescript@5.9.2):
     dependencies:
       ansis: 4.1.0
       cac: 6.7.14
