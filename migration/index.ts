@@ -62,23 +62,28 @@ const v26 = ESLintUtils.RuleCreator.withoutDocs({
         if (argument.type !== NT.ObjectExpression) return;
         let isDeprecated = false;
         let nested: TSESTree.ObjectExpression | undefined = undefined;
-        let target: TSESTree.Node = node;
-        if (
-          node.parent.type === NT.MemberExpression &&
-          node.parent.property.type === NT.Identifier &&
-          node.parent.parent.type === NT.CallExpression
+        let cursor: TSESTree.Node = node;
+        while (
+          cursor &&
+          cursor.parent &&
+          cursor.parent.type === NT.MemberExpression &&
+          cursor.parent.property.type === NT.Identifier &&
+          cursor.parent.parent &&
+          cursor.parent.parent.type === NT.CallExpression
         ) {
-          target = node.parent.parent;
-          if (node.parent.property.name === "deprecated") isDeprecated = true;
+          const name = cursor.parent.property.name;
+          const call = cursor.parent.parent as TSESTree.CallExpression;
+          if (name === "deprecated") isDeprecated = true;
           if (
-            node.parent.property.name === "nest" &&
-            node.parent.parent.arguments[0] &&
-            node.parent.parent.arguments[0].type === NT.ObjectExpression
+            name === "nest" &&
+            call.arguments[0] &&
+            call.arguments[0].type === NT.ObjectExpression
           )
-            nested = node.parent.parent.arguments[0];
+            nested = call.arguments[0];
+          cursor = call;
         }
         ctx.report({
-          node: target,
+          node: cursor,
           messageId: "change",
           data: {
             subject: "value",
@@ -96,7 +101,7 @@ const v26 = ESLintUtils.RuleCreator.withoutDocs({
               .map(makeMapper(isDeprecated ? "deprecated" : undefined))
               .concat(nested?.properties.map(makeMapper("nest")) ?? [])
               .join("\n");
-            return fixer.replaceText(target, `{\n${nextProps}\n}`);
+            return fixer.replaceText(cursor, `{\n${nextProps}\n}`);
           },
         });
       },

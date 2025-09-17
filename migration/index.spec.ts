@@ -80,6 +80,21 @@ describe("Migration", () => {
           },
         ],
       },
+      {
+        name: "DependsOnMethod both deprecated and with nesting",
+        code: `const routing = new DependsOnMethod({ get: someEndpoint }).deprecated().nest({ some: otherEndpoint });`,
+        output: `const routing = {\n"get /": someEndpoint.deprecated(),\n"some": otherEndpoint,\n};`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "value",
+              from: "new DependsOnMethod(...)",
+              to: "its argument object and append its keys with ' /'",
+            },
+          },
+        ],
+      },
     ],
   });
 });
