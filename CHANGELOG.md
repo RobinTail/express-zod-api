@@ -4,7 +4,20 @@
 
 ### v26.0.0
 
-- TODO: Add stuff here
+- `DependsOnMethod` removed: use flat syntax with explicit method and a slash;
+
+```patch
+  const routing: Routing = {
+-   "/v1/users": new DependsOnMethod({
++   "/v1/users": {
+-     get: getUserEndpoint,
++     "get /": getUserEndpoint,
+-   }).nest({
+      create: makeUserEndpoint
+-   }),
++   },
+  };
+```
 
 ## Version 25
 
