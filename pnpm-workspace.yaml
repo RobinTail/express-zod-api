@@ -12,8 +12,9 @@ onlyBuiltDependencies:
 gitChecks: false
 engineStrict: true
 autoInstallPeers: false
-minimumReleaseAge: 2880
+minimumReleaseAge: 2880 # 2 days
 minimumReleaseAgeExclude:
+  - "@types/node"
   - eslint
   - express
   - http-errors
