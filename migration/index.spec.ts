@@ -36,6 +36,21 @@ describe("Migration", () => {
         ],
       },
       {
+        name: "DependsOnMethod with literals",
+        code: `const routing = new DependsOnMethod({ "get": someEndpoint });`,
+        output: `const routing = {\n"get /": someEndpoint,\n};`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "value",
+              from: "new DependsOnMethod(...)",
+              to: "its argument object and append its keys with ' /'",
+            },
+          },
+        ],
+      },
+      {
         name: "deprecated DependsOnMethod",
         code: `const routing = new DependsOnMethod({ get: someEndpoint }).deprecated();`,
         output: `const routing = {\n"get /": someEndpoint.deprecated(),\n};`,

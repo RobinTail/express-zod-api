@@ -6,7 +6,7 @@ import {
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
 
 type NamedProp = TSESTree.PropertyNonComputedName & {
-  key: TSESTree.Identifier;
+  key: TSESTree.Identifier | TSESTree.StringLiteral;
 };
 
 interface Queries {
@@ -22,7 +22,11 @@ const queries: Record<Listener, string> = {
 const isNamedProp = (prop: TSESTree.ObjectLiteralElement): prop is NamedProp =>
   prop.type === NT.Property &&
   !prop.computed &&
-  prop.key.type === NT.Identifier;
+  (prop.key.type === NT.Identifier ||
+    (prop.key.type === NT.Literal && typeof prop.key.value === "string"));
+
+const getPropName = (prop: NamedProp): string =>
+  prop.key.type === NT.Identifier ? prop.key.name : prop.key.value;
 
 const listen = <
   S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
@@ -86,7 +90,7 @@ const v26 = ESLintUtils.RuleCreator.withoutDocs({
               (feat?: "deprecated" | "nest") =>
               (prop: TSESTree.ObjectLiteralElement) =>
                 isNamedProp(prop)
-                  ? `"${prop.key.name}${feat === "nest" ? "" : " /"}": ${ctx.sourceCode.getText(prop.value)}${feat === "deprecated" ? ".deprecated()" : ""},`
+                  ? `"${getPropName(prop)}${feat === "nest" ? "" : " /"}": ${ctx.sourceCode.getText(prop.value)}${feat === "deprecated" ? ".deprecated()" : ""},`
                   : `${ctx.sourceCode.getText(prop)}, /** @todo migrate manually */`;
             const nextProps = argument.properties
               .map(makeMapper(isDeprecated ? "deprecated" : undefined))
