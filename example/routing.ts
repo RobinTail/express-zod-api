@@ -1,4 +1,4 @@
-import { DependsOnMethod, Routing, ServeStatic } from "express-zod-api";
+import { Routing, ServeStatic } from "express-zod-api";
 import { rawAcceptingEndpoint } from "./endpoints/accept-raw";
 import { createUserEndpoint } from "./endpoints/create-user";
 import { deleteUserEndpoint } from "./endpoints/delete-user";
@@ -16,12 +16,12 @@ export const routing: Routing = {
     user: {
       // syntax 1: methods are defined within the endpoint
       retrieve: retrieveUserEndpoint, // path: /v1/user/retrieve
-      // syntax 2: methods are defined within the route (id is the route path param by the way)
-      ":id": new DependsOnMethod({
-        patch: updateUserEndpoint, // demonstrates authentication
-      }).nest({
+      // id is the route path param
+      ":id": {
         remove: deleteUserEndpoint, // nested path: /v1/user/:id/remove
-      }),
+        // syntax 2: methods are defined within the route
+        "patch /": updateUserEndpoint, // demonstrates authentication
+      },
       // demonstrates different response schemas depending on status code
       create: createUserEndpoint,
       // this one demonstrates the legacy array based response

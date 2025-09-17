@@ -280,7 +280,7 @@ in one place, illustrating how you can structure your API using whichever method
 architecture — or even mix them seamlessly.
 
 ```ts
-import { Routing, DependsOnMethod, ServeStatic } from "express-zod-api";
+import { Routing, ServeStatic } from "express-zod-api";
 
 const routing: Routing = {
   // flat syntax — /v1/users
@@ -298,12 +298,12 @@ const routing: Routing = {
     // mixed syntax with explicit method — /v1/user/:id
     "delete /user/:id": deleteUserEndpoint,
     // method-based routing — /v1/account
-    account: new DependsOnMethod({
-      get: endpointA,
-      delete: endpointA,
-      post: endpointB,
-      patch: endpointB,
-    }),
+    account: {
+      "get /": endpointA,
+      "delete /": endpointA,
+      "post /": endpointB,
+      "patch /": endpointB,
+    },
   },
   // static file serving — /public serves files from ./assets
   public: new ServeStatic("assets", {
@@ -1175,11 +1175,11 @@ new Documentation({
 ## Deprecated schemas and routes
 
 As your API evolves, you may need to mark some parameters or routes as deprecated before deleting them. For this
-purpose, the `.deprecated()` method is available on each schema, `Endpoint` and `DependsOnMethod`, it's immutable.
+purpose, the `.deprecated()` method is available on each schema and `Endpoint`, it's immutable.
 You can also deprecate all routes the `Endpoint` assigned to by setting `EndpointsFactory::build({ deprecated: true })`.
 
 ```ts
-import { Routing, DependsOnMethod } from "express-zod-api";
+import { Routing } from "express-zod-api";
 import { z } from "zod";
 
 const someEndpoint = factory.build({
@@ -1191,8 +1191,7 @@ const someEndpoint = factory.build({
 
 const routing: Routing = {
   v1: oldEndpoint.deprecated(), // deprecates the /v1 path
-  v2: new DependsOnMethod({ get: oldEndpoint }).deprecated(), // deprecates the /v2 path
-  v3: someEndpoint, // the path is assigned with initially deprecated endpoint (also deprecated)
+  v2: someEndpoint, // the path is assigned with initially deprecated endpoint (also deprecated)
 };
 ```
 

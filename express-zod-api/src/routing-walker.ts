@@ -1,4 +1,3 @@
-import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
 import { ClientMethod, isMethod, Method } from "./method";
@@ -98,13 +97,6 @@ export const walkRouting = ({
       if (explicitMethod) prohibit(explicitMethod, path);
       if (element instanceof ServeStatic) {
         if (onStatic) element.apply(path, onStatic);
-      } else if (element instanceof DependsOnMethod) {
-        for (const [method, endpoint] of element.entries) {
-          const { methods } = endpoint;
-          checkDuplicate(method, path, visited);
-          checkMethodSupported(method, path, methods);
-          onEndpoint(method, path, endpoint);
-        }
       } else {
         stack.unshift(...processEntries(element, path));
       }
