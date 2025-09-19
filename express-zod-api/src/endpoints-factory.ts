@@ -52,8 +52,7 @@ interface BuildProps<
   operationId?: string | ((method: ClientMethod) => string);
   /**
    * @desc HTTP method(s) this endpoint can handle
-   * @default "get" unless the Endpoint is assigned within DependsOnMethod
-   * @see DependsOnMethod
+   * @default "get" unless method is explicitly defined in Routing keys
    * */
   method?: Method | [Method, ...Method[]];
   /**

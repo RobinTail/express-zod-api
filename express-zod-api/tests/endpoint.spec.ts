@@ -131,6 +131,20 @@ describe("Endpoint", () => {
     });
   });
 
+  describe(".nest()", () => {
+    test("should return Routing arrangement", () => {
+      const subject = defaultEndpointsFactory.build({
+        output: z.object({}),
+        handler: vi.fn(),
+      });
+      expect(subject).toHaveProperty("nest", expect.any(Function));
+      expect(subject.nest({ subpath: subject })).toEqual({
+        "": subject,
+        subpath: subject,
+      });
+    });
+  });
+
   describe("#parseOutput", () => {
     test("Should throw on output validation failure", async () => {
       const endpoint = defaultEndpointsFactory.build({
