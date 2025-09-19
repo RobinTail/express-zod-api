@@ -11,6 +11,7 @@ import { builtinModules } from "node:module";
 const cwd = dirname(fileURLToPath(import.meta.url));
 const ezDir = join(cwd, "express-zod-api");
 const migrationDir = join(cwd, "migration");
+const pluginDir = join(cwd, "zod-plugin");
 
 const importConcerns = [
   {
@@ -197,6 +198,18 @@ export default tsPlugin.config(
     files: ["express-zod-api/src/*.ts"],
     rules: {
       "allowed/dependencies": ["error", { packageDir: ezDir }],
+      "no-restricted-syntax": [
+        "warn",
+        ...importConcerns,
+        ...performanceConcerns,
+      ],
+    },
+  },
+  {
+    name: "source/plugin",
+    files: ["zod-plugin/src/*.ts"],
+    rules: {
+      "allowed/dependencies": ["error", { packageDir: pluginDir }],
       "no-restricted-syntax": [
         "warn",
         ...importConcerns,
