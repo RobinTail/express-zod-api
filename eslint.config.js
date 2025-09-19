@@ -240,12 +240,7 @@ export default tsPlugin.config(
   },
   {
     name: "tests/all",
-    files: [
-      "express-zod-api/tests/*.ts",
-      "express-zod-api/vitest.setup.ts",
-      "migration/*.spec.ts",
-      "zod-plugin/tests/*.ts",
-    ],
+    files: ["**/tests/*.ts", "**/vitest.setup.ts", "**/*.spec.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": "warn",
