@@ -175,13 +175,7 @@ export default tsPlugin.config(
   prettierRules,
   {
     name: "globally/ignored",
-    ignores: [
-      "express-zod-api/dist/",
-      "express-zod-api/coverage/",
-      "migration/dist",
-      "compat-test/sample.ts",
-      "zod-plugin/dist",
-    ],
+    ignores: ["**/dist/", "**/coverage/", "compat-test/sample.ts"],
   },
   {
     name: "globally/disabled",
