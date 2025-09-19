@@ -11,6 +11,7 @@ import { builtinModules } from "node:module";
 const cwd = dirname(fileURLToPath(import.meta.url));
 const ezDir = join(cwd, "express-zod-api");
 const migrationDir = join(cwd, "migration");
+const pluginDir = join(cwd, "zod-plugin");
 
 const importConcerns = [
   {
@@ -175,13 +176,7 @@ export default tsPlugin.config(
   prettierRules,
   {
     name: "globally/ignored",
-    ignores: [
-      "express-zod-api/dist/",
-      "express-zod-api/coverage/",
-      "migration/dist",
-      "compat-test/sample.ts",
-      "zod-plugin/dist",
-    ],
+    ignores: ["**/dist/", "**/coverage/", "compat-test/sample.ts"],
   },
   {
     name: "globally/disabled",
@@ -203,6 +198,18 @@ export default tsPlugin.config(
     files: ["express-zod-api/src/*.ts"],
     rules: {
       "allowed/dependencies": ["error", { packageDir: ezDir }],
+      "no-restricted-syntax": [
+        "warn",
+        ...importConcerns,
+        ...performanceConcerns,
+      ],
+    },
+  },
+  {
+    name: "source/plugin",
+    files: ["zod-plugin/src/*.ts"],
+    rules: {
+      "allowed/dependencies": ["error", { packageDir: pluginDir }],
       "no-restricted-syntax": [
         "warn",
         ...importConcerns,
@@ -240,12 +247,7 @@ export default tsPlugin.config(
   },
   {
     name: "tests/all",
-    files: [
-      "express-zod-api/tests/*.ts",
-      "express-zod-api/vitest.setup.ts",
-      "migration/*.spec.ts",
-      "zod-plugin/*.spec.ts",
-    ],
+    files: ["**/tests/*.ts", "**/vitest.setup.ts", "**/*.spec.ts"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": "warn",

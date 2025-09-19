@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { pack, unpack } from "./packer";
+import { pack, unpack } from "../src";
 
 describe("Packer", () => {
   describe("pack()", () => {
