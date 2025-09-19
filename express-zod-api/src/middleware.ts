@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { emptySchema, FlatObject } from "./common-helpers";
+import { EmptyObject, emptySchema, FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
 import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
 import { ActualLogger } from "./logger-helpers";
+import * as R from "ramda";
 
 type Handler<IN, OPT, OUT> = (params: {
   /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware */
@@ -108,14 +109,14 @@ export class Middleware<
 export class ExpressMiddleware<
   R extends Request,
   S extends Response,
-  OUT extends FlatObject,
+  OUT extends FlatObject = EmptyObject,
 > extends Middleware<FlatObject, OUT, string> {
   constructor(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- issue #2824, assignment compatibility fix
     nativeMw: (request: R, response: S, next: NextFunction) => any,
     {
-      provider = () => ({}) as OUT,
-      transformer = (err: Error) => err,
+      provider = R.always({} as OUT),
+      transformer = R.identity,
     }: {
       provider?: (request: R, response: S) => OUT | Promise<OUT>;
       transformer?: (err: Error) => Error;
