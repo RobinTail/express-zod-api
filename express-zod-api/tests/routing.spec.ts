@@ -500,7 +500,7 @@ describe("Routing", () => {
       ).toHaveLength(0);
       expect(handlerMock).toHaveBeenCalledWith({
         input: { test: 123 },
-        options: {},
+        ctx: {},
         logger: getLoggerMock.mock.results.pop()!.value,
       });
       expect(responseMock._getStatusCode()).toBe(200);

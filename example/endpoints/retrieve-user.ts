@@ -31,7 +31,7 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
       name: z.string(),
       features: feature.array(), // @link https://github.com/colinhacks/zod/issues/4592
     }),
-    handler: async ({ input: { id }, options: { method }, logger }) => {
+    handler: async ({ input: { id }, ctx: { method }, logger }) => {
       logger.debug(`Requested id: ${id}, method ${method}`);
       const name = "John Doe";
       assert(id <= 100, createHttpError(404, "User not found"));
