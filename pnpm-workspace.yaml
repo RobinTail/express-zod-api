@@ -19,6 +19,7 @@ minimumReleaseAgeExclude:
   - express
   - http-errors
   - typescript
+  - tsdown
   - tsx
   - vitest
   - zod
