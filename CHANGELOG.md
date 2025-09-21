@@ -2,6 +2,13 @@
 
 ## Version 24
 
+### v24.7.4
+
+- This patch fixes the issue for users facing `TypeError: .example is not a function`, but not using that method:
+  - It was reported that in some environments Zod plugin is not loaded correctly so that the usage of
+    `ZodType::example()` (plugin method) internally by the framework itself was causing this issue;
+  - This version fixes the problem by replacing the usage of `.example()` with `globalRegistry.add()`.
+
 ### v24.7.3
 
 - Fixed the depiction of the negative response to `HEAD` requests:
