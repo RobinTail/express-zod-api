@@ -11,12 +11,14 @@ type NamedProp = TSESTree.PropertyNonComputedName & {
 
 interface Queries {
   dependsOnMethod: TSESTree.NewExpression;
+  handlerOptions: TSESTree.Property;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
   dependsOnMethod: `${NT.NewExpression}[callee.name='DependsOnMethod']`,
+  handlerOptions: `${NT.ObjectExpression} > ${NT.Property}[key.name='handler'] > ${NT.ArrowFunctionExpression} > ${NT.ObjectPattern} > ${NT.Property}[key.name='options']`,
 };
 
 const isNamedProp = (prop: TSESTree.ObjectLiteralElement): prop is NamedProp =>
@@ -103,6 +105,14 @@ const v26 = ESLintUtils.RuleCreator.withoutDocs({
               .join("\n");
             return fixer.replaceText(cursor, `{\n${nextProps}\n}`);
           },
+        });
+      },
+      handlerOptions: (node) => {
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "property", from: "options", to: "ctx" },
+          fix: (fixer) => fixer.replaceText(node.key, "ctx"),
         });
       },
     }),
