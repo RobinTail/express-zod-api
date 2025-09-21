@@ -2,6 +2,10 @@
 
 ## Version 1
 
+### v1.2.1
+
+- Add missing restrictions on supported Node.js versions.
+
 ### v1.2.0
 
 - Changed bundler from `tsup` to `tsdown`.
