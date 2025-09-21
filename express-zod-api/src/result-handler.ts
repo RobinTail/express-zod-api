@@ -94,6 +94,16 @@ export class ResultHandler<
   }
 }
 
+const defaultNegativeSchema = z.object({
+  status: z.literal("error"),
+  error: z.object({ message: z.string() }),
+});
+globalRegistry.add(defaultNegativeSchema, {
+  examples: [
+    { status: "error", error: { message: "Sample error message" } },
+  ] satisfies z.output<typeof defaultNegativeSchema>[],
+});
+
 export const defaultResultHandler = new ResultHandler({
   positive: (output) => {
     const responseSchema = z.object({
@@ -111,15 +121,7 @@ export const defaultResultHandler = new ResultHandler({
     }
     return responseSchema;
   },
-  negative: z
-    .object({
-      status: z.literal("error"),
-      error: z.object({ message: z.string() }),
-    })
-    .example({
-      status: "error",
-      error: { message: "Sample error message" },
-    }),
+  negative: defaultNegativeSchema,
   handler: ({ error, input, output, request, response, logger }) => {
     if (error) {
       const httpError = ensureHttpError(error);
@@ -136,6 +138,13 @@ export const defaultResultHandler = new ResultHandler({
       .status(defaultStatusCodes.positive)
       .json({ status: "success", data: output });
   },
+});
+
+const arrayNegativeSchema = z.string();
+globalRegistry.add(arrayNegativeSchema, {
+  examples: ["Sample error message"] satisfies z.output<
+    typeof arrayNegativeSchema
+  >[],
 });
 
 /**
@@ -170,10 +179,7 @@ export const arrayResultHandler = new ResultHandler({
     }
     return responseSchema;
   },
-  negative: {
-    schema: z.string().example("Sample error message"),
-    mimeType: "text/plain",
-  },
+  negative: { schema: arrayNegativeSchema, mimeType: "text/plain" },
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
       const httpError = ensureHttpError(error);
