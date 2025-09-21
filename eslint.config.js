@@ -33,6 +33,13 @@ const importConcerns = [
   })),
 ];
 
+const compatibilityConcerns = [
+  {
+    selector: "CallExpression > MemberExpression[property.name='example']",
+    message: "avoid using example() method to operate without zod plugin",
+  },
+];
+
 const performanceConcerns = [
   {
     selector: "ImportDeclaration[source.value=/assert/]", // #2169
@@ -210,6 +217,7 @@ export default tsPlugin.config(
         "warn",
         ...importConcerns,
         ...performanceConcerns,
+        ...compatibilityConcerns,
       ],
     },
   },
