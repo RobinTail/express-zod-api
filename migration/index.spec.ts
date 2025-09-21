@@ -135,6 +135,17 @@ describe("Migration", () => {
           },
         ],
       },
+      {
+        name: "addOptions method",
+        code: `factory.addOptions(() => {});`,
+        output: `factory.addContext(() => {});`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "method", from: "addOptions", to: "addContext" },
+          },
+        ],
+      },
     ],
   });
 });
