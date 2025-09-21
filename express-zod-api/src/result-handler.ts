@@ -112,15 +112,17 @@ export const defaultResultHandler = new ResultHandler({
     }
     return responseSchema;
   },
-  negative: z
-    .object({
+  negative: () => {
+    const schema = z.object({
       status: z.literal("error"),
       error: z.object({ message: z.string() }),
-    })
-    .example({
-      status: "error",
-      error: { message: "Sample error message" },
-    }),
+    });
+    const examples: z.output<typeof schema>[] = [
+      { status: "error", error: { message: "Sample error message" } },
+    ];
+    globalRegistry.add(schema, { examples });
+    return schema;
+  },
   handler: ({ error, input, output, request, response, logger }) => {
     if (error) {
       const httpError = ensureHttpError(error);
@@ -169,9 +171,11 @@ export const arrayResultHandler = new ResultHandler({
     }
     return responseSchema;
   },
-  negative: {
-    schema: z.string().example("Sample error message"),
-    mimeType: "text/plain",
+  negative: () => {
+    const schema = z.string();
+    const examples: z.output<typeof schema>[] = ["Sample error message"];
+    globalRegistry.add(schema, { examples });
+    return { schema, mimeType: "text/plain" };
   },
   handler: ({ response, output, error, logger, request, input }) => {
     if (error) {
