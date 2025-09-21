@@ -146,6 +146,17 @@ describe("Migration", () => {
           },
         ],
       },
+      {
+        name: "testMiddleware options property",
+        code: `testMiddleware({ options: {} });`,
+        output: `testMiddleware({ ctx: {} });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "options", to: "ctx" },
+          },
+        ],
+      },
     ],
   });
 });
