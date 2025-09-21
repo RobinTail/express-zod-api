@@ -20,9 +20,15 @@ type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
   dependsOnMethod: `${NT.NewExpression}[callee.name='DependsOnMethod']`,
-  handlerOptions: `${NT.ObjectExpression} > ${NT.Property}[key.name='handler'] > ${NT.ArrowFunctionExpression} > ${NT.ObjectPattern} > ${NT.Property}[key.name='options']`,
-  addOptions: `${NT.CallExpression}:has( ${NT.ArrowFunctionExpression} ) > ${NT.MemberExpression} > ${NT.Identifier}[name='addOptions']`,
-  testMiddlewareOptions: `${NT.CallExpression}[callee.name='testMiddleware'] > ${NT.ObjectExpression} > ${NT.Property}[key.name='options']`,
+  handlerOptions:
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='handler'] > ` +
+    `${NT.ArrowFunctionExpression} > ${NT.ObjectPattern} > ${NT.Property}[key.name='options']`,
+  addOptions:
+    `${NT.CallExpression}:has( ${NT.ArrowFunctionExpression} ) > ` +
+    `${NT.MemberExpression} > ${NT.Identifier}[name='addOptions']`,
+  testMiddlewareOptions:
+    `${NT.CallExpression}[callee.name='testMiddleware'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='options']`,
 };
 
 const isNamedProp = (prop: TSESTree.ObjectLiteralElement): prop is NamedProp =>
