@@ -14,7 +14,10 @@ engineStrict: true
 autoInstallPeers: false
 minimumReleaseAge: 2880 # 2 days
 minimumReleaseAgeExclude:
-  - "@types/node"
+  - "@types/*"
+  - "@eslint/*"
+  - "@vitest/*"
+  - "@typescript-eslint/*"
   - eslint
   - express
   - http-errors
