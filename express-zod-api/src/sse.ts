@@ -53,30 +53,30 @@ export const ensureStream = (response: Response) =>
     "cache-control": "no-cache",
   });
 
-  export const makeMiddleware = <E extends EventsMap>(events: E) =>
-    new Middleware({
-      handler: async ({ request, response }): Promise<Emitter<E>> => {
-        const controller = new AbortController();
-  
-        request.on("close", () => {
-          controller.abort();
-        });
-  
-       return setTimeout(() => ensureStream(response), headersTimeout) && {
-          isClosed: () => response.writableEnded || response.closed,
-          signal: controller.signal,
-          emit: (event, data) => {
-            ensureStream(response);
-            response.write(formatEvent(events, event, data), "utf-8");
-            /**
-             * Issue 2347: flush is the method of compression, it must be called only when compression is enabled
-             * @link https://github.com/RobinTail/express-zod-api/issues/2347
-             * */
-            response.flush?.();
-          },
-        }
+export const makeMiddleware = <E extends EventsMap>(events: E) =>
+  new Middleware({
+    handler: async ({ request, response }): Promise<Emitter<E>> => {
+      const controller = new AbortController();
+
+      request.on("close", () => {
+        controller.abort();
+      });
+
+     return setTimeout(() => ensureStream(response), headersTimeout) && {
+        isClosed: () => response.writableEnded || response.closed,
+        signal: controller.signal,
+        emit: (event, data) => {
+          ensureStream(response);
+          response.write(formatEvent(events, event, data), "utf-8");
+          /**
+           * Issue 2347: flush is the method of compression, it must be called only when compression is enabled
+           * @link https://github.com/RobinTail/express-zod-api/issues/2347
+           * */
+          response.flush?.();
+        },
       }
-    });
+    }
+  });
 
 export const makeResultHandler = <E extends EventsMap>(events: E) =>
   new ResultHandler({
