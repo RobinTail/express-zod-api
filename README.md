@@ -1040,7 +1040,7 @@ test("should respond successfully", async () => {
 ## Testing middlewares
 
 Middlewares can also be tested individually using the `testMiddleware()` method. You can also pass `ctx` collected
-from returns of previous middlewares, if the one being tested somehow depends on them. Possible errors would be handled
+from returns of previous middlewares, if the one being tested somehow depends on it. Possible errors would be handled
 either by `errorHandler` configured within given `configProps` or `defaultResultHandler`.
 
 ```typescript
