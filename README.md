@@ -383,7 +383,7 @@ const factory = defaultEndpointsFactory
 
 ## Context
 
-In case need to provide your endpoints with a context that does not depend on Request, like non-persistent database
+If you need to provide your endpoints with a context that does not depend on Request, like non-persistent database
 connection, consider shorthand method `addContext`. For static values consider reusing a `const` across your files.
 
 ```typescript
