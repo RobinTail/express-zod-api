@@ -90,9 +90,7 @@ describe("SSE", () => {
           signal: expect.any(AbortSignal),
           emit: expect.any(Function),
         });
-        const { isClosed, emit } = output as Emitter<{
-          test: z.ZodString;
-        }>;
+        const { isClosed, emit } = output as Emitter<{ test: z.ZodString }>;
         expect(isClosed()).toBeFalsy();
         emit("test", "something");
         expect(responseMock._getData()).toBe(
