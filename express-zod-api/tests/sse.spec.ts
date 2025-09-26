@@ -90,7 +90,9 @@ describe("SSE", () => {
           signal: expect.any(AbortSignal),
           emit: expect.any(Function),
         });
-        const { isClosed, emit, signal } = output as Emitter<{ test: z.ZodString }>;
+        const { isClosed, emit, signal } = output as Emitter<{
+          test: z.ZodString;
+        }>;
         expect(isClosed()).toBeFalsy();
         expect(signal.aborted).toBeFalsy();
         emit("test", "something");
@@ -109,9 +111,9 @@ describe("SSE", () => {
       const { requestMock, output } = await testMiddleware({ middleware });
       const { signal } = output as Emitter<{ test: z.ZodString }>;
       expect(signal.aborted).toBeFalsy();
-      requestMock.emit("close")
+      requestMock.emit("close");
       expect(signal.aborted).toBeTruthy();
-    })
+    });
   });
 
   describe("makeResultHandler()", () => {

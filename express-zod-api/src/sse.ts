@@ -64,9 +64,9 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
         controller.abort();
       });
 
-     setTimeout(() => ensureStream(response), headersTimeout)
+      setTimeout(() => ensureStream(response), headersTimeout);
 
-     return {
+      return {
         isClosed: () => response.writableEnded || response.closed,
         signal: controller.signal,
         emit: (event, data) => {
@@ -78,8 +78,8 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
            * */
           response.flush?.();
         },
-      }
-    }
+      };
+    },
   });
 
 export const makeResultHandler = <E extends EventsMap>(events: E) =>
