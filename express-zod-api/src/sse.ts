@@ -61,10 +61,7 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
       const controller = new AbortController();
 
       request.once("close", () => {
-        controller.abort();
-      });
-
-      response.once("close", () => {
+        console.log("here");
         controller.abort();
       });
 
