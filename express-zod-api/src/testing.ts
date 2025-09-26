@@ -120,13 +120,13 @@ export const testMiddleware = async <
   REQ extends RequestOptions,
 >({
   middleware,
-  options = {},
+  ctx = {},
   ...rest
 }: TestingProps<REQ, LOG> & {
   /** @desc The middleware to test */
   middleware: AbstractMiddleware;
-  /** @desc The aggregated output from previously executed middlewares */
-  options?: FlatObject;
+  /** @desc The aggregated returns of previously executed middlewares */
+  ctx?: FlatObject;
 }) => {
   const {
     requestMock,
@@ -140,7 +140,7 @@ export const testMiddleware = async <
     response: responseMock,
     logger: loggerMock,
     input,
-    options,
+    ctx,
   };
   try {
     const output = await middleware.execute(commons);

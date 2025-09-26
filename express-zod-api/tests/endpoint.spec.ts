@@ -46,8 +46,8 @@ describe("Endpoint", () => {
       });
       const handlerMock = vi
         .fn()
-        .mockImplementationOnce(async ({ input, options }) => ({
-          inc2: (options as { inc: number }).inc + 1,
+        .mockImplementationOnce(async ({ input, ctx }) => ({
+          inc2: (ctx as { inc: number }).inc + 1,
           str: input.n.toFixed(2),
           transform: "test",
         }));
@@ -71,8 +71,8 @@ describe("Endpoint", () => {
       expect(middlewareMock).toHaveBeenCalledTimes(1);
       expect(middlewareMock).toHaveBeenCalledWith({
         input: { n: 453 },
-        options: {
-          inc: 454, // due to reassignment of options
+        ctx: {
+          inc: 454, // due to reassignment
         },
         request: requestMock,
         response: responseMock,
@@ -81,7 +81,7 @@ describe("Endpoint", () => {
       expect(handlerMock).toHaveBeenCalledTimes(1);
       expect(handlerMock).toHaveBeenCalledWith({
         input: { n: 453 },
-        options: { inc: 454 },
+        ctx: { inc: 454 },
         logger: loggerMock,
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
@@ -89,7 +89,7 @@ describe("Endpoint", () => {
         error: null,
         input: { n: 453 },
         logger: loggerMock,
-        options: { inc: 454 },
+        ctx: { inc: 454 },
         output: { inc2: 455, str: "453.00", transform: 4 },
         request: requestMock,
         response: responseMock,
@@ -210,7 +210,7 @@ describe("Endpoint", () => {
       expect(loggerMock._getLogs().error).toHaveLength(0);
       expect(loggerMock._getLogs().warn).toEqual([
         [
-          "A middleware has closed the stream. Accumulated options:",
+          "A middleware has closed the stream. Accumulated context:",
           { inc: 454 },
         ],
       ]);
@@ -240,7 +240,7 @@ describe("Endpoint", () => {
         error: null,
         logger: loggerMock,
         input: {},
-        options: {},
+        ctx: {},
         output: { test: "OK" },
         request: requestMock,
         response: responseMock,

@@ -5,6 +5,12 @@
 ### v26.0.0
 
 - `DependsOnMethod` removed: use flat syntax with explicit method and a slash;
+- `options` property renamed to `ctx` in argument of:
+  - `Middleware::handler()`,
+  - `ResultHandler::handler()`,
+  - `handler` of `EndpointsFactory::build()` argument,
+  - `testMiddleware()`;
+- `EndpointsFactory::addOptions()` renamed to `addContext()`;
 
 ```patch
   const routing: Routing = {

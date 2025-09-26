@@ -11,12 +11,24 @@ type NamedProp = TSESTree.PropertyNonComputedName & {
 
 interface Queries {
   dependsOnMethod: TSESTree.NewExpression;
+  handlerOptions: TSESTree.Property;
+  addOptions: TSESTree.Identifier;
+  testMiddlewareOptions: TSESTree.Property;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
   dependsOnMethod: `${NT.NewExpression}[callee.name='DependsOnMethod']`,
+  handlerOptions:
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='handler'] > ` +
+    `${NT.ArrowFunctionExpression} > ${NT.ObjectPattern} > ${NT.Property}[key.name='options']`,
+  addOptions:
+    `${NT.CallExpression}:has( ${NT.ArrowFunctionExpression} ) > ` +
+    `${NT.MemberExpression} > ${NT.Identifier}[name='addOptions']`,
+  testMiddlewareOptions:
+    `${NT.CallExpression}[callee.name='testMiddleware'] > ` +
+    `${NT.ObjectExpression} > ${NT.Property}[key.name='options']`,
 };
 
 const isNamedProp = (prop: TSESTree.ObjectLiteralElement): prop is NamedProp =>
@@ -103,6 +115,30 @@ const v26 = ESLintUtils.RuleCreator.withoutDocs({
               .join("\n");
             return fixer.replaceText(cursor, `{\n${nextProps}\n}`);
           },
+        });
+      },
+      handlerOptions: (node) => {
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "property", from: "options", to: "ctx" },
+          fix: (fixer) => fixer.replaceText(node.key, "ctx"),
+        });
+      },
+      addOptions: (node) => {
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "method", from: "addOptions", to: "addContext" },
+          fix: (fixer) => fixer.replaceText(node, "addContext"),
+        });
+      },
+      testMiddlewareOptions: (node) => {
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "property", from: "options", to: "ctx" },
+          fix: (fixer) => fixer.replaceText(node.key, "ctx"),
         });
       },
     }),

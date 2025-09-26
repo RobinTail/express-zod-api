@@ -32,11 +32,11 @@ import type { Routing } from "./routing";
 import { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 
-export type Handler<IN, OUT, OPT> = (params: {
+export type Handler<IN, OUT, CTX> = (params: {
   /** @desc The inputs from the enabled input sources validated against the final input schema (incl. Middlewares) */
   input: IN;
   /** @desc The returns of the assigned Middlewares */
-  options: OPT;
+  ctx: CTX;
   /** @desc The instance of the configured logger */
   logger: ActualLogger;
 }) => Promise<OUT>;
@@ -85,9 +85,9 @@ export abstract class AbstractEndpoint {
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
-  OPT extends FlatObject,
+  CTX extends FlatObject,
 > extends AbstractEndpoint {
-  readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0];
+  readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
 
   /** considered expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
@@ -106,7 +106,7 @@ export class Endpoint<
     middlewares?: AbstractMiddleware[];
     inputSchema: IN;
     outputSchema: OUT;
-    handler: Handler<z.output<IN>, z.input<OUT>, OPT>;
+    handler: Handler<z.output<IN>, z.input<OUT>, CTX>;
     resultHandler: AbstractResultHandler;
     description?: string;
     shortDescription?: string;
@@ -120,7 +120,7 @@ export class Endpoint<
   }
 
   #clone(
-    inc?: Partial<ConstructorParameters<typeof Endpoint<IN, OUT, OPT>>[0]>,
+    inc?: Partial<ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0]>,
   ) {
     return new Endpoint({ ...this.#def, ...inc });
   }
@@ -214,7 +214,7 @@ export class Endpoint<
   async #runMiddlewares({
     method,
     logger,
-    options,
+    ctx,
     response,
     ...rest
   }: {
@@ -223,7 +223,7 @@ export class Endpoint<
     request: Request;
     response: Response;
     logger: ActualLogger;
-    options: Partial<OPT>;
+    ctx: Partial<CTX>;
   }) {
     for (const mw of this.#def.middlewares || []) {
       if (
@@ -231,14 +231,11 @@ export class Endpoint<
         !(mw instanceof ExpressMiddleware)
       )
         continue;
-      Object.assign(
-        options,
-        await mw.execute({ ...rest, options, response, logger }),
-      );
+      Object.assign(ctx, await mw.execute({ ...rest, ctx, response, logger }));
       if (response.writableEnded) {
         logger.warn(
-          "A middleware has closed the stream. Accumulated options:",
-          options,
+          "A middleware has closed the stream. Accumulated context:",
+          ctx,
         );
         break;
       }
@@ -250,7 +247,7 @@ export class Endpoint<
     ...rest
   }: {
     input: Readonly<FlatObject>;
-    options: OPT;
+    ctx: CTX;
     logger: ActualLogger;
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
@@ -270,7 +267,7 @@ export class Endpoint<
       response: Response;
       logger: ActualLogger;
       input: FlatObject;
-      options: Partial<OPT>;
+      ctx: Partial<CTX>;
     },
   ) {
     try {
@@ -298,7 +295,7 @@ export class Endpoint<
     config: CommonConfig;
   }) {
     const method = getActualMethod(request);
-    const options: Partial<OPT> = {};
+    const ctx: Partial<CTX> = {};
     let result: DiscriminatedResult = { output: {}, error: null };
     const input = getInput(request, config.inputSources);
     try {
@@ -308,7 +305,7 @@ export class Endpoint<
         request,
         response,
         logger,
-        options,
+        ctx,
       });
       if (response.writableEnded) return;
       if (method === ("options" satisfies CORSMethod))
@@ -318,7 +315,7 @@ export class Endpoint<
           await this.#parseAndRunHandler({
             input,
             logger,
-            options: options as OPT, // ensured the complete OPT by writableEnded condition and try-catch
+            ctx: ctx as CTX, // ensured the complete CTX by writableEnded condition and try-catch
           }),
         ),
         error: null,
@@ -332,7 +329,7 @@ export class Endpoint<
       request,
       response,
       logger,
-      options,
+      ctx,
     });
   }
 }
