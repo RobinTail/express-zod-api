@@ -27,6 +27,13 @@
 
 ## Version 25
 
+### v25.5.0
+
+- Feature: `AbortSignal` for subscription handlers:
+  - The `handler` of `EventStreamFactory::build()` is now equipped with `signal` option;
+  - That signal is aborted when the client disconnects;
+  - The feature was suggested and implemented by [@jakub-msqt](https://github.com/jakub-msqt).
+
 ### v25.4.1
 
 - This patch fixes the issue for users facing `TypeError: .example is not a function`, but not using that method:

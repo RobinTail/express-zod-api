@@ -87,6 +87,7 @@ describe("SSE", () => {
         if (flushMock) responseMock.flush = flushMock;
         expect(output).toEqual({
           isClosed: expect.any(Function),
+          signal: expect.any(AbortSignal),
           emit: expect.any(Function),
         });
         const { isClosed, emit } = output as Emitter<{ test: z.ZodString }>;
@@ -100,6 +101,15 @@ describe("SSE", () => {
         expect(isClosed()).toBeTruthy();
       },
     );
+
+    test("should abort signal on connection close", async () => {
+      const middleware = makeMiddleware({ test: z.string() });
+      const { requestMock, output } = await testMiddleware({ middleware });
+      const { signal } = output as Emitter<{ test: z.ZodString }>;
+      expect(signal.aborted).toBeFalsy();
+      requestMock.emit("close");
+      expect(signal.aborted).toBeTruthy();
+    });
   });
 
   describe("makeResultHandler()", () => {

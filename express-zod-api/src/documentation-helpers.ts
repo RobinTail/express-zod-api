@@ -363,7 +363,7 @@ const depicters: Partial<Record<FirstPartyKind | ProprietaryBrand, Depicter>> =
   };
 
 /**
- * @todo simplify if fixed (unable to customize references):
+ * Changes references relative to a schema root into the ones relative to a document root
  * @link https://github.com/colinhacks/zod/issues/4281
  * */
 const fixReferences = (

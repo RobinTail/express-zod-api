@@ -16,6 +16,8 @@ type EventsMap = Record<string, z.ZodType>;
 export interface Emitter<E extends EventsMap> extends FlatObject {
   /** @desc Returns true when the connection was closed or terminated */
   isClosed: () => boolean;
+  /** @desc Abort signal bound to the client connection lifecycle */
+  signal: AbortSignal;
   /** @desc Sends an event to the stream according to the declared schema */
   emit: <K extends keyof E>(event: K, data: z.input<E[K]>) => void;
 }
@@ -55,9 +57,18 @@ export const ensureStream = (response: Response) =>
 
 export const makeMiddleware = <E extends EventsMap>(events: E) =>
   new Middleware({
-    handler: async ({ response }): Promise<Emitter<E>> =>
-      setTimeout(() => ensureStream(response), headersTimeout) && {
+    handler: async ({ request, response }): Promise<Emitter<E>> => {
+      const controller = new AbortController();
+
+      request.once("close", () => {
+        controller.abort();
+      });
+
+      setTimeout(() => ensureStream(response), headersTimeout);
+
+      return {
         isClosed: () => response.writableEnded || response.closed,
+        signal: controller.signal,
         emit: (event, data) => {
           ensureStream(response);
           response.write(formatEvent(events, event, data), "utf-8");
@@ -67,7 +78,8 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
            * */
           response.flush?.();
         },
-      },
+      };
+    },
   });
 
 export const makeResultHandler = <E extends EventsMap>(events: E) =>
