@@ -21,6 +21,7 @@ minimumReleaseAgeExclude:
   - eslint
   - express
   - http-errors
+  - rolldown
   - typescript
   - tsdown
   - tsx
