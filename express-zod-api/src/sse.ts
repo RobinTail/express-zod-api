@@ -64,6 +64,10 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
         controller.abort();
       });
 
+      response.once("close", () => {
+        controller.abort();
+      });
+
       setTimeout(() => ensureStream(response), headersTimeout);
 
       return {
