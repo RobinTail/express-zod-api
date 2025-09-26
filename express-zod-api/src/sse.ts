@@ -64,7 +64,9 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
         controller.abort();
       });
 
-     return setTimeout(() => ensureStream(response), headersTimeout) && {
+     setTimeout(() => ensureStream(response), headersTimeout)
+
+     return {
         isClosed: () => response.writableEnded || response.closed,
         signal: controller.signal,
         emit: (event, data) => {
