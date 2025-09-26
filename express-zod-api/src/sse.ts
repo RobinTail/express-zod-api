@@ -60,7 +60,7 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
     handler: async ({ request, response }): Promise<Emitter<E>> => {
       const controller = new AbortController();
 
-      request.on("close", () => {
+      request.once("close", () => {
         controller.abort();
       });
 
