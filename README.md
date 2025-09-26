@@ -1372,7 +1372,7 @@ const subscriptionEndpoint = new EventStreamFactory({
   time: z.int().positive(),
 }).buildVoid({
   input: z.object({}), // optional input schema
-  handler: async ({ options: { emit, isClosed } }) => {
+  handler: async ({ options: { emit, isClosed, signal } }) => {
     while (!isClosed()) {
       emit("time", Date.now());
       await setTimeout(1000);
