@@ -85,6 +85,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/jakub-msqt.png" alt="@jakub-msqt" width="50px" />](https://github.com/jakub-msqt)
 [<img src="https://github.com/misha-z1nchuk.png" alt="@misha-z1nchuk" width="50px" />](https://github.com/misha-z1nchuk)
 [<img src="https://github.com/GreaterTamarack.png" alt="@GreaterTamarack" width="50px" />](https://github.com/GreaterTamarack)
 [<img src="https://github.com/pepegc.png" alt="@pepegc" width="50px" />](https://github.com/pepegc)
@@ -1371,7 +1372,7 @@ const subscriptionEndpoint = new EventStreamFactory({
   time: z.int().positive(),
 }).buildVoid({
   input: z.object({}), // optional input schema
-  handler: async ({ options: { emit, isClosed } }) => {
+  handler: async ({ options: { emit, isClosed, signal } }) => {
     while (!isClosed()) {
       emit("time", Date.now());
       await setTimeout(1000);
