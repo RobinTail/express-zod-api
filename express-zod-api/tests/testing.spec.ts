@@ -61,17 +61,17 @@ describe("Testing", () => {
     test("Should test a middleware", async () => {
       const { output } = await testMiddleware({
         requestProps: { method: "POST", body: { test: "something" } },
-        options: { prev: "accumulated" },
+        ctx: { prev: "accumulated" },
         middleware: new Middleware({
           input: z.object({ test: z.string() }),
-          handler: async ({ options, input: { test } }) => ({
-            optKeys: Object.keys(options),
+          handler: async ({ ctx, input: { test } }) => ({
+            ctxKeys: Object.keys(ctx),
             inpLen: test.length,
           }),
         }),
       });
       expect(output).toEqual({
-        optKeys: ["prev"],
+        ctxKeys: ["prev"],
         inpLen: 9,
       });
     });

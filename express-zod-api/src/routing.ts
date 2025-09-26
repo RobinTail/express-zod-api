@@ -3,9 +3,8 @@ import createHttpError from "http-errors";
 import { isProduction } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { ContentType } from "./content-type";
-import { DependsOnMethod } from "./depends-on-method";
 import { Diagnostics } from "./diagnostics";
-import { AbstractEndpoint } from "./endpoint";
+import type { AbstractEndpoint } from "./endpoint";
 import { CORSMethod, isMethod } from "./method";
 import { OnEndpoint, walkRouting } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
@@ -19,7 +18,7 @@ import * as R from "ramda";
  * @example { v1: { "patch /books/:bookId": changeBookEndpoint } }
  * */
 export interface Routing {
-  [K: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
+  [K: string]: Routing | AbstractEndpoint | ServeStatic;
 }
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;

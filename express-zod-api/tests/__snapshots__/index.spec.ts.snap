@@ -2,8 +2,6 @@
 
 exports[`Index Entrypoint > exports > BuiltinLogger should have certain value 1`] = `[Function]`;
 
-exports[`Index Entrypoint > exports > DependsOnMethod should have certain value 1`] = `[Function]`;
-
 exports[`Index Entrypoint > exports > Documentation should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > DocumentationError should have certain value 1`] = `[Function]`;
@@ -84,7 +82,6 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "ResultHandler",
   "defaultResultHandler",
   "arrayResultHandler",
-  "DependsOnMethod",
   "ServeStatic",
   "createServer",
   "attachRouting",
