@@ -2,6 +2,11 @@
 
 ## Version 25
 
+### v25.5.1
+
+- Aligned the requirements on Node.js versions between for `@express-zod-api/zod-plugin`;
+- Added the `signal` property, introduced in [v25.5.0](#v2550), to example in Readme.
+
 ### v25.5.0
 
 - Feature: `AbortSignal` for subscription handlers:
