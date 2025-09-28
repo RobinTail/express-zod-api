@@ -21,16 +21,14 @@ export const findNestedSchema = (
   { io, condition }: NestedSchemaLookupProps,
 ) =>
   R.tryCatch(
-    () => {
-      z.toJSONSchema(subject, {
+    () =>
+      void z.toJSONSchema(subject, {
         io,
         unrepresentable: "any",
         override: ({ zodSchema }) => {
           if (condition(zodSchema)) throw new DeepCheckError(zodSchema); // exits early
         },
-      });
-      return undefined;
-    },
+      }),
     (err: DeepCheckError) => err.cause,
   )();
 
