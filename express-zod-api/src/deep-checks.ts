@@ -73,6 +73,7 @@ const unsupported: FirstPartyKind[] = [
   "void",
   "promise",
   "never",
+  "function",
 ];
 
 export const findJsonIncompatible = (

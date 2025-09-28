@@ -511,7 +511,7 @@ describe("Routing", () => {
       });
     });
 
-    const circular: z.ZodType = z.lazy(() => z.tuple([circular, z.nan()]));
+    const circular: z.ZodType = z.lazy(() => z.tuple([circular, z.function()]));
     test.each([
       [z.bigint(), z.set(z.string())],
       [z.nan(), z.map(z.string(), z.boolean())],
