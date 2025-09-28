@@ -1,6 +1,8 @@
 {
   "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
+    "module": "node20",
+    "target": "es2023",
     "noImplicitAny": true,
     "noImplicitOverride": true,
     "noUncheckedSideEffectImports": true,
