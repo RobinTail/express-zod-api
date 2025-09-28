@@ -16,7 +16,7 @@ const extractQuickStartFromReadme = async () => {
 
 const quickStart = await extractQuickStartFromReadme();
 const program = `
-import { givePort } from "../tools/ports";
+import { givePort } from "../tools/ports.ts";
 ${quickStart}
 `;
 
