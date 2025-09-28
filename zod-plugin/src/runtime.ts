@@ -1,7 +1,7 @@
 import { globalRegistry, z } from "zod";
-import { name } from "../package.json";
-import { setBrand } from "./brand";
-import { remap } from "./remap";
+import manifest from "../package.json" with { type: "json" };
+import { setBrand } from "./brand.ts";
+import { remap } from "./remap.ts";
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
   const examples = globalRegistry.get(this)?.examples?.slice() || [];
@@ -17,7 +17,7 @@ const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
   return this.meta({ default: defaultLabel });
 };
 
-const pluginFlag = Symbol.for(name);
+const pluginFlag = Symbol.for(manifest.name);
 
 if (!(pluginFlag in globalThis)) {
   (globalThis as Record<symbol, unknown>)[pluginFlag] = true;
