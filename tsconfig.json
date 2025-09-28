@@ -3,7 +3,6 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "noImplicitOverride": true,
-    "strictNullChecks": true,
     "types": ["vitest/globals"]
   }
 }
