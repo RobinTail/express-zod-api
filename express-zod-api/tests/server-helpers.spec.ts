@@ -1,5 +1,5 @@
 import { fail } from "node:assert/strict";
-import { fileUploadMock } from "./express-mock";
+import { fileUploadMock } from "./express-mock.ts";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,
@@ -12,14 +12,18 @@ import {
   installDeprecationListener,
   installTerminationListener,
   localsID,
-} from "../src/server-helpers";
-import { CommonConfig, defaultResultHandler, ResultHandler } from "../src";
+} from "../src/server-helpers.ts";
+import {
+  CommonConfig,
+  defaultResultHandler,
+  ResultHandler,
+} from "../src/index.ts";
 import { Request } from "express";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
-} from "../src/testing";
+} from "../src/testing.ts";
 import createHttpError from "http-errors";
 
 describe("Server helpers", () => {
