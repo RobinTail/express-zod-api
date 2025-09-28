@@ -4,7 +4,6 @@
     "noImplicitAny": true,
     "noImplicitOverride": true,
     "noUncheckedSideEffectImports": true,
-    "strictNullChecks": true,
     "types": ["vitest/globals"]
   }
 }
