@@ -1,7 +1,7 @@
 import { BuiltinLogger, createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
 import createHttpError from "http-errors";
-import { givePort } from "../tools/ports";
+import { givePort } from "../tools/ports.ts";
 import qs from "qs";
 
 export const config = createConfig({
