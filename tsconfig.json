@@ -7,6 +7,7 @@
     "noImplicitAny": true,
     "noImplicitOverride": true,
     "noUncheckedSideEffectImports": true,
+    "resolveJsonModule": true,
     "types": ["vitest/globals"]
   }
 }
