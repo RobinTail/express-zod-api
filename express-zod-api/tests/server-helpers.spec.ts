@@ -98,10 +98,7 @@ describe("Server helpers", () => {
       expect(spy.mock.calls[0][0].response).toEqual(responseMock);
     });
 
-    test.each([
-      () => assert.fail("I am faulty"),
-      async () => assert.fail("I am faulty"),
-    ])(
+    test.each([() => fail("I am faulty"), () => Promise.reject("I am faulty")])(
       "should call Last Resort Handler in case of ResultHandler is faulty %#",
       async (rhImpl) => {
         const errorHandler = new ResultHandler({
