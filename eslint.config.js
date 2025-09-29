@@ -24,6 +24,10 @@ const importConcerns = [
     selector: "ImportDeclaration[source.value=/^zod/] > ImportDefaultSpecifier",
     message: "do import { z } instead",
   },
+  {
+    selector: "ImportDeclaration[source.value=/^\\..+\\.js$/]",
+    message: "use .ts extension for relative imports",
+  },
   ...builtinModules.map((mod) => ({
     selector: `ImportDeclaration[source.value='${mod}']`,
     message: `use node:${mod} for the built-in module`,
