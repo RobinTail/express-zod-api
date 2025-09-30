@@ -25,7 +25,7 @@ const importConcerns = [
     message: "do import { z } instead",
   },
   {
-    selector: "ImportDeclaration[source.value=/^\\..+\\.js$/]",
+    selector: "ImportDeclaration[source.value=/\\.js$/]",
     message: "use .ts extension for relative imports",
   },
   ...builtinModules.map((mod) => ({
