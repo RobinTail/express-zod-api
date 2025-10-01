@@ -68,6 +68,10 @@ const performanceConcerns = [
     selector: "MemberExpression[object.name='R'] > Identifier[name='union']", // #2599
     message: "R.union() is 1.5x slower than [...Set().add()]",
   },
+  {
+    selector: "ImportDeclaration[source.value=/package.json$/]", // #2974
+    message: "it can not be tree shaken, use tsdown and process.env instead",
+  },
 ];
 
 const tsFactoryConcerns = [
