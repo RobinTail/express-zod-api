@@ -1,5 +1,4 @@
 import { globalRegistry, z } from "zod";
-import manifest from "../package.json" with { type: "json" };
 import { setBrand } from "./brand.ts";
 import { remap } from "./remap.ts";
 
@@ -17,7 +16,8 @@ const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
   return this.meta({ default: defaultLabel });
 };
 
-const pluginFlag = Symbol.for(manifest.name);
+// eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN
+const pluginFlag = Symbol.for(process.env.TSDOWN_SELF!);
 
 if (!(pluginFlag in globalThis)) {
   (globalThis as Record<symbol, unknown>)[pluginFlag] = true;
