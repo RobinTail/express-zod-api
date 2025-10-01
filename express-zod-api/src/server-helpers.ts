@@ -9,9 +9,9 @@ import { lastResortHandler } from "./last-resort.ts";
 import { ResultHandlerError } from "./errors.ts";
 import { ensureError } from "./common-helpers.ts";
 import { monitor } from "./graceful-shutdown.ts";
-import manifest from "../package.json" with { type: "json" };
 
-export const localsID = Symbol.for(manifest.name);
+// eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN
+export const localsID = Symbol.for(process.env.TSDOWN_SELF!);
 
 type EquippedRequest = Request<
   unknown,
