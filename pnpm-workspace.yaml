@@ -16,6 +16,7 @@ minimumReleaseAge: 2880 # 2 days
 minimumReleaseAgeExclude:
   - "@types/*"
   - "@eslint/*"
+  - "@rolldown/*"
   - "@vitest/*"
   - "@typescript-eslint/*"
   - eslint
