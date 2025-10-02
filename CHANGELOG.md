@@ -2,6 +2,17 @@
 
 ## Version 25
 
+### v25.5.2
+
+- Added `z.function()` to the list of JSON-incompatible schemas:
+  - It will warn when using such schema in a JSON operating Endpoint;
+  - `z.function()` [became a schema again](https://github.com/colinhacks/zod/issues/4143) in Zod 4.1.0.
+
+### v25.5.1
+
+- Aligned the requirements on Node.js versions between for `@express-zod-api/zod-plugin`;
+- Added the `signal` property, introduced in [v25.5.0](#v2550), to example in Readme.
+
 ### v25.5.0
 
 - Feature: `AbortSignal` for subscription handlers:

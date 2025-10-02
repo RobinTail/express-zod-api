@@ -3,7 +3,7 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "noImplicitOverride": true,
-    "strictNullChecks": true,
+    "noUncheckedSideEffectImports": true,
     "types": ["vitest/globals"]
   }
 }
