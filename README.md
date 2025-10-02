@@ -183,9 +183,13 @@ pnpm add -D @types/express @types/node @types/http-errors
 
 ## Environment preparation
 
-Consider using the recommended `tsconfig.json` base for your project according to your Node.js version,
-for example [the base for Node.js 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json).
-Ensure having the following options in order to make it work as expected:
+Starting v25, ensure running your code as ESM module by either:
+
+- setting `"type": "module"` in your `package.json`;
+- or using `.mts` file extension;
+- or using `tsx` or `vite-node` or similar tools.
+
+Enable the following `compilerOptions` in your `tsconfig.json` to make it work as expected:
 
 ```json
 {
