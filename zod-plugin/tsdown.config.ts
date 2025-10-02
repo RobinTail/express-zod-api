@@ -4,7 +4,7 @@ export default defineConfig([
   {
     entry: "src/index.ts",
     minify: true,
-    attw: { profile: "esmOnly", level: "error" },
+    attw: { level: "error" },
     banner: {
       dts: "import './augmentation.js';",
     },
