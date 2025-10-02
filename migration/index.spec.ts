@@ -11,15 +11,16 @@ const tester = new RuleTester({
   languageOptions: { parser },
 });
 
+const ruleName =
+  `v${manifest.version.split(".")[0]}` as keyof typeof migration.rules;
+
 describe("Migration", () => {
   test("should consist of one rule being the major version of the package", () => {
-    expect(migration.rules).toHaveProperty(
-      `v${manifest.version.split(".")[0]}`,
-    );
+    expect(migration.rules).toHaveProperty(ruleName);
     expect(migration).toMatchSnapshot();
   });
 
-  tester.run("v25", migration.rules.v25, {
+  tester.run(ruleName, migration.rules[ruleName], {
     valid: [
       `import {} from "zod";`,
       `ez.dateIn({ examples: ["1963-04-21"] });`,
