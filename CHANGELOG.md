@@ -1474,7 +1474,7 @@ const config = createConfig({
   - The ESLint plugin was introduced in v20.0.0 for automated migration from v19 (except assertions in tests);
   - For migrating from v19 use the following minimal config and run `eslint --fix`:
 
-```javascript
+```js
 // eslint.config.js (or .mjs if you're developing in a CommonJS environment)
 import parser from "@typescript-eslint/parser";
 import migration from "express-zod-api/migration";
@@ -1507,7 +1507,7 @@ export default [
       - it can also be a function returning one of those values depending on duration in milliseconds;
       - thus, you can immediately assess the measured performance.
 
-```typescript
+```ts
 const done = logger.profile({
   message: "expensive operation",
   severity: (ms) => (ms > 500 ? "error" : "info"),
@@ -1525,14 +1525,14 @@ done(); // error: expensive operation '555.55ms'
   - The output severity is `debug` (will be customizable later), so logger must have the corresponding `level`;
   - It prints the duration in log using adaptive units: from picoseconds to minutes.
 
-```typescript
+```ts
 // usage assuming that logger is an instance of BuiltinLogger
 const done = logger.profile("expensive operation");
 doExpensiveOperation();
 done(); // debug: expensive operation '555 milliseconds'
 ```
 
-```typescript
+```ts
 // to set up config using the built-in logger do this:
 import { createConfig, BuiltinLogger } from "express-zod-api";
 
@@ -1557,7 +1557,7 @@ declare module "express-zod-api" {
   - The method returns: `Promise<{ output, requestMock, responseMock, loggerMock }>`;
   - Export fixed in v20.14.3.
 
-```typescript
+```ts
 import { z } from "zod";
 import { Middleware, testMiddleware } from "express-zod-api";
 
@@ -1961,7 +1961,7 @@ const after = ez.raw({
   - Consider reusing `const` across your files for persistent connections;
   - In case of intentional non-persistent connection, consider resources cleanup if necessary:
 
-```typescript
+```ts
 import { createResultHandler } from "express-zod-api";
 
 const resultHandlerWithCleanup = createResultHandler({
@@ -2186,7 +2186,7 @@ withRest: # z.tuple([z.boolean()]).rest(z.string())
   - Suggested use case: database clients that do not close their connections when their instances are destroyed.
   - The `options` coming to Result Handler can be empty or incomplete in case of errors and failures.
 
-```typescript
+```ts
 import {
   createResultHandler,
   EndpointsFactory,
@@ -2223,7 +2223,7 @@ const dbEquippedFactory = new EndpointsFactory(
   - Please note: the `.debug()` method of the configured logger is used for upload related logging, therefore the
     severity `level` of that logger must be configured accordingly in order to see those messages.
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 import { Logger } from "winston";
 
@@ -2266,7 +2266,7 @@ info: POST: /v1/avatar/upload
   - It can be used to connect a middleware that restricts the ability to upload;
   - It accepts a function similar to `beforeRouting`, having `app` and `logger` in its argument.
 
-```typescript
+```ts
 import createHttpError from "http-errors";
 import { createConfig } from "express-zod-api";
 
@@ -2390,7 +2390,7 @@ after:
   - The option controls how deeply the objects should be inspected, serialized and printed.
   - It can be set to `null` or `Infinity` for unlimited depth.
 
-```typescript
+```ts
 // Reproduction example
 import { createConfig, createServer } from "express-zod-api";
 
@@ -2405,7 +2405,7 @@ subject.prop = subject;
 logger.error("Circular reference", subject);
 ```
 
-```typescript
+```ts
 // Feature example
 import { createConfig } from "express-zod-api";
 
@@ -2418,7 +2418,7 @@ createConfig({ logger: { level: "warn", depth: null } });
 
 - Fixed logging arrays by the default `winston` logger.
 
-```typescript
+```ts
 // before: Items { '0': 123 }
 // after:  Items [ 123 ]
 logger.debug("Items", [123]);
@@ -2555,7 +2555,7 @@ after:
   - The provider function receives the initially configured logger and the request, it can also be asynchronous;
   - Consider the following example in case of Winston logger:
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 import { Logger } from "winston"; // or another compatible logger
 import { randomUUID } from "node:crypto";
@@ -2837,7 +2837,7 @@ operationId:
     - Consider using `logger` property supplied to `createConfig()` instead;
     - Otherwise, supply also the `winston` argument to the helper (`import winston from "winston"`).
 
-```typescript
+```ts
 import winston from "winston";
 import { createConfig, createLogger, createServer } from "express-zod-api";
 
@@ -2860,7 +2860,7 @@ declare module "express-zod-api" {
 const { app, httpServer } = await createServer(config, routing);
 ```
 
-```typescript
+```ts
 // Adjust your tests: set the MockOverrides type once anywhere
 declare module "express-zod-api" {
   interface MockOverrides extends jest.Mock {} // or Mock from vitest
@@ -2890,7 +2890,7 @@ declare module "express-zod-api" {
 
 - Hotfix for 14.2.4: handling the case of empty object supplied as a second argument to the logger methods.
 
-```typescript
+```ts
 logger.info("Payload", {});
 ```
 
@@ -2898,7 +2898,7 @@ logger.info("Payload", {});
 
 - Fixed internal logging format when primitive are supplied as a second argument to the logger methods.
 
-```typescript
+```ts
 logger.info("Listening", 8090);
 ```
 
@@ -2934,7 +2934,7 @@ logger.info("Listening", 8090);
   - `ez.raw()` — which is the same as `z.object({ raw: ez.file().buffer() })`.
   - Thus, the raw data becomes available to a handler as `input.raw` property.
 
-```typescript
+```ts
 import express from "express";
 import { createConfig, defaultEndpointsFactory, ez } from "express-zod-api";
 
@@ -2965,7 +2965,7 @@ const rawAcceptingEndpoint = defaultEndpointsFactory.build({
     [in Node.js documentation](https://nodejs.org/dist/latest-v20.x/docs/api/net.html#serverlistenoptions-callback).
   - Thanks to [@huyhoang160593](https://github.com/huyhoang160593) for noticing the lack of configurability.
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 
 createConfig({
@@ -3014,7 +3014,7 @@ createConfig({
     - or `npm install -D @types/express @types/node @types/http-errors`
   - The property `DependsOnMethod::methods` is renamed to `endpoints`.
 
-```typescript
+```ts
 // before
 import { createHttpError } from "express-zod-api";
 // after
@@ -3034,7 +3034,7 @@ import createHttpError from "http-errors";
 - Featuring an ability to specify multiple server URLs when generating documentation.
   - This feature is a shorthand for `new Documentation().addServer()`
 
-```typescript
+```ts
 new Documentation({
   serverUrl: ["https://example1.com", "https://example2.com"],
   // ...
@@ -3046,7 +3046,7 @@ new Documentation({
 - Feature: ability to assign a function to the `operationId` property of the `EndpointsFactory::build()` argument.
   - This can help to customize the Operation ID for the endpoints serving multiple methods.
 
-```typescript
+```ts
 import { defaultEndpointsFactory } from "express-zod-api";
 
 defaultEndpointsFactory.build({
@@ -3064,7 +3064,7 @@ defaultEndpointsFactory.build({
   - When using this feature, you must ensure the uniqueness of the IDs you specified across your API endpoints.
   - The feature is implemented by [@john-schmitz](https://github.com/john-schmitz).
 
-```typescript
+```ts
 import { defaultEndpointsFactory } from "express-zod-api";
 
 defaultEndpointsFactory.build({
@@ -3081,7 +3081,7 @@ defaultEndpointsFactory.build({
   - The headers are lowercase when describing their validation schema.
   - Parameters in request headers described the following way are supported by the documentation generator.
 
-```typescript
+```ts
 import { createConfig, defaultEndpointsFactory } from "express-zod-api";
 import { z } from "zod";
 
@@ -3608,7 +3608,7 @@ after:
       implementation.
     - Read the [customization instructions](README.md#customizing-input-sources).
 
-```typescript
+```ts
 // Your custom ResultHandler
 // Before: if you're having an expression like this:
 if (error instanceof z.ZodError) {
@@ -3642,7 +3642,7 @@ inputSources: { delete: ["body", "query", "params"] }
   - `mimeType` overrides `mimeTypes` when both are specified.
   - The `createApiResponse()` method is deprecated and will be removed in next major release.
 
-```typescript
+```ts
 // JSON responding ResultHandler Example
 // before
 createResultHandler({
@@ -3657,7 +3657,7 @@ createResultHandler({
 });
 ```
 
-```typescript
+```ts
 // Example on customizing MIME types and status codes
 // before
 createResultHandler({
@@ -3740,7 +3740,7 @@ after:
   - The list of required object properties was depicted incorrectly by the OpenAPI generator in case of using the new
     `coerce` feature in the response schema.
 
-```typescript
+```ts
 // reproduction example
 const endpoint = defaultEndpointsFactory.build({
   // ...
@@ -3776,7 +3776,7 @@ after:
     - `ZodNativeEnum` (similar to `ZodEnum`), `ZodCatch`, `ZodBranded`, `ZodPipeline`.
   - Additionally, the representation of some schemas have been changed slightly:
 
-```typescript
+```ts
 interface Changes<T> {
   ZodFile: {
     before: any;
@@ -3839,7 +3839,7 @@ output/anything: Number must be greater than 0
 - The regular expression used for validating `z.dateIn()` made easier
   by [@niklashigi](https://github.com/niklashigi).
 
-```typescript
+```ts
 const before = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{3})?)?Z?$/;
 const after = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/;
 ```
@@ -3862,7 +3862,7 @@ const after = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/;
   - The list of the allowed methods in the response to `OPTIONS` request did only contain the first method declared
     within `DependsOnMethod` instance.
 
-```typescript
+```ts
 // reproduction minimal setup
 const routing: Routing = {
   test: new DependsOnMethod({
@@ -3948,7 +3948,7 @@ after:
   - The feature suggested by [@johngeorgewright](https://github.com/johngeorgewright)
     and [ssteuteville](https://github.com/ssteuteville).
 
-```typescript
+```ts
 // example
 import { z } from "express-zod-api";
 
@@ -3982,7 +3982,7 @@ const endpoint = endpointsFactory.build({
     generated from the `description` by trimming.
   - You can optionally disable this behavior with the new option `hasSummaryFromDescription` of the `OpenAPI` generator.
 
-```typescript
+```ts
 const exampleEndpoint = yourEndpointsFactory.build({
   // ...
   description: "The detailed explanaition on what this endpoint does.",
@@ -4004,7 +4004,7 @@ const exampleEndpoint = yourEndpointsFactory.build({
   - The feature suggested by [@TheWisestOne](https://github.com/TheWisestOne).
 - The property `scopes` (introduced in v7.9.0) has got its singular variation `scope`.
 
-```typescript
+```ts
 import {
   createConfig,
   EndpointsFactory,
@@ -4064,7 +4064,7 @@ const exampleEndpoint = taggedEndpointsFactory.build({
   - The list of the allowed methods in the response to `OPTIONS` request did only contain the first method declared
     within `DependsOnMethod` instance.
 
-```typescript
+```ts
 // reproduction minimal setup
 const routing: Routing = {
   test: new DependsOnMethod({
@@ -4097,7 +4097,7 @@ const routing: Routing = {
   - In this case that entity will be stringified into a `.message` of `Error`.
   - The issue manifested itself as a positive API response without data.
 
-```typescript
+```ts
 // reproduction example
 const myEndpoint = defaultEndpointsFactory.build({
   method: "get",
@@ -4127,7 +4127,7 @@ const myEndpoint = defaultEndpointsFactory.build({
     flows including scopes.
   - Endpoints utilizing those middlewares can now specify their `scopes`.
 
-```typescript
+```ts
 import { createMiddleware, defaultEndpointsFactory, z } from "express-zod-api";
 
 // example middleware
@@ -4184,7 +4184,7 @@ const myEndpoint = defaultEndpointsFactory.addMiddleware(myMiddleware).build({
   - Supported security types: `basic`, `bearer`, `input`, `header`, `cookie`, `openid` and `oauth2`.
   - OpenID and OAuth2 security types are currently have the limited support: without scopes.
 
-```typescript
+```ts
 // example middleware
 import { createMiddleware } from "express-zod-api";
 
@@ -4254,7 +4254,7 @@ createMiddleware({
     - **Please note:** If using both `cors` package (express middleware) and `cors` configuration option, the
       configuration option sets CORS headers first, so the middleware can override them if needed.
 
-```typescript
+```ts
 import { defaultEndpointsFactory } from "express-zod-api";
 import cors from "cors";
 
@@ -4276,7 +4276,7 @@ const myFactory = defaultEndpointsFactory.addExpressMiddleware(
   - Setting `cors: true` implies the default headers;
   - The feature suggested by [@HardCoreQual](https://github.com/HardCoreQual).
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
@@ -4301,7 +4301,7 @@ Access-Control-Max-Age: 5000
   The output was empty, considering the first argument to be a message.
   It's fixed in this version by adding `[No message]` message before printing the object.
 
-```typescript
+```ts
 // reproduction example
 logger.debug({ something: "test" });
 ```
@@ -4379,7 +4379,7 @@ logger.debug({ something: "test" });
 - `zod-to-ts` version is 1.0.0.
   - The type of optional I/O parameters in the generated Client is aligned with `zod` definition.
 
-```typescript
+```ts
 interface Before {
   foo: number | undefined;
 }
@@ -4405,7 +4405,7 @@ interface After {
   - Its parameter `path` now contains substituted path params;
   - The feature suggested by [@hellovai](https://github.com/hellovai).
 
-```typescript
+```ts
 // example client-generator.ts
 import fs from "fs";
 import { Client } from "express-zod-api";
@@ -4413,7 +4413,7 @@ import { Client } from "express-zod-api";
 fs.writeFileSync("./frontend/client.ts", new Client(routing).print(), "utf-8");
 ```
 
-```typescript
+```ts
 // example frontend using the most simple Implementation based on fetch
 import { ExpressZodAPIClient } from "./client.ts";
 
@@ -4463,7 +4463,7 @@ client.provide("get", "/v1/user/retrieve", { id: "10" });
   - Instead, it is now documented using `oneOf` OpenAPI notation.
 - In addition, you can now also use the new `z.discriminatedUnion()` as the input schema on the top level.
 
-```typescript
+```ts
 // how to migrate
 export const myMiddleware = createMiddleware({
   input: z
@@ -4476,7 +4476,7 @@ export const myMiddleware = createMiddleware({
 });
 ```
 
-```typescript
+```ts
 // example
 const endpoint = defaultEndpointsFactory.build({
   method: "post",
@@ -4526,7 +4526,7 @@ const endpoint = defaultEndpointsFactory.build({
   - You can also specify an error transformer so that the `ResultHandler` would send the status you need.
     - In case the error is not a `HttpError`, the `ResultHandler` will send the status `500`.
 
-```typescript
+```ts
 import { defaultEndpointsFactory, createHttpError } from "express-zod-api";
 import cors from "cors";
 import { auth } from "express-oauth2-jwt-bearer";
@@ -4583,7 +4583,7 @@ const advancedUsage = defaultEndpointsFactory.use(auth(), {
   - `z.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHanlder` with a `string` representation in ISO
     format for the response transmission.
 
-```typescript
+```ts
 import { z, defaultEndpointsFactory } from "express-zod-api";
 
 const updateUserEndpoint = defaultEndpointsFactory.build({
@@ -4629,7 +4629,7 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
   - Only responses with compressible content types are subject to compression.
   - There is also a default threshold of 1KB that can be configured.
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
@@ -4675,7 +4675,7 @@ const config = createConfig({
   - You can find the documentation on these arguments here: http://expressjs.com/en/4x/api.html#express.static
   - The feature suggested by [@Isaac-Leonard](https://github.com/Isaac-Leonard).
 
-```typescript
+```ts
 import { Routing, ServeStatic } from "express-zod-api";
 import path from "path";
 
@@ -4697,7 +4697,7 @@ const routing: Routing = {
   - The method executes the endpoint and returns the created mocks.
   - After that you only need to assert your expectations in the test.
 
-```typescript
+```ts
 import { testEndpoint } from "express-zod-api";
 
 test("should respond successfully", async () => {
@@ -4725,7 +4725,7 @@ test("should respond successfully", async () => {
   - This option is only available when using `createServer()` method.
 - New configuration option `https`:
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
@@ -4760,7 +4760,7 @@ const config = createConfig({
   - Under the hood the method creates a middleware with an empty input and attaches it to the factory.
   - The argument supplied to the method is available within `options` parameter of the Endpoint's `handler`.
 
-```typescript
+```ts
 import { defaultEndpointsFactory } from "express-zod-api";
 
 const newFactory = defaultEndpointsFactory.addOptions({
@@ -4818,7 +4818,7 @@ after: "/v1/user/{id}"
   - You no longer need a middleware like `paramsProviderMiddleware` to handle path params.
   - The route path params are now reflected in the generated documentation.
 
-```typescript
+```ts
 const routingExample: Routing = {
   v1: {
     user: {
@@ -4846,7 +4846,7 @@ const getUserEndpoint = endpointsFactory.build({
 
 - The default configuration of `inputSources` has been changed.
 
-```typescript
+```ts
 const newInputSourcesByDefault: InputSources = {
   get: ["query", "params"],
   post: ["body", "params", "files"],
@@ -4890,7 +4890,7 @@ const newInputSourcesByDefault: InputSources = {
   - Notice: `withMeta()` mutates its argument;
   - The feature suggested by [@digimuza](https://github.com/digimuza).
 
-```typescript
+```ts
 import { defaultEndpointsFactory } from "express-zod-api";
 
 const exampleEndpoint = defaultEndpointsFactory.build({
@@ -4957,7 +4957,7 @@ example:
 - New config option `inputSources` allows you to specify the properties of the request, that are combined into an
   input that is being validated and available to your endpoints and middlewares.
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 
 createConfig({
@@ -4975,7 +4975,7 @@ createConfig({
 
 - For example, in case you need `query` along with `body` available to your endpoints handling POST requests, consider:
 
-```typescript
+```ts
 createConfig({
   // ...,
   inputSources: {
@@ -4994,7 +4994,7 @@ createConfig({
   so I add startup logo in this regard.
 - However, you can turn it off with a simple setting:
 
-```typescript
+```ts
 import {createConfig} from 'express-zod-api';
 
 const config = createConfig({
@@ -5010,7 +5010,7 @@ const config = createConfig({
   - In case of using enums and literals in the key schema they will be described as required ones in the generated
     OpenAPI / Swagger documentation.
 
-```typescript
+```ts
 // example
 z.record(
   z.enum(["option1", "option2"]), // keys
@@ -5021,7 +5021,7 @@ z.record(
 - Feature #145: `attachRouting()` now returns the `logger` instance and `notFoundHandler`. You can use it with your
   custom express app for handling `404` (not found) errors:
 
-```typescript
+```ts
 const { notFoundHandler } = attachRouting(config, routing);
 app.use(notFoundHandler);
 app.listen();
@@ -5029,7 +5029,7 @@ app.listen();
 
 - Or you can use the `logger` instance with any `ResultHandler` for the same purpose:
 
-```typescript
+```ts
 const { logger } = attachRouting(config, routing);
 app.use((request, response) => {
   defaultResultHandler.handler({
@@ -5064,7 +5064,7 @@ app.listen();
 - Introducing the new schema: `z.upload()`.
 - New configuration option:
 
-```typescript
+```ts
 const config = createConfig({
   server: {
     upload: true,
@@ -5083,7 +5083,7 @@ const config = createConfig({
 
 - Creating the `Endpoint`:
 
-```typescript
+```ts
 const fileUploadEndpoint = defaultEndpointsFactory.build({
   method: "post",
   type: "upload", // <- new option, required
@@ -5122,7 +5122,7 @@ after:
   Please avoid using it for Endpoint outputs.
 - Supporting default values of optional properties in OpenAPI/Swagger documentation.
 
-```typescript
+```ts
 // example
 z.object({
   name: z.string().optional().default("John Wick"),
@@ -5146,7 +5146,7 @@ z.object({
   - Please use helper function `createConfig()`.
   - This way it assigns the correct type for using configuration with `createServer()` and `attachRouting()`.
 
-```typescript
+```ts
 // before
 const configBefore: ConfigType = {
   server: {
@@ -5253,7 +5253,7 @@ ZodString: # z.string()
   `.base64()` which also reflected in the generated Swagger / OpenAPI documentation.
   You can use it instead of `z.string()` with `createApiResponse()`:
 
-```typescript
+```ts
 // before
 const fileStreamingEndpointsFactoryBefore = new EndpointsFactory(
   createResultHandler({
@@ -5310,7 +5310,7 @@ const fileStreamingEndpointsFactoryAfter = new EndpointsFactory(
   facilitate type inference with essentially double nesting of generic types. Typescript does not yet support such
   features as `MyGenericType<A<B>>`.
 
-```typescript
+```ts
 // before
 export const endpointsFactoryBefore = new EndpointsFactory();
 // after
@@ -5319,14 +5319,14 @@ export const endpointsFactoryAfter = new EndpointsFactory(defaultResultHandler);
 import { defaultEndpointsFactory } from "express-zod-api";
 ```
 
-```typescript
+```ts
 // before
 resultHandler: ResultHandler; // optional
 // after
 errorHandler: ResultHandlerDefinition<any, any>; // optional, default: defaultResultHandler
 ```
 
-```typescript
+```ts
 // Example. Before (v1):
 import { EndpointOutput } from "express-zod-api";
 
@@ -5369,7 +5369,7 @@ type MyEndpointResponse = EndpointResponse<typeof myEndpointV2>; // => the follo
 //  }
 ```
 
-```typescript
+```ts
 // before
 new OpenAPI({
   /* ... */
@@ -5380,7 +5380,7 @@ new OpenAPI({
 }).getSpecAsYaml();
 ```
 
-```typescript
+```ts
 // before
 const myResultHandlerV1: ResultHandler = ({
   error,
@@ -5439,7 +5439,7 @@ const myResultHandlerV2 = createResultHandler({
 - Ability to specify the endpoint description and export it to the Swagger / OpenAPI specification:
   - The feature suggested by [@glitch452](https://github.com/glitch452).
 
-```typescript
+```ts
 // example
 const endpoint = endpointsFactory.build({
   description: "Here is an example description of the endpoint",
@@ -5449,7 +5449,7 @@ const endpoint = endpointsFactory.build({
 
 - Ability to specify either `methods` or `method` property to `.build()`. This is just a more convenient way for a single method case.
 
-```typescript
+```ts
 // example
 const endpoint = endpointsFactory.build({
   method: "get", // same as methods:['get'] before
@@ -5461,7 +5461,7 @@ const endpoint = endpointsFactory.build({
   It can also be the same Endpoint that handle multiple methods as well.
   This is a solution for the question raised in issue [#29](https://github.com/RobinTail/express-zod-api/issues/29).
 
-```typescript
+```ts
 // example of different I/O schemas for /v1/user
 const routing: Routing = {
   v1: {
@@ -5506,7 +5506,7 @@ const routing: Routing = {
 - Zod version is v3.0.0-beta.1.
 - Ability to use z.ZodIntersection and z.ZodUnion as an I/O schema for handlers and middlewares.
 
-```typescript
+```ts
 // example
 const middleware = createMiddleware({
   input: z
@@ -5526,7 +5526,7 @@ const middleware = createMiddleware({
 
 - Ability to use `z.transform()` in handler's output schema.
 
-```typescript
+```ts
 // example
 const endpoint = factory.build({
   methods: ["post"],
@@ -5554,7 +5554,7 @@ const endpoint = factory.build({
 
 - `ConfigType` changes:
 
-```typescript
+```ts
 // before
 export interface ConfigType {
   server: {
@@ -5588,7 +5588,7 @@ export type ConfigType = (
 
 - More convenient way to attach routing to your custom express app:
 
-```typescript
+```ts
 // before
 initRouting({ app, logger, config, routing });
 // after
@@ -5606,7 +5606,7 @@ attachRouting(config, routing);
 - Ability to specify your custom Winston logger in config.
 - `createLogger()` now accepts `LoggerConfig` as an argument:
 
-```typescript
+```ts
 // before
 createLogger(config);
 // after
@@ -5622,7 +5622,7 @@ createLogger(config.logger);
 - Zod version is v3.0.0-alpha33.
 - The syntax for generating the Swagger/OpenAPI specification has changed:
 
-```typescript
+```ts
 // before
 generateOpenApi().getSpecAsYaml();
 // after
