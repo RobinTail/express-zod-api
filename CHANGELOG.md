@@ -1474,7 +1474,7 @@ const config = createConfig({
   - The ESLint plugin was introduced in v20.0.0 for automated migration from v19 (except assertions in tests);
   - For migrating from v19 use the following minimal config and run `eslint --fix`:
 
-```javascript
+```js
 // eslint.config.js (or .mjs if you're developing in a CommonJS environment)
 import parser from "@typescript-eslint/parser";
 import migration from "express-zod-api/migration";
