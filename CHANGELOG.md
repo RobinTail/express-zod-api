@@ -4,12 +4,12 @@
 
 ### v25.5.3
 
-- Updating environment requirements in Readme:
-  - Version 25 should be run in ESM environment, because it installs Zod plugin using `import` statement;
-  - To ensure that, either set `type: module` in `package.json`, use `.mts` extension or run using `tsx`/`vite-node`;
-  - Despite supporting `require(ESM)` by all Node.js versions, `zod` remains a dual package with CJS and ESM copies;
-  - If your code `require("zod")` (CJS) it's not the same one that the framework `import`s;
-  - That can lead to `TypeError: example is not a function` and losing the metadata set by `.meta()` method;
+- Updated environment requirements in the Readme:
+  - Version 25 should be run in an ESM environment because it installs the Zod plugin using the `import` statement;
+  - To ensure this, either set `type: module` in `package.json`, use `.mts` extension, or run using `tsx`/`vite-node`;
+  - Although all Node.js versions support `require(ESM)`, `zod` remains a dual package with both CJS and ESM copies;
+  - If your code uses `require("zod")` (CJS), it is not the same instance that the framework operates;
+  - This can lead to `TypeError: example is not a function` and loss of metadata set by the `.meta()` method;
   - This issue was reported by [@squishykid](https://github.com/squishykid).
 
 ### v25.5.2
