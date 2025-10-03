@@ -2,6 +2,16 @@
 
 ## Version 25
 
+### v25.5.3
+
+- Updating environment requirements in Readme:
+  - Version 25 has to be run in ESM environment, because it installs Zod plugin using `import` statement;
+  - To ensure that, either set `type: module` in `package.json`, use `.mts` extension or run using `tsx`/`vite-node`;
+  - Despite supporting `require(ESM)` by all Node.js versions, `zod` remains a dual package with CJS and ESM copies;
+  - If your code `require("zod")` (CJS) it's not the same one that the framework `import`s;
+  - That can lead to `TypeError: example is not a function`, malfunctioning `.meta()` method and other weirdness;
+  - This issue was reported by [@squishykid](https://github.com/squishykid).
+
 ### v25.5.2
 
 - Added `z.function()` to the list of JSON-incompatible schemas:
@@ -75,9 +85,10 @@ const config = createConfig({
 - Supported Node.js versions: `^20.19.0 || ^22.12.0 || ^24.0.0`;
 - The framework distribution is now ESM-only (finally);
   - All the Node.js versions listed above support `require(ESM)` syntax;
-  - If facing TypeScript error `TS1479`, ensure either:
-    - using the [recommended tsconfig base for Node 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json);
-    - or switching your project to ESM by setting `"type": "module"` in `package.json`;
+  - If facing TypeScript error `TS1479`:
+    - switch your project to ESM by setting `"type": "module"` in `package.json`;
+    - or change file extension to `.mts`;
+    - or run your code using `tsx` or `vite-node` or similar tool;
 - Supported `zod` version: `^4.0.0`;
   - Compatibility with `zod@^3` is dropped;
   - You SHOULD now `import { z } from "zod"` without the `/v4` suffix;
