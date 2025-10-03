@@ -59,7 +59,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Graceful shutdown](#graceful-shutdown)
    6. [Subscriptions](#subscriptions)
 8. [Caveats](#caveats)
-   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+   1. [TypeError: example is not a function](#typeerror-example-is-not-a-function)
+   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
 
 See also [Changelog](CHANGELOG.md) and [automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
@@ -1394,6 +1395,11 @@ framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has si
 There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
 
+## TypeError: example is not a function
+
+If you face this error then [switch your environment to ESM](#environment-preparation).
+See [issue 2981](https://github.com/RobinTail/express-zod-api/issues/2981) for details.
+
 ## Excessive properties in endpoint output
 
 The schema validator removes excessive properties by default. However, Typescript
@@ -1402,13 +1408,9 @@ in this case during development. You can achieve this verification by assigning 
 reusing it in forced type of the output:
 
 ```typescript
-import { z } from "zod";
+const output = z.object({ anything: z.number() });
 
-const output = z.object({
-  anything: z.number(),
-});
-
-endpointsFactory.build({
+factory.build({
   output,
   handler: async (): Promise<z.input<typeof output>> => ({
     anything: 123,
