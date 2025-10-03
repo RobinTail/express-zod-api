@@ -85,10 +85,9 @@ const config = createConfig({
 - Supported Node.js versions: `^20.19.0 || ^22.12.0 || ^24.0.0`;
 - The framework distribution is now ESM-only (finally);
   - All the Node.js versions listed above support `require(ESM)` syntax;
-  - If facing TypeScript error `TS1479`:
-    - switch your project to ESM by setting `"type": "module"` in `package.json`;
-    - or change file extension to `.mts`;
-    - or run your code using `tsx` or `vite-node` or similar tool;
+  - If facing TypeScript error `TS1479`, ensure either:
+    - using the [recommended tsconfig base for Node 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json);
+    - or switching your project to ESM by setting `"type": "module"` in `package.json`;
 - Supported `zod` version: `^4.0.0`;
   - Compatibility with `zod@^3` is dropped;
   - You SHOULD now `import { z } from "zod"` without the `/v4` suffix;
