@@ -59,7 +59,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Graceful shutdown](#graceful-shutdown)
    6. [Subscriptions](#subscriptions)
 8. [Caveats](#caveats)
-   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+   1. [TypeError: example is not a function](#typeerror-example-is-not-a-function)
+   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
 
 See also [Changelog](CHANGELOG.md) and [automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
@@ -85,6 +86,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/squishykid.png" alt="@squishykid" width="50px" />](https://github.com/squishykid)
 [<img src="https://github.com/jakub-msqt.png" alt="@jakub-msqt" width="50px" />](https://github.com/jakub-msqt)
 [<img src="https://github.com/misha-z1nchuk.png" alt="@misha-z1nchuk" width="50px" />](https://github.com/misha-z1nchuk)
 [<img src="https://github.com/GreaterTamarack.png" alt="@GreaterTamarack" width="50px" />](https://github.com/GreaterTamarack)
@@ -183,9 +185,13 @@ pnpm add -D @types/express @types/node @types/http-errors
 
 ## Environment preparation
 
-Consider using the recommended `tsconfig.json` base for your project according to your Node.js version,
-for example [the base for Node.js 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json).
-Ensure having the following options in order to make it work as expected:
+Ensure running your code as [ESM](https://nodejs.org/api/esm.html#enabling) by either:
+
+- setting `"type": "module"` in your `package.json`;
+- or using `.mts` file extension;
+- or using `tsx` or `vite-node` or similar tools.
+
+Enable the following `compilerOptions` in your `tsconfig.json` to make it work as expected:
 
 ```json
 {
@@ -1389,6 +1395,11 @@ framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has si
 There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
 
+## TypeError: example is not a function
+
+If you face this error then [switch your environment to ESM](#environment-preparation).
+See [issue 2981](https://github.com/RobinTail/express-zod-api/issues/2981) for details.
+
 ## Excessive properties in endpoint output
 
 The schema validator removes excessive properties by default. However, Typescript
@@ -1397,13 +1408,9 @@ in this case during development. You can achieve this verification by assigning 
 reusing it in forced type of the output:
 
 ```typescript
-import { z } from "zod";
+const output = z.object({ anything: z.number() });
 
-const output = z.object({
-  anything: z.number(),
-});
-
-endpointsFactory.build({
+factory.build({
   output,
   handler: async (): Promise<z.input<typeof output>> => ({
     anything: 123,
