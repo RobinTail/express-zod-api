@@ -183,7 +183,7 @@ pnpm add -D @types/express @types/node @types/http-errors
 
 ## Environment preparation
 
-Starting v25, ensure running your code as ESM module by either:
+Starting v25, ensure running your code as ESM by either:
 
 - setting `"type": "module"` in your `package.json`;
 - or using `.mts` file extension;
