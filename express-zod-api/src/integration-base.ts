@@ -1,8 +1,8 @@
 import * as R from "ramda";
 import ts from "typescript";
-import { ResponseVariant } from "./api-response.ts";
+import type { ResponseVariant } from "./api-response.ts";
 import { contentTypes } from "./content-type.ts";
-import { ClientMethod, clientMethods } from "./method.ts";
+import { type ClientMethod, clientMethods } from "./method.ts";
 import type { makeEventSchema } from "./sse.ts";
 import {
   accessModifiers,
@@ -35,7 +35,7 @@ import {
   makePublicProperty,
   makeIndexed,
   makeMaybeAsync,
-  Typeable,
+  type Typeable,
   makeFnType,
   makeLiteralType,
   literally,

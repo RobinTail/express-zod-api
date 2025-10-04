@@ -1,35 +1,38 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
-import { NormalizedResponse, ResponseVariant } from "./api-response.ts";
+import type { NormalizedResponse, ResponseVariant } from "./api-response.ts";
 import { findRequestTypeDefiningSchema } from "./deep-checks.ts";
 import {
-  FlatObject,
+  type FlatObject,
   getActualMethod,
   getInput,
   ensureError,
   isSchema,
 } from "./common-helpers.ts";
-import { CommonConfig } from "./config-type.ts";
+import type { CommonConfig } from "./config-type.ts";
 import {
   InputValidationError,
   OutputValidationError,
   ResultHandlerError,
 } from "./errors.ts";
 import { ezFormBrand } from "./form-schema.ts";
-import { IOSchema } from "./io-schema.ts";
+import type { IOSchema } from "./io-schema.ts";
 import { lastResortHandler } from "./last-resort.ts";
-import { ActualLogger } from "./logger-helpers.ts";
-import { LogicalContainer } from "./logical-container.ts";
+import type { ActualLogger } from "./logger-helpers.ts";
+import type { LogicalContainer } from "./logical-container.ts";
 import { getBrand } from "@express-zod-api/zod-plugin";
-import { ClientMethod, CORSMethod, Method, SomeMethod } from "./method.ts";
-import { AbstractMiddleware, ExpressMiddleware } from "./middleware.ts";
-import { ContentType } from "./content-type.ts";
+import type { ClientMethod, CORSMethod, Method, SomeMethod } from "./method.ts";
+import { type AbstractMiddleware, ExpressMiddleware } from "./middleware.ts";
+import type { ContentType } from "./content-type.ts";
 import { ezRawBrand } from "./raw-schema.ts";
-import { DiscriminatedResult, pullResponseExamples } from "./result-helpers.ts";
+import {
+  type DiscriminatedResult,
+  pullResponseExamples,
+} from "./result-helpers.ts";
 import { Routable } from "./routable.ts";
-import { AbstractResultHandler } from "./result-handler.ts";
-import { Security } from "./security.ts";
+import type { AbstractResultHandler } from "./result-handler.ts";
+import type { Security } from "./security.ts";
 import { ezUploadBrand } from "./upload-schema.ts";
 
 export type Handler<IN, OUT, OPT> = (params: {

@@ -1,8 +1,8 @@
-import { IRouter } from "express";
+import type { IRouter } from "express";
 import ts from "typescript";
 import { z } from "zod";
 import * as entrypoint from "../src/index.ts";
-import {
+import type {
   ApiResponse,
   AppConfig,
   BasicSecurity,

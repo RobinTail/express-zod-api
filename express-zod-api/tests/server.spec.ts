@@ -15,10 +15,10 @@ import {
 } from "./http-mock.ts";
 import { z } from "zod";
 import {
-  AppConfig,
+  type AppConfig,
   BuiltinLogger,
   EndpointsFactory,
-  ServerConfig,
+  type ServerConfig,
   attachRouting,
   createServer,
   defaultResultHandler,

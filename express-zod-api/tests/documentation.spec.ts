@@ -9,8 +9,8 @@ import {
   defaultEndpointsFactory,
   ez,
   ResultHandler,
-  Depicter,
-  Method,
+  type Depicter,
+  type Method,
 } from "../src/index.ts";
 import { contentTypes } from "../src/content-type.ts";
 import { z } from "zod";

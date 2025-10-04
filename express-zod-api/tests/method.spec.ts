@@ -2,11 +2,11 @@ import * as R from "ramda";
 import {
   isMethod,
   methods,
-  Method,
+  type Method,
   clientMethods,
-  ClientMethod,
-  SomeMethod,
-  CORSMethod,
+  type ClientMethod,
+  type SomeMethod,
+  type CORSMethod,
 } from "../src/method.ts";
 
 describe("Method", () => {

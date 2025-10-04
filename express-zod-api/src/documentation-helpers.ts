@@ -1,49 +1,49 @@
 import {
-  ExamplesObject,
+  type ExamplesObject,
   isReferenceObject,
   isSchemaObject,
-  MediaTypeObject,
-  OAuthFlowObject,
-  ParameterObject,
-  ReferenceObject,
-  RequestBodyObject,
-  ResponseObject,
-  SchemaObject,
-  SchemaObjectType,
-  SecurityRequirementObject,
-  SecuritySchemeObject,
-  TagObject,
+  type MediaTypeObject,
+  type OAuthFlowObject,
+  type ParameterObject,
+  type ReferenceObject,
+  type RequestBodyObject,
+  type ResponseObject,
+  type SchemaObject,
+  type SchemaObjectType,
+  type SecurityRequirementObject,
+  type SecuritySchemeObject,
+  type TagObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
-import { NormalizedResponse, ResponseVariant } from "./api-response.ts";
+import type { NormalizedResponse, ResponseVariant } from "./api-response.ts";
 import { ezBufferBrand } from "./buffer-schema.ts";
 import {
   shouldHaveContent,
-  FlatObject,
+  type FlatObject,
   getRoutePathParams,
   getTransformedType,
   isObject,
   isSchema,
   makeCleanId,
   routePathParamsRegex,
-  Tag,
+  type Tag,
   ucFirst,
 } from "./common-helpers.ts";
-import { InputSource } from "./config-type.ts";
+import type { InputSource } from "./config-type.ts";
 import { contentTypes } from "./content-type.ts";
 import { ezDateInBrand } from "./date-in-schema.ts";
 import { ezDateOutBrand } from "./date-out-schema.ts";
 import { DocumentationError } from "./errors.ts";
-import { IOSchema } from "./io-schema.ts";
+import type { IOSchema } from "./io-schema.ts";
 import { flattenIO } from "./json-schema-helpers.ts";
-import { Alternatives } from "./logical-container.ts";
+import type { Alternatives } from "./logical-container.ts";
 import { getBrand } from "@express-zod-api/zod-plugin";
-import { ClientMethod } from "./method.ts";
-import { ProprietaryBrand } from "./proprietary-schemas.ts";
+import type { ClientMethod } from "./method.ts";
+import type { ProprietaryBrand } from "./proprietary-schemas.ts";
 import { ezRawBrand } from "./raw-schema.ts";
-import { FirstPartyKind } from "./schema-walker.ts";
-import { Security } from "./security.ts";
+import type { FirstPartyKind } from "./schema-walker.ts";
+import type { Security } from "./security.ts";
 import { ezUploadBrand } from "./upload-schema.ts";
 import wellKnownHeaders from "./well-known-headers.json" with { type: "json" };
 

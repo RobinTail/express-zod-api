@@ -245,7 +245,7 @@ const helloWorldEndpoint = defaultEndpointsFactory.build({
 Connect your endpoint to the `/v1/hello` route:
 
 ```ts
-import { Routing } from "express-zod-api";
+import type { Routing } from "express-zod-api";
 
 const routing: Routing = {
   v1: {

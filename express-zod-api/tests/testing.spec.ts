@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-  CommonConfig,
+  type CommonConfig,
   defaultEndpointsFactory,
   Middleware,
   ResultHandler,

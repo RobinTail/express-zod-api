@@ -1,15 +1,15 @@
-import { IRouter, RequestHandler } from "express";
+import type { IRouter, RequestHandler } from "express";
 import createHttpError from "http-errors";
 import { isProduction } from "./common-helpers.ts";
-import { CommonConfig } from "./config-type.ts";
-import { ContentType } from "./content-type.ts";
-import { DependsOnMethod } from "./depends-on-method.ts";
+import type { CommonConfig } from "./config-type.ts";
+import type { ContentType } from "./content-type.ts";
+import type { DependsOnMethod } from "./depends-on-method.ts";
 import { Diagnostics } from "./diagnostics.ts";
-import { AbstractEndpoint } from "./endpoint.ts";
-import { CORSMethod, isMethod } from "./method.ts";
-import { OnEndpoint, walkRouting } from "./routing-walker.ts";
-import { ServeStatic } from "./serve-static.ts";
-import { GetLogger } from "./server-helpers.ts";
+import type { AbstractEndpoint } from "./endpoint.ts";
+import { type CORSMethod, isMethod } from "./method.ts";
+import { type OnEndpoint, walkRouting } from "./routing-walker.ts";
+import type { ServeStatic } from "./serve-static.ts";
+import type { GetLogger } from "./server-helpers.ts";
 import * as R from "ramda";
 
 /**
