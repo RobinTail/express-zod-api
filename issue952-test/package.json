@@ -2,6 +2,7 @@
   "name": "issue952-test",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "test": "tsc -p tsconfig.json",
     "posttest": "rm *.d.ts"
