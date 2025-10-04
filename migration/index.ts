@@ -42,6 +42,7 @@ const listen = <
 const ruleName = `v${process.env.TSDOWN_VERSION!.split(".")[0]}`;
 
 const theRule = ESLintUtils.RuleCreator.withoutDocs({
+  name: ruleName,
   meta: {
     type: "problem",
     fixable: "code",
