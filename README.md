@@ -59,7 +59,8 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Graceful shutdown](#graceful-shutdown)
    6. [Subscriptions](#subscriptions)
 8. [Caveats](#caveats)
-   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+   1. [TypeError: example is not a function](#typeerror-example-is-not-a-function)
+   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
 
 See also [Changelog](CHANGELOG.md) and [automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
@@ -85,6 +86,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/squishykid.png" alt="@squishykid" width="50px" />](https://github.com/squishykid)
 [<img src="https://github.com/jakub-msqt.png" alt="@jakub-msqt" width="50px" />](https://github.com/jakub-msqt)
 [<img src="https://github.com/misha-z1nchuk.png" alt="@misha-z1nchuk" width="50px" />](https://github.com/misha-z1nchuk)
 [<img src="https://github.com/GreaterTamarack.png" alt="@GreaterTamarack" width="50px" />](https://github.com/GreaterTamarack)
@@ -183,9 +185,13 @@ pnpm add -D @types/express @types/node @types/http-errors
 
 ## Environment preparation
 
-Consider using the recommended `tsconfig.json` base for your project according to your Node.js version,
-for example [the base for Node.js 20+](https://github.com/tsconfig/bases/blob/main/bases/node20.json).
-Ensure having the following options in order to make it work as expected:
+Ensure running your code as [ESM](https://nodejs.org/api/esm.html#enabling) by either:
+
+- setting `"type": "module"` in your `package.json`;
+- or using `.mts` file extension;
+- or using `tsx` or `vite-node` or similar tools.
+
+Enable the following `compilerOptions` in your `tsconfig.json` to make it work as expected:
 
 ```json
 {
@@ -201,7 +207,7 @@ Ensure having the following options in order to make it work as expected:
 Create a minimal configuration. Find out all configurable options
 [in sources](https://github.com/RobinTail/express-zod-api/blob/master/express-zod-api/src/config-type.ts).
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
@@ -215,7 +221,7 @@ const config = createConfig({
 Use the default factory to make an endpoint that responds with "Hello, World" or "Hello, {name}" depending on inputs.
 Learn how to make factories for [custom response](#response-customization) and by [adding middlewares](#middlewares).
 
-```typescript
+```ts
 import { defaultEndpointsFactory } from "express-zod-api";
 import { z } from "zod";
 
@@ -238,7 +244,7 @@ const helloWorldEndpoint = defaultEndpointsFactory.build({
 
 Connect your endpoint to the `/v1/hello` route:
 
-```typescript
+```ts
 import { Routing } from "express-zod-api";
 
 const routing: Routing = {
@@ -252,7 +258,7 @@ const routing: Routing = {
 
 See the [complete implementation example](https://github.com/RobinTail/express-zod-api/tree/master/example).
 
-```typescript
+```ts
 import { createServer } from "express-zod-api";
 
 createServer(config, routing);
@@ -328,7 +334,7 @@ Inputs of middlewares are also available to endpoint handlers within `input`.
 
 Here is an example of the authentication middleware, that checks a `key` from input and `token` from headers:
 
-```typescript
+```ts
 import { z } from "zod";
 import createHttpError from "http-errors";
 import { Middleware } from "express-zod-api";
@@ -357,7 +363,7 @@ const authMiddleware = new Middleware({
 
 By using `.addMiddleware()` method before `.build()` you can connect it to the endpoint:
 
-```typescript
+```ts
 const yourEndpoint = defaultEndpointsFactory
   .addMiddleware(authMiddleware)
   .build({
@@ -371,7 +377,7 @@ You can create a new factory by connecting as many middlewares as you want — t
 order for all the endpoints produced on that factory. You may also use a shorter inline syntax within the
 `.addMiddleware()` method, and have access to the output of the previously executed middlewares in chain as `ctx`:
 
-```typescript
+```ts
 import { defaultEndpointsFactory } from "express-zod-api";
 
 const factory = defaultEndpointsFactory
@@ -386,7 +392,7 @@ const factory = defaultEndpointsFactory
 If you need to provide your endpoints with a context that does not depend on Request, like non-persistent database
 connection, consider shorthand method `addContext`. For static values consider reusing a `const` across your files.
 
-```typescript
+```ts
 import { readFile } from "node:fs/promises";
 import { defaultEndpointsFactory } from "express-zod-api";
 
@@ -401,7 +407,7 @@ const endpointsFactory = defaultEndpointsFactory.addContext(async () => {
 **Notice on resources cleanup**: If necessary, you can release resources at the end of the request processing in a
 custom [Result Handler](#response-customization):
 
-```typescript
+```ts
 import { ResultHandler } from "express-zod-api";
 
 const resultHandlerWithCleanup = new ResultHandler({
@@ -422,7 +428,7 @@ In case it's a middleware establishing and serving its own routes, or somehow gl
 being an additional request parser (like `cookie-parser`), use the `beforeRouting` option. However, it might be better
 to avoid `cors` here — [the framework handles it on its own](#cross-origin-resource-sharing).
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
 
@@ -442,7 +448,7 @@ In case you need a special processing of `request`, or to modify the `response` 
 `addExpressMiddleware()` of `EndpointsFactory` (or its alias `use()`). The method has two optional features: a provider
 of a [context](#context) and an error transformer for adjusting the response status code.
 
-```typescript
+```ts
 import { defaultEndpointsFactory } from "express-zod-api";
 import createHttpError from "http-errors";
 import { auth } from "express-oauth2-jwt-bearer";
@@ -458,7 +464,7 @@ const factory = defaultEndpointsFactory.use(auth(), {
 You can implement additional validations within schemas using refinements.
 Validation errors are reported in a response with a status code `400`.
 
-```typescript
+```ts
 import { z } from "zod";
 import { Middleware } from "express-zod-api";
 
@@ -478,7 +484,7 @@ const nicknameConstraintMiddleware = new Middleware({
 
 By the way, you can also refine the whole I/O object, for example in case you need a complex validation of its props.
 
-```typescript
+```ts
 const endpoint = endpointsFactory.build({
   input: z
     .object({
@@ -510,7 +516,7 @@ square brackets. You can choose between those parsers as well as configure a cus
 
 Since parameters of GET requests come in the form of strings, there is often a need to transform them into numbers.
 
-```typescript
+```ts
 import { z } from "zod";
 
 const getUserEndpoint = endpointsFactory.buildVoid({
@@ -590,7 +596,7 @@ provides your endpoint handler or middleware with a `Date`. It supports the foll
 `ez.dateOut()`, on the contrary, accepts a `Date` and provides `ResultHandler` with a `string` representation in ISO
 format for the response transmission. Both schemas accept metadata as an argument. Consider the following example:
 
-```typescript
+```ts
 import { z } from "zod";
 import { ez, defaultEndpointsFactory } from "express-zod-api";
 
@@ -615,7 +621,7 @@ You can enable your API for other domains using the corresponding configuration 
 ensure you explicitly choose the correct setting. In addition to being a boolean, `cors` can also be assigned a
 function that overrides default CORS headers. That function has several parameters and can be asynchronous.
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
@@ -635,7 +641,7 @@ Please note: If you only want to send specific headers on requests to a specific
 The modern API standard often assumes the use of a secure data transfer protocol, confirmed by a TLS certificate, also
 often called an SSL certificate in habit. This way you can additionally (or solely) configure and run the HTTPS server:
 
-```typescript
+```ts
 import { createConfig, createServer } from "express-zod-api";
 
 const config = createConfig({
@@ -664,7 +670,7 @@ it might be a good idea to enable GZIP and Brotli compression for your API respo
 
 Install `compression` and `@types/compression`, and enable or configure compression:
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 
 const config = createConfig({
@@ -680,7 +686,7 @@ In order to receive a compressed response the client should include the followin
 
 A simple built-in console logger is used by default with the following options that you can configure:
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 const config = createConfig({
   logger: {
@@ -694,7 +700,7 @@ const config = createConfig({
 You can also replace it with a one having at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
 Winston and Pino support is well known. Here is an example configuring `pino` logger with `pino-pretty` extension:
 
-```typescript
+```ts
 import pino, { Logger } from "pino";
 import { createConfig } from "express-zod-api";
 
@@ -719,7 +725,7 @@ In case you need a dedicated logger for each request (for example, equipped with
 it can also be asynchronous. The child logger returned by that function will replace the `logger` in all handlers.
 You can use the `.child()` method of the built-in logger or [install a custom logger](#customizing-logger) instead.
 
-```typescript
+```ts
 import { createConfig, BuiltinLogger } from "express-zod-api";
 import { randomUUID } from "node:crypto";
 
@@ -742,7 +748,7 @@ You can customize the list of `request` properties that are combined into `input
 to your endpoints and middlewares. The order here matters: each next item in the array has a higher priority than its
 previous sibling. The following arrangement is default:
 
-```typescript
+```ts
 import { createConfig } from "express-zod-api";
 
 createConfig({
@@ -764,7 +770,7 @@ In a similar way you can enable request headers as the input source. This is an 
 - consider handling headers in `Middleware` and declaring them within `security` property to improve `Documentation`;
 - the request headers acquired that way are always lowercase when describing their validation schemas.
 
-```typescript
+```ts
 import { createConfig, Middleware } from "express-zod-api";
 import { z } from "zod";
 
@@ -792,7 +798,7 @@ factory.build({
 `ResultHandler` is responsible for transmitting consistent responses containing the endpoint output or an error.
 The `defaultResultHandler` sets the HTTP status code and ensures the following type of the response:
 
-```typescript
+```ts
 type DefaultResponse<OUT> =
   | { status: "success"; data: OUT } // Positive response
   | { status: "error"; error: { message: string } }; // or Negative response
@@ -800,7 +806,7 @@ type DefaultResponse<OUT> =
 
 You can create your own result handler by using this example as a template:
 
-```typescript
+```ts
 import { z } from "zod";
 import {
   ResultHandler,
@@ -829,7 +835,7 @@ _See also [Different responses for different status codes](#different-responses-
 
 After creating your custom `ResultHandler` you can use it as an argument for `EndpointsFactory` instance creation:
 
-```typescript
+```ts
 import { EndpointsFactory } from "express-zod-api";
 
 const endpointsFactory = new EndpointsFactory(yourResultHandler);
@@ -840,7 +846,7 @@ const endpointsFactory = new EndpointsFactory(yourResultHandler);
 For some REST APIs, empty responses are typical: with status code `204` (No Content) and redirects (302). In order to
 describe it set the `mimeType` to `null` and `schema` to `z.never()`:
 
-```typescript
+```ts
 const resultHandler = new ResultHandler({
   positive: { statusCode: 204, mimeType: null, schema: z.never() },
   negative: { statusCode: 404, mimeType: null, schema: z.never() },
@@ -857,7 +863,7 @@ One of them implements file streaming, in this case the endpoint just has to pro
 The response schema can be `z.string()`, `z.base64()` or `ez.buffer()` to reflect the data accordingly in the
 [generated documentation](#creating-a-documentation).
 
-```typescript
+```ts
 const fileStreamingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
     positive: { schema: ez.buffer(), mimeType: "image/*" },
@@ -948,7 +954,7 @@ available options. The `limitHandler` option is replaced by the `limitError` one
 middleware for restricting the ability to upload using the `beforeUpload` option. So the configuration for the limited
 and restricted upload might look this way:
 
-```typescript
+```ts
 import createHttpError from "http-errors";
 
 const config = createConfig({
@@ -965,7 +971,7 @@ const config = createConfig({
 
 Then use `ez.upload()` schema for a corresponding property. The request content type must be `multipart/form-data`:
 
-```typescript
+```ts
 import { z } from "zod";
 import { ez, defaultEndpointsFactory } from "express-zod-api";
 
@@ -989,7 +995,7 @@ _You can still send other data and specify additional `input` parameters, includ
 If you already have your own configured express application, or you find the framework settings not enough, you can
 connect the endpoints to your app or any express router using the `attachRouting()` method:
 
-```typescript
+```ts
 import express from "express";
 import { createConfig, attachRouting, Routing } from "express-zod-api";
 
@@ -1019,7 +1025,7 @@ makes mocking easier. Under the hood, request and response object are mocked usi
 [node-mocks-http](https://www.npmjs.com/package/node-mocks-http) library, therefore you can utilize its API for
 settings additional properties and asserting expectation using the provided getters, such as `._getStatusCode()`.
 
-```typescript
+```ts
 import { testEndpoint } from "express-zod-api";
 
 test("should respond successfully", async () => {
@@ -1043,7 +1049,7 @@ Middlewares can also be tested individually using the `testMiddleware()` method.
 from returns of previous middlewares, if the one being tested somehow depends on it. Possible errors would be handled
 either by `errorHandler` configured within given `configProps` or `defaultResultHandler`.
 
-```typescript
+```ts
 import { z } from "zod";
 import { Middleware, testMiddleware } from "express-zod-api";
 
@@ -1076,7 +1082,7 @@ adding the runtime helpers the framework relies on.
 You can generate a Typescript file containing the IO types of your API and a client for it.
 Consider installing `prettier` and using the async `printFormatted()` method.
 
-```typescript
+```ts
 import { Integration } from "express-zod-api";
 
 const client = new Integration({
@@ -1092,7 +1098,7 @@ The generated client is flexibly configurable on the frontend side for using a c
 makes requests using the libraries and methods of your choice. The default implementation uses `fetch`. The client
 asserts the type of request parameters and response. Consuming the generated client requires Typescript version 4.1+.
 
-```typescript
+```ts
 import { Client, Implementation, Subscription } from "./client.ts"; // the generated file
 
 const client = new Client(/* optional custom Implementation */);
@@ -1105,7 +1111,7 @@ new Subscription("get /v1/events/stream", {}).on("time", (time) => {}); // Serve
 
 You can generate the specification of your API and write it to a `.yaml` file, that can be used as the documentation:
 
-```typescript
+```ts
 import { Documentation } from "express-zod-api";
 
 const yamlString = new Documentation({
@@ -1122,7 +1128,7 @@ const yamlString = new Documentation({
 You can add descriptions and examples to your endpoints, their I/O schemas and their properties. It will be included
 into the generated documentation of your API. Consider the following example:
 
-```typescript
+```ts
 import { defaultEndpointsFactory } from "express-zod-api";
 
 const exampleEndpoint = defaultEndpointsFactory.build({
@@ -1148,7 +1154,7 @@ When generating documentation, you may find it necessary to classify endpoints i
 endpoints is available for that purpose. In order to establish the constraints on tags across all the endpoints, they
 should be declared as keys of `TagOverrides` interface. Consider the following example:
 
-```typescript
+```ts
 import { defaultEndpointsFactory, Documentation } from "express-zod-api";
 
 // Add similar declaration once, somewhere in your code, preferably near config
@@ -1248,7 +1254,7 @@ for example if your API strictly follows REST standards. It may also be necessar
 generated Documentation. For that purpose, the constructor of `ResultHandler` accepts flexible declaration of possible
 response schemas and their corresponding status codes.
 
-```typescript
+```ts
 import { ResultHandler } from "express-zod-api";
 
 new ResultHandler({
@@ -1289,7 +1295,7 @@ file as an entire body of request. Use the proprietary `ez.raw()` schema as the 
 The default parser in this case is `express.raw()`. You can customize it by assigning the `rawParser` option in config.
 The raw data is placed into `request.body.raw` property, having type `Buffer`.
 
-```typescript
+```ts
 import { defaultEndpointsFactory, ez } from "express-zod-api";
 
 const rawAcceptingEndpoint = defaultEndpointsFactory.build({
@@ -1310,7 +1316,7 @@ For debugging and performance testing purposes the framework offers a simple `.p
 It starts a timer when you call it and measures the duration in adaptive units (from picoseconds to minutes) until you
 invoke the returned callback. The default severity of those measurements is `debug`.
 
-```typescript
+```ts
 import { createConfig, BuiltinLogger } from "express-zod-api";
 
 // This enables the .profile() method on built-in logger:
@@ -1326,7 +1332,7 @@ done(); // debug: expensive operation '555 milliseconds'
 
 You can also customize the profiler with your own formatter, chosen severity or even performance assessment function:
 
-```typescript
+```ts
 logger.profile({
   message: "expensive operation",
   severity: (ms) => (ms > 500 ? "error" : "info"), // assess immediately
@@ -1362,7 +1368,7 @@ Client application can subscribe to the event stream using `EventSource` class i
 [instance of the generated](#generating-a-frontend-client) `Subscription` class. The following example demonstrates
 the implementation emitting the `time` event each second.
 
-```typescript
+```ts
 import { z } from "zod";
 import { EventStreamFactory } from "express-zod-api";
 import { setTimeout } from "node:timers/promises";
@@ -1388,6 +1394,11 @@ framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has si
 There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
 
+## TypeError: example is not a function
+
+If you face this error then [switch your environment to ESM](#environment-preparation).
+See [issue 2981](https://github.com/RobinTail/express-zod-api/issues/2981) for details.
+
 ## Excessive properties in endpoint output
 
 The schema validator removes excessive properties by default. However, Typescript
@@ -1395,14 +1406,10 @@ The schema validator removes excessive properties by default. However, Typescrip
 in this case during development. You can achieve this verification by assigning the output schema to a constant and
 reusing it in forced type of the output:
 
-```typescript
-import { z } from "zod";
+```ts
+const output = z.object({ anything: z.number() });
 
-const output = z.object({
-  anything: z.number(),
-});
-
-endpointsFactory.build({
+factory.build({
   output,
   handler: async (): Promise<z.input<typeof output>> => ({
     anything: 123,
