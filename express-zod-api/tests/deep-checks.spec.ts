@@ -1,9 +1,9 @@
 import { UploadedFile } from "express-fileupload";
 import { z } from "zod";
-import { ez } from "../src";
-import { findNestedSchema, hasCycle } from "../src/deep-checks";
+import { ez } from "../src/index.ts";
+import { findNestedSchema, hasCycle } from "../src/deep-checks.ts";
 import { getBrand } from "@express-zod-api/zod-plugin";
-import { ezUploadBrand } from "../src/upload-schema";
+import { ezUploadBrand } from "../src/upload-schema.ts";
 
 describe("Checks", () => {
   describe("findNestedSchema()", () => {

@@ -8,7 +8,7 @@ import {
   expect,
   test,
 } from "vitest";
-import { givePort } from "../tools/ports";
+import { givePort } from "../tools/ports.ts";
 
 describe("ESM Test", async () => {
   let out = "";
