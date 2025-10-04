@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { givePort } from "../tools/ports";
+import { givePort } from "../tools/ports.ts";
 
 describe("ESM Test", async () => {
   let out = "";

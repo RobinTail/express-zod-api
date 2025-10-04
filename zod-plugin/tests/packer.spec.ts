@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { pack, unpack } from "../src";
+import { pack, unpack } from "../src/index.ts";
 
 describe("Packer", () => {
   describe("pack()", () => {

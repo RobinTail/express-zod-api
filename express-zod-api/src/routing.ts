@@ -1,14 +1,14 @@
 import { IRouter, RequestHandler } from "express";
 import createHttpError from "http-errors";
-import { isProduction } from "./common-helpers";
-import { CommonConfig } from "./config-type";
-import { ContentType } from "./content-type";
-import { Diagnostics } from "./diagnostics";
-import type { AbstractEndpoint } from "./endpoint";
-import { CORSMethod, isMethod } from "./method";
-import { OnEndpoint, walkRouting } from "./routing-walker";
-import { ServeStatic } from "./serve-static";
-import { GetLogger } from "./server-helpers";
+import { isProduction } from "./common-helpers.ts";
+import { CommonConfig } from "./config-type.ts";
+import { ContentType } from "./content-type.ts";
+import { Diagnostics } from "./diagnostics.ts";
+import { AbstractEndpoint } from "./endpoint.ts";
+import { CORSMethod, isMethod } from "./method.ts";
+import { OnEndpoint, walkRouting } from "./routing-walker.ts";
+import { ServeStatic } from "./serve-static.ts";
+import { GetLogger } from "./server-helpers.ts";
 import * as R from "ramda";
 
 /**

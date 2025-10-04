@@ -3,7 +3,7 @@ import {
   expressMock,
   staticHandler,
   staticMock,
-} from "./express-mock";
+} from "./express-mock.ts";
 import { z } from "zod";
 import {
   EndpointsFactory,
@@ -11,13 +11,13 @@ import {
   ServeStatic,
   defaultResultHandler,
   ez,
-} from "../src";
+} from "../src/index.ts";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
-} from "../src/testing";
-import { createWrongMethodHandler, initRouting } from "../src/routing";
+} from "../src/testing.ts";
+import { createWrongMethodHandler, initRouting } from "../src/routing.ts";
 import type { IRouter, RequestHandler } from "express";
 import createHttpError from "http-errors";
 

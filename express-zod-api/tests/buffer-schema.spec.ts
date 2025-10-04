@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { z, $brand } from "zod";
-import { ez } from "../src";
+import { ez } from "../src/index.ts";
 
 describe("ez.buffer()", () => {
   describe("creation", () => {

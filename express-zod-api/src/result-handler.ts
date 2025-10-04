@@ -4,11 +4,11 @@ import {
   ApiResponse,
   defaultStatusCodes,
   NormalizedResponse,
-} from "./api-response";
-import { FlatObject, isObject } from "./common-helpers";
-import { contentTypes } from "./content-type";
-import { IOSchema } from "./io-schema";
-import { ActualLogger } from "./logger-helpers";
+} from "./api-response.ts";
+import { FlatObject, isObject } from "./common-helpers.ts";
+import { contentTypes } from "./content-type.ts";
+import { IOSchema } from "./io-schema.ts";
+import { ActualLogger } from "./logger-helpers.ts";
 import {
   DiscriminatedResult,
   ensureHttpError,
@@ -16,7 +16,7 @@ import {
   logServerError,
   normalize,
   ResultSchema,
-} from "./result-helpers";
+} from "./result-helpers.ts";
 
 type Handler<RES = unknown> = (
   params: DiscriminatedResult & {

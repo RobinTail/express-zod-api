@@ -6,26 +6,26 @@ import {
   EmptySchema,
   FlatObject,
   Tag,
-} from "./common-helpers";
-import { Endpoint, Handler } from "./endpoint";
+} from "./common-helpers.ts";
+import { Endpoint, Handler } from "./endpoint.ts";
 import {
   IOSchema,
   FinalInputSchema,
   Extension,
   ensureExtension,
   makeFinalInputSchema,
-} from "./io-schema";
-import { ClientMethod, Method } from "./method";
+} from "./io-schema.ts";
+import { ClientMethod, Method } from "./method.ts";
 import {
   AbstractMiddleware,
   ExpressMiddleware,
   Middleware,
-} from "./middleware";
+} from "./middleware.ts";
 import {
   AbstractResultHandler,
   arrayResultHandler,
   defaultResultHandler,
-} from "./result-handler";
+} from "./result-handler.ts";
 
 interface BuildProps<
   IN extends IOSchema,

@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { ez } from "../src";
+import { ez } from "../src/index.ts";
 import { getBrand } from "@express-zod-api/zod-plugin";
-import { ezUploadBrand } from "../src/upload-schema";
+import { ezUploadBrand } from "../src/upload-schema.ts";
 
 describe("ez.upload()", () => {
   describe("creation", () => {
