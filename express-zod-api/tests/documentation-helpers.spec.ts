@@ -1,9 +1,9 @@
-import { SchemaObject } from "openapi3-ts/oas31";
+import type { SchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src/index.ts";
 import {
-  OpenAPIContext,
+  type OpenAPIContext,
   depictRequestParams,
   depictSecurity,
   depictSecurityRefs,

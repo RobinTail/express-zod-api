@@ -8,7 +8,7 @@ import { z } from "zod";
 import {
   DependsOnMethod,
   EndpointsFactory,
-  Routing,
+  type Routing,
   ServeStatic,
   defaultResultHandler,
   ez,

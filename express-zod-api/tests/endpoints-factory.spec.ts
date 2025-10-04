@@ -1,4 +1,4 @@
-import { RequestHandler } from "express";
+import type { RequestHandler } from "express";
 import createHttpError from "http-errors";
 import { expectTypeOf } from "vitest";
 import {
@@ -8,7 +8,7 @@ import {
   ResultHandler,
   testMiddleware,
 } from "../src/index.ts";
-import { EmptyObject } from "../src/common-helpers.ts";
+import type { EmptyObject } from "../src/common-helpers.ts";
 import { Endpoint } from "../src/endpoint.ts";
 import { z } from "zod";
 

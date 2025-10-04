@@ -14,11 +14,11 @@ import {
   localsID,
 } from "../src/server-helpers.ts";
 import {
-  CommonConfig,
+  type CommonConfig,
   defaultResultHandler,
   ResultHandler,
 } from "../src/index.ts";
-import { Request } from "express";
+import type { Request } from "express";
 import {
   makeLoggerMock,
   makeRequestMock,

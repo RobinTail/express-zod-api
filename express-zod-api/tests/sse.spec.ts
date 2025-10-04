@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-  FlatObject,
+  type FlatObject,
   Middleware,
   ResultHandler,
   testEndpoint,
@@ -9,7 +9,7 @@ import {
   EndpointsFactory,
 } from "../src/index.ts";
 import {
-  Emitter,
+  type Emitter,
   ensureStream,
   formatEvent,
   makeEventSchema,

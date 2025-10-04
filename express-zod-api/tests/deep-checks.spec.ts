@@ -1,4 +1,4 @@
-import { UploadedFile } from "express-fileupload";
+import type { UploadedFile } from "express-fileupload";
 import { z } from "zod";
 import { ez } from "../src/index.ts";
 import { findNestedSchema, hasCycle } from "../src/deep-checks.ts";

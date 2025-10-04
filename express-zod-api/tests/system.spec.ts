@@ -5,7 +5,7 @@ import { readFile } from "node:fs/promises";
 import { z } from "zod";
 import {
   EndpointsFactory,
-  Method,
+  type Method,
   createConfig,
   createServer,
   defaultResultHandler,

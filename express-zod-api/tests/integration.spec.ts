@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   EndpointsFactory,
   Integration,
-  Producer,
+  type Producer,
   defaultEndpointsFactory,
   ResultHandler,
 } from "../src/index.ts";
