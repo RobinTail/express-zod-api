@@ -8,6 +8,7 @@
     "noImplicitOverride": true,
     "noUncheckedSideEffectImports": true,
     "resolveJsonModule": true,
+    "erasableSyntaxOnly": true,
     "types": ["vitest/globals"]
   }
 }
