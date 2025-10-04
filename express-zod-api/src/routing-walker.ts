@@ -1,9 +1,9 @@
 import { DependsOnMethod } from "./depends-on-method.ts";
 import { AbstractEndpoint } from "./endpoint.ts";
 import { RoutingError } from "./errors.ts";
-import { ClientMethod, isMethod, Method } from "./method.ts";
-import { Routing } from "./routing.ts";
-import { ServeStatic, StaticHandler } from "./serve-static.ts";
+import { type ClientMethod, isMethod, type Method } from "./method.ts";
+import type { Routing } from "./routing.ts";
+import { ServeStatic, type StaticHandler } from "./serve-static.ts";
 
 export type OnEndpoint<M extends string = Method> = (
   method: M,

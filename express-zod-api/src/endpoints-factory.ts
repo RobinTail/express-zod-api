@@ -1,21 +1,21 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import {
-  EmptyObject,
+  type EmptyObject,
   emptySchema,
-  EmptySchema,
-  FlatObject,
-  Tag,
+  type EmptySchema,
+  type FlatObject,
+  type Tag,
 } from "./common-helpers.ts";
-import { Endpoint, Handler } from "./endpoint.ts";
+import { Endpoint, type Handler } from "./endpoint.ts";
 import {
-  IOSchema,
-  FinalInputSchema,
-  Extension,
+  type IOSchema,
+  type FinalInputSchema,
+  type Extension,
   ensureExtension,
   makeFinalInputSchema,
 } from "./io-schema.ts";
-import { ClientMethod, Method } from "./method.ts";
+import type { ClientMethod, Method } from "./method.ts";
 import {
   AbstractMiddleware,
   ExpressMiddleware,

@@ -3,7 +3,7 @@ import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
 import { BuiltinLogger } from "./builtin-logger.ts";
-import {
+import type {
   AppConfig,
   CommonConfig,
   HttpConfig,
@@ -12,7 +12,7 @@ import {
 import { isLoggerInstance } from "./logger-helpers.ts";
 import { loadPeer } from "./peer-helpers.ts";
 import { defaultResultHandler } from "./result-handler.ts";
-import { Parsers, Routing, initRouting } from "./routing.ts";
+import { type Parsers, type Routing, initRouting } from "./routing.ts";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,

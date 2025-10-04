@@ -1,20 +1,20 @@
 import {
   OpenApiBuilder,
-  OperationObject,
-  ReferenceObject,
-  ResponsesObject,
-  SchemaObject,
-  SecuritySchemeObject,
-  SecuritySchemeType,
+  type OperationObject,
+  type ReferenceObject,
+  type ResponsesObject,
+  type SchemaObject,
+  type SecuritySchemeObject,
+  type SecuritySchemeType,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { responseVariants } from "./api-response.ts";
 import { contentTypes } from "./content-type.ts";
 import { DocumentationError } from "./errors.ts";
 import { getInputSources, makeCleanId } from "./common-helpers.ts";
-import { CommonConfig } from "./config-type.ts";
+import type { CommonConfig } from "./config-type.ts";
 import { processContainers } from "./logical-container.ts";
-import { ClientMethod } from "./method.ts";
+import type { ClientMethod } from "./method.ts";
 import {
   depictBody,
   depictRequestParams,
@@ -24,13 +24,13 @@ import {
   depictTags,
   ensureShortDescription,
   reformatParamsInPath,
-  IsHeader,
+  type IsHeader,
   nonEmpty,
-  BrandHandling,
+  type BrandHandling,
   depictRequest,
 } from "./documentation-helpers.ts";
-import { Routing } from "./routing.ts";
-import { OnEndpoint, walkRouting, withHead } from "./routing-walker.ts";
+import type { Routing } from "./routing.ts";
+import { type OnEndpoint, walkRouting, withHead } from "./routing-walker.ts";
 
 type Component =
   | "positiveResponse"

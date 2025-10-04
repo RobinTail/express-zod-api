@@ -1,6 +1,6 @@
-import { Response } from "express";
+import type { Response } from "express";
 import { z } from "zod";
-import { FlatObject } from "./common-helpers.ts";
+import type { FlatObject } from "./common-helpers.ts";
 import { contentTypes } from "./content-type.ts";
 import { EndpointsFactory } from "./endpoints-factory.ts";
 import { Middleware } from "./middleware.ts";

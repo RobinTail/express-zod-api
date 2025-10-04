@@ -1,21 +1,21 @@
-import { Request, Response } from "express";
-import { ensureError, FlatObject, getInput } from "./common-helpers.ts";
-import { CommonConfig } from "./config-type.ts";
+import type { Request, Response } from "express";
+import { ensureError, type FlatObject, getInput } from "./common-helpers.ts";
+import type { CommonConfig } from "./config-type.ts";
 import { AbstractEndpoint } from "./endpoint.ts";
 import {
-  AbstractLogger,
-  ActualLogger,
+  type AbstractLogger,
+  type ActualLogger,
   isSeverity,
-  Severity,
+  type Severity,
 } from "./logger-helpers.ts";
 import { contentTypes } from "./content-type.ts";
 import {
   createRequest,
-  RequestOptions,
+  type RequestOptions,
   createResponse,
-  ResponseOptions,
+  type ResponseOptions,
 } from "node-mocks-http";
-import { AbstractMiddleware } from "./middleware.ts";
+import type { AbstractMiddleware } from "./middleware.ts";
 import { defaultResultHandler } from "./result-handler.ts";
 
 export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) =>

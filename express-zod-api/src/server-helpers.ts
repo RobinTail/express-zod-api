@@ -1,9 +1,9 @@
 import type fileUpload from "express-fileupload";
 import { loadPeer } from "./peer-helpers.ts";
-import { AbstractResultHandler } from "./result-handler.ts";
-import { ActualLogger } from "./logger-helpers.ts";
-import { CommonConfig, ServerConfig } from "./config-type.ts";
-import { ErrorRequestHandler, RequestHandler, Request } from "express";
+import type { AbstractResultHandler } from "./result-handler.ts";
+import type { ActualLogger } from "./logger-helpers.ts";
+import type { CommonConfig, ServerConfig } from "./config-type.ts";
+import type { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError from "http-errors";
 import { lastResortHandler } from "./last-resort.ts";
 import { ResultHandlerError } from "./errors.ts";

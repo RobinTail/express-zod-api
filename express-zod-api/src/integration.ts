@@ -1,7 +1,7 @@
 import * as R from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { ResponseVariant, responseVariants } from "./api-response.ts";
+import { type ResponseVariant, responseVariants } from "./api-response.ts";
 import { IntegrationBase } from "./integration-base.ts";
 import {
   f,
@@ -16,13 +16,13 @@ import {
 } from "./typescript-api.ts";
 import { shouldHaveContent, makeCleanId } from "./common-helpers.ts";
 import { loadPeer } from "./peer-helpers.ts";
-import { Routing } from "./routing.ts";
-import { OnEndpoint, walkRouting, withHead } from "./routing-walker.ts";
-import { HandlingRules } from "./schema-walker.ts";
+import type { Routing } from "./routing.ts";
+import { type OnEndpoint, walkRouting, withHead } from "./routing-walker.ts";
+import type { HandlingRules } from "./schema-walker.ts";
 import { zodToTs } from "./zts.ts";
-import { ZTSContext } from "./zts-helpers.ts";
+import type { ZTSContext } from "./zts-helpers.ts";
 import type Prettier from "prettier";
-import { ClientMethod } from "./method.ts";
+import type { ClientMethod } from "./method.ts";
 
 interface IntegrationParams {
   routing: Routing;

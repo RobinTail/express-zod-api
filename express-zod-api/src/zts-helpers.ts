@@ -1,6 +1,6 @@
 import type ts from "typescript";
-import { FlatObject } from "./common-helpers.ts";
-import { SchemaHandler } from "./schema-walker.ts";
+import type { FlatObject } from "./common-helpers.ts";
+import type { SchemaHandler } from "./schema-walker.ts";
 
 export interface ZTSContext extends FlatObject {
   isResponse: boolean;

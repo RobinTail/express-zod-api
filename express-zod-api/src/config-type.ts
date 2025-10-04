@@ -1,14 +1,14 @@
 import type compression from "compression";
-import { IRouter, Request, RequestHandler } from "express";
+import type { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
-import { ServerOptions } from "node:https";
-import { BuiltinLoggerConfig } from "./builtin-logger.ts";
-import { AbstractEndpoint } from "./endpoint.ts";
-import { AbstractLogger, ActualLogger } from "./logger-helpers.ts";
-import { Method } from "./method.ts";
-import { AbstractResultHandler } from "./result-handler.ts";
-import { ListenOptions } from "node:net";
-import { GetLogger } from "./server-helpers.ts";
+import type { ServerOptions } from "node:https";
+import type { BuiltinLoggerConfig } from "./builtin-logger.ts";
+import type { AbstractEndpoint } from "./endpoint.ts";
+import type { AbstractLogger, ActualLogger } from "./logger-helpers.ts";
+import type { Method } from "./method.ts";
+import type { AbstractResultHandler } from "./result-handler.ts";
+import type { ListenOptions } from "node:net";
+import type { GetLogger } from "./server-helpers.ts";
 
 export type InputSource = keyof Pick<
   Request,
