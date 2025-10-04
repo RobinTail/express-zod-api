@@ -1,4 +1,4 @@
-import { DependsOnMethod, Routing, ServeStatic } from "express-zod-api";
+import { DependsOnMethod, type Routing, ServeStatic } from "express-zod-api";
 import { rawAcceptingEndpoint } from "./endpoints/accept-raw.ts";
 import { createUserEndpoint } from "./endpoints/create-user.ts";
 import { deleteUserEndpoint } from "./endpoints/delete-user.ts";
