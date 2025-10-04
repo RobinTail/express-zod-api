@@ -24,6 +24,10 @@ const importConcerns = [
     selector: "ImportDeclaration[source.value=/^zod/] > ImportDefaultSpecifier",
     message: "do import { z } instead",
   },
+  {
+    selector: "ImportDeclaration[source.value=/\\.js$/]",
+    message: "use .ts extension for relative imports",
+  },
   ...builtinModules.map((mod) => ({
     selector: `ImportDeclaration[source.value='${mod}']`,
     message: `use node:${mod} for the built-in module`,
@@ -63,6 +67,10 @@ const performanceConcerns = [
   {
     selector: "MemberExpression[object.name='R'] > Identifier[name='union']", // #2599
     message: "R.union() is 1.5x slower than [...Set().add()]",
+  },
+  {
+    selector: "ImportDeclaration[source.value=/package.json$/]", // #2974
+    message: "it can not be tree shaken, use tsdown and process.env instead",
   },
 ];
 

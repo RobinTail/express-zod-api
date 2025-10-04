@@ -16,8 +16,8 @@ import {
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
-import { NormalizedResponse, ResponseVariant } from "./api-response";
-import { ezBufferBrand } from "./buffer-schema";
+import { NormalizedResponse, ResponseVariant } from "./api-response.ts";
+import { ezBufferBrand } from "./buffer-schema.ts";
 import {
   shouldHaveContent,
   FlatObject,
@@ -29,23 +29,23 @@ import {
   routePathParamsRegex,
   Tag,
   ucFirst,
-} from "./common-helpers";
-import { InputSource } from "./config-type";
-import { contentTypes } from "./content-type";
-import { ezDateInBrand } from "./date-in-schema";
-import { ezDateOutBrand } from "./date-out-schema";
-import { DocumentationError } from "./errors";
-import { IOSchema } from "./io-schema";
-import { flattenIO } from "./json-schema-helpers";
-import { Alternatives } from "./logical-container";
+} from "./common-helpers.ts";
+import { InputSource } from "./config-type.ts";
+import { contentTypes } from "./content-type.ts";
+import { ezDateInBrand } from "./date-in-schema.ts";
+import { ezDateOutBrand } from "./date-out-schema.ts";
+import { DocumentationError } from "./errors.ts";
+import { IOSchema } from "./io-schema.ts";
+import { flattenIO } from "./json-schema-helpers.ts";
+import { Alternatives } from "./logical-container.ts";
 import { getBrand } from "@express-zod-api/zod-plugin";
-import { ClientMethod } from "./method";
-import { ProprietaryBrand } from "./proprietary-schemas";
-import { ezRawBrand } from "./raw-schema";
-import { FirstPartyKind } from "./schema-walker";
-import { Security } from "./security";
-import { ezUploadBrand } from "./upload-schema";
-import wellKnownHeaders from "./well-known-headers.json";
+import { ClientMethod } from "./method.ts";
+import { ProprietaryBrand } from "./proprietary-schemas.ts";
+import { ezRawBrand } from "./raw-schema.ts";
+import { FirstPartyKind } from "./schema-walker.ts";
+import { Security } from "./security.ts";
+import { ezUploadBrand } from "./upload-schema.ts";
+import wellKnownHeaders from "./well-known-headers.json" with { type: "json" };
 
 interface ReqResCommons {
   makeRef: (

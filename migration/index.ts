@@ -38,7 +38,10 @@ const listen = <
     {},
   );
 
-const v25 = ESLintUtils.RuleCreator.withoutDocs({
+// eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN and vitest
+const ruleName = `v${process.env.TSDOWN_VERSION!.split(".")[0]}`;
+
+const theRule = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: "problem",
     fixable: "code",
@@ -90,5 +93,5 @@ const v25 = ESLintUtils.RuleCreator.withoutDocs({
 });
 
 export default {
-  rules: { v25 },
+  rules: { [ruleName]: theRule } as Record<`v${number}`, typeof theRule>,
 } satisfies TSESLint.Linter.Plugin;
