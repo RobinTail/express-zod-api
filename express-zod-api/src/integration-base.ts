@@ -56,6 +56,8 @@ export abstract class IntegrationBase {
     { store: Store; isDeprecated: boolean }
   >();
 
+  readonly #serverUrl: string;
+
   readonly #ids = {
     pathType: f.createIdentifier("Path"),
     implementationType: f.createIdentifier("Implementation"),
@@ -119,7 +121,9 @@ export abstract class IntegrationBase {
     { expose: true },
   );
 
-  protected constructor(private readonly serverUrl: string) {}
+  protected constructor(serverUrl: string) {
+    this.#serverUrl = serverUrl;
+  }
 
   /**
    * @example SomeOf<_>
@@ -353,7 +357,7 @@ export abstract class IntegrationBase {
         [this.#ids.pathParameter],
         [this.#ids.searchParamsConst],
       ),
-      literally(this.serverUrl),
+      literally(this.#serverUrl),
     );
 
   /**
