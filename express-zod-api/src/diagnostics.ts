@@ -13,8 +13,11 @@ export class Diagnostics {
     AbstractEndpoint,
     { flat: ReturnType<typeof flattenIO>; paths: string[] }
   >();
+  protected logger: ActualLogger;
 
-  constructor(protected logger: ActualLogger) {}
+  constructor(logger: ActualLogger) {
+    this.logger = logger;
+  }
 
   public checkSchema(endpoint: AbstractEndpoint, ctx: FlatObject): void {
     if (this.#verifiedEndpoints.has(endpoint)) return;

@@ -77,7 +77,10 @@ export class EndpointsFactory<
 > {
   protected schema = undefined as IN;
   protected middlewares: AbstractMiddleware[] = [];
-  constructor(protected resultHandler: AbstractResultHandler) {}
+  protected resultHandler: AbstractResultHandler;
+  constructor(resultHandler: AbstractResultHandler) {
+    this.resultHandler = resultHandler;
+  }
 
   #extend<
     AIN extends IOSchema | undefined,

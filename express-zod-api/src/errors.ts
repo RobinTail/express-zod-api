@@ -43,17 +43,20 @@ export class IOSchemaError extends Error {
 
 export class DeepCheckError extends IOSchemaError {
   public override name = "DeepCheckError";
+  public override readonly cause: z.core.$ZodType;
 
-  constructor(public override readonly cause: z.core.$ZodType) {
+  constructor(cause: z.core.$ZodType) {
     super("Found", { cause });
+    this.cause = cause;
   }
 }
 
 /** @desc An error of validating the Endpoint handler's returns against the Endpoint output schema */
 export class OutputValidationError extends IOSchemaError {
   public override name = "OutputValidationError";
+  public override readonly cause: z.ZodError;
 
-  constructor(public override readonly cause: z.ZodError) {
+  constructor(cause: z.ZodError) {
     const prefixedPath = new z.ZodError(
       cause.issues.map(({ path, ...rest }) => ({
         ...rest,
@@ -61,29 +64,36 @@ export class OutputValidationError extends IOSchemaError {
       })),
     );
     super(getMessageFromError(prefixedPath), { cause });
+    this.cause = cause;
   }
 }
 
 /** @desc An error of validating the input sources against the Middleware or Endpoint input schema */
 export class InputValidationError extends IOSchemaError {
   public override name = "InputValidationError";
+  public override readonly cause: z.ZodError;
 
-  constructor(public override readonly cause: z.ZodError) {
+  constructor(cause: z.ZodError) {
     super(getMessageFromError(cause), { cause });
+    this.cause = cause;
   }
 }
 
 /** @desc An error related to the execution or incorrect configuration of ResultHandler */
 export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";
+  public override readonly cause: Error;
+  public readonly handled?: Error;
 
   constructor(
     /** @desc The error thrown from ResultHandler */
-    public override readonly cause: Error,
+    cause: Error,
     /** @desc The error being processed by ResultHandler when it failed */
-    public readonly handled?: Error,
+    handled?: Error,
   ) {
     super(getMessageFromError(cause), { cause });
+    this.cause = cause;
+    this.handled = handled;
   }
 }
 
