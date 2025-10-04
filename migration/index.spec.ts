@@ -11,8 +11,8 @@ const tester = new RuleTester({
   languageOptions: { parser },
 });
 
-const ruleName =
-  `v${manifest.version.split(".")[0]}` as keyof typeof migration.rules;
+const ruleName = `v${manifest.version.split(".")[0]}`;
+const theRule = migration.rules[ruleName as keyof typeof migration.rules];
 
 describe("Migration", () => {
   test("should consist of one rule being the major version of the package", () => {
@@ -20,7 +20,7 @@ describe("Migration", () => {
     expect(migration).toMatchSnapshot();
   });
 
-  tester.run(ruleName, migration.rules[ruleName], {
+  tester.run(ruleName, theRule, {
     valid: [
       `import {} from "zod";`,
       `ez.dateIn({ examples: ["1963-04-21"] });`,
