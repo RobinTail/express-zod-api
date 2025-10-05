@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { responseVariants } from "./api-response";
-import { FlatObject, getRoutePathParams } from "./common-helpers";
-import { contentTypes } from "./content-type";
-import { findJsonIncompatible } from "./deep-checks";
-import { AbstractEndpoint } from "./endpoint";
-import { flattenIO } from "./json-schema-helpers";
-import { ActualLogger } from "./logger-helpers";
+import { responseVariants } from "./api-response.ts";
+import { FlatObject, getRoutePathParams } from "./common-helpers.ts";
+import { contentTypes } from "./content-type.ts";
+import { findJsonIncompatible } from "./deep-checks.ts";
+import { AbstractEndpoint } from "./endpoint.ts";
+import { flattenIO } from "./json-schema-helpers.ts";
+import { ActualLogger } from "./logger-helpers.ts";
 
 export class Diagnostics {
   #verifiedEndpoints = new WeakSet<AbstractEndpoint>();

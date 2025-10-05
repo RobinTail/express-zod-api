@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { brandProperty, getBrand, setBrand } from "../src/brand";
-import * as packer from "../src/packer";
+import { brandProperty, getBrand, setBrand } from "../src/brand.ts";
+import * as packer from "../src/packer.ts";
 
 describe("Brand", () => {
   describe("brandProperty", () => {

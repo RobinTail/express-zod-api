@@ -12,11 +12,11 @@ import {
   emptySchema,
   EmptySchema,
   EmptyObject,
-} from "../src/common-helpers";
+} from "../src/common-helpers.ts";
 import { z } from "zod";
-import { makeRequestMock } from "../src/testing";
-import { methods } from "../src/method";
-import { CommonConfig, InputSources } from "../src/config-type";
+import { makeRequestMock } from "../src/testing.ts";
+import { methods } from "../src/method.ts";
+import { CommonConfig, InputSources } from "../src/config-type.ts";
 
 describe("Common Helpers", () => {
   describe("emptySchema", () => {

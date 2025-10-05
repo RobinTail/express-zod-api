@@ -1,7 +1,6 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import migration from "./index";
 import parser from "@typescript-eslint/parser";
-import { version } from "./package.json";
+import manifest from "./package.json" with { type: "json" };
 
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
@@ -11,13 +10,18 @@ const tester = new RuleTester({
   languageOptions: { parser },
 });
 
-describe("Migration", () => {
+describe("Migration", async () => {
+  vi.stubEnv("TSDOWN_VERSION", manifest.version);
+  const { default: migration } = await import("./index.ts");
+  const ruleName = `v${manifest.version.split(".")[0]}`;
+  const theRule = migration.rules[ruleName as keyof typeof migration.rules];
+
   test("should consist of one rule being the major version of the package", () => {
-    expect(migration.rules).toHaveProperty(`v${version.split(".")[0]}`);
+    expect(migration.rules).toHaveProperty(ruleName);
     expect(migration).toMatchSnapshot();
   });
 
-  tester.run("v25", migration.rules.v25, {
+  tester.run(ruleName, theRule, {
     valid: [
       `import {} from "zod";`,
       `ez.dateIn({ examples: ["1963-04-21"] });`,

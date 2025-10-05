@@ -1,5 +1,5 @@
 import { z } from "zod";
-import * as entrypoint from "../src";
+import * as entrypoint from "../src/index.ts";
 
 describe("Entrypoint", () => {
   test("Augmentation", () => {
