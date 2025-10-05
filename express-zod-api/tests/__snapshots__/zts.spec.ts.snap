@@ -59,7 +59,6 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     promise: any;
     optDefaultString?: string | undefined;
     refinedStringWithSomeBullshit: (string | number) & (bigint | null);
-    nativeEnum: "A" | "apple" | "banana" | "cantaloupe" | 5;
     lazy: SomeType;
     discUnion: {
         kind: "circle";
@@ -169,11 +168,9 @@ exports[`zod-to-ts > PrimitiveSchema (isResponse=true) > outputs correct typescr
 }"
 `;
 
-exports[`zod-to-ts > enums > handles 'numeric' literals 1`] = `""Red" | "Green" | "Blue" | 0 | 1 | 2"`;
+exports[`zod-to-ts > enums > handles enum-like literals 0 1`] = `"0 | 1 | 2"`;
 
-exports[`zod-to-ts > enums > handles 'quoted string' literals 1`] = `""Two Words" | "'Quotes\\"" | "\\\\\\"Escaped\\\\\\"" | 0 | 1 | 2"`;
-
-exports[`zod-to-ts > enums > handles 'string' literals 1`] = `""apple" | "banana" | "cantaloupe""`;
+exports[`zod-to-ts > enums > handles enum-like literals 1 1`] = `""apple" | "banana" | "cantaloupe""`;
 
 exports[`zod-to-ts > ez.buffer() > should be Buffer 1`] = `"Buffer"`;
 

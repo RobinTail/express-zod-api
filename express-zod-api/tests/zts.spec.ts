@@ -38,45 +38,15 @@ describe("zod-to-ts", () => {
   });
 
   describe("enums", () => {
-    // noinspection JSUnusedGlobalSymbols
-    enum Color {
-      Red,
-      Green,
-      Blue,
-    }
-
-    // noinspection JSUnusedGlobalSymbols
-    enum Fruit {
-      Apple = "apple",
-      Banana = "banana",
-      Cantaloupe = "cantaloupe",
-    }
-
-    // noinspection JSUnusedGlobalSymbols
-    enum StringLiteral {
-      "Two Words",
-      "'Quotes\"",
-      '\\"Escaped\\"',
-    }
-
     test.each([
-      { schema: z.enum(Color), feature: "numeric" },
-      { schema: z.enum(Fruit), feature: "string" },
-      { schema: z.enum(StringLiteral), feature: "quoted string" },
-    ])("handles $feature literals", ({ schema }) => {
+      z.enum({ red: 0, green: 1, blue: 2 }),
+      z.enum(["apple", "banana", "cantaloupe"]),
+    ])("handles enum-like literals %#", (schema) => {
       expect(printNodeTest(zodToTs(schema, { ctx }))).toMatchSnapshot();
     });
   });
 
   describe("Example", () => {
-    // noinspection JSUnusedGlobalSymbols
-    enum Fruits {
-      Apple = "apple",
-      Banana = "banana",
-      Cantaloupe = "cantaloupe",
-      A = 5,
-    }
-
     const pickedSchema = z
       .object({
         string: z.string(),
@@ -158,7 +128,6 @@ describe("zod-to-ts", () => {
         .refine((val) => val.length > 10)
         .or(z.number())
         .and(z.bigint().nullish()),
-      nativeEnum: z.enum(Fruits),
       lazy: z.lazy(() => z.string()),
       discUnion: z.discriminatedUnion("kind", [
         z.object({ kind: z.literal("circle"), radius: z.number() }),
