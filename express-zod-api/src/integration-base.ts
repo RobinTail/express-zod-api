@@ -5,7 +5,6 @@ import { contentTypes } from "./content-type.ts";
 import { ClientMethod, clientMethods } from "./method.ts";
 import type { makeEventSchema } from "./sse.ts";
 import {
-  accessModifiers,
   ensureTypeNode,
   f,
   makeArrowFn,
@@ -32,7 +31,7 @@ import {
   propOf,
   recordStringAny,
   makeAssignment,
-  makePublicProperty,
+  makeProperty,
   makeIndexed,
   makeMaybeAsync,
   Typeable,
@@ -331,14 +330,30 @@ export abstract class IntegrationBase {
     makePublicClass(
       name,
       [
-        // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
-        makePublicConstructor([
-          makeParam(this.#ids.implementationArgument, {
-            type: ensureTypeNode(this.#ids.implementationType, ["T"]),
-            mod: accessModifiers.protectedReadonly,
-            init: this.#ids.defaultImplementationConst,
-          }),
-        ]),
+        // protected readonly implementation: Implementation<T>;
+        makeProperty(
+          this.#ids.implementationArgument,
+          ensureTypeNode(this.#ids.implementationType, ["T"]), // @todo extract
+        ),
+        // public constructor(implementation: Implementation<T> = defaultImplementation) {}
+        makePublicConstructor(
+          [
+            makeParam(this.#ids.implementationArgument, {
+              type: ensureTypeNode(this.#ids.implementationType, ["T"]), // @todo extract
+              init: this.#ids.defaultImplementationConst,
+            }),
+          ],
+          [
+            // this.implementation = implementation;
+            makeAssignment(
+              f.createPropertyAccessExpression(
+                f.createThis(),
+                this.#ids.implementationArgument,
+              ),
+              this.#ids.implementationArgument,
+            ),
+          ],
+        ),
         this.#makeProvider(),
       ],
       { typeParams: ["T"] },
@@ -599,7 +614,7 @@ export abstract class IntegrationBase {
     makePublicClass(
       name,
       [
-        makePublicProperty(this.#ids.sourceProp, "EventSource"),
+        makeProperty(this.#ids.sourceProp, "EventSource", { expose: true }),
         this.#makeSubscriptionConstructor(),
         this.#makeOnMethod(),
       ],

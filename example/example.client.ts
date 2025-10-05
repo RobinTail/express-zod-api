@@ -663,9 +663,12 @@ const defaultImplementation: Implementation = async (method, path, params) => {
 };
 
 export class Client<T> {
+  protected readonly implementation: Implementation<T>;
   public constructor(
-    protected readonly implementation: Implementation<T> = defaultImplementation,
-  ) {}
+    implementation: Implementation<T> = defaultImplementation,
+  ) {
+    this.implementation = implementation;
+  }
   public provide<K extends Request>(
     request: K,
     params: Input[K],
