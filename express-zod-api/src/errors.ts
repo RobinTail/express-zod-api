@@ -82,15 +82,12 @@ export class InputValidationError extends IOSchemaError {
 /** @desc An error related to the execution or incorrect configuration of ResultHandler */
 export class ResultHandlerError extends Error {
   public override name = "ResultHandlerError";
+  /** @desc The error thrown from ResultHandler */
   public override readonly cause: Error;
+  /** @desc The error being processed by ResultHandler when it failed */
   public readonly handled?: Error;
 
-  constructor(
-    /** @desc The error thrown from ResultHandler */
-    cause: Error,
-    /** @desc The error being processed by ResultHandler when it failed */
-    handled?: Error,
-  ) {
+  constructor(cause: Error, handled?: Error) {
     super(getMessageFromError(cause), { cause });
     this.cause = cause;
     this.handled = handled;
