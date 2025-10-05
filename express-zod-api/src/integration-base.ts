@@ -326,20 +326,18 @@ export abstract class IntegrationBase {
    * @example export class Client { ___ }
    * @internal
    * */
-  protected makeClientClass = (name: string) =>
-    makePublicClass(
+  protected makeClientClass = (name: string) => {
+    const genericImplType = ensureTypeNode(this.#ids.implementationType, ["T"]);
+    return makePublicClass(
       name,
       [
         // protected readonly implementation: Implementation<T>;
-        makeProperty(
-          this.#ids.implementationArgument,
-          ensureTypeNode(this.#ids.implementationType, ["T"]), // @todo extract
-        ),
+        makeProperty(this.#ids.implementationArgument, genericImplType),
         // public constructor(implementation: Implementation<T> = defaultImplementation) {}
         makePublicConstructor(
           [
             makeParam(this.#ids.implementationArgument, {
-              type: ensureTypeNode(this.#ids.implementationType, ["T"]), // @todo extract
+              type: genericImplType,
               init: this.#ids.defaultImplementationConst,
             }),
           ],
@@ -358,6 +356,7 @@ export abstract class IntegrationBase {
       ],
       { typeParams: ["T"] },
     );
+  };
 
   // `?${new URLSearchParams(____)}`
   #makeSearchParams = (from: ts.Expression) =>
