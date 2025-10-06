@@ -54,9 +54,10 @@ const listen = <
   );
 
 // eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN and vitest
-const ruleName = `v${process.env.TSDOWN_VERSION!.split(".")[0]}`;
+const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0] ?? "0"}`; // fail-safe for bumpp
 
 const theRule = ESLintUtils.RuleCreator.withoutDocs({
+  name: ruleName,
   meta: {
     type: "problem",
     fixable: "code",

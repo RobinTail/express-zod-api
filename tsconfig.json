@@ -8,6 +8,6 @@
     "noImplicitOverride": true,
     "noUncheckedSideEffectImports": true,
     "resolveJsonModule": true,
-    "types": ["vitest/globals"]
+    "types": ["node", "vitest/globals"]
   }
 }
