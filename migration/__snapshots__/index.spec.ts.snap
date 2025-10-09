@@ -17,7 +17,6 @@ exports[`Migration > should consist of one rule being the major version of the p
         "schema": [],
         "type": "problem",
       },
-      "name": "v26",
     },
   },
 }
