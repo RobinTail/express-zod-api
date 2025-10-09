@@ -76,7 +76,7 @@ describe("SSE", () => {
   describe("makeMiddleware()", () => {
     // with and without response.flush()
     test.each([vi.fn(), undefined])(
-      "should create a Middleware providing options for emission %#",
+      "should create a Middleware providing context for emission %#",
       async (flushMock) => {
         const middleware = makeMiddleware({ test: z.string() });
         expect(middleware).toBeInstanceOf(Middleware);
@@ -128,7 +128,7 @@ describe("SSE", () => {
         const positiveResponse = makeResponseMock();
         const commons = {
           input: {},
-          options: {},
+          ctx: {},
           request: makeRequestMock(),
           logger: makeLoggerMock(),
         };
@@ -163,9 +163,9 @@ describe("SSE", () => {
     test("should combine SSE Middleware with corresponding ResultHandler and return Endpoint", async () => {
       const endpoint = new EventStreamFactory({ test: z.string() }).buildVoid({
         input: z.object({ some: z.string().optional() }),
-        handler: async ({ input, options }) => {
+        handler: async ({ input, ctx }) => {
           expectTypeOf(input).toExtend<{ some?: string }>();
-          expectTypeOf(options.emit)
+          expectTypeOf(ctx.emit)
             .parameter(0)
             .toEqualTypeOf("test" as const);
         },
