@@ -20,6 +20,7 @@ minimumReleaseAgeExclude:
   - "@vitest/*"
   - "@typescript-eslint/*"
   - eslint
+  - eslint-plugin-allowed-dependencies
   - express
   - http-errors
   - ramda
