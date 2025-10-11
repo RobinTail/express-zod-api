@@ -50,8 +50,8 @@ catalogs:
       version: 4.1.12
   prod:
     ramda:
-      specifier: ^0.31.3
-      version: 0.31.3
+      specifier: ^0.32.0
+      version: 0.32.0
 
 overrides:
   '@scarf/scarf': npm:empty-npm-package@1.0.0
@@ -191,7 +191,7 @@ importers:
         version: 4.5.0
       ramda:
         specifier: catalog:prod
-        version: 0.31.3
+        version: 0.32.0
     devDependencies:
       '@types/compression':
         specifier: catalog:dev
@@ -282,7 +282,7 @@ importers:
     dependencies:
       ramda:
         specifier: catalog:prod
-        version: 0.31.3
+        version: 0.32.0
     devDependencies:
       '@types/ramda':
         specifier: catalog:dev
@@ -1936,6 +1936,9 @@ packages:
 
   ramda@0.31.3:
     resolution: {integrity: sha512-xKADKRNnqmDdX59PPKLm3gGmk1ZgNnj3k7DryqWwkamp4TJ6B36DdpyKEQ0EoEYmH2R62bV4Q+S0ym2z8N2f3Q==}
+
+  ramda@0.32.0:
+    resolution: {integrity: sha512-GQWAHhxhxWBWA8oIBr1XahFVjQ9Fic6MK9ikijfd4TZHfE2+urfk+irVlR5VOn48uwMgM+loRRBJd6Yjsbc0zQ==}
 
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
@@ -3985,6 +3988,8 @@ snapshots:
   queue-microtask@1.2.3: {}
 
   ramda@0.31.3: {}
+
+  ramda@0.32.0: {}
 
   range-parser@1.2.1: {}
 
