@@ -79,8 +79,8 @@ importers:
         specifier: ^10.1.5
         version: 10.1.8(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-allowed-dependencies:
-        specifier: ^1.3.2
-        version: 1.3.2(eslint@9.37.0(jiti@2.6.0))(typescript-eslint@8.46.0(eslint@9.37.0(jiti@2.6.0))(typescript@5.9.3))
+        specifier: ^2.0.0-beta.2
+        version: 2.0.0-beta.2(eslint@9.37.0(jiti@2.6.0))(typescript-eslint@8.46.0(eslint@9.37.0(jiti@2.6.0))(typescript@5.9.3))
       eslint-plugin-prettier:
         specifier: ^5.4.1
         version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.37.0(jiti@2.6.0)))(eslint@9.37.0(jiti@2.6.0))(prettier@3.6.2)
@@ -1348,9 +1348,9 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-allowed-dependencies@1.3.2:
-    resolution: {integrity: sha512-CAMI/xkFAdfD0909GBsKMJaCRO/KXA4c7vss2NDGzDkaEXT7HDuZBKzGnQSyIaJirXig0qSPO9Lyu4qPWoUZyQ==}
-    engines: {node: ^18.18.0 || ^20.9.0 || ^22.0.0 || ^24.0.0}
+  eslint-plugin-allowed-dependencies@2.0.0-beta.2:
+    resolution: {integrity: sha512-jCNwuOLC5BRNwrHz85L1VyZhIdGtmgx+FdVM4JzgQgxgdJqaRhguobLkiiLT3xXyS+MqTSQ1K0MMZDFpEDRhzQ==}
+    engines: {node: ^20.19.0 || ^22.12.0 || ^24.0.0}
     peerDependencies:
       eslint: ^9.0.0
       typescript-eslint: ^8.0.0
@@ -3383,7 +3383,7 @@ snapshots:
     dependencies:
       eslint: 9.37.0(jiti@2.6.0)
 
-  eslint-plugin-allowed-dependencies@1.3.2(eslint@9.37.0(jiti@2.6.0))(typescript-eslint@8.46.0(eslint@9.37.0(jiti@2.6.0))(typescript@5.9.3)):
+  eslint-plugin-allowed-dependencies@2.0.0-beta.2(eslint@9.37.0(jiti@2.6.0))(typescript-eslint@8.46.0(eslint@9.37.0(jiti@2.6.0))(typescript@5.9.3)):
     dependencies:
       eslint: 9.37.0(jiti@2.6.0)
       ramda: 0.32.0
