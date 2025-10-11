@@ -20,8 +20,10 @@ minimumReleaseAgeExclude:
   - "@vitest/*"
   - "@typescript-eslint/*"
   - eslint
+  - eslint-plugin-allowed-dependencies
   - express
   - http-errors
+  - ramda
   - rolldown
   - typescript
   - tsdown
@@ -37,7 +39,7 @@ publicHoistPattern:
   - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting
 catalogs:
   prod:
-    "ramda": "^0.31.3"
+    "ramda": "^0.32.0"
   dev:
     "@types/compression": "^1.8.1"
     "@types/express": "^5.0.3"
