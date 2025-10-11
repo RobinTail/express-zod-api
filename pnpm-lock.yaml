@@ -79,7 +79,7 @@ importers:
         specifier: ^10.1.5
         version: 10.1.8(eslint@9.37.0(jiti@2.6.0))
       eslint-plugin-allowed-dependencies:
-        specifier: ^2.0.0-beta.2
+        specifier: ^2.0.0
         version: 2.0.0(eslint@9.37.0(jiti@2.6.0))(typescript-eslint@8.46.0(eslint@9.37.0(jiti@2.6.0))(typescript@5.9.3))
       eslint-plugin-prettier:
         specifier: ^5.4.1
