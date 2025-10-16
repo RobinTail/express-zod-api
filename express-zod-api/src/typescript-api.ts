@@ -17,7 +17,7 @@ const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
 
 const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
 
-export const accessModifiers = {
+const accessModifiers = {
   public: [f.createModifier(ts.SyntaxKind.PublicKeyword)],
   protectedReadonly: [
     f.createModifier(ts.SyntaxKind.ProtectedKeyword),
@@ -222,12 +222,13 @@ export const makeType = (
   return comment ? addJsDoc(node, comment) : node;
 };
 
-export const makePublicProperty = (
+export const makeProperty = (
   name: string | ts.PropertyName,
   type: Typeable,
+  { expose }: { expose?: boolean } = {},
 ) =>
   f.createPropertyDeclaration(
-    accessModifiers.public,
+    expose ? accessModifiers.public : accessModifiers.protectedReadonly,
     name,
     undefined,
     ensureTypeNode(type),
