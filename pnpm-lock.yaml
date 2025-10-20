@@ -92,7 +92,7 @@ importers:
         version: 3.6.2
       tsdown:
         specifier: ^0.15.3
-        version: 0.15.7(@arethetypeswrong/core@0.18.2)(typescript@5.9.3)
+        version: 0.15.8(@arethetypeswrong/core@0.18.2)(typescript@5.9.3)
       tsx:
         specifier: ^4.19.4
         version: 4.20.6
@@ -1960,8 +1960,8 @@ packages:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
-  rolldown-plugin-dts@0.16.11:
-    resolution: {integrity: sha512-9IQDaPvPqTx3RjG2eQCK5GYZITo203BxKunGI80AGYicu1ySFTUyugicAaTZWRzFWh9DSnzkgNeMNbDWBbSs0w==}
+  rolldown-plugin-dts@0.16.12:
+    resolution: {integrity: sha512-9dGjm5oqtKcbZNhpzyBgb8KrYiU616A7IqcFWG7Msp1RKAXQ/hapjivRg+g5IYWSiFhnk3OKYV5T4Ft1t8Cczg==}
     engines: {node: '>=20.18.0'}
     peerDependencies:
       '@ts-macro/tsc': ^0.3.6
@@ -2174,8 +2174,8 @@ packages:
   ts-toolbelt@9.6.0:
     resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
 
-  tsdown@0.15.7:
-    resolution: {integrity: sha512-uFaVgWAogjOMqjY+CQwrUt3C6wzy6ynt82CIoXymnbS17ipUZ8WDXUceJjkislUahF/BZc5+W44Ue3p2oWtqUg==}
+  tsdown@0.15.8:
+    resolution: {integrity: sha512-A9CY3lO2SC6G5wyQV38cNdPkDmCoIQ6zYVd+lLnEGH09BxNRTJkCHfb7cBeBxZYJDYGFtgg/3yBpEryYJjBd+Q==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
@@ -4002,7 +4002,7 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rolldown-plugin-dts@0.16.11(rolldown@1.0.0-beta.43)(typescript@5.9.3):
+  rolldown-plugin-dts@0.16.12(rolldown@1.0.0-beta.43)(typescript@5.9.3):
     dependencies:
       '@babel/generator': 7.28.3
       '@babel/parser': 7.28.4
@@ -4255,7 +4255,7 @@ snapshots:
 
   ts-toolbelt@9.6.0: {}
 
-  tsdown@0.15.7(@arethetypeswrong/core@0.18.2)(typescript@5.9.3):
+  tsdown@0.15.8(@arethetypeswrong/core@0.18.2)(typescript@5.9.3):
     dependencies:
       ansis: 4.2.0
       cac: 6.7.14
@@ -4265,7 +4265,7 @@ snapshots:
       empathic: 2.0.0
       hookable: 5.5.3
       rolldown: 1.0.0-beta.43
-      rolldown-plugin-dts: 0.16.11(rolldown@1.0.0-beta.43)(typescript@5.9.3)
+      rolldown-plugin-dts: 0.16.12(rolldown@1.0.0-beta.43)(typescript@5.9.3)
       semver: 7.7.3
       tinyexec: 1.0.1
       tinyglobby: 0.2.15
