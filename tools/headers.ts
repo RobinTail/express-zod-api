@@ -1,5 +1,6 @@
 import { execSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
+import { format } from "prettier";
 
 /**
  * @link https://chatgpt.com/c/6795dae3-8a10-800e-96af-fd0d01579f39
@@ -208,7 +209,7 @@ const responseOnlyHeaders = {
   },
 };
 
-const dest = "express-zod-api/src/well-known-headers.json";
+const dest = "express-zod-api/src/well-known-headers.ts";
 
 let mtime: Date | undefined;
 try {
@@ -252,4 +253,6 @@ const headers = lines
 
 console.debug("CRC:", headers.length);
 
-await writeFile(dest, JSON.stringify(headers, undefined, 2), "utf-8");
+const json = JSON.stringify(headers, undefined, 2);
+const tsCode = await format(`export default ${json};`, { filepath: dest });
+await writeFile(dest, tsCode, "utf-8");
