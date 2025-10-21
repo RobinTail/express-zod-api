@@ -45,7 +45,7 @@ import { ezRawBrand } from "./raw-schema.ts";
 import { FirstPartyKind } from "./schema-walker.ts";
 import { Security } from "./security.ts";
 import { ezUploadBrand } from "./upload-schema.ts";
-import wellKnownHeaders from "./well-known-headers.json" with { type: "json" };
+import wellKnownHeaders from "./well-known-headers.ts";
 
 interface ReqResCommons {
   makeRef: (
