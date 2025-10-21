@@ -1,4 +1,4 @@
-[
+export default [
   "a-im",
   "accept",
   "accept-additions",
@@ -201,5 +201,5 @@
   "want-repr-digest",
   "warning",
   "x-content-type-options",
-  "x-frame-options"
-]
+  "x-frame-options",
+];
