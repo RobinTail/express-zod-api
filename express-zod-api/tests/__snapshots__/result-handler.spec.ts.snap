@@ -145,3 +145,15 @@ exports[`ResultHandler > 'defaultResultHandler' > should generate negative respo
   ],
 }
 `;
+
+exports[`ResultHandler > arrayResultHandler should attempt to take examples from the items prop 1`] = `
+{
+  "examples": [
+    [
+      "One",
+      "Two",
+      "Three",
+    ],
+  ],
+}
+`;
