@@ -9,6 +9,6 @@
     "noUncheckedSideEffectImports": true,
     "resolveJsonModule": true,
     "verbatimModuleSyntax": true,
-    "types": ["vitest/globals"]
+    "types": ["node", "vitest/globals"]
   }
 }

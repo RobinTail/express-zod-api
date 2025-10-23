@@ -186,14 +186,8 @@ describe("ResultHandler", () => {
     test("should forward output schema examples", () => {
       const apiResponse = subject.getPositiveResponse(
         z
-          .object({
-            str: z.string(),
-            items: z.array(z.string()),
-          })
-          .example({
-            str: "test",
-            items: ["One", "Two", "Three"],
-          }),
+          .object({ str: z.string(), items: z.array(z.string()) })
+          .example({ str: "test", items: ["One", "Two", "Three"] }),
       );
       expect(apiResponse).toHaveLength(1);
       expect(apiResponse[0].schema.meta()).toMatchSnapshot();
@@ -204,6 +198,14 @@ describe("ResultHandler", () => {
       expect(apiResponse).toHaveLength(1);
       expect(apiResponse[0].schema.meta()).toMatchSnapshot();
     });
+  });
+
+  test("arrayResultHandler should attempt to take examples from the items prop", () => {
+    const apiResponse = arrayResultHandler.getPositiveResponse(
+      z.object({ items: z.array(z.string()).example(["One", "Two", "Three"]) }),
+    );
+    expect(apiResponse).toHaveLength(1);
+    expect(apiResponse[0].schema.meta()).toMatchSnapshot();
   });
 
   test("arrayResultHandler should fail when there is no items prop in the output", () => {
