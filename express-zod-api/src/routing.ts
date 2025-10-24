@@ -3,7 +3,6 @@ import createHttpError from "http-errors";
 import { isProduction } from "./common-helpers.ts";
 import { CommonConfig } from "./config-type.ts";
 import { ContentType } from "./content-type.ts";
-import { DependsOnMethod } from "./depends-on-method.ts";
 import { Diagnostics } from "./diagnostics.ts";
 import { AbstractEndpoint } from "./endpoint.ts";
 import { CORSMethod, isMethod } from "./method.ts";
@@ -17,9 +16,10 @@ import * as R from "ramda";
  * @example { "v1/books/:bookId": getBookEndpoint }
  * @example { "get /v1/books/:bookId": getBookEndpoint }
  * @example { v1: { "patch /books/:bookId": changeBookEndpoint } }
+ * @example { dependsOnMethod: { "get /": retrieveEndpoint, "post /": createEndpoint } }
  * */
 export interface Routing {
-  [K: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
+  [K: string]: Routing | AbstractEndpoint | ServeStatic;
 }
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
