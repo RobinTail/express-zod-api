@@ -1,12 +1,12 @@
 import ansis from "ansis";
 import { inspect } from "node:util";
 import { performance } from "node:perf_hooks";
-import { FlatObject, isProduction } from "./common-helpers.ts";
+import { type FlatObject, isProduction } from "./common-helpers.ts";
 import {
-  AbstractLogger,
+  type AbstractLogger,
   formatDuration,
   isHidden,
-  Severity,
+  type Severity,
   styles,
 } from "./logger-helpers.ts";
 

@@ -5,9 +5,9 @@ import { ezDateInBrand } from "./date-in-schema.ts";
 import { ezDateOutBrand } from "./date-out-schema.ts";
 import { DeepCheckError } from "./errors.ts";
 import { ezFormBrand } from "./form-schema.ts";
-import { IOSchema } from "./io-schema.ts";
+import type { IOSchema } from "./io-schema.ts";
 import { getBrand } from "@express-zod-api/zod-plugin";
-import { FirstPartyKind } from "./schema-walker.ts";
+import type { FirstPartyKind } from "./schema-walker.ts";
 import { ezUploadBrand } from "./upload-schema.ts";
 import { ezRawBrand } from "./raw-schema.ts";
 

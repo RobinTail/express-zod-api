@@ -1,6 +1,6 @@
 import * as R from "ramda";
-import { AbstractEndpoint } from "./endpoint.ts";
-import { Method } from "./method.ts";
+import type { AbstractEndpoint } from "./endpoint.ts";
+import type { Method } from "./method.ts";
 import { Routable } from "./routable.ts";
 
 export class DependsOnMethod extends Routable {

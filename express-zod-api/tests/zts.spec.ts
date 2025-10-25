@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ez } from "../src/index.ts";
 import { f, printNode } from "../src/typescript-api.ts";
 import { zodToTs } from "../src/zts.ts";
-import { ZTSContext } from "../src/zts-helpers.ts";
+import type { ZTSContext } from "../src/zts-helpers.ts";
 
 describe("zod-to-ts", () => {
   const printNodeTest = (node: ts.Node) =>

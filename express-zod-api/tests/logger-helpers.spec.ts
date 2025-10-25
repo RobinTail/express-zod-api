@@ -1,7 +1,7 @@
 import { BuiltinLogger } from "../src/index.ts";
-import { BuiltinLoggerConfig } from "../src/builtin-logger.ts";
+import type { BuiltinLoggerConfig } from "../src/builtin-logger.ts";
 import {
-  AbstractLogger,
+  type AbstractLogger,
   isLoggerInstance,
   isSeverity,
   isHidden,

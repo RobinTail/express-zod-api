@@ -1,16 +1,16 @@
-import { Request } from "express";
+import type { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
-import { NormalizedResponse, ResponseVariant } from "./api-response.ts";
+import type { NormalizedResponse, ResponseVariant } from "./api-response.ts";
 import {
   combinations,
-  FlatObject,
+  type FlatObject,
   getMessageFromError,
   isProduction,
 } from "./common-helpers.ts";
 import { InputValidationError, ResultHandlerError } from "./errors.ts";
-import { ActualLogger } from "./logger-helpers.ts";
+import type { ActualLogger } from "./logger-helpers.ts";
 import type { LazyResult, Result } from "./result-handler.ts";
 
 export type ResultSchema<R extends Result> =

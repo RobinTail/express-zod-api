@@ -6,16 +6,20 @@ import { getTransformedType, isSchema } from "./common-helpers.ts";
 import { ezDateInBrand } from "./date-in-schema.ts";
 import { ezDateOutBrand } from "./date-out-schema.ts";
 import { hasCycle } from "./deep-checks.ts";
-import { ProprietaryBrand } from "./proprietary-schemas.ts";
-import { ezRawBrand, RawSchema } from "./raw-schema.ts";
-import { FirstPartyKind, HandlingRules, walkSchema } from "./schema-walker.ts";
+import type { ProprietaryBrand } from "./proprietary-schemas.ts";
+import { ezRawBrand, type RawSchema } from "./raw-schema.ts";
+import {
+  type FirstPartyKind,
+  type HandlingRules,
+  walkSchema,
+} from "./schema-walker.ts";
 import {
   ensureTypeNode,
   makeInterfaceProp,
   makeLiteralType,
   makeUnion,
 } from "./typescript-api.ts";
-import { Producer, ZTSContext } from "./zts-helpers.ts";
+import type { Producer, ZTSContext } from "./zts-helpers.ts";
 
 const { factory: f } = ts;
 
