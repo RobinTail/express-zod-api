@@ -157,3 +157,21 @@ exports[`ResultHandler > arrayResultHandler should attempt to take examples from
   ],
 }
 `;
+
+exports[`ResultHandler > getters > should throw when result is defined as an empty array 1`] = `
+ResultHandlerError({
+  "cause": Error({
+    "message": "At least one positive response schema required.",
+  }),
+  "message": "At least one positive response schema required.",
+})
+`;
+
+exports[`ResultHandler > getters > should throw when result is defined as an empty array 2`] = `
+ResultHandlerError({
+  "cause": Error({
+    "message": "At least one negative response schema required.",
+  }),
+  "message": "At least one negative response schema required.",
+})
+`;

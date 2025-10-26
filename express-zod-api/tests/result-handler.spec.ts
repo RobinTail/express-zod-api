@@ -7,7 +7,6 @@ import {
   defaultResultHandler,
   ResultHandler,
 } from "../src/index.ts";
-import { ResultHandlerError } from "../src/errors.ts";
 import { AbstractResultHandler, Result } from "../src/result-handler.ts";
 import {
   makeLoggerMock,
@@ -46,22 +45,14 @@ describe("ResultHandler", () => {
           negative: vi.fn(),
           handler: vi.fn(),
         }).getPositiveResponse(z.object({})),
-      ).toThrow(
-        new ResultHandlerError(
-          new Error("At least one positive response schema required."),
-        ),
-      );
+      ).toThrowErrorMatchingSnapshot();
       expect(() =>
         new ResultHandler({
           positive: vi.fn(),
           negative: [] as Result,
           handler: vi.fn(),
         }).getNegativeResponse(),
-      ).toThrow(
-        new ResultHandlerError(
-          new Error("At least one negative response schema required."),
-        ),
-      );
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 

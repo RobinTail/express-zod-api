@@ -5,7 +5,6 @@ import { contentTypes } from "./content-type.ts";
 import { ClientMethod, clientMethods } from "./method.ts";
 import type { makeEventSchema } from "./sse.ts";
 import {
-  accessModifiers,
   ensureTypeNode,
   f,
   makeArrowFn,
@@ -32,7 +31,7 @@ import {
   propOf,
   recordStringAny,
   makeAssignment,
-  makePublicProperty,
+  makeProperty,
   makeIndexed,
   makeMaybeAsync,
   Typeable,
@@ -55,6 +54,8 @@ export abstract class IntegrationBase {
     string,
     { store: Store; isDeprecated: boolean }
   >();
+
+  readonly #serverUrl: string;
 
   readonly #ids = {
     pathType: f.createIdentifier("Path"),
@@ -119,7 +120,9 @@ export abstract class IntegrationBase {
     { expose: true },
   );
 
-  protected constructor(private readonly serverUrl: string) {}
+  protected constructor(serverUrl: string) {
+    this.#serverUrl = serverUrl;
+  }
 
   /**
    * @example SomeOf<_>
@@ -323,22 +326,37 @@ export abstract class IntegrationBase {
    * @example export class Client { ___ }
    * @internal
    * */
-  protected makeClientClass = (name: string) =>
-    makePublicClass(
+  protected makeClientClass = (name: string) => {
+    const genericImplType = ensureTypeNode(this.#ids.implementationType, ["T"]);
+    return makePublicClass(
       name,
       [
-        // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
-        makePublicConstructor([
-          makeParam(this.#ids.implementationArgument, {
-            type: ensureTypeNode(this.#ids.implementationType, ["T"]),
-            mod: accessModifiers.protectedReadonly,
-            init: this.#ids.defaultImplementationConst,
-          }),
-        ]),
+        // protected readonly implementation: Implementation<T>;
+        makeProperty(this.#ids.implementationArgument, genericImplType),
+        // public constructor(implementation: Implementation<T> = defaultImplementation) {}
+        makePublicConstructor(
+          [
+            makeParam(this.#ids.implementationArgument, {
+              type: genericImplType,
+              init: this.#ids.defaultImplementationConst,
+            }),
+          ],
+          [
+            // this.implementation = implementation;
+            makeAssignment(
+              f.createPropertyAccessExpression(
+                f.createThis(),
+                this.#ids.implementationArgument,
+              ),
+              this.#ids.implementationArgument,
+            ),
+          ],
+        ),
         this.#makeProvider(),
       ],
       { typeParams: ["T"] },
     );
+  };
 
   // `?${new URLSearchParams(____)}`
   #makeSearchParams = (from: ts.Expression) =>
@@ -353,7 +371,7 @@ export abstract class IntegrationBase {
         [this.#ids.pathParameter],
         [this.#ids.searchParamsConst],
       ),
-      literally(this.serverUrl),
+      literally(this.#serverUrl),
     );
 
   /**
@@ -595,7 +613,7 @@ export abstract class IntegrationBase {
     makePublicClass(
       name,
       [
-        makePublicProperty(this.#ids.sourceProp, "EventSource"),
+        makeProperty(this.#ids.sourceProp, "EventSource", { expose: true }),
         this.#makeSubscriptionConstructor(),
         this.#makeOnMethod(),
       ],
