@@ -30,7 +30,7 @@ type Mapper = <T extends Record<string, unknown>>(
 /** Used by runtime (bound) */
 export const remap = function (
   this: z.ZodObject,
-  tool: Record<string, string> | Mapper,
+  tool: Partial<Record<string, string>> | Mapper,
 ) {
   const transformer =
     typeof tool === "function" ? tool : R.renameKeys(R.reject(R.isNil, tool)); // rejecting undefined
