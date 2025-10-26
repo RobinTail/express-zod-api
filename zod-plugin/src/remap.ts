@@ -27,13 +27,23 @@ type Mapper = <T extends Record<string, unknown>>(
   subject: T,
 ) => { [P in string | keyof T]: T[keyof T] };
 
+/** @todo naming */
+const ensure = (tool: Record<string, string>) => {
+  const targets = Object.values(tool);
+  if (new Set(targets).size !== targets.length)
+    throw new Error("remap(): duplicate target keys", { cause: tool });
+  return tool;
+};
+
 /** Used by runtime (bound) */
 export const remap = function (
   this: z.ZodObject,
   tool: Partial<Record<string, string>> | Mapper,
 ) {
   const transformer =
-    typeof tool === "function" ? tool : R.renameKeys(R.reject(R.isNil, tool)); // rejecting undefined
+    typeof tool === "function"
+      ? tool
+      : R.renameKeys(ensure(R.reject(R.isNil, tool))); // rejecting undefined
   const nextShape = transformer(
     R.map(R.invoker(0, "clone"), this._zod.def.shape), // immutable, changed from R.clone due to failure
   );
