@@ -4,7 +4,7 @@
 
 ### v2.1.0
 
-- `ZodObject::remap()` would throw an `Error` if duplicate target keys found in its argument.
+- `ZodObject::remap()` now throws an `Error` if duplicate target keys found in its argument.
 
 ### v2.0.0
 
