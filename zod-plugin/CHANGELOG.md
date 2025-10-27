@@ -2,6 +2,10 @@
 
 ## Version 2
 
+### v2.1.0
+
+- `ZodObject::remap()` would throw an `Error` if duplicate target keys found in its argument.
+
 ### v2.0.0
 
 - Restricting the supported Node.js versions: `^20.19.0 || ^22.12.0 || ^24.0.0`.
