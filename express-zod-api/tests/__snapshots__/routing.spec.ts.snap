@@ -10,23 +10,13 @@ RoutingError({
 })
 `;
 
-exports[`Routing > initRouting() > Should check if endpoint supports the method it's assigned to within DependsOnMethod 1`] = `
+exports[`Routing > initRouting() > Should check if endpoint supports the method it's assigned to 1`] = `
 RoutingError({
   "cause": {
     "method": "post",
     "path": "/v1/user",
   },
   "message": "Method post is not supported by the assigned Endpoint.",
-})
-`;
-
-exports[`Routing > initRouting() > Should prohibit DependsOnMethod for a route having explicit method 1`] = `
-RoutingError({
-  "cause": {
-    "method": "get",
-    "path": "/v1/user/retrieve",
-  },
-  "message": "Route with explicit method can only be assigned with Endpoint",
 })
 `;
 
@@ -51,6 +41,16 @@ RoutingError({
 `;
 
 exports[`Routing > initRouting() > Should prohibit nested routing within a route having explicit method 1`] = `
+RoutingError({
+  "cause": {
+    "method": "get",
+    "path": "/v1/user/retrieve",
+  },
+  "message": "Route with explicit method can only be assigned with Endpoint",
+})
+`;
+
+exports[`Routing > initRouting() > Should prohibit nesting for a route having explicit method 1`] = `
 RoutingError({
   "cause": {
     "method": "get",

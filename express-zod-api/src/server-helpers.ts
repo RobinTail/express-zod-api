@@ -39,7 +39,7 @@ export const createCatcher =
       response,
       input: null,
       output: null,
-      options: {},
+      ctx: {},
       logger: getLogger(request),
     });
   };
@@ -60,7 +60,7 @@ export const createNotFoundHandler =
         error,
         input: null,
         output: null,
-        options: {},
+        ctx: {},
       });
     } catch (e) {
       lastResortHandler({
