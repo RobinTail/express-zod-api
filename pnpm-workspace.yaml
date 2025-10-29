@@ -25,6 +25,7 @@ minimumReleaseAgeExclude:
   - http-errors
   - ramda
   - rolldown
+  - rolldown-plugin-dts
   - typescript
   - typescript-eslint
   - tsdown
