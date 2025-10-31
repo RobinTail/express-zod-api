@@ -522,7 +522,7 @@ describe("Documentation", () => {
         input: z.object({
           key: z.string(),
         }),
-        handler: vi.fn<any>(),
+        handler: vi.fn(),
       });
       const mw2 = new Middleware({
         security: {
@@ -539,11 +539,11 @@ describe("Documentation", () => {
             },
           ],
         },
-        handler: vi.fn<any>(),
+        handler: vi.fn(),
       });
       const mw3 = new Middleware({
         security: { type: "bearer", format: "JWT" },
-        handler: vi.fn<any>(),
+        handler: vi.fn(),
       });
       const spec = new Documentation({
         config: sampleConfig,

@@ -17,7 +17,7 @@ describe("Endpoint", () => {
         methods: ["get", "post", "put", "delete", "patch"],
         inputSchema: z.object({}),
         outputSchema: z.object({}),
-        handler: vi.fn<any>(),
+        handler: vi.fn(),
         resultHandler: new ResultHandler({
           positive: z.string(),
           negative: z.string(),
