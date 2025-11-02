@@ -172,6 +172,7 @@ export default [
   "sec-websocket-protocol",
   "sec-websocket-version",
   "security-scheme",
+  "set-txn",
   "setprofile",
   "signature",
   "signature-input",
