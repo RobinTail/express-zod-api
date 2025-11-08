@@ -4,6 +4,7 @@ import manifest from "./package.json" with { type: "json" };
 export default defineConfig([
   {
     entry: "src/index.ts",
+    fixedExtension: false,
     minify: true,
     attw: { profile: "esmOnly", level: "error" },
     banner: {
@@ -15,6 +16,7 @@ export default defineConfig([
   },
   {
     entry: "src/augmentation.ts",
+    fixedExtension: false,
     dts: { emitDtsOnly: true },
   },
 ]);

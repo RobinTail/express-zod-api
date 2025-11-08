@@ -56,12 +56,7 @@ describe("Server helpers", () => {
           errorHandler,
           getLogger: () => makeLoggerMock(),
         });
-        await handler(
-          error,
-          makeRequestMock(),
-          makeResponseMock(),
-          vi.fn<any>(),
-        );
+        await handler(error, makeRequestMock(), makeResponseMock(), vi.fn());
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy.mock.calls[0][0].error).toEqual(
           error instanceof Error ? error : new Error(error),

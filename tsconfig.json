@@ -3,6 +3,7 @@
   "compilerOptions": {
     "module": "node20",
     "target": "es2023",
+    "noEmit": true,
     "allowImportingTsExtensions": true,
     "noImplicitAny": true,
     "noImplicitOverride": true,
