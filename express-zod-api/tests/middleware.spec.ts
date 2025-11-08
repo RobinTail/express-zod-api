@@ -40,7 +40,7 @@ describe("Middleware", () => {
     test("should validate the supplied input or throw an InputValidationError", async () => {
       const mw = new Middleware({
         input: z.object({ test: z.string() }),
-        handler: vi.fn<any>(),
+        handler: vi.fn(),
       });
       await expect(() =>
         mw.execute({
@@ -54,7 +54,7 @@ describe("Middleware", () => {
     });
 
     test("should call the handler and return its output", async () => {
-      const handlerMock = vi.fn<any>(() => ({ result: "test" }));
+      const handlerMock = vi.fn(async () => ({ result: "test" }));
       const mw = new Middleware({
         input: z.object({ test: z.string() }),
         handler: handlerMock,
