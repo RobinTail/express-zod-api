@@ -201,7 +201,7 @@ export interface ServerConfig extends CommonConfig {
    * */
   beforeRouting?: ServerHook;
   /**
-   * A code to execute after processing the Routing of your API, but before error handling.
+   * @desc A code to execute after processing the Routing of your API, but before error handling.
    * @see beforeRouting
    * */
   afterRouting?: ServerHook;
