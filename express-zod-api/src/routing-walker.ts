@@ -24,6 +24,10 @@ interface RoutingWalkerParams {
   onStatic?: (path: string, handler: StaticHandler) => void;
 }
 
+/** Checks that the given object has at least 2 keys that do exactly match Method */
+const hasMultipleMethodOnlyEntries = (subject: Routing) =>
+  Object.keys(subject).filter(isMethod).length > 1;
+
 /** @example delete /v1/user/retrieve —> [/v1/user/retrieve, delete] */
 const detachMethod = (subject: string): [string, Method?] => {
   const [method, rest] = subject.trim().split(/ (.+)/, 2);
@@ -35,14 +39,17 @@ const detachMethod = (subject: string): [string, Method?] => {
 const trimPath = (path: string) =>
   path.trim().split("/").filter(Boolean).join("/");
 
-const processEntries = (subject: Routing, parent?: string) =>
-  Object.entries(subject).map<[string, Routing[string], Method?]>(
+const processEntries = (subject: Routing, parent?: string) => {
+  const preferMethod = hasMultipleMethodOnlyEntries(subject);
+  return Object.entries(subject).map<[string, Routing[string], Method?]>(
     ([_key, item]) => {
-      const [segment, method] = detachMethod(_key);
+      const [segment, method] =
+        isMethod(_key) && preferMethod ? ["/", _key] : detachMethod(_key);
       const path = [parent || ""].concat(trimPath(segment) || []).join("/");
       return [path, item, method];
     },
   );
+};
 
 const prohibit = (method: Method, path: string) => {
   throw new RoutingError(
