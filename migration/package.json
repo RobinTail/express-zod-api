@@ -15,7 +15,7 @@
   "bugs": "https://github.com/RobinTail/express-zod-api/issues",
   "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
-    "pretest": "tsc --noEmit",
+    "pretest": "tsc",
     "test": "vitest run --globals",
     "build": "tsdown",
     "prepublishOnly": "eslint && pnpm test && pnpm build"

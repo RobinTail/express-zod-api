@@ -90,7 +90,7 @@ describe("Server", () => {
       expect(httpListenSpy).toHaveBeenCalledWith(port, expect.any(Function));
     });
 
-    test("Should create server with custom parsers, logger, error handler and beforeRouting", async () => {
+    test("Should create server with custom parsers, logger, error handler and hooks", async () => {
       const customLogger = new BuiltinLogger({ level: "silent" });
       const infoMethod = vi.spyOn(customLogger, "info");
       const port = givePort();
@@ -101,6 +101,7 @@ describe("Server", () => {
         rawParser: vi.fn(),
         formParser: vi.fn(),
         beforeRouting: vi.fn(),
+        afterRouting: vi.fn(),
         cors: true,
         startupLogo: false,
         errorHandler: {
@@ -147,10 +148,12 @@ describe("Server", () => {
       );
       expect(appMock.use).toHaveBeenCalledTimes(2);
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
-      expect(configMock.beforeRouting).toHaveBeenCalledWith({
-        app: appMock,
-        getLogger: expect.any(Function),
-      });
+      for (const hook of ["beforeRouting", "afterRouting"] as const) {
+        expect(configMock[hook]).toHaveBeenCalledWith({
+          app: appMock,
+          getLogger: expect.any(Function),
+        });
+      }
       expect(infoMethod).toHaveBeenCalledTimes(1);
       expect(infoMethod).toHaveBeenCalledWith(`Listening`, { port });
       expect(appMock.get).toHaveBeenCalledTimes(1);
