@@ -30,7 +30,7 @@ describe("EndpointsFactory", () => {
     test("Should create the factory with middleware and result handler", () => {
       const middleware = new Middleware({
         input: z.object({ n: z.number() }),
-        handler: vi.fn<any>(),
+        handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
         middleware,
@@ -45,7 +45,7 @@ describe("EndpointsFactory", () => {
       const factory = new EndpointsFactory(resultHandlerMock);
       const middleware = new Middleware({
         input: z.object({ n: z.number() }),
-        handler: vi.fn<any>(),
+        handler: vi.fn(),
       });
       const newFactory = factory.addMiddleware(middleware);
       expect(factory["middlewares"]).toStrictEqual([]);
@@ -243,7 +243,7 @@ describe("EndpointsFactory", () => {
     test("Should create an endpoint with simple middleware", () => {
       const middleware = new Middleware({
         input: z.object({ n: z.number() }),
-        handler: vi.fn<any>(),
+        handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
         middleware,
@@ -273,7 +273,7 @@ describe("EndpointsFactory", () => {
           .refine((props) => Object.keys(props).length, {
             message: "Should be at least one option specified",
           }),
-        handler: vi.fn<any>(),
+        handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
         middleware,
@@ -293,7 +293,7 @@ describe("EndpointsFactory", () => {
     test("Should create an endpoint with intersection middleware", () => {
       const middleware = new Middleware({
         input: z.object({ n1: z.number() }).and(z.object({ n2: z.number() })),
-        handler: vi.fn<any>(),
+        handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
         middleware,
@@ -316,7 +316,7 @@ describe("EndpointsFactory", () => {
     test("Should create an endpoint with union middleware", () => {
       const middleware = new Middleware({
         input: z.object({ n1: z.number() }).or(z.object({ n2: z.number() })),
-        handler: vi.fn<any>(),
+        handler: vi.fn(),
       });
       const factory = new EndpointsFactory(resultHandlerMock).addMiddleware(
         middleware,

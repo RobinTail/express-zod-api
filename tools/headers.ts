@@ -185,6 +185,10 @@ const responseOnlyHeaders = {
       "Deprecated but appeared in earlier specs like RFC 2965, Section 3.3.3.",
     reason: "A legacy header for setting cookies.",
   },
+  "set-txn": {
+    proof: "https://datatracker.ietf.org/doc/draft-ietf-scim-events/15/",
+    reason: "set-txn HTTP Response Header for Asynchronous Requests",
+  },
   "strict-transport-security": {
     proof: "Defined in RFC 6797, Section 6.1.",
     reason: "Enforces HTTPS policies in responses.",
