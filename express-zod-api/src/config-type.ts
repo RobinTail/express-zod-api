@@ -135,7 +135,7 @@ interface GracefulOptions {
   beforeExit?: () => void | Promise<void>;
 }
 
-type BeforeRouting = (params: {
+type ServerHook = (params: {
   app: IRouter;
   /** @desc Returns child logger for the given request (if configured) or the configured logger otherwise */
   getLogger: GetLogger;
@@ -199,7 +199,12 @@ export interface ServerConfig extends CommonConfig {
    * @desc It can help to avoid making a DIY solution based on the attachRouting() approach.
    * @example ({ app }) => { app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); }
    * */
-  beforeRouting?: BeforeRouting;
+  beforeRouting?: ServerHook;
+  /**
+   * A code to execute after processing the Routing of your API, but before error handling.
+   * @see beforeRouting
+   * */
+  afterRouting?: ServerHook;
   /**
    * @desc Rejects new connections and attempts to finish ongoing ones in the specified time before exit.
    * */
