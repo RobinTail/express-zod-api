@@ -128,8 +128,8 @@ describe("Routing", () => {
           user: {
             "get /": getEndpoint,
             "post /": postEndpoint,
-            "put /": putAndPatchEndpoint,
-            "patch /": putAndPatchEndpoint,
+            put: putAndPatchEndpoint,
+            patch: putAndPatchEndpoint,
           },
         },
       };
