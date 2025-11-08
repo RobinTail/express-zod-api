@@ -89,6 +89,8 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       : [],
   };
   initRouting({ app, routing, getLogger, config, parsers });
+
+  await config.afterRouting?.({ app, getLogger });
   app.use(catcher, notFoundHandler);
 
   const created: Array<http.Server | https.Server> = [];
