@@ -126,8 +126,8 @@ describe("Routing", () => {
       const routing: Routing = {
         v1: {
           user: {
-            "get /": getEndpoint,
-            "post /": postEndpoint,
+            get: getEndpoint,
+            post: postEndpoint,
             put: putAndPatchEndpoint,
             patch: putAndPatchEndpoint,
           },
