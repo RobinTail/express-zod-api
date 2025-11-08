@@ -3,6 +3,7 @@ import manifest from "./package.json" with { type: "json" };
 
 export default defineConfig({
   entry: "index.ts",
+  fixedExtension: false,
   minify: true,
   skipNodeModulesBundle: true,
   attw: { profile: "esmOnly", level: "error" },

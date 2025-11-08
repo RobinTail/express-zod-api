@@ -117,6 +117,13 @@ describe("Zod Runtime Plugin", () => {
       },
     );
 
+    test("throws when multiple source keys map to the same target", () => {
+      const schema = z.object({ a: z.number(), b: z.string() });
+      expect(() => schema.remap({ a: "x", b: "x" })).toThrowError(
+        /duplicate target keys/,
+      );
+    });
+
     test("should support a mapping function", () => {
       const schema = z.object({ user_id: z.string(), name: z.string() });
       const mappedSchema = schema.remap((shape) => camelize(shape, true));
