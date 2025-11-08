@@ -17,7 +17,7 @@
   "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
     "build": "tsdown",
-    "pretest": "tsc --noEmit",
+    "pretest": "tsc",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
     "prepublishOnly": "eslint && pnpm -r build && pnpm test",
