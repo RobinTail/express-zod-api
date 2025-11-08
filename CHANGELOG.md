@@ -2,6 +2,12 @@
 
 ## Version 25
 
+### v25.6.0
+
+- Added `afterRouting` hook to server configuration:
+  - Similar to `beforeRouting` one;
+  - A code to execute after processing the Routing of your API, but before error handling.
+
 ### v25.5.3
 
 - Updated environment requirements in the Readme:
