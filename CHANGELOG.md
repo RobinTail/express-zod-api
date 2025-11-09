@@ -4,7 +4,7 @@
 
 ### v26.0.0
 
-- `DependsOnMethod` removed: use flat syntax with explicit method and a slash;
+- `DependsOnMethod` removed: use the nested methods instead;
 - `options` property renamed to `ctx` in argument of:
   - `Middleware::handler()`,
   - `ResultHandler::handler()`,
@@ -16,8 +16,7 @@
   const routing: Routing = {
 -   "/v1/users": new DependsOnMethod({
 +   "/v1/users": {
--     get: getUserEndpoint,
-+     "get /": getUserEndpoint,
+      get: getUserEndpoint,
 -   }).nest({
       create: makeUserEndpoint
 -   }),
