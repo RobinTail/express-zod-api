@@ -77,7 +77,7 @@ const collectSiblings = ({
       familiar.set(path, new Map(config.cors ? [["options", value]] : []));
     familiar.get(path)?.set(method, value);
   };
-  walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
+  walkRouting({ routing, config, onEndpoint, onStatic: app.use.bind(app) });
   return familiar;
 };
 

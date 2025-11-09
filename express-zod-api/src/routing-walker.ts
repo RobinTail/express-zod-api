@@ -3,6 +3,7 @@ import { RoutingError } from "./errors.ts";
 import { ClientMethod, isMethod, Method } from "./method.ts";
 import { Routing } from "./routing.ts";
 import { ServeStatic, StaticHandler } from "./serve-static.ts";
+import { CommonConfig } from "./config-type.ts";
 
 export type OnEndpoint<M extends string = Method> = (
   method: M,
@@ -20,13 +21,10 @@ export const withHead =
 
 interface RoutingWalkerParams {
   routing: Routing;
+  config: CommonConfig;
   onEndpoint: OnEndpoint;
   onStatic?: (path: string, handler: StaticHandler) => void;
 }
-
-/** Checks that the given object has at least 2 keys that do exactly match Method */
-const hasMultipleMethodOnlyEntries = (subject: Routing) =>
-  Object.keys(subject).filter(isMethod).length > 1;
 
 /** @example delete /v1/user/retrieve —> [/v1/user/retrieve, delete] */
 const detachMethod = (subject: string): [string, Method?] => {
@@ -39,8 +37,12 @@ const detachMethod = (subject: string): [string, Method?] => {
 const trimPath = (path: string) =>
   path.trim().split("/").filter(Boolean).join("/");
 
-const processEntries = (subject: Routing, parent?: string) => {
-  const preferMethod = hasMultipleMethodOnlyEntries(subject);
+const processEntries = (
+  { methodLikeRouteBehavior = "method" }: CommonConfig,
+  subject: Routing,
+  parent?: string,
+) => {
+  const preferMethod = methodLikeRouteBehavior === "method";
   return Object.entries(subject).map<[string, Routing[string], Method?]>(
     ([_key, item]) => {
       const [segment, method] =
@@ -83,10 +85,11 @@ const checkDuplicate = (method: Method, path: string, visited: Set<string>) => {
 
 export const walkRouting = ({
   routing,
+  config,
   onEndpoint,
   onStatic,
 }: RoutingWalkerParams) => {
-  const stack = processEntries(routing);
+  const stack = processEntries(config, routing);
   const visited = new Set<string>();
   while (stack.length) {
     const [path, element, explicitMethod] = stack.shift()!;
@@ -107,7 +110,7 @@ export const walkRouting = ({
       if (element instanceof ServeStatic) {
         if (onStatic) element.apply(path, onStatic);
       } else {
-        stack.unshift(...processEntries(element, path));
+        stack.unshift(...processEntries(config, element, path));
       }
     }
   }

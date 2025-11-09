@@ -39,6 +39,7 @@ describe("Routing", () => {
           cors: true,
           startupLogo: false,
           wrongMethodBehavior,
+          methodLikeRouteBehavior: "route" as const,
         };
         const factory = new EndpointsFactory(defaultResultHandler);
         const getEndpoint = factory.build({

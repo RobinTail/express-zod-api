@@ -20,7 +20,7 @@ export const routing: Routing = {
       ":id": {
         remove: deleteUserEndpoint, // nested path: /v1/user/:id/remove
         // syntax 2: methods are defined within the route
-        "patch /": updateUserEndpoint, // demonstrates authentication
+        patch: updateUserEndpoint, // demonstrates authentication
       },
       // demonstrates different response schemas depending on status code
       create: createUserEndpoint,
