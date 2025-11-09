@@ -16,6 +16,7 @@
   - `handler` of `EndpointsFactory::build()` argument,
   - `testMiddleware()`;
 - `EndpointsFactory::addOptions()` renamed to `addContext()`;
+- The `Integration::contstructor()` argument object now requires `config` property, similar to `Documentation`;
 
 ```patch
   const routing: Routing = {
