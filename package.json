@@ -3,9 +3,9 @@
   "type": "module",
   "scripts": {
     "start": "pnpm -F example start",
-    "prebuild": "tsx tools/contributors.ts && tsx tools/license.ts",
+    "prebuild": "unrun tools/contributors.ts && unrun tools/license.ts",
     "build": "pnpm -r build",
-    "pretest": "tsx tools/make-tests.ts",
+    "pretest": "unrun tools/make-tests.ts",
     "test": "pnpm -r test",
     "bench": "pnpm -F express-zod-api bench",
     "lint": "eslint && prettier *.md **/*.md --check",
@@ -25,8 +25,8 @@
     "husky": "^9.0.5",
     "prettier": "3.6.2",
     "tsdown": "^0.16.0",
-    "tsx": "^4.19.4",
     "typescript-eslint": "catalog:dev",
+    "unrun": "^0.2.6",
     "vitest": "^4.0.1"
   },
   "packageManager": "pnpm@10.20.0+sha512.cf9998222162dd85864d0a8102e7892e7ba4ceadebbf5a31f9c2fce48dfce317a9c53b9f6464d1ef9042cba2e02ae02a9f7c143a2b438cd93c91840f0192b9dd"
