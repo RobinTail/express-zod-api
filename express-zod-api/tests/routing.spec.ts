@@ -59,7 +59,7 @@ describe("Routing", () => {
         const routing: Routing = {
           v1: {
             user: {
-              get: getEndpoint,
+              get: getEndpoint, // should be treated as a route (methodLikeRouteBehavior: "route")
               set: postEndpoint,
               universal: getAndPostEndpoint,
             },
@@ -164,9 +164,9 @@ describe("Routing", () => {
       const routing: Routing = {
         v1: {
           user: {
-            "put /": putAndPatchEndpoint,
-            "patch /": putAndPatchEndpoint,
-            "post /": putAndPatchEndpoint, // intentional
+            put: putAndPatchEndpoint,
+            patch: putAndPatchEndpoint,
+            post: putAndPatchEndpoint, // intentional
           },
         },
       };
@@ -209,10 +209,10 @@ describe("Routing", () => {
       });
       const routing: Routing = {
         hello: {
-          "get /": getEndpoint,
-          "post /": postEndpoint,
-          "put /": putAndPatchEndpoint,
-          "patch /": putAndPatchEndpoint,
+          get: getEndpoint,
+          post: postEndpoint,
+          put: putAndPatchEndpoint,
+          patch: putAndPatchEndpoint,
         },
       };
       const logger = makeLoggerMock();
