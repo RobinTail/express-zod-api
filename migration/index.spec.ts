@@ -23,7 +23,7 @@ describe("Migration", async () => {
 
   tester.run(ruleName, theRule, {
     valid: [
-      `const routing = { "get /": someEndpoint };`,
+      `const routing = { get: someEndpoint };`,
       `factory.build({ handler: async ({ ctx }) => {} });`,
       `factory.addContext();`,
       `new Middleware({ handler: async ({ ctx }) => {} });`,
@@ -34,7 +34,7 @@ describe("Migration", async () => {
       {
         name: "basic DependsOnMethod",
         code: `const routing = new DependsOnMethod({ get: someEndpoint });`,
-        output: `const routing = {\n"get /": someEndpoint,\n};`,
+        output: `const routing = {\nget: someEndpoint,\n};`,
         errors: [
           {
             messageId: "change",
@@ -49,7 +49,7 @@ describe("Migration", async () => {
       {
         name: "DependsOnMethod with literals",
         code: `const routing = new DependsOnMethod({ "get": someEndpoint });`,
-        output: `const routing = {\n"get /": someEndpoint,\n};`,
+        output: `const routing = {\nget: someEndpoint,\n};`,
         errors: [
           {
             messageId: "change",
@@ -64,7 +64,7 @@ describe("Migration", async () => {
       {
         name: "deprecated DependsOnMethod",
         code: `const routing = new DependsOnMethod({ get: someEndpoint }).deprecated();`,
-        output: `const routing = {\n"get /": someEndpoint.deprecated(),\n};`,
+        output: `const routing = {\nget: someEndpoint.deprecated(),\n};`,
         errors: [
           {
             messageId: "change",
@@ -79,7 +79,7 @@ describe("Migration", async () => {
       {
         name: "DependsOnMethod with nesting",
         code: `const routing = new DependsOnMethod({ get: someEndpoint }).nest({ some: otherEndpoint });`,
-        output: `const routing = {\n"get /": someEndpoint,\n"some": otherEndpoint,\n};`,
+        output: `const routing = {\nget: someEndpoint,\nsome: otherEndpoint,\n};`,
         errors: [
           {
             messageId: "change",
@@ -93,8 +93,8 @@ describe("Migration", async () => {
       },
       {
         name: "DependsOnMethod both deprecated and with nesting",
-        code: `const routing = new DependsOnMethod({ get: someEndpoint }).deprecated().nest({ some: otherEndpoint });`,
-        output: `const routing = {\n"get /": someEndpoint.deprecated(),\n"some": otherEndpoint,\n};`,
+        code: `const routing = new DependsOnMethod({ get: someEndpoint }).deprecated().nest({ "get some": otherEndpoint });`,
+        output: `const routing = {\nget: someEndpoint.deprecated(),\n"get some": otherEndpoint,\n};`,
         errors: [
           {
             messageId: "change",
