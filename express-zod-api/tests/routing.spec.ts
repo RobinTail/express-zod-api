@@ -39,7 +39,7 @@ describe("Routing", () => {
           cors: true,
           startupLogo: false,
           wrongMethodBehavior,
-          methodLikeRouteBehavior: "route" as const,
+          methodLikeRouteBehavior: "path" as const,
         };
         const factory = new EndpointsFactory(defaultResultHandler);
         const getEndpoint = factory.build({
@@ -59,7 +59,7 @@ describe("Routing", () => {
         const routing: Routing = {
           v1: {
             user: {
-              get: getEndpoint, // should be treated as a route (methodLikeRouteBehavior: "route")
+              get: getEndpoint, // should be treated as a path
               set: postEndpoint,
               universal: getAndPostEndpoint,
             },
