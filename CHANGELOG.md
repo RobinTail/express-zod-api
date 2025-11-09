@@ -4,7 +4,12 @@
 
 ### v26.0.0
 
-- `DependsOnMethod` removed: use the nested methods instead;
+- `DependsOnMethod` removed:
+  - You can now specify methods as direct keys of an assigned object in `Routing`;
+  - That object can still contain nested paths as before;
+  - The keys matching lowercase HTTP methods are treated according to the new config setting `methodLikeRouteBehavior`:
+    - `method` — when assigned with an Endpoint the key is treated as method of its parent path (default);
+    - `path` — the key is always treated as a nested path segment;
 - `options` property renamed to `ctx` in argument of:
   - `Middleware::handler()`,
   - `ResultHandler::handler()`,
