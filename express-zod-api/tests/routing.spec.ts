@@ -39,6 +39,7 @@ describe("Routing", () => {
           cors: true,
           startupLogo: false,
           wrongMethodBehavior,
+          methodLikeRouteBehavior: "path" as const,
         };
         const factory = new EndpointsFactory(defaultResultHandler);
         const getEndpoint = factory.build({
@@ -58,7 +59,7 @@ describe("Routing", () => {
         const routing: Routing = {
           v1: {
             user: {
-              get: getEndpoint,
+              get: getEndpoint, // should be treated as a path
               set: postEndpoint,
               universal: getAndPostEndpoint,
             },
@@ -126,10 +127,10 @@ describe("Routing", () => {
       const routing: Routing = {
         v1: {
           user: {
-            "get /": getEndpoint,
-            "post /": postEndpoint,
-            "put /": putAndPatchEndpoint,
-            "patch /": putAndPatchEndpoint,
+            get: getEndpoint,
+            post: postEndpoint,
+            put: putAndPatchEndpoint,
+            patch: putAndPatchEndpoint,
           },
         },
       };
@@ -163,9 +164,9 @@ describe("Routing", () => {
       const routing: Routing = {
         v1: {
           user: {
-            "put /": putAndPatchEndpoint,
-            "patch /": putAndPatchEndpoint,
-            "post /": putAndPatchEndpoint, // intentional
+            put: putAndPatchEndpoint,
+            patch: putAndPatchEndpoint,
+            post: putAndPatchEndpoint, // intentional
           },
         },
       };
@@ -208,10 +209,10 @@ describe("Routing", () => {
       });
       const routing: Routing = {
         hello: {
-          "get /": getEndpoint,
-          "post /": postEndpoint,
-          "put /": putAndPatchEndpoint,
-          "patch /": putAndPatchEndpoint,
+          get: getEndpoint,
+          post: postEndpoint,
+          put: putAndPatchEndpoint,
+          patch: putAndPatchEndpoint,
         },
       };
       const logger = makeLoggerMock();

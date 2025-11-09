@@ -4,20 +4,25 @@
 
 ### v26.0.0
 
-- `DependsOnMethod` removed: use flat syntax with explicit method and a slash;
+- `DependsOnMethod` removed:
+  - You can now specify methods as direct keys of an assigned object in `Routing`;
+  - That object can still contain nested paths as before;
+  - The keys matching lowercase HTTP methods are treated according to the new config setting `methodLikeRouteBehavior`:
+    - `method` — when assigned with an Endpoint the key is treated as method of its parent path (default);
+    - `path` — the key is always treated as a nested path segment;
 - `options` property renamed to `ctx` in argument of:
   - `Middleware::handler()`,
   - `ResultHandler::handler()`,
   - `handler` of `EndpointsFactory::build()` argument,
   - `testMiddleware()`;
 - `EndpointsFactory::addOptions()` renamed to `addContext()`;
+- The `Integration::constructor()` argument object now requires `config` property, similar to `Documentation`;
 
 ```patch
   const routing: Routing = {
 -   "/v1/users": new DependsOnMethod({
 +   "/v1/users": {
--     get: getUserEndpoint,
-+     "get /": getUserEndpoint,
+      get: getUserEndpoint,
 -   }).nest({
       create: makeUserEndpoint
 -   }),

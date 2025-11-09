@@ -110,7 +110,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
               (feat?: "deprecated" | "nest") =>
               (prop: TSESTree.ObjectLiteralElement) =>
                 isNamedProp(prop)
-                  ? `"${getPropName(prop)}${feat === "nest" ? "" : " /"}": ${ctx.sourceCode.getText(prop.value)}${feat === "deprecated" ? ".deprecated()" : ""},`
+                  ? `${feat === "nest" ? ctx.sourceCode.getText(prop.key) : getPropName(prop)}: ${ctx.sourceCode.getText(prop.value)}${feat === "deprecated" ? ".deprecated()" : ""},`
                   : `${ctx.sourceCode.getText(prop)}, /** @todo migrate manually */`;
             const nextProps = argument.properties
               .map(makeMapper(isDeprecated ? "deprecated" : undefined))

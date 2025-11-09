@@ -16,7 +16,8 @@ import * as R from "ramda";
  * @example { "v1/books/:bookId": getBookEndpoint }
  * @example { "get /v1/books/:bookId": getBookEndpoint }
  * @example { v1: { "patch /books/:bookId": changeBookEndpoint } }
- * @example { dependsOnMethod: { "get /": retrieveEndpoint, "post /": createEndpoint } }
+ * @example { dependsOnMethod: { get: retrieveEndpoint, post: createEndpoint } }
+ * @see CommonConfig.methodLikeRouteBehavior
  * */
 export interface Routing {
   [K: string]: Routing | AbstractEndpoint | ServeStatic;
@@ -77,7 +78,7 @@ const collectSiblings = ({
       familiar.set(path, new Map(config.cors ? [["options", value]] : []));
     familiar.get(path)?.set(method, value);
   };
-  walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
+  walkRouting({ routing, config, onEndpoint, onStatic: app.use.bind(app) });
   return familiar;
 };
 
