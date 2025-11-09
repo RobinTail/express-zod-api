@@ -1087,6 +1087,7 @@ import { Integration } from "express-zod-api";
 
 const client = new Integration({
   routing,
+  config,
   variant: "client", // <— optional, see also "types" for a DIY solution
 });
 
