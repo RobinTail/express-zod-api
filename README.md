@@ -307,10 +307,10 @@ const routing: Routing = {
     "delete /user/:id": deleteUserEndpoint,
     // method-based routing — /v1/account
     account: {
-      "get /": endpointA,
-      "delete /": endpointA,
-      "post /": endpointB,
-      "patch /": endpointB,
+      get: endpointA,
+      delete: endpointA,
+      post: endpointB,
+      patch: endpointB,
     },
   },
   // static file serving — /public serves files from ./assets
