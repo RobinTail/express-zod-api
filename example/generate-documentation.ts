@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { Documentation } from "express-zod-api";
-import { config } from "./config.ts";
-import { routing } from "./routing.ts";
+import { config } from "./config";
+import { routing } from "./routing";
 import manifest from "./package.json" with { type: "json" };
 
 await writeFile(

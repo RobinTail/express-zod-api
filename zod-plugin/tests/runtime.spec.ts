@@ -1,6 +1,6 @@
 import camelize from "camelize-ts";
 import { z } from "zod";
-import { getBrand } from "../src/index.ts";
+import { getBrand } from "../src";
 
 describe("Zod Runtime Plugin", () => {
   describe(".example()", () => {

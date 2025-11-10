@@ -7,7 +7,7 @@ import {
   ClientMethod,
   SomeMethod,
   CORSMethod,
-} from "../src/method.ts";
+} from "../src/method";
 
 describe("Method", () => {
   describe("SomeMethod type", () => {

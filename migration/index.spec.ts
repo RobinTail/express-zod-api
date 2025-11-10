@@ -12,7 +12,7 @@ const tester = new RuleTester({
 
 describe("Migration", async () => {
   vi.stubEnv("TSDOWN_VERSION", manifest.version);
-  const { default: migration } = await import("./index.ts");
+  const { default: migration } = await import("./");
   const ruleName = `v${manifest.version.split(".")[0]}`;
   const theRule = migration.rules[ruleName as keyof typeof migration.rules];
 

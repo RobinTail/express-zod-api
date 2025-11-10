@@ -1,4 +1,4 @@
-import type { EmptyObject, FlatObject } from "./common-helpers.ts";
+import type { EmptyObject, FlatObject } from "./common-helpers";
 import { getBrand } from "@express-zod-api/zod-plugin";
 import type { z } from "zod";
 
