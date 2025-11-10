@@ -55,6 +55,7 @@ catalogs:
 
 overrides:
   '@scarf/scarf': npm:empty-npm-package@1.0.0
+  esbuild: npm:empty-npm-package@1.0.0
   vite: npm:rolldown-vite@7.2.2
   lightningcss: npm:empty-npm-package@1.0.0
 
@@ -1726,7 +1727,6 @@ packages:
     hasBin: true
     peerDependencies:
       '@types/node': ^20.19.0 || >=22.12.0
-      esbuild: ^0.25.0
       jiti: '>=1.21.0'
       less: ^4.0.0
       sass: ^1.70.0
@@ -1738,8 +1738,6 @@ packages:
       yaml: ^2.4.2
     peerDependenciesMeta:
       '@types/node':
-        optional: true
-      esbuild:
         optional: true
       jiti:
         optional: true
@@ -2696,7 +2694,6 @@ snapshots:
       vite: rolldown-vite@7.2.2(@types/node@24.10.1)(yaml@2.8.1)
     transitivePeerDependencies:
       - '@types/node'
-      - esbuild
       - jiti
       - less
       - sass
@@ -3546,6 +3543,7 @@ snapshots:
   rolldown-vite@7.2.2(@types/node@24.10.1)(yaml@2.8.1):
     dependencies:
       '@oxc-project/runtime': 0.96.0
+      esbuild: empty-npm-package@1.0.0
       fdir: 6.5.0(picomatch@4.0.3)
       lightningcss: empty-npm-package@1.0.0
       picomatch: 4.0.3
@@ -3880,7 +3878,6 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.10.1
     transitivePeerDependencies:
-      - esbuild
       - jiti
       - less
       - msw
