@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { Documentation } from "express-zod-api";
 import { config } from "./config";
 import { routing } from "./routing";
-import manifest from "./package.json" with { type: "json" };
+import manifest from "./package.json";
 
 await writeFile(
   "example.documentation.yaml",

@@ -1,5 +1,5 @@
 import { defineConfig } from "tsdown";
-import manifest from "./package.json" with { type: "json" };
+import manifest from "./package.json";
 
 export default defineConfig({
   entry: "index.ts",

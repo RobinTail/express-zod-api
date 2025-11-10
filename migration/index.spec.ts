@@ -1,6 +1,6 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
 import parser from "@typescript-eslint/parser";
-import manifest from "./package.json" with { type: "json" };
+import manifest from "./package.json";
 
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
