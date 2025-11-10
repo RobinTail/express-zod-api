@@ -27,7 +27,7 @@ import {
   defaultResultHandler,
 } from "./result-handler.ts";
 
-interface BuildProps<
+export interface BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema | z.ZodVoid,
   MIN extends IOSchema | undefined,
