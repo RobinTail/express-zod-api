@@ -7,8 +7,6 @@ packages:
   - esm-test
   - compat-test
   - issue952-test
-onlyBuiltDependencies:
-  - esbuild # todo remove if tsx removed: https://github.com/RobinTail/express-zod-api/pull/3051
 gitChecks: false
 engineStrict: true
 autoInstallPeers: false
