@@ -71,7 +71,7 @@ importers:
         version: 24.10.0
       '@vitest/coverage-v8':
         specifier: ^4.0.1
-        version: 4.0.8(vitest@4.0.8(@types/node@24.10.0)(tsx@4.20.6)(yaml@2.8.1))
+        version: 4.0.8(vitest@4.0.8(@types/node@24.10.0)(yaml@2.8.1))
       eslint:
         specifier: ^9.28.0
         version: 9.39.1
@@ -93,15 +93,15 @@ importers:
       tsdown:
         specifier: ^0.16.0
         version: 0.16.1(@arethetypeswrong/core@0.18.2)(synckit@0.11.11)(typescript@5.9.3)
-      tsx:
-        specifier: ^4.19.4
-        version: 4.20.6
       typescript-eslint:
         specifier: catalog:dev
         version: 8.46.3(eslint@9.39.1)(typescript@5.9.3)
+      unrun:
+        specifier: ^0.2.6
+        version: 0.2.6(synckit@0.11.11)
       vitest:
         specifier: ^4.0.1
-        version: 4.0.8(@types/node@24.10.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 4.0.8(@types/node@24.10.0)(yaml@2.8.1)
 
   cjs-test:
     devDependencies:
@@ -2100,11 +2100,6 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-  tsx@4.20.6:
-    resolution: {integrity: sha512-ytQKuwgmrrkDTFP4LjR0ToE2nqgy886GpvRSpU0JAnrdBYppuY5rLkRUYPU1yCryb24SsKBTL/hlDQAEFVwtZg==}
-    engines: {node: '>=18.0.0'}
-    hasBin: true
-
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
@@ -2947,7 +2942,7 @@ snapshots:
       '@typescript-eslint/types': 8.46.3
       eslint-visitor-keys: 4.2.1
 
-  '@vitest/coverage-v8@4.0.8(vitest@4.0.8(@types/node@24.10.0)(tsx@4.20.6)(yaml@2.8.1))':
+  '@vitest/coverage-v8@4.0.8(vitest@4.0.8(@types/node@24.10.0)(yaml@2.8.1))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
       '@vitest/utils': 4.0.8
@@ -2960,7 +2955,7 @@ snapshots:
       magicast: 0.5.1
       std-env: 3.10.0
       tinyrainbow: 3.0.3
-      vitest: 4.0.8(@types/node@24.10.0)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 4.0.8(@types/node@24.10.0)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -2973,13 +2968,13 @@ snapshots:
       chai: 6.2.0
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.8(vite@7.2.2(@types/node@24.10.0)(tsx@4.20.6)(yaml@2.8.1))':
+  '@vitest/mocker@4.0.8(vite@7.2.2(@types/node@24.10.0)(yaml@2.8.1))':
     dependencies:
       '@vitest/spy': 4.0.8
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.2.2(@types/node@24.10.0)(tsx@4.20.6)(yaml@2.8.1)
+      vite: 7.2.2(@types/node@24.10.0)(yaml@2.8.1)
 
   '@vitest/pretty-format@4.0.8':
     dependencies:
@@ -4079,13 +4074,6 @@ snapshots:
   tslib@2.8.1:
     optional: true
 
-  tsx@4.20.6:
-    dependencies:
-      esbuild: 0.25.12
-      get-tsconfig: 4.13.0
-    optionalDependencies:
-      fsevents: 2.3.3
-
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
@@ -4159,7 +4147,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite@7.2.2(@types/node@24.10.0)(tsx@4.20.6)(yaml@2.8.1):
+  vite@7.2.2(@types/node@24.10.0)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.12
       fdir: 6.5.0(picomatch@4.0.3)
@@ -4170,13 +4158,12 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.10.0
       fsevents: 2.3.3
-      tsx: 4.20.6
       yaml: 2.8.1
 
-  vitest@4.0.8(@types/node@24.10.0)(tsx@4.20.6)(yaml@2.8.1):
+  vitest@4.0.8(@types/node@24.10.0)(yaml@2.8.1):
     dependencies:
       '@vitest/expect': 4.0.8
-      '@vitest/mocker': 4.0.8(vite@7.2.2(@types/node@24.10.0)(tsx@4.20.6)(yaml@2.8.1))
+      '@vitest/mocker': 4.0.8(vite@7.2.2(@types/node@24.10.0)(yaml@2.8.1))
       '@vitest/pretty-format': 4.0.8
       '@vitest/runner': 4.0.8
       '@vitest/snapshot': 4.0.8
@@ -4193,7 +4180,7 @@ snapshots:
       tinyexec: 0.3.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vite: 7.2.2(@types/node@24.10.0)(tsx@4.20.6)(yaml@2.8.1)
+      vite: 7.2.2(@types/node@24.10.0)(yaml@2.8.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.10.0
