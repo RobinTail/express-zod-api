@@ -23,9 +23,11 @@ import { zodToTs } from "./zts.ts";
 import { ZTSContext } from "./zts-helpers.ts";
 import type Prettier from "prettier";
 import { ClientMethod } from "./method.ts";
+import { CommonConfig } from "./config-type.ts";
 
 interface IntegrationParams {
   routing: Routing;
+  config: CommonConfig;
   /**
    * @desc What should be generated
    * @example "types" — types of your endpoint requests and responses (for a DIY solution)
@@ -50,6 +52,7 @@ interface IntegrationParams {
   /**
    * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
    * @default true
+   * @todo move to config
    * */
   hasHeadMethod?: boolean;
   /**
@@ -89,6 +92,7 @@ export class Integration extends IntegrationBase {
 
   public constructor({
     routing,
+    config,
     brandHandling,
     variant = "client",
     clientClassName = "Client",
@@ -154,6 +158,7 @@ export class Integration extends IntegrationBase {
     };
     walkRouting({
       routing,
+      config,
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
     this.#program.unshift(...this.#aliases.values());

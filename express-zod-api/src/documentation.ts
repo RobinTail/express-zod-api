@@ -62,6 +62,7 @@ interface DocumentationParams {
   /**
    * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
    * @default true
+   * @todo move to config
    * */
   hasHeadMethod?: boolean;
   /** @default inline */
@@ -262,6 +263,7 @@ export class Documentation extends OpenApiBuilder {
     };
     walkRouting({
       routing,
+      config,
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
     if (tags) this.rootDoc.tags = depictTags(tags);

@@ -14,7 +14,6 @@ export {
   defaultResultHandler,
   arrayResultHandler,
 } from "./result-handler.ts";
-export { DependsOnMethod } from "./depends-on-method.ts";
 export { ServeStatic } from "./serve-static.ts";
 export { createServer, attachRouting } from "./server.ts";
 export { Documentation } from "./documentation.ts";

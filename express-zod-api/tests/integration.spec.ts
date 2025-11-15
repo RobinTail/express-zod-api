@@ -21,12 +21,14 @@ describe("Integration", () => {
       return recursive2;
     },
   });
+  const configMock = { cors: false };
 
   test.each([recursive1, recursive2])(
     "Should support types variant and handle recursive schemas %#",
     (recursiveSchema) => {
       const client = new Integration({
         variant: "types",
+        config: configMock,
         routing: {
           v1: {
             test: defaultEndpointsFactory
@@ -48,6 +50,7 @@ describe("Integration", () => {
 
   test("Should treat optionals the same way as z.infer() by default", async () => {
     const client = new Integration({
+      config: configMock,
       routing: {
         v1: {
           "test-with-dashes": defaultEndpointsFactory.build({
@@ -70,6 +73,7 @@ describe("Integration", () => {
     "Should support HEAD method by default %#",
     async (hasHeadMethod) => {
       const client = new Integration({
+        config: configMock,
         hasHeadMethod,
         variant: "types",
         routing: {
@@ -106,6 +110,7 @@ describe("Integration", () => {
       }),
     );
     const client = new Integration({
+      config: configMock,
       variant: "types",
       routing: {
         v1: {
@@ -131,6 +136,7 @@ describe("Integration", () => {
         return next(schema);
       };
       const client = new Integration({
+        config: configMock,
         variant: "types",
         brandHandling: {
           CUSTOM: () =>
