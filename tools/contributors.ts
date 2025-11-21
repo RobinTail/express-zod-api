@@ -10,7 +10,7 @@ for (const link of links) users.add(link[1]);
 const markdown = Array.from(users)
   .map(
     (user) =>
-      `[<img src="https://github.com/${user}.png" alt="@${user}" width="50px" />](https://github.com/${user})`,
+      `[<img src="https://github.com/${user}.png" alt="@${user}" width="50" />](https://github.com/${user})`,
   )
   .join("\n");
 
