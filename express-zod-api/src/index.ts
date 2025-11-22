@@ -1,7 +1,9 @@
 import "@express-zod-api/zod-plugin"; // side effects here
 export { createConfig } from "./config-type.ts";
+export { type Endpoint } from "./endpoint.ts";
 export {
   EndpointsFactory,
+  type BuildProps,
   defaultEndpointsFactory,
   arrayEndpointsFactory,
 } from "./endpoints-factory.ts";
