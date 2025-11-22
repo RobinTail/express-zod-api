@@ -1,7 +1,7 @@
 import { SchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
-import { ez } from "../src";
+import { ez } from "../src/index.ts";
 import {
   OpenAPIContext,
   depictRequestParams,
@@ -25,7 +25,7 @@ import {
   depictDateOut,
   depictBody,
   depictRequest,
-} from "../src/documentation-helpers";
+} from "../src/documentation-helpers.ts";
 
 describe("Documentation helpers", () => {
   const makeRefMock = vi.fn();
