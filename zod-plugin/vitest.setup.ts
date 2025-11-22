@@ -1,1 +1,1 @@
-import "./src/runtime.ts";
+import "./src/runtime";

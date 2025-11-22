@@ -1,6 +1,6 @@
 import { createServer } from "express-zod-api";
-import { config } from "./config.ts";
-import { routing } from "./routing.ts";
+import { config } from "./config";
+import { routing } from "./routing";
 
 /**
  * "await" is only needed for using entities returned from this method.

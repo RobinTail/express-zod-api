@@ -11,10 +11,10 @@ import {
   ResultHandler,
   Depicter,
   Method,
-} from "../src/index.ts";
-import { contentTypes } from "../src/content-type.ts";
+} from "../src";
+import { contentTypes } from "../src/content-type";
 import { z } from "zod";
-import { givePort } from "../../tools/ports.ts";
+import { givePort } from "../../tools/ports";
 import * as R from "ramda";
 
 describe("Documentation", () => {

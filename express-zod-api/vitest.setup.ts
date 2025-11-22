@@ -1,7 +1,7 @@
 import { getBrand } from "@express-zod-api/zod-plugin";
 import type { NewPlugin } from "@vitest/pretty-format";
 import { z } from "zod";
-import { ResultHandlerError } from "./src/errors.ts";
+import { ResultHandlerError } from "./src/errors";
 
 /** Takes cause and certain props of custom errors into account */
 const errorSerializer: NewPlugin = {

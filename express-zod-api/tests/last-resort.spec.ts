@@ -1,7 +1,7 @@
 import createHttpError, { HttpError } from "http-errors";
-import { ResultHandlerError } from "../src/errors.ts";
-import { lastResortHandler } from "../src/last-resort.ts";
-import { makeLoggerMock, makeResponseMock } from "../src/testing.ts";
+import { ResultHandlerError } from "../src/errors";
+import { lastResortHandler } from "../src/last-resort";
+import { makeLoggerMock, makeResponseMock } from "../src/testing";
 
 describe("Last Resort Handler", () => {
   test("should be a function", () => {

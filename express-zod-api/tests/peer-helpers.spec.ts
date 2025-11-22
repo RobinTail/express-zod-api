@@ -1,5 +1,5 @@
-import { MissingPeerError } from "../src/index.ts";
-import { loadPeer } from "../src/peer-helpers.ts";
+import { MissingPeerError } from "../src";
+import { loadPeer } from "../src/peer-helpers";
 
 describe("Peer loading helpers", () => {
   describe("loadPeer()", () => {

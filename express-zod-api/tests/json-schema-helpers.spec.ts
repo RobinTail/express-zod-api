@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { flattenIO } from "../src/json-schema-helpers.ts";
+import { flattenIO } from "../src/json-schema-helpers";
 
 describe("JSON Schema helpers", () => {
   describe("flattenIO()", () => {

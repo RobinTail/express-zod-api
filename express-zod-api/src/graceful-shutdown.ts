@@ -2,14 +2,14 @@ import http from "node:http";
 import https from "node:https";
 import { setInterval } from "node:timers/promises";
 import type { Socket } from "node:net";
-import type { ActualLogger } from "./logger-helpers.ts";
+import type { ActualLogger } from "./logger-helpers";
 import {
   closeAsync,
   hasHttpServer,
   hasResponse,
   isEncrypted,
   weAreClosed,
-} from "./graceful-helpers.ts";
+} from "./graceful-helpers";
 
 export const monitor = (
   servers: Array<http.Server | https.Server>,

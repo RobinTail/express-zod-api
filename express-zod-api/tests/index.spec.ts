@@ -1,7 +1,7 @@
 import { IRouter } from "express";
 import ts from "typescript";
 import { z } from "zod";
-import * as entrypoint from "../src/index.ts";
+import * as entrypoint from "../src";
 import {
   ApiResponse,
   AppConfig,
@@ -21,7 +21,7 @@ import {
   Producer,
   Routing,
   ServerConfig,
-} from "../src/index.ts";
+} from "../src";
 
 describe("Index Entrypoint", () => {
   describe("exports", () => {

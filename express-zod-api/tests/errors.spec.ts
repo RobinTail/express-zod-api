@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DocumentationError, RoutingError } from "../src/index.ts";
+import { DocumentationError, RoutingError } from "../src";
 import {
   IOSchemaError,
   InputValidationError,
@@ -7,7 +7,7 @@ import {
   OutputValidationError,
   ResultHandlerError,
   DeepCheckError,
-} from "../src/errors.ts";
+} from "../src/errors";
 
 describe("Errors", () => {
   const zodError = new z.ZodError([
