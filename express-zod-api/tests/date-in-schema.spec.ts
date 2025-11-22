@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ezDateInBrand } from "../src/date-in-schema";
-import { ez } from "../src";
+import { ezDateInBrand } from "../src/date-in-schema.ts";
+import { ez } from "../src/index.ts";
 import { getBrand } from "@express-zod-api/zod-plugin";
 
 describe("ez.dateIn()", () => {

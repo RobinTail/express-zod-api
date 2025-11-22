@@ -1,6 +1,6 @@
 import { globalRegistry, z } from "zod";
-import { setBrand } from "./brand";
-import { remap } from "./remap";
+import { setBrand } from "./brand.ts";
+import { remap } from "./remap.ts";
 
 const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
   const examples = globalRegistry.get(this)?.examples?.slice() || [];

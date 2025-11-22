@@ -1,6 +1,6 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
 import parser from "@typescript-eslint/parser";
-import manifest from "./package.json";
+import manifest from "./package.json" with { type: "json" };
 
 RuleTester.afterAll = afterAll;
 RuleTester.describe = describe;
@@ -12,7 +12,7 @@ const tester = new RuleTester({
 
 describe("Migration", async () => {
   vi.stubEnv("TSDOWN_VERSION", manifest.version);
-  const { default: migration } = await import("./");
+  const { default: migration } = await import("./index.ts");
   const ruleName = `v${manifest.version.split(".")[0]}`;
   const theRule = migration.rules[ruleName as keyof typeof migration.rules];
 

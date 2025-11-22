@@ -1,15 +1,15 @@
 import * as R from "ramda";
 import { z } from "zod";
-import { ezBufferBrand } from "./buffer-schema";
-import { ezDateInBrand } from "./date-in-schema";
-import { ezDateOutBrand } from "./date-out-schema";
-import { DeepCheckError } from "./errors";
-import { ezFormBrand } from "./form-schema";
-import { IOSchema } from "./io-schema";
+import { ezBufferBrand } from "./buffer-schema.ts";
+import { ezDateInBrand } from "./date-in-schema.ts";
+import { ezDateOutBrand } from "./date-out-schema.ts";
+import { DeepCheckError } from "./errors.ts";
+import { ezFormBrand } from "./form-schema.ts";
+import { IOSchema } from "./io-schema.ts";
 import { getBrand } from "@express-zod-api/zod-plugin";
-import { FirstPartyKind } from "./schema-walker";
-import { ezUploadBrand } from "./upload-schema";
-import { ezRawBrand } from "./raw-schema";
+import { FirstPartyKind } from "./schema-walker.ts";
+import { ezUploadBrand } from "./upload-schema.ts";
+import { ezRawBrand } from "./raw-schema.ts";
 
 interface NestedSchemaLookupProps {
   io: "input" | "output";
