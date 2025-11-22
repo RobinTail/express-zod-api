@@ -1,5 +1,5 @@
 import { Express, IRouter } from "express";
-import { createConfig } from "../src/index.ts";
+import { createConfig } from "../src";
 
 describe("ConfigType", () => {
   describe("createConfig()", () => {

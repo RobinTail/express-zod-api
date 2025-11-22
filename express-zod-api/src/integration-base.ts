@@ -1,9 +1,9 @@
 import * as R from "ramda";
 import ts from "typescript";
-import { ResponseVariant } from "./api-response.ts";
-import { contentTypes } from "./content-type.ts";
-import { ClientMethod, clientMethods } from "./method.ts";
-import type { makeEventSchema } from "./sse.ts";
+import { ResponseVariant } from "./api-response";
+import { contentTypes } from "./content-type";
+import { ClientMethod, clientMethods } from "./method";
+import type { makeEventSchema } from "./sse";
 import {
   accessModifiers,
   ensureTypeNode,
@@ -39,7 +39,7 @@ import {
   makeFnType,
   makeLiteralType,
   literally,
-} from "./typescript-api.ts";
+} from "./typescript-api";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
 type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
