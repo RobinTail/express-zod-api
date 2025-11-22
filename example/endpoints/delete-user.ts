@@ -1,7 +1,7 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { noContentFactory } from "../factories.ts";
+import { noContentFactory } from "../factories";
 
 /** @desc The endpoint demonstrates no content response established by its factory */
 export const deleteUserEndpoint = noContentFactory.buildVoid({

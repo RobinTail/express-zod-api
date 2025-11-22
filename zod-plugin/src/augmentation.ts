@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import type { Intact, Remap } from "./remap.ts";
+import type { Intact, Remap } from "./remap";
 
 declare module "zod/v4/core" {
   interface GlobalMeta {

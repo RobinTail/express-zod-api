@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ez } from "../src/index.ts";
-import { ezFormBrand } from "../src/form-schema.ts";
+import { ez } from "../src";
+import { ezFormBrand } from "../src/form-schema";
 import { getBrand } from "@express-zod-api/zod-plugin";
 
 describe("ez.form()", () => {

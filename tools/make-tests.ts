@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
-import { givePort } from "./ports.ts";
+import { givePort } from "./ports";
 
 const extractQuickStartFromReadme = async () => {
   const readme = await readFile("README.md", "utf-8");
@@ -16,7 +16,7 @@ const extractQuickStartFromReadme = async () => {
 
 const quickStart = await extractQuickStartFromReadme();
 const program = `
-import { givePort } from "../tools/ports.ts";
+import { givePort } from "../tools/ports";
 ${quickStart}
 `;
 

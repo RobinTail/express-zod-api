@@ -2,17 +2,17 @@ import express from "express";
 import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
-import { BuiltinLogger } from "./builtin-logger.ts";
+import { BuiltinLogger } from "./builtin-logger";
 import {
   AppConfig,
   CommonConfig,
   HttpConfig,
   ServerConfig,
-} from "./config-type.ts";
-import { isLoggerInstance } from "./logger-helpers.ts";
-import { loadPeer } from "./peer-helpers.ts";
-import { defaultResultHandler } from "./result-handler.ts";
-import { Parsers, Routing, initRouting } from "./routing.ts";
+} from "./config-type";
+import { isLoggerInstance } from "./logger-helpers";
+import { loadPeer } from "./peer-helpers";
+import { defaultResultHandler } from "./result-handler";
+import { Parsers, Routing, initRouting } from "./routing";
 import {
   createLoggingMiddleware,
   createNotFoundHandler,
@@ -22,8 +22,8 @@ import {
   installDeprecationListener,
   moveRaw,
   installTerminationListener,
-} from "./server-helpers.ts";
-import { printStartupLogo } from "./startup-logo.ts";
+} from "./server-helpers";
+import { printStartupLogo } from "./startup-logo";
 
 const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) printStartupLogo(process.stdout);
