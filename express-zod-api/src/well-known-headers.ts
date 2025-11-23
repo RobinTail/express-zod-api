@@ -8,6 +8,7 @@ export default [
   "accept-encoding",
   "accept-features",
   "accept-language",
+  "accept-query",
   "accept-signature",
   "access-control",
   "access-control-request-headers",
