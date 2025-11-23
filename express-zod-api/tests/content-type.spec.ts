@@ -1,4 +1,4 @@
-import { contentTypes } from "../src/content-type.ts";
+import { contentTypes } from "../src/content-type";
 
 describe("contentTypes", () => {
   test("should has predefined properties", () => {

@@ -2,7 +2,7 @@ import createHttpError from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
 import { defaultEndpointsFactory } from "express-zod-api";
-import { methodProviderMiddleware } from "../middlewares.ts";
+import { methodProviderMiddleware } from "../middlewares";
 
 // Demonstrating circular schemas using z.object()
 const feature = z.object({

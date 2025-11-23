@@ -1,16 +1,16 @@
 import { Request } from "express";
 import * as R from "ramda";
 import { z } from "zod";
-import { CommonConfig, InputSource, InputSources } from "./config-type.ts";
-import { contentTypes } from "./content-type.ts";
+import { CommonConfig, InputSource, InputSources } from "./config-type";
+import { contentTypes } from "./content-type";
 import {
   ClientMethod,
   SomeMethod,
   isMethod,
   Method,
   CORSMethod,
-} from "./method.ts";
-import { NormalizedResponse } from "./api-response.ts";
+} from "./method";
+import { NormalizedResponse } from "./api-response";
 
 /** @since zod 3.25.61 output type fixed */
 export const emptySchema = z.object({});

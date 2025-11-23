@@ -13,8 +13,8 @@ import {
   BuiltinLogger,
   Middleware,
   ez,
-} from "../src/index.ts";
-import { givePort } from "../../tools/ports.ts";
+} from "../src";
+import { givePort } from "../../tools/ports";
 import { setTimeout } from "node:timers/promises";
 
 describe("App in production mode", async () => {

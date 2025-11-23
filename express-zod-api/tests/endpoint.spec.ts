@@ -7,8 +7,8 @@ import {
   ez,
   testEndpoint,
   ResultHandler,
-} from "../src/index.ts";
-import { Endpoint } from "../src/endpoint.ts";
+} from "../src";
+import { Endpoint } from "../src/endpoint";
 
 describe("Endpoint", () => {
   describe(".methods", () => {

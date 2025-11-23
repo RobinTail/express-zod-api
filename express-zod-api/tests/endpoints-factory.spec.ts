@@ -7,9 +7,9 @@ import {
   defaultEndpointsFactory,
   ResultHandler,
   testMiddleware,
-} from "../src/index.ts";
-import { EmptyObject } from "../src/common-helpers.ts";
-import { Endpoint } from "../src/endpoint.ts";
+} from "../src";
+import { EmptyObject } from "../src/common-helpers";
+import { Endpoint } from "../src/endpoint";
 import { z } from "zod";
 
 describe("EndpointsFactory", () => {

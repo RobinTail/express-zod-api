@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { InputValidationError, Middleware } from "../src/index.ts";
-import { AbstractMiddleware, ExpressMiddleware } from "../src/middleware.ts";
+import { InputValidationError, Middleware } from "../src";
+import { AbstractMiddleware, ExpressMiddleware } from "../src/middleware";
 import {
   makeLoggerMock,
   makeRequestMock,
   makeResponseMock,
-} from "../src/testing.ts";
+} from "../src/testing";
 
 describe("Middleware", () => {
   describe("constructor()", () => {

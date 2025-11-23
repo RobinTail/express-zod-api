@@ -1,5 +1,5 @@
-import { BuiltinLogger } from "../src/index.ts";
-import { BuiltinLoggerConfig } from "../src/builtin-logger.ts";
+import { BuiltinLogger } from "../src";
+import { BuiltinLoggerConfig } from "../src/builtin-logger";
 import {
   AbstractLogger,
   isLoggerInstance,
@@ -7,7 +7,7 @@ import {
   isHidden,
   makeNumberFormat,
   formatDuration,
-} from "../src/logger-helpers.ts";
+} from "../src/logger-helpers";
 
 describe("Logger helpers", () => {
   describe("isSeverity()", () => {

@@ -1,8 +1,9 @@
 {
   "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
-    "module": "node20",
-    "target": "es2023",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "target": "esnext",
     "noEmit": true,
     "allowImportingTsExtensions": true,
     "noImplicitAny": true,

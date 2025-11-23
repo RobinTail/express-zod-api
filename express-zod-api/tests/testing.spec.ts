@@ -6,7 +6,7 @@ import {
   ResultHandler,
   testEndpoint,
   testMiddleware,
-} from "../src/index.ts";
+} from "../src";
 import type { Mock } from "vitest";
 
 describe("Testing", () => {

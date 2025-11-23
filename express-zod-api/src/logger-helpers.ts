@@ -1,6 +1,6 @@
 import { Ansis, blue, green, hex, red, cyanBright } from "ansis";
 import * as R from "ramda";
-import { isObject } from "./common-helpers.ts";
+import { isObject } from "./common-helpers";
 
 export const styles = {
   debug: blue,

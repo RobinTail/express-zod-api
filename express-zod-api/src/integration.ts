@@ -1,8 +1,8 @@
 import * as R from "ramda";
 import ts from "typescript";
 import { z } from "zod";
-import { ResponseVariant, responseVariants } from "./api-response.ts";
-import { IntegrationBase } from "./integration-base.ts";
+import { ResponseVariant, responseVariants } from "./api-response";
+import { IntegrationBase } from "./integration-base";
 import {
   f,
   makeInterfaceProp,
@@ -13,17 +13,17 @@ import {
   makeIndexed,
   makeLiteralType,
   makeUnion,
-} from "./typescript-api.ts";
-import { shouldHaveContent, makeCleanId } from "./common-helpers.ts";
-import { loadPeer } from "./peer-helpers.ts";
-import { Routing } from "./routing.ts";
-import { OnEndpoint, walkRouting, withHead } from "./routing-walker.ts";
-import { HandlingRules } from "./schema-walker.ts";
-import { zodToTs } from "./zts.ts";
-import { ZTSContext } from "./zts-helpers.ts";
+} from "./typescript-api";
+import { shouldHaveContent, makeCleanId } from "./common-helpers";
+import { loadPeer } from "./peer-helpers";
+import { Routing } from "./routing";
+import { OnEndpoint, walkRouting, withHead } from "./routing-walker";
+import { HandlingRules } from "./schema-walker";
+import { zodToTs } from "./zts";
+import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
-import { ClientMethod } from "./method.ts";
-import { CommonConfig } from "./config-type.ts";
+import { ClientMethod } from "./method";
+import type { CommonConfig } from "./config-type.ts";
 
 interface IntegrationParams {
   routing: Routing;

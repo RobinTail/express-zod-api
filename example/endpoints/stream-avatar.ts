@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { fileStreamingEndpointsFactory } from "../factories.ts";
+import { fileStreamingEndpointsFactory } from "../factories";
 
 export const streamAvatarEndpoint = fileStreamingEndpointsFactory.build({
   shortDescription: "Streams a file content.",

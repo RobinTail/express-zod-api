@@ -1,4 +1,4 @@
-import { defaultStatusCodes, responseVariants } from "../src/api-response.ts";
+import { defaultStatusCodes, responseVariants } from "../src/api-response";
 
 describe("ApiResponse", () => {
   describe("defaultStatusCodes", () => {

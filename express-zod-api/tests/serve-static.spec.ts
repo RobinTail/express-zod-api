@@ -1,5 +1,5 @@
-import { staticMock, staticHandler } from "./express-mock.ts";
-import { ServeStatic } from "../src/index.ts";
+import { staticMock, staticHandler } from "./express-mock";
+import { ServeStatic } from "../src";
 
 describe("ServeStatic", () => {
   describe("constructor()", () => {

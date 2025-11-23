@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import { combinations, isObject } from "./common-helpers.ts";
+import { combinations, isObject } from "./common-helpers";
 
 type LogicalOr<T> = { or: T[] };
 type LogicalAnd<T> = { and: T[] };

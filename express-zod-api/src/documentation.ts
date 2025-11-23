@@ -8,13 +8,13 @@ import {
   SecuritySchemeType,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { responseVariants } from "./api-response.ts";
-import { contentTypes } from "./content-type.ts";
-import { DocumentationError } from "./errors.ts";
-import { getInputSources, makeCleanId } from "./common-helpers.ts";
-import { CommonConfig } from "./config-type.ts";
-import { processContainers } from "./logical-container.ts";
-import { ClientMethod } from "./method.ts";
+import { responseVariants } from "./api-response";
+import { contentTypes } from "./content-type";
+import { DocumentationError } from "./errors";
+import { getInputSources, makeCleanId } from "./common-helpers";
+import { CommonConfig } from "./config-type";
+import { processContainers } from "./logical-container";
+import { ClientMethod } from "./method";
 import {
   depictBody,
   depictRequestParams,
@@ -28,9 +28,9 @@ import {
   nonEmpty,
   BrandHandling,
   depictRequest,
-} from "./documentation-helpers.ts";
-import { Routing } from "./routing.ts";
-import { OnEndpoint, walkRouting, withHead } from "./routing-walker.ts";
+} from "./documentation-helpers";
+import { Routing } from "./routing";
+import { OnEndpoint, walkRouting, withHead } from "./routing-walker";
 
 type Component =
   | "positiveResponse"
