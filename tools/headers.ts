@@ -23,6 +23,11 @@ const responseOnlyHeaders = {
     reason:
       "The server uses this to tell the client it supports partial requests (e.g., byte ranges).",
   },
+  "accept-query": {
+    reason: "Called a response field in the documentation",
+    proof:
+      "https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/14/#section-3",
+  },
   "access-control-allow-credentials": {
     proof: "Defined in CORS Specification (Fetch Standard, Section 6.2).",
     reason: "Used in responses to indicate support for credentials in CORS.",

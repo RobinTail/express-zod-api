@@ -1,21 +1,21 @@
 import * as R from "ramda";
 import ts from "typescript";
 import { globalRegistry, z } from "zod";
-import { ezBufferBrand } from "./buffer-schema.ts";
-import { getTransformedType, isSchema } from "./common-helpers.ts";
-import { ezDateInBrand } from "./date-in-schema.ts";
-import { ezDateOutBrand } from "./date-out-schema.ts";
-import { hasCycle } from "./deep-checks.ts";
-import { ProprietaryBrand } from "./proprietary-schemas.ts";
-import { ezRawBrand, RawSchema } from "./raw-schema.ts";
-import { FirstPartyKind, HandlingRules, walkSchema } from "./schema-walker.ts";
+import { ezBufferBrand } from "./buffer-schema";
+import { getTransformedType, isSchema } from "./common-helpers";
+import { ezDateInBrand } from "./date-in-schema";
+import { ezDateOutBrand } from "./date-out-schema";
+import { hasCycle } from "./deep-checks";
+import { ProprietaryBrand } from "./proprietary-schemas";
+import { ezRawBrand, RawSchema } from "./raw-schema";
+import { FirstPartyKind, HandlingRules, walkSchema } from "./schema-walker";
 import {
   ensureTypeNode,
   makeInterfaceProp,
   makeLiteralType,
   makeUnion,
-} from "./typescript-api.ts";
-import { Producer, ZTSContext } from "./zts-helpers.ts";
+} from "./typescript-api";
+import { Producer, ZTSContext } from "./zts-helpers";
 
 const { factory: f } = ts;
 

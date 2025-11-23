@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { defaultEndpointsFactory, DependsOnMethod } from "../src/index.ts";
+import { defaultEndpointsFactory, DependsOnMethod } from "../src";
 
 const endpoint = defaultEndpointsFactory.build({
   output: z.object({}),

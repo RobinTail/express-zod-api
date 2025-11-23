@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ezDateOutBrand } from "../src/date-out-schema.ts";
-import { ez } from "../src/index.ts";
+import { ezDateOutBrand } from "../src/date-out-schema";
+import { ez } from "../src";
 import { getBrand } from "@express-zod-api/zod-plugin";
 
 describe("ez.dateOut()", () => {

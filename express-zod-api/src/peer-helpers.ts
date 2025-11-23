@@ -1,4 +1,4 @@
-import { MissingPeerError } from "./errors.ts";
+import { MissingPeerError } from "./errors";
 
 export const loadPeer = async <T>(
   moduleName: string,

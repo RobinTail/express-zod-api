@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { IOSchema, ez } from "../src/index.ts";
-import { makeFinalInputSchema, ensureExtension } from "../src/io-schema.ts";
+import { IOSchema, ez } from "../src";
+import { makeFinalInputSchema, ensureExtension } from "../src/io-schema";
 
 describe("I/O Schema and related helpers", () => {
   describe("IOSchema", () => {
