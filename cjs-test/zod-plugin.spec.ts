@@ -1,5 +1,8 @@
-import "express-zod-api"; // side effect here via the Zod plugin
-import { z } from "zod";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+
+require("express-zod-api"); // side effect here via Zod Plugin
+const z = require("zod"); // ensure CJS version of Zod is used
 
 describe("Zod plugin in CJS environment", () => {
   /** @link https://github.com/RobinTail/express-zod-api/issues/2981 */
