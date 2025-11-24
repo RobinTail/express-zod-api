@@ -46,7 +46,7 @@ catalogs:
       specifier: ^8.46.1
       version: 8.47.0
     zod:
-      specifier: ^4.0.0
+      specifier: ^4.1.13
       version: 4.1.13
   prod:
     ramda:
