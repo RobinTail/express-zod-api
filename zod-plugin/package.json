@@ -42,7 +42,7 @@
     "ramda": "catalog:prod"
   },
   "peerDependencies": {
-    "zod": "^4.0.0"
+    "zod": "catalog:peer"
   },
   "devDependencies": {
     "@types/ramda": "catalog:dev",
