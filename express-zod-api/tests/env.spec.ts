@@ -1,8 +1,17 @@
 import createHttpError from "http-errors";
 import * as R from "ramda";
 import { z } from "zod";
+import { createRequire } from "node:module";
 
 describe("Environment checks", () => {
+  describe("Zod global registry", () => {
+    test("is shared across both of its ESM and CJS packages", () => {
+      createRequire(import.meta.url)("zod");
+      const { globalRegistry } = createRequire(import.meta.url)("zod");
+      expect(globalRegistry).toBe(z.globalRegistry);
+    });
+  });
+
   describe("Zod Dates", () => {
     test.each(["2021-01-32", "22/01/2022", "2021-01-31T25:00:00.000Z"])(
       "should detect invalid date %#",
