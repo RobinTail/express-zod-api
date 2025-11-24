@@ -186,12 +186,6 @@ pnpm add -D @types/express @types/node @types/http-errors
 
 ## Environment preparation
 
-Ensure running your code as [ESM](https://nodejs.org/api/esm.html#enabling) by either:
-
-- setting `"type": "module"` in your `package.json`;
-- or using `.mts` file extension;
-- or using `tsx` or `vite-node` or similar tools.
-
 Enable the following `compilerOptions` in your `tsconfig.json` to make it work as expected:
 
 ```json
@@ -1395,11 +1389,6 @@ framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has si
 
 There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
-
-## TypeError: example is not a function
-
-If you face this error then [switch your environment to ESM](#environment-preparation).
-See [issue 2981](https://github.com/RobinTail/express-zod-api/issues/2981) for details.
 
 ## Excessive properties in endpoint output
 
