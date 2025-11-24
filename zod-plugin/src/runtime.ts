@@ -1,8 +1,8 @@
+import { createRequire } from "node:module";
 import { z } from "zod";
 import { setBrand } from "./brand";
 import { remap } from "./remap";
-import { createRequire } from "node:module";
-import { deprecationSetter, exampleSetter, labelSetter } from "./meta.ts";
+import { deprecationSetter, exampleSetter, labelSetter } from "./meta";
 
 // eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN
 const pluginFlag = Symbol.for(process.env.TSDOWN_SELF!);
