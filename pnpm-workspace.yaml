@@ -44,7 +44,7 @@ catalogs:
   prod:
     "ramda": "^0.32.0"
   peer:
-    "zod": "^4.0.0"
+    "zod": "^4.1.13"
   dev:
     "@types/compression": "^1.8.1"
     "@types/express": "^5.0.3"
