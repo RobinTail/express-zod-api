@@ -7,9 +7,10 @@
 - Supported `zod` versions: `^4.1.13`:
   - This Zod patch contains an [important fix](https://github.com/colinhacks/zod/pull/5452) that makes the
     `globalRegistry` really global across both CJS and ESM bundles of Zod distribution;
-  - Though, the requirement on running the framework in ESM environment remains, I consider the fix critical in order
-    to avoid unexpected behaviour such as [loosing metadata](https://github.com/RobinTail/express-zod-api/issues/3059);
-  - The issue was found and reported by [@shadone](https://github.com/shadone).
+  - The issue was found and reported by [@shadone](https://github.com/shadone);
+- New version of Zod plugin now also extends the CJS exports of Zod:
+  - This fixes the "TypeError: example is not a function" in CJS and removes the requirement to use ESM environment;
+  - The issue reported by [@squishykid](https://github.com/squishykid), and addressed earlier in [v25.5.3](#v2553);
 - `DependsOnMethod` removed:
   - You can now specify methods as direct keys of an assigned object in `Routing`;
   - That object can still contain nested paths as before;
