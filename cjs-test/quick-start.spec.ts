@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
+import { givePort } from "../tools/ports";
 
 describe("CJS Test", async () => {
-  const { givePort } = await import("../tools/ports.js");
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();

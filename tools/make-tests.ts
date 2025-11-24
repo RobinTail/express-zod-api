@@ -14,19 +14,15 @@ const extractQuickStartFromReadme = async () => {
     .trim();
 };
 
-const quickStart = await extractQuickStartFromReadme();
-const program = `
-import { givePort } from "../tools/ports";
-${quickStart}
-`;
+const program = await extractQuickStartFromReadme();
 
 const examplePort = String(givePort("example"));
 
 const testContent = {
-  cjs: program.replace(examplePort, "givePort('cjs')"),
-  esm: program.replace(examplePort, "givePort('esm')"),
-  compat: program.replace(examplePort, "givePort('compat')"),
-  issue952: quickStart.replace(/const/g, "export const"),
+  cjs: program.replace(examplePort, String(givePort("cjs"))),
+  esm: program.replace(examplePort, String(givePort("esm"))),
+  compat: program.replace(examplePort, String(givePort("compat"))),
+  issue952: program.replace(/const/g, "export const"),
 };
 
 for (const testName in testContent) {
