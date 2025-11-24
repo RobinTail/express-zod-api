@@ -108,6 +108,9 @@ importers:
       express-zod-api:
         specifier: workspace:*
         version: link:../express-zod-api
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
       zod:
         specifier: catalog:dev
         version: 4.1.13
