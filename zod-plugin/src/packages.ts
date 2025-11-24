@@ -7,3 +7,11 @@ export const getZodPackages = () => {
   if (z !== zCJS) packages.push(zCJS);
   return packages;
 };
+
+export const getZodClasses = (pkg: typeof z) =>
+  Object.keys(pkg)
+    .filter(
+      (key) => key.startsWith("Zod") && !/(Success|Error|Function)$/.test(key),
+    )
+    .map((key) => pkg[key as keyof typeof pkg])
+    .filter((Cls) => typeof Cls === "function");

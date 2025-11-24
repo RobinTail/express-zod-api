@@ -2,7 +2,7 @@ import type { z } from "zod";
 import { setBrand } from "./brand";
 import { remap } from "./remap";
 import { deprecationSetter, exampleSetter, labelSetter } from "./meta";
-import { getZodPackages } from "./packages";
+import { getZodClasses, getZodPackages } from "./packages";
 
 // eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN
 const pluginFlag = Symbol.for(process.env.TSDOWN_SELF!);
@@ -10,11 +10,7 @@ const pluginFlag = Symbol.for(process.env.TSDOWN_SELF!);
 if (!(pluginFlag in globalThis)) {
   (globalThis as Record<symbol, unknown>)[pluginFlag] = true;
   for (const pkg of getZodPackages()) {
-    for (const entry of Object.keys(pkg)) {
-      if (!entry.startsWith("Zod")) continue;
-      if (/(Success|Error|Function)$/.test(entry)) continue;
-      const Cls = pkg[entry as keyof typeof pkg];
-      if (typeof Cls !== "function") continue;
+    for (const Cls of getZodClasses(pkg)) {
       Object.defineProperties(Cls.prototype, {
         ["example" satisfies keyof z.ZodType]: {
           value: exampleSetter,
