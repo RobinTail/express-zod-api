@@ -1,21 +1,8 @@
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import { setBrand } from "./brand";
 import { remap } from "./remap";
 import { createRequire } from "node:module";
-
-const exampleSetter = function (this: z.ZodType, value: z.output<typeof this>) {
-  const examples = globalRegistry.get(this)?.examples?.slice() || [];
-  examples.push(value);
-  return this.meta({ examples });
-};
-
-const deprecationSetter = function (this: z.ZodType) {
-  return this.meta({ deprecated: true });
-};
-
-const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
-  return this.meta({ default: defaultLabel });
-};
+import { deprecationSetter, exampleSetter, labelSetter } from "./meta.ts";
 
 // eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN
 const pluginFlag = Symbol.for(process.env.TSDOWN_SELF!);
