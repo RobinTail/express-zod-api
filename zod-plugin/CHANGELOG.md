@@ -4,7 +4,8 @@
 
 ### v3.0.0
 
-- Supported `zod` versions: `^4.1.13`.
+- Supported `zod` versions: `^4.1.13`;
+- The plugin patches both ESM and CJS exports of `zod`.
 
 ## Version 2
 
