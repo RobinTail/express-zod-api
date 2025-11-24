@@ -37,7 +37,7 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
     ],
     "schema": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "anyOf": [
+      "oneOf": [
         {
           "additionalProperties": false,
           "properties": {
