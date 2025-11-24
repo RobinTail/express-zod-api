@@ -3,10 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "test": "vitest run --globals"
+    "pretest": "tsc",
+    "test": "vitest run --globals",
+    "posttest": "rm *.js"
   },
   "devDependencies": {
     "express-zod-api": "workspace:*",
+    "typescript": "catalog:dev",
     "zod": "catalog:dev"
   }
 }
