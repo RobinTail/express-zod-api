@@ -6,7 +6,7 @@ describe("CJS Test", async () => {
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
-  const quickStart = spawn("tsx", ["quick-start.ts"]);
+  const quickStart = spawn("node", ["quick-start.js"]);
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   const port = givePort("cjs");
