@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 3
+
+### v3.0.0
+
+- Supported `zod` versions: `^4.1.13`.
+
 ## Version 2
 
 ### v2.1.0
