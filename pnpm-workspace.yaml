@@ -19,11 +19,13 @@ minimumReleaseAgeExclude:
   - "@rolldown/*"
   - "@vitest/*"
   - "@typescript-eslint/*"
+  - body-parser
   - eslint
   - eslint-plugin-allowed-dependencies
   - express
   - http-errors
   - ramda
+  - raw-body
   - rolldown
   - rolldown-plugin-dts
   - typescript
