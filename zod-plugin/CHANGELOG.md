@@ -4,7 +4,8 @@
 
 ### v3.0.0
 
-- Supported `zod` versions: `^4.1.13`.
+- Supported `zod` versions: `^4.1.13`;
+- The plugin now also patches the CJS exports of `zod`.
 
 ## Version 2
 
