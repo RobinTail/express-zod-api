@@ -30,7 +30,7 @@ import { DiscriminatedResult, pullResponseExamples } from "./result-helpers";
 import { AbstractResultHandler } from "./result-handler";
 import { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
-import type { Routing } from "./routing.ts";
+import type { Routing } from "./routing";
 
 export type Handler<IN, OUT, CTX> = (params: {
   /** @desc The inputs from the enabled input sources validated against the final input schema (incl. Middlewares) */

@@ -3,7 +3,7 @@ import { RoutingError } from "./errors";
 import { ClientMethod, isMethod, Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
-import type { CommonConfig } from "./config-type.ts";
+import type { CommonConfig } from "./config-type";
 
 export type OnEndpoint<M extends string = Method> = (
   method: M,

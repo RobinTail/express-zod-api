@@ -23,7 +23,7 @@ import { zodToTs } from "./zts";
 import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
 import { ClientMethod } from "./method";
-import type { CommonConfig } from "./config-type.ts";
+import type { CommonConfig } from "./config-type";
 
 interface IntegrationParams {
   routing: Routing;
