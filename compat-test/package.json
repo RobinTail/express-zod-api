@@ -12,7 +12,7 @@
     "eslint": "npm:eslint@9.0.0",
     "express": "npm:express@5.1.0",
     "express-zod-api": "workspace:*",
-    "http-errors": "npm:http-errors@2.0.0",
+    "http-errors": "npm:http-errors@2.0.1",
     "typescript": "npm:typescript@5.1.3",
     "typescript-eslint": "npm:typescript-eslint@8.0.0",
     "zod": "npm:zod@4.1.13"
