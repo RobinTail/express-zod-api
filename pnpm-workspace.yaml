@@ -58,7 +58,7 @@ catalogs:
     "compression": "^1.8.0"
     "express": "^5.1.0"
     "express-fileupload": "^1.5.1"
-    "http-errors": "^2.0.0"
+    "http-errors": "^2.0.1"
     "typescript": "^5.9.2"
     "typescript-eslint": "^8.46.1"
     "zod": "^4.1.13"
