@@ -41,7 +41,7 @@ describe("Migration", async () => {
             data: {
               subject: "value",
               from: "new DependsOnMethod(...)",
-              to: "its argument object and append its keys with ' /'",
+              to: "its argument",
             },
           },
         ],
@@ -56,7 +56,7 @@ describe("Migration", async () => {
             data: {
               subject: "value",
               from: "new DependsOnMethod(...)",
-              to: "its argument object and append its keys with ' /'",
+              to: "its argument",
             },
           },
         ],
@@ -71,7 +71,7 @@ describe("Migration", async () => {
             data: {
               subject: "value",
               from: "new DependsOnMethod(...)",
-              to: "its argument object and append its keys with ' /'",
+              to: "its argument",
             },
           },
         ],
@@ -86,7 +86,7 @@ describe("Migration", async () => {
             data: {
               subject: "value",
               from: "new DependsOnMethod(...)",
-              to: "its argument object and append its keys with ' /'",
+              to: "its argument",
             },
           },
         ],
@@ -101,7 +101,7 @@ describe("Migration", async () => {
             data: {
               subject: "value",
               from: "new DependsOnMethod(...)",
-              to: "its argument object and append its keys with ' /'",
+              to: "its argument",
             },
           },
         ],
