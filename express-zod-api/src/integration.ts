@@ -52,7 +52,6 @@ interface IntegrationParams {
   /**
    * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
    * @default true
-   * @todo move to config
    * */
   hasHeadMethod?: boolean;
   /**
