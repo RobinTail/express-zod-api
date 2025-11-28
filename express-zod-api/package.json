@@ -96,7 +96,7 @@
     "express": "catalog:dev",
     "express-fileupload": "catalog:dev",
     "http-errors": "catalog:dev",
-    "node-forge": "^1.3.1",
+    "node-forge": "^1.3.2",
     "snakify-ts": "^2.3.0",
     "typescript": "catalog:dev",
     "undici": "^7.10.0",
