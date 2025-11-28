@@ -2,8 +2,10 @@ import { z } from "zod";
 
 export const ezDateOutBrand = Symbol("DateOut");
 
-export interface DateOutParams
-  extends Omit<Parameters<z.ZodString["meta"]>[0], "examples"> {
+export interface DateOutParams extends Omit<
+  Parameters<z.ZodString["meta"]>[0],
+  "examples"
+> {
   examples?: string[];
 }
 

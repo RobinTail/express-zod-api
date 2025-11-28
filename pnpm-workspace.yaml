@@ -17,11 +17,14 @@ minimumReleaseAgeExclude:
   - "@rolldown/*"
   - "@vitest/*"
   - "@typescript-eslint/*"
+  - body-parser
   - eslint
   - eslint-plugin-allowed-dependencies
   - express
   - http-errors
+  - prettier
   - ramda
+  - raw-body
   - rolldown
   - rolldown-plugin-dts
   - typescript
@@ -41,6 +44,8 @@ publicHoistPattern:
 catalogs:
   prod:
     "ramda": "^0.32.0"
+  peer:
+    "zod": "^4.0.0"
   dev:
     "@types/compression": "^1.8.1"
     "@types/express": "^5.0.3"
