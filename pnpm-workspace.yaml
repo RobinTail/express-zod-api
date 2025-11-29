@@ -24,6 +24,7 @@ minimumReleaseAgeExclude:
   - eslint-plugin-allowed-dependencies
   - express
   - http-errors
+  - prettier
   - ramda
   - raw-body
   - rolldown
@@ -32,6 +33,7 @@ minimumReleaseAgeExclude:
   - typescript-eslint
   - tsdown
   - tsx
+  - unrun
   - vite
   - vitest
   - zod

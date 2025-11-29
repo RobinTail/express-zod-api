@@ -21,18 +21,15 @@ declare module "zod" {
   interface ZodType<
     out Output = unknown,
     out Input = unknown,
-    out Internals extends z.core.$ZodTypeInternals<
-      Output,
-      Input
-    > = z.core.$ZodTypeInternals<Output, Input>,
+    out Internals extends z.core.$ZodTypeInternals<Output, Input> =
+      z.core.$ZodTypeInternals<Output, Input>,
   > extends z.core.$ZodType<Output, Input, Internals> {
     /** @desc Shorthand for .meta({ examples }) */
     example(example: z.output<this>): this;
     deprecated(): this;
   }
   interface ZodDefault<T extends z.core.SomeType = z.core.$ZodType>
-    extends z._ZodType<z.core.$ZodDefaultInternals<T>>,
-      z.core.$ZodDefault<T> {
+    extends z._ZodType<z.core.$ZodDefaultInternals<T>>, z.core.$ZodDefault<T> {
     /** @desc Shorthand for .meta({ default }) */
     label(label: string): this;
   }
@@ -40,7 +37,9 @@ declare module "zod" {
     // @ts-expect-error -- external issue
     out Shape extends z.core.$ZodShape = z.core.$ZodLooseShape,
     out Config extends z.core.$ZodObjectConfig = z.core.$strip,
-  > extends z._ZodType<z.core.$ZodObjectInternals<Shape, Config>>,
+  >
+    extends
+      z._ZodType<z.core.$ZodObjectInternals<Shape, Config>>,
       z.core.$ZodObject<Shape, Config> {
     remap<V extends string, U extends { [P in keyof Shape]?: V }>(
       mapping: U,
