@@ -19,7 +19,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
 4. [Basic features](#basic-features)
    1. [Routing](#routing) including static file serving
    2. [Middlewares](#middlewares)
-   3. [Options](#options)
+   3. [Context](#context)
    4. [Using native express middlewares](#using-native-express-middlewares)
    5. [Refinements](#refinements)
    6. [Query string parser](#query-string-parser)
@@ -86,6 +86,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/shadone.png" alt="@shadone" width="50" />](https://github.com/shadone)
 [<img src="https://github.com/squishykid.png" alt="@squishykid" width="50" />](https://github.com/squishykid)
 [<img src="https://github.com/jakub-msqt.png" alt="@jakub-msqt" width="50" />](https://github.com/jakub-msqt)
 [<img src="https://github.com/misha-z1nchuk.png" alt="@misha-z1nchuk" width="50" />](https://github.com/misha-z1nchuk)
@@ -149,7 +150,7 @@ These people contributed to the improvement of the framework by reporting bugs, 
 The API operates object schemas for input and output validation.
 The object being validated is the combination of certain `request` properties.
 It is available to the endpoint handler as the `input` parameter.
-Middlewares have access to all `request` properties, they can provide endpoints with `options`.
+Middlewares have access to all `request` properties, they can provide endpoints with `ctx` (context).
 The object returned by the endpoint handler is called `output`. It goes to the `ResultHandler` which is
 responsible for transmitting consistent responses containing the `output` or possible error.
 Much can be customized to fit your needs.
@@ -184,12 +185,6 @@ pnpm add -D @types/express @types/node @types/http-errors
 ```
 
 ## Environment preparation
-
-Ensure running your code as [ESM](https://nodejs.org/api/esm.html#enabling) by either:
-
-- setting `"type": "module"` in your `package.json`;
-- or using `.mts` file extension;
-- or using `tsx` or `vite-node` or similar tools.
 
 Enable the following `compilerOptions` in your `tsconfig.json` to make it work as expected:
 
@@ -233,8 +228,8 @@ const helloWorldEndpoint = defaultEndpointsFactory.build({
   output: z.object({
     greetings: z.string(),
   }),
-  handler: async ({ input: { name }, options, logger }) => {
-    logger.debug("Options:", options); // middlewares provide options
+  handler: async ({ input: { name }, ctx, logger }) => {
+    logger.debug("Context:", ctx); // middlewares provide ctx
     return { greetings: `Hello, ${name || "World"}. Happy coding!` };
   },
 });
@@ -288,7 +283,7 @@ in one place, illustrating how you can structure your API using whichever method
 architecture — or even mix them seamlessly.
 
 ```ts
-import { Routing, DependsOnMethod, ServeStatic } from "express-zod-api";
+import { Routing, ServeStatic } from "express-zod-api";
 
 const routing: Routing = {
   // flat syntax — /v1/users
@@ -306,12 +301,12 @@ const routing: Routing = {
     // mixed syntax with explicit method — /v1/user/:id
     "delete /user/:id": deleteUserEndpoint,
     // method-based routing — /v1/account
-    account: new DependsOnMethod({
+    account: {
       get: endpointA,
       delete: endpointA,
       post: endpointB,
       patch: endpointB,
-    }),
+    },
   },
   // static file serving — /public serves files from ./assets
   public: new ServeStatic("assets", {
@@ -329,7 +324,7 @@ When the method is not specified, the one(s) supported by the Endpoint applied (
 
 ## Middlewares
 
-Middleware can authenticate using input or `request` headers, and can provide endpoint handlers with `options`.
+Middleware can authenticate using input or `request` headers, and can provide endpoint handlers with `ctx`.
 Inputs of middlewares are also available to endpoint handlers within `input`.
 
 Here is an example of the authentication middleware, that checks a `key` from input and `token` from headers:
@@ -356,7 +351,7 @@ const authMiddleware = new Middleware({
     if (!user) throw createHttpError(401, "Invalid key");
     if (request.headers.token !== user.token)
       throw createHttpError(401, "Invalid token");
-    return { user }; // provides endpoints with options.user
+    return { user }; // provides endpoints with ctx.user
   },
 });
 ```
@@ -367,7 +362,7 @@ By using `.addMiddleware()` method before `.build()` you can connect it to the e
 const yourEndpoint = defaultEndpointsFactory
   .addMiddleware(authMiddleware)
   .build({
-    handler: async ({ options: { user } }) => {
+    handler: async ({ ctx: { user } }) => {
       // user is the one returned by authMiddleware
     }, // ...
   });
@@ -375,7 +370,7 @@ const yourEndpoint = defaultEndpointsFactory
 
 You can create a new factory by connecting as many middlewares as you want — they will be executed in the specified
 order for all the endpoints produced on that factory. You may also use a shorter inline syntax within the
-`.addMiddleware()` method, and have access to the output of the previously executed middlewares in chain as `options`:
+`.addMiddleware()` method, and have access to the output of the previously executed middlewares in chain as `ctx`:
 
 ```ts
 import { defaultEndpointsFactory } from "express-zod-api";
@@ -383,20 +378,20 @@ import { defaultEndpointsFactory } from "express-zod-api";
 const factory = defaultEndpointsFactory
   .addMiddleware(authMiddleware) // add Middleware instance or use shorter syntax:
   .addMiddleware({
-    handler: async ({ options: { user } }) => ({}), // user from authMiddleware
+    handler: async ({ ctx: { user } }) => ({}), // user from authMiddleware
   });
 ```
 
-## Options
+## Context
 
-In case you'd like to provide your endpoints with options that do not depend on Request, like non-persistent connection
-to a database, consider shorthand method `addOptions`. For static options consider reusing `const` across your files.
+If you need to provide your endpoints with a context that does not depend on Request, like non-persistent database
+connection, consider shorthand method `addContext`. For static values consider reusing a `const` across your files.
 
 ```ts
 import { readFile } from "node:fs/promises";
 import { defaultEndpointsFactory } from "express-zod-api";
 
-const endpointsFactory = defaultEndpointsFactory.addOptions(async () => {
+const endpointsFactory = defaultEndpointsFactory.addContext(async () => {
   // caution: new connection on every request:
   const db = mongoose.connect("mongodb://connection.string");
   const privateKey = await readFile("private-key.pem", "utf-8");
@@ -411,10 +406,10 @@ custom [Result Handler](#response-customization):
 import { ResultHandler } from "express-zod-api";
 
 const resultHandlerWithCleanup = new ResultHandler({
-  handler: ({ options }) => {
-    // necessary to check for certain option presence:
-    if ("db" in options && options.db) {
-      options.db.connection.close(); // sample cleanup
+  handler: ({ ctx }) => {
+    // necessary to check the presence of a certain property:
+    if ("db" in ctx && ctx.db) {
+      ctx.db.connection.close(); // sample cleanup
     }
   },
 });
@@ -446,7 +441,7 @@ const config = createConfig({
 
 In case you need a special processing of `request`, or to modify the `response` for selected endpoints, use the method
 `addExpressMiddleware()` of `EndpointsFactory` (or its alias `use()`). The method has two optional features: a provider
-of [options](#options) and an error transformer for adjusting the response status code.
+of a [context](#context) and an error transformer for adjusting the response status code.
 
 ```ts
 import { defaultEndpointsFactory } from "express-zod-api";
@@ -1045,8 +1040,8 @@ test("should respond successfully", async () => {
 
 ## Testing middlewares
 
-Middlewares can also be tested individually using the `testMiddleware()` method. You can also pass `options` collected
-from outputs of previous middlewares, if the one being tested somehow depends on them. Possible errors would be handled
+Middlewares can also be tested individually using the `testMiddleware()` method. You can also pass `ctx` collected
+from returns of previous middlewares, if the one being tested somehow depends on it. Possible errors would be handled
 either by `errorHandler` configured within given `configProps` or `defaultResultHandler`.
 
 ```ts
@@ -1055,8 +1050,8 @@ import { Middleware, testMiddleware } from "express-zod-api";
 
 const middleware = new Middleware({
   input: z.object({ test: z.string() }),
-  handler: async ({ options, input: { test } }) => ({
-    collectedOptions: Object.keys(options),
+  handler: async ({ ctx, input: { test } }) => ({
+    collectedContext: Object.keys(ctx),
     testLength: test.length,
   }),
 });
@@ -1064,10 +1059,10 @@ const middleware = new Middleware({
 const { output, responseMock, loggerMock } = await testMiddleware({
   middleware,
   requestProps: { method: "POST", body: { test: "something" } },
-  options: { prev: "accumulated" }, // responseOptions, configProps, loggerProps
+  ctx: { prev: "accumulated" }, // responseOptions, configProps, loggerProps
 });
 expect(loggerMock._getLogs().error).toHaveLength(0);
-expect(output).toEqual({ collectedOptions: ["prev"], testLength: 9 });
+expect(output).toEqual({ collectedContext: ["prev"], testLength: 9 });
 ```
 
 # Integration and Documentation
@@ -1087,6 +1082,7 @@ import { Integration } from "express-zod-api";
 
 const client = new Integration({
   routing,
+  config,
   variant: "client", // <— optional, see also "types" for a DIY solution
 });
 
@@ -1183,11 +1179,11 @@ new Documentation({
 ## Deprecated schemas and routes
 
 As your API evolves, you may need to mark some parameters or routes as deprecated before deleting them. For this
-purpose, the `.deprecated()` method is available on each schema, `Endpoint` and `DependsOnMethod`, it's immutable.
+purpose, the `.deprecated()` method is available on each schema and `Endpoint`, it's immutable.
 You can also deprecate all routes the `Endpoint` assigned to by setting `EndpointsFactory::build({ deprecated: true })`.
 
 ```ts
-import { Routing, DependsOnMethod } from "express-zod-api";
+import { Routing } from "express-zod-api";
 import { z } from "zod";
 
 const someEndpoint = factory.build({
@@ -1199,8 +1195,7 @@ const someEndpoint = factory.build({
 
 const routing: Routing = {
   v1: oldEndpoint.deprecated(), // deprecates the /v1 path
-  v2: new DependsOnMethod({ get: oldEndpoint }).deprecated(), // deprecates the /v2 path
-  v3: someEndpoint, // the path is assigned with initially deprecated endpoint (also deprecated)
+  v2: someEndpoint, // the path is assigned with initially deprecated endpoint (also deprecated)
 };
 ```
 
@@ -1378,7 +1373,7 @@ const subscriptionEndpoint = new EventStreamFactory({
   time: z.int().positive(),
 }).buildVoid({
   input: z.object({}), // optional input schema
-  handler: async ({ options: { emit, isClosed, signal } }) => {
+  handler: async ({ ctx: { emit, isClosed, signal } }) => {
     while (!isClosed()) {
       emit("time", Date.now());
       await setTimeout(1000);
@@ -1394,11 +1389,6 @@ framework, [Zod Sockets](https://github.com/RobinTail/zod-sockets), which has si
 
 There are some well-known issues and limitations, or third party bugs that cannot be fixed in the usual way, but you
 should be aware of them.
-
-## TypeError: example is not a function
-
-If you face this error then [switch your environment to ESM](#environment-preparation).
-See [issue 2981](https://github.com/RobinTail/express-zod-api/issues/2981) for details.
 
 ## Excessive properties in endpoint output
 

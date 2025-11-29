@@ -1,8 +1,14 @@
+import { createRequire } from "node:module";
 import camelize from "camelize-ts";
-import { z } from "zod";
+import { z as zESM } from "zod";
 import { getBrand } from "../src";
 
-describe("Zod Runtime Plugin", () => {
+const { z: zCJS } = createRequire(import.meta.url)("zod");
+
+describe.each<{ variant: string; z: typeof zESM }>([
+  { variant: "ESM", z: zESM },
+  { variant: "CJS", z: zCJS },
+])("Zod Runtime Plugin for $variant package", ({ z }) => {
   describe(".example()", () => {
     test("should be present", () => {
       const schema = z.string();

@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import parser from "@typescript-eslint/parser";
+import { parser } from "typescript-eslint";
 import manifest from "./package.json";
 
 RuleTester.afterAll = afterAll;
@@ -23,53 +23,145 @@ describe("Migration", async () => {
 
   tester.run(ruleName, theRule, {
     valid: [
-      `import {} from "zod";`,
-      `ez.dateIn({ examples: ["1963-04-21"] });`,
-      `ez.dateOut({ examples: ["2021-12-31T00:00:00.000Z"] });`,
-      `schema.meta()?.examples;`,
+      `const routing = { get: someEndpoint };`,
+      `factory.build({ handler: async ({ ctx }) => {} });`,
+      `factory.addContext();`,
+      `new Middleware({ handler: async ({ ctx }) => {} });`,
+      `new ResultHandler({ handler: ({ ctx }) => {} });`,
+      `testMiddleware({ ctx: {} });`,
     ],
     invalid: [
       {
-        code: `import {} from "zod/v4";`,
-        output: `import {} from "zod";`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "import", from: "zod/v4", to: "zod" },
-          },
-        ],
-      },
-      {
-        code: `ez.dateIn({ example: "1963-04-21" });`,
-        output: `ez.dateIn({ examples: ["1963-04-21"] });`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "property", from: "example", to: "examples" },
-          },
-        ],
-      },
-      {
-        code: `ez.dateOut({ example: "2021-12-31T00:00:00.000Z" });`,
-        output: `ez.dateOut({ examples: ["2021-12-31T00:00:00.000Z"] });`,
-        errors: [
-          {
-            messageId: "change",
-            data: { subject: "property", from: "example", to: "examples" },
-          },
-        ],
-      },
-      {
-        code: `getExamples(schema);`,
-        output: `(schema.meta()?.examples || []);`,
+        name: "basic DependsOnMethod",
+        code: `const routing = new DependsOnMethod({ get: someEndpoint });`,
+        output: `const routing = {\nget: someEndpoint,\n};`,
         errors: [
           {
             messageId: "change",
             data: {
-              subject: "method",
-              from: "getExamples()",
-              to: ".meta()?.examples || []",
+              subject: "value",
+              from: "new DependsOnMethod(...)",
+              to: "its argument",
             },
+          },
+        ],
+      },
+      {
+        name: "DependsOnMethod with literals",
+        code: `const routing = new DependsOnMethod({ "get": someEndpoint });`,
+        output: `const routing = {\nget: someEndpoint,\n};`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "value",
+              from: "new DependsOnMethod(...)",
+              to: "its argument",
+            },
+          },
+        ],
+      },
+      {
+        name: "deprecated DependsOnMethod",
+        code: `const routing = new DependsOnMethod({ get: someEndpoint }).deprecated();`,
+        output: `const routing = {\nget: someEndpoint.deprecated(),\n};`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "value",
+              from: "new DependsOnMethod(...)",
+              to: "its argument",
+            },
+          },
+        ],
+      },
+      {
+        name: "DependsOnMethod with nesting",
+        code: `const routing = new DependsOnMethod({ get: someEndpoint }).nest({ some: otherEndpoint });`,
+        output: `const routing = {\nget: someEndpoint,\nsome: otherEndpoint,\n};`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "value",
+              from: "new DependsOnMethod(...)",
+              to: "its argument",
+            },
+          },
+        ],
+      },
+      {
+        name: "DependsOnMethod both deprecated and with nesting",
+        code: `const routing = new DependsOnMethod({ get: someEndpoint }).deprecated().nest({ "get some": otherEndpoint });`,
+        output: `const routing = {\nget: someEndpoint.deprecated(),\n"get some": otherEndpoint,\n};`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "value",
+              from: "new DependsOnMethod(...)",
+              to: "its argument",
+            },
+          },
+        ],
+      },
+      {
+        name: "options in handler",
+        code: `factory.build({ handler: async ({ options }) => { console.log(options); } });`,
+        output: `factory.build({ handler: async ({ ctx }) => { console.log(ctx); } });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "options", to: "ctx" },
+          },
+          {
+            messageId: "change",
+            data: { subject: "const", from: "options", to: "ctx" },
+          },
+        ],
+      },
+      {
+        name: "renamed options in handler",
+        code: `new Middleware({ handler: async ({ options: ttt }) => { console.log(ttt); } });`,
+        output: `new Middleware({ handler: async ({ ctx: ttt }) => { console.log(ttt); } });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "options", to: "ctx" },
+          },
+        ],
+      },
+      {
+        name: "destructed options in handler",
+        code: `new ResultHandler({ handler: ({ options: { method } }) => {} });`,
+        output: `new ResultHandler({ handler: ({ ctx: { method } }) => {} });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "options", to: "ctx" },
+          },
+        ],
+      },
+      {
+        name: "addOptions method",
+        code: `factory.addOptions(() => {});`,
+        output: `factory.addContext(() => {});`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "method", from: "addOptions", to: "addContext" },
+          },
+        ],
+      },
+      {
+        name: "testMiddleware options property",
+        code: `testMiddleware({ options: {} });`,
+        output: `testMiddleware({ ctx: {} });`,
+        errors: [
+          {
+            messageId: "change",
+            data: { subject: "property", from: "options", to: "ctx" },
           },
         ],
       },

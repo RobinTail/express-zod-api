@@ -3,7 +3,6 @@ import createHttpError from "http-errors";
 import { isProduction } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import { ContentType } from "./content-type";
-import { DependsOnMethod } from "./depends-on-method";
 import { Diagnostics } from "./diagnostics";
 import { AbstractEndpoint } from "./endpoint";
 import { CORSMethod, isMethod } from "./method";
@@ -17,9 +16,11 @@ import * as R from "ramda";
  * @example { "v1/books/:bookId": getBookEndpoint }
  * @example { "get /v1/books/:bookId": getBookEndpoint }
  * @example { v1: { "patch /books/:bookId": changeBookEndpoint } }
+ * @example { dependsOnMethod: { get: retrieveEndpoint, post: createEndpoint } }
+ * @see CommonConfig.methodLikeRouteBehavior
  * */
 export interface Routing {
-  [K: string]: Routing | DependsOnMethod | AbstractEndpoint | ServeStatic;
+  [K: string]: Routing | AbstractEndpoint | ServeStatic;
 }
 
 export type Parsers = Partial<Record<ContentType, RequestHandler[]>>;
@@ -77,7 +78,7 @@ const collectSiblings = ({
       familiar.set(path, new Map(config.cors ? [["options", value]] : []));
     familiar.get(path)?.set(method, value);
   };
-  walkRouting({ routing, onEndpoint, onStatic: app.use.bind(app) });
+  walkRouting({ routing, config, onEndpoint, onStatic: app.use.bind(app) });
   return familiar;
 };
 

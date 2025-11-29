@@ -13,11 +13,11 @@ The minimal configuration to apply migrations automatically using `eslint --fix`
 
 ```js
 // eslint.config.mjs
-import parser from "@typescript-eslint/parser";
+import { parser } from "typescript-eslint";
 import migration from "@express-zod-api/migration";
 
 export default [
   { languageOptions: { parser }, plugins: { migration } },
-  { files: ["**/*.ts"], rules: { "migration/v25": "error" } },
+  { files: ["**/*.ts"], rules: { "migration/v26": "error" } },
 ];
 ```

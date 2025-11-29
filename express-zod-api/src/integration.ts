@@ -23,9 +23,11 @@ import { zodToTs } from "./zts";
 import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
 import { ClientMethod } from "./method";
+import type { CommonConfig } from "./config-type";
 
 interface IntegrationParams {
   routing: Routing;
+  config: CommonConfig;
   /**
    * @desc What should be generated
    * @example "types" — types of your endpoint requests and responses (for a DIY solution)
@@ -89,6 +91,7 @@ export class Integration extends IntegrationBase {
 
   public constructor({
     routing,
+    config,
     brandHandling,
     variant = "client",
     clientClassName = "Client",
@@ -154,6 +157,7 @@ export class Integration extends IntegrationBase {
     };
     walkRouting({
       routing,
+      config,
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
     this.#program.unshift(...this.#aliases.values());

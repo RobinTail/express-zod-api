@@ -12,7 +12,7 @@ export const printStartupLogo = (stream: WriteStream) => {
   const thanks = italic(
     "Thank you for choosing Express Zod API for your project.".padStart(132),
   );
-  const dedicationMessage = italic("for Sara".padEnd(20));
+  const dedicationMessage = italic("for Lia".padEnd(20));
 
   const pink = hex("#F5A9B8");
   const blue = hex("#5BCEFA");

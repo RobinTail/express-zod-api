@@ -4,11 +4,12 @@
 
 | Version | Code name     | Release |     Supported      |
 | ------: | :------------ | :------ | :----------------: |
+|  26.x.x | Lia           | 12.2025 | :white_check_mark: |
 |  25.x.x | Sara          | 08.2025 | :white_check_mark: |
 |  24.x.x | Ashley        | 06.2025 | :white_check_mark: |
 |  23.x.x | Sonia         | 04.2025 | :white_check_mark: |
 |  22.x.x | Tai           | 01.2025 | :white_check_mark: |
-|  21.x.x | Kesaria       | 11.2024 | :white_check_mark: |
+|  21.x.x | Kesaria       | 11.2024 |        :x:         |
 |  20.x.x | Zoey          | 06.2024 |        :x:         |
 |  19.x.x | Dime          | 05.2024 |        :x:         |
 |  18.x.x | Victoria      | 04.2024 |        :x:         |
