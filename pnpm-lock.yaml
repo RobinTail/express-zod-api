@@ -11,7 +11,7 @@ catalogs:
       version: 1.8.1
     '@types/express':
       specifier: ^5.0.3
-      version: 5.0.3
+      version: 5.0.5
     '@types/express-fileupload':
       specifier: ^1.5.1
       version: 1.5.1
@@ -188,7 +188,7 @@ importers:
         version: 4.2.0
       node-mocks-http:
         specifier: ^1.17.2
-        version: 1.17.2(@types/express@5.0.3)(@types/node@24.10.1)
+        version: 1.17.2(@types/express@5.0.5)(@types/node@24.10.1)
       openapi3-ts:
         specifier: ^4.5.0
         version: 4.5.0
@@ -207,7 +207,7 @@ importers:
         version: 1.1.37
       '@types/express':
         specifier: catalog:dev
-        version: 5.0.3
+        version: 5.0.5
       '@types/express-fileupload':
         specifier: catalog:dev
         version: 1.5.1
@@ -261,7 +261,7 @@ importers:
     dependencies:
       '@types/express':
         specifier: catalog:dev
-        version: 5.0.3
+        version: 5.0.5
       '@types/express-fileupload':
         specifier: catalog:dev
         version: 1.5.1
@@ -864,11 +864,11 @@ packages:
   '@types/express-fileupload@1.5.1':
     resolution: {integrity: sha512-DllImBVI1lCyjl2klky/TEwk60mbNebgXv1669h66g9TfptWSrEFq5a/raHSutaFzjSm1tmn9ypdNfu4jPSixQ==}
 
-  '@types/express-serve-static-core@5.0.7':
-    resolution: {integrity: sha512-R+33OsgWw7rOhD1emjU7dzCDHucJrgJXMA5PYCzJxVil0dsyx5iBEPHqpPfiKNJQb7lZ1vxwoLR4Z87bBUpeGQ==}
+  '@types/express-serve-static-core@5.1.0':
+    resolution: {integrity: sha512-jnHMsrd0Mwa9Cf4IdOzbz543y4XJepXrbia2T4b6+spXC2We3t1y6K44D3mR8XMFSXMCf3/l7rCgddfx7UNVBA==}
 
-  '@types/express@5.0.3':
-    resolution: {integrity: sha512-wGA0NX93b19/dZC1J18tKWVIYWyyF2ZjT9vin/NRu0qzzvfVzWjs04iq2rQ3H65vCTQYlRqs3YHfY7zjdV+9Kw==}
+  '@types/express@5.0.5':
+    resolution: {integrity: sha512-LuIQOcb6UmnF7C1PCFmEU1u2hmiHL43fgFQX67sN3H4Z+0Yk0Neo++mFsBjhOAuLzvlQeqAAkeDOZrJs9rzumQ==}
 
   '@types/http-errors@2.0.5':
     resolution: {integrity: sha512-r8Tayk8HJnX0FztbZN7oVqGccWgw98T/0neJphO91KkmOzug1KkofZURD4UaD5uH8AqcFLfdPErnBod0u71/qg==}
@@ -894,11 +894,14 @@ packages:
   '@types/range-parser@1.2.7':
     resolution: {integrity: sha512-hKormJbkJqzQGhziax5PItDUTMAM9uE2XXQmM37dyd4hVM+5aVl7oVxMVUiVQn2oCQFN/LKCZdvSM0pFRqbSmQ==}
 
-  '@types/send@0.17.5':
-    resolution: {integrity: sha512-z6F2D3cOStZvuk2SaP6YrwkNO65iTZcwA2ZkSABegdkAh/lf+Aa/YQndZVfmEXT5vgAp6zv06VQ3ejSVjAny4w==}
+  '@types/send@0.17.6':
+    resolution: {integrity: sha512-Uqt8rPBE8SY0RK8JB1EzVOIZ32uqy8HwdxCnoCOsYrvnswqmFZ/k+9Ikidlk/ImhsdvBsloHbAlewb2IEBV/Og==}
 
-  '@types/serve-static@1.15.8':
-    resolution: {integrity: sha512-roei0UY3LhpOJvjbIP6ZZFngyLKl5dskOtDhxY5THRSpO+ZI+nzJ+m5yUMzGrp89YRa7lvknKkMYjqQFGwA7Sg==}
+  '@types/send@1.2.1':
+    resolution: {integrity: sha512-arsCikDvlU99zl1g69TcAB3mzZPpxgw0UQnaHeC1Nwb015xp8bknZv5rIfri9xTOcMuaVgvabfIRA7PSZVuZIQ==}
+
+  '@types/serve-static@1.15.10':
+    resolution: {integrity: sha512-tRs1dB+g8Itk72rlSI2ZrW6vZg0YrLI81iQSTkMmOqnqCaNr/8Ek4VwWcN5vZgCYWbg/JJSGBlUaYGAOP73qBw==}
 
   '@types/swagger-ui-express@4.1.8':
     resolution: {integrity: sha512-AhZV8/EIreHFmBV5wAs0gzJUNq9JbbSXgJLQubCC0jtIo6prnI9MIRRxnU4MZX9RB9yXxF1V4R7jtLl/Wcj31g==}
@@ -2698,7 +2701,7 @@ snapshots:
 
   '@types/compression@1.8.1':
     dependencies:
-      '@types/express': 5.0.3
+      '@types/express': 5.0.5
       '@types/node': 24.10.1
 
   '@types/connect@3.4.38':
@@ -2720,20 +2723,20 @@ snapshots:
   '@types/express-fileupload@1.5.1':
     dependencies:
       '@types/busboy': 1.5.4
-      '@types/express': 5.0.3
+      '@types/express': 5.0.5
 
-  '@types/express-serve-static-core@5.0.7':
+  '@types/express-serve-static-core@5.1.0':
     dependencies:
       '@types/node': 24.10.1
       '@types/qs': 6.14.0
       '@types/range-parser': 1.2.7
-      '@types/send': 0.17.5
+      '@types/send': 1.2.1
 
-  '@types/express@5.0.3':
+  '@types/express@5.0.5':
     dependencies:
       '@types/body-parser': 1.19.6
-      '@types/express-serve-static-core': 5.0.7
-      '@types/serve-static': 1.15.8
+      '@types/express-serve-static-core': 5.1.0
+      '@types/serve-static': 1.15.10
 
   '@types/http-errors@2.0.5': {}
 
@@ -2757,21 +2760,25 @@ snapshots:
 
   '@types/range-parser@1.2.7': {}
 
-  '@types/send@0.17.5':
+  '@types/send@0.17.6':
     dependencies:
       '@types/mime': 1.3.5
       '@types/node': 24.10.1
 
-  '@types/serve-static@1.15.8':
+  '@types/send@1.2.1':
+    dependencies:
+      '@types/node': 24.10.1
+
+  '@types/serve-static@1.15.10':
     dependencies:
       '@types/http-errors': 2.0.5
       '@types/node': 24.10.1
-      '@types/send': 0.17.5
+      '@types/send': 0.17.6
 
   '@types/swagger-ui-express@4.1.8':
     dependencies:
-      '@types/express': 5.0.3
-      '@types/serve-static': 1.15.8
+      '@types/express': 5.0.5
+      '@types/serve-static': 1.15.10
 
   '@typescript-eslint/eslint-plugin@8.0.0(@typescript-eslint/parser@8.0.0(eslint@9.0.0)(typescript@5.1.3))(eslint@9.0.0)(typescript@5.1.3)':
     dependencies:
@@ -3727,7 +3734,7 @@ snapshots:
 
   node-forge@1.3.2: {}
 
-  node-mocks-http@1.17.2(@types/express@5.0.3)(@types/node@24.10.1):
+  node-mocks-http@1.17.2(@types/express@5.0.5)(@types/node@24.10.1):
     dependencies:
       accepts: 1.3.8
       content-disposition: 0.5.4
@@ -3740,7 +3747,7 @@ snapshots:
       range-parser: 1.2.1
       type-is: 1.6.18
     optionalDependencies:
-      '@types/express': 5.0.3
+      '@types/express': 5.0.5
       '@types/node': 24.10.1
 
   object-assign@4.1.1: {}
