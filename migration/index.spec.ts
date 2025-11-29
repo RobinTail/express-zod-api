@@ -108,19 +108,23 @@ describe("Migration", async () => {
       },
       {
         name: "options in handler",
-        code: `factory.build({ handler: async ({ options }) => {} });`,
-        output: `factory.build({ handler: async ({ ctx }) => {} });`,
+        code: `factory.build({ handler: async ({ options }) => { console.log(options); } });`,
+        output: `factory.build({ handler: async ({ ctx }) => { console.log(ctx); } });`,
         errors: [
           {
             messageId: "change",
             data: { subject: "property", from: "options", to: "ctx" },
           },
+          {
+            messageId: "change",
+            data: { subject: "const", from: "options", to: "ctx" },
+          },
         ],
       },
       {
         name: "renamed options in handler",
-        code: `new Middleware({ handler: async ({ options: ttt }) => {} });`,
-        output: `new Middleware({ handler: async ({ ctx: ttt }) => {} });`,
+        code: `new Middleware({ handler: async ({ options: ttt }) => { console.log(ttt); } });`,
+        output: `new Middleware({ handler: async ({ ctx: ttt }) => { console.log(ttt); } });`,
         errors: [
           {
             messageId: "change",

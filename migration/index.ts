@@ -127,6 +127,17 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           data: { subject: "property", from: "options", to: "ctx" },
           fix: (fixer) => fixer.replaceText(node.key, "ctx"),
         });
+        const scope = ctx.sourceCode.getScope(node);
+        const variable = scope.variables.find((one) => one.name === "options");
+        if (!variable) return;
+        for (const ref of variable.references) {
+          ctx.report({
+            node: ref.identifier,
+            messageId: "change",
+            data: { subject: "const", from: ref.identifier.name, to: "ctx" },
+            fix: (fixer) => fixer.replaceText(ref.identifier, "ctx"),
+          });
+        }
       },
       addOptions: (node) => {
         ctx.report({
