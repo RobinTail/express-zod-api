@@ -6,7 +6,7 @@ export default defineConfig({
   fixedExtension: false,
   minify: true,
   skipNodeModulesBundle: true,
-  attw: { profile: "esmOnly", level: "error" },
+  attw: { profile: "esm-only", level: "error" },
   define: {
     "process.env.TSDOWN_VERSION": `"${manifest.version}"`, // used by ruleName
   },
