@@ -47,9 +47,9 @@ export const formatEvent = <E extends EventsMap>(
     .parse({ event, data });
 
 const headersTimeout = 1e4; // 10s to respond with a status code other than 200
-export const ensureStream = (response: Response) =>
-  response.headersSent ||
-  response.writeHead(200, {
+export const ensureStream = (res: Response) =>
+  res.headersSent ||
+  res.writeHead(200, {
     connection: "keep-alive",
     "content-type": contentTypes.sse,
     "cache-control": "no-cache",

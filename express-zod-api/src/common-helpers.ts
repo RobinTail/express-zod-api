@@ -36,10 +36,10 @@ export const routePathParamsRegex = /:([A-Za-z0-9_]+)/g;
 export const getRoutePathParams = (path: string): string[] =>
   path.match(routePathParamsRegex)?.map((param) => param.slice(1)) || [];
 
-const areFilesAvailable = (request: Request): boolean => {
-  const contentType = request.header("content-type") || "";
+const areFilesAvailable = (req: Request): boolean => {
+  const contentType = req.header("content-type") || "";
   const isUpload = contentType.toLowerCase().startsWith(contentTypes.upload);
-  return "files" in request && isUpload;
+  return "files" in req && isUpload;
 };
 
 export const defaultInputSources: InputSources = {
@@ -51,8 +51,8 @@ export const defaultInputSources: InputSources = {
 };
 const fallbackInputSources: InputSource[] = ["body", "query", "params"];
 
-export const getActualMethod = (request: Request) =>
-  request.method.toLowerCase() as SomeMethod;
+export const getActualMethod = (req: Request) =>
+  req.method.toLowerCase() as SomeMethod;
 
 export const getInputSources = (
   actualMethod: SomeMethod,

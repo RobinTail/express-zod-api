@@ -22,7 +22,7 @@ type EquippedRequest = Request<
 >;
 
 /** @desc Returns child logger for the given request (if configured) or the configured logger otherwise */
-export type GetLogger = (request?: Request) => ActualLogger;
+export type GetLogger = (req?: Request) => ActualLogger;
 
 interface HandlerCreatorParams {
   errorHandler: AbstractResultHandler;
@@ -136,8 +136,8 @@ export const createLoggingMiddleware =
 
 export const makeGetLogger =
   (fallback: ActualLogger): GetLogger =>
-  (request) =>
-    (request as EquippedRequest | undefined)?.res?.locals[localsID]?.logger ||
+  (req) =>
+    (req as EquippedRequest | undefined)?.res?.locals[localsID]?.logger ||
     fallback;
 
 export const installDeprecationListener = (logger: ActualLogger) =>

@@ -112,12 +112,12 @@ export class ExpressMiddleware<
 > extends Middleware<FlatObject, RET, string> {
   constructor(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- issue #2824, assignment compatibility fix
-    nativeMw: (request: R, response: S, next: NextFunction) => any,
+    nativeMw: (req: R, res: S, next: NextFunction) => any,
     {
       provider = () => ({}) as RET,
       transformer = (err: Error) => err,
     }: {
-      provider?: (request: R, response: S) => RET | Promise<RET>;
+      provider?: (req: R, res: S) => RET | Promise<RET>;
       transformer?: (err: Error) => Error;
     } = {},
   ) {
