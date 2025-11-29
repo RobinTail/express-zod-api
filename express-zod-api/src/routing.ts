@@ -98,14 +98,14 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
         });
       if (config.cors) {
         // issue #2706, must go before parsers:
-        handlers.unshift(async (request, response, next) => {
-          const logger = getLogger(request);
+        handlers.unshift(async (req, res, next) => {
+          const logger = getLogger(req);
           const defaultHeaders = makeCorsHeaders(accessMethods);
           const headers =
             typeof config.cors === "function"
-              ? await config.cors({ request, endpoint, logger, defaultHeaders })
+              ? await config.cors({ req, endpoint, logger, defaultHeaders })
               : defaultHeaders;
-          response.set(headers);
+          res.set(headers);
           next();
         });
       }

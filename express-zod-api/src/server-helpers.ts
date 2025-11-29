@@ -94,16 +94,16 @@ export const createUploadParsers = async ({
     ...(typeof config.upload === "object" && config.upload),
   };
   const parsers: RequestHandler[] = [];
-  parsers.push(async (request, response, next) => {
-    const logger = getLogger(request);
-    await beforeUpload?.({ request, logger });
+  parsers.push(async (req, res, next) => {
+    const logger = getLogger(req);
+    await beforeUpload?.({ req, logger });
     return uploader({
       debug: true,
       ...options,
       abortOnLimit: false,
       parseNested: true,
       logger: createUploadLogger(logger),
-    })(request, response, next);
+    })(req, res, next);
   });
   if (limitError) parsers.push(createUploadFailureHandler(limitError));
   return parsers;
@@ -127,11 +127,10 @@ export const createLoggingMiddleware =
     logger: ActualLogger;
     config: CommonConfig;
   }): RequestHandler =>
-  async (request, response, next) => {
-    const logger = (await childLoggerProvider?.({ request, parent })) || parent;
-    accessLogger?.(request, logger);
-    if (request.res)
-      (request as EquippedRequest).res!.locals[localsID] = { logger };
+  async (req, res, next) => {
+    const logger = (await childLoggerProvider?.({ req, parent })) || parent;
+    accessLogger?.(req, logger);
+    if (req.res) (req as EquippedRequest).res!.locals[localsID] = { logger };
     next();
   };
 

@@ -142,8 +142,8 @@ describe("App in production mode", async () => {
     formParser: express.urlencoded({ parameterLimit: 2 }),
     rawParser: express.raw({ limit: 20 }),
     upload: {
-      beforeUpload: ({ request }) => {
-        if ("trigger" in request.query) throw new Error("beforeUpload failure");
+      beforeUpload: ({ req }) => {
+        if ("trigger" in req.query) throw new Error("beforeUpload failure");
       },
     },
     beforeRouting: ({ app, getLogger }) => {

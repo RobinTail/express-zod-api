@@ -204,7 +204,7 @@ describe("Server helpers", () => {
       fileUploadMock.mockImplementationOnce(() => internalMw);
       await parsers[0](requestMock, responseMock, nextMock);
       expect(beforeUploadMock).toHaveBeenCalledWith({
-        request: requestMock,
+        req: requestMock,
         logger: loggerMock,
       });
       expect(fileUploadMock).toHaveBeenCalledTimes(1);

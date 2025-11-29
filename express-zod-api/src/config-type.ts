@@ -20,17 +20,17 @@ type Headers = Record<string, string>;
 type HeadersProvider = (params: {
   /** @desc The default headers to be overridden. */
   defaultHeaders: Headers;
-  request: Request;
+  req: Request;
   endpoint: AbstractEndpoint;
   logger: ActualLogger;
 }) => Headers | Promise<Headers>;
 
 type ChildLoggerProvider = (params: {
-  request: Request;
+  req: Request;
   parent: ActualLogger;
 }) => ActualLogger | Promise<ActualLogger>;
 
-type LogAccess = (request: Request, logger: ActualLogger) => void;
+type LogAccess = (req: Request, logger: ActualLogger) => void;
 
 export interface CommonConfig {
   /**
@@ -92,7 +92,7 @@ export interface CommonConfig {
 }
 
 type BeforeUpload = (params: {
-  request: Request;
+  req: Request;
   logger: ActualLogger;
 }) => void | Promise<void>;
 
@@ -117,7 +117,7 @@ type UploadOptions = Pick<
   limitError?: Error;
   /**
    * @desc A handler to execute before uploading — it can be used for restrictions by throwing an error.
-   * @example ({ request }) => { throw createHttpError(403, "Not authorized"); }
+   * @example ({ req }) => { throw createHttpError(403, "Not authorized"); }
    * */
   beforeUpload?: BeforeUpload;
 };
