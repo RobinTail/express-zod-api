@@ -5,8 +5,8 @@ interface $PackerDef<B extends object> extends z.core.$ZodCheckDef {
   bag: B;
 }
 
-interface $PackerInternals<B extends object>
-  extends z.core.$ZodCheckInternals<unknown> {
+interface $PackerInternals<B extends object> extends z.core
+  .$ZodCheckInternals<unknown> {
   def: $PackerDef<B>;
 }
 
