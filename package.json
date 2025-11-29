@@ -23,8 +23,8 @@
     "eslint-plugin-allowed-dependencies": "^2.0.0",
     "eslint-plugin-prettier": "^5.4.1",
     "husky": "^9.0.5",
-    "prettier": "3.7.1",
-    "tsdown": "^0.16.0",
+    "prettier": "3.7.2",
+    "tsdown": "^0.16.8",
     "typescript-eslint": "catalog:dev",
     "unrun": "^0.2.14",
     "vitest": "^4.0.1"
