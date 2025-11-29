@@ -16,9 +16,9 @@ type Handler<IN, CTX, RET> = (params: {
    * */
   ctx: CTX;
   /** @link https://expressjs.com/en/5x/api.html#req */
-  request: Request;
+  req: Request;
   /** @link https://expressjs.com/en/5x/api.html#res */
-  response: Response;
+  res: Response;
   /** @desc The instance of the configured logger */
   logger: ActualLogger;
 }) => Promise<RET>;
@@ -31,8 +31,8 @@ export abstract class AbstractMiddleware {
   public abstract execute(params: {
     input: unknown;
     ctx: FlatObject;
-    request: Request;
-    response: Response;
+    req: Request;
+    res: Response;
     logger: ActualLogger;
   }): Promise<FlatObject>;
 }
@@ -90,8 +90,8 @@ export class Middleware<
   }: {
     input: unknown;
     ctx: CTX;
-    request: Request;
-    response: Response;
+    req: Request;
+    res: Response;
     logger: ActualLogger;
   }) {
     try {
@@ -112,23 +112,23 @@ export class ExpressMiddleware<
 > extends Middleware<FlatObject, RET, string> {
   constructor(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- issue #2824, assignment compatibility fix
-    nativeMw: (request: R, response: S, next: NextFunction) => any,
+    nativeMw: (req: R, res: S, next: NextFunction) => any,
     {
       provider = () => ({}) as RET,
       transformer = (err: Error) => err,
     }: {
-      provider?: (request: R, response: S) => RET | Promise<RET>;
+      provider?: (req: R, res: S) => RET | Promise<RET>;
       transformer?: (err: Error) => Error;
     } = {},
   ) {
     super({
-      handler: async ({ request, response }) =>
+      handler: async ({ req, res }) =>
         new Promise<RET>((resolve, reject) => {
           const next = (err?: unknown) => {
             if (err && err instanceof Error) return reject(transformer(err));
-            resolve(provider(request as R, response as S));
+            resolve(provider(req as R, res as S));
           };
-          nativeMw(request as R, response as S, next)?.catch(next);
+          nativeMw(req as R, res as S, next)?.catch(next);
         }),
     });
   }

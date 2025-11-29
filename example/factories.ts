@@ -21,11 +21,11 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
     positive: { schema: z.string(), mimeType: "image/svg+xml" },
     negative: { schema: z.string(), mimeType: "text/plain" },
-    handler: ({ response, error, output }) => {
-      if (error) return void response.status(400).send(error.message);
+    handler: ({ res, error, output }) => {
+      if (error) return void res.status(400).send(error.message);
       if ("data" in output && typeof output.data === "string")
-        response.type("svg").send(output.data);
-      else response.status(400).send("Data is missing");
+        res.type("svg").send(output.data);
+      else res.status(400).send("Data is missing");
     },
   }),
 );
@@ -35,17 +35,17 @@ export const fileStreamingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
     positive: { schema: ez.buffer(), mimeType: "image/*" },
     negative: { schema: z.string(), mimeType: "text/plain" },
-    handler: async ({ response, error, output, request: { method } }) => {
-      if (error) return void response.status(400).send(error.message);
+    handler: async ({ res, error, output, req: { method } }) => {
+      if (error) return void res.status(400).send(error.message);
       if ("filename" in output && typeof output.filename === "string") {
-        const target = response.attachment(output.filename);
+        const target = res.attachment(output.filename);
         if (method === "HEAD") {
           const { size } = await stat(output.filename);
           return void target.set("Content-Length", `${size}`).end();
         }
         createReadStream(output.filename).pipe(target);
       } else {
-        response.status(400).send("Filename is missing");
+        res.status(400).send("Filename is missing");
       }
     },
   }),
@@ -75,14 +75,14 @@ export const statusDependingFactory = new EndpointsFactory(
         schema: z.object({ status: z.literal("error"), reason: z.string() }),
       },
     ],
-    handler: ({ error, response, output }) => {
+    handler: ({ error, res, output }) => {
       if (error) {
         const httpError = ensureHttpError(error);
         const doesExist =
           httpError.statusCode === 409 &&
           "id" in httpError &&
           typeof httpError.id === "number";
-        return void response
+        return void res
           .status(httpError.statusCode)
           .json(
             doesExist
@@ -90,7 +90,7 @@ export const statusDependingFactory = new EndpointsFactory(
               : { status: "error", reason: httpError.message },
           );
       }
-      response.status(201).json({ status: "created", data: output });
+      res.status(201).json({ status: "created", data: output });
     },
   }),
 );
@@ -100,8 +100,8 @@ export const noContentFactory = new EndpointsFactory(
   new ResultHandler({
     positive: { statusCode: 204, mimeType: null, schema: z.never() },
     negative: { statusCode: 404, mimeType: null, schema: z.never() },
-    handler: ({ error, response }) => {
-      response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
+    handler: ({ error, res }) => {
+      res.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
     },
   }),
 );

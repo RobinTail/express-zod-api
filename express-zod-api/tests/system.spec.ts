@@ -75,8 +75,8 @@ describe("App in production mode", async () => {
       handler: async () => ({ user: { id: 354 } }),
     })
     .addMiddleware({
-      handler: async ({ request, ctx: { user } }) => ({
-        method: request.method.toLowerCase() as Method,
+      handler: async ({ req, ctx: { user } }) => ({
+        method: req.method.toLowerCase() as Method,
         permissions: user.id === 354 ? ["any"] : [],
       }),
     })
@@ -142,8 +142,8 @@ describe("App in production mode", async () => {
     formParser: express.urlencoded({ parameterLimit: 2 }),
     rawParser: express.raw({ limit: 20 }),
     upload: {
-      beforeUpload: ({ request }) => {
-        if ("trigger" in request.query) throw new Error("beforeUpload failure");
+      beforeUpload: ({ req }) => {
+        if ("trigger" in req.query) throw new Error("beforeUpload failure");
       },
     },
     beforeRouting: ({ app, getLogger }) => {

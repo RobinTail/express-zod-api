@@ -14,8 +14,8 @@ describe("Testing", () => {
     test("Should test an endpoint", async () => {
       const endpoint = defaultEndpointsFactory
         .addMiddleware({
-          handler: async ({ response }) => {
-            response
+          handler: async ({ res }) => {
+            res
               .setHeader("X-Some", "header")
               .header("X-Another", "header as well")
               .send("this is just for testing mocked methods");
@@ -81,7 +81,7 @@ describe("Testing", () => {
       new ResultHandler({
         positive: [],
         negative: [],
-        handler: ({ error, response }) => void response.end(error!.message),
+        handler: ({ error, res }) => void res.end(error!.message),
       }),
     ])(
       "Issue #2153: should catch errors using errorHandler %#",

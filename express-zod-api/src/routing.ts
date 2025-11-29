@@ -92,20 +92,20 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
     for (const [method, [matchingParsers, endpoint]] of methods) {
       const handlers = matchingParsers
         .slice() // must be immutable
-        .concat(async (request, response) => {
-          const logger = getLogger(request);
-          return endpoint.execute({ request, response, logger, config });
+        .concat(async (req, res) => {
+          const logger = getLogger(req);
+          return endpoint.execute({ req, res, logger, config });
         });
       if (config.cors) {
         // issue #2706, must go before parsers:
-        handlers.unshift(async (request, response, next) => {
-          const logger = getLogger(request);
+        handlers.unshift(async (req, res, next) => {
+          const logger = getLogger(req);
           const defaultHeaders = makeCorsHeaders(accessMethods);
           const headers =
             typeof config.cors === "function"
-              ? await config.cors({ request, endpoint, logger, defaultHeaders })
+              ? await config.cors({ req, endpoint, logger, defaultHeaders })
               : defaultHeaders;
-          response.set(headers);
+          res.set(headers);
           next();
         });
       }

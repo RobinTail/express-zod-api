@@ -89,8 +89,8 @@ describe("Server helpers", () => {
       );
       expect(spy.mock.calls[0][0].input).toBeNull();
       expect(spy.mock.calls[0][0].output).toBeNull();
-      expect(spy.mock.calls[0][0].request).toEqual(requestMock);
-      expect(spy.mock.calls[0][0].response).toEqual(responseMock);
+      expect(spy.mock.calls[0][0].req).toEqual(requestMock);
+      expect(spy.mock.calls[0][0].res).toEqual(responseMock);
     });
 
     test.each([() => fail("I am faulty"), () => Promise.reject("I am faulty")])(
@@ -204,7 +204,7 @@ describe("Server helpers", () => {
       fileUploadMock.mockImplementationOnce(() => internalMw);
       await parsers[0](requestMock, responseMock, nextMock);
       expect(beforeUploadMock).toHaveBeenCalledWith({
-        request: requestMock,
+        req: requestMock,
         logger: loggerMock,
       });
       expect(fileUploadMock).toHaveBeenCalledTimes(1);

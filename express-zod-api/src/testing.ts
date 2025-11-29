@@ -107,8 +107,8 @@ export const testEndpoint = async <
   const { requestMock, responseMock, loggerMock, configMock } =
     makeTestingMocks(rest);
   await endpoint.execute({
-    request: requestMock,
-    response: responseMock,
+    req: requestMock,
+    res: responseMock,
     config: configMock as CommonConfig,
     logger: loggerMock as ActualLogger,
   });
@@ -136,8 +136,8 @@ export const testMiddleware = async <
   } = makeTestingMocks(rest);
   const input = getInput(requestMock, inputSources);
   const commons = {
-    request: requestMock,
-    response: responseMock,
+    req: requestMock,
+    res: responseMock,
     logger: loggerMock,
     input,
     ctx,

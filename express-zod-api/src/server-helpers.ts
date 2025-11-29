@@ -22,7 +22,7 @@ type EquippedRequest = Request<
 >;
 
 /** @desc Returns child logger for the given request (if configured) or the configured logger otherwise */
-export type GetLogger = (request?: Request) => ActualLogger;
+export type GetLogger = (req?: Request) => ActualLogger;
 
 interface HandlerCreatorParams {
   errorHandler: AbstractResultHandler;
@@ -31,31 +31,28 @@ interface HandlerCreatorParams {
 
 export const createCatcher =
   ({ errorHandler, getLogger }: HandlerCreatorParams): ErrorRequestHandler =>
-  async (error, request, response, next) => {
+  async (error, req, res, next) => {
     if (!error) return next();
     return errorHandler.execute({
       error: ensureError(error),
-      request,
-      response,
+      req,
+      res,
       input: null,
       output: null,
       ctx: {},
-      logger: getLogger(request),
+      logger: getLogger(req),
     });
   };
 
 export const createNotFoundHandler =
   ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
-  async (request, response) => {
-    const error = createHttpError(
-      404,
-      `Can not ${request.method} ${request.path}`,
-    );
-    const logger = getLogger(request);
+  async (req, res) => {
+    const error = createHttpError(404, `Can not ${req.method} ${req.path}`);
+    const logger = getLogger(req);
     try {
       await errorHandler.execute({
-        request,
-        response,
+        req,
+        res,
         logger,
         error,
         input: null,
@@ -64,7 +61,7 @@ export const createNotFoundHandler =
       });
     } catch (e) {
       lastResortHandler({
-        response,
+        res,
         logger,
         error: new ResultHandlerError(ensureError(e), error),
       });
@@ -97,16 +94,16 @@ export const createUploadParsers = async ({
     ...(typeof config.upload === "object" && config.upload),
   };
   const parsers: RequestHandler[] = [];
-  parsers.push(async (request, response, next) => {
-    const logger = getLogger(request);
-    await beforeUpload?.({ request, logger });
+  parsers.push(async (req, res, next) => {
+    const logger = getLogger(req);
+    await beforeUpload?.({ req, logger });
     return uploader({
       debug: true,
       ...options,
       abortOnLimit: false,
       parseNested: true,
       logger: createUploadLogger(logger),
-    })(request, response, next);
+    })(req, res, next);
   });
   if (limitError) parsers.push(createUploadFailureHandler(limitError));
   return parsers;
@@ -130,18 +127,17 @@ export const createLoggingMiddleware =
     logger: ActualLogger;
     config: CommonConfig;
   }): RequestHandler =>
-  async (request, response, next) => {
-    const logger = (await childLoggerProvider?.({ request, parent })) || parent;
-    accessLogger?.(request, logger);
-    if (request.res)
-      (request as EquippedRequest).res!.locals[localsID] = { logger };
+  async (req, res, next) => {
+    const logger = (await childLoggerProvider?.({ req, parent })) || parent;
+    accessLogger?.(req, logger);
+    if (req.res) (req as EquippedRequest).res!.locals[localsID] = { logger };
     next();
   };
 
 export const makeGetLogger =
   (fallback: ActualLogger): GetLogger =>
-  (request) =>
-    (request as EquippedRequest | undefined)?.res?.locals[localsID]?.logger ||
+  (req) =>
+    (req as EquippedRequest | undefined)?.res?.locals[localsID]?.logger ||
     fallback;
 
 export const installDeprecationListener = (logger: ActualLogger) =>
