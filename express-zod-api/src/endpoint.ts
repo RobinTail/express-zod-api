@@ -49,8 +49,8 @@ export abstract class AbstractEndpoint {
   /** @desc Marks the route as deprecated (makes a copy of the endpoint) */
   public abstract deprecated(): this;
   public abstract execute(params: {
-    request: Request;
-    response: Response;
+    req: Request;
+    res: Response;
     logger: ActualLogger;
     config: CommonConfig;
   }): Promise<void>;
@@ -215,13 +215,13 @@ export class Endpoint<
     method,
     logger,
     ctx,
-    response,
+    res,
     ...rest
   }: {
     method: SomeMethod;
     input: Readonly<FlatObject>; // Issue #673: input is immutable, since this.inputSchema is combined with ones of middlewares
-    request: Request;
-    response: Response;
+    req: Request;
+    res: Response;
     logger: ActualLogger;
     ctx: Partial<CTX>;
   }) {
@@ -231,8 +231,8 @@ export class Endpoint<
         !(mw instanceof ExpressMiddleware)
       )
         continue;
-      Object.assign(ctx, await mw.execute({ ...rest, ctx, response, logger }));
-      if (response.writableEnded) {
+      Object.assign(ctx, await mw.execute({ ...rest, ctx, res, logger }));
+      if (res.writableEnded) {
         logger.warn(
           "A middleware has closed the stream. Accumulated context:",
           ctx,
@@ -263,8 +263,8 @@ export class Endpoint<
 
   async #handleResult(
     params: DiscriminatedResult & {
-      request: Request;
-      response: Response;
+      req: Request;
+      res: Response;
       logger: ActualLogger;
       input: FlatObject;
       ctx: Partial<CTX>;
@@ -284,32 +284,25 @@ export class Endpoint<
   }
 
   public override async execute({
-    request,
-    response,
+    req,
+    res,
     logger,
     config,
   }: {
-    request: Request;
-    response: Response;
+    req: Request;
+    res: Response;
     logger: ActualLogger;
     config: CommonConfig;
   }) {
-    const method = getActualMethod(request);
+    const method = getActualMethod(req);
     const ctx: Partial<CTX> = {};
     let result: DiscriminatedResult = { output: {}, error: null };
-    const input = getInput(request, config.inputSources);
+    const input = getInput(req, config.inputSources);
     try {
-      await this.#runMiddlewares({
-        method,
-        input,
-        request,
-        response,
-        logger,
-        ctx,
-      });
-      if (response.writableEnded) return;
+      await this.#runMiddlewares({ method, input, req, res, logger, ctx });
+      if (res.writableEnded) return;
       if (method === ("options" satisfies CORSMethod))
-        return void response.status(200).end();
+        return void res.status(200).end();
       result = {
         output: await this.#parseOutput(
           await this.#parseAndRunHandler({
@@ -323,13 +316,6 @@ export class Endpoint<
     } catch (e) {
       result = { output: null, error: ensureError(e) };
     }
-    await this.#handleResult({
-      ...result,
-      input,
-      request,
-      response,
-      logger,
-      ctx,
-    });
+    await this.#handleResult({ ...result, input, req, res, logger, ctx });
   }
 }

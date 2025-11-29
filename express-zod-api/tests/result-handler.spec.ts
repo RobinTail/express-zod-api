@@ -27,11 +27,11 @@ describe("ResultHandler", () => {
           { statusCode: 400, schema: z.literal("error") },
           { statusCode: 500, schema: z.literal("failure") },
         ],
-        handler: ({ response }) => {
-          expectTypeOf(response).toEqualTypeOf<
+        handler: ({ res }) => {
+          expectTypeOf(res).toEqualTypeOf<
             Response<"ok" | "kinda" | "error" | "failure">
           >();
-          response.status(200).send("error");
+          res.status(200).send("error");
         },
       });
       expect(subject).toBeInstanceOf(AbstractResultHandler);
@@ -88,8 +88,8 @@ describe("ResultHandler", () => {
         error,
         input: { something: 453 },
         output: null,
-        request: requestMock,
-        response: responseMock,
+        req: requestMock,
+        res: responseMock,
         logger: loggerMock,
         ctx: {},
       });
@@ -124,8 +124,8 @@ describe("ResultHandler", () => {
         input: { something: 453 },
         output: null,
         ctx: {},
-        request: requestMock,
-        response: responseMock,
+        req: requestMock,
+        res: responseMock,
         logger: loggerMock,
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
@@ -149,8 +149,8 @@ describe("ResultHandler", () => {
         input: { something: 453 },
         output: null,
         ctx: {},
-        request: requestMock,
-        response: responseMock,
+        req: requestMock,
+        res: responseMock,
         logger: loggerMock,
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
@@ -174,8 +174,8 @@ describe("ResultHandler", () => {
         input: { something: 453 },
         output: { anything: 118, items: ["One", "Two", "Three"] },
         ctx: {},
-        request: requestMock,
-        response: responseMock,
+        req: requestMock,
+        res: responseMock,
         logger: loggerMock,
       });
       expect(loggerMock._getLogs().error).toHaveLength(0);
@@ -227,8 +227,8 @@ describe("ResultHandler", () => {
         input: { something: 453 },
         output: { anything: 118 },
         ctx: {},
-        request: requestMock,
-        response: responseMock,
+        req: requestMock,
+        res: responseMock,
         logger: loggerMock,
       }),
     ).toThrowError(

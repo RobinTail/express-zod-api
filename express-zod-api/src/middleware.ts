@@ -16,9 +16,9 @@ type Handler<IN, CTX, RET> = (params: {
    * */
   ctx: CTX;
   /** @link https://expressjs.com/en/5x/api.html#req */
-  request: Request;
+  req: Request;
   /** @link https://expressjs.com/en/5x/api.html#res */
-  response: Response;
+  res: Response;
   /** @desc The instance of the configured logger */
   logger: ActualLogger;
 }) => Promise<RET>;
@@ -31,8 +31,8 @@ export abstract class AbstractMiddleware {
   public abstract execute(params: {
     input: unknown;
     ctx: FlatObject;
-    request: Request;
-    response: Response;
+    req: Request;
+    res: Response;
     logger: ActualLogger;
   }): Promise<FlatObject>;
 }
@@ -90,8 +90,8 @@ export class Middleware<
   }: {
     input: unknown;
     ctx: CTX;
-    request: Request;
-    response: Response;
+    req: Request;
+    res: Response;
     logger: ActualLogger;
   }) {
     try {
@@ -122,13 +122,13 @@ export class ExpressMiddleware<
     } = {},
   ) {
     super({
-      handler: async ({ request, response }) =>
+      handler: async ({ req, res }) =>
         new Promise<RET>((resolve, reject) => {
           const next = (err?: unknown) => {
             if (err && err instanceof Error) return reject(transformer(err));
-            resolve(provider(request as R, response as S));
+            resolve(provider(req as R, res as S));
           };
-          nativeMw(request as R, response as S, next)?.catch(next);
+          nativeMw(req as R, res as S, next)?.catch(next);
         }),
     });
   }

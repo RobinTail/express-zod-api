@@ -24,8 +24,8 @@ type Handler<RES = unknown> = (
     input: FlatObject | null;
     /** can be empty: check presence of the required property using "in" operator */
     ctx: FlatObject;
-    request: Request;
-    response: Response<RES>;
+    req: Request;
+    res: Response<RES>;
     logger: ActualLogger;
   },
 ) => void | Promise<void>;
@@ -122,11 +122,11 @@ export const defaultResultHandler = new ResultHandler({
     return responseSchema;
   },
   negative: defaultNegativeSchema,
-  handler: ({ error, input, output, request, response, logger }) => {
+  handler: ({ error, input, output, req, res, logger }) => {
     if (error) {
       const httpError = ensureHttpError(error);
-      logServerError(httpError, logger, request, input);
-      return void response
+      logServerError(httpError, logger, req, input);
+      return void res
         .status(httpError.statusCode)
         .set(httpError.headers)
         .json({
@@ -134,7 +134,7 @@ export const defaultResultHandler = new ResultHandler({
           error: { message: getPublicErrorMessage(httpError) },
         });
     }
-    response
+    res
       .status(defaultStatusCodes.positive)
       .json({ status: "success", data: output });
   },
@@ -180,20 +180,17 @@ export const arrayResultHandler = new ResultHandler({
     return responseSchema;
   },
   negative: { schema: arrayNegativeSchema, mimeType: "text/plain" },
-  handler: ({ response, output, error, logger, request, input }) => {
+  handler: ({ res, output, error, logger, req, input }) => {
     if (error) {
       const httpError = ensureHttpError(error);
-      logServerError(httpError, logger, request, input);
-      return void response
+      logServerError(httpError, logger, req, input);
+      return void res
         .status(httpError.statusCode)
         .type("text/plain")
         .send(getPublicErrorMessage(httpError));
     }
-    if ("items" in output && Array.isArray(output.items)) {
-      return void response
-        .status(defaultStatusCodes.positive)
-        .json(output.items);
-    }
+    if ("items" in output && Array.isArray(output.items))
+      return void res.status(defaultStatusCodes.positive).json(output.items);
     throw new Error("Property 'items' is missing in the endpoint output");
   },
 });

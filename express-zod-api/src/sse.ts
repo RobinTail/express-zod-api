@@ -57,26 +57,26 @@ export const ensureStream = (response: Response) =>
 
 export const makeMiddleware = <E extends EventsMap>(events: E) =>
   new Middleware({
-    handler: async ({ request, response }): Promise<Emitter<E>> => {
+    handler: async ({ req, res }): Promise<Emitter<E>> => {
       const controller = new AbortController();
 
-      request.once("close", () => {
+      req.once("close", () => {
         controller.abort();
       });
 
-      setTimeout(() => ensureStream(response), headersTimeout);
+      setTimeout(() => ensureStream(res), headersTimeout);
 
       return {
-        isClosed: () => response.writableEnded || response.closed,
+        isClosed: () => res.writableEnded || res.closed,
         signal: controller.signal,
         emit: (event, data) => {
-          ensureStream(response);
-          response.write(formatEvent(events, event, data), "utf-8");
+          ensureStream(res);
+          res.write(formatEvent(events, event, data), "utf-8");
           /**
            * Issue 2347: flush is the method of compression, it must be called only when compression is enabled
            * @link https://github.com/RobinTail/express-zod-api/issues/2347
            * */
-          response.flush?.();
+          res.flush?.();
         },
       };
     },
@@ -96,18 +96,18 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
       };
     },
     negative: { mimeType: "text/plain", schema: z.string() },
-    handler: async ({ response, error, logger, request, input }) => {
+    handler: async ({ res, error, logger, req, input }) => {
       if (error) {
         const httpError = ensureHttpError(error);
-        logServerError(httpError, logger, request, input);
-        if (!response.headersSent) {
-          response
+        logServerError(httpError, logger, req, input);
+        if (!res.headersSent) {
+          res
             .status(httpError.statusCode)
             .type("text/plain")
             .write(getPublicErrorMessage(httpError), "utf-8");
         }
       }
-      response.end();
+      res.end();
     },
   });
 

@@ -27,11 +27,7 @@ describe("Last Resort Handler", () => {
           cause,
           new Error("what went wrong before"),
         );
-        lastResortHandler({
-          error,
-          logger: loggerMock,
-          response: responseMock,
-        });
+        lastResortHandler({ error, logger: loggerMock, res: responseMock });
         expect(loggerMock._getLogs().error).toEqual([
           ["Result handler failure", error],
         ]);

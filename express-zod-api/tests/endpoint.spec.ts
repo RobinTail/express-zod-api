@@ -74,8 +74,8 @@ describe("Endpoint", () => {
         ctx: {
           inc: 454, // due to reassignment
         },
-        request: requestMock,
-        response: responseMock,
+        req: requestMock,
+        res: responseMock,
         logger: loggerMock,
       });
       expect(handlerMock).toHaveBeenCalledTimes(1);
@@ -91,8 +91,8 @@ describe("Endpoint", () => {
         logger: loggerMock,
         ctx: { inc: 454 },
         output: { inc2: 455, str: "453.00", transform: 4 },
-        request: requestMock,
-        response: responseMock,
+        req: requestMock,
+        res: responseMock,
       });
       expect(responseMock._getStatusCode()).toBe(200);
       expect(responseMock._getJSONData()).toEqual({
@@ -182,8 +182,8 @@ describe("Endpoint", () => {
     test("Should handle middleware closing the response stream", async () => {
       const middlewareMock = vi
         .fn()
-        .mockImplementationOnce(async ({ input, response }) => {
-          response.end("to hell with all that!");
+        .mockImplementationOnce(async ({ input, res }) => {
+          res.end("to hell with all that!");
           return { inc: input.n + 1 };
         });
       const factory = defaultEndpointsFactory.addMiddleware({
@@ -242,8 +242,8 @@ describe("Endpoint", () => {
         input: {},
         ctx: {},
         output: { test: "OK" },
-        request: requestMock,
-        response: responseMock,
+        req: requestMock,
+        res: responseMock,
       });
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getHeaders()).toHaveProperty(

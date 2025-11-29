@@ -47,8 +47,8 @@ describe("Middleware", () => {
           input: { test: 123 },
           ctx: {},
           logger: makeLoggerMock(),
-          request: makeRequestMock(),
-          response: makeResponseMock(),
+          req: makeRequestMock(),
+          res: makeResponseMock(),
         }),
       ).rejects.toThrow(InputValidationError);
     });
@@ -67,16 +67,16 @@ describe("Middleware", () => {
           input: { test: "something" },
           ctx: { one: "anything " },
           logger: loggerMock,
-          request: requestMock,
-          response: responseMock,
+          req: requestMock,
+          res: responseMock,
         }),
       ).toEqual({ result: "test" });
       expect(handlerMock).toHaveBeenCalledWith({
         input: { test: "something" },
         ctx: { one: "anything " },
         logger: loggerMock,
-        request: requestMock,
-        response: responseMock,
+        req: requestMock,
+        res: responseMock,
       });
     });
   });

@@ -31,31 +31,28 @@ interface HandlerCreatorParams {
 
 export const createCatcher =
   ({ errorHandler, getLogger }: HandlerCreatorParams): ErrorRequestHandler =>
-  async (error, request, response, next) => {
+  async (error, req, res, next) => {
     if (!error) return next();
     return errorHandler.execute({
       error: ensureError(error),
-      request,
-      response,
+      req,
+      res,
       input: null,
       output: null,
       ctx: {},
-      logger: getLogger(request),
+      logger: getLogger(req),
     });
   };
 
 export const createNotFoundHandler =
   ({ errorHandler, getLogger }: HandlerCreatorParams): RequestHandler =>
-  async (request, response) => {
-    const error = createHttpError(
-      404,
-      `Can not ${request.method} ${request.path}`,
-    );
-    const logger = getLogger(request);
+  async (req, res) => {
+    const error = createHttpError(404, `Can not ${req.method} ${req.path}`);
+    const logger = getLogger(req);
     try {
       await errorHandler.execute({
-        request,
-        response,
+        req,
+        res,
         logger,
         error,
         input: null,
@@ -64,7 +61,7 @@ export const createNotFoundHandler =
       });
     } catch (e) {
       lastResortHandler({
-        response,
+        res,
         logger,
         error: new ResultHandlerError(ensureError(e), error),
       });

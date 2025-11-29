@@ -7,13 +7,13 @@ import { getPublicErrorMessage } from "./result-helpers";
 interface LastResortHandlerParams {
   error: ResultHandlerError;
   logger: ActualLogger;
-  response: Response;
+  res: Response;
 }
 
 export const lastResortHandler = ({
   error,
   logger,
-  response,
+  res,
 }: LastResortHandlerParams) => {
   logger.error("Result handler failure", error);
   const message = getPublicErrorMessage(
@@ -24,5 +24,5 @@ export const lastResortHandler = ({
       { expose: isHttpError(error.cause) ? error.cause.expose : false }, // retain the cause exposition setting
     ),
   );
-  response.status(500).type("text/plain").end(message);
+  res.status(500).type("text/plain").end(message);
 };

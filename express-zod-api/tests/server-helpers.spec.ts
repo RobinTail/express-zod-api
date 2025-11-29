@@ -89,8 +89,8 @@ describe("Server helpers", () => {
       );
       expect(spy.mock.calls[0][0].input).toBeNull();
       expect(spy.mock.calls[0][0].output).toBeNull();
-      expect(spy.mock.calls[0][0].request).toEqual(requestMock);
-      expect(spy.mock.calls[0][0].response).toEqual(responseMock);
+      expect(spy.mock.calls[0][0].req).toEqual(requestMock);
+      expect(spy.mock.calls[0][0].res).toEqual(responseMock);
     });
 
     test.each([() => fail("I am faulty"), () => Promise.reject("I am faulty")])(

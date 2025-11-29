@@ -23,7 +23,7 @@ export const authMiddleware = new Middleware({
 });
 
 export const methodProviderMiddleware = new Middleware({
-  handler: async ({ request }) => ({
-    method: request.method.toLowerCase() as Method,
+  handler: async ({ req }) => ({
+    method: req.method.toLowerCase() as Method,
   }),
 });

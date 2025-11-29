@@ -92,9 +92,9 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
     for (const [method, [matchingParsers, endpoint]] of methods) {
       const handlers = matchingParsers
         .slice() // must be immutable
-        .concat(async (request, response) => {
-          const logger = getLogger(request);
-          return endpoint.execute({ request, response, logger, config });
+        .concat(async (req, res) => {
+          const logger = getLogger(req);
+          return endpoint.execute({ req, res, logger, config });
         });
       if (config.cors) {
         // issue #2706, must go before parsers:

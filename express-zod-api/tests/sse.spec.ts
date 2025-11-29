@@ -129,13 +129,13 @@ describe("SSE", () => {
         const commons = {
           input: {},
           ctx: {},
-          request: makeRequestMock(),
+          req: makeRequestMock(),
           logger: makeLoggerMock(),
         };
         resultHandler.execute({
           ...commons,
           output: {},
-          response: positiveResponse,
+          res: positiveResponse,
           error: null,
         });
         expect(positiveResponse.statusCode).toBe(200);
@@ -145,7 +145,7 @@ describe("SSE", () => {
         resultHandler.execute({
           ...commons,
           output: null,
-          response: negativeResponse,
+          res: negativeResponse,
           error: new Error("failure"),
         });
         expect(negativeResponse.statusCode).toBe(500);
