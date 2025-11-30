@@ -46,7 +46,7 @@ const processEntries = (
   return Object.entries(subject).map<[string, Routing[string], Method?]>(
     ([_key, item]) => {
       const [segment, method] =
-        isMethod(_key) && preferMethod && item instanceof AbstractEndpoint
+        preferMethod && isMethod(_key) && item instanceof AbstractEndpoint
           ? ["/", _key]
           : detachMethod(_key);
       const path = [parent || ""].concat(trimPath(segment) || []).join("/");
