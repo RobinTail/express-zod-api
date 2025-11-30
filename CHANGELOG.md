@@ -40,6 +40,10 @@
 
 ## Version 25
 
+### v25.6.1
+
+- Technical update before v26: no significant changes.
+
 ### v25.6.0
 
 - Added `afterRouting` hook to server configuration:
