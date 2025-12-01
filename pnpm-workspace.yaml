@@ -58,7 +58,7 @@ catalogs:
     "@typescript-eslint/rule-tester": "^8.46.1"
     "camelize-ts": "^3.0.0"
     "compression": "^1.8.0"
-    "express": "^5.1.0"
+    "express": "^5.2.0"
     "express-fileupload": "^1.5.1"
     "http-errors": "^2.0.1"
     "typescript": "^5.9.2"
