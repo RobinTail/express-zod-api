@@ -1,6 +1,6 @@
 {
   "name": "@express-zod-api/zod-plugin",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0",
   "license": "MIT",
   "description": "Zod plugin for express-zod-api",
   "sideEffects": true,
