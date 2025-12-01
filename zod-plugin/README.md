@@ -18,7 +18,7 @@ This module extends Zod functionality when it's imported:
 
 ## Requirements
 
-- Zod `^4.0.0`
+- Zod `^4.1.13`
 
 ## Basic usage
 

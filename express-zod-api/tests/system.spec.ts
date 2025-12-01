@@ -35,7 +35,7 @@ describe("App in production mode", async () => {
     )
     .build({
       output: z.object({ corsDone: z.boolean() }),
-      handler: async ({ options: { corsDone } }) => ({ corsDone }),
+      handler: async ({ ctx: { corsDone } }) => ({ corsDone }),
     });
   const faultyResultHandler = new ResultHandler({
     positive: z.object({}),
@@ -75,7 +75,7 @@ describe("App in production mode", async () => {
       handler: async () => ({ user: { id: 354 } }),
     })
     .addMiddleware({
-      handler: async ({ request, options: { user } }) => ({
+      handler: async ({ request, ctx: { user } }) => ({
         method: request.method.toLowerCase() as Method,
         permissions: user.id === 354 ? ["any"] : [],
       }),
@@ -86,7 +86,7 @@ describe("App in production mode", async () => {
       output: z.looseObject({ anything: z.number().positive() }), // allow excessive keys
       handler: async ({
         input: { key, something },
-        options: { user, permissions, method },
+        ctx: { user, permissions, method },
       }) => {
         // Problem 787: should lead to ZodError that is NOT considered as the IOSchema validation error
         if (something === "internal_zod_error") z.number().parse("");

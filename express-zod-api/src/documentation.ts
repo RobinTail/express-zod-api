@@ -262,6 +262,7 @@ export class Documentation extends OpenApiBuilder {
     };
     walkRouting({
       routing,
+      config,
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
     if (tags) this.rootDoc.tags = depictTags(tags);

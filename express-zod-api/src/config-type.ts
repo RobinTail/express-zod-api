@@ -47,6 +47,14 @@ export interface CommonConfig {
    * */
   wrongMethodBehavior?: 404 | 405;
   /**
+   * @desc How to treat Routing keys that look like methods (when assigned with an Endpoint)
+   * @see Method
+   * @example "method" — the key is treated as method of its parent path
+   * @example "path" — the key is treated as a nested path segment
+   * @default "method"
+   * */
+  methodLikeRouteBehavior?: "method" | "path";
+  /**
    * @desc The ResultHandler to use for handling routing, parsing and upload errors
    * @default defaultResultHandler
    * @see defaultResultHandler
