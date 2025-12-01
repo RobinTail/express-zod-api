@@ -6,7 +6,6 @@ import {
 } from "./express-mock";
 import { z } from "zod";
 import {
-  DependsOnMethod,
   EndpointsFactory,
   Routing,
   ServeStatic,
@@ -40,6 +39,7 @@ describe("Routing", () => {
           cors: true,
           startupLogo: false,
           wrongMethodBehavior,
+          methodLikeRouteBehavior: "path" as const,
         };
         const factory = new EndpointsFactory(defaultResultHandler);
         const getEndpoint = factory.build({
@@ -59,7 +59,7 @@ describe("Routing", () => {
         const routing: Routing = {
           v1: {
             user: {
-              get: getEndpoint,
+              get: getEndpoint, // should be treated as a path
               set: postEndpoint,
               universal: getAndPostEndpoint,
             },
@@ -109,7 +109,7 @@ describe("Routing", () => {
       expect(appMock.use).toHaveBeenCalledWith("/public", staticHandler);
     });
 
-    test("Should accept DependsOnMethod", () => {
+    test("Should handle method depending assignments", () => {
       const handlerMock = vi.fn();
       const factory = new EndpointsFactory(defaultResultHandler);
       const getEndpoint = factory.build({
@@ -126,12 +126,12 @@ describe("Routing", () => {
       });
       const routing: Routing = {
         v1: {
-          user: new DependsOnMethod({
+          user: {
             get: getEndpoint,
             post: postEndpoint,
             put: putAndPatchEndpoint,
             patch: putAndPatchEndpoint,
-          }),
+          },
         },
       };
       const logger = makeLoggerMock();
@@ -154,7 +154,7 @@ describe("Routing", () => {
       expect(appMock.options.mock.calls[0][0]).toBe("/v1/user");
     });
 
-    test("Should check if endpoint supports the method it's assigned to within DependsOnMethod", () => {
+    test("Should check if endpoint supports the method it's assigned to", () => {
       const factory = new EndpointsFactory(defaultResultHandler);
       const putAndPatchEndpoint = factory.build({
         method: ["put", "patch"],
@@ -163,11 +163,11 @@ describe("Routing", () => {
       });
       const routing: Routing = {
         v1: {
-          user: new DependsOnMethod({
+          user: {
             put: putAndPatchEndpoint,
             patch: putAndPatchEndpoint,
             post: putAndPatchEndpoint, // intentional
-          }),
+          },
         },
       };
       const logger = makeLoggerMock();
@@ -181,7 +181,7 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
-    test("Issue 705: should set all DependsOnMethod' methods for CORS", async () => {
+    test("Issue 705: should set all assigned methods to CORS response header", async () => {
       const handler = vi.fn(async () => ({}));
       const configMock = {
         cors: (params: { defaultHeaders: Record<string, string> }) => ({
@@ -208,12 +208,12 @@ describe("Routing", () => {
         handler,
       });
       const routing: Routing = {
-        hello: new DependsOnMethod({
+        hello: {
           get: getEndpoint,
           post: postEndpoint,
           put: putAndPatchEndpoint,
           patch: putAndPatchEndpoint,
-        }),
+        },
       };
       const logger = makeLoggerMock();
       initRouting({
@@ -408,7 +408,7 @@ describe("Routing", () => {
       ).toThrowErrorMatchingSnapshot();
     });
 
-    test("Should prohibit DependsOnMethod for a route having explicit method", () => {
+    test("Should prohibit nesting for a route having explicit method", () => {
       const logger = makeLoggerMock();
       expect(() =>
         initRouting({
@@ -417,7 +417,7 @@ describe("Routing", () => {
           config: { cors: false },
           routing: {
             v1: {
-              "get /user/retrieve": new DependsOnMethod({}),
+              "get /user/retrieve": {},
             },
           },
         }),
@@ -501,7 +501,7 @@ describe("Routing", () => {
       ).toHaveLength(0);
       expect(handlerMock).toHaveBeenCalledWith({
         input: { test: 123 },
-        options: {},
+        ctx: {},
         logger: getLoggerMock.mock.results.pop()!.value,
       });
       expect(responseMock._getStatusCode()).toBe(200);

@@ -14,7 +14,6 @@ export {
   defaultResultHandler,
   arrayResultHandler,
 } from "./result-handler";
-export { DependsOnMethod } from "./depends-on-method";
 export { ServeStatic } from "./serve-static";
 export { createServer, attachRouting } from "./server";
 export { Documentation } from "./documentation";
