@@ -70,7 +70,7 @@ const collectSiblings = ({
   const doc = isProduction() ? undefined : new Diagnostics(getLogger());
   const familiar = new Map<string, Siblings>();
   const onEndpoint: OnEndpoint = (method, path, endpoint) => {
-    doc?.check(endpoint, { method }, path);
+    doc?.check(method, path, endpoint);
     const matchingParsers = parsers?.[endpoint.requestType] || [];
     const value = R.pair(matchingParsers, endpoint);
     if (!familiar.has(path))

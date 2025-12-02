@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { responseVariants } from "./api-response";
-import { FlatObject, getRoutePathParams } from "./common-helpers";
+import { getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { findJsonIncompatible } from "./deep-checks";
 import { AbstractEndpoint } from "./endpoint";
 import { flattenIO } from "./json-schema-helpers";
 import { ActualLogger } from "./logger-helpers";
+import { Method } from "./method";
 
 export class Diagnostics {
   #verified = new WeakMap<
@@ -19,11 +20,7 @@ export class Diagnostics {
 
   constructor(protected logger: ActualLogger) {}
 
-  public check(
-    endpoint: AbstractEndpoint,
-    ctx: FlatObject,
-    path: string,
-  ): void {
+  public check(method: Method, path: string, endpoint: AbstractEndpoint): void {
     let ref = this.#verified.get(endpoint);
     if (!ref) {
       ref = { schemaChecked: false, paths: [] };
@@ -39,10 +36,10 @@ export class Diagnostics {
         while (stack.length > 0) {
           const entry = stack.shift()!;
           if (entry.type && entry.type !== "object") {
-            this.logger.warn(
-              `Endpoint ${dir} schema is not object-based`,
-              Object.assign(ctx, { path }),
-            );
+            this.logger.warn(`Endpoint ${dir} schema is not object-based`, {
+              method,
+              path,
+            });
           }
           for (const prop of ["allOf", "oneOf", "anyOf"] as const)
             if (entry[prop]) stack.push(...entry[prop]);
@@ -53,7 +50,7 @@ export class Diagnostics {
         if (reason) {
           this.logger.warn(
             "The final input schema of the endpoint contains an unsupported JSON payload type.",
-            Object.assign(ctx, { path, reason }),
+            { method, path, reason },
           );
         }
       }
@@ -64,7 +61,7 @@ export class Diagnostics {
           if (reason) {
             this.logger.warn(
               `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
-              Object.assign(ctx, { path, reason }),
+              { method, path, reason },
             );
           }
         }
@@ -89,7 +86,7 @@ export class Diagnostics {
       if (param in flat.properties) continue;
       this.logger.warn(
         "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
-        Object.assign(ctx, { path, param }),
+        { method, path, param },
       );
     }
     ref.paths.push(path);
