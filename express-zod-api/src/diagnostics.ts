@@ -66,7 +66,7 @@ export class Diagnostics {
     ref.hasValidSchema = true;
   }
 
-  #checkPath(
+  #checkPathParams(
     ref: Cache,
     method: Method,
     path: string,
@@ -75,14 +75,12 @@ export class Diagnostics {
     if (ref.paths.includes(path)) return;
     const params = getRoutePathParams(path);
     if (params.length === 0) return; // next statement can be expensive
-    ref.flat =
-      ref.flat ||
-      flattenIO(
-        z.toJSONSchema(endpoint.inputSchema, {
-          unrepresentable: "any",
-          io: "input",
-        }),
-      );
+    ref.flat ??= flattenIO(
+      z.toJSONSchema(endpoint.inputSchema, {
+        unrepresentable: "any",
+        io: "input",
+      }),
+    );
     for (const param of params) {
       if (param in ref.flat.properties) continue;
       this.logger.warn(
@@ -100,6 +98,6 @@ export class Diagnostics {
       this.#verified.set(endpoint, ref);
     }
     this.#checkSchema(ref, method, path, endpoint);
-    this.#checkPath(ref, method, path, endpoint);
+    this.#checkPathParams(ref, method, path, endpoint);
   }
 }
