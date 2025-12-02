@@ -31,8 +31,8 @@ catalogs:
       specifier: ^1.8.0
       version: 1.8.1
     express:
-      specifier: ^5.1.0
-      version: 5.1.0
+      specifier: ^5.2.0
+      version: 5.2.1
     express-fileupload:
       specifier: ^1.5.1
       version: 1.5.2
@@ -170,7 +170,7 @@ importers:
         version: 6.14.0
       swagger-ui-express:
         specifier: ^5.0.0
-        version: 5.0.1(express@5.1.0)
+        version: 5.0.1(express@5.2.1)
       typescript:
         specifier: catalog:dev
         version: 5.9.3
@@ -234,7 +234,7 @@ importers:
         version: 2.0.0
       express:
         specifier: catalog:dev
-        version: 5.1.0
+        version: 5.2.1
       express-fileupload:
         specifier: catalog:dev
         version: 1.5.2
@@ -1401,6 +1401,10 @@ packages:
 
   express@5.1.0:
     resolution: {integrity: sha512-DT9ck5YIRU+8GYzzU5kT3eHGA5iL+1Zd0EutOmTE9Dtk+Tvuzd23VBU+ec7HPNSTxXYO55gPV/hq4pSBJDjFpA==}
+    engines: {node: '>= 18'}
+
+  express@5.2.1:
+    resolution: {integrity: sha512-hIS4idWWai69NezIdRt2xFVofaF4j+6INOpJlVOLDO8zXGpUVEVzIYk12UUi2JzjEzWL3IOAxcTubgz9Po0yXw==}
     engines: {node: '>= 18'}
 
   fast-deep-equal@3.1.3:
@@ -3408,6 +3412,39 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  express@5.2.1:
+    dependencies:
+      accepts: 2.0.0
+      body-parser: 2.2.1
+      content-disposition: 1.0.0
+      content-type: 1.0.5
+      cookie: 0.7.2
+      cookie-signature: 1.2.2
+      debug: 4.4.3
+      depd: 2.0.0
+      encodeurl: 2.0.0
+      escape-html: 1.0.3
+      etag: 1.8.1
+      finalhandler: 2.1.0
+      fresh: 2.0.0
+      http-errors: 2.0.1
+      merge-descriptors: 2.0.0
+      mime-types: 3.0.1
+      on-finished: 2.4.1
+      once: 1.4.0
+      parseurl: 1.3.3
+      proxy-addr: 2.0.7
+      qs: 6.14.0
+      range-parser: 1.2.1
+      router: 2.2.0
+      send: 1.2.0
+      serve-static: 2.2.0
+      statuses: 2.0.2
+      type-is: 2.0.1
+      vary: 1.1.2
+    transitivePeerDependencies:
+      - supports-color
+
   fast-deep-equal@3.1.3: {}
 
   fast-diff@1.3.0: {}
@@ -4002,9 +4039,9 @@ snapshots:
     dependencies:
       '@scarf/scarf': empty-npm-package@1.0.0
 
-  swagger-ui-express@5.0.1(express@5.1.0):
+  swagger-ui-express@5.0.1(express@5.2.1):
     dependencies:
-      express: 5.1.0
+      express: 5.2.1
       swagger-ui-dist: 5.29.0
 
   synckit@0.11.11:
