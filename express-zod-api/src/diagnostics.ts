@@ -9,7 +9,7 @@ import { ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
 
 interface Cache {
-  schemaChecked: boolean;
+  hasValidSchema: boolean;
   flat?: ReturnType<typeof flattenIO>;
   paths: string[];
 }
@@ -25,7 +25,7 @@ export class Diagnostics {
     path: string,
     endpoint: AbstractEndpoint,
   ): void {
-    if (ref.schemaChecked) return;
+    if (ref.hasValidSchema) return;
     for (const dir of ["input", "output"] as const) {
       const stack = [
         z.toJSONSchema(endpoint[`${dir}Schema`], { unrepresentable: "any" }),
@@ -63,7 +63,7 @@ export class Diagnostics {
         }
       }
     }
-    ref.schemaChecked = true;
+    ref.hasValidSchema = true;
   }
 
   #checkPath(
@@ -96,7 +96,7 @@ export class Diagnostics {
   public check(method: Method, path: string, endpoint: AbstractEndpoint): void {
     let ref = this.#verified.get(endpoint);
     if (!ref) {
-      ref = { schemaChecked: false, paths: [] };
+      ref = { hasValidSchema: false, paths: [] };
       this.#verified.set(endpoint, ref);
     }
     this.#checkSchema(ref, method, path, endpoint);
