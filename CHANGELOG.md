@@ -27,7 +27,7 @@
 - The `Integration::constructor()` argument object now requires a `config` property, similar to `Documentation`;
 - Consider [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
-```patch
+```diff
   const routing: Routing = {
 -   "/v1/users": new DependsOnMethod({
 +   "/v1/users": {
