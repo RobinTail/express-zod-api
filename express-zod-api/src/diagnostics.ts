@@ -75,7 +75,7 @@ export class Diagnostics {
     if (ref.paths.includes(path)) return;
     const params = getRoutePathParams(path);
     if (params.length === 0) return; // next statement can be expensive
-    const flat =
+    ref.flat =
       ref.flat ||
       flattenIO(
         z.toJSONSchema(endpoint.inputSchema, {
@@ -83,9 +83,8 @@ export class Diagnostics {
           io: "input",
         }),
       );
-    ref.flat = flat;
     for (const param of params) {
-      if (param in flat.properties) continue;
+      if (param in ref.flat.properties) continue;
       this.logger.warn(
         "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
         { method, path, param },
