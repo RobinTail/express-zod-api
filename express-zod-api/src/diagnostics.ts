@@ -21,9 +21,8 @@ export class Diagnostics {
 
   #checkSchema(
     ref: Cache,
-    method: Method,
-    path: string,
     endpoint: AbstractEndpoint,
+    ctx: { method: Method; path: string },
   ): void {
     if (ref.hasValidSchema) return;
     for (const dir of ["input", "output"] as const) {
@@ -32,12 +31,8 @@ export class Diagnostics {
       ];
       while (stack.length > 0) {
         const entry = stack.shift()!;
-        if (entry.type && entry.type !== "object") {
-          this.logger.warn(`Endpoint ${dir} schema is not object-based`, {
-            method,
-            path,
-          });
-        }
+        if (entry.type && entry.type !== "object")
+          this.logger.warn(`Endpoint ${dir} schema is not object-based`, ctx);
         for (const prop of ["allOf", "oneOf", "anyOf"] as const)
           if (entry[prop]) stack.push(...entry[prop]);
       }
@@ -47,7 +42,7 @@ export class Diagnostics {
       if (reason) {
         this.logger.warn(
           "The final input schema of the endpoint contains an unsupported JSON payload type.",
-          { method, path, reason },
+          { ...ctx, reason },
         );
       }
     }
@@ -58,7 +53,7 @@ export class Diagnostics {
         if (reason) {
           this.logger.warn(
             `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
-            { method, path, reason },
+            { ...ctx, reason },
           );
         }
       }
@@ -97,7 +92,7 @@ export class Diagnostics {
       ref = { hasValidSchema: false, paths: [] };
       this.#verified.set(endpoint, ref);
     }
-    this.#checkSchema(ref, method, path, endpoint);
+    this.#checkSchema(ref, endpoint, { method, path });
     this.#checkPathParams(ref, method, path, endpoint);
   }
 }
