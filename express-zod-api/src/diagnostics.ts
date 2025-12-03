@@ -7,6 +7,7 @@ import { AbstractEndpoint } from "./endpoint";
 import { flattenIO } from "./json-schema-helpers";
 import { ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
+import type { OnEndpoint } from "./routing-walker";
 
 interface Cache {
   hasValidSchema: boolean;
@@ -86,7 +87,7 @@ export class Diagnostics {
     ref.paths.push(path);
   }
 
-  public check(method: Method, path: string, endpoint: AbstractEndpoint): void {
+  public check: OnEndpoint = (method, path, endpoint) => {
     let ref = this.#verified.get(endpoint);
     if (!ref) {
       ref = { hasValidSchema: false, paths: [] };
@@ -94,5 +95,5 @@ export class Diagnostics {
     }
     this.#checkSchema(ref, endpoint, { method, path });
     this.#checkPathParams(ref, method, path, endpoint);
-  }
+  };
 }
