@@ -1,12 +1,11 @@
 import { z } from "zod";
 import { responseVariants } from "./api-response";
-import { getRoutePathParams } from "./common-helpers";
+import { FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { findJsonIncompatible } from "./deep-checks";
 import { AbstractEndpoint } from "./endpoint";
 import { flattenIO } from "./json-schema-helpers";
 import { ActualLogger } from "./logger-helpers";
-import { Method } from "./method";
 import type { OnEndpoint } from "./routing-walker";
 
 interface Findings {
@@ -23,7 +22,7 @@ export class Diagnostics {
   #checkSchema(
     ref: Findings,
     endpoint: AbstractEndpoint,
-    ctx: { method: Method; path: string },
+    ctx: FlatObject,
   ): void {
     if (ref.isSchemaChecked) return;
     for (const dir of ["input", "output"] as const) {
@@ -64,9 +63,9 @@ export class Diagnostics {
 
   #checkPathParams(
     ref: Findings,
-    method: Method,
-    path: string,
     endpoint: AbstractEndpoint,
+    path: string,
+    ctx: FlatObject,
   ): void {
     if (ref.paths.has(path)) return;
     const params = getRoutePathParams(path);
@@ -81,7 +80,7 @@ export class Diagnostics {
       if (param in ref.flat.properties) continue;
       this.logger.warn(
         "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
-        { method, path, param },
+        { ...ctx, path, param },
       );
     }
     ref.paths.add(path);
@@ -94,6 +93,6 @@ export class Diagnostics {
       this.#verified.set(endpoint, ref);
     }
     this.#checkSchema(ref, endpoint, { method, path });
-    this.#checkPathParams(ref, method, path, endpoint);
+    this.#checkPathParams(ref, endpoint, path, { method });
   };
 }
