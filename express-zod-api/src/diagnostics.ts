@@ -6,18 +6,25 @@ import { findJsonIncompatible } from "./deep-checks";
 import { AbstractEndpoint } from "./endpoint";
 import { flattenIO } from "./json-schema-helpers";
 import { ActualLogger } from "./logger-helpers";
+import type { OnEndpoint } from "./routing-walker";
+
+interface Findings {
+  isSchemaChecked: boolean;
+  flat?: ReturnType<typeof flattenIO>;
+  paths: Set<string>;
+}
 
 export class Diagnostics {
-  #verifiedEndpoints = new WeakSet<AbstractEndpoint>();
-  #verifiedPaths = new WeakMap<
-    AbstractEndpoint,
-    { flat: ReturnType<typeof flattenIO>; paths: string[] }
-  >();
+  #verified = new WeakMap<AbstractEndpoint, Findings>();
 
   constructor(protected logger: ActualLogger) {}
 
-  public checkSchema(endpoint: AbstractEndpoint, ctx: FlatObject): void {
-    if (this.#verifiedEndpoints.has(endpoint)) return;
+  #checkSchema(
+    ref: Findings,
+    endpoint: AbstractEndpoint,
+    ctx: FlatObject,
+  ): void {
+    if (ref.isSchemaChecked) return;
     for (const dir of ["input", "output"] as const) {
       const stack = [
         z.toJSONSchema(endpoint[`${dir}Schema`], { unrepresentable: "any" }),
@@ -35,7 +42,7 @@ export class Diagnostics {
       if (reason) {
         this.logger.warn(
           "The final input schema of the endpoint contains an unsupported JSON payload type.",
-          Object.assign(ctx, { reason }),
+          { ...ctx, reason },
         );
       }
     }
@@ -46,39 +53,46 @@ export class Diagnostics {
         if (reason) {
           this.logger.warn(
             `The final ${variant} response schema of the endpoint contains an unsupported JSON payload type.`,
-            Object.assign(ctx, { reason }),
+            { ...ctx, reason },
           );
         }
       }
     }
-    this.#verifiedEndpoints.add(endpoint);
+    ref.isSchemaChecked = true;
   }
 
-  public checkPathParams(
-    path: string,
+  #checkPathParams(
+    ref: Findings,
     endpoint: AbstractEndpoint,
+    path: string,
     ctx: FlatObject,
   ): void {
-    const ref = this.#verifiedPaths.get(endpoint);
-    if (ref?.paths.includes(path)) return;
+    if (ref.paths.has(path)) return;
     const params = getRoutePathParams(path);
     if (params.length === 0) return; // next statement can be expensive
-    const flat =
-      ref?.flat ||
-      flattenIO(
-        z.toJSONSchema(endpoint.inputSchema, {
-          unrepresentable: "any",
-          io: "input",
-        }),
-      );
+    ref.flat ??= flattenIO(
+      z.toJSONSchema(endpoint.inputSchema, {
+        unrepresentable: "any",
+        io: "input",
+      }),
+    );
     for (const param of params) {
-      if (param in flat.properties) continue;
+      if (param in ref.flat.properties) continue;
       this.logger.warn(
         "The input schema of the endpoint is most likely missing the parameter of the path it's assigned to.",
-        Object.assign(ctx, { path, param }),
+        { ...ctx, path, param },
       );
     }
-    if (ref) ref.paths.push(path);
-    else this.#verifiedPaths.set(endpoint, { flat, paths: [path] });
+    ref.paths.add(path);
   }
+
+  public check: OnEndpoint = (method, path, endpoint) => {
+    let ref = this.#verified.get(endpoint);
+    if (!ref) {
+      ref = { isSchemaChecked: false, paths: new Set() };
+      this.#verified.set(endpoint, ref);
+    }
+    this.#checkSchema(ref, endpoint, { method, path });
+    this.#checkPathParams(ref, endpoint, path, { method });
+  };
 }
