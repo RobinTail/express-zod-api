@@ -12,7 +12,7 @@ import type { OnEndpoint } from "./routing-walker";
 interface Cache {
   hasValidSchema: boolean;
   flat?: ReturnType<typeof flattenIO>;
-  paths: string[];
+  paths: Set<string>;
 }
 
 export class Diagnostics {
@@ -68,7 +68,7 @@ export class Diagnostics {
     path: string,
     endpoint: AbstractEndpoint,
   ): void {
-    if (ref.paths.includes(path)) return;
+    if (ref.paths.has(path)) return;
     const params = getRoutePathParams(path);
     if (params.length === 0) return; // next statement can be expensive
     ref.flat ??= flattenIO(
@@ -84,13 +84,13 @@ export class Diagnostics {
         { method, path, param },
       );
     }
-    ref.paths.push(path);
+    ref.paths.add(path);
   }
 
   public check: OnEndpoint = (method, path, endpoint) => {
     let ref = this.#verified.get(endpoint);
     if (!ref) {
-      ref = { hasValidSchema: false, paths: [] };
+      ref = { hasValidSchema: false, paths: new Set() };
       this.#verified.set(endpoint, ref);
     }
     this.#checkSchema(ref, endpoint, { method, path });
