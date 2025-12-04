@@ -30,7 +30,7 @@ export const updateUserEndpoint =
     }),
     handler: async ({
       input: { id, name },
-      options: { authorized }, // comes from authMiddleware
+      ctx: { authorized }, // comes from authMiddleware
       logger,
     }) => {
       logger.debug(`${authorized} is changing user #${id}`);

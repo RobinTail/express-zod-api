@@ -31,7 +31,7 @@ interface BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema | z.ZodVoid,
   MIN extends IOSchema | undefined,
-  OPT extends FlatObject,
+  CTX extends FlatObject,
   SCO extends string,
 > {
   /**
@@ -42,8 +42,8 @@ interface BuildProps<
   input?: IN;
   /** @desc The schema by which the returns of the Endpoint handler is validated */
   output: OUT;
-  /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (options) and a logger */
-  handler: Handler<z.output<FinalInputSchema<MIN, IN>>, z.input<OUT>, OPT>;
+  /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (ctx) and a logger */
+  handler: Handler<z.output<FinalInputSchema<MIN, IN>>, z.input<OUT>, CTX>;
   /** @desc The operation description for the generated Documentation */
   description?: string;
   /** @desc The operation summary for the generated Documentation (50 symbols max) */
@@ -52,8 +52,7 @@ interface BuildProps<
   operationId?: string | ((method: ClientMethod) => string);
   /**
    * @desc HTTP method(s) this endpoint can handle
-   * @default "get" unless the Endpoint is assigned within DependsOnMethod
-   * @see DependsOnMethod
+   * @default "get" unless method is explicitly defined in Routing keys
    * */
   method?: Method | [Method, ...Method[]];
   /**
@@ -72,7 +71,7 @@ interface BuildProps<
 
 export class EndpointsFactory<
   IN extends IOSchema | undefined = undefined,
-  OUT extends FlatObject = EmptyObject,
+  CTX extends FlatObject = EmptyObject,
   SCO extends string = string,
 > {
   protected schema = undefined as IN;
@@ -81,12 +80,12 @@ export class EndpointsFactory<
 
   #extend<
     AIN extends IOSchema | undefined,
-    AOUT extends FlatObject,
+    RET extends FlatObject,
     ASCO extends string,
-  >(middleware: Middleware<OUT, AOUT, ASCO, AIN>) {
+  >(middleware: Middleware<CTX, RET, ASCO, AIN>) {
     const factory = new EndpointsFactory<
       Extension<IN, AIN>,
-      OUT & AOUT,
+      CTX & RET,
       SCO & ASCO
     >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);
@@ -95,13 +94,13 @@ export class EndpointsFactory<
   }
 
   public addMiddleware<
-    AOUT extends FlatObject,
+    RET extends FlatObject,
     ASCO extends string,
     AIN extends IOSchema | undefined = undefined,
   >(
     subject:
-      | Middleware<OUT, AOUT, ASCO, AIN>
-      | ConstructorParameters<typeof Middleware<OUT, AOUT, ASCO, AIN>>[0],
+      | Middleware<CTX, RET, ASCO, AIN>
+      | ConstructorParameters<typeof Middleware<CTX, RET, ASCO, AIN>>[0],
   ) {
     return this.#extend(
       subject instanceof Middleware ? subject : new Middleware(subject),
@@ -118,8 +117,8 @@ export class EndpointsFactory<
     return this.#extend(new ExpressMiddleware(...params));
   }
 
-  public addOptions<AOUT extends FlatObject>(getOptions: () => Promise<AOUT>) {
-    return this.#extend(new Middleware({ handler: getOptions }));
+  public addContext<RET extends FlatObject>(getContext: () => Promise<RET>) {
+    return this.#extend(new Middleware({ handler: getContext }));
   }
 
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
@@ -130,7 +129,7 @@ export class EndpointsFactory<
     tag,
     method,
     ...rest
-  }: BuildProps<BIN, BOUT, IN, OUT, SCO>) {
+  }: BuildProps<BIN, BOUT, IN, CTX, SCO>) {
     const { middlewares, resultHandler } = this;
     const methods = typeof method === "string" ? [method] : method;
     const getOperationId =
@@ -157,7 +156,7 @@ export class EndpointsFactory<
   public buildVoid<BIN extends IOSchema = EmptySchema>({
     handler,
     ...rest
-  }: Omit<BuildProps<BIN, z.ZodVoid, IN, OUT, SCO>, "output">) {
+  }: Omit<BuildProps<BIN, z.ZodVoid, IN, CTX, SCO>, "output">) {
     return this.build({
       ...rest,
       output: emptySchema,

@@ -1,6 +1,49 @@
 # Changelog
 
+## Version 26
+
+### v26.0.0
+
+- Supported `http-errors` versions: `^2.0.1`;
+- Supported `zod` versions: `^4.1.13`:
+  - This Zod patch contains an [important fix](https://github.com/colinhacks/zod/pull/5452) that makes the
+    `globalRegistry` truly global across both CJS and ESM bundles of the Zod distribution;
+  - The issue was found and reported by [@shadone](https://github.com/shadone);
+- The new version of the Zod plugin now also extends the CJS exports of Zod:
+  - This fixes the "TypeError: example is not a function" in CJS and removes the requirement to use an ESM environment;
+  - The issue was reported by [@squishykid](https://github.com/squishykid) and addressed earlier in [v25.5.3](#v2553);
+- `DependsOnMethod` removed:
+  - You can now specify methods as direct keys of an assigned object in `Routing`;
+  - That object can still contain nested paths as before;
+  - Keys matching lowercase HTTP methods are treated according to the new config setting `methodLikeRouteBehavior`:
+    - `method` — when assigned with an Endpoint, the key is treated as a method of its parent path (default);
+    - `path` — the key is always treated as a nested path segment;
+- The `options` property has been renamed to `ctx` in the argument of:
+  - `Middleware::handler()`,
+  - `ResultHandler::handler()`,
+  - The `handler` of the `EndpointsFactory::build()` argument,
+  - `testMiddleware()`;
+- `EndpointsFactory::addOptions()` renamed to `addContext()`;
+- The `Integration::constructor()` argument object now requires a `config` property, similar to `Documentation`;
+- Consider [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
+
+```diff
+  const routing: Routing = {
+-   "/v1/users": new DependsOnMethod({
++   "/v1/users": {
+      get: getUserEndpoint,
+-   }).nest({
+      create: makeUserEndpoint
+-   }),
++   },
+  };
+```
+
 ## Version 25
+
+### v25.6.1
+
+- Technical update before v26: no significant changes.
 
 ### v25.6.0
 

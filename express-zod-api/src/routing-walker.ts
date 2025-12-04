@@ -1,9 +1,9 @@
-import { DependsOnMethod } from "./depends-on-method";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
 import { ClientMethod, isMethod, Method } from "./method";
 import { Routing } from "./routing";
 import { ServeStatic, StaticHandler } from "./serve-static";
+import type { CommonConfig } from "./config-type";
 
 export type OnEndpoint<M extends string = Method> = (
   method: M,
@@ -21,6 +21,7 @@ export const withHead =
 
 interface RoutingWalkerParams {
   routing: Routing;
+  config: CommonConfig;
   onEndpoint: OnEndpoint;
   onStatic?: (path: string, handler: StaticHandler) => void;
 }
@@ -36,14 +37,23 @@ const detachMethod = (subject: string): [string, Method?] => {
 const trimPath = (path: string) =>
   path.trim().split("/").filter(Boolean).join("/");
 
-const processEntries = (subject: Routing, parent?: string) =>
-  Object.entries(subject).map<[string, Routing[string], Method?]>(
+const processEntries = (
+  { methodLikeRouteBehavior = "method" }: CommonConfig,
+  subject: Routing,
+  parent?: string,
+) => {
+  const preferMethod = methodLikeRouteBehavior === "method";
+  return Object.entries(subject).map<[string, Routing[string], Method?]>(
     ([_key, item]) => {
-      const [segment, method] = detachMethod(_key);
+      const [segment, method] =
+        preferMethod && isMethod(_key) && item instanceof AbstractEndpoint
+          ? ["/", _key]
+          : detachMethod(_key);
       const path = [parent || ""].concat(trimPath(segment) || []).join("/");
       return [path, item, method];
     },
   );
+};
 
 const prohibit = (method: Method, path: string) => {
   throw new RoutingError(
@@ -75,10 +85,11 @@ const checkDuplicate = (method: Method, path: string, visited: Set<string>) => {
 
 export const walkRouting = ({
   routing,
+  config,
   onEndpoint,
   onStatic,
 }: RoutingWalkerParams) => {
-  const stack = processEntries(routing);
+  const stack = processEntries(config, routing);
   const visited = new Set<string>();
   while (stack.length) {
     const [path, element, explicitMethod] = stack.shift()!;
@@ -98,15 +109,8 @@ export const walkRouting = ({
       if (explicitMethod) prohibit(explicitMethod, path);
       if (element instanceof ServeStatic) {
         if (onStatic) element.apply(path, onStatic);
-      } else if (element instanceof DependsOnMethod) {
-        for (const [method, endpoint] of element.entries) {
-          const { methods } = endpoint;
-          checkDuplicate(method, path, visited);
-          checkMethodSupported(method, path, methods);
-          onEndpoint(method, path, endpoint);
-        }
       } else {
-        stack.unshift(...processEntries(element, path));
+        stack.unshift(...processEntries(config, element, path));
       }
     }
   }

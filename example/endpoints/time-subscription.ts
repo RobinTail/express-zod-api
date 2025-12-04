@@ -12,11 +12,7 @@ export const subscriptionEndpoint = eventsFactory.buildVoid({
       .deprecated()
       .describe("for testing error response"),
   }),
-  handler: async ({
-    input: { trigger },
-    options: { emit, isClosed },
-    logger,
-  }) => {
+  handler: async ({ input: { trigger }, ctx: { emit, isClosed }, logger }) => {
     if (trigger === "failure") throw new Error("Intentional failure");
     while (!isClosed()) {
       logger.debug("emitting");
