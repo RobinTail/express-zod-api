@@ -9,23 +9,23 @@ import { ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
 import type { OnEndpoint } from "./routing-walker";
 
-interface Cache {
-  hasValidSchema: boolean;
+interface Findings {
+  isSchemaChecked: boolean;
   flat?: ReturnType<typeof flattenIO>;
   paths: Set<string>;
 }
 
 export class Diagnostics {
-  #verified = new WeakMap<AbstractEndpoint, Cache>();
+  #verified = new WeakMap<AbstractEndpoint, Findings>();
 
   constructor(protected logger: ActualLogger) {}
 
   #checkSchema(
-    ref: Cache,
+    ref: Findings,
     endpoint: AbstractEndpoint,
     ctx: { method: Method; path: string },
   ): void {
-    if (ref.hasValidSchema) return;
+    if (ref.isSchemaChecked) return;
     for (const dir of ["input", "output"] as const) {
       const stack = [
         z.toJSONSchema(endpoint[`${dir}Schema`], { unrepresentable: "any" }),
@@ -59,11 +59,11 @@ export class Diagnostics {
         }
       }
     }
-    ref.hasValidSchema = true;
+    ref.isSchemaChecked = true;
   }
 
   #checkPathParams(
-    ref: Cache,
+    ref: Findings,
     method: Method,
     path: string,
     endpoint: AbstractEndpoint,
@@ -90,7 +90,7 @@ export class Diagnostics {
   public check: OnEndpoint = (method, path, endpoint) => {
     let ref = this.#verified.get(endpoint);
     if (!ref) {
-      ref = { hasValidSchema: false, paths: new Set() };
+      ref = { isSchemaChecked: false, paths: new Set() };
       this.#verified.set(endpoint, ref);
     }
     this.#checkSchema(ref, endpoint, { method, path });
