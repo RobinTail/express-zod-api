@@ -24,6 +24,7 @@ minimumReleaseAgeExclude:
   - eslint-plugin-allowed-dependencies
   - express
   - http-errors
+  - import-without-cache
   - prettier
   - ramda
   - raw-body
