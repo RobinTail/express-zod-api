@@ -24,7 +24,7 @@
     "eslint-plugin-prettier": "^5.4.1",
     "husky": "^9.0.5",
     "prettier": "3.7.4",
-    "tsdown": "^0.16.8",
+    "tsdown": "^0.17.0",
     "typescript-eslint": "catalog:dev",
     "unrun": "^0.2.14",
     "vitest": "^4.0.1"
