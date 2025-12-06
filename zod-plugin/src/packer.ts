@@ -16,7 +16,7 @@ interface $Packer<B extends object> extends z.core.$ZodCheck {
 
 /**
  * @public
- * @desc Attaches an inheritable attributes to the schema (withstands refinements).
+ * @desc Attaches inheritable attributes to the schema (withstand refinements).
  */
 export const pack = <T extends z.ZodType, B extends object>(
   subject: T,
