@@ -15,7 +15,7 @@ describe("ESM Test", async () => {
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
-  const quickStart = spawn("tsx", ["quick-start.ts"]);
+  const quickStart = spawn("unrun", ["quick-start.ts"]);
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });
