@@ -65,4 +65,4 @@ catalogs:
 overrides:
   "@scarf/scarf": "npm:empty-npm-package@1.0.0"
   "lightningcss": "npm:empty-npm-package@1.0.0"
-  "vite": "^8.0.0-beta.0"
+  "vite": "^8.0.0-beta.1"
