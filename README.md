@@ -59,8 +59,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Graceful shutdown](#graceful-shutdown)
    6. [Subscriptions](#subscriptions)
 8. [Caveats](#caveats)
-   1. [TypeError: example is not a function](#typeerror-example-is-not-a-function)
-   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
 
 See also [Changelog](CHANGELOG.md) and [automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
