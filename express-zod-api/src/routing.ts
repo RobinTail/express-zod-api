@@ -67,7 +67,9 @@ const collectSiblings = ({
   routing,
   parsers,
 }: InitProps) => {
-  const doc = isProduction() ? undefined : new Diagnostics(getLogger());
+  const doc = isProduction()
+    ? undefined
+    : new Diagnostics(getLogger(), config.routeCheck);
   const familiar = new Map<string, Siblings>();
   const onEndpoint: OnEndpoint = (method, path, endpoint) => {
     doc?.check(method, path, endpoint);
