@@ -382,6 +382,7 @@ const fixReferences = (
           entry.$ref = ctx.makeRef(
             depiction.id || depiction, // avoiding serialization, because changing $ref
             asOAS(depiction),
+            depiction.id,
           ).$ref;
         }
         continue;
