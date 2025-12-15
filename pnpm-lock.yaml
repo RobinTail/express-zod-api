@@ -46,8 +46,8 @@ catalogs:
       specifier: ^8.46.1
       version: 8.50.0
     zod:
-      specifier: ^4.1.13
-      version: 4.1.13
+      specifier: ^4.2.0
+      version: 4.2.0
   prod:
     ramda:
       specifier: ^0.32.0
@@ -113,7 +113,7 @@ importers:
         version: 5.9.3
       zod:
         specifier: catalog:dev
-        version: 4.1.13
+        version: 4.2.0
 
   compat-test:
     devDependencies:
@@ -149,7 +149,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 4.1.13
+        version: 4.2.0
 
   example:
     devDependencies:
@@ -176,7 +176,7 @@ importers:
         version: 5.9.3
       zod:
         specifier: catalog:dev
-        version: 4.1.13
+        version: 4.2.0
 
   express-zod-api:
     dependencies:
@@ -255,7 +255,7 @@ importers:
         version: 7.16.0
       zod:
         specifier: catalog:dev
-        version: 4.1.13
+        version: 4.2.0
 
   issue952-test:
     dependencies:
@@ -273,7 +273,7 @@ importers:
         version: 5.9.3
       zod:
         specifier: catalog:dev
-        version: 4.1.13
+        version: 4.2.0
 
   migration:
     devDependencies:
@@ -298,7 +298,7 @@ importers:
         version: 5.9.3
       zod:
         specifier: catalog:dev
-        version: 4.1.13
+        version: 4.2.0
 
 packages:
 
@@ -2279,6 +2279,9 @@ packages:
   zod@4.1.13:
     resolution: {integrity: sha512-AvvthqfqrAhNH9dnfmrfKzX5upOdjUVJYFqNSlkmGf64gRaTzlPwz99IHYnVs28qYAybvAlBV+H7pn0saFY4Ig==}
 
+  zod@4.2.0:
+    resolution: {integrity: sha512-Bd5fw9wlIhtqCCxotZgdTOMwGm1a0u75wARVEY9HMs1X17trvA/lMi4+MGK5EUfYkXVTbX8UDiDKW4OgzHVUZw==}
+
 snapshots:
 
   '@andrewbranch/untar.js@1.0.3': {}
@@ -4227,3 +4230,5 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zod@4.1.13: {}
+
+  zod@4.2.0: {}
