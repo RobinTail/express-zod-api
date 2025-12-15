@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.2",
-    "@tsconfig/node20": "^20.1.5",
+    "@tsconfig/node22": "^22.0.0",
     "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "^4.0.1",
     "eslint": "^9.28.0",
