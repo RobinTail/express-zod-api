@@ -47,7 +47,7 @@ catalogs:
       version: 8.50.0
     zod:
       specifier: ^4.2.0
-      version: 4.2.0
+      version: 4.2.1
   prod:
     ramda:
       specifier: ^0.32.0
@@ -113,7 +113,7 @@ importers:
         version: 5.9.3
       zod:
         specifier: catalog:dev
-        version: 4.2.0
+        version: 4.2.1
 
   compat-test:
     devDependencies:
@@ -149,7 +149,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 4.2.0
+        version: 4.2.1
 
   example:
     devDependencies:
@@ -176,7 +176,7 @@ importers:
         version: 5.9.3
       zod:
         specifier: catalog:dev
-        version: 4.2.0
+        version: 4.2.1
 
   express-zod-api:
     dependencies:
@@ -255,7 +255,7 @@ importers:
         version: 7.16.0
       zod:
         specifier: catalog:dev
-        version: 4.2.0
+        version: 4.2.1
 
   issue952-test:
     dependencies:
@@ -273,7 +273,7 @@ importers:
         version: 5.9.3
       zod:
         specifier: catalog:dev
-        version: 4.2.0
+        version: 4.2.1
 
   migration:
     devDependencies:
@@ -298,7 +298,7 @@ importers:
         version: 5.9.3
       zod:
         specifier: catalog:dev
-        version: 4.2.0
+        version: 4.2.1
 
 packages:
 
@@ -2064,7 +2064,6 @@ packages:
   tsdown@0.18.0:
     resolution: {integrity: sha512-Yotdh3NzizysnqR96xfpHFYtEntk1cZvSRHz8A+Pn3ZHNdTQa4fBQxh6HHzWZwfjdQv47xb7GCv6vEWMtxBirw==}
     engines: {node: '>=20.19.0'}
-    deprecated: Including an unexpected breaking change (copy behavior)
     hasBin: true
     peerDependencies:
       '@arethetypeswrong/core': ^0.18.1
@@ -2279,8 +2278,8 @@ packages:
   zod@4.1.13:
     resolution: {integrity: sha512-AvvthqfqrAhNH9dnfmrfKzX5upOdjUVJYFqNSlkmGf64gRaTzlPwz99IHYnVs28qYAybvAlBV+H7pn0saFY4Ig==}
 
-  zod@4.2.0:
-    resolution: {integrity: sha512-Bd5fw9wlIhtqCCxotZgdTOMwGm1a0u75wARVEY9HMs1X17trvA/lMi4+MGK5EUfYkXVTbX8UDiDKW4OgzHVUZw==}
+  zod@4.2.1:
+    resolution: {integrity: sha512-0wZ1IRqGGhMP76gLqz8EyfBXKk0J2qo2+H3fi4mcUP/KtTocoX08nmIAHl1Z2kJIZbZee8KOpBCSNPRgauucjw==}
 
 snapshots:
 
@@ -4231,4 +4230,4 @@ snapshots:
 
   zod@4.1.13: {}
 
-  zod@4.2.0: {}
+  zod@4.2.1: {}
