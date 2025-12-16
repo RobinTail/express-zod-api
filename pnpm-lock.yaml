@@ -281,6 +281,19 @@ importers:
         specifier: catalog:dev
         version: 8.50.0(eslint@9.39.2)(typescript@5.9.3)
 
+  ts-api:
+    dependencies:
+      ramda:
+        specifier: catalog:prod
+        version: 0.32.0
+    devDependencies:
+      '@types/ramda':
+        specifier: catalog:dev
+        version: 0.31.1
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
+
   zod-plugin:
     dependencies:
       ramda:

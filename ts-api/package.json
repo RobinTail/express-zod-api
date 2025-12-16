@@ -1,0 +1,54 @@
+{
+  "name": "@express-zod-api/ts-api",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "Typescript API for express-zod-api",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobinTail/express-zod-api.git"
+  },
+  "author": {
+    "name": "Anna Bocharova",
+    "url": "https://robintail.cz",
+    "email": "me@robintail.cz"
+  },
+  "bugs": "https://github.com/RobinTail/express-zod-api/issues",
+  "funding": "https://github.com/sponsors/RobinTail",
+  "scripts": {
+    "pretest": "tsc",
+    "test": "vitest run",
+    "build": "tsdown",
+    "prepublishOnly": "eslint && pnpm test && pnpm build"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "*.md"
+  ],
+  "engines": {
+    "node": "^20.19.0 || ^22.12.0 || ^24.0.0"
+  },
+  "dependencies": {
+    "ramda": "catalog:prod"
+  },
+  "peerDependencies": {
+    "typescript": "^5.1.3"
+  },
+  "devDependencies": {
+    "@types/ramda": "catalog:dev",
+    "typescript": "catalog:dev"
+  },
+  "keywords": [
+    "typescript"
+  ]
+}
