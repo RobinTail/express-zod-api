@@ -1,5 +1,6 @@
+import { createRequire } from "node:module";
 import * as R from "ramda";
-import ts from "typescript";
+import type ts from "typescript";
 import { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
 import { ClientMethod, clientMethods } from "./method";
@@ -55,6 +56,7 @@ export abstract class IntegrationBase {
     string,
     { store: Store; isDeprecated: boolean }
   >();
+  protected ts: typeof ts;
 
   readonly #ids = {
     pathType: f.createIdentifier("Path"),
@@ -119,7 +121,9 @@ export abstract class IntegrationBase {
     { expose: true },
   );
 
-  protected constructor(private readonly serverUrl: string) {}
+  protected constructor(private readonly serverUrl: string) {
+    this.ts = createRequire(import.meta.url)("typescript"); // @todo replace with a dynamic import in next major
+  }
 
   /**
    * @example SomeOf<_>
@@ -178,15 +182,15 @@ export abstract class IntegrationBase {
       makeFnType(
         {
           [this.#ids.methodParameter.text]: this.methodType.name,
-          [this.#ids.pathParameter.text]: ts.SyntaxKind.StringKeyword,
+          [this.#ids.pathParameter.text]: this.ts.SyntaxKind.StringKeyword,
           [this.#ids.paramsArgument.text]: recordStringAny,
           [this.#ids.ctxArgument.text]: { optional: true, type: "T" },
         },
-        makePromise(ts.SyntaxKind.AnyKeyword),
+        makePromise(this.ts.SyntaxKind.AnyKeyword),
       ),
       {
         expose: true,
-        params: { T: { init: ts.SyntaxKind.UnknownKeyword } },
+        params: { T: { init: this.ts.SyntaxKind.UnknownKeyword } },
       },
     );
 
@@ -198,7 +202,7 @@ export abstract class IntegrationBase {
     makeConst(
       this.#ids.parseRequestFn,
       makeArrowFn(
-        { [this.#ids.requestParameter.text]: ts.SyntaxKind.StringKeyword },
+        { [this.#ids.requestParameter.text]: this.ts.SyntaxKind.StringKeyword },
         f.createAsExpression(
           makeCall(this.#ids.requestParameter, propOf<string>("split"))(
             f.createRegularExpressionLiteral("/ (.+)/"), // split once
@@ -221,7 +225,7 @@ export abstract class IntegrationBase {
       this.#ids.substituteFn,
       makeArrowFn(
         {
-          [this.#ids.pathParameter.text]: ts.SyntaxKind.StringKeyword,
+          [this.#ids.pathParameter.text]: this.ts.SyntaxKind.StringKeyword,
           [this.#ids.paramsArgument.text]: recordStringAny,
         },
         f.createBlock([
@@ -234,7 +238,7 @@ export abstract class IntegrationBase {
           f.createForInStatement(
             f.createVariableDeclarationList(
               [f.createVariableDeclaration(this.#ids.keyParameter)],
-              ts.NodeFlags.Const,
+              this.ts.NodeFlags.Const,
             ),
             this.#ids.paramsArgument,
             f.createBlock([
@@ -448,7 +452,7 @@ export abstract class IntegrationBase {
     // if (!contentType) return;
     const noBodyStatement = f.createIfStatement(
       f.createPrefixUnaryExpression(
-        ts.SyntaxKind.ExclamationToken,
+        this.ts.SyntaxKind.ExclamationToken,
         this.#ids.contentTypeConst,
       ),
       f.createReturnStatement(),
@@ -546,7 +550,7 @@ export abstract class IntegrationBase {
               makeLiteralType(propOf<SSEShape>("data")),
             ),
           },
-          makeMaybeAsync(ts.SyntaxKind.VoidKeyword),
+          makeMaybeAsync(this.ts.SyntaxKind.VoidKeyword),
         ),
       }),
       [
@@ -605,14 +609,16 @@ export abstract class IntegrationBase {
             this.requestType.name,
             f.createTemplateLiteralType(f.createTemplateHead("get "), [
               f.createTemplateLiteralTypeSpan(
-                ensureTypeNode(ts.SyntaxKind.StringKeyword),
+                ensureTypeNode(this.ts.SyntaxKind.StringKeyword),
                 f.createTemplateTail(""),
               ),
             ]),
           ),
           R: makeExtract(
             makeIndexed(this.interfaces.positive, "K"),
-            makeOneLine(this.#makeEventNarrow(ts.SyntaxKind.StringKeyword)),
+            makeOneLine(
+              this.#makeEventNarrow(this.ts.SyntaxKind.StringKeyword),
+            ),
           ),
         },
       },
