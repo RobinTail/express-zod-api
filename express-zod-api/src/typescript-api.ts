@@ -1,5 +1,6 @@
+import { createRequire } from "node:module";
 import * as R from "ramda";
-import ts from "typescript";
+import type ts from "typescript";
 
 export type Typeable =
   | ts.TypeNode
@@ -11,410 +12,447 @@ type TypeParams =
   | string[]
   | Partial<Record<string, Typeable | { type?: ts.TypeNode; init: Typeable }>>;
 
-export const f = ts.factory;
+export class TypescriptAPI {
+  public ts: typeof ts;
+  public f: typeof ts.factory;
+  public exportModifier: ts.ModifierToken<ts.SyntaxKind.ExportKeyword>[];
+  public asyncModifier: ts.ModifierToken<ts.SyntaxKind.AsyncKeyword>[];
+  public accessModifiers: Record<"public" | "protectedReadonly", ts.Modifier[]>;
+  #primitives: ts.KeywordTypeSyntaxKind[];
+  #safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
-const exportModifier = [f.createModifier(ts.SyntaxKind.ExportKeyword)];
-
-const asyncModifier = [f.createModifier(ts.SyntaxKind.AsyncKeyword)];
-
-export const accessModifiers = {
-  public: [f.createModifier(ts.SyntaxKind.PublicKeyword)],
-  protectedReadonly: [
-    f.createModifier(ts.SyntaxKind.ProtectedKeyword),
-    f.createModifier(ts.SyntaxKind.ReadonlyKeyword),
-  ],
-};
-
-export const addJsDoc = <T extends ts.Node>(node: T, text: string) =>
-  ts.addSyntheticLeadingComment(
-    node,
-    ts.SyntaxKind.MultiLineCommentTrivia,
-    `* ${text} `,
-    true,
-  );
-
-export const printNode = (
-  node: ts.Node,
-  printerOptions?: ts.PrinterOptions,
-) => {
-  const sourceFile = ts.createSourceFile(
-    "print.ts",
-    "",
-    ts.ScriptTarget.Latest,
-    false,
-    ts.ScriptKind.TS,
-  );
-  const printer = ts.createPrinter(printerOptions);
-  return printer.printNode(ts.EmitHint.Unspecified, node, sourceFile);
-};
-
-const safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
-export const makePropertyIdentifier = (name: string | number) =>
-  typeof name === "string" && safePropRegex.test(name)
-    ? f.createIdentifier(name)
-    : literally(name);
-
-export const makeTemplate = (
-  head: string,
-  ...rest: ([ts.Expression] | [ts.Expression, string])[]
-) =>
-  f.createTemplateExpression(
-    f.createTemplateHead(head),
-    rest.map(([id, str = ""], idx) =>
-      f.createTemplateSpan(
-        id,
-        idx === rest.length - 1
-          ? f.createTemplateTail(str)
-          : f.createTemplateMiddle(str),
-      ),
-    ),
-  );
-
-export const makeParam = (
-  name: string | ts.Identifier,
-  {
-    type,
-    mod,
-    init,
-    optional,
-  }: {
-    type?: Typeable;
-    mod?: ts.Modifier[];
-    init?: ts.Expression;
-    optional?: boolean;
-  } = {},
-) =>
-  f.createParameterDeclaration(
-    mod,
-    undefined,
-    name,
-    optional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-    type ? ensureTypeNode(type) : undefined,
-    init,
-  );
-
-export const makeParams = (
-  params: Partial<Record<string, Typeable | Parameters<typeof makeParam>[1]>>,
-) =>
-  Object.entries(params).map(([name, value]) =>
-    makeParam(
-      name,
-      typeof value === "string" ||
-        typeof value === "number" ||
-        (typeof value === "object" && "kind" in value)
-        ? { type: value }
-        : value,
-    ),
-  );
-
-export const makePublicConstructor = (
-  params: ts.ParameterDeclaration[],
-  statements: ts.Statement[] = [],
-) =>
-  f.createConstructorDeclaration(
-    accessModifiers.public,
-    params,
-    f.createBlock(statements),
-  );
-
-export const ensureTypeNode = (
-  subject: Typeable,
-  args?: Typeable[], // only for string and id
-): ts.TypeNode =>
-  typeof subject === "number"
-    ? f.createKeywordTypeNode(subject)
-    : typeof subject === "string" || ts.isIdentifier(subject)
-      ? f.createTypeReferenceNode(subject, args && R.map(ensureTypeNode, args))
-      : subject;
-
-// Record<string, any>
-export const recordStringAny = ensureTypeNode("Record", [
-  ts.SyntaxKind.StringKeyword,
-  ts.SyntaxKind.AnyKeyword,
-]);
-
-/** ensures distinct union (unique primitives) */
-export const makeUnion = (entries: ts.TypeNode[]) => {
-  const nodes = new Map<ts.TypeNode | ts.KeywordTypeSyntaxKind, ts.TypeNode>();
-  for (const entry of entries)
-    nodes.set(isPrimitive(entry) ? entry.kind : entry, entry);
-  return f.createUnionTypeNode(Array.from(nodes.values()));
-};
-
-export const makeInterfaceProp = (
-  name: string | number,
-  value: Typeable,
-  {
-    isOptional,
-    isDeprecated,
-    comment,
-  }: { isOptional?: boolean; isDeprecated?: boolean; comment?: string } = {},
-) => {
-  const propType = ensureTypeNode(value);
-  const node = f.createPropertySignature(
-    undefined,
-    makePropertyIdentifier(name),
-    isOptional ? f.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-    isOptional
-      ? makeUnion([propType, ensureTypeNode(ts.SyntaxKind.UndefinedKeyword)])
-      : propType,
-  );
-  const jsdoc = R.reject(R.isNil, [
-    isDeprecated ? "@deprecated" : undefined,
-    comment,
-  ]);
-  return jsdoc.length ? addJsDoc(node, jsdoc.join(" ")) : node;
-};
-
-export const makeOneLine = (subject: ts.TypeNode) =>
-  ts.setEmitFlags(subject, ts.EmitFlags.SingleLine);
-
-export const makeDeconstruction = (
-  ...names: ts.Identifier[]
-): ts.ArrayBindingPattern =>
-  f.createArrayBindingPattern(
-    names.map(
-      (name) => f.createBindingElement(undefined, undefined, name), // can also add default value at last
-    ),
-  );
-
-export const makeConst = (
-  name: string | ts.Identifier | ts.ArrayBindingPattern,
-  value: ts.Expression,
-  { type, expose }: { type?: Typeable; expose?: true } = {},
-) =>
-  f.createVariableStatement(
-    expose && exportModifier,
-    f.createVariableDeclarationList(
-      [
-        f.createVariableDeclaration(
-          name,
-          undefined,
-          type ? ensureTypeNode(type) : undefined,
-          value,
-        ),
+  constructor() {
+    this.ts = createRequire(import.meta.url)("typescript"); // @todo replace with a dynamic import in next major
+    this.f = this.ts.factory;
+    this.exportModifier = [
+      this.f.createModifier(this.ts.SyntaxKind.ExportKeyword),
+    ];
+    this.asyncModifier = [
+      this.f.createModifier(this.ts.SyntaxKind.AsyncKeyword),
+    ];
+    this.accessModifiers = {
+      public: [this.f.createModifier(this.ts.SyntaxKind.PublicKeyword)],
+      protectedReadonly: [
+        this.f.createModifier(this.ts.SyntaxKind.ProtectedKeyword),
+        this.f.createModifier(this.ts.SyntaxKind.ReadonlyKeyword),
       ],
-      ts.NodeFlags.Const,
-    ),
-  );
+    };
+    this.#primitives = [
+      this.ts.SyntaxKind.AnyKeyword,
+      this.ts.SyntaxKind.BigIntKeyword,
+      this.ts.SyntaxKind.BooleanKeyword,
+      this.ts.SyntaxKind.NeverKeyword,
+      this.ts.SyntaxKind.NumberKeyword,
+      this.ts.SyntaxKind.ObjectKeyword,
+      this.ts.SyntaxKind.StringKeyword,
+      this.ts.SyntaxKind.SymbolKeyword,
+      this.ts.SyntaxKind.UndefinedKeyword,
+      this.ts.SyntaxKind.UnknownKeyword,
+      this.ts.SyntaxKind.VoidKeyword,
+    ];
+  }
 
-export const makePublicLiteralType = (
-  name: ts.Identifier | string,
-  literals: string[],
-) =>
-  makeType(name, makeUnion(R.map(makeLiteralType, literals)), { expose: true });
-
-export const makeType = (
-  name: ts.Identifier | string,
-  value: ts.TypeNode,
-  {
-    expose,
-    comment,
-    params,
-  }: { expose?: boolean; comment?: string; params?: TypeParams } = {},
-) => {
-  const node = f.createTypeAliasDeclaration(
-    expose ? exportModifier : undefined,
-    name,
-    params && makeTypeParams(params),
-    value,
-  );
-  return comment ? addJsDoc(node, comment) : node;
-};
-
-export const makePublicProperty = (
-  name: string | ts.PropertyName,
-  type: Typeable,
-) =>
-  f.createPropertyDeclaration(
-    accessModifiers.public,
-    name,
-    undefined,
-    ensureTypeNode(type),
-    undefined,
-  );
-
-export const makePublicMethod = (
-  name: ts.Identifier,
-  params: ts.ParameterDeclaration[],
-  statements: ts.Statement[],
-  {
-    typeParams,
-    returns,
-  }: { typeParams?: TypeParams; returns?: ts.TypeNode } = {},
-) =>
-  f.createMethodDeclaration(
-    accessModifiers.public,
-    undefined,
-    name,
-    undefined,
-    typeParams && makeTypeParams(typeParams),
-    params,
-    returns,
-    f.createBlock(statements),
-  );
-
-export const makePublicClass = (
-  name: string,
-  statements: ts.ClassElement[],
-  { typeParams }: { typeParams?: TypeParams } = {},
-) =>
-  f.createClassDeclaration(
-    exportModifier,
-    name,
-    typeParams && makeTypeParams(typeParams),
-    undefined,
-    statements,
-  );
-
-export const makeKeyOf = (subj: Typeable) =>
-  f.createTypeOperatorNode(ts.SyntaxKind.KeyOfKeyword, ensureTypeNode(subj));
-
-export const makePromise = (subject: Typeable) =>
-  ensureTypeNode(Promise.name, [subject]);
-
-export const makeInterface = (
-  name: ts.Identifier | string,
-  props: ts.PropertySignature[],
-  { expose, comment }: { expose?: boolean; comment?: string } = {},
-) => {
-  const node = f.createInterfaceDeclaration(
-    expose ? exportModifier : undefined,
-    name,
-    undefined,
-    undefined,
-    props,
-  );
-  return comment ? addJsDoc(node, comment) : node;
-};
-
-export const makeTypeParams = (
-  params:
-    | string[]
-    | Partial<
-        Record<string, Typeable | { type?: ts.TypeNode; init: Typeable }>
-      >,
-) =>
-  (Array.isArray(params)
-    ? params.map((name) => R.pair(name, undefined))
-    : Object.entries(params)
-  ).map(([name, val]) => {
-    const { type, init } =
-      typeof val === "object" && "init" in val ? val : { type: val };
-    return f.createTypeParameterDeclaration(
-      [],
-      name,
-      type ? ensureTypeNode(type) : undefined,
-      init ? ensureTypeNode(init) : undefined,
+  public addJsDoc = <T extends ts.Node>(node: T, text: string) =>
+    this.ts.addSyntheticLeadingComment(
+      node,
+      this.ts.SyntaxKind.MultiLineCommentTrivia,
+      `* ${text} `,
+      true,
     );
-  });
 
-export const makeArrowFn = (
-  params:
-    | Array<Parameters<typeof makeParam>[0]>
-    | Parameters<typeof makeParams>[0],
-  body: ts.ConciseBody,
-  { isAsync }: { isAsync?: boolean } = {},
-) =>
-  f.createArrowFunction(
-    isAsync ? asyncModifier : undefined,
-    undefined,
-    Array.isArray(params) ? R.map(makeParam, params) : makeParams(params),
-    undefined,
-    undefined,
-    body,
-  );
+  public printNode = (node: ts.Node, printerOptions?: ts.PrinterOptions) => {
+    const sourceFile = this.ts.createSourceFile(
+      "print.ts",
+      "",
+      this.ts.ScriptTarget.Latest,
+      false,
+      this.ts.ScriptKind.TS,
+    );
+    const printer = this.ts.createPrinter(printerOptions);
+    return printer.printNode(this.ts.EmitHint.Unspecified, node, sourceFile);
+  };
 
-export const propOf = <T>(name: keyof NoInfer<T>) => name as string;
+  public makePropertyIdentifier = (name: string | number) =>
+    typeof name === "string" && this.#safePropRegex.test(name)
+      ? this.f.createIdentifier(name)
+      : this.literally(name);
 
-export const makeTernary = (
-  condition: ts.Expression,
-  positive: ts.Expression,
-  negative: ts.Expression,
-) =>
-  f.createConditionalExpression(
-    condition,
-    f.createToken(ts.SyntaxKind.QuestionToken),
-    positive,
-    f.createToken(ts.SyntaxKind.ColonToken),
-    negative,
-  );
-
-export const makeCall =
-  (
-    first: ts.Expression | string,
-    ...rest: Array<ts.Identifier | ts.ConditionalExpression | string>
+  public makeTemplate = (
+    head: string,
+    ...rest: ([ts.Expression] | [ts.Expression, string])[]
   ) =>
-  (...args: ts.Expression[]) =>
-    f.createCallExpression(
-      rest.reduce(
-        (acc, entry) =>
-          typeof entry === "string" || ts.isIdentifier(entry)
-            ? f.createPropertyAccessExpression(acc, entry)
-            : f.createElementAccessExpression(acc, entry),
-        typeof first === "string" ? f.createIdentifier(first) : first,
+    this.f.createTemplateExpression(
+      this.f.createTemplateHead(head),
+      rest.map(([id, str = ""], idx) =>
+        this.f.createTemplateSpan(
+          id,
+          idx === rest.length - 1
+            ? this.f.createTemplateTail(str)
+            : this.f.createTemplateMiddle(str),
+        ),
       ),
-      undefined,
-      args,
     );
 
-export const makeNew = (cls: string, ...args: ts.Expression[]) =>
-  f.createNewExpression(f.createIdentifier(cls), undefined, args);
+  public makeParam = (
+    name: string | ts.Identifier,
+    {
+      type,
+      mod,
+      init,
+      optional,
+    }: {
+      type?: Typeable;
+      mod?: ts.Modifier[];
+      init?: ts.Expression;
+      optional?: boolean;
+    } = {},
+  ) =>
+    this.f.createParameterDeclaration(
+      mod,
+      undefined,
+      name,
+      optional
+        ? this.f.createToken(this.ts.SyntaxKind.QuestionToken)
+        : undefined,
+      type ? this.ensureTypeNode(type) : undefined,
+      init,
+    );
 
-export const makeExtract = (base: Typeable, narrow: ts.TypeNode) =>
-  ensureTypeNode("Extract", [base, narrow]);
+  public makeParams = (
+    params: Partial<
+      Record<string, Typeable | Parameters<typeof this.makeParam>[1]>
+    >,
+  ) =>
+    Object.entries(params).map(([name, value]) =>
+      this.makeParam(
+        name,
+        typeof value === "string" ||
+          typeof value === "number" ||
+          (typeof value === "object" && "kind" in value)
+          ? { type: value }
+          : value,
+      ),
+    );
 
-export const makeAssignment = (left: ts.Expression, right: ts.Expression) =>
-  f.createExpressionStatement(
-    f.createBinaryExpression(
-      left,
-      f.createToken(ts.SyntaxKind.EqualsToken),
-      right,
-    ),
-  );
+  public makePublicConstructor = (
+    params: ts.ParameterDeclaration[],
+    statements: ts.Statement[] = [],
+  ) =>
+    this.f.createConstructorDeclaration(
+      this.accessModifiers.public,
+      params,
+      this.f.createBlock(statements),
+    );
 
-export const makeIndexed = (subject: Typeable, index: Typeable) =>
-  f.createIndexedAccessTypeNode(ensureTypeNode(subject), ensureTypeNode(index));
+  public ensureTypeNode = (
+    subject: Typeable,
+    args?: Typeable[], // only for string and id
+  ): ts.TypeNode =>
+    typeof subject === "number"
+      ? this.f.createKeywordTypeNode(subject)
+      : typeof subject === "string" || this.ts.isIdentifier(subject)
+        ? this.f.createTypeReferenceNode(
+            subject,
+            args && R.map(this.ensureTypeNode.bind(this), args),
+          )
+        : subject;
 
-export const makeMaybeAsync = (subj: Typeable) =>
-  makeUnion([ensureTypeNode(subj), makePromise(subj)]);
+  // Record<string, any>
+  public makeRecordStringAny = () =>
+    this.ensureTypeNode("Record", [
+      this.ts.SyntaxKind.StringKeyword,
+      this.ts.SyntaxKind.AnyKeyword,
+    ]);
 
-export const makeFnType = (
-  params: Parameters<typeof makeParams>[0],
-  returns: Typeable,
-) =>
-  f.createFunctionTypeNode(
-    undefined,
-    makeParams(params),
-    ensureTypeNode(returns),
-  );
+  /** ensures distinct union (unique primitives) */
+  public makeUnion = (entries: ts.TypeNode[]) => {
+    const nodes = new Map<
+      ts.TypeNode | ts.KeywordTypeSyntaxKind,
+      ts.TypeNode
+    >();
+    for (const entry of entries)
+      nodes.set(this.isPrimitive(entry) ? entry.kind : entry, entry);
+    return this.f.createUnionTypeNode(Array.from(nodes.values()));
+  };
 
-/* eslint-disable prettier/prettier -- shorter and works better this way than overrides */
-export const literally = <T extends string | null | boolean | number | bigint>(subj: T) => (
-  typeof subj === "number" ? f.createNumericLiteral(subj)
-    : typeof subj === "bigint" ? f.createBigIntLiteral(subj.toString())
-    : typeof subj === "boolean" ? subj ? f.createTrue() : f.createFalse()
-    : subj === null ? f.createNull() : f.createStringLiteral(subj)
+  public makeInterfaceProp = (
+    name: string | number,
+    value: Typeable,
+    {
+      isOptional,
+      isDeprecated,
+      comment,
+    }: { isOptional?: boolean; isDeprecated?: boolean; comment?: string } = {},
+  ) => {
+    const propType = this.ensureTypeNode(value);
+    const node = this.f.createPropertySignature(
+      undefined,
+      this.makePropertyIdentifier(name),
+      isOptional
+        ? this.f.createToken(this.ts.SyntaxKind.QuestionToken)
+        : undefined,
+      isOptional
+        ? this.makeUnion([
+            propType,
+            this.ensureTypeNode(this.ts.SyntaxKind.UndefinedKeyword),
+          ])
+        : propType,
+    );
+    const jsdoc = R.reject(R.isNil, [
+      isDeprecated ? "@deprecated" : undefined,
+      comment,
+    ]);
+    return jsdoc.length ? this.addJsDoc(node, jsdoc.join(" ")) : node;
+  };
+
+  public makeOneLine = (subject: ts.TypeNode) =>
+    this.ts.setEmitFlags(subject, this.ts.EmitFlags.SingleLine);
+
+  public makeDeconstruction = (
+    ...names: ts.Identifier[]
+  ): ts.ArrayBindingPattern =>
+    this.f.createArrayBindingPattern(
+      names.map(
+        (name) => this.f.createBindingElement(undefined, undefined, name), // can also add default value at last
+      ),
+    );
+
+  public makeConst = (
+    name: string | ts.Identifier | ts.ArrayBindingPattern,
+    value: ts.Expression,
+    { type, expose }: { type?: Typeable; expose?: true } = {},
+  ) =>
+    this.f.createVariableStatement(
+      expose && this.exportModifier,
+      this.f.createVariableDeclarationList(
+        [
+          this.f.createVariableDeclaration(
+            name,
+            undefined,
+            type ? this.ensureTypeNode(type) : undefined,
+            value,
+          ),
+        ],
+        this.ts.NodeFlags.Const,
+      ),
+    );
+
+  public makePublicLiteralType = (
+    name: ts.Identifier | string,
+    literals: string[],
+  ) =>
+    this.makeType(
+      name,
+      this.makeUnion(R.map(this.makeLiteralType.bind(this), literals)),
+      { expose: true },
+    );
+
+  public makeType = (
+    name: ts.Identifier | string,
+    value: ts.TypeNode,
+    {
+      expose,
+      comment,
+      params,
+    }: { expose?: boolean; comment?: string; params?: TypeParams } = {},
+  ) => {
+    const node = this.f.createTypeAliasDeclaration(
+      expose ? this.exportModifier : undefined,
+      name,
+      params && this.makeTypeParams(params),
+      value,
+    );
+    return comment ? this.addJsDoc(node, comment) : node;
+  };
+
+  public makePublicProperty = (
+    name: string | ts.PropertyName,
+    type: Typeable,
+  ) =>
+    this.f.createPropertyDeclaration(
+      this.accessModifiers.public,
+      name,
+      undefined,
+      this.ensureTypeNode(type),
+      undefined,
+    );
+
+  public makePublicMethod = (
+    name: ts.Identifier,
+    params: ts.ParameterDeclaration[],
+    statements: ts.Statement[],
+    {
+      typeParams,
+      returns,
+    }: { typeParams?: TypeParams; returns?: ts.TypeNode } = {},
+  ) =>
+    this.f.createMethodDeclaration(
+      this.accessModifiers.public,
+      undefined,
+      name,
+      undefined,
+      typeParams && this.makeTypeParams(typeParams),
+      params,
+      returns,
+      this.f.createBlock(statements),
+    );
+
+  public makePublicClass = (
+    name: string,
+    statements: ts.ClassElement[],
+    { typeParams }: { typeParams?: TypeParams } = {},
+  ) =>
+    this.f.createClassDeclaration(
+      this.exportModifier,
+      name,
+      typeParams && this.makeTypeParams(typeParams),
+      undefined,
+      statements,
+    );
+
+  public makeKeyOf = (subj: Typeable) =>
+    this.f.createTypeOperatorNode(
+      this.ts.SyntaxKind.KeyOfKeyword,
+      this.ensureTypeNode(subj),
+    );
+
+  public makePromise = (subject: Typeable) =>
+    this.ensureTypeNode(Promise.name, [subject]);
+
+  public makeInterface = (
+    name: ts.Identifier | string,
+    props: ts.PropertySignature[],
+    { expose, comment }: { expose?: boolean; comment?: string } = {},
+  ) => {
+    const node = this.f.createInterfaceDeclaration(
+      expose ? this.exportModifier : undefined,
+      name,
+      undefined,
+      undefined,
+      props,
+    );
+    return comment ? this.addJsDoc(node, comment) : node;
+  };
+
+  public makeTypeParams = (
+    params:
+      | string[]
+      | Partial<
+          Record<string, Typeable | { type?: ts.TypeNode; init: Typeable }>
+        >,
+  ) =>
+    (Array.isArray(params)
+      ? params.map((name) => R.pair(name, undefined))
+      : Object.entries(params)
+    ).map(([name, val]) => {
+      const { type, init } =
+        typeof val === "object" && "init" in val ? val : { type: val };
+      return this.f.createTypeParameterDeclaration(
+        [],
+        name,
+        type ? this.ensureTypeNode(type) : undefined,
+        init ? this.ensureTypeNode(init) : undefined,
+      );
+    });
+
+  public makeArrowFn = (
+    params:
+      | Array<Parameters<typeof this.makeParam>[0]>
+      | Parameters<typeof this.makeParams>[0],
+    body: ts.ConciseBody,
+    { isAsync }: { isAsync?: boolean } = {},
+  ) =>
+    this.f.createArrowFunction(
+      isAsync ? this.asyncModifier : undefined,
+      undefined,
+      Array.isArray(params)
+        ? R.map(this.makeParam.bind(this), params)
+        : this.makeParams(params),
+      undefined,
+      undefined,
+      body,
+    );
+
+  public makeTernary = (
+    condition: ts.Expression,
+    positive: ts.Expression,
+    negative: ts.Expression,
+  ) =>
+    this.f.createConditionalExpression(
+      condition,
+      this.f.createToken(this.ts.SyntaxKind.QuestionToken),
+      positive,
+      this.f.createToken(this.ts.SyntaxKind.ColonToken),
+      negative,
+    );
+
+  public makeCall =
+    (
+      first: ts.Expression | string,
+      ...rest: Array<ts.Identifier | ts.ConditionalExpression | string>
+    ) =>
+    (...args: ts.Expression[]) =>
+      this.f.createCallExpression(
+        rest.reduce(
+          (acc, entry) =>
+            typeof entry === "string" || this.ts.isIdentifier(entry)
+              ? this.f.createPropertyAccessExpression(acc, entry)
+              : this.f.createElementAccessExpression(acc, entry),
+          typeof first === "string" ? this.f.createIdentifier(first) : first,
+        ),
+        undefined,
+        args,
+      );
+
+  public makeNew = (cls: string, ...args: ts.Expression[]) =>
+    this.f.createNewExpression(this.f.createIdentifier(cls), undefined, args);
+
+  public makeExtract = (base: Typeable, narrow: ts.TypeNode) =>
+    this.ensureTypeNode("Extract", [base, narrow]);
+
+  public makeAssignment = (left: ts.Expression, right: ts.Expression) =>
+    this.f.createExpressionStatement(
+      this.f.createBinaryExpression(
+        left,
+        this.f.createToken(this.ts.SyntaxKind.EqualsToken),
+        right,
+      ),
+    );
+
+  public makeIndexed = (subject: Typeable, index: Typeable) =>
+    this.f.createIndexedAccessTypeNode(
+      this.ensureTypeNode(subject),
+      this.ensureTypeNode(index),
+    );
+
+  public makeMaybeAsync = (subj: Typeable) =>
+    this.makeUnion([this.ensureTypeNode(subj), this.makePromise(subj)]);
+
+  public makeFnType = (
+    params: Parameters<typeof this.makeParams>[0],
+    returns: Typeable,
+  ) =>
+    this.f.createFunctionTypeNode(
+      undefined,
+      this.makeParams(params),
+      this.ensureTypeNode(returns),
+    );
+
+  /* eslint-disable prettier/prettier -- shorter and works better this way than overrides */
+  public literally = <T extends string | null | boolean | number | bigint>(subj: T) => (
+    typeof subj === "number" ? this.f.createNumericLiteral(subj)
+      : typeof subj === "bigint" ? this.f.createBigIntLiteral(subj.toString())
+        : typeof subj === "boolean" ? subj ? this.f.createTrue() : this.f.createFalse()
+          : subj === null ? this.f.createNull() : this.f.createStringLiteral(subj)
   ) as T extends string ? ts.StringLiteral : T extends number ? ts.NumericLiteral
     : T extends boolean ? ts.BooleanLiteral : ts.NullLiteral;
-/* eslint-enable prettier/prettier */
+  /* eslint-enable prettier/prettier */
 
-export const makeLiteralType = (subj: Parameters<typeof literally>[0]) =>
-  f.createLiteralTypeNode(literally(subj));
+  public makeLiteralType = (subj: Parameters<typeof this.literally>[0]) =>
+    this.f.createLiteralTypeNode(this.literally(subj));
 
-const primitives: ts.KeywordTypeSyntaxKind[] = [
-  ts.SyntaxKind.AnyKeyword,
-  ts.SyntaxKind.BigIntKeyword,
-  ts.SyntaxKind.BooleanKeyword,
-  ts.SyntaxKind.NeverKeyword,
-  ts.SyntaxKind.NumberKeyword,
-  ts.SyntaxKind.ObjectKeyword,
-  ts.SyntaxKind.StringKeyword,
-  ts.SyntaxKind.SymbolKeyword,
-  ts.SyntaxKind.UndefinedKeyword,
-  ts.SyntaxKind.UnknownKeyword,
-  ts.SyntaxKind.VoidKeyword,
-];
+  public isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
+    (this.#primitives as ts.SyntaxKind[]).includes(node.kind);
+}
 
-const isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
-  (primitives as ts.SyntaxKind[]).includes(node.kind);
+export const propOf = <T>(name: keyof NoInfer<T>) => name as string;
