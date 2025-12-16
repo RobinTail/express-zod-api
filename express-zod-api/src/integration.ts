@@ -4,7 +4,6 @@ import { z } from "zod";
 import { ResponseVariant, responseVariants } from "./api-response";
 import { IntegrationBase } from "./integration-base";
 import {
-  f,
   makeInterfaceProp,
   makeInterface,
   makeType,
@@ -147,7 +146,7 @@ export class Integration extends IntegrationBase {
           makeIndexed(this.interfaces.positive, literalIdx),
           makeIndexed(this.interfaces.negative, literalIdx),
         ]),
-        encoded: f.createIntersectionTypeNode([
+        encoded: this.f.createIntersectionTypeNode([
           ensureTypeNode(dictionaries.positive.name),
           ensureTypeNode(dictionaries.negative.name),
         ]),
@@ -203,7 +202,7 @@ export class Integration extends IntegrationBase {
       usageExampleText &&
       this.ts.addSyntheticLeadingComment(
         this.ts.addSyntheticLeadingComment(
-          f.createEmptyStatement(),
+          this.f.createEmptyStatement(),
           this.ts.SyntaxKind.SingleLineCommentTrivia,
           " Usage example:",
         ),
