@@ -22,42 +22,44 @@ export abstract class IntegrationBase extends TypescriptAPI {
   >();
 
   readonly #ids = {
-    pathType: "Path",
-    implementationType: "Implementation",
-    keyParameter: "key",
-    pathParameter: "path",
-    paramsArgument: "params",
-    ctxArgument: "ctx",
-    methodParameter: "method",
-    requestParameter: "request",
-    eventParameter: "event",
-    dataParameter: "data",
-    handlerParameter: "handler",
-    msgParameter: "msg",
-    parseRequestFn: "parseRequest",
-    substituteFn: "substitute",
-    provideMethod: "provide",
-    onMethod: "on",
-    implementationArgument: "implementation",
-    hasBodyConst: "hasBody",
-    undefinedValue: "undefined",
-    responseConst: "response",
-    restConst: "rest",
-    searchParamsConst: "searchParams",
-    defaultImplementationConst: "defaultImplementation",
-    clientConst: "client",
-    contentTypeConst: "contentType",
-    isJsonConst: "isJSON",
-    sourceProp: "source",
-  } satisfies Record<string, string>;
+    pathType: this.f.createIdentifier("Path"),
+    implementationType: this.f.createIdentifier("Implementation"),
+    keyParameter: this.f.createIdentifier("key"),
+    pathParameter: this.f.createIdentifier("path"),
+    paramsArgument: this.f.createIdentifier("params"),
+    ctxArgument: this.f.createIdentifier("ctx"),
+    methodParameter: this.f.createIdentifier("method"),
+    requestParameter: this.f.createIdentifier("request"),
+    eventParameter: this.f.createIdentifier("event"),
+    dataParameter: this.f.createIdentifier("data"),
+    handlerParameter: this.f.createIdentifier("handler"),
+    msgParameter: this.f.createIdentifier("msg"),
+    parseRequestFn: this.f.createIdentifier("parseRequest"),
+    substituteFn: this.f.createIdentifier("substitute"),
+    provideMethod: this.f.createIdentifier("provide"),
+    onMethod: this.f.createIdentifier("on"),
+    implementationArgument: this.f.createIdentifier("implementation"),
+    hasBodyConst: this.f.createIdentifier("hasBody"),
+    undefinedValue: this.f.createIdentifier("undefined"),
+    responseConst: this.f.createIdentifier("response"),
+    restConst: this.f.createIdentifier("rest"),
+    searchParamsConst: this.f.createIdentifier("searchParams"),
+    defaultImplementationConst: this.f.createIdentifier(
+      "defaultImplementation",
+    ),
+    clientConst: this.f.createIdentifier("client"),
+    contentTypeConst: this.f.createIdentifier("contentType"),
+    isJsonConst: this.f.createIdentifier("isJSON"),
+    sourceProp: this.f.createIdentifier("source"),
+  } satisfies Record<string, ts.Identifier>;
 
   /** @internal */
-  protected interfaces: Record<IOKind, string> = {
-    input: "Input",
-    positive: "PositiveResponse",
-    negative: "NegativeResponse",
-    encoded: "EncodedResponse",
-    response: "Response",
+  protected interfaces: Record<IOKind, ts.Identifier> = {
+    input: this.f.createIdentifier("Input"),
+    positive: this.f.createIdentifier("PositiveResponse"),
+    negative: this.f.createIdentifier("NegativeResponse"),
+    encoded: this.f.createIdentifier("EncodedResponse"),
+    response: this.f.createIdentifier("Response"),
   };
 
   /**
@@ -148,10 +150,10 @@ export abstract class IntegrationBase extends TypescriptAPI {
       this.#ids.implementationType,
       this.makeFnType(
         {
-          [this.#ids.methodParameter]: this.methodType.name,
-          [this.#ids.pathParameter]: this.ts.SyntaxKind.StringKeyword,
-          [this.#ids.paramsArgument]: this.makeRecordStringAny(),
-          [this.#ids.ctxArgument]: { optional: true, type: "T" },
+          [this.#ids.methodParameter.text]: this.methodType.name,
+          [this.#ids.pathParameter.text]: this.ts.SyntaxKind.StringKeyword,
+          [this.#ids.paramsArgument.text]: this.makeRecordStringAny(),
+          [this.#ids.ctxArgument.text]: { optional: true, type: "T" },
         },
         this.makePromise(this.ts.SyntaxKind.AnyKeyword),
       ),
@@ -169,7 +171,7 @@ export abstract class IntegrationBase extends TypescriptAPI {
     this.makeConst(
       this.#ids.parseRequestFn,
       this.makeArrowFn(
-        { [this.#ids.requestParameter]: this.ts.SyntaxKind.StringKeyword },
+        { [this.#ids.requestParameter.text]: this.ts.SyntaxKind.StringKeyword },
         this.f.createAsExpression(
           this.makeCall(this.#ids.requestParameter, propOf<string>("split"))(
             this.f.createRegularExpressionLiteral("/ (.+)/"), // split once
@@ -192,16 +194,14 @@ export abstract class IntegrationBase extends TypescriptAPI {
       this.#ids.substituteFn,
       this.makeArrowFn(
         {
-          [this.#ids.pathParameter]: this.ts.SyntaxKind.StringKeyword,
-          [this.#ids.paramsArgument]: this.makeRecordStringAny(),
+          [this.#ids.pathParameter.text]: this.ts.SyntaxKind.StringKeyword,
+          [this.#ids.paramsArgument.text]: this.makeRecordStringAny(),
         },
         this.f.createBlock([
           this.makeConst(
             this.#ids.restConst,
             this.f.createObjectLiteralExpression([
-              this.f.createSpreadAssignment(
-                this.ts.factory.createIdentifier(this.#ids.paramsArgument),
-              ),
+              this.f.createSpreadAssignment(this.#ids.paramsArgument),
             ]),
           ),
           this.f.createForInStatement(
@@ -209,40 +209,30 @@ export abstract class IntegrationBase extends TypescriptAPI {
               [this.f.createVariableDeclaration(this.#ids.keyParameter)],
               this.ts.NodeFlags.Const,
             ),
-            this.ts.factory.createIdentifier(this.#ids.paramsArgument),
+            this.#ids.paramsArgument,
             this.f.createBlock([
               this.makeAssignment(
-                this.ts.factory.createIdentifier(this.#ids.pathParameter),
+                this.#ids.pathParameter,
                 this.makeCall(
                   this.#ids.pathParameter,
                   propOf<string>("replace"),
                 )(
-                  this.makeTemplate(":", [
-                    this.ts.factory.createIdentifier(this.#ids.keyParameter),
-                  ]), // `:${key}`
+                  this.makeTemplate(":", [this.#ids.keyParameter]), // `:${key}`
                   this.makeArrowFn(
                     [],
                     this.f.createBlock([
                       this.f.createExpressionStatement(
                         this.f.createDeleteExpression(
                           this.f.createElementAccessExpression(
-                            this.ts.factory.createIdentifier(
-                              this.#ids.restConst,
-                            ),
-                            this.ts.factory.createIdentifier(
-                              this.#ids.keyParameter,
-                            ),
+                            this.#ids.restConst,
+                            this.#ids.keyParameter,
                           ),
                         ),
                       ),
                       this.f.createReturnStatement(
                         this.f.createElementAccessExpression(
-                          this.ts.factory.createIdentifier(
-                            this.#ids.paramsArgument,
-                          ),
-                          this.ts.factory.createIdentifier(
-                            this.#ids.keyParameter,
-                          ),
+                          this.#ids.paramsArgument,
+                          this.#ids.keyParameter,
                         ),
                       ),
                     ]),
@@ -254,8 +244,8 @@ export abstract class IntegrationBase extends TypescriptAPI {
           this.f.createReturnStatement(
             this.f.createAsExpression(
               this.f.createArrayLiteralExpression([
-                this.ts.factory.createIdentifier(this.#ids.pathParameter),
-                this.ts.factory.createIdentifier(this.#ids.restConst),
+                this.#ids.pathParameter,
+                this.#ids.restConst,
               ]),
               this.ensureTypeNode("const"),
             ),
@@ -267,37 +257,35 @@ export abstract class IntegrationBase extends TypescriptAPI {
   // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {}
   #makeProvider = () =>
     this.makePublicMethod(
-      this.ts.factory.createIdentifier(this.#ids.provideMethod),
+      this.#ids.provideMethod,
       this.makeParams({
-        [this.#ids.requestParameter]: "K",
-        [this.#ids.paramsArgument]: this.makeIndexed(
+        [this.#ids.requestParameter.text]: "K",
+        [this.#ids.paramsArgument.text]: this.makeIndexed(
           this.interfaces.input,
           "K",
         ),
-        [this.#ids.ctxArgument]: { optional: true, type: "T" },
+        [this.#ids.ctxArgument.text]: { optional: true, type: "T" },
       }),
       [
         this.makeConst(
           // const [method, path] = this.parseRequest(request);
           this.makeDeconstruction(
-            this.ts.factory.createIdentifier(this.#ids.methodParameter),
-            this.ts.factory.createIdentifier(this.#ids.pathParameter),
+            this.#ids.methodParameter,
+            this.#ids.pathParameter,
           ),
-          this.makeCall(this.#ids.parseRequestFn)(
-            this.ts.factory.createIdentifier(this.#ids.requestParameter),
-          ),
+          this.makeCall(this.#ids.parseRequestFn)(this.#ids.requestParameter),
         ),
         // return this.implementation(___)
         this.f.createReturnStatement(
           this.makeCall(this.f.createThis(), this.#ids.implementationArgument)(
-            this.ts.factory.createIdentifier(this.#ids.methodParameter),
+            this.#ids.methodParameter,
             this.f.createSpreadElement(
               this.makeCall(this.#ids.substituteFn)(
-                this.ts.factory.createIdentifier(this.#ids.pathParameter),
-                this.ts.factory.createIdentifier(this.#ids.paramsArgument),
+                this.#ids.pathParameter,
+                this.#ids.paramsArgument,
               ),
             ),
-            this.ts.factory.createIdentifier(this.#ids.ctxArgument),
+            this.#ids.ctxArgument,
           ),
         ),
       ],
@@ -322,9 +310,7 @@ export abstract class IntegrationBase extends TypescriptAPI {
           this.makeParam(this.#ids.implementationArgument, {
             type: this.ensureTypeNode(this.#ids.implementationType, ["T"]),
             mod: this.accessModifiers.protectedReadonly,
-            init: this.ts.factory.createIdentifier(
-              this.#ids.defaultImplementationConst,
-            ),
+            init: this.#ids.defaultImplementationConst,
           }),
         ]),
         this.#makeProvider(),
@@ -342,8 +328,8 @@ export abstract class IntegrationBase extends TypescriptAPI {
       URL.name,
       this.makeTemplate(
         "",
-        [this.ts.factory.createIdentifier(this.#ids.pathParameter)],
-        [this.ts.factory.createIdentifier(this.#ids.searchParamsConst)],
+        [this.#ids.pathParameter],
+        [this.#ids.searchParamsConst],
       ),
       this.literally(this.serverUrl),
     );
@@ -363,14 +349,14 @@ export abstract class IntegrationBase extends TypescriptAPI {
     const headersProperty = this.f.createPropertyAssignment(
       propOf<RequestInit>("headers"),
       this.makeTernary(
-        this.ts.factory.createIdentifier(this.#ids.hasBodyConst),
+        this.#ids.hasBodyConst,
         this.f.createObjectLiteralExpression([
           this.f.createPropertyAssignment(
             this.literally("Content-Type"),
             this.literally(contentTypes.json),
           ),
         ]),
-        this.ts.factory.createIdentifier(this.#ids.undefinedValue),
+        this.#ids.undefinedValue,
       ),
     );
 
@@ -378,12 +364,12 @@ export abstract class IntegrationBase extends TypescriptAPI {
     const bodyProperty = this.f.createPropertyAssignment(
       propOf<RequestInit>("body"),
       this.makeTernary(
-        this.ts.factory.createIdentifier(this.#ids.hasBodyConst),
+        this.#ids.hasBodyConst,
         this.makeCall(
           JSON[Symbol.toStringTag],
           propOf<JSON>("stringify"),
-        )(this.ts.factory.createIdentifier(this.#ids.paramsArgument)),
-        this.ts.factory.createIdentifier(this.#ids.undefinedValue),
+        )(this.#ids.paramsArgument),
+        this.#ids.undefinedValue,
       ),
     );
 
@@ -413,7 +399,7 @@ export abstract class IntegrationBase extends TypescriptAPI {
             this.literally("delete" satisfies ClientMethod),
           ]),
           propOf<string[]>("includes"),
-        )(this.ts.factory.createIdentifier(this.#ids.methodParameter)),
+        )(this.#ids.methodParameter),
       ),
     );
 
@@ -421,11 +407,9 @@ export abstract class IntegrationBase extends TypescriptAPI {
     const searchParamsStatement = this.makeConst(
       this.#ids.searchParamsConst,
       this.makeTernary(
-        this.ts.factory.createIdentifier(this.#ids.hasBodyConst),
+        this.#ids.hasBodyConst,
         this.literally(""),
-        this.#makeSearchParams(
-          this.ts.factory.createIdentifier(this.#ids.paramsArgument),
-        ),
+        this.#makeSearchParams(this.#ids.paramsArgument),
       ),
     );
 
@@ -443,7 +427,7 @@ export abstract class IntegrationBase extends TypescriptAPI {
     const noBodyStatement = this.f.createIfStatement(
       this.f.createPrefixUnaryExpression(
         this.ts.SyntaxKind.ExclamationToken,
-        this.ts.factory.createIdentifier(this.#ids.contentTypeConst),
+        this.#ids.contentTypeConst,
       ),
       this.f.createReturnStatement(),
     );
@@ -462,7 +446,7 @@ export abstract class IntegrationBase extends TypescriptAPI {
       this.makeCall(
         this.#ids.responseConst,
         this.makeTernary(
-          this.ts.factory.createIdentifier(this.#ids.isJsonConst),
+          this.#ids.isJsonConst,
           this.literally(propOf<Response>("json")),
           this.literally(propOf<Response>("text")),
         ),
@@ -500,25 +484,20 @@ export abstract class IntegrationBase extends TypescriptAPI {
       }),
       [
         this.makeConst(
-          this.makeDeconstruction(
-            this.ts.factory.createIdentifier(this.#ids.pathParameter),
-            this.ts.factory.createIdentifier(this.#ids.restConst),
-          ),
+          this.makeDeconstruction(this.#ids.pathParameter, this.#ids.restConst),
           this.makeCall(this.#ids.substituteFn)(
             this.f.createElementAccessExpression(
               this.makeCall(this.#ids.parseRequestFn)(
-                this.ts.factory.createIdentifier(this.#ids.requestParameter),
+                this.#ids.requestParameter,
               ),
               this.literally(1),
             ),
-            this.ts.factory.createIdentifier(this.#ids.paramsArgument),
+            this.#ids.paramsArgument,
           ),
         ),
         this.makeConst(
           this.#ids.searchParamsConst,
-          this.#makeSearchParams(
-            this.ts.factory.createIdentifier(this.#ids.restConst),
-          ),
+          this.#makeSearchParams(this.#ids.restConst),
         ),
         this.makeAssignment(
           this.f.createPropertyAccessExpression(
@@ -537,12 +516,12 @@ export abstract class IntegrationBase extends TypescriptAPI {
 
   #makeOnMethod = () =>
     this.makePublicMethod(
-      this.ts.factory.createIdentifier(this.#ids.onMethod),
+      this.#ids.onMethod,
       this.makeParams({
-        [this.#ids.eventParameter]: "E",
-        [this.#ids.handlerParameter]: this.makeFnType(
+        [this.#ids.eventParameter.text]: "E",
+        [this.#ids.handlerParameter.text]: this.makeFnType(
           {
-            [this.#ids.dataParameter]: this.makeIndexed(
+            [this.#ids.dataParameter.text]: this.makeIndexed(
               this.makeExtract(
                 "R",
                 this.makeOneLine(this.#makeEventNarrow("E")),
@@ -560,7 +539,7 @@ export abstract class IntegrationBase extends TypescriptAPI {
             this.#ids.sourceProp,
             propOf<EventSource>("addEventListener"),
           )(
-            this.ts.factory.createIdentifier(this.#ids.eventParameter),
+            this.#ids.eventParameter,
             this.makeArrowFn(
               [this.#ids.msgParameter],
               this.makeCall(this.#ids.handlerParameter)(
@@ -571,9 +550,7 @@ export abstract class IntegrationBase extends TypescriptAPI {
                   this.f.createPropertyAccessExpression(
                     this.f.createParenthesizedExpression(
                       this.f.createAsExpression(
-                        this.ts.factory.createIdentifier(
-                          this.#ids.msgParameter,
-                        ),
+                        this.#ids.msgParameter,
                         this.ensureTypeNode(MessageEvent.name),
                       ),
                     ),
