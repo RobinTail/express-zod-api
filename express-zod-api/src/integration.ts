@@ -90,7 +90,7 @@ export class Integration extends IntegrationBase {
     hasHeadMethod = true,
   }: IntegrationParams) {
     super(serverUrl);
-    const commons = { makeAlias: this.#makeAlias.bind(this) };
+    const commons = { makeAlias: this.#makeAlias.bind(this), api: this };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
