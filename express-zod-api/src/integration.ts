@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import ts from "typescript";
+import type ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant, responseVariants } from "./api-response";
 import { IntegrationBase } from "./integration-base";
@@ -201,13 +201,13 @@ export class Integration extends IntegrationBase {
     const usageExampleText = this.#printUsage(printerOptions);
     const commentNode =
       usageExampleText &&
-      ts.addSyntheticLeadingComment(
-        ts.addSyntheticLeadingComment(
+      this.ts.addSyntheticLeadingComment(
+        this.ts.addSyntheticLeadingComment(
           f.createEmptyStatement(),
-          ts.SyntaxKind.SingleLineCommentTrivia,
+          this.ts.SyntaxKind.SingleLineCommentTrivia,
           " Usage example:",
         ),
-        ts.SyntaxKind.MultiLineCommentTrivia,
+        this.ts.SyntaxKind.MultiLineCommentTrivia,
         `\n${usageExampleText}`,
       );
     return this.#program
