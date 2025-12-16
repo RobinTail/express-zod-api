@@ -89,12 +89,12 @@ export abstract class IntegrationBase {
   } satisfies Record<string, string>;
 
   /** @internal */
-  protected interfaces: Record<IOKind, ts.Identifier> = {
-    input: f.createIdentifier("Input"),
-    positive: f.createIdentifier("PositiveResponse"),
-    negative: f.createIdentifier("NegativeResponse"),
-    encoded: f.createIdentifier("EncodedResponse"),
-    response: f.createIdentifier("Response"),
+  protected interfaces: Record<IOKind, string> = {
+    input: "Input",
+    positive: "PositiveResponse",
+    negative: "NegativeResponse",
+    encoded: "EncodedResponse",
+    response: "Response",
   };
 
   /**
