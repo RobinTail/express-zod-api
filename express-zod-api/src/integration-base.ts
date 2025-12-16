@@ -59,34 +59,34 @@ export abstract class IntegrationBase {
   protected ts: typeof ts;
 
   readonly #ids = {
-    pathType: f.createIdentifier("Path"),
-    implementationType: f.createIdentifier("Implementation"),
-    keyParameter: f.createIdentifier("key"),
-    pathParameter: f.createIdentifier("path"),
-    paramsArgument: f.createIdentifier("params"),
-    ctxArgument: f.createIdentifier("ctx"),
-    methodParameter: f.createIdentifier("method"),
-    requestParameter: f.createIdentifier("request"),
-    eventParameter: f.createIdentifier("event"),
-    dataParameter: f.createIdentifier("data"),
-    handlerParameter: f.createIdentifier("handler"),
-    msgParameter: f.createIdentifier("msg"),
-    parseRequestFn: f.createIdentifier("parseRequest"),
-    substituteFn: f.createIdentifier("substitute"),
-    provideMethod: f.createIdentifier("provide"),
-    onMethod: f.createIdentifier("on"),
-    implementationArgument: f.createIdentifier("implementation"),
-    hasBodyConst: f.createIdentifier("hasBody"),
-    undefinedValue: f.createIdentifier("undefined"),
-    responseConst: f.createIdentifier("response"),
-    restConst: f.createIdentifier("rest"),
-    searchParamsConst: f.createIdentifier("searchParams"),
-    defaultImplementationConst: f.createIdentifier("defaultImplementation"),
-    clientConst: f.createIdentifier("client"),
-    contentTypeConst: f.createIdentifier("contentType"),
-    isJsonConst: f.createIdentifier("isJSON"),
-    sourceProp: f.createIdentifier("source"),
-  } satisfies Record<string, ts.Identifier>;
+    pathType: "Path",
+    implementationType: "Implementation",
+    keyParameter: "key",
+    pathParameter: "path",
+    paramsArgument: "params",
+    ctxArgument: "ctx",
+    methodParameter: "method",
+    requestParameter: "request",
+    eventParameter: "event",
+    dataParameter: "data",
+    handlerParameter: "handler",
+    msgParameter: "msg",
+    parseRequestFn: "parseRequest",
+    substituteFn: "substitute",
+    provideMethod: "provide",
+    onMethod: "on",
+    implementationArgument: "implementation",
+    hasBodyConst: "hasBody",
+    undefinedValue: "undefined",
+    responseConst: "response",
+    restConst: "rest",
+    searchParamsConst: "searchParams",
+    defaultImplementationConst: "defaultImplementation",
+    clientConst: "client",
+    contentTypeConst: "contentType",
+    isJsonConst: "isJSON",
+    sourceProp: "source",
+  } satisfies Record<string, string>;
 
   /** @internal */
   protected interfaces: Record<IOKind, ts.Identifier> = {
@@ -181,10 +181,10 @@ export abstract class IntegrationBase {
       this.#ids.implementationType,
       makeFnType(
         {
-          [this.#ids.methodParameter.text]: this.methodType.name,
-          [this.#ids.pathParameter.text]: this.ts.SyntaxKind.StringKeyword,
-          [this.#ids.paramsArgument.text]: recordStringAny,
-          [this.#ids.ctxArgument.text]: { optional: true, type: "T" },
+          [this.#ids.methodParameter]: this.methodType.name,
+          [this.#ids.pathParameter]: this.ts.SyntaxKind.StringKeyword,
+          [this.#ids.paramsArgument]: recordStringAny,
+          [this.#ids.ctxArgument]: { optional: true, type: "T" },
         },
         makePromise(this.ts.SyntaxKind.AnyKeyword),
       ),
@@ -202,7 +202,7 @@ export abstract class IntegrationBase {
     makeConst(
       this.#ids.parseRequestFn,
       makeArrowFn(
-        { [this.#ids.requestParameter.text]: this.ts.SyntaxKind.StringKeyword },
+        { [this.#ids.requestParameter]: this.ts.SyntaxKind.StringKeyword },
         f.createAsExpression(
           makeCall(this.#ids.requestParameter, propOf<string>("split"))(
             f.createRegularExpressionLiteral("/ (.+)/"), // split once
@@ -225,14 +225,16 @@ export abstract class IntegrationBase {
       this.#ids.substituteFn,
       makeArrowFn(
         {
-          [this.#ids.pathParameter.text]: this.ts.SyntaxKind.StringKeyword,
-          [this.#ids.paramsArgument.text]: recordStringAny,
+          [this.#ids.pathParameter]: this.ts.SyntaxKind.StringKeyword,
+          [this.#ids.paramsArgument]: recordStringAny,
         },
         f.createBlock([
           makeConst(
             this.#ids.restConst,
             f.createObjectLiteralExpression([
-              f.createSpreadAssignment(this.#ids.paramsArgument),
+              f.createSpreadAssignment(
+                this.ts.factory.createIdentifier(this.#ids.paramsArgument),
+              ),
             ]),
           ),
           f.createForInStatement(
@@ -240,27 +242,37 @@ export abstract class IntegrationBase {
               [f.createVariableDeclaration(this.#ids.keyParameter)],
               this.ts.NodeFlags.Const,
             ),
-            this.#ids.paramsArgument,
+            this.ts.factory.createIdentifier(this.#ids.paramsArgument),
             f.createBlock([
               makeAssignment(
-                this.#ids.pathParameter,
+                this.ts.factory.createIdentifier(this.#ids.pathParameter),
                 makeCall(this.#ids.pathParameter, propOf<string>("replace"))(
-                  makeTemplate(":", [this.#ids.keyParameter]), // `:${key}`
+                  makeTemplate(":", [
+                    this.ts.factory.createIdentifier(this.#ids.keyParameter),
+                  ]), // `:${key}`
                   makeArrowFn(
                     [],
                     f.createBlock([
                       f.createExpressionStatement(
                         f.createDeleteExpression(
                           f.createElementAccessExpression(
-                            this.#ids.restConst,
-                            this.#ids.keyParameter,
+                            this.ts.factory.createIdentifier(
+                              this.#ids.restConst,
+                            ),
+                            this.ts.factory.createIdentifier(
+                              this.#ids.keyParameter,
+                            ),
                           ),
                         ),
                       ),
                       f.createReturnStatement(
                         f.createElementAccessExpression(
-                          this.#ids.paramsArgument,
-                          this.#ids.keyParameter,
+                          this.ts.factory.createIdentifier(
+                            this.#ids.paramsArgument,
+                          ),
+                          this.ts.factory.createIdentifier(
+                            this.#ids.keyParameter,
+                          ),
                         ),
                       ),
                     ]),
@@ -272,8 +284,8 @@ export abstract class IntegrationBase {
           f.createReturnStatement(
             f.createAsExpression(
               f.createArrayLiteralExpression([
-                this.#ids.pathParameter,
-                this.#ids.restConst,
+                this.ts.factory.createIdentifier(this.#ids.pathParameter),
+                this.ts.factory.createIdentifier(this.#ids.restConst),
               ]),
               ensureTypeNode("const"),
             ),
@@ -285,35 +297,34 @@ export abstract class IntegrationBase {
   // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {}
   #makeProvider = () =>
     makePublicMethod(
-      this.#ids.provideMethod,
+      this.ts.factory.createIdentifier(this.#ids.provideMethod),
       makeParams({
-        [this.#ids.requestParameter.text]: "K",
-        [this.#ids.paramsArgument.text]: makeIndexed(
-          this.interfaces.input,
-          "K",
-        ),
-        [this.#ids.ctxArgument.text]: { optional: true, type: "T" },
+        [this.#ids.requestParameter]: "K",
+        [this.#ids.paramsArgument]: makeIndexed(this.interfaces.input, "K"),
+        [this.#ids.ctxArgument]: { optional: true, type: "T" },
       }),
       [
         makeConst(
           // const [method, path] = this.parseRequest(request);
           makeDeconstruction(
-            this.#ids.methodParameter,
-            this.#ids.pathParameter,
+            this.ts.factory.createIdentifier(this.#ids.methodParameter),
+            this.ts.factory.createIdentifier(this.#ids.pathParameter),
           ),
-          makeCall(this.#ids.parseRequestFn)(this.#ids.requestParameter),
+          makeCall(this.#ids.parseRequestFn)(
+            this.ts.factory.createIdentifier(this.#ids.requestParameter),
+          ),
         ),
         // return this.implementation(___)
         f.createReturnStatement(
           makeCall(f.createThis(), this.#ids.implementationArgument)(
-            this.#ids.methodParameter,
+            this.ts.factory.createIdentifier(this.#ids.methodParameter),
             f.createSpreadElement(
               makeCall(this.#ids.substituteFn)(
-                this.#ids.pathParameter,
-                this.#ids.paramsArgument,
+                this.ts.factory.createIdentifier(this.#ids.pathParameter),
+                this.ts.factory.createIdentifier(this.#ids.paramsArgument),
               ),
             ),
-            this.#ids.ctxArgument,
+            this.ts.factory.createIdentifier(this.#ids.ctxArgument),
           ),
         ),
       ],
@@ -336,7 +347,9 @@ export abstract class IntegrationBase {
           makeParam(this.#ids.implementationArgument, {
             type: ensureTypeNode(this.#ids.implementationType, ["T"]),
             mod: accessModifiers.protectedReadonly,
-            init: this.#ids.defaultImplementationConst,
+            init: this.ts.factory.createIdentifier(
+              this.#ids.defaultImplementationConst,
+            ),
           }),
         ]),
         this.#makeProvider(),
@@ -354,8 +367,8 @@ export abstract class IntegrationBase {
       URL.name,
       makeTemplate(
         "",
-        [this.#ids.pathParameter],
-        [this.#ids.searchParamsConst],
+        [this.ts.factory.createIdentifier(this.#ids.pathParameter)],
+        [this.ts.factory.createIdentifier(this.#ids.searchParamsConst)],
       ),
       literally(this.serverUrl),
     );
@@ -375,14 +388,14 @@ export abstract class IntegrationBase {
     const headersProperty = f.createPropertyAssignment(
       propOf<RequestInit>("headers"),
       makeTernary(
-        this.#ids.hasBodyConst,
+        this.ts.factory.createIdentifier(this.#ids.hasBodyConst),
         f.createObjectLiteralExpression([
           f.createPropertyAssignment(
             literally("Content-Type"),
             literally(contentTypes.json),
           ),
         ]),
-        this.#ids.undefinedValue,
+        this.ts.factory.createIdentifier(this.#ids.undefinedValue),
       ),
     );
 
@@ -390,12 +403,12 @@ export abstract class IntegrationBase {
     const bodyProperty = f.createPropertyAssignment(
       propOf<RequestInit>("body"),
       makeTernary(
-        this.#ids.hasBodyConst,
+        this.ts.factory.createIdentifier(this.#ids.hasBodyConst),
         makeCall(
           JSON[Symbol.toStringTag],
           propOf<JSON>("stringify"),
-        )(this.#ids.paramsArgument),
-        this.#ids.undefinedValue,
+        )(this.ts.factory.createIdentifier(this.#ids.paramsArgument)),
+        this.ts.factory.createIdentifier(this.#ids.undefinedValue),
       ),
     );
 
@@ -425,7 +438,7 @@ export abstract class IntegrationBase {
             literally("delete" satisfies ClientMethod),
           ]),
           propOf<string[]>("includes"),
-        )(this.#ids.methodParameter),
+        )(this.ts.factory.createIdentifier(this.#ids.methodParameter)),
       ),
     );
 
@@ -433,9 +446,11 @@ export abstract class IntegrationBase {
     const searchParamsStatement = makeConst(
       this.#ids.searchParamsConst,
       makeTernary(
-        this.#ids.hasBodyConst,
+        this.ts.factory.createIdentifier(this.#ids.hasBodyConst),
         literally(""),
-        this.#makeSearchParams(this.#ids.paramsArgument),
+        this.#makeSearchParams(
+          this.ts.factory.createIdentifier(this.#ids.paramsArgument),
+        ),
       ),
     );
 
@@ -453,7 +468,7 @@ export abstract class IntegrationBase {
     const noBodyStatement = f.createIfStatement(
       f.createPrefixUnaryExpression(
         this.ts.SyntaxKind.ExclamationToken,
-        this.#ids.contentTypeConst,
+        this.ts.factory.createIdentifier(this.#ids.contentTypeConst),
       ),
       f.createReturnStatement(),
     );
@@ -472,7 +487,7 @@ export abstract class IntegrationBase {
       makeCall(
         this.#ids.responseConst,
         makeTernary(
-          this.#ids.isJsonConst,
+          this.ts.factory.createIdentifier(this.#ids.isJsonConst),
           literally(propOf<Response>("json")),
           literally(propOf<Response>("text")),
         ),
@@ -510,18 +525,25 @@ export abstract class IntegrationBase {
       }),
       [
         makeConst(
-          makeDeconstruction(this.#ids.pathParameter, this.#ids.restConst),
+          makeDeconstruction(
+            this.ts.factory.createIdentifier(this.#ids.pathParameter),
+            this.ts.factory.createIdentifier(this.#ids.restConst),
+          ),
           makeCall(this.#ids.substituteFn)(
             f.createElementAccessExpression(
-              makeCall(this.#ids.parseRequestFn)(this.#ids.requestParameter),
+              makeCall(this.#ids.parseRequestFn)(
+                this.ts.factory.createIdentifier(this.#ids.requestParameter),
+              ),
               literally(1),
             ),
-            this.#ids.paramsArgument,
+            this.ts.factory.createIdentifier(this.#ids.paramsArgument),
           ),
         ),
         makeConst(
           this.#ids.searchParamsConst,
-          this.#makeSearchParams(this.#ids.restConst),
+          this.#makeSearchParams(
+            this.ts.factory.createIdentifier(this.#ids.restConst),
+          ),
         ),
         makeAssignment(
           f.createPropertyAccessExpression(
@@ -540,12 +562,12 @@ export abstract class IntegrationBase {
 
   #makeOnMethod = () =>
     makePublicMethod(
-      this.#ids.onMethod,
+      this.ts.factory.createIdentifier(this.#ids.onMethod),
       makeParams({
-        [this.#ids.eventParameter.text]: "E",
-        [this.#ids.handlerParameter.text]: makeFnType(
+        [this.#ids.eventParameter]: "E",
+        [this.#ids.handlerParameter]: makeFnType(
           {
-            [this.#ids.dataParameter.text]: makeIndexed(
+            [this.#ids.dataParameter]: makeIndexed(
               makeExtract("R", makeOneLine(this.#makeEventNarrow("E"))),
               makeLiteralType(propOf<SSEShape>("data")),
             ),
@@ -560,7 +582,7 @@ export abstract class IntegrationBase {
             this.#ids.sourceProp,
             propOf<EventSource>("addEventListener"),
           )(
-            this.#ids.eventParameter,
+            this.ts.factory.createIdentifier(this.#ids.eventParameter),
             makeArrowFn(
               [this.#ids.msgParameter],
               makeCall(this.#ids.handlerParameter)(
@@ -571,7 +593,9 @@ export abstract class IntegrationBase {
                   f.createPropertyAccessExpression(
                     f.createParenthesizedExpression(
                       f.createAsExpression(
-                        this.#ids.msgParameter,
+                        this.ts.factory.createIdentifier(
+                          this.#ids.msgParameter,
+                        ),
                         ensureTypeNode(MessageEvent.name),
                       ),
                     ),
