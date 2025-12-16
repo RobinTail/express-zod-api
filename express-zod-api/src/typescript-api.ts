@@ -13,10 +13,15 @@ type TypeParams =
   | Partial<Record<string, Typeable | { type?: ts.TypeNode; init: Typeable }>>;
 
 export class TypescriptAPI {
+  /** @internal */
   public ts: typeof ts;
+  /** @internal */
   public f: typeof ts.factory;
+  /** @internal */
   public exportModifier: ts.ModifierToken<ts.SyntaxKind.ExportKeyword>[];
+  /** @internal */
   public asyncModifier: ts.ModifierToken<ts.SyntaxKind.AsyncKeyword>[];
+  /** @internal */
   public accessModifiers: Record<"public" | "protectedReadonly", ts.Modifier[]>;
   #primitives: ts.KeywordTypeSyntaxKind[];
   #safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
@@ -52,6 +57,7 @@ export class TypescriptAPI {
     ];
   }
 
+  /** @internal */
   public addJsDoc = <T extends ts.Node>(node: T, text: string) =>
     this.ts.addSyntheticLeadingComment(
       node,
@@ -60,6 +66,7 @@ export class TypescriptAPI {
       true,
     );
 
+  /** @internal */
   public printNode = (node: ts.Node, printerOptions?: ts.PrinterOptions) => {
     const sourceFile = this.ts.createSourceFile(
       "print.ts",
@@ -72,11 +79,13 @@ export class TypescriptAPI {
     return printer.printNode(this.ts.EmitHint.Unspecified, node, sourceFile);
   };
 
+  /** @internal */
   public makePropertyIdentifier = (name: string | number) =>
     typeof name === "string" && this.#safePropRegex.test(name)
       ? this.f.createIdentifier(name)
       : this.literally(name);
 
+  /** @internal */
   public makeTemplate = (
     head: string,
     ...rest: ([ts.Expression] | [ts.Expression, string])[]
@@ -93,6 +102,7 @@ export class TypescriptAPI {
       ),
     );
 
+  /** @internal */
   public makeParam = (
     name: string | ts.Identifier,
     {
@@ -118,6 +128,7 @@ export class TypescriptAPI {
       init,
     );
 
+  /** @internal */
   public makeParams = (
     params: Partial<
       Record<string, Typeable | Parameters<typeof this.makeParam>[1]>
@@ -134,6 +145,7 @@ export class TypescriptAPI {
       ),
     );
 
+  /** @internal */
   public makePublicConstructor = (
     params: ts.ParameterDeclaration[],
     statements: ts.Statement[] = [],
@@ -144,6 +156,7 @@ export class TypescriptAPI {
       this.f.createBlock(statements),
     );
 
+  /** @internal */
   public ensureTypeNode = (
     subject: Typeable,
     args?: Typeable[], // only for string and id
@@ -157,14 +170,20 @@ export class TypescriptAPI {
           )
         : subject;
 
-  // Record<string, any>
+  /**
+   * @internal
+   * @example Record<string, any>
+   * */
   public makeRecordStringAny = () =>
     this.ensureTypeNode("Record", [
       this.ts.SyntaxKind.StringKeyword,
       this.ts.SyntaxKind.AnyKeyword,
     ]);
 
-  /** ensures distinct union (unique primitives) */
+  /**
+   * @internal
+   * ensures distinct union (unique primitives)
+   * */
   public makeUnion = (entries: ts.TypeNode[]) => {
     const nodes = new Map<
       ts.TypeNode | ts.KeywordTypeSyntaxKind,
@@ -175,6 +194,7 @@ export class TypescriptAPI {
     return this.f.createUnionTypeNode(Array.from(nodes.values()));
   };
 
+  /** @internal */
   public makeInterfaceProp = (
     name: string | number,
     value: Typeable,
@@ -205,9 +225,11 @@ export class TypescriptAPI {
     return jsdoc.length ? this.addJsDoc(node, jsdoc.join(" ")) : node;
   };
 
+  /** @internal */
   public makeOneLine = (subject: ts.TypeNode) =>
     this.ts.setEmitFlags(subject, this.ts.EmitFlags.SingleLine);
 
+  /** @internal */
   public makeDeconstruction = (
     ...names: ts.Identifier[]
   ): ts.ArrayBindingPattern =>
@@ -217,6 +239,7 @@ export class TypescriptAPI {
       ),
     );
 
+  /** @internal */
   public makeConst = (
     name: string | ts.Identifier | ts.ArrayBindingPattern,
     value: ts.Expression,
@@ -237,6 +260,7 @@ export class TypescriptAPI {
       ),
     );
 
+  /** @internal */
   public makePublicLiteralType = (
     name: ts.Identifier | string,
     literals: string[],
@@ -247,6 +271,7 @@ export class TypescriptAPI {
       { expose: true },
     );
 
+  /** @internal */
   public makeType = (
     name: ts.Identifier | string,
     value: ts.TypeNode,
@@ -265,6 +290,7 @@ export class TypescriptAPI {
     return comment ? this.addJsDoc(node, comment) : node;
   };
 
+  /** @internal */
   public makePublicProperty = (
     name: string | ts.PropertyName,
     type: Typeable,
@@ -277,6 +303,7 @@ export class TypescriptAPI {
       undefined,
     );
 
+  /** @internal */
   public makePublicMethod = (
     name: ts.Identifier,
     params: ts.ParameterDeclaration[],
@@ -297,6 +324,7 @@ export class TypescriptAPI {
       this.f.createBlock(statements),
     );
 
+  /** @internal */
   public makePublicClass = (
     name: string,
     statements: ts.ClassElement[],
@@ -310,15 +338,18 @@ export class TypescriptAPI {
       statements,
     );
 
+  /** @internal */
   public makeKeyOf = (subj: Typeable) =>
     this.f.createTypeOperatorNode(
       this.ts.SyntaxKind.KeyOfKeyword,
       this.ensureTypeNode(subj),
     );
 
+  /** @internal */
   public makePromise = (subject: Typeable) =>
     this.ensureTypeNode(Promise.name, [subject]);
 
+  /** @internal */
   public makeInterface = (
     name: ts.Identifier | string,
     props: ts.PropertySignature[],
@@ -334,6 +365,7 @@ export class TypescriptAPI {
     return comment ? this.addJsDoc(node, comment) : node;
   };
 
+  /** @internal */
   public makeTypeParams = (
     params:
       | string[]
@@ -355,6 +387,7 @@ export class TypescriptAPI {
       );
     });
 
+  /** @internal */
   public makeArrowFn = (
     params:
       | Array<Parameters<typeof this.makeParam>[0]>
@@ -373,6 +406,7 @@ export class TypescriptAPI {
       body,
     );
 
+  /** @internal */
   public makeTernary = (
     condition: ts.Expression,
     positive: ts.Expression,
@@ -386,6 +420,7 @@ export class TypescriptAPI {
       negative,
     );
 
+  /** @internal */
   public makeCall =
     (
       first: ts.Expression | string,
@@ -404,12 +439,15 @@ export class TypescriptAPI {
         args,
       );
 
+  /** @internal */
   public makeNew = (cls: string, ...args: ts.Expression[]) =>
     this.f.createNewExpression(this.f.createIdentifier(cls), undefined, args);
 
+  /** @internal */
   public makeExtract = (base: Typeable, narrow: ts.TypeNode) =>
     this.ensureTypeNode("Extract", [base, narrow]);
 
+  /** @internal */
   public makeAssignment = (left: ts.Expression, right: ts.Expression) =>
     this.f.createExpressionStatement(
       this.f.createBinaryExpression(
@@ -419,15 +457,18 @@ export class TypescriptAPI {
       ),
     );
 
+  /** @internal */
   public makeIndexed = (subject: Typeable, index: Typeable) =>
     this.f.createIndexedAccessTypeNode(
       this.ensureTypeNode(subject),
       this.ensureTypeNode(index),
     );
 
+  /** @internal */
   public makeMaybeAsync = (subj: Typeable) =>
     this.makeUnion([this.ensureTypeNode(subj), this.makePromise(subj)]);
 
+  /** @internal */
   public makeFnType = (
     params: Parameters<typeof this.makeParams>[0],
     returns: Typeable,
@@ -439,6 +480,7 @@ export class TypescriptAPI {
     );
 
   /* eslint-disable prettier/prettier -- shorter and works better this way than overrides */
+  /** @internal */
   public literally = <T extends string | null | boolean | number | bigint>(subj: T) => (
     typeof subj === "number" ? this.f.createNumericLiteral(subj)
       : typeof subj === "bigint" ? this.f.createBigIntLiteral(subj.toString())
@@ -448,9 +490,11 @@ export class TypescriptAPI {
     : T extends boolean ? ts.BooleanLiteral : ts.NullLiteral;
   /* eslint-enable prettier/prettier */
 
+  /** @internal */
   public makeLiteralType = (subj: Parameters<typeof this.literally>[0]) =>
     this.f.createLiteralTypeNode(this.literally(subj));
 
+  /** @internal */
   public isPrimitive = (node: ts.TypeNode): node is ts.KeywordTypeNode =>
     (this.#primitives as ts.SyntaxKind[]).includes(node.kind);
 }
