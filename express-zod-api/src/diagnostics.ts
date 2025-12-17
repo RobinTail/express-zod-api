@@ -17,7 +17,10 @@ interface Findings {
 export class Diagnostics {
   #verified = new WeakMap<AbstractEndpoint, Findings>();
 
-  constructor(protected logger: ActualLogger) {}
+  constructor(
+    protected logger: ActualLogger,
+    protected customCheck?: OnEndpoint,
+  ) {}
 
   #checkSchema(
     ref: Findings,
@@ -94,5 +97,6 @@ export class Diagnostics {
     }
     this.#checkSchema(ref, endpoint, { method, path });
     this.#checkPathParams(ref, endpoint, path, { method });
+    this.customCheck?.(method, path, endpoint);
   };
 }
