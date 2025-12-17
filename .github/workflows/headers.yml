@@ -51,7 +51,7 @@ jobs:
 
       - name: Create a pull request
         if: steps.git-state.outputs.changes == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           base: master
           branch: ${{ steps.create-branch.outputs.branch-name }}

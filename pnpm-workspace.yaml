@@ -61,7 +61,7 @@ catalogs:
     "http-errors": "^2.0.1"
     "typescript": "^5.9.2"
     "typescript-eslint": "^8.46.1"
-    "zod": "^4.1.13"
+    "zod": "^4.2.0"
 overrides:
   "@scarf/scarf": "npm:empty-npm-package@1.0.0"
   "lightningcss": "npm:empty-npm-package@1.0.0"
