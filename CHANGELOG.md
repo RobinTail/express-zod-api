@@ -2,6 +2,14 @@
 
 ## Version 26
 
+### v26.1.0
+
+- Optimization to the memory consumption for your API:
+  - It has been discovered that static import of `typescript` within the framework consumes memory unnecessarily;
+  - Importing `typescript` is only necessary to generate an Integration;
+  - This version avoids static importing, but the solution is temporary in order to avoid breaking changes;
+  - The issue was found, investigated and reported by [@NicolasMahe](https://github.com/NicolasMahe).
+
 ### v26.0.0
 
 - Supported `http-errors` versions: `^2.0.1`;
