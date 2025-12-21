@@ -35,7 +35,7 @@ jobs:
           echo "branch-name=$BRANCH_NAME" >> $GITHUB_OUTPUT
 
       - name: Create a pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: ${{ steps.create-branch.outputs.branch-name }}
           commit-message: "Upgrading all dependencies"
