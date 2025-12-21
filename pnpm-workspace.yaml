@@ -10,7 +10,7 @@ packages:
 onlyBuiltDependencies:
   - esbuild
 gitChecks: false
-engineStrict: true
+# engineStrict: true
 autoInstallPeers: false
 minimumReleaseAge: 2880 # 2 days
 minimumReleaseAgeExclude:
