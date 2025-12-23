@@ -1,5 +1,5 @@
 import * as R from "ramda";
-import ts from "typescript";
+import type ts from "typescript";
 import { globalRegistry, z } from "zod";
 import { ezBufferBrand } from "./buffer-schema";
 import { getTransformedType, isSchema } from "./common-helpers";
@@ -11,16 +11,6 @@ import { ezRawBrand, RawSchema } from "./raw-schema";
 import { FirstPartyKind, HandlingRules, walkSchema } from "./schema-walker";
 import type { TypescriptAPI } from "./typescript-api";
 import { Producer, ZTSContext } from "./zts-helpers";
-
-const samples = {
-  [ts.SyntaxKind.AnyKeyword]: "",
-  [ts.SyntaxKind.BigIntKeyword]: BigInt(0),
-  [ts.SyntaxKind.BooleanKeyword]: false,
-  [ts.SyntaxKind.NumberKeyword]: 0,
-  [ts.SyntaxKind.ObjectKeyword]: {},
-  [ts.SyntaxKind.StringKeyword]: "",
-  [ts.SyntaxKind.UndefinedKeyword]: undefined,
-} satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
 
 const nodePath = {
   name: R.path([
@@ -40,7 +30,7 @@ const onLiteral: Producer = (
 ) => {
   const values = def.values.map((entry) =>
     entry === undefined
-      ? api.ensureTypeNode(ts.SyntaxKind.UndefinedKeyword)
+      ? api.ensureTypeNode(api.ts.SyntaxKind.UndefinedKeyword)
       : api.makeLiteralType(entry),
   );
   return values.length === 1 ? values[0] : api.makeUnion(values);
@@ -114,9 +104,6 @@ const onSomeUnion: Producer = (
   { next, api },
 ) => api.makeUnion(def.options.map(next));
 
-const makeSample = (produced: ts.TypeNode) =>
-  samples?.[produced.kind as keyof typeof samples];
-
 const onNullable: Producer = (
   { _zod: { def } }: z.core.$ZodNullable,
   { next, api },
@@ -141,7 +128,7 @@ const onRecord: Producer = (
 
 const intersect = R.tryCatch(
   (api: TypescriptAPI, nodes: ts.TypeNode[]) => {
-    if (!nodes.every(ts.isTypeLiteralNode)) throw new Error("Not objects");
+    if (!nodes.every(api.ts.isTypeLiteralNode)) throw new Error("Not objects");
     const members = R.chain(R.prop("members"), nodes);
     const uniqs = R.uniqWith((...props) => {
       if (!R.eqBy(nodePath.name, ...props)) return false;
@@ -160,9 +147,20 @@ const onIntersection: Producer = (
 ) => intersect(api, [def.left, def.right].map(next));
 
 const onPrimitive =
-  (syntaxKind: ts.KeywordTypeSyntaxKind): Producer =>
+  (
+    syntaxKind:
+      | "AnyKeyword"
+      | "BigIntKeyword"
+      | "BooleanKeyword"
+      | "NeverKeyword"
+      | "NumberKeyword"
+      | "StringKeyword"
+      | "UndefinedKeyword"
+      | "UnknownKeyword"
+      | "VoidKeyword",
+  ): Producer =>
   ({}, { api }) =>
-    api.ensureTypeNode(syntaxKind);
+    api.ensureTypeNode(api.ts.SyntaxKind[syntaxKind]);
 
 const onWrapped: Producer = (
   {
@@ -178,7 +176,9 @@ const onWrapped: Producer = (
 
 const getFallback = (api: TypescriptAPI, isResponse: boolean) =>
   api.ensureTypeNode(
-    isResponse ? ts.SyntaxKind.UnknownKeyword : ts.SyntaxKind.AnyKeyword,
+    isResponse
+      ? api.ts.SyntaxKind.UnknownKeyword
+      : api.ts.SyntaxKind.AnyKeyword,
   );
 
 const onPipeline: Producer = (
@@ -189,16 +189,26 @@ const onPipeline: Producer = (
   const opposite = def[isResponse ? "in" : "out"];
   if (!isSchema<z.core.$ZodTransform>(target, "transform")) return next(target);
   const opposingType = next(opposite);
-  const targetType = getTransformedType(target, makeSample(opposingType));
+  const samples = {
+    [api.ts.SyntaxKind.AnyKeyword]: "",
+    [api.ts.SyntaxKind.BigIntKeyword]: BigInt(0),
+    [api.ts.SyntaxKind.BooleanKeyword]: false,
+    [api.ts.SyntaxKind.NumberKeyword]: 0,
+    [api.ts.SyntaxKind.ObjectKeyword]: {},
+    [api.ts.SyntaxKind.StringKeyword]: "",
+    [api.ts.SyntaxKind.UndefinedKeyword]: undefined,
+  } satisfies Partial<Record<ts.KeywordTypeSyntaxKind, unknown>>;
+  const sample = samples[opposingType.kind as keyof typeof samples];
+  const targetType = getTransformedType(target, sample);
   const resolutions: Partial<
     Record<NonNullable<typeof targetType>, ts.KeywordTypeSyntaxKind>
   > = {
-    number: ts.SyntaxKind.NumberKeyword,
-    bigint: ts.SyntaxKind.BigIntKeyword,
-    boolean: ts.SyntaxKind.BooleanKeyword,
-    string: ts.SyntaxKind.StringKeyword,
-    undefined: ts.SyntaxKind.UndefinedKeyword,
-    object: ts.SyntaxKind.ObjectKeyword,
+    number: api.ts.SyntaxKind.NumberKeyword,
+    bigint: api.ts.SyntaxKind.BigIntKeyword,
+    boolean: api.ts.SyntaxKind.BooleanKeyword,
+    string: api.ts.SyntaxKind.StringKeyword,
+    undefined: api.ts.SyntaxKind.UndefinedKeyword,
+    object: api.ts.SyntaxKind.ObjectKeyword,
   };
   return api.ensureTypeNode(
     (targetType && resolutions[targetType]) || getFallback(api, isResponse),
@@ -222,17 +232,17 @@ const producers: HandlingRules<
   ZTSContext,
   FirstPartyKind | ProprietaryBrand
 > = {
-  string: onPrimitive(ts.SyntaxKind.StringKeyword),
-  number: onPrimitive(ts.SyntaxKind.NumberKeyword),
-  bigint: onPrimitive(ts.SyntaxKind.BigIntKeyword),
-  boolean: onPrimitive(ts.SyntaxKind.BooleanKeyword),
-  any: onPrimitive(ts.SyntaxKind.AnyKeyword),
-  undefined: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
-  [ezDateInBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
-  [ezDateOutBrand]: onPrimitive(ts.SyntaxKind.StringKeyword),
-  never: onPrimitive(ts.SyntaxKind.NeverKeyword),
-  void: onPrimitive(ts.SyntaxKind.UndefinedKeyword),
-  unknown: onPrimitive(ts.SyntaxKind.UnknownKeyword),
+  string: onPrimitive("StringKeyword"),
+  number: onPrimitive("NumberKeyword"),
+  bigint: onPrimitive("BigIntKeyword"),
+  boolean: onPrimitive("BooleanKeyword"),
+  any: onPrimitive("AnyKeyword"),
+  undefined: onPrimitive("UndefinedKeyword"),
+  [ezDateInBrand]: onPrimitive("StringKeyword"),
+  [ezDateOutBrand]: onPrimitive("StringKeyword"),
+  never: onPrimitive("NeverKeyword"),
+  void: onPrimitive("UndefinedKeyword"),
+  unknown: onPrimitive("UnknownKeyword"),
   null: onNull,
   array: onArray,
   tuple: onTuple,
