@@ -6,6 +6,7 @@ import type { TypescriptAPI } from "./typescript-api";
 export interface ZTSContext extends FlatObject {
   isResponse: boolean;
   makeAlias: (key: object, produce: () => ts.TypeNode) => ts.TypeNode;
+  /** @internal */
   api: TypescriptAPI;
 }
 
