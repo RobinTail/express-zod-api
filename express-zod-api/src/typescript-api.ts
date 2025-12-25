@@ -19,7 +19,7 @@ export class TypescriptAPI {
   public asyncModifier: ts.ModifierToken<ts.SyntaxKind.AsyncKeyword>[];
   public accessModifiers: Record<"public" | "protectedReadonly", ts.Modifier[]>;
   #primitives: ts.KeywordTypeSyntaxKind[];
-  #safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+  static #safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
   constructor() {
     this.ts = createRequire(import.meta.url)("typescript"); // @todo replace with a dynamic import in next major
@@ -73,7 +73,7 @@ export class TypescriptAPI {
   };
 
   public makePropertyIdentifier = (name: string | number) =>
-    typeof name === "string" && this.#safePropRegex.test(name)
+    typeof name === "string" && TypescriptAPI.#safePropRegex.test(name)
       ? this.f.createIdentifier(name)
       : this.literally(name);
 
