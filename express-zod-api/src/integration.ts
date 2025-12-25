@@ -71,11 +71,11 @@ export class Integration extends IntegrationBase {
     let name = this.#aliases.get(key)?.name?.text;
     if (!name) {
       name = `Type${this.#aliases.size + 1}`;
-      const temp = this.makeLiteralType(null);
-      this.#aliases.set(key, this.makeType(name, temp));
-      this.#aliases.set(key, this.makeType(name, produce()));
+      const temp = this.api.makeLiteralType(null);
+      this.#aliases.set(key, this.api.makeType(name, temp));
+      this.#aliases.set(key, this.api.makeType(name, produce()));
     }
-    return this.ensureTypeNode(name);
+    return this.api.ensureTypeNode(name);
   }
 
   public constructor({
@@ -90,14 +90,14 @@ export class Integration extends IntegrationBase {
     hasHeadMethod = true,
   }: IntegrationParams) {
     super(serverUrl);
-    const commons = { makeAlias: this.#makeAlias.bind(this), api: this };
+    const commons = { makeAlias: this.#makeAlias.bind(this), api: this.api };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
-      const input = this.makeType(
+      const input = this.api.makeType(
         entitle("input"),
         zodToTs(inputSchema, ctxIn),
         { comment: request },
@@ -108,17 +108,17 @@ export class Integration extends IntegrationBase {
           const responses = endpoint.getResponses(responseVariant);
           const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
             const hasContent = shouldHaveContent(method, mimeTypes);
-            const variantType = this.makeType(
+            const variantType = this.api.makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
               zodToTs(hasContent ? schema : noContent, ctxOut),
               { comment: request },
             );
             this.#program.push(variantType);
             return statusCodes.map((code) =>
-              this.makeInterfaceProp(code, variantType.name),
+              this.api.makeInterfaceProp(code, variantType.name),
             );
           }, Array.from(responses.entries()));
-          const dict = this.makeInterface(
+          const dict = this.api.makeInterface(
             entitle(responseVariant, "response", "variants"),
             props,
             { comment: request },
@@ -129,18 +129,18 @@ export class Integration extends IntegrationBase {
         {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
       );
       this.paths.add(path);
-      const literalIdx = this.makeLiteralType(request);
+      const literalIdx = this.api.makeLiteralType(request);
       const store = {
-        input: this.ensureTypeNode(input.name),
+        input: this.api.ensureTypeNode(input.name),
         positive: this.someOf(dictionaries.positive),
         negative: this.someOf(dictionaries.negative),
-        response: this.makeUnion([
-          this.makeIndexed(this.interfaces.positive, literalIdx),
-          this.makeIndexed(this.interfaces.negative, literalIdx),
+        response: this.api.makeUnion([
+          this.api.makeIndexed(this.interfaces.positive, literalIdx),
+          this.api.makeIndexed(this.interfaces.negative, literalIdx),
         ]),
-        encoded: this.f.createIntersectionTypeNode([
-          this.ensureTypeNode(dictionaries.positive.name),
-          this.ensureTypeNode(dictionaries.negative.name),
+        encoded: this.api.f.createIntersectionTypeNode([
+          this.api.ensureTypeNode(dictionaries.positive.name),
+          this.api.ensureTypeNode(dictionaries.negative.name),
         ]),
       };
       this.registry.set(request, { isDeprecated, store });
@@ -182,7 +182,7 @@ export class Integration extends IntegrationBase {
           .map((entry) =>
             typeof entry === "string"
               ? entry
-              : this.printNode(entry, printerOptions),
+              : this.api.printNode(entry, printerOptions),
           )
           .join("\n")
       : undefined;
@@ -192,19 +192,19 @@ export class Integration extends IntegrationBase {
     const usageExampleText = this.#printUsage(printerOptions);
     const commentNode =
       usageExampleText &&
-      this.ts.addSyntheticLeadingComment(
-        this.ts.addSyntheticLeadingComment(
-          this.f.createEmptyStatement(),
-          this.ts.SyntaxKind.SingleLineCommentTrivia,
+      this.api.ts.addSyntheticLeadingComment(
+        this.api.ts.addSyntheticLeadingComment(
+          this.api.f.createEmptyStatement(),
+          this.api.ts.SyntaxKind.SingleLineCommentTrivia,
           " Usage example:",
         ),
-        this.ts.SyntaxKind.MultiLineCommentTrivia,
+        this.api.ts.SyntaxKind.MultiLineCommentTrivia,
         `\n${usageExampleText}`,
       );
     return this.#program
       .concat(commentNode || [])
       .map((node, index) =>
-        this.printNode(
+        this.api.printNode(
           node,
           index < this.#program.length
             ? printerOptions

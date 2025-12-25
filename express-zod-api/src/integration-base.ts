@@ -10,7 +10,9 @@ type IOKind = "input" | "response" | ResponseVariant | "encoded";
 type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
 type Store = Record<IOKind, ts.TypeNode>;
 
-export abstract class IntegrationBase extends TypescriptAPI {
+export abstract class IntegrationBase {
+  /** @internal */
+  protected api = new TypescriptAPI();
   /** @internal */
   protected paths = new Set<string>();
   /** @internal */
@@ -22,59 +24,62 @@ export abstract class IntegrationBase extends TypescriptAPI {
   >();
 
   readonly #ids = {
-    pathType: this.f.createIdentifier("Path"),
-    implementationType: this.f.createIdentifier("Implementation"),
-    keyParameter: this.f.createIdentifier("key"),
-    pathParameter: this.f.createIdentifier("path"),
-    paramsArgument: this.f.createIdentifier("params"),
-    ctxArgument: this.f.createIdentifier("ctx"),
-    methodParameter: this.f.createIdentifier("method"),
-    requestParameter: this.f.createIdentifier("request"),
-    eventParameter: this.f.createIdentifier("event"),
-    dataParameter: this.f.createIdentifier("data"),
-    handlerParameter: this.f.createIdentifier("handler"),
-    msgParameter: this.f.createIdentifier("msg"),
-    parseRequestFn: this.f.createIdentifier("parseRequest"),
-    substituteFn: this.f.createIdentifier("substitute"),
-    provideMethod: this.f.createIdentifier("provide"),
-    onMethod: this.f.createIdentifier("on"),
-    implementationArgument: this.f.createIdentifier("implementation"),
-    hasBodyConst: this.f.createIdentifier("hasBody"),
-    undefinedValue: this.f.createIdentifier("undefined"),
-    responseConst: this.f.createIdentifier("response"),
-    restConst: this.f.createIdentifier("rest"),
-    searchParamsConst: this.f.createIdentifier("searchParams"),
-    defaultImplementationConst: this.f.createIdentifier(
+    pathType: this.api.f.createIdentifier("Path"),
+    implementationType: this.api.f.createIdentifier("Implementation"),
+    keyParameter: this.api.f.createIdentifier("key"),
+    pathParameter: this.api.f.createIdentifier("path"),
+    paramsArgument: this.api.f.createIdentifier("params"),
+    ctxArgument: this.api.f.createIdentifier("ctx"),
+    methodParameter: this.api.f.createIdentifier("method"),
+    requestParameter: this.api.f.createIdentifier("request"),
+    eventParameter: this.api.f.createIdentifier("event"),
+    dataParameter: this.api.f.createIdentifier("data"),
+    handlerParameter: this.api.f.createIdentifier("handler"),
+    msgParameter: this.api.f.createIdentifier("msg"),
+    parseRequestFn: this.api.f.createIdentifier("parseRequest"),
+    substituteFn: this.api.f.createIdentifier("substitute"),
+    provideMethod: this.api.f.createIdentifier("provide"),
+    onMethod: this.api.f.createIdentifier("on"),
+    implementationArgument: this.api.f.createIdentifier("implementation"),
+    hasBodyConst: this.api.f.createIdentifier("hasBody"),
+    undefinedValue: this.api.f.createIdentifier("undefined"),
+    responseConst: this.api.f.createIdentifier("response"),
+    restConst: this.api.f.createIdentifier("rest"),
+    searchParamsConst: this.api.f.createIdentifier("searchParams"),
+    defaultImplementationConst: this.api.f.createIdentifier(
       "defaultImplementation",
     ),
-    clientConst: this.f.createIdentifier("client"),
-    contentTypeConst: this.f.createIdentifier("contentType"),
-    isJsonConst: this.f.createIdentifier("isJSON"),
-    sourceProp: this.f.createIdentifier("source"),
+    clientConst: this.api.f.createIdentifier("client"),
+    contentTypeConst: this.api.f.createIdentifier("contentType"),
+    isJsonConst: this.api.f.createIdentifier("isJSON"),
+    sourceProp: this.api.f.createIdentifier("source"),
   } satisfies Record<string, ts.Identifier>;
 
   /** @internal */
   protected interfaces: Record<IOKind, ts.Identifier> = {
-    input: this.f.createIdentifier("Input"),
-    positive: this.f.createIdentifier("PositiveResponse"),
-    negative: this.f.createIdentifier("NegativeResponse"),
-    encoded: this.f.createIdentifier("EncodedResponse"),
-    response: this.f.createIdentifier("Response"),
+    input: this.api.f.createIdentifier("Input"),
+    positive: this.api.f.createIdentifier("PositiveResponse"),
+    negative: this.api.f.createIdentifier("NegativeResponse"),
+    encoded: this.api.f.createIdentifier("EncodedResponse"),
+    response: this.api.f.createIdentifier("Response"),
   };
 
   /**
    * @example export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
    * @internal
    * */
-  protected methodType = this.makePublicLiteralType("Method", clientMethods);
+  protected methodType = this.api.makePublicLiteralType(
+    "Method",
+    clientMethods,
+  );
 
   /**
    * @example type SomeOf<T> = T[keyof T];
    * @internal
    * */
-  protected someOfType = this.makeType(
+  protected someOfType = this.api.makeType(
     "SomeOf",
-    this.makeIndexed("T", this.makeKeyOf("T")),
+    this.api.makeIndexed("T", this.api.makeKeyOf("T")),
     { params: ["T"] },
   );
 
@@ -82,29 +87,27 @@ export abstract class IntegrationBase extends TypescriptAPI {
    * @example export type Request = keyof Input;
    * @internal
    * */
-  protected requestType = this.makeType(
+  protected requestType = this.api.makeType(
     "Request",
-    this.makeKeyOf(this.interfaces.input),
+    this.api.makeKeyOf(this.interfaces.input),
     { expose: true },
   );
 
-  protected constructor(private readonly serverUrl: string) {
-    super();
-  }
+  protected constructor(private readonly serverUrl: string) {}
 
   /**
    * @example SomeOf<_>
    * @internal
    **/
   protected someOf = ({ name }: ts.TypeAliasDeclaration) =>
-    this.ensureTypeNode(this.someOfType.name, [name]);
+    this.api.ensureTypeNode(this.someOfType.name, [name]);
 
   /**
    * @example export type Path = "/v1/user/retrieve" | ___;
    * @internal
    * */
   protected makePathType = () =>
-    this.makePublicLiteralType(this.#ids.pathType, Array.from(this.paths));
+    this.api.makePublicLiteralType(this.#ids.pathType, Array.from(this.paths));
 
   /**
    * @example export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
@@ -112,10 +115,10 @@ export abstract class IntegrationBase extends TypescriptAPI {
    * */
   protected makePublicInterfaces = () =>
     (Object.keys(this.interfaces) as IOKind[]).map((kind) =>
-      this.makeInterface(
+      this.api.makeInterface(
         this.interfaces[kind],
         Array.from(this.registry).map(([request, { store, isDeprecated }]) =>
-          this.makeInterfaceProp(request, store[kind], { isDeprecated }),
+          this.api.makeInterfaceProp(request, store[kind], { isDeprecated }),
         ),
         { expose: true },
       ),
@@ -126,14 +129,14 @@ export abstract class IntegrationBase extends TypescriptAPI {
    * @internal
    * */
   protected makeEndpointTags = () =>
-    this.makeConst(
+    this.api.makeConst(
       "endpointTags",
-      this.f.createObjectLiteralExpression(
+      this.api.f.createObjectLiteralExpression(
         Array.from(this.tags).map(([request, tags]) =>
-          this.f.createPropertyAssignment(
-            this.makePropertyIdentifier(request),
-            this.f.createArrayLiteralExpression(
-              R.map(this.literally.bind(this), tags),
+          this.api.f.createPropertyAssignment(
+            this.api.makePropertyIdentifier(request),
+            this.api.f.createArrayLiteralExpression(
+              R.map(this.api.literally.bind(this.api), tags),
             ),
           ),
         ),
@@ -146,20 +149,20 @@ export abstract class IntegrationBase extends TypescriptAPI {
    * @internal
    * */
   protected makeImplementationType = () =>
-    this.makeType(
+    this.api.makeType(
       this.#ids.implementationType,
-      this.makeFnType(
+      this.api.makeFnType(
         {
           [this.#ids.methodParameter.text]: this.methodType.name,
-          [this.#ids.pathParameter.text]: this.ts.SyntaxKind.StringKeyword,
-          [this.#ids.paramsArgument.text]: this.makeRecordStringAny(),
+          [this.#ids.pathParameter.text]: this.api.ts.SyntaxKind.StringKeyword,
+          [this.#ids.paramsArgument.text]: this.api.makeRecordStringAny(),
           [this.#ids.ctxArgument.text]: { optional: true, type: "T" },
         },
-        this.makePromise(this.ts.SyntaxKind.AnyKeyword),
+        this.api.makePromise(this.api.ts.SyntaxKind.AnyKeyword),
       ),
       {
         expose: true,
-        params: { T: { init: this.ts.SyntaxKind.UnknownKeyword } },
+        params: { T: { init: this.api.ts.SyntaxKind.UnknownKeyword } },
       },
     );
 
@@ -168,18 +171,24 @@ export abstract class IntegrationBase extends TypescriptAPI {
    * @internal
    * */
   protected makeParseRequestFn = () =>
-    this.makeConst(
+    this.api.makeConst(
       this.#ids.parseRequestFn,
-      this.makeArrowFn(
-        { [this.#ids.requestParameter.text]: this.ts.SyntaxKind.StringKeyword },
-        this.f.createAsExpression(
-          this.makeCall(this.#ids.requestParameter, propOf<string>("split"))(
-            this.f.createRegularExpressionLiteral("/ (.+)/"), // split once
-            this.literally(2), // excludes third empty element
+      this.api.makeArrowFn(
+        {
+          [this.#ids.requestParameter.text]:
+            this.api.ts.SyntaxKind.StringKeyword,
+        },
+        this.api.f.createAsExpression(
+          this.api.makeCall(
+            this.#ids.requestParameter,
+            propOf<string>("split"),
+          )(
+            this.api.f.createRegularExpressionLiteral("/ (.+)/"), // split once
+            this.api.literally(2), // excludes third empty element
           ),
-          this.f.createTupleTypeNode([
-            this.ensureTypeNode(this.methodType.name),
-            this.ensureTypeNode(this.#ids.pathType),
+          this.api.f.createTupleTypeNode([
+            this.api.ensureTypeNode(this.methodType.name),
+            this.api.ensureTypeNode(this.#ids.pathType),
           ]),
         ),
       ),
@@ -190,47 +199,47 @@ export abstract class IntegrationBase extends TypescriptAPI {
    * @internal
    * */
   protected makeSubstituteFn = () =>
-    this.makeConst(
+    this.api.makeConst(
       this.#ids.substituteFn,
-      this.makeArrowFn(
+      this.api.makeArrowFn(
         {
-          [this.#ids.pathParameter.text]: this.ts.SyntaxKind.StringKeyword,
-          [this.#ids.paramsArgument.text]: this.makeRecordStringAny(),
+          [this.#ids.pathParameter.text]: this.api.ts.SyntaxKind.StringKeyword,
+          [this.#ids.paramsArgument.text]: this.api.makeRecordStringAny(),
         },
-        this.f.createBlock([
-          this.makeConst(
+        this.api.f.createBlock([
+          this.api.makeConst(
             this.#ids.restConst,
-            this.f.createObjectLiteralExpression([
-              this.f.createSpreadAssignment(this.#ids.paramsArgument),
+            this.api.f.createObjectLiteralExpression([
+              this.api.f.createSpreadAssignment(this.#ids.paramsArgument),
             ]),
           ),
-          this.f.createForInStatement(
-            this.f.createVariableDeclarationList(
-              [this.f.createVariableDeclaration(this.#ids.keyParameter)],
-              this.ts.NodeFlags.Const,
+          this.api.f.createForInStatement(
+            this.api.f.createVariableDeclarationList(
+              [this.api.f.createVariableDeclaration(this.#ids.keyParameter)],
+              this.api.ts.NodeFlags.Const,
             ),
             this.#ids.paramsArgument,
-            this.f.createBlock([
-              this.makeAssignment(
+            this.api.f.createBlock([
+              this.api.makeAssignment(
                 this.#ids.pathParameter,
-                this.makeCall(
+                this.api.makeCall(
                   this.#ids.pathParameter,
                   propOf<string>("replace"),
                 )(
-                  this.makeTemplate(":", [this.#ids.keyParameter]), // `:${key}`
-                  this.makeArrowFn(
+                  this.api.makeTemplate(":", [this.#ids.keyParameter]), // `:${key}`
+                  this.api.makeArrowFn(
                     [],
-                    this.f.createBlock([
-                      this.f.createExpressionStatement(
-                        this.f.createDeleteExpression(
-                          this.f.createElementAccessExpression(
+                    this.api.f.createBlock([
+                      this.api.f.createExpressionStatement(
+                        this.api.f.createDeleteExpression(
+                          this.api.f.createElementAccessExpression(
                             this.#ids.restConst,
                             this.#ids.keyParameter,
                           ),
                         ),
                       ),
-                      this.f.createReturnStatement(
-                        this.f.createElementAccessExpression(
+                      this.api.f.createReturnStatement(
+                        this.api.f.createElementAccessExpression(
                           this.#ids.paramsArgument,
                           this.#ids.keyParameter,
                         ),
@@ -241,13 +250,13 @@ export abstract class IntegrationBase extends TypescriptAPI {
               ),
             ]),
           ),
-          this.f.createReturnStatement(
-            this.f.createAsExpression(
-              this.f.createArrayLiteralExpression([
+          this.api.f.createReturnStatement(
+            this.api.f.createAsExpression(
+              this.api.f.createArrayLiteralExpression([
                 this.#ids.pathParameter,
                 this.#ids.restConst,
               ]),
-              this.ensureTypeNode("const"),
+              this.api.ensureTypeNode("const"),
             ),
           ),
         ]),
@@ -256,31 +265,36 @@ export abstract class IntegrationBase extends TypescriptAPI {
 
   // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {}
   #makeProvider = () =>
-    this.makePublicMethod(
+    this.api.makePublicMethod(
       this.#ids.provideMethod,
-      this.makeParams({
+      this.api.makeParams({
         [this.#ids.requestParameter.text]: "K",
-        [this.#ids.paramsArgument.text]: this.makeIndexed(
+        [this.#ids.paramsArgument.text]: this.api.makeIndexed(
           this.interfaces.input,
           "K",
         ),
         [this.#ids.ctxArgument.text]: { optional: true, type: "T" },
       }),
       [
-        this.makeConst(
+        this.api.makeConst(
           // const [method, path] = this.parseRequest(request);
-          this.makeDeconstruction(
+          this.api.makeDeconstruction(
             this.#ids.methodParameter,
             this.#ids.pathParameter,
           ),
-          this.makeCall(this.#ids.parseRequestFn)(this.#ids.requestParameter),
+          this.api.makeCall(this.#ids.parseRequestFn)(
+            this.#ids.requestParameter,
+          ),
         ),
         // return this.implementation(___)
-        this.f.createReturnStatement(
-          this.makeCall(this.f.createThis(), this.#ids.implementationArgument)(
+        this.api.f.createReturnStatement(
+          this.api.makeCall(
+            this.api.f.createThis(),
+            this.#ids.implementationArgument,
+          )(
             this.#ids.methodParameter,
-            this.f.createSpreadElement(
-              this.makeCall(this.#ids.substituteFn)(
+            this.api.f.createSpreadElement(
+              this.api.makeCall(this.#ids.substituteFn)(
                 this.#ids.pathParameter,
                 this.#ids.paramsArgument,
               ),
@@ -291,8 +305,8 @@ export abstract class IntegrationBase extends TypescriptAPI {
       ],
       {
         typeParams: { K: this.requestType.name },
-        returns: this.makePromise(
-          this.makeIndexed(this.interfaces.response, "K"),
+        returns: this.api.makePromise(
+          this.api.makeIndexed(this.interfaces.response, "K"),
         ),
       },
     );
@@ -302,14 +316,14 @@ export abstract class IntegrationBase extends TypescriptAPI {
    * @internal
    * */
   protected makeClientClass = (name: string) =>
-    this.makePublicClass(
+    this.api.makePublicClass(
       name,
       [
         // public constructor(protected readonly implementation: Implementation = defaultImplementation) {}
-        this.makePublicConstructor([
-          this.makeParam(this.#ids.implementationArgument, {
-            type: this.ensureTypeNode(this.#ids.implementationType, ["T"]),
-            mod: this.accessModifiers.protectedReadonly,
+        this.api.makePublicConstructor([
+          this.api.makeParam(this.#ids.implementationArgument, {
+            type: this.api.ensureTypeNode(this.#ids.implementationType, ["T"]),
+            mod: this.api.accessModifiers.protectedReadonly,
             init: this.#ids.defaultImplementationConst,
           }),
         ]),
@@ -320,18 +334,18 @@ export abstract class IntegrationBase extends TypescriptAPI {
 
   // `?${new URLSearchParams(____)}`
   #makeSearchParams = (from: ts.Expression) =>
-    this.makeTemplate("?", [this.makeNew(URLSearchParams.name, from)]);
+    this.api.makeTemplate("?", [this.api.makeNew(URLSearchParams.name, from)]);
 
   // new URL(`${path}${searchParams}`, "http:____")
   #makeFetchURL = () =>
-    this.makeNew(
+    this.api.makeNew(
       URL.name,
-      this.makeTemplate(
+      this.api.makeTemplate(
         "",
         [this.#ids.pathParameter],
         [this.#ids.searchParamsConst],
       ),
-      this.literally(this.serverUrl),
+      this.api.literally(this.serverUrl),
     );
 
   /**
@@ -340,20 +354,23 @@ export abstract class IntegrationBase extends TypescriptAPI {
    * */
   protected makeDefaultImplementation = () => {
     // method: method.toUpperCase()
-    const methodProperty = this.f.createPropertyAssignment(
+    const methodProperty = this.api.f.createPropertyAssignment(
       propOf<RequestInit>("method"),
-      this.makeCall(this.#ids.methodParameter, propOf<string>("toUpperCase"))(),
+      this.api.makeCall(
+        this.#ids.methodParameter,
+        propOf<string>("toUpperCase"),
+      )(),
     );
 
     // headers: hasBody ? { "Content-Type": "application/json" } : undefined
-    const headersProperty = this.f.createPropertyAssignment(
+    const headersProperty = this.api.f.createPropertyAssignment(
       propOf<RequestInit>("headers"),
-      this.makeTernary(
+      this.api.makeTernary(
         this.#ids.hasBodyConst,
-        this.f.createObjectLiteralExpression([
-          this.f.createPropertyAssignment(
-            this.literally("Content-Type"),
-            this.literally(contentTypes.json),
+        this.api.f.createObjectLiteralExpression([
+          this.api.f.createPropertyAssignment(
+            this.api.literally("Content-Type"),
+            this.api.literally(contentTypes.json),
           ),
         ]),
         this.#ids.undefinedValue,
@@ -361,11 +378,11 @@ export abstract class IntegrationBase extends TypescriptAPI {
     );
 
     // body: hasBody ? JSON.stringify(params) : undefined
-    const bodyProperty = this.f.createPropertyAssignment(
+    const bodyProperty = this.api.f.createPropertyAssignment(
       propOf<RequestInit>("body"),
-      this.makeTernary(
+      this.api.makeTernary(
         this.#ids.hasBodyConst,
-        this.makeCall(
+        this.api.makeCall(
           JSON[Symbol.toStringTag],
           propOf<JSON>("stringify"),
         )(this.#ids.paramsArgument),
@@ -374,12 +391,12 @@ export abstract class IntegrationBase extends TypescriptAPI {
     );
 
     // const response = await fetch(new URL(`${path}${searchParams}`, "https://example.com"), { ___ });
-    const responseStatement = this.makeConst(
+    const responseStatement = this.api.makeConst(
       this.#ids.responseConst,
-      this.f.createAwaitExpression(
-        this.makeCall(fetch.name)(
+      this.api.f.createAwaitExpression(
+        this.api.makeCall(fetch.name)(
           this.#makeFetchURL(),
-          this.f.createObjectLiteralExpression([
+          this.api.f.createObjectLiteralExpression([
             methodProperty,
             headersProperty,
             bodyProperty,
@@ -389,14 +406,14 @@ export abstract class IntegrationBase extends TypescriptAPI {
     );
 
     // const hasBody = !["get", "delete"].includes(method);
-    const hasBodyStatement = this.makeConst(
+    const hasBodyStatement = this.api.makeConst(
       this.#ids.hasBodyConst,
-      this.f.createLogicalNot(
-        this.makeCall(
-          this.f.createArrayLiteralExpression([
-            this.literally("get" satisfies ClientMethod),
-            this.literally("head" satisfies ClientMethod),
-            this.literally("delete" satisfies ClientMethod),
+      this.api.f.createLogicalNot(
+        this.api.makeCall(
+          this.api.f.createArrayLiteralExpression([
+            this.api.literally("get" satisfies ClientMethod),
+            this.api.literally("head" satisfies ClientMethod),
+            this.api.literally("delete" satisfies ClientMethod),
           ]),
           propOf<string[]>("includes"),
         )(this.#ids.methodParameter),
@@ -404,64 +421,64 @@ export abstract class IntegrationBase extends TypescriptAPI {
     );
 
     // const searchParams = hasBody ? "" : ___;
-    const searchParamsStatement = this.makeConst(
+    const searchParamsStatement = this.api.makeConst(
       this.#ids.searchParamsConst,
-      this.makeTernary(
+      this.api.makeTernary(
         this.#ids.hasBodyConst,
-        this.literally(""),
+        this.api.literally(""),
         this.#makeSearchParams(this.#ids.paramsArgument),
       ),
     );
 
     // const contentType = response.headers.get("content-type");
-    const contentTypeStatement = this.makeConst(
+    const contentTypeStatement = this.api.makeConst(
       this.#ids.contentTypeConst,
-      this.makeCall(
+      this.api.makeCall(
         this.#ids.responseConst,
         propOf<Response>("headers"),
         propOf<Headers>("get"),
-      )(this.literally("content-type")),
+      )(this.api.literally("content-type")),
     );
 
     // if (!contentType) return;
-    const noBodyStatement = this.f.createIfStatement(
-      this.f.createPrefixUnaryExpression(
-        this.ts.SyntaxKind.ExclamationToken,
+    const noBodyStatement = this.api.f.createIfStatement(
+      this.api.f.createPrefixUnaryExpression(
+        this.api.ts.SyntaxKind.ExclamationToken,
         this.#ids.contentTypeConst,
       ),
-      this.f.createReturnStatement(),
+      this.api.f.createReturnStatement(),
     );
 
     // const isJSON = contentType.startsWith("application/json");
-    const isJsonConst = this.makeConst(
+    const isJsonConst = this.api.makeConst(
       this.#ids.isJsonConst,
-      this.makeCall(
+      this.api.makeCall(
         this.#ids.contentTypeConst,
         propOf<string>("startsWith"),
-      )(this.literally(contentTypes.json)),
+      )(this.api.literally(contentTypes.json)),
     );
 
     // return response[isJSON ? "json" : "text"]();
-    const returnStatement = this.f.createReturnStatement(
-      this.makeCall(
+    const returnStatement = this.api.f.createReturnStatement(
+      this.api.makeCall(
         this.#ids.responseConst,
-        this.makeTernary(
+        this.api.makeTernary(
           this.#ids.isJsonConst,
-          this.literally(propOf<Response>("json")),
-          this.literally(propOf<Response>("text")),
+          this.api.literally(propOf<Response>("json")),
+          this.api.literally(propOf<Response>("text")),
         ),
       )(),
     );
 
-    return this.makeConst(
+    return this.api.makeConst(
       this.#ids.defaultImplementationConst,
-      this.makeArrowFn(
+      this.api.makeArrowFn(
         [
           this.#ids.methodParameter,
           this.#ids.pathParameter,
           this.#ids.paramsArgument,
         ],
-        this.f.createBlock([
+        this.api.f.createBlock([
           hasBodyStatement,
           searchParamsStatement,
           responseStatement,
@@ -477,81 +494,84 @@ export abstract class IntegrationBase extends TypescriptAPI {
   };
 
   #makeSubscriptionConstructor = () =>
-    this.makePublicConstructor(
-      this.makeParams({
+    this.api.makePublicConstructor(
+      this.api.makeParams({
         request: "K",
-        params: this.makeIndexed(this.interfaces.input, "K"),
+        params: this.api.makeIndexed(this.interfaces.input, "K"),
       }),
       [
-        this.makeConst(
-          this.makeDeconstruction(this.#ids.pathParameter, this.#ids.restConst),
-          this.makeCall(this.#ids.substituteFn)(
-            this.f.createElementAccessExpression(
-              this.makeCall(this.#ids.parseRequestFn)(
+        this.api.makeConst(
+          this.api.makeDeconstruction(
+            this.#ids.pathParameter,
+            this.#ids.restConst,
+          ),
+          this.api.makeCall(this.#ids.substituteFn)(
+            this.api.f.createElementAccessExpression(
+              this.api.makeCall(this.#ids.parseRequestFn)(
                 this.#ids.requestParameter,
               ),
-              this.literally(1),
+              this.api.literally(1),
             ),
             this.#ids.paramsArgument,
           ),
         ),
-        this.makeConst(
+        this.api.makeConst(
           this.#ids.searchParamsConst,
           this.#makeSearchParams(this.#ids.restConst),
         ),
-        this.makeAssignment(
-          this.f.createPropertyAccessExpression(
-            this.f.createThis(),
+        this.api.makeAssignment(
+          this.api.f.createPropertyAccessExpression(
+            this.api.f.createThis(),
             this.#ids.sourceProp,
           ),
-          this.makeNew("EventSource", this.#makeFetchURL()),
+          this.api.makeNew("EventSource", this.#makeFetchURL()),
         ),
       ],
     );
 
   #makeEventNarrow = (value: Typeable) =>
-    this.f.createTypeLiteralNode([
-      this.makeInterfaceProp(propOf<SSEShape>("event"), value),
+    this.api.f.createTypeLiteralNode([
+      this.api.makeInterfaceProp(propOf<SSEShape>("event"), value),
     ]);
 
   #makeOnMethod = () =>
-    this.makePublicMethod(
+    this.api.makePublicMethod(
       this.#ids.onMethod,
-      this.makeParams({
+      this.api.makeParams({
         [this.#ids.eventParameter.text]: "E",
-        [this.#ids.handlerParameter.text]: this.makeFnType(
+        [this.#ids.handlerParameter.text]: this.api.makeFnType(
           {
-            [this.#ids.dataParameter.text]: this.makeIndexed(
-              this.makeExtract(
+            [this.#ids.dataParameter.text]: this.api.makeIndexed(
+              this.api.makeExtract(
                 "R",
-                this.makeOneLine(this.#makeEventNarrow("E")),
+                this.api.makeOneLine(this.#makeEventNarrow("E")),
               ),
-              this.makeLiteralType(propOf<SSEShape>("data")),
+              this.api.makeLiteralType(propOf<SSEShape>("data")),
             ),
           },
-          this.makeMaybeAsync(this.ts.SyntaxKind.VoidKeyword),
+          this.api.makeMaybeAsync(this.api.ts.SyntaxKind.VoidKeyword),
         ),
       }),
       [
-        this.f.createExpressionStatement(
-          this.makeCall(
-            this.f.createThis(),
+        this.api.f.createExpressionStatement(
+          this.api.makeCall(
+            this.api.f.createThis(),
             this.#ids.sourceProp,
             propOf<EventSource>("addEventListener"),
           )(
             this.#ids.eventParameter,
-            this.makeArrowFn(
+            this.api.makeArrowFn(
               [this.#ids.msgParameter],
-              this.makeCall(this.#ids.handlerParameter)(
-                this.makeCall(
+              this.api.makeCall(this.#ids.handlerParameter)(
+                this.api.makeCall(
                   JSON[Symbol.toStringTag],
                   propOf<JSON>("parse"),
                 )(
-                  this.f.createPropertyAccessExpression(
-                    this.f.createParenthesizedExpression(
-                      this.f.createAsExpression(
+                  this.api.f.createPropertyAccessExpression(
+                    this.api.f.createParenthesizedExpression(
+                      this.api.f.createAsExpression(
                         this.#ids.msgParameter,
-                        this.ensureTypeNode(MessageEvent.name),
+                        this.api.ensureTypeNode(MessageEvent.name),
                       ),
                     ),
                     propOf<SSEShape>("data"),
@@ -561,13 +581,13 @@ export abstract class IntegrationBase extends TypescriptAPI {
             ),
           ),
         ),
-        this.f.createReturnStatement(this.f.createThis()),
+        this.api.f.createReturnStatement(this.api.f.createThis()),
       ],
       {
         typeParams: {
-          E: this.makeIndexed(
+          E: this.api.makeIndexed(
             "R",
-            this.makeLiteralType(propOf<SSEShape>("event")),
+            this.api.makeLiteralType(propOf<SSEShape>("event")),
           ),
         },
       },
@@ -578,31 +598,31 @@ export abstract class IntegrationBase extends TypescriptAPI {
    * @internal
    * */
   protected makeSubscriptionClass = (name: string) =>
-    this.makePublicClass(
+    this.api.makePublicClass(
       name,
       [
-        this.makePublicProperty(this.#ids.sourceProp, "EventSource"),
+        this.api.makePublicProperty(this.#ids.sourceProp, "EventSource"),
         this.#makeSubscriptionConstructor(),
         this.#makeOnMethod(),
       ],
       {
         typeParams: {
-          K: this.makeExtract(
+          K: this.api.makeExtract(
             this.requestType.name,
-            this.f.createTemplateLiteralType(
-              this.f.createTemplateHead("get "),
+            this.api.f.createTemplateLiteralType(
+              this.api.f.createTemplateHead("get "),
               [
-                this.f.createTemplateLiteralTypeSpan(
-                  this.ensureTypeNode(this.ts.SyntaxKind.StringKeyword),
-                  this.f.createTemplateTail(""),
+                this.api.f.createTemplateLiteralTypeSpan(
+                  this.api.ensureTypeNode(this.api.ts.SyntaxKind.StringKeyword),
+                  this.api.f.createTemplateTail(""),
                 ),
               ],
             ),
           ),
-          R: this.makeExtract(
-            this.makeIndexed(this.interfaces.positive, "K"),
-            this.makeOneLine(
-              this.#makeEventNarrow(this.ts.SyntaxKind.StringKeyword),
+          R: this.api.makeExtract(
+            this.api.makeIndexed(this.interfaces.positive, "K"),
+            this.api.makeOneLine(
+              this.#makeEventNarrow(this.api.ts.SyntaxKind.StringKeyword),
             ),
           ),
         },
@@ -614,25 +634,28 @@ export abstract class IntegrationBase extends TypescriptAPI {
     clientClassName: string,
     subscriptionClassName: string,
   ): ts.Node[] => [
-    this.makeConst(this.#ids.clientConst, this.makeNew(clientClassName)), // const client = new Client();
+    this.api.makeConst(
+      this.#ids.clientConst,
+      this.api.makeNew(clientClassName),
+    ), // const client = new Client();
     // client.provide("get /v1/user/retrieve", { id: "10" });
-    this.makeCall(this.#ids.clientConst, this.#ids.provideMethod)(
-      this.literally(`${"get" satisfies ClientMethod} /v1/user/retrieve`),
-      this.f.createObjectLiteralExpression([
-        this.f.createPropertyAssignment("id", this.literally("10")),
+    this.api.makeCall(this.#ids.clientConst, this.#ids.provideMethod)(
+      this.api.literally(`${"get" satisfies ClientMethod} /v1/user/retrieve`),
+      this.api.f.createObjectLiteralExpression([
+        this.api.f.createPropertyAssignment("id", this.api.literally("10")),
       ]),
     ),
     // new Subscription("get /v1/events/stream", {}).on("time", (time) => {});
-    this.makeCall(
-      this.makeNew(
+    this.api.makeCall(
+      this.api.makeNew(
         subscriptionClassName,
-        this.literally(`${"get" satisfies ClientMethod} /v1/events/stream`),
-        this.f.createObjectLiteralExpression(),
+        this.api.literally(`${"get" satisfies ClientMethod} /v1/events/stream`),
+        this.api.f.createObjectLiteralExpression(),
       ),
       this.#ids.onMethod,
     )(
-      this.literally("time"),
-      this.makeArrowFn(["time"], this.f.createBlock([])),
+      this.api.literally("time"),
+      this.api.makeArrowFn(["time"], this.api.f.createBlock([])),
     ),
   ];
 }
