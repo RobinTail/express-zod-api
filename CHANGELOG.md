@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 27
+
+### v27.0.0
+
+- to be announced.
+
 ## Version 26
 
 ### v26.1.0
