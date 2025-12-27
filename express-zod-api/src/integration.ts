@@ -8,6 +8,7 @@ import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting, withHead } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
+import { TypescriptAPI } from "./typescript-api";
 import { zodToTs } from "./zts";
 import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
@@ -15,6 +16,7 @@ import { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 
 interface IntegrationParams {
+  typescript: typeof ts;
   routing: Routing;
   config: CommonConfig;
   /**
@@ -79,6 +81,7 @@ export class Integration extends IntegrationBase {
   }
 
   public constructor({
+    typescript,
     routing,
     config,
     brandHandling,
@@ -89,7 +92,7 @@ export class Integration extends IntegrationBase {
     noContent = z.undefined(),
     hasHeadMethod = true,
   }: IntegrationParams) {
-    super(serverUrl);
+    super(new TypescriptAPI(typescript), serverUrl);
     const commons = { makeAlias: this.#makeAlias.bind(this), api: this.api };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
@@ -174,6 +177,13 @@ export class Integration extends IntegrationBase {
     this.#usage.push(
       ...this.makeUsageStatements(clientClassName, subscriptionClassName),
     );
+  }
+
+  public static async create(params: Omit<IntegrationParams, "typescript">) {
+    return new Integration({
+      ...params,
+      typescript: await loadPeer<typeof ts>("typescript"),
+    });
   }
 
   #printUsage(printerOptions?: ts.PrinterOptions) {

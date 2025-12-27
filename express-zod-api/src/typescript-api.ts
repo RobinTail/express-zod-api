@@ -1,6 +1,5 @@
 import * as R from "ramda";
 import type ts from "typescript";
-import { loadPeer } from "./peer-helpers";
 
 export type Typeable =
   | ts.TypeNode
@@ -20,10 +19,6 @@ export class TypescriptAPI {
   public accessModifiers: Record<"public" | "protectedReadonly", ts.Modifier[]>;
   #primitives: ts.KeywordTypeSyntaxKind[];
   static #safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
-
-  public static async create() {
-    return new TypescriptAPI(await loadPeer("typescript"));
-  }
 
   constructor(typescript: typeof ts) {
     this.ts = typescript;

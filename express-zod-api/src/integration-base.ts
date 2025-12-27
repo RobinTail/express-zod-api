@@ -12,8 +12,6 @@ type Store = Record<IOKind, ts.TypeNode>;
 
 export abstract class IntegrationBase {
   /** @internal */
-  protected api = new TypescriptAPI();
-  /** @internal */
   protected paths = new Set<string>();
   /** @internal */
   protected tags = new Map<string, ReadonlyArray<string>>();
@@ -22,6 +20,12 @@ export abstract class IntegrationBase {
     string,
     { store: Store; isDeprecated: boolean }
   >();
+
+  protected constructor(
+    /** @internal */
+    protected readonly api: TypescriptAPI,
+    protected readonly serverUrl: string,
+  ) {}
 
   readonly #ids = {
     pathType: this.api.f.createIdentifier("Path"),
@@ -92,8 +96,6 @@ export abstract class IntegrationBase {
     this.api.makeKeyOf(this.interfaces.input),
     { expose: true },
   );
-
-  protected constructor(private readonly serverUrl: string) {}
 
   /**
    * @example SomeOf<_>
