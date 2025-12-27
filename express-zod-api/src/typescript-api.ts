@@ -215,9 +215,7 @@ export class TypescriptAPI {
   public makeOneLine = (subject: ts.TypeNode) =>
     this.ts.setEmitFlags(subject, this.ts.EmitFlags.SingleLine);
 
-  public makeDeconstruction = (
-    ...names: ts.Identifier[]
-  ): ts.ArrayBindingPattern =>
+  public makeDeconstruction = (...names: string[]): ts.ArrayBindingPattern =>
     this.f.createArrayBindingPattern(
       names.map(
         (name) => this.f.createBindingElement(undefined, undefined, name), // can also add default value at last
