@@ -415,10 +415,13 @@ export class TypescriptAPI {
   public makeExtract = (base: Typeable, narrow: ts.TypeNode) =>
     this.ensureTypeNode("Extract", [base, narrow]);
 
-  public makeAssignment = (left: ts.Expression, right: ts.Expression) =>
+  public makeAssignment = (
+    left: ts.Expression | string,
+    right: ts.Expression,
+  ) =>
     this.f.createExpressionStatement(
       this.f.createBinaryExpression(
-        left,
+        typeof left === "string" ? this.makeId(left) : left,
         this.f.createToken(this.ts.SyntaxKind.EqualsToken),
         right,
       ),
