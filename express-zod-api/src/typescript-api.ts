@@ -154,7 +154,7 @@ export class TypescriptAPI {
       : typeof subject === "string" || this.ts.isIdentifier(subject)
         ? this.f.createTypeReferenceNode(
             subject,
-            args && R.map(this.ensureTypeNode.bind(this), args),
+            args && R.map(this.ensureTypeNode, args),
           )
         : subject;
 
@@ -246,11 +246,9 @@ export class TypescriptAPI {
     name: ts.Identifier | string,
     literals: string[],
   ) =>
-    this.makeType(
-      name,
-      this.makeUnion(R.map(this.makeLiteralType.bind(this), literals)),
-      { expose: true },
-    );
+    this.makeType(name, this.makeUnion(R.map(this.makeLiteralType, literals)), {
+      expose: true,
+    });
 
   public makeType = (
     name: ts.Identifier | string,
@@ -371,7 +369,7 @@ export class TypescriptAPI {
       isAsync ? this.asyncModifier : undefined,
       undefined,
       Array.isArray(params)
-        ? R.map(this.makeParam.bind(this), params)
+        ? R.map(this.makeParam, params)
         : this.makeParams(params),
       undefined,
       undefined,

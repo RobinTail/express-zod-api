@@ -142,7 +142,7 @@ export abstract class IntegrationBase {
           this.api.f.createPropertyAssignment(
             this.api.makePropertyIdentifier(request),
             this.api.f.createArrayLiteralExpression(
-              R.map(this.api.literally.bind(this.api), tags),
+              R.map(this.api.literally, tags),
             ),
           ),
         ),
