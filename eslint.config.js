@@ -242,11 +242,7 @@ export default tsPlugin.config(
     files: ["migration/index.ts"],
     rules: {
       "allowed/dependencies": ["error", { packageDir: migrationDir }],
-      "no-restricted-syntax": [
-        "warn",
-        ...importConcerns,
-        ...performanceConcerns,
-      ],
+      "no-restricted-syntax": ["warn", ...importConcerns],
     },
   },
   {
