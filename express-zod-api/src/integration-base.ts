@@ -207,7 +207,9 @@ export abstract class IntegrationBase {
           this.api.makeConst(
             this.#ids.restConst,
             this.api.f.createObjectLiteralExpression([
-              this.api.f.createSpreadAssignment(this.#ids.paramsArgument),
+              this.api.f.createSpreadAssignment(
+                this.api.makeId(this.#ids.paramsArgument),
+              ),
             ]),
           ),
           this.api.f.createForInStatement(
@@ -230,15 +232,15 @@ export abstract class IntegrationBase {
                       this.api.f.createExpressionStatement(
                         this.api.f.createDeleteExpression(
                           this.api.f.createElementAccessExpression(
-                            this.#ids.restConst,
-                            this.#ids.keyParameter,
+                            this.api.makeId(this.#ids.restConst),
+                            this.api.makeId(this.#ids.keyParameter),
                           ),
                         ),
                       ),
                       this.api.f.createReturnStatement(
                         this.api.f.createElementAccessExpression(
-                          this.#ids.paramsArgument,
-                          this.#ids.keyParameter,
+                          this.api.makeId(this.#ids.paramsArgument),
+                          this.api.makeId(this.#ids.keyParameter),
                         ),
                       ),
                     ]),
@@ -250,8 +252,8 @@ export abstract class IntegrationBase {
           this.api.f.createReturnStatement(
             this.api.f.createAsExpression(
               this.api.f.createArrayLiteralExpression([
-                this.#ids.pathParameter,
-                this.#ids.restConst,
+                this.api.makeId(this.#ids.pathParameter),
+                this.api.makeId(this.#ids.restConst),
               ]),
               this.api.ensureTypeNode("const"),
             ),
@@ -441,7 +443,7 @@ export abstract class IntegrationBase {
     const noBodyStatement = this.api.f.createIfStatement(
       this.api.f.createPrefixUnaryExpression(
         this.api.ts.SyntaxKind.ExclamationToken,
-        this.#ids.contentTypeConst,
+        this.api.makeId(this.#ids.contentTypeConst),
       ),
       this.api.f.createReturnStatement(),
     );
