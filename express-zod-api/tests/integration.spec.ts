@@ -27,6 +27,7 @@ describe("Integration", () => {
     "Should support types variant and handle recursive schemas %#",
     (recursiveSchema) => {
       const client = new Integration({
+        typescript: ts,
         variant: "types",
         config: configMock,
         routing: {
@@ -49,7 +50,7 @@ describe("Integration", () => {
   );
 
   test("Should treat optionals the same way as z.infer() by default", async () => {
-    const client = new Integration({
+    const client = await Integration.create({
       config: configMock,
       routing: {
         v1: {
@@ -72,7 +73,7 @@ describe("Integration", () => {
   test.each([undefined, false])(
     "Should support HEAD method by default %#",
     async (hasHeadMethod) => {
-      const client = new Integration({
+      const client = await Integration.create({
         config: configMock,
         hasHeadMethod,
         variant: "types",
@@ -109,7 +110,7 @@ describe("Integration", () => {
         handler: vi.fn(),
       }),
     );
-    const client = new Integration({
+    const client = await Integration.create({
       config: configMock,
       variant: "types",
       routing: {
@@ -135,7 +136,7 @@ describe("Integration", () => {
         schema._zod.bag.brand = undefined;
         return next(schema);
       };
-      const client = new Integration({
+      const client = await Integration.create({
         config: configMock,
         variant: "types",
         brandHandling: {

@@ -180,7 +180,7 @@ Install the framework, its peer dependencies and type assistance packages using 
 
 ```shell
 # example for pnpm:
-pnpm add express-zod-api express zod typescript http-errors
+pnpm add express-zod-api express zod http-errors
 pnpm add -D @types/express @types/node @types/http-errors
 ```
 
@@ -1074,13 +1074,15 @@ adding the runtime helpers the framework relies on.
 
 ## Generating a Frontend Client
 
-You can generate a Typescript file containing the IO types of your API and a client for it.
-Consider installing `prettier` and using the async `printFormatted()` method.
+You can generate a Typescript file containing the IO types of your API and a client for it. Make sure you have
+`typescript` installed. Consider also installing `prettier` and using the async `printFormatted()` method.
 
 ```ts
+import typescript from "typescript";
 import { Integration } from "express-zod-api";
 
 const client = new Integration({
+  typescript, // or await Integration.create() to delegate importing
   routing,
   config,
   variant: "client", // <— optional, see also "types" for a DIY solution

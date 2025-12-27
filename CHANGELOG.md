@@ -4,7 +4,32 @@
 
 ### v27.0.0
 
-- to be announced.
+- Breaking change to the `Integration` class:
+  - Either import and assign the `typescript` property to constructor argument;
+  - Or use the new static async method `create()` to delegate the import;
+
+```diff
+  /** Option 1: import and assign */
+  import { Integration } from "express-zod-api";
++ import typescript from "typescript";
+
+  const client = new Integration({
+    routing,
+    config,
++   typescript,
+  });
+```
+
+```diff
+  /** Option 2: delegate asynchronously */
+  import { Integration } from "express-zod-api";
+
+- const client = new Integration({
++ const client = await Integration.create({
+    routing,
+    config,
+  });
+```
 
 ## Version 26
 

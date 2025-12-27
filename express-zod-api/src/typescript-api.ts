@@ -1,4 +1,3 @@
-import { createRequire } from "node:module";
 import * as R from "ramda";
 import type ts from "typescript";
 
@@ -21,8 +20,8 @@ export class TypescriptAPI {
   #primitives: ts.KeywordTypeSyntaxKind[];
   static #safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
-  constructor() {
-    this.ts = createRequire(import.meta.url)("typescript"); // @todo replace with a dynamic import in next major
+  constructor(typescript: typeof ts) {
+    this.ts = typescript;
     this.f = this.ts.factory;
     this.exportModifier = [
       this.f.createModifier(this.ts.SyntaxKind.ExportKeyword),
@@ -72,20 +71,22 @@ export class TypescriptAPI {
     return printer.printNode(this.ts.EmitHint.Unspecified, node, sourceFile);
   };
 
+  public makeId = (name: string) => this.f.createIdentifier(name);
+
   public makePropertyIdentifier = (name: string | number) =>
     typeof name === "string" && TypescriptAPI.#safePropRegex.test(name)
-      ? this.f.createIdentifier(name)
+      ? this.makeId(name)
       : this.literally(name);
 
   public makeTemplate = (
     head: string,
-    ...rest: ([ts.Expression] | [ts.Expression, string])[]
+    ...rest: [ts.Expression | string, string?][]
   ) =>
     this.f.createTemplateExpression(
       this.f.createTemplateHead(head),
       rest.map(([id, str = ""], idx) =>
         this.f.createTemplateSpan(
-          id,
+          typeof id === "string" ? this.makeId(id) : id,
           idx === rest.length - 1
             ? this.f.createTemplateTail(str)
             : this.f.createTemplateMiddle(str),
@@ -98,12 +99,12 @@ export class TypescriptAPI {
     {
       type,
       mod,
-      init,
+      initId,
       optional,
     }: {
       type?: Typeable;
       mod?: ts.Modifier[];
-      init?: ts.Expression;
+      initId?: string;
       optional?: boolean;
     } = {},
   ) =>
@@ -115,7 +116,7 @@ export class TypescriptAPI {
         ? this.f.createToken(this.ts.SyntaxKind.QuestionToken)
         : undefined,
       type ? this.ensureTypeNode(type) : undefined,
-      init,
+      initId ? this.makeId(initId) : undefined,
     );
 
   public makeParams = (
@@ -153,7 +154,7 @@ export class TypescriptAPI {
       : typeof subject === "string" || this.ts.isIdentifier(subject)
         ? this.f.createTypeReferenceNode(
             subject,
-            args && R.map(this.ensureTypeNode.bind(this), args),
+            args && R.map(this.ensureTypeNode, args),
           )
         : subject;
 
@@ -214,9 +215,7 @@ export class TypescriptAPI {
   public makeOneLine = (subject: ts.TypeNode) =>
     this.ts.setEmitFlags(subject, this.ts.EmitFlags.SingleLine);
 
-  public makeDeconstruction = (
-    ...names: ts.Identifier[]
-  ): ts.ArrayBindingPattern =>
+  public makeDeconstruction = (...names: string[]): ts.ArrayBindingPattern =>
     this.f.createArrayBindingPattern(
       names.map(
         (name) => this.f.createBindingElement(undefined, undefined, name), // can also add default value at last
@@ -247,11 +246,9 @@ export class TypescriptAPI {
     name: ts.Identifier | string,
     literals: string[],
   ) =>
-    this.makeType(
-      name,
-      this.makeUnion(R.map(this.makeLiteralType.bind(this), literals)),
-      { expose: true },
-    );
+    this.makeType(name, this.makeUnion(R.map(this.makeLiteralType, literals)), {
+      expose: true,
+    });
 
   public makeType = (
     name: ts.Identifier | string,
@@ -284,7 +281,7 @@ export class TypescriptAPI {
     );
 
   public makePublicMethod = (
-    name: ts.Identifier,
+    name: string,
     params: ts.ParameterDeclaration[],
     statements: ts.Statement[],
     {
@@ -372,7 +369,7 @@ export class TypescriptAPI {
       isAsync ? this.asyncModifier : undefined,
       undefined,
       Array.isArray(params)
-        ? R.map(this.makeParam.bind(this), params)
+        ? R.map(this.makeParam, params)
         : this.makeParams(params),
       undefined,
       undefined,
@@ -380,46 +377,55 @@ export class TypescriptAPI {
     );
 
   public makeTernary = (
-    condition: ts.Expression,
-    positive: ts.Expression,
-    negative: ts.Expression,
-  ) =>
-    this.f.createConditionalExpression(
+    ...args: [
+      ts.Expression | string,
+      ts.Expression | string,
+      ts.Expression | string,
+    ]
+  ) => {
+    const [condition, positive, negative] = args.map((arg) =>
+      typeof arg === "string" ? this.makeId(arg) : arg,
+    );
+    return this.f.createConditionalExpression(
       condition,
       this.f.createToken(this.ts.SyntaxKind.QuestionToken),
       positive,
       this.f.createToken(this.ts.SyntaxKind.ColonToken),
       negative,
     );
+  };
 
   public makeCall =
     (
       first: ts.Expression | string,
       ...rest: Array<ts.Identifier | ts.ConditionalExpression | string>
     ) =>
-    (...args: ts.Expression[]) =>
+    (...args: Array<ts.Expression | string>) =>
       this.f.createCallExpression(
         rest.reduce(
           (acc, entry) =>
             typeof entry === "string" || this.ts.isIdentifier(entry)
               ? this.f.createPropertyAccessExpression(acc, entry)
               : this.f.createElementAccessExpression(acc, entry),
-          typeof first === "string" ? this.f.createIdentifier(first) : first,
+          typeof first === "string" ? this.makeId(first) : first,
         ),
         undefined,
-        args,
+        args.map((arg) => (typeof arg === "string" ? this.makeId(arg) : arg)),
       );
 
   public makeNew = (cls: string, ...args: ts.Expression[]) =>
-    this.f.createNewExpression(this.f.createIdentifier(cls), undefined, args);
+    this.f.createNewExpression(this.makeId(cls), undefined, args);
 
   public makeExtract = (base: Typeable, narrow: ts.TypeNode) =>
     this.ensureTypeNode("Extract", [base, narrow]);
 
-  public makeAssignment = (left: ts.Expression, right: ts.Expression) =>
+  public makeAssignment = (
+    left: ts.Expression | string,
+    right: ts.Expression,
+  ) =>
     this.f.createExpressionStatement(
       this.f.createBinaryExpression(
-        left,
+        typeof left === "string" ? this.makeId(left) : left,
         this.f.createToken(this.ts.SyntaxKind.EqualsToken),
         right,
       ),

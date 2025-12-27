@@ -97,7 +97,7 @@ const onArray: Producer = (
 ) => api.f.createArrayTypeNode(next(def.element));
 
 const onEnum: Producer = ({ _zod: { def } }: z.core.$ZodEnum, { api }) =>
-  api.makeUnion(Object.values(def.entries).map(api.makeLiteralType.bind(api)));
+  api.makeUnion(R.map(api.makeLiteralType, Object.values(def.entries)));
 
 const onSomeUnion: Producer = (
   { _zod: { def } }: z.core.$ZodUnion | z.core.$ZodDiscriminatedUnion,
