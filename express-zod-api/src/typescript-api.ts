@@ -1,6 +1,6 @@
-import { createRequire } from "node:module";
 import * as R from "ramda";
 import type ts from "typescript";
+import { loadPeer } from "./peer-helpers";
 
 export type Typeable =
   | ts.TypeNode
@@ -21,8 +21,12 @@ export class TypescriptAPI {
   #primitives: ts.KeywordTypeSyntaxKind[];
   static #safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
-  constructor() {
-    this.ts = createRequire(import.meta.url)("typescript"); // @todo replace with a dynamic import in next major
+  public static async create() {
+    return new TypescriptAPI(await loadPeer("typescript"));
+  }
+
+  constructor(typescript: typeof ts) {
+    this.ts = typescript;
     this.f = this.ts.factory;
     this.exportModifier = [
       this.f.createModifier(this.ts.SyntaxKind.ExportKeyword),
