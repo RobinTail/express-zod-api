@@ -220,7 +220,7 @@ export abstract class IntegrationBase {
               [this.api.f.createVariableDeclaration(this.#ids.keyParameter)],
               this.api.ts.NodeFlags.Const,
             ),
-            this.#ids.paramsArgument,
+            this.api.makeId(this.#ids.paramsArgument),
             this.api.f.createBlock([
               this.api.makeAssignment(
                 this.#ids.pathParameter,
