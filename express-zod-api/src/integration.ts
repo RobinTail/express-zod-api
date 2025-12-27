@@ -8,7 +8,6 @@ import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
 import { OnEndpoint, walkRouting, withHead } from "./routing-walker";
 import { HandlingRules } from "./schema-walker";
-import { TypescriptAPI } from "./typescript-api";
 import { zodToTs } from "./zts";
 import { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
@@ -92,7 +91,7 @@ export class Integration extends IntegrationBase {
     noContent = z.undefined(),
     hasHeadMethod = true,
   }: IntegrationParams) {
-    super(new TypescriptAPI(typescript), serverUrl);
+    super(typescript, serverUrl);
     const commons = { makeAlias: this.#makeAlias.bind(this), api: this.api };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
