@@ -28,44 +28,42 @@ export abstract class IntegrationBase {
   ) {}
 
   readonly #ids = {
-    pathType: this.api.f.createIdentifier("Path"),
-    implementationType: this.api.f.createIdentifier("Implementation"),
-    keyParameter: this.api.f.createIdentifier("key"),
-    pathParameter: this.api.f.createIdentifier("path"),
-    paramsArgument: this.api.f.createIdentifier("params"),
-    ctxArgument: this.api.f.createIdentifier("ctx"),
-    methodParameter: this.api.f.createIdentifier("method"),
-    requestParameter: this.api.f.createIdentifier("request"),
-    eventParameter: this.api.f.createIdentifier("event"),
-    dataParameter: this.api.f.createIdentifier("data"),
-    handlerParameter: this.api.f.createIdentifier("handler"),
-    msgParameter: this.api.f.createIdentifier("msg"),
-    parseRequestFn: this.api.f.createIdentifier("parseRequest"),
-    substituteFn: this.api.f.createIdentifier("substitute"),
-    provideMethod: this.api.f.createIdentifier("provide"),
-    onMethod: this.api.f.createIdentifier("on"),
-    implementationArgument: this.api.f.createIdentifier("implementation"),
-    hasBodyConst: this.api.f.createIdentifier("hasBody"),
-    undefinedValue: this.api.f.createIdentifier("undefined"),
-    responseConst: this.api.f.createIdentifier("response"),
-    restConst: this.api.f.createIdentifier("rest"),
-    searchParamsConst: this.api.f.createIdentifier("searchParams"),
-    defaultImplementationConst: this.api.f.createIdentifier(
-      "defaultImplementation",
-    ),
-    clientConst: this.api.f.createIdentifier("client"),
-    contentTypeConst: this.api.f.createIdentifier("contentType"),
-    isJsonConst: this.api.f.createIdentifier("isJSON"),
-    sourceProp: this.api.f.createIdentifier("source"),
-  } satisfies Record<string, ts.Identifier>;
+    pathType: "Path",
+    implementationType: "Implementation",
+    keyParameter: "key",
+    pathParameter: "path",
+    paramsArgument: "params",
+    ctxArgument: "ctx",
+    methodParameter: "method",
+    requestParameter: "request",
+    eventParameter: "event",
+    dataParameter: "data",
+    handlerParameter: "handler",
+    msgParameter: "msg",
+    parseRequestFn: "parseRequest",
+    substituteFn: "substitute",
+    provideMethod: "provide",
+    onMethod: "on",
+    implementationArgument: "implementation",
+    hasBodyConst: "hasBody",
+    undefinedValue: "undefined",
+    responseConst: "response",
+    restConst: "rest",
+    searchParamsConst: "searchParams",
+    defaultImplementationConst: "defaultImplementation",
+    clientConst: "client",
+    contentTypeConst: "contentType",
+    isJsonConst: "isJSON",
+    sourceProp: "source",
+  } satisfies Record<string, string>;
 
   /** @internal */
-  protected interfaces: Record<IOKind, ts.Identifier> = {
-    input: this.api.f.createIdentifier("Input"),
-    positive: this.api.f.createIdentifier("PositiveResponse"),
-    negative: this.api.f.createIdentifier("NegativeResponse"),
-    encoded: this.api.f.createIdentifier("EncodedResponse"),
-    response: this.api.f.createIdentifier("Response"),
+  protected interfaces: Record<IOKind, string> = {
+    input: "Input",
+    positive: "PositiveResponse",
+    negative: "NegativeResponse",
+    encoded: "EncodedResponse",
+    response: "Response",
   };
 
   /**
@@ -155,10 +153,10 @@ export abstract class IntegrationBase {
       this.#ids.implementationType,
       this.api.makeFnType(
         {
-          [this.#ids.methodParameter.text]: this.methodType.name,
-          [this.#ids.pathParameter.text]: this.api.ts.SyntaxKind.StringKeyword,
-          [this.#ids.paramsArgument.text]: this.api.makeRecordStringAny(),
-          [this.#ids.ctxArgument.text]: { optional: true, type: "T" },
+          [this.#ids.methodParameter]: this.methodType.name,
+          [this.#ids.pathParameter]: this.api.ts.SyntaxKind.StringKeyword,
+          [this.#ids.paramsArgument]: this.api.makeRecordStringAny(),
+          [this.#ids.ctxArgument]: { optional: true, type: "T" },
         },
         this.api.makePromise(this.api.ts.SyntaxKind.AnyKeyword),
       ),
@@ -176,10 +174,7 @@ export abstract class IntegrationBase {
     this.api.makeConst(
       this.#ids.parseRequestFn,
       this.api.makeArrowFn(
-        {
-          [this.#ids.requestParameter.text]:
-            this.api.ts.SyntaxKind.StringKeyword,
-        },
+        { [this.#ids.requestParameter]: this.api.ts.SyntaxKind.StringKeyword },
         this.api.f.createAsExpression(
           this.api.makeCall(
             this.#ids.requestParameter,
@@ -205,8 +200,8 @@ export abstract class IntegrationBase {
       this.#ids.substituteFn,
       this.api.makeArrowFn(
         {
-          [this.#ids.pathParameter.text]: this.api.ts.SyntaxKind.StringKeyword,
-          [this.#ids.paramsArgument.text]: this.api.makeRecordStringAny(),
+          [this.#ids.pathParameter]: this.api.ts.SyntaxKind.StringKeyword,
+          [this.#ids.paramsArgument]: this.api.makeRecordStringAny(),
         },
         this.api.f.createBlock([
           this.api.makeConst(
@@ -270,12 +265,12 @@ export abstract class IntegrationBase {
     this.api.makePublicMethod(
       this.#ids.provideMethod,
       this.api.makeParams({
-        [this.#ids.requestParameter.text]: "K",
-        [this.#ids.paramsArgument.text]: this.api.makeIndexed(
+        [this.#ids.requestParameter]: "K",
+        [this.#ids.paramsArgument]: this.api.makeIndexed(
           this.interfaces.input,
           "K",
         ),
-        [this.#ids.ctxArgument.text]: { optional: true, type: "T" },
+        [this.#ids.ctxArgument]: { optional: true, type: "T" },
       }),
       [
         this.api.makeConst(
@@ -540,10 +535,10 @@ export abstract class IntegrationBase {
     this.api.makePublicMethod(
       this.#ids.onMethod,
       this.api.makeParams({
-        [this.#ids.eventParameter.text]: "E",
-        [this.#ids.handlerParameter.text]: this.api.makeFnType(
+        [this.#ids.eventParameter]: "E",
+        [this.#ids.handlerParameter]: this.api.makeFnType(
           {
-            [this.#ids.dataParameter.text]: this.api.makeIndexed(
+            [this.#ids.dataParameter]: this.api.makeIndexed(
               this.api.makeExtract(
                 "R",
                 this.api.makeOneLine(this.#makeEventNarrow("E")),
