@@ -80,13 +80,13 @@ export class TypescriptAPI {
 
   public makeTemplate = (
     head: string,
-    ...rest: ([ts.Expression] | [ts.Expression, string])[]
+    ...rest: [ts.Expression | string, string?][]
   ) =>
     this.f.createTemplateExpression(
       this.f.createTemplateHead(head),
       rest.map(([id, str = ""], idx) =>
         this.f.createTemplateSpan(
-          id,
+          typeof id === "string" ? this.makeId(id) : id,
           idx === rest.length - 1
             ? this.f.createTemplateTail(str)
             : this.f.createTemplateMiddle(str),
