@@ -1,19 +1,8 @@
 import * as R from "ramda";
-import ts from "typescript";
+import type ts from "typescript";
 import { z } from "zod";
 import { ResponseVariant, responseVariants } from "./api-response";
 import { IntegrationBase } from "./integration-base";
-import {
-  f,
-  makeInterfaceProp,
-  makeInterface,
-  makeType,
-  printNode,
-  ensureTypeNode,
-  makeIndexed,
-  makeLiteralType,
-  makeUnion,
-} from "./typescript-api";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import { Routing } from "./routing";
@@ -82,11 +71,11 @@ export class Integration extends IntegrationBase {
     let name = this.#aliases.get(key)?.name?.text;
     if (!name) {
       name = `Type${this.#aliases.size + 1}`;
-      const temp = makeLiteralType(null);
-      this.#aliases.set(key, makeType(name, temp));
-      this.#aliases.set(key, makeType(name, produce()));
+      const temp = this.api.makeLiteralType(null);
+      this.#aliases.set(key, this.api.makeType(name, temp));
+      this.#aliases.set(key, this.api.makeType(name, produce()));
     }
-    return ensureTypeNode(name);
+    return this.api.ensureTypeNode(name);
   }
 
   public constructor({
@@ -101,33 +90,35 @@ export class Integration extends IntegrationBase {
     hasHeadMethod = true,
   }: IntegrationParams) {
     super(serverUrl);
-    const commons = { makeAlias: this.#makeAlias.bind(this) };
+    const commons = { makeAlias: this.#makeAlias.bind(this), api: this.api };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const entitle = makeCleanId.bind(null, method, path); // clean id with method+path prefix
       const { isDeprecated, inputSchema, tags } = endpoint;
       const request = `${method} ${path}`;
-      const input = makeType(entitle("input"), zodToTs(inputSchema, ctxIn), {
-        comment: request,
-      });
+      const input = this.api.makeType(
+        entitle("input"),
+        zodToTs(inputSchema, ctxIn),
+        { comment: request },
+      );
       this.#program.push(input);
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
           const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
             const hasContent = shouldHaveContent(method, mimeTypes);
-            const variantType = makeType(
+            const variantType = this.api.makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
               zodToTs(hasContent ? schema : noContent, ctxOut),
               { comment: request },
             );
             this.#program.push(variantType);
             return statusCodes.map((code) =>
-              makeInterfaceProp(code, variantType.name),
+              this.api.makeInterfaceProp(code, variantType.name),
             );
           }, Array.from(responses.entries()));
-          const dict = makeInterface(
+          const dict = this.api.makeInterface(
             entitle(responseVariant, "response", "variants"),
             props,
             { comment: request },
@@ -138,18 +129,18 @@ export class Integration extends IntegrationBase {
         {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
       );
       this.paths.add(path);
-      const literalIdx = makeLiteralType(request);
+      const literalIdx = this.api.makeLiteralType(request);
       const store = {
-        input: ensureTypeNode(input.name),
+        input: this.api.ensureTypeNode(input.name),
         positive: this.someOf(dictionaries.positive),
         negative: this.someOf(dictionaries.negative),
-        response: makeUnion([
-          makeIndexed(this.interfaces.positive, literalIdx),
-          makeIndexed(this.interfaces.negative, literalIdx),
+        response: this.api.makeUnion([
+          this.api.makeIndexed(this.interfaces.positive, literalIdx),
+          this.api.makeIndexed(this.interfaces.negative, literalIdx),
         ]),
-        encoded: f.createIntersectionTypeNode([
-          ensureTypeNode(dictionaries.positive.name),
-          ensureTypeNode(dictionaries.negative.name),
+        encoded: this.api.f.createIntersectionTypeNode([
+          this.api.ensureTypeNode(dictionaries.positive.name),
+          this.api.ensureTypeNode(dictionaries.negative.name),
         ]),
       };
       this.registry.set(request, { isDeprecated, store });
@@ -191,7 +182,7 @@ export class Integration extends IntegrationBase {
           .map((entry) =>
             typeof entry === "string"
               ? entry
-              : printNode(entry, printerOptions),
+              : this.api.printNode(entry, printerOptions),
           )
           .join("\n")
       : undefined;
@@ -201,19 +192,19 @@ export class Integration extends IntegrationBase {
     const usageExampleText = this.#printUsage(printerOptions);
     const commentNode =
       usageExampleText &&
-      ts.addSyntheticLeadingComment(
-        ts.addSyntheticLeadingComment(
-          f.createEmptyStatement(),
-          ts.SyntaxKind.SingleLineCommentTrivia,
+      this.api.ts.addSyntheticLeadingComment(
+        this.api.ts.addSyntheticLeadingComment(
+          this.api.f.createEmptyStatement(),
+          this.api.ts.SyntaxKind.SingleLineCommentTrivia,
           " Usage example:",
         ),
-        ts.SyntaxKind.MultiLineCommentTrivia,
+        this.api.ts.SyntaxKind.MultiLineCommentTrivia,
         `\n${usageExampleText}`,
       );
     return this.#program
       .concat(commentNode || [])
       .map((node, index) =>
-        printNode(
+        this.api.printNode(
           node,
           index < this.#program.length
             ? printerOptions
