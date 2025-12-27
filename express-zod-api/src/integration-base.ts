@@ -55,6 +55,7 @@ export abstract class IntegrationBase {
     contentTypeConst: "contentType",
     isJsonConst: "isJSON",
     sourceProp: "source",
+    methodType: "Method",
   } satisfies Record<string, string>;
 
   /** @internal */
@@ -70,10 +71,8 @@ export abstract class IntegrationBase {
    * @example export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
    * @internal
    * */
-  protected methodType = this.api.makePublicLiteralType(
-    "Method",
-    clientMethods,
-  );
+  protected makeMethodType = () =>
+    this.api.makePublicLiteralType(this.#ids.methodType, clientMethods);
 
   /**
    * @example type SomeOf<T> = T[keyof T];
@@ -153,7 +152,7 @@ export abstract class IntegrationBase {
       this.#ids.implementationType,
       this.api.makeFnType(
         {
-          [this.#ids.methodParameter]: this.methodType.name,
+          [this.#ids.methodParameter]: this.#ids.methodType,
           [this.#ids.pathParameter]: this.api.ts.SyntaxKind.StringKeyword,
           [this.#ids.paramsArgument]: this.api.makeRecordStringAny(),
           [this.#ids.ctxArgument]: { optional: true, type: "T" },
@@ -184,7 +183,7 @@ export abstract class IntegrationBase {
             this.api.literally(2), // excludes third empty element
           ),
           this.api.f.createTupleTypeNode([
-            this.api.ensureTypeNode(this.methodType.name),
+            this.api.ensureTypeNode(this.#ids.methodType),
             this.api.ensureTypeNode(this.#ids.pathType),
           ]),
         ),

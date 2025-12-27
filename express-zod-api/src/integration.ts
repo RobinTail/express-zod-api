@@ -157,7 +157,7 @@ export class Integration extends IntegrationBase {
     this.#program.unshift(...this.#aliases.values());
     this.#program.push(
       this.makePathType(),
-      this.methodType,
+      this.makeMethodType(),
       ...this.makePublicInterfaces(),
       this.requestType,
     );
