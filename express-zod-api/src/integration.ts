@@ -65,7 +65,7 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  readonly #program: ts.Node[] = [this.someOfType];
+  readonly #program: ts.Node[] = [this.makeSomeOfType()];
   readonly #aliases = new Map<object, ts.TypeAliasDeclaration>();
   #usage: Array<ts.Node | string> = [];
 

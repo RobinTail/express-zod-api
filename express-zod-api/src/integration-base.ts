@@ -56,6 +56,7 @@ export abstract class IntegrationBase {
     isJsonConst: "isJSON",
     sourceProp: "source",
     methodType: "Method",
+    someOfType: "SomeOf",
   } satisfies Record<string, string>;
 
   /** @internal */
@@ -78,11 +79,12 @@ export abstract class IntegrationBase {
    * @example type SomeOf<T> = T[keyof T];
    * @internal
    * */
-  protected someOfType = this.api.makeType(
-    "SomeOf",
-    this.api.makeIndexed("T", this.api.makeKeyOf("T")),
-    { params: ["T"] },
-  );
+  protected makeSomeOfType = () =>
+    this.api.makeType(
+      this.#ids.someOfType,
+      this.api.makeIndexed("T", this.api.makeKeyOf("T")),
+      { params: ["T"] },
+    );
 
   /**
    * @example export type Request = keyof Input;
@@ -99,7 +101,7 @@ export abstract class IntegrationBase {
    * @internal
    **/
   protected someOf = ({ name }: ts.TypeAliasDeclaration) =>
-    this.api.ensureTypeNode(this.someOfType.name, [name]);
+    this.api.ensureTypeNode(this.#ids.someOfType, [name]);
 
   /**
    * @example export type Path = "/v1/user/retrieve" | ___;
