@@ -402,7 +402,7 @@ export class TypescriptAPI {
       first: ts.Expression | string,
       ...rest: Array<ts.Identifier | ts.ConditionalExpression | string>
     ) =>
-    (...args: ts.Expression[]) =>
+    (...args: Array<ts.Expression | string>) =>
       this.f.createCallExpression(
         rest.reduce(
           (acc, entry) =>
@@ -412,7 +412,7 @@ export class TypescriptAPI {
           typeof first === "string" ? this.makeId(first) : first,
         ),
         undefined,
-        args,
+        args.map((arg) => (typeof arg === "string" ? this.makeId(arg) : arg)),
       );
 
   public makeNew = (cls: string, ...args: ts.Expression[]) =>
