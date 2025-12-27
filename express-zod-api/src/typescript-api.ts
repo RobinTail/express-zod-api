@@ -71,9 +71,11 @@ export class TypescriptAPI {
     return printer.printNode(this.ts.EmitHint.Unspecified, node, sourceFile);
   };
 
+  public makeId = (name: string) => this.f.createIdentifier(name);
+
   public makePropertyIdentifier = (name: string | number) =>
     typeof name === "string" && TypescriptAPI.#safePropRegex.test(name)
-      ? this.f.createIdentifier(name)
+      ? this.makeId(name)
       : this.literally(name);
 
   public makeTemplate = (
@@ -403,14 +405,14 @@ export class TypescriptAPI {
             typeof entry === "string" || this.ts.isIdentifier(entry)
               ? this.f.createPropertyAccessExpression(acc, entry)
               : this.f.createElementAccessExpression(acc, entry),
-          typeof first === "string" ? this.f.createIdentifier(first) : first,
+          typeof first === "string" ? this.makeId(first) : first,
         ),
         undefined,
         args,
       );
 
   public makeNew = (cls: string, ...args: ts.Expression[]) =>
-    this.f.createNewExpression(this.f.createIdentifier(cls), undefined, args);
+    this.f.createNewExpression(this.makeId(cls), undefined, args);
 
   public makeExtract = (base: Typeable, narrow: ts.TypeNode) =>
     this.ensureTypeNode("Extract", [base, narrow]);

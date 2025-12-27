@@ -176,6 +176,10 @@ const tsFactoryConcerns = [
     selector: "Identifier[name='createUnionTypeNode']",
     message: "use makeUnion() helper",
   },
+  {
+    selector: "Identifier[name='createIdentifier']",
+    message: "use makeId() helper",
+  },
 ];
 
 export default tsPlugin.config(
