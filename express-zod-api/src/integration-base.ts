@@ -572,7 +572,7 @@ export abstract class IntegrationBase {
                   this.api.f.createPropertyAccessExpression(
                     this.api.f.createParenthesizedExpression(
                       this.api.f.createAsExpression(
-                        this.#ids.msgParameter,
+                        this.api.makeId(this.#ids.msgParameter),
                         this.api.ensureTypeNode(MessageEvent.name),
                       ),
                     ),
