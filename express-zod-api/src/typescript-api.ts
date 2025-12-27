@@ -99,12 +99,12 @@ export class TypescriptAPI {
     {
       type,
       mod,
-      init,
+      initId,
       optional,
     }: {
       type?: Typeable;
       mod?: ts.Modifier[];
-      init?: ts.Expression;
+      initId?: string;
       optional?: boolean;
     } = {},
   ) =>
@@ -116,7 +116,7 @@ export class TypescriptAPI {
         ? this.f.createToken(this.ts.SyntaxKind.QuestionToken)
         : undefined,
       type ? this.ensureTypeNode(type) : undefined,
-      init,
+      initId ? this.makeId(initId) : undefined,
     );
 
   public makeParams = (

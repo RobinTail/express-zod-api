@@ -326,7 +326,7 @@ export abstract class IntegrationBase {
           this.api.makeParam(this.#ids.implementationArgument, {
             type: this.api.ensureTypeNode(this.#ids.implementationType, ["T"]),
             mod: this.api.accessModifiers.protectedReadonly,
-            init: this.#ids.defaultImplementationConst,
+            initId: this.#ids.defaultImplementationConst,
           }),
         ]),
         this.#makeProvider(),
