@@ -57,6 +57,7 @@ export abstract class IntegrationBase {
     sourceProp: "source",
     methodType: "Method",
     someOfType: "SomeOf",
+    requestType: "Request",
   } satisfies Record<string, string>;
 
   /** @internal */
@@ -90,11 +91,12 @@ export abstract class IntegrationBase {
    * @example export type Request = keyof Input;
    * @internal
    * */
-  protected requestType = this.api.makeType(
-    "Request",
-    this.api.makeKeyOf(this.interfaces.input),
-    { expose: true },
-  );
+  protected makeRequestType = () =>
+    this.api.makeType(
+      this.#ids.requestType,
+      this.api.makeKeyOf(this.interfaces.input),
+      { expose: true },
+    );
 
   /**
    * @example SomeOf<_>
@@ -304,7 +306,7 @@ export abstract class IntegrationBase {
         ),
       ],
       {
-        typeParams: { K: this.requestType.name },
+        typeParams: { K: this.#ids.requestType },
         returns: this.api.makePromise(
           this.api.makeIndexed(this.interfaces.response, "K"),
         ),
@@ -608,7 +610,7 @@ export abstract class IntegrationBase {
       {
         typeParams: {
           K: this.api.makeExtract(
-            this.requestType.name,
+            this.#ids.requestType,
             this.api.f.createTemplateLiteralType(
               this.api.f.createTemplateHead("get "),
               [

@@ -159,7 +159,7 @@ export class Integration extends IntegrationBase {
       this.makePathType(),
       this.makeMethodType(),
       ...this.makePublicInterfaces(),
-      this.requestType,
+      this.makeRequestType(),
     );
 
     if (variant === "types") return;
