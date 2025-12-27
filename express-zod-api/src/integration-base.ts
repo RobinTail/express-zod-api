@@ -335,8 +335,10 @@ export abstract class IntegrationBase {
     );
 
   // `?${new URLSearchParams(____)}`
-  #makeSearchParams = (from: ts.Expression) =>
-    this.api.makeTemplate("?", [this.api.makeNew(URLSearchParams.name, from)]);
+  #makeSearchParams = (fromId: string) =>
+    this.api.makeTemplate("?", [
+      this.api.makeNew(URLSearchParams.name, this.api.makeId(fromId)),
+    ]);
 
   // new URL(`${path}${searchParams}`, "http:____")
   #makeFetchURL = () =>
