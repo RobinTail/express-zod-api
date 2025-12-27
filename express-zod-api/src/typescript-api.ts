@@ -283,7 +283,7 @@ export class TypescriptAPI {
     );
 
   public makePublicMethod = (
-    name: ts.Identifier,
+    name: string,
     params: ts.ParameterDeclaration[],
     statements: ts.Statement[],
     {
