@@ -379,17 +379,23 @@ export class TypescriptAPI {
     );
 
   public makeTernary = (
-    condition: ts.Expression,
-    positive: ts.Expression,
-    negative: ts.Expression,
-  ) =>
-    this.f.createConditionalExpression(
+    ...args: [
+      ts.Expression | string,
+      ts.Expression | string,
+      ts.Expression | string,
+    ]
+  ) => {
+    const [condition, positive, negative] = args.map((arg) =>
+      typeof arg === "string" ? this.makeId(arg) : arg,
+    );
+    return this.f.createConditionalExpression(
       condition,
       this.f.createToken(this.ts.SyntaxKind.QuestionToken),
       positive,
       this.f.createToken(this.ts.SyntaxKind.ColonToken),
       negative,
     );
+  };
 
   public makeCall =
     (
