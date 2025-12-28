@@ -39,6 +39,20 @@ describe("Migration", async () => {
         ],
       },
       {
+        name: "should handle no props",
+        code: `new Integration({});`,
+        output: `import typescript from "typescript";\n\nnew Integration({ typescript });`,
+        errors: [
+          {
+            messageId: "add",
+            data: {
+              subject: "typescript property",
+              to: "constructor argument",
+            },
+          },
+        ],
+      },
+      {
         name: "should use static create() method in async context",
         code: `await new Integration({ config, routing }).printFormatted();`,
         output: `await (await Integration.create({ config, routing })).printFormatted();`,

@@ -100,7 +100,9 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
                     ctx.sourceCode.ast.range,
                     `import typescript from "typescript";\n\n`,
                   ),
-                  fixer.insertTextBefore(node.properties[0], "typescript, "),
+                  node.properties.length
+                    ? fixer.insertTextBefore(node.properties[0], "typescript, ")
+                    : fixer.replaceText(node, `{ typescript }`),
                 ],
               },
         );
