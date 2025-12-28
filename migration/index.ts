@@ -63,18 +63,47 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           .filter(isNamedProp)
           .find((one) => getPropName(one) === "typescript");
         if (tsProp) return;
-        ctx.report({
-          node: node,
-          messageId: "add",
-          data: { subject: "typescript property", to: "constructor argument" },
-          fix: (fixer) => [
-            fixer.insertTextBeforeRange(
-              ctx.sourceCode.ast.range,
-              `import typescript from "typescript";\n\n`,
-            ),
-            fixer.insertTextBefore(node.properties[0], "typescript, "),
-          ],
-        });
+        const hasAsyncCtx = ctx.sourceCode
+          .getAncestors(node)
+          .some(
+            (one) =>
+              one.type === NT.AwaitExpression ||
+              ((one.type === NT.ArrowFunctionExpression ||
+                one.type === NT.FunctionExpression) &&
+                one.async),
+          );
+        ctx.report(
+          hasAsyncCtx
+            ? {
+                node: node.parent,
+                messageId: "change",
+                data: {
+                  subject: "constructor",
+                  from: "new Integration()",
+                  to: "await Integration.create()",
+                },
+                fix: (fixer) =>
+                  fixer.replaceText(
+                    node.parent,
+                    `(await Integration.create(${ctx.sourceCode.getText(node)}))`,
+                  ),
+              }
+            : {
+                node: node,
+                messageId: "add",
+                data: {
+                  subject: "typescript property",
+                  to: "constructor argument",
+                },
+                fix: (fixer) => [
+                  fixer.insertTextBeforeRange(
+                    ctx.sourceCode.ast.range,
+                    `import typescript from "typescript";\n\n`,
+                  ),
+                  fixer.insertTextBefore(node.properties[0], "typescript, "),
+                ],
+              },
+        );
       },
     }),
 });

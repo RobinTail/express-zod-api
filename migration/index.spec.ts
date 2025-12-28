@@ -38,6 +38,21 @@ describe("Migration", async () => {
           },
         ],
       },
+      {
+        name: "should use static create() method in async context",
+        code: `await new Integration({ config, routing }).printFormatted();`,
+        output: `await (await Integration.create({ config, routing })).printFormatted();`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "constructor",
+              from: "new Integration()",
+              to: "await Integration.create()",
+            },
+          },
+        ],
+      },
     ],
   });
 });
