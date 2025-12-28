@@ -4,6 +4,6 @@ import { describe, test, expect } from "vitest";
 describe("Migration", () => {
   test("should fix the import", async () => {
     const fixed = await readFile("./sample.ts", "utf-8");
-    expect(fixed).toBe(`const route = {};\n`); // @todo set to the expected fixed content of next major
+    expect(fixed).toBe(`import typescript from "typescript";\n\nnew Integration({ typescript, routing });\n`);
   });
 });

@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "pretest": "echo 'const route = {};' > sample.ts",
+    "pretest": "echo 'new Integration({ routing });' > sample.ts",
     "test": "eslint --fix && vitest --run",
     "posttest": "rm sample.ts"
   },
