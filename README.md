@@ -59,8 +59,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    5. [Graceful shutdown](#graceful-shutdown)
    6. [Subscriptions](#subscriptions)
 8. [Caveats](#caveats)
-   1. [TypeError: example is not a function](#typeerror-example-is-not-a-function)
-   2. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
+   1. [Excessive properties in endpoint output](#excessive-properties-in-endpoint-output)
 9. [Your input to my output](#your-input-to-my-output)
 
 See also [Changelog](CHANGELOG.md) and [automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
@@ -86,6 +85,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/NicolasMahe.png" alt="@NicolasMahe" width="50" />](https://github.com/NicolasMahe)
 [<img src="https://github.com/shadone.png" alt="@shadone" width="50" />](https://github.com/shadone)
 [<img src="https://github.com/squishykid.png" alt="@squishykid" width="50" />](https://github.com/squishykid)
 [<img src="https://github.com/jakub-msqt.png" alt="@jakub-msqt" width="50" />](https://github.com/jakub-msqt)
