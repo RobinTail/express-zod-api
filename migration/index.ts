@@ -59,12 +59,6 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
   create: (ctx) =>
     listen({
       integration: (node) => {
-        const scope = ctx.sourceCode.getScope(node);
-        const integrationImport = scope.variables
-          .find((one) => one.name === "Integration")
-          ?.identifiers.flatMap(ctx.sourceCode.getAncestors)
-          .find((one) => one.type === NT.ImportDeclaration);
-        if (!integrationImport) return; // can't figure out where Integration comes from
         const tsProp = node.properties
           .filter(isNamedProp)
           .find((one) => getPropName(one) === "typescript");
@@ -75,8 +69,8 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           data: { subject: "typescript property", to: "constructor argument" },
           fix: (fixer) => [
             fixer.insertTextBeforeRange(
-              integrationImport.range,
-              `import typescript from "typescript";\n`,
+              ctx.sourceCode.ast.range,
+              `import typescript from "typescript";\n\n`,
             ),
             fixer.insertTextBefore(node.properties[0], "typescript, "),
           ],

@@ -26,13 +26,8 @@ describe("Migration", async () => {
     invalid: [
       {
         name: "should import typescript and add it as a property to constructor argument",
-        code:
-          `import { Integration } from "express-zod-api";\n` +
-          `new Integration({ config, routing });`,
-        output:
-          `import typescript from "typescript";\n` +
-          `import { Integration } from "express-zod-api";\n` +
-          `new Integration({ typescript, config, routing });`,
+        code: `new Integration({ config, routing });`,
+        output: `import typescript from "typescript";\n\nnew Integration({ typescript, config, routing });`,
         errors: [
           {
             messageId: "add",
