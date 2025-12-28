@@ -176,6 +176,10 @@ const tsFactoryConcerns = [
     selector: "Identifier[name='createUnionTypeNode']",
     message: "use makeUnion() helper",
   },
+  {
+    selector: "Identifier[name='createIdentifier']",
+    message: "use makeId() helper",
+  },
 ];
 
 export default tsPlugin.config(
@@ -238,11 +242,7 @@ export default tsPlugin.config(
     files: ["migration/index.ts"],
     rules: {
       "allowed/dependencies": ["error", { packageDir: migrationDir }],
-      "no-restricted-syntax": [
-        "warn",
-        ...importConcerns,
-        ...performanceConcerns,
-      ],
+      "no-restricted-syntax": ["warn", ...importConcerns],
     },
   },
   {

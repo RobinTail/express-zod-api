@@ -22,7 +22,37 @@ describe("Migration", async () => {
   });
 
   tester.run(ruleName, theRule, {
-    valid: [`const routing = {};`],
-    invalid: [],
+    valid: [`new Integration({ typescript, config, routing });`],
+    invalid: [
+      {
+        name: "should import typescript and add it as a property to constructor argument",
+        code: `new Integration({ config, routing });`,
+        output: `import typescript from "typescript";\n\nnew Integration({ typescript, config, routing });`,
+        errors: [
+          {
+            messageId: "add",
+            data: {
+              subject: "typescript property",
+              to: "constructor argument",
+            },
+          },
+        ],
+      },
+      {
+        name: "should use static create() method in async context",
+        code: `await new Integration({ config, routing }).printFormatted();`,
+        output: `await (await Integration.create({ config, routing })).printFormatted();`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "constructor",
+              from: "new Integration()",
+              to: "await Integration.create()",
+            },
+          },
+        ],
+      },
+    ],
   });
 });

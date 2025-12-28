@@ -1,24 +1,24 @@
 import {
   ESLintUtils,
-  // AST_NODE_TYPES as NT,
+  AST_NODE_TYPES as NT,
   type TSESLint,
-  // type TSESTree,
+  type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
 
-/*
 type NamedProp = TSESTree.PropertyNonComputedName & {
   key: TSESTree.Identifier | TSESTree.StringLiteral;
 };
- */
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- temporary
-interface Queries {}
+interface Queries {
+  integration: TSESTree.ObjectExpression;
+}
 
 type Listener = keyof Queries;
 
-const queries: Record<Listener, string> = {};
+const queries: Record<Listener, string> = {
+  integration: `${NT.NewExpression}[callee.name="Integration"] > ${NT.ObjectExpression}`,
+};
 
-/*
 const isNamedProp = (prop: TSESTree.ObjectLiteralElement): prop is NamedProp =>
   prop.type === NT.Property &&
   !prop.computed &&
@@ -27,7 +27,6 @@ const isNamedProp = (prop: TSESTree.ObjectLiteralElement): prop is NamedProp =>
 
 const getPropName = (prop: NamedProp): string =>
   prop.key.type === NT.Identifier ? prop.key.name : prop.key.value;
-*/
 
 const listen = <
   S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
@@ -42,7 +41,6 @@ const listen = <
     {},
   );
 
-// eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN and vitest
 const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0] ?? "0"}`; // fail-safe for bumpp
 
 const theRule = ESLintUtils.RuleCreator.withoutDocs({
@@ -58,7 +56,56 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
     },
   },
   defaultOptions: [],
-  create: () => listen({}),
+  create: (ctx) =>
+    listen({
+      integration: (node) => {
+        const tsProp = node.properties
+          .filter(isNamedProp)
+          .find((one) => getPropName(one) === "typescript");
+        if (tsProp) return;
+        const hasAsyncCtx = ctx.sourceCode
+          .getAncestors(node)
+          .some(
+            (one) =>
+              one.type === NT.AwaitExpression ||
+              ((one.type === NT.ArrowFunctionExpression ||
+                one.type === NT.FunctionExpression) &&
+                one.async),
+          );
+        ctx.report(
+          hasAsyncCtx
+            ? {
+                node: node.parent,
+                messageId: "change",
+                data: {
+                  subject: "constructor",
+                  from: "new Integration()",
+                  to: "await Integration.create()",
+                },
+                fix: (fixer) =>
+                  fixer.replaceText(
+                    node.parent,
+                    `(await Integration.create(${ctx.sourceCode.getText(node)}))`,
+                  ),
+              }
+            : {
+                node: node,
+                messageId: "add",
+                data: {
+                  subject: "typescript property",
+                  to: "constructor argument",
+                },
+                fix: (fixer) => [
+                  fixer.insertTextBeforeRange(
+                    ctx.sourceCode.ast.range,
+                    `import typescript from "typescript";\n\n`,
+                  ),
+                  fixer.insertTextBefore(node.properties[0], "typescript, "),
+                ],
+              },
+        );
+      },
+    }),
 });
 
 export default {
