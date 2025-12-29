@@ -1142,7 +1142,8 @@ const exampleEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
-_See the example of the generated documentation
+You can also use `schema.meta({ id: "UniqueName" })` for custom schema naming.
+_See the complete example of the generated documentation
 [here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.documentation.yaml)_
 
 ## Tagging the endpoints
