@@ -50,8 +50,8 @@ import wellKnownHeaders from "./well-known-headers";
 interface ReqResCommons {
   makeRef: (
     key: object | string,
-    subject: SchemaObject | ReferenceObject,
-    name?: string,
+    value: SchemaObject | ReferenceObject,
+    proposedName?: string,
   ) => ReferenceObject;
   path: string;
   method: ClientMethod;
@@ -323,7 +323,7 @@ export const depictRequestParams = ({
           ? makeRef(
               jsonSchema.id || JSON.stringify(jsonSchema),
               depicted,
-              makeCleanId(description, name),
+              jsonSchema.id || makeCleanId(description, name),
             )
           : depicted;
       return acc.concat({
@@ -382,6 +382,7 @@ const fixReferences = (
           entry.$ref = ctx.makeRef(
             depiction.id || depiction, // avoiding serialization, because changing $ref
             asOAS(depiction),
+            depiction.id,
           ).$ref;
         }
         continue;
