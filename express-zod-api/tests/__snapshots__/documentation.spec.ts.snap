@@ -3834,7 +3834,7 @@ paths:
           description: An optional cursor string used for pagination. This can be
             retrieved from the \`next\` property of the previous page response.
           schema:
-            $ref: "#/components/schemas/HeadHrisEmployeesParameterCursor"
+            $ref: "#/components/schemas/GetHrisEmployeesParameterCursor"
       responses:
         "200":
           description: HEAD /hris/employees Positive response
@@ -3878,10 +3878,6 @@ components:
         - status
         - error
       additionalProperties: false
-    HeadHrisEmployeesParameterCursor:
-      description: An optional cursor string used for pagination. This can be
-        retrieved from the \`next\` property of the previous page response.
-      type: string
   responses: {}
   parameters: {}
   examples: {}

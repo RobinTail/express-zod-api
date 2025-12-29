@@ -50,8 +50,8 @@ import wellKnownHeaders from "./well-known-headers";
 interface ReqResCommons {
   makeRef: (
     key: object | string,
-    subject: SchemaObject | ReferenceObject,
-    name?: string,
+    value: SchemaObject | ReferenceObject,
+    proposedName?: string,
   ) => ReferenceObject;
   path: string;
   method: ClientMethod;
