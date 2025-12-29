@@ -95,14 +95,19 @@ export class Documentation extends OpenApiBuilder {
 
   #makeRef(
     key: object | string,
-    subject: SchemaObject | ReferenceObject,
-    name = this.#references.get(key),
+    value: SchemaObject | ReferenceObject,
+    proposedName?: string,
   ): ReferenceObject {
+    let name = this.#references.get(key); // search in the cache by the given key
     if (!name) {
-      name = `Schema${this.#references.size + 1}`;
+      let inc = proposedName ? 0 : 1;
+      do {
+        name = `${proposedName ?? "Schema"}${inc ? this.#references.size + inc : ""}`;
+        inc++;
+      } while (this.rootDoc.components?.schemas?.[name]); // search in existing references for the unique name
       this.#references.set(key, name);
     }
-    this.addSchema(name, subject);
+    this.addSchema(name, value);
     return { $ref: `#/components/schemas/${name}` };
   }
 
