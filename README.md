@@ -85,6 +85,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/NicolasMahe.png" alt="@NicolasMahe" width="50" />](https://github.com/NicolasMahe)
 [<img src="https://github.com/shadone.png" alt="@shadone" width="50" />](https://github.com/shadone)
 [<img src="https://github.com/squishykid.png" alt="@squishykid" width="50" />](https://github.com/squishykid)
 [<img src="https://github.com/jakub-msqt.png" alt="@jakub-msqt" width="50" />](https://github.com/jakub-msqt)
