@@ -804,7 +804,10 @@ describe("Documentation", () => {
             ":name": defaultEndpointsFactory.build({
               method: "post",
               input: z.object({
-                name: z.literal("John").or(z.literal("Jane")),
+                name: z
+                  .literal("John")
+                  .or(z.literal("Jane"))
+                  .meta({ id: "NameParam" }),
                 other: z.boolean(),
               }),
               output: z.object({}),
