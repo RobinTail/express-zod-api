@@ -4966,11 +4966,7 @@ paths:
           required: true
           description: POST /v1/:name Parameter
           schema:
-            anyOf:
-              - type: string
-                const: John
-              - type: string
-                const: Jane
+            $ref: "#/components/schemas/NameParam"
       requestBody:
         description: POST /v1/:name Request body
         content:
@@ -5031,7 +5027,14 @@ paths:
                     error:
                       message: Sample error message
 components:
-  schemas: {}
+  schemas:
+    NameParam:
+      id: NameParam
+      anyOf:
+        - type: string
+          const: John
+        - type: string
+          const: Jane
   responses: {}
   parameters: {}
   examples: {}

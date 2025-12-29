@@ -323,7 +323,7 @@ export const depictRequestParams = ({
           ? makeRef(
               jsonSchema.id || JSON.stringify(jsonSchema),
               depicted,
-              makeCleanId(description, name),
+              jsonSchema.id || makeCleanId(description, name),
             )
           : depicted;
       return acc.concat({
