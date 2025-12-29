@@ -85,6 +85,8 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 
 These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
 
+[<img src="https://github.com/arlyon.png" alt="@arlyon" width="50" />](https://github.com/arlyon)
+[<img src="https://github.com/Upsilon-Iridani.png" alt="@Upsilon-Iridani" width="50" />](https://github.com/Upsilon-Iridani)
 [<img src="https://github.com/NicolasMahe.png" alt="@NicolasMahe" width="50" />](https://github.com/NicolasMahe)
 [<img src="https://github.com/shadone.png" alt="@shadone" width="50" />](https://github.com/shadone)
 [<img src="https://github.com/squishykid.png" alt="@squishykid" width="50" />](https://github.com/squishykid)
@@ -116,7 +118,6 @@ These people contributed to the improvement of the framework by reporting bugs, 
 [<img src="https://github.com/ben-xD.png" alt="@ben-xD" width="50" />](https://github.com/ben-xD)
 [<img src="https://github.com/daniel-white.png" alt="@daniel-white" width="50" />](https://github.com/daniel-white)
 [<img src="https://github.com/kotsmile.png" alt="@kotsmile" width="50" />](https://github.com/kotsmile)
-[<img src="https://github.com/arlyon.png" alt="@arlyon" width="50" />](https://github.com/arlyon)
 [<img src="https://github.com/elee1766.png" alt="@elee1766" width="50" />](https://github.com/elee1766)
 [<img src="https://github.com/danclaytondev.png" alt="@danclaytondev" width="50" />](https://github.com/danclaytondev)
 [<img src="https://github.com/huyhoang160593.png" alt="@huyhoang160593" width="50" />](https://github.com/huyhoang160593)
