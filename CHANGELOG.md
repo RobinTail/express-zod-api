@@ -4,7 +4,7 @@
 
 ### v26.2.0
 
-- Ability to specify a custom name for a schemas in the generated Documentation:
+- Ability to specify a custom name for a schema in the generated Documentation:
   - Use the `.meta()` method on a schema with an `{ id }` as an argument;
   - The `id` must be unique across all schemas used in your API;
   - The feature proposed by [@arlyon](https://github.com/arlyon) 2 years ago, but the
