@@ -80,7 +80,7 @@ export interface CommonConfig {
   accessLogger?: null | LogAccess;
   /**
    * @desc The hook to call on startup (development mode only) to perform custom diagnostics
-   * @example ({ method, path, endpoint, logger }) => assert(/^\/v\d/.test(path)) // all paths start with version
+   * @example ({ method, path, endpoint, logger }) => assert(/^\/v\d+/.test(path)) // all paths start with version
    * @see Diagnostics
    */
   routeCheck?: DiagnosticsHook;
