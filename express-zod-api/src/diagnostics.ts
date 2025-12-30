@@ -14,12 +14,19 @@ interface Findings {
   paths: Set<string>;
 }
 
+export type DiagnosticsHook = (params: {
+  method: Parameters<OnEndpoint>[0];
+  path: string;
+  endpoint: AbstractEndpoint;
+  logger: ActualLogger;
+}) => void;
+
 export class Diagnostics {
   #verified = new WeakMap<AbstractEndpoint, Findings>();
 
   constructor(
     protected logger: ActualLogger,
-    protected customCheck?: OnEndpoint,
+    protected customCheck?: DiagnosticsHook,
   ) {}
 
   #checkSchema(
@@ -97,6 +104,6 @@ export class Diagnostics {
     }
     this.#checkSchema(ref, endpoint, { method, path });
     this.#checkPathParams(ref, endpoint, path, { method });
-    this.customCheck?.(method, path, endpoint);
+    this.customCheck?.({ method, path, endpoint, logger: this.logger });
   };
 }
