@@ -74,7 +74,7 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
 - You can keep the endpoint's input and output type declarations right next to its handler.
 - All input and output data types are validated, so it ensures you won't have an empty string, null or undefined where
   you expect a number.
-- Variables within an endpoint handler have types according to the declared schema, so your IDE and Typescript will
+- Variables within an endpoint handler have types according to the declared schema, so your IDE and TypeScript will
   provide you with necessary hints to focus on bringing your vision to life.
 - All of your endpoints can respond in a consistent way.
 - The expected endpoint input and response types can be exported to the frontend, so you don't get confused about the
@@ -321,7 +321,7 @@ const routing: Routing = {
 
 Same Endpoint can be reused on different routes or handle multiple methods if needed. Path parameters (the `:id` above)
 should be declared in the endpoint’s input schema. Properties assigned with Endpoint can explicitly declare a method.
-When the method is not specified, the one(s) supported by the Endpoint applied (or `get` as a fallback).
+If no method is specified, the methods supported by the endpoint are used (or `get` as a fallback).
 
 ## Middlewares
 
@@ -567,7 +567,7 @@ z.object({ user_name: z.string(), id: z.number() }).remap({
 
 ## Dealing with dates
 
-Dates in Javascript are one of the most troublesome entities. In addition, `Date` cannot be passed directly in JSON
+Dates in JavaScript are one of the most troublesome entities. In addition, `Date` cannot be passed directly in JSON
 format. Therefore, attempting to return `Date` from the endpoint handler results in it being converted to an ISO string
 in actual response by calling
 [toJSON()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toJSON),
@@ -1075,7 +1075,7 @@ adding the runtime helpers the framework relies on.
 
 ## Generating a Frontend Client
 
-You can generate a Typescript file containing the IO types of your API and a client for it. Make sure you have
+You can generate a TypeScript file containing the IO types of your API and a client for it. Make sure you have
 `typescript` installed. Consider also installing `prettier` and using the async `printFormatted()` method.
 
 ```ts
@@ -1095,14 +1095,14 @@ const prettierFormattedTypescriptCode = await client.printFormatted(); // or jus
 Alternatively, you can supply your own `format` function into that method or use a regular `print()` method instead.
 The generated client is flexibly configurable on the frontend side for using a custom implementation function that
 makes requests using the libraries and methods of your choice. The default implementation uses `fetch`. The client
-asserts the type of request parameters and response. Consuming the generated client requires Typescript version 4.1+.
+asserts the type of request parameters and response. Consuming the generated client requires TypeScript version 4.1+.
 
 ```ts
 import { Client, Implementation, Subscription } from "./client.ts"; // the generated file
 
 const client = new Client(/* optional custom Implementation */);
 client.provide("get /v1/user/retrieve", { id: "10" });
-client.provide("post /v1/user/:id", { id: "10" }); // it also substitues path params
+client.provide("post /v1/user/:id", { id: "10" }); // it also substitutes path params
 new Subscription("get /v1/events/stream", {}).on("time", (time) => {}); // Server-sent events (SSE)
 ```
 
@@ -1396,7 +1396,7 @@ should be aware of them.
 
 ## Excessive properties in endpoint output
 
-The schema validator removes excessive properties by default. However, Typescript
+The schema validator removes excessive properties by default. However, TypeScript
 [does not yet display errors](https://www.typescriptlang.org/docs/handbook/interfaces.html#excess-property-checks)
 in this case during development. You can achieve this verification by assigning the output schema to a constant and
 reusing it in forced type of the output:
