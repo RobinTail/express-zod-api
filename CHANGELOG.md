@@ -2,6 +2,23 @@
 
 ## Version 26
 
+### v26.2.0
+
+- Ability to specify a custom name for a schema in the generated Documentation:
+  - Use the `.meta()` method on a schema with an `{ id }` as an argument;
+  - The `id` must be unique across all schemas used in your API;
+  - The feature proposed by [@arlyon](https://github.com/arlyon) 2 years ago, but the
+    implementation became possible only with Zod 4 and thanks to suggestions
+    from [@Upsilon-Iridani](https://github.com/Upsilon-Iridani).
+
+### v26.1.0
+
+- Optimization to the memory consumption for your API:
+  - It has been discovered that static import of `typescript` within the framework consumes memory unnecessarily;
+  - Importing `typescript` is only necessary to generate an Integration;
+  - This version avoids static importing, but the solution is temporary in order to avoid breaking changes;
+  - The issue was found, investigated and reported by [@NicolasMahe](https://github.com/NicolasMahe).
+
 ### v26.0.0
 
 - Supported `http-errors` versions: `^2.0.1`;

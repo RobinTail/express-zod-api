@@ -29,7 +29,7 @@ export class Diagnostics {
   ): void {
     if (ref.isSchemaChecked) return;
     for (const dir of ["input", "output"] as const) {
-      const stack = [
+      const stack: z.core.JSONSchema.BaseSchema[] = [
         z.toJSONSchema(endpoint[`${dir}Schema`], { unrepresentable: "any" }),
       ];
       while (stack.length > 0) {

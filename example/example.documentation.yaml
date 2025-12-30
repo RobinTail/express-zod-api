@@ -42,7 +42,7 @@ paths:
                       features:
                         type: array
                         items:
-                          $ref: "#/components/schemas/Schema1"
+                          $ref: "#/components/schemas/Feature"
                     required:
                       - id
                       - name
@@ -867,7 +867,8 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    Schema1:
+    Feature:
+      id: Feature
       type: object
       properties:
         title:
@@ -875,7 +876,7 @@ components:
         features:
           type: array
           items:
-            $ref: "#/components/schemas/Schema1"
+            $ref: "#/components/schemas/Feature"
       required:
         - title
       additionalProperties: false
