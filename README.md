@@ -1100,7 +1100,7 @@ import { Client, Implementation, Subscription } from "./client.ts"; // the gener
 
 const client = new Client(/* optional custom Implementation */);
 client.provide("get /v1/user/retrieve", { id: "10" });
-client.provide("post /v1/user/:id", { id: "10" }); // it also substitues path params
+client.provide("post /v1/user/:id", { id: "10" }); // it also substitutes path params
 new Subscription("get /v1/events/stream", {}).on("time", (time) => {}); // Server-sent events (SSE)
 ```
 
