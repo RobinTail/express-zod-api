@@ -8,6 +8,7 @@ import { AbstractLogger, ActualLogger } from "./logger-helpers";
 import { Method } from "./method";
 import { AbstractResultHandler } from "./result-handler";
 import { ListenOptions } from "node:net";
+import { DiagnosticsHook } from "./diagnostics";
 import { GetLogger } from "./server-helpers";
 
 export type InputSource = keyof Pick<
@@ -77,6 +78,12 @@ export interface CommonConfig {
    * @example null — disables the feature
    * */
   accessLogger?: null | LogAccess;
+  /**
+   * @desc The hook to call on startup (development mode only) to perform custom diagnostics
+   * @example ({ method, path, endpoint, logger }) => assert(/^\/v\d+/.test(path)) // all paths start with version
+   * @see Diagnostics
+   */
+  routeCheck?: DiagnosticsHook;
   /**
    * @desc You can disable the startup logo.
    * @default true

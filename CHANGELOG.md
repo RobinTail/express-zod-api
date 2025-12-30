@@ -2,6 +2,21 @@
 
 ## Version 26
 
+### v26.3.0
+
+- New configuration hook `routeCheck` for implementing custom diagnostics of your routing:
+  - The assigned function is called during the API startup in development mode only (not in production);
+  - The feature suggested by [@JoshElias](https://github.com/JoshElias).
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  routeCheck: ({ method, path, endpoint, logger }) =>
+    assert(/^\/v\d+/.test(path)), // all paths start with version
+});
+```
+
 ### v26.2.0
 
 - Ability to specify a custom name for a schema in the generated Documentation:
