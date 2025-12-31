@@ -90,7 +90,7 @@ describe("JSON Schema helpers", () => {
       expect(subject).toMatchSnapshot();
     });
 
-    test("should handle records", () => {
+    test("should handle union of records", () => {
       const subject = z.toJSONSchema(
         z
           .record(z.literal(["one", "two"]), z.string())
