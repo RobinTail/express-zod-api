@@ -3597,8 +3597,8 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
-            deprecated: true
             type: string
+            deprecated: true
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -3656,8 +3656,8 @@ paths:
           required: true
           description: HEAD /v1/getSomething Parameter
           schema:
-            deprecated: true
             type: string
+            deprecated: true
       responses:
         "200":
           description: HEAD /v1/getSomething Positive response
@@ -3716,11 +3716,6 @@ paths:
                     type: string
                     const: success
                   data:
-                    examples:
-                      - a: first
-                        b: prefix_first
-                      - a: second
-                        b: prefix_second
                     type: object
                     properties:
                       a:
@@ -3731,6 +3726,11 @@ paths:
                       - a
                       - b
                     additionalProperties: false
+                    examples:
+                      - a: first
+                        b: prefix_first
+                      - a: second
+                        b: prefix_second
                 required:
                   - status
                   - data
@@ -3936,8 +3936,6 @@ paths:
                     type: string
                     const: success
                   data:
-                    examples:
-                      - num: 123
                     type: object
                     properties:
                       num:
@@ -3945,6 +3943,8 @@ paths:
                     required:
                       - num
                     additionalProperties: false
+                    examples:
+                      - num: 123
                 required:
                   - status
                   - data
@@ -4016,13 +4016,13 @@ paths:
               type: object
               properties:
                 key:
+                  type: string
                   examples:
                     - 1234-56789-01
-                  type: string
                 str:
+                  type: string
                   examples:
                     - test
-                  type: string
               required:
                 - key
                 - str
@@ -4047,9 +4047,9 @@ paths:
                     type: object
                     properties:
                       num:
+                        type: number
                         examples:
                           - 123
-                        type: number
                     required:
                       - num
                     additionalProperties: false
@@ -4140,8 +4140,6 @@ paths:
                     type: string
                     const: success
                   data:
-                    examples:
-                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
@@ -4149,6 +4147,8 @@ paths:
                     required:
                       - numericStr
                     additionalProperties: false
+                    examples:
+                      - numericStr: "123"
                 required:
                   - status
                   - data
@@ -4257,8 +4257,6 @@ paths:
                     type: string
                     const: success
                   data:
-                    examples:
-                      - numericStr: "123"
                     type: object
                     properties:
                       numericStr:
@@ -4266,6 +4264,8 @@ paths:
                     required:
                       - numericStr
                     additionalProperties: false
+                    examples:
+                      - numericStr: "123"
                 required:
                   - status
                   - data
@@ -4335,9 +4335,9 @@ paths:
           required: true
           description: GET /v1/getSomething Parameter
           schema:
+            type: string
             examples:
               - "123"
-            type: string
           examples:
             example1:
               value: "123"
@@ -4410,9 +4410,9 @@ paths:
           required: true
           description: HEAD /v1/getSomething Parameter
           schema:
+            type: string
             examples:
               - "123"
-            type: string
           examples:
             example1:
               value: "123"
@@ -4454,9 +4454,9 @@ paths:
               type: object
               properties:
                 strNum:
+                  type: string
                   examples:
                     - "123"
-                  type: string
               required:
                 - strNum
             examples:
@@ -4556,8 +4556,8 @@ paths:
           required: true
           description: here is the test
           schema:
-            description: here is the test
             type: string
+            description: here is the test
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -4573,10 +4573,10 @@ paths:
                     type: object
                     properties:
                       result:
-                        description: some positive integer
                         type: integer
                         exclusiveMinimum: 0
                         maximum: 9007199254740991
+                        description: some positive integer
                     required:
                       - result
                     additionalProperties: false
@@ -4620,8 +4620,8 @@ paths:
           required: true
           description: here is the test
           schema:
-            description: here is the test
             type: string
+            description: here is the test
       responses:
         "200":
           description: HEAD /v1/getSomething Positive response
@@ -5032,12 +5032,12 @@ paths:
 components:
   schemas:
     NameParam:
-      id: NameParam
       anyOf:
         - type: string
           const: John
         - type: string
           const: Jane
+      id: NameParam
   responses: {}
   parameters: {}
   examples: {}
