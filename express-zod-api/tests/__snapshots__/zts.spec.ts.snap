@@ -76,6 +76,11 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
     catch: number;
     pipeline: string;
     readonly: string;
+    extended: {
+        hex: string;
+        hash: string;
+    };
+    codec: string;
 }"
 `;
 

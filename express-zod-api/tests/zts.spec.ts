@@ -171,6 +171,11 @@ describe("zod-to-ts", () => {
       catch: z.number().catch(123),
       pipeline: z.string().regex(/\d+/).transform(Number).pipe(z.number()),
       readonly: z.string().readonly(),
+      extended: z.object({}).extend({ hex: z.hex(), hash: z.hash("sha256") }),
+      codec: z.codec(z.string(), z.number(), {
+        encode: String,
+        decode: Number,
+      }),
     });
 
     test("should produce the expected results", () => {
