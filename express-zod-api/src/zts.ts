@@ -128,7 +128,16 @@ const onTuple: Producer = (
 const onRecord: Producer = (
   { _zod: { def } }: z.core.$ZodRecord,
   { next, api },
-) => api.ensureTypeNode("Record", [def.keyType, def.valueType].map(next));
+) => {
+  const [keyNode, valueNode] = [def.keyType, def.valueType].map(next);
+  const primary = api.ensureTypeNode("Record", [keyNode, valueNode]);
+  const isLoose = def.mode === "loose";
+  if (!isLoose) return primary;
+  return api.f.createIntersectionTypeNode([
+    primary,
+    api.ensureTypeNode("Record", ["PropertyKey", valueNode]),
+  ]);
+};
 
 const intersect = R.tryCatch(
   (api: TypescriptAPI, nodes: ts.TypeNode[]) => {

@@ -53,7 +53,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
             ] | bigint)[];
         };
     }>;
-    looseRecord: Record<"one" | "two", boolean>;
+    looseRecord: Record<"one" | "two", boolean> & Record<PropertyKey, boolean>;
     map: any;
     set: any;
     intersection: (string & number) | bigint;
