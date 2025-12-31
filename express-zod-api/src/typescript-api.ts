@@ -186,9 +186,15 @@ export class TypescriptAPI {
     value: Typeable,
     {
       isOptional,
+      hasUndefined = isOptional,
       isDeprecated,
       comment,
-    }: { isOptional?: boolean; isDeprecated?: boolean; comment?: string } = {},
+    }: {
+      isOptional?: boolean;
+      hasUndefined?: boolean;
+      isDeprecated?: boolean;
+      comment?: string;
+    } = {},
   ) => {
     const propType = this.ensureTypeNode(value);
     const node = this.f.createPropertySignature(
@@ -197,7 +203,7 @@ export class TypescriptAPI {
       isOptional
         ? this.f.createToken(this.ts.SyntaxKind.QuestionToken)
         : undefined,
-      isOptional
+      hasUndefined
         ? this.makeUnion([
             propType,
             this.ensureTypeNode(this.ts.SyntaxKind.UndefinedKeyword),
