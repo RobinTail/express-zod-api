@@ -81,6 +81,7 @@ exports[`zod-to-ts > Example > should produce the expected results 1`] = `
         hash: string;
     };
     codec: string;
+    slug: string;
 }"
 `;
 

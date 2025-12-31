@@ -176,6 +176,7 @@ describe("zod-to-ts", () => {
         encode: String,
         decode: Number,
       }),
+      slug: z.string().slugify(),
     });
 
     test("should produce the expected results", () => {
