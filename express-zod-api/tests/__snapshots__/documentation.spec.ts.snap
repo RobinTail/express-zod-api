@@ -2091,6 +2091,9 @@ paths:
                             - option2
                         additionalProperties:
                           type: boolean
+                        required:
+                          - option1
+                          - option2
                     required:
                       - simple
                       - stringy
