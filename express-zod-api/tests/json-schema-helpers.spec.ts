@@ -90,23 +90,26 @@ describe("JSON Schema helpers", () => {
       expect(subject).toMatchSnapshot();
     });
 
-    test("should handle union of records", () => {
-      const subject = z.toJSONSchema(
-        z
-          .record(z.literal(["one", "two"]), z.string())
-          .meta({
-            examples: [
-              { one: "test", two: "jest" },
-              { one: "some", two: "another" },
-            ],
-          })
-          .or(
-            z
-              .record(z.enum(["three", "four"]), z.number())
-              .meta({ examples: [{ three: 123, four: 456 }] }),
-          ),
-      );
-      expect(flattenIO(subject)).toMatchSnapshot();
+    describe("should handle records", () => {
+      const rec1 = z.record(z.literal(["one", "two"]), z.string()).meta({
+        examples: [
+          { one: "test", two: "jest" },
+          { one: "some", two: "another" },
+        ],
+      });
+      const rec2 = z
+        .record(z.enum(["three", "four"]), z.number())
+        .meta({ examples: [{ three: 123, four: 456 }] });
+
+      test("in union", () => {
+        const subject = z.toJSONSchema(rec1.or(rec2));
+        expect(flattenIO(subject)).toMatchSnapshot();
+      });
+
+      test("in intersection", () => {
+        const subject = z.toJSONSchema(rec1.and(rec2));
+        expect(flattenIO(subject)).toMatchSnapshot();
+      });
     });
   });
 });
