@@ -207,6 +207,7 @@ describe("zod-to-ts", () => {
           }),
         ])
         .optional(),
+      exact: z.string().exactOptional(),
     });
 
     test("Zod 4: does not add undefined to it, unwrap as is", () => {

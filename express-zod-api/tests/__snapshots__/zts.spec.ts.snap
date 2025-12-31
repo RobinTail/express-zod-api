@@ -291,6 +291,7 @@ exports[`zod-to-ts > z.optional() > Zod 4: should add question mark only to opti
             required: string;
         }
     ] | undefined;
+    exact?: string | undefined;
 }"
 `;
 
