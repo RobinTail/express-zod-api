@@ -170,7 +170,8 @@ const onWrapped: Producer = (
     | z.core.$ZodCatch
     | z.core.$ZodDefault
     | z.core.$ZodOptional
-    | z.core.$ZodNonOptional,
+    | z.core.$ZodNonOptional
+    | z.core.$ZodExactOptional,
   { next },
 ) => next(def.innerType);
 
