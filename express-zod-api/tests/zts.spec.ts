@@ -150,6 +150,7 @@ describe("zod-to-ts", () => {
           }),
         }),
       ),
+      looseRecord: z.looseRecord(z.literal(["one", "two"]), z.boolean()),
       map: z.map(z.string(), z.array(z.object({ string: z.string() }))),
       set: z.set(z.string()),
       intersection: z.intersection(z.string(), z.number()).or(z.bigint()),
