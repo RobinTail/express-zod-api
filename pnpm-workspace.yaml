@@ -26,6 +26,7 @@ minimumReleaseAgeExclude:
   - http-errors
   - import-without-cache
   - prettier
+  - qs
   - ramda
   - raw-body
   - rolldown
