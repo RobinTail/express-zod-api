@@ -2,6 +2,12 @@
 
 ## Version 26
 
+### v26.3.0
+
+- Supporting several latest features of Zod 4.2 and 4.3 by the `Integration` generator:
+  - `z.looseRecord()` schema;
+  - Object properties wrapped by `z.exactOptional()` or created by `ZodType::exactOptional()` method.
+
 ### v26.2.0
 
 - Ability to specify a custom name for a schema in the generated Documentation:
