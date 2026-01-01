@@ -2072,6 +2072,8 @@ paths:
                           const: only
                         additionalProperties:
                           type: boolean
+                        required:
+                          - only
                       union:
                         type: object
                         propertyNames:
@@ -2082,6 +2084,9 @@ paths:
                               const: option2
                         additionalProperties:
                           type: boolean
+                        required:
+                          - option1
+                          - option2
                       enum:
                         type: object
                         propertyNames:
