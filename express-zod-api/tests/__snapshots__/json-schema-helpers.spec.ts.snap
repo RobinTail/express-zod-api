@@ -1,6 +1,46 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`JSON Schema helpers > flattenIO() > should handle records 1`] = `
+exports[`JSON Schema helpers > flattenIO() > should handle records > in intersection 1`] = `
+{
+  "examples": [
+    {
+      "four": 456,
+      "one": "test",
+      "three": 123,
+      "two": "jest",
+    },
+    {
+      "four": 456,
+      "one": "some",
+      "three": 123,
+      "two": "another",
+    },
+  ],
+  "properties": {
+    "four": {
+      "type": "number",
+    },
+    "one": {
+      "type": "string",
+    },
+    "three": {
+      "type": "number",
+    },
+    "two": {
+      "type": "string",
+    },
+  },
+  "required": [
+    "one",
+    "two",
+    "three",
+    "four",
+  ],
+  "type": "object",
+}
+`;
+
+exports[`JSON Schema helpers > flattenIO() > should handle records > in union 1`] = `
 {
   "examples": [
     {
