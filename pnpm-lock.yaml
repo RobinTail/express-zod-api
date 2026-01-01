@@ -10,7 +10,7 @@ catalogs:
       specifier: ^1.8.1
       version: 1.8.1
     '@types/express':
-      specifier: ^5.0.3
+      specifier: ^5.0.6
       version: 5.0.6
     '@types/express-fileupload':
       specifier: ^1.5.1
@@ -19,34 +19,34 @@ catalogs:
       specifier: ^2.0.5
       version: 2.0.5
     '@types/ramda':
-      specifier: ^0.31.0
+      specifier: ^0.31.1
       version: 0.31.1
     '@typescript-eslint/rule-tester':
-      specifier: ^8.46.1
+      specifier: ^8.51.0
       version: 8.51.0
     camelize-ts:
       specifier: ^3.0.0
       version: 3.0.0
     compression:
-      specifier: ^1.8.0
+      specifier: ^1.8.1
       version: 1.8.1
     express:
-      specifier: ^5.2.0
+      specifier: ^5.2.1
       version: 5.2.1
     express-fileupload:
-      specifier: ^1.5.1
+      specifier: ^1.5.2
       version: 1.5.2
     http-errors:
       specifier: ^2.0.1
       version: 2.0.1
     typescript:
-      specifier: ^5.9.2
+      specifier: ^5.9.3
       version: 5.9.3
     typescript-eslint:
-      specifier: ^8.46.1
+      specifier: ^8.51.0
       version: 8.51.0
     zod:
-      specifier: ^4.2.0
+      specifier: ^4.3.4
       version: 4.3.4
   prod:
     ramda:
@@ -64,43 +64,43 @@ importers:
         specifier: ^0.18.2
         version: 0.18.2
       '@tsconfig/node20':
-        specifier: ^20.1.5
+        specifier: ^20.1.8
         version: 20.1.8
       '@types/node':
-        specifier: ^24.0.0
+        specifier: ^24.10.4
         version: 24.10.4
       '@vitest/coverage-v8':
-        specifier: ^4.0.1
+        specifier: ^4.0.16
         version: 4.0.16(vitest@4.0.16(@types/node@24.10.4)(tsx@4.21.0)(yaml@2.8.1))
       eslint:
-        specifier: ^9.28.0
+        specifier: ^9.39.2
         version: 9.39.2
       eslint-config-prettier:
-        specifier: ^10.1.5
+        specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.2)
       eslint-plugin-allowed-dependencies:
-        specifier: ^2.0.0
+        specifier: ^2.0.1
         version: 2.0.1(eslint@9.39.2)(typescript-eslint@8.51.0(eslint@9.39.2)(typescript@5.9.3))
       eslint-plugin-prettier:
-        specifier: ^5.4.1
+        specifier: ^5.5.4
         version: 5.5.4(eslint-config-prettier@10.1.8(eslint@9.39.2))(eslint@9.39.2)(prettier@3.7.4)
       husky:
-        specifier: ^9.0.5
+        specifier: ^9.1.7
         version: 9.1.7
       prettier:
         specifier: 3.7.4
         version: 3.7.4
       tsdown:
-        specifier: ^0.18.0
+        specifier: ^0.18.4
         version: 0.18.4(@arethetypeswrong/core@0.18.2)(synckit@0.11.11)(typescript@5.9.3)
       tsx:
-        specifier: ^4.19.4
+        specifier: ^4.21.0
         version: 4.21.0
       typescript-eslint:
         specifier: catalog:dev
         version: 8.51.0(eslint@9.39.2)(typescript@5.9.3)
       vitest:
-        specifier: ^4.0.1
+        specifier: ^4.0.16
         version: 4.0.16(@types/node@24.10.4)(tsx@4.21.0)(yaml@2.8.1)
 
   cjs-test:
@@ -169,7 +169,7 @@ importers:
         specifier: ^6.14.1
         version: 6.14.1
       swagger-ui-express:
-        specifier: ^5.0.0
+        specifier: ^5.0.1
         version: 5.0.1(express@5.2.1)
       typescript:
         specifier: catalog:dev
@@ -184,7 +184,7 @@ importers:
         specifier: workspace:^
         version: link:../zod-plugin
       ansis:
-        specifier: ^4.1.0
+        specifier: ^4.2.0
         version: 4.2.0
       node-mocks-http:
         specifier: ^1.17.2
@@ -215,7 +215,7 @@ importers:
         specifier: catalog:dev
         version: 2.0.5
       '@types/node-forge':
-        specifier: ^1.3.11
+        specifier: ^1.3.14
         version: 1.3.14
       '@types/ramda':
         specifier: catalog:dev
@@ -242,7 +242,7 @@ importers:
         specifier: catalog:dev
         version: 2.0.1
       node-forge:
-        specifier: ^1.3.2
+        specifier: ^1.3.3
         version: 1.3.3
       snakify-ts:
         specifier: ^2.3.0
@@ -251,7 +251,7 @@ importers:
         specifier: catalog:dev
         version: 5.9.3
       undici:
-        specifier: ^7.10.0
+        specifier: ^7.16.0
         version: 7.16.0
       zod:
         specifier: catalog:dev
