@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@express-zod-api/zod-plugin": "workspace:^",
-    "ansis": "^4.1.0",
+    "ansis": "^4.2.0",
     "node-mocks-http": "^1.17.2",
     "openapi3-ts": "^4.5.0",
     "ramda": "catalog:prod"
@@ -87,7 +87,7 @@
     "@types/express": "catalog:dev",
     "@types/express-fileupload": "catalog:dev",
     "@types/http-errors": "catalog:dev",
-    "@types/node-forge": "^1.3.11",
+    "@types/node-forge": "^1.3.14",
     "@types/ramda": "catalog:dev",
     "camelize-ts": "catalog:dev",
     "compression": "catalog:dev",
@@ -96,10 +96,10 @@
     "express": "catalog:dev",
     "express-fileupload": "catalog:dev",
     "http-errors": "catalog:dev",
-    "node-forge": "^1.3.2",
+    "node-forge": "^1.3.3",
     "snakify-ts": "^2.3.0",
     "typescript": "catalog:dev",
-    "undici": "^7.10.0",
+    "undici": "^7.16.0",
     "zod": "catalog:dev"
   },
   "keywords": [
