@@ -1,12 +1,11 @@
-import { z } from "zod";
-import { pack, unpack } from "./packer";
+import { z, globalRegistry } from "zod";
 
-/** The property within schema._zod.bag where we store the brand */
+/** The property we store the brand in */
 export const brandProperty = "brand" as const;
 
 /** Used by runtime (bound) */
 export const setBrand = function (this: z.ZodType, brand?: PropertyKey) {
-  return pack(this, { [brandProperty]: brand });
+  return this.meta({ [brandProperty]: brand });
 };
 
 /**
@@ -14,7 +13,7 @@ export const setBrand = function (this: z.ZodType, brand?: PropertyKey) {
  * @desc Retrieves the brand from the schema set by its .brand() method.
  * */
 export const getBrand = (subject: z.core.$ZodType) => {
-  const { [brandProperty]: brand } = unpack(subject) || {};
+  const { [brandProperty]: brand } = globalRegistry.get(subject) || {};
   if (
     typeof brand === "symbol" ||
     typeof brand === "string" ||
