@@ -15,19 +15,19 @@
   },
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.2",
-    "@tsconfig/node20": "^20.1.5",
-    "@types/node": "^24.0.0",
-    "@vitest/coverage-v8": "^4.0.1",
-    "eslint": "^9.28.0",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-allowed-dependencies": "^2.0.0",
-    "eslint-plugin-prettier": "^5.4.1",
-    "husky": "^9.0.5",
+    "@tsconfig/node20": "^20.1.8",
+    "@types/node": "^24.10.4",
+    "@vitest/coverage-v8": "^4.0.16",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-allowed-dependencies": "^2.0.1",
+    "eslint-plugin-prettier": "^5.5.4",
+    "husky": "^9.1.7",
     "prettier": "3.7.4",
-    "tsdown": "^0.18.0",
-    "tsx": "^4.19.4",
+    "tsdown": "^0.18.4",
+    "tsx": "^4.21.0",
     "typescript-eslint": "catalog:dev",
-    "vitest": "^4.0.1"
+    "vitest": "^4.0.16"
   },
-  "packageManager": "pnpm@10.26.2+sha512.0e308ff2005fc7410366f154f625f6631ab2b16b1d2e70238444dd6ae9d630a8482d92a451144debc492416896ed16f7b114a86ec68b8404b2443869e68ffda6"
+  "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a"
 }
