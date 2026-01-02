@@ -7,8 +7,6 @@ packages:
   - esm-test
   - compat-test
   - issue952-test
-onlyBuiltDependencies:
-  - esbuild
 gitChecks: false
 engineStrict: true
 autoInstallPeers: false
@@ -34,7 +32,6 @@ minimumReleaseAgeExclude:
   - typescript
   - typescript-eslint
   - tsdown
-  - tsx
   - unrun
   - vite
   - vitest
@@ -68,3 +65,5 @@ catalogs:
     "zod": "^4.3.4"
 overrides:
   "@scarf/scarf": "npm:empty-npm-package@1.0.0"
+  "lightningcss": "npm:empty-npm-package@1.0.0"
+  "vite": "^8.0.0-beta.5"
