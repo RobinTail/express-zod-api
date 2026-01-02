@@ -18,8 +18,8 @@
     "express-zod-api": "workspace:*",
     "express-fileupload": "catalog:dev",
     "http-errors": "catalog:dev",
-    "qs": "^6.14.0",
-    "swagger-ui-express": "^5.0.0",
+    "qs": "^6.14.1",
+    "swagger-ui-express": "^5.0.1",
     "typescript": "catalog:dev",
     "zod": "catalog:dev"
   }

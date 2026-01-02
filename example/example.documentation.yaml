@@ -42,7 +42,7 @@ paths:
                       features:
                         type: array
                         items:
-                          $ref: "#/components/schemas/Schema1"
+                          $ref: "#/components/schemas/Feature"
                     required:
                       - id
                       - name
@@ -132,10 +132,10 @@ paths:
           required: true
           description: PATCH /v1/user/:id Parameter
           schema:
-            examples:
-              - "1234567890"
             type: string
             minLength: 1
+            examples:
+              - "1234567890"
           examples:
             example1:
               value: "1234567890"
@@ -144,9 +144,9 @@ paths:
           required: true
           description: PATCH /v1/user/:id Parameter
           schema:
+            type: string
             examples:
               - "12"
-            type: string
           examples:
             example1:
               value: "12"
@@ -158,15 +158,15 @@ paths:
               type: object
               properties:
                 key:
+                  type: string
+                  minLength: 1
                   examples:
                     - 1234-5678-90
+                name:
                   type: string
                   minLength: 1
-                name:
                   examples:
                     - John Doe
-                  type: string
-                  minLength: 1
                 birthday:
                   description: the day of birth
                   type: string
@@ -205,9 +205,9 @@ paths:
                     type: object
                     properties:
                       name:
+                        type: string
                         examples:
                           - John Doe
-                        type: string
                       createdAt:
                         description: account creation date
                         type: string
@@ -275,11 +275,11 @@ paths:
               type: object
               properties:
                 name:
+                  type: string
+                  pattern: ^\w+ \w+$
                   description: first name and last name
                   examples:
                     - John Doe
-                  type: string
-                  pattern: ^\w+ \w+$
               required:
                 - name
             examples:
@@ -867,7 +867,7 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    Schema1:
+    Feature:
       type: object
       properties:
         title:
@@ -875,10 +875,11 @@ components:
         features:
           type: array
           items:
-            $ref: "#/components/schemas/Schema1"
+            $ref: "#/components/schemas/Feature"
       required:
         - title
       additionalProperties: false
+      id: Feature
   responses: {}
   parameters: {}
   examples: {}

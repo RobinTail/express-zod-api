@@ -5,12 +5,15 @@ import { defaultEndpointsFactory } from "express-zod-api";
 import { methodProviderMiddleware } from "../middlewares";
 
 // Demonstrating circular schemas using z.object()
-const feature = z.object({
-  title: z.string(),
-  get features() {
-    return z.array(feature).optional();
-  },
-});
+const feature = z
+  .object({
+    title: z.string(),
+    get features() {
+      return z.array(feature).optional();
+    },
+  })
+  // This gives the schema a custom name in the OpenAPI documentation (must be unique across the API)
+  .meta({ id: "Feature" });
 
 export const retrieveUserEndpoint = defaultEndpointsFactory
   .addMiddleware(methodProviderMiddleware)
