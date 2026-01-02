@@ -4,6 +4,7 @@
 
 | Version | Code name     | Release |     Supported      |
 | ------: | :------------ | :------ | :----------------: |
+|  27.x.x | Nikki         | 02.2026 | :white_check_mark: |
 |  26.x.x | Lia           | 12.2025 | :white_check_mark: |
 |  25.x.x | Sara          | 08.2025 | :white_check_mark: |
 |  24.x.x | Ashley        | 06.2025 | :white_check_mark: |
