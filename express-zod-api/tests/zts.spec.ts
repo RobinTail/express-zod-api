@@ -150,6 +150,7 @@ describe("zod-to-ts", () => {
           }),
         }),
       ),
+      looseRecord: z.looseRecord(z.literal(["one", "two"]), z.boolean()),
       map: z.map(z.string(), z.array(z.object({ string: z.string() }))),
       set: z.set(z.string()),
       intersection: z.intersection(z.string(), z.number()).or(z.bigint()),
@@ -171,6 +172,13 @@ describe("zod-to-ts", () => {
       catch: z.number().catch(123),
       pipeline: z.string().regex(/\d+/).transform(Number).pipe(z.number()),
       readonly: z.string().readonly(),
+      extended: z.object({}).extend({ hex: z.hex(), hash: z.hash("sha256") }),
+      codec: z.codec(z.string(), z.number(), {
+        encode: String,
+        decode: Number,
+      }),
+      slug: z.string().slugify(),
+      xor: z.xor([z.string(), z.number()]),
     });
 
     test("should produce the expected results", () => {
@@ -199,6 +207,7 @@ describe("zod-to-ts", () => {
           }),
         ])
         .optional(),
+      exact: z.string().exactOptional(),
     });
 
     test("Zod 4: does not add undefined to it, unwrap as is", () => {

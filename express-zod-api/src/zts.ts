@@ -76,11 +76,15 @@ const onObject: Producer = (
       ([key, value]) => {
         const { description: comment, deprecated: isDeprecated } =
           globalRegistry.get(value) || {};
+        const isOptional =
+          (isResponse ? value._zod.optout : value._zod.optin) === "optional";
+        const hasUndefined =
+          isOptional && !(value instanceof z.core.$ZodExactOptional);
         return api.makeInterfaceProp(key, next(value), {
           comment,
           isDeprecated,
-          isOptional:
-            (isResponse ? value._zod.optout : value._zod.optin) === "optional",
+          isOptional,
+          hasUndefined,
         });
       },
     );
@@ -124,7 +128,16 @@ const onTuple: Producer = (
 const onRecord: Producer = (
   { _zod: { def } }: z.core.$ZodRecord,
   { next, api },
-) => api.ensureTypeNode("Record", [def.keyType, def.valueType].map(next));
+) => {
+  const [keyNode, valueNode] = [def.keyType, def.valueType].map(next);
+  const primary = api.ensureTypeNode("Record", [keyNode, valueNode]);
+  const isLoose = def.mode === "loose";
+  if (!isLoose) return primary;
+  return api.f.createIntersectionTypeNode([
+    primary,
+    api.ensureTypeNode("Record", ["PropertyKey", valueNode]),
+  ]);
+};
 
 const intersect = R.tryCatch(
   (api: TypescriptAPI, nodes: ts.TypeNode[]) => {
@@ -170,7 +183,8 @@ const onWrapped: Producer = (
     | z.core.$ZodCatch
     | z.core.$ZodDefault
     | z.core.$ZodOptional
-    | z.core.$ZodNonOptional,
+    | z.core.$ZodNonOptional
+    | z.core.$ZodExactOptional,
   { next },
 ) => next(def.innerType);
 
