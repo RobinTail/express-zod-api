@@ -1,12 +1,7 @@
-import { z, globalRegistry } from "zod";
+import { globalRegistry, z } from "zod";
 
 /** The property we store the brand in */
 export const brandProperty = "x-brand" as const;
-
-/** Used by runtime (bound) */
-export const setBrand = function (this: z.ZodType, brand?: PropertyKey) {
-  return this.meta({ [brandProperty]: brand });
-};
 
 /**
  * @public

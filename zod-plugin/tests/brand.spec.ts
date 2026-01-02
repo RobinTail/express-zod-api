@@ -1,18 +1,10 @@
 import { z, globalRegistry } from "zod";
-import { brandProperty, getBrand, setBrand } from "../src/brand";
+import { brandProperty, getBrand } from "../src/brand";
 
 describe("Brand", () => {
   describe("brandProperty", () => {
     test("should be brand", () => {
       expect(brandProperty).toBe("x-brand");
-    });
-  });
-
-  describe("setBrand", () => {
-    test("calls meta() with given brand", () => {
-      const parent = z.string();
-      const subject = setBrand.call(parent, "test");
-      expect(subject.meta()).toHaveProperty(brandProperty, "test");
     });
   });
 
