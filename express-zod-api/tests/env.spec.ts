@@ -129,11 +129,7 @@ describe("Environment checks", () => {
       expect(schema.meta()).toMatchSnapshot();
     });
 
-    /**
-     * @since zod 4.3.0
-     * @todo use this fact for refactoring .brand() implementation in Zod Plugin
-     */
-    test("metadata is now inheritable", () => {
+    test("metadata is inheritable since zod 4.3.0", () => {
       const parent = z.string().meta({ one: "test" });
       const subject = parent.min(1).meta({ two: "another" });
       expect(subject.meta()).toHaveProperty("one", "test");
