@@ -53,9 +53,39 @@ describe("Migration", async () => {
         ],
       },
       {
-        name: "should use static create() method in async context",
+        name: "should use static create() method when there is 'await' statement",
         code: `await new Integration({ config, routing }).printFormatted();`,
         output: `await (await Integration.create({ config, routing })).printFormatted();`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "constructor",
+              from: "new Integration()",
+              to: "await Integration.create()",
+            },
+          },
+        ],
+      },
+      {
+        name: "should use static create() method when inside async functional expression",
+        code: `async () => { new Integration({ config, routing }); }`,
+        output: `async () => { (await Integration.create({ config, routing })); }`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "constructor",
+              from: "new Integration()",
+              to: "await Integration.create()",
+            },
+          },
+        ],
+      },
+      {
+        name: "should use static create() method when inside async function declaration",
+        code: `async function test() { new Integration({ config, routing }); }`,
+        output: `async function test() { (await Integration.create({ config, routing })); }`,
         errors: [
           {
             messageId: "change",

@@ -70,7 +70,8 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             (one) =>
               one.type === NT.AwaitExpression ||
               ((one.type === NT.ArrowFunctionExpression ||
-                one.type === NT.FunctionExpression) &&
+                one.type === NT.FunctionExpression ||
+                one.type === NT.FunctionDeclaration) &&
                 one.async),
           );
         ctx.report(
