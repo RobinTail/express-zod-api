@@ -169,12 +169,19 @@ describe("BuiltinLogger", () => {
       undefined,
       (ms: number) => Math.round(ms),
       (ms: number) => `${ms.toFixed(0)}ms`,
-    ] as const)("should accept formatter option %#", (formatter) => {
-      const { logger, logSpy } = makeLogger({ level: "debug", color: false });
-      logger.profile({ message: "test", formatter })();
-      expect(logSpy).toHaveBeenCalledWith(
-        expect.stringMatching(/debug: test '?\d+\s?\w*'?$/),
-      );
-    });
+    ] as const)(
+      "should accept durationFormatter option %#",
+      (durationFormatter) => {
+        const { logger, logSpy } = makeLogger({
+          level: "debug",
+          color: false,
+          durationFormatter,
+        });
+        logger.profile({ message: "test" })();
+        expect(logSpy).toHaveBeenCalledWith(
+          expect.stringMatching(/debug: test '?\d+\s?\w*'?$/),
+        );
+      },
+    );
   });
 });

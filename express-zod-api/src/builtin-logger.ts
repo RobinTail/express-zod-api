@@ -33,14 +33,17 @@ export interface BuiltinLoggerConfig {
    * @see childLoggerProvider
    * */
   ctx: Context;
+  /**
+   * @desc Formatter for duration in profile() method
+   * @default formatDuration - adaptive units and limited fraction
+   * */
+  durationFormatter: (ms: number) => string | number;
 }
 
 interface ProfilerOptions {
   message: string;
   /** @default "debug" */
   severity?: Severity | ((ms: number) => Severity);
-  /** @default formatDuration - adaptive units and limited fraction */
-  formatter?: (ms: number) => string | number;
 }
 
 /** @desc Built-in console logger with optional colorful inspections */
@@ -53,8 +56,9 @@ export class BuiltinLogger implements AbstractLogger {
     level = isProduction() ? "warn" : "debug",
     depth = 2,
     ctx = {},
+    durationFormatter = formatDuration,
   }: Partial<BuiltinLoggerConfig> = {}) {
-    this.config = { color, level, depth, ctx };
+    this.config = { color, level, depth, ctx, durationFormatter };
   }
 
   protected format(subject: unknown) {
@@ -120,15 +124,12 @@ export class BuiltinLogger implements AbstractLogger {
     const start = performance.now();
     return () => {
       const duration = performance.now() - start;
-      const {
-        message,
-        severity = "debug",
-        formatter = formatDuration,
-      } = typeof subject === "object" ? subject : { message: subject };
+      const { message, severity = "debug" } =
+        typeof subject === "object" ? subject : { message: subject };
       this.print(
         typeof severity === "function" ? severity(duration) : severity,
         message,
-        formatter(duration),
+        this.config.durationFormatter(duration),
       );
     };
   }
