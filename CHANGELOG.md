@@ -4,6 +4,8 @@
 
 ### v27.0.0
 
+- Supported `zod` versions: `^4.3.4`;
+- The new version of Zod Plugin utilizes the inheritable metadata feature of Zod 4.3;
 - Breaking change to the `Integration` class:
   - Either import and assign the `typescript` property to constructor argument;
   - Or use the new static async method `create()` to delegate the import;
