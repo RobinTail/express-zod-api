@@ -14,7 +14,7 @@ This module extends Zod functionality when it's imported:
   - Supports a mapping object or an object transforming function as an argument;
   - Relies on `R.renameKeys()` from the `ramda` library;
 - Alters the `.brand()` method on all Zod schemas:
-  - shorthand for `.meta({ brand: ... })` making the brand available in runtime via `getBrand()` helper;
+  - shorthand for `.meta({ "x-brand": ... })` making the brand available in runtime via `getBrand()` helper;
 
 ## Requirements
 
