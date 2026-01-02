@@ -12,7 +12,7 @@ describe("Brand", () => {
     test("calls meta() with given brand", () => {
       const parent = z.string();
       const subject = setBrand.call(parent, "test");
-      expect(subject.meta()).toHaveProperty("x-brand", "test");
+      expect(subject.meta()).toHaveProperty(brandProperty, "test");
     });
   });
 
