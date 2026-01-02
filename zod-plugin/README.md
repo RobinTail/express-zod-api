@@ -29,7 +29,7 @@ import { getBrand } from "@express-zod-api/zod-plugin";
 const schema = z.string().example("test").example("another").brand("custom");
 
 getBrand(schema); // "custom"
-schema.meta(); // { examples: ["test", "another"], brand: "custom" }
+schema.meta(); // { examples: ["test", "another"], "x-brand": "custom" }
 ```
 
 ## Helpers
