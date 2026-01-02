@@ -129,6 +129,12 @@ describe("Environment checks", () => {
       expect(schema.meta()).toMatchSnapshot();
     });
 
+    test("metadata is inheritable since zod 4.3.0", () => {
+      const parent = z.string().meta({ one: "test" });
+      const subject = parent.min(1).meta({ two: "another" });
+      expect(subject.meta()).toHaveProperty("one", "test");
+    });
+
     test("object shape conveys the keys optionality", () => {
       const schema = z.object({
         one: z.boolean(),

@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import {
   EndpointsFactory,
   Integration,
@@ -133,7 +133,7 @@ describe("Integration", () => {
         schema: ReturnType<z.ZodType["brand"]>,
         { next },
       ) => {
-        schema._zod.bag.brand = undefined;
+        globalRegistry.remove(schema);
         return next(schema);
       };
       const client = await Integration.create({
