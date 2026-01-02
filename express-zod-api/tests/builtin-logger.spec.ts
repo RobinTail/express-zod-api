@@ -167,21 +167,20 @@ describe("BuiltinLogger", () => {
 
     test.each([
       undefined,
-      (ms: number) => Math.round(ms),
-      (ms: number) => `${ms.toFixed(0)}ms`,
-    ] as const)(
-      "should accept durationFormatter option %#",
-      (durationFormatter) => {
-        const { logger, logSpy } = makeLogger({
-          level: "debug",
-          color: false,
-          durationFormatter,
-        });
-        logger.profile({ message: "test" })();
-        expect(logSpy).toHaveBeenCalledWith(
-          expect.stringMatching(/debug: test '?\d+\s?\w*'?$/),
-        );
-      },
-    );
+      vi.fn((ms: number) => Math.round(ms)),
+      vi.fn((ms: number) => `${ms.toFixed(0)}ms`),
+    ])("should accept durationFormatter option %#", (durationFormatter) => {
+      const { logger, logSpy } = makeLogger({
+        level: "debug",
+        color: false,
+        durationFormatter,
+      });
+      logger.profile("test")();
+      if (durationFormatter)
+        expect(durationFormatter).toHaveBeenCalledWith(expect.any(Number));
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/debug: test '?\d+\s?\w*'?$/),
+      );
+    });
   });
 });
