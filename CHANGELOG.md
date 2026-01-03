@@ -6,9 +6,10 @@
 
 - Supported `zod` versions: `^4.3.4`;
 - The new version of Zod Plugin utilizes the inheritable metadata feature of Zod 4.3;
-- Breaking change to the `Integration` class:
-  - Either import and assign the `typescript` property to constructor argument;
+- The `typescript` dependency is now optional and only required for making `Integration`:
+  - Either import and assign the `typescript` property to its constructor argument;
   - Or use the new static async method `create()` to delegate the import;
+  - This change addresses the memory consumption issue fixed previously in v26.1.0, but with proper ESM handling.
 
 ```diff
   /** Option 1: import and assign */
