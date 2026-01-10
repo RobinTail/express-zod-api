@@ -6,7 +6,7 @@ import { zodToTs } from "../src/zts";
 import { ZTSContext } from "../src/zts-helpers";
 
 describe("zod-to-ts", () => {
-  const api = new TypescriptAPI();
+  const api = new TypescriptAPI(ts);
   const printNodeTest = (node: ts.Node) =>
     api.printNode(node, { newLine: ts.NewLineKind.LineFeed });
   const ctx: ZTSContext = {
