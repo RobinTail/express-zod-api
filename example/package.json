@@ -14,9 +14,7 @@
   "devDependencies": {
     "@types/http-errors": "catalog:dev",
     "@types/swagger-ui-express": "^4.1.8",
-    "compression": "catalog:dev",
     "express-zod-api": "workspace:*",
-    "express-fileupload": "catalog:dev",
     "http-errors": "catalog:dev",
     "qs": "^6.14.1",
     "swagger-ui-express": "^5.0.1",
