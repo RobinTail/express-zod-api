@@ -69,7 +69,6 @@ interface BuildProps<
   deprecated?: boolean;
 }
 
-/** @todo consider having CTX based on unknown in the next major */
 export class EndpointsFactory<
   IN extends IOSchema | undefined = undefined,
   CTX = unknown,
