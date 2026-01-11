@@ -31,7 +31,7 @@ interface BuildProps<
   IN extends IOSchema,
   OUT extends IOSchema | z.ZodVoid,
   MIN extends IOSchema | undefined,
-  CTX extends FlatObject,
+  CTX,
   SCO extends string,
 > {
   /**
@@ -72,7 +72,7 @@ interface BuildProps<
 /** @todo consider having CTX based on unknown in the next major */
 export class EndpointsFactory<
   IN extends IOSchema | undefined = undefined,
-  CTX extends FlatObject = EmptyObject,
+  CTX = unknown,
   SCO extends string = string,
 > {
   protected schema = undefined as IN;
@@ -86,7 +86,7 @@ export class EndpointsFactory<
   >(middleware: Middleware<CTX, RET, ASCO, AIN>) {
     const factory = new EndpointsFactory<
       Extension<IN, AIN>,
-      (CTX extends EmptyObject ? RET : CTX) & RET,
+      CTX & RET,
       SCO & ASCO
     >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);

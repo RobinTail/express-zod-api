@@ -85,7 +85,7 @@ export abstract class AbstractEndpoint {
 export class Endpoint<
   IN extends IOSchema,
   OUT extends IOSchema,
-  CTX extends FlatObject,
+  CTX,
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
 
