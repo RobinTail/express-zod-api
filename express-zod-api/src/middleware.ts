@@ -30,7 +30,7 @@ export abstract class AbstractMiddleware {
   public abstract get schema(): IOSchema | undefined;
   public abstract execute(params: {
     input: unknown;
-    ctx: FlatObject;
+    ctx: unknown;
     request: Request;
     response: Response;
     logger: ActualLogger;
@@ -38,7 +38,7 @@ export abstract class AbstractMiddleware {
 }
 
 export class Middleware<
-  CTX extends FlatObject,
+  CTX,
   RET extends FlatObject,
   SCO extends string,
   IN extends IOSchema | undefined = undefined,
@@ -109,7 +109,7 @@ export class ExpressMiddleware<
   R extends Request,
   S extends Response,
   RET extends FlatObject,
-> extends Middleware<FlatObject, RET, string> {
+> extends Middleware<unknown, RET, string> {
   constructor(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- issue #2824, assignment compatibility fix
     nativeMw: (request: R, response: S, next: NextFunction) => any,
