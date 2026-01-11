@@ -74,7 +74,7 @@ describe("EndpointsFactory", () => {
         handler: async () => ({ test: "fist" }),
       });
       expectTypeOf(factory).toEqualTypeOf<
-        EndpointsFactory<undefined, EmptyObject & { test: string }>
+        EndpointsFactory<undefined, { test: string }>
       >();
     });
 
@@ -109,10 +109,7 @@ describe("EndpointsFactory", () => {
         option2: "other value",
       }));
       expectTypeOf(newFactory).toEqualTypeOf<
-        EndpointsFactory<
-          undefined,
-          EmptyObject & { option1: string; option2: string }
-        >
+        EndpointsFactory<undefined, { option1: string; option2: string }>
       >();
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
