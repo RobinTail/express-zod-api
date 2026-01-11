@@ -65,7 +65,7 @@ describe("Testing", () => {
         middleware: new Middleware({
           input: z.object({ test: z.string() }),
           handler: async ({ ctx, input: { test } }) => ({
-            ctxKeys: Object.keys(ctx),
+            ctxKeys: ctx && typeof ctx == "object" ? Object.keys(ctx) : [],
             inpLen: test.length,
           }),
         }),

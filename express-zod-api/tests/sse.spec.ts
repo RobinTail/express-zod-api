@@ -1,6 +1,5 @@
 import { z } from "zod";
 import {
-  FlatObject,
   Middleware,
   ResultHandler,
   testEndpoint,
@@ -81,7 +80,7 @@ describe("SSE", () => {
         const middleware = makeMiddleware({ test: z.string() });
         expect(middleware).toBeInstanceOf(Middleware);
         expectTypeOf(middleware).toEqualTypeOf<
-          Middleware<FlatObject, Emitter<{ test: z.ZodString }>, string>
+          Middleware<unknown, Emitter<{ test: z.ZodString }>, string>
         >();
         const { output, responseMock } = await testMiddleware({ middleware });
         if (flushMock) responseMock.flush = flushMock;
