@@ -36,4 +36,5 @@ schema.meta(); // { examples: ["test", "another"] }
 
 - `getBrand()` — retrieves the brand from the schema that was set by its `.brand()` method;
 - `pack()` — returns a cloned schema having inheritable attributes assigned (such as brand);
-- `unpack()` — retrieves the attributes from the schema that was set by `pack()` helper.
+- `unpack()` — retrieves the attributes from the schema that was set by `pack()` helper;
+- `patch()` — applies the plugin to a Zod package you import yourself.

@@ -2,6 +2,10 @@
 
 ## Version 3
 
+### v3.1.0
+
+- Added `patch()` method for using with a Zod package you import yourself.
+
 ### v3.0.0
 
 - Supported `zod` versions: `^4.1.13`;
