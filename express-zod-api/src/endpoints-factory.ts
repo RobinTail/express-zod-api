@@ -69,6 +69,7 @@ interface BuildProps<
   deprecated?: boolean;
 }
 
+/** @todo consider having CTX based on unknown in the next major */
 export class EndpointsFactory<
   IN extends IOSchema | undefined = undefined,
   CTX = unknown,
@@ -85,7 +86,7 @@ export class EndpointsFactory<
   >(middleware: Middleware<CTX, RET, ASCO, AIN>) {
     const factory = new EndpointsFactory<
       Extension<IN, AIN>,
-      CTX & RET,
+      (CTX extends EmptyObject ? RET : CTX) & RET,
       SCO & ASCO
     >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);
