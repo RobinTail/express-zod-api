@@ -2,6 +2,13 @@
 
 ## Version 26
 
+### v26.3.1
+
+- Fixed the type of `ctx` for Endpoints built on factories having at least one Middleware:
+  - Removed `Record<string, never>` from the type union;
+  - This prevents accessing non-existing properties on `ctx`;
+  - The issue was reported by [@pycanis](https://github.com/pycanis).
+
 ### v26.3.0
 
 - Supporting several latest features of Zod 4.2 and 4.3 by the `Integration` generator:
