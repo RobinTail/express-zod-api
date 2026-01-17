@@ -99,7 +99,7 @@
     "node-forge": "^1.3.3",
     "snakify-ts": "^2.3.0",
     "typescript": "catalog:dev",
-    "undici": "^7.16.0",
+    "undici": "^7.18.2",
     "zod": "catalog:dev"
   },
   "keywords": [
