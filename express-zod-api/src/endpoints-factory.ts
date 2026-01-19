@@ -85,7 +85,7 @@ export class EndpointsFactory<
   >(middleware: Middleware<CTX, RET, ASCO, AIN>) {
     const factory = new EndpointsFactory<
       Extension<IN, AIN>,
-      CTX & RET,
+      (CTX extends EmptyObject ? RET : CTX) & RET,
       SCO & ASCO
     >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);
