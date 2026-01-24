@@ -7,6 +7,7 @@ export default defineConfig({
   inlineOnly: false,
   minify: true,
   attw: { profile: "esm-only", level: "error" },
+  external: ["express-serve-static-core"],
   define: {
     "process.env.TSDOWN_SELF": `"${manifest.name}"`, // used by localsID
     "process.env.TSDOWN_BUILD": `"v${manifest.version}"`, // @since v25.0.0 is pure ESM
