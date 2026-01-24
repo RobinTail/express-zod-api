@@ -4,6 +4,7 @@ import manifest from "./package.json" with { type: "json" };
 export default defineConfig({
   entry: "src/index.ts",
   fixedExtension: false,
+  inlineOnly: false,
   minify: true,
   attw: { profile: "esm-only", level: "error" },
   define: {
