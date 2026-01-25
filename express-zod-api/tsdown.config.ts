@@ -14,18 +14,15 @@ export default defineConfig({
       generateBundle: async (_opt, bundle) => {
         for (const [name, file] of Object.entries(bundle)) {
           if (name.endsWith(".d.ts") && "code" in file) {
-            // ensure newlines around jsdoc comments
-            file.code = file.code.replaceAll(
-              /(\/\*\*[^\r\n]*?\*\/)/g,
-              "\n$1\n",
+            file.code = await format(
+              file.code
+                .replaceAll(/(\/\*\*[^\r\n]*?\*\/)/g, "\n$1\n") // ensure newlines around jsdoc
+                .replaceAll(/\n\s*\n/g, "\n"), // rm double newlines
+              {
+                parser: "typescript", // ensure readable formatting
+                printWidth: 120,
+              },
             );
-            // rm double newlines
-            file.code = file.code.replaceAll(/\n\s*\n/g, "\n");
-            // ensure readable formatting
-            file.code = await format(file.code, {
-              parser: "typescript",
-              printWidth: 120,
-            });
           }
         }
       },
