@@ -15,7 +15,7 @@ describe("DTS", () => {
       "./node_modules/express-zod-api/node_modules/@express-zod-api/zod-plugin/dist/index.d.ts",
       "utf-8",
     );
-    expect(pluginDts).toMatch(`import './augmentation.js';`);
+    expect(pluginDts).toMatch(`import "./augmentation.js";`);
   });
 
   test("Augmentation must extend Zod", async () => {
