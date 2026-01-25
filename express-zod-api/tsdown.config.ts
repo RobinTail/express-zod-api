@@ -1,11 +1,14 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
+import humanReadableDtsPlugin from "dts-plugin";
 
 export default defineConfig({
   entry: "src/index.ts",
   fixedExtension: false,
   minify: true,
   attw: { profile: "esm-only", level: "error" },
+  external: ["express-serve-static-core", "qs"],
+  plugins: [humanReadableDtsPlugin()],
   define: {
     "process.env.TSDOWN_SELF": `"${manifest.name}"`, // used by localsID
     "process.env.TSDOWN_BUILD": `"v${manifest.version}"`, // @since v25.0.0 is pure ESM

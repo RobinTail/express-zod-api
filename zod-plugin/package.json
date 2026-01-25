@@ -47,6 +47,7 @@
   "devDependencies": {
     "@types/ramda": "catalog:dev",
     "camelize-ts": "catalog:dev",
+    "dts-plugin": "workspace:^",
     "typescript": "catalog:dev",
     "zod": "catalog:dev"
   },
