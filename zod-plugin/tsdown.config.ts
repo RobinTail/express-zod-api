@@ -1,5 +1,6 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
+import humanReadableDtsPlugin from "dts-plugin";
 
 export default defineConfig([
   {
@@ -7,6 +8,7 @@ export default defineConfig([
     fixedExtension: false,
     minify: true,
     attw: { profile: "esm-only", level: "error" },
+    plugins: [humanReadableDtsPlugin()],
     banner: {
       dts: "import './augmentation.js';",
     },
@@ -18,5 +20,6 @@ export default defineConfig([
     entry: "src/augmentation.ts",
     fixedExtension: false,
     dts: { emitDtsOnly: true },
+    plugins: [humanReadableDtsPlugin()],
   },
 ]);

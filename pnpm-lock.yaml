@@ -289,6 +289,9 @@ importers:
       '@typescript-eslint/rule-tester':
         specifier: catalog:dev
         version: 8.53.1(eslint@9.39.2)(typescript@5.9.3)
+      dts-plugin:
+        specifier: workspace:^
+        version: link:../dts-plugin
 
   zod-plugin:
     dependencies:
@@ -302,6 +305,9 @@ importers:
       camelize-ts:
         specifier: catalog:dev
         version: 3.0.0
+      dts-plugin:
+        specifier: workspace:^
+        version: link:../dts-plugin
       typescript:
         specifier: catalog:dev
         version: 5.9.3
