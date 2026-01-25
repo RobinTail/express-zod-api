@@ -1,7 +1,11 @@
 import type { z } from "zod";
-import { setBrand } from "./brand";
 import { remap } from "./remap";
-import { deprecationSetter, exampleSetter, labelSetter } from "./meta";
+import {
+  deprecationSetter,
+  exampleSetter,
+  labelSetter,
+  brandSetter,
+} from "./meta";
 import { getClasses, getPackages } from "./packages";
 
 // eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN
@@ -23,7 +27,7 @@ if (!(pluginFlag in globalThis)) {
         ["brand" satisfies keyof z.ZodType]: {
           set() {}, // this is required to override the existing method
           get() {
-            return setBrand.bind(this) as z.ZodType["brand"];
+            return brandSetter.bind(this) as z.ZodType["brand"];
           },
         },
       });

@@ -15,6 +15,7 @@ import { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 
 interface IntegrationParams {
+  typescript: typeof ts;
   routing: Routing;
   config: CommonConfig;
   /**
@@ -63,7 +64,7 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  readonly #program: ts.Node[] = [this.someOfType];
+  readonly #program: ts.Node[] = [this.makeSomeOfType()];
   readonly #aliases = new Map<object, ts.TypeAliasDeclaration>();
   #usage: Array<ts.Node | string> = [];
 
@@ -79,6 +80,7 @@ export class Integration extends IntegrationBase {
   }
 
   public constructor({
+    typescript,
     routing,
     config,
     brandHandling,
@@ -89,7 +91,7 @@ export class Integration extends IntegrationBase {
     noContent = z.undefined(),
     hasHeadMethod = true,
   }: IntegrationParams) {
-    super(serverUrl);
+    super(typescript, serverUrl);
     const commons = { makeAlias: this.#makeAlias.bind(this), api: this.api };
     const ctxIn = { brandHandling, ctx: { ...commons, isResponse: false } };
     const ctxOut = { brandHandling, ctx: { ...commons, isResponse: true } };
@@ -154,9 +156,9 @@ export class Integration extends IntegrationBase {
     this.#program.unshift(...this.#aliases.values());
     this.#program.push(
       this.makePathType(),
-      this.methodType,
+      this.makeMethodType(),
       ...this.makePublicInterfaces(),
-      this.requestType,
+      this.makeRequestType(),
     );
 
     if (variant === "types") return;
@@ -174,6 +176,13 @@ export class Integration extends IntegrationBase {
     this.#usage.push(
       ...this.makeUsageStatements(clientClassName, subscriptionClassName),
     );
+  }
+
+  public static async create(params: Omit<IntegrationParams, "typescript">) {
+    return new Integration({
+      ...params,
+      typescript: await loadPeer<typeof ts>("typescript"),
+    });
   }
 
   #printUsage(printerOptions?: ts.PrinterOptions) {
