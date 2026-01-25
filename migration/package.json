@@ -42,6 +42,7 @@
     "typescript-eslint": "^8.0.0"
   },
   "devDependencies": {
-    "@typescript-eslint/rule-tester": "catalog:dev"
+    "@typescript-eslint/rule-tester": "catalog:dev",
+    "dts-plugin": "workspace:^"
   }
 }
