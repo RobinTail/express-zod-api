@@ -1,6 +1,11 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
-import { format } from "prettier";
+import { format, type Options } from "prettier";
+
+const prettyOptions: Options = {
+  parser: "typescript",
+  printWidth: 120,
+};
 
 export default defineConfig({
   entry: "src/index.ts",
@@ -13,17 +18,13 @@ export default defineConfig({
       name: "human-readable-dts-rolldown-plugin",
       generateBundle: async (_opt, bundle) => {
         for (const [name, file] of Object.entries(bundle)) {
-          if (name.endsWith(".d.ts") && "code" in file) {
-            file.code = await format(
-              file.code
-                .replaceAll(/(\/\*\*[^\r\n]*?\*\/)/g, "\n$1\n") // ensure newlines around jsdoc
-                .replaceAll(/\n\s*\n/g, "\n"), // rm double newlines
-              {
-                parser: "typescript", // ensure readable formatting
-                printWidth: 120,
-              },
-            );
-          }
+          if (!(name.endsWith(".d.ts") && "code" in file)) continue;
+          file.code = await format(
+            file.code
+              .replaceAll(/(\/\*\*[^\r\n]*?\*\/)/g, "\n$1\n") // ensure newlines around jsdoc
+              .replaceAll(/\n\s*\n/g, "\n"), // rm double newlines
+            prettyOptions,
+          );
         }
       },
     },
