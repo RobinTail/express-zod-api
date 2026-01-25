@@ -96,6 +96,7 @@
     "compression": "catalog:dev",
     "cors": "^2.8.5",
     "depd": "^2.0.0",
+    "dts-plugin": "workspace:^",
     "express": "catalog:dev",
     "express-fileupload": "catalog:dev",
     "http-errors": "catalog:dev",
