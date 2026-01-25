@@ -5,8 +5,13 @@
   "version": "0.1.0",
   "author": "Anna Bocharova",
   "type": "module",
-  "main": "./index.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc"
+  },
   "devDependencies": {
-    "rolldown": "^1.0.0-rc.1"
+    "rolldown": "^1.0.0-rc.1",
+    "typescript": "catalog:dev"
   }
 }

@@ -147,6 +147,9 @@ importers:
       rolldown:
         specifier: ^1.0.0-rc.1
         version: 1.0.0-rc.1
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
 
   esm-test:
     devDependencies:
