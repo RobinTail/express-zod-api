@@ -295,6 +295,9 @@ importers:
       dts-plugin:
         specifier: workspace:^
         version: link:../dts-plugin
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
 
   zod-plugin:
     dependencies:
