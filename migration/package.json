@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@typescript-eslint/rule-tester": "catalog:dev",
-    "dts-plugin": "workspace:^"
+    "dts-plugin": "workspace:^",
+    "typescript": "catalog:dev"
   }
 }
