@@ -1,4 +1,5 @@
 import { globalRegistry, type z } from "zod";
+import { brandProperty } from "./brand";
 
 export const exampleSetter = function (
   this: z.ZodType,
@@ -15,4 +16,8 @@ export const deprecationSetter = function (this: z.ZodType) {
 
 export const labelSetter = function (this: z.ZodDefault, defaultLabel: string) {
   return this.meta({ default: defaultLabel });
+};
+
+export const brandSetter = function (this: z.ZodType, brand?: PropertyKey) {
+  return this.meta({ [brandProperty]: brand });
 };
