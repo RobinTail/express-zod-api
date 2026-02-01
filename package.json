@@ -16,7 +16,7 @@
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.2",
     "@tsconfig/node20": "^20.1.8",
-    "@types/node": "^24.10.4",
+    "@types/node": "^24.10.9",
     "@vitest/coverage-v8": "^4.0.16",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
