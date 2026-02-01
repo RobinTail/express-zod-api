@@ -1,7 +1,6 @@
 import { createRequire } from "node:module";
 import camelize from "camelize-ts";
 import { z as zESM } from "zod";
-import { getBrand } from "../src";
 
 const { z: zCJS } = createRequire(import.meta.url)("zod");
 
@@ -70,19 +69,25 @@ describe.each<{ variant: string; z: typeof zESM }>([
 
   describe(".brand()", () => {
     test("should set the brand", () => {
-      expect(getBrand(z.string().brand("test"))).toBe("test");
+      const subject = z.string().brand("test");
+      expect(subject.meta()).toEqual({ "x-brand": "test" });
     });
 
     test("should withstand refinements", () => {
       const schema = z.string();
       const schemaWithMeta = schema.brand("test");
-      expect(getBrand(schemaWithMeta)).toBe("test");
-      expect(getBrand(schemaWithMeta.regex(/@example.com$/))).toBe("test");
+      expect(schemaWithMeta.meta()).toEqual({ "x-brand": "test" });
+      expect(schemaWithMeta.regex(/@example.com$/).meta()).toEqual({
+        "x-brand": "test",
+      });
     });
 
     test("should withstand describing", () => {
       const schema = z.string().brand("test").describe("something");
-      expect(getBrand(schema)).toBe("test");
+      expect(schema.meta()).toEqual({
+        "x-brand": "test",
+        description: "something",
+      });
     });
   });
 
