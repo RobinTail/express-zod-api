@@ -9,7 +9,8 @@
 - The `typescript` dependency is now optional and only required for making `Integration`:
   - Either import and assign the `typescript` property to its constructor argument;
   - Or use the new static async method `create()` to delegate the import;
-  - This change addresses the memory consumption issue fixed previously in v26.1.0, but with proper ESM handling.
+  - This change addresses the memory consumption issue fixed previously in v26.1.0, but with proper ESM handling;
+- Consider [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff
   /** Option 1: import and assign */
