@@ -11,6 +11,10 @@
 
 ## Version 3
 
+### v3.0.1
+
+- Improved readability of the types declaration in the bundle;
+
 ### v3.0.0
 
 - Supported `zod` versions: `^4.1.13`;

@@ -36,6 +36,10 @@
 
 ## Version 26
 
+### v26.3.2
+
+- Improved readability of the types declaration in the bundle;
+
 ### v26.3.1
 
 - Fixed the type of `ctx` for Endpoints built on factories having at least one Middleware:
