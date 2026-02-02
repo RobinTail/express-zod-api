@@ -1,6 +1,45 @@
 # Changelog
 
+## Version 27
+
+### v27.0.0
+
+- Supported `zod` versions: `^4.3.4`;
+- The new version of Zod Plugin utilizes the inheritable metadata feature of Zod 4.3;
+- The `typescript` dependency is now optional and only required for making `Integration`:
+  - Either import and assign the `typescript` property to its constructor argument;
+  - Or use the new static async method `create()` to delegate the import;
+  - This change addresses the memory consumption issue fixed previously in v26.1.0, but with proper ESM handling;
+- Consider [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
+
+```diff
+  /** Option 1: import and assign */
+  import { Integration } from "express-zod-api";
++ import typescript from "typescript";
+
+  const client = new Integration({
+    routing,
+    config,
++   typescript,
+  });
+```
+
+```diff
+  /** Option 2: delegate asynchronously */
+  import { Integration } from "express-zod-api";
+
+- const client = new Integration({
++ const client = await Integration.create({
+    routing,
+    config,
+  });
+```
+
 ## Version 26
+
+### v26.3.2
+
+- Improved readability of the types declaration in the bundle;
 
 ### v26.3.1
 
