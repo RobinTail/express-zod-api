@@ -2,10 +2,14 @@
 
 ## Version 27
 
+### v27.0.1
+
+- Removed debug-level comments from the declaration files in the distribution.
+
 ### v27.0.0
 
 - Supported `zod` versions: `^4.3.4`;
-- The new version of Zod Plugin utilizes the inheritable metadata feature of Zod 4.3;
+- The new version of Zod Plugin uses the inheritable metadata feature of Zod 4.3;
 - The `typescript` dependency is now optional and only required for making `Integration`:
   - Either import and assign the `typescript` property to its constructor argument;
   - Or use the new static async method `create()` to delegate the import;
