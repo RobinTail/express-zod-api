@@ -2,12 +2,16 @@
 
 ## Version 4
 
+### v4.0.1
+
+- Removed debug-level comments from the declaration files in the distribution.
+
 ### v4.0.0
 
 - Supported `zod` versions: `^4.3.4`;
 - Zod made metadata inheritable, so that `pack()` and `unpack()` are removed;
   - Use the `.meta()` method of a schema instead of both helpers;
-- Runtime distinguishable brand is now stored along with other metadata.
+- Runtime-distinguishable brand is now stored along with other metadata.
 
 ## Version 3
 
