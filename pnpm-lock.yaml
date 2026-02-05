@@ -145,7 +145,7 @@ importers:
   dts-plugin:
     devDependencies:
       rolldown:
-        specifier: ^1.0.0-rc.1
+        specifier: ^1.0.0-rc.3
         version: 1.0.0-rc.3
       typescript:
         specifier: catalog:dev
