@@ -1,4 +1,3 @@
-import { getBrand } from "@express-zod-api/zod-plugin";
 import type { NewPlugin } from "@vitest/pretty-format";
 import { z } from "zod";
 import { ResultHandlerError } from "./src/errors";
@@ -23,13 +22,7 @@ const errorSerializer: NewPlugin = {
 const schemaSerializer: NewPlugin = {
   test: (subject) => subject instanceof z.ZodType,
   serialize: (entity: z.ZodType, config, indentation, depth, refs, printer) => {
-    const serialization = z.toJSONSchema(entity, {
-      unrepresentable: "any",
-      override: ({ zodSchema, jsonSchema }) => {
-        if (zodSchema._zod.def.type === "custom")
-          jsonSchema["x-brand"] = getBrand(zodSchema);
-      },
-    });
+    const serialization = z.toJSONSchema(entity, { unrepresentable: "any" });
     return printer(serialization, config, indentation, depth, refs);
   },
 };

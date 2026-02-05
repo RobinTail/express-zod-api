@@ -38,9 +38,11 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Install dependencies
         run: pnpm install
+      - name: Build everything
+        # the local DTS plugin is required for building bundles
+        # @todo remove when no longer required
+        run: pnpm build
       - name: Publish ${{inputs.workspace}} with ${{ inputs.tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_KEY}}
         run: |
           pnpm -F ${{inputs.workspace}} exec \
             pnpm publish --provenance --tag ${{ inputs.tag }}

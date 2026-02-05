@@ -15,6 +15,7 @@ export default (): Plugin => ({
       file.code = await format(
         file.code
           .replaceAll(/(\/\*\*[^\r\n]*?\*\/)/g, "\n$1\n") // ensure newlines around jsdoc
+          .replaceAll(/^\/\/#(end)?region[^\r\n]*/gm, "") // rm rolldown comments
           .replaceAll(/\n\s*\n/g, "\n"), // rm double newlines
         prettyOptions,
       );

@@ -13,12 +13,12 @@ This module extends Zod functionality when it's imported:
 - Adds `.remap()` method to `ZodObject` for renaming object properties:
   - Supports a mapping object or an object transforming function as an argument;
   - Relies on `R.renameKeys()` from the `ramda` library;
-- Alters the `.brand()` method on all Zod schemas by making the assigned brand available in runtime:
-  - The brand set this way will withstand refinements, unlike the metadata set by `.meta()`.
+- Alters the `.brand()` method on all Zod schemas:
+  - shorthand for `.meta({ "x-brand": ... })` making the brand available in runtime via `getBrand()` helper;
 
 ## Requirements
 
-- Zod `^4.1.13`
+- Zod `^4.3.4`
 
 ## Basic usage
 
@@ -29,11 +29,9 @@ import { getBrand } from "@express-zod-api/zod-plugin";
 const schema = z.string().example("test").example("another").brand("custom");
 
 getBrand(schema); // "custom"
-schema.meta(); // { examples: ["test", "another"] }
+schema.meta(); // { examples: ["test", "another"], "x-brand": "custom" }
 ```
 
 ## Helpers
 
-- `getBrand()` — retrieves the brand from the schema that was set by its `.brand()` method;
-- `pack()` — returns a cloned schema having inheritable attributes assigned (such as brand);
-- `unpack()` — retrieves the attributes from the schema that was set by `pack()` helper.
+- `getBrand()` — retrieves the brand from the schema that was set by its `.brand()` method.

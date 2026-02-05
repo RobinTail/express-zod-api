@@ -10,25 +10,13 @@ type NamedProp = TSESTree.PropertyNonComputedName & {
 };
 
 interface Queries {
-  dependsOnMethod: TSESTree.NewExpression;
-  handlerOptions: TSESTree.Property;
-  addOptions: TSESTree.Identifier;
-  testMiddlewareOptions: TSESTree.Property;
+  integration: TSESTree.ObjectExpression;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  dependsOnMethod: `${NT.NewExpression}[callee.name='DependsOnMethod']`,
-  handlerOptions:
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='handler'] > ` +
-    `${NT.ArrowFunctionExpression} > ${NT.ObjectPattern} > ${NT.Property}[key.name='options']`,
-  addOptions:
-    `${NT.CallExpression}:has( ${NT.ArrowFunctionExpression} ) > ` +
-    `${NT.MemberExpression} > ${NT.Identifier}[name='addOptions']`,
-  testMiddlewareOptions:
-    `${NT.CallExpression}[callee.name='testMiddleware'] > ` +
-    `${NT.ObjectExpression} > ${NT.Property}[key.name='options']`,
+  integration: `${NT.NewExpression}[callee.name="Integration"] > ${NT.ObjectExpression}`,
 };
 
 const isNamedProp = (prop: TSESTree.ObjectLiteralElement): prop is NamedProp =>
@@ -53,7 +41,6 @@ const listen = <
     {},
   );
 
-// eslint-disable-next-line no-restricted-syntax -- substituted by TSDOWN and vitest
 const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0] ?? "0"}`; // fail-safe for bumpp
 
 const theRule = ESLintUtils.RuleCreator.withoutDocs({
@@ -72,89 +59,55 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
   defaultOptions: [],
   create: (ctx) =>
     listen({
-      dependsOnMethod: (node) => {
-        if (node.arguments.length !== 1) return;
-        const argument = node.arguments[0];
-        if (argument.type !== NT.ObjectExpression) return;
-        let isDeprecated = false;
-        let nested: TSESTree.ObjectExpression | undefined = undefined;
-        let cursor: TSESTree.Node = node;
-        while (
-          cursor &&
-          cursor.parent &&
-          cursor.parent.type === NT.MemberExpression &&
-          cursor.parent.property.type === NT.Identifier &&
-          cursor.parent.parent &&
-          cursor.parent.parent.type === NT.CallExpression
-        ) {
-          const name = cursor.parent.property.name;
-          const call = cursor.parent.parent as TSESTree.CallExpression;
-          if (name === "deprecated") isDeprecated = true;
-          if (
-            name === "nest" &&
-            call.arguments[0] &&
-            call.arguments[0].type === NT.ObjectExpression
-          )
-            nested = call.arguments[0];
-          cursor = call;
-        }
-        ctx.report({
-          node: cursor,
-          messageId: "change",
-          data: {
-            subject: "value",
-            from: "new DependsOnMethod(...)",
-            to: "its argument",
-          },
-          fix: (fixer) => {
-            const makeMapper =
-              (feat?: "deprecated" | "nest") =>
-              (prop: TSESTree.ObjectLiteralElement) =>
-                isNamedProp(prop)
-                  ? `${feat === "nest" ? ctx.sourceCode.getText(prop.key) : getPropName(prop)}: ${ctx.sourceCode.getText(prop.value)}${feat === "deprecated" ? ".deprecated()" : ""},`
-                  : `${ctx.sourceCode.getText(prop)}, /** @todo migrate manually */`;
-            const nextProps = argument.properties
-              .map(makeMapper(isDeprecated ? "deprecated" : undefined))
-              .concat(nested?.properties.map(makeMapper("nest")) ?? [])
-              .join("\n");
-            return fixer.replaceText(cursor, `{\n${nextProps}\n}`);
-          },
-        });
-      },
-      handlerOptions: (node) => {
-        ctx.report({
-          node,
-          messageId: "change",
-          data: { subject: "property", from: "options", to: "ctx" },
-          fix: (fixer) => fixer.replaceText(node.key, "ctx"),
-        });
-        const scope = ctx.sourceCode.getScope(node);
-        const variable = scope.variables.find((one) => one.name === "options");
-        if (!variable) return;
-        for (const ref of variable.references) {
-          ctx.report({
-            node: ref.identifier,
-            messageId: "change",
-            data: { subject: "const", from: ref.identifier.name, to: "ctx" },
-            fix: (fixer) => fixer.replaceText(ref.identifier, "ctx"),
-          });
-        }
-      },
-      addOptions: (node) => {
-        ctx.report({
-          node,
-          messageId: "change",
-          data: { subject: "method", from: "addOptions", to: "addContext" },
-          fix: (fixer) => fixer.replaceText(node, "addContext"),
-        });
-      },
-      testMiddlewareOptions: (node) => {
-        ctx.report({
-          node,
-          messageId: "change",
-          data: { subject: "property", from: "options", to: "ctx" },
-          fix: (fixer) => fixer.replaceText(node.key, "ctx"),
-        });
+      integration: (node) => {
+        const tsProp = node.properties
+          .filter(isNamedProp)
+          .find((one) => getPropName(one) === "typescript");
+        if (tsProp) return;
+        const hasAsyncCtx = ctx.sourceCode
+          .getAncestors(node)
+          .some(
+            (one) =>
+              one.type === NT.AwaitExpression ||
+              ((one.type === NT.ArrowFunctionExpression ||
+                one.type === NT.FunctionExpression ||
+                one.type === NT.FunctionDeclaration) &&
+                one.async),
+          );
+        ctx.report(
+          hasAsyncCtx
+            ? {
+                node: node.parent,
+                messageId: "change",
+                data: {
+                  subject: "constructor",
+                  from: "new Integration()",
+                  to: "await Integration.create()",
+                },
+                fix: (fixer) =>
+                  fixer.replaceText(
+                    node.parent,
+                    `(await Integration.create(${ctx.sourceCode.getText(node)}))`,
+                  ),
+              }
+            : {
+                node: node,
+                messageId: "add",
+                data: {
+                  subject: "typescript property",
+                  to: "constructor argument",
+                },
+                fix: (fixer) => [
+                  fixer.insertTextBeforeRange(
+                    ctx.sourceCode.ast.range,
+                    `import typescript from "typescript";\n\n`,
+                  ),
+                  node.properties.length
+                    ? fixer.insertTextBefore(node.properties[0], "typescript, ")
+                    : fixer.replaceText(node, `{ typescript }`),
+                ],
+              },
+        );
       },
     }),
 });
