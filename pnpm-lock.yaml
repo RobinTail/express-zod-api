@@ -22,7 +22,7 @@ catalogs:
       specifier: ^0.31.1
       version: 0.31.1
     '@typescript-eslint/rule-tester':
-      specifier: ^8.51.0
+      specifier: ^8.54.0
       version: 8.54.0
     camelize-ts:
       specifier: ^3.0.0
@@ -43,7 +43,7 @@ catalogs:
       specifier: ^5.9.3
       version: 5.9.3
     typescript-eslint:
-      specifier: ^8.51.0
+      specifier: ^8.54.0
       version: 8.54.0
     zod:
       specifier: ^4.3.4
