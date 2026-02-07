@@ -11,7 +11,7 @@ packages:
 onlyBuiltDependencies:
   - esbuild
 gitChecks: false
-engineStrict: false # todo set back to true
+engineStrict: true
 autoInstallPeers: false
 minimumReleaseAge: 2880 # 2 days
 minimumReleaseAgeExclude:
