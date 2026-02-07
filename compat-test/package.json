@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@express-zod-api/migration": "workspace:*",
-    "eslint": "npm:eslint@9.0.0",
+    "eslint": "npm:eslint@10.0.0",
     "express": "npm:express@5.1.0",
     "express-zod-api": "workspace:*",
     "http-errors": "npm:http-errors@2.0.1",
