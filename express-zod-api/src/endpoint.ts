@@ -296,7 +296,7 @@ export class Endpoint<
   }) {
     const method = getActualMethod(request);
     const ctx: Partial<CTX> = {};
-    let result: DiscriminatedResult = { output: {}, error: null };
+    let result: DiscriminatedResult;
     const input = getInput(request, config.inputSources);
     try {
       await this.#runMiddlewares({
