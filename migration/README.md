@@ -4,8 +4,8 @@ ESLint plugin for migrating Express Zod API to its next major version.
 
 ## Requirements
 
-- `eslint` v10;
-- `typescript-eslint` v8.
+- `eslint@^10.0.0`;
+- `typescript-eslint@^8.56.0`
 
 ## Usage
 
