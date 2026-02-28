@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 5
+
+### v5.0.0
+
+- Supported Node.js versions: `^20.19.0 || ^22.13.0 || ^24.0.0`;
+
 ## Version 4
 
 ### v4.0.1
