@@ -13,7 +13,7 @@ describe("Example", async () => {
     out += chunk.toString();
   };
   const matchOut = (regExp: RegExp) => regExp.test(out);
-  const example = spawn("tsx", ["index.ts"]);
+  const example = spawn("unrun", ["index.ts"]);
   example.stdout.on("data", listener);
   const port = givePort("example");
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });

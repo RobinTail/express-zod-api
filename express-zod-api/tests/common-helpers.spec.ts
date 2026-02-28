@@ -321,7 +321,7 @@ describe("Common Helpers", () => {
       [Symbol("symbol"), "Symbol(symbol)"],
       [true, "true"],
       [false, "false"],
-      [() => {}, "() => {\n      }"],
+      [() => {}, "() => {}"],
       [/regexp/is, "/regexp/is"],
       [[1, 2, 3], "1,2,3"],
     ])("should accept %#", (argument, expected) => {
