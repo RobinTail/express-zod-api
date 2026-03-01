@@ -11,7 +11,7 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "rolldown": "^1.0.0-rc.3",
+    "rolldown": "1.0.0-rc.6",
     "typescript": "catalog:dev"
   }
 }
