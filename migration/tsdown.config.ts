@@ -6,7 +6,9 @@ export default defineConfig({
   entry: "index.ts",
   fixedExtension: false,
   minify: true,
-  skipNodeModulesBundle: true,
+  deps: {
+    skipNodeModulesBundle: true,
+  },
   attw: { profile: "esm-only", level: "error" },
   plugins: [humanReadableDtsPlugin()],
   define: {
