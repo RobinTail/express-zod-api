@@ -62,6 +62,7 @@ exports[`Index Entrypoint > exports > ez should have certain value 1`] = `
   "dateIn": [Function],
   "dateOut": [Function],
   "form": [Function],
+  "paginated": [Function],
   "raw": [Function],
   "upload": [Function],
 }
