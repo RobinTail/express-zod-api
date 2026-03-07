@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 28
+
+### v28.0.0
+
+- Supported Node.js versions: `^22.18.0 || ^24.0.0`;
+
 ## Version 27
 
 ### v27.0.1
