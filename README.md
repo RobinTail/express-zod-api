@@ -636,7 +636,7 @@ const listUsers = defaultEndpointsFactory.build({
   output: pagination.output,
   handler: async ({ input: { limit, offset } }) => {
     const { users, total } = await db.getUsers(limit, offset);
-    return { users, total, limit, offset }; // or nextCursor
+    return { users, total, limit, offset }; // or { users, nextCursor, limit } for cursor pagination
   },
 });
 ```
