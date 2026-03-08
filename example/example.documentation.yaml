@@ -398,20 +398,20 @@ paths:
         - name: limit
           in: query
           required: false
-          description: Page size (number of items per page)
+          description: Page size (number of users per page)
           schema:
             default: 20
-            description: Page size (number of items per page)
+            description: Page size (number of users per page)
             type: integer
             minimum: 1
             maximum: 100
         - name: offset
           in: query
           required: false
-          description: Number of items to skip
+          description: Number of users to skip
           schema:
             default: 0
-            description: Number of items to skip
+            description: Number of users to skip
             type: integer
             minimum: 0
             maximum: 9007199254740991
@@ -442,7 +442,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      items:
+                      users:
                         type: array
                         items:
                           type: object
@@ -459,7 +459,7 @@ paths:
                             - name
                             - role
                           additionalProperties: false
-                        description: Page of items
+                        description: Page of users
                       total:
                         type: integer
                         minimum: 0
@@ -476,7 +476,7 @@ paths:
                         maximum: 9007199254740991
                         description: Offset used
                     required:
-                      - items
+                      - users
                       - total
                       - limit
                       - offset
@@ -524,20 +524,20 @@ paths:
         - name: limit
           in: query
           required: false
-          description: Page size (number of items per page)
+          description: Page size (number of users per page)
           schema:
             default: 20
-            description: Page size (number of items per page)
+            description: Page size (number of users per page)
             type: integer
             minimum: 1
             maximum: 100
         - name: offset
           in: query
           required: false
-          description: Number of items to skip
+          description: Number of users to skip
           schema:
             default: 0
-            description: Number of items to skip
+            description: Number of users to skip
             type: integer
             minimum: 0
             maximum: 9007199254740991

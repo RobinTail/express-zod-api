@@ -2,11 +2,20 @@ import { z } from "zod";
 
 const DEFAULT_MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 20;
+const DEFAULT_ITEMS_NAME = "items" as const;
 
 /** @desc Common pagination config: shared by offset and cursor styles. */
-interface CommonPaginationConfig<T extends z.ZodType = z.ZodType> {
+interface CommonPaginationConfig<
+  T extends z.ZodType = z.ZodType,
+  K extends string = typeof DEFAULT_ITEMS_NAME,
+> {
   /** @desc Zod schema for each item in the paginated list. */
   itemSchema: T;
+  /**
+   * @desc The name of the property containing the list of items.
+   * @default "items"
+   * */
+  itemsName?: K;
   /**
    * @desc Maximum allowed page size (client request is capped to this).
    * @default 100
@@ -25,7 +34,8 @@ interface CommonPaginationConfig<T extends z.ZodType = z.ZodType> {
  */
 interface OffsetPaginatedConfig<
   T extends z.ZodType = z.ZodType,
-> extends CommonPaginationConfig<T> {
+  K extends string = typeof DEFAULT_ITEMS_NAME,
+> extends CommonPaginationConfig<T, K> {
   /** @desc Discriminator for offset-style pagination. */
   style: "offset";
 }
@@ -36,7 +46,8 @@ interface OffsetPaginatedConfig<
  */
 interface CursorPaginatedConfig<
   T extends z.ZodType = z.ZodType,
-> extends CommonPaginationConfig<T> {
+  K extends string = typeof DEFAULT_ITEMS_NAME,
+> extends CommonPaginationConfig<T, K> {
   /** @desc Discriminator for cursor-style pagination. */
   style: "cursor";
 }
@@ -58,41 +69,53 @@ type CursorInput = z.ZodObject<{
 }>;
 
 /** @desc Response shape for offset pagination. */
-type OffsetOutput<T extends z.ZodType> = z.ZodObject<{
-  /** @desc Page of items for the current request. */
-  items: z.ZodArray<T>;
-  /** @desc Total number of items across all pages. */
-  total: z.ZodNumber;
-  /** @desc Page size used for this response. */
-  limit: z.ZodNumber;
-  /** @desc Offset used for this response. */
-  offset: z.ZodNumber;
-}>;
+type OffsetOutput<T extends z.ZodType, K extends string> = z.ZodObject<
+  {
+    /** @desc Page of items for the current request. */
+    [ITEMS in K]: z.ZodArray<T>;
+  } & {
+    /** @desc Total number of items across all pages. */
+    total: z.ZodNumber;
+    /** @desc Page size used for this response. */
+    limit: z.ZodNumber;
+    /** @desc Offset used for this response. */
+    offset: z.ZodNumber;
+  }
+>;
 
 /** @desc Response shape for cursor pagination. */
-type CursorOutput<T extends z.ZodType> = z.ZodObject<{
-  /** @desc Page of items for the current request. */
-  items: z.ZodArray<T>;
-  /** @desc Cursor for the next page, or null if there are no more pages. */
-  nextCursor: z.ZodNullable<z.ZodString>;
-  /** @desc Page size used for this response. */
-  limit: z.ZodNumber;
-}>;
+type CursorOutput<T extends z.ZodType, K extends string> = z.ZodObject<
+  {
+    /** @desc Page of items for the current request. */
+    [ITEMS in K]: z.ZodArray<T>;
+  } & {
+    /** @desc Cursor for the next page, or null if there are no more pages. */
+    nextCursor: z.ZodNullable<z.ZodString>;
+    /** @desc Page size used for this response. */
+    limit: z.ZodNumber;
+  }
+>;
 
 /** @desc Return type of ez.paginated() for offset style. */
-interface OffsetPaginatedResult<T extends z.ZodType = z.ZodType> {
+interface OffsetPaginatedResult<
+  T extends z.ZodType = z.ZodType,
+  K extends string = typeof DEFAULT_ITEMS_NAME,
+> {
   /** @desc Zod schema for offset pagination request params. */
   input: OffsetInput;
   /** @desc Zod schema for offset pagination response. */
-  output: OffsetOutput<T>;
+  output: OffsetOutput<T, K>;
 }
 
 /** @desc Return type of ez.paginated() for cursor style. */
-interface CursorPaginatedResult<T extends z.ZodType = z.ZodType> {
+interface CursorPaginatedResult<
+  T extends z.ZodType = z.ZodType,
+  K extends string = typeof DEFAULT_ITEMS_NAME,
+> {
   /** @desc Zod schema for cursor pagination request params. */
   input: CursorInput;
   /** @desc Zod schema for cursor pagination response. */
-  output: CursorOutput<T>;
+  output: CursorOutput<T, K>;
 }
 
 /**
@@ -108,15 +131,18 @@ interface CursorPaginatedResult<T extends z.ZodType = z.ZodType> {
  * endpoint.input = pagination.input.and(z.object({ ... }));
  * endpoint.output = pagination.output;
  */
-export function paginated<T extends z.ZodType>(
-  config: OffsetPaginatedConfig<T>,
-): OffsetPaginatedResult<T>;
-export function paginated<T extends z.ZodType>(
-  config: CursorPaginatedConfig<T>,
-): CursorPaginatedResult<T>;
+export function paginated<
+  T extends z.ZodType,
+  K extends string = typeof DEFAULT_ITEMS_NAME,
+>(config: OffsetPaginatedConfig<T, K>): OffsetPaginatedResult<T, K>;
+export function paginated<
+  T extends z.ZodType,
+  K extends string = typeof DEFAULT_ITEMS_NAME,
+>(config: CursorPaginatedConfig<T, K>): CursorPaginatedResult<T, K>;
 export function paginated({
   style,
   itemSchema,
+  itemsName = DEFAULT_ITEMS_NAME,
   maxLimit = DEFAULT_MAX_LIMIT,
   defaultLimit = DEFAULT_LIMIT,
 }: OffsetPaginatedConfig | CursorPaginatedConfig):
@@ -128,7 +154,7 @@ export function paginated({
     .min(1)
     .max(maxLimit)
     .default(defaultLimit)
-    .describe("Page size (number of items per page)");
+    .describe(`Page size (number of ${itemsName} per page)`);
 
   if (style === "offset") {
     const offsetSchema = z.coerce
@@ -136,7 +162,7 @@ export function paginated({
       .int()
       .min(0)
       .default(0)
-      .describe("Number of items to skip");
+      .describe(`Number of ${itemsName} to skip`);
 
     const input = z.object({
       limit: limitSchema,
@@ -144,7 +170,7 @@ export function paginated({
     });
 
     const output = z.object({
-      items: z.array(itemSchema).describe("Page of items"),
+      [itemsName]: z.array(itemSchema).describe(`Page of ${itemsName}`),
       total: z.number().int().min(0).describe("Total number of items"),
       limit: z.number().int().min(1).describe("Page size used"),
       offset: z.number().int().min(0).describe("Offset used"),
@@ -165,7 +191,7 @@ export function paginated({
   });
 
   const output = z.object({
-    items: z.array(itemSchema).describe("Page of items"),
+    [itemsName]: z.array(itemSchema).describe(`Page of ${itemsName}`),
     nextCursor: z
       .string()
       .nullable()

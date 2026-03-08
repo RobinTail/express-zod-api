@@ -139,7 +139,10 @@ exports[`Example > Positive > Should handle valid GET request 1`] = `
 exports[`Example > Positive > Should respond with paginated list (ez.paginated) 1`] = `
 {
   "data": {
-    "items": [
+    "limit": 20,
+    "offset": 0,
+    "total": 8,
+    "users": [
       {
         "name": "Maria Merian",
         "role": "manager",
@@ -173,9 +176,6 @@ exports[`Example > Positive > Should respond with paginated list (ez.paginated) 
         "role": "operator",
       },
     ],
-    "limit": 20,
-    "offset": 0,
-    "total": 8,
   },
   "status": "success",
 }

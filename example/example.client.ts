@@ -162,9 +162,9 @@ interface PostV1UserCreateNegativeResponseVariants {
 
 /** get /v1/user/list */
 type GetV1UserListInput = {
-  /** Page size (number of items per page) */
+  /** Page size (number of users per page) */
   limit?: number | undefined;
-  /** Number of items to skip */
+  /** Number of users to skip */
   offset?: number | undefined;
   /** Filter by roles; omit for all */
   roles?: ("manager" | "operator" | "admin")[] | undefined;
@@ -174,8 +174,8 @@ type GetV1UserListInput = {
 type GetV1UserListPositiveVariant1 = {
   status: "success";
   data: {
-    /** Page of items */
-    items: {
+    /** Page of users */
+    users: {
       name: string;
       role: "manager" | "operator" | "admin";
     }[];
@@ -208,9 +208,9 @@ interface GetV1UserListNegativeResponseVariants {
 
 /** head /v1/user/list */
 type HeadV1UserListInput = {
-  /** Page size (number of items per page) */
+  /** Page size (number of users per page) */
   limit?: number | undefined;
-  /** Number of items to skip */
+  /** Number of users to skip */
   offset?: number | undefined;
   /** Filter by roles; omit for all */
   roles?: ("manager" | "operator" | "admin")[] | undefined;

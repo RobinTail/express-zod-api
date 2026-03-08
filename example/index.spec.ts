@@ -121,12 +121,12 @@ describe("Example", async () => {
       );
       expect(response.status).toBe(200);
       const json = (await response.json()) as {
-        data?: { items?: Array<{ role: string }> };
+        data?: { users?: Array<{ role: string }> };
       };
-      const items = json.data?.items;
-      if (!Array.isArray(items)) fail("response.data.items should be an array");
+      const users = json.data?.users;
+      if (!Array.isArray(users)) fail("response.data.users should be an array");
       expect(
-        items.every((one: { role: string }) =>
+        users.every((one: { role: string }) =>
           ["admin", "operator"].includes(one.role),
         ),
       ).toBeTruthy();

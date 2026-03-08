@@ -11,6 +11,7 @@ const userSchema = z.object({
 const paginatedUsers = ez.paginated({
   style: "offset",
   itemSchema: userSchema,
+  itemsName: "users",
   maxLimit: 100,
   defaultLimit: 20,
 });
@@ -49,7 +50,7 @@ export const listUsersEndpoint = defaultEndpointsFactory.build({
       ? users.filter(({ role }) => roles.includes(role))
       : users;
     const total = filtered.length;
-    const items = filtered.slice(offset, offset + limit);
-    return { items, total, limit, offset };
+    const page = filtered.slice(offset, offset + limit);
+    return { users: page, total, limit, offset };
   },
 });

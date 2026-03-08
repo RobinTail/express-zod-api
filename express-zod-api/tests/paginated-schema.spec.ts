@@ -80,7 +80,7 @@ describe("ez.paginated()", () => {
       const outputSchema = pagination.output;
 
       test("parses valid offset response", () => {
-        const result = outputSchema.safeParse({
+        const payload = {
           items: [
             { id: 1, name: "Alice" },
             { id: 2, name: "Bob" },
@@ -88,9 +88,15 @@ describe("ez.paginated()", () => {
           total: 42,
           limit: 10,
           offset: 0,
-        });
+        };
+        const result = outputSchema.safeParse(payload);
         expect(result.success).toBe(true);
         if (result.success) {
+          expectTypeOf(result.data).toMatchTypeOf<
+            z.input<typeof outputSchema>
+          >();
+          expect(result.data).toHaveProperty("items");
+          expect(result.data.items).toEqual(payload.items);
           expect(result.data.items).toHaveLength(2);
           expect(result.data.total).toBe(42);
           expect(result.data.limit).toBe(10);
@@ -151,13 +157,19 @@ describe("ez.paginated()", () => {
       const outputSchema = pagination.output;
 
       test("parses valid cursor response", () => {
-        const result = outputSchema.safeParse({
+        const payload = {
           items: [{ id: 1, title: "First" }],
           nextCursor: "next_page_token",
           limit: 20,
-        });
+        };
+        const result = outputSchema.safeParse(payload);
         expect(result.success).toBe(true);
         if (result.success) {
+          expectTypeOf(result.data).toMatchTypeOf<
+            z.input<typeof outputSchema>
+          >();
+          expect(result.data).toHaveProperty("items");
+          expect(result.data.items).toEqual(payload.items);
           expect(result.data.items).toHaveLength(1);
           expect(result.data.nextCursor).toBe("next_page_token");
           expect(result.data.limit).toBe(20);
@@ -172,6 +184,55 @@ describe("ez.paginated()", () => {
         });
         expect(result.success).toBe(true);
       });
+    });
+  });
+
+  describe("custom itemsName", () => {
+    test("output uses custom key for items array (offset and cursor)", () => {
+      const offsetPagination = ez.paginated({
+        style: "offset",
+        itemSchema: userSchema,
+        itemsName: "users",
+        maxLimit: 100,
+        defaultLimit: 20,
+      });
+      const offsetResult = offsetPagination.output.safeParse({
+        users: [{ id: 1, name: "Alice" }],
+        total: 1,
+        limit: 20,
+        offset: 0,
+      });
+      expect(offsetResult.success).toBe(true);
+      if (offsetResult.success) {
+        expectTypeOf(offsetResult.data).toMatchTypeOf<
+          z.input<typeof offsetPagination.output>
+        >();
+        expect(offsetResult.data).toHaveProperty("users");
+        expect(offsetResult.data.users).toEqual([{ id: 1, name: "Alice" }]);
+        expect(offsetResult.data).not.toHaveProperty("items");
+      }
+
+      const cursorPagination = ez.paginated({
+        style: "cursor",
+        itemSchema: userSchema,
+        itemsName: "results",
+        maxLimit: 50,
+        defaultLimit: 20,
+      });
+      const cursorResult = cursorPagination.output.safeParse({
+        results: [{ id: 2, name: "Bob" }],
+        nextCursor: null,
+        limit: 20,
+      });
+      expect(cursorResult.success).toBe(true);
+      if (cursorResult.success) {
+        expectTypeOf(cursorResult.data).toMatchTypeOf<
+          z.input<typeof cursorPagination.output>
+        >();
+        expect(cursorResult.data).toHaveProperty("results");
+        expect(cursorResult.data.results).toEqual([{ id: 2, name: "Bob" }]);
+        expect(cursorResult.data).not.toHaveProperty("items");
+      }
     });
   });
 
