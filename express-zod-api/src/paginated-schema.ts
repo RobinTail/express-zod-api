@@ -4,7 +4,7 @@ const DEFAULT_MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 20;
 
 /** @desc Common pagination config: shared by offset and cursor styles. */
-export interface CommonPaginationConfig<T extends z.ZodType = z.ZodType> {
+interface CommonPaginationConfig<T extends z.ZodType = z.ZodType> {
   /** @desc Zod schema for each item in the paginated list. */
   itemSchema: T;
   /**
@@ -23,7 +23,7 @@ export interface CommonPaginationConfig<T extends z.ZodType = z.ZodType> {
  * @desc Configuration for offset-based pagination (limit and offset).
  * @example { style: "offset", itemSchema, maxLimit: 50, defaultLimit: 10 }
  */
-export interface OffsetPaginatedConfig<
+interface OffsetPaginatedConfig<
   T extends z.ZodType = z.ZodType,
 > extends CommonPaginationConfig<T> {
   /** @desc Discriminator for offset-style pagination. */
@@ -34,7 +34,7 @@ export interface OffsetPaginatedConfig<
  * @desc Configuration for cursor-based pagination (cursor and limit).
  * @example { style: "cursor", itemSchema, maxLimit: 50, defaultLimit: 10 }
  */
-export interface CursorPaginatedConfig<
+interface CursorPaginatedConfig<
   T extends z.ZodType = z.ZodType,
 > extends CommonPaginationConfig<T> {
   /** @desc Discriminator for cursor-style pagination. */
@@ -42,57 +42,57 @@ export interface CursorPaginatedConfig<
 }
 
 /** @desc Request params for offset pagination. */
-interface OffsetInput {
+type OffsetInput = z.ZodObject<{
   /** @desc Page size (number of items per page). */
-  limit: number;
+  limit: z.ZodDefault<z.ZodCoercedNumber>;
   /** @desc Number of items to skip from the start of the list. */
-  offset: number;
-}
+  offset: z.ZodDefault<z.ZodCoercedNumber>;
+}>;
 
 /** @desc Request params for cursor pagination. */
-interface CursorInput {
+type CursorInput = z.ZodObject<{
   /** @desc Opaque cursor for the next page; omit for the first page. */
-  cursor?: string;
+  cursor: z.ZodOptional<z.ZodString>;
   /** @desc Page size (number of items per page). */
-  limit: number;
-}
+  limit: z.ZodDefault<z.ZodCoercedNumber>;
+}>;
 
 /** @desc Response shape for offset pagination. */
-interface OffsetOutput<T> {
+type OffsetOutput<T extends z.ZodType> = z.ZodObject<{
   /** @desc Page of items for the current request. */
-  items: T[];
+  items: z.ZodArray<T>;
   /** @desc Total number of items across all pages. */
-  total: number;
+  total: z.ZodNumber;
   /** @desc Page size used for this response. */
-  limit: number;
+  limit: z.ZodNumber;
   /** @desc Offset used for this response. */
-  offset: number;
-}
+  offset: z.ZodNumber;
+}>;
 
 /** @desc Response shape for cursor pagination. */
-interface CursorOutput<T> {
+type CursorOutput<T extends z.ZodType> = z.ZodObject<{
   /** @desc Page of items for the current request. */
-  items: T[];
+  items: z.ZodArray<T>;
   /** @desc Cursor for the next page, or null if there are no more pages. */
-  nextCursor: string | null;
+  nextCursor: z.ZodNullable<z.ZodString>;
   /** @desc Page size used for this response. */
-  limit: number;
-}
+  limit: z.ZodNumber;
+}>;
 
 /** @desc Return type of ez.paginated() for offset style. */
-export interface OffsetPaginatedResult<T extends z.ZodType = z.ZodType> {
+interface OffsetPaginatedResult<T extends z.ZodType = z.ZodType> {
   /** @desc Zod schema for offset pagination request params. */
-  input: z.ZodType<OffsetInput>;
+  input: OffsetInput;
   /** @desc Zod schema for offset pagination response. */
-  output: z.ZodType<OffsetOutput<z.output<T>>>;
+  output: OffsetOutput<T>;
 }
 
 /** @desc Return type of ez.paginated() for cursor style. */
-export interface CursorPaginatedResult<T extends z.ZodType = z.ZodType> {
+interface CursorPaginatedResult<T extends z.ZodType = z.ZodType> {
   /** @desc Zod schema for cursor pagination request params. */
-  input: z.ZodType<CursorInput>;
+  input: CursorInput;
   /** @desc Zod schema for cursor pagination response. */
-  output: z.ZodType<CursorOutput<z.output<T>>>;
+  output: CursorOutput<T>;
 }
 
 /**
