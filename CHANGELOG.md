@@ -2,6 +2,36 @@
 
 ## Version 27
 
+### v27.1.0
+
+- Introducing `ez.paginated()` helper for creating paginated endpoints:
+  - The configurable helper returns `input` and `output` schemas for your Endpoint;
+  - Use the `style` option to choose between `offset` and `cursor` pagination;
+  - The `itemsName` option configures the name of the property containing the items array;
+- The `Integration` generator now equips the `Client` with a static `hasMore()` method.
+
+```ts
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
+
+const pagination = ez.paginated({
+  style: "offset", // or "cursor"
+  itemSchema: z.object({ id: z.number(), name: z.string() }),
+  itemsName: "users", // defines the output name of the items array
+  maxLimit: 100,
+  defaultLimit: 20,
+});
+
+const listUsers = defaultEndpointsFactory.build({
+  input: pagination.input,
+  output: pagination.output,
+  handler: async ({ input: { limit, offset } }) => {
+    const { users, total } = await db.getUsers(limit, offset);
+    return { users, total, limit, offset }; // or { users, nextCursor, limit } for cursor pagination
+  },
+});
+```
+
 ### v27.0.1
 
 - Removed debug-level comments from the declaration files in the distribution.

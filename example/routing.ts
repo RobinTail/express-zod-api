@@ -3,6 +3,7 @@ import { rawAcceptingEndpoint } from "./endpoints/accept-raw";
 import { createUserEndpoint } from "./endpoints/create-user";
 import { deleteUserEndpoint } from "./endpoints/delete-user";
 import { listUsersEndpoint } from "./endpoints/list-users";
+import { listUsersPaginatedEndpoint } from "./endpoints/list-users-paginated";
 import { submitFeedbackEndpoint } from "./endpoints/submit-feedback";
 import { subscriptionEndpoint } from "./endpoints/time-subscription";
 import { uploadAvatarEndpoint } from "./endpoints/upload-avatar";
@@ -24,7 +25,7 @@ export const routing: Routing = {
       },
       // demonstrates different response schemas depending on status code
       create: createUserEndpoint,
-      // this one demonstrates the legacy array based response
+      // this one demonstrates the legacy array-based response
       list: listUsersEndpoint,
     },
     avatar: {
@@ -41,6 +42,8 @@ export const routing: Routing = {
   },
   // flat syntax with explicitly specified method:
   "post /v1/forms/feedback": submitFeedbackEndpoint,
+  // Demonstrates ez.paginated() helper for easy pagination:
+  "/v2/users/list": listUsersPaginatedEndpoint,
   // path /public serves static files from /assets
   public: new ServeStatic("assets", {
     dotfiles: "deny",

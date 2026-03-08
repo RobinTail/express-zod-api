@@ -6,7 +6,8 @@ import qs from "qs";
 
 export const config = createConfig({
   http: { listen: givePort("example") },
-  queryParser: (query) => qs.parse(query, { comma: true }), // affects listUsersEndpoint
+  // required for listUsersPaginatedEndpoint and listUsersEndpoint (legacy API demo)
+  queryParser: (query) => qs.parse(query, { comma: true }),
   upload: {
     limits: { fileSize: 51200 },
     limitError: createHttpError(413, "The file is too large"), // affects uploadAvatarEndpoint
