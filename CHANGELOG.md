@@ -8,7 +8,8 @@
   - The configurable helper returns `input` and `output` schemas for your Endpoint;
   - Use the `style` option to choose between `offset` and `cursor` pagination;
   - The `itemsName` option configures the name of the property containing the items array;
-- The `Integration` generator now equips the `Client` with a static `hasMore()` method.
+- The `Integration` generator now equips the `Client` with a static `hasMore()` method;
+- The `Incremental` added to the list of well-known recognizable request headers.
 
 ```ts
 import { z } from "zod";
