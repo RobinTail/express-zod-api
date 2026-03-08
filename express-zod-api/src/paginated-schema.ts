@@ -83,6 +83,13 @@ type OffsetOutput<T extends z.ZodType, K extends string> = z.ZodObject<
   }
 >;
 
+/** Keys reserved by offset output shape (itemsName must not match). */
+const OFFSET_OUTPUT_RESERVED_KEYS: string[] = [
+  "total",
+  "limit",
+  "offset",
+] as const satisfies Array<keyof OffsetOutput<never, never>["shape"]>;
+
 /** @desc Response shape for cursor pagination. */
 type CursorOutput<T extends z.ZodType, K extends string> = z.ZodObject<
   {
@@ -95,6 +102,12 @@ type CursorOutput<T extends z.ZodType, K extends string> = z.ZodObject<
     limit: z.ZodNumber;
   }
 >;
+
+/** Keys reserved by cursor output shape (itemsName must not match). */
+const CURSOR_OUTPUT_RESERVED_KEYS: string[] = [
+  "nextCursor",
+  "limit",
+] as const satisfies Array<keyof CursorOutput<never, never>["shape"]>;
 
 /** @desc Return type of ez.paginated() for offset style. */
 export interface OffsetPaginatedResult<
@@ -153,6 +166,16 @@ export function paginated({
   if (defaultLimit > maxLimit) {
     throw new Error(
       "ez.paginated: defaultLimit must not be greater than maxLimit",
+    );
+  }
+  if (style === "offset" && OFFSET_OUTPUT_RESERVED_KEYS.includes(itemsName)) {
+    throw new Error(
+      `ez.paginated: itemsName must not match reserved keys for offset output (${OFFSET_OUTPUT_RESERVED_KEYS.join(", ")})`,
+    );
+  }
+  if (style === "cursor" && CURSOR_OUTPUT_RESERVED_KEYS.includes(itemsName)) {
+    throw new Error(
+      `ez.paginated: itemsName must not match reserved keys for cursor output (${CURSOR_OUTPUT_RESERVED_KEYS.join(", ")})`,
     );
   }
   const limitSchema = z.coerce

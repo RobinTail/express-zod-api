@@ -32,6 +32,34 @@ describe("ez.paginated()", () => {
         }),
       ).toThrow("ez.paginated: defaultLimit must not be greater than maxLimit");
     });
+
+    test("throws when itemsName matches reserved key for offset output", () => {
+      for (const reserved of ["total", "limit", "offset"]) {
+        expect(() =>
+          ez.paginated({
+            style: "offset",
+            itemSchema: userSchema,
+            itemsName: reserved,
+          }),
+        ).toThrow(
+          "ez.paginated: itemsName must not match reserved keys for offset output (total, limit, offset)",
+        );
+      }
+    });
+
+    test("throws when itemsName matches reserved key for cursor output", () => {
+      for (const reserved of ["nextCursor", "limit"]) {
+        expect(() =>
+          ez.paginated({
+            style: "cursor",
+            itemSchema: userSchema,
+            itemsName: reserved,
+          }),
+        ).toThrow(
+          "ez.paginated: itemsName must not match reserved keys for cursor output (nextCursor, limit)",
+        );
+      }
+    });
   });
 
   describe("offset style", () => {
