@@ -34,7 +34,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    15. [Child logger](#child-logger)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
-   2. [Headers as input source](#headers-as-input-source)
+   2. [Headers as input source](#headers-as-an-input-source)
    3. [Response customization](#response-customization)
    4. [Empty response](#empty-response)
    5. [Non-JSON response](#non-json-response) including file downloads
@@ -48,7 +48,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
 6. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [Generating a Frontend Client](#generating-a-frontend-client)
-   3. [Creating a documentation](#creating-a-documentation)
+   3. [Creating documentation](#creating-documentation)
    4. [Tagging the endpoints](#tagging-the-endpoints)
    5. [Deprecated schemas and routes](#deprecated-schemas-and-routes)
    6. [Customizable brands handling](#customizable-brands-handling)
@@ -67,9 +67,9 @@ See also [Changelog](CHANGELOG.md) and [automated migration](https://www.npmjs.c
 
 # Overview
 
-I made this framework because of the often repetitive tasks of starting a web server APIs with the need to validate input
-data. It integrates and provides the capabilities of popular web server, logging, validation and documenting solutions.
-Therefore, many basic tasks can be accomplished faster and easier, in particular:
+I made this framework because of the often repetitive tasks of starting web server APIs with the need to validate input
+data. It integrates and provides the capabilities of popular web server, logging, validation, and documenting solutions.
+Therefore, many basic tasks can be achieved faster and easier, in particular:
 
 - You can describe web server routes as a hierarchical object.
 - You can keep the endpoint's input and output type declarations right next to its handler.
@@ -77,14 +77,14 @@ Therefore, many basic tasks can be accomplished faster and easier, in particular
   you expect a number.
 - Variables within an endpoint handler have types according to the declared schema, so your IDE and TypeScript will
   provide you with necessary hints to focus on bringing your vision to life.
-- All of your endpoints can respond in a consistent way.
+- All of your endpoints can respond consistently.
 - The expected endpoint input and response types can be exported to the frontend, so you don't get confused about the
   field names when you implement the client for your API.
 - You can generate your API documentation in OpenAPI 3.1 and JSON Schema compatible format.
 
 ## Contributors
 
-These people contributed to the improvement of the framework by reporting bugs, making changes and suggesting ideas:
+These people contributed to the improvement of the framework by reporting bugs, making changes, and suggesting ideas:
 
 [<img src="https://github.com/pycanis.png" alt="@pycanis" width="50" />](https://github.com/pycanis)
 [<img src="https://github.com/arlyon.png" alt="@arlyon" width="50" />](https://github.com/arlyon)
@@ -165,7 +165,7 @@ Much can be customized to fit your needs.
 - [Typescript](https://www.typescriptlang.org/) first.
 - Web server — [Express.js](https://expressjs.com/) v5.
 - Schema validation — [Zod 4.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin):
-  - For using with Zod 3.x install the framework versions below 24.0.0.
+  - For using with Zod 3.x, install the framework versions below 24.0.0.
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
@@ -321,7 +321,7 @@ const routing: Routing = {
 };
 ```
 
-Same Endpoint can be reused on different routes or handle multiple methods if needed. Path parameters (the `:id` above)
+The same Endpoint can be reused on different routes or handle multiple methods. Path parameters (the `:id` above)
 should be declared in the endpoint’s input schema. Properties assigned with Endpoint can explicitly declare a method.
 If no method is specified, the methods supported by the endpoint are used (or `get` as a fallback).
 
@@ -373,7 +373,7 @@ const yourEndpoint = defaultEndpointsFactory
 
 You can create a new factory by connecting as many middlewares as you want — they will be executed in the specified
 order for all the endpoints produced on that factory. You may also use a shorter inline syntax within the
-`.addMiddleware()` method, and have access to the output of the previously executed middlewares in chain as `ctx`:
+`.addMiddleware()` method, and have access to the output of the previously executed middlewares in a chain as `ctx`:
 
 ```ts
 import { defaultEndpointsFactory } from "express-zod-api";
@@ -480,7 +480,7 @@ const nicknameConstraintMiddleware = new Middleware({
 });
 ```
 
-By the way, you can also refine the whole I/O object, for example in case you need a complex validation of its props.
+By the way, you can also refine the whole I/O object, for example, in case you need a complex validation of its props.
 
 ```ts
 const endpoint = endpointsFactory.build({
@@ -533,7 +533,7 @@ For some APIs it may be important that public interfaces such as query parameter
 implementation itself requires camel case for internal naming. In order to facilitate interoperability between the
 different naming standards you can `.transform()` the entire `input` schema into another object using a well-typed
 mapping library, such as [camelize-ts](https://www.npmjs.com/package/camelize-ts). However, that approach would not be
-enough for the `output` schema if you're also aiming to [generate a valid documentation](#creating-a-documentation),
+enough for the `output` schema if you're also aiming to [generate valid documentation](#creating-documentation),
 because the transformations themselves do not contain schemas. Addressing this case, the framework offers the `.remap()`
 method of the object schema, a part of the [Zod plugin](#zod-plugin), which under the hood, in addition to the
 transformation, also `.pipe()` the transformed object into a new object schema.
@@ -576,7 +576,7 @@ in actual response by calling
 which in turn calls
 [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString).
 It is also impossible to transmit the `Date` in its original form to your endpoints within JSON. Therefore, there is
-confusion with original method ~~z.date()~~ that is not recommended to use without transformations.
+confusion with the original method ~~z.date()~~ that is not recommended to use without transformations.
 
 In order to solve this problem, the framework provides two custom methods for dealing with dates: `ez.dateIn()` and
 `ez.dateOut()` for using within input and output schemas accordingly.
@@ -691,7 +691,7 @@ your API at [Let's Encrypt](https://letsencrypt.org/).
 
 ## Enabling compression
 
-According to [Express.js best practices guide](https://expressjs.com/en/advanced/best-practice-performance.html)
+According to [Express.js best practices guide](https://expressjs.com/en/advanced/best-practice-performance.html),
 it might be a good idea to enable GZIP and Brotli compression for your API responses.
 
 Install `compression` and `@types/compression`, and enable or configure compression:
@@ -705,7 +705,7 @@ const config = createConfig({
 });
 ```
 
-In order to receive a compressed response the client should include the following header in the request:
+To receive a compressed response, the client should include the following header in the request:
 `Accept-Encoding: br, gzip, deflate`. Only responses with compressible content types are subject to compression.
 
 ## Customizing logger
@@ -724,7 +724,7 @@ const config = createConfig({
 ```
 
 You can also replace it with a one having at least the following methods: `info()`, `debug()`, `error()` and `warn()`.
-Winston and Pino support is well known. Here is an example configuring `pino` logger with `pino-pretty` extension:
+Winston and Pino support is well-known. Here is an example configuring `pino` logger with `pino-pretty` extension:
 
 ```ts
 import pino, { Logger } from "pino";
@@ -788,11 +788,11 @@ createConfig({
 });
 ```
 
-## Headers as input source
+## Headers as an input source
 
-In a similar way you can enable request headers as the input source. This is an opt-in feature. Please note:
+Similarly, you can enable request headers as the input source. This is an opt-in feature. Please note:
 
-- consider giving `headers` the lowest priority among other `inputSources` to avoid overwrites;
+- consider giving `headers` the lowest priority among other `inputSources` to avoid overwriting;
 - consider handling headers in `Middleware` and declaring them within `security` property to improve `Documentation`;
 - the request headers acquired that way are always lowercase when describing their validation schemas.
 
@@ -869,8 +869,8 @@ const endpointsFactory = new EndpointsFactory(yourResultHandler);
 
 ## Empty response
 
-For some REST APIs, empty responses are typical: with status code `204` (No Content) and redirects (302). In order to
-describe it set the `mimeType` to `null` and `schema` to `z.never()`:
+For some REST APIs, empty responses are typical: with status code `204` (No Content) and redirects (302). To describe
+it, set the `mimeType` to `null` and `schema` to `z.never()`:
 
 ```ts
 const resultHandler = new ResultHandler({
@@ -881,13 +881,13 @@ const resultHandler = new ResultHandler({
 
 ## Non-JSON response
 
-To configure a non-JSON responses (for example, to send an image file) you should specify its MIME type.
+To configure a non-JSON response (for example, to send an image file), you should specify its MIME type.
 
 You can find two approaches to `EndpointsFactory` and `ResultHandler` implementation
 [in this example](https://github.com/RobinTail/express-zod-api/blob/master/example/factories.ts).
 One of them implements file streaming, in this case the endpoint just has to provide the filename.
 The response schema can be `z.string()`, `z.base64()` or `ez.buffer()` to reflect the data accordingly in the
-[generated documentation](#creating-a-documentation).
+[generated documentation](#creating-documentation).
 
 ```ts
 const fileStreamingEndpointsFactory = new EndpointsFactory(
@@ -935,7 +935,7 @@ Consider enabling production mode by setting `NODE_ENV` environment variable to 
 - Express activates some [performance optimizations](https://expressjs.com/en/advanced/best-practice-performance.html);
 - Self-diagnosis for potential problems is disabled to ensure faster startup;
 - The `defaultResultHandler`, `defaultEndpointsFactory` and `LastResortHandler` generalize server-side error messages
-  in negative responses in order to improve the security of your API by not disclosing the exact causes of errors:
+  in negative responses to improve the security of your API by not disclosing the exact causes of errors:
   - Throwing errors that have or imply `5XX` status codes become just `Internal Server Error` message in response;
   - You can control that behavior by throwing errors using `createHttpError()` and using its `expose` option:
 
@@ -976,7 +976,7 @@ _Hint: for unlisted extra fields use the following syntax: `ez.form( z.object({}
 
 Install the following additional packages: `express-fileupload` and `@types/express-fileupload`, and enable or
 configure file uploads. Refer to [documentation](https://www.npmjs.com/package/express-fileupload#available-options) on
-available options. The `limitHandler` option is replaced by the `limitError` one. You can also connect an additional
+available options. The `limitHandler` option is replaced by the `limitError` one. You can also connect additional
 middleware for restricting the ability to upload using the `beforeUpload` option. So the configuration for the limited
 and restricted upload might look this way:
 
@@ -1046,9 +1046,9 @@ then consider using the `beforeRouting` [option in config instead](#using-native
 ## Testing endpoints
 
 The way to test endpoints is to mock the request, response, and logger objects, invoke the `execute()` method, and
-assert the expectations on status, headers and payload. The framework provides a special method `testEndpoint` that
-makes mocking easier. Under the hood, request and response object are mocked using the
-[node-mocks-http](https://www.npmjs.com/package/node-mocks-http) library, therefore you can utilize its API for
+assert the expectations on status, headers, and payload. The framework provides a special method `testEndpoint` that
+makes mocking easier. Under the hood, the request and response objects are mocked using the
+[node-mocks-http](https://www.npmjs.com/package/node-mocks-http) library; therefore, you can use its API for
 settings additional properties and asserting expectation using the provided getters, such as `._getStatusCode()`.
 
 ```ts
@@ -1136,7 +1136,7 @@ client.provide("post /v1/user/:id", { id: "10" }); // it also substitutes path p
 new Subscription("get /v1/events/stream", {}).on("time", (time) => {}); // Server-sent events (SSE)
 ```
 
-## Creating a documentation
+## Creating documentation
 
 You can generate the specification of your API and write it to a `.yaml` file, that can be used as the documentation:
 
@@ -1154,8 +1154,8 @@ const yamlString = new Documentation({
 }).getSpecAsYaml();
 ```
 
-You can add descriptions and examples to your endpoints, their I/O schemas and their properties. It will be included
-into the generated documentation of your API. Consider the following example:
+You can add descriptions and examples to your endpoints, their I/O schemas, and their properties. It will be included
+in the generated documentation of your API. Consider the following example:
 
 ```ts
 import { defaultEndpointsFactory } from "express-zod-api";
@@ -1237,8 +1237,8 @@ const routing: Routing = {
 
 You can customize handling rules for your schemas in Documentation and Integration. Use the `.brand()` method on your
 schema to make it special and distinguishable for the framework in runtime. Using symbols is recommended for branding.
-After that utilize the `brandHandling` feature of both constructors to declare your custom implementation. In case you
-need to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
+After that use the `brandHandling` feature of both constructors to declare your custom implementation. In case you need
+to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
 
 ```ts
 import ts from "typescript";
@@ -1280,7 +1280,7 @@ new Integration({
 ## Different responses for different status codes
 
 In some special cases you may want the ResultHandler to respond slightly differently depending on the status code,
-for example if your API strictly follows REST standards. It may also be necessary to reflect this difference in the
+for example, if your API strictly follows REST standards. It may also be necessary to reflect this difference in the
 generated Documentation. For that purpose, the constructor of `ResultHandler` accepts flexible declaration of possible
 response schemas and their corresponding status codes.
 
@@ -1310,10 +1310,10 @@ new ResultHandler({
 
 ## Array response
 
-Please avoid doing this in new projects: responding with array is a bad practice keeping your endpoints from evolving
-in backward compatible way (without making breaking changes). Nevertheless, for the purpose of easier migration of
-legacy APIs to this framework consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
-or implement your own ones in a similar way.
+Please avoid doing this in new projects: responding with an array is a bad practice keeping your endpoints from evolving
+in a backward compatible way (without making breaking changes). Nevertheless, for easier migration of legacy APIs to
+this framework consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
+or implement your own ones similarly.
 The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
 assigned to that property is used as the response. This approach also supports examples, as well as documentation and
 client generation. Check out [the example endpoint](/example/endpoints/list-users.ts) for more details.
@@ -1360,7 +1360,7 @@ doExpensiveOperation();
 done(); // debug: expensive operation '555 milliseconds'
 ```
 
-You can also customize the profiler with your own formatter, chosen severity or even performance assessment function:
+You can also customize the profiler with your own formatter, chosen severity, or even performance assessment function:
 
 ```ts
 logger.profile({
@@ -1392,8 +1392,8 @@ createConfig({
 
 ## Subscriptions
 
-If you want the user of a client application to be able to subscribe to subsequent updates initiated by the server,
-consider [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) feature.
+If you want the user of a client application to be able to subscribe to further updates initiated by the server,
+consider the [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) feature.
 Client application can subscribe to the event stream using `EventSource` class instance or the
 [instance of the generated](#generating-a-frontend-client) `Subscription` class. The following example demonstrates
 the implementation emitting the `time` event each second.
@@ -1429,7 +1429,7 @@ should be aware of them.
 The schema validator removes excessive properties by default. However, TypeScript
 [does not yet display errors](https://www.typescriptlang.org/docs/handbook/interfaces.html#excess-property-checks)
 in this case during development. You can achieve this verification by assigning the output schema to a constant and
-reusing it in forced type of the output:
+reusing it in the forced type of the output:
 
 ```ts
 const output = z.object({ anything: z.number() });
