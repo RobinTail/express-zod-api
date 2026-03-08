@@ -136,6 +136,43 @@ exports[`Example > Positive > Should handle valid GET request 1`] = `
 }
 `;
 
+exports[`Example > Positive > Should respond with array (legacy API ResultHandler) 1`] = `
+[
+  {
+    "name": "Maria Merian",
+    "role": "manager",
+  },
+  {
+    "name": "Mary Anning",
+    "role": "operator",
+  },
+  {
+    "name": "Marie Skłodowska Curie",
+    "role": "admin",
+  },
+  {
+    "name": "Henrietta Leavitt",
+    "role": "manager",
+  },
+  {
+    "name": "Lise Meitner",
+    "role": "operator",
+  },
+  {
+    "name": "Alice Ball",
+    "role": "admin",
+  },
+  {
+    "name": "Gerty Cori",
+    "role": "manager",
+  },
+  {
+    "name": "Helen Taussig",
+    "role": "operator",
+  },
+]
+`;
+
 exports[`Example > Positive > Should respond with paginated list (ez.paginated) 1`] = `
 {
   "data": {

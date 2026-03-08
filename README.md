@@ -1287,7 +1287,7 @@ legacy APIs to this framework consider using `arrayResultHandler` or `arrayEndpo
 or implement your own ones in a similar way.
 The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
 assigned to that property is used as the response. This approach also supports examples, as well as documentation and
-client generation. Check out [the example endpoint](/example/endpoints/list-users.ts) for more details.
+client generation. Check out [the example endpoint](/example/endpoints/list-users-paginated.ts) for more details.
 
 ## Accepting raw data
 

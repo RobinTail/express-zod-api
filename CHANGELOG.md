@@ -3282,7 +3282,7 @@ after:
   - Missing the `items` property will result in internal error (status code `500`).
   - The negative response schema is `z.string()`, meaning that in case of error the response will be its plain message.
   - The result handler also supports examples, as well as documentation and client generation.
-  - Check out the [example endpoint](/example/endpoints/list-users.ts) for details.
+  - Check out the [example endpoint](/example/endpoints/list-users-paginated.ts) for details.
 - This version also contains a corresponding fix:
   - Fixed depicting the examples in case of `z.array()` and `z.string()` as response schemas in `ResultHandler`.
 

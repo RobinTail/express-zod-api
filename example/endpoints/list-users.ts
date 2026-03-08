@@ -1,22 +1,9 @@
 import { z } from "zod";
-import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { arrayRespondingFactory } from "../factories";
 
 const roleSchema = z.enum(["manager", "operator", "admin"]);
 
-const userSchema = z.object({
-  name: z.string(),
-  role: roleSchema,
-});
-
-const paginatedUsers = ez.paginated({
-  style: "offset",
-  itemSchema: userSchema,
-  itemsName: "users",
-  maxLimit: 100,
-  defaultLimit: 20,
-});
-
-const users: z.output<typeof userSchema>[] = [
+const users = [
   { name: "Maria Merian", role: "manager" },
   { name: "Mary Anning", role: "operator" },
   { name: "Marie Skłodowska Curie", role: "admin" },
@@ -25,32 +12,26 @@ const users: z.output<typeof userSchema>[] = [
   { name: "Alice Ball", role: "admin" },
   { name: "Gerty Cori", role: "manager" },
   { name: "Helen Taussig", role: "operator" },
-];
+] as const;
 
 /**
- * Lists users with offset pagination and optional role filter.
- * Uses ez.paginated() for request params (limit, offset) and response shape (items, total, limit, offset).
- */
-export const listUsersEndpoint = defaultEndpointsFactory.build({
+ * This endpoint demonstrates the ability to respond with array.
+ * Avoid doing this in new projects. This feature is only for easier migration of legacy APIs.
+ * */
+export const listUsersEndpoint = arrayRespondingFactory.build({
   tag: "users",
-  shortDescription: "Lists users with pagination.",
-  description:
-    "Returns a page of users. Optionally filter by roles. Uses offset-based pagination (limit and offset).",
-  input: paginatedUsers.input.and(
-    z.object({
-      roles: z
-        .array(roleSchema)
-        .optional()
-        .describe("Filter by roles; omit for all"),
-    }),
-  ),
-  output: paginatedUsers.output,
-  handler: async ({ input: { limit, offset, roles } }) => {
-    const filtered = roles
-      ? users.filter(({ role }) => roles.includes(role))
-      : users;
-    const total = filtered.length;
-    const page = filtered.slice(offset, offset + limit);
-    return { users: page, total, limit, offset };
-  },
+  input: z.object({
+    roles: z.array(roleSchema).optional(),
+  }),
+  output: z.object({
+    // the arrayResultHandler will take the "items" prop as the response
+    items: z.array(z.object({ name: z.string(), role: roleSchema })).example([
+      { name: "Hunter Schafer", role: "manager" },
+      { name: "Laverne Cox", role: "operator" },
+      { name: "Patti Harrison", role: "admin" },
+    ]),
+  }),
+  handler: async ({ input: { roles } }) => ({
+    items: users.filter(({ role }) => roles?.includes(role) ?? true),
+  }),
 });

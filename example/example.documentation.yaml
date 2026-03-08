@@ -389,38 +389,14 @@ paths:
   /v1/user/list:
     get:
       operationId: GetV1UserList
-      summary: Lists users with pagination.
-      description: Returns a page of users. Optionally filter by roles. Uses
-        offset-based pagination (limit and offset).
       tags:
         - users
       parameters:
-        - name: limit
-          in: query
-          required: false
-          description: Page size (number of users per page)
-          schema:
-            default: 20
-            description: Page size (number of users per page)
-            type: integer
-            minimum: 1
-            maximum: 100
-        - name: offset
-          in: query
-          required: false
-          description: Number of users to skip
-          schema:
-            default: 0
-            description: Number of users to skip
-            type: integer
-            minimum: 0
-            maximum: 9007199254740991
         - name: roles
           in: query
           required: false
-          description: Filter by roles; omit for all
+          description: GET /v1/user/list Parameter
           schema:
-            description: Filter by roles; omit for all
             type: array
             items:
               type: string
@@ -434,119 +410,50 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      users:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            name:
-                              type: string
-                            role:
-                              type: string
-                              enum:
-                                - manager
-                                - operator
-                                - admin
-                          required:
-                            - name
-                            - role
-                          additionalProperties: false
-                        description: Page of users
-                      total:
-                        type: integer
-                        minimum: 0
-                        maximum: 9007199254740991
-                        description: Total number of items
-                      limit:
-                        type: integer
-                        minimum: 1
-                        maximum: 9007199254740991
-                        description: Page size used
-                      offset:
-                        type: integer
-                        minimum: 0
-                        maximum: 9007199254740991
-                        description: Offset used
-                    required:
-                      - users
-                      - total
-                      - limit
-                      - offset
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
-                additionalProperties: false
-        "400":
-          description: GET /v1/user/list Negative response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
-                required:
-                  - status
-                  - error
-                additionalProperties: false
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    role:
+                      type: string
+                      enum:
+                        - manager
+                        - operator
+                        - admin
+                  required:
+                    - name
+                    - role
+                  additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    - name: Hunter Schafer
+                      role: manager
+                    - name: Laverne Cox
+                      role: operator
+                    - name: Patti Harrison
+                      role: admin
+        "400":
+          description: GET /v1/user/list Negative response
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                example1:
+                  value: Sample error message
     head:
       operationId: HeadV1UserList
-      summary: Lists users with pagination.
-      description: Returns a page of users. Optionally filter by roles. Uses
-        offset-based pagination (limit and offset).
       tags:
         - users
       parameters:
-        - name: limit
-          in: query
-          required: false
-          description: Page size (number of users per page)
-          schema:
-            default: 20
-            description: Page size (number of users per page)
-            type: integer
-            minimum: 1
-            maximum: 100
-        - name: offset
-          in: query
-          required: false
-          description: Number of users to skip
-          schema:
-            default: 0
-            description: Number of users to skip
-            type: integer
-            minimum: 0
-            maximum: 9007199254740991
         - name: roles
           in: query
           required: false
-          description: Filter by roles; omit for all
+          description: HEAD /v1/user/list Parameter
           schema:
-            description: Filter by roles; omit for all
             type: array
             items:
               type: string
@@ -958,6 +865,179 @@ paths:
                     status: error
                     error:
                       message: Sample error message
+  /v2/users/list:
+    get:
+      operationId: GetV2UsersList
+      summary: Lists users with pagination.
+      description: Returns a page of users. Optionally filter by roles. Uses
+        offset-based pagination (limit and offset).
+      tags:
+        - users
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Page size (number of users per page)
+          schema:
+            default: 20
+            description: Page size (number of users per page)
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          required: false
+          description: Number of users to skip
+          schema:
+            default: 0
+            description: Number of users to skip
+            type: integer
+            minimum: 0
+            maximum: 9007199254740991
+        - name: roles
+          in: query
+          required: false
+          description: Filter by roles; omit for all
+          schema:
+            description: Filter by roles; omit for all
+            type: array
+            items:
+              type: string
+              enum:
+                - manager
+                - operator
+                - admin
+      responses:
+        "200":
+          description: GET /v2/users/list Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            role:
+                              type: string
+                              enum:
+                                - manager
+                                - operator
+                                - admin
+                          required:
+                            - name
+                            - role
+                          additionalProperties: false
+                        description: Page of users
+                      total:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                        description: Total number of items
+                      limit:
+                        type: integer
+                        minimum: 1
+                        maximum: 9007199254740991
+                        description: Page size used
+                      offset:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                        description: Offset used
+                    required:
+                      - users
+                      - total
+                      - limit
+                      - offset
+                    additionalProperties: false
+                required:
+                  - status
+                  - data
+                additionalProperties: false
+        "400":
+          description: GET /v2/users/list Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                    additionalProperties: false
+                required:
+                  - status
+                  - error
+                additionalProperties: false
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+    head:
+      operationId: HeadV2UsersList
+      summary: Lists users with pagination.
+      description: Returns a page of users. Optionally filter by roles. Uses
+        offset-based pagination (limit and offset).
+      tags:
+        - users
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Page size (number of users per page)
+          schema:
+            default: 20
+            description: Page size (number of users per page)
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          required: false
+          description: Number of users to skip
+          schema:
+            default: 0
+            description: Number of users to skip
+            type: integer
+            minimum: 0
+            maximum: 9007199254740991
+        - name: roles
+          in: query
+          required: false
+          description: Filter by roles; omit for all
+          schema:
+            description: Filter by roles; omit for all
+            type: array
+            items:
+              type: string
+              enum:
+                - manager
+                - operator
+                - admin
+      responses:
+        "200":
+          description: HEAD /v2/users/list Positive response
+        "400":
+          description: HEAD /v2/users/list Negative response
 components:
   schemas:
     Feature:

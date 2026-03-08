@@ -104,8 +104,15 @@ describe("Example", async () => {
       expect(true).toBeTruthy();
     });
 
-    test("Should respond with paginated list (ez.paginated)", async () => {
+    test("Should respond with array (legacy API ResultHandler)", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/list`);
+      expect(response.status).toBe(200);
+      const json = await response.json();
+      expect(json).toMatchSnapshot();
+    });
+
+    test("Should respond with paginated list (ez.paginated)", async () => {
+      const response = await fetch(`http://localhost:${port}/v2/users/list`);
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toMatchSnapshot();
@@ -117,7 +124,7 @@ describe("Example", async () => {
       "roles=admin&roles=operator",
     ])("Should support arrays in query %#", async (query) => {
       const response = await fetch(
-        `http://localhost:${port}/v1/user/list?${query}`,
+        `http://localhost:${port}/v2/users/list?${query}`,
       );
       expect(response.status).toBe(200);
       const json = (await response.json()) as {
