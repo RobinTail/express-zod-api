@@ -736,6 +736,16 @@ export type Implementation<T = unknown> = (
   ctx?: T,
 ) => Promise<any>;
 
+export type Pagination =
+  | {
+      nextCursor: string | null;
+    }
+  | {
+      total: number;
+      limit: number;
+      offset: number;
+    };
+
 const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "head", "delete"].includes(method);
   const searchParams = hasBody ? "" : `?${new URLSearchParams(params)}`;
@@ -764,6 +774,10 @@ export class Client<T> {
   ): Promise<Response[K]> {
     const [method, path] = parseRequest(request);
     return this.implementation(method, ...substitute(path, params), ctx);
+  }
+  public static hasMore(response: Pagination): boolean {
+    if ("nextCursor" in response) return response.nextCursor !== null;
+    return response.offset + response.limit < response.total;
   }
 }
 

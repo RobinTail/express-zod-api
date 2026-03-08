@@ -97,7 +97,7 @@ type CursorOutput<T extends z.ZodType, K extends string> = z.ZodObject<
 >;
 
 /** @desc Return type of ez.paginated() for offset style. */
-interface OffsetPaginatedResult<
+export interface OffsetPaginatedResult<
   T extends z.ZodType = z.ZodType,
   K extends string = typeof DEFAULT_ITEMS_NAME,
 > {
@@ -108,7 +108,7 @@ interface OffsetPaginatedResult<
 }
 
 /** @desc Return type of ez.paginated() for cursor style. */
-interface CursorPaginatedResult<
+export interface CursorPaginatedResult<
   T extends z.ZodType = z.ZodType,
   K extends string = typeof DEFAULT_ITEMS_NAME,
 > {
