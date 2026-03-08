@@ -35,8 +35,8 @@ export class TypescriptAPI {
     this.accessModifiers = {
       public: [this.f.createModifier(this.ts.SyntaxKind.PublicKeyword)],
       publicStatic: [
-        this.f.createModifier(this.ts.SyntaxKind.StaticKeyword),
         this.f.createModifier(this.ts.SyntaxKind.PublicKeyword),
+        this.f.createModifier(this.ts.SyntaxKind.StaticKeyword),
       ],
       protectedReadonly: [
         this.f.createModifier(this.ts.SyntaxKind.ProtectedKeyword),
