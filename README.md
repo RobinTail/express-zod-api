@@ -619,8 +619,6 @@ Consider using `ez.paginated()` to get reusable `input` and `output` schemas for
 Attach schemas to your endpoint and compose with other params (e.g. `.and(z.object({ ... }))`).
 To check if more pages are available, use [Client.hasMore()](#generating-a-frontend-client).
 
-**Offset pagination** (limit and offset):
-
 ```ts
 import { z } from "zod";
 import { ez, defaultEndpointsFactory } from "express-zod-api";
