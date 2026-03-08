@@ -1049,7 +1049,7 @@ The way to test endpoints is to mock the request, response, and logger objects, 
 assert the expectations on status, headers, and payload. The framework provides a special method `testEndpoint` that
 makes mocking easier. Under the hood, the request and response objects are mocked using the
 [node-mocks-http](https://www.npmjs.com/package/node-mocks-http) library; therefore, you can use its API for
-settings additional properties and asserting expectation using the provided getters, such as `._getStatusCode()`.
+settings additional properties and asserting expectations using the provided getters, such as `._getStatusCode()`.
 
 ```ts
 import { testEndpoint } from "express-zod-api";
