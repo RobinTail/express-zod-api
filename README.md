@@ -617,7 +617,7 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
 
 Consider using `ez.paginated()` to get reusable `input` and `output` schemas for offset or cursor-based pagination.
 Attach schemas to your endpoint and compose with other params (e.g. `.and(z.object({ ... }))`).
-To check if more pages are available, use [Client.hasMore()](#generating-a-frontend-client).
+To check if more pages are available, use [Client::hasMore()](#generating-a-frontend-client).
 
 ```ts
 import { z } from "zod";
