@@ -4,48 +4,63 @@ const DEFAULT_MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 20;
 
 /** @desc Common pagination config: item schema and limit options */
-export type CommonPaginationConfig<T extends z.ZodType = z.ZodType> = {
+export interface CommonPaginationConfig<T extends z.ZodType = z.ZodType> {
   /** Schema for each item in the paginated list */
   itemSchema: T;
   /** Maximum allowed page size (default 100) */
   maxLimit?: number;
   /** Default page size when client omits limit (default 20) */
   defaultLimit?: number;
-};
+}
 
 /** @desc Configuration for offset-based pagination (limit + offset) */
-export type OffsetPaginatedConfig<T extends z.ZodType = z.ZodType> =
-  CommonPaginationConfig<T> & { style: "offset" };
+export interface OffsetPaginatedConfig<
+  T extends z.ZodType = z.ZodType,
+> extends CommonPaginationConfig<T> {
+  style: "offset";
+}
 
 /** @desc Configuration for cursor-based pagination (cursor + limit) */
-export type CursorPaginatedConfig<T extends z.ZodType = z.ZodType> =
-  CommonPaginationConfig<T> & { style: "cursor" };
+export interface CursorPaginatedConfig<
+  T extends z.ZodType = z.ZodType,
+> extends CommonPaginationConfig<T> {
+  style: "cursor";
+}
 
-type OffsetInput = { limit: number; offset: number };
-type CursorInput = { cursor?: string; limit: number };
-type OffsetOutput<T> = {
+interface OffsetInput {
+  limit: number;
+  offset: number;
+}
+
+interface CursorInput {
+  cursor?: string;
+  limit: number;
+}
+
+interface OffsetOutput<T> {
   items: T[];
   total: number;
   limit: number;
   offset: number;
-};
-type CursorOutput<T> = {
+}
+
+interface CursorOutput<T> {
   items: T[];
   nextCursor: string | null;
   limit: number;
-};
+}
 
 /** @desc Return type of ez.paginated() for offset style: input and output schemas */
-export type OffsetPaginatedResult<T extends z.ZodType = z.ZodType> = {
+export interface OffsetPaginatedResult<T extends z.ZodType = z.ZodType> {
   input: z.ZodType<OffsetInput>;
   output: z.ZodType<OffsetOutput<z.output<T>>>;
-};
+}
 
 /** @desc Return type of ez.paginated() for cursor style: input and output schemas */
-export type CursorPaginatedResult<T extends z.ZodType = z.ZodType> = {
+export interface CursorPaginatedResult<T extends z.ZodType = z.ZodType> {
   input: z.ZodType<CursorInput>;
   output: z.ZodType<CursorOutput<z.output<T>>>;
-};
+}
 
 /**
  * Creates a pagination helper with a single config for both request params and response shape.
