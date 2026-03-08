@@ -4,6 +4,36 @@ import { ez } from "../src";
 const userSchema = z.object({ id: z.number(), name: z.string() });
 
 describe("ez.paginated()", () => {
+  describe("config validation", () => {
+    test("throws when maxLimit is 0 or less", () => {
+      expect(() =>
+        ez.paginated({
+          style: "offset",
+          itemSchema: userSchema,
+          maxLimit: 0,
+        }),
+      ).toThrow("ez.paginated: maxLimit must be greater than 0");
+      expect(() =>
+        ez.paginated({
+          style: "cursor",
+          itemSchema: userSchema,
+          maxLimit: -1,
+        }),
+      ).toThrow("ez.paginated: maxLimit must be greater than 0");
+    });
+
+    test("throws when defaultLimit is greater than maxLimit", () => {
+      expect(() =>
+        ez.paginated({
+          style: "offset",
+          itemSchema: userSchema,
+          maxLimit: 10,
+          defaultLimit: 20,
+        }),
+      ).toThrow("ez.paginated: defaultLimit must not be greater than maxLimit");
+    });
+  });
+
   describe("offset style", () => {
     const pagination = ez.paginated({
       style: "offset",

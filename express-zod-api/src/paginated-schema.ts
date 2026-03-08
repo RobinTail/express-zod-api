@@ -148,6 +148,13 @@ export function paginated({
 }: OffsetPaginatedConfig | CursorPaginatedConfig):
   | OffsetPaginatedResult
   | CursorPaginatedResult {
+  if (maxLimit <= 0)
+    throw new Error("ez.paginated: maxLimit must be greater than 0");
+  if (defaultLimit > maxLimit) {
+    throw new Error(
+      "ez.paginated: defaultLimit must not be greater than maxLimit",
+    );
+  }
   const limitSchema = z.coerce
     .number()
     .int()
