@@ -4,8 +4,10 @@ const DEFAULT_MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 20;
 
 /** @desc Configuration for offset-based pagination (limit + offset) */
-export type OffsetPaginatedConfig = {
+export type OffsetPaginatedConfig<T extends z.ZodType = z.ZodType> = {
   style: "offset";
+  /** Schema for each item in the paginated list */
+  itemSchema: T;
   /** Maximum allowed page size (default 100) */
   maxLimit?: number;
   /** Default page size when client omits limit (default 20) */
@@ -13,16 +15,15 @@ export type OffsetPaginatedConfig = {
 };
 
 /** @desc Configuration for cursor-based pagination (cursor + limit) */
-export type CursorPaginatedConfig = {
+export type CursorPaginatedConfig<T extends z.ZodType = z.ZodType> = {
   style: "cursor";
+  /** Schema for each item in the paginated list */
+  itemSchema: T;
   /** Maximum allowed page size (default 100) */
   maxLimit?: number;
   /** Default page size when client omits limit (default 20) */
   defaultLimit?: number;
 };
-
-/** @desc Configuration for pagination; style discriminates offset vs cursor behaviour */
-export type PaginatedConfig = OffsetPaginatedConfig | CursorPaginatedConfig;
 
 type OffsetInput = { limit: number; offset: number };
 type CursorInput = { cursor?: string; limit: number };
@@ -38,42 +39,43 @@ type CursorOutput<T> = {
   limit: number;
 };
 
-/** @desc Return type of ez.paginated() for offset style: input schema and output(schema) factory */
-export type OffsetPaginatedResult = {
+/** @desc Return type of ez.paginated() for offset style: input and output schemas */
+export type OffsetPaginatedResult<T extends z.ZodType = z.ZodType> = {
   input: z.ZodType<OffsetInput>;
-  output: <T extends z.ZodType>(
-    itemSchema: T,
-  ) => z.ZodType<OffsetOutput<z.output<T>>>;
+  output: z.ZodType<OffsetOutput<z.output<T>>>;
 };
 
-/** @desc Return type of ez.paginated() for cursor style: input schema and output(schema) factory */
-export type CursorPaginatedResult = {
+/** @desc Return type of ez.paginated() for cursor style: input and output schemas */
+export type CursorPaginatedResult<T extends z.ZodType = z.ZodType> = {
   input: z.ZodType<CursorInput>;
-  output: <T extends z.ZodType>(
-    itemSchema: T,
-  ) => z.ZodType<CursorOutput<z.output<T>>>;
+  output: z.ZodType<CursorOutput<z.output<T>>>;
 };
 
 /**
  * Creates a pagination helper with a single config for both request params and response shape.
- * Use the returned `.input` as the endpoint input schema and `.output(itemSchema)` for the response schema.
+ * Use the returned `.input` as the endpoint input schema and `.output` as the response schema.
  * Compose with other params via `.input.and(z.object({ ... }))`.
  *
- * @param config - Pagination config; `style` discriminates offset vs cursor (limit/offset vs cursor/limit).
- * @returns Object with `input` (Zod schema for pagination params) and `output(itemSchema)` (factory for response schema).
+ * @param config - Pagination config; `style` discriminates offset vs cursor; `itemSchema` defines each list item.
+ * @returns Object with `input` (Zod schema for pagination params) and `output` (schema for paginated response).
  *
  * @example
- * const pagination = ez.paginated({ style: "offset", maxLimit: 100, defaultLimit: 20 });
+ * const pagination = ez.paginated({ style: "offset", maxLimit: 100, defaultLimit: 20, itemSchema: userSchema });
  * input: pagination.input,
- * output: pagination.output(userSchema),
+ * output: pagination.output,
  */
-export function paginated(config: OffsetPaginatedConfig): OffsetPaginatedResult;
-export function paginated(config: CursorPaginatedConfig): CursorPaginatedResult;
+export function paginated<T extends z.ZodType>(
+  config: OffsetPaginatedConfig<T>,
+): OffsetPaginatedResult<T>;
+export function paginated<T extends z.ZodType>(
+  config: CursorPaginatedConfig<T>,
+): CursorPaginatedResult<T>;
 export function paginated(
-  config: PaginatedConfig,
+  config: OffsetPaginatedConfig | CursorPaginatedConfig,
 ): OffsetPaginatedResult | CursorPaginatedResult {
   const maxLimit = config.maxLimit ?? DEFAULT_MAX_LIMIT;
   const defaultLimit = config.defaultLimit ?? DEFAULT_LIMIT;
+  const itemSchema = config.itemSchema;
 
   const limitSchema = z.coerce
     .number()
@@ -96,17 +98,14 @@ export function paginated(
       offset: offsetSchema,
     });
 
-    return {
-      input,
-      output<T extends z.ZodType>(itemSchema: T) {
-        return z.object({
-          items: z.array(itemSchema).describe("Page of items"),
-          total: z.number().int().min(0).describe("Total number of items"),
-          limit: z.number().int().min(1).describe("Page size used"),
-          offset: z.number().int().min(0).describe("Offset used"),
-        });
-      },
-    };
+    const output = z.object({
+      items: z.array(itemSchema).describe("Page of items"),
+      total: z.number().int().min(0).describe("Total number of items"),
+      limit: z.number().int().min(1).describe("Page size used"),
+      offset: z.number().int().min(0).describe("Offset used"),
+    });
+
+    return { input, output };
   }
 
   // cursor style
@@ -120,17 +119,14 @@ export function paginated(
     limit: limitSchema,
   });
 
-  return {
-    input,
-    output<T extends z.ZodType>(itemSchema: T) {
-      return z.object({
-        items: z.array(itemSchema).describe("Page of items"),
-        nextCursor: z
-          .string()
-          .nullable()
-          .describe("Cursor for the next page, or null if no more pages"),
-        limit: z.number().int().min(1).describe("Page size used"),
-      });
-    },
-  };
+  const output = z.object({
+    items: z.array(itemSchema).describe("Page of items"),
+    nextCursor: z
+      .string()
+      .nullable()
+      .describe("Cursor for the next page, or null if no more pages"),
+    limit: z.number().int().min(1).describe("Page size used"),
+  });
+
+  return { input, output };
 }

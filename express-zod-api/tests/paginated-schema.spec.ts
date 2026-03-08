@@ -7,10 +7,13 @@ import {
 } from "../src";
 import { givePort } from "../../tools/ports";
 
+const userSchema = z.object({ id: z.number(), name: z.string() });
+
 describe("ez.paginated()", () => {
   describe("offset style", () => {
     const pagination = ez.paginated({
       style: "offset",
+      itemSchema: userSchema,
       maxLimit: 100,
       defaultLimit: 20,
     });
@@ -59,6 +62,7 @@ describe("ez.paginated()", () => {
       test("accepts custom defaultLimit and maxLimit", () => {
         const custom = ez.paginated({
           style: "offset",
+          itemSchema: userSchema,
           maxLimit: 50,
           defaultLimit: 10,
         });
@@ -73,8 +77,7 @@ describe("ez.paginated()", () => {
     });
 
     describe("output", () => {
-      const userSchema = z.object({ id: z.number(), name: z.string() });
-      const outputSchema = pagination.output(userSchema);
+      const outputSchema = pagination.output;
 
       test("parses valid offset response", () => {
         const result = outputSchema.safeParse({
@@ -107,8 +110,10 @@ describe("ez.paginated()", () => {
   });
 
   describe("cursor style", () => {
+    const postSchema = z.object({ id: z.number(), title: z.string() });
     const pagination = ez.paginated({
       style: "cursor",
+      itemSchema: postSchema,
       maxLimit: 50,
       defaultLimit: 20,
     });
@@ -143,8 +148,7 @@ describe("ez.paginated()", () => {
     });
 
     describe("output", () => {
-      const postSchema = z.object({ id: z.number(), title: z.string() });
-      const outputSchema = pagination.output(postSchema);
+      const outputSchema = pagination.output;
 
       test("parses valid cursor response", () => {
         const result = outputSchema.safeParse({
@@ -175,6 +179,7 @@ describe("ez.paginated()", () => {
     test("input can be composed with .and() for extra params", () => {
       const pagination = ez.paginated({
         style: "offset",
+        itemSchema: userSchema,
         maxLimit: 100,
         defaultLimit: 20,
       });
@@ -209,11 +214,10 @@ describe("ez.paginated()", () => {
       http: { listen: givePort() },
     });
 
-    const userSchema = z.object({ id: z.number(), name: z.string() });
-
     test("offset pagination endpoint is documented with query params and response schema", () => {
       const pagination = ez.paginated({
         style: "offset",
+        itemSchema: userSchema,
         maxLimit: 100,
         defaultLimit: 20,
       });
@@ -223,7 +227,7 @@ describe("ez.paginated()", () => {
           users: defaultEndpointsFactory.build({
             method: "get",
             input: pagination.input,
-            output: pagination.output(userSchema),
+            output: pagination.output,
             handler: async ({ input: { limit, offset } }) => ({
               items: [],
               total: 0,
@@ -242,6 +246,7 @@ describe("ez.paginated()", () => {
     test("cursor pagination endpoint is documented with query params and response schema", () => {
       const pagination = ez.paginated({
         style: "cursor",
+        itemSchema: userSchema,
         maxLimit: 50,
         defaultLimit: 20,
       });
@@ -251,7 +256,7 @@ describe("ez.paginated()", () => {
           posts: defaultEndpointsFactory.build({
             method: "get",
             input: pagination.input,
-            output: pagination.output(userSchema),
+            output: pagination.output,
             handler: async ({ input: { cursor, limit } }) => ({
               items: [],
               nextCursor: `next${cursor}`,
