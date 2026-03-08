@@ -5,21 +5,52 @@ const userSchema = z.object({ id: z.number(), name: z.string() });
 
 describe("ez.paginated()", () => {
   describe("config validation", () => {
-    test("throws when maxLimit is 0 or less", () => {
+    test("throws when maxLimit is not a positive integer", () => {
       expect(() =>
         ez.paginated({
           style: "offset",
           itemSchema: userSchema,
           maxLimit: 0,
         }),
-      ).toThrow("ez.paginated: maxLimit must be greater than 0");
+      ).toThrow("ez.paginated: maxLimit must be a positive integer");
       expect(() =>
         ez.paginated({
           style: "cursor",
           itemSchema: userSchema,
           maxLimit: -1,
         }),
-      ).toThrow("ez.paginated: maxLimit must be greater than 0");
+      ).toThrow("ez.paginated: maxLimit must be a positive integer");
+      expect(() =>
+        ez.paginated({
+          style: "offset",
+          itemSchema: userSchema,
+          maxLimit: 50.5,
+        }),
+      ).toThrow("ez.paginated: maxLimit must be a positive integer");
+    });
+
+    test("throws when defaultLimit is not a positive integer", () => {
+      expect(() =>
+        ez.paginated({
+          style: "offset",
+          itemSchema: userSchema,
+          defaultLimit: 0,
+        }),
+      ).toThrow("ez.paginated: defaultLimit must be a positive integer");
+      expect(() =>
+        ez.paginated({
+          style: "cursor",
+          itemSchema: userSchema,
+          defaultLimit: -1,
+        }),
+      ).toThrow("ez.paginated: defaultLimit must be a positive integer");
+      expect(() =>
+        ez.paginated({
+          style: "offset",
+          itemSchema: userSchema,
+          defaultLimit: 1.5,
+        }),
+      ).toThrow("ez.paginated: defaultLimit must be a positive integer");
     });
 
     test("throws when defaultLimit is greater than maxLimit", () => {

@@ -161,8 +161,10 @@ export function paginated({
 }: OffsetPaginatedConfig | CursorPaginatedConfig):
   | OffsetPaginatedResult
   | CursorPaginatedResult {
-  if (maxLimit <= 0)
-    throw new Error("ez.paginated: maxLimit must be greater than 0");
+  if (!Number.isInteger(maxLimit) || maxLimit < 1)
+    throw new Error("ez.paginated: maxLimit must be a positive integer");
+  if (!Number.isInteger(defaultLimit) || defaultLimit < 1)
+    throw new Error("ez.paginated: defaultLimit must be a positive integer");
   if (defaultLimit > maxLimit) {
     throw new Error(
       "ez.paginated: defaultLimit must not be greater than maxLimit",
