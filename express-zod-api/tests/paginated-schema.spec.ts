@@ -150,19 +150,17 @@ describe("ez.paginated()", () => {
         const result = outputSchema.safeParse({
           items: [{ id: 1, title: "First" }],
           nextCursor: "next_page_token",
-          hasMore: true,
           limit: 20,
         });
         expect(result.success).toBe(true);
         if (result.success) {
           expect(result.data.items).toHaveLength(1);
           expect(result.data.nextCursor).toBe("next_page_token");
-          expect(result.data.hasMore).toBe(true);
           expect(result.data.limit).toBe(20);
         }
       });
 
-      test("accepts nextCursor null and hasMore omitted", () => {
+      test("accepts nextCursor null", () => {
         const result = outputSchema.safeParse({
           items: [],
           nextCursor: null,

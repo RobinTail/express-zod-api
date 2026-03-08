@@ -35,7 +35,6 @@ type OffsetOutput<T> = {
 type CursorOutput<T> = {
   items: T[];
   nextCursor: string | null;
-  hasMore?: boolean;
   limit: number;
 };
 
@@ -130,7 +129,6 @@ export function paginated(
           .string()
           .nullable()
           .describe("Cursor for the next page, or null if no more pages"),
-        hasMore: z.boolean().optional().describe("Whether more pages exist"),
         limit: z.number().int().min(1).describe("Page size used"),
       });
     },

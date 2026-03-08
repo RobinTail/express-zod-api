@@ -59,9 +59,6 @@ paths:
                         type:
                           - string
                           - "null"
-                      hasMore:
-                        description: Whether more pages exist
-                        type: boolean
                       limit:
                         type: integer
                         minimum: 1
