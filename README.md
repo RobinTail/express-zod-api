@@ -1310,9 +1310,10 @@ new ResultHandler({
 
 ## Array response
 
-Responding with a bare array is not recommended for new APIs (it blocks backward‑compatible changes). For migrating
-legacy APIs, use `arrayResultHandler` or `arrayEndpointsFactory`: the endpoint output must have an `items` array, which
-is sent as the response body. See the [example](/example/endpoints/list-users.ts).
+Responding with a bare array is not recommended for new APIs (it blocks backward‑compatible changes).
+For new endpoints, prefer [Pagination](#pagination). For migrating legacy APIs, use `arrayResultHandler` or
+`arrayEndpointsFactory`: the endpoint output must have an `items` array, which is sent as the response body.
+See the [bad](/example/endpoints/list-users.ts) and [good](/example/endpoints/list-users-paginated.ts) examples.
 
 ## Accepting raw data
 
