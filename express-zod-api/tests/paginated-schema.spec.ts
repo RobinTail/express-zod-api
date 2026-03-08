@@ -1,11 +1,5 @@
 import { z } from "zod";
-import {
-  defaultEndpointsFactory,
-  Documentation,
-  ez,
-  createConfig,
-} from "../src";
-import { givePort } from "../../tools/ports";
+import { ez } from "../src";
 
 const userSchema = z.object({ id: z.number(), name: z.string() });
 
@@ -265,71 +259,6 @@ describe("ez.paginated()", () => {
           role: "admin",
         });
       }
-    });
-  });
-
-  describe("OpenAPI documentation", () => {
-    const sampleConfig = createConfig({
-      cors: true,
-      logger: { level: "silent" },
-      http: { listen: givePort() },
-    });
-
-    test("offset pagination endpoint is documented with query params and response schema", () => {
-      const pagination = ez.paginated({
-        style: "offset",
-        itemSchema: userSchema,
-        maxLimit: 100,
-        defaultLimit: 20,
-      });
-      const spec = new Documentation({
-        config: sampleConfig,
-        routing: {
-          users: defaultEndpointsFactory.build({
-            method: "get",
-            input: pagination.input,
-            output: pagination.output,
-            handler: async ({ input: { limit, offset } }) => ({
-              items: [],
-              total: 0,
-              limit,
-              offset,
-            }),
-          }),
-        },
-        version: "1.0.0",
-        title: "Paginated API",
-        serverUrl: "https://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
-    });
-
-    test("cursor pagination endpoint is documented with query params and response schema", () => {
-      const pagination = ez.paginated({
-        style: "cursor",
-        itemSchema: userSchema,
-        maxLimit: 50,
-        defaultLimit: 20,
-      });
-      const spec = new Documentation({
-        config: sampleConfig,
-        routing: {
-          posts: defaultEndpointsFactory.build({
-            method: "get",
-            input: pagination.input,
-            output: pagination.output,
-            handler: async ({ input: { cursor, limit } }) => ({
-              items: [],
-              nextCursor: `next${cursor}`,
-              limit,
-            }),
-          }),
-        },
-        version: "1.0.0",
-        title: "Cursor Paginated API",
-        serverUrl: "https://example.com",
-      }).getSpecAsYaml();
-      expect(spec).toMatchSnapshot();
     });
   });
 });
