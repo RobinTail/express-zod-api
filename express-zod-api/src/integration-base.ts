@@ -310,9 +310,6 @@ export abstract class IntegrationBase {
     return this.api.makeType(
       this.#ids.paginationType,
       this.api.makeUnion([cursorShape, offsetShape]),
-      {
-        expose: true,
-      },
     );
   };
 

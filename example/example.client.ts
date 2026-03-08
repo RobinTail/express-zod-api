@@ -736,7 +736,7 @@ export type Implementation<T = unknown> = (
   ctx?: T,
 ) => Promise<any>;
 
-export type Pagination =
+type Pagination =
   | {
       nextCursor: string | null;
     }
