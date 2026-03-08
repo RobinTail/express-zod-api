@@ -2217,7 +2217,7 @@ const labeledDefaultSchema = withMeta(
     capabilities, so that the user could subscribe to subsequent updates initiated by the server;
   - Check out an [example of the synergy between two frameworks](https://github.com/RobinTail/zod-sockets#subscriptions)
     and the [Demo Chat application](https://github.com/RobinTail/chat);
-  - The feature suggested by [@ben-xD](https://github.com/ben-xD).
+  - The feature suggested by [@uxduck](https://github.com/uxduck).
 
 ### v18.1.0
 
