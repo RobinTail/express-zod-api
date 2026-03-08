@@ -104,7 +104,7 @@ describe("Example", async () => {
       expect(true).toBeTruthy();
     });
 
-    test("Should respond with array (legacy API ResultHandler)", async () => {
+    test("Should respond with paginated list (ez.paginated)", async () => {
       const response = await fetch(`http://localhost:${port}/v1/user/list`);
       expect(response.status).toBe(200);
       const json = await response.json();
@@ -120,10 +120,15 @@ describe("Example", async () => {
         `http://localhost:${port}/v1/user/list?${query}`,
       );
       expect(response.status).toBe(200);
-      const json = await response.json();
-      if (!Array.isArray(json)) fail("should be an array");
+      const json = (await response.json()) as {
+        data?: { items?: Array<{ role: string }> };
+      };
+      const items = json.data?.items;
+      if (!Array.isArray(items)) fail("response.data.items should be an array");
       expect(
-        json.every((one) => ["admin", "operator"].includes(one.role)),
+        items.every((one: { role: string }) =>
+          ["admin", "operator"].includes(one.role),
+        ),
       ).toBeTruthy();
     });
 

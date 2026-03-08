@@ -162,14 +162,31 @@ interface PostV1UserCreateNegativeResponseVariants {
 
 /** get /v1/user/list */
 type GetV1UserListInput = {
+  /** Page size (number of items per page) */
+  limit?: number | undefined;
+  /** Number of items to skip */
+  offset?: number | undefined;
+  /** Filter by roles; omit for all */
   roles?: ("manager" | "operator" | "admin")[] | undefined;
 };
 
 /** get /v1/user/list */
 type GetV1UserListPositiveVariant1 = {
-  name: string;
-  role: "manager" | "operator" | "admin";
-}[];
+  status: "success";
+  data: {
+    /** Page of items */
+    items: {
+      name: string;
+      role: "manager" | "operator" | "admin";
+    }[];
+    /** Total number of items */
+    total: number;
+    /** Page size used */
+    limit: number;
+    /** Offset used */
+    offset: number;
+  };
+};
 
 /** get /v1/user/list */
 interface GetV1UserListPositiveResponseVariants {
@@ -177,7 +194,12 @@ interface GetV1UserListPositiveResponseVariants {
 }
 
 /** get /v1/user/list */
-type GetV1UserListNegativeVariant1 = string;
+type GetV1UserListNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
 
 /** get /v1/user/list */
 interface GetV1UserListNegativeResponseVariants {
@@ -186,6 +208,11 @@ interface GetV1UserListNegativeResponseVariants {
 
 /** head /v1/user/list */
 type HeadV1UserListInput = {
+  /** Page size (number of items per page) */
+  limit?: number | undefined;
+  /** Number of items to skip */
+  offset?: number | undefined;
+  /** Filter by roles; omit for all */
   roles?: ("manager" | "operator" | "admin")[] | undefined;
 };
 
