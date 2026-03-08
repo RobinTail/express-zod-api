@@ -117,7 +117,7 @@ These people contributed to the improvement of the framework by reporting bugs, 
 [<img src="https://github.com/rottmann.png" alt="@rottmann" width="50" />](https://github.com/rottmann)
 [<img src="https://github.com/boarush.png" alt="@boarush" width="50" />](https://github.com/boarush)
 [<img src="https://github.com/shawncarr.png" alt="@shawncarr" width="50" />](https://github.com/shawncarr)
-[<img src="https://github.com/ben-xD.png" alt="@ben-xD" width="50" />](https://github.com/ben-xD)
+[<img src="https://github.com/uxduck.png" alt="@uxduck" width="50" />](https://github.com/uxduck)
 [<img src="https://github.com/daniel-white.png" alt="@daniel-white" width="50" />](https://github.com/daniel-white)
 [<img src="https://github.com/kotsmile.png" alt="@kotsmile" width="50" />](https://github.com/kotsmile)
 [<img src="https://github.com/elee1766.png" alt="@elee1766" width="50" />](https://github.com/elee1766)
