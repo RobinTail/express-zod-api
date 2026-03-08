@@ -114,13 +114,14 @@ export function paginated<T extends z.ZodType>(
 export function paginated<T extends z.ZodType>(
   config: CursorPaginatedConfig<T>,
 ): CursorPaginatedResult<T>;
-export function paginated(
-  config: OffsetPaginatedConfig | CursorPaginatedConfig,
-): OffsetPaginatedResult | CursorPaginatedResult {
-  const maxLimit = config.maxLimit ?? DEFAULT_MAX_LIMIT;
-  const defaultLimit = config.defaultLimit ?? DEFAULT_LIMIT;
-  const itemSchema = config.itemSchema;
-
+export function paginated({
+  style,
+  itemSchema,
+  maxLimit = DEFAULT_MAX_LIMIT,
+  defaultLimit = DEFAULT_LIMIT,
+}: OffsetPaginatedConfig | CursorPaginatedConfig):
+  | OffsetPaginatedResult
+  | CursorPaginatedResult {
   const limitSchema = z.coerce
     .number()
     .int()
@@ -129,7 +130,7 @@ export function paginated(
     .default(defaultLimit)
     .describe("Page size (number of items per page)");
 
-  if (config.style === "offset") {
+  if (style === "offset") {
     const offsetSchema = z.coerce
       .number()
       .int()
