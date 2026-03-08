@@ -29,7 +29,7 @@ const users: z.output<typeof userSchema>[] = [
 
 /**
  * Lists users with offset pagination and optional role filter.
- * Uses ez.paginated() for request params (limit, offset) and response shape (users, total, limit, offset).
+ * Uses ez.paginated() for input params (limit, offset) and output shape (users, total, limit, offset).
  */
 export const listUsersPaginatedEndpoint = defaultEndpointsFactory.build({
   tag: "users",

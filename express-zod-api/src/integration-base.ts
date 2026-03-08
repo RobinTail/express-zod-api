@@ -5,7 +5,7 @@ import { contentTypes } from "./content-type";
 import { ClientMethod, clientMethods } from "./method";
 import type { makeEventSchema } from "./sse";
 import { propOf, Typeable, TypescriptAPI } from "./typescript-api";
-import {
+import type {
   CursorPaginatedResult,
   OffsetPaginatedResult,
 } from "./paginated-schema";
