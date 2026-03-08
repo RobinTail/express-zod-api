@@ -3,77 +3,110 @@ import { z } from "zod";
 const DEFAULT_MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 20;
 
-/** @desc Common pagination config: item schema and limit options */
+/** @desc Common pagination config: shared by offset and cursor styles. */
 export interface CommonPaginationConfig<T extends z.ZodType = z.ZodType> {
-  /** Schema for each item in the paginated list */
+  /** @desc Zod schema for each item in the paginated list. */
   itemSchema: T;
-  /** Maximum allowed page size (default 100) */
+  /**
+   * @desc Maximum allowed page size (client request is capped to this).
+   * @default 100
+   */
   maxLimit?: number;
-  /** Default page size when client omits limit (default 20) */
+  /**
+   * @desc Default page size when the client omits the limit parameter.
+   * @default 20
+   */
   defaultLimit?: number;
 }
 
-/** @desc Configuration for offset-based pagination (limit + offset) */
+/**
+ * @desc Configuration for offset-based pagination (limit and offset).
+ * @example { style: "offset", itemSchema, maxLimit: 50, defaultLimit: 10 }
+ */
 export interface OffsetPaginatedConfig<
   T extends z.ZodType = z.ZodType,
 > extends CommonPaginationConfig<T> {
+  /** @desc Discriminator for offset-style pagination. */
   style: "offset";
 }
 
-/** @desc Configuration for cursor-based pagination (cursor + limit) */
+/**
+ * @desc Configuration for cursor-based pagination (cursor and limit).
+ * @example { style: "cursor", itemSchema, maxLimit: 50, defaultLimit: 10 }
+ */
 export interface CursorPaginatedConfig<
   T extends z.ZodType = z.ZodType,
 > extends CommonPaginationConfig<T> {
+  /** @desc Discriminator for cursor-style pagination. */
   style: "cursor";
 }
 
+/** @desc Request params for offset pagination. */
 interface OffsetInput {
+  /** @desc Page size (number of items per page). */
   limit: number;
+  /** @desc Number of items to skip from the start of the list. */
   offset: number;
 }
 
+/** @desc Request params for cursor pagination. */
 interface CursorInput {
+  /** @desc Opaque cursor for the next page; omit for the first page. */
   cursor?: string;
+  /** @desc Page size (number of items per page). */
   limit: number;
 }
 
+/** @desc Response shape for offset pagination. */
 interface OffsetOutput<T> {
+  /** @desc Page of items for the current request. */
   items: T[];
+  /** @desc Total number of items across all pages. */
   total: number;
+  /** @desc Page size used for this response. */
   limit: number;
+  /** @desc Offset used for this response. */
   offset: number;
 }
 
+/** @desc Response shape for cursor pagination. */
 interface CursorOutput<T> {
+  /** @desc Page of items for the current request. */
   items: T[];
+  /** @desc Cursor for the next page, or null if there are no more pages. */
   nextCursor: string | null;
+  /** @desc Page size used for this response. */
   limit: number;
 }
 
-/** @desc Return type of ez.paginated() for offset style: input and output schemas */
+/** @desc Return type of ez.paginated() for offset style. */
 export interface OffsetPaginatedResult<T extends z.ZodType = z.ZodType> {
+  /** @desc Zod schema for offset pagination request params. */
   input: z.ZodType<OffsetInput>;
+  /** @desc Zod schema for offset pagination response. */
   output: z.ZodType<OffsetOutput<z.output<T>>>;
 }
 
-/** @desc Return type of ez.paginated() for cursor style: input and output schemas */
+/** @desc Return type of ez.paginated() for cursor style. */
 export interface CursorPaginatedResult<T extends z.ZodType = z.ZodType> {
+  /** @desc Zod schema for cursor pagination request params. */
   input: z.ZodType<CursorInput>;
+  /** @desc Zod schema for cursor pagination response. */
   output: z.ZodType<CursorOutput<z.output<T>>>;
 }
 
 /**
- * Creates a pagination helper with a single config for both request params and response shape.
+ * @desc Creates a pagination helper with a single config for both request params and response shape.
  * Use the returned `.input` as the endpoint input schema and `.output` as the response schema.
  * Compose with other params via `.input.and(z.object({ ... }))`.
  *
  * @param config - Pagination config; `style` discriminates offset vs cursor; `itemSchema` defines each list item.
- * @returns Object with `input` (Zod schema for pagination params) and `output` (schema for paginated response).
+ * @returns Object with `input` (Zod schema for pagination params) and `output` (Zod schema for paginated response).
  *
  * @example
  * const pagination = ez.paginated({ style: "offset", maxLimit: 100, defaultLimit: 20, itemSchema: userSchema });
- * input: pagination.input,
- * output: pagination.output,
+ * endpoint.input = pagination.input.and(z.object({ ... }));
+ * endpoint.output = pagination.output;
  */
 export function paginated<T extends z.ZodType>(
   config: OffsetPaginatedConfig<T>,
