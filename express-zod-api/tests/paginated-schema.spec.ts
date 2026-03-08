@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ez } from "../src";
 
-const userSchema = z.object({ id: z.number(), name: z.string() });
+const itemSchema = z.object({ id: z.number(), name: z.string() });
 
 describe("ez.paginated()", () => {
   describe("config validation", () => {
@@ -9,7 +9,7 @@ describe("ez.paginated()", () => {
       "throws when maxLimit is $maxLimit",
       (maxLimit) => {
         expect(() =>
-          ez.paginated({ style: "offset", itemSchema: userSchema, maxLimit }),
+          ez.paginated({ style: "offset", itemSchema, maxLimit }),
         ).toThrow("ez.paginated: maxLimit must be a positive integer");
       },
     );
@@ -18,11 +18,7 @@ describe("ez.paginated()", () => {
       "throws when defaultLimit is $defaultLimit",
       (defaultLimit) => {
         expect(() =>
-          ez.paginated({
-            style: "cursor",
-            itemSchema: userSchema,
-            defaultLimit,
-          }),
+          ez.paginated({ style: "cursor", itemSchema, defaultLimit }),
         ).toThrow("ez.paginated: defaultLimit must be a positive integer");
       },
     );
@@ -31,7 +27,7 @@ describe("ez.paginated()", () => {
       expect(() =>
         ez.paginated({
           style: "offset",
-          itemSchema: userSchema,
+          itemSchema,
           maxLimit: 10,
           defaultLimit: 20,
         }),
@@ -42,11 +38,7 @@ describe("ez.paginated()", () => {
       "throws when itemsName is %s for offset output",
       (itemsName) => {
         expect(() =>
-          ez.paginated({
-            style: "offset",
-            itemSchema: userSchema,
-            itemsName,
-          }),
+          ez.paginated({ style: "offset", itemSchema, itemsName }),
         ).toThrow(
           "ez.paginated: itemsName must not match reserved keys for offset output (total, limit, offset)",
         );
@@ -57,11 +49,7 @@ describe("ez.paginated()", () => {
       "throws when itemsName is %s for cursor output",
       (itemsName) => {
         expect(() =>
-          ez.paginated({
-            style: "cursor",
-            itemSchema: userSchema,
-            itemsName,
-          }),
+          ez.paginated({ style: "cursor", itemSchema, itemsName }),
         ).toThrow(
           "ez.paginated: itemsName must not match reserved keys for cursor output (nextCursor, limit)",
         );
@@ -72,17 +60,14 @@ describe("ez.paginated()", () => {
   describe("offset style", () => {
     const pagination = ez.paginated({
       style: "offset",
-      itemSchema: userSchema,
+      itemSchema,
       maxLimit: 100,
       defaultLimit: 20,
     });
 
     describe("input", () => {
       test("parses query string params (coerced to numbers)", () => {
-        const result = pagination.input.safeParse({
-          limit: "10",
-          offset: "5",
-        });
+        const result = pagination.input.safeParse({ limit: "10", offset: "5" });
         expect(result.success).toBe(true);
         if (result.success)
           expect(result.data).toEqual({ limit: 10, offset: 5 });
@@ -121,7 +106,7 @@ describe("ez.paginated()", () => {
       test("accepts custom defaultLimit and maxLimit", () => {
         const custom = ez.paginated({
           style: "offset",
-          itemSchema: userSchema,
+          itemSchema,
           maxLimit: 50,
           defaultLimit: 10,
         });
@@ -250,7 +235,7 @@ describe("ez.paginated()", () => {
     test("output uses custom key for items array (offset and cursor)", () => {
       const offsetPagination = ez.paginated({
         style: "offset",
-        itemSchema: userSchema,
+        itemSchema,
         itemsName: "users",
         maxLimit: 100,
         defaultLimit: 20,
@@ -273,7 +258,7 @@ describe("ez.paginated()", () => {
 
       const cursorPagination = ez.paginated({
         style: "cursor",
-        itemSchema: userSchema,
+        itemSchema,
         itemsName: "results",
         maxLimit: 50,
         defaultLimit: 20,
@@ -299,7 +284,7 @@ describe("ez.paginated()", () => {
     test("input can be composed with .and() for extra params", () => {
       const pagination = ez.paginated({
         style: "offset",
-        itemSchema: userSchema,
+        itemSchema,
         maxLimit: 100,
         defaultLimit: 20,
       });
