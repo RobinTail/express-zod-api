@@ -1154,7 +1154,7 @@ const yamlString = new Documentation({
 }).getSpecAsYaml();
 ```
 
-You can add descriptions and examples to your endpoints, their I/O schemas, and their properties. It will be included
+You can add descriptions and examples to your endpoints, their I/O schemas, and their properties. They will be included
 in the generated documentation of your API. Consider the following example:
 
 ```ts
