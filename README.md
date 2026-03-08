@@ -26,11 +26,12 @@ Start your API server with I/O schema validation and custom middlewares in minut
    7. [Transformations](#transformations)
    8. [Top level transformations and mapping](#top-level-transformations-and-mapping)
    9. [Dealing with dates](#dealing-with-dates)
-   10. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
-   11. [Enabling HTTPS](#enabling-https)
-   12. [Enabling compression](#enabling-compression)
-   13. [Customizing logger](#customizing-logger)
-   14. [Child logger](#child-logger)
+   10. [Pagination](#pagination)
+   11. [Cross-Origin Resource Sharing](#cross-origin-resource-sharing) (CORS)
+   12. [Enabling HTTPS](#enabling-https)
+   13. [Enabling compression](#enabling-compression)
+   14. [Customizing logger](#customizing-logger)
+   15. [Child logger](#child-logger)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Headers as input source](#headers-as-input-source)
@@ -609,6 +610,36 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
   handler: async ({ input }) => ({
     createdAt: new Date("2022-01-22"), // 2022-01-22T00:00:00.000Z
   }),
+});
+```
+
+## Pagination
+
+Consider using `ez.paginated()` to get reusable `input` and `output` schemas for offset or cursor-based pagination.
+Attach schemas to your endpoint and compose with other params (e.g. `.and(z.object({ ... }))`).
+To check if more pages are available, use [Client.hasMore()](#generating-a-frontend-client).
+
+**Offset pagination** (limit and offset):
+
+```ts
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
+
+const pagination = ez.paginated({
+  style: "offset", // or "cursor"
+  itemSchema: z.object({ id: z.number(), name: z.string() }),
+  itemsName: "users", // defines the output name of the items array
+  maxLimit: 100,
+  defaultLimit: 20,
+});
+
+const listUsers = defaultEndpointsFactory.build({
+  input: pagination.input,
+  output: pagination.output,
+  handler: async ({ input: { limit, offset } }) => {
+    const { users, total } = await db.getUsers(limit, offset);
+    return { users, total, limit, offset }; // or nextCursor
+  },
 });
 ```
 
