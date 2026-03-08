@@ -1310,13 +1310,9 @@ new ResultHandler({
 
 ## Array response
 
-Please avoid doing this in new projects: responding with an array is a bad practice keeping your endpoints from evolving
-in a backward compatible way (without making breaking changes). Nevertheless, for easier migration of legacy APIs to
-this framework consider using `arrayResultHandler` or `arrayEndpointsFactory` instead of default ones,
-or implement your own ones similarly.
-The `arrayResultHandler` expects your endpoint to have `items` property in the `output` object schema. The array
-assigned to that property is used as the response. This approach also supports examples, as well as documentation and
-client generation. Check out [the example endpoint](/example/endpoints/list-users.ts) for more details.
+Responding with a bare array is not recommended for new APIs (it blocks backward‑compatible changes). For migrating
+legacy APIs, use `arrayResultHandler` or `arrayEndpointsFactory`: the endpoint output must have an `items` array, which
+is sent as the response body. See the [example](/example/endpoints/list-users.ts).
 
 ## Accepting raw data
 
