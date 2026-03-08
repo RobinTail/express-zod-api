@@ -47,7 +47,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
    12. [Testing middlewares](#testing-middlewares)
 6. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
-   2. [Generating a Frontend Client](#generating-a-frontend-client)
+   2. [End-to-End Type Safety](#end-to-end-type-safety)
    3. [Creating documentation](#creating-documentation)
    4. [Tagging the endpoints](#tagging-the-endpoints)
    5. [Deprecated schemas and routes](#deprecated-schemas-and-routes)
@@ -78,8 +78,8 @@ Therefore, many basic tasks can be achieved faster and easier, in particular:
 - Variables within an endpoint handler have types according to the declared schema, so your IDE and TypeScript will
   provide you with necessary hints to focus on bringing your vision to life.
 - All of your endpoints can respond consistently.
-- The expected endpoint input and response types can be exported to the frontend, so you don't get confused about the
-  field names when you implement the client for your API.
+- The expected endpoint input and response types can be exported to the frontend, giving you end-to-end type safety
+  so you don't get confused about the field names when you implement the client for your API.
 - You can generate your API documentation in OpenAPI 3.1 and JSON Schema compatible format.
 
 ## Contributors
@@ -617,7 +617,7 @@ const updateUserEndpoint = defaultEndpointsFactory.build({
 
 Consider using `ez.paginated()` to get reusable `input` and `output` schemas for offset or cursor-based pagination.
 Attach schemas to your endpoint and compose with other params (e.g. `.and(z.object({ ... }))`).
-To check if more pages are available, use [Client::hasMore()](#generating-a-frontend-client).
+To check if more pages are available, use [Client::hasMore()](#end-to-end-type-safety).
 
 ```ts
 import { z } from "zod";
@@ -1103,10 +1103,11 @@ expect(output).toEqual({ collectedContext: ["prev"], testLength: 9 });
 Express Zod API augments Zod using [Zod Plugin](https://www.npmjs.com/package/@express-zod-api/zod-plugin),
 adding the runtime helpers the framework relies on.
 
-## Generating a Frontend Client
+## End-to-End Type Safety
 
-You can generate a TypeScript file containing the IO types of your API and a client for it. Make sure you have
-`typescript` installed. Consider also installing `prettier` and using the async `printFormatted()` method.
+You can generate a TypeScript file containing the IO types of your API and a client for it, giving you end-to-end type
+safety between your API and frontend. Make sure you have `typescript` installed. Consider also installing `prettier`
+and using the async `printFormatted()` method.
 
 ```ts
 import typescript from "typescript";
@@ -1392,7 +1393,7 @@ createConfig({
 If you want the user of a client application to be able to subscribe to further updates initiated by the server,
 consider the [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) feature.
 Client application can subscribe to the event stream using `EventSource` class instance or the
-[instance of the generated](#generating-a-frontend-client) `Subscription` class. The following example demonstrates
+[instance of the generated](#end-to-end-type-safety) `Subscription` class. The following example demonstrates
 the implementation emitting the `time` event each second.
 
 ```ts
