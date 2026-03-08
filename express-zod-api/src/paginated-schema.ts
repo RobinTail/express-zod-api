@@ -3,9 +3,8 @@ import { z } from "zod";
 const DEFAULT_MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 20;
 
-/** @desc Configuration for offset-based pagination (limit + offset) */
-export type OffsetPaginatedConfig<T extends z.ZodType = z.ZodType> = {
-  style: "offset";
+/** @desc Common pagination config: item schema and limit options */
+export type CommonPaginationConfig<T extends z.ZodType = z.ZodType> = {
   /** Schema for each item in the paginated list */
   itemSchema: T;
   /** Maximum allowed page size (default 100) */
@@ -14,16 +13,13 @@ export type OffsetPaginatedConfig<T extends z.ZodType = z.ZodType> = {
   defaultLimit?: number;
 };
 
+/** @desc Configuration for offset-based pagination (limit + offset) */
+export type OffsetPaginatedConfig<T extends z.ZodType = z.ZodType> =
+  CommonPaginationConfig<T> & { style: "offset" };
+
 /** @desc Configuration for cursor-based pagination (cursor + limit) */
-export type CursorPaginatedConfig<T extends z.ZodType = z.ZodType> = {
-  style: "cursor";
-  /** Schema for each item in the paginated list */
-  itemSchema: T;
-  /** Maximum allowed page size (default 100) */
-  maxLimit?: number;
-  /** Default page size when client omits limit (default 20) */
-  defaultLimit?: number;
-};
+export type CursorPaginatedConfig<T extends z.ZodType = z.ZodType> =
+  CommonPaginationConfig<T> & { style: "cursor" };
 
 type OffsetInput = { limit: number; offset: number };
 type CursorInput = { cursor?: string; limit: number };
