@@ -203,7 +203,7 @@ export function paginated({
 
     const output = z.object({
       [itemsName]: z.array(itemSchema).describe(`Page of ${itemsName}`),
-      total: z.number().int().min(0).describe("Total number of items"),
+      total: z.number().int().min(0).describe(`Total number of ${itemsName}`),
       limit: z.number().int().min(1).describe("Page size used"),
       offset: z.number().int().min(0).describe("Offset used"),
     });

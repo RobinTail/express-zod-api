@@ -454,7 +454,7 @@ type GetV2UsersListPositiveVariant1 = {
       name: string;
       role: "manager" | "operator" | "admin";
     }[];
-    /** Total number of items */
+    /** Total number of users */
     total: number;
     /** Page size used */
     limit: number;
