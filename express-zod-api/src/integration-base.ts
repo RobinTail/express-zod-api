@@ -293,20 +293,11 @@ export abstract class IntegrationBase {
         ]),
       ),
     ]);
-    const offsetShape = this.api.f.createTypeLiteralNode([
-      this.api.makeInterfaceProp(
-        totalProp,
-        this.api.ts.SyntaxKind.NumberKeyword,
+    const offsetShape = this.api.f.createTypeLiteralNode(
+      [totalProp, limitProp, offsetProp].map((prop) =>
+        this.api.makeInterfaceProp(prop, this.api.ts.SyntaxKind.NumberKeyword),
       ),
-      this.api.makeInterfaceProp(
-        limitProp,
-        this.api.ts.SyntaxKind.NumberKeyword,
-      ),
-      this.api.makeInterfaceProp(
-        offsetProp,
-        this.api.ts.SyntaxKind.NumberKeyword,
-      ),
-    ]);
+    );
     return this.api.makeType(
       this.#ids.paginationType,
       this.api.makeUnion([cursorShape, offsetShape]),
