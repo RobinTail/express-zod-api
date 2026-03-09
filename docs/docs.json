@@ -3,9 +3,9 @@
   "name": "Express Zod API",
   "theme": "aspen",
   "colors": {
-    "primary": "#249cec",
-    "light": "#76c1f4",
-    "dark": "#254454"
+    "primary": "#d69000",
+    "light": "#d69000",
+    "dark": "#d69000"
   },
   "favicon": "https://media.brand.dev/11c1c6dd-fd68-4f67-9f16-fea7239e235c.png",
   "navbar": {
