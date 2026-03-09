@@ -22,7 +22,6 @@ const certExt = [
 ];
 
 export const signCert = () => {
-  // (forge as any).options.usePureJavaScript = true;
   const keys = forge.pki.rsa.generateKeyPair(2048);
   const cert = forge.pki.createCertificate();
   cert.publicKey = keys.publicKey;
