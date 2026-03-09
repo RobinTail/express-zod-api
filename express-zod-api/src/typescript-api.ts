@@ -16,7 +16,10 @@ export class TypescriptAPI {
   public f: typeof ts.factory;
   public exportModifier: ts.ModifierToken<ts.SyntaxKind.ExportKeyword>[];
   public asyncModifier: ts.ModifierToken<ts.SyntaxKind.AsyncKeyword>[];
-  public accessModifiers: Record<"public" | "protectedReadonly", ts.Modifier[]>;
+  public accessModifiers: Record<
+    "public" | "publicStatic" | "protectedReadonly",
+    ts.Modifier[]
+  >;
   #primitives: ts.KeywordTypeSyntaxKind[];
   static #safePropRegex = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
 
@@ -31,6 +34,10 @@ export class TypescriptAPI {
     ];
     this.accessModifiers = {
       public: [this.f.createModifier(this.ts.SyntaxKind.PublicKeyword)],
+      publicStatic: [
+        this.f.createModifier(this.ts.SyntaxKind.PublicKeyword),
+        this.f.createModifier(this.ts.SyntaxKind.StaticKeyword),
+      ],
       protectedReadonly: [
         this.f.createModifier(this.ts.SyntaxKind.ProtectedKeyword),
         this.f.createModifier(this.ts.SyntaxKind.ReadonlyKeyword),
@@ -293,10 +300,17 @@ export class TypescriptAPI {
     {
       typeParams,
       returns,
-    }: { typeParams?: TypeParams; returns?: ts.TypeNode } = {},
+      isStatic,
+    }: {
+      typeParams?: TypeParams;
+      returns?: ts.TypeNode;
+      isStatic?: boolean;
+    } = {},
   ) =>
     this.f.createMethodDeclaration(
-      this.accessModifiers.public,
+      isStatic
+        ? this.accessModifiers.publicStatic
+        : this.accessModifiers.public,
       undefined,
       name,
       undefined,

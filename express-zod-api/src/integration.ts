@@ -168,6 +168,7 @@ export class Integration extends IntegrationBase {
       this.makeParseRequestFn(),
       this.makeSubstituteFn(),
       this.makeImplementationType(),
+      this.makePaginationType(),
       this.makeDefaultImplementation(),
       this.makeClientClass(clientClassName),
       this.makeSubscriptionClass(subscriptionClassName),

@@ -98,6 +98,7 @@ export default [
   "if-unmodified-since",
   "im",
   "include-referred-token-binding-id",
+  "incremental",
   "isolation",
   "keep-alive",
   "label",

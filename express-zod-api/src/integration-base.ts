@@ -5,6 +5,10 @@ import { contentTypes } from "./content-type";
 import { ClientMethod, clientMethods } from "./method";
 import type { makeEventSchema } from "./sse";
 import { propOf, Typeable, TypescriptAPI } from "./typescript-api";
+import type {
+  CursorPaginatedResult,
+  OffsetPaginatedResult,
+} from "./paginated-schema";
 
 type IOKind = "input" | "response" | ResponseVariant | "encoded";
 type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
@@ -61,6 +65,7 @@ export abstract class IntegrationBase {
     methodType: "Method",
     someOfType: "SomeOf",
     requestType: "Request",
+    paginationType: "Pagination",
   } satisfies Record<string, string>;
 
   /** @internal */
@@ -268,6 +273,84 @@ export abstract class IntegrationBase {
       ),
     );
 
+  /**
+   * @example { nextCursor: string | null } | { total, limit, offset: number }
+   * @internal
+   */
+  protected makePaginationType = () => {
+    const nextCursorProp =
+      propOf<CursorPaginatedResult["output"]["shape"]>("nextCursor");
+    const totalProp = propOf<OffsetPaginatedResult["output"]["shape"]>("total");
+    const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
+    const offsetProp =
+      propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
+    const cursorShape = this.api.f.createTypeLiteralNode([
+      this.api.makeInterfaceProp(
+        nextCursorProp,
+        this.api.makeUnion([
+          this.api.ensureTypeNode(this.api.ts.SyntaxKind.StringKeyword),
+          this.api.makeLiteralType(null),
+        ]),
+      ),
+    ]);
+    const offsetShape = this.api.f.createTypeLiteralNode(
+      [totalProp, limitProp, offsetProp].map((prop) =>
+        this.api.makeInterfaceProp(prop, this.api.ts.SyntaxKind.NumberKeyword),
+      ),
+    );
+    return this.api.makeType(
+      this.#ids.paginationType,
+      this.api.makeUnion([cursorShape, offsetShape]),
+    );
+  };
+
+  /**
+   * static hasMore(response: Pagination): boolean
+   * @internal
+   */
+  #makeHasMoreMethod = () => {
+    const responseId = this.api.makeId(this.#ids.responseConst);
+    const nextCursorProp =
+      propOf<CursorPaginatedResult["output"]["shape"]>("nextCursor");
+    const totalProp = propOf<OffsetPaginatedResult["output"]["shape"]>("total");
+    const limitProp = propOf<OffsetPaginatedResult["output"]["shape"]>("limit");
+    const offsetProp =
+      propOf<OffsetPaginatedResult["output"]["shape"]>("offset");
+    const inExpression = this.api.f.createBinaryExpression(
+      this.api.literally(nextCursorProp),
+      this.api.ts.SyntaxKind.InKeyword,
+      responseId,
+    );
+    const returnCursor = this.api.f.createReturnStatement(
+      this.api.f.createBinaryExpression(
+        this.api.f.createPropertyAccessExpression(responseId, nextCursorProp),
+        this.api.ts.SyntaxKind.ExclamationEqualsEqualsToken,
+        this.api.literally(null),
+      ),
+    );
+    const offsetPlusLimit = this.api.f.createBinaryExpression(
+      this.api.f.createPropertyAccessExpression(responseId, offsetProp),
+      this.api.ts.SyntaxKind.PlusToken,
+      this.api.f.createPropertyAccessExpression(responseId, limitProp),
+    );
+    const returnOffset = this.api.f.createReturnStatement(
+      this.api.f.createBinaryExpression(
+        offsetPlusLimit,
+        this.api.ts.SyntaxKind.LessThanToken,
+        this.api.f.createPropertyAccessExpression(responseId, totalProp),
+      ),
+    );
+    return this.api.makePublicMethod(
+      "hasMore",
+      [this.api.makeParam(responseId, { type: this.#ids.paginationType })],
+      [this.api.f.createIfStatement(inExpression, returnCursor), returnOffset],
+      {
+        returns: this.api.ensureTypeNode(this.api.ts.SyntaxKind.BooleanKeyword),
+        isStatic: true,
+      },
+    );
+  };
+
   // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {}
   #makeProvider = () =>
     this.api.makePublicMethod(
@@ -333,6 +416,7 @@ export abstract class IntegrationBase {
           }),
         ]),
         this.#makeProvider(),
+        this.#makeHasMoreMethod(),
       ],
       { typeParams: ["T"] },
     );
