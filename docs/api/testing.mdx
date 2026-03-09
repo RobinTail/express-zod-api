@@ -1,0 +1,341 @@
+---
+title: "Testing Utilities"
+description: "Test your endpoints and middleware with built-in helpers"
+---
+
+## Overview
+
+Express Zod API provides utilities for testing endpoints and middleware without starting a server.
+
+```typescript
+import { testEndpoint, testMiddleware } from "express-zod-api";
+```
+
+## testEndpoint()
+
+Tests an endpoint by mocking request/response objects.
+
+```typescript
+import { testEndpoint } from "express-zod-api";
+
+const { responseMock, loggerMock } = await testEndpoint({
+  endpoint: getUserEndpoint,
+  requestProps: {
+    method: "GET",
+    query: { id: "123" },
+  },
+});
+
+expect(responseMock._getStatusCode()).toBe(200);
+expect(responseMock._getJSONData()).toEqual({
+  status: "success",
+  data: { id: "123", name: "John" },
+});
+```
+
+### Parameters
+
+<ParamField path="endpoint" type="Endpoint" required>
+  The endpoint to test
+</ParamField>
+
+<ParamField path="requestProps" type="RequestProps">
+  Mock request properties
+  
+  ```typescript
+  {
+    method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+    query?: Record<string, any>;
+    body?: any;
+    params?: Record<string, string>;
+    headers?: Record<string, string>;
+    files?: Record<string, any>;
+    // ... any Express Request property
+  }
+  ```
+</ParamField>
+
+<ParamField path="responseOptions" type="ResponseOptions">
+  Mock response options
+  
+  ```typescript
+  {
+    locals?: Record<string, any>;
+  }
+  ```
+</ParamField>
+
+<ParamField path="configProps" type="Partial<CommonConfig>">
+  Override config for this test
+</ParamField>
+
+<ParamField path="loggerProps" type="LoggerOverrides">
+  Custom logger for testing
+</ParamField>
+
+### Returns
+
+<ResponseField name="responseMock" type="MockResponse">
+  Mocked response object with assertion methods:
+  
+  - `_getStatusCode()`: Get HTTP status code
+  - `_getJSONData()`: Get parsed JSON response
+  - `_getHeaders()`: Get response headers (lowercase)
+  - `_isJSON()`: Check if response is JSON
+  - `_isEndCalled()`: Check if response ended
+  - `_getRedirectUrl()`: Get redirect location
+</ResponseField>
+
+<ResponseField name="loggerMock" type="MockLogger">
+  Mocked logger with logs:
+  
+  - `_getLogs()`: Returns `{ debug: [], info: [], warn: [], error: [] }`
+</ResponseField>
+
+### Examples
+
+#### Testing GET Endpoint
+
+```typescript
+import { testEndpoint } from "express-zod-api";
+import { describe, expect, test } from "vitest";
+
+describe("GET /users/:id", () => {
+  test("should return user", async () => {
+    const { responseMock, loggerMock } = await testEndpoint({
+      endpoint: getUserEndpoint,
+      requestProps: {
+        method: "GET",
+        params: { id: "123" },
+      },
+    });
+
+    expect(loggerMock._getLogs().error).toHaveLength(0);
+    expect(responseMock._getStatusCode()).toBe(200);
+    expect(responseMock._getJSONData()).toEqual({
+      status: "success",
+      data: {
+        id: "123",
+        name: "John Doe",
+        email: "john@example.com",
+      },
+    });
+  });
+
+  test("should return 404 for missing user", async () => {
+    const { responseMock } = await testEndpoint({
+      endpoint: getUserEndpoint,
+      requestProps: {
+        params: { id: "999" },
+      },
+    });
+
+    expect(responseMock._getStatusCode()).toBe(404);
+  });
+});
+```
+
+#### Testing POST Endpoint
+
+```typescript
+test("should create user", async () => {
+  const { responseMock } = await testEndpoint({
+    endpoint: createUserEndpoint,
+    requestProps: {
+      method: "POST",
+      body: {
+        name: "Jane Doe",
+        email: "jane@example.com",
+      },
+    },
+  });
+
+  expect(responseMock._getStatusCode()).toBe(201);
+  expect(responseMock._getJSONData().data).toHaveProperty("id");
+});
+```
+
+#### Testing File Upload
+
+```typescript
+test("should upload file", async () => {
+  const mockFile = {
+    name: "test.pdf",
+    data: Buffer.from("test content"),
+    size: 12,
+    mimetype: "application/pdf",
+    mv: vi.fn().mockResolvedValue(undefined),
+  };
+
+  const { responseMock } = await testEndpoint({
+    endpoint: uploadEndpoint,
+    requestProps: {
+      method: "POST",
+      files: { document: mockFile },
+    },
+  });
+
+  expect(responseMock._getStatusCode()).toBe(200);
+  expect(mockFile.mv).toHaveBeenCalled();
+});
+```
+
+## testMiddleware()
+
+Tests middleware in isolation.
+
+```typescript
+import { testMiddleware } from "express-zod-api";
+
+const { output, responseMock, loggerMock } = await testMiddleware({
+  middleware: authMiddleware,
+  requestProps: {
+    headers: { authorization: "Bearer token123" },
+  },
+});
+
+expect(output).toHaveProperty("user");
+expect(output.user.id).toBe("123");
+```
+
+### Parameters
+
+<ParamField path="middleware" type="Middleware" required>
+  The middleware to test
+</ParamField>
+
+<ParamField path="requestProps" type="RequestProps">
+  Mock request properties
+</ParamField>
+
+<ParamField path="responseOptions" type="ResponseOptions">
+  Mock response options
+</ParamField>
+
+<ParamField path="ctx" type="Context">
+  Context from previous middleware
+</ParamField>
+
+<ParamField path="configProps" type="Partial<CommonConfig>">
+  Override config for this test
+</ParamField>
+
+<ParamField path="loggerProps" type="LoggerOverrides">
+  Custom logger for testing
+</ParamField>
+
+### Returns
+
+<ResponseField name="output" type="Context">
+  Context object returned by middleware
+</ResponseField>
+
+<ResponseField name="responseMock" type="MockResponse">
+  Mocked response object
+</ResponseField>
+
+<ResponseField name="loggerMock" type="MockLogger">
+  Mocked logger
+</ResponseField>
+
+### Examples
+
+#### Testing Auth Middleware
+
+```typescript
+import { testMiddleware } from "express-zod-api";
+import createHttpError from "http-errors";
+
+test("should authenticate valid token", async () => {
+  const { output, responseMock } = await testMiddleware({
+    middleware: authMiddleware,
+    requestProps: {
+      headers: { authorization: "Bearer valid-token" },
+    },
+  });
+
+  expect(output.user).toBeDefined();
+  expect(output.user.id).toBe("123");
+});
+
+test("should reject invalid token", async () => {
+  const { responseMock } = await testMiddleware({
+    middleware: authMiddleware,
+    requestProps: {
+      headers: { authorization: "Bearer invalid" },
+    },
+  });
+
+  expect(responseMock._getStatusCode()).toBe(401);
+});
+```
+
+#### Testing Middleware Chain
+
+```typescript
+test("should pass context through chain", async () => {
+  // Test first middleware
+  const { output: firstOutput } = await testMiddleware({
+    middleware: authMiddleware,
+    requestProps: {
+      headers: { authorization: "Bearer token" },
+    },
+  });
+
+  // Test second middleware with previous context
+  const { output: secondOutput } = await testMiddleware({
+    middleware: permissionsMiddleware,
+    ctx: firstOutput,
+  });
+
+  expect(secondOutput).toHaveProperty("user");
+  expect(secondOutput).toHaveProperty("permissions");
+});
+```
+
+## Integration with Test Frameworks
+
+### Vitest
+
+```typescript
+import { describe, test, expect } from "vitest";
+import { testEndpoint } from "express-zod-api";
+
+describe("Users API", () => {
+  test("GET /users", async () => {
+    const { responseMock } = await testEndpoint({
+      endpoint: listUsersEndpoint,
+    });
+    expect(responseMock._getStatusCode()).toBe(200);
+  });
+});
+```
+
+### Jest
+
+```typescript
+import { testEndpoint } from "express-zod-api";
+
+describe("Users API", () => {
+  it("should list users", async () => {
+    const { responseMock } = await testEndpoint({
+      endpoint: listUsersEndpoint,
+    });
+    expect(responseMock._getStatusCode()).toBe(200);
+  });
+});
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="Testing Guide" href="/advanced/testing">
+    Complete testing guide
+  </Card>
+  <Card title="Endpoint" href="/api/endpoint">
+    Create endpoints
+  </Card>
+  <Card title="Middleware" href="/api/middleware">
+    Create middleware
+  </Card>
+</CardGroup>

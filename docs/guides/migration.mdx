@@ -1,0 +1,491 @@
+---
+title: Migration Guide
+description: Upgrade Express Zod API across major versions
+---
+
+## Overview
+
+This guide helps you migrate between major versions of Express Zod API. The framework provides automated migration tools to handle most breaking changes.
+
+<Note>
+  Express Zod API follows semantic versioning. Major version updates may include breaking changes, while minor and patch versions maintain backward compatibility.
+</Note>
+
+## Automated Migration Tool
+
+The framework includes an ESLint plugin that automatically fixes most breaking changes:
+
+```bash
+npm install --save-dev @express-zod-api/migration eslint @typescript-eslint/parser
+```
+
+### Basic Configuration
+
+Create or update your `eslint.config.mjs`:
+
+```js
+import parser from "@typescript-eslint/parser";
+import migration from "@express-zod-api/migration";
+
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v27": "error" } },
+];
+```
+
+### Run Migration
+
+```bash
+eslint --fix .
+```
+
+The tool will automatically update your code to the latest API.
+
+## Version 27 (Current)
+
+### From v26 to v27
+
+**Key Changes:**
+
+1. **TypeScript Dependency**: Now optional, only required for `Integration`
+2. **Integration Constructor**: Requires explicit `typescript` property or use async `create()`
+3. **Zod Plugin**: Uses inheritable metadata feature from Zod 4.3+
+
+#### Option 1: Import and Assign TypeScript
+
+```ts
+import { Integration } from "express-zod-api";
+import typescript from "typescript";
+
+const client = new Integration({
+  routing,
+  config,
+  typescript, // explicitly provide typescript
+});
+```
+
+#### Option 2: Use Async Factory
+
+```ts
+import { Integration } from "express-zod-api";
+
+// Delegates typescript import automatically
+const client = await Integration.create({
+  routing,
+  config,
+});
+```
+
+**Automated Migration:**
+
+```js
+// eslint.config.mjs
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v27": "error" } },
+];
+```
+
+## Version 26
+
+### From v25 to v26
+
+**Key Changes:**
+
+1. **Method-based routing**: `DependsOnMethod` removed in favor of direct method keys
+2. **Renamed properties**: `options` → `ctx`, `addOptions()` → `addContext()`
+3. **Integration config**: Now requires `config` property
+4. **http-errors**: Updated to v2.0.1+
+5. **Zod**: Updated to v4.1.13+ (CJS and ESM fix)
+
+#### Method-Based Routing
+
+```diff
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+- "/v1/users": new DependsOnMethod({
++ "/v1/users": {
+    get: getUserEndpoint,
+-   }).nest({
+    create: makeUserEndpoint,
+- }),
++ },
+};
+```
+
+#### Context Rename
+
+```diff
+import { Middleware } from "express-zod-api";
+
+const middleware = new Middleware({
+- handler: async ({ options }) => {
++ handler: async ({ ctx }) => {
+-   return { value: options.something };
++   return { value: ctx.something };
+  },
+});
+```
+
+```diff
+- factory.addOptions(async () => ({ db: mongoose.connect() }));
++ factory.addContext(async () => ({ db: mongoose.connect() }));
+```
+
+#### Integration Config
+
+```diff
+import { Integration } from "express-zod-api";
+
+const client = new Integration({
+  routing,
++ config, // now required
+});
+```
+
+**Automated Migration:**
+
+```js
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v26": "error" } },
+];
+```
+
+## Version 25
+
+### From v24 to v25
+
+**Key Changes:**
+
+1. **Node.js**: Minimum versions 20.19.0, 22.12.0, or 24.0.0
+2. **ESM-only**: Framework distribution is now ESM-only
+3. **Zod 4**: Must import from `zod` (not `zod/v4`)
+4. **Metadata**: Removed `example` property support in `.meta()`
+5. **Middleware input**: Now `unknown` when schema not defined
+
+#### Zod Import
+
+```diff
+- import { z } from "zod/v4";
++ import { z } from "zod";
+```
+
+#### Examples Syntax
+
+```diff
+- z.string().meta({ example: "test" });
+- z.string().meta({ examples: { one: { value: "test" } } });
++ z.string().meta({ examples: ["test"] });
++ z.string().example("test").example("another"); // plugin method
+```
+
+#### Date Schemas
+
+```diff
+- ez.dateIn().example("2021-12-31");
++ ez.dateIn({ examples: ["2021-12-31"] });
+```
+
+**Automated Migration:**
+
+```js
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v25": "error" } },
+];
+```
+
+## Version 24
+
+### From v23 to v24
+
+**Key Changes:**
+
+1. **Zod 4**: Switched to Zod v4 (import from `zod/v4`)
+2. **Example syntax**: `.example()` now takes output type (after transformation)
+3. **Date schemas**: Accept metadata as argument
+4. **File schema**: `ez.file()` removed, use `z.string()`, `z.base64()`, or `ez.buffer()`
+5. **Documentation**: Mostly delegated to Zod's `toJSONSchema()`
+6. **ResultHandler**: Discriminated argument (either `output` or `error`, not both)
+
+#### Import Changes
+
+```diff
+- import { z } from "zod";
++ import { z } from "zod/v4";
+```
+
+#### Example Placement
+
+```diff
+input: z.string()
++ .example("123")
+  .transform(Number)
+- .example("123") // wrong: takes number now
+```
+
+#### Date Schema Changes
+
+```diff
+- ez.dateIn().example("2021-12-31");
++ ez.dateIn({ examples: ["2021-12-31"] });
+```
+
+#### File Schema Replacement
+
+```diff
+- ez.file("base64");
++ z.base64();
+
+- ez.file("buffer");
++ ez.buffer();
+```
+
+**Automated Migration:**
+
+```js
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v24": "error" } },
+];
+```
+
+## Version 23
+
+### From v22 to v23
+
+**Key Changes:**
+
+1. **Express**: Minimum version 5.1.0 (first stable v5)
+2. **Wrong method behavior**: Default changed to `405` (Method Not Allowed)
+3. **Security interfaces**: `CustomHeaderSecurity` renamed to `HeaderSecurity`
+4. **Public API**: Many internal methods marked internal
+5. **Testing**: `errorHandler` moved to config from `testMiddleware()`
+
+#### Express Upgrade
+
+```bash
+npm install express@^5.1.0
+```
+
+#### Config Default
+
+The default for `wrongMethodBehavior` changed:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+// v22 default: 404
+// v23 default: 405
+const config = createConfig({
+  wrongMethodBehavior: 404, // explicit if you want old behavior
+});
+```
+
+#### Testing Changes
+
+```diff
+import { testMiddleware, createConfig } from "express-zod-api";
+
++ const config = createConfig({ errorHandler: customHandler });
+
+const { output } = await testMiddleware({
+  middleware,
+- errorHandler: customHandler,
++ configProps: { errorHandler: customHandler },
+});
+```
+
+**Automated Migration:**
+
+```js
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v23": "error" } },
+];
+```
+
+## Version 22
+
+### From v21 to v22
+
+**Key Changes:**
+
+1. **Node.js**: Minimum versions 20.9.0 and 22.0.0 (dropped Node 18)
+2. **Headers as input**: All headers addressed (not just `x-` prefixed)
+3. **Tagging**: Tags moved to `Documentation` constructor, use `TagOverrides` interface
+4. **Generated client**: Class renamed `ExpressZodAPIClient` → `Client`
+5. **Integration**: `splitResponse` property removed (always splits)
+
+#### Headers Configuration
+
+```diff
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  inputSources: {
+-   get: ["query", "headers"],
++   get: ["headers", "query"], // move headers first to avoid overwrites
+  },
+});
+```
+
+#### Tagging Changes
+
+```diff
+- createConfig({ tags: {} });
+
++ // Declare tags interface
++ declare module "express-zod-api" {
++   interface TagOverrides {
++     users: unknown;
++     files: unknown;
++   }
++ }
+
+- new Documentation({ routing, config });
++ new Documentation({
++   routing,
++   config,
++   tags: {
++     users: "All about users",
++     files: { description: "Files", url: "https://example.com" },
++   },
++ });
+```
+
+#### Factory Changes
+
+```diff
+- new EndpointsFactory({ config, resultHandler })
++ new EndpointsFactory(resultHandler)
+
+- new EventStreamFactory({ config, events })
++ new EventStreamFactory(events)
+```
+
+#### Client Usage
+
+```diff
+- import { ExpressZodAPIClient } from "./client";
+- const client = new ExpressZodAPIClient(implementation);
++ import { Client } from "./client";
++ const client = new Client(implementation);
+
+- client.provide("get", "/v1/user/retrieve", { id: "10" });
++ client.provide("get /v1/user/retrieve", { id: "10" });
+```
+
+**Automated Migration:**
+
+```js
+export default [
+  { languageOptions: { parser }, plugins: { migration } },
+  { files: ["**/*.ts"], rules: { "migration/v22": "error" } },
+];
+```
+
+## Common Patterns
+
+### Updating Dependencies
+
+Always update peer dependencies when upgrading:
+
+```bash
+npm install express-zod-api@latest \
+  express@latest \
+  zod@latest \
+  http-errors@latest
+
+npm install -D @types/express@latest \
+  @types/node@latest \
+  @types/http-errors@latest
+```
+
+### Checking Breaking Changes
+
+Read the changelog before upgrading:
+
+```bash
+npx npm-check-updates -i express-zod-api
+```
+
+Or visit the [changelog](https://github.com/RobinTail/express-zod-api/blob/master/CHANGELOG.md).
+
+### Testing After Migration
+
+Always run your test suite after migration:
+
+```bash
+npm test
+```
+
+Check for:
+- TypeScript compilation errors
+- Failed tests
+- Runtime errors
+- Documentation generation
+- Integration generation
+
+### Gradual Migration
+
+For large codebases:
+
+1. Create a new branch for migration
+2. Update dependencies
+3. Run automated migration
+4. Fix remaining TypeScript errors
+5. Run tests and fix failures
+6. Test generated documentation and client
+7. Deploy to staging environment
+8. Monitor for issues
+9. Merge to production
+
+## Version Support
+
+| Version | Node.js | Express | Zod | Status |
+|---------|---------|---------|-----|--------|
+| v27 | 20.19+, 22.12+, 24+ | 4.21+, 5.0+ | 4.3+ | Current |
+| v26 | 20.9+, 22+ | 4.21+, 5.0+ | 4.1+ | Maintenance |
+| v25 | 20.19+, 22.12+, 24+ | 4.21+, 5.0+ | 4.0+ | Unsupported |
+| v24 | 20.9+, 22+ | 4.21+, 5.0+ | 3.25.35+ | Unsupported |
+| v23 | 20.9+, 22+ | 5.1+ | 3.25.35+ | Unsupported |
+| v22 | 20.9+, 22+ | 4.21+, 5.0+ | 3.25.35+ | Unsupported |
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="TypeScript errors after migration">
+    Ensure your `tsconfig.json` has `strict: true` and `skipLibCheck: true`. Update `@types/*` packages to latest versions.
+  </Accordion>
+  
+  <Accordion title="Module resolution issues">
+    For Zod 4, ensure `moduleResolution` in `tsconfig.json` is `node16`, `nodenext`, or `bundler`.
+  </Accordion>
+  
+  <Accordion title="ESM/CJS compatibility">
+    Express Zod API v25+ is ESM-only. Set `"type": "module"` in `package.json` or use `.mts` extension.
+  </Accordion>
+  
+  <Accordion title="Zod plugin not working">
+    If using `require("zod")` in CJS, you may get different instances. Use ESM or update to v26+ for proper CJS support.
+  </Accordion>
+  
+  <Accordion title="Generated client errors">
+    Regenerate both documentation and client after migration. The generated API may have changed.
+  </Accordion>
+</AccordionGroup>
+
+## Getting Help
+
+- **GitHub Issues**: [Report bugs or ask questions](https://github.com/RobinTail/express-zod-api/issues)
+- **Changelog**: [Full version history](https://github.com/RobinTail/express-zod-api/blob/master/CHANGELOG.md)
+- **Migration Package**: [Automated migration tool](https://www.npmjs.com/package/@express-zod-api/migration)
+
+## Next Steps
+
+- Review the [Changelog](https://github.com/RobinTail/express-zod-api/blob/master/CHANGELOG.md) for detailed changes
+- Check [Authentication Guide](/guides/authentication) for updated patterns
+- See [API Reference](/api-reference/configuration) for current API documentation

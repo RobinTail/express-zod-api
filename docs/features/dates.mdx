@@ -1,0 +1,287 @@
+---
+title: Working with Dates
+description: Handle dates properly in Express Zod API using ez.dateIn() and ez.dateOut()
+---
+
+Dates in JavaScript are notoriously difficult to work with, and JSON doesn't have a native date type. Express Zod API provides specialized schemas to handle dates correctly in both requests and responses.
+
+## The Date Problem
+
+When you return a `Date` object in JSON, it's automatically converted to an ISO 8601 string by calling `toISOString()`:
+
+```js
+const response = { createdAt: new Date("2022-01-22") };
+JSON.stringify(response);
+// {"createdAt":"2022-01-22T00:00:00.000Z"}
+```
+
+Similarly, dates can't be transmitted in JSON format in their original form - they must be strings. The built-in `z.date()` schema doesn't handle these conversions automatically.
+
+## The Solution: ez.dateIn() and ez.dateOut()
+
+Express Zod API provides two custom schemas for handling dates:
+
+- **`ez.dateIn()`** - For input: accepts ISO string, validates it, transforms to `Date` object
+- **`ez.dateOut()`** - For output: accepts `Date` object, transforms to ISO string for response
+
+## Using ez.dateIn()
+
+`ez.dateIn()` accepts ISO date strings and transforms them into JavaScript `Date` objects:
+
+```ts
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
+
+const updateUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    userId: z.string(),
+    birthday: ez.dateIn({ examples: ["1963-04-21"] }),
+  }),
+  output: z.object({
+    success: z.boolean(),
+  }),
+  handler: async ({ input }) => {
+    // input.birthday is a Date object
+    console.log(input.birthday instanceof Date); // true
+    console.log(input.birthday.getFullYear()); // 1963
+    
+    await db.users.update({ id: input.userId, birthday: input.birthday });
+    return { success: true };
+  },
+});
+```
+
+## Supported Date Formats
+
+`ez.dateIn()` accepts several ISO 8601 date/time formats:
+
+```text
+2021-12-31T23:59:59.000Z  // Full ISO with milliseconds and timezone
+2021-12-31T23:59:59Z       // ISO without milliseconds
+2021-12-31T23:59:59        // Local time without timezone
+2021-12-31                 // Date only
+```
+
+## Using ez.dateOut()
+
+`ez.dateOut()` accepts a `Date` object and transforms it to an ISO string for the response:
+
+```ts
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
+
+const getUserEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    userId: z.string(),
+  }),
+  output: z.object({
+    name: z.string(),
+    createdAt: ez.dateOut({ examples: ["2021-12-31T00:00:00.000Z"] }),
+  }),
+  handler: async ({ input }) => {
+    const user = await db.users.findById(input.userId);
+    
+    return {
+      name: user.name,
+      createdAt: user.createdAt, // Date object from database
+    };
+  },
+});
+```
+
+The response will contain:
+
+```json
+{
+  "status": "success",
+  "data": {
+    "name": "John Doe",
+    "createdAt": "2021-12-31T00:00:00.000Z"
+  }
+}
+```
+
+## Complete Example
+
+Here's a real example from the Express Zod API source code:
+
+```ts
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
+
+const updateUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    userId: z.string(),
+    birthday: ez.dateIn({
+      description: "the day of birth",
+      examples: ["1963-04-21"],
+    }),
+  }),
+  output: z.object({
+    createdAt: ez.dateOut({
+      description: "account creation date",
+      examples: ["2021-12-31T00:00:00.000Z"],
+    }),
+  }),
+  handler: async ({ input }) => ({
+    createdAt: new Date("2022-01-22"),
+  }),
+});
+```
+
+## Adding Metadata
+
+Both `ez.dateIn()` and `ez.dateOut()` accept metadata that appears in generated documentation:
+
+```ts
+ez.dateIn({
+  description: "User's date of birth",
+  examples: ["1990-01-15"],
+})
+
+ez.dateOut({
+  description: "When the resource was created",
+  examples: ["2024-03-08T12:00:00.000Z"],
+})
+```
+
+## Validation with Dates
+
+You can add refinements to date schemas for additional validation:
+
+```ts
+import { ez } from "express-zod-api";
+import { z } from "zod";
+
+const bookingEndpoint = endpointsFactory.build({
+  input: z.object({
+    startDate: ez.dateIn(),
+    endDate: ez.dateIn(),
+  })
+  .refine(
+    (data) => data.endDate > data.startDate,
+    "End date must be after start date",
+  ),
+  // ...
+});
+```
+
+## Common Date Patterns
+
+### Future Dates Only
+
+```ts
+ez.dateIn().refine(
+  (date) => date > new Date(),
+  "Date must be in the future",
+)
+```
+
+### Age Verification
+
+```ts
+ez.dateIn().refine(
+  (birthDate) => {
+    const age = new Date().getFullYear() - birthDate.getFullYear();
+    return age >= 18;
+  },
+  "Must be at least 18 years old",
+)
+```
+
+### Date Range
+
+```ts
+ez.dateIn().refine(
+  (date) => {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    return date >= thirtyDaysAgo && date <= now;
+  },
+  "Date must be within the last 30 days",
+)
+```
+
+## Implementation Details
+
+Here's how `ez.dateIn()` works internally:
+
+```ts
+// From express-zod-api/src/date-in-schema.ts
+export const dateIn = ({ examples, ...rest } = {}) => {
+  const schema = z.union([
+    z.iso.date(),
+    z.iso.datetime(),
+    z.iso.datetime({ local: true }),
+  ]);
+
+  return schema
+    .meta({ examples })
+    .transform((str) => new Date(str))
+    .pipe(z.date())
+    .brand(ezDateInBrand as symbol)
+    .meta(rest);
+};
+```
+
+And `ez.dateOut()`:
+
+```ts
+// From express-zod-api/src/date-out-schema.ts
+export const dateOut = (meta = {}) =>
+  z
+    .date()
+    .transform((date) => date.toISOString())
+    .brand(ezDateOutBrand as symbol)
+    .meta(meta);
+```
+
+## Best Practices
+
+<Card title="Always Use ez.dateIn() for Input" icon="download">
+Don't use plain `z.date()` for input schemas. It won't handle JSON date strings correctly.
+</Card>
+
+<Card title="Always Use ez.dateOut() for Output" icon="upload">
+Use `ez.dateOut()` to ensure consistent ISO string formatting in responses.
+</Card>
+
+<Card title="Store Dates as Date Objects" icon="database">
+Work with proper Date objects in your handlers. Only convert to/from strings at API boundaries.
+</Card>
+
+<Card title="Include Examples" icon="book">
+Add examples to help generate better API documentation and make your API easier to understand.
+</Card>
+
+## Troubleshooting
+
+### "Invalid date string" Error
+
+Ensure the date string follows one of the supported ISO 8601 formats. Timestamps (epoch milliseconds) are not supported - convert them to ISO strings first:
+
+```ts
+// Wrong
+const timestamp = 1641000000000;
+
+// Right  
+const isoString = new Date(timestamp).toISOString();
+```
+
+### Timezone Issues
+
+All dates are handled in ISO 8601 format, which includes timezone information. Be careful when comparing dates across different timezones.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Pagination" icon="list" href="/features/pagination">
+    Implement paginated endpoints
+  </Card>
+  <Card title="Transformations" icon="wand-magic-sparkles" href="/features/transformations">
+    Learn more about data transformations
+  </Card>
+</CardGroup>
