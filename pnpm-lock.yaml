@@ -92,13 +92,13 @@ importers:
         specifier: 3.8.1
         version: 3.8.1
       tsdown:
-        specifier: ^0.21.0
+        specifier: ^0.21.2
         version: 0.21.2(@arethetypeswrong/core@0.18.2)(synckit@0.11.12)(typescript@5.9.3)
       typescript-eslint:
         specifier: catalog:dev
         version: 8.55.0(eslint@9.39.4)(typescript@5.9.3)
       unrun:
-        specifier: ^0.2.17
+        specifier: ^0.2.32
         version: 0.2.32(synckit@0.11.12)
       vitest:
         specifier: ^4.0.16
