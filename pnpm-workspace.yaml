@@ -36,6 +36,7 @@ minimumReleaseAgeExclude:
   - typescript-eslint
   - tsdown
   - tsx
+  - undici
   - unrun
   - vite
   - vitest
@@ -67,3 +68,4 @@ catalogs:
     "zod": "^4.3.4"
 overrides:
   "@scarf/scarf": "npm:empty-npm-package@1.0.0"
+  "lightningcss": "npm:empty-npm-package@1.0.0"

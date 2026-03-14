@@ -435,6 +435,78 @@ interface PostV1FormsFeedbackNegativeResponseVariants {
   400: PostV1FormsFeedbackNegativeVariant1;
 }
 
+/** get /v2/users/list */
+type GetV2UsersListInput = {
+  /** Page size (number of users per page) */
+  limit?: number | undefined;
+  /** Number of users to skip */
+  offset?: number | undefined;
+  /** Filter by roles; omit for all */
+  roles?: ("manager" | "operator" | "admin")[] | undefined;
+};
+
+/** get /v2/users/list */
+type GetV2UsersListPositiveVariant1 = {
+  status: "success";
+  data: {
+    /** Page of users */
+    users: {
+      name: string;
+      role: "manager" | "operator" | "admin";
+    }[];
+    /** Total number of users */
+    total: number;
+    /** Page size used */
+    limit: number;
+    /** Offset used */
+    offset: number;
+  };
+};
+
+/** get /v2/users/list */
+interface GetV2UsersListPositiveResponseVariants {
+  200: GetV2UsersListPositiveVariant1;
+}
+
+/** get /v2/users/list */
+type GetV2UsersListNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** get /v2/users/list */
+interface GetV2UsersListNegativeResponseVariants {
+  400: GetV2UsersListNegativeVariant1;
+}
+
+/** head /v2/users/list */
+type HeadV2UsersListInput = {
+  /** Page size (number of users per page) */
+  limit?: number | undefined;
+  /** Number of users to skip */
+  offset?: number | undefined;
+  /** Filter by roles; omit for all */
+  roles?: ("manager" | "operator" | "admin")[] | undefined;
+};
+
+/** head /v2/users/list */
+type HeadV2UsersListPositiveVariant1 = undefined;
+
+/** head /v2/users/list */
+interface HeadV2UsersListPositiveResponseVariants {
+  200: HeadV2UsersListPositiveVariant1;
+}
+
+/** head /v2/users/list */
+type HeadV2UsersListNegativeVariant1 = undefined;
+
+/** head /v2/users/list */
+interface HeadV2UsersListNegativeResponseVariants {
+  400: HeadV2UsersListNegativeVariant1;
+}
+
 export type Path =
   | "/v1/user/retrieve"
   | "/v1/user/:id/remove"
@@ -446,7 +518,8 @@ export type Path =
   | "/v1/avatar/upload"
   | "/v1/avatar/raw"
   | "/v1/events/stream"
-  | "/v1/forms/feedback";
+  | "/v1/forms/feedback"
+  | "/v2/users/list";
 
 export type Method = "get" | "post" | "put" | "delete" | "patch" | "head";
 
@@ -469,6 +542,8 @@ export interface Input {
   "get /v1/events/stream": GetV1EventsStreamInput;
   "head /v1/events/stream": HeadV1EventsStreamInput;
   "post /v1/forms/feedback": PostV1FormsFeedbackInput;
+  "get /v2/users/list": GetV2UsersListInput;
+  "head /v2/users/list": HeadV2UsersListInput;
 }
 
 export interface PositiveResponse {
@@ -490,6 +565,8 @@ export interface PositiveResponse {
   "get /v1/events/stream": SomeOf<GetV1EventsStreamPositiveResponseVariants>;
   "head /v1/events/stream": SomeOf<HeadV1EventsStreamPositiveResponseVariants>;
   "post /v1/forms/feedback": SomeOf<PostV1FormsFeedbackPositiveResponseVariants>;
+  "get /v2/users/list": SomeOf<GetV2UsersListPositiveResponseVariants>;
+  "head /v2/users/list": SomeOf<HeadV2UsersListPositiveResponseVariants>;
 }
 
 export interface NegativeResponse {
@@ -511,6 +588,8 @@ export interface NegativeResponse {
   "get /v1/events/stream": SomeOf<GetV1EventsStreamNegativeResponseVariants>;
   "head /v1/events/stream": SomeOf<HeadV1EventsStreamNegativeResponseVariants>;
   "post /v1/forms/feedback": SomeOf<PostV1FormsFeedbackNegativeResponseVariants>;
+  "get /v2/users/list": SomeOf<GetV2UsersListNegativeResponseVariants>;
+  "head /v2/users/list": SomeOf<HeadV2UsersListNegativeResponseVariants>;
 }
 
 export interface EncodedResponse {
@@ -548,6 +627,10 @@ export interface EncodedResponse {
     HeadV1EventsStreamNegativeResponseVariants;
   "post /v1/forms/feedback": PostV1FormsFeedbackPositiveResponseVariants &
     PostV1FormsFeedbackNegativeResponseVariants;
+  "get /v2/users/list": GetV2UsersListPositiveResponseVariants &
+    GetV2UsersListNegativeResponseVariants;
+  "head /v2/users/list": HeadV2UsersListPositiveResponseVariants &
+    HeadV2UsersListNegativeResponseVariants;
 }
 
 export interface Response {
@@ -601,6 +684,12 @@ export interface Response {
   "post /v1/forms/feedback":
     | PositiveResponse["post /v1/forms/feedback"]
     | NegativeResponse["post /v1/forms/feedback"];
+  "get /v2/users/list":
+    | PositiveResponse["get /v2/users/list"]
+    | NegativeResponse["get /v2/users/list"];
+  "head /v2/users/list":
+    | PositiveResponse["head /v2/users/list"]
+    | NegativeResponse["head /v2/users/list"];
 }
 
 export type Request = keyof Input;
@@ -622,6 +711,8 @@ export const endpointTags = {
   "get /v1/events/stream": ["subscriptions"],
   "head /v1/events/stream": ["subscriptions"],
   "post /v1/forms/feedback": ["forms"],
+  "get /v2/users/list": ["users"],
+  "head /v2/users/list": ["users"],
 };
 
 const parseRequest = (request: string) =>
@@ -644,6 +735,16 @@ export type Implementation<T = unknown> = (
   params: Record<string, any>,
   ctx?: T,
 ) => Promise<any>;
+
+type Pagination =
+  | {
+      nextCursor: string | null;
+    }
+  | {
+      total: number;
+      limit: number;
+      offset: number;
+    };
 
 const defaultImplementation: Implementation = async (method, path, params) => {
   const hasBody = !["get", "head", "delete"].includes(method);
@@ -673,6 +774,10 @@ export class Client<T> {
   ): Promise<Response[K]> {
     const [method, path] = parseRequest(request);
     return this.implementation(method, ...substitute(path, params), ctx);
+  }
+  public static hasMore(response: Pagination): boolean {
+    if ("nextCursor" in response) return response.nextCursor !== null;
+    return response.offset + response.limit < response.total;
   }
 }
 
