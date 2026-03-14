@@ -8,8 +8,6 @@ packages:
   - compat-test
   - issue952-test
   - dts-plugin
-onlyBuiltDependencies:
-  - esbuild
 gitChecks: false
 # engineStrict: true
 autoInstallPeers: false
@@ -35,7 +33,6 @@ minimumReleaseAgeExclude:
   - typescript
   - typescript-eslint
   - tsdown
-  - tsx
   - undici
   - unrun
   - vite
