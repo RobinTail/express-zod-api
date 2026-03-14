@@ -31,7 +31,7 @@ jobs:
         run: pnpm install
 
       - name: Check for new headers on IANA.ORG
-        run: pnpm tsx tools/headers.ts
+        run: pnpm unrun tools/headers.ts
 
       - name: Check for changes
         id: git-state
