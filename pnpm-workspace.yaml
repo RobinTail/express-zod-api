@@ -33,6 +33,7 @@ minimumReleaseAgeExclude:
   - typescript
   - typescript-eslint
   - tsdown
+  - undici
   - unrun
   - vite
   - vitest
