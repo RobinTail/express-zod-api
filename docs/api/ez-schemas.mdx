@@ -1,0 +1,270 @@
+---
+title: "ez Schemas"
+description: "Built-in schema helpers for dates, files, forms, and more"
+---
+
+## Overview
+
+The `ez` object provides specialized Zod schemas for common API patterns like dates, file uploads, forms, and raw data.
+
+```typescript
+import { ez } from "express-zod-api";
+import { z } from "zod";
+```
+
+## Date Schemas
+
+### ez.dateIn()
+
+Accepts ISO date strings and provides `Date` objects to your handler.
+
+```typescript
+const endpoint = defaultEndpointsFactory.build({
+  input: z.object({
+    startDate: ez.dateIn(),
+    endDate: ez.dateIn({ examples: ["2024-12-31"] }),
+  }),
+  handler: async ({ input }) => {
+    // input.startDate and input.endDate are Date objects
+    const days = daysBetween(input.startDate, input.endDate);
+    return { days };
+  },
+});
+```
+
+**Supported formats**:
+- `2021-12-31T23:59:59.000Z`
+- `2021-12-31T23:59:59Z`
+- `2021-12-31T23:59:59`
+- `2021-12-31`
+
+### ez.dateOut()
+
+Accepts `Date` objects from your handler and returns ISO strings in responses.
+
+```typescript
+const endpoint = defaultEndpointsFactory.build({
+  output: z.object({
+    createdAt: ez.dateOut(),
+    updatedAt: ez.dateOut({ examples: ["2024-01-01T00:00:00Z"] }),
+  }),
+  handler: async () => {
+    return {
+      createdAt: new Date(),
+      updatedAt: new Date("2024-01-01"),
+    };
+  },
+});
+```
+
+## File Upload
+
+### ez.upload()
+
+Handles file uploads with `multipart/form-data`.
+
+```typescript
+const uploadEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    avatar: ez.upload(),
+    document: ez.upload(),
+  }),
+  output: z.object({ success: z.boolean() }),
+  handler: async ({ input }) => {
+    // input.avatar: { name, mv(), mimetype, data, size, etc }
+    await input.avatar.mv(`/uploads/${input.avatar.name}`);
+    return { success: true };
+  },
+});
+```
+
+**File object properties**:
+
+<ParamField path="name" type="string">
+  Original filename
+</ParamField>
+
+<ParamField path="data" type="Buffer">
+  File contents as Buffer
+</ParamField>
+
+<ParamField path="size" type="number">
+  File size in bytes
+</ParamField>
+
+<ParamField path="mimetype" type="string">
+  MIME type (e.g., "image/png")
+</ParamField>
+
+<ParamField path="mv" type="function">
+  Move file to destination: `mv(path: string) => Promise<void>`
+</ParamField>
+
+<ParamField path="truncated" type="boolean">
+  True if file exceeded size limit
+</ParamField>
+
+## Form Data
+
+### ez.form()
+
+Handles URL-encoded form data (`application/x-www-form-urlencoded`).
+
+```typescript
+const formEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.form({
+    name: z.string().min(1),
+    email: z.string().email(),
+    subscribe: z.enum(["true", "false"]).transform(v => v === "true"),
+  }),
+  output: z.object({ success: z.boolean() }),
+  handler: async ({ input }) => {
+    await saveContact(input);
+    return { success: true };
+  },
+});
+```
+
+## Raw Data
+
+### ez.raw()
+
+Accepts raw request body as `Buffer` for binary data.
+
+```typescript
+import { ez } from "express-zod-api";
+
+const rawEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw({
+    examples: [{ data: Buffer.from("example").toString("base64") }],
+  }),
+  output: z.object({ length: z.number() }),
+  handler: async ({ input: { data } }) => {
+    // data is a Buffer
+    return { length: data.length };
+  },
+});
+```
+
+### ez.buffer()
+
+For documenting binary responses in OpenAPI.
+
+```typescript
+const fileResultHandler = new ResultHandler({
+  positive: { schema: ez.buffer(), mimeType: "application/pdf" },
+  // ...
+});
+```
+
+## Pagination
+
+### ez.paginated()
+
+Creates reusable pagination schemas.
+
+```typescript
+import { ez } from "express-zod-api";
+import { z } from "zod";
+
+const pagination = ez.paginated({
+  style: "offset", // or "cursor"
+  itemSchema: z.object({
+    id: z.number(),
+    name: z.string(),
+  }),
+  itemsName: "users",
+  maxLimit: 100,
+  defaultLimit: 20,
+});
+
+const listUsers = defaultEndpointsFactory.build({
+  input: pagination.input,
+  output: pagination.output,
+  handler: async ({ input: { limit, offset } }) => {
+    const users = await db.users.find().limit(limit).skip(offset);
+    const total = await db.users.count();
+    return { users, total, limit, offset };
+  },
+});
+```
+
+**Offset-based** (limit/offset):
+
+```typescript
+// Input: { limit?: number, offset?: number }
+// Output: { items: T[], total: number, limit: number, offset: number }
+```
+
+**Cursor-based** (limit/cursor):
+
+```typescript
+// Input: { limit?: number, cursor?: string }
+// Output: { items: T[], nextCursor: string | null, limit: number }
+```
+
+## Complete Example
+
+```typescript
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
+
+const createEventEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    title: z.string().min(1).max(200),
+    description: z.string(),
+    startDate: ez.dateIn(),
+    endDate: ez.dateIn(),
+    image: ez.upload().optional(),
+  }),
+  output: z.object({
+    id: z.string(),
+    createdAt: ez.dateOut(),
+    imageUrl: z.string().url().nullable(),
+  }),
+  handler: async ({ input }) => {
+    let imageUrl = null;
+    
+    if (input.image) {
+      const filename = `${uuid()}.${ext(input.image.name)}`;
+      await input.image.mv(`./uploads/${filename}`);
+      imageUrl = `https://cdn.example.com/${filename}`;
+    }
+    
+    const event = await db.events.create({
+      title: input.title,
+      description: input.description,
+      startDate: input.startDate,
+      endDate: input.endDate,
+      imageUrl,
+    });
+    
+    return {
+      id: event.id,
+      createdAt: event.createdAt,
+      imageUrl,
+    };
+  },
+});
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="Dates" href="/features/dates">
+    Working with dates in detail
+  </Card>
+  <Card title="File Uploads" href="/advanced/file-uploads">
+    Complete file upload guide
+  </Card>
+  <Card title="Pagination" href="/features/pagination">
+    Pagination patterns
+  </Card>
+  <Card title="Raw Data" href="/advanced/raw-data">
+    Handle binary data
+  </Card>
+</CardGroup>

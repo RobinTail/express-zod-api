@@ -1,0 +1,391 @@
+---
+title: Production Mode
+description: Optimize your API for production with performance improvements and enhanced security.
+---
+
+## Overview
+
+Production mode in Express Zod API enables important optimizations and security enhancements. It's activated by setting the `NODE_ENV` environment variable to `production`.
+
+## Enabling Production Mode
+
+Set the environment variable before starting your server:
+
+```bash
+NODE_ENV=production node dist/index.js
+```
+
+Or in your deployment configuration:
+
+```bash
+export NODE_ENV=production
+```
+
+## What Changes in Production Mode
+
+### 1. Express Performance Optimizations
+
+Express automatically activates [performance optimizations](https://expressjs.com/en/advanced/best-practice-performance.html) when `NODE_ENV=production`:
+
+- Template caching
+- CSS caching
+- Reduced overhead in error handling
+- Optimized view rendering
+
+### 2. Self-Diagnosis Disabled
+
+The framework's self-diagnosis for potential configuration problems is disabled to ensure faster startup:
+
+```typescript
+// In development: checks for common configuration issues
+// In production: skips these checks for faster startup
+```
+
+### 3. Error Message Security
+
+The most important change is how error messages are handled. In production, server-side error details are **generalized** to prevent information disclosure.
+
+## Error Message Behavior
+
+### Default Behavior
+
+In production mode, the `defaultResultHandler`, `defaultEndpointsFactory`, and `LastResortHandler` generalize server-side error messages:
+
+```typescript
+// Development mode:
+throw new Error("Database connection failed on server db-01:5432");
+// Response: { status: "error", error: { message: "Database connection failed on server db-01:5432" } }
+
+// Production mode:
+throw new Error("Database connection failed on server db-01:5432");
+// Response: { status: "error", error: { message: "Internal Server Error" } }
+```
+
+### Status Code Rules
+
+Errors with 5XX status codes are generalized in production:
+
+```typescript
+import createHttpError from "http-errors";
+
+// In production mode:
+createHttpError(500, "Something is broken");
+// Response: "Internal Server Error"
+
+createHttpError(503, "Redis is down");
+// Response: "Service Unavailable"
+
+// 4XX errors are still exposed:
+createHttpError(401, "Token expired");
+// Response: "Token expired"
+
+createHttpError(400, "Invalid email format");
+// Response: "Invalid email format"
+```
+
+## Controlling Error Exposure
+
+Use the `expose` option in `createHttpError()` to control whether error messages are shown:
+
+```typescript
+import createHttpError from "http-errors";
+
+// Always hide (even for 4XX):
+createHttpError(401, "Token expired", { expose: false });
+// Production: "Unauthorized"
+// Development: "Token expired"
+
+// Always show (even for 5XX):
+createHttpError(501, "We didn't make it yet", { expose: true });
+// Production: "We didn't make it yet"
+// Development: "We didn't make it yet"
+
+// Default behavior (expose based on status code):
+createHttpError(400, "Validation failed"); // Always exposed
+createHttpError(500, "Internal error");    // Hidden in production
+```
+
+## Complete Examples
+
+### Error Handling in Production
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import createHttpError from "http-errors";
+import { z } from "zod";
+
+const getUserEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({ id: z.string() }),
+  output: z.object({ id: z.number(), name: z.string() }),
+  handler: async ({ input: { id } }) => {
+    try {
+      const user = await database.getUser(id);
+      if (!user) {
+        // 404 - message is always shown
+        throw createHttpError(404, "User not found");
+      }
+      return user;
+    } catch (error) {
+      if (error.statusCode === 404) {
+        throw error; // Re-throw 4XX errors
+      }
+      // Log the real error for debugging
+      logger.error("Database error:", error);
+      // Throw generic 500 - message hidden in production
+      throw createHttpError(500, "Failed to retrieve user");
+    }
+  },
+});
+```
+
+### Custom Error with Expose Control
+
+```typescript
+const paymentEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({ amount: z.number(), userId: z.string() }),
+  output: z.object({ transactionId: z.string() }),
+  handler: async ({ input }) => {
+    try {
+      const transaction = await processPayment(input);
+      return { transactionId: transaction.id };
+    } catch (error) {
+      if (error.code === "INSUFFICIENT_FUNDS") {
+        // User-friendly message, always show
+        throw createHttpError(
+          402,
+          "Insufficient funds in account",
+          { expose: true },
+        );
+      }
+
+      if (error.code === "PAYMENT_GATEWAY_ERROR") {
+        logger.error("Payment gateway error:", error);
+        // Hide technical details in production
+        throw createHttpError(
+          503,
+          `Payment gateway error: ${error.message}`,
+          { expose: false },
+        );
+      }
+
+      // Generic error for anything else
+      logger.error("Unexpected payment error:", error);
+      throw createHttpError(500, "Payment processing failed");
+    }
+  },
+});
+```
+
+## Logging in Production
+
+Adjust logging levels for production:
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  logger: {
+    level: process.env.NODE_ENV === "production" ? "warn" : "debug",
+    color: process.env.NODE_ENV !== "production",
+  },
+});
+```
+
+### Structured Logging
+
+Use structured logging in production for better monitoring:
+
+```typescript
+import pino from "pino";
+import { createConfig } from "express-zod-api";
+
+const logger = pino({
+  level: process.env.NODE_ENV === "production" ? "info" : "debug",
+  transport:
+    process.env.NODE_ENV === "production"
+      ? undefined // JSON in production
+      : {
+          target: "pino-pretty",
+          options: { colorize: true },
+        },
+});
+
+const config = createConfig({ logger });
+
+declare module "express-zod-api" {
+  interface LoggerOverrides extends pino.Logger {}
+}
+```
+
+## Environment-Specific Configuration
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const isProduction = process.env.NODE_ENV === "production";
+
+const config = createConfig({
+  // Use different ports
+  http: {
+    listen: isProduction ? 8080 : 3000,
+  },
+
+  // Enable compression in production
+  compression: isProduction,
+
+  // Adjust CORS
+  cors: isProduction
+    ? { origin: "https://yourdomain.com" }
+    : true,
+
+  // Production vs development logger
+  logger: {
+    level: isProduction ? "warn" : "debug",
+  },
+
+  // Enable graceful shutdown in production
+  gracefulShutdown: isProduction
+    ? {
+        timeout: 30000,
+        events: ["SIGTERM", "SIGINT"],
+      }
+    : undefined,
+});
+```
+
+## Security Best Practices
+
+### 1. Never Expose Internal Errors
+
+```typescript
+// Bad - exposes internal details
+throw new Error(`Database query failed: ${sqlQuery}`);
+
+// Good - generic message, log details
+logger.error("Database query failed:", { sqlQuery, error });
+throw createHttpError(500, "Database error");
+```
+
+### 2. Use Appropriate Status Codes
+
+```typescript
+// User errors (4XX) - safe to expose
+throw createHttpError(400, "Email format is invalid");
+throw createHttpError(404, "Resource not found");
+throw createHttpError(409, "Email already exists");
+
+// Server errors (5XX) - hide in production
+throw createHttpError(500, "Internal error"); // "Internal Server Error" in production
+```
+
+### 3. Log Sensitive Errors Securely
+
+```typescript
+const endpoint = factory.build({
+  handler: async ({ input, logger }) => {
+    try {
+      return await processRequest(input);
+    } catch (error) {
+      // Log full error details for debugging
+      logger.error("Request processing failed", {
+        error: error.message,
+        stack: error.stack,
+        input: sanitizeForLogging(input), // Remove sensitive data
+      });
+
+      // Return safe error to client
+      throw createHttpError(500, "Request failed");
+    }
+  },
+});
+```
+
+## Monitoring and Observability
+
+Implement proper monitoring in production:
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+
+    // Error tracking (e.g., Sentry)
+    if (process.env.NODE_ENV === "production") {
+      app.use((err, req, res, next) => {
+        Sentry.captureException(err);
+        next(err);
+      });
+    }
+
+    // Request logging
+    app.use((req, res, next) => {
+      const start = Date.now();
+      res.on("finish", () => {
+        const duration = Date.now() - start;
+        logger.info("Request completed", {
+          method: req.method,
+          path: req.path,
+          status: res.statusCode,
+          duration,
+        });
+      });
+      next();
+    });
+  },
+});
+```
+
+## Testing Production Behavior
+
+Test production error handling:
+
+```typescript
+import { testEndpoint } from "express-zod-api";
+
+test("should hide 5XX errors in production", async () => {
+  // Set production mode
+  const originalEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = "production";
+
+  const { responseMock } = await testEndpoint({
+    endpoint: myEndpoint,
+    requestProps: { method: "GET" },
+  });
+
+  expect(responseMock._getJSONData()).toEqual({
+    status: "error",
+    error: { message: "Internal Server Error" },
+  });
+
+  // Restore
+  process.env.NODE_ENV = originalEnv;
+});
+```
+
+## Checklist for Production
+
+<Accordion title="Production Deployment Checklist">
+- [ ] Set `NODE_ENV=production`
+- [ ] Configure appropriate logging level
+- [ ] Enable compression
+- [ ] Set up graceful shutdown
+- [ ] Configure CORS properly
+- [ ] Use HTTPS
+- [ ] Set appropriate rate limits
+- [ ] Enable error monitoring (Sentry, etc.)
+- [ ] Review and sanitize error messages
+- [ ] Test error handling in production mode
+- [ ] Set up health check endpoints
+- [ ] Configure proper timeout values
+</Accordion>
+
+## Related Topics
+
+- [Error Handling](/core-concepts/error-handling) - Understanding error handling
+- [Configuration](/core-concepts/configuration) - Server configuration options
+- [Graceful Shutdown](/advanced/graceful-shutdown) - Handling shutdowns properly
+- [Logging](/core-concepts/logging) - Logger configuration

@@ -1,0 +1,387 @@
+---
+title: Accepting Raw Data
+description: Learn how to accept and process raw binary data, streaming uploads, or custom binary formats in your API endpoints.
+---
+
+## Overview
+
+Some APIs need to accept raw data as the entire body of a request, such as binary file uploads, streaming data, or custom binary formats. Express Zod API provides the `ez.raw()` schema for this purpose.
+
+## Using ez.raw()
+
+Use the proprietary `ez.raw()` schema to accept raw binary data:
+
+```typescript
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
+
+const rawAcceptingEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw({
+    // Optional: additional inputs like route params
+  }),
+  output: z.object({ length: z.number().nonnegative() }),
+  handler: async ({ input: { raw } }) => ({
+    length: raw.length, // raw is a Buffer
+  }),
+});
+```
+
+## Configuration
+
+Raw data is parsed using the `rawParser` configuration option, which defaults to `express.raw()`:
+
+```typescript
+import { createConfig } from "express-zod-api";
+import express from "express";
+
+const config = createConfig({
+  rawParser: express.raw({
+    limit: "10mb", // Customize size limit
+    type: "application/octet-stream", // Accept specific content type
+  }),
+  // ... other config
+});
+```
+
+## The Raw Buffer
+
+Raw data is available as a `Buffer` in the `input.raw` property:
+
+```typescript
+handler: async ({ input: { raw } }) => {
+  console.log(raw); // <Buffer 89 50 4e 47 0d 0a 1a 0a ...>
+  console.log(raw.length); // Size in bytes
+  console.log(raw.toString('utf-8')); // Convert to string if text
+}
+```
+
+## Complete Raw Data Example
+
+```typescript
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
+import { writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+
+const uploadRawImageEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  tag: "files",
+  shortDescription: "Upload raw binary image data",
+  input: ez.raw({
+    userId: z.string(), // From path params or query
+  }),
+  output: z.object({
+    size: z.number(),
+    hash: z.string(),
+    filename: z.string(),
+  }),
+  handler: async ({ input: { raw, userId } }) => {
+    // Verify it's an image (check magic bytes)
+    const isPNG = raw[0] === 0x89 && raw[1] === 0x50;
+    const isJPEG = raw[0] === 0xFF && raw[1] === 0xD8;
+
+    if (!isPNG && !isJPEG) {
+      throw createHttpError(400, "Invalid image format");
+    }
+
+    // Generate hash
+    const hash = createHash("sha256").update(raw).digest("hex");
+
+    // Save file
+    const filename = `uploads/${userId}-${hash}.${isPNG ? "png" : "jpg"}`;
+    await writeFile(filename, raw);
+
+    return {
+      size: raw.length,
+      hash,
+      filename,
+    };
+  },
+});
+```
+
+## With Route Parameters
+
+Combine raw data with path parameters:
+
+```typescript
+import { ez } from "express-zod-api";
+import { z } from "zod";
+
+const endpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw({
+    id: z.string(), // From route params
+    version: z.string().optional(), // From query params
+  }),
+  output: z.object({ success: z.boolean() }),
+  handler: async ({ input: { raw, id, version } }) => {
+    // Process raw data with context from params
+    await saveData(id, version, raw);
+    return { success: true };
+  },
+});
+```
+
+Routing:
+
+```typescript
+const routing: Routing = {
+  v1: {
+    data: {
+      ":id": endpoint, // POST /v1/data/:id
+    },
+  },
+};
+```
+
+## Processing Different Data Types
+
+### Binary File Upload
+
+```typescript
+const uploadBinaryEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw(),
+  output: z.object({ filename: z.string() }),
+  handler: async ({ input: { raw }, request }) => {
+    const contentType = request.headers["content-type"];
+    const extension = getExtensionFromMimeType(contentType);
+    const filename = `upload-${Date.now()}.${extension}`;
+    await writeFile(filename, raw);
+    return { filename };
+  },
+});
+```
+
+### Text Data
+
+```typescript
+const processTextEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw(),
+  output: z.object({ lines: z.number(), words: z.number() }),
+  handler: async ({ input: { raw } }) => {
+    const text = raw.toString("utf-8");
+    const lines = text.split("\n").length;
+    const words = text.split(/\s+/).filter(Boolean).length;
+    return { lines, words };
+  },
+});
+```
+
+### JSON with Custom Processing
+
+```typescript
+const customJsonEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw(),
+  output: z.object({ processed: z.boolean() }),
+  handler: async ({ input: { raw } }) => {
+    // Parse JSON manually for custom processing
+    const text = raw.toString("utf-8");
+    const data = JSON.parse(text);
+
+    // Custom processing
+    await processCustomJson(data);
+
+    return { processed: true };
+  },
+});
+```
+
+### Protocol Buffers / MessagePack
+
+```typescript
+import msgpack from "msgpack-lite";
+
+const msgpackEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw(),
+  output: z.object({ success: z.boolean() }),
+  handler: async ({ input: { raw } }) => {
+    // Decode MessagePack
+    const data = msgpack.decode(raw);
+
+    // Process data
+    await saveData(data);
+
+    return { success: true };
+  },
+});
+```
+
+## Validation and Security
+
+### Size Validation
+
+```typescript
+const endpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw().refine(
+    ({ raw }) => raw.length <= 5 * 1024 * 1024, // 5 MB
+    "File too large (max 5 MB)",
+  ),
+  // ...
+});
+```
+
+### Content Type Validation
+
+```typescript
+const endpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw(),
+  output: z.object({ success: z.boolean() }),
+  handler: async ({ input: { raw }, request }) => {
+    const contentType = request.headers["content-type"];
+
+    if (contentType !== "application/octet-stream") {
+      throw createHttpError(415, "Unsupported Media Type");
+    }
+
+    // Process data
+    return { success: true };
+  },
+});
+```
+
+### Magic Byte Validation
+
+```typescript
+const MAGIC_BYTES = {
+  PNG: [0x89, 0x50, 0x4e, 0x47],
+  JPEG: [0xff, 0xd8, 0xff],
+  PDF: [0x25, 0x50, 0x44, 0x46],
+};
+
+function validateFileType(buffer: Buffer, type: keyof typeof MAGIC_BYTES): boolean {
+  const magic = MAGIC_BYTES[type];
+  return magic.every((byte, i) => buffer[i] === byte);
+}
+
+const endpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.raw(),
+  handler: async ({ input: { raw } }) => {
+    if (!validateFileType(raw, "PNG")) {
+      throw createHttpError(400, "File must be a PNG image");
+    }
+    // Process PNG
+  },
+});
+```
+
+## Streaming Large Files
+
+For very large files, consider streaming instead of buffering:
+
+```typescript
+import { createWriteStream } from "node:fs";
+import { pipeline } from "node:stream/promises";
+
+const config = createConfig({
+  // Use a custom parser that supports streaming
+  beforeRouting: ({ app }) => {
+    app.post("/upload-stream", (req, res) => {
+      const writeStream = createWriteStream("large-file.bin");
+      pipeline(req, writeStream)
+        .then(() => res.json({ success: true }))
+        .catch((err) => res.status(500).json({ error: err.message }));
+    });
+  },
+});
+```
+
+## Client Examples
+
+### Using Fetch
+
+```typescript
+// Upload binary data
+const fileBuffer = await readFile("image.png");
+
+const response = await fetch("/v1/upload/raw", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/octet-stream",
+  },
+  body: fileBuffer,
+});
+
+const result = await response.json();
+```
+
+### Using ReadStream
+
+```typescript
+import { createReadStream } from "node:fs";
+
+const stream = createReadStream("large-file.bin");
+
+const response = await fetch("/v1/upload/raw", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/octet-stream",
+  },
+  body: stream,
+  duplex: "half",
+});
+```
+
+## Use Cases
+
+<AccordionGroup>
+  <Accordion title="Binary File Uploads">
+    Accept entire files as raw binary data without multipart encoding overhead.
+  </Accordion>
+
+  <Accordion title="Custom Binary Protocols">
+    Implement APIs that accept Protocol Buffers, MessagePack, or other binary formats.
+  </Accordion>
+
+  <Accordion title="Streaming Data">
+    Accept streaming data for real-time processing or large file uploads.
+  </Accordion>
+
+  <Accordion title="Webhook Payloads">
+    Process raw webhook data before parsing to verify signatures.
+  </Accordion>
+</AccordionGroup>
+
+## Comparison with File Uploads
+
+| Feature | ez.raw() | ez.upload() |
+|---------|----------|-------------|
+| Content Type | `application/octet-stream` | `multipart/form-data` |
+| Multiple files | No | Yes |
+| Additional fields | Limited (params/query) | Yes (form fields) |
+| Metadata | Manual | Automatic (filename, mimetype) |
+| Use case | Binary protocols, streaming | Traditional file uploads |
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Set Size Limits">
+    Always configure appropriate size limits in `rawParser` to prevent memory exhaustion.
+  </Accordion>
+
+  <Accordion title="Validate Content Type">
+    Check the Content-Type header to ensure you're receiving the expected data format.
+  </Accordion>
+
+  <Accordion title="Use Magic Bytes">
+    For security, validate file types using magic bytes rather than trusting extensions or MIME types.
+  </Accordion>
+
+  <Accordion title="Consider Memory Usage">
+    For large files, consider streaming approaches to avoid loading entire files into memory.
+  </Accordion>
+</AccordionGroup>
+
+## Related Topics
+
+- [File Uploads](/advanced/file-uploads) - Using multipart/form-data
+- [Non-JSON Responses](/advanced/non-json-responses) - Serving binary data
+- [Input Sources](/advanced/input-sources) - Configuring input sources
