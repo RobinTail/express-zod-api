@@ -48,6 +48,6 @@ jobs:
       - name: Bumpp ${{inputs.workspace}}
         run: |
           pnpm -F ${{inputs.workspace}} exec \
-            pnpm dlx bumpp ${{inputs.kind}} \
+            pnpm dlx bumpp@10 ${{inputs.kind}} \
             ${{ startsWith(inputs.kind, 'pre') && '--preid beta' || '' }} \
             --tag=${{inputs.workspace}}-v%s --commit='${{inputs.workspace}} version %s' -y
