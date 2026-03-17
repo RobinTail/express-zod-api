@@ -143,15 +143,6 @@ importers:
         specifier: npm:zod@4.1.13
         version: 4.1.13
 
-  dts-plugin:
-    devDependencies:
-      rolldown:
-        specifier: ^1.0.0-rc.9
-        version: 1.0.0-rc.9
-      typescript:
-        specifier: catalog:dev
-        version: 5.9.3
-
   esm-test:
     devDependencies:
       express-zod-api:
@@ -242,9 +233,6 @@ importers:
       depd:
         specifier: ^2.0.0
         version: 2.0.0
-      dts-plugin:
-        specifier: workspace:^
-        version: link:../dts-plugin
       express:
         specifier: catalog:dev
         version: 5.2.1
@@ -293,9 +281,6 @@ importers:
       '@typescript-eslint/rule-tester':
         specifier: catalog:dev
         version: 8.55.0(eslint@9.39.4)(typescript@5.9.3)
-      dts-plugin:
-        specifier: workspace:^
-        version: link:../dts-plugin
       typescript:
         specifier: catalog:dev
         version: 5.9.3
@@ -312,9 +297,6 @@ importers:
       camelize-ts:
         specifier: catalog:dev
         version: 3.0.0
-      dts-plugin:
-        specifier: workspace:^
-        version: link:../dts-plugin
       typescript:
         specifier: catalog:dev
         version: 5.9.3

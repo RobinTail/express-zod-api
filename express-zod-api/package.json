@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "27.1.0",
+  "version": "27.1.1-beta.1",
   "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -16,7 +16,7 @@
   "bugs": "https://github.com/RobinTail/express-zod-api/issues",
   "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
-    "build": "tsdown",
+    "build": "tsdown --config-loader unrun",
     "pretest": "tsc",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
@@ -96,7 +96,6 @@
     "compression": "catalog:dev",
     "cors": "^2.8.5",
     "depd": "^2.0.0",
-    "dts-plugin": "workspace:^",
     "express": "catalog:dev",
     "express-fileupload": "catalog:dev",
     "http-errors": "catalog:dev",
