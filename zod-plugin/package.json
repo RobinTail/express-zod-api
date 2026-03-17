@@ -18,7 +18,7 @@
   "scripts": {
     "pretest": "tsc",
     "test": "vitest run",
-    "build": "tsdown",
+    "build": "tsdown --config-loader unrun",
     "prepublishOnly": "eslint && pnpm test && pnpm build"
   },
   "type": "module",
@@ -47,7 +47,6 @@
   "devDependencies": {
     "@types/ramda": "catalog:dev",
     "camelize-ts": "catalog:dev",
-    "dts-plugin": "workspace:^",
     "typescript": "catalog:dev",
     "zod": "catalog:dev"
   },

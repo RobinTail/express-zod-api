@@ -1,6 +1,6 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
-import humanReadableDtsPlugin from "dts-plugin";
+import { humanReadableDtsPlugin } from "../tools/readableDts";
 
 const plugins = [humanReadableDtsPlugin()];
 
