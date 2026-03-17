@@ -7,7 +7,6 @@ packages:
   - esm-test
   - compat-test
   - issue952-test
-  - dts-plugin
 gitChecks: false
 engineStrict: true
 autoInstallPeers: false
@@ -43,6 +42,7 @@ publicHoistPattern:
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
   - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
   - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting
+  - "rolldown" # used by readableDts tool
 catalogs:
   prod:
     "ramda": "^0.32.0"

@@ -30,7 +30,7 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
       - uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -38,10 +38,6 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Install dependencies
         run: pnpm install
-      - name: Build everything
-        # the local DTS plugin is required for building bundles
-        # @todo remove when no longer required
-        run: pnpm build
       - name: Publish ${{inputs.workspace}} with ${{ inputs.tag }}
         run: |
           pnpm -F ${{inputs.workspace}} exec \
