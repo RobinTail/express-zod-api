@@ -55,8 +55,8 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
       move: "move {{ subject }} to {{ to }}",
       remove: "remove {{ subject }}",
     },
+    defaultOptions: [],
   },
-  defaultOptions: [],
   create: (ctx) =>
     listen({
       integration: (node) => {

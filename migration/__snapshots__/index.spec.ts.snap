@@ -5,8 +5,9 @@ exports[`Migration > should consist of one rule being the major version of the p
   "rules": {
     "v27": {
       "create": [Function],
-      "defaultOptions": [],
+      "defaultOptions": undefined,
       "meta": {
+        "defaultOptions": [],
         "fixable": "code",
         "messages": {
           "add": "add {{ subject }} to {{ to }}",
