@@ -1,0 +1,442 @@
+---
+title: Generating Documentation
+description: Create OpenAPI 3.1 documentation for your API automatically
+---
+
+Express Zod API can automatically generate comprehensive OpenAPI 3.1 (formerly Swagger) documentation from your endpoint definitions.
+
+## Quick Start
+
+Create a script to generate your documentation:
+
+```typescript generate-documentation.ts
+import { writeFile } from "node:fs/promises";
+import { Documentation } from "express-zod-api";
+import { config } from "./config";
+import { routing } from "./routing";
+import manifest from "./package.json";
+
+await writeFile(
+  "api-documentation.yaml",
+  new Documentation({
+    routing,
+    config,
+    version: manifest.version,
+    title: "Example API",
+    serverUrl: "https://api.example.com",
+  }).getSpecAsYaml(),
+  "utf-8"
+);
+```
+
+<Tip>
+Run this during your build process to keep documentation in sync with your code.
+</Tip>
+
+## Configuration Options
+
+### Required Options
+
+<ParamField path="routing" type="Routing" required>
+  Your API routing configuration.
+</ParamField>
+
+<ParamField path="config" type="CommonConfig" required>
+  Your API server configuration.
+</ParamField>
+
+<ParamField path="title" type="string" required>
+  The title of your API (appears in the documentation).
+</ParamField>
+
+<ParamField path="version" type="string" required>
+  The version of your API (semantic versioning recommended).
+</ParamField>
+
+<ParamField path="serverUrl" type="string | string[]" required>
+  The base URL(s) where your API is hosted. Can be a single URL or an array for multiple environments.
+</ParamField>
+
+### Optional Options
+
+<ParamField path="composition" type="'inline' | 'components'" default="inline">
+  How to structure schemas in the documentation:
+  - `"inline"` - Inline all schemas directly in endpoints
+  - `"components"` - Extract schemas to a separate reusable components section
+</ParamField>
+
+<ParamField path="hasSummaryFromDescription" type="boolean" default={true}>
+  Automatically use the first line of description as the summary.
+</ParamField>
+
+<ParamField path="hasHeadMethod" type="boolean" default={true}>
+  Include HEAD method for each GET endpoint (Express feature).
+</ParamField>
+
+<ParamField path="tags" type="object">
+  Extended descriptions for endpoint tags. See [Tagging Endpoints](#tagging-endpoints).
+</ParamField>
+
+<ParamField path="descriptions" type="object">
+  Custom description generators for components. See [Custom Descriptions](#custom-descriptions).
+</ParamField>
+
+<ParamField path="brandHandling" type="object">
+  Custom handling for branded schemas. See [Branded Types](#branded-types).
+</ParamField>
+
+<ParamField path="isHeader" type="function">
+  Custom logic for recognizing headers in input sources.
+</ParamField>
+
+## Adding Descriptions and Examples
+
+Add rich documentation directly to your endpoints:
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const getUserEndpoint = defaultEndpointsFactory.build({
+  shortDescription: "Retrieves a user by ID",
+  description: `
+    This endpoint fetches a single user from the database.
+    Requires authentication via API key.
+  `,
+  input: z.object({
+    id: z.string()
+      .example("user_123")
+      .describe("The unique identifier for the user"),
+  }),
+  output: z.object({
+    id: z.string().example("user_123"),
+    name: z.string().example("John Doe"),
+    email: z.string().email().example("john@example.com"),
+    createdAt: z.string().example("2024-01-01T00:00:00Z"),
+  }).describe("User object with all details"),
+  handler: async ({ input }) => {
+    // Implementation
+    return {
+      id: input.id,
+      name: "John Doe",
+      email: "john@example.com",
+      createdAt: new Date().toISOString(),
+    };
+  },
+});
+```
+
+<Note>
+Examples should be set **before** transformations, as transformations modify the schema.
+</Note>
+
+## Tagging Endpoints
+
+Organize your endpoints into logical groups using tags:
+
+### 1. Define Tag Constraints
+
+```typescript
+// Declare tags once in your codebase
+declare module "express-zod-api" {
+  interface TagOverrides {
+    users: unknown;
+    files: unknown;
+    subscriptions: unknown;
+  }
+}
+```
+
+### 2. Tag Your Endpoints
+
+```typescript
+const getUserEndpoint = defaultEndpointsFactory.build({
+  tag: "users", // Single tag
+  // or
+  tag: ["users", "admin"], // Multiple tags
+  // ... endpoint definition
+});
+```
+
+### 3. Add Tag Descriptions to Documentation
+
+```typescript
+new Documentation({
+  routing,
+  config,
+  title: "My API",
+  version: "1.0.0",
+  serverUrl: "https://api.example.com",
+  tags: {
+    users: "All operations related to user management",
+    files: {
+      description: "File upload and download operations",
+      url: "https://docs.example.com/files",
+    },
+    subscriptions: "Real-time event subscriptions",
+  },
+});
+```
+
+## Deprecation Markers
+
+Mark schemas and endpoints as deprecated:
+
+```typescript
+import { z } from "zod";
+import { Routing, defaultEndpointsFactory } from "express-zod-api";
+
+// Deprecate a specific field
+const endpoint = defaultEndpointsFactory.build({
+  input: z.object({
+    newField: z.string(),
+    oldField: z.string().deprecated(), // Field is deprecated
+  }),
+});
+
+// Deprecate an entire endpoint
+const legacyEndpoint = defaultEndpointsFactory.build({
+  deprecated: true, // All routes using this endpoint are deprecated
+  // ... rest of definition
+});
+
+// Deprecate specific routes
+const routing: Routing = {
+  v1: oldEndpoint.deprecated(), // Deprecates /v1 path
+  v2: newEndpoint, // Not deprecated
+};
+```
+
+## Multiple Server URLs
+
+Provide multiple server URLs for different environments:
+
+```typescript
+new Documentation({
+  routing,
+  config,
+  title: "My API",
+  version: "1.0.0",
+  serverUrl: [
+    "https://api.example.com",
+    "https://staging-api.example.com",
+    "http://localhost:8080",
+  ],
+});
+```
+
+## Composition Modes
+
+### Inline Mode (Default)
+
+Schemas are defined directly in each endpoint:
+
+```yaml
+paths:
+  /user:
+    get:
+      parameters:
+        - name: id
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+```
+
+### Components Mode
+
+Schemas are extracted to a reusable components section:
+
+```typescript
+new Documentation({
+  // ... other options
+  composition: "components",
+});
+```
+
+```yaml
+paths:
+  /user:
+    get:
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+components:
+  schemas:
+    UserResponse:
+      type: object
+      properties:
+        name:
+          type: string
+```
+
+<Tip>
+Use `"components"` mode to reduce file size when schemas are reused across endpoints.
+</Tip>
+
+## Custom Descriptions
+
+Generate dynamic descriptions for different components:
+
+```typescript
+new Documentation({
+  routing,
+  config,
+  title: "My API",
+  version: "1.0.0",
+  serverUrl: "https://api.example.com",
+  descriptions: {
+    positiveResponse: ({ method, path, statusCode }) => 
+      `Successful ${method.toUpperCase()} response for ${path} (${statusCode})`,
+    negativeResponse: ({ method, path, statusCode }) => 
+      `Error response for ${method.toUpperCase()} ${path} (${statusCode})`,
+    requestParameter: ({ operationId }) => 
+      `Parameters for operation ${operationId}`,
+    requestBody: ({ method, path }) => 
+      `Request body for ${method.toUpperCase()} ${path}`,
+  },
+});
+```
+
+## Custom Schema Names
+
+Provide custom names for schemas using metadata:
+
+```typescript
+const userSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+}).meta({ id: "User" });
+
+const endpoint = defaultEndpointsFactory.build({
+  output: userSchema,
+  // ...
+});
+```
+
+The schema will appear as `User` in the components section when using `composition: "components"`.
+
+## Branded Types
+
+Customize how branded types appear in documentation:
+
+```typescript
+import { z } from "zod";
+import { Documentation, Depicter } from "express-zod-api";
+
+const myBrand = Symbol("UserId");
+const userIdSchema = z.string().brand(myBrand);
+
+const customHandler: Depicter = (
+  { zodSchema, jsonSchema },
+  { path, method, isResponse }
+) => ({
+  ...jsonSchema,
+  type: "string",
+  pattern: "^user_[a-z0-9]+$",
+  example: "user_123abc",
+  description: "A unique user identifier",
+});
+
+new Documentation({
+  routing,
+  config,
+  title: "My API",
+  version: "1.0.0",
+  serverUrl: "https://api.example.com",
+  brandHandling: {
+    [myBrand]: customHandler,
+  },
+});
+```
+
+## Serving Documentation
+
+Use the generated YAML with Swagger UI:
+
+```typescript
+import express from "express";
+import swaggerUi from "swagger-ui-express";
+import { createConfig } from "express-zod-api";
+import YAML from "yaml";
+import { readFileSync } from "fs";
+
+const spec = YAML.parse(
+  readFileSync("api-documentation.yaml", "utf-8")
+);
+
+const config = createConfig({
+  beforeRouting: ({ app }) => {
+    app.use("/docs", swaggerUi.serve, swaggerUi.setup(spec));
+  },
+  // ... other config
+});
+```
+
+Now visit `https://your-api.com/docs` to view your interactive documentation.
+
+## Complete Example
+
+```typescript
+import { writeFile } from "node:fs/promises";
+import { Documentation } from "express-zod-api";
+import { config } from "./config";
+import { routing } from "./routing";
+import manifest from "./package.json";
+
+// Define tags
+declare module "express-zod-api" {
+  interface TagOverrides {
+    users: unknown;
+    admin: unknown;
+    public: unknown;
+  }
+}
+
+const documentation = new Documentation({
+  routing,
+  config,
+  version: manifest.version,
+  title: "My Awesome API",
+  serverUrl: [
+    "https://api.example.com",
+    "https://staging.example.com",
+  ],
+  composition: "components",
+  hasSummaryFromDescription: true,
+  hasHeadMethod: true,
+  tags: {
+    users: "User management operations",
+    admin: "Administrative operations",
+    public: "Publicly accessible endpoints",
+  },
+});
+
+try {
+  await writeFile(
+    "openapi.yaml",
+    documentation.getSpecAsYaml(),
+    "utf-8"
+  );
+  console.log("✓ Documentation generated successfully");
+} catch (error) {
+  console.error("Failed to generate documentation:", error);
+  process.exit(1);
+}
+```
+
+## Next Steps
+
+- Learn about [End-to-End Type Safety](/integration/end-to-end-type-safety) with TypeScript clients
+- Explore [OpenAPI integration](/integration/openapi) options
+- See how to [integrate with Express apps](/integration/express-app)

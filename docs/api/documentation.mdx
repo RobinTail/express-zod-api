@@ -1,0 +1,190 @@
+---
+title: "Documentation"
+description: "Generate OpenAPI 3.1 documentation from your API"
+---
+
+## Overview
+
+The `Documentation` class generates OpenAPI 3.1 specifications from your routing and configuration.
+
+```typescript
+import { Documentation } from "express-zod-api";
+
+const documentation = new Documentation({
+  routing,
+  config,
+  version: "1.0.0",
+  title: "My API",
+  serverUrl: "https://api.example.com",
+});
+
+const yaml = documentation.getSpecAsYaml();
+const json = documentation.getSpec();
+```
+
+## Configuration
+
+<ParamField path="routing" type="Routing" required>
+  Your API routing object
+</ParamField>
+
+<ParamField path="config" type="Config" required>
+  Your Express Zod API configuration
+</ParamField>
+
+<ParamField path="version" type="string" required>
+  API version (semver)
+</ParamField>
+
+<ParamField path="title" type="string" required>
+  API title
+</ParamField>
+
+<ParamField path="serverUrl" type="string | { url: string; description?: string }[]" required>
+  Server URL(s)
+</ParamField>
+
+<ParamField path="description" type="string">
+  API description
+</ParamField>
+
+<ParamField path="composition" type="'inline' | 'components'">
+  Schema composition style
+  
+  - `"inline"`: Schemas defined inline
+  - `"components"`: Schemas in separate components section with `$ref`
+  
+  Default: `"inline"`
+</ParamField>
+
+<ParamField path="tags" type="Record<string, string | { description: string; url?: string }>">
+  Tag descriptions for grouping endpoints
+</ParamField>
+
+## Methods
+
+### getSpec()
+
+Returns OpenAPI specification as a JavaScript object.
+
+```typescript
+const spec = documentation.getSpec();
+// Returns: OpenAPIObject
+```
+
+### getSpecAsYaml()
+
+Returns OpenAPI specification as YAML string.
+
+```typescript
+const yaml = documentation.getSpecAsYaml();
+fs.writeFileSync("openapi.yaml", yaml);
+```
+
+## Examples
+
+### Basic Documentation
+
+```typescript
+import { Documentation } from "express-zod-api";
+
+const docs = new Documentation({
+  routing,
+  config,
+  version: "1.0.0",
+  title: "My API",
+  serverUrl: "https://api.example.com",
+  description: "A sample API built with Express Zod API",
+});
+
+const yaml = docs.getSpecAsYaml();
+fs.writeFileSync("docs/openapi.yaml", yaml);
+```
+
+### Multiple Servers
+
+```typescript
+const docs = new Documentation({
+  routing,
+  config,
+  version: "1.0.0",
+  title: "My API",
+  serverUrl: [
+    { url: "https://api.example.com", description: "Production" },
+    { url: "https://staging-api.example.com", description: "Staging" },
+    { url: "http://localhost:8090", description: "Development" },
+  ],
+});
+```
+
+### With Tags
+
+```typescript
+const docs = new Documentation({
+  routing,
+  config,
+  version: "1.0.0",
+  title: "My API",
+  serverUrl: "https://api.example.com",
+  tags: {
+    users: "User management endpoints",
+    posts: {
+      description: "Blog post operations",
+      url: "https://docs.example.com/posts",
+    },
+    admin: "Administrative functions",
+  },
+});
+```
+
+### Component Composition
+
+```typescript
+const docs = new Documentation({
+  routing,
+  config,
+  version: "1.0.0",
+  title: "My API",
+  serverUrl: "https://api.example.com",
+  composition: "components", // Use $ref for schemas
+});
+```
+
+### Serving with Swagger UI
+
+```typescript
+import swaggerUi from "swagger-ui-express";
+import { Documentation } from "express-zod-api";
+
+const docs = new Documentation({
+  routing,
+  config,
+  version: "1.0.0",
+  title: "My API",
+  serverUrl: "https://api.example.com",
+});
+
+const spec = docs.getSpec();
+
+const config = createConfig({
+  http: { listen: 8090 },
+  cors: true,
+  beforeRouting: ({ app }) => {
+    app.use("/docs", swaggerUi.serve, swaggerUi.setup(spec));
+  },
+});
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="Documentation Guide" href="/integration/documentation">
+    Complete documentation guide
+  </Card>
+  <Card title="OpenAPI" href="/integration/openapi">
+    OpenAPI specification details
+  </Card>
+  <Card title="Tagging Endpoints" href="/integration/documentation#tagging-endpoints">
+    Organize endpoints with tags
+  </Card>
+</CardGroup>
