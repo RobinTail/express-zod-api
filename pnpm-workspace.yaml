@@ -44,7 +44,7 @@ publicHoistPattern:
   - "globals" # used by eslint.config.js
   - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
   - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting
-  - "rolldown" # used by reabdableDts tool
+  - "rolldown" # used by readableDts tool
 catalogs:
   prod:
     "ramda": "^0.32.0"
