@@ -7,8 +7,6 @@ import { ServeStatic } from "./serve-static";
 import type { StaticHandler } from "./serve-static";
 import type { CommonConfig } from "./config-type";
 
-export type { Routing };
-
 export type OnEndpoint<M extends string = Method> = (
   method: M,
   path: string,
