@@ -9,6 +9,7 @@
     "noImplicitOverride": true,
     "noUncheckedSideEffectImports": true,
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
     "types": ["node", "vitest/globals"]
   }
 }

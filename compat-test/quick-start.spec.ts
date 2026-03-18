@@ -8,14 +8,14 @@ import {
   expect,
   test,
 } from "vitest";
-import { givePort } from "../tools/ports";
+import { givePort } from "../tools/ports.ts";
 
 describe("ESM Test", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
-  const quickStart = spawn("unrun", ["quick-start.ts"]);
+  const quickStart = spawn("node", ["quick-start.ts"]);
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });

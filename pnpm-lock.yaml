@@ -103,9 +103,6 @@ importers:
       typescript-eslint:
         specifier: catalog:dev
         version: 8.56.0(eslint@10.0.0)(typescript@5.9.3)
-      unrun:
-        specifier: ^0.2.32
-        version: 0.2.32(synckit@0.11.12)
       vitest:
         specifier: ^4.0.16
         version: 4.1.0(@types/node@24.12.0)(yaml@2.8.2)

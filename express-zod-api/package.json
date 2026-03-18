@@ -16,7 +16,7 @@
   "bugs": "https://github.com/RobinTail/express-zod-api/issues",
   "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
-    "build": "tsdown --config-loader unrun",
+    "build": "tsdown",
     "pretest": "tsc",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
