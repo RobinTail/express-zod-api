@@ -1,11 +1,12 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { emptySchema, FlatObject } from "./common-helpers";
+import { emptySchema } from "./common-helpers";
+import type { FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
-import { IOSchema } from "./io-schema";
-import { LogicalContainer } from "./logical-container";
-import { Security } from "./security";
-import { ActualLogger } from "./logger-helpers";
+import type { IOSchema } from "./io-schema";
+import type { LogicalContainer } from "./logical-container";
+import type { Security } from "./security";
+import type { ActualLogger } from "./logger-helpers";
 
 type Handler<IN, CTX, RET> = (params: {
   /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware */

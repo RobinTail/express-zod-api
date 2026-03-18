@@ -1,14 +1,16 @@
-import { IRouter, RequestHandler } from "express";
+import type { IRouter, RequestHandler } from "express";
 import createHttpError from "http-errors";
 import { isProduction } from "./common-helpers";
-import { CommonConfig } from "./config-type";
-import { ContentType } from "./content-type";
+import type { CommonConfig } from "./config-type";
+import type { ContentType } from "./content-type";
 import { Diagnostics } from "./diagnostics";
-import { AbstractEndpoint } from "./endpoint";
-import { CORSMethod, isMethod } from "./method";
-import { OnEndpoint, walkRouting } from "./routing-walker";
+import type { AbstractEndpoint } from "./endpoint";
+import { isMethod } from "./method";
+import type { CORSMethod } from "./method";
+import { walkRouting } from "./routing-walker";
+import type { OnEndpoint } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
-import { GetLogger } from "./server-helpers";
+import type { GetLogger } from "./server-helpers";
 import * as R from "ramda";
 
 /**

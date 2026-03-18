@@ -7,11 +7,11 @@ import {
 import { z } from "zod";
 import {
   EndpointsFactory,
-  Routing,
   ServeStatic,
   defaultResultHandler,
   ez,
 } from "../src";
+import type { Routing } from "../src";
 import {
   makeLoggerMock,
   makeRequestMock,

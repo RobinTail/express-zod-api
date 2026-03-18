@@ -1,5 +1,6 @@
 import { performance } from "node:perf_hooks";
-import { BuiltinLogger, BuiltinLoggerConfig } from "../src/builtin-logger";
+import { BuiltinLogger } from "../src/builtin-logger";
+import type { BuiltinLoggerConfig } from "../src/builtin-logger";
 
 describe("BuiltinLogger", () => {
   beforeEach(() => {

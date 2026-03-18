@@ -5,7 +5,6 @@ import { readFile } from "node:fs/promises";
 import { z } from "zod";
 import {
   EndpointsFactory,
-  Method,
   createConfig,
   createServer,
   defaultResultHandler,
@@ -14,6 +13,7 @@ import {
   Middleware,
   ez,
 } from "../src";
+import type { Method } from "../src";
 import { givePort } from "../../tools/ports";
 import { setTimeout } from "node:timers/promises";
 

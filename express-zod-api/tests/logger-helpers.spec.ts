@@ -1,13 +1,13 @@
 import { BuiltinLogger } from "../src";
-import { BuiltinLoggerConfig } from "../src/builtin-logger";
+import type { BuiltinLoggerConfig } from "../src/builtin-logger";
 import {
-  AbstractLogger,
   isLoggerInstance,
   isSeverity,
   isHidden,
   makeNumberFormat,
   formatDuration,
 } from "../src/logger-helpers";
+import type { AbstractLogger } from "../src/logger-helpers";
 
 describe("Logger helpers", () => {
   describe("isSeverity()", () => {
