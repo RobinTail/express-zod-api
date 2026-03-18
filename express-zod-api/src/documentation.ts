@@ -28,12 +28,8 @@ import {
   depictRequest,
 } from "./documentation-helpers";
 import type { IsHeader, BrandHandling } from "./documentation-helpers";
-import {
-  walkRouting,
-  withHead,
-  type Routing,
-  type OnEndpoint,
-} from "./routing-walker";
+import type { Routing } from "./routing";
+import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 
 type Component =
   | "positiveResponse"
