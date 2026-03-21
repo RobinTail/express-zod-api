@@ -195,7 +195,7 @@ export default tsPlugin.config(
   prettierRules,
   {
     name: "globally/ignored",
-    ignores: ["**/dist/", "**/coverage/", "compat-test/sample.ts"],
+    ignores: ["**/dist/", "**/coverage/", "compat-test"],
   },
   {
     name: "globally/disabled",

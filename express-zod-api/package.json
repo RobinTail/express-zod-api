@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "27.1.1",
+  "version": "28.0.0-beta.1",
   "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -39,7 +39,7 @@
     "*.md"
   ],
   "engines": {
-    "node": "^20.19.0 || ^22.12.0 || ^24.0.0"
+    "node": "^22.18.0 || ^24.0.0"
   },
   "dependencies": {
     "@express-zod-api/zod-plugin": "workspace:^",
