@@ -8,7 +8,7 @@ packages:
   - compat-test
   - issue952-test
 gitChecks: false
-engineStrict: true
+# engineStrict: true
 autoInstallPeers: false
 minimumReleaseAge: 2880 # 2 days
 minimumReleaseAgeExclude:
