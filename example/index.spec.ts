@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createReadStream, readFileSync } from "node:fs";
-import { Client, Subscription } from "./example.client";
-import { givePort } from "../tools/ports";
+import { Client, Subscription } from "./example.client.ts";
+import { givePort } from "../tools/ports.ts";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { fail } from "node:assert";
@@ -13,7 +13,7 @@ describe("Example", async () => {
     out += chunk.toString();
   };
   const matchOut = (regExp: RegExp) => regExp.test(out);
-  const example = spawn("unrun", ["index.ts"]);
+  const example = spawn("node", ["index.ts"]);
   example.stdout.on("data", listener);
   const port = givePort("example");
   await vi.waitFor(() => assert(out.includes(`Listening`)), { timeout: 1e4 });

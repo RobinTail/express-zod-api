@@ -10,13 +10,12 @@ import {
   shouldHaveContent,
   getInputSources,
   emptySchema,
-  EmptySchema,
-  EmptyObject,
 } from "../src/common-helpers";
+import type { EmptySchema, EmptyObject } from "../src/common-helpers";
 import { z } from "zod";
 import { makeRequestMock } from "../src/testing";
 import { methods } from "../src/method";
-import { CommonConfig, InputSources } from "../src/config-type";
+import type { CommonConfig, InputSources } from "../src/config-type";
 
 describe("Common Helpers", () => {
   describe("emptySchema", () => {

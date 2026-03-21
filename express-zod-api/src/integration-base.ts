@@ -1,10 +1,12 @@
 import * as R from "ramda";
 import type ts from "typescript";
-import { ResponseVariant } from "./api-response";
+import type { ResponseVariant } from "./api-response";
 import { contentTypes } from "./content-type";
-import { ClientMethod, clientMethods } from "./method";
+import { clientMethods } from "./method";
+import type { ClientMethod } from "./method";
 import type { makeEventSchema } from "./sse";
-import { propOf, Typeable, TypescriptAPI } from "./typescript-api";
+import { propOf, TypescriptAPI } from "./typescript-api";
+import type { Typeable } from "./typescript-api";
 import type {
   CursorPaginatedResult,
   OffsetPaginatedResult,

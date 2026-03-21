@@ -1,12 +1,12 @@
 import { z } from "zod";
 import {
-  CommonConfig,
   defaultEndpointsFactory,
   Middleware,
   ResultHandler,
   testEndpoint,
   testMiddleware,
 } from "../src";
+import type { CommonConfig } from "../src";
 import type { Mock } from "vitest";
 
 describe("Testing", () => {

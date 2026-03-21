@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { fileSendingEndpointsFactory } from "../factories";
+import { fileSendingEndpointsFactory } from "../factories.ts";
 import { readFile } from "node:fs/promises";
 
 export const sendAvatarEndpoint = fileSendingEndpointsFactory.build({

@@ -1,21 +1,18 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { globalRegistry, z } from "zod";
-import {
-  ApiResponse,
-  defaultStatusCodes,
-  NormalizedResponse,
-} from "./api-response";
-import { FlatObject, isObject } from "./common-helpers";
+import { defaultStatusCodes } from "./api-response";
+import type { ApiResponse, NormalizedResponse } from "./api-response";
+import { isObject } from "./common-helpers";
+import type { FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
-import { IOSchema } from "./io-schema";
-import { ActualLogger } from "./logger-helpers";
+import type { IOSchema } from "./io-schema";
+import type { ActualLogger } from "./logger-helpers";
+import type { DiscriminatedResult, ResultSchema } from "./result-helpers";
 import {
-  DiscriminatedResult,
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
   normalize,
-  ResultSchema,
 } from "./result-helpers";
 
 type Handler<RES = unknown> = (

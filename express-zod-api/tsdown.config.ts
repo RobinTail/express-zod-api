@@ -1,6 +1,6 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
-import { humanReadableDtsPlugin } from "../tools/readableDts";
+import { humanReadableDtsPlugin } from "../tools/readableDts.ts";
 
 export default defineConfig({
   entry: "src/index.ts",

@@ -3,10 +3,10 @@ import { globalRegistry, z } from "zod";
 import {
   EndpointsFactory,
   Integration,
-  Producer,
   defaultEndpointsFactory,
   ResultHandler,
 } from "../src";
+import type { Producer } from "../src";
 
 describe("Integration", () => {
   const recursive1: z.ZodType = z.lazy(() =>

@@ -17,7 +17,7 @@
   "scripts": {
     "pretest": "tsc",
     "test": "vitest run --globals",
-    "build": "tsdown --config-loader unrun",
+    "build": "tsdown",
     "prepublishOnly": "eslint && pnpm test && pnpm build"
   },
   "type": "module",
