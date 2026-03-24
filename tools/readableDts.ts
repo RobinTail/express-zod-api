@@ -16,6 +16,7 @@ export const humanReadableDtsPlugin = (): Plugin => ({
         file.code
           .replaceAll(/(\/\*\*[^\r\n]*?\*\/)/g, "\n$1\n") // ensure newlines around jsdoc
           .replaceAll(/^\/\/#(end)?region[^\r\n]*/gm, "") // rm rolldown comments
+          .replaceAll(/#private;\s*/g, "") // rm #private markers (TS6 compatibility)
           .replaceAll(/\n\s*\n/g, "\n"), // rm double newlines
         prettyOptions,
       );
