@@ -1,6 +1,6 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
-import { humanReadableDtsPlugin } from "../tools/readableDts.ts";
+import { fixDtsPlugin } from "../tools/fixDts.ts";
 
 export default defineConfig({
   entry: "src/index.ts",
@@ -14,7 +14,7 @@ export default defineConfig({
     /** @since tsdown 0.21 it shakes the unused import */
     dts: `import "@express-zod-api/zod-plugin";`,
   },
-  plugins: [humanReadableDtsPlugin()],
+  plugins: [fixDtsPlugin()],
   define: {
     "process.env.TSDOWN_SELF": `"${manifest.name}"`, // used by localsID
     "process.env.TSDOWN_BUILD": `"v${manifest.version}"`, // @since v25.0.0 is pure ESM

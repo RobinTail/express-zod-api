@@ -1,6 +1,6 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
-import { humanReadableDtsPlugin } from "../tools/readableDts.ts";
+import { fixDtsPlugin } from "../tools/fixDts.ts";
 
 export default defineConfig({
   entry: "index.ts",
@@ -10,7 +10,7 @@ export default defineConfig({
     skipNodeModulesBundle: true,
   },
   attw: { profile: "esm-only", level: "error" },
-  plugins: [humanReadableDtsPlugin()],
+  plugins: [fixDtsPlugin()],
   define: {
     "process.env.TSDOWN_VERSION": `"${manifest.version}"`, // used by ruleName
   },
