@@ -1,11 +1,7 @@
 import type { Request } from "express";
 import * as R from "ramda";
 import { z } from "zod";
-import {
-  type CommonConfig,
-  type InputSource,
-  type InputSources,
-} from "./config-type";
+import type { CommonConfig, InputSource, InputSources } from "./config-type";
 import { contentTypes } from "./content-type";
 import {
   type ClientMethod,
