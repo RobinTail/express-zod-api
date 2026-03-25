@@ -24,6 +24,7 @@ minimumReleaseAgeExclude:
   - express
   - http-errors
   - import-without-cache
+  - picomatch
   - prettier
   - qs
   - ramda
@@ -63,7 +64,7 @@ catalogs:
     "express": "^5.2.1"
     "express-fileupload": "^1.5.2"
     "http-errors": "^2.0.1"
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.2"
     "typescript-eslint": "^8.51.0"
     "zod": "^4.3.4"
 overrides:
