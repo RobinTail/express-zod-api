@@ -24,6 +24,7 @@ minimumReleaseAgeExclude:
   - express
   - http-errors
   - import-without-cache
+  - picomatch
   - prettier
   - qs
   - ramda
