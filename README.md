@@ -243,7 +243,7 @@ const helloWorldEndpoint = defaultEndpointsFactory.build({
 Connect your endpoint to the `/v1/hello` route:
 
 ```ts
-import { Routing } from "express-zod-api";
+import type { Routing } from "express-zod-api";
 
 const routing: Routing = {
   v1: {
@@ -1218,7 +1218,7 @@ purpose, the `.deprecated()` method is available on each schema and `Endpoint`, 
 You can also deprecate all routes the `Endpoint` assigned to by setting `EndpointsFactory::build({ deprecated: true })`.
 
 ```ts
-import { Routing } from "express-zod-api";
+import type { Routing } from "express-zod-api";
 import { z } from "zod";
 
 const someEndpoint = factory.build({

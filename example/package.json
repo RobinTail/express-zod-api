@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "unrun index.ts",
+    "start": "node index.ts",
     "build": "pnpm build:docs && pnpm build:client",
-    "build:docs": "unrun generate-documentation.ts",
-    "build:client": "unrun generate-client.ts",
+    "build:docs": "node generate-documentation.ts",
+    "build:client": "node generate-client.ts",
     "pretest": "tsc",
     "test": "vitest run index.spec.ts"
   },

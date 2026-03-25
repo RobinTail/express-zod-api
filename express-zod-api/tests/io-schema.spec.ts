@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { IOSchema, ez } from "../src";
+import { ez, type IOSchema } from "../src";
 import { makeFinalInputSchema, ensureExtension } from "../src/io-schema";
 
 describe("I/O Schema and related helpers", () => {

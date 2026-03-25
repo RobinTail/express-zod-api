@@ -1,19 +1,19 @@
-import { Request, Response } from "express";
-import { ensureError, FlatObject, getInput } from "./common-helpers";
-import { CommonConfig } from "./config-type";
-import { AbstractEndpoint } from "./endpoint";
+import type { Request, Response } from "express";
+import { ensureError, getInput, type FlatObject } from "./common-helpers";
+import type { CommonConfig } from "./config-type";
+import type { AbstractEndpoint } from "./endpoint";
 import {
-  AbstractLogger,
-  ActualLogger,
   isSeverity,
-  Severity,
+  type AbstractLogger,
+  type ActualLogger,
+  type Severity,
 } from "./logger-helpers";
 import { contentTypes } from "./content-type";
 import {
   createRequest,
-  RequestOptions,
   createResponse,
-  ResponseOptions,
+  type RequestOptions,
+  type ResponseOptions,
 } from "node-mocks-http";
 import { AbstractMiddleware } from "./middleware";
 import { defaultResultHandler } from "./result-handler";
