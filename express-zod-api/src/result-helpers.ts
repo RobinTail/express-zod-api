@@ -2,7 +2,7 @@ import type { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
-import { type NormalizedResponse, type ResponseVariant } from "./api-response";
+import type { NormalizedResponse, ResponseVariant } from "./api-response";
 import {
   combinations,
   getMessageFromError,
