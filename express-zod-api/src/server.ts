@@ -3,11 +3,11 @@ import type compression from "compression";
 import http from "node:http";
 import https from "node:https";
 import { BuiltinLogger } from "./builtin-logger";
-import {
-  type AppConfig,
-  type CommonConfig,
-  type HttpConfig,
-  type ServerConfig,
+import type {
+  AppConfig,
+  CommonConfig,
+  HttpConfig,
+  ServerConfig,
 } from "./config-type";
 import { isLoggerInstance } from "./logger-helpers";
 import { loadPeer } from "./peer-helpers";
