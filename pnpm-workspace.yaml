@@ -10,6 +10,7 @@ packages:
 gitChecks: false
 engineStrict: true
 autoInstallPeers: false
+dedupePeers: true
 minimumReleaseAge: 2880 # 2 days
 minimumReleaseAgeExclude:
   - "@types/*"
