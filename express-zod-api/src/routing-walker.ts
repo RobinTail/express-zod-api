@@ -1,10 +1,8 @@
 import type { Routing } from "./routing";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
-import { isMethod } from "./method";
-import type { ClientMethod, Method } from "./method";
-import { ServeStatic } from "./serve-static";
-import type { StaticHandler } from "./serve-static";
+import { isMethod, type ClientMethod, type Method } from "./method";
+import { ServeStatic, type StaticHandler } from "./serve-static";
 import type { CommonConfig } from "./config-type";
 
 export type OnEndpoint<M extends string = Method> = (

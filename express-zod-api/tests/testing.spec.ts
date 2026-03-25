@@ -5,8 +5,8 @@ import {
   ResultHandler,
   testEndpoint,
   testMiddleware,
+  type CommonConfig,
 } from "../src";
-import type { CommonConfig } from "../src";
 import type { Mock } from "vitest";
 
 describe("Testing", () => {

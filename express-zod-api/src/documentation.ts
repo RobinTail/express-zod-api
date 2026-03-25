@@ -1,12 +1,12 @@
-import type {
-  OperationObject,
-  ReferenceObject,
-  ResponsesObject,
-  SchemaObject,
-  SecuritySchemeObject,
-  SecuritySchemeType,
+import {
+  type OperationObject,
+  type ReferenceObject,
+  type ResponsesObject,
+  type SchemaObject,
+  type SecuritySchemeObject,
+  type SecuritySchemeType,
+  OpenApiBuilder,
 } from "openapi3-ts/oas31";
-import { OpenApiBuilder } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
@@ -26,8 +26,9 @@ import {
   reformatParamsInPath,
   nonEmpty,
   depictRequest,
+  type IsHeader,
+  type BrandHandling,
 } from "./documentation-helpers";
-import type { IsHeader, BrandHandling } from "./documentation-helpers";
 import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 

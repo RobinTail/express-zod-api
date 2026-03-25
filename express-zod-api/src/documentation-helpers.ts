@@ -1,25 +1,26 @@
-import type {
-  ExamplesObject,
-  MediaTypeObject,
-  OAuthFlowObject,
-  ParameterObject,
-  ReferenceObject,
-  RequestBodyObject,
-  ResponseObject,
-  SchemaObject,
-  SchemaObjectType,
-  SecurityRequirementObject,
-  SecuritySchemeObject,
-  TagObject,
+import {
+  type ExamplesObject,
+  type MediaTypeObject,
+  type OAuthFlowObject,
+  type ParameterObject,
+  type ReferenceObject,
+  type RequestBodyObject,
+  type ResponseObject,
+  type SchemaObject,
+  type SchemaObjectType,
+  type SecurityRequirementObject,
+  type SecuritySchemeObject,
+  type TagObject,
+  isReferenceObject,
+  isSchemaObject,
 } from "openapi3-ts/oas31";
-import { isReferenceObject, isSchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
 import type { NormalizedResponse, ResponseVariant } from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
-import type { FlatObject } from "./common-helpers";
-import type { Tag } from "./common-helpers";
 import {
+  type FlatObject,
+  type Tag,
   shouldHaveContent,
   getRoutePathParams,
   getTransformedType,

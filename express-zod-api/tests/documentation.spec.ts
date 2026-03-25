@@ -9,8 +9,9 @@ import {
   defaultEndpointsFactory,
   ez,
   ResultHandler,
+  type Depicter,
+  type Method,
 } from "../src";
-import type { Depicter, Method } from "../src";
 import { contentTypes } from "../src/content-type";
 import { z } from "zod";
 import { givePort } from "../../tools/ports";

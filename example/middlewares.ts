@@ -1,8 +1,7 @@
 import createHttpError from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { Middleware } from "express-zod-api";
-import type { Method } from "express-zod-api";
+import { Middleware, type Method } from "express-zod-api";
 
 export const authMiddleware = new Middleware({
   security: {

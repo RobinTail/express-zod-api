@@ -6,8 +6,8 @@ import {
   isHidden,
   makeNumberFormat,
   formatDuration,
+  type AbstractLogger,
 } from "../src/logger-helpers";
-import type { AbstractLogger } from "../src/logger-helpers";
 
 describe("Logger helpers", () => {
   describe("isSeverity()", () => {

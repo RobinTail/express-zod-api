@@ -1,5 +1,8 @@
-import { defaultEndpointsFactory, Documentation } from "express-zod-api";
-import type { TagOverrides } from "express-zod-api";
+import {
+  defaultEndpointsFactory,
+  Documentation,
+  type TagOverrides,
+} from "express-zod-api";
 
 declare module "express-zod-api" {
   export interface TagOverrides {

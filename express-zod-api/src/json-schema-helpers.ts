@@ -1,6 +1,5 @@
 import * as R from "ramda";
-import { combinations, isObject } from "./common-helpers";
-import type { FlatObject } from "./common-helpers";
+import { combinations, isObject, type FlatObject } from "./common-helpers";
 import type { z } from "zod";
 
 const isJsonObjectSchema = (

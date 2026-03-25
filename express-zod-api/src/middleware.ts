@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { emptySchema } from "./common-helpers";
-import type { FlatObject } from "./common-helpers";
+import { emptySchema, type FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
 import type { IOSchema } from "./io-schema";
 import type { LogicalContainer } from "./logical-container";

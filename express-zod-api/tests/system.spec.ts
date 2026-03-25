@@ -12,8 +12,8 @@ import {
   BuiltinLogger,
   Middleware,
   ez,
+  type Method,
 } from "../src";
-import type { Method } from "../src";
 import { givePort } from "../../tools/ports";
 import { setTimeout } from "node:timers/promises";
 

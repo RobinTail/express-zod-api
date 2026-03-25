@@ -10,8 +10,9 @@ import {
   shouldHaveContent,
   getInputSources,
   emptySchema,
+  type EmptySchema,
+  type EmptyObject,
 } from "../src/common-helpers";
-import type { EmptySchema, EmptyObject } from "../src/common-helpers";
 import { z } from "zod";
 import { makeRequestMock } from "../src/testing";
 import { methods } from "../src/method";

@@ -1,8 +1,8 @@
 import type fileUpload from "express-fileupload";
 import { loadPeer } from "./peer-helpers";
-import type { AbstractResultHandler } from "./result-handler";
+import { type AbstractResultHandler } from "./result-handler";
 import type { ActualLogger } from "./logger-helpers";
-import type { CommonConfig, ServerConfig } from "./config-type";
+import { type CommonConfig, type ServerConfig } from "./config-type";
 import type { ErrorRequestHandler, RequestHandler, Request } from "express";
 import createHttpError from "http-errors";
 import { lastResortHandler } from "./last-resort";

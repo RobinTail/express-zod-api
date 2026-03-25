@@ -10,8 +10,8 @@ import {
   ServeStatic,
   defaultResultHandler,
   ez,
+  type Routing,
 } from "../src";
-import type { Routing } from "../src";
 import {
   makeLoggerMock,
   makeRequestMock,

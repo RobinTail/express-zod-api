@@ -2,13 +2,13 @@ import type { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import * as R from "ramda";
 import { globalRegistry, z } from "zod";
-import type { NormalizedResponse, ResponseVariant } from "./api-response";
+import { type NormalizedResponse, type ResponseVariant } from "./api-response";
 import {
   combinations,
   getMessageFromError,
   isProduction,
+  type FlatObject,
 } from "./common-helpers";
-import type { FlatObject } from "./common-helpers";
 import { InputValidationError, ResultHandlerError } from "./errors";
 import type { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";

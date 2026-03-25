@@ -5,8 +5,8 @@ import {
   Integration,
   defaultEndpointsFactory,
   ResultHandler,
+  type Producer,
 } from "../src";
-import type { Producer } from "../src";
 
 describe("Integration", () => {
   const recursive1: z.ZodType = z.lazy(() =>

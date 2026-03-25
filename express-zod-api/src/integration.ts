@@ -1,14 +1,12 @@
 import * as R from "ramda";
 import type ts from "typescript";
 import { z } from "zod";
-import { responseVariants } from "./api-response";
-import type { ResponseVariant } from "./api-response";
+import { responseVariants, type ResponseVariant } from "./api-response";
 import { IntegrationBase } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
 import type { Routing } from "./routing";
-import { walkRouting, withHead } from "./routing-walker";
-import type { OnEndpoint } from "./routing-walker";
+import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
 import type { ZTSContext } from "./zts-helpers";

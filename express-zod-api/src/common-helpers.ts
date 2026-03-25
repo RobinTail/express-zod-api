@@ -1,10 +1,19 @@
 import type { Request } from "express";
 import * as R from "ramda";
 import { z } from "zod";
-import type { CommonConfig, InputSource, InputSources } from "./config-type";
+import {
+  type CommonConfig,
+  type InputSource,
+  type InputSources,
+} from "./config-type";
 import { contentTypes } from "./content-type";
-import type { ClientMethod, SomeMethod, Method, CORSMethod } from "./method";
-import { isMethod } from "./method";
+import {
+  type ClientMethod,
+  type SomeMethod,
+  type Method,
+  type CORSMethod,
+  isMethod,
+} from "./method";
 import type { NormalizedResponse } from "./api-response";
 
 /** @since zod 3.25.61 output type fixed */

@@ -7,10 +7,12 @@ import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { hasCycle } from "./deep-checks";
 import type { ProprietaryBrand } from "./proprietary-schemas";
-import { ezRawBrand } from "./raw-schema";
-import type { RawSchema } from "./raw-schema";
-import { walkSchema } from "./schema-walker";
-import type { FirstPartyKind, HandlingRules } from "./schema-walker";
+import { ezRawBrand, type RawSchema } from "./raw-schema";
+import {
+  walkSchema,
+  type FirstPartyKind,
+  type HandlingRules,
+} from "./schema-walker";
 import type { TypescriptAPI } from "./typescript-api";
 import type { Producer, ZTSContext } from "./zts-helpers";
 

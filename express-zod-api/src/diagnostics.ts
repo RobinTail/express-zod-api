@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { responseVariants } from "./api-response";
-import type { FlatObject } from "./common-helpers";
-import { getRoutePathParams } from "./common-helpers";
+import { type FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { findJsonIncompatible } from "./deep-checks";
 import { AbstractEndpoint } from "./endpoint";

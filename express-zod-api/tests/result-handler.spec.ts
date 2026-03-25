@@ -8,8 +8,7 @@ import {
   ResultHandler,
 } from "../src";
 import { ResultHandlerError } from "../src/errors";
-import { AbstractResultHandler } from "../src/result-handler";
-import type { Result } from "../src/result-handler";
+import { AbstractResultHandler, type Result } from "../src/result-handler";
 import {
   makeLoggerMock,
   makeRequestMock,

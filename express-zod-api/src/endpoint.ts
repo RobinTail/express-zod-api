@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
-import type { NormalizedResponse, ResponseVariant } from "./api-response";
+import { type NormalizedResponse, type ResponseVariant } from "./api-response";
 import { findRequestTypeDefiningSchema } from "./deep-checks";
-import type { FlatObject } from "./common-helpers";
 import {
+  type FlatObject,
   getActualMethod,
   getInput,
   ensureError,
@@ -22,12 +22,19 @@ import { lastResortHandler } from "./last-resort";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
 import { getBrand } from "@express-zod-api/zod-plugin";
-import type { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
+import {
+  type ClientMethod,
+  type CORSMethod,
+  type Method,
+  type SomeMethod,
+} from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import type { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
-import type { DiscriminatedResult } from "./result-helpers";
-import { pullResponseExamples } from "./result-helpers";
+import {
+  type DiscriminatedResult,
+  pullResponseExamples,
+} from "./result-helpers";
 import type { AbstractResultHandler } from "./result-handler";
 import type { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";

@@ -1,16 +1,20 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { emptySchema } from "./common-helpers";
-import type {
-  EmptyObject,
-  EmptySchema,
-  FlatObject,
-  Tag,
+import {
+  emptySchema,
+  type EmptyObject,
+  type EmptySchema,
+  type FlatObject,
+  type Tag,
 } from "./common-helpers";
-import { Endpoint } from "./endpoint";
-import type { Handler } from "./endpoint";
-import { ensureExtension, makeFinalInputSchema } from "./io-schema";
-import type { IOSchema, FinalInputSchema, Extension } from "./io-schema";
+import { Endpoint, type Handler } from "./endpoint";
+import {
+  ensureExtension,
+  makeFinalInputSchema,
+  type IOSchema,
+  type FinalInputSchema,
+  type Extension,
+} from "./io-schema";
 import type { ClientMethod, Method } from "./method";
 import {
   AbstractMiddleware,

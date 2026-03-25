@@ -1,10 +1,12 @@
 import * as R from "ramda";
-import { isMethod, methods, clientMethods } from "../src/method";
-import type {
-  Method,
-  ClientMethod,
-  SomeMethod,
-  CORSMethod,
+import {
+  isMethod,
+  methods,
+  clientMethods,
+  type Method,
+  type ClientMethod,
+  type SomeMethod,
+  type CORSMethod,
 } from "../src/method";
 
 describe("Method", () => {

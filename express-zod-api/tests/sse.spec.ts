@@ -6,10 +6,10 @@ import {
   testMiddleware,
   EventStreamFactory,
   EndpointsFactory,
+  type FlatObject,
 } from "../src";
-import type { FlatObject } from "../src";
-import type { Emitter } from "../src/sse";
 import {
+  type Emitter,
   ensureStream,
   formatEvent,
   makeEventSchema,
