@@ -8,6 +8,11 @@
 
 ## Version 27
 
+### v27.2.0
+
+- Supporting TypeScript 6:
+  - Supported `typescript` versions: `^5.1.3 || 6.0.2`.
+
 ### v27.1.0
 
 - Introducing `ez.paginated()` helper for creating paginated endpoints:
