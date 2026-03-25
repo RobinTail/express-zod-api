@@ -1,7 +1,7 @@
-import type { Routing } from "./routing";
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
 import { isMethod, type ClientMethod, type Method } from "./method";
+import type { Routing } from "./routing";
 import { ServeStatic, type StaticHandler } from "./serve-static";
 import type { CommonConfig } from "./config-type";
 
