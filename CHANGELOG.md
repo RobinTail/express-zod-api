@@ -5,6 +5,7 @@
 ### v28.0.0
 
 - Supported Node.js versions: `^22.18.0 || ^24.0.0`;
+- Supported TypeScript versions: `^6.0.2`;
 
 ## Version 27
 
