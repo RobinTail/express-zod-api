@@ -106,7 +106,7 @@ importers:
         version: 8.56.0(eslint@10.0.0)(typescript@6.0.2)
       vitest:
         specifier: ^4.0.16
-        version: 4.1.2(@types/node@24.12.0)(yaml@2.8.2)
+        version: 4.1.2(@types/node@24.12.0)(yaml@2.8.3)
 
   cjs-test:
     devDependencies:
@@ -1797,8 +1797,8 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
-  yaml@2.8.2:
-    resolution: {integrity: sha512-mplynKqc1C2hTVYxd0PU2xQAc22TI1vShAYGksCCfxbn/dFwnHTNi1bvYsBTkhdUNtGIf5xNOg938rrSSYvS9A==}
+  yaml@2.8.3:
+    resolution: {integrity: sha512-AvbaCLOO2Otw/lW5bmh9d/WEdcDFdQp2Z2ZUH3pX9U2ihyUY0nvLv7J6TrWowklRGPYbB/IuIMfYgxaCPg5Bpg==}
     engines: {node: '>= 14.6'}
     hasBin: true
 
@@ -2311,7 +2311,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.0.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.2(@types/node@24.12.0)(yaml@2.8.2)
+      vitest: 4.1.2(@types/node@24.12.0)(yaml@2.8.3)
 
   '@vitest/expect@4.1.2':
     dependencies:
@@ -2328,7 +2328,7 @@ snapshots:
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.3(@types/node@24.12.0)(yaml@2.8.2)
+      vite: 8.0.3(@types/node@24.12.0)(yaml@2.8.3)
 
   '@vitest/pretty-format@4.1.2':
     dependencies:
@@ -2956,7 +2956,7 @@ snapshots:
 
   openapi3-ts@4.5.0:
     dependencies:
-      yaml: 2.8.2
+      yaml: 2.8.3
 
   optionator@0.9.4:
     dependencies:
@@ -3305,7 +3305,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite@8.0.3(@types/node@24.12.0)(yaml@2.8.2):
+  vite@8.0.3(@types/node@24.12.0)(yaml@2.8.3):
     dependencies:
       lightningcss: empty-npm-package@1.0.0
       picomatch: 4.0.4
@@ -3315,9 +3315,9 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.12.0
       fsevents: 2.3.3
-      yaml: 2.8.2
+      yaml: 2.8.3
 
-  vitest@4.1.2(@types/node@24.12.0)(yaml@2.8.2):
+  vitest@4.1.2(@types/node@24.12.0)(yaml@2.8.3):
     dependencies:
       '@vitest/expect': 4.1.2
       '@vitest/mocker': 4.1.2(vite@8.0.3)
@@ -3337,7 +3337,7 @@ snapshots:
       tinyexec: 1.0.4
       tinyglobby: 0.2.15
       tinyrainbow: 3.1.0
-      vite: 8.0.3(@types/node@24.12.0)(yaml@2.8.2)
+      vite: 8.0.3(@types/node@24.12.0)(yaml@2.8.3)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.12.0
@@ -3368,7 +3368,7 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  yaml@2.8.2: {}
+  yaml@2.8.3: {}
 
   yocto-queue@0.1.0: {}
 
