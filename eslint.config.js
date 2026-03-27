@@ -195,7 +195,7 @@ export default tsPlugin.config(
   prettierRules,
   {
     name: "globally/ignored",
-    ignores: ["**/dist/", "**/coverage/", "compat-test/sample.ts"],
+    ignores: ["**/dist/", "**/coverage/", "compat-test"],
   },
   {
     name: "globally/disabled",
@@ -210,6 +210,7 @@ export default tsPlugin.config(
       curly: ["warn", "multi-or-nest", "consistent"],
       "@typescript-eslint/no-shadow": "warn",
       "no-restricted-syntax": ["warn", ...importConcerns],
+      "no-duplicate-imports": "warn",
     },
   },
   {
@@ -274,6 +275,7 @@ export default tsPlugin.config(
     files: ["*-test/quick-start.ts", "example/example.client.ts"],
     rules: {
       "prettier/prettier": "off",
+      "no-duplicate-imports": "off",
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": [
         "error",

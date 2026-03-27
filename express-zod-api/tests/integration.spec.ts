@@ -3,9 +3,9 @@ import { globalRegistry, z } from "zod";
 import {
   EndpointsFactory,
   Integration,
-  Producer,
   defaultEndpointsFactory,
   ResultHandler,
+  type Producer,
 } from "../src";
 
 describe("Integration", () => {

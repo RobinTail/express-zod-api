@@ -6,11 +6,15 @@ import { getTransformedType, isSchema } from "./common-helpers";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { hasCycle } from "./deep-checks";
-import { ProprietaryBrand } from "./proprietary-schemas";
-import { ezRawBrand, RawSchema } from "./raw-schema";
-import { FirstPartyKind, HandlingRules, walkSchema } from "./schema-walker";
+import type { ProprietaryBrand } from "./proprietary-schemas";
+import { ezRawBrand, type RawSchema } from "./raw-schema";
+import {
+  walkSchema,
+  type FirstPartyKind,
+  type HandlingRules,
+} from "./schema-walker";
 import type { TypescriptAPI } from "./typescript-api";
-import { Producer, ZTSContext } from "./zts-helpers";
+import type { Producer, ZTSContext } from "./zts-helpers";
 
 const nodePath = {
   name: R.path([

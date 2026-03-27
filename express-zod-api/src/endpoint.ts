@@ -1,34 +1,37 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
-import { NormalizedResponse, ResponseVariant } from "./api-response";
+import type { NormalizedResponse, ResponseVariant } from "./api-response";
 import { findRequestTypeDefiningSchema } from "./deep-checks";
 import {
-  FlatObject,
+  type FlatObject,
   getActualMethod,
   getInput,
   ensureError,
   isSchema,
 } from "./common-helpers";
-import { CommonConfig } from "./config-type";
+import type { CommonConfig } from "./config-type";
 import {
   InputValidationError,
   OutputValidationError,
   ResultHandlerError,
 } from "./errors";
 import { ezFormBrand } from "./form-schema";
-import { IOSchema } from "./io-schema";
+import type { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
-import { ActualLogger } from "./logger-helpers";
-import { LogicalContainer } from "./logical-container";
+import type { ActualLogger } from "./logger-helpers";
+import type { LogicalContainer } from "./logical-container";
 import { getBrand } from "@express-zod-api/zod-plugin";
-import { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
+import type { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
-import { ContentType } from "./content-type";
+import type { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
-import { DiscriminatedResult, pullResponseExamples } from "./result-helpers";
-import { AbstractResultHandler } from "./result-handler";
-import { Security } from "./security";
+import {
+  type DiscriminatedResult,
+  pullResponseExamples,
+} from "./result-helpers";
+import type { AbstractResultHandler } from "./result-handler";
+import type { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 import type { Routing } from "./routing";
 
@@ -296,7 +299,7 @@ export class Endpoint<
   }) {
     const method = getActualMethod(request);
     const ctx: Partial<CTX> = {};
-    let result: DiscriminatedResult = { output: {}, error: null };
+    let result: DiscriminatedResult;
     const input = getInput(request, config.inputSources);
     try {
       await this.#runMiddlewares({

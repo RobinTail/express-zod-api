@@ -1,11 +1,11 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { emptySchema, FlatObject } from "./common-helpers";
+import { emptySchema, type FlatObject } from "./common-helpers";
 import { InputValidationError } from "./errors";
-import { IOSchema } from "./io-schema";
-import { LogicalContainer } from "./logical-container";
-import { Security } from "./security";
-import { ActualLogger } from "./logger-helpers";
+import type { IOSchema } from "./io-schema";
+import type { LogicalContainer } from "./logical-container";
+import type { Security } from "./security";
+import type { ActualLogger } from "./logger-helpers";
 
 type Handler<IN, CTX, RET> = (params: {
   /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware */
@@ -122,14 +122,15 @@ export class ExpressMiddleware<
     } = {},
   ) {
     super({
-      handler: async ({ request, response }) =>
-        new Promise<RET>((resolve, reject) => {
-          const next = (err?: unknown) => {
-            if (err && err instanceof Error) return reject(transformer(err));
-            resolve(provider(request as R, response as S));
-          };
-          nativeMw(request as R, response as S, next)?.catch(next);
-        }),
+      handler: async ({ request, response }) => {
+        const { promise, resolve, reject } = Promise.withResolvers<RET>();
+        const next = (err?: unknown) => {
+          if (err && err instanceof Error) return reject(transformer(err));
+          resolve(provider(request as R, response as S));
+        };
+        nativeMw(request as R, response as S, next)?.catch(next);
+        return promise;
+      },
     });
   }
 }

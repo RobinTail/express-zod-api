@@ -1,4 +1,4 @@
-import { Response } from "express";
+import type { Response } from "express";
 import createHttpError from "http-errors";
 import { z } from "zod";
 import {
@@ -8,7 +8,7 @@ import {
   ResultHandler,
 } from "../src";
 import { ResultHandlerError } from "../src/errors";
-import { AbstractResultHandler, Result } from "../src/result-handler";
+import { AbstractResultHandler, type Result } from "../src/result-handler";
 import {
   makeLoggerMock,
   makeRequestMock,

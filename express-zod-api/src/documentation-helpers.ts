@@ -1,49 +1,49 @@
 import {
-  ExamplesObject,
+  type ExamplesObject,
+  type MediaTypeObject,
+  type OAuthFlowObject,
+  type ParameterObject,
+  type ReferenceObject,
+  type RequestBodyObject,
+  type ResponseObject,
+  type SchemaObject,
+  type SchemaObjectType,
+  type SecurityRequirementObject,
+  type SecuritySchemeObject,
+  type TagObject,
   isReferenceObject,
   isSchemaObject,
-  MediaTypeObject,
-  OAuthFlowObject,
-  ParameterObject,
-  ReferenceObject,
-  RequestBodyObject,
-  ResponseObject,
-  SchemaObject,
-  SchemaObjectType,
-  SecurityRequirementObject,
-  SecuritySchemeObject,
-  TagObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
-import { NormalizedResponse, ResponseVariant } from "./api-response";
+import type { NormalizedResponse, ResponseVariant } from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
 import {
+  type FlatObject,
+  type Tag,
   shouldHaveContent,
-  FlatObject,
   getRoutePathParams,
   getTransformedType,
   isObject,
   isSchema,
   makeCleanId,
   routePathParamsRegex,
-  Tag,
   ucFirst,
 } from "./common-helpers";
-import { InputSource } from "./config-type";
+import type { InputSource } from "./config-type";
 import { contentTypes } from "./content-type";
 import { ezDateInBrand } from "./date-in-schema";
 import { ezDateOutBrand } from "./date-out-schema";
 import { DocumentationError } from "./errors";
-import { IOSchema } from "./io-schema";
+import type { IOSchema } from "./io-schema";
 import { flattenIO } from "./json-schema-helpers";
-import { Alternatives } from "./logical-container";
+import type { Alternatives } from "./logical-container";
 import { getBrand } from "@express-zod-api/zod-plugin";
-import { ClientMethod } from "./method";
-import { ProprietaryBrand } from "./proprietary-schemas";
+import type { ClientMethod } from "./method";
+import type { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
-import { FirstPartyKind } from "./schema-walker";
-import { Security } from "./security";
+import type { FirstPartyKind } from "./schema-walker";
+import type { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 import wellKnownHeaders from "./well-known-headers";
 
