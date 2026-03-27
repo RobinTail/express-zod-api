@@ -100,7 +100,7 @@ importers:
         version: 8.55.0(eslint@9.39.4)(typescript@6.0.2)
       unrun:
         specifier: ^0.2.32
-        version: 0.2.33(synckit@0.11.12)
+        version: 0.2.34(synckit@0.11.12)
       vitest:
         specifier: ^4.0.16
         version: 4.1.2(@types/node@24.12.0)(yaml@2.8.2)
@@ -2006,8 +2006,8 @@ packages:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
 
-  unrun@0.2.33:
-    resolution: {integrity: sha512-urXTjZHOHS6lMnatQerLcBpcTsaKZYGuu9aSZ+HlNfCApkiINRbj7YecC9h9hdZroMT4WQ4KVyzHfBqHKuFX9Q==}
+  unrun@0.2.34:
+    resolution: {integrity: sha512-LyaghRBR++r7svhDK6tnDz2XaYHWdneBOA0jbS8wnRsHerI9MFljX4fIiTgbbNbEVzZ0C9P1OjWLLe1OqoaaEw==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
@@ -3810,7 +3810,7 @@ snapshots:
       tinyglobby: 0.2.15
       tree-kill: 1.2.2
       unconfig-core: 7.5.0
-      unrun: 0.2.33(synckit@0.11.12)
+      unrun: 0.2.34(synckit@0.11.12)
     optionalDependencies:
       '@arethetypeswrong/core': 0.18.2
       typescript: 6.0.2
@@ -3882,9 +3882,9 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  unrun@0.2.33(synckit@0.11.12):
+  unrun@0.2.34(synckit@0.11.12):
     dependencies:
-      rolldown: 1.0.0-rc.11
+      rolldown: 1.0.0-rc.12
     optionalDependencies:
       synckit: 0.11.12
 
