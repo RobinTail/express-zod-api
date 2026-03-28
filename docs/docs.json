@@ -1,0 +1,136 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Express Zod API",
+  "theme": "aspen",
+  "colors": {
+    "primary": "#d69000",
+    "light": "#d69000",
+    "dark": "#d69000"
+  },
+  "favicon": "https://media.brand.dev/11c1c6dd-fd68-4f67-9f16-fea7239e235c.png",
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/robintail/express-zod-api"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/robintail/express-zod-api"
+    }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart",
+              "how-it-works"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/endpoints",
+              "concepts/routing",
+              "concepts/middleware",
+              "concepts/context",
+              "concepts/result-handlers",
+              "concepts/error-handling"
+            ]
+          },
+          {
+            "group": "Basic Features",
+            "pages": [
+              "features/schema-validation",
+              "features/refinements",
+              "features/transformations",
+              "features/dates",
+              "features/pagination",
+              "features/cors",
+              "features/https",
+              "features/compression",
+              "features/logging"
+            ]
+          },
+          {
+            "group": "Advanced Features",
+            "pages": [
+              "advanced/input-sources",
+              "advanced/response-customization",
+              "advanced/non-json-responses",
+              "advanced/file-uploads",
+              "advanced/html-forms",
+              "advanced/raw-data",
+              "advanced/testing",
+              "advanced/production-mode",
+              "advanced/graceful-shutdown"
+            ]
+          },
+          {
+            "group": "Integration",
+            "pages": [
+              "integration/documentation",
+              "integration/end-to-end-type-safety",
+              "integration/zod-plugin",
+              "integration/openapi",
+              "integration/express-app"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/authentication",
+              "guides/express-middleware",
+              "guides/subscriptions",
+              "guides/migration"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Configuration",
+            "pages": [
+              "api/create-config",
+              "api/config-options"
+            ]
+          },
+          {
+            "group": "Core Classes",
+            "pages": [
+              "api/endpoints-factory",
+              "api/endpoint",
+              "api/middleware",
+              "api/result-handler",
+              "api/routing"
+            ]
+          },
+          {
+            "group": "Schema Helpers",
+            "pages": [
+              "api/ez-schemas",
+              "api/proprietary-schemas"
+            ]
+          },
+          {
+            "group": "Utilities",
+            "pages": [
+              "api/documentation",
+              "api/integration",
+              "api/server",
+              "api/testing"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
