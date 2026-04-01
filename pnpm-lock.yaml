@@ -69,8 +69,8 @@ importers:
         specifier: ^20.1.8
         version: 20.1.9
       '@types/node':
-        specifier: ^24.10.9
-        version: 24.12.0
+        specifier: ^25.5.0
+        version: 25.5.0
       '@vitest/coverage-v8':
         specifier: ^4.0.16
         version: 4.1.2(vitest@4.1.2)
@@ -103,7 +103,7 @@ importers:
         version: 0.2.34(synckit@0.11.12)
       vitest:
         specifier: ^4.0.16
-        version: 4.1.2(@types/node@24.12.0)(yaml@2.8.3)
+        version: 4.1.2(@types/node@25.5.0)(yaml@2.8.3)
 
   cjs-test:
     devDependencies:
@@ -190,7 +190,7 @@ importers:
         version: 4.2.0
       node-mocks-http:
         specifier: ^1.17.2
-        version: 1.17.2(@types/express@5.0.6)(@types/node@24.12.0)
+        version: 1.17.2(@types/express@5.0.6)(@types/node@25.5.0)
       openapi3-ts:
         specifier: ^4.5.0
         version: 4.5.0
@@ -631,8 +631,8 @@ packages:
   '@types/node-forge@1.3.14':
     resolution: {integrity: sha512-mhVF2BnD4BO+jtOp7z1CdzaK4mbuK0LLQYAvdOLqHTavxFNq4zA1EmYkpnFjP8HOUzedfQkRnp0E2ulSAYSzAw==}
 
-  '@types/node@24.12.0':
-    resolution: {integrity: sha512-GYDxsZi3ChgmckRT9HPU0WEhKLP08ev/Yfcq2AstjrDASOYCSXeyjDsHg4v5t4jOj7cyDX3vmprafKlWIG9MXQ==}
+  '@types/node@25.5.0':
+    resolution: {integrity: sha512-jp2P3tQMSxWugkCUKLRPVUpGaL5MVFwF8RDuSRztfwgN1wmqJeMSbKlnEtQqU8UrhTmzEmZdu2I6v2dpp7XIxw==}
 
   '@types/qs@6.14.0':
     resolution: {integrity: sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ==}
@@ -1892,8 +1892,8 @@ packages:
   unconfig-core@7.5.0:
     resolution: {integrity: sha512-Su3FauozOGP44ZmKdHy2oE6LPjk51M/TRRjHv2HNCWiDvfvCoxC2lno6jevMA91MYAdCdwP05QnWdWpSbncX/w==}
 
-  undici-types@7.16.0:
-    resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
+  undici-types@7.18.2:
+    resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
   undici@7.24.6:
     resolution: {integrity: sha512-Xi4agocCbRzt0yYMZGMA6ApD7gvtUFaxm4ZmeacWI4cZxaF6C+8I8QfofC20NAePiB/IcvZmzkJ7XPa471AEtA==}
@@ -2283,11 +2283,11 @@ snapshots:
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
 
   '@types/busboy@1.5.4':
     dependencies:
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
 
   '@types/chai@5.2.3':
     dependencies:
@@ -2297,21 +2297,21 @@ snapshots:
   '@types/compression@1.8.1':
     dependencies:
       '@types/express': 5.0.6
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
 
   '@types/cors@2.8.19':
     dependencies:
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
 
   '@types/deep-eql@4.0.2': {}
 
   '@types/depd@1.1.37':
     dependencies:
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
 
   '@types/estree@1.0.8': {}
 
@@ -2322,7 +2322,7 @@ snapshots:
 
   '@types/express-serve-static-core@5.1.1':
     dependencies:
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
       '@types/qs': 6.14.0
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
@@ -2341,11 +2341,11 @@ snapshots:
 
   '@types/node-forge@1.3.14':
     dependencies:
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
 
-  '@types/node@24.12.0':
+  '@types/node@25.5.0':
     dependencies:
-      undici-types: 7.16.0
+      undici-types: 7.18.2
 
   '@types/qs@6.14.0': {}
 
@@ -2357,12 +2357,12 @@ snapshots:
 
   '@types/send@1.2.1':
     dependencies:
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
 
   '@types/serve-static@2.2.0':
     dependencies:
       '@types/http-errors': 2.0.5
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
 
   '@types/swagger-ui-express@4.1.8':
     dependencies:
@@ -2567,7 +2567,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.0.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.2(@types/node@24.12.0)(yaml@2.8.3)
+      vitest: 4.1.2(@types/node@25.5.0)(yaml@2.8.3)
 
   '@vitest/expect@4.1.2':
     dependencies:
@@ -2584,7 +2584,7 @@ snapshots:
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.3(@types/node@24.12.0)(yaml@2.8.3)
+      vite: 8.0.3(@types/node@25.5.0)(yaml@2.8.3)
 
   '@vitest/pretty-format@4.1.2':
     dependencies:
@@ -3308,7 +3308,7 @@ snapshots:
 
   node-forge@1.4.0: {}
 
-  node-mocks-http@1.17.2(@types/express@5.0.6)(@types/node@24.12.0):
+  node-mocks-http@1.17.2(@types/express@5.0.6)(@types/node@25.5.0):
     dependencies:
       accepts: 1.3.8
       content-disposition: 0.5.4
@@ -3322,7 +3322,7 @@ snapshots:
       type-is: 1.6.18
     optionalDependencies:
       '@types/express': 5.0.6
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
 
   object-assign@4.1.1: {}
 
@@ -3704,7 +3704,7 @@ snapshots:
       '@quansync/fs': 1.0.0
       quansync: 1.0.0
 
-  undici-types@7.16.0: {}
+  undici-types@7.18.2: {}
 
   undici@7.24.6: {}
 
@@ -3724,7 +3724,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite@8.0.3(@types/node@24.12.0)(yaml@2.8.3):
+  vite@8.0.3(@types/node@25.5.0)(yaml@2.8.3):
     dependencies:
       lightningcss: empty-npm-package@1.0.0
       picomatch: 4.0.4
@@ -3732,11 +3732,11 @@ snapshots:
       rolldown: 1.0.0-rc.12
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
       fsevents: 2.3.3
       yaml: 2.8.3
 
-  vitest@4.1.2(@types/node@24.12.0)(yaml@2.8.3):
+  vitest@4.1.2(@types/node@25.5.0)(yaml@2.8.3):
     dependencies:
       '@vitest/expect': 4.1.2
       '@vitest/mocker': 4.1.2(vite@8.0.3)
@@ -3756,10 +3756,10 @@ snapshots:
       tinyexec: 1.0.4
       tinyglobby: 0.2.15
       tinyrainbow: 3.1.0
-      vite: 8.0.3(@types/node@24.12.0)(yaml@2.8.3)
+      vite: 8.0.3(@types/node@25.5.0)(yaml@2.8.3)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 24.12.0
+      '@types/node': 25.5.0
     transitivePeerDependencies:
       - '@vitejs/devtools'
       - esbuild
