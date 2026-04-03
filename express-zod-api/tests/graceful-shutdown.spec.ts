@@ -7,6 +7,8 @@ import { givePort } from "../../tools/ports";
 import { signCert } from "./ssl-helpers";
 
 describe("monitor()", () => {
+  const sslOptions = signCert();
+
   const makeHttpServer = (handler: http.RequestListener) => {
     const { promise, resolve } = Promise.withResolvers<[http.Server, number]>();
     const subject = http.createServer(handler);
@@ -18,7 +20,7 @@ describe("monitor()", () => {
   const makeHttpsServer = (handler: http.RequestListener) => {
     const { promise, resolve } =
       Promise.withResolvers<[https.Server, number]>();
-    const subject = https.createServer(signCert(), handler);
+    const subject = https.createServer(sslOptions, handler);
     const port = givePort();
     subject.listen(port, () => resolve([subject, port]));
     return promise;
@@ -83,9 +85,8 @@ describe("monitor()", () => {
       body: string;
       headers: http.IncomingHttpHeaders;
     }>();
-    const req = https.request(
-      { ...options, port, rejectUnauthorized: false },
-      (res) => handleResponse(resolve, res),
+    const req = https.request({ ...sslOptions, ...options, port }, (res) =>
+      handleResponse(resolve, res),
     );
     req.on("error", reject);
     req.end();

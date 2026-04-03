@@ -33,8 +33,10 @@ export const signCert = () => {
   cert.setIssuer(certAttr);
   cert.setExtensions(certExt);
   cert.sign(keys.privateKey, forge.md.sha256.create());
+  const certPem = forge.pki.certificateToPem(cert);
   return {
-    cert: forge.pki.certificateToPem(cert),
+    ca: certPem,
+    cert: certPem,
     key: forge.pki.privateKeyToPem(keys.privateKey),
   };
 };
