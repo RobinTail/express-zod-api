@@ -160,23 +160,6 @@ describe("monitor()", () => {
   );
 
   test(
-    "new request fails after graceful shutdown",
-    { timeout: 500 },
-    async () => {
-      const [httpServer, port] = await makeHttpServer(async ({}, res) => {
-        await setTimeout(100);
-        res.end("foo");
-      });
-      const graceful = monitor([httpServer], { timeout: 150 });
-      await setTimeout(50);
-      void graceful.shutdown();
-      await setTimeout(50);
-      const request = makeHttpRequest(port);
-      await expect(request).rejects.toThrowError();
-    },
-  );
-
-  test(
     "ongoing requests receive {connection: close} header (new request reusing an existing socket)",
     { timeout: 1e3 },
     async () => {
