@@ -73,7 +73,7 @@ importers:
         version: 22.0.5
       '@types/node':
         specifier: ^25.5.0
-        version: 25.5.0
+        version: 25.5.1
       '@vitest/coverage-v8':
         specifier: ^4.0.16
         version: 4.1.2(vitest@4.1.2)
@@ -106,7 +106,7 @@ importers:
         version: 8.58.0(eslint@10.0.0)(typescript@6.0.2)
       vitest:
         specifier: ^4.0.16
-        version: 4.1.2(@types/node@25.5.0)(yaml@2.8.3)
+        version: 4.1.2(@types/node@25.5.1)(yaml@2.8.3)
 
   cjs-test:
     devDependencies:
@@ -193,7 +193,7 @@ importers:
         version: 4.2.0
       node-mocks-http:
         specifier: ^1.17.2
-        version: 1.17.2(@types/express@5.0.6)(@types/node@25.5.0)
+        version: 1.17.2(@types/express@5.0.6)(@types/node@25.5.1)
       openapi3-ts:
         specifier: ^4.5.0
         version: 4.5.0
@@ -257,7 +257,7 @@ importers:
         version: 6.0.2
       undici:
         specifier: ^7.16.0
-        version: 7.24.6
+        version: 7.24.7
       zod:
         specifier: catalog:dev
         version: 4.3.6
@@ -615,8 +615,8 @@ packages:
   '@types/node-forge@1.3.14':
     resolution: {integrity: sha512-mhVF2BnD4BO+jtOp7z1CdzaK4mbuK0LLQYAvdOLqHTavxFNq4zA1EmYkpnFjP8HOUzedfQkRnp0E2ulSAYSzAw==}
 
-  '@types/node@25.5.0':
-    resolution: {integrity: sha512-jp2P3tQMSxWugkCUKLRPVUpGaL5MVFwF8RDuSRztfwgN1wmqJeMSbKlnEtQqU8UrhTmzEmZdu2I6v2dpp7XIxw==}
+  '@types/node@25.5.1':
+    resolution: {integrity: sha512-lgrR3HRNQdTEeeXBnLURFO4JIIbpcVcMlLM9IG0jsNRTRNSbMkm9S2hyhxhnokke1NM25Dr9QghgeB5PQKolrw==}
 
   '@types/qs@6.15.0':
     resolution: {integrity: sha512-JawvT8iBVWpzTrz3EGw9BTQFg3BQNmwERdKE22vlTxawwtbyUSlMppvZYKLZzB5zgACXdXxbD3m1bXaMqP/9ow==}
@@ -1670,8 +1670,8 @@ packages:
   undici-types@7.18.2:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
-  undici@7.24.6:
-    resolution: {integrity: sha512-Xi4agocCbRzt0yYMZGMA6ApD7gvtUFaxm4ZmeacWI4cZxaF6C+8I8QfofC20NAePiB/IcvZmzkJ7XPa471AEtA==}
+  undici@7.24.7:
+    resolution: {integrity: sha512-H/nlJ/h0ggGC+uRL3ovD+G0i4bqhvsDOpbDv7At5eFLlj2b41L8QliGbnl2H7SnDiYhENphh1tQFJZf+MyfLsQ==}
     engines: {node: '>=20.18.1'}
 
   unpipe@1.0.0:
@@ -2008,11 +2008,11 @@ snapshots:
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
 
   '@types/busboy@1.5.4':
     dependencies:
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
 
   '@types/chai@5.2.3':
     dependencies:
@@ -2022,21 +2022,21 @@ snapshots:
   '@types/compression@1.8.1':
     dependencies:
       '@types/express': 5.0.6
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
 
   '@types/cors@2.8.19':
     dependencies:
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
 
   '@types/deep-eql@4.0.2': {}
 
   '@types/depd@1.1.37':
     dependencies:
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
 
   '@types/esrecurse@4.3.1': {}
 
@@ -2049,7 +2049,7 @@ snapshots:
 
   '@types/express-serve-static-core@5.1.1':
     dependencies:
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
       '@types/qs': 6.15.0
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
@@ -2068,9 +2068,9 @@ snapshots:
 
   '@types/node-forge@1.3.14':
     dependencies:
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
 
-  '@types/node@25.5.0':
+  '@types/node@25.5.1':
     dependencies:
       undici-types: 7.18.2
 
@@ -2084,12 +2084,12 @@ snapshots:
 
   '@types/send@1.2.1':
     dependencies:
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
 
   '@types/serve-static@2.2.0':
     dependencies:
       '@types/http-errors': 2.0.5
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
 
   '@types/swagger-ui-express@4.1.8':
     dependencies:
@@ -2292,7 +2292,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.0.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.2(@types/node@25.5.0)(yaml@2.8.3)
+      vitest: 4.1.2(@types/node@25.5.1)(yaml@2.8.3)
 
   '@vitest/expect@4.1.2':
     dependencies:
@@ -2309,7 +2309,7 @@ snapshots:
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.3(@types/node@25.5.0)(yaml@2.8.3)
+      vite: 8.0.3(@types/node@25.5.1)(yaml@2.8.3)
 
   '@vitest/pretty-format@4.1.2':
     dependencies:
@@ -2903,7 +2903,7 @@ snapshots:
 
   node-forge@1.4.0: {}
 
-  node-mocks-http@1.17.2(@types/express@5.0.6)(@types/node@25.5.0):
+  node-mocks-http@1.17.2(@types/express@5.0.6)(@types/node@25.5.1):
     dependencies:
       accepts: 1.3.8
       content-disposition: 0.5.4
@@ -2917,7 +2917,7 @@ snapshots:
       type-is: 1.6.18
     optionalDependencies:
       '@types/express': 5.0.6
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
 
   object-assign@4.1.1: {}
 
@@ -3274,7 +3274,7 @@ snapshots:
 
   undici-types@7.18.2: {}
 
-  undici@7.24.6: {}
+  undici@7.24.7: {}
 
   unpipe@1.0.0: {}
 
@@ -3295,7 +3295,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite@8.0.3(@types/node@25.5.0)(yaml@2.8.3):
+  vite@8.0.3(@types/node@25.5.1)(yaml@2.8.3):
     dependencies:
       lightningcss: empty-npm-package@1.0.0
       picomatch: 4.0.4
@@ -3303,14 +3303,14 @@ snapshots:
       rolldown: 1.0.0-rc.12
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
       fsevents: 2.3.3
       yaml: 2.8.3
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
 
-  vitest@4.1.2(@types/node@25.5.0)(yaml@2.8.3):
+  vitest@4.1.2(@types/node@25.5.1)(yaml@2.8.3):
     dependencies:
       '@vitest/expect': 4.1.2
       '@vitest/mocker': 4.1.2(vite@8.0.3)
@@ -3330,10 +3330,10 @@ snapshots:
       tinyexec: 1.0.4
       tinyglobby: 0.2.15
       tinyrainbow: 3.1.0
-      vite: 8.0.3(@types/node@25.5.0)(yaml@2.8.3)
+      vite: 8.0.3(@types/node@25.5.1)(yaml@2.8.3)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 25.5.0
+      '@types/node': 25.5.1
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
