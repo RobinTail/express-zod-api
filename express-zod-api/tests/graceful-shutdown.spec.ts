@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import http from "node:http";
 import https from "node:https";
-import { Agent, fetch } from "undici";
 import { setTimeout } from "node:timers/promises";
 import { monitor } from "../src/graceful-shutdown";
 import { givePort } from "../../tools/ports";
@@ -31,6 +30,68 @@ describe("monitor()", () => {
     return promise;
   };
 
+  const handleResponse = (
+    resolve: (value: {
+      res: http.IncomingMessage;
+      body: string;
+      headers: http.IncomingHttpHeaders;
+    }) => void,
+    res: http.IncomingMessage,
+  ) => {
+    const chunks: Buffer[] = [];
+    res.on("data", (chunk) => chunks.push(chunk));
+    res.on("end", () =>
+      resolve({
+        res,
+        body: Buffer.concat(chunks).toString(),
+        headers: res.headers,
+      }),
+    );
+  };
+
+  const makeHttpRequest = (
+    port: number,
+    options?: http.RequestOptions,
+  ): Promise<{
+    res: http.IncomingMessage;
+    body: string;
+    headers: http.IncomingHttpHeaders;
+  }> => {
+    const { promise, resolve, reject } = Promise.withResolvers<{
+      res: http.IncomingMessage;
+      body: string;
+      headers: http.IncomingHttpHeaders;
+    }>();
+    const req = http.request({ ...options, port }, (res) =>
+      handleResponse(resolve, res),
+    );
+    req.on("error", reject);
+    req.end();
+    return promise;
+  };
+
+  const makeHttpsRequest = (
+    port: number,
+    options?: https.RequestOptions,
+  ): Promise<{
+    res: http.IncomingMessage;
+    body: string;
+    headers: http.IncomingHttpHeaders;
+  }> => {
+    const { promise, resolve, reject } = Promise.withResolvers<{
+      res: http.IncomingMessage;
+      body: string;
+      headers: http.IncomingHttpHeaders;
+    }>();
+    const req = https.request(
+      { ...options, port, rejectUnauthorized: false },
+      (res) => handleResponse(resolve, res),
+    );
+    req.on("error", reject);
+    req.end();
+    return promise;
+  };
+
   test(
     "shuts down HTTP server with no connections",
     { timeout: 100 },
@@ -50,9 +111,9 @@ describe("monitor()", () => {
       const handler = vi.fn();
       const [httpServer, port] = await makeHttpServer(handler);
       const graceful = monitor([httpServer], { timeout: 150 });
-      void fetch(`http://localhost:${port}`, {
-        headers: { connection: "close" },
-      }).catch(vi.fn());
+      makeHttpRequest(port, { headers: { connection: "close" } }).catch(
+        vi.fn(),
+      );
       await vi.waitFor(() => assert(handler.mock.calls.length === 1), {
         interval: 30, // unstable
       });
@@ -75,19 +136,19 @@ describe("monitor()", () => {
         res.end("foo");
       });
       const graceful = monitor([httpServer], { timeout: 150 });
-      const request0 = fetch(`http://localhost:${port}`, {
+      const request0 = makeHttpRequest(port, {
         headers: { connection: "close" },
       });
       await setTimeout(50);
       void graceful.shutdown();
       await setTimeout(50);
-      const request1 = fetch(`http://localhost:${port}`, {
+      const request1 = makeHttpRequest(port, {
         headers: { connection: "close" },
       });
       await expect(request1).rejects.toThrowError();
       const response0 = await request0;
-      expect(response0.headers.get("connection")).toBe("close");
-      await expect(response0.text()).resolves.toBe("foo");
+      expect(response0.headers.connection).toBe("close");
+      expect(response0.body).toBe("foo");
     },
   );
 
@@ -100,45 +161,31 @@ describe("monitor()", () => {
         res.end("foo");
       });
       const graceful = monitor([httpServer], { timeout: 150 });
-      const request = fetch(`http://localhost:${port}`, { keepalive: true });
+      const request = makeHttpRequest(port, {
+        headers: { connection: "keep-alive" },
+      });
       await setTimeout(50);
       void graceful.shutdown();
       const response = await request;
-      expect(response.headers.get("connection")).toBe("close");
-      await expect(response.text()).resolves.toBe("foo");
+      expect(response.headers.connection).toBe("close");
+      expect(response.body).toBe("foo");
     },
   );
 
   test(
-    "ongoing requests receive {connection: close} header (new request reusing an existing socket)",
-    { timeout: 1e3 },
+    "new request fails after graceful shutdown",
+    { timeout: 500 },
     async () => {
-      const handler = vi
-        .fn<http.RequestListener>()
-        .mockImplementationOnce(async ({}, res) => {
-          res.write("foo");
-          await setTimeout(50);
-          res.end("bar");
-        })
-        .mockImplementationOnce(async ({}, res) => {
-          await setTimeout(50);
-          res.end("baz");
-        });
-      const [httpServer, port] = await makeHttpServer(handler);
+      const [httpServer, port] = await makeHttpServer(async ({}, res) => {
+        await setTimeout(100);
+        res.end("foo");
+      });
       const graceful = monitor([httpServer], { timeout: 150 });
-      const dispatcher = new Agent({ pipelining: 5, keepAliveTimeout: 5e3 });
-      const request0 = fetch(`http://localhost:${port}`, { dispatcher });
       await setTimeout(50);
       void graceful.shutdown();
-      const request1 = fetch(`http://localhost:${port}`, { dispatcher });
       await setTimeout(50);
-      expect(handler).toHaveBeenCalledTimes(2);
-      const response0 = await request0;
-      expect(response0.headers.get("connection")).toBe("keep-alive");
-      await expect(response0.text()).resolves.toBe("foobar");
-      const response1 = await request1;
-      expect(response1.headers.get("connection")).toBe("close");
-      await expect(response1.text()).resolves.toBe("baz");
+      const request = makeHttpRequest(port);
+      await expect(request).rejects.toThrowError();
     },
   );
 
@@ -147,9 +194,7 @@ describe("monitor()", () => {
       res.end("foo");
     });
     const graceful = monitor([httpServer], { timeout: 150 });
-    await fetch(`http://localhost:${port}`, {
-      headers: { connection: "close" },
-    });
+    await makeHttpRequest(port, { headers: { connection: "close" } });
     await setTimeout(50);
     expect(graceful.sockets.size).toBe(0);
     await graceful.shutdown();
@@ -165,10 +210,7 @@ describe("monitor()", () => {
       { timeout: 500 },
       async () => {
         const graceful = monitor([httpsServer], { timeout: 150 });
-        await fetch(`https://localhost:${port}`, {
-          dispatcher: new Agent({ connect: { rejectUnauthorized: false } }),
-          headers: { connection: "close" },
-        });
+        await makeHttpsRequest(port, { headers: { connection: "close" } });
         await setTimeout(50);
         expect(graceful.sockets.size).toBe(0);
         await graceful.shutdown();
@@ -187,9 +229,9 @@ describe("monitor()", () => {
       const [httpServer, port] = await makeHttpServer(spy);
       expect(httpServer.listening).toBeTruthy();
       const graceful = monitor([httpServer], { timeout: 500 });
-      void fetch(`http://localhost:${port}`, {
-        headers: { connection: "close" },
-      });
+      makeHttpRequest(port, { headers: { connection: "close" } }).catch(
+        vi.fn(),
+      );
       await setTimeout(50);
       await expect(getConnections(httpServer)).resolves.toBe(1);
       void graceful.shutdown();

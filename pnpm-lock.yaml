@@ -255,9 +255,6 @@ importers:
       typescript:
         specifier: catalog:dev
         version: 6.0.2
-      undici:
-        specifier: ^7.16.0
-        version: 7.24.6
       zod:
         specifier: catalog:dev
         version: 4.3.6
@@ -1669,10 +1666,6 @@ packages:
 
   undici-types@7.18.2:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
-
-  undici@7.24.6:
-    resolution: {integrity: sha512-Xi4agocCbRzt0yYMZGMA6ApD7gvtUFaxm4ZmeacWI4cZxaF6C+8I8QfofC20NAePiB/IcvZmzkJ7XPa471AEtA==}
-    engines: {node: '>=20.18.1'}
 
   unpipe@1.0.0:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
@@ -3273,8 +3266,6 @@ snapshots:
       quansync: 1.0.0
 
   undici-types@7.18.2: {}
-
-  undici@7.24.6: {}
 
   unpipe@1.0.0: {}
 
