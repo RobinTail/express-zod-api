@@ -14,7 +14,7 @@
     "express-zod-api": "workspace:*",
     "http-errors": "npm:http-errors@2.0.1",
     "typescript": "npm:typescript@6.0.2",
-    "typescript-eslint": "npm:typescript-eslint@8.56.0",
+    "typescript-eslint": "npm:typescript-eslint@8.58.0",
     "zod": "npm:zod@4.1.13"
   }
 }
