@@ -176,6 +176,40 @@ describe("monitor()", () => {
     },
   );
 
+  test(
+    "ongoing requests receive {connection: close} header (new request reusing an existing socket)",
+    { timeout: 1e3 },
+    async () => {
+      const handler = vi
+        .fn<http.RequestListener>()
+        .mockImplementationOnce(async ({}, res) => {
+          res.write("foo");
+          await setTimeout(50);
+          res.end("bar");
+        })
+        .mockImplementationOnce(async ({}, res) => {
+          await setTimeout(50);
+          res.end("baz");
+        });
+      const [httpServer, port] = await makeHttpServer(handler);
+      const graceful = monitor([httpServer], { timeout: 150 });
+      const agent = new http.Agent({ keepAlive: true, maxSockets: 1 });
+      const request0 = makeHttpRequest(port, { agent });
+      await setTimeout(50);
+      void graceful.shutdown();
+      const request1 = makeHttpRequest(port, { agent });
+      await setTimeout(50);
+      expect(handler).toHaveBeenCalledTimes(2);
+      const response0 = await request0;
+      expect(response0.headers.connection).toBe("keep-alive");
+      expect(response0.body).toBe("foobar");
+      const response1 = await request1;
+      expect(response1.headers.connection).toBe("close");
+      expect(response1.body).toBe("baz");
+      agent.destroy();
+    },
+  );
+
   test("empties internal socket collection", { timeout: 500 }, async () => {
     const [httpServer, port] = await makeHttpServer(({}, res) => {
       res.end("foo");
