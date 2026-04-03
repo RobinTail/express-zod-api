@@ -6,6 +6,12 @@ import { monitor } from "../src/graceful-shutdown";
 import { givePort } from "../../tools/ports";
 import { signCert } from "./ssl-helpers";
 
+interface HttpResult {
+  res: http.IncomingMessage;
+  body: string;
+  headers: http.IncomingHttpHeaders;
+}
+
 describe("monitor()", () => {
   const sslOptions = signCert();
 
@@ -33,11 +39,7 @@ describe("monitor()", () => {
   };
 
   const handleResponse = (
-    resolve: (value: {
-      res: http.IncomingMessage;
-      body: string;
-      headers: http.IncomingHttpHeaders;
-    }) => void,
+    resolve: (value: HttpResult) => void,
     res: http.IncomingMessage,
   ) => {
     const chunks: Buffer[] = [];
@@ -54,16 +56,8 @@ describe("monitor()", () => {
   const makeHttpRequest = (
     port: number,
     options?: http.RequestOptions,
-  ): Promise<{
-    res: http.IncomingMessage;
-    body: string;
-    headers: http.IncomingHttpHeaders;
-  }> => {
-    const { promise, resolve, reject } = Promise.withResolvers<{
-      res: http.IncomingMessage;
-      body: string;
-      headers: http.IncomingHttpHeaders;
-    }>();
+  ): Promise<HttpResult> => {
+    const { promise, resolve, reject } = Promise.withResolvers<HttpResult>();
     const req = http.request({ ...options, port }, (res) =>
       handleResponse(resolve, res),
     );
@@ -75,16 +69,8 @@ describe("monitor()", () => {
   const makeHttpsRequest = (
     port: number,
     options?: https.RequestOptions,
-  ): Promise<{
-    res: http.IncomingMessage;
-    body: string;
-    headers: http.IncomingHttpHeaders;
-  }> => {
-    const { promise, resolve, reject } = Promise.withResolvers<{
-      res: http.IncomingMessage;
-      body: string;
-      headers: http.IncomingHttpHeaders;
-    }>();
+  ): Promise<HttpResult> => {
+    const { promise, resolve, reject } = Promise.withResolvers<HttpResult>();
     const req = https.request({ ...sslOptions, ...options, port }, (res) =>
       handleResponse(resolve, res),
     );
