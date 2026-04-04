@@ -4,7 +4,7 @@
 
 ### v28.0.0
 
-- Supported Node.js versions: `^22.18.0 || ^24.0.0`;
+- Supported Node.js versions: `^22.19.0 || ^24.0.0`;
 
 ## Version 27
 
