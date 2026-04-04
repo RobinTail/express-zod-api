@@ -40,12 +40,12 @@ export interface CommonConfig {
    */
   cors: boolean | HeadersProvider;
   /**
-   * @desc How to respond to a request that uses a wrong method to an existing endpoint
-   * @example 404 — Not found
-   * @example 405 — Method not allowed, incl. the "Allow" header with a list of methods
-   * @default 405
-   * */
-  wrongMethodBehavior?: 404 | 405;
+   * @desc Controls how to respond to a request to an existing endpoint with an invalid HTTP method.
+   * @example true — respond with status code 405 and "Allow" header containing a list of valid methods
+   * @example false — respond with status code 404 (Not found)
+   * @default true
+   */
+  hintAllowedMethods?: boolean;
   /**
    * @desc How to treat Routing keys that look like methods (when assigned with an Endpoint)
    * @see Method

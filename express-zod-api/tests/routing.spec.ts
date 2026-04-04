@@ -31,14 +31,14 @@ describe("Routing", () => {
       vi.clearAllMocks(); // resets call counters on mocked methods
     });
 
-    test.each([404, 405] as const)(
+    test.each([true, false] as const)(
       "Should set right methods %#",
-      (wrongMethodBehavior) => {
+      (hintAllowedMethods) => {
         const handlerMock = vi.fn();
         const configMock = {
           cors: true,
           startupLogo: false,
-          wrongMethodBehavior,
+          hintAllowedMethods,
           methodLikeRouteBehavior: "path" as const,
         };
         const factory = new EndpointsFactory(defaultResultHandler);
@@ -85,7 +85,7 @@ describe("Routing", () => {
         expect(appMock.options.mock.calls[0][0]).toBe("/v1/user/get");
         expect(appMock.options.mock.calls[1][0]).toBe("/v1/user/set");
         expect(appMock.options.mock.calls[2][0]).toBe("/v1/user/universal");
-        if (wrongMethodBehavior !== 405) return;
+        if (hintAllowedMethods !== true) return;
         expect(appMock.all).toHaveBeenCalledTimes(3);
         expect(appMock.all.mock.calls[0][0]).toBe("/v1/user/get");
         expect(appMock.all.mock.calls[1][0]).toBe("/v1/user/set");
