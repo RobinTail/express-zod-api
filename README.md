@@ -920,7 +920,7 @@ it normalizes errors into consistent HTTP responses with sensible status codes. 
 - Routing, parsing and upload issues:
   - Handled by `ResultHandler` configured as `errorHandler` (the defaults is `defaultResultHandler`);
   - Parsing errors: passed through as-is (typically `HttpError` with `4XX` code used for response by default);
-  - Routing errors: `404` or `405`, based on `wrongMethodBehavior` configuration;
+  - Routing errors: `404` or `405`, based on `hintAllowedMethods` configuration;
   - Upload issues: thrown only if `upload.limitError` is configured (`HttpError::statusCode` can be used for response);
   - For other errors the default status code is `500`;
 - `ResultHandler` failures:

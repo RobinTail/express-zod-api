@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "pretest": "echo 'new Integration();' > sample.ts",
+    "pretest": "echo 'createConfig({ wrongMethodBehavior: 404 });' > sample.ts",
     "test": "eslint --fix && vitest --run",
     "posttest": "rm sample.ts"
   },

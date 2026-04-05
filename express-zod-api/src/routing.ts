@@ -110,7 +110,7 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
       }
       app[method](path, ...handlers);
     }
-    if (config.wrongMethodBehavior === 404) continue;
+    if (config.hintAllowedMethods === false) continue;
     deprioritized.set(path, createWrongMethodHandler(accessMethods));
   }
   for (const [path, handler] of deprioritized) app.all(path, handler);
