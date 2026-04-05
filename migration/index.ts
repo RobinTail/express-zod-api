@@ -1,21 +1,28 @@
 import {
   ESLintUtils,
-  // AST_NODE_TYPES as NT,
+  AST_NODE_TYPES as NT,
   type TSESLint,
-  // type TSESTree,
+  type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
 
-/*
 type NamedProp = TSESTree.PropertyNonComputedName & {
   key: TSESTree.Identifier | TSESTree.StringLiteral;
 };
 
-interface Queries {}
+interface Queries {
+  wrongMethodBehavior: NamedProp;
+}
 
 type Listener = keyof Queries;
 
-const queries: Record<Listener, string> = {};
+const queries: Record<Listener, string> = {
+  wrongMethodBehavior:
+    `${NT.CallExpression}[callee.name="createConfig"] > ` +
+    `${NT.ObjectExpression} > ` +
+    `${NT.Property}[key.name="wrongMethodBehavior"]`,
+};
 
+/*
 const isNamedProp = (prop: TSESTree.ObjectLiteralElement): prop is NamedProp =>
   prop.type === NT.Property &&
   !prop.computed &&
@@ -24,6 +31,8 @@ const isNamedProp = (prop: TSESTree.ObjectLiteralElement): prop is NamedProp =>
 
 const getPropName = (prop: NamedProp): string =>
   prop.key.type === NT.Identifier ? prop.key.name : prop.key.value;
+*/
+
 const listen = <
   S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
 >(
@@ -36,7 +45,6 @@ const listen = <
       }),
     {},
   );
-*/
 
 const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0] ?? "0"}`; // fail-safe for bumpp
 
@@ -54,7 +62,32 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
     },
     defaultOptions: [],
   },
-  create: () => ({}), // (ctx) => listen({}),
+  create: (ctx) =>
+    listen({
+      wrongMethodBehavior: (node) => {
+        const value = node.value;
+        const newKey = "hintAllowedMethods";
+        let newValue: string;
+        if (value.type === NT.Literal && typeof value.value === "number")
+          newValue = value.value === 405 ? "true" : "false";
+        else if (value.type === NT.Identifier && value.name === "undefined")
+          newValue = "undefined";
+        else return;
+        ctx.report({
+          node,
+          messageId: "change",
+          data: {
+            subject: "property",
+            from: "wrongMethodBehavior",
+            to: newKey,
+          },
+          fix: (fixer) => [
+            fixer.replaceText(node.key, newKey),
+            fixer.replaceText(value, newValue),
+          ],
+        });
+      },
+    }),
 });
 
 export default {

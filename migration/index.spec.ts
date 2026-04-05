@@ -22,7 +22,53 @@ describe("Migration", async () => {
   });
 
   tester.run(ruleName, theRule, {
-    valid: [`new Integration({ typescript, config, routing });`],
-    invalid: [],
+    valid: [`createConfig({ hintAllowedMethods: false });`],
+    invalid: [
+      {
+        name: "wrongMethodBehavior=404",
+        code: `createConfig({ wrongMethodBehavior: 404 });`,
+        output: `createConfig({ hintAllowedMethods: false });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "wrongMethodBehavior",
+              to: "hintAllowedMethods",
+            },
+          },
+        ],
+      },
+      {
+        name: "wrongMethodBehavior=405",
+        code: `createConfig({ wrongMethodBehavior: 405 });`,
+        output: `createConfig({ hintAllowedMethods: true });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "wrongMethodBehavior",
+              to: "hintAllowedMethods",
+            },
+          },
+        ],
+      },
+      {
+        name: "wrongMethodBehavior=undefined",
+        code: `createConfig({ wrongMethodBehavior: undefined });`,
+        output: `createConfig({ hintAllowedMethods: undefined });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "wrongMethodBehavior",
+              to: "hintAllowedMethods",
+            },
+          },
+        ],
+      },
+    ],
   });
 });
