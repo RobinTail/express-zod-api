@@ -31,7 +31,7 @@ describe("Routing", () => {
       vi.clearAllMocks(); // resets call counters on mocked methods
     });
 
-    test.each([true, false] as const)(
+    test.each([true, false, undefined] as const)(
       "Should set right methods %#",
       (hintAllowedMethods) => {
         const handlerMock = vi.fn();
@@ -85,7 +85,7 @@ describe("Routing", () => {
         expect(appMock.options.mock.calls[0][0]).toBe("/v1/user/get");
         expect(appMock.options.mock.calls[1][0]).toBe("/v1/user/set");
         expect(appMock.options.mock.calls[2][0]).toBe("/v1/user/universal");
-        if (hintAllowedMethods !== true) return;
+        if (hintAllowedMethods === false) return;
         expect(appMock.all).toHaveBeenCalledTimes(3);
         expect(appMock.all.mock.calls[0][0]).toBe("/v1/user/get");
         expect(appMock.all.mock.calls[1][0]).toBe("/v1/user/set");
