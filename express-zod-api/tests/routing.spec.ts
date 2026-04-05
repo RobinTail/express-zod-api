@@ -31,7 +31,7 @@ describe("Routing", () => {
       vi.clearAllMocks(); // resets call counters on mocked methods
     });
 
-    test.each([true, false, undefined] as const)(
+    test.each([true, false, undefined])(
       "Should set right methods %#",
       (hintAllowedMethods) => {
         const handlerMock = vi.fn();
