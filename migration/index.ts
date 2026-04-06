@@ -124,7 +124,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             from: "hasSummaryFromDescription",
             to: newKey,
           },
-          fix: (fixer) => [fixer.replaceText(node.key, newKey)],
+          fix: (fixer) => fixer.replaceText(node.key, newKey),
         });
       },
       noContent: (node) => {
@@ -133,7 +133,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           node,
           messageId: "change",
           data: { subject: "property", from: "noContent", to: newKey },
-          fix: (fixer) => [fixer.replaceText(node.key, newKey)],
+          fix: (fixer) => fixer.replaceText(node.key, newKey),
         });
       },
     }),
