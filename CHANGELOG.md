@@ -31,7 +31,7 @@
 ```
 
 ```diff
-  new Integration({ 
+  new Integration({
 -   noContent: z.undefined(),
 +   noBodySchema: z.undefined(),
   });
