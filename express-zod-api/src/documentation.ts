@@ -196,7 +196,7 @@ export class Documentation extends OpenApiBuilder {
         isHeader,
         security,
         request,
-        description: descriptions?.requestParameter?.call(null, {
+        description: descriptions?.requestParameter?.({
           method,
           path,
           operationId,
@@ -216,7 +216,7 @@ export class Documentation extends OpenApiBuilder {
               statusCode,
               hasMultipleStatusCodes:
                 apiResponses.length > 1 || statusCodes.length > 1,
-              description: descriptions?.[`${variant}Response`]?.call(null, {
+              description: descriptions?.[`${variant}Response`]?.({
                 method,
                 path,
                 operationId,
@@ -234,7 +234,7 @@ export class Documentation extends OpenApiBuilder {
             paramNames: R.pluck("name", depictedParams),
             schema: inputSchema,
             mimeType: contentTypes[endpoint.requestType],
-            description: descriptions?.requestBody?.call(null, {
+            description: descriptions?.requestBody?.({
               method,
               path,
               operationId,
