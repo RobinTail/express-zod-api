@@ -38,7 +38,7 @@ interface IntegrationParams {
    * @desc The schema to use for responses without body such as 204
    * @default z.undefined()
    * */
-  noContent?: z.ZodType;
+  noBodySchema?: z.ZodType;
   /**
    * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
    * @default true
@@ -88,7 +88,7 @@ export class Integration extends IntegrationBase {
     clientClassName = "Client",
     subscriptionClassName = "Subscription",
     serverUrl = "https://example.com",
-    noContent = z.undefined(),
+    noBodySchema = z.undefined(),
     hasHeadMethod = true,
   }: IntegrationParams) {
     super(typescript, serverUrl);
@@ -109,10 +109,10 @@ export class Integration extends IntegrationBase {
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
           const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
-            const hasContent = shouldHaveContent(method, mimeTypes);
+            const hasBody = shouldHaveContent(method, mimeTypes);
             const variantType = this.api.makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
-              zodToTs(hasContent ? schema : noContent, ctxOut),
+              zodToTs(hasBody ? schema : noBodySchema, ctxOut),
               { comment: request },
             );
             this.#program.push(variantType);

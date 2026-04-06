@@ -13,6 +13,7 @@ interface Queries {
   wrongMethodBehavior: NamedProp;
   methodLikeRouteBehavior: NamedProp;
   hasSummaryFromDescription: NamedProp;
+  noContent: NamedProp;
 }
 
 type Listener = keyof Queries;
@@ -30,6 +31,10 @@ const queries: Record<Listener, string> = {
     `${NT.NewExpression}[callee.name="Documentation"] > ` +
     `${NT.ObjectExpression} > ` +
     `${NT.Property}[key.name="hasSummaryFromDescription"]`,
+  noContent:
+    `${NT.NewExpression}[callee.name="Integration"] > ` +
+    `${NT.ObjectExpression} > ` +
+    `${NT.Property}[key.name="noContent"]`,
 };
 
 const listen = <
@@ -119,7 +124,16 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             from: "hasSummaryFromDescription",
             to: newKey,
           },
-          fix: (fixer) => [fixer.replaceText(node.key, newKey)],
+          fix: (fixer) => fixer.replaceText(node.key, newKey),
+        });
+      },
+      noContent: (node) => {
+        const newKey = "noBodySchema";
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "property", from: "noContent", to: newKey },
+          fix: (fixer) => fixer.replaceText(node.key, newKey),
         });
       },
     }),
