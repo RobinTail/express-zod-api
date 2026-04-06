@@ -26,6 +26,7 @@ describe("Migration", async () => {
       `createConfig({ hintAllowedMethods: false });`,
       `createConfig({ recognizeMethodDependentRoutes: true });`,
       `new Documentation({ hasSummary: false });`,
+      `new Integration({ noBodySchema: z.undefined() });`,
     ],
     invalid: [
       {
@@ -159,6 +160,36 @@ describe("Migration", async () => {
               subject: "property",
               from: "hasSummaryFromDescription",
               to: "hasSummary",
+            },
+          },
+        ],
+      },
+      {
+        name: "noContent=z.undefined()",
+        code: `new Integration({ noContent: z.undefined() });`,
+        output: `new Integration({ noBodySchema: z.undefined() });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "noContent",
+              to: "noBodySchema",
+            },
+          },
+        ],
+      },
+      {
+        name: "noContent=undefined",
+        code: `new Integration({ noContent: undefined });`,
+        output: `new Integration({ noBodySchema: undefined });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "noContent",
+              to: "noBodySchema",
             },
           },
         ],

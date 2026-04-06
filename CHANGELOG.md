@@ -10,6 +10,8 @@
   - property `methodLikeRouteBehavior` (string literal) changed to `recognizeMethodDependentRoutes` (boolean);
 - Breaking change to the `Documentation` constructor argument (object):
   - property `hasSummaryFromDescription` (boolean) renamed to `hasSummary` (boolean);
+- Breaking change to the `Integration` constructor argument (object):
+  - property `noContent` renamed to `noBodySchema`;
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff
@@ -26,6 +28,11 @@
 -   hasSummaryFromDescription: false,
 +   hasSummary: false,
   });
+```
+
+```diff
+- new Integration({ noContent: z.undefined() });
++ new Integration({ noBodySchema: z.undefined() });
 ```
 
 ## Version 27
