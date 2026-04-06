@@ -38,15 +38,16 @@ const trimPath = (path: string) =>
   path.trim().split("/").filter(Boolean).join("/");
 
 const processEntries = (
-  { methodLikeRouteBehavior = "method" }: CommonConfig,
+  { recognizeMethodDependentRoutes = true }: CommonConfig,
   subject: Routing,
   parent?: string,
 ) => {
-  const preferMethod = methodLikeRouteBehavior === "method";
   return Object.entries(subject).map<[string, Routing[string], Method?]>(
     ([_key, item]) => {
       const [segment, method] =
-        preferMethod && isMethod(_key) && item instanceof AbstractEndpoint
+        recognizeMethodDependentRoutes &&
+        isMethod(_key) &&
+        item instanceof AbstractEndpoint
           ? ["/", _key]
           : detachMethod(_key);
       const path = [parent || ""].concat(trimPath(segment) || []).join("/");

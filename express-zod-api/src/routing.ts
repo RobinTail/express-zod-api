@@ -17,7 +17,7 @@ import * as R from "ramda";
  * @example { "get /v1/books/:bookId": getBookEndpoint }
  * @example { v1: { "patch /books/:bookId": changeBookEndpoint } }
  * @example { dependsOnMethod: { get: retrieveEndpoint, post: createEndpoint } }
- * @see CommonConfig.methodLikeRouteBehavior
+ * @see CommonConfig.recognizeMethodDependentRoutes
  * */
 export interface Routing {
   [K: string]: Routing | AbstractEndpoint | ServeStatic;

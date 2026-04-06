@@ -11,6 +11,7 @@ type NamedProp = TSESTree.PropertyNonComputedName & {
 
 interface Queries {
   wrongMethodBehavior: NamedProp;
+  methodLikeRouteBehavior: NamedProp;
 }
 
 type Listener = keyof Queries;
@@ -20,18 +21,11 @@ const queries: Record<Listener, string> = {
     `${NT.CallExpression}[callee.name="createConfig"] > ` +
     `${NT.ObjectExpression} > ` +
     `${NT.Property}[key.name="wrongMethodBehavior"]`,
+  methodLikeRouteBehavior:
+    `${NT.CallExpression}[callee.name="createConfig"] > ` +
+    `${NT.ObjectExpression} > ` +
+    `${NT.Property}[key.name="methodLikeRouteBehavior"]`,
 };
-
-/*
-const isNamedProp = (prop: TSESTree.ObjectLiteralElement): prop is NamedProp =>
-  prop.type === NT.Property &&
-  !prop.computed &&
-  (prop.key.type === NT.Identifier ||
-    (prop.key.type === NT.Literal && typeof prop.key.value === "string"));
-
-const getPropName = (prop: NamedProp): string =>
-  prop.key.type === NT.Identifier ? prop.key.name : prop.key.value;
-*/
 
 const listen = <
   S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
@@ -79,6 +73,29 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           data: {
             subject: "property",
             from: "wrongMethodBehavior",
+            to: newKey,
+          },
+          fix: (fixer) => [
+            fixer.replaceText(node.key, newKey),
+            fixer.replaceText(value, newValue),
+          ],
+        });
+      },
+      methodLikeRouteBehavior: (node) => {
+        const value = node.value;
+        const newKey = "recognizeMethodDependentRoutes";
+        let newValue: string;
+        if (value.type === NT.Identifier && value.name === "undefined")
+          newValue = "undefined";
+        else if (value.type === NT.Literal && typeof value.value === "string")
+          newValue = value.value === "method" ? "true" : "false";
+        else return;
+        ctx.report({
+          node,
+          messageId: "change",
+          data: {
+            subject: "property",
+            from: "methodLikeRouteBehavior",
             to: newKey,
           },
           fix: (fixer) => [

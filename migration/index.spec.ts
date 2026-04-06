@@ -22,7 +22,10 @@ describe("Migration", async () => {
   });
 
   tester.run(ruleName, theRule, {
-    valid: [`createConfig({ hintAllowedMethods: false });`],
+    valid: [
+      `createConfig({ hintAllowedMethods: false });`,
+      `createConfig({ recognizeMethodDependentRoutes: true });`,
+    ],
     invalid: [
       {
         name: "wrongMethodBehavior=404",
@@ -65,6 +68,51 @@ describe("Migration", async () => {
               subject: "property",
               from: "wrongMethodBehavior",
               to: "hintAllowedMethods",
+            },
+          },
+        ],
+      },
+      {
+        name: "methodLikeRouteBehavior=method",
+        code: `createConfig({ methodLikeRouteBehavior: "method" });`,
+        output: `createConfig({ recognizeMethodDependentRoutes: true });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "methodLikeRouteBehavior",
+              to: "recognizeMethodDependentRoutes",
+            },
+          },
+        ],
+      },
+      {
+        name: "methodLikeRouteBehavior=path",
+        code: `createConfig({ methodLikeRouteBehavior: "path" });`,
+        output: `createConfig({ recognizeMethodDependentRoutes: false });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "methodLikeRouteBehavior",
+              to: "recognizeMethodDependentRoutes",
+            },
+          },
+        ],
+      },
+      {
+        name: "methodLikeRouteBehavior=undefined",
+        code: `createConfig({ methodLikeRouteBehavior: undefined });`,
+        output: `createConfig({ recognizeMethodDependentRoutes: undefined });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "methodLikeRouteBehavior",
+              to: "recognizeMethodDependentRoutes",
             },
           },
         ],
