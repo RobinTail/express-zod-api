@@ -12,6 +12,7 @@ type NamedProp = TSESTree.PropertyNonComputedName & {
 interface Queries {
   wrongMethodBehavior: NamedProp;
   methodLikeRouteBehavior: NamedProp;
+  hasSummaryFromDescription: NamedProp;
 }
 
 type Listener = keyof Queries;
@@ -25,6 +26,10 @@ const queries: Record<Listener, string> = {
     `${NT.CallExpression}[callee.name="createConfig"] > ` +
     `${NT.ObjectExpression} > ` +
     `${NT.Property}[key.name="methodLikeRouteBehavior"]`,
+  hasSummaryFromDescription:
+    `${NT.NewExpression}[callee.name="Documentation"] > ` +
+    `${NT.ObjectExpression} > ` +
+    `${NT.Property}[key.name="hasSummaryFromDescription"]`,
 };
 
 const listen = <
@@ -96,6 +101,29 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           data: {
             subject: "property",
             from: "methodLikeRouteBehavior",
+            to: newKey,
+          },
+          fix: (fixer) => [
+            fixer.replaceText(node.key, newKey),
+            fixer.replaceText(value, newValue),
+          ],
+        });
+      },
+      hasSummaryFromDescription: (node) => {
+        const value = node.value;
+        const newKey = "hasSummary";
+        let newValue: string;
+        if (value.type === NT.Identifier && value.name === "undefined")
+          newValue = "undefined";
+        else if (value.type === NT.Literal && typeof value.value === "boolean")
+          newValue = value.value ? "true" : "false";
+        else return;
+        ctx.report({
+          node,
+          messageId: "change",
+          data: {
+            subject: "property",
+            from: "hasSummaryFromDescription",
             to: newKey,
           },
           fix: (fixer) => [

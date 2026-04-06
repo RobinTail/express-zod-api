@@ -25,6 +25,7 @@ describe("Migration", async () => {
     valid: [
       `createConfig({ hintAllowedMethods: false });`,
       `createConfig({ recognizeMethodDependentRoutes: true });`,
+      `new Documentation({ hasSummary: false });`,
     ],
     invalid: [
       {
@@ -113,6 +114,51 @@ describe("Migration", async () => {
               subject: "property",
               from: "methodLikeRouteBehavior",
               to: "recognizeMethodDependentRoutes",
+            },
+          },
+        ],
+      },
+      {
+        name: "hasSummaryFromDescription=true",
+        code: `new Documentation({ hasSummaryFromDescription: true });`,
+        output: `new Documentation({ hasSummary: true });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "hasSummaryFromDescription",
+              to: "hasSummary",
+            },
+          },
+        ],
+      },
+      {
+        name: "hasSummaryFromDescription=false",
+        code: `new Documentation({ hasSummaryFromDescription: false });`,
+        output: `new Documentation({ hasSummary: false });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "hasSummaryFromDescription",
+              to: "hasSummary",
+            },
+          },
+        ],
+      },
+      {
+        name: "hasSummaryFromDescription=undefined",
+        code: `new Documentation({ hasSummaryFromDescription: undefined });`,
+        output: `new Documentation({ hasSummary: undefined });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "hasSummaryFromDescription",
+              to: "hasSummary",
             },
           },
         ],
