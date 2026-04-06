@@ -110,15 +110,16 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         });
       },
       hasSummaryFromDescription: (node) => {
+        const newKey = "hasSummary";
         ctx.report({
           node,
           messageId: "change",
           data: {
             subject: "property",
             from: "hasSummaryFromDescription",
-            to: "hasSummary",
+            to: newKey,
           },
-          fix: (fixer) => [fixer.replaceText(node.key, "hasSummary")],
+          fix: (fixer) => [fixer.replaceText(node.key, newKey)],
         });
       },
     }),
