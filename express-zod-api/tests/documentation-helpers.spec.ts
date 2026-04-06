@@ -709,5 +709,8 @@ describe("Documentation helpers", () => {
         ),
       ).toBe("this text is definitely too long for the short de…");
     });
+    test.each(["", undefined])("accepts %s as is", (value) => {
+      expect(ensureShortDescription(value)).toBe(value);
+    });
   });
 });

@@ -12,6 +12,7 @@ type NamedProp = TSESTree.PropertyNonComputedName & {
 interface Queries {
   wrongMethodBehavior: NamedProp;
   methodLikeRouteBehavior: NamedProp;
+  hasSummaryFromDescription: NamedProp;
 }
 
 type Listener = keyof Queries;
@@ -25,6 +26,10 @@ const queries: Record<Listener, string> = {
     `${NT.CallExpression}[callee.name="createConfig"] > ` +
     `${NT.ObjectExpression} > ` +
     `${NT.Property}[key.name="methodLikeRouteBehavior"]`,
+  hasSummaryFromDescription:
+    `${NT.NewExpression}[callee.name="Documentation"] > ` +
+    `${NT.ObjectExpression} > ` +
+    `${NT.Property}[key.name="hasSummaryFromDescription"]`,
 };
 
 const listen = <
@@ -102,6 +107,19 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             fixer.replaceText(node.key, newKey),
             fixer.replaceText(value, newValue),
           ],
+        });
+      },
+      hasSummaryFromDescription: (node) => {
+        const newKey = "hasSummary";
+        ctx.report({
+          node,
+          messageId: "change",
+          data: {
+            subject: "property",
+            from: "hasSummaryFromDescription",
+            to: newKey,
+          },
+          fix: (fixer) => [fixer.replaceText(node.key, newKey)],
         });
       },
     }),

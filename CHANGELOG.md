@@ -8,6 +8,8 @@
 - Breaking changes to the `createConfig()` argument (object):
   - property `wrongMethodBehavior` (number) changed to `hintAllowedMethods` (boolean);
   - property `methodLikeRouteBehavior` (string literal) changed to `recognizeMethodDependentRoutes` (boolean);
+- Breaking change to the `Documentation` constructor argument (object):
+  - property `hasSummaryFromDescription` (boolean) renamed to `hasSummary` (boolean);
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
 
 ```diff
@@ -16,6 +18,13 @@
 +   hintAllowedMethods: false,
 -   methodLikeRouteBehavior: "path",
 +   recognizeMethodDependentRoutes: false,
+  });
+```
+
+```diff
+  new Documentation({
+-   hasSummaryFromDescription: false,
++   hasSummary: false,
   });
 ```
 

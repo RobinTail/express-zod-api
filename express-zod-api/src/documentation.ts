@@ -57,8 +57,11 @@ interface DocumentationParams {
    * @default () => `${method} ${path} ${component}`
    * */
   descriptions?: Partial<Record<Component, Descriptor>>;
-  /** @default true */
-  hasSummaryFromDescription?: boolean;
+  /**
+   * @desc Generates the summary field for each Endpoint from either shortDescription or description.
+   * @default true
+   */
+  hasSummary?: boolean;
   /**
    * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
    * @default true
@@ -158,7 +161,7 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     tags,
     isHeader,
-    hasSummaryFromDescription = true,
+    hasSummary = true,
     hasHeadMethod = true,
     composition = "inline",
   }: DocumentationParams) {
@@ -176,11 +179,9 @@ export class Documentation extends OpenApiBuilder {
         makeRef: this.#makeRef.bind(this),
       };
       const { description, shortDescription, scopes, inputSchema } = endpoint;
-      const summary = shortDescription
-        ? ensureShortDescription(shortDescription)
-        : hasSummaryFromDescription && description
-          ? ensureShortDescription(description)
-          : undefined;
+      const summary = hasSummary
+        ? ensureShortDescription(shortDescription || description)
+        : undefined;
       const inputSources = getInputSources(method, config.inputSources);
       const operationId = this.#ensureUniqOperationId(
         path,

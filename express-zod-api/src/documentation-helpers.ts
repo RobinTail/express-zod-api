@@ -665,8 +665,8 @@ export const depictTags = (
     return agg.concat(entry);
   }, []);
 
-export const ensureShortDescription = (description: string) =>
-  description.length <= shortDescriptionLimit
+export const ensureShortDescription = (description?: string) =>
+  !description || description.length <= shortDescriptionLimit
     ? description
     : description.slice(0, shortDescriptionLimit - 1) + "…";
 
