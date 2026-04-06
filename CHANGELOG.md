@@ -24,7 +24,7 @@
 ```diff
   new Documentation({
 -   hasSummaryFromDescription: false,
-+   hasSummary: false
++   hasSummary: false,
   });
 ```
 
