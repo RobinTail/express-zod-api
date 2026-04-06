@@ -47,9 +47,11 @@ export interface CommonConfig {
    */
   hintAllowedMethods?: boolean;
   /**
-   * @desc Whether to recognize method-dependent routes in Routing.
-   * @example true — routing keys are treated as HTTP methods (like "get", "post")
-   * @example false — routing keys are treated as nested path segments
+   * @desc Controls how to treat Routing keys matching HTTP methods ("get", "post") and having Endpoint assigned.
+   * @example true — treat such keys as HTTP methods complementing their parent paths
+   *          { users: { get: ... }} becomes GET /users
+   * @example false — treat such keys as nested path segments regardless of the name
+   *          { users: { get: ... }} remains /users/get
    * @default true
    */
   recognizeMethodDependentRoutes?: boolean;
