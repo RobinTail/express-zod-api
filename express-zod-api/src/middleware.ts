@@ -6,6 +6,7 @@ import { IOSchema } from "./io-schema";
 import { LogicalContainer } from "./logical-container";
 import { Security } from "./security";
 import { ActualLogger } from "./logger-helpers";
+import { isPromise } from "node:util/types";
 
 type Handler<IN, CTX, RET> = (params: {
   /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware */
@@ -128,7 +129,8 @@ export class ExpressMiddleware<
             if (err && err instanceof Error) return reject(transformer(err));
             resolve(provider(request as R, response as S));
           };
-          nativeMw(request as R, response as S, next)?.catch(next);
+          const returns = nativeMw(request as R, response as S, next);
+          if (isPromise(returns)) returns.catch(next);
         }),
     });
   }

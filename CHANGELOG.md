@@ -2,6 +2,11 @@
 
 ## Version 27
 
+### v27.2.1
+
+- Improved handling of native Express middleware return values:
+  - Avoids potential errors when middleware returns non-promise truthy values.
+
 ### v27.2.0
 
 - Supporting TypeScript 6:
