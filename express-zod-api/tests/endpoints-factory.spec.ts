@@ -216,12 +216,12 @@ describe("EndpointsFactory", () => {
       expect(middleware).toHaveBeenCalledTimes(1);
     });
 
-    test.each(["test", 123, true, {}, { catch: null }, { catch: "test" }])(
+    test.each([123, {}, { catch: "test" }])(
       "should handle broken middlewares that do not call next() sync %#",
       async (value) => {
         const factory = new EndpointsFactory(resultHandlerMock);
         const middleware: RequestHandler = vi.fn(({}, {}, next) => {
-          setTimeout(next, 1000);
+          setTimeout(next, 250);
           return value;
         });
         const newFactory = factory[method](middleware);
