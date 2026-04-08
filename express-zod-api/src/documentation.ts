@@ -22,7 +22,7 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictTags,
-  ensureShortDescription,
+  trimSummary,
   reformatParamsInPath,
   nonEmpty,
   depictRequest,
@@ -180,7 +180,7 @@ export class Documentation extends OpenApiBuilder {
       };
       const { description, shortDescription, scopes, inputSchema } = endpoint;
       const summary = hasSummary
-        ? ensureShortDescription(shortDescription || description)
+        ? trimSummary(shortDescription || description)
         : undefined;
       const inputSources = getInputSources(method, config.inputSources);
       const operationId = this.#ensureUniqOperationId(
