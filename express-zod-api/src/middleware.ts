@@ -128,7 +128,7 @@ export class ExpressMiddleware<
             if (err && err instanceof Error) return reject(transformer(err));
             resolve(provider(request as R, response as S));
           };
-          nativeMw(request as R, response as S, next)?.catch(next);
+          nativeMw(request as R, response as S, next)?.catch?.(next);
         }),
     });
   }
