@@ -22,12 +22,13 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictTags,
-  trimSummary,
+  defaultTrimSummary,
   reformatParamsInPath,
   nonEmpty,
   depictRequest,
   type IsHeader,
   type BrandHandling,
+  type TrimSummary,
 } from "./documentation-helpers";
 import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
@@ -57,6 +58,12 @@ interface DocumentationParams {
    * @default () => `${method} ${path} ${component}`
    * */
   descriptions?: Partial<Record<Component, Descriptor>>;
+  /**
+   * @desc The function that ensures the maximum length for summary fields. Can optionally make them from descriptions.
+   * @default 50 symbols max (best practice)
+   * @see defaultTrimSummary
+   * */
+  trimSummary?: TrimSummary;
   /**
    * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
    * @default true
@@ -157,6 +164,7 @@ export class Documentation extends OpenApiBuilder {
     tags,
     isHeader,
     hasHeadMethod = true,
+    trimSummary = defaultTrimSummary,
     composition = "inline",
   }: DocumentationParams) {
     super();
@@ -246,7 +254,7 @@ export class Documentation extends OpenApiBuilder {
 
       const operation: OperationObject = {
         operationId,
-        summary: trimSummary(summary),
+        summary: trimSummary({ summary, description }),
         description,
         deprecated: endpoint.isDeprecated || undefined,
         tags: nonEmpty(endpoint.tags),

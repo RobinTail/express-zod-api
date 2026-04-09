@@ -76,6 +76,11 @@ export type IsHeader = (
   path: string,
 ) => boolean | null | undefined;
 
+export type TrimSummary = (params: {
+  summary?: string;
+  description?: string;
+}) => string | undefined;
+
 export type BrandHandling = Record<string | symbol, Depicter>;
 
 const summeryMaxLength = 50;
@@ -665,10 +670,14 @@ export const depictTags = (
     return agg.concat(entry);
   }, []);
 
-export const trimSummary = (description?: string) =>
-  !description || description.length <= summeryMaxLength
-    ? description
-    : description.slice(0, summeryMaxLength - 1) + "…";
+/** @desc Ensures the summary string does not exceed 50 symbols */
+export const defaultTrimSummary: TrimSummary = ({
+  description,
+  summary = description,
+}) =>
+  !summary || summary.length <= summeryMaxLength
+    ? summary
+    : summary.slice(0, summeryMaxLength - 1) + "…";
 
 export const nonEmpty = <T>(subject: T[] | ReadonlyArray<T>) =>
   subject.length ? subject.slice() : undefined;

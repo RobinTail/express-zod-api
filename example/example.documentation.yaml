@@ -122,6 +122,7 @@ paths:
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
+      summary: Changes the user record. Example user update endp…
       description: Changes the user record. Example user update endpoint.
       tags:
         - users
@@ -566,6 +567,7 @@ paths:
   /v1/avatar/upload:
     post:
       operationId: PostV1AvatarUpload
+      summary: Handles a file upload.
       description: Handles a file upload.
       tags:
         - files

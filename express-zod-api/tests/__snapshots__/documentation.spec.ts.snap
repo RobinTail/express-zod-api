@@ -9,6 +9,7 @@ paths:
   /v1/getSome/thing:
     get:
       operationId: coolOperationId
+      summary: thing is the path segment
       description: thing is the path segment
       responses:
         "200":
@@ -59,6 +60,7 @@ paths:
                       message: Sample error message
     head:
       operationId: coolOperationId__HEAD
+      summary: thing is the path segment
       description: thing is the path segment
       responses:
         "200":
@@ -90,6 +92,7 @@ paths:
   /v1/getSome/thing:
     get:
       operationId: getCoolOperationId
+      summary: thing is the path segment
       description: thing is the path segment
       responses:
         "200":
@@ -140,6 +143,7 @@ paths:
                       message: Sample error message
     head:
       operationId: headCoolOperationId
+      summary: thing is the path segment
       description: thing is the path segment
       responses:
         "200":
@@ -148,6 +152,7 @@ paths:
           description: HEAD /v1/getSome/thing Negative response
     post:
       operationId: postCoolOperationId
+      summary: thing is the path segment
       description: thing is the path segment
       requestBody:
         description: POST /v1/getSome/thing Request body
@@ -289,6 +294,7 @@ paths:
   /v1/getSome/{thing}:
     get:
       operationId: GetV1GetSomeThing2
+      summary: thing is the path parameter
       description: thing is the path parameter
       responses:
         "200":
@@ -339,6 +345,7 @@ paths:
                       message: Sample error message
     head:
       operationId: HeadV1GetSomeThing2
+      summary: thing is the path parameter
       description: thing is the path parameter
       responses:
         "200":

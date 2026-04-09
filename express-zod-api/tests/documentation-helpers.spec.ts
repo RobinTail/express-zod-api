@@ -8,7 +8,7 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictTags,
-  trimSummary,
+  defaultTrimSummary,
   excludeParamsFromDepiction,
   defaultIsHeader,
   reformatParamsInPath,
@@ -694,21 +694,26 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("trimSummary()", () => {
-    test("keeps the short text as it is", () => {
-      expect(trimSummary("here is a short text")).toBe("here is a short text");
-      expect(trimSummary(" ")).toBe(" ");
-      expect(trimSummary("")).toBe("");
-    });
-    test("trims the long text", () => {
-      expect(
-        trimSummary(
-          "this text is definitely too long for the short description",
-        ),
-      ).toBe("this text is definitely too long for the short de…");
-    });
-    test.each(["", undefined])("accepts %s as is", (value) => {
-      expect(trimSummary(value)).toBe(value);
+  describe("defaultTrimSummary()", () => {
+    test.each(["here is a short text", " ", ""])(
+      "keeps the short text as it is %#",
+      (summary) => {
+        expect(defaultTrimSummary({ summary })).toBe(summary);
+      },
+    );
+    test.each(["summary", "description"])(
+      "trims the long text in %s",
+      (name) => {
+        expect(
+          defaultTrimSummary({
+            [name]:
+              "this text is definitely too long for the short description",
+          }),
+        ).toBe("this text is definitely too long for the short de…");
+      },
+    );
+    test("accepts undefined as is", () => {
+      expect(defaultTrimSummary({})).toBeUndefined();
     });
   });
 });
