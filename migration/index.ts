@@ -55,7 +55,7 @@ const listen = <
     {},
   );
 
-const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0] ?? "0"}`;
+const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0] ?? "0"}`; // fail-safe for bumpp
 
 const theRule = ESLintUtils.RuleCreator.withoutDocs({
   name: ruleName,
@@ -123,11 +123,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         ctx.report({
           node,
           messageId: "remove",
-          data: {
-            subject: "property",
-            from: "hasSummaryFromDescription",
-            to: "",
-          },
+          data: { subject: "property" },
           fix: (fixer) => {
             const after = ctx.sourceCode.getTokenAfter(node);
             const end = node.range[1] + (after?.value === "," ? 1 : 0);

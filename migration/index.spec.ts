@@ -128,11 +128,7 @@ describe("Migration", async () => {
         errors: [
           {
             messageId: "remove",
-            data: {
-              subject: "property",
-              from: "hasSummaryFromDescription",
-              to: "",
-            },
+            data: { subject: "property" },
           },
         ],
       },
@@ -143,11 +139,7 @@ describe("Migration", async () => {
         errors: [
           {
             messageId: "remove",
-            data: {
-              subject: "property",
-              from: "hasSummaryFromDescription",
-              to: "",
-            },
+            data: { subject: "property" },
           },
         ],
       },
