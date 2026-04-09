@@ -670,7 +670,7 @@ export const depictTags = (
     return agg.concat(entry);
   }, []);
 
-/** @desc Ensures the summary string does not exceed 50 symbols */
+/** @desc Ensures the summary string does not exceed 50 symbols, uses description as a fallback */
 export const defaultTrimSummary: TrimSummary = ({
   description,
   summary = description,
