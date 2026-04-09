@@ -60,7 +60,7 @@ interface DocumentationParams {
   descriptions?: Partial<Record<Component, Descriptor>>;
   /**
    * @desc The function that ensures the maximum length for summary fields. Can optionally make them from descriptions.
-   * @default 50 symbols max (best practice), uses description as a fallback
+   * @default 50 symbols max (best practice)
    * @see defaultTrimSummary
    * */
   trimSummary?: TrimSummary;
@@ -254,7 +254,7 @@ export class Documentation extends OpenApiBuilder {
 
       const operation: OperationObject = {
         operationId,
-        summary: trimSummary({ summary, description, default: trimSummary }),
+        summary: trimSummary({ summary, description }),
         description,
         deprecated: endpoint.isDeprecated || undefined,
         tags: nonEmpty(endpoint.tags),

@@ -79,12 +79,11 @@ export type IsHeader = (
 export type TrimSummary = (params: {
   summary?: string;
   description?: string;
-  limit?: number;
-  default: TrimSummary;
 }) => string | undefined;
 
 export type BrandHandling = Record<string | symbol, Depicter>;
 
+const summeryMaxLength = 50;
 const isoDateDocumentationUrl =
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
@@ -675,11 +674,10 @@ export const depictTags = (
 export const defaultTrimSummary: TrimSummary = ({
   description,
   summary = description,
-  limit = 50, // considered as a best practice
 }) =>
-  !summary || summary.length <= limit
+  !summary || summary.length <= summeryMaxLength
     ? summary
-    : summary.slice(0, limit - 1) + "…";
+    : summary.slice(0, summeryMaxLength - 1) + "…";
 
 export const nonEmpty = <T>(subject: T[] | ReadonlyArray<T>) =>
   subject.length ? subject.slice() : undefined;
