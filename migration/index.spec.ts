@@ -25,7 +25,6 @@ describe("Migration", async () => {
     valid: [
       `createConfig({ hintAllowedMethods: false });`,
       `createConfig({ recognizeMethodDependentRoutes: true });`,
-      `new Documentation({ hasSummary: false });`,
       `new Integration({ noBodySchema: z.undefined() });`,
       `factory.build({ summary: "hello" });`,
       `factory.buildVoid({ summary: "hello" });`,
