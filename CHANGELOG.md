@@ -8,8 +8,10 @@
 - Breaking changes to the `createConfig()` argument (object):
   - property `wrongMethodBehavior` (number) changed to `hintAllowedMethods` (boolean);
   - property `methodLikeRouteBehavior` (string literal) changed to `recognizeMethodDependentRoutes` (boolean);
+- Breaking change to the `EndpointsFactory::build()` argument (object):
+  - property `shortDescription` renamed to `summary`;
 - Breaking change to the `Documentation` constructor argument (object):
-  - property `hasSummaryFromDescription` renamed to `hasSummary`;
+  - property `hasSummaryFromDescription` removed;
 - Breaking change to the `Integration` constructor argument (object):
   - property `noContent` renamed to `noBodySchema`;
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
@@ -24,9 +26,15 @@
 ```
 
 ```diff
+  factory.build({
+-   shortDescription: "Retrieves the user.",
++   summary: "Retrieves the user.",
+  });
+```
+
+```diff
   new Documentation({
 -   hasSummaryFromDescription: false,
-+   hasSummary: false,
   });
 ```
 

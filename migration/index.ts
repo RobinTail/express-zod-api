@@ -3,7 +3,7 @@ import {
   AST_NODE_TYPES as NT,
   type TSESLint,
   type TSESTree,
-} from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
+} from "@typescript-eslint/utils";
 
 type NamedProp = TSESTree.PropertyNonComputedName & {
   key: TSESTree.Identifier | TSESTree.StringLiteral;
@@ -14,6 +14,7 @@ interface Queries {
   methodLikeRouteBehavior: NamedProp;
   hasSummaryFromDescription: NamedProp;
   noContent: NamedProp;
+  shortDescription: NamedProp;
 }
 
 type Listener = keyof Queries;
@@ -35,6 +36,10 @@ const queries: Record<Listener, string> = {
     `${NT.NewExpression}[callee.name="Integration"] > ` +
     `${NT.ObjectExpression} > ` +
     `${NT.Property}[key.name="noContent"]`,
+  shortDescription:
+    `${NT.CallExpression}[callee.property.name=/build|buildVoid/] > ` +
+    `${NT.ObjectExpression} > ` +
+    `${NT.Property}[key.name="shortDescription"]`,
 };
 
 const listen = <
@@ -50,7 +55,7 @@ const listen = <
     {},
   );
 
-const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0] ?? "0"}`; // fail-safe for bumpp
+const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0] ?? "0"}`;
 
 const theRule = ESLintUtils.RuleCreator.withoutDocs({
   name: ruleName,
@@ -115,16 +120,19 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         });
       },
       hasSummaryFromDescription: (node) => {
-        const newKey = "hasSummary";
         ctx.report({
           node,
-          messageId: "change",
+          messageId: "remove",
           data: {
             subject: "property",
             from: "hasSummaryFromDescription",
-            to: newKey,
+            to: "",
           },
-          fix: (fixer) => fixer.replaceText(node.key, newKey),
+          fix: (fixer) => {
+            const after = ctx.sourceCode.getTokenAfter(node);
+            const end = node.range[1] + (after?.value === "," ? 1 : 0);
+            return fixer.removeRange([node.range[0], end]);
+          },
         });
       },
       noContent: (node) => {
@@ -133,6 +141,15 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           node,
           messageId: "change",
           data: { subject: "property", from: "noContent", to: newKey },
+          fix: (fixer) => fixer.replaceText(node.key, newKey),
+        });
+      },
+      shortDescription: (node) => {
+        const newKey = "summary";
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "property", from: "shortDescription", to: newKey },
           fix: (fixer) => fixer.replaceText(node.key, newKey),
         });
       },

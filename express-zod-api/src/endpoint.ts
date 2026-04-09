@@ -66,7 +66,7 @@ export abstract class AbstractEndpoint {
   /** @internal */
   public abstract get description(): string | undefined;
   /** @internal */
-  public abstract get shortDescription(): string | undefined;
+  public abstract get summary(): string | undefined;
   /** @internal */
   public abstract get methods(): ReadonlyArray<Method> | undefined;
   /** @internal */
@@ -112,7 +112,7 @@ export class Endpoint<
     handler: Handler<z.output<IN>, z.input<OUT>, CTX>;
     resultHandler: AbstractResultHandler;
     description?: string;
-    shortDescription?: string;
+    summary?: string;
     getOperationId?: (method: ClientMethod) => string | undefined;
     methods?: Method[];
     scopes?: string[];
@@ -143,8 +143,8 @@ export class Endpoint<
   }
 
   /** @internal */
-  public override get shortDescription() {
-    return this.#def.shortDescription;
+  public override get summary() {
+    return this.#def.summary;
   }
 
   /** @internal */

@@ -588,7 +588,7 @@ describe("Documentation", () => {
             getSome: {
               thing: defaultEndpointsFactory.build({
                 description: "thing is the path segment",
-                shortDescription: "operationIdEndpoint",
+                summary: "operationIdEndpoint",
                 output: z.object({}),
                 handler: async () => ({}),
               }),

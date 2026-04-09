@@ -47,7 +47,7 @@ interface BuildProps<
   /** @desc The operation description for the generated Documentation */
   description?: string;
   /** @desc The operation summary for the generated Documentation (50 symbols max) */
-  shortDescription?: string;
+  summary?: string;
   /** @desc The operation ID for the generated Documentation (must be unique) */
   operationId?: string | ((method: ClientMethod) => string);
   /**
