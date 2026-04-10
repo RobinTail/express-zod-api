@@ -28,23 +28,17 @@
 -   methodLikeRouteBehavior: "path",
 +   recognizeMethodDependentRoutes: false,
   });
-```
 
-```diff
   factory.build({
 -   shortDescription: "Retrieves the user.",
 +   summary: "Retrieves the user.",
   });
-```
 
-```diff
   new Documentation({
 -   hasSummaryFromDescription: false,
 +   summarizer: ({ summary, trim }) => trim(summary),
   });
-```
 
-```diff
   new Integration({
 -   noContent: z.undefined(),
 +   noBodySchema: z.undefined(),
