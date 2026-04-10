@@ -3,7 +3,12 @@ import {
   ESLintUtils,
   type TSESLint,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
-import { queryNamedProp, type NamedProp, getPropName } from "./helpers.ts";
+import {
+  queryNamedProp,
+  type NamedProp,
+  getPropName,
+  renameProp,
+} from "./helpers.ts";
 
 interface Queries {
   wrongMethodBehavior: NamedProp;
@@ -141,24 +146,8 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           },
         });
       },
-      noContent: (node) => {
-        const newKey = "noBodySchema";
-        ctx.report({
-          node,
-          messageId: "change",
-          data: { subject: "property", from: getPropName(node), to: newKey },
-          fix: (fixer) => fixer.replaceText(node.key, newKey),
-        });
-      },
-      shortDescription: (node) => {
-        const newKey = "summary";
-        ctx.report({
-          node,
-          messageId: "change",
-          data: { subject: "property", from: getPropName(node), to: newKey },
-          fix: (fixer) => fixer.replaceText(node.key, newKey),
-        });
-      },
+      noContent: (node) => renameProp({ ctx, node, to: "noBodySchema" }),
+      shortDescription: (node) => renameProp({ ctx, node, to: "summary" }),
     }),
 });
 
