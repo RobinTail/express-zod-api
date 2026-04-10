@@ -10,7 +10,7 @@ export const queryNamedProp = (name: string) =>
 export const getPropName = (prop: NamedProp): string =>
   "name" in prop.key ? prop.key.name : prop.key.value;
 
-export const renameProp = ({
+export const changeProp = ({
   ctx,
   node,
   to,

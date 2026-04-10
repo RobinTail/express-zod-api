@@ -7,7 +7,7 @@ import {
   queryNamedProp,
   type NamedProp,
   getPropName,
-  renameProp,
+  changeProp,
 } from "./helpers.ts";
 
 interface Queries {
@@ -75,7 +75,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
   create: (ctx) =>
     listen({
       wrongMethodBehavior: (node) =>
-        renameProp({
+        changeProp({
           ctx,
           node,
           to: "hintAllowedMethods",
@@ -88,7 +88,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           },
         }),
       methodLikeRouteBehavior: (node) =>
-        renameProp({
+        changeProp({
           ctx,
           node,
           to: "recognizeMethodDependentRoutes",
@@ -129,8 +129,8 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           },
         });
       },
-      noContent: (node) => renameProp({ ctx, node, to: "noBodySchema" }),
-      shortDescription: (node) => renameProp({ ctx, node, to: "summary" }),
+      noContent: (node) => changeProp({ ctx, node, to: "noBodySchema" }),
+      shortDescription: (node) => changeProp({ ctx, node, to: "summary" }),
     }),
 });
 
