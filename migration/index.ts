@@ -1,13 +1,9 @@
 import {
-  ESLintUtils,
   AST_NODE_TYPES as NT,
+  ESLintUtils,
   type TSESLint,
-  type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
-
-type NamedProp = TSESTree.PropertyNonComputedName & {
-  key: TSESTree.Identifier | TSESTree.StringLiteral;
-};
+import { queryNamedProp, type NamedProp } from "./helpers.ts";
 
 interface Queries {
   wrongMethodBehavior: NamedProp;
@@ -23,23 +19,23 @@ const queries: Record<Listener, string> = {
   wrongMethodBehavior:
     `${NT.CallExpression}[callee.name="createConfig"] > ` +
     `${NT.ObjectExpression} > ` +
-    `${NT.Property}[key.name="wrongMethodBehavior"]`,
+    queryNamedProp("wrongMethodBehavior"),
   methodLikeRouteBehavior:
     `${NT.CallExpression}[callee.name="createConfig"] > ` +
     `${NT.ObjectExpression} > ` +
-    `${NT.Property}[key.name="methodLikeRouteBehavior"]`,
+    queryNamedProp("methodLikeRouteBehavior"),
   hasSummaryFromDescription:
     `${NT.NewExpression}[callee.name="Documentation"] > ` +
     `${NT.ObjectExpression} > ` +
-    `${NT.Property}[key.name="hasSummaryFromDescription"]`,
+    queryNamedProp("hasSummaryFromDescription"),
   noContent:
     `${NT.NewExpression}[callee.name="Integration"] > ` +
     `${NT.ObjectExpression} > ` +
-    `${NT.Property}[key.name="noContent"]`,
+    queryNamedProp("noContent"),
   shortDescription:
     `${NT.CallExpression}[callee.property.name=/build|buildVoid/] > ` +
     `${NT.ObjectExpression} > ` +
-    `${NT.Property}[key.name="shortDescription"]`,
+    queryNamedProp("shortDescription"),
 };
 
 const listen = <

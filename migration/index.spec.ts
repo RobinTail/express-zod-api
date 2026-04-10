@@ -218,6 +218,66 @@ describe("Migration", async () => {
           },
         ],
       },
+      {
+        name: "wrongMethodBehavior with string key",
+        code: `createConfig({ "wrongMethodBehavior": 405 });`,
+        output: `createConfig({ hintAllowedMethods: true });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "wrongMethodBehavior",
+              to: "hintAllowedMethods",
+            },
+          },
+        ],
+      },
+      {
+        name: "noContent with string key",
+        code: `new Integration({ "noContent": z.undefined() });`,
+        output: `new Integration({ noBodySchema: z.undefined() });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "noContent",
+              to: "noBodySchema",
+            },
+          },
+        ],
+      },
+      {
+        name: "hasSummaryFromDescription=false with string key",
+        code: `new Documentation({ "hasSummaryFromDescription": false });`,
+        output: `new Documentation({ summarizer: ({ summary, trim }) => trim(summary) });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "hasSummaryFromDescription",
+              to: "summarizer",
+            },
+          },
+        ],
+      },
+      {
+        name: "shortDescription with string key in build()",
+        code: `factory.build({ "shortDescription": "Retrieves the user." });`,
+        output: `factory.build({ summary: "Retrieves the user." });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "shortDescription",
+              to: "summary",
+            },
+          },
+        ],
+      },
     ],
   });
 });
