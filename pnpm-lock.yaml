@@ -201,6 +201,9 @@ importers:
         specifier: catalog:prod
         version: 0.32.0
     devDependencies:
+      '@express-zod-api/zod-plugin':
+        specifier: workspace:^
+        version: link:../zod-plugin
       '@types/compression':
         specifier: catalog:dev
         version: 1.8.1
