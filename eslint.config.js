@@ -240,7 +240,7 @@ export default tsPlugin.config(
   },
   {
     name: "source/migration",
-    files: ["migration/index.ts"],
+    files: ["migration/index.ts", "migration/helpers.ts"],
     rules: {
       "allowed/dependencies": ["error", { packageDir: migrationDir }],
       "no-restricted-syntax": ["warn", ...importConcerns],
