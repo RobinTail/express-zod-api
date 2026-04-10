@@ -8,7 +8,7 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictTags,
-  defaultTrimSummary,
+  trimSummary,
   excludeParamsFromDepiction,
   defaultIsHeader,
   reformatParamsInPath,
@@ -694,26 +694,22 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("defaultTrimSummary()", () => {
+  describe("trimSummary()", () => {
     test.each(["here is a short text", " ", ""])(
       "keeps the short text as it is %#",
       (summary) => {
-        expect(defaultTrimSummary({ summary })).toBe(summary);
+        expect(trimSummary(summary)).toBe(summary);
       },
     );
-    test.each(["summary", "description"])(
-      "trims the long text in %s",
-      (name) => {
-        expect(
-          defaultTrimSummary({
-            [name]:
-              "this text is definitely too long for the short description",
-          }),
-        ).toBe("this text is definitely too long for the short de…");
-      },
-    );
+    test("trims the long text in %s", () => {
+      expect(
+        trimSummary(
+          "this text is definitely too long for the short description",
+        ),
+      ).toBe("this text is definitely too long for the short de…");
+    });
     test("accepts undefined as is", () => {
-      expect(defaultTrimSummary({})).toBeUndefined();
+      expect(trimSummary()).toBeUndefined();
     });
   });
 });
