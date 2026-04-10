@@ -1,4 +1,4 @@
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import { ezDateOutBrand } from "../src/date-out-schema";
 import { ez } from "../src";
 import { brandProperty } from "../src/brand";
@@ -8,8 +8,7 @@ describe("ez.dateOut()", () => {
     test("should create an instance", () => {
       const schema = ez.dateOut();
       expect(schema).toBeInstanceOf(z.ZodPipe);
-      const meta = globalRegistry.get(schema);
-      expect(meta ? meta[brandProperty] : undefined).toBe(ezDateOutBrand);
+      expect(schema.meta()).toHaveProperty(brandProperty, ezDateOutBrand);
     });
   });
 

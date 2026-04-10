@@ -1,4 +1,4 @@
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import { ez } from "../src";
 import { brandProperty } from "../src/brand";
 import { ezRawBrand } from "../src/raw-schema";
@@ -8,8 +8,7 @@ describe("ez.raw()", () => {
     test("should be an instance of branded object", () => {
       const schema = ez.raw();
       expect(schema).toBeInstanceOf(z.ZodObject);
-      const meta = globalRegistry.get(schema);
-      expect(meta ? meta[brandProperty] : undefined).toBe(ezRawBrand);
+      expect(schema.meta()).toHaveProperty(brandProperty, ezRawBrand);
     });
   });
 

@@ -1,4 +1,4 @@
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import { ez } from "../src";
 import { brandProperty } from "../src/brand";
 import { ezUploadBrand } from "../src/upload-schema";
@@ -8,8 +8,7 @@ describe("ez.upload()", () => {
     test("should create an instance", () => {
       const schema = ez.upload();
       expect(schema).toBeInstanceOf(z.ZodCustom);
-      const meta = globalRegistry.get(schema);
-      expect(meta ? meta[brandProperty] : undefined).toBe(ezUploadBrand);
+      expect(schema.meta()).toHaveProperty(brandProperty, ezUploadBrand);
     });
   });
 

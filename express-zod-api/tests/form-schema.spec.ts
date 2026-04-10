@@ -1,4 +1,4 @@
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import { ez } from "../src";
 import { brandProperty } from "../src/brand";
 import { ezFormBrand } from "../src/form-schema";
@@ -10,8 +10,7 @@ describe("ez.form()", () => {
       (base) => {
         const schema = ez.form(base);
         expect(schema).toBeInstanceOf(z.ZodObject);
-        const meta = globalRegistry.get(schema);
-        expect(meta ? meta[brandProperty] : undefined).toBe(ezFormBrand);
+        expect(schema.meta()).toHaveProperty(brandProperty, ezFormBrand);
         expect(schema._zod.def.shape).toHaveProperty(
           "name",
           expect.any(z.ZodString),
