@@ -21,5 +21,5 @@ export const dateIn = ({ examples, ...rest }: DateInParams = {}) => {
     .meta({ examples })
     .transform((str) => new Date(str))
     .pipe(z.date())
-    .meta({ [brandProperty]: ezDateInBrand, ...rest });
+    .meta({ ...rest, [brandProperty]: ezDateInBrand });
 };
