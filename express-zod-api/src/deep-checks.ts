@@ -53,8 +53,7 @@ export const hasCycle = (
 export const findRequestTypeDefiningSchema = (subject: IOSchema) =>
   findNestedSchema(subject, {
     condition: (schema) => {
-      const meta = globalRegistry.get(schema);
-      const brand = meta ? meta[brandProperty] : undefined;
+      const { [brandProperty]: brand } = globalRegistry.get(schema) || {};
       return (
         typeof brand === "symbol" &&
         [ezUploadBrand, ezRawBrand, ezFormBrand].includes(brand)
@@ -82,8 +81,7 @@ export const findJsonIncompatible = (
   findNestedSchema(subject, {
     io,
     condition: (zodSchema) => {
-      const meta = globalRegistry.get(zodSchema);
-      const brand = meta ? meta[brandProperty] : undefined;
+      const { [brandProperty]: brand } = globalRegistry.get(zodSchema) || {};
       const { type } = zodSchema._zod.def;
       if (unsupported.includes(type)) return true;
       if (brand === ezBufferBrand) return true;
