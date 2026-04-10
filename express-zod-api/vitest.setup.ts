@@ -1,4 +1,5 @@
 import type { NewPlugin } from "@vitest/pretty-format";
+import "@express-zod-api/zod-plugin";
 import { z } from "zod";
 import { ResultHandlerError } from "./src/errors";
 

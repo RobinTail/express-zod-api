@@ -10,10 +10,6 @@ export default defineConfig({
   deps: {
     neverBundle: ["express-serve-static-core", "qs"],
   },
-  banner: {
-    /** @since tsdown 0.21 it shakes the unused import */
-    dts: `import "@express-zod-api/zod-plugin";`,
-  },
   plugins: [fixDtsPlugin()],
   define: {
     "process.env.TSDOWN_SELF": `"${manifest.name}"`, // used by localsID

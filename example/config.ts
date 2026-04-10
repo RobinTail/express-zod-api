@@ -1,3 +1,4 @@
+import "@express-zod-api/zod-plugin"; // adds .example() method
 import { BuiltinLogger, createConfig } from "express-zod-api";
 import ui from "swagger-ui-express";
 import createHttpError from "http-errors";

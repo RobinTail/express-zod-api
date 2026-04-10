@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { brandProperty } from "./brand";
 
 export const ezDateInBrand = Symbol("DateIn");
 
@@ -20,6 +21,5 @@ export const dateIn = ({ examples, ...rest }: DateInParams = {}) => {
     .meta({ examples })
     .transform((str) => new Date(str))
     .pipe(z.date())
-    .brand(ezDateInBrand as symbol)
-    .meta(rest);
+    .meta({ [brandProperty]: ezDateInBrand, ...rest });
 };

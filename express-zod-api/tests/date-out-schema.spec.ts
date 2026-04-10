@@ -1,14 +1,15 @@
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import { ezDateOutBrand } from "../src/date-out-schema";
 import { ez } from "../src";
-import { getBrand } from "@express-zod-api/zod-plugin";
+import { brandProperty } from "../src/brand";
 
 describe("ez.dateOut()", () => {
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.dateOut();
       expect(schema).toBeInstanceOf(z.ZodPipe);
-      expect(getBrand(schema)).toBe(ezDateOutBrand);
+      const meta = globalRegistry.get(schema);
+      expect(meta ? meta[brandProperty] : undefined).toBe(ezDateOutBrand);
     });
   });
 
