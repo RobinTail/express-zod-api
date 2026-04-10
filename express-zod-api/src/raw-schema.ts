@@ -5,7 +5,7 @@ import { brandProperty } from "./brand";
 export const ezRawBrand = Symbol("Raw");
 
 const base = z.object({ raw: buffer() });
-type Base = z.ZodObject<{ raw: z.ZodType<Buffer> }>;
+type Base = typeof base;
 
 const extended = <S extends z.core.$ZodShape>(extra: S) =>
   base.extend(extra).meta({ [brandProperty]: ezRawBrand });
