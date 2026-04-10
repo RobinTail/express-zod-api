@@ -701,7 +701,7 @@ describe("Documentation helpers", () => {
         expect(trimSummary(summary)).toBe(summary);
       },
     );
-    test("trims the long text in %s", () => {
+    test("trims the long text", () => {
       expect(
         trimSummary(
           "this text is definitely too long for the short description",
