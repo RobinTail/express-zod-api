@@ -92,9 +92,11 @@ export class Endpoint<
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
 
-  /** considered expensive operation, only required for generators */
+  /** considered an expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
-    if (globalRegistry.get(this.#def.outputSchema)?.examples?.length) return; // examples on output schema, or pull up:
+    const { examples: existing } =
+      globalRegistry.get(this.#def.outputSchema) || {};
+    if (Array.isArray(existing) && existing.length) return; // examples on output schema, or pull up:
     if (!isSchema<z.core.$ZodObject>(this.#def.outputSchema, "object")) return;
     const examples = pullResponseExamples(this.#def.outputSchema);
     if (!examples.length) return;

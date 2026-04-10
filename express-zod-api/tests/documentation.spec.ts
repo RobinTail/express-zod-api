@@ -1,3 +1,4 @@
+import "@express-zod-api/zod-plugin";
 import camelize from "camelize-ts";
 import snakify from "snakify-ts";
 import {

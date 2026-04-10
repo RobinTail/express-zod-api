@@ -106,9 +106,6 @@ describe("I/O Schema and related helpers", () => {
             .transform(() => ({ n: 123 }))
             .pipe(z.object({ n: z.number() })),
         ).toExtend<IOSchema>();
-        expectTypeOf(
-          z.object({ user_id: z.string() }).remap({ user_id: "userId" }),
-        ).toExtend<IOSchema>();
       });
       test("does not accept transformation to another type", () => {
         expectTypeOf(

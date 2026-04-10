@@ -1,3 +1,4 @@
+import "@express-zod-api/zod-plugin";
 import ts from "typescript";
 import { globalRegistry, z } from "zod";
 import {

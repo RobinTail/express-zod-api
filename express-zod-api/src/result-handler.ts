@@ -111,7 +111,7 @@ export const defaultResultHandler = new ResultHandler({
       data: output,
     });
     const { examples } = globalRegistry.get(output) || {}; // pulling down:
-    if (examples?.length) {
+    if (Array.isArray(examples) && examples.length) {
       globalRegistry.add(responseSchema, {
         examples: examples.map((data) => ({
           status: "success" as const,
@@ -160,11 +160,11 @@ export const arrayResultHandler = new ResultHandler({
       output.shape.items instanceof z.ZodArray
         ? output.shape.items
         : z.array(z.any());
-    if (globalRegistry.get(responseSchema)?.examples?.length)
-      return responseSchema; // has examples on the items, or pull down:
-    const examples = globalRegistry
-      .get(output)
-      ?.examples?.filter(
+    const { examples: existing } = globalRegistry.get(responseSchema) || {};
+    if (Array.isArray(existing) && existing.length) return responseSchema; // has examples on the items, or pull down:
+    const { examples: pulled } = globalRegistry.get(output) || {};
+    const examples = (Array.isArray(pulled) ? pulled : [])
+      .filter(
         (example): example is { items: unknown[] } =>
           isObject(example) &&
           "items" in example &&
