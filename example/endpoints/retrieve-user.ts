@@ -19,7 +19,7 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
   .addMiddleware(methodProviderMiddleware)
   .build({
     tag: "users",
-    shortDescription: "Retrieves the user.",
+    summary: "Retrieves the user.",
     description: "Example user retrieval endpoint.",
     input: z.object({
       id: z

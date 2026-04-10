@@ -78,7 +78,6 @@ export type IsHeader = (
 
 export type BrandHandling = Record<string | symbol, Depicter>;
 
-const shortDescriptionLimit = 50;
 const isoDateDocumentationUrl =
   "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
 
@@ -665,10 +664,11 @@ export const depictTags = (
     return agg.concat(entry);
   }, []);
 
-export const ensureShortDescription = (description?: string) =>
-  !description || description.length <= shortDescriptionLimit
-    ? description
-    : description.slice(0, shortDescriptionLimit - 1) + "…";
+/** @desc Ensures the summary string does not exceed the limit */
+export const trimSummary = (summary?: string, limit = 50) =>
+  !summary || summary.length <= limit
+    ? summary
+    : summary.slice(0, limit - 1) + "…";
 
 export const nonEmpty = <T>(subject: T[] | ReadonlyArray<T>) =>
   subject.length ? subject.slice() : undefined;

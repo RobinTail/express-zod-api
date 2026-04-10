@@ -22,7 +22,7 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictTags,
-  ensureShortDescription,
+  trimSummary,
   reformatParamsInPath,
   nonEmpty,
   depictRequest,
@@ -45,6 +45,19 @@ type Descriptor = (
   },
 ) => string;
 
+type Summarizer = (params: {
+  summary?: string;
+  description?: string;
+  trim: typeof trimSummary;
+}) => string | undefined;
+
+/** @desc Uses description as a fallback */
+const defaultSummarizer: Summarizer = ({
+  description,
+  summary = description,
+  trim,
+}) => trim(summary);
+
 interface DocumentationParams {
   title: string;
   version: string;
@@ -58,10 +71,11 @@ interface DocumentationParams {
    * */
   descriptions?: Partial<Record<Component, Descriptor>>;
   /**
-   * @desc Generates the summary field for each Endpoint from either shortDescription or description.
-   * @default true
-   */
-  hasSummary?: boolean;
+   * @desc The function that ensures the maximum length for summary fields. Can optionally make them from descriptions.
+   * @see defaultSummarizer
+   * @see trimSummary
+   * */
+  summarizer?: Summarizer;
   /**
    * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
    * @default true
@@ -161,8 +175,8 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     tags,
     isHeader,
-    hasSummary = true,
     hasHeadMethod = true,
+    summarizer = defaultSummarizer,
     composition = "inline",
   }: DocumentationParams) {
     super();
@@ -178,10 +192,7 @@ export class Documentation extends OpenApiBuilder {
         brandHandling,
         makeRef: this.#makeRef.bind(this),
       };
-      const { description, shortDescription, scopes, inputSchema } = endpoint;
-      const summary = hasSummary
-        ? ensureShortDescription(shortDescription || description)
-        : undefined;
+      const { description, summary, scopes, inputSchema } = endpoint;
       const inputSources = getInputSources(method, config.inputSources);
       const operationId = this.#ensureUniqOperationId(
         path,
@@ -255,7 +266,7 @@ export class Documentation extends OpenApiBuilder {
 
       const operation: OperationObject = {
         operationId,
-        summary,
+        summary: summarizer({ summary, description, trim: trimSummary }),
         description,
         deprecated: endpoint.isDeprecated || undefined,
         tags: nonEmpty(endpoint.tags),

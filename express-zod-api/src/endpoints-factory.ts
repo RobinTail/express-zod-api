@@ -44,10 +44,10 @@ interface BuildProps<
   output: OUT;
   /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (ctx) and a logger */
   handler: Handler<z.output<FinalInputSchema<MIN, IN>>, z.input<OUT>, CTX>;
-  /** @desc The operation description for the generated Documentation */
+  /** @desc The operation description for the generated Documentation (may use Markdown) */
   description?: string;
-  /** @desc The operation summary for the generated Documentation (50 symbols max) */
-  shortDescription?: string;
+  /** @desc The operation summary for the generated Documentation (short plain string) */
+  summary?: string;
   /** @desc The operation ID for the generated Documentation (must be unique) */
   operationId?: string | ((method: ClientMethod) => string);
   /**

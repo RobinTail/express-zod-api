@@ -14,6 +14,7 @@ interface Queries {
   methodLikeRouteBehavior: NamedProp;
   hasSummaryFromDescription: NamedProp;
   noContent: NamedProp;
+  shortDescription: NamedProp;
 }
 
 type Listener = keyof Queries;
@@ -35,6 +36,10 @@ const queries: Record<Listener, string> = {
     `${NT.NewExpression}[callee.name="Integration"] > ` +
     `${NT.ObjectExpression} > ` +
     `${NT.Property}[key.name="noContent"]`,
+  shortDescription:
+    `${NT.CallExpression}[callee.property.name=/build|buildVoid/] > ` +
+    `${NT.ObjectExpression} > ` +
+    `${NT.Property}[key.name="shortDescription"]`,
 };
 
 const listen = <
@@ -115,16 +120,29 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         });
       },
       hasSummaryFromDescription: (node) => {
-        const newKey = "hasSummary";
+        const value = node.value;
+        const isDisabled = value.type === NT.Literal && value.value === false;
         ctx.report({
           node,
-          messageId: "change",
+          messageId: isDisabled ? "change" : "remove",
           data: {
             subject: "property",
-            from: "hasSummaryFromDescription",
-            to: newKey,
+            ...(isDisabled && {
+              from: "hasSummaryFromDescription",
+              to: "summarizer",
+            }),
           },
-          fix: (fixer) => fixer.replaceText(node.key, newKey),
+          fix: (fixer) => {
+            if (isDisabled) {
+              return fixer.replaceText(
+                node,
+                "summarizer: ({ summary, trim }) => trim(summary)",
+              );
+            }
+            const after = ctx.sourceCode.getTokenAfter(node);
+            const end = node.range[1] + (after?.value === "," ? 1 : 0);
+            return fixer.removeRange([node.range[0], end]);
+          },
         });
       },
       noContent: (node) => {
@@ -133,6 +151,15 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           node,
           messageId: "change",
           data: { subject: "property", from: "noContent", to: newKey },
+          fix: (fixer) => fixer.replaceText(node.key, newKey),
+        });
+      },
+      shortDescription: (node) => {
+        const newKey = "summary";
+        ctx.report({
+          node,
+          messageId: "change",
+          data: { subject: "property", from: "shortDescription", to: newKey },
           fix: (fixer) => fixer.replaceText(node.key, newKey),
         });
       },

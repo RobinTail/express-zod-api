@@ -1162,7 +1162,7 @@ in the generated documentation of your API. Consider the following example:
 import { defaultEndpointsFactory } from "express-zod-api";
 
 const exampleEndpoint = defaultEndpointsFactory.build({
-  shortDescription: "Retrieves the user.", // <—— this becomes the summary line
+  summary: "Retrieves the user.",
   description: "The detailed explanaition on what this endpoint does.",
   input: z.object({
     id: z
