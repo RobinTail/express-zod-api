@@ -74,52 +74,35 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
   },
   create: (ctx) =>
     listen({
-      wrongMethodBehavior: (node) => {
-        const value = node.value;
-        const newKey = "hintAllowedMethods";
-        let newValue: string;
-        if (value.type === NT.Literal && typeof value.value === "number")
-          newValue = value.value === 405 ? "true" : "false";
-        else if (value.type === NT.Identifier && value.name === "undefined")
-          newValue = "undefined";
-        else return;
-        ctx.report({
+      wrongMethodBehavior: (node) =>
+        renameProp({
+          ctx,
           node,
-          messageId: "change",
-          data: {
-            subject: "property",
-            from: getPropName(node),
-            to: newKey,
+          to: "hintAllowedMethods",
+          assign: (value) => {
+            if (value.type === NT.Literal && typeof value.value === "number")
+              return value.value === 405 ? "true" : "false";
+            else if (value.type === NT.Identifier && value.name === "undefined")
+              return "undefined";
+            else return null;
           },
-          fix: (fixer) => [
-            fixer.replaceText(node.key, newKey),
-            fixer.replaceText(value, newValue),
-          ],
-        });
-      },
-      methodLikeRouteBehavior: (node) => {
-        const value = node.value;
-        const newKey = "recognizeMethodDependentRoutes";
-        let newValue: string;
-        if (value.type === NT.Identifier && value.name === "undefined")
-          newValue = "undefined";
-        else if (value.type === NT.Literal && typeof value.value === "string")
-          newValue = value.value === "method" ? "true" : "false";
-        else return;
-        ctx.report({
+        }),
+      methodLikeRouteBehavior: (node) =>
+        renameProp({
+          ctx,
           node,
-          messageId: "change",
-          data: {
-            subject: "property",
-            from: getPropName(node),
-            to: newKey,
+          to: "recognizeMethodDependentRoutes",
+          assign: (value) => {
+            if (value.type === NT.Identifier && value.name === "undefined")
+              return "undefined";
+            else if (
+              value.type === NT.Literal &&
+              typeof value.value === "string"
+            )
+              return value.value === "method" ? "true" : "false";
+            else return null;
           },
-          fix: (fixer) => [
-            fixer.replaceText(node.key, newKey),
-            fixer.replaceText(value, newValue),
-          ],
-        });
-      },
+        }),
       hasSummaryFromDescription: (node) => {
         const value = node.value;
         const isDisabled = value.type === NT.Literal && value.value === false;

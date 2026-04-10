@@ -14,14 +14,24 @@ export const renameProp = ({
   ctx,
   node,
   to,
+  assign,
 }: {
   ctx: TSESLint.RuleContext<"change", unknown[]>;
   node: NamedProp;
   to: string;
+  assign?: (value: typeof node.value) => string | null;
 }) =>
   ctx.report({
     node,
     messageId: "change",
     data: { subject: "property", from: getPropName(node), to },
-    fix: (fixer) => fixer.replaceText(node.key, to),
+    fix: (fixer) => {
+      const changes = [fixer.replaceText(node.key, to)];
+      if (assign) {
+        const newValue = assign(node.value);
+        if (!newValue) return null; // unclear fix
+        changes.push(fixer.replaceText(node.value, newValue));
+      }
+      return changes;
+    },
   });

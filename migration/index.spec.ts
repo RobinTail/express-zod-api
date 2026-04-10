@@ -77,6 +77,20 @@ describe("Migration", async () => {
         ],
       },
       {
+        name: "wrongMethodBehavior is wrong",
+        code: `createConfig({ wrongMethodBehavior: "wrong" });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "wrongMethodBehavior",
+              to: "hintAllowedMethods",
+            },
+          },
+        ],
+      },
+      {
         name: "methodLikeRouteBehavior=method",
         code: `createConfig({ methodLikeRouteBehavior: "method" });`,
         output: `createConfig({ recognizeMethodDependentRoutes: true });`,
@@ -110,6 +124,20 @@ describe("Migration", async () => {
         name: "methodLikeRouteBehavior=undefined",
         code: `createConfig({ methodLikeRouteBehavior: undefined });`,
         output: `createConfig({ recognizeMethodDependentRoutes: undefined });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "methodLikeRouteBehavior",
+              to: "recognizeMethodDependentRoutes",
+            },
+          },
+        ],
+      },
+      {
+        name: "methodLikeRouteBehavior is wrong",
+        code: `createConfig({ methodLikeRouteBehavior: 123 });`,
         errors: [
           {
             messageId: "change",
