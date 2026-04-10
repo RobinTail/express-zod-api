@@ -15,7 +15,7 @@
   - If used with `false` value, replace it with `summarizer: ({ summary, trim }) => trim(summary)` for same behavior;
 - Featuring `summarizer` option to customize the summary of the Endpoint in the genedated Documentation:
   - The function receives `summary`, `description` and the default `trim()` function as arguments;
-  - The default summarizer uses `description` as a fallback for missing summary;
+  - The default summarizer uses `description` as a fallback for missing `summary`;
   - The `trim()` function accepts a string and the limit (default: 50, best practice) that you can now customize;
 - Breaking change to the `Integration` constructor argument (object):
   - property `noContent` renamed to `noBodySchema`;

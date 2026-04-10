@@ -51,6 +51,13 @@ type Summarizer = (params: {
   trim: typeof trimSummary;
 }) => string | undefined;
 
+/** @desc Uses description as a fallback */
+const defaultSummarizer: Summarizer = ({
+  description,
+  summary = description,
+  trim,
+}) => trim(summary);
+
 interface DocumentationParams {
   title: string;
   version: string;
@@ -65,7 +72,7 @@ interface DocumentationParams {
   descriptions?: Partial<Record<Component, Descriptor>>;
   /**
    * @desc The function that ensures the maximum length for summary fields. Can optionally make them from descriptions.
-   * @default 50 symbols max (best practice), uses description as a fallback, adds "…" for longer trimmed strings.
+   * @see defaultSummarizer
    * @see trimSummary
    * */
   summarizer?: Summarizer;
@@ -169,8 +176,7 @@ export class Documentation extends OpenApiBuilder {
     tags,
     isHeader,
     hasHeadMethod = true,
-    summarizer = ({ description, summary = description, trim }) =>
-      trim(summary),
+    summarizer = defaultSummarizer,
     composition = "inline",
   }: DocumentationParams) {
     super();
