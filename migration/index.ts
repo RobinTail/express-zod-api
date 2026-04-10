@@ -120,11 +120,25 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         });
       },
       hasSummaryFromDescription: (node) => {
+        const value = node.value;
+        const isDisabled = value.type === NT.Literal && value.value === false;
         ctx.report({
           node,
-          messageId: "remove",
-          data: { subject: "property" },
+          messageId: isDisabled ? "change" : "remove",
+          data: {
+            subject: "property",
+            ...(isDisabled && {
+              from: "hasSummaryFromDescription",
+              to: "summarizer",
+            }),
+          },
           fix: (fixer) => {
+            if (isDisabled) {
+              return fixer.replaceText(
+                node,
+                "summarizer: ({ summary, trim }) => trim(summary)",
+              );
+            }
             const after = ctx.sourceCode.getTokenAfter(node);
             const end = node.range[1] + (after?.value === "," ? 1 : 0);
             return fixer.removeRange([node.range[0], end]);

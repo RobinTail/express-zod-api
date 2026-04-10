@@ -11,7 +11,8 @@
 - Breaking change to the `EndpointsFactory::build()` argument (object):
   - property `shortDescription` renamed to `summary`;
 - Breaking change to the `Documentation` constructor argument (object):
-  - property `hasSummaryFromDescription` removed;
+  - property `hasSummaryFromDescription` (boolean) replaced with `summarizer` (function);
+  - If used with `false` value, replace it with `summarizer: ({ summary, trim }) => trim(summary)` for same behavior;
 - Breaking change to the `Integration` constructor argument (object):
   - property `noContent` renamed to `noBodySchema`;
 - Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
@@ -35,6 +36,7 @@
 ```diff
   new Documentation({
 -   hasSummaryFromDescription: false,
++   summarizer: ({ summary, trim }) => trim(summary),
   });
 ```
 

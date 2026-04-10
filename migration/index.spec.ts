@@ -25,6 +25,7 @@ describe("Migration", async () => {
     valid: [
       `createConfig({ hintAllowedMethods: false });`,
       `createConfig({ recognizeMethodDependentRoutes: true });`,
+      `new Documentation({ summarizer: ({summary, trim}) => trim(summary) });`,
       `new Integration({ noBodySchema: z.undefined() });`,
       `factory.build({ summary: "hello" });`,
       `factory.buildVoid({ summary: "hello" });`,
@@ -121,7 +122,7 @@ describe("Migration", async () => {
         ],
       },
       {
-        name: "hasSummaryFromDescription first",
+        name: "hasSummaryFromDescription=true (first)",
         code: `new Documentation({ hasSummaryFromDescription: true, other: 1 });`,
         output: `new Documentation({  other: 1 });`,
         errors: [
@@ -132,13 +133,28 @@ describe("Migration", async () => {
         ],
       },
       {
-        name: "hasSummaryFromDescription last",
-        code: `new Documentation({ other: 1, hasSummaryFromDescription: false });`,
+        name: "hasSummaryFromDescription=undefined (last)",
+        code: `new Documentation({ other: 1, hasSummaryFromDescription: undefined });`,
         output: `new Documentation({ other: 1,  });`,
         errors: [
           {
             messageId: "remove",
             data: { subject: "property" },
+          },
+        ],
+      },
+      {
+        name: "hasSummaryFromDescription=false",
+        code: `new Documentation({ hasSummaryFromDescription: false });`,
+        output: `new Documentation({ summarizer: ({ summary, trim }) => trim(summary) });`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "property",
+              from: "hasSummaryFromDescription",
+              to: "summarizer",
+            },
           },
         ],
       },
