@@ -3,7 +3,7 @@ import {
   ESLintUtils,
   type TSESLint,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
-import { queryNamedProp, type NamedProp } from "./helpers.ts";
+import { queryNamedProp, type NamedProp, getPropName } from "./helpers.ts";
 
 interface Queries {
   wrongMethodBehavior: NamedProp;
@@ -83,7 +83,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           messageId: "change",
           data: {
             subject: "property",
-            from: "wrongMethodBehavior",
+            from: getPropName(node),
             to: newKey,
           },
           fix: (fixer) => [
@@ -106,7 +106,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           messageId: "change",
           data: {
             subject: "property",
-            from: "methodLikeRouteBehavior",
+            from: getPropName(node),
             to: newKey,
           },
           fix: (fixer) => [
@@ -124,7 +124,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           data: {
             subject: "property",
             ...(isDisabled && {
-              from: "hasSummaryFromDescription",
+              from: getPropName(node),
               to: "summarizer",
             }),
           },
@@ -146,7 +146,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         ctx.report({
           node,
           messageId: "change",
-          data: { subject: "property", from: "noContent", to: newKey },
+          data: { subject: "property", from: getPropName(node), to: newKey },
           fix: (fixer) => fixer.replaceText(node.key, newKey),
         });
       },
@@ -155,7 +155,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         ctx.report({
           node,
           messageId: "change",
-          data: { subject: "property", from: "shortDescription", to: newKey },
+          data: { subject: "property", from: getPropName(node), to: newKey },
           fix: (fixer) => fixer.replaceText(node.key, newKey),
         });
       },
