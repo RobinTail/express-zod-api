@@ -86,6 +86,7 @@
     }
   },
   "devDependencies": {
+    "@express-zod-api/zod-plugin": "workspace:^",
     "@types/compression": "catalog:dev",
     "@types/cors": "^2.8.19",
     "@types/depd": "^1.1.37",
