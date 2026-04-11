@@ -1,4 +1,4 @@
-# Zod Plugin from Express Zod API
+# Zod Plugin for Express Zod API
 
 ## Overview
 
