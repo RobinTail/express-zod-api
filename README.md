@@ -1100,25 +1100,21 @@ expect(output).toEqual({ collectedContext: ["prev"], testLength: 9 });
 
 ## Zod Plugin
 
-The [**@express-zod-api/zod-plugin**](https://www.npmjs.com/package/@express-zod-api/zod-plugin) is an optional package that extends Zod with convenience methods:
+The [@express-zod-api/zod-plugin](https://www.npmjs.com/package/@express-zod-api/zod-plugin) is an optional package
+that extends Zod with convenience methods:
 
-```shell
-pnpm add @express-zod-api/zod-plugin
-```
+- `.brand(name)` — enhanced with a shorthand for `.meta({ "x-brand": name })`;
+- `.example(value)` — shorthand for `.meta({ examples: [value] })`;
+- `.deprecated()` — shorthand for `.meta({ deprecated: true })`;
+- `.label(text)` — shorthand for `.meta({ default: text })` on `ZodDefault`;
+- `.remap(mapping)` — for renaming `ZodObject` shape properties;
 
-Import it once (preferably in your routing file):
+To benefit from these methods, install `@express-zod-api/zod-plugin` and import it once, preferrably at the top of a
+file declaring your `Routing`.
 
 ```ts
-import "@express-zod-api/zod-plugin";
+import "@express-zod-api/zod-plugin"; // in your routing.ts file
 ```
-
-This enables:
-
-- `.example(value)` — shorthand for `.meta({ examples: [value] })`
-- `.deprecated()` — marks schema as deprecated in documentation
-- `.brand(name)` — creates branded types for schema identification
-- `.label(text)` — shorthand for `.meta({ default: text })` on ZodDefault
-- `.remap(mapping)` — renames object properties in transformations
 
 ## End-to-End Type Safety
 
