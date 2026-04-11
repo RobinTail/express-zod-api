@@ -1169,11 +1169,7 @@ const yamlString = new Documentation({
 ```
 
 You can add descriptions and examples to your endpoints, their I/O schemas, and their properties. They will be included
-in the generated documentation of your API.
-
-> **Note:** Setting examples via `.example()` requires [Zod Plugin](#zod-plugin). You can also use `.meta({ examples: [...] })` directly.
-
-Consider the following example:
+in the generated documentation of your API. Consider the following example:
 
 ```ts
 import { defaultEndpointsFactory } from "express-zod-api";
@@ -1183,8 +1179,8 @@ const exampleEndpoint = defaultEndpointsFactory.build({
   description: "The detailed explanaition on what this endpoint does.",
   input: z.object({
     id: z
-      .string()
-      .meta({ examples: ["123"] }) // input examples should be set before transformations
+      .string() // input examples should be set before transformations
+      .example("123") // requires Zod Plugin, or .meta({ examples: ["123"] })
       .transform(Number)
       .describe("the ID of the user"),
   }),
@@ -1192,7 +1188,8 @@ const exampleEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
-You can also use `schema.meta({ id: "UniqueName" })` for custom schema naming.
+Setting examples via `.example()` requires [Zod Plugin](#zod-plugin). You can also use `.meta({ examples: [] })` and
+`.meta({ id: "UniqueName" })` for custom schema naming.
 _See the complete example of the generated documentation
 [here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.documentation.yaml)_
 
