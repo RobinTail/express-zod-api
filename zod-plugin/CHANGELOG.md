@@ -10,6 +10,11 @@
 
 ## Version 4
 
+### v4.1.0
+
+- Added `x-brand` type to the augmentation of Zod's `GlobalMeta` interface:
+  - The property is used to store the brand of the schema when using the `ZodType::brand()` method.
+
 ### v4.0.1
 
 - Removed debug-level comments from the declaration files in the distribution.

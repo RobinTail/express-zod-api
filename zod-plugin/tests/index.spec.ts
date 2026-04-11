@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 import * as entrypoint from "../src";
 
 describe("Entrypoint", () => {
@@ -13,6 +13,18 @@ describe("Entrypoint", () => {
       .toHaveProperty("label")
       .toEqualTypeOf<(value: string) => z.ZodDefault<z.ZodString>>();
     expectTypeOf<z.ZodObject>().toHaveProperty("remap");
+    expectTypeOf<ReturnType<typeof globalRegistry.get>>()
+      .exclude(undefined)
+      .toHaveProperty("default")
+      .toEqualTypeOf<unknown | undefined>();
+    expectTypeOf<ReturnType<typeof globalRegistry.get>>()
+      .exclude(undefined)
+      .toHaveProperty("examples")
+      .toEqualTypeOf<unknown[] | undefined>();
+    expectTypeOf<ReturnType<typeof globalRegistry.get>>()
+      .exclude(undefined)
+      .toHaveProperty("x-brand")
+      .toEqualTypeOf<symbol | string | number | undefined>();
   });
 
   test("Exports", () => {
