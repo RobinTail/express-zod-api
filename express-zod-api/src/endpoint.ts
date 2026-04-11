@@ -21,7 +21,7 @@ import type { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
-import { getBrand } from "./brand";
+import { getBrand, getExamples } from "./metadata.ts";
 import type { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import type { ContentType } from "./content-type";
@@ -94,9 +94,7 @@ export class Endpoint<
 
   /** considered an expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
-    const { examples: existing } =
-      globalRegistry.get(this.#def.outputSchema) || {};
-    if (Array.isArray(existing) && existing.length) return; // examples on output schema, or pull up:
+    if (getExamples(this.#def.outputSchema).length) return; // examples on output schema, or pull up:
     if (!isSchema<z.core.$ZodObject>(this.#def.outputSchema, "object")) return;
     const examples = pullResponseExamples(this.#def.outputSchema);
     if (!examples.length) return;

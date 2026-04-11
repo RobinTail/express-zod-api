@@ -1,5 +1,5 @@
 import type { EmptyObject, FlatObject } from "./common-helpers";
-import { getBrand } from "./brand";
+import { getBrand } from "./metadata.ts";
 import type { z } from "zod";
 
 export type FirstPartyKind = z.core.$ZodTypeDef["type"];

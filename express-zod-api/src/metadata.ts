@@ -13,3 +13,10 @@ export const getBrand = (subject: z.core.$ZodType) => {
     return brand;
   return undefined;
 };
+
+/** @desc Returns examples from the schema metadata always as an array */
+export const getExamples = (subject: z.core.$ZodType): unknown[] => {
+  const { examples } = globalRegistry.get(subject) || {};
+  if (Array.isArray(examples)) return examples;
+  return [];
+};

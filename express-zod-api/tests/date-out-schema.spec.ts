@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ezDateOutBrand } from "../src/date-out-schema";
 import { ez } from "../src";
-import { getBrand } from "../src/brand";
+import { getBrand } from "../src/metadata.ts";
 
 describe("ez.dateOut()", () => {
   describe("creation", () => {

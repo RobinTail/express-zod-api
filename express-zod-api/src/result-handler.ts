@@ -17,6 +17,7 @@ import {
   logServerError,
   normalize,
 } from "./result-helpers";
+import { getExamples } from "./metadata.ts";
 
 type Handler<RES = unknown> = (
   params: DiscriminatedResult & {
@@ -160,10 +161,8 @@ export const arrayResultHandler = new ResultHandler({
       output.shape.items instanceof z.ZodArray
         ? output.shape.items
         : z.array(z.any());
-    const { examples: existing } = globalRegistry.get(responseSchema) || {};
-    if (Array.isArray(existing) && existing.length) return responseSchema; // has examples on the items, or pull down:
-    const { examples: pulled } = globalRegistry.get(output) || {};
-    const examples = (Array.isArray(pulled) ? pulled : [])
+    if (getExamples(responseSchema).length) return responseSchema; // has examples on the items, or pull down:
+    const examples = getExamples(output)
       .filter(
         (example): example is { items: unknown[] } =>
           isObject(example) &&

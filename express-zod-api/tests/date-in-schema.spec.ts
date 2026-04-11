@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ezDateInBrand } from "../src/date-in-schema";
 import { ez } from "../src";
-import { getBrand } from "../src/brand";
+import { getBrand } from "../src/metadata.ts";
 
 describe("ez.dateIn()", () => {
   describe("creation", () => {

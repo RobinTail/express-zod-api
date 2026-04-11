@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ez } from "../src";
 import { ezFormBrand } from "../src/form-schema";
-import { getBrand } from "../src/brand";
+import { getBrand } from "../src/metadata.ts";
 
 describe("ez.form()", () => {
   describe("creation", () => {

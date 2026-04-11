@@ -1,6 +1,6 @@
 import type { UploadedFile } from "express-fileupload";
 import { z } from "zod";
-import { brandProperty } from "./brand";
+import { brandProperty } from "./metadata.ts";
 
 export const ezUploadBrand = Symbol("Upload");
 
