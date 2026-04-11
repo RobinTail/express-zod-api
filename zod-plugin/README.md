@@ -24,6 +24,7 @@ This module extends Zod functionality when it's imported:
 
 ```ts
 import { z } from "zod";
+import "@express-zod-api/zod-plugin";
 
 const schema = z.string().example("test").example("another").brand("custom");
 
