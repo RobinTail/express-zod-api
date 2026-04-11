@@ -1,17 +1,14 @@
 import type { UploadedFile } from "express-fileupload";
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import { ez } from "../src";
-import { brandProperty } from "../src/brand";
 import { findNestedSchema, hasCycle } from "../src/deep-checks";
+import { getBrand } from "../src/brand";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("Checks", () => {
   describe("findNestedSchema()", () => {
-    const condition = (subject: z.core.$ZodType) => {
-      const meta = globalRegistry.get(subject);
-      const brand = meta ? meta[brandProperty] : undefined;
-      return brand === ezUploadBrand;
-    };
+    const condition = (subject: z.core.$ZodType) =>
+      getBrand(subject) === ezUploadBrand;
 
     test("should return true for given argument satisfying condition", () => {
       expect(
