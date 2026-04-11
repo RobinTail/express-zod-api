@@ -17,7 +17,7 @@ import {
   logServerError,
   normalize,
 } from "./result-helpers";
-import { getExamples } from "./metadata.ts";
+import { getExamples } from "./metadata";
 
 type Handler<RES = unknown> = (
   params: DiscriminatedResult & {

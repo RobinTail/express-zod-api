@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ez } from "../src";
-import { getBrand } from "../src/metadata.ts";
+import { getBrand } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("ez.upload()", () => {

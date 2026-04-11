@@ -6,7 +6,7 @@ import { ezDateOutBrand } from "./date-out-schema";
 import { DeepCheckError } from "./errors";
 import { ezFormBrand } from "./form-schema";
 import type { IOSchema } from "./io-schema";
-import { getBrand } from "./metadata.ts";
+import { getBrand } from "./metadata";
 import type { FirstPartyKind } from "./schema-walker";
 import { ezUploadBrand } from "./upload-schema";
 import { ezRawBrand } from "./raw-schema";

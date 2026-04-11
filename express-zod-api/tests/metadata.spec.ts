@@ -1,5 +1,5 @@
 import { globalRegistry, z } from "zod";
-import { brandProperty, getBrand, getExamples } from "../src/metadata.ts";
+import { brandProperty, getBrand, getExamples } from "../src/metadata";
 
 describe("Metadata helpers", () => {
   describe("getBrand()", () => {

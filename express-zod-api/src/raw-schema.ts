@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { buffer } from "./buffer-schema";
-import { brandProperty } from "./metadata.ts";
+import { brandProperty } from "./metadata";
 
 export const ezRawBrand = Symbol("Raw");
 

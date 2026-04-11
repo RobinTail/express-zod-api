@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { brandProperty } from "./metadata.ts";
+import { brandProperty } from "./metadata";
 
 export const ezDateOutBrand = Symbol("DateOut");
 

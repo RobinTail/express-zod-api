@@ -21,7 +21,7 @@ import type { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
-import { getBrand, getExamples } from "./metadata.ts";
+import { getBrand, getExamples } from "./metadata";
 import type { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import type { ContentType } from "./content-type";
