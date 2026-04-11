@@ -1,7 +1,7 @@
 import type { Request } from "express";
 import createHttpError, { HttpError, isHttpError } from "http-errors";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import type { NormalizedResponse, ResponseVariant } from "./api-response";
 import {
   combinations,
@@ -12,6 +12,7 @@ import {
 import { InputValidationError, ResultHandlerError } from "./errors";
 import type { ActualLogger } from "./logger-helpers";
 import type { LazyResult, Result } from "./result-handler";
+import { getExamples } from "./metadata.ts";
 
 export type ResultSchema<R extends Result> =
   R extends Result<infer S> ? S : never;
@@ -90,13 +91,11 @@ export const getPublicErrorMessage = (error: HttpError): string =>
 /** @see pullRequestExamples */
 export const pullResponseExamples = <T extends z.core.$ZodObject>(subject: T) =>
   Object.entries(subject._zod.def.shape).reduce<FlatObject[]>(
-    (acc, [key, schema]) => {
-      const { examples } = globalRegistry.get(schema) || {};
-      return combinations(
+    (acc, [key, schema]) =>
+      combinations(
         acc,
-        (Array.isArray(examples) ? examples : []).map(R.objOf(key)),
+        getExamples(schema).map(R.objOf(key)),
         ([left, right]) => ({ ...left, ...right }),
-      );
-    },
+      ),
     [],
   );
