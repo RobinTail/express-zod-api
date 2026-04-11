@@ -21,7 +21,7 @@ import type { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
 import type { ActualLogger } from "./logger-helpers";
 import type { LogicalContainer } from "./logical-container";
-import { brandProperty } from "./brand";
+import { getBrand } from "./brand";
 import type { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
 import type { ContentType } from "./content-type";
@@ -169,7 +169,7 @@ export class Endpoint<
   public override get requestType() {
     const found = findRequestTypeDefiningSchema(this.#def.inputSchema);
     if (found) {
-      const { [brandProperty]: brand } = globalRegistry.get(found) || {};
+      const brand = getBrand(found);
       if (brand === ezUploadBrand) return "upload";
       if (brand === ezRawBrand) return "raw";
       if (brand === ezFormBrand) return "form";

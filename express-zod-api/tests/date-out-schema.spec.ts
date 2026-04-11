@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { ezDateOutBrand } from "../src/date-out-schema";
 import { ez } from "../src";
-import { brandProperty } from "../src/brand";
+import { getBrand } from "../src/brand";
 
 describe("ez.dateOut()", () => {
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.dateOut();
       expect(schema).toBeInstanceOf(z.ZodPipe);
-      expect(schema.meta()).toHaveProperty(brandProperty, ezDateOutBrand);
+      expect(getBrand(schema)).toBe(ezDateOutBrand);
     });
   });
 

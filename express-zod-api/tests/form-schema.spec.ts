@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ez } from "../src";
-import { brandProperty } from "../src/brand";
+import { getBrand } from "../src/brand";
 import { ezFormBrand } from "../src/form-schema";
 
 describe("ez.form()", () => {
@@ -10,7 +10,7 @@ describe("ez.form()", () => {
       (base) => {
         const schema = ez.form(base);
         expect(schema).toBeInstanceOf(z.ZodObject);
-        expect(schema.meta()).toHaveProperty(brandProperty, ezFormBrand);
+        expect(getBrand(schema)).toBe(ezFormBrand);
         expect(schema._zod.def.shape).toHaveProperty(
           "name",
           expect.any(z.ZodString),

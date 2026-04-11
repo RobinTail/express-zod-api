@@ -15,7 +15,7 @@ import {
   isSchemaObject,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { globalRegistry, z } from "zod";
+import { z } from "zod";
 import type { NormalizedResponse, ResponseVariant } from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
 import {
@@ -38,7 +38,7 @@ import { DocumentationError } from "./errors";
 import type { IOSchema } from "./io-schema";
 import { flattenIO } from "./json-schema-helpers";
 import type { Alternatives } from "./logical-container";
-import { brandProperty } from "./brand";
+import { getBrand } from "./brand";
 import type { ClientMethod } from "./method";
 import type { ProprietaryBrand } from "./proprietary-schemas";
 import { ezRawBrand } from "./raw-schema";
@@ -403,10 +403,7 @@ const depict = (
       unrepresentable: "any",
       io: ctx.isResponse ? "output" : "input",
       override: (zodCtx) => {
-        const meta = globalRegistry.get(zodCtx.zodSchema);
-        const brand = meta
-          ? (meta[brandProperty] as string | number | symbol | undefined)
-          : undefined;
+        const brand = getBrand(zodCtx.zodSchema);
         const depicter =
           rules[
             brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type

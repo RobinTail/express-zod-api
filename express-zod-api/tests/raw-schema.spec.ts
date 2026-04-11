@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ez } from "../src";
-import { brandProperty } from "../src/brand";
+import { getBrand } from "../src/brand";
 import { ezRawBrand } from "../src/raw-schema";
 
 describe("ez.raw()", () => {
@@ -8,7 +8,7 @@ describe("ez.raw()", () => {
     test("should be an instance of branded object", () => {
       const schema = ez.raw();
       expect(schema).toBeInstanceOf(z.ZodObject);
-      expect(schema.meta()).toHaveProperty(brandProperty, ezRawBrand);
+      expect(getBrand(schema)).toBe(ezRawBrand);
     });
   });
 

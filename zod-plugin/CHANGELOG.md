@@ -5,6 +5,8 @@
 ### v5.0.0
 
 - Supported Node.js versions: `^22.19.0 || ^24.0.0`;
+- `getBrand()` removed:
+  - use `schema.meta()?.["x-brand"]` instead.
 
 ## Version 4
 

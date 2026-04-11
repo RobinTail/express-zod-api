@@ -1,6 +1,5 @@
 import type { EmptyObject, FlatObject } from "./common-helpers";
-import { globalRegistry } from "zod";
-import { brandProperty } from "./brand";
+import { getBrand } from "./brand";
 import type { z } from "zod";
 
 export type FirstPartyKind = z.core.$ZodTypeDef["type"];
@@ -39,10 +38,7 @@ export const walkSchema = <
     onMissing: SchemaHandler<U, Context, "last">;
   },
 ): U => {
-  const meta = globalRegistry.get(schema);
-  const brand = meta
-    ? (meta[brandProperty] as string | number | symbol | undefined)
-    : undefined;
+  const brand = getBrand(schema);
   const handler =
     brand && brand in rules
       ? rules[brand as keyof typeof rules]
