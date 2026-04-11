@@ -1109,7 +1109,7 @@ that extends Zod with convenience methods:
 - `.label(text)` — shorthand for `.meta({ default: text })` on `ZodDefault`;
 - `.remap(mapping)` — for renaming `ZodObject` shape properties;
 
-To benefit from these methods, install `@express-zod-api/zod-plugin` and import it once, preferrably at the top of a
+To benefit from these methods, install `@express-zod-api/zod-plugin` and import it once, preferably at the top of a
 file declaring your `Routing`.
 
 ```ts
