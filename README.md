@@ -1227,12 +1227,9 @@ new Documentation({
 
 ## Deprecated schemas and routes
 
-As your API evolves, you may need to mark some parameters or routes as deprecated before deleting them. For this
-purpose, the `.deprecated()` method is available on each schema and `Endpoint`, it's immutable.
-
-> **Note:** The `.deprecated()` method requires [Zod Plugin](#zod-plugin). Alternatively, you can use `.meta({ deprecated: true })` directly.
-
-You can also deprecate all routes the `Endpoint` assigned to by setting `EndpointsFactory::build({ deprecated: true })`.
+As your API evolves, you may need to mark some parameters or routes as deprecated before deleting them. This can be
+achieved using the corresponding method or metadata. The `.deprecated()` method on Zod schema requires to install the
+[Zod Plugin](#zod-plugin). Consider the following example:
 
 ```ts
 import type { Routing } from "express-zod-api";
@@ -1241,7 +1238,7 @@ import { z } from "zod";
 const someEndpoint = factory.build({
   deprecated: true, // deprecates all routes the endpoint assigned to
   input: z.object({
-    prop: z.string().deprecated(), // deprecates the property or a path parameter (requires Zod Plugin)
+    prop: z.string().deprecated(), // requires Zod Plugin, or .meta({ deprecated: true })
   }),
 });
 
