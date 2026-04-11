@@ -111,8 +111,8 @@ export const defaultResultHandler = new ResultHandler({
       status: z.literal("success"),
       data: output,
     });
-    const { examples } = globalRegistry.get(output) || {}; // pulling down:
-    if (Array.isArray(examples) && examples.length) {
+    const examples = getExamples(output); // pulling down:
+    if (examples.length) {
       globalRegistry.add(responseSchema, {
         examples: examples.map((data) => ({
           status: "success" as const,
