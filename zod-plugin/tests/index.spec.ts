@@ -27,9 +27,7 @@ describe("Entrypoint", () => {
       .toEqualTypeOf<symbol | string | number | undefined>();
   });
 
-  test("Exports", () => {
-    expect(entrypoint).toMatchObject({
-      getBrand: expect.any(Function),
-    });
+  test("has no exports", () => {
+    expect(Object.keys(entrypoint)).toHaveLength(0);
   });
 });

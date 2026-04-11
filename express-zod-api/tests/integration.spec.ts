@@ -7,6 +7,7 @@ import {
   ResultHandler,
   type Producer,
 } from "../src";
+import { brandProperty } from "../src/metadata";
 
 describe("Integration", () => {
   const recursive1: z.ZodType = z.lazy(() =>
@@ -149,11 +150,11 @@ describe("Integration", () => {
             custom: defaultEndpointsFactory.build({
               method: "post",
               input: z.object({
-                string: z.string().brand("CUSTOM"),
-                regular: z.string().brand("DEEP"),
+                string: z.string().meta({ [brandProperty]: "CUSTOM" }),
+                regular: z.string().meta({ [brandProperty]: "DEEP" }),
               }),
               output: z.object({
-                number: z.number().brand("CUSTOM"),
+                number: z.number().meta({ [brandProperty]: "CUSTOM" }),
               }),
               handler: vi.fn(),
             }),

@@ -158,6 +158,9 @@ importers:
 
   example:
     devDependencies:
+      '@express-zod-api/zod-plugin':
+        specifier: workspace:*
+        version: link:../zod-plugin
       '@types/http-errors':
         specifier: catalog:dev
         version: 2.0.5
@@ -185,9 +188,6 @@ importers:
 
   express-zod-api:
     dependencies:
-      '@express-zod-api/zod-plugin':
-        specifier: workspace:^
-        version: link:../zod-plugin
       ansis:
         specifier: ^4.2.0
         version: 4.2.0
@@ -201,6 +201,9 @@ importers:
         specifier: catalog:prod
         version: 0.32.0
     devDependencies:
+      '@express-zod-api/zod-plugin':
+        specifier: workspace:^
+        version: link:../zod-plugin
       '@types/compression':
         specifier: catalog:dev
         version: 1.8.1

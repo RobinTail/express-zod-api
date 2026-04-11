@@ -277,10 +277,10 @@ describe("zod-to-ts", () => {
       expect(printNodeTest(node)).toMatchSnapshot();
     });
 
-    test("supports zod.deprecated()", () => {
+    test("supports deprecated metadata", () => {
       const schema = z.object({
-        one: z.string().deprecated(),
-        two: z.string().deprecated().describe("with description"),
+        one: z.string().meta({ deprecated: true }),
+        two: z.string().meta({ deprecated: true }).describe("with description"),
       });
       const node = zodToTs(schema, { ctx });
       expect(printNodeTest(node)).toMatchSnapshot();

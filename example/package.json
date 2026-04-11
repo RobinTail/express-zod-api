@@ -12,6 +12,7 @@
     "test": "vitest run index.spec.ts"
   },
   "devDependencies": {
+    "@express-zod-api/zod-plugin": "workspace:*",
     "@types/http-errors": "catalog:dev",
     "@types/swagger-ui-express": "^4.1.8",
     "express-zod-api": "workspace:*",

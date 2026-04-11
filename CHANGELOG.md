@@ -5,6 +5,9 @@
 ### v28.0.0
 
 - Supported Node.js versions: `^22.19.0 || ^24.0.0`;
+- The Zod plugin is no longer installed automatically — it's an optional peer dependency now:
+  - To keep using `.example()`, `.label()`, `.remap()`, `.deprecated()` and `.brand()` methods on schemas
+    install the `@express-zod-api/zod-plugin` manually and import it (ideally at the top of a file declaring `Routing`);
 - Breaking changes to the `createConfig()` argument (object):
   - property `wrongMethodBehavior` (number) changed to `hintAllowedMethods` (boolean);
   - property `methodLikeRouteBehavior` (string literal) changed to `recognizeMethodDependentRoutes` (boolean);

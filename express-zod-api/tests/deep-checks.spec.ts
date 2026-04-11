@@ -2,7 +2,7 @@ import type { UploadedFile } from "express-fileupload";
 import { z } from "zod";
 import { ez } from "../src";
 import { findNestedSchema, hasCycle } from "../src/deep-checks";
-import { getBrand } from "@express-zod-api/zod-plugin";
+import { getBrand } from "../src/metadata";
 import { ezUploadBrand } from "../src/upload-schema";
 
 describe("Checks", () => {
@@ -22,7 +22,7 @@ describe("Checks", () => {
       z.object({ test: z.boolean() }).and(z.object({ test2: ez.upload() })),
       z.optional(ez.upload()),
       ez.upload().nullable(),
-      ez.upload().default({} as UploadedFile & z.core.$brand<symbol>),
+      ez.upload().default({} as UploadedFile),
       z.record(z.string(), ez.upload()),
       ez.upload().refine(() => true),
       z.array(ez.upload()),

@@ -1,3 +1,4 @@
+import "@express-zod-api/zod-plugin"; // adds .example() method
 import { type Routing, ServeStatic } from "express-zod-api";
 import { rawAcceptingEndpoint } from "./endpoints/accept-raw.ts";
 import { createUserEndpoint } from "./endpoints/create-user.ts";
