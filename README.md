@@ -1250,11 +1250,9 @@ const routing: Routing = {
 
 ## Customizable brands handling
 
-You can customize handling rules for your schemas in Documentation and Integration. Use the `.brand()` method on your
-schema to make it special and distinguishable for the framework in runtime. Using symbols is recommended for branding.
-
-> **Note:** The `.brand()` method requires [Zod Plugin](#zod-plugin).
-
+You can customize handling rules for your schemas in Documentation and Integration. The framework treats your schema
+specially based on its `x-brand` metadata. When the [Zod Plugin](#zod-plugin) is installed you can conveniently use
+the `.brand()` enhanced method of the Zod schema, preferably with a symbol argument for its branding.
 After that use the `brandHandling` feature of both constructors to declare your custom implementation. In case you need
 to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
 
@@ -1269,7 +1267,7 @@ import {
 } from "express-zod-api";
 
 const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for this purpose
-const myBrandedSchema = z.string().brand(myBrand); // requires Zod Plugin
+const myBrandedSchema = z.string().brand(myBrand); // requires Zod Plugin, or .meta({ "x-brand": myBrand })
 
 const ruleForDocs: Depicter = (
   { zodSchema, jsonSchema }, // jsonSchema is the default depiction
