@@ -5,7 +5,7 @@ export type NamedProp = TSESTree.PropertyNonComputedName & {
 };
 
 export const queryNamedProp = (name: string) =>
-  `Property[key.name="${name}"],[key.value="${name}"]`;
+  `Property[key.name="${name}"],Property[key.value="${name}"]`;
 
 export const getPropName = (prop: NamedProp): string =>
   "name" in prop.key ? prop.key.name : prop.key.value;
