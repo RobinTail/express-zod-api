@@ -11,6 +11,14 @@ describe("Metadata helpers", () => {
         expect(getBrand(subject)).toBe(metadata?.[brandProperty]);
       },
     );
+    test.each([true, null, new Date()])(
+      "should ignore invalid values %#",
+      (brand) => {
+        const subject = z.string();
+        globalRegistry.add(subject, { [brandProperty]: brand });
+        expect(getBrand(subject)).toBeUndefined();
+      },
+    );
   });
 
   describe("getExamples()", () => {
@@ -24,5 +32,14 @@ describe("Metadata helpers", () => {
       globalRegistry.add(subject, metadata);
       expect(getExamples(subject)).toEqual(metadata.examples ?? []);
     });
+
+    test.each([{}, 123, true, "test"])(
+      "should ignore invalid values %#",
+      (examples) => {
+        const subject = z.number();
+        globalRegistry.add(subject, { examples });
+        expect(getExamples(subject)).toEqual([]);
+      },
+    );
   });
 });
