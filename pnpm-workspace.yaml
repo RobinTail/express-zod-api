@@ -66,5 +66,5 @@ catalogs:
     "typescript-eslint": "^8.58.0"
     "zod": "^4.3.4"
 overrides:
-  "@scarf/scarf": "npm:empty-npm-package@1.0.0"
-  "lightningcss": "npm:empty-npm-package@1.0.0"
+  "@scarf/scarf": "-"
+  "lightningcss": "-"

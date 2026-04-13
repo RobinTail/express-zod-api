@@ -55,8 +55,8 @@ catalogs:
       version: 0.32.0
 
 overrides:
-  '@scarf/scarf': npm:empty-npm-package@1.0.0
-  lightningcss: npm:empty-npm-package@1.0.0
+  '@scarf/scarf': '-'
+  lightningcss: '-'
 
 importers:
 
@@ -913,9 +913,6 @@ packages:
   empathic@2.0.0:
     resolution: {integrity: sha512-i6UzDscO/XfAcNYD75CfICkmfLedpyPDdozrLMmQc5ORaQcdMoc21OnlEylMIqI7U8eniKrPMxxtj8k0vhmJhA==}
     engines: {node: '>=14'}
-
-  empty-npm-package@1.0.0:
-    resolution: {integrity: sha512-q4Mq/+XO7UNDdMiPpR/LIBIW1Zl4V0Z6UT9aKGqIAnBCtCb3lvZJM1KbDbdzdC8fKflwflModfjR29Nt0EpcwA==}
 
   encodeurl@2.0.0:
     resolution: {integrity: sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==}
@@ -2492,8 +2489,6 @@ snapshots:
 
   empathic@2.0.0: {}
 
-  empty-npm-package@1.0.0: {}
-
   encodeurl@2.0.0: {}
 
   es-define-property@1.0.1: {}
@@ -3152,9 +3147,7 @@ snapshots:
     dependencies:
       has-flag: 4.0.0
 
-  swagger-ui-dist@5.32.1:
-    dependencies:
-      '@scarf/scarf': empty-npm-package@1.0.0
+  swagger-ui-dist@5.32.1: {}
 
   swagger-ui-express@5.0.1(express@5.2.1):
     dependencies:
@@ -3300,7 +3293,6 @@ snapshots:
 
   vite@8.0.5(@types/node@25.6.0)(yaml@2.8.3):
     dependencies:
-      lightningcss: empty-npm-package@1.0.0
       picomatch: 4.0.4
       postcss: 8.5.8
       rolldown: 1.0.0-rc.12
