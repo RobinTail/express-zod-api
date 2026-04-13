@@ -164,8 +164,7 @@ Much can be customized to fit your needs.
 
 - [Typescript](https://www.typescriptlang.org/) first.
 - Web server — [Express.js](https://expressjs.com/) v5.
-- Schema validation — [Zod 4.x](https://github.com/colinhacks/zod)
-  - For using with Zod 3.x, install the framework versions below 24.0.0.
+- Schema validation — [Zod 4.x](https://github.com/colinhacks/zod);
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
