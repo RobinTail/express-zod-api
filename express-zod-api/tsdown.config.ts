@@ -1,6 +1,6 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
-import { fixDtsPlugin } from "../tools/fixDts";
+import { fixDtsPlugin } from "../tools/fixDts.ts";
 
 export default defineConfig({
   entry: "src/index.ts",
