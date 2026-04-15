@@ -2,6 +2,10 @@
 
 ## Version 27
 
+### v27.3.0
+
+- Supporting Node 26.
+
 ### v27.2.2
 
 - `@express-zod-api/zod-plugin` version bumped to `^4.1.0`.
