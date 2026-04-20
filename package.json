@@ -17,17 +17,17 @@
     "@arethetypeswrong/core": "^0.18.2",
     "@tsconfig/node20": "^20.1.8",
     "@types/node": "^25.5.0",
-    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/coverage-v8": "^4.1.4",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-allowed-dependencies": "^2.0.1",
     "eslint-plugin-prettier": "^5.5.4",
     "husky": "^9.1.7",
     "prettier": "3.8.3",
-    "tsdown": "^0.21.5",
+    "tsdown": "^0.21.9",
     "typescript-eslint": "catalog:dev",
-    "unrun": "^0.2.32",
-    "vitest": "^4.0.16"
+    "unrun": "^0.2.36",
+    "vitest": "^4.1.4"
   },
   "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
 }
