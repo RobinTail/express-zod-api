@@ -1,0 +1,438 @@
+---
+title: "Configuration Options"
+description: "Complete reference for all Express Zod API configuration options"
+---
+
+## Overview
+
+This page provides a comprehensive reference for all configuration options available in Express Zod API. Options are organized by category.
+
+## Common Configuration
+
+These options are available in all configurations:
+
+### cors
+
+<ParamField path="cors" type="boolean | HeadersProvider" required>
+  Enables cross-origin resource sharing (CORS)
+</ParamField>
+
+**Type**: `boolean | HeadersProvider`
+
+**Required**: Yes
+
+**Default**: N/A (must be explicitly set)
+
+**Examples**:
+
+```typescript
+// Enable with default headers
+cors: true
+
+// Disable CORS
+cors: false
+
+// Custom CORS headers
+cors: ({ defaultHeaders, request, endpoint, logger }) => ({
+  ...defaultHeaders,
+  "Access-Control-Allow-Origin": "https://example.com",
+  "Access-Control-Max-Age": "86400",
+})
+```
+
+### logger
+
+**Type**: `BuiltinLoggerConfig | AbstractLogger`
+
+**Default**: `{ level: "debug", color: true, depth: 2 }`
+
+**Built-in Logger Options**:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `level` | `"debug" \| "info" \| "warn" \| "error"` | Minimum log level |
+| `color` | `boolean` | Enable colored output |
+| `depth` | `number` | Object inspection depth |
+
+**Examples**:
+
+```typescript
+// Built-in logger
+logger: { level: "info", color: false, depth: 3 }
+
+// Winston
+import winston from "winston";
+logger: winston.createLogger({ ... })
+
+// Pino
+import pino from "pino";
+logger: pino({ level: "info" })
+```
+
+### errorHandler
+
+**Type**: `AbstractResultHandler`
+
+**Default**: `defaultResultHandler`
+
+**Description**: Handles routing, parsing, and upload errors.
+
+```typescript
+import { ResultHandler } from "express-zod-api";
+
+errorHandler: new ResultHandler({
+  positive: (data) => ({ schema: z.object({ data }), mimeType: "application/json" }),
+  negative: z.object({ error: z.string() }),
+  handler: ({ error, response }) => {
+    if (error) {
+      response.status(500).json({ error: error.message });
+    }
+  },
+})
+```
+
+### inputSources
+
+**Type**: `Partial<InputSources>`
+
+**Default**:
+```typescript
+{
+  get: ["query", "params"],
+  post: ["body", "params", "files"],
+  put: ["body", "params"],
+  patch: ["body", "params"],
+  delete: ["query", "params"],
+}
+```
+
+**Description**: Controls which request properties are merged into endpoint `input`.
+
+```typescript
+inputSources: {
+  get: ["headers", "query", "params"],
+  post: ["body", "params"],
+}
+```
+
+### childLoggerProvider
+
+**Type**: `(params: { parent: Logger; request: Request }) => Logger | Promise<Logger>`
+
+**Default**: None
+
+**Description**: Creates a request-scoped child logger.
+
+```typescript
+import { randomUUID } from "crypto";
+
+childLoggerProvider: ({ parent, request }) =>
+  parent.child({ requestId: randomUUID() })
+```
+
+### accessLogger
+
+**Type**: `((request: Request, logger: Logger) => void) | null`
+
+**Default**: `({ method, path }, logger) => logger.debug(${method}: ${path})`
+
+**Description**: Logs each request. Set to `null` to disable.
+
+```typescript
+accessLogger: ({ method, path, ip }, logger) =>
+  logger.info(`${method} ${path} from ${ip}`)
+```
+
+### wrongMethodBehavior
+
+**Type**: `404 | 405`
+
+**Default**: `405`
+
+**Description**: HTTP status code when wrong method is used.
+
+- `404`: Returns Not Found
+- `405`: Returns Method Not Allowed with `Allow` header
+
+### methodLikeRouteBehavior
+
+**Type**: `"method" | "path"`
+
+**Default**: `"method"`
+
+**Description**: How to treat routing keys that match HTTP method names.
+
+### startupLogo
+
+**Type**: `boolean`
+
+**Default**: `true`
+
+**Description**: Show ASCII logo on server start.
+
+## Server Configuration
+
+These options are for standalone servers (using `createServer()`):
+
+### http
+
+**Type**: `{ listen: number | string | ListenOptions }`
+
+**Description**: HTTP server configuration.
+
+```typescript
+// Port number
+http: { listen: 8090 }
+
+// UNIX socket
+http: { listen: "/var/run/app.sock" }
+
+// Full options
+http: { listen: { port: 8090, host: "0.0.0.0" } }
+```
+
+### https
+
+**Type**: `{ options: ServerOptions; listen: number | string | ListenOptions }`
+
+**Description**: HTTPS server with TLS certificates.
+
+```typescript
+import { readFileSync } from "fs";
+
+https: {
+  options: {
+    cert: readFileSync("cert.pem"),
+    key: readFileSync("key.pem"),
+  },
+  listen: 443,
+}
+```
+
+### beforeRouting
+
+**Type**: `(params: { app: Express; getLogger: GetLogger }) => void | Promise<void>`
+
+**Description**: Configure Express app before routes are attached.
+
+```typescript
+import swaggerUi from "swagger-ui-express";
+
+beforeRouting: ({ app }) => {
+  app.use("/docs", swaggerUi.serve, swaggerUi.setup(spec));
+}
+```
+
+### jsonParser
+
+**Type**: `RequestHandler | false`
+
+**Default**: `express.json()`
+
+**Description**: JSON body parser or `false` to disable.
+
+```typescript
+import express from "express";
+
+jsonParser: express.json({ limit: "10mb" })
+```
+
+### formParser
+
+**Type**: `RequestHandler | false`
+
+**Default**: `express.urlencoded({ extended: false })`
+
+**Description**: Form body parser or `false` to disable.
+
+```typescript
+import express from "express";
+
+formParser: express.urlencoded({ extended: true })
+```
+
+### upload
+
+**Type**: `boolean | UploadOptions`
+
+**Description**: Enable file uploads.
+
+**Options**:
+
+```typescript
+interface UploadOptions {
+  limits?: {
+    fileSize?: number;
+    files?: number;
+    fields?: number;
+  };
+  limitError?: HttpError;
+  beforeUpload?: (params: {
+    request: Request;
+    logger: Logger;
+  }) => void | Promise<void>;
+  debug?: boolean;
+}
+```
+
+**Example**:
+
+```typescript
+import createHttpError from "http-errors";
+
+upload: {
+  limits: { fileSize: 5 * 1024 * 1024 },
+  limitError: createHttpError(413, "File too large"),
+  beforeUpload: ({ request }) => {
+    if (!request.headers.authorization) {
+      throw createHttpError(401, "Unauthorized");
+    }
+  },
+}
+```
+
+### compression
+
+**Type**: `boolean | CompressionOptions`
+
+**Description**: Enable GZIP/Brotli compression.
+
+```typescript
+compression: {
+  threshold: "1kb",
+  level: 6,
+  filter: (req, res) => {
+    if (req.headers["x-no-compression"]) return false;
+    return compression.filter(req, res);
+  },
+}
+```
+
+### queryParser
+
+**Type**: `"simple" | "extended" | ((str: string) => any)`
+
+**Default**: `"simple"`
+
+**Description**: Query string parser.
+
+```typescript
+import qs from "qs";
+
+// Simple parser
+queryParser: "simple"
+
+// Extended parser (nested objects)
+queryParser: "extended"
+
+// Custom parser
+queryParser: (str) => qs.parse(str, { comma: true })
+```
+
+### gracefulShutdown
+
+**Type**: `GracefulShutdownConfig`
+
+**Options**:
+
+```typescript
+interface GracefulShutdownConfig {
+  timeout?: number; // milliseconds
+  events?: string[]; // default: ["SIGTERM", "SIGINT"]
+  beforeShutdown?: () => void | Promise<void>;
+  onShutdown?: (signal: string) => void | Promise<void>;
+}
+```
+
+**Example**:
+
+```typescript
+gracefulShutdown: {
+  timeout: 30000,
+  events: ["SIGTERM", "SIGINT", "SIGUSR2"],
+  beforeShutdown: async () => {
+    await db.disconnect();
+    await cache.quit();
+  },
+  onShutdown: async (signal) => {
+    logger.info(`Received ${signal}, shutting down`);
+  },
+}
+```
+
+## App Configuration
+
+These options are for attaching to an existing Express app:
+
+### app
+
+**Type**: `Express | Router`
+
+**Required**: Yes (for app config)
+
+**Description**: Express application or router instance.
+
+```typescript
+import express from "express";
+import { createConfig, attachRouting } from "express-zod-api";
+
+const app = express();
+
+const config = createConfig({
+  app,
+  cors: true,
+  logger: { level: "info" },
+});
+
+attachRouting(config, routing);
+
+app.listen(8090);
+```
+
+## Type Definitions
+
+### InputSource
+
+```typescript
+type InputSource = "query" | "body" | "files" | "params" | "headers";
+```
+
+### InputSources
+
+```typescript
+type InputSources = Record<Method, InputSource[]>;
+```
+
+### Method
+
+```typescript
+type Method = "get" | "post" | "put" | "patch" | "delete";
+```
+
+### HeadersProvider
+
+```typescript
+type HeadersProvider = (params: {
+  defaultHeaders: Record<string, string>;
+  request: Request;
+  endpoint: AbstractEndpoint;
+  logger: Logger;
+}) => Record<string, string> | Promise<Record<string, string>>;
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="createConfig" icon="gear" href="/api/create-config">
+    Create a configuration object
+  </Card>
+  <Card title="createServer" icon="server" href="/api/server">
+    Start a server with configuration
+  </Card>
+  <Card title="Production Mode" icon="shield" href="/advanced/production-mode">
+    Production deployment settings
+  </Card>
+  <Card title="CORS" icon="globe" href="/features/cors">
+    Configure CORS in detail
+  </Card>
+</CardGroup>

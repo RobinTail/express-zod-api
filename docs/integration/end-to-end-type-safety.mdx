@@ -1,0 +1,346 @@
+---
+title: End-to-End Type Safety
+description: Generate TypeScript clients with complete type safety from your API to frontend
+---
+
+One of Express Zod API's most powerful features is the ability to generate TypeScript clients that provide complete end-to-end type safety between your backend API and frontend applications.
+
+## Overview
+
+The `Integration` class generates TypeScript code containing:
+
+- Input/output types for all your endpoints
+- A fully-typed client for making API requests
+- Runtime validation of request and response data
+- Support for Server-Sent Events (SSE) subscriptions
+
+## Quick Start
+
+Create a script to generate your client:
+
+```typescript generate-client.ts
+import { writeFile } from "node:fs/promises";
+import { Integration } from "express-zod-api";
+import { routing } from "./routing";
+import { config } from "./config";
+import typescript from "typescript";
+
+await writeFile(
+  "client.ts",
+  await new Integration({
+    typescript,
+    routing,
+    config,
+    serverUrl: "https://api.example.com",
+  }).printFormatted(),
+  "utf-8"
+);
+```
+
+<Tip>
+Run this script during your build process to keep your client in sync with your API.
+</Tip>
+
+## Configuration Options
+
+### Basic Options
+
+<ParamField path="typescript" type="typeof ts" required>
+  The TypeScript compiler API. Import from the `typescript` package.
+</ParamField>
+
+<ParamField path="routing" type="Routing" required>
+  Your API routing configuration.
+</ParamField>
+
+<ParamField path="config" type="CommonConfig" required>
+  Your API server configuration.
+</ParamField>
+
+<ParamField path="serverUrl" type="string" default="https://example.com">
+  The base URL where your API is hosted.
+</ParamField>
+
+### Advanced Options
+
+<ParamField path="variant" type="'types' | 'client'" default="client">
+  What to generate:
+  - `"types"` - Only TypeScript types (for DIY solutions)
+  - `"client"` - Full client with types and implementation
+</ParamField>
+
+<ParamField path="clientClassName" type="string" default="Client">
+  Name for the generated client class.
+</ParamField>
+
+<ParamField path="subscriptionClassName" type="string" default="Subscription">
+  Name for the generated subscription class (for SSE).
+</ParamField>
+
+<ParamField path="noContent" type="z.ZodType" default="z.undefined()">
+  Schema for responses without body (like 204 No Content).
+</ParamField>
+
+<ParamField path="hasHeadMethod" type="boolean" default={true}>
+  Generate HEAD method for each GET endpoint (Express feature).
+</ParamField>
+
+<ParamField path="brandHandling" type="object">
+  Custom handling rules for branded schemas. See the Integration class documentation for details.
+</ParamField>
+
+## Using the Generated Client
+
+### Basic Usage
+
+The generated client provides type-safe methods for all your endpoints:
+
+```typescript frontend-app.ts
+import { Client } from "./client";
+
+const client = new Client();
+
+// TypeScript knows the exact shape of inputs and outputs
+const response = await client.provide("get /v1/user/retrieve", { 
+  id: "10" 
+});
+
+// response is fully typed based on your endpoint definition
+console.log(response.userName);
+```
+
+### Path Parameters
+
+The client automatically substitutes path parameters:
+
+```typescript
+// If your route is /v1/user/:id
+await client.provide("post /v1/user/:id", { 
+  id: "10",  // substituted into the path
+  name: "John"  // sent as body
+});
+```
+
+### Custom Implementation
+
+You can provide a custom implementation function to use your preferred HTTP library:
+
+```typescript
+import { Client, Implementation } from "./client";
+import axios from "axios";
+
+const customImplementation: Implementation = async ({
+  method,
+  url,
+  body,
+  headers,
+}) => {
+  const response = await axios({
+    method,
+    url,
+    data: body,
+    headers,
+  });
+  return response.data;
+};
+
+const client = new Client(customImplementation);
+```
+
+### Server-Sent Events (SSE)
+
+For endpoints that use `EventStreamFactory`, use the generated `Subscription` class:
+
+```typescript
+import { Subscription } from "./client";
+
+const subscription = new Subscription("get /v1/events/stream", {});
+
+subscription.on("time", (timestamp) => {
+  console.log("Server time:", timestamp);
+  // TypeScript knows timestamp is a number based on your endpoint
+});
+
+subscription.on("error", (error) => {
+  console.error("Stream error:", error);
+});
+
+// Clean up when done
+subscription.close();
+```
+
+## Pagination Support
+
+The client includes a `hasMore()` method for paginated endpoints:
+
+```typescript
+import { Client } from "./client";
+
+const client = new Client();
+
+let offset = 0;
+const limit = 20;
+
+while (true) {
+  const response = await client.provide("get /v1/users/list", {
+    offset,
+    limit,
+  });
+
+  // Process users
+  response.users.forEach(user => console.log(user.name));
+
+  // Check if more pages available
+  if (!client.hasMore(response)) break;
+  
+  offset += limit;
+}
+```
+
+## Formatting Options
+
+### Using Prettier
+
+The `printFormatted()` method automatically uses Prettier if installed:
+
+```typescript
+const formatted = await integration.printFormatted();
+```
+
+You can also provide custom formatting:
+
+```typescript
+const formatted = await integration.printFormatted({
+  format: async (code) => {
+    // Your custom formatter
+    return prettify(code);
+  },
+  printerOptions: {
+    // TypeScript printer options
+    newLine: ts.NewLineKind.LineFeed,
+  },
+});
+```
+
+### Without Formatting
+
+For unformatted output:
+
+```typescript
+const code = integration.print({
+  // Optional TypeScript printer options
+  newLine: ts.NewLineKind.LineFeed,
+});
+```
+
+## Async Creation
+
+If you want to avoid importing TypeScript yourself, use the async `create()` method:
+
+```typescript
+import { Integration } from "express-zod-api";
+
+const client = await Integration.create({
+  routing,
+  config,
+  variant: "client",
+  // TypeScript is imported automatically
+});
+```
+
+## Types-Only Generation
+
+For DIY solutions where you want to implement your own client:
+
+```typescript
+const integration = new Integration({
+  typescript,
+  routing,
+  config,
+  variant: "types", // Only generate types
+});
+```
+
+This generates:
+- Input types for all endpoints
+- Response types for all endpoints
+- Path and method type unions
+- Request/response interfaces
+
+## Complete Example
+
+Here's a full example with multiple features:
+
+```typescript generate-client.ts
+import { writeFile } from "node:fs/promises";
+import { Integration } from "express-zod-api";
+import { routing } from "./routing";
+import { config } from "./config";
+import typescript from "typescript";
+import { z } from "zod";
+
+const integration = new Integration({
+  typescript,
+  routing,
+  config,
+  variant: "client",
+  clientClassName: "ApiClient",
+  subscriptionClassName: "ApiSubscription",
+  serverUrl: process.env.API_URL || "http://localhost:8080",
+  hasHeadMethod: true,
+  noContent: z.undefined(),
+});
+
+try {
+  const output = await integration.printFormatted();
+  await writeFile("src/api/client.ts", output, "utf-8");
+  console.log("✓ Client generated successfully");
+} catch (error) {
+  console.error("Failed to generate client:", error);
+  process.exit(1);
+}
+```
+
+```typescript frontend-usage.ts
+import { ApiClient, ApiSubscription } from "./api/client";
+
+const api = new ApiClient();
+
+// Type-safe API calls
+const user = await api.provide("get /v1/user/:id", { id: "123" });
+console.log(user.name, user.email);
+
+// Type-safe subscriptions
+const events = new ApiSubscription("get /v1/events", {});
+events.on("update", (data) => {
+  // data is fully typed
+  console.log("Update:", data);
+});
+```
+
+<Note>
+The generated client requires TypeScript 4.1 or higher to consume.
+</Note>
+
+## Benefits
+
+<CardGroup cols={2}>
+  <Card title="Type Safety" icon="shield-check">
+    Compile-time verification of request parameters and response handling
+  </Card>
+  <Card title="Auto-Complete" icon="wand-magic-sparkles">
+    Full IDE support with autocomplete for all endpoints and their types
+  </Card>
+  <Card title="Refactoring" icon="code-merge">
+    Changes to your API automatically surface as TypeScript errors in frontend
+  </Card>
+  <Card title="Documentation" icon="book">
+    Types serve as inline documentation for API consumers
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+- Learn about [OpenAPI documentation](/integration/openapi) generation
+- Explore [branded types](/api/proprietary-schemas)
+- Set up [pagination](/features/pagination) in your endpoints

@@ -1,0 +1,360 @@
+---
+title: Authentication
+description: Implement secure authentication patterns using Middlewares
+---
+
+## Overview
+
+Express Zod API provides a powerful middleware system for implementing authentication. Middlewares can validate credentials from various input sources and provide authenticated context to your endpoints.
+
+## Basic Authentication Middleware
+
+Authentication middlewares check credentials and return user information that becomes available as `ctx` to your endpoints.
+
+### API Key and Token Authentication
+
+Here's a complete example that validates both an API key from the input and a token from headers:
+
+```ts
+import { z } from "zod";
+import createHttpError from "http-errors";
+import { Middleware } from "express-zod-api";
+
+const authMiddleware = new Middleware({
+  security: {
+    and: [
+      { type: "input", name: "key" },
+      { type: "header", name: "token" },
+    ],
+  },
+  input: z.object({
+    key: z.string().min(1),
+  }),
+  handler: async ({ input: { key }, request, logger }) => {
+    logger.debug("Checking the key and token");
+    
+    // Validate API key
+    const user = await db.Users.findOne({ key });
+    if (!user) {
+      throw createHttpError(401, "Invalid key");
+    }
+    
+    // Validate token from headers
+    if (request.headers.token !== user.token) {
+      throw createHttpError(401, "Invalid token");
+    }
+    
+    // Return user context to endpoints
+    return { user };
+  },
+});
+```
+
+<Note>
+  The `security` property is optional but recommended—it helps generate proper API documentation.
+</Note>
+
+## Using Authentication Middleware
+
+Connect the middleware to your endpoints using `.addMiddleware()`:
+
+```ts
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const protectedEndpoint = defaultEndpointsFactory
+  .addMiddleware(authMiddleware)
+  .build({
+    input: z.object({
+      data: z.string(),
+    }),
+    output: z.object({
+      result: z.string(),
+      userId: z.string(),
+    }),
+    handler: async ({ input, ctx: { user } }) => {
+      // user is available from authMiddleware
+      return {
+        result: `Processed: ${input.data}`,
+        userId: user.id,
+      };
+    },
+  });
+```
+
+## Creating an Authenticated Factory
+
+For multiple endpoints requiring authentication, create a dedicated factory:
+
+```ts
+const authenticatedFactory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware);
+
+// All endpoints built with this factory are authenticated
+const getUserEndpoint = authenticatedFactory.build({
+  method: "get",
+  input: z.object({ id: z.string() }),
+  output: z.object({ name: z.string(), email: z.string() }),
+  handler: async ({ input, ctx: { user } }) => {
+    // user is always available
+    return await db.Users.findById(input.id);
+  },
+});
+```
+
+## Headers as Input Source
+
+To validate headers directly in your input schema, enable them in your configuration:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  inputSources: {
+    get: ["headers", "query", "params"], // headers have lowest priority
+    post: ["headers", "body", "params", "files"],
+  },
+});
+```
+
+Then use headers in your middleware:
+
+```ts
+const headerAuthMiddleware = new Middleware({
+  security: { type: "header", name: "authorization" },
+  input: z.object({
+    authorization: z.string().min(1), // lowercase!
+  }),
+  handler: async ({ input: { authorization } }) => {
+    const token = authorization.replace("Bearer ", "");
+    const user = await verifyToken(token);
+    if (!user) throw createHttpError(401, "Unauthorized");
+    return { user };
+  },
+});
+```
+
+<Warning>
+  Request headers are always lowercase when used as input sources.
+</Warning>
+
+## Bearer Token Authentication
+
+Implement standard Bearer token authentication:
+
+```ts
+const bearerAuthMiddleware = new Middleware({
+  security: { type: "header", name: "authorization" },
+  input: z.object({
+    authorization: z
+      .string()
+      .regex(/^Bearer \S+$/, "Must be a valid Bearer token"),
+  }),
+  handler: async ({ input: { authorization }, logger }) => {
+    const token = authorization.substring(7); // Remove "Bearer "
+    
+    try {
+      const payload = await jwt.verify(token, process.env.JWT_SECRET);
+      const user = await db.Users.findById(payload.userId);
+      
+      if (!user) {
+        throw createHttpError(401, "User not found");
+      }
+      
+      logger.info(`Authenticated user: ${user.id}`);
+      return { user, token };
+    } catch (error) {
+      throw createHttpError(401, "Invalid or expired token");
+    }
+  },
+});
+```
+
+## Role-Based Access Control
+
+Implement role checking with chained middlewares:
+
+```ts
+const requireRole = (requiredRole: string) =>
+  new Middleware({
+    handler: async ({ ctx: { user } }) => {
+      if (user.role !== requiredRole) {
+        throw createHttpError(403, "Insufficient permissions");
+      }
+      return {}; // No additional context
+    },
+  });
+
+// Use it:
+const adminFactory = authenticatedFactory
+  .addMiddleware(requireRole("admin"));
+
+const deleteUserEndpoint = adminFactory.build({
+  method: "delete",
+  input: z.object({ id: z.string() }),
+  output: z.object({ success: z.boolean() }),
+  handler: async ({ input, ctx: { user } }) => {
+    await db.Users.delete(input.id);
+    return { success: true };
+  },
+});
+```
+
+## API Key Authentication
+
+Simple API key validation:
+
+```ts
+const apiKeyMiddleware = new Middleware({
+  security: { type: "input", name: "apiKey" },
+  input: z.object({
+    apiKey: z.string().uuid(),
+  }),
+  handler: async ({ input: { apiKey }, logger }) => {
+    const client = await db.ApiKeys.findOne({ 
+      key: apiKey, 
+      active: true 
+    });
+    
+    if (!client) {
+      throw createHttpError(401, "Invalid API key");
+    }
+    
+    // Update last used timestamp
+    await db.ApiKeys.updateOne(
+      { _id: client._id },
+      { $set: { lastUsed: new Date() } }
+    );
+    
+    logger.info(`API request from client: ${client.name}`);
+    return { client };
+  },
+});
+```
+
+## Multiple Authentication Strategies
+
+Support multiple authentication methods:
+
+```ts
+const flexibleAuthMiddleware = new Middleware({
+  input: z.object({
+    authorization: z.string().optional(),
+    apiKey: z.string().optional(),
+  }),
+  handler: async ({ input, request }) => {
+    // Try Bearer token first
+    if (input.authorization?.startsWith("Bearer ")) {
+      const token = input.authorization.substring(7);
+      const user = await verifyJWT(token);
+      if (user) return { user };
+    }
+    
+    // Try API key
+    if (input.apiKey) {
+      const client = await db.ApiKeys.findOne({ key: input.apiKey });
+      if (client) return { client };
+    }
+    
+    throw createHttpError(401, "Authentication required");
+  },
+});
+```
+
+## Session-Based Authentication
+
+Integrate with Express sessions:
+
+```ts
+import session from "express-session";
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  beforeRouting: ({ app }) => {
+    app.use(session({
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false,
+    }));
+  },
+});
+
+const sessionAuthMiddleware = new Middleware({
+  handler: async ({ request }) => {
+    if (!request.session?.userId) {
+      throw createHttpError(401, "Please log in");
+    }
+    
+    const user = await db.Users.findById(request.session.userId);
+    if (!user) {
+      throw createHttpError(401, "Session invalid");
+    }
+    
+    return { user };
+  },
+});
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use security declarations">
+    Always specify the `security` property in your authentication middleware. This generates proper documentation and helps API consumers understand authentication requirements.
+  </Accordion>
+  
+  <Accordion title="Validate thoroughly">
+    Check not just the presence but also the format and validity of credentials. Use Zod refinements for complex validation rules.
+  </Accordion>
+  
+  <Accordion title="Log authentication events">
+    Log both successful and failed authentication attempts for security auditing. Include relevant context but never log sensitive credentials.
+  </Accordion>
+  
+  <Accordion title="Handle errors properly">
+    Use appropriate HTTP status codes: 401 for authentication failures, 403 for authorization failures. Use `createHttpError` for consistent error handling.
+  </Accordion>
+  
+  <Accordion title="Create reusable factories">
+    When multiple endpoints share authentication requirements, create a factory with the middleware attached rather than adding it to each endpoint.
+  </Accordion>
+</AccordionGroup>
+
+## Testing Authentication
+
+Test your authentication middleware:
+
+```ts
+import { testMiddleware } from "express-zod-api";
+
+describe("authMiddleware", () => {
+  test("should authenticate valid credentials", async () => {
+    const { output, loggerMock } = await testMiddleware({
+      middleware: authMiddleware,
+      requestProps: {
+        body: { key: "valid-key" },
+        headers: { token: "valid-token" },
+      },
+    });
+    
+    expect(loggerMock._getLogs().error).toHaveLength(0);
+    expect(output).toHaveProperty("user");
+  });
+  
+  test("should reject invalid key", async () => {
+    const { responseMock } = await testMiddleware({
+      middleware: authMiddleware,
+      requestProps: {
+        body: { key: "invalid" },
+        headers: { token: "valid-token" },
+      },
+    });
+    
+    expect(responseMock._getStatusCode()).toBe(401);
+  });
+});
+```
+
+## Next Steps
+
+- Learn about [Express Middleware Integration](/guides/express-middleware) for using third-party auth libraries
+- Explore [Advanced Features](/essentials/advanced-features) for custom result handlers
+- See [Testing](/essentials/testing) for comprehensive endpoint testing
