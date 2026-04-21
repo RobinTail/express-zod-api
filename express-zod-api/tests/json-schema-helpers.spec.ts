@@ -58,7 +58,10 @@ describe("JSON Schema helpers", () => {
 
   describe("nestOptional()", () => {
     test("should pair true with given argument", () => {
-      expect(nestOptional("value")).toEqual([true, "value"]);
+      expect(nestOptional({ type: "string" })).toEqual([
+        true,
+        { type: "string" },
+      ]);
     });
   });
 

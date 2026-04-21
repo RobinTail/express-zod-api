@@ -33,7 +33,7 @@ export const canMerge = R.pipe(
 );
 
 /** @internal */
-export const nestOptional = R.pair(true);
+export const nestOptional = R.pair(true)<z.core.JSONSchema.BaseSchema>;
 
 /** @internal */
 export const processAllOf = (
