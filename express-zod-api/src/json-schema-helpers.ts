@@ -2,7 +2,9 @@ import * as R from "ramda";
 import { combinations, FlatObject, isObject } from "./common-helpers";
 import type { z } from "zod";
 
-export type MergeMode = "coerce" | "throw";
+type MergeMode = "coerce" | "throw";
+type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &
+  Required<Pick<z.core.JSONSchema.ObjectSchema, "properties">>;
 
 /** @internal */
 export const isJsonObjectSchema = (
@@ -35,12 +37,12 @@ export const nestOptional = R.pair(true);
 
 /** @internal */
 export const processAllOf = (
-  entry: z.core.JSONSchema.BaseSchema,
+  subject: z.core.JSONSchema.BaseSchema,
   mode: MergeMode,
   isOptional: boolean,
 ) => {
-  if (!("allOf" in entry) || !entry.allOf) return [];
-  return entry.allOf.map((one) => {
+  if (!("allOf" in subject) || !subject.allOf) return [];
+  return subject.allOf.map((one) => {
     if (mode === "throw" && !(one.type === "object" && canMerge(one)))
       throw new Error("Can not merge");
     return R.pair(isOptional, one);
@@ -48,33 +50,32 @@ export const processAllOf = (
 };
 
 /** @internal */
-export const processVariants = (entry: z.core.JSONSchema.BaseSchema) => {
+export const processVariants = (subject: z.core.JSONSchema.BaseSchema) => {
   const result: [boolean, z.core.JSONSchema.BaseSchema][] = [];
-  if (entry.anyOf) result.push(...R.map(nestOptional, entry.anyOf));
-  if (entry.oneOf) result.push(...R.map(nestOptional, entry.oneOf));
+  if (subject.anyOf) result.push(...R.map(nestOptional, subject.anyOf));
+  if (subject.oneOf) result.push(...R.map(nestOptional, subject.oneOf));
   return result;
 };
 
 /** @internal */
 export const processPropertyNames = (
-  entry: z.core.JSONSchema.BaseSchema,
-  flat: z.core.JSONSchema.ObjectSchema &
-    Required<Pick<z.core.JSONSchema.ObjectSchema, "properties">>,
-  flatRequired: string[],
+  subject: z.core.JSONSchema.BaseSchema,
+  target: FlattenObjectSchema,
+  requiredKeys: string[],
   isOptional: boolean,
 ) => {
-  if (!isObject(entry.propertyNames)) return;
+  if (!isObject(subject.propertyNames)) return;
   const keys: string[] = [];
-  if (typeof entry.propertyNames.const === "string")
-    keys.push(entry.propertyNames.const);
-  if (entry.propertyNames.enum) {
+  if (typeof subject.propertyNames.const === "string")
+    keys.push(subject.propertyNames.const);
+  if (subject.propertyNames.enum) {
     keys.push(
-      ...entry.propertyNames.enum.filter((one) => typeof one === "string"),
+      ...subject.propertyNames.enum.filter((one) => typeof one === "string"),
     );
   }
-  const value = { ...Object(entry.additionalProperties) }; // it can be bool
-  for (const key of keys) flat.properties[key] ??= value;
-  if (!isOptional) flatRequired.push(...keys);
+  const value = { ...Object(subject.additionalProperties) }; // it can be bool
+  for (const key of keys) target.properties[key] ??= value;
+  if (!isOptional) requiredKeys.push(...keys);
 };
 
 export const flattenIO = (
@@ -82,11 +83,7 @@ export const flattenIO = (
   mode: MergeMode = "coerce",
 ) => {
   const stack = [R.pair(false, jsonSchema)]; // [isOptional, JSON Schema]
-  const flat: z.core.JSONSchema.ObjectSchema &
-    Required<Pick<z.core.JSONSchema.ObjectSchema, "properties">> = {
-    type: "object",
-    properties: {},
-  };
+  const flat: FlattenObjectSchema = { type: "object", properties: {} };
   const flatRequired: string[] = [];
   while (stack.length) {
     const [isOptional, entry] = stack.shift()!;
