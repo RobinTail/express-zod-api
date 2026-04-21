@@ -129,13 +129,15 @@ describe("JSON Schema helpers", () => {
     });
 
     test("should not add to required when optional", () => {
-      const entry = {
-        type: "object" as const,
-        propertyNames: { const: "key" },
-      };
       const flat = { type: "object" as const, properties: {} };
       const flatRequired: string[] = [];
-      processPropertyNames(entry, flat, flatRequired, true);
+      processPropertyNames(
+        { type: "object", propertyNames: { const: "key" } },
+        flat,
+        flatRequired,
+        true,
+      );
+      expect(flat.properties).toHaveProperty("key");
       expect(flatRequired).toEqual([]);
     });
   });
