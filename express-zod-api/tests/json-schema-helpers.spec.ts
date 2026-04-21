@@ -1,6 +1,10 @@
 import { z } from "zod";
 import {
   flattenIO,
+  isJsonObjectSchema,
+  propsMerger,
+  canMerge,
+  nestOptional,
   processAllOf,
   processVariants,
   processPropertyNames,
@@ -8,6 +12,56 @@ import {
 } from "../src/json-schema-helpers";
 
 describe("JSON Schema helpers", () => {
+  describe("isJsonObjectSchema()", () => {
+    test("should return true for object schema", () => {
+      expect(isJsonObjectSchema({ type: "object" })).toBe(true);
+    });
+
+    test.each(["string", "array"] as const)(
+      "should return false for non-object schema",
+      (one) => {
+        expect(isJsonObjectSchema({ type: one })).toBe(false);
+      },
+    );
+  });
+
+  describe("propsMerger()", () => {
+    test("should merge objects deeply", () => {
+      expect(propsMerger({ a: { b: 1 } }, { a: { c: 2 } })).toStrictEqual({
+        a: { b: 1, c: 2 },
+      });
+    });
+
+    test("should throw when leaf values cannot be merged", () => {
+      expect(() => propsMerger({ a: 1 }, { a: "string" })).toThrow(
+        "Can not flatten properties",
+      );
+    });
+  });
+
+  describe("canMerge()", () => {
+    test("should return true for empty object", () => {
+      expect(canMerge({})).toBe(true);
+    });
+
+    test("should return true for object with only mergeable keys", () => {
+      expect(canMerge({ type: "object", properties: {} })).toBe(true);
+    });
+
+    test.each([{ title: "test" }, { format: "date-time" }])(
+      "should return false for object with non-mergeable keys",
+      (subj) => {
+        expect(canMerge(subj)).toBe(false);
+      },
+    );
+  });
+
+  describe("nestOptional()", () => {
+    test("should pair true with given argument", () => {
+      expect(nestOptional("value")).toEqual([true, "value"]);
+    });
+  });
+
   describe("processAllOf()", () => {
     test("should return empty array when no allOf", () => {
       const result = processAllOf(

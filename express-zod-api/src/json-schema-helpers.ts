@@ -4,17 +4,20 @@ import type { z } from "zod";
 
 export type MergeMode = "coerce" | "throw";
 
-const isJsonObjectSchema = (
+/** @internal */
+export const isJsonObjectSchema = (
   subject: z.core.JSONSchema.BaseSchema,
 ): subject is z.core.JSONSchema.ObjectSchema => subject.type === "object";
 
-const propsMerger = R.mergeDeepWith((a: unknown, b: unknown) => {
+/** @internal */
+export const propsMerger = R.mergeDeepWith((a: unknown, b: unknown) => {
   if (Array.isArray(a) && Array.isArray(b)) return R.concat(a, b);
   if (a === b) return b;
   throw new Error("Can not flatten properties", { cause: { a, b } });
 });
 
-const canMerge = R.pipe(
+/** @internal */
+export const canMerge = R.pipe(
   Object.keys,
   R.without([
     "type",
@@ -27,7 +30,8 @@ const canMerge = R.pipe(
   R.isEmpty,
 );
 
-const nestOptional = R.pair(true);
+/** @internal */
+export const nestOptional = R.pair(true);
 
 /** @internal */
 export const processAllOf = (
