@@ -1,7 +1,188 @@
 import { z } from "zod";
-import { flattenIO } from "../src/json-schema-helpers";
+import {
+  flattenIO,
+  processAllOf,
+  processVariants,
+  processPropertyNames,
+  pullRequestExamples,
+} from "../src/json-schema-helpers";
 
 describe("JSON Schema helpers", () => {
+  describe("processAllOf()", () => {
+    test("should return empty array when no allOf", () => {
+      const result = processAllOf(
+        { type: "object", properties: {} },
+        "coerce",
+        false,
+      );
+      expect(result).toEqual([]);
+    });
+
+    test("should map allOf entries with isOptional flag in coerce mode", () => {
+      const result = processAllOf(
+        {
+          type: "object",
+          allOf: [{ type: "object", properties: { a: { type: "string" } } }],
+        },
+        "coerce",
+        true,
+      );
+      expect(result).toEqual([
+        [true, { type: "object", properties: { a: { type: "string" } } }],
+      ]);
+    });
+
+    test("should throw in throw mode when schema cannot be merged", () => {
+      expect(() =>
+        processAllOf(
+          { type: "object", allOf: [{ type: "string" }] },
+          "throw",
+          false,
+        ),
+      ).toThrow("Can not merge");
+    });
+
+    test("should allow mergeable schemas in throw mode", () => {
+      const result = processAllOf(
+        {
+          type: "object",
+          allOf: [{ type: "object", properties: { a: { type: "string" } } }],
+        },
+        "throw",
+        false,
+      );
+      expect(result).toEqual([
+        [false, { type: "object", properties: { a: { type: "string" } } }],
+      ]);
+    });
+  });
+
+  describe("processVariants()", () => {
+    test("should return empty array when no anyOf/oneOf", () => {
+      const result = processVariants({ type: "object", properties: {} });
+      expect(result).toEqual([]);
+    });
+
+    test("should process anyOf as optional", () => {
+      const result = processVariants({
+        type: "object",
+        anyOf: [{ type: "string" }, { type: "number" }],
+      });
+      expect(result).toEqual([
+        [true, { type: "string" }],
+        [true, { type: "number" }],
+      ]);
+    });
+
+    test("should process oneOf as optional", () => {
+      const result = processVariants({
+        type: "object",
+        oneOf: [{ type: "string" }, { type: "number" }],
+      });
+      expect(result).toEqual([
+        [true, { type: "string" }],
+        [true, { type: "number" }],
+      ]);
+    });
+  });
+
+  describe("processPropertyNames()", () => {
+    test("should not modify flat when no propertyNames", () => {
+      const flat = { type: "object" as const, properties: {} };
+      const flatRequired: string[] = [];
+      processPropertyNames(
+        { type: "object", properties: {} },
+        flat,
+        flatRequired,
+        false,
+      );
+      expect(flat.properties).toEqual({});
+      expect(flatRequired).toEqual([]);
+    });
+
+    test("should extract const key", () => {
+      const flat = { type: "object" as const, properties: {} };
+      const flatRequired: string[] = [];
+      processPropertyNames(
+        { type: "object", propertyNames: { const: "key" } },
+        flat,
+        flatRequired,
+        false,
+      );
+      expect(flat.properties).toHaveProperty("key");
+      expect(flatRequired).toContain("key");
+    });
+
+    test("should extract enum keys", () => {
+      const flat = { type: "object" as const, properties: {} };
+      const flatRequired: string[] = [];
+      processPropertyNames(
+        { type: "object", propertyNames: { enum: ["a", "b"] } },
+        flat,
+        flatRequired,
+        false,
+      );
+      expect(flat.properties).toHaveProperty("a");
+      expect(flat.properties).toHaveProperty("b");
+      expect(flatRequired).toContain("a");
+      expect(flatRequired).toContain("b");
+    });
+
+    test("should not add to required when optional", () => {
+      const entry = {
+        type: "object" as const,
+        propertyNames: { const: "key" },
+      };
+      const flat = { type: "object" as const, properties: {} };
+      const flatRequired: string[] = [];
+      processPropertyNames(entry, flat, flatRequired, true);
+      expect(flatRequired).toEqual([]);
+    });
+  });
+
+  describe("pullRequestExamples()", () => {
+    test("should return empty array for empty properties", () => {
+      expect(pullRequestExamples({ type: "object", properties: {} })).toEqual(
+        [],
+      );
+    });
+
+    test("should return empty array when properties have no examples", () => {
+      expect(
+        pullRequestExamples({
+          type: "object",
+          properties: { name: { type: "string" } },
+        }),
+      ).toEqual([]);
+    });
+
+    test("should extract examples from properties", () => {
+      expect(
+        pullRequestExamples({
+          type: "object",
+          properties: { name: { type: "string", examples: ["john", "jane"] } },
+        }),
+      ).toEqual([{ name: "john" }, { name: "jane" }]);
+    });
+
+    test("should combine examples from multiple properties", () => {
+      expect(
+        pullRequestExamples({
+          type: "object",
+          properties: {
+            name: { type: "string", examples: ["john", "jane"] },
+            age: { type: "number", examples: [25, 30] },
+          },
+        }),
+      ).toEqual([
+        { name: "john", age: 25 },
+        { name: "john", age: 30 },
+        { name: "jane", age: 25 },
+        { name: "jane", age: 30 },
+      ]);
+    });
+  });
+
   describe("flattenIO()", () => {
     test("should pass the object schema through", () => {
       const subject = flattenIO({
