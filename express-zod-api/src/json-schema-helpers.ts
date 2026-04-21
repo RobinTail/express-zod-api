@@ -29,6 +29,7 @@ const canMerge = R.pipe(
 
 const nestOptional = R.pair(true);
 
+/** @internal */
 export const processAllOf = (
   entry: z.core.JSONSchema.BaseSchema,
   mode: MergeMode,
@@ -42,6 +43,7 @@ export const processAllOf = (
   });
 };
 
+/** @internal */
 export const processVariants = (entry: z.core.JSONSchema.BaseSchema) => {
   const result: [boolean, z.core.JSONSchema.BaseSchema][] = [];
   if (entry.anyOf) result.push(...R.map(nestOptional, entry.anyOf));
@@ -49,6 +51,7 @@ export const processVariants = (entry: z.core.JSONSchema.BaseSchema) => {
   return result;
 };
 
+/** @internal */
 export const processPropertyNames = (
   entry: z.core.JSONSchema.BaseSchema,
   flat: z.core.JSONSchema.ObjectSchema &
