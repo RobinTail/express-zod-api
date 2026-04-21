@@ -34,6 +34,7 @@ export const canMerge = R.pipe(
 
 /** @internal */
 export const nestOptional = R.pair(true)<z.core.JSONSchema.BaseSchema>;
+type Stack = Array<ReturnType<typeof nestOptional>>;
 
 /** @internal */
 export const processAllOf = (
@@ -51,7 +52,7 @@ export const processAllOf = (
 
 /** @internal */
 export const processVariants = (subject: z.core.JSONSchema.BaseSchema) => {
-  const result: [boolean, z.core.JSONSchema.BaseSchema][] = [];
+  const result: Stack = [];
   if (subject.anyOf) result.push(...R.map(nestOptional, subject.anyOf));
   if (subject.oneOf) result.push(...R.map(nestOptional, subject.oneOf));
   return result;
@@ -82,7 +83,7 @@ export const flattenIO = (
   jsonSchema: z.core.JSONSchema.BaseSchema,
   mode: MergeMode = "coerce",
 ) => {
-  const stack = [R.pair(false, jsonSchema)]; // [isOptional, JSON Schema]
+  const stack: Stack = [R.pair(false, jsonSchema)]; // [isOptional, JSON Schema]
   const flat: FlattenObjectSchema = { type: "object", properties: {} };
   const flatRequired: string[] = [];
   while (stack.length) {
