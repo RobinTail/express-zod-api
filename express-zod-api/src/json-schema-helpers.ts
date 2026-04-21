@@ -59,7 +59,7 @@ export const processVariants = (subject: z.core.JSONSchema.BaseSchema) => {
 
 /** @internal */
 export const processPropertyNames = (
-  subject: z.core.JSONSchema.BaseSchema,
+  subject: z.core.JSONSchema.ObjectSchema,
   target: FlattenObjectSchema,
   requiredKeys: string[],
   isOptional: boolean,
