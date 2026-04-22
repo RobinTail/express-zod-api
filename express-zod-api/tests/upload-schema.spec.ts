@@ -1,9 +1,60 @@
 import { z } from "zod";
 import { ez } from "../src";
 import { getBrand } from "../src/metadata";
-import { ezUploadBrand } from "../src/upload-schema";
+import { ezUploadBrand, isObjectOfUploadShape } from "../src/upload-schema";
 
 describe("ez.upload()", () => {
+  describe("isObjectOfUploadShape() helper", () => {
+    test.each([null, undefined, "test", 123, false])(
+      "should return false for non-object %#",
+      (subject) => {
+        expect(isObjectOfUploadShape(subject)).toBe(false);
+      },
+    );
+
+    test.each([
+      "name",
+      "encoding",
+      "mimetype",
+      "data",
+      "tempFilePath",
+      "truncated",
+      "size",
+      "md5",
+      "mv",
+    ] as const)("should return false when missing %s key", (key) => {
+      const input = {
+        name: null,
+        encoding: null,
+        mimetype: null,
+        data: null,
+        tempFilePath: null,
+        truncated: null,
+        size: null,
+        md5: null,
+        mv: null,
+      };
+      delete input[key];
+      expect(isObjectOfUploadShape(input)).toBe(false);
+    });
+
+    test("should return true for an object of valid shape", () => {
+      expect(
+        isObjectOfUploadShape({
+          name: null,
+          encoding: null,
+          mimetype: null,
+          data: null,
+          tempFilePath: null,
+          truncated: null,
+          size: null,
+          md5: null,
+          mv: null,
+        }),
+      ).toBe(true);
+    });
+  });
+
   describe("creation", () => {
     test("should create an instance", () => {
       const schema = ez.upload();

@@ -217,7 +217,7 @@ export default tsPlugin.config(
     name: "source/ez",
     files: ["express-zod-api/src/*.ts"],
     rules: {
-      complexity: ["error", 20],
+      complexity: ["error", 18],
       "allowed/dependencies": ["error", { packageDir: ezDir }],
       "no-restricted-syntax": [
         "warn",
