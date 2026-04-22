@@ -22,7 +22,7 @@ describe("ez.upload()", () => {
       "size",
       "md5",
       "mv",
-    ] as const)("should return false when missing $% key", (key) => {
+    ] as const)("should return false when missing %s key", (key) => {
       const input = {
         name: null,
         encoding: null,
