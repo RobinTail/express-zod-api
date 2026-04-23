@@ -77,108 +77,108 @@ const performanceConcerns = [
 const tsFactoryConcerns = [
   {
     selector: "Identifier[name='createConditionalExpression']",
-    message: "use makeTernary() helper",
+    message: "use TypescriptAPI::makeTernary()",
   },
   {
     selector: "Identifier[name='createArrowFunction']",
-    message: "use makeArrowFn() helper",
+    message: "use TypescriptAPI::makeArrowFn()",
   },
   {
     selector: "Identifier[name='createTypeParameterDeclaration']",
-    message: "use makeTypeParams() helper",
+    message: "use TypescriptAPI::makeTypeParams()",
   },
   {
     selector: "Identifier[name='createInterfaceDeclaration']",
-    message: "use makeInterface() helper",
+    message: "use TypescriptAPI::makeInterface()",
   },
   {
     selector: "Identifier[name='createClassDeclaration']",
-    message: "use makePublicClass() helper",
+    message: "use TypescriptAPI::makePublicClass()",
   },
   {
     selector: "Identifier[name='createMethodDeclaration']",
-    message: "use makePublicMethod() helper",
+    message: "use TypescriptAPI::makePublicMethod()",
   },
   {
     selector: "Identifier[name='createTypeAliasDeclaration']",
-    message: "use makeType() or makePublicLiteralType() helpers",
+    message: "use TypescriptAPI::makeType()",
   },
   {
     selector: "Identifier[name='createVariableStatement']",
-    message: "use makeConst() helper",
+    message: "use TypescriptAPI::makeConst()",
   },
   {
     selector: "Identifier[name='createArrayBindingPattern']",
-    message: "use makeDeconstruction() helper",
+    message: "use TypescriptAPI::makeDeconstruction()",
   },
   {
     selector: "Identifier[name='createPropertySignature']",
-    message: "use makeInterfaceProp() helper",
+    message: "use TypescriptAPI::makeInterfaceProp()",
   },
   {
     selector: "Identifier[name='createConstructorDeclaration']",
-    message: "use makePublicConstructor() helper",
+    message: "use TypescriptAPI::makePublicConstructor()",
   },
   {
     selector: "Identifier[name='createParameterDeclaration']",
-    message: "use makeParam() or makeParams() helpers",
+    message: "use TypescriptAPI::makeParam()",
   },
   {
     selector: "Identifier[name='createCallExpression']",
-    message: "use makeCall() helper",
+    message: "use TypescriptAPI::makeCall()",
   },
   {
     selector: "Identifier[name='KeyOfKeyword']",
-    message: "use makeKeyOf() helper",
+    message: "use TypescriptAPI::makeKeyOf()",
   },
   {
     selector: "Identifier[name='createTemplateExpression']",
-    message: "use makeTemplate() helper",
+    message: "use TypescriptAPI::makeTemplate()",
   },
   {
     selector: "Identifier[name='createNewExpression']",
-    message: "use makeNew() helper",
+    message: "use TypescriptAPI::makeNew()",
   },
   {
     selector: "Literal[value='Promise']",
-    message: "use makePromise() helper",
+    message: "use TypescriptAPI::makePromise()",
   },
   {
     selector: "Identifier[name=/^create(TypeReference|KeywordType)Node$/]",
-    message: "use ensureTypeNode() helper",
+    message: "use TypescriptAPI::ensureTypeNode()",
   },
   {
     selector: "Literal[value='Extract']",
-    message: "use makeExtract() helper",
+    message: "use TypescriptAPI::makeExtract()",
   },
   {
     selector: "Identifier[name='EqualsToken']",
-    message: "use makeAssignment() helper",
+    message: "use TypescriptAPI::makeAssignment()",
   },
   {
     selector: "Identifier[name='createIndexedAccessTypeNode']",
-    message: "use makeIndexed() helper",
+    message: "use TypescriptAPI::makeIndexed()",
   },
   {
     selector: "Identifier[name='createFunctionTypeNode']",
-    message: "use makeFnType() helper",
+    message: "use TypescriptAPI::makeFnType()",
   },
   {
     selector: "Identifier[name='createLiteralTypeNode']",
-    message: "use makeLiteralType() helper",
+    message: "use TypescriptAPI::makeLiteralType()",
   },
   {
     selector:
       "Identifier[name=/^create(NumericLiteral|StringLiteral|True|False|Null)$/]",
-    message: "use literally() helper",
+    message: "use TypescriptAPI::literally()",
   },
   {
     selector: "Identifier[name='createUnionTypeNode']",
-    message: "use makeUnion() helper",
+    message: "use TypescriptAPI::makeUnion()",
   },
   {
     selector: "Identifier[name='createIdentifier']",
-    message: "use makeId() helper",
+    message: "use TypescriptAPI::makeId()",
   },
 ];
 
