@@ -103,7 +103,7 @@ interface SampleInterface {
 - **Zod**: Use named import `import { z } from "zod"`
 - **Ramda**: Use namespace import `import * as R from "ramda"`
 - **Node.js built-ins**: Use `node:` prefix
-- **Type-only imports**: Use `import type` for types and interfaces (verbatimModuleSyntax)
+- **Type-only imports**: Use `import type` for types and interfaces
 - **Relative imports**: Must be extensionless
 - Combine import from the same module into a single line
 
