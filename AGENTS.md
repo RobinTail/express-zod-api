@@ -58,7 +58,7 @@ See `src/index.ts` for the complete public API exports.
 - **`express-zod-api/src/index.ts`** — Public API exports
 - **`express-zod-api/src/config-type.ts`** — Configuration types for `createConfig()`
 - **`express-zod-api/src/routing.ts`** — Core routing logic
-- **`express-zod-api/src/testing.ts`** — Test utilities
+- **`express-zod-api/src/testing.ts`** — Test utilities: `testEndpoint` and `testMiddleware` are public, others internal
 - **`express-zod-api/tests/express-mock.ts`** — Express mocking for tests
 - **`migration/index.ts`** — Migration ESLint rules
 - **`CHANGELOG.md`** — Version history and breaking changes
