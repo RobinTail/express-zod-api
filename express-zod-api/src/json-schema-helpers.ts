@@ -18,19 +18,21 @@ export const propsMerger = R.mergeDeepWith((a: unknown, b: unknown) => {
   throw new Error("Can not flatten properties", { cause: { a, b } });
 });
 
+const mergeableKeys = new Set([
+  "type",
+  "properties",
+  "required",
+  "examples",
+  "description",
+  "additionalProperties",
+]);
+
 /** @internal */
-export const canMerge = R.pipe(
-  Object.keys,
-  R.without([
-    "type",
-    "properties",
-    "required",
-    "examples",
-    "description",
-    "additionalProperties",
-  ] satisfies Array<keyof z.core.JSONSchema.ObjectSchema>),
-  R.isEmpty,
-);
+export const canMerge = (subject: Record<string, unknown>): boolean => {
+  for (const key of Object.keys(subject))
+    if (!mergeableKeys.has(key)) return false;
+  return true;
+};
 
 /** @internal */
 export const nestOptional = R.pair(true)<z.core.JSONSchema.BaseSchema>;
