@@ -105,13 +105,15 @@ interface CommonConfig {
 - **Node.js built-ins**: Use `node:` prefix
 - **Type-only imports**: Use `import type` for types and interfaces (verbatimModuleSyntax)
 - **Relative imports**: Must be extensionless
+- Combine import from the same module into a single line
 
 ```typescript
 import { z } from "zod";
 import * as R from "ramda";
 import { dirname } from "node:path";
-import type { SomeType } from "./some-module";
-import { someValue } from "./some-module";
+import type { SomeType } from "./module-a";
+import { someValue } from "./module-b";
+import { anotherValue, type AnotherType } from "./module-c";
 ```
 
 ### 5. Type Declaration Convention
