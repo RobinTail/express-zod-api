@@ -235,6 +235,24 @@ ts.factory.createParameterDeclaration();
 ts.factory.createVariableStatement();
 ```
 
+### 14. Performance Priority
+
+For code involved in API execution (routing, middlewares, schema definition, validation), performance is the highest
+priority. This does not apply to generators (`Integration`, `Documentation`).
+
+When editing that code or choosing between multiple implementations in performance-critical scope, always A/B test it:
+
+1. Create a benchmark in `express-zod-api/bench` (similar to `experiment.bench.ts`)
+2. Compare current vs featured solution (for refactoring) or two variants (for new code)
+3. Run benchmark via `pnpm bench`
+
+```typescript
+describe("Experiment for feature", () => {
+  bench("current", () => {}); // implementation A
+  bench("featured", () => {}); // implementation B
+});
+```
+
 ## Breaking Change Policy
 
 Any breaking change to the public API requires an update to the migration script, its tests, and CHANGELOG.
