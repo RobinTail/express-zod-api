@@ -104,14 +104,14 @@ interface CommonConfig {
 - **Ramda**: Use namespace import `import * as R from "ramda"`
 - **Node.js built-ins**: Use `node:` prefix
 - **Type-only imports**: Use `import type` for types and interfaces (verbatimModuleSyntax)
-- **Relative imports**: Must use `.ts` extension
+- **Relative imports**: Must be extensionless
 
 ```typescript
 import { z } from "zod";
 import * as R from "ramda";
 import { dirname } from "node:path";
 import type { SomeType } from "./some-module";
-import { someValue } from "./some-module.ts";
+import { someValue } from "./some-module";
 ```
 
 ### 5. Type Declaration Convention
