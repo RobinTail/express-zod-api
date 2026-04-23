@@ -2,8 +2,6 @@
 
 This file provides essential context for working with the express-zod-api project.
 
----
-
 ## Project Overview
 
 The **express-zod-api** is a TypeScript framework for building Express.js APIs with Zod schema validation. It provides
@@ -11,8 +9,6 @@ type-safe request/response handling, automatic OpenAPI documentation, and a clea
 
 - **Package manager**: pnpm
 - **Current version** and **Node version**: See `express-zod-api/package.json`
-
----
 
 ## Project Structure
 
@@ -42,8 +38,6 @@ This is a pnpm monorepo. The directory name becomes the workspace name.
 
 The rest are test workspaces.
 
----
-
 ## Architecture Overview
 
 Quick reference on how the key modules connect:
@@ -59,19 +53,15 @@ flowchart LR
 
 See `src/index.ts` for the complete public API exports.
 
----
-
 ## Important Entry Points
 
-- **`express-zod-api/src/index.ts`** — Public API exports (everything exported here is part of the public API)
-- **`express-zod-api/src/config-type.ts`** — Configuration types for `createConfig()` function
+- **`express-zod-api/src/index.ts`** — Public API exports
+- **`express-zod-api/src/config-type.ts`** — Configuration types for `createConfig()`
 - **`express-zod-api/src/routing.ts`** — Core routing logic
-- **`express-zod-api/src/testing.ts`** — Test utilities (`testEndpoint`, `testMiddleware`, `makeRequestMock`, `makeResponseMock`, `makeLoggerMock`)
+- **`express-zod-api/src/testing.ts`** — Test utilities
 - **`express-zod-api/tests/express-mock.ts`** — Express mocking for tests
 - **`migration/index.ts`** — Migration ESLint rules
 - **`CHANGELOG.md`** — Version history and breaking changes
-
----
 
 ## Key Conventions
 
@@ -79,7 +69,8 @@ See `src/index.ts` for the complete public API exports.
 
 - **Source files**: `src/*.ts`
 - **Test files**: `tests/*.spec.ts` (Vitest)
-- **Test organization**: In `express-zod-api` workspace, the `tests/` directory mirrors `src/`. Each source file has a corresponding test file with the same name.
+- **Test organization**: In `express-zod-api` workspace, `tests/` mirrors `src/`.
+  Each source file has a corresponding test file with the same name.
 
 ### 2. Public API Convention
 
@@ -87,7 +78,7 @@ Everything exported via `express-zod-api/src/index.ts` is part of the public API
 
 ### 3. JSDoc Convention for Public Entities
 
-All properties of publicly available entities (exposed via `index.ts`) must have JSDoc documentation using these directives:
+All properties of publicly available entities (exposed via `index.ts`) must have JSDoc documentation using directives:
 
 - **`@desc`**: Short description of what the property does
 - **`@default`**: Default value (required for optional properties)
@@ -99,9 +90,9 @@ Each directive should aim to fit on one line:
 interface CommonConfig {
   /** @desc Enables cross-origin resource sharing. */
   cors: boolean | HeadersProvider;
-  /** @desc Controls how to respond to a request with an invalid HTTP method. */
+  /** @desc Controls how to respond. */
   /** @default true */
-  /** @example true — respond with 405 and "Allow" header */
+  /** @example true — respond with 405 */
   /** @example false — respond with 404 */
   hintAllowedMethods?: boolean;
 }
@@ -109,13 +100,11 @@ interface CommonConfig {
 
 ### 4. Import Conventions
 
-Follow these rules to maintain consistency:
-
 - **Zod**: Use named import `import { z } from "zod"`
 - **Ramda**: Use namespace import `import * as R from "ramda"`
-- **Node.js built-ins**: Use `node:` prefix `import { dirname } from "node:path"`
+- **Node.js built-ins**: Use `node:` prefix
 - **Type-only imports**: Use `import type` for types and interfaces (verbatimModuleSyntax)
-- **Relative imports**: Must use `.ts` extension (not `.js`)
+- **Relative imports**: Must use `.ts` extension
 
 ```typescript
 import { z } from "zod";
@@ -137,10 +126,7 @@ interface User {
 }
 
 // Avoid
-type User = {
-  name: string;
-  age: number;
-};
+type User = { name: string; age: number };
 ```
 
 ### 6. Testing Convention
@@ -155,7 +141,8 @@ test.each([true, false, undefined])(
 );
 ```
 
-- **Mock patterns**: Use utilities from `src/testing.ts` (`testEndpoint`, `testMiddleware`, `makeRequestMock`, `makeResponseMock`, `makeLoggerMock`) and Express mocks from `tests/express-mock.ts`:
+- **Mock patterns**: Use utilities from `src/testing.ts` (`testEndpoint`, `testMiddleware`, etc.) and Express mocks from
+  `tests/express-mock.ts`:
 
 ```typescript
 const { endpoint, loggerMock, requestMock, responseMock } = await testEndpoint({
@@ -167,11 +154,10 @@ const { endpoint, loggerMock, requestMock, responseMock } = await testEndpoint({
 
 - **Test runner**: Vitest
 - **Location**: `tests/` directories within each package
-- **Run tests**: `pnpm test` (from root) or `pnpm test` (from package)
 
 ### 7. Configuration (config-type.ts)
 
-Public API config uses `CommonConfig` interface with optional properties and JSDoc documentation:
+Public API config uses `CommonConfig` interface with JSDoc:
 
 ```typescript
 interface CommonConfig {
@@ -201,11 +187,11 @@ const endpoint = factory.build({
 ### 10. Line Length
 
 - Maximum line length: 120 characters (including Markdown files)
-- Use line breaks and code folding to stay within the limit
+- Use line breaks and code folding to stay within limit
 
 ### 11. Code Refactoring
 
-When extracting statements into new functions (or moving/refactoring code), preserve any inline comments from the source location:
+When moving statements, preserve any inline comments from the source location:
 
 ```typescript
 // Original:
@@ -217,11 +203,13 @@ const copyDescription = (entry, flat) => {
 };
 ```
 
----
+### 12. Markdown files policy
+
+Markdown files should avoid `---` horizontal rule separators.
 
 ## Breaking Change Policy
 
-Any breaking change to the public API requires an update to the migration script and its tests.
+Any breaking change to the public API requires an update to the migration script, its tests, and CHANGELOG.
 
 ### Migration Organization
 
@@ -230,14 +218,12 @@ The migration is implemented as an ESLint rule in `migration/index.ts`:
 1. **`Queries` interface** — defines AST node types to search for using esquery selectors
 2. **`queries` object** — maps query names to esquery selectors
 3. **`listen()` function** — connects queries to their handler functions in `create()`
-4. **`create()` function** — implements the actual transformation (rename, value conversion, auto-fix)
+4. **`create()` function** — implements the actual transformation
 
 **Tests** are in `migration/index.spec.ts` using `RuleTester`:
 
 - `valid` — code that should NOT trigger the rule
 - `invalid` — code that SHOULD be transformed, with expected `output` and error assertions
-
----
 
 ## CHANGELOG Convention
 
@@ -253,8 +239,6 @@ The `CHANGELOG.md` follows these rules:
   - Other items end with `;`
 - **Code samples**: Prefer a single sample below the list
 - **Major releases** (vN.0.0): Use `diff` code block with `+`/`-` prefixes and spacing offset
-
----
 
 ## Common Tasks
 
