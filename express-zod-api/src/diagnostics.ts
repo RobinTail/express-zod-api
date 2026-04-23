@@ -29,8 +29,9 @@ export class Diagnostics {
       const stack: z.core.JSONSchema.BaseSchema[] = [
         z.toJSONSchema(endpoint[`${dir}Schema`], { unrepresentable: "any" }),
       ];
-      while (stack.length > 0) {
-        const entry = stack.shift()!;
+      let idx = 0;
+      while (idx < stack.length) {
+        const entry = stack[idx++];
         if (entry.type && entry.type !== "object")
           this.logger.warn(`Endpoint ${dir} schema is not object-based`, ctx);
         for (const prop of ["allOf", "oneOf", "anyOf"] as const)
