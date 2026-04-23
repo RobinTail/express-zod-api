@@ -18,7 +18,7 @@
     "@eslint/js": "^10.0.1",
     "@tsconfig/node22": "^22.0.5",
     "@types/node": "^25.5.0",
-    "@vitest/coverage-v8": "^4.1.4",
+    "@vitest/coverage-v8": "^4.1.5",
     "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-allowed-dependencies": "^2.1.0",
@@ -26,9 +26,9 @@
     "globals": "^17.5.0",
     "husky": "^9.1.7",
     "prettier": "3.8.3",
-    "tsdown": "^0.21.9",
+    "tsdown": "^0.21.10",
     "typescript-eslint": "catalog:dev",
-    "vitest": "^4.1.4"
+    "vitest": "^4.1.5"
   },
   "packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8"
 }
