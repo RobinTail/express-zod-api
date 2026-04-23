@@ -147,7 +147,7 @@ test.each([true, false, undefined])(
   `tests/express-mock.ts`:
 
 ```typescript
-const { endpoint, loggerMock, requestMock, responseMock } = await testEndpoint({
+const { loggerMock, requestMock, responseMock } = await testEndpoint({
   endpoint,
   requestProps: { method: "GET" },
   responseOptions: { locals: {} },
