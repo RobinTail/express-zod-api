@@ -208,6 +208,33 @@ const copyDescription = (entry, flat) => {
 
 Markdown files should avoid `---` horizontal rule separators.
 
+### 13. TypeScript Generators Policy
+
+For generating TypeScript code, prefer using helpers from `TypescriptAPI` class over direct factory methods. Native
+factory methods have verbose APIs with many redundant arguments.
+
+Files that generate TypeScript code:
+
+- `express-zod-api/src/typescript-api.ts` (defines the helpers)
+- `express-zod-api/src/integration.ts`
+- `express-zod-api/src/integration-base.ts`
+- `express-zod-api/src/zts.ts`
+
+**Examples**: Use these helpers instead of verbose factory calls:
+
+```typescript
+// Use TypescriptAPI methods:
+api.makeId("User");
+api.makeParam("name", { type: "string" });
+api.makeConst("count", api.literally(0));
+api.makeInterface("User", [api.makeInterfaceProp("name", "string")]);
+
+// Avoid native factory calls:
+ts.factory.createIdentifier("User");
+ts.factory.createParameterDeclaration();
+ts.factory.createVariableStatement();
+```
+
 ## Breaking Change Policy
 
 Any breaking change to the public API requires an update to the migration script, its tests, and CHANGELOG.
