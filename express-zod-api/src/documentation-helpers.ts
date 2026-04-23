@@ -309,7 +309,6 @@ export const depictRequestParams = ({
     )
       return "header";
     if (isQueryEnabled) return "query";
-    return undefined;
   };
 
   return Object.entries(flat.properties).reduce<ParameterObject[]>(
