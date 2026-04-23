@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   flattenIO,
   isJsonObjectSchema,
+  mergeExamples,
   propsMerger,
   canMerge,
   nestOptional,
@@ -196,6 +197,46 @@ describe("JSON Schema helpers", () => {
       );
       expect(flat.properties).toHaveProperty("key");
       expect(flatRequired).toEqual([]);
+    });
+  });
+
+  describe("mergeExamples()", () => {
+    test("should do nothing when entry has no examples", () => {
+      const flat = { type: "object" as const, properties: {} };
+      mergeExamples(flat, { type: "string" }, false);
+      expect(flat).toEqual({ type: "object", properties: {} });
+    });
+
+    test("should concatenate examples when optional", () => {
+      const flat = {
+        type: "object" as const,
+        properties: {},
+        examples: [{ a: 1 }],
+      };
+      mergeExamples(flat, { examples: [{ b: 2 }, { c: 3 }] }, true);
+      expect(flat.examples).toEqual([{ a: 1 }, { b: 2 }, { c: 3 }]);
+    });
+
+    test.each([true, false])(
+      "should initialize examples when flat has none (isOptional=%s)",
+      (isOptional) => {
+        const flat = { type: "object" as const, properties: {} };
+        mergeExamples(flat, { examples: [{ a: 1 }] }, isOptional);
+        expect(flat).toHaveProperty("examples", [{ a: 1 }]);
+      },
+    );
+
+    test("should produce combinations when required", () => {
+      const flat = {
+        type: "object" as const,
+        properties: {},
+        examples: [{ a: 1 }],
+      };
+      mergeExamples(flat, { examples: [{ b: 2 }, { b: 3 }] }, false);
+      expect(flat.examples).toEqual([
+        { a: 1, b: 2 },
+        { a: 1, b: 3 },
+      ]);
     });
   });
 
