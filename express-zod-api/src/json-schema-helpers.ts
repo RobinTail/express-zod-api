@@ -81,16 +81,16 @@ export const processPropertyNames = (
 
 /** @internal */
 export const mergeExamples = (
-  flat: FlattenObjectSchema,
+  target: FlattenObjectSchema,
   entry: z.core.JSONSchema.BaseSchema,
   isOptional: boolean,
 ) => {
   if (!entry.examples?.length) return;
   if (isOptional) {
-    flat.examples = R.concat(flat.examples || [], entry.examples);
+    target.examples = R.concat(target.examples || [], entry.examples);
   } else {
-    flat.examples = combinations(
-      flat.examples?.filter(isObject) || [],
+    target.examples = combinations(
+      target.examples?.filter(isObject) || [],
       entry.examples.filter(isObject),
       ([a, b]) => R.mergeDeepRight(a, b),
     );
