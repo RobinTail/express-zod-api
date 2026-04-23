@@ -306,16 +306,19 @@ export const depictRequestParams = ({
     areHeadersEnabled &&
     (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders));
 
+  const getLocation = (name: string) =>
+    isPathParam(name)
+      ? "path"
+      : isHeaderParam(name)
+        ? "header"
+        : isQueryEnabled
+          ? "query"
+          : undefined;
+
   return Object.entries(flat.properties).reduce<ParameterObject[]>(
     (acc, [name, jsonSchema]) => {
       if (!isObject(jsonSchema)) return acc;
-      const location = isPathParam(name)
-        ? "path"
-        : isHeaderParam(name)
-          ? "header"
-          : isQueryEnabled
-            ? "query"
-            : undefined;
+      const location = getLocation(name);
       if (!location) return acc;
       const depicted = asOAS(jsonSchema);
       const result =
