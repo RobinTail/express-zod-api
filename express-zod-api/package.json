@@ -21,7 +21,7 @@
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
     "prepublishOnly": "eslint && pnpm -r build && pnpm test",
-    "prepack": "cp ../*.md ../LICENSE ./"
+    "prepack": "find .. -maxdepth 1 \\( -name '*.md' ! -name 'AGENTS.md' -o -name 'LICENSE' \\) -exec cp {} . \\;"
   },
   "type": "module",
   "main": "dist/index.js",
