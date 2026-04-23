@@ -79,7 +79,8 @@ export const processPropertyNames = (
   if (!isOptional) requiredKeys.push(...keys);
 };
 
-const mergeExamples = (
+/** @internal */
+export const mergeExamples = (
   flat: FlattenObjectSchema,
   entry: z.core.JSONSchema.BaseSchema,
   isOptional: boolean,
