@@ -143,8 +143,8 @@ test.each([true, false, undefined])(
 );
 ```
 
-- **Mock patterns**: Use utilities from `src/testing.ts` (`testEndpoint`, `testMiddleware`, etc.) and Express mocks from
-  `tests/express-mock.ts`:
+- **Mock patterns**: Use utilities from `src/testing.ts` (`testEndpoint`, `testMiddleware`, etc.)
+  and Express mocks from `tests/express-mock.ts`:
 
 ```typescript
 const { loggerMock, requestMock, responseMock } = await testEndpoint({
