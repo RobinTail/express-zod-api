@@ -220,12 +220,9 @@ describe("JSON Schema helpers", () => {
     test.each([true, false])(
       "should initialize examples when flat has none (isOptional=%s)",
       (isOptional) => {
-        const flat: { type: "object"; properties: {}; examples?: unknown[] } = {
-          type: "object",
-          properties: {},
-        };
+        const flat = { type: "object" as const, properties: {} };
         mergeExamples(flat, { examples: [{ a: 1 }] }, isOptional);
-        expect(flat.examples).toEqual([{ a: 1 }]);
+        expect(flat).toHaveProperty("examples", [{ a: 1 }]);
       },
     );
 
