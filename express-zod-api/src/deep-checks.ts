@@ -39,8 +39,9 @@ export const hasCycle = (
 ) => {
   const json = z.toJSONSchema(subject, { io, unrepresentable: "any" });
   const stack: unknown[] = [json];
-  while (stack.length) {
-    const entry = stack.shift()!;
+  let idx = 0;
+  while (idx < stack.length) {
+    const entry = stack[idx++];
     if (R.is(Object, entry)) {
       if ((entry as z.core.JSONSchema.BaseSchema).$ref === "#") return true;
       stack.push(...R.values(entry));
