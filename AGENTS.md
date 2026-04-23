@@ -80,21 +80,21 @@ Everything exported via `express-zod-api/src/index.ts` is part of the public API
 
 All properties of publicly available entities (exposed via `index.ts`) must have JSDoc documentation using directives:
 
-- **`@desc`**: Short description of what the property does
+- **`@desc`**: Short description of what the property does, ends with a period
 - **`@default`**: Default value (required for optional properties)
 - **`@example`**: Example value (required for literal types, one per variant)
 
 Each directive should aim to fit on one line:
 
 ```typescript
-interface CommonConfig {
-  /** @desc Enables cross-origin resource sharing. */
-  cors: boolean | HeadersProvider;
-  /** @desc Controls how to respond. */
+interface SampleInterface {
+  /** @desc Enables certain feature. */
+  sampleRequiredProperty: boolean | SampleOptions;
+  /** @desc Controls another feature. */
   /** @default true */
-  /** @example true — respond with 405 */
-  /** @example false — respond with 404 */
-  hintAllowedMethods?: boolean;
+  /** @example true — leads to one thing */
+  /** @example false — leads to another thing */
+  sampleOptionalProperty?: boolean;
 }
 ```
 
