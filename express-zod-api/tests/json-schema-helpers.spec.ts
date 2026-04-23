@@ -217,14 +217,17 @@ describe("JSON Schema helpers", () => {
       expect(flat.examples).toEqual([{ a: 1 }, { b: 2 }, { c: 3 }]);
     });
 
-    test("should initialize examples when optional and flat has none", () => {
-      const flat: { type: "object"; properties: {}; examples?: unknown[] } = {
-        type: "object",
-        properties: {},
-      };
-      mergeExamples(flat, { examples: [{ a: 1 }] }, true);
-      expect(flat.examples).toEqual([{ a: 1 }]);
-    });
+    test.each([true, false])(
+      "should initialize examples when flat has none (isOptional=%s)",
+      (isOptional) => {
+        const flat: { type: "object"; properties: {}; examples?: unknown[] } = {
+          type: "object",
+          properties: {},
+        };
+        mergeExamples(flat, { examples: [{ a: 1 }] }, isOptional);
+        expect(flat.examples).toEqual([{ a: 1 }]);
+      },
+    );
 
     test("should produce combinations when required", () => {
       const flat = {
@@ -237,15 +240,6 @@ describe("JSON Schema helpers", () => {
         { a: 1, b: 2 },
         { a: 1, b: 3 },
       ]);
-    });
-
-    test("should handle required with no prior examples", () => {
-      const flat: { type: "object"; properties: {}; examples?: unknown[] } = {
-        type: "object",
-        properties: {},
-      };
-      mergeExamples(flat, { examples: [{ a: 1 }] }, false);
-      expect(flat.examples).toEqual([{ a: 1 }]);
     });
   });
 
