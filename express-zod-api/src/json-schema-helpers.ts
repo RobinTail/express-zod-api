@@ -79,6 +79,24 @@ export const processPropertyNames = (
   if (!isOptional) requiredKeys.push(...keys);
 };
 
+/** @internal */
+export const mergeExamples = (
+  target: FlattenObjectSchema,
+  entry: z.core.JSONSchema.BaseSchema,
+  isOptional: boolean,
+) => {
+  if (!entry.examples?.length) return;
+  if (isOptional) {
+    target.examples = R.concat(target.examples || [], entry.examples);
+  } else {
+    target.examples = combinations(
+      target.examples?.filter(isObject) || [],
+      entry.examples.filter(isObject),
+      ([a, b]) => R.mergeDeepRight(a, b),
+    );
+  }
+};
+
 export const flattenIO = (
   jsonSchema: z.core.JSONSchema.BaseSchema,
   mode: MergeMode = "coerce",
@@ -91,17 +109,7 @@ export const flattenIO = (
     if (entry.description) flat.description ??= entry.description;
     stack.push(...processAllOf(entry, mode, isOptional));
     stack.push(...processVariants(entry));
-    if (entry.examples?.length) {
-      if (isOptional) {
-        flat.examples = R.concat(flat.examples || [], entry.examples);
-      } else {
-        flat.examples = combinations(
-          flat.examples?.filter(isObject) || [],
-          entry.examples.filter(isObject),
-          ([a, b]) => R.mergeDeepRight(a, b),
-        );
-      }
-    }
+    mergeExamples(flat, entry, isOptional);
     if (!isJsonObjectSchema(entry)) continue;
     stack.push([isOptional, { examples: pullRequestExamples(entry) }]);
     if (entry.properties) {

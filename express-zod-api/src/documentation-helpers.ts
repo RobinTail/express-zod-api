@@ -295,26 +295,25 @@ export const depictRequestParams = ({
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
   const areHeadersEnabled = inputSources.includes("headers");
-  const isPathParam = (name: string) =>
-    areParamsEnabled && pathParams.includes(name);
   const securityHeaders = R.chain(
     R.filter((entry: Security) => entry.type === "header"),
     security ?? [],
   ).map(({ name }) => name);
-  const isHeaderParam = (name: string) =>
-    areHeadersEnabled &&
-    (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders));
+
+  const getLocation = (name: string) => {
+    if (areParamsEnabled && pathParams.includes(name)) return "path";
+    if (
+      areHeadersEnabled &&
+      (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders))
+    )
+      return "header";
+    if (isQueryEnabled) return "query";
+  };
 
   return Object.entries(flat.properties).reduce<ParameterObject[]>(
     (acc, [name, jsonSchema]) => {
       if (!isObject(jsonSchema)) return acc;
-      const location = isPathParam(name)
-        ? "path"
-        : isHeaderParam(name)
-          ? "header"
-          : isQueryEnabled
-            ? "query"
-            : undefined;
+      const location = getLocation(name);
       if (!location) return acc;
       const depicted = asOAS(jsonSchema);
       const result =
