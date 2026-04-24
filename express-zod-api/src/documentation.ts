@@ -86,7 +86,11 @@ interface DocumentationParams {
    * @example { users: "About users", files: { description: "About files", url: "https://example.com" } }
    * */
   tags?: Parameters<typeof depictTags>[0];
-  /** @default Infinity */
+  /**
+   * @desc Maximum number of combinations for examples and security access schemas
+   * @default Infinity
+   * @todo set to 20 in v28
+   * */
   maxCombinations?: number;
 }
 
