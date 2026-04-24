@@ -41,12 +41,13 @@ const onTemplateLiteral: Producer = (
   { next, api },
 ) => {
   const parts = [...def.parts];
+  let idx = 0;
   const shiftText = () => {
     let text = "";
-    while (parts.length) {
-      const part = parts.shift();
+    while (idx < parts.length) {
+      const part = parts[idx++];
       if (isSchema(part)) {
-        parts.unshift(part);
+        idx--;
         break;
       }
       text += part ?? ""; // Handle potential undefined values
@@ -55,12 +56,13 @@ const onTemplateLiteral: Producer = (
   };
   const head = api.f.createTemplateHead(shiftText());
   const spans: ts.TemplateLiteralTypeSpan[] = [];
-  while (parts.length) {
-    const schema = next(parts.shift() as z.core.$ZodType);
+  while (idx < parts.length) {
+    const schema = next(parts[idx++] as z.core.$ZodType);
     const text = shiftText();
-    const textWrapper = parts.length
-      ? api.f.createTemplateMiddle
-      : api.f.createTemplateTail;
+    const textWrapper =
+      idx < parts.length
+        ? api.f.createTemplateMiddle
+        : api.f.createTemplateTail;
     spans.push(api.f.createTemplateLiteralTypeSpan(schema, textWrapper(text)));
   }
   if (!spans.length) return api.makeLiteralType(head.text);
