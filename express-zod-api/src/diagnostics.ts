@@ -47,9 +47,8 @@ export class Diagnostics {
       }
     }
     for (const variant of responseVariants) {
-      for (const { mimeTypes, schema } of endpoint.getResponses(variant, {
-        maxCombinations: 0, // not required for this check
-      })) {
+      const responses = endpoint.getResponses(variant, { maxCombinations: 0 }); // no examples
+      for (const { mimeTypes, schema } of responses) {
         if (!mimeTypes?.includes(contentTypes.json)) continue;
         const reason = findJsonIncompatible(schema, "output");
         if (reason) {
