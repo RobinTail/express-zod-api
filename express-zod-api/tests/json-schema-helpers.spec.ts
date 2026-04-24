@@ -203,7 +203,7 @@ describe("JSON Schema helpers", () => {
   describe("mergeExamples()", () => {
     test("should do nothing when entry has no examples", () => {
       const flat = { type: "object" as const, properties: {} };
-      mergeExamples(flat, { type: "string" }, false);
+      mergeExamples(flat, { type: "string" }, { isOptional: false });
       expect(flat).toEqual({ type: "object", properties: {} });
     });
 
@@ -213,7 +213,11 @@ describe("JSON Schema helpers", () => {
         properties: {},
         examples: [{ a: 1 }],
       };
-      mergeExamples(flat, { examples: [{ b: 2 }, { c: 3 }] }, true);
+      mergeExamples(
+        flat,
+        { examples: [{ b: 2 }, { c: 3 }] },
+        { isOptional: true },
+      );
       expect(flat.examples).toEqual([{ a: 1 }, { b: 2 }, { c: 3 }]);
     });
 
@@ -221,7 +225,7 @@ describe("JSON Schema helpers", () => {
       "should initialize examples when flat has none (isOptional=%s)",
       (isOptional) => {
         const flat = { type: "object" as const, properties: {} };
-        mergeExamples(flat, { examples: [{ a: 1 }] }, isOptional);
+        mergeExamples(flat, { examples: [{ a: 1 }] }, { isOptional });
         expect(flat).toHaveProperty("examples", [{ a: 1 }]);
       },
     );
@@ -232,7 +236,11 @@ describe("JSON Schema helpers", () => {
         properties: {},
         examples: [{ a: 1 }],
       };
-      mergeExamples(flat, { examples: [{ b: 2 }, { b: 3 }] }, false);
+      mergeExamples(
+        flat,
+        { examples: [{ b: 2 }, { b: 3 }] },
+        { isOptional: false },
+      );
       expect(flat.examples).toEqual([
         { a: 1, b: 2 },
         { a: 1, b: 3 },
