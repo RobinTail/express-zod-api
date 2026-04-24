@@ -28,7 +28,7 @@ describe.each(queues)("$1", (queue) => {
   bench("index approach", () => {
     const q = [...queue];
     let idx = 0;
-    while (idx < q.length) idx++;
+    while (idx < q.length) q[idx++]; // eslint-disable-line @typescript-eslint/no-unused-expressions
   });
 
   bench("pop() reverse", () => {

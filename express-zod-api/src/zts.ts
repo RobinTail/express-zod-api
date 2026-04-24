@@ -40,9 +40,9 @@ const onTemplateLiteral: Producer = (
   { _zod: { def } }: z.core.$ZodTemplateLiteral,
   { next, api },
 ) => {
-  const parts = [...def.parts];
+  const { parts } = def;
   let idx = 0;
-  const shiftText = () => {
+  const readText = () => {
     let text = "";
     while (idx < parts.length) {
       const part = parts[idx++];
@@ -54,11 +54,11 @@ const onTemplateLiteral: Producer = (
     }
     return text;
   };
-  const head = api.f.createTemplateHead(shiftText());
+  const head = api.f.createTemplateHead(readText());
   const spans: ts.TemplateLiteralTypeSpan[] = [];
   while (idx < parts.length) {
     const schema = next(parts[idx++] as z.core.$ZodType);
-    const text = shiftText();
+    const text = readText();
     const textWrapper =
       idx < parts.length
         ? api.f.createTemplateMiddle
