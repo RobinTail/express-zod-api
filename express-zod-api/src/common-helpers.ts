@@ -113,7 +113,16 @@ export const combinations = <T>(
   a: T[],
   b: T[],
   merge: (pair: [T, T]) => T,
-): T[] => (a.length && b.length ? R.xprod(a, b).map(merge) : a.concat(b));
+  limit = Infinity,
+): T[] => {
+  if (!a.length || !b.length) return a.concat(b);
+  const result: T[] = [];
+  for (let idxA = 0; idxA < a.length && result.length < limit; idxA++) {
+    for (let idxB = 0; idxB < b.length && result.length < limit; idxB++)
+      result.push(merge([a[idxA], b[idxB]]));
+  }
+  return result;
+};
 
 export const ucFirst = (subject: string) =>
   subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
