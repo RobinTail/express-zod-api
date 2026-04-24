@@ -115,10 +115,11 @@ export const combinations = <T>(
   right: T[],
   /** @desc The function that combines elements */
   merge: (a: T, b: T) => T,
-  /** @desc Maximum number of combinations to generate, only applies to non-empty arrays */
+  /** @desc Maximum number of combinations */
   limit = Infinity,
 ): T[] => {
-  if (!left.length || !right.length) return left.concat(right); // immutable one or another
+  if (Number.isNaN(limit) || limit <= 0) return [];
+  if (!left.length || !right.length) return left.concat(right).slice(0, limit);
   const result: T[] = [];
   for (let idxL = 0; idxL < left.length && result.length < limit; idxL++) {
     for (let idxR = 0; idxR < right.length && result.length < limit; idxR++)
