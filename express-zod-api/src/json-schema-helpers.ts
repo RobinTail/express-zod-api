@@ -133,10 +133,7 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
   Object.entries(subject.properties || {}).reduce<FlatObject[]>(
     (acc, [key, prop]) => {
       const { examples = [] } = isObject(prop) ? prop : {};
-      return combinations(acc, examples.map(R.objOf(key)), (left, right) => ({
-        ...left,
-        ...right,
-      }));
+      return combinations(acc, examples.map(R.objOf(key)), R.mergeRight);
     },
     [],
   );
