@@ -270,15 +270,21 @@ describe("Common Helpers", () => {
 
   describe("combinations()", () => {
     test("should run callback on each combination of items from two arrays", () => {
-      expect(combinations([1, 2], [4, 5, 6], ([a, b]) => a + b)).toEqual([
+      expect(combinations([1, 2], [4, 5, 6], (a, b) => a + b)).toEqual([
         5, 6, 7, 6, 7, 8,
       ]);
     });
 
+    test("should limit the number of combinations", () => {
+      expect(combinations([1, 2], [4, 5, 6], (a, b) => a + b, 4)).toEqual([
+        5, 6, 7, 6,
+      ]);
+    });
+
     test("should handle one or two arrays are empty", () => {
-      expect(combinations([], [4, 5, 6], ([a, b]) => a + b)).toEqual([4, 5, 6]);
-      expect(combinations([1, 2, 3], [], ([a, b]) => a + b)).toEqual([1, 2, 3]);
-      expect(combinations<number>([], [], ([a, b]) => a + b)).toEqual([]);
+      expect(combinations([], [4, 5, 6], (a, b) => a + b)).toEqual([4, 5, 6]);
+      expect(combinations([1, 2, 3], [], (a, b) => a + b)).toEqual([1, 2, 3]);
+      expect(combinations<number>([], [], (a, b) => a + b)).toEqual([]);
     });
   });
 

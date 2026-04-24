@@ -92,7 +92,7 @@ export const pullResponseExamples = <T extends z.core.$ZodObject>(subject: T) =>
   Object.entries(subject._zod.def.shape).reduce<FlatObject[]>(
     (acc, [key, schema]) => {
       const { examples = [] } = globalRegistry.get(schema) || {};
-      return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
+      return combinations(acc, examples.map(R.objOf(key)), (left, right) => ({
         ...left,
         ...right,
       }));

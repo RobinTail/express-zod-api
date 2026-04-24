@@ -36,7 +36,7 @@ export const processContainers = <T>(
       combinations(
         acc,
         R.map((opt) => (isSimple(opt) ? [opt] : opt.and), entry),
-        ([a, b]) => R.concat(a, b),
+        (a, b) => R.concat(a, b),
       ),
     R.reject(R.isEmpty, [persistent]),
   );

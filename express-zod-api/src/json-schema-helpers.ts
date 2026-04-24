@@ -95,7 +95,7 @@ export const mergeExamples = (
     target.examples = combinations(
       target.examples?.filter(isObject) || [],
       entry.examples.filter(isObject),
-      ([a, b]) => R.mergeDeepRight(a, b),
+      (a, b) => R.mergeDeepRight(a, b),
     );
   }
 };
@@ -133,7 +133,7 @@ export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
   Object.entries(subject.properties || {}).reduce<FlatObject[]>(
     (acc, [key, prop]) => {
       const { examples = [] } = isObject(prop) ? prop : {};
-      return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
+      return combinations(acc, examples.map(R.objOf(key)), (left, right) => ({
         ...left,
         ...right,
       }));

@@ -110,16 +110,16 @@ export const isSchema = <T extends z.core.$ZodType = z.core.$ZodType>(
   (type ? R.path(["_zod", "def", "type"], subject) === type : true);
 
 export const combinations = <T>(
-  a: T[],
-  b: T[],
-  merge: (pair: [T, T]) => T,
+  left: T[],
+  right: T[],
+  merge: (a: T, b: T) => T,
   limit = Infinity,
 ): T[] => {
-  if (!a.length || !b.length) return a.concat(b);
+  if (!left.length || !right.length) return left.concat(right);
   const result: T[] = [];
-  for (let idxA = 0; idxA < a.length && result.length < limit; idxA++) {
-    for (let idxB = 0; idxB < b.length && result.length < limit; idxB++)
-      result.push(merge([a[idxA], b[idxB]]));
+  for (let idxL = 0; idxL < left.length && result.length < limit; idxL++) {
+    for (let idxR = 0; idxR < right.length && result.length < limit; idxR++)
+      result.push(merge(left[idxL], right[idxR]));
   }
   return result;
 };
