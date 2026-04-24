@@ -41,8 +41,7 @@ type Stack = Array<ReturnType<typeof nestOptional>>;
 /** @internal */
 export const processAllOf = (
   subject: z.core.JSONSchema.BaseSchema,
-  isStrict: boolean,
-  isOptional: boolean,
+  { isStrict, isOptional }: { isStrict: boolean; isOptional: boolean },
 ) => {
   if (!("allOf" in subject) || !subject.allOf) return [];
   return subject.allOf.map((one) => {
@@ -120,7 +119,7 @@ export const flattenIO = (
   for (let idx = 0; idx < stack.length; idx++) {
     const [isOptional, entry] = stack[idx];
     if (entry.description) flat.description ??= entry.description;
-    stack.push(...processAllOf(entry, isStrict, isOptional));
+    stack.push(...processAllOf(entry, { isStrict, isOptional }));
     stack.push(...processVariants(entry));
     mergeExamples(flat, entry, { isOptional, maxCombinations });
     if (!isJsonObjectSchema(entry)) continue;

@@ -70,8 +70,7 @@ describe("JSON Schema helpers", () => {
     test("should return empty array when no allOf", () => {
       const result = processAllOf(
         { type: "object", properties: {} },
-        false,
-        false,
+        { isStrict: false, isOptional: false },
       );
       expect(result).toEqual([]);
     });
@@ -82,8 +81,7 @@ describe("JSON Schema helpers", () => {
           type: "object",
           allOf: [{ type: "object", properties: { a: { type: "string" } } }],
         },
-        false,
-        true,
+        { isStrict: false, isOptional: true },
       );
       expect(result).toEqual([
         [true, { type: "object", properties: { a: { type: "string" } } }],
@@ -94,8 +92,7 @@ describe("JSON Schema helpers", () => {
       expect(() =>
         processAllOf(
           { type: "object", allOf: [{ type: "string" }] },
-          true,
-          false,
+          { isStrict: true, isOptional: false },
         ),
       ).toThrow("Can not merge");
     });
@@ -106,8 +103,7 @@ describe("JSON Schema helpers", () => {
           type: "object",
           allOf: [{ type: "object", properties: { a: { type: "string" } } }],
         },
-        true,
-        false,
+        { isStrict: true, isOptional: false },
       );
       expect(result).toEqual([
         [false, { type: "object", properties: { a: { type: "string" } } }],
