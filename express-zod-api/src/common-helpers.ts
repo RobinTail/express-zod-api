@@ -109,7 +109,7 @@ export const isSchema = <T extends z.core.$ZodType = z.core.$ZodType>(
   "_zod" in subject &&
   (type ? R.path(["_zod", "def", "type"], subject) === type : true);
 
-/** Configurable replacement for R.xprod() */
+/** Configurable replacement for R.xprod(), but it also handles empty arrays */
 export const combinations = <T>(
   left: T[],
   right: T[],
