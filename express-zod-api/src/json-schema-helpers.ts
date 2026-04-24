@@ -95,7 +95,7 @@ export const mergeExamples = (
     target.examples = combinations(
       target.examples?.filter(isObject) || [],
       entry.examples.filter(isObject),
-      (a, b) => R.mergeDeepRight(a, b),
+      R.mergeDeepRight,
     );
   }
 };
