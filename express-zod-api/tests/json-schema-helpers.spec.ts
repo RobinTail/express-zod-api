@@ -203,6 +203,19 @@ describe("JSON Schema helpers", () => {
       expect(flat).toEqual({ type: "object", properties: {} });
     });
 
+    test.each([0, -1, NaN])(
+      "should do nothing when maxCombinations=%s",
+      (maxCombinations) => {
+        const flat = { type: "object" as const, properties: {} };
+        mergeExamples(
+          flat,
+          { examples: [{ a: 1 }] },
+          { isOptional: false, maxCombinations },
+        );
+        expect(flat).toEqual({ type: "object", properties: {} });
+      },
+    );
+
     test("should concatenate examples when optional", () => {
       const flat = {
         type: "object" as const,

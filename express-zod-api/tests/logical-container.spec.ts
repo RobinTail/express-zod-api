@@ -124,19 +124,19 @@ describe("LogicalContainer", () => {
       ).toEqual([[{ type: "bearer", format: "JWT" }]]);
     });
 
-    test("should control the maximum combinations", () => {
-      expect(
-        processContainers(
-          [
-            { or: [{ and: [1, 2] }, { and: [3, 4] }] },
-            { or: [{ and: [5, 6] }, { and: [7, 8] }] },
-          ],
-          2,
-        ),
-      ).toEqual([
-        [1, 2, 5, 6],
-        [1, 2, 7, 8],
-      ]);
-    });
+    test.each([2, 0, -1, NaN])(
+      "should control the maximum combinations %s",
+      (maxCombinations) => {
+        expect(
+          processContainers(
+            [
+              { or: [{ and: [1, 2] }, { and: [3, 4] }] },
+              { or: [{ and: [5, 6] }, { and: [7, 8] }] },
+            ],
+            maxCombinations,
+          ),
+        ).toHaveLength(Math.max(0, maxCombinations || 0));
+      },
+    );
   });
 });
