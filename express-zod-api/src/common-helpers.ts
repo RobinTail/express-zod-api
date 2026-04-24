@@ -118,7 +118,7 @@ export const combinations = <T>(
   /** @desc Maximum number of combinations */
   limit = Infinity,
 ): T[] => {
-  if (Number.isNaN(limit) || limit <= 0) return [];
+  if (!(limit > 0)) return [];
   if (!left.length || !right.length) return left.concat(right).slice(0, limit);
   const result: T[] = [];
   for (let idxL = 0; idxL < left.length && result.length < limit; idxL++) {
