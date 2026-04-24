@@ -87,7 +87,8 @@ interface DocumentationParams {
    * */
   tags?: Parameters<typeof depictTags>[0];
   /**
-   * @desc Maximum number of combinations for examples and security access schemas
+   * @desc Maximum number of combined examples and security schemes
+   * @example 0 — disables combining of examples and security schemes
    * @default Infinity
    * @todo set to 20 in v28
    * */
