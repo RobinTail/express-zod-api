@@ -33,10 +33,10 @@ export const processContainers = <T>(
   const alternators = R.map(R.prop("or"), R.concat(ors, orsInAnds)); // no chain!
   return alternators.reduce(
     (acc, entry) =>
-      combinations(
+      combinations<Combination<T>>(
         acc,
         R.map((opt) => (isSimple(opt) ? [opt] : opt.and), entry),
-        (a, b) => R.concat(a, b),
+        R.concat,
       ),
     R.reject(R.isEmpty, [persistent]),
   );
