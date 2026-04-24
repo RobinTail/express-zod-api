@@ -2,6 +2,13 @@
 
 ## Version 27
 
+### v27.2.3
+
+- Optimizing the performance of traverses:
+  - Replaced O(n) `Array::shift()` and `::unshift()` operations with O(1) index-based iteration;
+  - The expected boost is from 1.8x to 20x depending on queue size;
+  - Scope: generators (Integration and Documentation), startup (diagnostics, routing).
+
 ### v27.2.2
 
 - `@express-zod-api/zod-plugin` version bumped to `^4.1.0`.
