@@ -90,8 +90,8 @@ export const walkRouting = ({
 }: RoutingWalkerParams) => {
   const stack = processEntries(config, routing);
   const visited = new Set<string>();
-  while (stack.length) {
-    const [path, element, explicitMethod] = stack.shift()!;
+  for (let idx = 0; idx < stack.length; idx++) {
+    const [path, element, explicitMethod] = stack[idx];
     if (element instanceof AbstractEndpoint) {
       if (explicitMethod) {
         checkDuplicate(explicitMethod, path, visited);
@@ -109,7 +109,7 @@ export const walkRouting = ({
       if (element instanceof ServeStatic) {
         if (onStatic) element.apply(path, onStatic);
       } else {
-        stack.unshift(...processEntries(config, element, path));
+        stack.splice(idx + 1, 0, ...processEntries(config, element, path));
       }
     }
   }

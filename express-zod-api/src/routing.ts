@@ -89,15 +89,9 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
     /** @link https://github.com/RobinTail/express-zod-api/discussions/2791#discussioncomment-13745912 */
     if (accessMethods.includes("get")) accessMethods.push("head");
     for (const [method, [matchingParsers, endpoint]] of methods) {
-      const handlers = matchingParsers
-        .slice() // must be immutable
-        .concat(async (request, response) => {
-          const logger = getLogger(request);
-          return endpoint.execute({ request, response, logger, config });
-        });
+      const handlers: RequestHandler[] = []; // issue #2706: CORS must go before parsers:
       if (config.cors) {
-        // issue #2706, must go before parsers:
-        handlers.unshift(async (request, response, next) => {
+        handlers.push(async (request, response, next) => {
           const logger = getLogger(request);
           const defaultHeaders = makeCorsHeaders(accessMethods);
           const headers =
@@ -108,6 +102,10 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
           next();
         });
       }
+      handlers.push(...matchingParsers, async (request, response) => {
+        const logger = getLogger(request);
+        return endpoint.execute({ request, response, logger, config });
+      });
       app[method](path, ...handlers);
     }
     if (config.hintAllowedMethods === false) continue;

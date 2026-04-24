@@ -1,6 +1,7 @@
 import * as R from "ramda";
 import { combinations, isObject, type FlatObject } from "./common-helpers";
 import type { z } from "zod";
+import type { SchemaObject } from "openapi3-ts/oas31";
 
 type MergeMode = "coerce" | "throw";
 type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &
@@ -18,19 +19,21 @@ export const propsMerger = R.mergeDeepWith((a: unknown, b: unknown) => {
   throw new Error("Can not flatten properties", { cause: { a, b } });
 });
 
+const mergeableKeys = new Set<string>([
+  "type",
+  "properties",
+  "required",
+  "examples",
+  "description",
+  "additionalProperties",
+] satisfies Array<keyof SchemaObject>); // z.core.JSONSchema has index signature
+
 /** @internal */
-export const canMerge = R.pipe(
-  Object.keys,
-  R.without([
-    "type",
-    "properties",
-    "required",
-    "examples",
-    "description",
-    "additionalProperties",
-  ] satisfies Array<keyof z.core.JSONSchema.ObjectSchema>),
-  R.isEmpty,
-);
+export const canMerge = (subject: FlatObject): boolean => {
+  for (const key of Object.keys(subject))
+    if (!mergeableKeys.has(key)) return false;
+  return true;
+};
 
 /** @internal */
 export const nestOptional = R.pair(true)<z.core.JSONSchema.BaseSchema>;
@@ -104,8 +107,8 @@ export const flattenIO = (
   const stack: Stack = [R.pair(false, jsonSchema)]; // [isOptional, JSON Schema]
   const flat: FlattenObjectSchema = { type: "object", properties: {} };
   const flatRequired: string[] = [];
-  while (stack.length) {
-    const [isOptional, entry] = stack.shift()!;
+  for (let idx = 0; idx < stack.length; idx++) {
+    const [isOptional, entry] = stack[idx];
     if (entry.description) flat.description ??= entry.description;
     stack.push(...processAllOf(entry, mode, isOptional));
     stack.push(...processVariants(entry));
