@@ -89,6 +89,7 @@ export const mergeExamples = (
     maxCombinations = Infinity,
   }: { isOptional: boolean; maxCombinations?: number },
 ) => {
+  if (!(maxCombinations! > 0)) return;
   if (!entry.examples?.length) return;
   if (isOptional) {
     target.examples = R.concat(target.examples || [], entry.examples).slice(
