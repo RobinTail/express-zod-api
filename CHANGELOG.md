@@ -4,8 +4,9 @@
 
 ### v27.2.4
 
-- Fixed performance regression since v24.4.0:
-  - Removed unnecessary `pullResponseExamples()` call in `outputSchema` getter;
+- Fixed performance regression since v24.0.0:
+  - Removed unnecessary processing of output schema examples;
+  - Those used to be processed when the first API request occurred on endpoint;
   - Examples are only required for OpenAPI generators, not for runtime validation.
 
 ### v27.2.3
