@@ -110,7 +110,6 @@ export const walkRouting = ({
       if (element instanceof ServeStatic) {
         if (onStatic) element.apply(path, onStatic);
       } else {
-        // eslint-disable-next-line no-restricted-syntax -- acceptable due to conditional logic
         stack.splice(idx + 1, 0, ...processEntries(config, element, path));
       }
     }

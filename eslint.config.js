@@ -73,7 +73,7 @@ const performanceConcerns = [
     message: "it can not be tree shaken, use tsdown and process.env instead",
   },
   {
-    selector: "CallExpression[callee.property.name=/^(shift|unshift|splice)$/]", // #3343
+    selector: "CallExpression[callee.property.name=/^(shift|unshift)$/]", // #3343
     message: "shifting is 2-20x slower than index-based iteration",
   },
 ];
