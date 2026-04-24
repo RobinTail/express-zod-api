@@ -90,10 +90,10 @@ export class Endpoint<
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
 
   /** considered expensive operation, only required for generators */
-  #ensureOutputExamples = R.once(() => {
+  #ensureOutputExamples = R.once((limit?: number) => {
     if (globalRegistry.get(this.#def.outputSchema)?.examples?.length) return; // examples on output schema, or pull up:
     if (!isSchema<z.core.$ZodObject>(this.#def.outputSchema, "object")) return;
-    const examples = pullResponseExamples(this.#def.outputSchema);
+    const examples = pullResponseExamples(this.#def.outputSchema, limit);
     if (!examples.length) return;
     const current = this.#def.outputSchema.meta();
     globalRegistry

@@ -90,7 +90,7 @@ export const getPublicErrorMessage = (error: HttpError): string =>
 /** @see pullRequestExamples */
 export const pullResponseExamples = <T extends z.core.$ZodObject>(
   subject: T,
-  limit = Infinity,
+  limit?: number,
 ) =>
   Object.entries(subject._zod.def.shape).reduce<FlatObject[]>(
     (acc, [key, schema]) => {
