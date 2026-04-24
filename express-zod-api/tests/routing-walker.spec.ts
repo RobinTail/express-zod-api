@@ -10,22 +10,18 @@ describe("walkRouting()", () => {
     const routing = {
       v1: {
         user: { retrieve: endpoint, create: endpoint },
-        post: endpoint,
+        record: endpoint,
       },
     };
 
     const onEndpoint = vi.fn();
 
-    walkRouting({
-      routing,
-      config: { cors: false, methodLikeRouteBehavior: "path" },
-      onEndpoint,
-    });
+    walkRouting({ routing, config: { cors: false }, onEndpoint });
 
     expect(onEndpoint.mock.calls).toEqual([
       ["get", "/v1/user/retrieve", endpoint],
       ["get", "/v1/user/create", endpoint],
-      ["get", "/v1/post", endpoint],
+      ["get", "/v1/record", endpoint],
     ]);
   });
 
@@ -33,11 +29,7 @@ describe("walkRouting()", () => {
     const routing = { a: { b: { c: endpoint }, d: endpoint } };
 
     const onEndpoint = vi.fn();
-    walkRouting({
-      routing,
-      config: { cors: false, methodLikeRouteBehavior: "path" },
-      onEndpoint,
-    });
+    walkRouting({ routing, config: { cors: false }, onEndpoint });
 
     expect(onEndpoint.mock.calls).toEqual([
       ["get", "/a/b/c", endpoint],
