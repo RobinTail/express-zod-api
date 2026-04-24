@@ -189,7 +189,10 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
-      const security = processContainers(endpoint.security);
+      const security = processContainers(
+        endpoint.security,
+        config.maxCombinations,
+      );
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
