@@ -2,7 +2,6 @@ import * as R from "ramda";
 import { combinations, FlatObject, isObject } from "./common-helpers";
 import type { z } from "zod";
 import type { SchemaObject } from "openapi3-ts/oas31";
-import { CommonConfig } from "./config-type";
 
 type MergeMode = "coerce" | "throw";
 type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &
@@ -90,7 +89,7 @@ export const mergeExamples = (
   {
     isOptional,
     maxCombinations,
-  }: Pick<CommonConfig, "maxCombinations"> & { isOptional: boolean },
+  }: { isOptional: boolean; maxCombinations?: number },
 ) => {
   if (!entry.examples?.length) return;
   if (isOptional) {
@@ -110,9 +109,10 @@ export const flattenIO = (
   {
     mode = "coerce",
     maxCombinations,
-  }: Pick<CommonConfig, "maxCombinations"> & {
+  }: {
     /** @default "coerce" */
     mode?: MergeMode;
+    maxCombinations?: number;
   } = {},
 ) => {
   const stack: Stack = [R.pair(false, jsonSchema)]; // [isOptional, JSON Schema]

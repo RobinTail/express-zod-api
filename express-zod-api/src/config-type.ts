@@ -89,8 +89,6 @@ export interface CommonConfig {
    * @see defaultInputSources
    */
   inputSources?: Partial<InputSources>;
-  /** @default Infinity */
-  maxCombinations?: number;
 }
 
 type BeforeUpload = (params: {

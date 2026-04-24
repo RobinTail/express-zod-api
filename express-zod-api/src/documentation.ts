@@ -86,6 +86,8 @@ interface DocumentationParams {
    * @example { users: "About users", files: { description: "About files", url: "https://example.com" } }
    * */
   tags?: Parameters<typeof depictTags>[0];
+  /** @default Infinity */
+  maxCombinations?: number;
 }
 
 export class Documentation extends OpenApiBuilder {
@@ -161,6 +163,7 @@ export class Documentation extends OpenApiBuilder {
     hasSummaryFromDescription = true,
     hasHeadMethod = true,
     composition = "inline",
+    maxCombinations = Infinity,
   }: DocumentationParams) {
     super();
     this.addInfo({ title, version });
@@ -173,7 +176,7 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         brandHandling,
-        maxCombinations: config.maxCombinations,
+        maxCombinations,
         makeRef: this.#makeRef.bind(this),
       };
       const { description, shortDescription, scopes, inputSchema } = endpoint;
@@ -190,10 +193,7 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
-      const security = processContainers(
-        endpoint.security,
-        config.maxCombinations,
-      );
+      const security = processContainers(endpoint.security, maxCombinations);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
@@ -209,7 +209,9 @@ export class Documentation extends OpenApiBuilder {
 
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {
-        const apiResponses = endpoint.getResponses(variant, config);
+        const apiResponses = endpoint.getResponses(variant, {
+          maxCombinations,
+        });
         for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
             responses[statusCode] = depictResponse({
