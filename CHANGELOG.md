@@ -2,6 +2,13 @@
 
 ## Version 24
 
+### v24.7.5
+
+- Fixed performance regression in v24.0.0:
+  - Removed unnecessary processing of output schema examples;
+  - Those used to be processed when the first API request occurred on endpoint;
+  - Examples are only required for Documentation generator, not for runtime validation.
+
 ### v24.7.4
 
 - This patch fixes the issue for users facing `TypeError: .example is not a function`, but not using that method:
