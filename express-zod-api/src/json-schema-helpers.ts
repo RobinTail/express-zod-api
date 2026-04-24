@@ -86,12 +86,15 @@ export const mergeExamples = (
   entry: z.core.JSONSchema.BaseSchema,
   {
     isOptional,
-    maxCombinations,
+    maxCombinations = Infinity,
   }: { isOptional: boolean; maxCombinations?: number },
 ) => {
   if (!entry.examples?.length) return;
   if (isOptional) {
-    target.examples = R.concat(target.examples || [], entry.examples);
+    target.examples = R.concat(target.examples || [], entry.examples).slice(
+      0,
+      maxCombinations,
+    );
   } else {
     target.examples = combinations(
       target.examples?.filter(isObject) || [],
