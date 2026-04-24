@@ -129,7 +129,7 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
 export const depictIntersection = R.tryCatch<Depicter>(
   ({ jsonSchema }, { maxCombinations }) => {
     if (!jsonSchema.allOf) throw "no allOf";
-    return flattenIO(jsonSchema, { mode: "throw", maxCombinations });
+    return flattenIO(jsonSchema, { isStrict: true, maxCombinations });
   },
   (_err, { jsonSchema }) => jsonSchema,
 );

@@ -3,7 +3,6 @@ import { combinations, FlatObject, isObject } from "./common-helpers";
 import type { z } from "zod";
 import type { SchemaObject } from "openapi3-ts/oas31";
 
-type MergeMode = "coerce" | "throw";
 type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &
   Required<Pick<z.core.JSONSchema.ObjectSchema, "properties">>;
 
@@ -42,12 +41,12 @@ type Stack = Array<ReturnType<typeof nestOptional>>;
 /** @internal */
 export const processAllOf = (
   subject: z.core.JSONSchema.BaseSchema,
-  mode: MergeMode,
+  isStrict: boolean,
   isOptional: boolean,
 ) => {
   if (!("allOf" in subject) || !subject.allOf) return [];
   return subject.allOf.map((one) => {
-    if (mode === "throw" && !(one.type === "object" && canMerge(one)))
+    if (isStrict && !(one.type === "object" && canMerge(one)))
       throw new Error("Can not merge");
     return R.pair(isOptional, one);
   });
@@ -107,11 +106,11 @@ export const mergeExamples = (
 export const flattenIO = (
   jsonSchema: z.core.JSONSchema.BaseSchema,
   {
-    mode = "coerce",
+    isStrict = false,
     maxCombinations,
   }: {
-    /** @default "coerce" */
-    mode?: MergeMode;
+    /** @default false */
+    isStrict?: boolean;
     maxCombinations?: number;
   } = {},
 ) => {
@@ -121,7 +120,7 @@ export const flattenIO = (
   for (let idx = 0; idx < stack.length; idx++) {
     const [isOptional, entry] = stack[idx];
     if (entry.description) flat.description ??= entry.description;
-    stack.push(...processAllOf(entry, mode, isOptional));
+    stack.push(...processAllOf(entry, isStrict, isOptional));
     stack.push(...processVariants(entry));
     mergeExamples(flat, entry, { isOptional, maxCombinations });
     if (!isJsonObjectSchema(entry)) continue;
@@ -130,7 +129,7 @@ export const flattenIO = (
       { examples: pullRequestExamples(entry, maxCombinations) },
     ]);
     if (entry.properties) {
-      flat.properties = (mode === "throw" ? propsMerger : R.mergeDeepRight)(
+      flat.properties = (isStrict ? propsMerger : R.mergeDeepRight)(
         flat.properties,
         entry.properties,
       );

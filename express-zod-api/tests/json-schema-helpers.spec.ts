@@ -70,19 +70,19 @@ describe("JSON Schema helpers", () => {
     test("should return empty array when no allOf", () => {
       const result = processAllOf(
         { type: "object", properties: {} },
-        "coerce",
+        false,
         false,
       );
       expect(result).toEqual([]);
     });
 
-    test("should map allOf entries with isOptional flag in coerce mode", () => {
+    test("should map allOf entries with isOptional flag in non-strict mode", () => {
       const result = processAllOf(
         {
           type: "object",
           allOf: [{ type: "object", properties: { a: { type: "string" } } }],
         },
-        "coerce",
+        false,
         true,
       );
       expect(result).toEqual([
@@ -90,23 +90,23 @@ describe("JSON Schema helpers", () => {
       ]);
     });
 
-    test("should throw in throw mode when schema cannot be merged", () => {
+    test("should throw in strict mode when schema cannot be merged", () => {
       expect(() =>
         processAllOf(
           { type: "object", allOf: [{ type: "string" }] },
-          "throw",
+          true,
           false,
         ),
       ).toThrow("Can not merge");
     });
 
-    test("should allow mergeable schemas in throw mode", () => {
+    test("should allow mergeable schemas in strict mode", () => {
       const result = processAllOf(
         {
           type: "object",
           allOf: [{ type: "object", properties: { a: { type: "string" } } }],
         },
-        "throw",
+        true,
         false,
       );
       expect(result).toEqual([
