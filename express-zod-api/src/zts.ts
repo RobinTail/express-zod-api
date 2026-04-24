@@ -45,11 +45,9 @@ const onTemplateLiteral: Producer = (
   const readText = () => {
     let text = "";
     while (idx < parts.length) {
-      const part = parts[idx++];
-      if (isSchema(part)) {
-        idx--;
-        break;
-      }
+      const part = parts[idx];
+      if (isSchema(part)) break;
+      idx++;
       text += part ?? ""; // Handle potential undefined values
     }
     return text;
