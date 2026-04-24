@@ -1,0 +1,36 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`walkRouting() > should process endpoints in depth-first order 0 1`] = `
+[
+  [
+    "get",
+    "/v1/user/retrieve",
+    Endpoint {},
+  ],
+  [
+    "get",
+    "/v1/user/create",
+    Endpoint {},
+  ],
+  [
+    "get",
+    "/v1/record",
+    Endpoint {},
+  ],
+]
+`;
+
+exports[`walkRouting() > should process endpoints in depth-first order 1 1`] = `
+[
+  [
+    "get",
+    "/a/b/c",
+    Endpoint {},
+  ],
+  [
+    "get",
+    "/a/d",
+    Endpoint {},
+  ],
+]
+`;
