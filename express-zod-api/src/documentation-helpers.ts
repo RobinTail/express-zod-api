@@ -460,6 +460,7 @@ export const depictResponse = ({
   hasMultipleStatusCodes,
   statusCode,
   brandHandling,
+  maxCombinations,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
@@ -477,7 +478,7 @@ export const depictResponse = ({
   const response = asOAS(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
-      ctx: { isResponse: true, makeRef, path, method },
+      ctx: { isResponse: true, makeRef, path, method, maxCombinations },
     }),
   );
   const examples = [];
@@ -593,13 +594,14 @@ export const depictRequest = ({
   makeRef,
   path,
   method,
+  maxCombinations,
 }: ReqResCommons & {
   schema: IOSchema;
   brandHandling?: BrandHandling;
 }) =>
   depict(schema, {
     rules: { ...brandHandling, ...depicters },
-    ctx: { isResponse: false, makeRef, path, method },
+    ctx: { isResponse: false, makeRef, path, method, maxCombinations },
   });
 
 export const depictBody = ({
