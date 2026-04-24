@@ -107,7 +107,7 @@ export class Integration extends IntegrationBase {
       this.#program.push(input);
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
-          const responses = endpoint.getResponses(responseVariant);
+          const responses = endpoint.getResponses(responseVariant, config);
           const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
             const hasContent = shouldHaveContent(method, mimeTypes);
             const variantType = this.api.makeType(

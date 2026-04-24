@@ -208,7 +208,7 @@ export class Documentation extends OpenApiBuilder {
 
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {
-        const apiResponses = endpoint.getResponses(variant);
+        const apiResponses = endpoint.getResponses(variant, config);
         for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
             responses[statusCode] = depictResponse({

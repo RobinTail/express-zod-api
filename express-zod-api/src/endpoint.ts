@@ -57,6 +57,7 @@ export abstract class AbstractEndpoint {
   /** @internal */
   public abstract getResponses(
     variant: ResponseVariant,
+    config: Pick<CommonConfig, "maxCombinations">,
   ): ReadonlyArray<NormalizedResponse>;
   /** @internal */
   public abstract getOperationId(method: ClientMethod): string | undefined;
@@ -172,8 +173,11 @@ export class Endpoint<
   }
 
   /** @internal */
-  public override getResponses(variant: ResponseVariant) {
-    if (variant === "positive") this.#ensureOutputExamples();
+  public override getResponses(
+    variant: ResponseVariant,
+    { maxCombinations }: Pick<CommonConfig, "maxCombinations">,
+  ) {
+    if (variant === "positive") this.#ensureOutputExamples(maxCombinations);
     return Object.freeze(
       variant === "negative"
         ? this.#def.resultHandler.getNegativeResponse()
