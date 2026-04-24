@@ -77,6 +77,7 @@ export class Diagnostics {
         unrepresentable: "any",
         io: "input",
       }),
+      { maxCombinations: 0 }, // not required for this check
     );
     for (const param of params) {
       if (param in ref.flat.properties) continue;

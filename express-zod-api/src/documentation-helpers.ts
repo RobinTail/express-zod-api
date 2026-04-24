@@ -55,6 +55,7 @@ interface ReqResCommons {
   ) => ReferenceObject;
   path: string;
   method: ClientMethod;
+  maxCombinations?: number;
 }
 
 export interface OpenAPIContext extends ReqResCommons {
@@ -126,9 +127,9 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
 };
 
 export const depictIntersection = R.tryCatch<Depicter>(
-  ({ jsonSchema }) => {
+  ({ jsonSchema }, { maxCombinations }) => {
     if (!jsonSchema.allOf) throw "no allOf";
-    return flattenIO(jsonSchema, "throw");
+    return flattenIO(jsonSchema, { mode: "throw", maxCombinations });
   },
   (_err, { jsonSchema }) => jsonSchema,
 );
@@ -282,6 +283,7 @@ export const depictRequestParams = ({
   composition,
   isHeader,
   security,
+  maxCombinations,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResCommons & {
   composition: "inline" | "components";
@@ -291,7 +293,7 @@ export const depictRequestParams = ({
   isHeader?: IsHeader;
   security?: Alternatives<Security>;
 }) => {
-  const flat = flattenIO(request);
+  const flat = flattenIO(request, { maxCombinations });
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
@@ -609,6 +611,7 @@ export const depictBody = ({
   makeRef,
   composition,
   paramNames,
+  maxCombinations,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResCommons & {
   schema: IOSchema;
@@ -635,7 +638,7 @@ export const depictBody = ({
     examples: enumerateExamples(
       examples.length
         ? examples
-        : flattenIO(request)
+        : flattenIO(request, { maxCombinations })
             .examples?.filter(
               (one): one is FlatObject => isObject(one) && !Array.isArray(one),
             )

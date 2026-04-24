@@ -2,6 +2,7 @@ import * as R from "ramda";
 import { combinations, FlatObject, isObject } from "./common-helpers";
 import type { z } from "zod";
 import type { SchemaObject } from "openapi3-ts/oas31";
+import { CommonConfig } from "./config-type";
 
 type MergeMode = "coerce" | "throw";
 type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &
@@ -96,13 +97,20 @@ export const mergeExamples = (
       target.examples?.filter(isObject) || [],
       entry.examples.filter(isObject),
       R.mergeDeepRight,
+      // @todo: add limit
     );
   }
 };
 
 export const flattenIO = (
   jsonSchema: z.core.JSONSchema.BaseSchema,
-  mode: MergeMode = "coerce",
+  {
+    mode = "coerce",
+    maxCombinations,
+  }: Pick<CommonConfig, "maxCombinations"> & {
+    /** @default "coerce" */
+    mode?: MergeMode;
+  } = {},
 ) => {
   const stack: Stack = [R.pair(false, jsonSchema)]; // [isOptional, JSON Schema]
   const flat: FlattenObjectSchema = { type: "object", properties: {} };
@@ -114,7 +122,10 @@ export const flattenIO = (
     stack.push(...processVariants(entry));
     mergeExamples(flat, entry, isOptional);
     if (!isJsonObjectSchema(entry)) continue;
-    stack.push([isOptional, { examples: pullRequestExamples(entry) }]);
+    stack.push([
+      isOptional,
+      { examples: pullRequestExamples(entry, maxCombinations) },
+    ]);
     if (entry.properties) {
       flat.properties = (mode === "throw" ? propsMerger : R.mergeDeepRight)(
         flat.properties,

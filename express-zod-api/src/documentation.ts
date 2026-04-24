@@ -173,6 +173,7 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         brandHandling,
+        maxCombinations: config.maxCombinations,
         makeRef: this.#makeRef.bind(this),
       };
       const { description, shortDescription, scopes, inputSchema } = endpoint;
