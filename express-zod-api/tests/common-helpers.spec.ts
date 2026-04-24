@@ -283,7 +283,9 @@ describe("Common Helpers", () => {
 
     test("should handle one or two arrays are empty", () => {
       expect(combinations([], [4, 5, 6], (a, b) => a + b)).toEqual([4, 5, 6]);
-      expect(combinations([1, 2, 3], [], (a, b) => a + b)).toEqual([1, 2, 3]);
+      expect(combinations([1, 2, 3], [], (a, b) => a + b, 1)).toEqual([
+        1, 2, 3,
+      ]);
       expect(combinations<number>([], [], (a, b) => a + b)).toEqual([]);
     });
   });
