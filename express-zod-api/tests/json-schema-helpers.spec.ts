@@ -281,6 +281,24 @@ describe("JSON Schema helpers", () => {
         { name: "jane", age: 30 },
       ]);
     });
+
+    test("should respect the given limit", () => {
+      expect(
+        pullRequestExamples(
+          {
+            type: "object",
+            properties: {
+              name: { type: "string", examples: ["john", "jane"] },
+              age: { type: "number", examples: [25, 30] },
+            },
+          },
+          2,
+        ),
+      ).toEqual([
+        { name: "john", age: 25 },
+        { name: "john", age: 30 },
+      ]);
+    });
   });
 
   describe("flattenIO()", () => {

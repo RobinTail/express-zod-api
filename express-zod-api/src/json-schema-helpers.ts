@@ -129,11 +129,14 @@ export const flattenIO = (
 };
 
 /** @see pullResponseExamples */
-export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
+export const pullRequestExamples = (
+  subject: z.core.JSONSchema.ObjectSchema,
+  limit?: number,
+) =>
   Object.entries(subject.properties || {}).reduce<FlatObject[]>(
     (acc, [key, prop]) => {
       const { examples = [] } = isObject(prop) ? prop : {};
-      return combinations(acc, examples.map(R.objOf(key)), R.mergeRight);
+      return combinations(acc, examples.map(R.objOf(key)), R.mergeRight, limit);
     },
     [],
   );
