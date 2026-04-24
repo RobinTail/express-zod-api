@@ -280,6 +280,9 @@ importers:
       '@typescript-eslint/rule-tester':
         specifier: catalog:dev
         version: 8.48.0(eslint@9.39.1)(typescript@5.9.3)
+      typescript:
+        specifier: catalog:dev
+        version: 5.9.3
 
   zod-plugin:
     dependencies:
