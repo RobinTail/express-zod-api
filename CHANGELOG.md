@@ -2,6 +2,12 @@
 
 ## Version 27
 
+### v27.2.4
+
+- Fixed performance regression since v24.4.0:
+  - Removed unnecessary `pullResponseExamples()` call in `outputSchema` getter;
+  - Examples are only required for OpenAPI generators, not for runtime validation.
+
 ### v27.2.3
 
 - Optimizing the performance of traverses:
