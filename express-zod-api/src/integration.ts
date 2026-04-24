@@ -153,6 +153,7 @@ export class Integration extends IntegrationBase {
       config,
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
+    // eslint-disable-next-line no-restricted-syntax -- accumulated late, acceptable for generator
     this.#program.unshift(...this.#aliases.values());
     this.#program.push(
       this.makePathType(),
