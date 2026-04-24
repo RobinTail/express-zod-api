@@ -109,13 +109,16 @@ export const isSchema = <T extends z.core.$ZodType = z.core.$ZodType>(
   "_zod" in subject &&
   (type ? R.path(["_zod", "def", "type"], subject) === type : true);
 
+/** Configurable replacement for R.xprod() */
 export const combinations = <T>(
   left: T[],
   right: T[],
+  /** @desc The function that combines elements */
   merge: (a: T, b: T) => T,
+  /** @desc Maximum number of combinations to generate, only applies to non-empty arrays */
   limit = Infinity,
 ): T[] => {
-  if (!left.length || !right.length) return left.concat(right);
+  if (!left.length || !right.length) return left.concat(right); // immutable one or another
   const result: T[] = [];
   for (let idxL = 0; idxL < left.length && result.length < limit; idxL++) {
     for (let idxR = 0; idxR < right.length && result.length < limit; idxR++)
