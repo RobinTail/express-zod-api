@@ -371,9 +371,8 @@ const fixReferences = (
   ctx: OpenAPIContext,
 ) => {
   const stack: unknown[] = [subject, defs];
-  let idx = 0;
-  while (idx < stack.length) {
-    const entry = stack[idx++];
+  for (let idx = 0; idx < stack.length; idx++) {
+    const entry = stack[idx];
     if (R.is(Object, entry)) {
       if (isReferenceObject(entry) && !entry.$ref.startsWith("#/components")) {
         const actualName = entry.$ref.split("/").pop()!;
