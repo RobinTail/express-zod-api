@@ -1,6 +1,5 @@
 import * as R from "ramda";
 import { combinations, isObject } from "./common-helpers";
-import type { Security } from "./security";
 
 type LogicalOr<T> = { or: T[] };
 type LogicalAnd<T> = { and: T[] };
@@ -25,18 +24,6 @@ export const isSimple = <T>(entry: LogicalContainer<T>): entry is T =>
 type Combination<T> = T[];
 /** @desc OR[ AND[a,b] , AND[b,c] ] */
 export type Alternatives<T> = Array<Combination<T>>;
-
-const pickHeaders = (container: LogicalContainer<Security>): string[] => {
-  if (isLogicalAnd(container)) return R.chain(pickHeaders, container.and);
-  if (isLogicalOr(container)) return R.chain(pickHeaders, container.or);
-  if (container.type === "header") return [container.name];
-  return [];
-};
-
-/** @desc Extract header security names from logical containers without generating combinations */
-export const pickSecurityHeaders = (
-  containers: LogicalContainer<Security>[],
-): Set<string> => new Set(R.chain(pickHeaders, containers));
 
 export const processContainers = <T>(
   containers: LogicalContainer<T>[],

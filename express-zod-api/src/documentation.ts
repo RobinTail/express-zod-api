@@ -13,7 +13,8 @@ import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { getInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { processContainers, pickSecurityHeaders } from "./logical-container";
+import { getSecurityHeaders } from "./security";
+import { processContainers } from "./logical-container";
 import { ClientMethod } from "./method";
 import {
   depictBody,
@@ -199,7 +200,7 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
-      const securityHeaders = pickSecurityHeaders(endpoint.security);
+      const securityHeaders = getSecurityHeaders(endpoint.security);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
