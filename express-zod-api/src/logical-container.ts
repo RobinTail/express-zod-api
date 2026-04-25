@@ -9,13 +9,16 @@ export type LogicalContainer<T> =
   | LogicalAnd<T | LogicalOr<T>>
   | T;
 
-const isLogicalOr = <T>(subject: LogicalContainer<T>) =>
+/** @internal */
+export const isLogicalOr = <T>(subject: LogicalContainer<T>) =>
   isObject(subject) && "or" in subject;
 
-const isLogicalAnd = <T>(subject: LogicalContainer<T>) =>
+/** @internal */
+export const isLogicalAnd = <T>(subject: LogicalContainer<T>) =>
   isObject(subject) && "and" in subject;
 
-const isSimple = <T>(entry: LogicalContainer<T>): entry is T =>
+/** @internal */
+export const isSimple = <T>(entry: LogicalContainer<T>): entry is T =>
   !isLogicalAnd(entry) && !isLogicalOr(entry);
 
 type Combination<T> = T[];
