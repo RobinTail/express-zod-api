@@ -124,7 +124,7 @@ describe("LogicalContainer", () => {
       ).toEqual([[{ type: "bearer", format: "JWT" }]]);
     });
 
-    test("should control the maximum combinations %s", () => {
+    test("should control the maximum combinations", () => {
       expect(
         processContainers(
           [
