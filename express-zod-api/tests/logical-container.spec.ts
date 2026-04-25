@@ -1,6 +1,79 @@
-import { processContainers } from "../src/logical-container";
+import {
+  isLogicalOr,
+  isLogicalAnd,
+  isSimple,
+  processContainers,
+} from "../src/logical-container";
 
 describe("LogicalContainer", () => {
+  describe("isLogicalOr()", () => {
+    test.each([
+      true,
+      false,
+      0,
+      1,
+      "",
+      "test",
+      null,
+      undefined,
+      [],
+      [1],
+      {},
+      { and: [] },
+    ])("should return false when has no 'or' property %#", (value) => {
+      expect(isLogicalOr(value)).toBe(false);
+    });
+
+    test.each([{ or: [] }, { or: [1] }, { or: [1, 2, 3] }])(
+      "should return true for object with 'or' property %#",
+      (value) => {
+        expect(isLogicalOr(value)).toBe(true);
+      },
+    );
+  });
+
+  describe("isLogicalAnd()", () => {
+    test.each([
+      true,
+      false,
+      0,
+      1,
+      "",
+      "test",
+      null,
+      undefined,
+      [],
+      [1],
+      {},
+      { or: [] },
+    ])("should return false when has no 'and' property %#", (value) => {
+      expect(isLogicalAnd(value)).toBe(false);
+    });
+
+    test.each([{ and: [] }, { and: [1] }, { and: [1, 2, 3] }])(
+      "should return true for object with 'and' property %#",
+      (value) => {
+        expect(isLogicalAnd(value)).toBe(true);
+      },
+    );
+  });
+
+  describe("isSimple()", () => {
+    test.each([true, false, 0, 1, "", "test", null, undefined, [], [1], {}])(
+      "should return true for non-logical values %#",
+      (value) => {
+        expect(isSimple(value)).toBe(true);
+      },
+    );
+
+    test.each([{ or: [] }, { or: [1] }, { and: [] }, { and: [1] }])(
+      "should return false for logical containers %#",
+      (value) => {
+        expect(isSimple(value)).toBe(false);
+      },
+    );
+  });
+
   describe("processContainers()", () => {
     test("should process simples", () => {
       expect(processContainers([1])).toEqual([[1]]);
