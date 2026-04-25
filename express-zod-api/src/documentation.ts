@@ -13,7 +13,7 @@ import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { getInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
-import { processContainers } from "./logical-container";
+import { processContainers, pickSecurityHeaders } from "./logical-container";
 import { ClientMethod } from "./method";
 import {
   depictBody,
@@ -198,12 +198,12 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
-      const security = processContainers(endpoint.security, maxCombinations);
+      const securityHeaders = pickSecurityHeaders(endpoint.security);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         isHeader,
-        security,
+        securityHeaders,
         request,
         description: descriptions?.requestParameter?.call(null, {
           method,
@@ -254,7 +254,10 @@ export class Documentation extends OpenApiBuilder {
         : undefined;
 
       const securityRefs = depictSecurityRefs(
-        depictSecurity(security, inputSources),
+        depictSecurity(
+          processContainers(endpoint.security, maxCombinations),
+          inputSources,
+        ),
         scopes,
         (securitySchema) => {
           const name = this.#ensureUniqSecuritySchemaName(securitySchema);

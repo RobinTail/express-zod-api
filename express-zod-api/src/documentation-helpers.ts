@@ -268,9 +268,9 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
 
 export const defaultIsHeader = (
   name: string,
-  familiar?: string[],
+  familiar?: Set<string>,
 ): name is `x-${string}` =>
-  familiar?.includes(name) ||
+  familiar?.has(name) ||
   name.startsWith("x-") ||
   wellKnownHeaders.includes(name);
 
@@ -282,7 +282,7 @@ export const depictRequestParams = ({
   makeRef,
   composition,
   isHeader,
-  security,
+  securityHeaders,
   maxCombinations,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResCommons & {
@@ -291,17 +291,13 @@ export const depictRequestParams = ({
   request: z.core.JSONSchema.BaseSchema;
   inputSources: InputSource[];
   isHeader?: IsHeader;
-  security?: Alternatives<Security>;
+  securityHeaders?: Set<string>;
 }) => {
   const flat = flattenIO(request, { maxCombinations });
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
   const areHeadersEnabled = inputSources.includes("headers");
-  const securityHeaders = R.chain(
-    R.filter((entry: Security) => entry.type === "header"),
-    security ?? [],
-  ).map(({ name }) => name);
 
   const getLocation = (name: string) => {
     if (areParamsEnabled && pathParams.includes(name)) return "path";
