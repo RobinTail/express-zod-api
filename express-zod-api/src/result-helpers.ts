@@ -91,13 +91,11 @@ export const getPublicErrorMessage = (error: HttpError): string =>
 export const pullResponseExamples = <T extends z.core.$ZodObject>(
   subject: T,
   limit = Infinity,
-) => {
-  if (!(limit > 0)) return [];
-  return Object.entries(subject._zod.def.shape).reduce<FlatObject[]>(
+) =>
+  Object.entries(subject._zod.def.shape).reduce<FlatObject[]>(
     (acc, [key, schema]) => {
       const { examples = [] } = globalRegistry.get(schema) || {};
       return combinations(acc, examples.map(R.objOf(key)), R.mergeRight, limit);
     },
     [],
   );
-};

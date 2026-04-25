@@ -89,13 +89,9 @@ export const mergeExamples = (
     maxCombinations = Infinity,
   }: { isOptional: boolean; maxCombinations?: number },
 ) => {
-  if (!(maxCombinations > 0)) return;
   if (!entry.examples?.length) return;
   if (isOptional) {
-    target.examples = R.concat(target.examples || [], entry.examples).slice(
-      0,
-      maxCombinations,
-    );
+    target.examples = R.concat(target.examples || [], entry.examples);
   } else {
     target.examples = combinations(
       target.examples?.filter(isObject) || [],
@@ -148,13 +144,11 @@ export const flattenIO = (
 export const pullRequestExamples = (
   subject: z.core.JSONSchema.ObjectSchema,
   limit = Infinity,
-) => {
-  if (!(limit > 0)) return [];
-  return Object.entries(subject.properties || {}).reduce<FlatObject[]>(
+) =>
+  Object.entries(subject.properties || {}).reduce<FlatObject[]>(
     (acc, [key, prop]) => {
       const { examples = [] } = isObject(prop) ? prop : {};
       return combinations(acc, examples.map(R.objOf(key)), R.mergeRight, limit);
     },
     [],
   );
-};

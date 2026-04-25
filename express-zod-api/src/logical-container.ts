@@ -43,7 +43,6 @@ export const processContainers = <T>(
   containers: LogicalContainer<T>[],
   maxCombinations = Infinity,
 ): Alternatives<T> => {
-  if (!(maxCombinations > 0)) return [];
   const simples = R.filter(isSimple, containers);
   const ands = R.chain(R.prop("and"), R.filter(isLogicalAnd, containers));
   const [simpleAnds, orsInAnds] = R.partition(isSimple, ands);

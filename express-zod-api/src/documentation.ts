@@ -87,10 +87,11 @@ interface DocumentationParams {
    * */
   tags?: Parameters<typeof depictTags>[0];
   /**
-   * @desc Maximum number of combined examples and security schemes
-   * @example 0 — disables combining of examples and security schemes
+   * @desc Limits cartesian product when combining variations.
+   * @desc Applies to distributed examples and security scheme alternatives.
+   * @example 0 — disables combinations, but keeps concatenations
    * @default Infinity
-   * @todo set to 20 in v28
+   * @todo set to 20 or 50 in v28
    * */
   maxCombinations?: number;
 }

@@ -203,19 +203,6 @@ describe("JSON Schema helpers", () => {
       expect(flat).toEqual({ type: "object", properties: {} });
     });
 
-    test.each([0, -1, NaN])(
-      "should do nothing when maxCombinations=%s",
-      (maxCombinations) => {
-        const flat = { type: "object" as const, properties: {} };
-        mergeExamples(
-          flat,
-          { examples: [{ a: 1 }] },
-          { isOptional: false, maxCombinations },
-        );
-        expect(flat).toEqual({ type: "object", properties: {} });
-      },
-    );
-
     test("should concatenate examples when optional", () => {
       const flat = {
         type: "object" as const,
@@ -254,6 +241,24 @@ describe("JSON Schema helpers", () => {
         { a: 1, b: 2 },
         { a: 1, b: 3 },
       ]);
+    });
+
+    test("should apply limit to combinations when required", () => {
+      const flat = {
+        type: "object" as const,
+        properties: {},
+        examples: [{ a: 1 }],
+      };
+      mergeExamples(
+        flat,
+        { examples: [{ b: 2 }, { b: 3 }] },
+        { isOptional: false, maxCombinations: 1 },
+      );
+      expect(flat).toEqual({
+        type: "object",
+        properties: {},
+        examples: [{ a: 1, b: 2 }],
+      });
     });
   });
 
@@ -315,20 +320,6 @@ describe("JSON Schema helpers", () => {
         { name: "john", age: 25 },
         { name: "john", age: 30 },
       ]);
-    });
-
-    test.each([0, -1, NaN])("should return empty for limit=%s", (limit) => {
-      expect(
-        pullRequestExamples(
-          {
-            type: "object",
-            properties: {
-              name: { type: "string", examples: ["john"] },
-            },
-          },
-          limit,
-        ),
-      ).toEqual([]);
     });
   });
 
