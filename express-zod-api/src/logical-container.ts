@@ -24,13 +24,9 @@ type Combination<T> = T[];
 export type Alternatives<T> = Array<Combination<T>>;
 
 const pickHeaders = (container: LogicalContainer<Security>): string[] => {
-  if (isSimple(container)) {
-    return "type" in container && container.type === "header"
-      ? [container.name]
-      : [];
-  }
   if (isLogicalAnd(container)) return R.chain(pickHeaders, container.and);
   if (isLogicalOr(container)) return R.chain(pickHeaders, container.or);
+  if (container.type === "header") return [container.name];
   return [];
 };
 
