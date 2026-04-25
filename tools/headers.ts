@@ -263,5 +263,11 @@ const headers = lines
 console.debug("CRC:", headers.length);
 
 const json = JSON.stringify(headers, undefined, 2);
-const tsCode = await format(`export default ${json};`, { filepath: dest });
+const tsCode = await format(
+  `import * as R from "ramda";\n\n` +
+    `export const getWellKnownHeaders = R.once(\n` +
+    `  () => new Set(${json})\n` +
+    `);`,
+  { filepath: dest },
+);
 await writeFile(dest, tsCode, "utf-8");

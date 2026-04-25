@@ -1,16 +1,16 @@
 import { bench } from "vitest";
-import wellKnownHeaders from "../src/well-known-headers";
+import { getWellKnownHeaders } from "../src/well-known-headers";
 
-const target = wellKnownHeaders[wellKnownHeaders.length - 1];
+const target = "x-frame-options";
 
 describe("Array.includes vs Set.has for well-known headers lookup", () => {
-  const headerSet = new Set(wellKnownHeaders);
+  const headersArray = Array.from(getWellKnownHeaders());
 
   bench("Array.includes", () => {
-    wellKnownHeaders.includes(target);
+    headersArray.includes(target);
   });
 
   bench("Set.has", () => {
-    headerSet.has(target);
+    getWellKnownHeaders().has(target);
   });
 });
