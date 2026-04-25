@@ -123,6 +123,13 @@ describe("Result helpers", () => {
         { a: "two", b: 1, c: false },
       ]);
     });
+
+    test.each([0, -1, NaN])("returns empty for limit=%s", (limit) => {
+      const schema = z.object({
+        a: z.string().example("one"),
+      });
+      expect(pullResponseExamples(schema, limit)).toEqual([]);
+    });
   });
 
   describe.each(["development", "production"])(

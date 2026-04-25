@@ -316,6 +316,20 @@ describe("JSON Schema helpers", () => {
         { name: "john", age: 30 },
       ]);
     });
+
+    test.each([0, -1, NaN])("should return empty for limit=%s", (limit) => {
+      expect(
+        pullRequestExamples(
+          {
+            type: "object",
+            properties: {
+              name: { type: "string", examples: ["john"] },
+            },
+          },
+          limit,
+        ),
+      ).toEqual([]);
+    });
   });
 
   describe("flattenIO()", () => {
