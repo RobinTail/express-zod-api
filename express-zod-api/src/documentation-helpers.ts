@@ -55,6 +55,7 @@ interface ReqResCommons {
   ) => ReferenceObject;
   path: string;
   method: ClientMethod;
+  maxCombinations?: number;
 }
 
 export interface OpenAPIContext extends ReqResCommons {
@@ -126,9 +127,9 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
 };
 
 export const depictIntersection = R.tryCatch<Depicter>(
-  ({ jsonSchema }) => {
+  ({ jsonSchema }, { maxCombinations }) => {
     if (!jsonSchema.allOf) throw "no allOf";
-    return flattenIO(jsonSchema, "throw");
+    return flattenIO(jsonSchema, { isStrict: true, maxCombinations });
   },
   (_err, { jsonSchema }) => jsonSchema,
 );
@@ -267,9 +268,9 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
 
 export const defaultIsHeader = (
   name: string,
-  familiar?: string[],
+  familiar?: Set<string>,
 ): name is `x-${string}` =>
-  familiar?.includes(name) ||
+  familiar?.has(name) ||
   name.startsWith("x-") ||
   wellKnownHeaders.includes(name);
 
@@ -281,7 +282,8 @@ export const depictRequestParams = ({
   makeRef,
   composition,
   isHeader,
-  security,
+  securityHeaders,
+  maxCombinations,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResCommons & {
   composition: "inline" | "components";
@@ -289,17 +291,13 @@ export const depictRequestParams = ({
   request: z.core.JSONSchema.BaseSchema;
   inputSources: InputSource[];
   isHeader?: IsHeader;
-  security?: Alternatives<Security>;
+  securityHeaders?: Set<string>;
 }) => {
-  const flat = flattenIO(request);
+  const flat = flattenIO(request, { maxCombinations });
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
   const areHeadersEnabled = inputSources.includes("headers");
-  const securityHeaders = R.chain(
-    R.filter((entry: Security) => entry.type === "header"),
-    security ?? [],
-  ).map(({ name }) => name);
 
   const getLocation = (name: string) => {
     if (areParamsEnabled && pathParams.includes(name)) return "path";
@@ -458,6 +456,7 @@ export const depictResponse = ({
   hasMultipleStatusCodes,
   statusCode,
   brandHandling,
+  maxCombinations,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
@@ -475,7 +474,7 @@ export const depictResponse = ({
   const response = asOAS(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
-      ctx: { isResponse: true, makeRef, path, method },
+      ctx: { isResponse: true, makeRef, path, method, maxCombinations },
     }),
   );
   const examples = [];
@@ -591,13 +590,14 @@ export const depictRequest = ({
   makeRef,
   path,
   method,
+  maxCombinations,
 }: ReqResCommons & {
   schema: IOSchema;
   brandHandling?: BrandHandling;
 }) =>
   depict(schema, {
     rules: { ...brandHandling, ...depicters },
-    ctx: { isResponse: false, makeRef, path, method },
+    ctx: { isResponse: false, makeRef, path, method, maxCombinations },
   });
 
 export const depictBody = ({
@@ -609,6 +609,7 @@ export const depictBody = ({
   makeRef,
   composition,
   paramNames,
+  maxCombinations,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResCommons & {
   schema: IOSchema;
@@ -635,7 +636,7 @@ export const depictBody = ({
     examples: enumerateExamples(
       examples.length
         ? examples
-        : flattenIO(request)
+        : flattenIO(request, { maxCombinations })
             .examples?.filter(
               (one): one is FlatObject => isObject(one) && !Array.isArray(one),
             )

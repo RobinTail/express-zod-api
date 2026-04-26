@@ -13,6 +13,7 @@ import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { getInputSources, makeCleanId } from "./common-helpers";
 import { CommonConfig } from "./config-type";
+import { getSecurityHeaders } from "./security";
 import { processContainers } from "./logical-container";
 import { ClientMethod } from "./method";
 import {
@@ -86,6 +87,14 @@ interface DocumentationParams {
    * @example { users: "About users", files: { description: "About files", url: "https://example.com" } }
    * */
   tags?: Parameters<typeof depictTags>[0];
+  /**
+   * @desc Limits cartesian product when generating examples by combining each property's own examples.
+   * @desc Applies to: request/response examples, security scheme alternatives.
+   * @example 0 — disables product combinations, keeps concatenations
+   * @default Infinity
+   * @todo set to 20 or 50 in v28 to avoid too many combinations
+   * */
+  maxCombinations?: number;
 }
 
 export class Documentation extends OpenApiBuilder {
@@ -161,6 +170,7 @@ export class Documentation extends OpenApiBuilder {
     hasSummaryFromDescription = true,
     hasHeadMethod = true,
     composition = "inline",
+    maxCombinations = Infinity,
   }: DocumentationParams) {
     super();
     this.addInfo({ title, version });
@@ -173,6 +183,7 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         brandHandling,
+        maxCombinations,
         makeRef: this.#makeRef.bind(this),
       };
       const { description, shortDescription, scopes, inputSchema } = endpoint;
@@ -189,12 +200,12 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
-      const security = processContainers(endpoint.security);
+      const securityHeaders = getSecurityHeaders(endpoint.security);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         isHeader,
-        security,
+        securityHeaders,
         request,
         description: descriptions?.requestParameter?.call(null, {
           method,
@@ -205,7 +216,9 @@ export class Documentation extends OpenApiBuilder {
 
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {
-        const apiResponses = endpoint.getResponses(variant);
+        const apiResponses = endpoint.getResponses(variant, {
+          maxCombinations,
+        });
         for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
             responses[statusCode] = depictResponse({
@@ -243,7 +256,10 @@ export class Documentation extends OpenApiBuilder {
         : undefined;
 
       const securityRefs = depictSecurityRefs(
-        depictSecurity(security, inputSources),
+        depictSecurity(
+          processContainers(endpoint.security, maxCombinations),
+          inputSources,
+        ),
         scopes,
         (securitySchema) => {
           const name = this.#ensureUniqSecuritySchemaName(securitySchema);
