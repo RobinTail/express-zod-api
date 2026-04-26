@@ -80,7 +80,7 @@ describe("BuiltinLogger", () => {
         warn: customMock,
         error: redMock,
       }),
-    )("%s logger should display debug message", (method, styleMock) => {
+    )("debug logger should display %s message", (method, styleMock) => {
       const { logger, logSpy } = makeLogger({ level: "debug", color: true });
       logger[method]("testing debug message", { withColorful: "output" });
       expect(logSpy).toHaveBeenCalledWith(
