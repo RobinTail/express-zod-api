@@ -156,7 +156,6 @@ export class Endpoint<
 
   /** @internal */
   public override get outputSchema(): OUT {
-    this.#ensureOutputExamples();
     return this.#def.outputSchema;
   }
 
