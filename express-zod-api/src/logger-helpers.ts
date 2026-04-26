@@ -1,4 +1,4 @@
-import { Ansis, blue, green, hex, red, cyanBright } from "ansis";
+import { type Ansis, blue, green, hex, red, cyanBright } from "ansis";
 import * as R from "ramda";
 import { isObject } from "./common-helpers";
 
