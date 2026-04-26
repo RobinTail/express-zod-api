@@ -21,6 +21,7 @@ describe("BuiltinLogger", () => {
     customMock.mockClear();
     redMock.mockClear();
     cyanMock.mockClear();
+    vi.mocked(util.inspect).mockClear();
   });
 
   afterAll(() => {
@@ -102,8 +103,8 @@ describe("BuiltinLogger", () => {
         expect(vi.mocked(util.inspect)).toHaveBeenCalledWith(1234, {
           colors: true,
           depth: 2,
-          breakLength: 80,
-          compact: 3,
+          breakLength: level === "debug" ? 80 : Infinity,
+          compact: level === "debug" ? 3 : true,
         });
       },
     );
@@ -117,7 +118,12 @@ describe("BuiltinLogger", () => {
         expect(redMock).toHaveBeenCalledWith("error");
         expect(vi.mocked(util.inspect)).toHaveBeenCalledWith(
           {},
-          { colors: true, depth: 2, breakLength: 80, compact: 3 },
+          {
+            colors: true,
+            depth: 2,
+            breakLength: level === "debug" ? 80 : Infinity,
+            compact: level === "debug" ? 3 : true,
+          },
         );
       },
     );
@@ -132,8 +138,8 @@ describe("BuiltinLogger", () => {
         expect(vi.mocked(util.inspect)).toHaveBeenCalledWith(["test"], {
           colors: true,
           depth: 2,
-          breakLength: 80,
-          compact: 3,
+          breakLength: level === "debug" ? 80 : Infinity,
+          compact: level === "debug" ? 3 : true,
         });
       },
     );
