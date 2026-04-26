@@ -69,7 +69,9 @@ describe("BuiltinLogger", () => {
         );
       },
     );
+  });
 
+  describe("print()", () => {
     test.each(
       R.toPairs({
         debug: blueMock,
@@ -77,7 +79,7 @@ describe("BuiltinLogger", () => {
         warn: customMock,
         error: redMock,
       }),
-    )("Should create debug logger %#", (method, styleMock) => {
+    )("%s logger should display debug message", (method, styleMock) => {
       const { logger, logSpy } = makeLogger({ level: "debug", color: true });
       logger[method]("testing debug message", { withColorful: "output" });
       expect(logSpy).toHaveBeenCalledWith(
@@ -91,7 +93,7 @@ describe("BuiltinLogger", () => {
     });
 
     test.each(["debug", "warn"] as const)(
-      "Should handle non-object meta %#",
+      "%s logger should display primitive metadata",
       (level) => {
         const { logger, logSpy } = makeLogger({ level, color: true });
         logger.error("Code", 1234);
@@ -107,7 +109,7 @@ describe("BuiltinLogger", () => {
     );
 
     test.each(["debug", "warn"] as const)(
-      "Should handle empty object meta %#",
+      "%s logger should display object metadata",
       (level) => {
         const { logger, logSpy } = makeLogger({ level, color: true });
         logger.error("Payload", {});
@@ -120,20 +122,23 @@ describe("BuiltinLogger", () => {
       },
     );
 
-    test.each(["debug", "warn"] as const)("Should handle array %#", (level) => {
-      const { logger, logSpy } = makeLogger({ level, color: true });
-      logger.error("Array", ["test"]);
-      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("Array"));
-      expect(redMock).toHaveBeenCalledWith("error");
-      expect(vi.mocked(util.inspect)).toHaveBeenCalledWith(["test"], {
-        colors: true,
-        depth: 2,
-        breakLength: 80,
-        compact: 3,
-      });
-    });
+    test.each(["debug", "warn"] as const)(
+      "%s logger should display array metadata",
+      (level) => {
+        const { logger, logSpy } = makeLogger({ level, color: true });
+        logger.error("Array", ["test"]);
+        expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("Array"));
+        expect(redMock).toHaveBeenCalledWith("error");
+        expect(vi.mocked(util.inspect)).toHaveBeenCalledWith(["test"], {
+          colors: true,
+          depth: 2,
+          breakLength: 80,
+          compact: 3,
+        });
+      },
+    );
 
-    test("should handle error including cause", () => {
+    test("should display error metadata including its cause", () => {
       const error = new Error("something", { cause: new Error("anything") });
       const { logger, logSpy } = makeLogger({ level: "warn", color: false });
       logger.error("Failure", error);
@@ -149,7 +154,7 @@ describe("BuiltinLogger", () => {
     });
 
     test.each(["debug", "warn"] as const)(
-      "Should handle circular references within subject %#",
+      "%s logger should handle circular references",
       (level) => {
         const { logger, logSpy } = makeLogger({ level, color: false });
         const subject: any = {};
@@ -165,7 +170,7 @@ describe("BuiltinLogger", () => {
     );
   });
 
-  describe.each([true, false])(".child()", (color) => {
+  describe.each([true, false])(".child() when color=%s", (color) => {
     test.each([
       { requestId: "some id", extra: "data" },
       { requestId: "simple" },
