@@ -2,6 +2,10 @@
 
 ## Version 27
 
+### v27.3.0
+
+- Supporting Node 26.
+
 ### v27.2.4
 
 - Fixed performance regression since v24.0.0:
