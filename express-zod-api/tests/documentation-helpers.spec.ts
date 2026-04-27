@@ -1,14 +1,14 @@
-import { SchemaObject } from "openapi3-ts/oas31";
+import type { SchemaObject } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
 import {
-  OpenAPIContext,
+  type OpenAPIContext,
   depictRequestParams,
   depictSecurity,
   depictSecurityRefs,
   depictTags,
-  ensureShortDescription,
+  trimSummary,
   excludeParamsFromDepiction,
   defaultIsHeader,
   reformatParamsInPath,
@@ -694,20 +694,22 @@ describe("Documentation helpers", () => {
     });
   });
 
-  describe("ensureShortDescription()", () => {
-    test("keeps the short text as it is", () => {
-      expect(ensureShortDescription("here is a short text")).toBe(
-        "here is a short text",
-      );
-      expect(ensureShortDescription(" ")).toBe(" ");
-      expect(ensureShortDescription("")).toBe("");
-    });
+  describe("trimSummary()", () => {
+    test.each(["here is a short text", " ", ""])(
+      "keeps the short text as it is %#",
+      (summary) => {
+        expect(trimSummary(summary)).toBe(summary);
+      },
+    );
     test("trims the long text", () => {
       expect(
-        ensureShortDescription(
+        trimSummary(
           "this text is definitely too long for the short description",
         ),
       ).toBe("this text is definitely too long for the short de…");
+    });
+    test("accepts undefined as is", () => {
+      expect(trimSummary()).toBeUndefined();
     });
   });
 });

@@ -1,8 +1,8 @@
 import { AbstractEndpoint } from "./endpoint";
 import { RoutingError } from "./errors";
-import { ClientMethod, isMethod, Method } from "./method";
-import { Routing } from "./routing";
-import { ServeStatic, StaticHandler } from "./serve-static";
+import { isMethod, type ClientMethod, type Method } from "./method";
+import type { Routing } from "./routing";
+import { ServeStatic, type StaticHandler } from "./serve-static";
 import type { CommonConfig } from "./config-type";
 
 export type OnEndpoint<M extends string = Method> = (
@@ -38,11 +38,10 @@ const trimPath = (path: string) =>
   path.trim().split("/").filter(Boolean).join("/");
 
 const processEntries = (
-  { methodLikeRouteBehavior = "method" }: CommonConfig,
+  { recognizeMethodDependentRoutes: preferMethod = true }: CommonConfig,
   subject: Routing,
   parent?: string,
 ) => {
-  const preferMethod = methodLikeRouteBehavior === "method";
   return Object.entries(subject).map<[string, Routing[string], Method?]>(
     ([_key, item]) => {
       const [segment, method] =

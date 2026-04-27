@@ -1,12 +1,12 @@
 import { spawn } from "node:child_process";
-import { givePort } from "../tools/ports";
+import { givePort } from "../tools/ports.ts";
 
 describe("ESM Test", async () => {
   let out = "";
   const listener = (chunk: Buffer) => {
     out += chunk.toString();
   };
-  const quickStart = spawn("unrun", ["quick-start.ts"]);
+  const quickStart = spawn("node", ["quick-start.ts"]);
   quickStart.stdout.on("data", listener);
   quickStart.stderr.on("data", listener);
   const port = givePort("esm");

@@ -1,14 +1,14 @@
-import { IRouter, RequestHandler } from "express";
+import type { IRouter, RequestHandler } from "express";
 import createHttpError from "http-errors";
 import { isProduction } from "./common-helpers";
-import { CommonConfig } from "./config-type";
-import { ContentType } from "./content-type";
+import type { CommonConfig } from "./config-type";
+import type { ContentType } from "./content-type";
 import { Diagnostics } from "./diagnostics";
-import { AbstractEndpoint } from "./endpoint";
-import { CORSMethod, isMethod } from "./method";
-import { OnEndpoint, walkRouting } from "./routing-walker";
+import type { AbstractEndpoint } from "./endpoint";
+import { isMethod, type CORSMethod } from "./method";
+import { walkRouting, type OnEndpoint } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
-import { GetLogger } from "./server-helpers";
+import type { GetLogger } from "./server-helpers";
 import * as R from "ramda";
 
 /**
@@ -17,7 +17,7 @@ import * as R from "ramda";
  * @example { "get /v1/books/:bookId": getBookEndpoint }
  * @example { v1: { "patch /books/:bookId": changeBookEndpoint } }
  * @example { dependsOnMethod: { get: retrieveEndpoint, post: createEndpoint } }
- * @see CommonConfig.methodLikeRouteBehavior
+ * @see CommonConfig.recognizeMethodDependentRoutes
  * */
 export interface Routing {
   [K: string]: Routing | AbstractEndpoint | ServeStatic;
@@ -108,7 +108,7 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
       });
       app[method](path, ...handlers);
     }
-    if (config.wrongMethodBehavior === 404) continue;
+    if (config.hintAllowedMethods === false) continue;
     deprioritized.set(path, createWrongMethodHandler(accessMethods));
   }
   for (const [path, handler] of deprioritized) app.all(path, handler);

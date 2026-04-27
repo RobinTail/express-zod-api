@@ -1,4 +1,4 @@
-import { defaultEndpointsFactory, Routing } from "../src";
+import { defaultEndpointsFactory, type Routing } from "../src";
 import { walkRouting } from "../src/routing-walker";
 
 describe("walkRouting()", () => {
