@@ -518,9 +518,10 @@ describe("Example", async () => {
     });
   });
 
-  describe("OpenAPI Documentation", () => {
+  describe("OpenAPI Documentation", async () => {
+    const yamlData = await readFile("example.documentation.yaml", "utf-8");
+
     test("should be valid", { retry: 3, timeout: 5000 }, async () => {
-      const data = await readFile("example.documentation.yaml", "utf-8");
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort("too long"), 3000);
       try {
@@ -529,7 +530,7 @@ describe("Example", async () => {
           {
             method: "POST",
             headers: { "Content-Type": "application/yaml" },
-            body: data,
+            body: yamlData,
             signal: controller.signal,
           },
         );
