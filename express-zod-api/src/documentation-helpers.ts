@@ -45,7 +45,7 @@ import { ezRawBrand } from "./raw-schema";
 import { FirstPartyKind } from "./schema-walker";
 import { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
-import wellKnownHeaders from "./well-known-headers";
+import { getWellKnownHeaders } from "./well-known-headers";
 
 interface ReqResCommons {
   makeRef: (
@@ -272,7 +272,7 @@ export const defaultIsHeader = (
 ): name is `x-${string}` =>
   familiar?.has(name) ||
   name.startsWith("x-") ||
-  wellKnownHeaders.includes(name);
+  getWellKnownHeaders().has(name);
 
 export const depictRequestParams = ({
   path,
