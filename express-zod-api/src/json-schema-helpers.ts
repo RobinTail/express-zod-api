@@ -86,7 +86,7 @@ export const mergeExamples = (
   entry: z.core.JSONSchema.BaseSchema,
   {
     isOptional,
-    maxCombinations = Infinity,
+    maxCombinations,
   }: { isOptional: boolean; maxCombinations?: number },
 ) => {
   if (!entry.examples?.length) return;
@@ -143,7 +143,7 @@ export const flattenIO = (
 /** @see pullResponseExamples */
 export const pullRequestExamples = (
   subject: z.core.JSONSchema.ObjectSchema,
-  limit = Infinity,
+  limit?: number,
 ) =>
   Object.entries(subject.properties || {}).reduce<FlatObject[]>(
     (acc, [key, prop]) => {

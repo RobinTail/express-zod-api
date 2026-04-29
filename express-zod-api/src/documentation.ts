@@ -92,7 +92,7 @@ interface DocumentationParams {
    * @desc Applies to: request/response examples, security scheme alternatives.
    * @example 0 — disables product combinations, keeps concatenations
    * @default Infinity
-   * @todo set to 20 or 50 in v28 to avoid too many combinations
+   * @todo set to 10 or 20 in v28 to avoid too many combinations
    * */
   maxCombinations?: number;
 }
@@ -167,10 +167,10 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     tags,
     isHeader,
+    maxCombinations,
     hasSummaryFromDescription = true,
     hasHeadMethod = true,
     composition = "inline",
-    maxCombinations = Infinity,
   }: DocumentationParams) {
     super();
     this.addInfo({ title, version });
