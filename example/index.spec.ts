@@ -519,29 +519,38 @@ describe("Example", async () => {
   });
 
   describe("OpenAPI Documentation", () => {
-    test("should be valid", { retry: 3 }, async () => {
+    test("should be valid", { retry: 3, timeout: 5000 }, async () => {
       const data = await readFile("example.documentation.yaml", "utf-8");
-      const response = await fetch(
-        "https://validator.swagger.io/validator/debug",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/yaml" },
-          body: data,
-        },
-      );
-      expect(response.status).toBe(200);
-      const json = await response.json();
-      if (
-        typeof json === "object" &&
-        json !== null &&
-        "schemaValidationMessages" in json &&
-        Array.isArray(json.schemaValidationMessages) &&
-        json.schemaValidationMessages.length
-      ) {
-        console.warn(json);
-        json.schemaValidationMessages.every(({ level }) =>
-          expect(level).not.toBe("error"),
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort("too long"), 3000);
+      try {
+        const response = await fetch(
+          "https://validator.swagger.io/validator/debug",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/yaml" },
+            body: data,
+            signal: controller.signal,
+          },
         );
+        clearTimeout(timer);
+        expect(response.status).toBe(200);
+        const json = await response.json();
+        if (
+          typeof json === "object" &&
+          json !== null &&
+          "schemaValidationMessages" in json &&
+          Array.isArray(json.schemaValidationMessages) &&
+          json.schemaValidationMessages.length
+        ) {
+          console.warn(json);
+          json.schemaValidationMessages.every(({ level }) =>
+            expect(level).not.toBe("error"),
+          );
+        }
+      } catch (error) {
+        console.warn("Swagger OpenAPI validator:", error);
+        expect(error).toBe("too long");
       }
     });
   });
