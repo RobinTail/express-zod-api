@@ -50,6 +50,11 @@
 
 ## Version 27
 
+### v27.2.5
+
+- Reduced memory footprint at runtime: deferred population of well-known headers to Documentation;
+- Faster header lookup in Documentation generator (only when `headers` enabled in `inputSources`).
+
 ### v27.2.4
 
 - Fixed performance regression since v24.0.0:

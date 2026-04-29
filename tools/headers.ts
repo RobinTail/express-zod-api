@@ -263,5 +263,10 @@ const headers = lines
 console.debug("CRC:", headers.length);
 
 const json = JSON.stringify(headers, undefined, 2);
-const tsCode = await format(`export default ${json};`, { filepath: dest });
+const tsCode = await format(
+  `let cache: Set<string>;\n\n` +
+    `export const getWellKnownHeaders = () =>\n` +
+    `  (cache ??= new Set(${json}));\n`,
+  { filepath: dest },
+);
 await writeFile(dest, tsCode, "utf-8");
