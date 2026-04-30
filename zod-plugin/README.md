@@ -18,7 +18,8 @@ This module extends Zod functionality when it's imported:
 
 ## Requirements
 
-- Zod `^4.3.4`
+- Compatible with Zod versions `~4.3.4` (<4.4.0);
+- Zod 4.4+ support will be available in v5 (the next major version).
 
 ## Basic usage
 
