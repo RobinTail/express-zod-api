@@ -6,7 +6,7 @@ declare module "zod/v4/core" {
   interface GlobalMeta {
     default?: unknown; // can be an actual value or a label like "Today"
     examples?: unknown[]; // see zod commit ee5615d
-    [brandProperty]?: symbol | string | number;
+    [brandProperty]?: PropertyKey;
   }
 }
 
