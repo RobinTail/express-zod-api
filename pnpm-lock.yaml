@@ -48,7 +48,7 @@ catalogs:
       version: 8.55.0
     zod:
       specifier: ^4.3.4
-      version: 4.3.6
+      version: 4.4.1
   prod:
     ramda:
       specifier: ^0.32.0
@@ -115,7 +115,7 @@ importers:
         version: 6.0.3
       zod:
         specifier: catalog:dev
-        version: 4.3.6
+        version: 4.4.1
 
   compat-test:
     devDependencies:
@@ -151,7 +151,7 @@ importers:
         version: link:../express-zod-api
       zod:
         specifier: catalog:dev
-        version: 4.3.6
+        version: 4.4.1
 
   example:
     devDependencies:
@@ -178,7 +178,7 @@ importers:
         version: 6.0.3
       zod:
         specifier: catalog:dev
-        version: 4.3.6
+        version: 4.4.1
 
   express-zod-api:
     dependencies:
@@ -257,7 +257,7 @@ importers:
         version: 7.25.0
       zod:
         specifier: catalog:dev
-        version: 4.3.6
+        version: 4.4.1
 
   issue952-test:
     dependencies:
@@ -275,7 +275,7 @@ importers:
         version: 6.0.3
       zod:
         specifier: catalog:dev
-        version: 4.3.6
+        version: 4.4.1
 
   migration:
     devDependencies:
@@ -303,7 +303,7 @@ importers:
         version: 6.0.3
       zod:
         specifier: catalog:dev
-        version: 4.3.6
+        version: 4.4.1
 
 packages:
 
@@ -2036,8 +2036,8 @@ packages:
   zod@4.1.13:
     resolution: {integrity: sha512-AvvthqfqrAhNH9dnfmrfKzX5upOdjUVJYFqNSlkmGf64gRaTzlPwz99IHYnVs28qYAybvAlBV+H7pn0saFY4Ig==}
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+  zod@4.4.1:
+    resolution: {integrity: sha512-a6ENMBBGZBsnlSebQ/eKCguSBeGKSf4O7BPnqVPmYGtpBYI7VSqoVqw+QcB7kPRjbqPwhYTpFbVj/RqNz/CT0Q==}
 
 snapshots:
 
@@ -3797,4 +3797,4 @@ snapshots:
 
   zod@4.1.13: {}
 
-  zod@4.3.6: {}
+  zod@4.4.1: {}
