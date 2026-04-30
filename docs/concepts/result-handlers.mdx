@@ -1,0 +1,537 @@
+---
+title: Result Handlers
+description: Learn how to customize API response formats and handle errors consistently
+---
+
+## Overview
+
+Result Handlers are responsible for transforming endpoint outputs and errors into HTTP responses. They ensure consistent response formatting across your API and handle both successful results and errors. Every endpoint uses a Result Handler, either the default one or a custom implementation.
+
+## Result Handler Structure
+
+A Result Handler defines:
+- **Positive response schema**: How successful outputs are formatted
+- **Negative response schema**: How errors are formatted  
+- **Handler function**: Logic that sends the actual HTTP response
+
+## The Default Result Handler
+
+The `defaultResultHandler` provides a standard response format:
+
+```typescript
+import { defaultResultHandler } from "express-zod-api";
+
+// Positive response
+{
+  status: "success",
+  data: { /* your endpoint output */ }
+}
+
+// Negative response
+{
+  status: "error",
+  error: { message: "Error description" }
+}
+```
+
+Status codes:
+- **200** for successful responses
+- **400** for input validation errors
+- **500** for server errors (or error's `statusCode` if using `createHttpError`)
+
+## Creating Custom Result Handlers
+
+```typescript
+import { ResultHandler } from "express-zod-api";
+import { z } from "zod";
+import { ensureHttpError, getMessageFromError } from "express-zod-api";
+
+const customResultHandler = new ResultHandler({
+  // Positive response schema
+  positive: (output) => ({
+    schema: z.object({ data: output }),
+    mimeType: "application/json", // optional, can be array
+  }),
+  
+  // Negative response schema
+  negative: z.object({ 
+    error: z.string(),
+    timestamp: z.number(),
+  }),
+  
+  // Handler implementation
+  handler: ({ error, input, output, request, response, logger, ctx }) => {
+    if (error) {
+      const { statusCode } = ensureHttpError(error);
+      const message = getMessageFromError(error);
+      
+      return void response.status(statusCode).json({
+        error: message,
+        timestamp: Date.now(),
+      });
+    }
+    
+    response.status(200).json({ data: output });
+  },
+});
+```
+
+## Handler Function Parameters
+
+The handler receives a discriminated union based on success or failure:
+
+```typescript
+type HandlerParams = {
+  input: FlatObject | null;  // Request input (null if parsing failed)
+  ctx: FlatObject;           // Context from middlewares (may be partial)
+  request: Request;          // Express request object
+  response: Response;        // Express response object
+  logger: ActualLogger;      // Logger instance
+} & (
+  | { output: FlatObject; error: null }   // Success case
+  | { output: null; error: Error }        // Error case
+);
+```
+
+<ParamField path="error" type="Error | null">
+  The error if one occurred, or `null` on success. Use `ensureHttpError()` to normalize it.
+</ParamField>
+
+<ParamField path="output" type="FlatObject | null">
+  The validated endpoint output on success, or `null` if an error occurred.
+</ParamField>
+
+<ParamField path="input" type="FlatObject | null">
+  The validated input. Can be `null` if the error occurred before input validation.
+</ParamField>
+
+<ParamField path="ctx" type="FlatObject">
+  Context from middlewares. May be incomplete if middleware execution was interrupted.
+</ParamField>
+
+<ParamField path="request" type="Request">
+  Express request object with full access to headers, cookies, etc.
+</ParamField>
+
+<ParamField path="response" type="Response">
+  Express response object for sending the response.
+</ParamField>
+
+<ParamField path="logger" type="ActualLogger">
+  Configured logger instance for recording errors.
+</ParamField>
+
+## Using Custom Result Handlers
+
+Create an EndpointsFactory with your Result Handler:
+
+```typescript
+import { EndpointsFactory } from "express-zod-api";
+
+const customFactory = new EndpointsFactory(customResultHandler);
+
+const endpoint = customFactory.build({
+  input: z.object({ name: z.string() }),
+  output: z.object({ greeting: z.string() }),
+  handler: async ({ input }) => {
+    return { greeting: `Hello, ${input.name}!` };
+  },
+});
+
+// Response format determined by customResultHandler
+// { data: { greeting: "Hello, Alice!" } }
+```
+
+## Response Schemas
+
+### Static Schemas
+
+Define a fixed response structure:
+
+```typescript
+const resultHandler = new ResultHandler({
+  positive: z.object({
+    success: z.literal(true),
+    payload: z.any(), // Will be replaced with actual output
+  }),
+  negative: z.object({
+    success: z.literal(false),
+    message: z.string(),
+  }),
+  handler: ({ error, output, response }) => {
+    if (error) {
+      return void response.json({
+        success: false,
+        message: error.message,
+      });
+    }
+    response.json({ success: true, payload: output });
+  },
+});
+```
+
+### Dynamic Schemas (Lazy)
+
+Generate the schema based on the endpoint's output schema:
+
+```typescript
+const resultHandler = new ResultHandler({
+  // Function receives the endpoint's output schema
+  positive: (output) => {
+    const responseSchema = z.object({
+      status: z.literal("success"),
+      data: output, // Use the actual output schema
+    });
+    return responseSchema;
+  },
+  negative: z.object({
+    status: z.literal("error"),
+    error: z.string(),
+  }),
+  handler: ({ error, output, response }) => {
+    if (error) {
+      return void response.json({
+        status: "error",
+        error: error.message,
+      });
+    }
+    response.json({ status: "success", data: output });
+  },
+});
+```
+
+<Info>
+  Using lazy schemas (functions) allows the documentation generator to know the exact response structure for each endpoint.
+</Info>
+
+## Different Status Codes
+
+Customize status codes for different scenarios:
+
+```typescript
+const resultHandler = new ResultHandler({
+  positive: [
+    { schema: z.object({ data: z.any() }), statusCode: 200 },
+    { schema: z.object({ data: z.any() }), statusCode: 201 },
+  ],
+  negative: [
+    { schema: z.object({ error: z.string() }), statusCode: 400 },
+    { schema: z.object({ error: z.string() }), statusCode: 404 },
+    { schema: z.object({ error: z.string() }), statusCode: 500 },
+  ],
+  handler: ({ error, output, response }) => {
+    if (error) {
+      const statusCode = error.statusCode || 500;
+      return void response.status(statusCode).json({ error: error.message });
+    }
+    
+    // Choose status code based on output
+    const statusCode = "created" in output ? 201 : 200;
+    response.status(statusCode).json({ data: output });
+  },
+});
+```
+
+## Non-JSON Responses
+
+### Plain Text
+
+```typescript
+const textResultHandler = new ResultHandler({
+  positive: { 
+    schema: z.string(), 
+    mimeType: "text/plain" 
+  },
+  negative: { 
+    schema: z.string(), 
+    mimeType: "text/plain" 
+  },
+  handler: ({ error, output, response }) => {
+    if (error) {
+      return void response
+        .status(error.statusCode || 500)
+        .type("text/plain")
+        .send(error.message);
+    }
+    response.type("text/plain").send(output);
+  },
+});
+```
+
+### File Downloads
+
+```typescript
+import { ez } from "express-zod-api";
+import fs from "node:fs";
+
+const fileResultHandler = new ResultHandler({
+  positive: { 
+    schema: ez.buffer(), 
+    mimeType: "application/octet-stream" 
+  },
+  negative: { 
+    schema: z.string(), 
+    mimeType: "text/plain" 
+  },
+  handler: ({ error, output, response }) => {
+    if (error) {
+      return void response.status(400).send(error.message);
+    }
+    
+    if ("filename" in output) {
+      fs.createReadStream(output.filename)
+        .pipe(response.attachment(output.filename));
+    } else {
+      response.status(400).send("Filename missing");
+    }
+  },
+});
+
+const factory = new EndpointsFactory(fileResultHandler);
+```
+
+### Empty Responses
+
+For 204 No Content or redirects:
+
+```typescript
+const emptyResultHandler = new ResultHandler({
+  positive: { 
+    statusCode: 204, 
+    mimeType: null, 
+    schema: z.never() 
+  },
+  negative: { 
+    statusCode: 404, 
+    mimeType: null, 
+    schema: z.never() 
+  },
+  handler: ({ error, response }) => {
+    if (error) {
+      return void response.status(404).end();
+    }
+    response.status(204).end();
+  },
+});
+```
+
+## Error Handling
+
+### Normalizing Errors
+
+Use `ensureHttpError()` to convert any error to an HTTP error:
+
+```typescript
+import { ensureHttpError, getMessageFromError } from "express-zod-api";
+
+handler: ({ error, response }) => {
+  if (error) {
+    const httpError = ensureHttpError(error);
+    // httpError.statusCode is guaranteed to exist
+    
+    return void response
+      .status(httpError.statusCode)
+      .json({ error: getMessageFromError(httpError) });
+  }
+  // ...
+}
+```
+
+Error mappings:
+- `InputValidationError` → 400 Bad Request
+- `OutputValidationError` → 500 Internal Server Error
+- `HttpError` → Uses error's `statusCode`
+- Other errors → 500 Internal Server Error
+
+### Logging Errors
+
+Use `logServerError()` helper to log server-side errors:
+
+```typescript
+import { logServerError, ensureHttpError } from "express-zod-api";
+
+handler: ({ error, input, request, response, logger }) => {
+  if (error) {
+    const httpError = ensureHttpError(error);
+    logServerError(httpError, logger, request, input);
+    
+    return void response
+      .status(httpError.statusCode)
+      .json({ error: httpError.message });
+  }
+  // ...
+}
+```
+
+### Public vs Private Error Messages
+
+Control which error messages are exposed to clients:
+
+```typescript
+import { getPublicErrorMessage } from "express-zod-api";
+
+handler: ({ error, response }) => {
+  if (error) {
+    const httpError = ensureHttpError(error);
+    const message = getPublicErrorMessage(httpError);
+    // In production, 5XX errors become generic messages
+    // unless error.expose is true
+    
+    return void response
+      .status(httpError.statusCode)
+      .json({ error: message });
+  }
+  // ...
+}
+```
+
+## Resource Cleanup
+
+Clean up resources like database connections in the Result Handler:
+
+```typescript
+const resultHandler = new ResultHandler({
+  positive: (output) => z.object({ data: output }),
+  negative: z.object({ error: z.string() }),
+  handler: ({ error, output, response, ctx }) => {
+    // Cleanup: always check property exists
+    if ("db" in ctx && ctx.db) {
+      ctx.db.release(); // Return connection to pool
+    }
+    
+    if (error) {
+      return void response.status(500).json({ error: error.message });
+    }
+    
+    response.json({ data: output });
+  },
+});
+```
+
+<Warning>
+  Context may be incomplete if middleware execution was interrupted. Always check property existence using the `in` operator.
+</Warning>
+
+## Common Patterns
+
+### Standard REST API
+
+```typescript
+const restResultHandler = new ResultHandler({
+  positive: (output) => z.object({ data: output }),
+  negative: z.object({
+    error: z.object({
+      code: z.string(),
+      message: z.string(),
+      details: z.any().optional(),
+    }),
+  }),
+  handler: ({ error, output, response }) => {
+    if (error) {
+      const httpError = ensureHttpError(error);
+      return void response.status(httpError.statusCode).json({
+        error: {
+          code: httpError.name,
+          message: httpError.message,
+          details: httpError.cause,
+        },
+      });
+    }
+    response.json({ data: output });
+  },
+});
+```
+
+### GraphQL-style Responses
+
+```typescript
+const graphqlResultHandler = new ResultHandler({
+  positive: (output) => z.object({
+    data: output,
+    errors: z.null(),
+  }),
+  negative: z.object({
+    data: z.null(),
+    errors: z.array(z.object({
+      message: z.string(),
+      path: z.array(z.string()).optional(),
+    })),
+  }),
+  handler: ({ error, output, response }) => {
+    if (error) {
+      return void response.json({
+        data: null,
+        errors: [{ message: error.message }],
+      });
+    }
+    response.json({ data: output, errors: null });
+  },
+});
+```
+
+### API with Metadata
+
+```typescript
+const metadataResultHandler = new ResultHandler({
+  positive: (output) => z.object({
+    data: output,
+    meta: z.object({
+      timestamp: z.number(),
+      version: z.string(),
+    }),
+  }),
+  negative: z.object({ error: z.string() }),
+  handler: ({ error, output, response }) => {
+    if (error) {
+      return void response.json({ error: error.message });
+    }
+    response.json({
+      data: output,
+      meta: {
+        timestamp: Date.now(),
+        version: "1.0.0",
+      },
+    });
+  },
+});
+```
+
+## Array Result Handler (Legacy)
+
+<Warning>
+  The `arrayResultHandler` is deprecated. It's only provided for migrating legacy APIs. Responding with arrays prevents API evolution without breaking changes.
+</Warning>
+
+```typescript
+import { arrayResultHandler } from "express-zod-api";
+
+// Expects endpoints with { items: T[] } in output schema
+const endpoint = arrayFactory.build({
+  output: z.object({
+    items: z.array(z.object({ id: z.number() })),
+  }),
+  handler: async () => ({
+    items: [{ id: 1 }, { id: 2 }],
+  }),
+});
+
+// Response: [{ id: 1 }, { id: 2 }]
+```
+
+## Best Practices
+
+<Tip>
+  1. **Be consistent**: Use one Result Handler for your entire API
+  2. **Use lazy schemas**: Return functions from `positive` to get type-specific responses
+  3. **Handle all error types**: Check for `InputValidationError`, `OutputValidationError`, and `HttpError`
+  4. **Log server errors**: Use `logServerError()` for debugging
+  5. **Clean up resources**: Release connections and cleanup in the handler
+  6. **Set proper status codes**: Use `ensureHttpError()` to get appropriate codes
+  7. **Hide sensitive errors**: Use `getPublicErrorMessage()` in production
+</Tip>
+
+## See Also
+
+- [Endpoints](/concepts/endpoints) - Create endpoints that use Result Handlers
+- [Error Handling](/concepts/error-handling) - Error types and handling strategies
+- [Context](/concepts/context) - Clean up context resources in handlers

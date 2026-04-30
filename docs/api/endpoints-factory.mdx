@@ -1,0 +1,105 @@
+---
+title: "EndpointsFactory"
+description: "Create type-safe endpoint builders with middleware and custom result handlers"
+---
+
+## Overview
+
+The `EndpointsFactory` class creates endpoint builders that include middleware, result handlers, and shared configuration. It provides a fluent API for composing reusable endpoint factories.
+
+```typescript
+import { EndpointsFactory, defaultResultHandler } from "express-zod-api";
+
+const factory = new EndpointsFactory(defaultResultHandler)
+  .addMiddleware(authMiddleware)
+  .addContext(async () => ({ db: await connectDB() }));
+```
+
+## Pre-built Factories
+
+<CardGroup cols={2}>
+  <Card title="defaultEndpointsFactory" icon="check">
+    Uses `defaultResultHandler` with standard JSON responses
+  </Card>
+  <Card title="arrayEndpointsFactory" icon="list">
+    (Deprecated) For migrating legacy APIs that return arrays
+  </Card>
+</CardGroup>
+
+## Methods
+
+### build()
+
+Creates an endpoint with input/output schemas and a handler.
+
+```typescript
+const endpoint = factory.build({
+  method: "post",
+  input: z.object({ name: z.string() }),
+  output: z.object({ id: z.number(), name: z.string() }),
+  handler: async ({ input, ctx, logger }) => {
+    return { id: 1, name: input.name };
+  },
+});
+```
+
+### buildVoid()
+
+Shorthand for endpoints that return empty objects.
+
+```typescript
+const deleteEndpoint = factory.buildVoid({
+  method: "delete",
+  input: z.object({ id: z.string() }),
+  handler: async ({ input }) => {
+    await deleteUser(input.id);
+  },
+});
+```
+
+### addMiddleware()
+
+Adds middleware that provides context and executes before endpoints.
+
+```typescript
+const authFactory = factory.addMiddleware({
+  input: z.object({ token: z.string() }),
+  handler: async ({ input }) => {
+    const user = await validateToken(input.token);
+    return { user };
+  },
+});
+```
+
+### addExpressMiddleware() / use()
+
+Integrates native Express middleware.
+
+```typescript
+import { auth } from "express-oauth2-jwt-bearer";
+
+const factory = defaultEndpointsFactory.use(auth(), {
+  provider: (req) => ({ auth: req.auth }),
+});
+```
+
+### addContext()
+
+Provides request-independent context.
+
+```typescript
+const factory = defaultEndpointsFactory.addContext(async () => ({
+  db: await mongoose.connect("mongodb://localhost"),
+}));
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="Endpoint" href="/api/endpoint">
+    Individual endpoint documentation
+  </Card>
+  <Card title="Middleware" href="/api/middleware">
+    Create and use middleware
+  </Card>
+</CardGroup>

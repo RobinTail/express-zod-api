@@ -1,0 +1,357 @@
+---
+title: Endpoints
+description: Learn how to create and configure endpoints in Express Zod API
+---
+
+## Overview
+
+Endpoints are the fundamental building blocks of your API. Each endpoint represents a route handler that validates input, executes business logic, and returns validated output. Express Zod API uses Zod schemas to ensure type safety and automatic validation at runtime.
+
+## Basic Endpoint Structure
+
+An endpoint consists of:
+- **Input schema**: Validates incoming data from requests
+- **Output schema**: Validates data returned by the handler
+- **Handler function**: Business logic that processes input and returns output
+- **Middlewares** (optional): Pre-processing logic that provides context
+- **Result handler**: Formats the response consistently
+
+## Creating Your First Endpoint
+
+Use the `defaultEndpointsFactory` to create endpoints with the default result handler:
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const getUserEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    id: z.string(),
+  }),
+  output: z.object({
+    id: z.string(),
+    name: z.string(),
+    email: z.string().email(),
+  }),
+  handler: async ({ input, logger }) => {
+    logger.debug("Fetching user", input.id);
+    const user = await db.users.findById(input.id);
+    return user;
+  },
+});
+```
+
+## HTTP Methods
+
+Specify which HTTP method(s) an endpoint accepts:
+
+```typescript
+// Single method
+const getEndpoint = factory.build({
+  method: "get",
+  // ...
+});
+
+// Multiple methods
+const endpoint = factory.build({
+  method: ["post", "put"],
+  // ...
+});
+
+// Default is GET if not specified
+const defaultGetEndpoint = factory.build({
+  input: z.object({}),
+  output: z.object({}),
+  handler: async () => ({}),
+});
+```
+
+## Handler Function
+
+The handler receives validated input and returns output that gets validated against the output schema:
+
+```typescript
+type Handler<IN, OUT, CTX> = (params: {
+  input: IN;        // Validated input data
+  ctx: CTX;         // Context from middlewares
+  logger: ActualLogger; // Configured logger instance
+}) => Promise<OUT>;
+```
+
+### Handler Parameters
+
+<ParamField path="input" type="object">
+  The validated input combining data from enabled input sources (query params, body, path params, etc.)
+</ParamField>
+
+<ParamField path="ctx" type="object">
+  Context object provided by middlewares, containing authentication data, database connections, etc.
+</ParamField>
+
+<ParamField path="logger" type="ActualLogger">
+  Logger instance for recording debug information, warnings, and errors
+</ParamField>
+
+## Input Sources
+
+Input combines data from multiple request sources based on the HTTP method:
+
+```typescript
+// Default configuration
+{
+  get: ["query", "params"],
+  post: ["body", "params", "files"],
+  put: ["body", "params"],
+  patch: ["body", "params"],
+  delete: ["query", "params"],
+}
+```
+
+Path parameters (like `:id`) must be declared in the input schema:
+
+```typescript
+const endpoint = factory.build({
+  input: z.object({
+    id: z.string(), // from path parameter :id
+    name: z.string(), // from query or body
+  }),
+  // ...
+});
+
+// Used in routing as:
+// { "user/:id": endpoint }
+```
+
+## Output Validation
+
+The framework validates your handler's return value against the output schema. This catches bugs early:
+
+```typescript
+const endpoint = factory.build({
+  output: z.object({
+    id: z.number(),
+    name: z.string(),
+  }),
+  handler: async () => {
+    // ✅ Valid - matches schema
+    return { id: 1, name: "Alice" };
+    
+    // ❌ Throws OutputValidationError - type mismatch
+    // return { id: "1", name: "Alice" };
+    
+    // ❌ Throws OutputValidationError - missing field
+    // return { id: 1 };
+  },
+});
+```
+
+<Warning>
+  If your handler returns data that doesn't match the output schema, an `OutputValidationError` is thrown with a 500 status code. This is intentional to prevent incorrect data from reaching clients.
+</Warning>
+
+## Void Endpoints
+
+For endpoints that don't return data, use `buildVoid()`:
+
+```typescript
+const deleteEndpoint = factory.buildVoid({
+  method: "delete",
+  input: z.object({ id: z.string() }),
+  handler: async ({ input }) => {
+    await db.users.delete(input.id);
+    // No return needed - automatically returns {}
+  },
+});
+```
+
+## Endpoint Configuration
+
+### Documentation Metadata
+
+Add descriptions for API documentation generation:
+
+```typescript
+const endpoint = factory.build({
+  shortDescription: "Retrieves a user by ID",
+  description: "Fetches user details from the database including profile information.",
+  input: z.object({
+    id: z.string().describe("The unique user identifier"),
+  }),
+  // ...
+});
+```
+
+### Operation ID
+
+Set a unique operation ID for documentation and client generation:
+
+```typescript
+const endpoint = factory.build({
+  operationId: "getUser",
+  // Or as a function for different methods
+  operationId: (method) => `${method}User`,
+  // ...
+});
+```
+
+### Tags
+
+Organize endpoints into groups for documentation:
+
+```typescript
+// First, declare available tags
+declare module "express-zod-api" {
+  interface TagOverrides {
+    users: unknown;
+    admin: unknown;
+  }
+}
+
+// Then use them
+const endpoint = factory.build({
+  tag: "users",
+  // Or multiple tags
+  tag: ["users", "admin"],
+  // ...
+});
+```
+
+### Deprecation
+
+Mark endpoints as deprecated:
+
+```typescript
+// During build
+const endpoint = factory.build({
+  deprecated: true,
+  // ...
+});
+
+// Or mark existing endpoint
+const deprecatedEndpoint = existingEndpoint.deprecated();
+```
+
+## Advanced Features
+
+### Transformations
+
+Transform input data after validation:
+
+```typescript
+const endpoint = factory.build({
+  input: z.object({
+    id: z.string().transform((id) => parseInt(id, 10)),
+    date: z.string().transform((str) => new Date(str)),
+  }),
+  handler: async ({ input }) => {
+    // input.id is now a number
+    // input.date is now a Date object
+  },
+});
+```
+
+### Refinements
+
+Add custom validation rules:
+
+```typescript
+const endpoint = factory.build({
+  input: z.object({
+    password: z.string()
+      .min(8)
+      .refine(
+        (pwd) => /[A-Z]/.test(pwd),
+        "Password must contain an uppercase letter"
+      ),
+    email: z.string().email(),
+  }).refine(
+    (data) => data.email !== data.password,
+    "Password cannot be the same as email"
+  ),
+  // ...
+});
+```
+
+### Nested Endpoints
+
+Create nested route structures:
+
+```typescript
+const listEndpoint = factory.build({ /* ... */ });
+const createEndpoint = factory.build({ /* ... */ });
+
+// Creates both /users and /users/new
+const routing = {
+  users: listEndpoint.nest({
+    new: createEndpoint,
+  }),
+};
+```
+
+## Error Handling
+
+Throw HTTP errors from your handler:
+
+```typescript
+import createHttpError from "http-errors";
+
+const endpoint = factory.build({
+  handler: async ({ input }) => {
+    const user = await db.users.findById(input.id);
+    
+    if (!user) {
+      throw createHttpError(404, "User not found");
+    }
+    
+    if (!user.active) {
+      throw createHttpError(403, "User account is disabled");
+    }
+    
+    return user;
+  },
+});
+```
+
+<Info>
+  Errors are automatically handled by the Result Handler, which formats them consistently and sets appropriate HTTP status codes.
+</Info>
+
+## Type Safety
+
+The framework ensures end-to-end type safety:
+
+```typescript
+const endpoint = factory.build({
+  input: z.object({ id: z.string() }),
+  output: z.object({ name: z.string() }),
+  handler: async ({ input }) => {
+    // TypeScript knows input has shape { id: string }
+    const id: string = input.id; // ✅
+    
+    // Must return { name: string }
+    return { name: "Alice" }; // ✅
+    
+    // TypeScript error - wrong return type
+    // return { id: 123 }; // ❌
+  },
+});
+```
+
+## Best Practices
+
+<Tip>
+  1. **Keep handlers focused**: Each endpoint should do one thing well
+  2. **Use descriptive schemas**: Add `.describe()` to fields for better documentation
+  3. **Validate early**: Put validation in input schemas, not handler logic
+  4. **Handle errors explicitly**: Use `createHttpError` with appropriate status codes
+  5. **Add examples**: Use `.example()` on schemas for documentation and testing
+  6. **Leverage transformations**: Convert types at the schema level
+</Tip>
+
+## See Also
+
+- [Routing](/concepts/routing) - Connect endpoints to URL paths
+- [Middleware](/concepts/middleware) - Add authentication and context
+- [Result Handlers](/concepts/result-handlers) - Customize response format
+- [Error Handling](/concepts/error-handling) - Handle errors gracefully
