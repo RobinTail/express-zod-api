@@ -15,9 +15,10 @@ declare module "zod/v4/core" {
  * @see https://github.com/colinhacks/zod/blob/90efe7fa6135119224412c7081bd12ef0bccef26/plugin/effect/src/index.ts#L21-L31
  * @desc This code modifies and extends zod's functionality immediately when importing the plugin.
  * @desc Enables .example() and .deprecated() on all schemas (ZodType)
+ * @desc Enables .xBrand() on all schemas as an alternative to .brand() that doesn't conflict with Zod 4.4+
  * @desc Enables .label() on ZodDefault
  * @desc Enables .remap() on ZodObject
- * @desc Stores the argument supplied to .brand() on all schemas (runtime distinguishable branded types)
+ * @desc Stores the argument supplied to .xBrand() on all schemas (runtime distinguishable)
  * */
 declare module "zod" {
   interface ZodType<
@@ -29,6 +30,8 @@ declare module "zod" {
     /** @desc Shorthand for .meta({ examples }) */
     example(example: z.output<this>): this;
     deprecated(): this;
+    /** @desc Shorthand for .meta({ "x-brand": ... }) */
+    xBrand(brand?: PropertyKey): this;
   }
   interface ZodDefault<T extends z.core.SomeType = z.core.$ZodType>
     extends z._ZodType<z.core.$ZodDefaultInternals<T>>, z.core.$ZodDefault<T> {

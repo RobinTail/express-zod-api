@@ -370,6 +370,8 @@ const fixReferences = (
   ctx: OpenAPIContext,
 ) => {
   const stack: unknown[] = [subject, defs];
+  const filterNaming = (name: string) =>
+    /schema\d+$/.test(name) ? undefined : name;
   for (let idx = 0; idx < stack.length; idx++) {
     const entry = stack[idx];
     if (R.is(Object, entry)) {
@@ -380,7 +382,7 @@ const fixReferences = (
           entry.$ref = ctx.makeRef(
             depiction.id || depiction, // avoiding serialization, because changing $ref
             asOAS(depiction),
-            depiction.id,
+            depiction.id || filterNaming(actualName),
           ).$ref;
         }
         continue;

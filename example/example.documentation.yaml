@@ -1052,7 +1052,6 @@ components:
       required:
         - title
       additionalProperties: false
-      id: Feature
   responses: {}
   parameters: {}
   examples: {}
