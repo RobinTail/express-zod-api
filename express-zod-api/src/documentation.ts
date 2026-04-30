@@ -84,10 +84,11 @@ interface DocumentationParams {
   /** @default inline */
   composition?: "inline" | "components";
   /**
-   * @desc Handling rules for your own branded schemas.
+   * @desc Handling rules for your own schemas branded with `x-brand` metadata.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having Zod context as first argument, second one is the framework context.
-   * @example { MyBrand: ( { zodSchema, jsonSchema } ) => ({ type: "object" })
+   * @example { MyBrand: ({ zodSchema, jsonSchema }) => ({ type: "object" })
+   * @link https://www.npmjs.com/package/@express-zod-api/zod-plugin
    */
   brandHandling?: BrandHandling;
   /**

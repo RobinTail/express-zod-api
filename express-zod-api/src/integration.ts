@@ -45,10 +45,11 @@ interface IntegrationParams {
    * */
   hasHeadMethod?: boolean;
   /**
-   * @desc Handling rules for your own branded schemas.
+   * @desc Handling rules for your own schemas branded with `x-brand` metadata.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
-   * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => createKeywordTypeNode(SyntaxKind.AnyKeyword)
+   * @example { MyBrand: (schema: typeof myBrandSchema, { next }) => createKeywordTypeNode(SyntaxKind.AnyKeyword)
+   * @link https://www.npmjs.com/package/@express-zod-api/zod-plugin
    */
   brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
 }
