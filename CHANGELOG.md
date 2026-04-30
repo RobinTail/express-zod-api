@@ -8,7 +8,7 @@
 - Zod compatibility: `^4.3.4` (supports Zod 4.4+ without upper limit);
 - The Zod plugin is no longer installed automatically — it's an optional peer dependency now:
   - To keep using `.example()`, `.label()`, `.remap()`, `.deprecated()` and methods on schemas, as well as runtime
-    distinguisable brands, install the `@express-zod-api/zod-plugin` manually and import it (ideally at the top of a
+    distinguishable brands, install the `@express-zod-api/zod-plugin` manually and import it (ideally at the top of a
     file declaring your `Routing`);
   - Breaking change: `ZodType::brand()` method is no longer patched by the plugin:
     - Use `.xBrand()` method instead — alias for `.meta({ "x-brand": ... })` and does not conflict with Zod 4.4;
