@@ -2,6 +2,12 @@
 
 ## Version 2
 
+### v2.1.1
+
+- Limited compatibility to Zod versions `>=4.0.0 <4.4.0`:
+  - Zod 4.4.0 introduced a breaking change to how `brand` method works, making the current plugin approach incompatible;
+  - Support for Zod 4.4+ will be added in v5.
+
 ### v2.1.0
 
 - `ZodObject::remap()` now throws an `Error` if duplicate target keys found in its argument.
