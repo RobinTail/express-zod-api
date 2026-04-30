@@ -18,7 +18,7 @@ declare module "zod/v4/core" {
  * @desc Enables .xBrand() on all schemas as an alternative to .brand() that doesn't conflict with Zod 4.4+
  * @desc Enables .label() on ZodDefault
  * @desc Enables .remap() on ZodObject
- * @desc Stores the argument supplied to .xBrand() on all schemas (runtime distinguishable branded types)
+ * @desc Stores the argument supplied to .xBrand() on all schemas (runtime distinguishable)
  * */
 declare module "zod" {
   interface ZodType<
