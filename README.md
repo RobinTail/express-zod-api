@@ -1102,7 +1102,7 @@ expect(output).toEqual({ collectedContext: ["prev"], testLength: 9 });
 The [@express-zod-api/zod-plugin](https://www.npmjs.com/package/@express-zod-api/zod-plugin) is an optional package
 that extends Zod with convenience methods:
 
-- `.brand(name)` — enhanced with a shorthand for `.meta({ "x-brand": name })`;
+- `.xBrand(name)` — shorthand for `.meta({ "x-brand": name })`;
 - `.example(value)` — shorthand for `.meta({ examples: [value] })`;
 - `.deprecated()` — shorthand for `.meta({ deprecated: true })`;
 - `.label(text)` — shorthand for `.meta({ default: text })` on `ZodDefault`;
@@ -1251,9 +1251,9 @@ const routing: Routing = {
 
 You can customize handling rules for your schemas in Documentation and Integration. The framework treats your schema
 specially based on its `x-brand` metadata. When the [Zod Plugin](#zod-plugin) is installed you can conveniently use
-the `.brand()` enhanced method of the Zod schema, preferably with a symbol argument for its branding.
-After that use the `brandHandling` feature of both constructors to declare your custom implementation. In case you need
-to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
+the `.xBrand()` method on Zod schema, preferably with a symbol argument for its branding. After that use the
+`brandHandling` feature of both constructors to declare your custom implementation. In case you need to reuse a
+handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
 
 ```ts
 import ts from "typescript";
@@ -1266,7 +1266,7 @@ import {
 } from "express-zod-api";
 
 const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for this purpose
-const myBrandedSchema = z.string().brand(myBrand); // requires Zod Plugin, or .meta({ "x-brand": myBrand })
+const myBrandedSchema = z.string().xBrand(myBrand); // requires Zod Plugin, or .meta({ "x-brand": myBrand })
 
 const ruleForDocs: Depicter = (
   { zodSchema, jsonSchema }, // jsonSchema is the default depiction
