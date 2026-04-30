@@ -2,6 +2,12 @@
 
 ## Version 24
 
+### v24.7.6
+
+- Limited Zod compatibility to `^3.25.35 || >=4.0.0 <4.4.0`:
+  - Zod 4.4.0 introduced a breaking change to how `brand` method works, making the current plugin approach incompatible;
+  - Supporting Zod 4.4+ requires a breaking change and will be addressed in v28.
+
 ### v24.7.5
 
 - Fixed performance regression in v24.0.0:
