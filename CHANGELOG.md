@@ -2,6 +2,13 @@
 
 ## Version 27
 
+### v27.2.6
+
+- Limited Zod compatibility to `~4.3.4` (<4.4.0):
+  - Zod 4.4.0 introduced a breaking change to how `brand` method works, making the current plugin approach incompatible;
+  - `@express-zod-api/zod-plugin` version bumped to `^4.1.1` (limited Zod compatibility as well);
+  - Supporting Zod 4.4+ requires a breaking change and will be addressed in v28 (next major version).
+
 ### v27.2.5
 
 - Reduced memory footprint at runtime: deferred population of well-known headers to Documentation;
