@@ -19,7 +19,7 @@ export class Diagnostics {
   public checkSchema(endpoint: AbstractEndpoint, ctx: FlatObject): void {
     if (this.#verifiedEndpoints.has(endpoint)) return;
     for (const dir of ["input", "output"] as const) {
-      const stack = [
+      const stack: z.core.JSONSchema.BaseSchema[] = [
         z.toJSONSchema(endpoint[`${dir}Schema`], { unrepresentable: "any" }),
       ];
       while (stack.length > 0) {
