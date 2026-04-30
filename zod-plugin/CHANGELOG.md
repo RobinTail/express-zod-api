@@ -2,6 +2,12 @@
 
 ## Version 3
 
+### v3.0.2
+
+- Limited compatibility to Zod versions `>=4.1.13 <4.4.0`:
+  - Zod 4.4.0 introduced a breaking change to how `brand` method works, making the current plugin approach incompatible;
+  - Support for Zod 4.4+ will be added in v5.
+
 ### v3.0.1
 
 - Improved readability of the types declaration in the bundle;
