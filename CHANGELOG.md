@@ -11,7 +11,7 @@
     distinguisable brands, install the `@express-zod-api/zod-plugin` manually and import it (ideally at the top of a
     file declaring your `Routing`);
   - Breaking change: `ZodType::brand()` method is no longer patched by the plugin:
-    - Use `.xBrand()` method instead alias for `.meta({ "x-brand": ... })` and does not conflict with Zod 4.4;
+    - Use `.xBrand()` method instead — alias for `.meta({ "x-brand": ... })` and does not conflict with Zod 4.4;
 - Breaking changes to the `createConfig()` argument (object):
   - property `wrongMethodBehavior` (number) changed to `hintAllowedMethods` (boolean);
   - property `methodLikeRouteBehavior` (string literal) changed to `recognizeMethodDependentRoutes` (boolean);
