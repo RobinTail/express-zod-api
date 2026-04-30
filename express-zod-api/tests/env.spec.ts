@@ -194,7 +194,7 @@ describe("Environment checks", () => {
       },
     );
 
-    test("meta id does NOT go intto depiction", () => {
+    test("meta id does NOT go into depiction", () => {
       expect(
         z.toJSONSchema(z.string().meta({ id: "uniq" })),
       ).not.toHaveProperty("id");
