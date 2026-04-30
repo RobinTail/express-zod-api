@@ -1804,7 +1804,7 @@ paths:
                 cuid:
                   type: string
                   format: cuid
-                  pattern: ^[cC][^\\s-]{8,}$
+                  pattern: ^[cC][0-9a-z]{6,}$
                 cuid2:
                   type: string
                   format: cuid2
@@ -4974,7 +4974,7 @@ paths:
           required: true
           description: POST /v1/:name Parameter
           schema:
-            $ref: "#/components/schemas/NameParam"
+            $ref: "#/components/schemas/Schema1"
       requestBody:
         description: POST /v1/:name Request body
         content:
@@ -5036,13 +5036,12 @@ paths:
                       message: Sample error message
 components:
   schemas:
-    NameParam:
+    Schema1:
       anyOf:
         - type: string
           const: John
         - type: string
           const: Jane
-      id: NameParam
   responses: {}
   parameters: {}
   examples: {}

@@ -42,7 +42,7 @@ paths:
                       features:
                         type: array
                         items:
-                          $ref: "#/components/schemas/Feature"
+                          $ref: "#/components/schemas/Schema1"
                     required:
                       - id
                       - name
@@ -1040,7 +1040,7 @@ paths:
           description: HEAD /v2/users/list Negative response
 components:
   schemas:
-    Feature:
+    Schema1:
       type: object
       properties:
         title:
@@ -1048,11 +1048,10 @@ components:
         features:
           type: array
           items:
-            $ref: "#/components/schemas/Feature"
+            $ref: "#/components/schemas/Schema1"
       required:
         - title
       additionalProperties: false
-      id: Feature
   responses: {}
   parameters: {}
   examples: {}
