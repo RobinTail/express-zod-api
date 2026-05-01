@@ -2,6 +2,10 @@
 
 ## Version 27
 
+### v27.3.0
+
+- Supporting Node 26.
+
 ### v27.2.6
 
 - Limited Zod compatibility to `~4.3.4` (<4.4.0):
