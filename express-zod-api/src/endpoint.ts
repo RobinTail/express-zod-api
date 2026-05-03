@@ -1,34 +1,37 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import * as R from "ramda";
 import { z, globalRegistry } from "zod";
-import { NormalizedResponse, ResponseVariant } from "./api-response";
+import type { NormalizedResponse, ResponseVariant } from "./api-response";
 import { findRequestTypeDefiningSchema } from "./deep-checks";
 import {
-  FlatObject,
+  type FlatObject,
   getActualMethod,
   getInput,
   ensureError,
   isSchema,
 } from "./common-helpers";
-import { CommonConfig } from "./config-type";
+import type { CommonConfig } from "./config-type";
 import {
   InputValidationError,
   OutputValidationError,
   ResultHandlerError,
 } from "./errors";
 import { ezFormBrand } from "./form-schema";
-import { IOSchema } from "./io-schema";
+import type { IOSchema } from "./io-schema";
 import { lastResortHandler } from "./last-resort";
-import { ActualLogger } from "./logger-helpers";
-import { LogicalContainer } from "./logical-container";
-import { getBrand } from "@express-zod-api/zod-plugin";
-import { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
+import type { ActualLogger } from "./logger-helpers";
+import type { LogicalContainer } from "./logical-container";
+import { getBrand, getExamples } from "./metadata";
+import type { ClientMethod, CORSMethod, Method, SomeMethod } from "./method";
 import { AbstractMiddleware, ExpressMiddleware } from "./middleware";
-import { ContentType } from "./content-type";
+import type { ContentType } from "./content-type";
 import { ezRawBrand } from "./raw-schema";
-import { DiscriminatedResult, pullResponseExamples } from "./result-helpers";
-import { AbstractResultHandler } from "./result-handler";
-import { Security } from "./security";
+import {
+  type DiscriminatedResult,
+  pullResponseExamples,
+} from "./result-helpers";
+import type { AbstractResultHandler } from "./result-handler";
+import type { Security } from "./security";
 import { ezUploadBrand } from "./upload-schema";
 import type { Routing } from "./routing";
 
@@ -63,7 +66,7 @@ export abstract class AbstractEndpoint {
   /** @internal */
   public abstract get description(): string | undefined;
   /** @internal */
-  public abstract get shortDescription(): string | undefined;
+  public abstract get summary(): string | undefined;
   /** @internal */
   public abstract get methods(): ReadonlyArray<Method> | undefined;
   /** @internal */
@@ -89,9 +92,9 @@ export class Endpoint<
 > extends AbstractEndpoint {
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
 
-  /** considered expensive operation, only required for generators */
+  /** considered an expensive operation, only required for generators */
   #ensureOutputExamples = R.once(() => {
-    if (globalRegistry.get(this.#def.outputSchema)?.examples?.length) return; // examples on output schema, or pull up:
+    if (getExamples(this.#def.outputSchema).length) return; // examples on output schema, or pull up:
     if (!isSchema<z.core.$ZodObject>(this.#def.outputSchema, "object")) return;
     const examples = pullResponseExamples(this.#def.outputSchema);
     if (!examples.length) return;
@@ -109,7 +112,7 @@ export class Endpoint<
     handler: Handler<z.output<IN>, z.input<OUT>, CTX>;
     resultHandler: AbstractResultHandler;
     description?: string;
-    shortDescription?: string;
+    summary?: string;
     getOperationId?: (method: ClientMethod) => string | undefined;
     methods?: Method[];
     scopes?: string[];
@@ -140,8 +143,8 @@ export class Endpoint<
   }
 
   /** @internal */
-  public override get shortDescription() {
-    return this.#def.shortDescription;
+  public override get summary() {
+    return this.#def.summary;
   }
 
   /** @internal */
@@ -295,7 +298,7 @@ export class Endpoint<
   }) {
     const method = getActualMethod(request);
     const ctx: Partial<CTX> = {};
-    let result: DiscriminatedResult = { output: {}, error: null };
+    let result: DiscriminatedResult;
     const input = getInput(request, config.inputSources);
     try {
       await this.#runMiddlewares({

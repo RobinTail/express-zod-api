@@ -2,7 +2,7 @@ import createHttpError from "http-errors";
 import assert from "node:assert/strict";
 import { z } from "zod";
 import { defaultEndpointsFactory } from "express-zod-api";
-import { methodProviderMiddleware } from "../middlewares";
+import { methodProviderMiddleware } from "../middlewares.ts";
 
 // Demonstrating circular schemas using z.object()
 const feature = z
@@ -19,7 +19,7 @@ export const retrieveUserEndpoint = defaultEndpointsFactory
   .addMiddleware(methodProviderMiddleware)
   .build({
     tag: "users",
-    shortDescription: "Retrieves the user.",
+    summary: "Retrieves the user.",
     description: "Example user retrieval endpoint.",
     input: z.object({
       id: z

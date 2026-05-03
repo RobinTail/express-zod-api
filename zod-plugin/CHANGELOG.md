@@ -1,5 +1,18 @@
 # Changelog
 
+## Version 5
+
+### v5.0.0
+
+- Supported Node.js versions: `^22.19.0 || ^24.0.0`;
+- `getBrand()` removed:
+  - use `schema.meta()?.["x-brand"]` instead.
+- Added `xBrand()` method to all Zod schemas:
+  - shorthand for `.meta({ "x-brand": ... })`;
+  - This method does not conflict with Zod 4.4+ internal mechanisms;
+  - Use `xBrand()` instead of `brand()` for setting runtime-distinguishable brands;
+- Zod compatibility updated to `^4.3.4` (supports Zod 4.4+).
+
 ## Version 4
 
 ### v4.1.1

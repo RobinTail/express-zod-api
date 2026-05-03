@@ -1,17 +1,17 @@
 import * as R from "ramda";
 import type ts from "typescript";
 import { z } from "zod";
-import { ResponseVariant, responseVariants } from "./api-response";
+import { responseVariants, type ResponseVariant } from "./api-response";
 import { IntegrationBase } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
-import { Routing } from "./routing";
-import { OnEndpoint, walkRouting, withHead } from "./routing-walker";
-import { HandlingRules } from "./schema-walker";
+import type { Routing } from "./routing";
+import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
+import type { HandlingRules } from "./schema-walker";
 import { zodToTs } from "./zts";
-import { ZTSContext } from "./zts-helpers";
+import type { ZTSContext } from "./zts-helpers";
 import type Prettier from "prettier";
-import { ClientMethod } from "./method";
+import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 
 interface IntegrationParams {
@@ -38,17 +38,18 @@ interface IntegrationParams {
    * @desc The schema to use for responses without body such as 204
    * @default z.undefined()
    * */
-  noContent?: z.ZodType;
+  noBodySchema?: z.ZodType;
   /**
    * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
    * @default true
    * */
   hasHeadMethod?: boolean;
   /**
-   * @desc Handling rules for your own branded schemas.
+   * @desc Handling rules for your own schemas branded with `x-brand` metadata.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having schema as first argument that you should assign type to, second one is a context.
-   * @example { MyBrand: ( schema: typeof myBrandSchema, { next } ) => createKeywordTypeNode(SyntaxKind.AnyKeyword)
+   * @example { MyBrand: (schema: typeof myBrandSchema, { next }) => createKeywordTypeNode(SyntaxKind.AnyKeyword)
+   * @link https://www.npmjs.com/package/@express-zod-api/zod-plugin
    */
   brandHandling?: HandlingRules<ts.TypeNode, ZTSContext>;
 }
@@ -88,7 +89,7 @@ export class Integration extends IntegrationBase {
     clientClassName = "Client",
     subscriptionClassName = "Subscription",
     serverUrl = "https://example.com",
-    noContent = z.undefined(),
+    noBodySchema = z.undefined(),
     hasHeadMethod = true,
   }: IntegrationParams) {
     super(typescript, serverUrl);
@@ -109,10 +110,10 @@ export class Integration extends IntegrationBase {
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant);
           const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
-            const hasContent = shouldHaveContent(method, mimeTypes);
+            const hasBody = shouldHaveContent(method, mimeTypes);
             const variantType = this.api.makeType(
               entitle(responseVariant, "variant", `${idx + 1}`),
-              zodToTs(hasContent ? schema : noContent, ctxOut),
+              zodToTs(hasBody ? schema : noBodySchema, ctxOut),
               { comment: request },
             );
             this.#program.push(variantType);

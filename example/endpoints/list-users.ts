@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { arrayRespondingFactory } from "../factories";
+import { arrayRespondingFactory } from "../factories.ts";
 
 const roleSchema = z.enum(["manager", "operator", "admin"]);
 

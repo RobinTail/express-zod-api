@@ -164,8 +164,7 @@ Much can be customized to fit your needs.
 
 - [Typescript](https://www.typescriptlang.org/) first.
 - Web server — [Express.js](https://expressjs.com/) v5.
-- Schema validation — [Zod 4.x](https://github.com/colinhacks/zod) including [Zod Plugin](#zod-plugin):
-  - For using with Zod 3.x, install the framework versions below 24.0.0.
+- Schema validation — [Zod 4.x](https://github.com/colinhacks/zod);
 - Supports any logger having `info()`, `debug()`, `error()` and `warn()` methods;
   - Built-in console logger with colorful and pretty inspections by default.
 - Generators:
@@ -243,7 +242,7 @@ const helloWorldEndpoint = defaultEndpointsFactory.build({
 Connect your endpoint to the `/v1/hello` route:
 
 ```ts
-import { Routing } from "express-zod-api";
+import type { Routing } from "express-zod-api";
 
 const routing: Routing = {
   v1: {
@@ -920,7 +919,7 @@ it normalizes errors into consistent HTTP responses with sensible status codes. 
 - Routing, parsing and upload issues:
   - Handled by `ResultHandler` configured as `errorHandler` (the defaults is `defaultResultHandler`);
   - Parsing errors: passed through as-is (typically `HttpError` with `4XX` code used for response by default);
-  - Routing errors: `404` or `405`, based on `wrongMethodBehavior` configuration;
+  - Routing errors: `404` or `405`, based on `hintAllowedMethods` configuration;
   - Upload issues: thrown only if `upload.limitError` is configured (`HttpError::statusCode` can be used for response);
   - For other errors the default status code is `500`;
 - `ResultHandler` failures:
@@ -1100,8 +1099,21 @@ expect(output).toEqual({ collectedContext: ["prev"], testLength: 9 });
 
 ## Zod Plugin
 
-Express Zod API augments Zod using [Zod Plugin](https://www.npmjs.com/package/@express-zod-api/zod-plugin),
-adding the runtime helpers the framework relies on.
+The [@express-zod-api/zod-plugin](https://www.npmjs.com/package/@express-zod-api/zod-plugin) is an optional package
+that extends Zod with convenience methods:
+
+- `.xBrand(name)` — shorthand for `.meta({ "x-brand": name })`;
+- `.example(value)` — shorthand for `.meta({ examples: [value] })`;
+- `.deprecated()` — shorthand for `.meta({ deprecated: true })`;
+- `.label(text)` — shorthand for `.meta({ default: text })` on `ZodDefault`;
+- `.remap(mapping)` — for renaming `ZodObject` shape properties;
+
+To benefit from these methods, install `@express-zod-api/zod-plugin` and import it once, preferably at the top of a
+file declaring your `Routing`.
+
+```ts
+import "@express-zod-api/zod-plugin"; // in your routing.ts file
+```
 
 ## End-to-End Type Safety
 
@@ -1162,12 +1174,12 @@ in the generated documentation of your API. Consider the following example:
 import { defaultEndpointsFactory } from "express-zod-api";
 
 const exampleEndpoint = defaultEndpointsFactory.build({
-  shortDescription: "Retrieves the user.", // <—— this becomes the summary line
+  summary: "Retrieves the user.",
   description: "The detailed explanaition on what this endpoint does.",
   input: z.object({
     id: z
-      .string()
-      .example("123") // input examples should be set before transformations
+      .string() // input examples should be set before transformations
+      .example("123") // requires Zod Plugin, or .meta({ examples: ["123"] })
       .transform(Number)
       .describe("the ID of the user"),
   }),
@@ -1175,7 +1187,8 @@ const exampleEndpoint = defaultEndpointsFactory.build({
 });
 ```
 
-You can also use `schema.meta({ id: "UniqueName" })` for custom schema naming.
+Setting examples via `.example()` requires [Zod Plugin](#zod-plugin). You can also use `.meta({ examples: [] })` and
+`.meta({ id: "UniqueName" })` for custom schema naming.
 _See the complete example of the generated documentation
 [here](https://github.com/RobinTail/express-zod-api/blob/master/example/example.documentation.yaml)_
 
@@ -1213,18 +1226,18 @@ new Documentation({
 
 ## Deprecated schemas and routes
 
-As your API evolves, you may need to mark some parameters or routes as deprecated before deleting them. For this
-purpose, the `.deprecated()` method is available on each schema and `Endpoint`, it's immutable.
-You can also deprecate all routes the `Endpoint` assigned to by setting `EndpointsFactory::build({ deprecated: true })`.
+As your API evolves, you may need to mark some parameters or routes as deprecated before deleting them. This can be
+achieved using the corresponding method or metadata. The `.deprecated()` method on Zod schema requires to install the
+[Zod Plugin](#zod-plugin). Consider the following example:
 
 ```ts
-import { Routing } from "express-zod-api";
+import type { Routing } from "express-zod-api";
 import { z } from "zod";
 
 const someEndpoint = factory.build({
   deprecated: true, // deprecates all routes the endpoint assigned to
   input: z.object({
-    prop: z.string().deprecated(), // deprecates the property or a path parameter
+    prop: z.string().deprecated(), // requires Zod Plugin, or .meta({ deprecated: true })
   }),
 });
 
@@ -1236,10 +1249,11 @@ const routing: Routing = {
 
 ## Customizable brands handling
 
-You can customize handling rules for your schemas in Documentation and Integration. Use the `.brand()` method on your
-schema to make it special and distinguishable for the framework in runtime. Using symbols is recommended for branding.
-After that use the `brandHandling` feature of both constructors to declare your custom implementation. In case you need
-to reuse a handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
+You can customize handling rules for your schemas in Documentation and Integration. The framework treats your schema
+specially based on its `x-brand` metadata. When the [Zod Plugin](#zod-plugin) is installed you can conveniently use
+the `.xBrand()` method on Zod schema, preferably with a symbol argument for its branding. After that use the
+`brandHandling` feature of both constructors to declare your custom implementation. In case you need to reuse a
+handling rule for multiple brands, use the exposed types `Depicter` and `Producer`.
 
 ```ts
 import ts from "typescript";
@@ -1252,7 +1266,7 @@ import {
 } from "express-zod-api";
 
 const myBrand = Symbol("MamaToldMeImSpecial"); // I recommend to use symbols for this purpose
-const myBrandedSchema = z.string().brand(myBrand);
+const myBrandedSchema = z.string().xBrand(myBrand); // requires Zod Plugin, or .meta({ "x-brand": myBrand })
 
 const ruleForDocs: Depicter = (
   { zodSchema, jsonSchema }, // jsonSchema is the default depiction

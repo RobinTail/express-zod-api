@@ -1,6 +1,7 @@
 import type { UploadedFile } from "express-fileupload";
 import { z } from "zod";
 import { isObject } from "./common-helpers";
+import { brandProperty } from "./metadata";
 
 export const ezUploadBrand = Symbol("Upload");
 
@@ -37,4 +38,4 @@ export const upload = () =>
         }),
       },
     )
-    .brand(ezUploadBrand as symbol);
+    .meta({ [brandProperty]: ezUploadBrand });

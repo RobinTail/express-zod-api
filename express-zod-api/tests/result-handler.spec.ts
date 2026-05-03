@@ -1,4 +1,4 @@
-import { Response } from "express";
+import type { Response } from "express";
 import createHttpError from "http-errors";
 import { z } from "zod";
 import {
@@ -8,7 +8,7 @@ import {
   ResultHandler,
 } from "../src";
 import { ResultHandlerError } from "../src/errors";
-import { AbstractResultHandler, Result } from "../src/result-handler";
+import { AbstractResultHandler, type Result } from "../src/result-handler";
 import {
   makeLoggerMock,
   makeRequestMock,
@@ -185,9 +185,9 @@ describe("ResultHandler", () => {
 
     test("should forward output schema examples", () => {
       const apiResponse = subject.getPositiveResponse(
-        z
-          .object({ str: z.string(), items: z.array(z.string()) })
-          .example({ str: "test", items: ["One", "Two", "Three"] }),
+        z.object({ str: z.string(), items: z.array(z.string()) }).meta({
+          examples: [{ str: "test", items: ["One", "Two", "Three"] }],
+        }),
       );
       expect(apiResponse).toHaveLength(1);
       expect(apiResponse[0].schema.meta()).toMatchSnapshot();
@@ -202,7 +202,11 @@ describe("ResultHandler", () => {
 
   test("arrayResultHandler should attempt to take examples from the items prop", () => {
     const apiResponse = arrayResultHandler.getPositiveResponse(
-      z.object({ items: z.array(z.string()).example(["One", "Two", "Three"]) }),
+      z.object({
+        items: z
+          .array(z.string())
+          .meta({ examples: [["One", "Two", "Three"]] }),
+      }),
     );
     expect(apiResponse).toHaveLength(1);
     expect(apiResponse[0].schema.meta()).toMatchSnapshot();
@@ -213,7 +217,9 @@ describe("ResultHandler", () => {
     const loggerMock = makeLoggerMock();
     const positiveSchema = arrayResultHandler
       .getPositiveResponse(
-        z.object({ anything: z.number() }).example({ anything: 118 }),
+        z
+          .object({ anything: z.number() })
+          .meta({ examples: [{ anything: 118 }] }),
       )
       .pop()?.schema;
     expect(positiveSchema).toHaveProperty(["_zod", "def", "type"], "array");

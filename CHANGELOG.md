@@ -1,5 +1,57 @@
 # Changelog
 
+## Version 28
+
+### v28.0.0
+
+- Supported Node.js versions: `^22.19.0 || ^24.0.0`;
+- Zod compatibility: `^4.3.4` (supports Zod 4.4+ without upper limit);
+- The Zod plugin is no longer installed automatically — it's an optional peer dependency now:
+  - To keep using `.example()`, `.label()`, `.remap()`, `.deprecated()` and methods on schemas, as well as runtime
+    distinguishable brands, install the `@express-zod-api/zod-plugin` manually and import it (ideally at the top of a
+    file declaring your `Routing`);
+  - Breaking change: `ZodType::brand()` method is no longer patched by the plugin:
+    - Use `.xBrand()` method instead — alias for `.meta({ "x-brand": ... })` and does not conflict with Zod 4.4;
+- Breaking changes to the `createConfig()` argument (object):
+  - property `wrongMethodBehavior` (number) changed to `hintAllowedMethods` (boolean);
+  - property `methodLikeRouteBehavior` (string literal) changed to `recognizeMethodDependentRoutes` (boolean);
+- Breaking change to the `EndpointsFactory::build()` argument (object):
+  - property `shortDescription` renamed to `summary`;
+- Breaking change to the `Documentation` constructor argument (object):
+  - property `hasSummaryFromDescription` (boolean) replaced with `summarizer` (function);
+  - If used with `false` value, replace it with `summarizer: ({ summary, trim }) => trim(summary)` for same behavior;
+- Featuring `summarizer` option to customize the summary of the Endpoint in the generated Documentation:
+  - The function receives `summary`, `description` and the default `trim()` function as arguments;
+  - The default summarizer uses `description` as a fallback for missing `summary`;
+  - The `trim()` function accepts a string and the limit (default: 50, best practice) that you can now customize;
+- Breaking change to the `Integration` constructor argument (object):
+  - property `noContent` renamed to `noBodySchema`;
+- Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
+
+```diff
+  createConfig({
+-   wrongMethodBehavior: 404,
++   hintAllowedMethods: false,
+-   methodLikeRouteBehavior: "path",
++   recognizeMethodDependentRoutes: false,
+  });
+
+  factory.build({
+-   shortDescription: "Retrieves the user.",
++   summary: "Retrieves the user.",
+  });
+
+  new Documentation({
+-   hasSummaryFromDescription: false,
++   summarizer: ({ summary, trim }) => trim(summary),
+  });
+
+  new Integration({
+-   noContent: z.undefined(),
++   noBodySchema: z.undefined(),
+  });
+```
+
 ## Version 27
 
 ### v27.2.6

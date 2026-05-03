@@ -1,6 +1,6 @@
 {
   "name": "express-zod-api",
-  "version": "27.2.6",
+  "version": "28.0.0-beta.4",
   "description": "A Typescript framework to help you get an API server up and running with I/O schema validation and custom middlewares in minutes.",
   "license": "MIT",
   "repository": {
@@ -16,7 +16,7 @@
   "bugs": "https://github.com/RobinTail/express-zod-api/issues",
   "funding": "https://github.com/sponsors/RobinTail",
   "scripts": {
-    "build": "tsdown --config-loader unrun",
+    "build": "tsdown",
     "pretest": "tsc",
     "test": "vitest run --coverage",
     "bench": "vitest bench --run ./bench",
@@ -24,7 +24,6 @@
     "prepack": "find .. -maxdepth 1 \\( -name '*.md' ! -name 'AGENTS.md' -o -name 'LICENSE' \\) -exec cp {} . \\;"
   },
   "type": "module",
-  "sideEffects": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "dist/index.js",
@@ -39,16 +38,16 @@
     "*.md"
   ],
   "engines": {
-    "node": "^20.19.0 || ^22.12.0 || ^24.0.0"
+    "node": "^22.19.0 || ^24.0.0"
   },
   "dependencies": {
-    "@express-zod-api/zod-plugin": "workspace:^",
     "ansis": "^4.2.0",
     "node-mocks-http": "^1.17.2",
     "openapi3-ts": "^4.5.0",
     "ramda": "catalog:prod"
   },
   "peerDependencies": {
+    "@express-zod-api/zod-plugin": "workspace:^",
     "@types/compression": "^1.7.5",
     "@types/express": "^5.0.0",
     "@types/express-fileupload": "^1.5.0",
@@ -61,6 +60,9 @@
     "zod": "catalog:peer"
   },
   "peerDependenciesMeta": {
+    "@express-zod-api/zod-plugin": {
+      "optional": true
+    },
     "@types/compression": {
       "optional": true
     },
@@ -84,6 +86,7 @@
     }
   },
   "devDependencies": {
+    "@express-zod-api/zod-plugin": "workspace:^",
     "@types/compression": "catalog:dev",
     "@types/cors": "^2.8.19",
     "@types/depd": "^1.1.37",
@@ -102,7 +105,7 @@
     "node-forge": "^1.3.3",
     "snakify-ts": "^2.3.0",
     "typescript": "catalog:dev",
-    "undici": "^7.16.0",
+    "undici": "^8.0.0",
     "zod": "catalog:dev"
   },
   "keywords": [

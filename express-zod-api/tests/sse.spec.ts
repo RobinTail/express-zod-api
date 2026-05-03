@@ -1,15 +1,15 @@
 import { z } from "zod";
 import {
-  FlatObject,
   Middleware,
   ResultHandler,
   testEndpoint,
   testMiddleware,
   EventStreamFactory,
   EndpointsFactory,
+  type FlatObject,
 } from "../src";
 import {
-  Emitter,
+  type Emitter,
   ensureStream,
   formatEvent,
   makeEventSchema,

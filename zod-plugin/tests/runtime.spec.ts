@@ -67,15 +67,15 @@ describe.each<{ variant: string; z: typeof zESM }>([
     });
   });
 
-  describe(".brand()", () => {
+  describe(".xBrand()", () => {
     test("should set the brand", () => {
-      const subject = z.string().brand("test");
+      const subject = z.string().xBrand("test");
       expect(subject.meta()).toEqual({ "x-brand": "test" });
     });
 
     test("should withstand refinements", () => {
       const schema = z.string();
-      const schemaWithMeta = schema.brand("test");
+      const schemaWithMeta = schema.xBrand("test");
       expect(schemaWithMeta.meta()).toEqual({ "x-brand": "test" });
       expect(schemaWithMeta.regex(/@example.com$/).meta()).toEqual({
         "x-brand": "test",
@@ -83,7 +83,7 @@ describe.each<{ variant: string; z: typeof zESM }>([
     });
 
     test("should withstand describing", () => {
-      const schema = z.string().brand("test").describe("something");
+      const schema = z.string().xBrand("test").describe("something");
       expect(schema.meta()).toEqual({
         "x-brand": "test",
         description: "something",

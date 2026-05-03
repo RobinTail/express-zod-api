@@ -15,14 +15,14 @@ import {
 } from "./http-mock";
 import { z } from "zod";
 import {
-  AppConfig,
   BuiltinLogger,
   EndpointsFactory,
-  ServerConfig,
   attachRouting,
   createServer,
   defaultResultHandler,
   ez,
+  type AppConfig,
+  type ServerConfig,
 } from "../src";
 import express from "express";
 

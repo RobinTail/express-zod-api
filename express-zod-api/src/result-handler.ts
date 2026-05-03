@@ -1,22 +1,23 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { globalRegistry, z } from "zod";
 import {
-  ApiResponse,
   defaultStatusCodes,
-  NormalizedResponse,
+  type ApiResponse,
+  type NormalizedResponse,
 } from "./api-response";
-import { FlatObject, isObject } from "./common-helpers";
+import { isObject, type FlatObject } from "./common-helpers";
 import { contentTypes } from "./content-type";
-import { IOSchema } from "./io-schema";
-import { ActualLogger } from "./logger-helpers";
+import type { IOSchema } from "./io-schema";
+import type { ActualLogger } from "./logger-helpers";
 import {
-  DiscriminatedResult,
+  type DiscriminatedResult,
+  type ResultSchema,
   ensureHttpError,
   getPublicErrorMessage,
   logServerError,
   normalize,
-  ResultSchema,
 } from "./result-helpers";
+import { getExamples } from "./metadata";
 
 type Handler<RES = unknown> = (
   params: DiscriminatedResult & {
@@ -110,8 +111,8 @@ export const defaultResultHandler = new ResultHandler({
       status: z.literal("success"),
       data: output,
     });
-    const { examples } = globalRegistry.get(output) || {}; // pulling down:
-    if (examples?.length) {
+    const examples = getExamples(output); // pulling down:
+    if (examples.length) {
       globalRegistry.add(responseSchema, {
         examples: examples.map((data) => ({
           status: "success" as const,
@@ -160,11 +161,9 @@ export const arrayResultHandler = new ResultHandler({
       output.shape.items instanceof z.ZodArray
         ? output.shape.items
         : z.array(z.any());
-    if (globalRegistry.get(responseSchema)?.examples?.length)
-      return responseSchema; // has examples on the items, or pull down:
-    const examples = globalRegistry
-      .get(output)
-      ?.examples?.filter(
+    if (getExamples(responseSchema).length) return responseSchema; // has examples on the items, or pull down:
+    const examples = getExamples(output)
+      .filter(
         (example): example is { items: unknown[] } =>
           isObject(example) &&
           "items" in example &&

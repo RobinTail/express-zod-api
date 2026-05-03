@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { brandProperty } from "./metadata";
 
 export const ezBufferBrand = Symbol("Buffer");
 
@@ -7,4 +8,4 @@ export const buffer = () =>
     .custom<Buffer>((subject) => Buffer.isBuffer(subject), {
       error: "Expected Buffer",
     })
-    .brand(ezBufferBrand as symbol);
+    .meta({ [brandProperty]: ezBufferBrand });
