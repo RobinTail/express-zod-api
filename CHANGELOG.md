@@ -2,6 +2,32 @@
 
 ## Version 27
 
+### v27.3.0
+
+- Introduced `maxCombinations` setting for Documentation generator:
+  - Limits cartesian product when generating examples by combining each property's own examples;
+  - Set to `0` to disable product but keep concatenations;
+  - Default is `Infinity`, but may change to reasonable number in v28 to avoid too many combinations;
+  - Example: 6 props with 2 examples each → cartesian product makes 2^6 = 64 request examples:
+
+```ts
+const schema = z.object({
+  id: z.number().example(1).example(2),
+  name: z.string().example("john").example("jane"),
+  age: z.number().example(18).example(21),
+  role: z.enum(["user", "admin"]).example("user").example("admin"),
+  active: z.boolean().example(true).example(false),
+  tags: z.array(z.string()).example(["vip"]).example(["new", "promo"]),
+});
+// First 5:
+// { id: 1, name: "john", age: 18, role: "user", active: true, tags: ["vip"] },
+// { id: 1, name: "john", age: 18, role: "user", active: true, tags: ["new", "promo"] },
+// { id: 1, name: "john", age: 18, role: "user", active: false, tags: ["vip"] },
+// { id: 1, name: "john", age: 18, role: "user", active: false, tags: ["new", "promo"] },
+// { id: 1, name: "john", age: 18, role: "admin", active: true, tags: ["vip"] },
+// ...and 59 more
+```
+
 ### v27.2.6
 
 - Limited Zod compatibility to `~4.3.4` (<4.4.0):

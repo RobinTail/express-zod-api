@@ -3,7 +3,6 @@ import { combinations, FlatObject, isObject } from "./common-helpers";
 import type { z } from "zod";
 import type { SchemaObject } from "openapi3-ts/oas31";
 
-type MergeMode = "coerce" | "throw";
 type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &
   Required<Pick<z.core.JSONSchema.ObjectSchema, "properties">>;
 
@@ -42,12 +41,11 @@ type Stack = Array<ReturnType<typeof nestOptional>>;
 /** @internal */
 export const processAllOf = (
   subject: z.core.JSONSchema.BaseSchema,
-  mode: MergeMode,
-  isOptional: boolean,
+  { isStrict, isOptional }: { isStrict: boolean; isOptional: boolean },
 ) => {
   if (!("allOf" in subject) || !subject.allOf) return [];
   return subject.allOf.map((one) => {
-    if (mode === "throw" && !(one.type === "object" && canMerge(one)))
+    if (isStrict && !(one.type === "object" && canMerge(one)))
       throw new Error("Can not merge");
     return R.pair(isOptional, one);
   });
@@ -86,7 +84,10 @@ export const processPropertyNames = (
 export const mergeExamples = (
   target: FlattenObjectSchema,
   entry: z.core.JSONSchema.BaseSchema,
-  isOptional: boolean,
+  {
+    isOptional,
+    maxCombinations,
+  }: { isOptional: boolean; maxCombinations?: number },
 ) => {
   if (!entry.examples?.length) return;
   if (isOptional) {
@@ -95,14 +96,22 @@ export const mergeExamples = (
     target.examples = combinations(
       target.examples?.filter(isObject) || [],
       entry.examples.filter(isObject),
-      ([a, b]) => R.mergeDeepRight(a, b),
+      R.mergeDeepRight,
+      maxCombinations,
     );
   }
 };
 
 export const flattenIO = (
   jsonSchema: z.core.JSONSchema.BaseSchema,
-  mode: MergeMode = "coerce",
+  {
+    isStrict = false,
+    maxCombinations,
+  }: {
+    /** @default false */
+    isStrict?: boolean;
+    maxCombinations?: number;
+  } = {},
 ) => {
   const stack: Stack = [R.pair(false, jsonSchema)]; // [isOptional, JSON Schema]
   const flat: FlattenObjectSchema = { type: "object", properties: {} };
@@ -110,13 +119,16 @@ export const flattenIO = (
   for (let idx = 0; idx < stack.length; idx++) {
     const [isOptional, entry] = stack[idx];
     if (entry.description) flat.description ??= entry.description;
-    stack.push(...processAllOf(entry, mode, isOptional));
+    stack.push(...processAllOf(entry, { isStrict, isOptional }));
     stack.push(...processVariants(entry));
-    mergeExamples(flat, entry, isOptional);
+    mergeExamples(flat, entry, { isOptional, maxCombinations });
     if (!isJsonObjectSchema(entry)) continue;
-    stack.push([isOptional, { examples: pullRequestExamples(entry) }]);
+    stack.push([
+      isOptional,
+      { examples: pullRequestExamples(entry, maxCombinations) },
+    ]);
     if (entry.properties) {
-      flat.properties = (mode === "throw" ? propsMerger : R.mergeDeepRight)(
+      flat.properties = (isStrict ? propsMerger : R.mergeDeepRight)(
         flat.properties,
         entry.properties,
       );
@@ -129,14 +141,14 @@ export const flattenIO = (
 };
 
 /** @see pullResponseExamples */
-export const pullRequestExamples = (subject: z.core.JSONSchema.ObjectSchema) =>
+export const pullRequestExamples = (
+  subject: z.core.JSONSchema.ObjectSchema,
+  limit?: number,
+) =>
   Object.entries(subject.properties || {}).reduce<FlatObject[]>(
     (acc, [key, prop]) => {
       const { examples = [] } = isObject(prop) ? prop : {};
-      return combinations(acc, examples.map(R.objOf(key)), ([left, right]) => ({
-        ...left,
-        ...right,
-      }));
+      return combinations(acc, examples.map(R.objOf(key)), R.mergeRight, limit);
     },
     [],
   );

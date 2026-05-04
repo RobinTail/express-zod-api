@@ -110,6 +110,15 @@ describe("Result helpers", () => {
         { a: "three", b: 2, c: false },
       ]);
     });
+
+    test("respects the given limit", () => {
+      const schema = z.object({
+        a: z.string().meta({ examples: ["one", "two", "three"] }),
+        b: z.number().meta({ examples: [1, 2] }),
+        c: z.boolean().meta({ examples: [false] }),
+      });
+      expect(pullResponseExamples(schema, 3)).toHaveLength(3);
+    });
   });
 
   describe.each(["development", "production"])(

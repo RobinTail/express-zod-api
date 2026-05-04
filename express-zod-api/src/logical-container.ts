@@ -27,6 +27,7 @@ export type Alternatives<T> = Array<Combination<T>>;
 
 export const processContainers = <T>(
   containers: LogicalContainer<T>[],
+  maxCombinations?: number,
 ): Alternatives<T> => {
   const simples = R.filter(isSimple, containers);
   const ands = R.chain(R.prop("and"), R.filter(isLogicalAnd, containers));
@@ -36,10 +37,11 @@ export const processContainers = <T>(
   const alternators = R.map(R.prop("or"), R.concat(ors, orsInAnds)); // no chain!
   return alternators.reduce(
     (acc, entry) =>
-      combinations(
+      combinations<Combination<T>>(
         acc,
         R.map((opt) => (isSimple(opt) ? [opt] : opt.and), entry),
-        ([a, b]) => R.concat(a, b),
+        R.concat,
+        maxCombinations,
       ),
     R.reject(R.isEmpty, [persistent]),
   );

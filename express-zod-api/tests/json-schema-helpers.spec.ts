@@ -70,44 +70,40 @@ describe("JSON Schema helpers", () => {
     test("should return empty array when no allOf", () => {
       const result = processAllOf(
         { type: "object", properties: {} },
-        "coerce",
-        false,
+        { isStrict: false, isOptional: false },
       );
       expect(result).toEqual([]);
     });
 
-    test("should map allOf entries with isOptional flag in coerce mode", () => {
+    test("should map allOf entries with isOptional flag in non-strict mode", () => {
       const result = processAllOf(
         {
           type: "object",
           allOf: [{ type: "object", properties: { a: { type: "string" } } }],
         },
-        "coerce",
-        true,
+        { isStrict: false, isOptional: true },
       );
       expect(result).toEqual([
         [true, { type: "object", properties: { a: { type: "string" } } }],
       ]);
     });
 
-    test("should throw in throw mode when schema cannot be merged", () => {
+    test("should throw in strict mode when schema cannot be merged", () => {
       expect(() =>
         processAllOf(
           { type: "object", allOf: [{ type: "string" }] },
-          "throw",
-          false,
+          { isStrict: true, isOptional: false },
         ),
       ).toThrow("Can not merge");
     });
 
-    test("should allow mergeable schemas in throw mode", () => {
+    test("should allow mergeable schemas in strict mode", () => {
       const result = processAllOf(
         {
           type: "object",
           allOf: [{ type: "object", properties: { a: { type: "string" } } }],
         },
-        "throw",
-        false,
+        { isStrict: true, isOptional: false },
       );
       expect(result).toEqual([
         [false, { type: "object", properties: { a: { type: "string" } } }],
@@ -203,7 +199,7 @@ describe("JSON Schema helpers", () => {
   describe("mergeExamples()", () => {
     test("should do nothing when entry has no examples", () => {
       const flat = { type: "object" as const, properties: {} };
-      mergeExamples(flat, { type: "string" }, false);
+      mergeExamples(flat, { type: "string" }, { isOptional: false });
       expect(flat).toEqual({ type: "object", properties: {} });
     });
 
@@ -213,7 +209,11 @@ describe("JSON Schema helpers", () => {
         properties: {},
         examples: [{ a: 1 }],
       };
-      mergeExamples(flat, { examples: [{ b: 2 }, { c: 3 }] }, true);
+      mergeExamples(
+        flat,
+        { examples: [{ b: 2 }, { c: 3 }] },
+        { isOptional: true },
+      );
       expect(flat.examples).toEqual([{ a: 1 }, { b: 2 }, { c: 3 }]);
     });
 
@@ -221,7 +221,7 @@ describe("JSON Schema helpers", () => {
       "should initialize examples when flat has none (isOptional=%s)",
       (isOptional) => {
         const flat = { type: "object" as const, properties: {} };
-        mergeExamples(flat, { examples: [{ a: 1 }] }, isOptional);
+        mergeExamples(flat, { examples: [{ a: 1 }] }, { isOptional });
         expect(flat).toHaveProperty("examples", [{ a: 1 }]);
       },
     );
@@ -232,11 +232,29 @@ describe("JSON Schema helpers", () => {
         properties: {},
         examples: [{ a: 1 }],
       };
-      mergeExamples(flat, { examples: [{ b: 2 }, { b: 3 }] }, false);
+      mergeExamples(
+        flat,
+        { examples: [{ b: 2 }, { b: 3 }] },
+        { isOptional: false },
+      );
       expect(flat.examples).toEqual([
         { a: 1, b: 2 },
         { a: 1, b: 3 },
       ]);
+    });
+
+    test("should apply limit to combinations when required", () => {
+      const flat = {
+        type: "object" as const,
+        properties: {},
+        examples: [{ a: 1 }],
+      };
+      mergeExamples(
+        flat,
+        { examples: [{ b: 2 }, { b: 3 }] },
+        { isOptional: false, maxCombinations: 1 },
+      );
+      expect(flat.examples).toHaveLength(1);
     });
   });
 
@@ -280,6 +298,21 @@ describe("JSON Schema helpers", () => {
         { name: "jane", age: 25 },
         { name: "jane", age: 30 },
       ]);
+    });
+
+    test("should respect the given limit", () => {
+      expect(
+        pullRequestExamples(
+          {
+            type: "object",
+            properties: {
+              name: { type: "string", examples: ["john", "jane"] },
+              age: { type: "number", examples: [25, 30] },
+            },
+          },
+          2,
+        ),
+      ).toHaveLength(2);
     });
   });
 

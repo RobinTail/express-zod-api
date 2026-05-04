@@ -270,15 +270,31 @@ describe("Common Helpers", () => {
 
   describe("combinations()", () => {
     test("should run callback on each combination of items from two arrays", () => {
-      expect(combinations([1, 2], [4, 5, 6], ([a, b]) => a + b)).toEqual([
+      expect(combinations([1, 2], [4, 5, 6], (a, b) => a + b)).toEqual([
         5, 6, 7, 6, 7, 8,
       ]);
     });
 
     test("should handle one or two arrays are empty", () => {
-      expect(combinations([], [4, 5, 6], ([a, b]) => a + b)).toEqual([4, 5, 6]);
-      expect(combinations([1, 2, 3], [], ([a, b]) => a + b)).toEqual([1, 2, 3]);
-      expect(combinations<number>([], [], ([a, b]) => a + b)).toEqual([]);
+      expect(combinations([], [4, 5, 6], (a, b) => a + b)).toEqual([4, 5, 6]);
+      expect(combinations([1, 2, 3], [], (a, b) => a + b)).toEqual([1, 2, 3]);
+      expect(combinations<number>([], [], (a, b) => a + b)).toEqual([]);
+    });
+
+    test("should not apply the limit when returns original array", () => {
+      expect(combinations([1, 2, 3], [], (a, b) => a + b, 1)).toEqual([
+        1, 2, 3,
+      ]);
+    });
+
+    test("should limit the number of combinations", () => {
+      expect(combinations([1, 2], [4, 5, 6], (a, b) => a + b, 4)).toEqual([
+        5, 6, 7, 6,
+      ]);
+    });
+
+    test.each([0, -1, NaN])("should return empty for limit=%s", (limit) => {
+      expect(combinations([1, 2], [3, 4], (a, b) => a + b, limit)).toEqual([]);
     });
   });
 
