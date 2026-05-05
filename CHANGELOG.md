@@ -4,7 +4,7 @@
 
 ### v28.0.0
 
-- Supported Node.js versions: `^22.19.0 || ^24.0.0`;
+- Supported Node.js versions: `^22.19.0 || ^24.0.0 || ^26.0.0`;
 - Zod compatibility: `^4.3.4` (supports Zod 4.4+ without upper limit);
 - The Zod plugin is no longer installed automatically — it's an optional peer dependency now:
   - To keep using `.example()`, `.label()`, `.remap()`, `.deprecated()` and methods on schemas, as well as runtime
@@ -53,6 +53,10 @@
 ```
 
 ## Version 27
+
+### v27.3.0
+
+- Supporting Node 26.
 
 ### v27.2.6
 
