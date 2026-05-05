@@ -2,6 +2,10 @@
 
 ## Version 4
 
+### v4.2.0
+
+- Supporting Node 26.
+
 ### v4.1.1
 
 - Limited compatibility to Zod versions `~4.3.4` (<4.4.0):
