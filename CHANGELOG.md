@@ -2,7 +2,7 @@
 
 ## Version 27
 
-### v27.3.0
+### v27.4.0
 
 - Introduced `maxCombinations` setting for Documentation generator:
   - Limits cartesian product when generating examples by combining each property's own examples;
@@ -27,6 +27,10 @@ const schema = z.object({
 // { id: 1, name: "john", age: 18, role: "admin", active: true, tags: ["vip"] },
 // ...and 59 more
 ```
+
+### v27.3.0
+
+- Supporting Node 26.
 
 ### v27.2.6
 
