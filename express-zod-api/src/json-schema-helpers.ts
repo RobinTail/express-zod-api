@@ -96,10 +96,9 @@ export const mergeExamples = (
 ) => {
   if (!entry.examples?.length) return;
   if (isOptional) {
-    if (!(limit > 0)) return;
     target.examples = R.concat(target.examples || [], entry.examples).slice(
       0,
-      limit,
+      Math.max(0, limit || 0),
     );
   } else {
     target.examples = combinations(
