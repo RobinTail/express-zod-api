@@ -5,6 +5,7 @@ import { globalRegistry, z } from "zod";
 import { NormalizedResponse, ResponseVariant } from "./api-response";
 import {
   combinations,
+  defaultMaxCombinations,
   FlatObject,
   getMessageFromError,
   isProduction,
@@ -90,12 +91,14 @@ export const getPublicErrorMessage = (error: HttpError): string =>
 /** @see pullRequestExamples */
 export const pullResponseExamples = <T extends z.core.$ZodObject>(
   subject: T,
-  limit?: number,
-) =>
-  Object.entries(subject._zod.def.shape).reduce<FlatObject[]>(
+  limit = defaultMaxCombinations,
+) => {
+  if (!(limit > 0)) return [];
+  return Object.entries(subject._zod.def.shape).reduce<FlatObject[]>(
     (acc, [key, schema]) => {
       const { examples = [] } = globalRegistry.get(schema) || {};
       return combinations(acc, examples.map(R.objOf(key)), R.mergeRight, limit);
     },
     [],
   );
+};
