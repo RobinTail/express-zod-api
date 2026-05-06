@@ -289,6 +289,25 @@ describe("Endpoint", () => {
         expect(() => (responses as any[]).push()).toThrowError(/read only/);
       },
     );
+
+    test.each([0, -1, 1, 2, NaN])(
+      "should respect the limit=%s of examples for positive variant",
+      (maxExamples) => {
+        const factory = new EndpointsFactory(defaultResultHandler);
+        const endpoint = factory.build({
+          output: z.object({
+            something: z.number().meta({ examples: [1, 2] }),
+            another: z.boolean().meta({ examples: [true, false] }),
+          }),
+          handler: vi.fn(),
+        });
+        const responses = endpoint.getResponses("positive", { maxExamples });
+        expect(responses).toHaveLength(1);
+        expect(responses[0].schema.meta()?.examples ?? []).toHaveLength(
+          maxExamples > 0 ? maxExamples : 0,
+        );
+      },
+    );
   });
 
   describe(".scopes", () => {
