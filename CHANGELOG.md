@@ -4,10 +4,10 @@
 
 ### v27.4.0
 
-- Introduced `maxCombinations` setting for Documentation generator:
-  - Limits cartesian product when generating examples by combining each property's own examples;
-  - Set to `0` to disable product but keep concatenations;
-  - Default is `Infinity`, but may change to reasonable number in v28 to avoid too many combinations;
+- Introduced `limits` option for Documentation generator with two nested settings:
+  - `examples` — caps the cartesian product when combining each property's own examples;
+  - `security` — caps the cartesian product of security schemas combinations (must be at least 1);
+  - Both default to `Infinity`, but will be changed to a reasonable number in v28 to avoid too many combinations;
   - Example: 6 props with 2 examples each → cartesian product makes 2^6 = 64 request examples:
 
 ```ts
@@ -19,7 +19,7 @@ const schema = z.object({
   active: z.boolean().example(true).example(false),
   tags: z.array(z.string()).example(["vip"]).example(["new", "promo"]),
 });
-// First 5:
+// First 5 of 64 cartesian combinations:
 // { id: 1, name: "john", age: 18, role: "user", active: true, tags: ["vip"] },
 // { id: 1, name: "john", age: 18, role: "user", active: true, tags: ["new", "promo"] },
 // { id: 1, name: "john", age: 18, role: "user", active: false, tags: ["vip"] },
