@@ -252,7 +252,21 @@ describe("JSON Schema helpers", () => {
       mergeExamples(
         flat,
         { examples: [{ b: 2 }, { b: 3 }] },
-        { isOptional: false, maxCombinations: 1 },
+        { isOptional: false, limit: 1 },
+      );
+      expect(flat.examples).toHaveLength(1);
+    });
+
+    test("should apply limit to concatenations when optional", () => {
+      const flat = {
+        type: "object" as const,
+        properties: {},
+        examples: [{ a: 1 }],
+      };
+      mergeExamples(
+        flat,
+        { examples: [{ b: 2 }, { c: 3 }] },
+        { isOptional: true, limit: 1 },
       );
       expect(flat.examples).toHaveLength(1);
     });

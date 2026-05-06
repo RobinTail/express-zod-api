@@ -84,20 +84,21 @@ export const processPropertyNames = (
 export const mergeExamples = (
   target: FlattenObjectSchema,
   entry: z.core.JSONSchema.BaseSchema,
-  {
-    isOptional,
-    maxCombinations,
-  }: { isOptional: boolean; maxCombinations?: number },
+  { isOptional, limit = Infinity }: { isOptional: boolean; limit?: number },
 ) => {
   if (!entry.examples?.length) return;
   if (isOptional) {
-    target.examples = R.concat(target.examples || [], entry.examples);
+    if (!(limit > 0)) return;
+    target.examples = R.concat(target.examples || [], entry.examples).slice(
+      0,
+      limit,
+    );
   } else {
     target.examples = combinations(
       target.examples?.filter(isObject) || [],
       entry.examples.filter(isObject),
       R.mergeDeepRight,
-      maxCombinations,
+      limit,
     );
   }
 };
@@ -121,7 +122,7 @@ export const flattenIO = (
     if (entry.description) flat.description ??= entry.description;
     stack.push(...processAllOf(entry, { isStrict, isOptional }));
     stack.push(...processVariants(entry));
-    mergeExamples(flat, entry, { isOptional, maxCombinations });
+    mergeExamples(flat, entry, { isOptional, limit: maxCombinations });
     if (!isJsonObjectSchema(entry)) continue;
     stack.push([
       isOptional,
