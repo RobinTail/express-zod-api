@@ -129,7 +129,10 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
 export const depictIntersection = R.tryCatch<Depicter>(
   ({ jsonSchema }, { maxCombinations }) => {
     if (!jsonSchema.allOf) throw "no allOf";
-    return flattenIO(jsonSchema, { isStrict: true, maxCombinations });
+    return flattenIO(jsonSchema, {
+      isStrict: true,
+      maxExamples: maxCombinations,
+    });
   },
   (_err, { jsonSchema }) => jsonSchema,
 );
@@ -293,7 +296,7 @@ export const depictRequestParams = ({
   isHeader?: IsHeader;
   securityHeaders?: Set<string>;
 }) => {
-  const flat = flattenIO(request, { maxCombinations });
+  const flat = flattenIO(request, { maxExamples: maxCombinations });
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
@@ -636,7 +639,7 @@ export const depictBody = ({
     examples: enumerateExamples(
       examples.length
         ? examples
-        : flattenIO(request, { maxCombinations })
+        : flattenIO(request, { maxExamples: maxCombinations })
             .examples?.filter(
               (one): one is FlatObject => isObject(one) && !Array.isArray(one),
             )

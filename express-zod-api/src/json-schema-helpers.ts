@@ -107,11 +107,11 @@ export const flattenIO = (
   jsonSchema: z.core.JSONSchema.BaseSchema,
   {
     isStrict = false,
-    maxCombinations,
+    maxExamples,
   }: {
     /** @default false */
     isStrict?: boolean;
-    maxCombinations?: number;
+    maxExamples?: number;
   } = {},
 ) => {
   const stack: Stack = [R.pair(false, jsonSchema)]; // [isOptional, JSON Schema]
@@ -122,11 +122,11 @@ export const flattenIO = (
     if (entry.description) flat.description ??= entry.description;
     stack.push(...processAllOf(entry, { isStrict, isOptional }));
     stack.push(...processVariants(entry));
-    mergeExamples(flat, entry, { isOptional, limit: maxCombinations });
+    mergeExamples(flat, entry, { isOptional, limit: maxExamples });
     if (!isJsonObjectSchema(entry)) continue;
     stack.push([
       isOptional,
-      { examples: pullRequestExamples(entry, maxCombinations) },
+      { examples: pullRequestExamples(entry, maxExamples) },
     ]);
     if (entry.properties) {
       flat.properties = (isStrict ? propsMerger : R.mergeDeepRight)(
