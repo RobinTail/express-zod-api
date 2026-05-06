@@ -134,7 +134,7 @@ type User = { name: string; age: number };
 ### 6. Testing Convention
 
 - **Use `test.each()`**: Always prefer parameterized tests to reduce repetition
-- **Placeholders**: Use `%s` for the current value and `%#` for the index
+- **Placeholders**: Use `%s` for the current value or `%#` for the index
 
 ```typescript
 test.each([true, false, undefined])(
