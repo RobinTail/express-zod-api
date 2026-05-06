@@ -9,6 +9,7 @@ import {
   getInput,
   ensureError,
   isSchema,
+  defaultMaxCombinations,
 } from "./common-helpers";
 import { CommonConfig } from "./config-type";
 import {
@@ -91,7 +92,7 @@ export class Endpoint<
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
 
   /** considered expensive operation, only required for generators */
-  #ensureOutputExamples(limit?: number) {
+  #ensureOutputExamples(limit: number) {
     if (globalRegistry.get(this.#def.outputSchema)?.examples?.length) return; // examples on output schema, or pull up:
     if (!isSchema<z.core.$ZodObject>(this.#def.outputSchema, "object")) return;
     const examples = pullResponseExamples(this.#def.outputSchema, limit);
@@ -175,9 +176,10 @@ export class Endpoint<
   /** @internal */
   public override getResponses(
     variant: ResponseVariant,
-    { maxExamples }: { maxExamples?: number },
+    { maxExamples = defaultMaxCombinations }: { maxExamples?: number },
   ) {
-    if (variant === "positive") this.#ensureOutputExamples(maxExamples);
+    if (variant === "positive" && maxExamples > 0)
+      this.#ensureOutputExamples(maxExamples);
     return Object.freeze(
       variant === "negative"
         ? this.#def.resultHandler.getNegativeResponse()
