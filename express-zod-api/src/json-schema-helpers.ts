@@ -1,5 +1,10 @@
 import * as R from "ramda";
-import { combinations, FlatObject, isObject } from "./common-helpers";
+import {
+  combinations,
+  defaultMaxCombinations,
+  FlatObject,
+  isObject,
+} from "./common-helpers";
 import type { z } from "zod";
 import type { SchemaObject } from "openapi3-ts/oas31";
 
@@ -84,7 +89,10 @@ export const processPropertyNames = (
 export const mergeExamples = (
   target: FlattenObjectSchema,
   entry: z.core.JSONSchema.BaseSchema,
-  { isOptional, limit = Infinity }: { isOptional: boolean; limit?: number },
+  {
+    isOptional,
+    limit = defaultMaxCombinations,
+  }: { isOptional: boolean; limit?: number },
 ) => {
   if (!entry.examples?.length) return;
   if (isOptional) {

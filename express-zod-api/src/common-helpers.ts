@@ -109,6 +109,9 @@ export const isSchema = <T extends z.core.$ZodType = z.core.$ZodType>(
   "_zod" in subject &&
   (type ? R.path(["_zod", "def", "type"], subject) === type : true);
 
+/** @todo set to 20 in v28 to avoid too many combinations */
+export const defaultMaxCombinations = Infinity;
+
 /** Configurable replacement for R.xprod(), but it also handles empty arrays */
 export const combinations = <T>(
   left: T[],
@@ -116,7 +119,7 @@ export const combinations = <T>(
   /** @desc The function that combines elements */
   merge: (a: T, b: T) => T,
   /** @desc Maximum number of combinations */
-  limit = Infinity,
+  limit = defaultMaxCombinations,
 ): T[] => {
   if (!(limit > 0)) return [];
   if (!left.length || !right.length) return left.concat(right).slice(0, limit);

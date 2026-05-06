@@ -90,14 +90,14 @@ interface DocumentationParams {
   limits?: {
     /**
      * @desc Limits the number of examples
-     * @default Infinity
-     * @todo set to 10 or 20 in v28 to avoid too many combinations
+     * @default defaultMaxCombinations
+     * @see defaultMaxCombinations
      * */
     examples?: number;
     /**
      * @desc Limits the number of security scheme combinations
-     * @default Infinity
-     * @todo set to 10 or 20 in v28 to avoid too many combinations
+     * @default defaultMaxCombinations
+     * @see defaultMaxCombinations
      * */
     security?: number;
   };
