@@ -669,7 +669,7 @@ export const depictTags = (
 export const trimSummary = (summary?: string, limit = 50) =>
   !summary || summary.length <= limit
     ? summary
-    : summary.slice(0, limit - 1) + "…";
+    : summary.slice(0, Math.max(1, limit || 0) - 1) + "…";
 
 export const nonEmpty = <T>(subject: T[] | ReadonlyArray<T>) =>
   subject.length ? subject.slice() : undefined;

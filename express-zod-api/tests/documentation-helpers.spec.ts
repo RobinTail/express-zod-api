@@ -711,5 +711,10 @@ describe("Documentation helpers", () => {
     test("accepts undefined as is", () => {
       expect(trimSummary()).toBeUndefined();
     });
+    test.each([5, 0, -1, NaN])("handles different limit=%s", (limit) => {
+      expect(trimSummary("this text is long enough", limit)).toHaveLength(
+        limit > 0 ? limit : 1,
+      );
+    });
   });
 });
