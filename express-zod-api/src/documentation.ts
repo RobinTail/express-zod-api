@@ -87,14 +87,20 @@ interface DocumentationParams {
    * @example { users: "About users", files: { description: "About files", url: "https://example.com" } }
    * */
   tags?: Parameters<typeof depictTags>[0];
-  /**
-   * @desc Limits cartesian product when generating examples by combining each property's own examples.
-   * @desc Applies to: request/response examples, security scheme alternatives.
-   * @example 0 — disables product combinations, keeps concatenations
-   * @default Infinity
-   * @todo set to 10 or 20 in v28 to avoid too many combinations
-   * */
-  maxCombinations?: number;
+  limits?: {
+    /**
+     * @desc Limits the number of examples
+     * @default Infinity
+     * @todo set to 10 or 20 in v28 to avoid too many combinations
+     * */
+    examples?: number;
+    /**
+     * @desc Limits the number of security scheme combinations
+     * @default Infinity
+     * @todo set to 10 or 20 in v28 to avoid too many combinations
+     * */
+    security?: number;
+  };
 }
 
 export class Documentation extends OpenApiBuilder {
@@ -167,10 +173,10 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     tags,
     isHeader,
-    maxCombinations,
     hasSummaryFromDescription = true,
     hasHeadMethod = true,
     composition = "inline",
+    limits: { examples: maxExamples, security: maxSecurity } = {},
   }: DocumentationParams) {
     super();
     this.addInfo({ title, version });
@@ -183,7 +189,7 @@ export class Documentation extends OpenApiBuilder {
         endpoint,
         composition,
         brandHandling,
-        maxCombinations,
+        maxExamples,
         makeRef: this.#makeRef.bind(this),
       };
       const { description, shortDescription, scopes, inputSchema } = endpoint;
@@ -216,9 +222,7 @@ export class Documentation extends OpenApiBuilder {
 
       const responses: ResponsesObject = {};
       for (const variant of responseVariants) {
-        const apiResponses = endpoint.getResponses(variant, {
-          maxExamples: maxCombinations,
-        });
+        const apiResponses = endpoint.getResponses(variant, { maxExamples });
         for (const { mimeTypes, schema, statusCodes } of apiResponses) {
           for (const statusCode of statusCodes) {
             responses[statusCode] = depictResponse({
@@ -257,7 +261,7 @@ export class Documentation extends OpenApiBuilder {
 
       const securityRefs = depictSecurityRefs(
         depictSecurity(
-          processContainers(endpoint.security, maxCombinations),
+          processContainers(endpoint.security, maxSecurity),
           inputSources,
         ),
         scopes,

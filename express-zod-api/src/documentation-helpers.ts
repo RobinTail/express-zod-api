@@ -55,7 +55,7 @@ interface ReqResCommons {
   ) => ReferenceObject;
   path: string;
   method: ClientMethod;
-  maxCombinations?: number;
+  maxExamples?: number;
 }
 
 export interface OpenAPIContext extends ReqResCommons {
@@ -127,12 +127,9 @@ export const depictUnion: Depicter = ({ zodSchema, jsonSchema }) => {
 };
 
 export const depictIntersection = R.tryCatch<Depicter>(
-  ({ jsonSchema }, { maxCombinations }) => {
+  ({ jsonSchema }, { maxExamples }) => {
     if (!jsonSchema.allOf) throw "no allOf";
-    return flattenIO(jsonSchema, {
-      isStrict: true,
-      maxExamples: maxCombinations,
-    });
+    return flattenIO(jsonSchema, { isStrict: true, maxExamples });
   },
   (_err, { jsonSchema }) => jsonSchema,
 );
@@ -286,7 +283,7 @@ export const depictRequestParams = ({
   composition,
   isHeader,
   securityHeaders,
-  maxCombinations,
+  maxExamples,
   description = `${method.toUpperCase()} ${path} Parameter`,
 }: ReqResCommons & {
   composition: "inline" | "components";
@@ -296,7 +293,7 @@ export const depictRequestParams = ({
   isHeader?: IsHeader;
   securityHeaders?: Set<string>;
 }) => {
-  const flat = flattenIO(request, { maxExamples: maxCombinations });
+  const flat = flattenIO(request, { maxExamples });
   const pathParams = getRoutePathParams(path);
   const isQueryEnabled = inputSources.includes("query");
   const areParamsEnabled = inputSources.includes("params");
@@ -459,7 +456,7 @@ export const depictResponse = ({
   hasMultipleStatusCodes,
   statusCode,
   brandHandling,
-  maxCombinations,
+  maxExamples,
   description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
@@ -477,7 +474,7 @@ export const depictResponse = ({
   const response = asOAS(
     depict(schema, {
       rules: { ...brandHandling, ...depicters },
-      ctx: { isResponse: true, makeRef, path, method, maxCombinations },
+      ctx: { isResponse: true, makeRef, path, method, maxExamples },
     }),
   );
   const examples = [];
@@ -593,14 +590,14 @@ export const depictRequest = ({
   makeRef,
   path,
   method,
-  maxCombinations,
+  maxExamples,
 }: ReqResCommons & {
   schema: IOSchema;
   brandHandling?: BrandHandling;
 }) =>
   depict(schema, {
     rules: { ...brandHandling, ...depicters },
-    ctx: { isResponse: false, makeRef, path, method, maxCombinations },
+    ctx: { isResponse: false, makeRef, path, method, maxExamples },
   });
 
 export const depictBody = ({
@@ -612,7 +609,7 @@ export const depictBody = ({
   makeRef,
   composition,
   paramNames,
-  maxCombinations,
+  maxExamples,
   description = `${method.toUpperCase()} ${path} Request body`,
 }: ReqResCommons & {
   schema: IOSchema;
@@ -639,7 +636,7 @@ export const depictBody = ({
     examples: enumerateExamples(
       examples.length
         ? examples
-        : flattenIO(request, { maxExamples: maxCombinations })
+        : flattenIO(request, { maxExamples })
             .examples?.filter(
               (one): one is FlatObject => isObject(one) && !Array.isArray(one),
             )
