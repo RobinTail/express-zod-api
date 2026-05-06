@@ -95,9 +95,9 @@ interface DocumentationParams {
      * */
     examples?: number;
     /**
-     * @desc Limits the number of security scheme combinations
+     * @desc Limits the number of security schemas combinations. Must be at least 1.
      * @default defaultMaxCombinations
-     * @see defaultMaxCombinations
+     * @see Middleware
      * */
     security?: number;
   };
