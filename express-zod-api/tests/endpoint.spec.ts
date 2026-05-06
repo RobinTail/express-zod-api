@@ -283,7 +283,7 @@ describe("Endpoint", () => {
           handler: vi.fn(),
         });
         const responses = endpoint.getResponses(variant, {
-          maxCombinations: 0,
+          maxExamples: 0,
         });
         expect(responses).toMatchSnapshot();
         expect(() => (responses as any[]).push()).toThrowError(/read only/);

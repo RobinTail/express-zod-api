@@ -108,7 +108,7 @@ export class Integration extends IntegrationBase {
       const dictionaries = responseVariants.reduce(
         (agg, responseVariant) => {
           const responses = endpoint.getResponses(responseVariant, {
-            maxCombinations: 0, // not using examples yet
+            maxExamples: 0, // not using examples yet
           });
           const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
             const hasContent = shouldHaveContent(method, mimeTypes);
