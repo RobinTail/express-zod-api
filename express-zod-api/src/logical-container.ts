@@ -1,5 +1,9 @@
 import * as R from "ramda";
-import { combinations, isObject } from "./common-helpers";
+import {
+  combinations,
+  defaultMaxCombinations,
+  isObject,
+} from "./common-helpers";
 
 type LogicalOr<T> = { or: T[] };
 type LogicalAnd<T> = { and: T[] };
@@ -27,8 +31,9 @@ export type Alternatives<T> = Array<Combination<T>>;
 
 export const processContainers = <T>(
   containers: LogicalContainer<T>[],
-  maxCombinations?: number,
+  maxCombinations = defaultMaxCombinations,
 ): Alternatives<T> => {
+  if (!(maxCombinations > 0)) return [];
   const simples = R.filter(isSimple, containers);
   const ands = R.chain(R.prop("and"), R.filter(isLogicalAnd, containers));
   const [simpleAnds, orsInAnds] = R.partition(isSimple, ands);
