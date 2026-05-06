@@ -87,15 +87,20 @@ interface DocumentationParams {
    * @example { users: "About users", files: { description: "About files", url: "https://example.com" } }
    * */
   tags?: Parameters<typeof depictTags>[0];
+  /**
+   * `@desc` Caps on the number of generated entities.
+   * `@default` { examples: defaultMaxCombinations, security: defaultMaxCombinations }
+   * `@example` { examples: 20, security: 10 }
+   * */
   limits?: {
     /**
-     * @desc Limits the number of examples
+     * @desc Caps the number of generated examples (request/response examples from examples of individual properties).
      * @default defaultMaxCombinations
      * @see defaultMaxCombinations
      * */
     examples?: number;
     /**
-     * @desc Limits the number of security schemas combinations. Must be at least 1.
+     * @desc Caps the number of security schemas combinations. Must be at least 1.
      * @default defaultMaxCombinations
      * @see Middleware
      * */
