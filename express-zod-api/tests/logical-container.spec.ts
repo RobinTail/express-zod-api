@@ -196,5 +196,17 @@ describe("LogicalContainer", () => {
         processContainers([{ type: "bearer", format: "JWT" }, { and: [] }]),
       ).toEqual([[{ type: "bearer", format: "JWT" }]]);
     });
+
+    test("should control the maximum combinations", () => {
+      expect(
+        processContainers(
+          [
+            { or: [{ and: [1, 2] }, { and: [3, 4] }] },
+            { or: [{ and: [5, 6] }, { and: [7, 8] }] },
+          ],
+          2,
+        ),
+      ).toHaveLength(2);
+    });
   });
 });

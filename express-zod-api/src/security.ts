@@ -1,3 +1,10 @@
+import * as R from "ramda";
+import {
+  isLogicalAnd,
+  isLogicalOr,
+  type LogicalContainer,
+} from "./logical-container";
+
 export interface BasicSecurity {
   type: "basic";
 }
@@ -93,3 +100,15 @@ export type Security<K extends string = string, S extends string = string> =
   | CookieSecurity
   | OpenIdSecurity
   | OAuth2Security<S>;
+
+const pickHeaders = (container: LogicalContainer<Security>): string[] => {
+  if (isLogicalAnd(container)) return R.chain(pickHeaders, container.and);
+  if (isLogicalOr(container)) return R.chain(pickHeaders, container.or);
+  if (container.type === "header") return [container.name];
+  return [];
+};
+
+/** @desc Extract header security names from logical containers without generating combinations */
+export const getSecurityHeaders = (
+  containers: LogicalContainer<Security>[],
+): Set<string> => new Set(R.chain(pickHeaders, containers));

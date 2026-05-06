@@ -57,6 +57,7 @@ export abstract class AbstractEndpoint {
   /** @internal */
   public abstract getResponses(
     variant: ResponseVariant,
+    params: { maxCombinations?: number },
   ): ReadonlyArray<NormalizedResponse>;
   /** @internal */
   public abstract getOperationId(method: ClientMethod): string | undefined;
@@ -90,16 +91,16 @@ export class Endpoint<
   readonly #def: ConstructorParameters<typeof Endpoint<IN, OUT, CTX>>[0];
 
   /** considered expensive operation, only required for generators */
-  #ensureOutputExamples = R.once(() => {
+  #ensureOutputExamples(limit?: number) {
     if (globalRegistry.get(this.#def.outputSchema)?.examples?.length) return; // examples on output schema, or pull up:
     if (!isSchema<z.core.$ZodObject>(this.#def.outputSchema, "object")) return;
-    const examples = pullResponseExamples(this.#def.outputSchema);
+    const examples = pullResponseExamples(this.#def.outputSchema, limit);
     if (!examples.length) return;
     const current = this.#def.outputSchema.meta();
     globalRegistry
       .remove(this.#def.outputSchema) // reassign to avoid cloning
       .add(this.#def.outputSchema, { ...current, examples });
-  });
+  }
 
   constructor(def: {
     deprecated?: boolean;
@@ -172,8 +173,11 @@ export class Endpoint<
   }
 
   /** @internal */
-  public override getResponses(variant: ResponseVariant) {
-    if (variant === "positive") this.#ensureOutputExamples();
+  public override getResponses(
+    variant: ResponseVariant,
+    { maxCombinations }: { maxCombinations?: number },
+  ) {
+    if (variant === "positive") this.#ensureOutputExamples(maxCombinations);
     return Object.freeze(
       variant === "negative"
         ? this.#def.resultHandler.getNegativeResponse()

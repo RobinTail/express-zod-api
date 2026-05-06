@@ -109,11 +109,23 @@ export const isSchema = <T extends z.core.$ZodType = z.core.$ZodType>(
   "_zod" in subject &&
   (type ? R.path(["_zod", "def", "type"], subject) === type : true);
 
+/** Configurable replacement for R.xprod(), but it also handles empty arrays */
 export const combinations = <T>(
-  a: T[],
-  b: T[],
-  merge: (pair: [T, T]) => T,
-): T[] => (a.length && b.length ? R.xprod(a, b).map(merge) : a.concat(b));
+  left: T[],
+  right: T[],
+  /** @desc The function that combines elements */
+  merge: (a: T, b: T) => T,
+  /** @desc Maximum number of combinations (only applies to Cartesian product of non-empty arrays) */
+  limit = Infinity,
+): T[] => {
+  if (!left.length || !right.length) return left.concat(right);
+  const result: T[] = [];
+  for (let idxL = 0; idxL < left.length && result.length < limit; idxL++) {
+    for (let idxR = 0; idxR < right.length && result.length < limit; idxR++)
+      result.push(merge(left[idxL], right[idxR]));
+  }
+  return result;
+};
 
 export const ucFirst = (subject: string) =>
   subject.charAt(0).toUpperCase() + subject.slice(1).toLowerCase();
