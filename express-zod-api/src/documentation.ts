@@ -102,6 +102,7 @@ interface DocumentationParams {
     /**
      * @desc Caps the number of security schemas combinations. Must be at least 1.
      * @default defaultMaxCombinations
+     * @todo decouple from defaultMaxCombinations, use higher but still fixed limit in v28
      * @see Middleware
      * */
     security?: number;
