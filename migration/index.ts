@@ -43,17 +43,17 @@ const queries: Record<Listener, string> = {
     `${NT.ObjectExpression} > ` +
     queryNamedProp("shortDescription"),
   brandHandling:
-    `${NT.NewExpression}:matches([callee.name="Documentation"],[callee.name="Integration"]) > ` +
+    `${NT.NewExpression}[callee.name=/Documentation|Integration/] > ` +
     `${NT.ObjectExpression} > ` +
     queryNamedProp("brandHandling"),
 };
 
 const brandHandlingTodo = [
-  "@todo Manual migration required for `brandHandling`:",
-  "1. Install `@express-zod-api/zod-plugin` as a dependency.",
-  "2. Import it, ideally at the top of the file declaring your `Routing`.",
-  "3. Replace `.brand()` with `.xBrand()` on the branded schemas (provided by the plugin).",
-  '4. Alternatively, use `.meta({ "x-brand": ... })` on the schemas instead.',
+  "@todo Manual migration required:",
+  "1. Install `@express-zod-api/zod-plugin` as a dependency;",
+  "2. Import it, ideally at the top of the file declaring your `Routing`;",
+  "3. Replace `.brand()` with `.xBrand()` on the branded schemas (provided by the plugin);",
+  'Alternatively, use `.meta({ "x-brand": ... })` on the schemas instead (without plugin).',
 ];
 
 const listen = <
@@ -156,7 +156,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         ctx.report({
           node,
           messageId: "add",
-          data: { subject: "JSDoc note", to: getPropName(node) },
+          data: { subject: "plugin", to: "your app" },
           fix: (fixer) => fixer.insertTextBefore(node, comment),
         });
       },
