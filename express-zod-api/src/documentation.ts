@@ -88,9 +88,9 @@ interface DocumentationParams {
    * */
   tags?: Parameters<typeof depictTags>[0];
   /**
-   * `@desc` Caps on the number of generated entities.
-   * `@default` { examples: defaultMaxCombinations, security: defaultMaxCombinations }
-   * `@example` { examples: 20, security: 10 }
+   * @desc Caps on the number of generated entities.
+   * @default { examples: defaultMaxCombinations, security: defaultMaxCombinations }
+   * @example { examples: 20, security: 10 }
    * */
   limits?: {
     /**
