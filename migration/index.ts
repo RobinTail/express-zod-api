@@ -39,11 +39,11 @@ const queries: Record<Listener, string> = {
     `${NT.ObjectExpression} > ` +
     queryNamedProp("noContent"),
   shortDescription:
-    `${NT.CallExpression}[callee.property.name=/build|buildVoid/] > ` +
+    `${NT.CallExpression}[callee.property.name=/^(build|buildVoid)$/] > ` +
     `${NT.ObjectExpression} > ` +
     queryNamedProp("shortDescription"),
   brandHandling:
-    `${NT.NewExpression}[callee.name=/Documentation|Integration/] > ` +
+    `${NT.NewExpression}[callee.name=/^(Documentation|Integration)$/] > ` +
     `${NT.ObjectExpression} > ` +
     queryNamedProp("brandHandling"),
 };
