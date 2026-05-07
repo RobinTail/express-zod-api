@@ -29,6 +29,8 @@ describe("Migration", async () => {
       `new Integration({ noBodySchema: z.undefined() });`,
       `factory.build({ summary: "hello" });`,
       `factory.buildVoid({ summary: "hello" });`,
+      `factory.build({ brandHandling: { [myBrand]: rule } });`, // unrelated usage
+      `new Documentation({\n  /**\n   * @todo Manual migration required for \`brandHandling\`:\n   */\n  brandHandling: { [myBrand]: rule },\n});`,
     ],
     invalid: [
       {
@@ -303,6 +305,78 @@ describe("Migration", async () => {
               from: "shortDescription",
               to: "summary",
             },
+          },
+        ],
+      },
+      {
+        name: "brandHandling in Documentation",
+        code:
+          `new Documentation({\n` +
+          `  brandHandling: { [myBrand]: rule },\n` +
+          `});`,
+        output:
+          `new Documentation({\n` +
+          `  /**\n` +
+          `   * @todo Manual migration required for \`brandHandling\`:\n` +
+          `   * 1. Install \`@express-zod-api/zod-plugin\` as a dependency.\n` +
+          `   * 2. Import it, ideally at the top of the file declaring your \`Routing\`.\n` +
+          `   * 3. Replace \`.brand()\` with \`.xBrand()\` on the branded schemas (provided by the plugin).\n` +
+          `   * 4. Alternatively, use \`.meta({ "x-brand": ... })\` on the schemas instead.\n` +
+          `   */\n` +
+          `  brandHandling: { [myBrand]: rule },\n` +
+          `});`,
+        errors: [
+          {
+            messageId: "add",
+            data: { subject: "JSDoc note", to: "brandHandling" },
+          },
+        ],
+      },
+      {
+        name: "brandHandling in Integration",
+        code:
+          `new Integration({\n` +
+          `  brandHandling: { [myBrand]: rule },\n` +
+          `});`,
+        output:
+          `new Integration({\n` +
+          `  /**\n` +
+          `   * @todo Manual migration required for \`brandHandling\`:\n` +
+          `   * 1. Install \`@express-zod-api/zod-plugin\` as a dependency.\n` +
+          `   * 2. Import it, ideally at the top of the file declaring your \`Routing\`.\n` +
+          `   * 3. Replace \`.brand()\` with \`.xBrand()\` on the branded schemas (provided by the plugin).\n` +
+          `   * 4. Alternatively, use \`.meta({ "x-brand": ... })\` on the schemas instead.\n` +
+          `   */\n` +
+          `  brandHandling: { [myBrand]: rule },\n` +
+          `});`,
+        errors: [
+          {
+            messageId: "add",
+            data: { subject: "JSDoc note", to: "brandHandling" },
+          },
+        ],
+      },
+      {
+        name: "brandHandling with string key",
+        code:
+          `new Documentation({\n` +
+          `  "brandHandling": { [myBrand]: rule },\n` +
+          `});`,
+        output:
+          `new Documentation({\n` +
+          `  /**\n` +
+          `   * @todo Manual migration required for \`brandHandling\`:\n` +
+          `   * 1. Install \`@express-zod-api/zod-plugin\` as a dependency.\n` +
+          `   * 2. Import it, ideally at the top of the file declaring your \`Routing\`.\n` +
+          `   * 3. Replace \`.brand()\` with \`.xBrand()\` on the branded schemas (provided by the plugin).\n` +
+          `   * 4. Alternatively, use \`.meta({ "x-brand": ... })\` on the schemas instead.\n` +
+          `   */\n` +
+          `  "brandHandling": { [myBrand]: rule },\n` +
+          `});`,
+        errors: [
+          {
+            messageId: "add",
+            data: { subject: "JSDoc note", to: "brandHandling" },
           },
         ],
       },

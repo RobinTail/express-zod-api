@@ -16,6 +16,7 @@ interface Queries {
   hasSummaryFromDescription: NamedProp;
   noContent: NamedProp;
   shortDescription: NamedProp;
+  brandHandling: NamedProp;
 }
 
 type Listener = keyof Queries;
@@ -41,7 +42,19 @@ const queries: Record<Listener, string> = {
     `${NT.CallExpression}[callee.property.name=/build|buildVoid/] > ` +
     `${NT.ObjectExpression} > ` +
     queryNamedProp("shortDescription"),
+  brandHandling:
+    `${NT.NewExpression}:matches([callee.name="Documentation"],[callee.name="Integration"]) > ` +
+    `${NT.ObjectExpression} > ` +
+    queryNamedProp("brandHandling"),
 };
+
+const brandHandlingTodo = [
+  "@todo Manual migration required for `brandHandling`:",
+  "1. Install `@express-zod-api/zod-plugin` as a dependency.",
+  "2. Import it, ideally at the top of the file declaring your `Routing`.",
+  "3. Replace `.brand()` with `.xBrand()` on the branded schemas (provided by the plugin).",
+  '4. Alternatively, use `.meta({ "x-brand": ... })` on the schemas instead.',
+];
 
 const listen = <
   S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
@@ -131,6 +144,22 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
       },
       noContent: (node) => changeProp({ ctx, node, to: "noBodySchema" }),
       shortDescription: (node) => changeProp({ ctx, node, to: "summary" }),
+      brandHandling: (node) => {
+        const existing = ctx.sourceCode.getCommentsBefore(node);
+        if (existing.some(({ value }) => value.includes(brandHandlingTodo[0])))
+          return; // already annotated
+        const indent = " ".repeat(node.loc.start.column);
+        const body = brandHandlingTodo
+          .map((line) => `${indent} * ${line}`)
+          .join("\n");
+        const comment = `/**\n${body}\n${indent} */\n${indent}`;
+        ctx.report({
+          node,
+          messageId: "add",
+          data: { subject: "JSDoc note", to: getPropName(node) },
+          fix: (fixer) => fixer.insertTextBefore(node, comment),
+        });
+      },
     }),
 });
 
