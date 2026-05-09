@@ -26,7 +26,8 @@
   - The `trim()` function accepts a string and the limit (default: 50, best practice) that you can now customize;
 - Breaking change to the `Integration` constructor argument (object):
   - property `noContent` renamed to `noBodySchema`;
-- Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration).
+- Consider using [the automated migration](https://www.npmjs.com/package/@express-zod-api/migration):
+  - Now requires `eslint@^10.0.0` and `typescript-eslint@^8.58.0`.
 
 ```diff
   createConfig({
