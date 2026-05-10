@@ -2470,13 +2470,13 @@ paths:
       parameters:
         - name: string
           in: query
-          required: true
+          required: false
           description: GET /v1/getSomething Parameter
           schema:
             format: string (preprocessed)
         - name: number
           in: query
-          required: true
+          required: false
           description: GET /v1/getSomething Parameter
           schema:
             minimum: 0
@@ -2538,13 +2538,13 @@ paths:
       parameters:
         - name: string
           in: query
-          required: true
+          required: false
           description: HEAD /v1/getSomething Parameter
           schema:
             format: string (preprocessed)
         - name: number
           in: query
-          required: true
+          required: false
           description: HEAD /v1/getSomething Parameter
           schema:
             minimum: 0
