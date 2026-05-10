@@ -2258,8 +2258,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.58.0(typescript@5.1.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.58.0(typescript@5.1.3)
-      '@typescript-eslint/types': 8.58.0
+      '@typescript-eslint/tsconfig-utils': 8.59.0(typescript@5.1.3)
+      '@typescript-eslint/types': 8.59.0
       debug: 4.4.3
       typescript: 5.1.3
     transitivePeerDependencies:
@@ -2299,6 +2299,10 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.59.0
 
   '@typescript-eslint/tsconfig-utils@8.58.0(typescript@5.1.3)':
+    dependencies:
+      typescript: 5.1.3
+
+  '@typescript-eslint/tsconfig-utils@8.59.0(typescript@5.1.3)':
     dependencies:
       typescript: 5.1.3
 
