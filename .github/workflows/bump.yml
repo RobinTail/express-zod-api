@@ -45,9 +45,9 @@ jobs:
       - run: |
           pnpm install
           pnpm install_hooks
-      - name: Bumpp ${{inputs.workspace}}
+      - name: Bump ${{inputs.workspace}}
         run: |
-          pnpm -F ${{inputs.workspace}} exec \
-            pnpm dlx bumpp@10 ${{inputs.kind}} \
+          pnpm -F ${{inputs.workspace}} version ${{inputs.kind}} \
             ${{ startsWith(inputs.kind, 'pre') && '--preid beta' || '' }} \
-            --tag=${{inputs.workspace}}-v%s --commit='${{inputs.workspace}} version %s' -y
+            --tag-version-prefix=${{inputs.workspace}}-v \
+            --message='${{inputs.workspace}} version %s'
