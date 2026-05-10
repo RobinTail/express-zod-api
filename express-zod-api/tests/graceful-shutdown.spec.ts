@@ -8,26 +8,28 @@ import { givePort } from "../../tools/ports";
 import { signCert } from "./ssl-helpers";
 
 describe("monitor()", () => {
-  const makeHttpServer = (handler: http.RequestListener) =>
-    new Promise<[http.Server, number]>((resolve) => {
-      const subject = http.createServer(handler);
-      const port = givePort();
-      subject.listen(port, () => resolve([subject, port]));
-    });
+  const makeHttpServer = (handler: http.RequestListener) => {
+    const { promise, resolve } = Promise.withResolvers<[http.Server, number]>();
+    const subject = http.createServer(handler);
+    const port = givePort();
+    subject.listen(port, () => resolve([subject, port]));
+    return promise;
+  };
 
-  const makeHttpsServer = (handler: http.RequestListener) =>
-    new Promise<[https.Server, number]>((resolve) => {
-      const subject = https.createServer(signCert(), handler);
-      const port = givePort();
-      subject.listen(port, () => resolve([subject, port]));
-    });
+  const makeHttpsServer = (handler: http.RequestListener) => {
+    const { promise, resolve } =
+      Promise.withResolvers<[https.Server, number]>();
+    const subject = https.createServer(signCert(), handler);
+    const port = givePort();
+    subject.listen(port, () => resolve([subject, port]));
+    return promise;
+  };
 
-  const getConnections = (server: http.Server) =>
-    new Promise<number>((resolve, reject) => {
-      server.getConnections((err, count) =>
-        err ? reject(err) : resolve(count),
-      );
-    });
+  const getConnections = (server: http.Server) => {
+    const { promise, resolve, reject } = Promise.withResolvers<number>();
+    server.getConnections((err, count) => (err ? reject(err) : resolve(count)));
+    return promise;
+  };
 
   test(
     "shuts down HTTP server with no connections",

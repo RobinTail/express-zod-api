@@ -194,8 +194,10 @@ describe("Environment checks", () => {
       },
     );
 
-    test("meta id goes directly to depiction", () => {
-      expect(z.toJSONSchema(z.string().meta({ id: "uniq" }))).toMatchSnapshot();
+    test("meta id does NOT go into depiction", () => {
+      expect(
+        z.toJSONSchema(z.string().meta({ id: "uniq" })),
+      ).not.toHaveProperty("id");
     });
   });
 

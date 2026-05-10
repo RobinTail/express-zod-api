@@ -1,7 +1,7 @@
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 
-require("express-zod-api"); // side effect here via Zod Plugin
+require("@express-zod-api/zod-plugin"); // side effect here
 const z = require("zod"); // ensure CJS version of Zod is used
 
 describe("Zod plugin in CJS environment", () => {

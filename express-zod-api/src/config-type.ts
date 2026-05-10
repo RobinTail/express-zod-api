@@ -1,14 +1,14 @@
 import type compression from "compression";
-import { IRouter, Request, RequestHandler } from "express";
+import type { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
-import { ServerOptions } from "node:https";
-import { BuiltinLoggerConfig } from "./builtin-logger";
-import { AbstractEndpoint } from "./endpoint";
-import { AbstractLogger, ActualLogger } from "./logger-helpers";
-import { Method } from "./method";
-import { AbstractResultHandler } from "./result-handler";
-import { ListenOptions } from "node:net";
-import { GetLogger } from "./server-helpers";
+import type { ServerOptions } from "node:https";
+import type { BuiltinLoggerConfig } from "./builtin-logger";
+import type { AbstractEndpoint } from "./endpoint";
+import type { AbstractLogger, ActualLogger } from "./logger-helpers";
+import type { Method } from "./method";
+import type { AbstractResultHandler } from "./result-handler";
+import type { ListenOptions } from "node:net";
+import type { GetLogger } from "./server-helpers";
 
 export type InputSource = keyof Pick<
   Request,
@@ -40,20 +40,21 @@ export interface CommonConfig {
    */
   cors: boolean | HeadersProvider;
   /**
-   * @desc How to respond to a request that uses a wrong method to an existing endpoint
-   * @example 404 — Not found
-   * @example 405 — Method not allowed, incl. the "Allow" header with a list of methods
-   * @default 405
-   * */
-  wrongMethodBehavior?: 404 | 405;
+   * @desc Controls how to respond to a request to an existing endpoint with an invalid HTTP method.
+   * @example true — respond with status code 405 and "Allow" header containing a list of valid methods
+   * @example false — respond with status code 404 (Not found)
+   * @default true
+   */
+  hintAllowedMethods?: boolean;
   /**
-   * @desc How to treat Routing keys that look like methods (when assigned with an Endpoint)
-   * @see Method
-   * @example "method" — the key is treated as method of its parent path
-   * @example "path" — the key is treated as a nested path segment
-   * @default "method"
-   * */
-  methodLikeRouteBehavior?: "method" | "path";
+   * @desc Controls how to treat Routing keys matching HTTP methods ("get", "post") and having Endpoint assigned.
+   * @example true — treat such keys as HTTP methods complementing their parent paths
+   *          { users: { get: ... }} becomes GET /users
+   * @example false — treat such keys as nested path segments regardless of the name
+   *          { users: { get: ... }} remains /users/get
+   * @default true
+   */
+  recognizeMethodDependentRoutes?: boolean;
   /**
    * @desc The ResultHandler to use for handling routing, parsing and upload errors
    * @default defaultResultHandler

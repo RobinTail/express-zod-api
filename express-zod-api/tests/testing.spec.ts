@@ -1,11 +1,11 @@
 import { z } from "zod";
 import {
-  CommonConfig,
   defaultEndpointsFactory,
   Middleware,
   ResultHandler,
   testEndpoint,
   testMiddleware,
+  type CommonConfig,
 } from "../src";
 import type { Mock } from "vitest";
 

@@ -3,10 +3,11 @@
 exports[`Migration > should consist of one rule being the major version of the package 1`] = `
 {
   "rules": {
-    "v27": {
+    "v28": {
       "create": [Function],
-      "defaultOptions": [],
+      "defaultOptions": undefined,
       "meta": {
+        "defaultOptions": [],
         "fixable": "code",
         "messages": {
           "add": "add {{ subject }} to {{ to }}",
@@ -17,7 +18,7 @@ exports[`Migration > should consist of one rule being the major version of the p
         "schema": [],
         "type": "problem",
       },
-      "name": "v27",
+      "name": "v28",
     },
   },
 }

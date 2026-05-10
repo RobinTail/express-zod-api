@@ -24,11 +24,9 @@ if (!(pluginFlag in globalThis)) {
           value: deprecationSetter,
           writable: false,
         },
-        ["brand" satisfies keyof z.ZodType]: {
-          set() {}, // this is required to override the existing method
-          get() {
-            return brandSetter.bind(this) as z.ZodType["brand"];
-          },
+        ["xBrand" satisfies keyof z.ZodType]: {
+          value: brandSetter,
+          writable: false,
         },
       });
     }

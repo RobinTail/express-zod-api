@@ -1,13 +1,13 @@
 import ansis from "ansis";
 import { inspect } from "node:util";
 import { performance } from "node:perf_hooks";
-import { FlatObject, isProduction } from "./common-helpers";
+import { isProduction, type FlatObject } from "./common-helpers";
 import {
-  AbstractLogger,
   formatDuration,
   isHidden,
-  Severity,
   styles,
+  type AbstractLogger,
+  type Severity,
 } from "./logger-helpers";
 
 interface Context extends FlatObject {

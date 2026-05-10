@@ -1,6 +1,6 @@
 import { defineConfig } from "tsdown";
 import manifest from "./package.json" with { type: "json" };
-import { fixDtsPlugin } from "../tools/fixDts";
+import { fixDtsPlugin } from "../tools/fixDts.ts";
 
 export default defineConfig({
   entry: "src/index.ts",
@@ -9,10 +9,6 @@ export default defineConfig({
   attw: { profile: "esm-only", level: "error" },
   deps: {
     neverBundle: ["express-serve-static-core", "qs"],
-  },
-  banner: {
-    /** @since tsdown 0.21 it shakes the unused import */
-    dts: `import "@express-zod-api/zod-plugin";`,
   },
   plugins: [fixDtsPlugin()],
   define: {

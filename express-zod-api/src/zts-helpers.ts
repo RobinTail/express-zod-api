@@ -1,6 +1,6 @@
 import type ts from "typescript";
-import { FlatObject } from "./common-helpers";
-import { SchemaHandler } from "./schema-walker";
+import type { FlatObject } from "./common-helpers";
+import type { SchemaHandler } from "./schema-walker";
 import type { TypescriptAPI } from "./typescript-api";
 
 export interface ZTSContext extends FlatObject {

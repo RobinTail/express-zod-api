@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { getMessageFromError } from "./common-helpers";
-import { OpenAPIContext } from "./documentation-helpers";
+import type { OpenAPIContext } from "./documentation-helpers";
 import type { Method } from "./method";
 
 /** @desc An error related to the wrong Routing declaration */

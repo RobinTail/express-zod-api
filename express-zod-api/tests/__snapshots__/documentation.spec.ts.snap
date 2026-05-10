@@ -1804,7 +1804,7 @@ paths:
                 cuid:
                   type: string
                   format: cuid
-                  pattern: ^[cC][^\\s-]{8,}$
+                  pattern: ^[cC][0-9a-z]{6,}$
                 cuid2:
                   type: string
                   format: cuid2
@@ -5042,7 +5042,6 @@ components:
           const: John
         - type: string
           const: Jane
-      id: NameParam
   responses: {}
   parameters: {}
   examples: {}

@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { responseVariants } from "./api-response";
-import { FlatObject, getRoutePathParams } from "./common-helpers";
+import { type FlatObject, getRoutePathParams } from "./common-helpers";
 import { contentTypes } from "./content-type";
 import { findJsonIncompatible } from "./deep-checks";
 import { AbstractEndpoint } from "./endpoint";
 import { flattenIO } from "./json-schema-helpers";
-import { ActualLogger } from "./logger-helpers";
+import type { ActualLogger } from "./logger-helpers";
 import type { OnEndpoint } from "./routing-walker";
 
 interface Findings {

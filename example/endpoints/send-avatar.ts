@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { fileSendingEndpointsFactory } from "../factories";
+import { fileSendingEndpointsFactory } from "../factories.ts";
 import { readFile } from "node:fs/promises";
 
 export const sendAvatarEndpoint = fileSendingEndpointsFactory.build({
-  shortDescription: "Sends a file content.",
+  summary: "Sends a file content.",
   tag: ["files", "users"],
   input: z.object({
     userId: z

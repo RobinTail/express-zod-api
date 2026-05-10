@@ -1,20 +1,20 @@
 import {
+  type OperationObject,
+  type ReferenceObject,
+  type ResponsesObject,
+  type SchemaObject,
+  type SecuritySchemeObject,
+  type SecuritySchemeType,
   OpenApiBuilder,
-  OperationObject,
-  ReferenceObject,
-  ResponsesObject,
-  SchemaObject,
-  SecuritySchemeObject,
-  SecuritySchemeType,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { getInputSources, makeCleanId } from "./common-helpers";
-import { CommonConfig } from "./config-type";
+import type { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
-import { ClientMethod } from "./method";
+import type { ClientMethod } from "./method";
 import {
   depictBody,
   depictRequestParams,
@@ -22,15 +22,15 @@ import {
   depictSecurity,
   depictSecurityRefs,
   depictTags,
-  ensureShortDescription,
+  trimSummary,
   reformatParamsInPath,
-  IsHeader,
   nonEmpty,
-  BrandHandling,
   depictRequest,
+  type IsHeader,
+  type BrandHandling,
 } from "./documentation-helpers";
-import { Routing } from "./routing";
-import { OnEndpoint, walkRouting, withHead } from "./routing-walker";
+import type { Routing } from "./routing";
+import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 
 type Component =
   | "positiveResponse"
@@ -45,6 +45,19 @@ type Descriptor = (
   },
 ) => string;
 
+type Summarizer = (params: {
+  summary?: string;
+  description?: string;
+  trim: typeof trimSummary;
+}) => string | undefined;
+
+/** @desc Uses description as a fallback */
+const defaultSummarizer: Summarizer = ({
+  description,
+  summary = description,
+  trim,
+}) => trim(summary);
+
 interface DocumentationParams {
   title: string;
   version: string;
@@ -57,8 +70,12 @@ interface DocumentationParams {
    * @default () => `${method} ${path} ${component}`
    * */
   descriptions?: Partial<Record<Component, Descriptor>>;
-  /** @default true */
-  hasSummaryFromDescription?: boolean;
+  /**
+   * @desc The function that ensures the maximum length for summary fields. Can optionally make them from descriptions.
+   * @see defaultSummarizer
+   * @see trimSummary
+   * */
+  summarizer?: Summarizer;
   /**
    * @desc Depict the HEAD method for each Endpoint supporting the GET method (feature of Express)
    * @default true
@@ -67,10 +84,11 @@ interface DocumentationParams {
   /** @default inline */
   composition?: "inline" | "components";
   /**
-   * @desc Handling rules for your own branded schemas.
+   * @desc Handling rules for your own schemas branded with `x-brand` metadata.
    * @desc Keys: brands (recommended to use unique symbols).
    * @desc Values: functions having Zod context as first argument, second one is the framework context.
-   * @example { MyBrand: ( { zodSchema, jsonSchema } ) => ({ type: "object" })
+   * @example { MyBrand: ({ zodSchema, jsonSchema }) => ({ type: "object" })
+   * @link https://www.npmjs.com/package/@express-zod-api/zod-plugin
    */
   brandHandling?: BrandHandling;
   /**
@@ -158,8 +176,8 @@ export class Documentation extends OpenApiBuilder {
     brandHandling,
     tags,
     isHeader,
-    hasSummaryFromDescription = true,
     hasHeadMethod = true,
+    summarizer = defaultSummarizer,
     composition = "inline",
   }: DocumentationParams) {
     super();
@@ -175,12 +193,7 @@ export class Documentation extends OpenApiBuilder {
         brandHandling,
         makeRef: this.#makeRef.bind(this),
       };
-      const { description, shortDescription, scopes, inputSchema } = endpoint;
-      const summary = shortDescription
-        ? ensureShortDescription(shortDescription)
-        : hasSummaryFromDescription && description
-          ? ensureShortDescription(description)
-          : undefined;
+      const { description, summary, scopes, inputSchema } = endpoint;
       const inputSources = getInputSources(method, config.inputSources);
       const operationId = this.#ensureUniqOperationId(
         path,
@@ -196,7 +209,7 @@ export class Documentation extends OpenApiBuilder {
         isHeader,
         security,
         request,
-        description: descriptions?.requestParameter?.call(null, {
+        description: descriptions?.requestParameter?.({
           method,
           path,
           operationId,
@@ -216,7 +229,7 @@ export class Documentation extends OpenApiBuilder {
               statusCode,
               hasMultipleStatusCodes:
                 apiResponses.length > 1 || statusCodes.length > 1,
-              description: descriptions?.[`${variant}Response`]?.call(null, {
+              description: descriptions?.[`${variant}Response`]?.({
                 method,
                 path,
                 operationId,
@@ -234,7 +247,7 @@ export class Documentation extends OpenApiBuilder {
             paramNames: R.pluck("name", depictedParams),
             schema: inputSchema,
             mimeType: contentTypes[endpoint.requestType],
-            description: descriptions?.requestBody?.call(null, {
+            description: descriptions?.requestBody?.({
               method,
               path,
               operationId,
@@ -254,7 +267,7 @@ export class Documentation extends OpenApiBuilder {
 
       const operation: OperationObject = {
         operationId,
-        summary,
+        summary: summarizer({ summary, description, trim: trimSummary }),
         description,
         deprecated: endpoint.isDeprecated || undefined,
         tags: nonEmpty(endpoint.tags),

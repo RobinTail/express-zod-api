@@ -1,7 +1,7 @@
 import {
   defaultEndpointsFactory,
-  TagOverrides,
   Documentation,
+  type TagOverrides,
 } from "express-zod-api";
 
 declare module "express-zod-api" {

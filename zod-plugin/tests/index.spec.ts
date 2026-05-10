@@ -4,6 +4,9 @@ import * as entrypoint from "../src";
 describe("Entrypoint", () => {
   test("Augmentation", () => {
     expectTypeOf<z.ZodAny>()
+      .toHaveProperty("xBrand")
+      .toEqualTypeOf<(brand?: PropertyKey) => z.ZodAny>();
+    expectTypeOf<z.ZodAny>()
       .toHaveProperty("example")
       .toEqualTypeOf<(value: any) => z.ZodAny>();
     expectTypeOf<z.ZodDefault<z.ZodString>>()
@@ -24,12 +27,10 @@ describe("Entrypoint", () => {
     expectTypeOf<ReturnType<typeof globalRegistry.get>>()
       .exclude(undefined)
       .toHaveProperty("x-brand")
-      .toEqualTypeOf<symbol | string | number | undefined>();
+      .toEqualTypeOf<PropertyKey | undefined>();
   });
 
-  test("Exports", () => {
-    expect(entrypoint).toMatchObject({
-      getBrand: expect.any(Function),
-    });
+  test("has no exports", () => {
+    expect(Object.keys(entrypoint)).toHaveLength(0);
   });
 });

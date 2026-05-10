@@ -32,8 +32,8 @@ export const isEncrypted = (socket: Socket): boolean =>
 export const weAreClosed: http.RequestListener = ({}, res) =>
   void (!res.headersSent && res.setHeader("connection", "close"));
 
-export const closeAsync = (server: Server) =>
-  new Promise<void>(
-    (resolve, reject) =>
-      void server.close((error) => (error ? reject(error) : resolve())),
-  );
+export const closeAsync = (server: Server) => {
+  const { promise, resolve, reject } = Promise.withResolvers<void>();
+  server.close((error) => (error ? reject(error) : resolve()));
+  return promise;
+};

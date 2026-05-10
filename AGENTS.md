@@ -103,17 +103,16 @@ interface SampleInterface {
 - **Zod**: Use named import `import { z } from "zod"`
 - **Ramda**: Use namespace import `import * as R from "ramda"`
 - **Node.js built-ins**: Use `node:` prefix
-- **Type-only imports**: Use `import type` for types and interfaces
-- **Relative imports**: Must be extensionless
-- Combine import from the same module into a single line
+- **Type-only imports**: Use `import type` for types and interfaces (verbatimModuleSyntax)
+- **Relative imports**: Use `.ts` extension when file is meant to be run by `node` (`example` and testing workspaces)
+- Combine imports from the same module into a single statement
 
 ```typescript
 import { z } from "zod";
 import * as R from "ramda";
 import { dirname } from "node:path";
-import type { SomeType } from "./module-a";
-import { someValue } from "./module-b";
-import { anotherValue, type AnotherType } from "./module-c";
+import type { SomeType } from "./module-a"; // for compiled code
+import { someValue } from "./module-b.ts"; // for node execution
 ```
 
 ### 5. Type Declaration Convention

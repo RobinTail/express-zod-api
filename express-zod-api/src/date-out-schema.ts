@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { brandProperty } from "./metadata";
 
 export const ezDateOutBrand = Symbol("DateOut");
 
@@ -13,5 +14,4 @@ export const dateOut = (meta: DateOutParams = {}) =>
   z
     .date()
     .transform((date) => date.toISOString())
-    .brand(ezDateOutBrand as symbol)
-    .meta(meta);
+    .meta({ ...meta, [brandProperty]: ezDateOutBrand });

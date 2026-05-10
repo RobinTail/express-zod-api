@@ -1,21 +1,21 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import {
-  EmptyObject,
   emptySchema,
-  EmptySchema,
-  FlatObject,
-  Tag,
+  type EmptyObject,
+  type EmptySchema,
+  type FlatObject,
+  type Tag,
 } from "./common-helpers";
-import { Endpoint, Handler } from "./endpoint";
+import { Endpoint, type Handler } from "./endpoint";
 import {
-  IOSchema,
-  FinalInputSchema,
-  Extension,
   ensureExtension,
   makeFinalInputSchema,
+  type IOSchema,
+  type FinalInputSchema,
+  type Extension,
 } from "./io-schema";
-import { ClientMethod, Method } from "./method";
+import type { ClientMethod, Method } from "./method";
 import {
   AbstractMiddleware,
   ExpressMiddleware,
@@ -44,10 +44,10 @@ interface BuildProps<
   output: OUT;
   /** @desc The Endpoint handler receiving the validated inputs, returns of added Middlewares (ctx) and a logger */
   handler: Handler<z.output<FinalInputSchema<MIN, IN>>, z.input<OUT>, CTX>;
-  /** @desc The operation description for the generated Documentation */
+  /** @desc The operation description for the generated Documentation (may use Markdown) */
   description?: string;
-  /** @desc The operation summary for the generated Documentation (50 symbols max) */
-  shortDescription?: string;
+  /** @desc The operation summary for the generated Documentation (short plain string) */
+  summary?: string;
   /** @desc The operation ID for the generated Documentation (must be unique) */
   operationId?: string | ((method: ClientMethod) => string);
   /**

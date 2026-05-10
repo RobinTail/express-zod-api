@@ -8,7 +8,7 @@ import {
   cyanMock,
 } from "./ansis-mock";
 import * as R from "ramda";
-import { BuiltinLogger, BuiltinLoggerConfig } from "../src/builtin-logger";
+import { BuiltinLogger, type BuiltinLoggerConfig } from "../src/builtin-logger";
 
 vi.mock("node:util", { spy: true });
 

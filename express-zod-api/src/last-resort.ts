@@ -1,7 +1,7 @@
-import { Response } from "express";
+import type { Response } from "express";
 import createHttpError, { isHttpError } from "http-errors";
 import { ResultHandlerError } from "./errors";
-import { ActualLogger } from "./logger-helpers";
+import type { ActualLogger } from "./logger-helpers";
 import { getPublicErrorMessage } from "./result-helpers";
 
 interface LastResortHandlerParams {

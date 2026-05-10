@@ -33,7 +33,7 @@ const users: z.output<typeof userSchema>[] = [
  */
 export const listUsersPaginatedEndpoint = defaultEndpointsFactory.build({
   tag: "users",
-  shortDescription: "Lists users with pagination.",
+  summary: "Lists users with pagination.",
   description:
     "Returns a page of users. Optionally filter by roles. Uses offset-based pagination (limit and offset).",
   input: paginatedUsers.input.and(

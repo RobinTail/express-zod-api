@@ -7,7 +7,7 @@ import {
   EventStreamFactory,
   defaultEndpointsFactory,
 } from "express-zod-api";
-import { authMiddleware } from "./middlewares";
+import { authMiddleware } from "./middlewares.ts";
 import { createReadStream } from "node:fs";
 import { z } from "zod";
 import { stat } from "node:fs/promises";
