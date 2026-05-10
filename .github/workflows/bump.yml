@@ -45,9 +45,12 @@ jobs:
       - run: |
           pnpm install
           pnpm install_hooks
-      - name: Bump ${{inputs.workspace}}
+      - name: Bump ${{inputs.workspace}} ${{inputs.kind}}
+        working-directory: ${{inputs.workspace}}
         run: |
-          pnpm -F ${{inputs.workspace}} version ${{inputs.kind}} \
+          pnpm version ${{inputs.kind}} \
             ${{ startsWith(inputs.kind, 'pre') && '--preid beta' || '' }} \
             --tag-version-prefix=${{inputs.workspace}}-v \
             --message='${{inputs.workspace}} version %s'
+      - name: Push commit and tag
+        run: git push --follow-tags
