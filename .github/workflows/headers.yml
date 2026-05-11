@@ -16,8 +16,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0 # to figure out last change to the json file
 
       - uses: fregante/setup-git-user@v2
       - uses: pnpm/action-setup@v6
