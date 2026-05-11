@@ -40,5 +40,5 @@ jobs:
         run: pnpm install
       - name: Publish ${{inputs.workspace}} with ${{ inputs.tag }}
         run: |
-          pnpm -F ${{inputs.workspace}} exec \
-            pnpm publish --provenance --tag ${{ inputs.tag }}
+          pnpm -F ${{inputs.workspace}} \
+            publish --provenance --tag ${{ inputs.tag }}
