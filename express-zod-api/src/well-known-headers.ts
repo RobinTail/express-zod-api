@@ -1,5 +1,6 @@
 let cache: Set<string>;
 
+/** @since 2026-03-06T22:01:19.000Z */
 export const getWellKnownHeaders = () =>
   (cache ??= new Set([
     "a-im",

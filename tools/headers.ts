@@ -1,5 +1,4 @@
-import { execSync } from "node:child_process";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { format } from "prettier";
 
 /**
@@ -220,15 +219,6 @@ const responseOnlyHeaders = {
 
 const dest = "express-zod-api/src/well-known-headers.ts";
 
-let mtime: Date | undefined;
-try {
-  mtime = new Date(
-    execSync(`git log -1 --pretty="format:%ci" ${dest}`, { encoding: "utf8" }),
-  );
-} catch {}
-
-console.info("Current state", mtime);
-
 /**
  * @link https://www.iana.org/assignments/http-fields/http-fields.xhtml
  * @example https://github.com/ladjs/message-headers/blob/master/cron.js
@@ -241,7 +231,20 @@ if (!lastMod)
   throw new Error("Can not get Last-Modified headers from response");
 const state = new Date(lastMod);
 console.info("Last modified", state);
-if (mtime && state <= mtime) process.exit(0);
+
+try {
+  const existing = await readFile(dest, "utf-8");
+  const match = existing.match(/@since\s+(\S+)/);
+  if (match) {
+    const since = new Date(match[1]);
+    if (since >= state) {
+      console.info("Up to date since", since);
+      process.exit(0);
+    }
+  }
+} catch {
+  console.warn("No existing file");
+}
 
 const csv = await response.text();
 
@@ -265,6 +268,7 @@ console.debug("CRC:", headers.length);
 const json = JSON.stringify(headers, undefined, 2);
 const tsCode = await format(
   `let cache: Set<string>;\n\n` +
+    `/** @since ${state.toISOString()} */\n` +
     `export const getWellKnownHeaders = () =>\n` +
     `  (cache ??= new Set(${json}));\n`,
   { filepath: dest },
