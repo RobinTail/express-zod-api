@@ -34,8 +34,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0 # for git describe --tags (used by bumpp internally)
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v6
         with:
@@ -45,9 +43,12 @@ jobs:
       - run: |
           pnpm install
           pnpm install_hooks
-      - name: Bumpp ${{inputs.workspace}}
+      - name: Bump ${{inputs.workspace}} ${{inputs.kind}}
+        working-directory: ${{inputs.workspace}}
         run: |
-          pnpm -F ${{inputs.workspace}} exec \
-            pnpm dlx bumpp@10 ${{inputs.kind}} \
+          pnpm version ${{inputs.kind}} \
             ${{ startsWith(inputs.kind, 'pre') && '--preid beta' || '' }} \
-            --tag=${{inputs.workspace}}-v%s --commit='${{inputs.workspace}} version %s' -y
+            --tag-version-prefix=${{inputs.workspace}}-v \
+            --message='${{inputs.workspace}} version %s'
+      - name: Push commit and tag
+        run: git push --follow-tags
