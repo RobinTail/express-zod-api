@@ -11,34 +11,6 @@ gitChecks: false
 engineStrict: true
 autoInstallPeers: false
 dedupePeers: true
-minimumReleaseAge: 2880 # 2 days
-minimumReleaseAgeExclude:
-  - "@types/*"
-  - "@eslint/*"
-  - "@rolldown/*"
-  - "@vitest/*"
-  - "@typescript-eslint/*"
-  - body-parser
-  - eslint
-  - eslint-plugin-allowed-dependencies
-  - express
-  - http-errors
-  - import-without-cache
-  - picomatch
-  - prettier
-  - qs
-  - ramda
-  - raw-body
-  - rolldown
-  - rolldown-plugin-dts
-  - typescript
-  - typescript-eslint
-  - tsdown
-  - undici
-  - unrun
-  - vite
-  - vitest
-  - zod
 publicHoistPattern:
   - "@typescript-eslint/*" # used as an assumed transitive in migration
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
