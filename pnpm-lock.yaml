@@ -190,7 +190,7 @@ importers:
     dependencies:
       ansis:
         specifier: ^4.2.0
-        version: 4.2.0
+        version: 4.3.0
       node-mocks-http:
         specifier: ^1.17.2
         version: 1.17.2(@types/express@5.0.6)(@types/node@25.6.2)
@@ -830,6 +830,10 @@ packages:
 
   ansis@4.2.0:
     resolution: {integrity: sha512-HqZ5rWlFjGiV0tDm3UxxgNRqsOTniqoKZu0pIAfh7TZQMGuZK+hH0drySty0si0QXj1ieop4+SkSfPZBPPkHig==}
+    engines: {node: '>=14'}
+
+  ansis@4.3.0:
+    resolution: {integrity: sha512-44mvgtPvohuU/70DdY5Oz2AIrLJ9k6/5x4KmoSvPwO+5Moijo0+N9D0fKbbYZQWP1hNm5CpOf+E01jhxG/r8xg==}
     engines: {node: '>=14'}
 
   assertion-error@2.0.1:
@@ -2473,6 +2477,8 @@ snapshots:
       uri-js: 4.4.1
 
   ansis@4.2.0: {}
+
+  ansis@4.3.0: {}
 
   assertion-error@2.0.1: {}
 
