@@ -6,6 +6,7 @@ on:
     - cron: "0 0 * * 0" # Runs every Sunday at midnight UTC
 
 permissions:
+  id-token: none
   contents: write # Grants write access to push changes
   pull-requests: write # and create PRs
 
