@@ -183,7 +183,7 @@ describe("zod-to-ts", () => {
 
     test("should produce the expected results", () => {
       const node = zodToTs(example, { ctx });
-      expect(api.printNode(node)).toMatchSnapshot();
+      expect(printNodeTest(node)).toMatchSnapshot();
     });
   });
 
