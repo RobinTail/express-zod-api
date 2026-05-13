@@ -11,7 +11,9 @@ on:
 
 permissions:
   id-token: none
-
+permissions:
+  id-token: none
+  contents: read
 jobs:
   build:
     runs-on: ubuntu-latest
