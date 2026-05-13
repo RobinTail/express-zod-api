@@ -9,6 +9,9 @@ on:
   pull_request:
     branches: [ master, v25, v26, v27 ]
 
+permissions:
+  id-token: none
+
 jobs:
   build:
     runs-on: ubuntu-latest
