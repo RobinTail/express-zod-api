@@ -4,7 +4,7 @@
   "dependencyDashboard": false,
   "postUpdateOptions": ["pnpmDedupe"],
   "ignorePaths": ["**/compat-test/**"],
-  "minimumReleaseAge": "1 day",
+  "minimumReleaseAge": "7 days",
   "packageRules": [
     {
       "groupName": "TypeScript-ESLint and its rule tester",

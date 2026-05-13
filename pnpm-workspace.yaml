@@ -11,6 +11,7 @@ gitChecks: false
 engineStrict: true
 autoInstallPeers: false
 dedupePeers: true
+minimumReleaseAge: 10080
 publicHoistPattern:
   - "@typescript-eslint/*" # used as an assumed transitive in migration
   - "@vitest/*" # used by vitest.setup.ts and vitest.config.ts
