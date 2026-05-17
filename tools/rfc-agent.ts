@@ -6,6 +6,7 @@ import type {
 } from "openai/resources";
 
 const rfcContextRadius = 3;
+const rfcMaxLen = 3000;
 
 const HeaderSchema = z.object({
   name: z.string(),
@@ -69,10 +70,10 @@ export const classifyHeaders = async (
       const block = `--- Context around line ${i + 1} ---\n${excerpt}`;
       excerpts.push(block);
       totalLength += block.length;
-      if (totalLength > 5000) break;
+      if (totalLength > rfcMaxLen) break;
     }
     if (excerpts.length > 0) return excerpts.join("\n\n");
-    return text.slice(0, 3000) + "\n\n...(truncated)";
+    return text.slice(0, rfcMaxLen) + "…";
   };
 
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
