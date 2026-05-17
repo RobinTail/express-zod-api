@@ -122,13 +122,14 @@ const completion = await client.chat.completions.create({
 const raw = completion.choices[0].message.content;
 if (!raw) throw new Error("Empty response from LLM");
 
+console.info("Raw LLM response:", raw);
+
 let classified: z.infer<typeof ResponseSchema>;
 try {
   const parsed = JSON.parse(raw);
   classified = ResponseSchema.parse(parsed);
 } catch (err) {
   console.error("Failed to parse or validate LLM response:", err);
-  console.error("Raw response:", raw);
   process.exit(1);
 }
 
