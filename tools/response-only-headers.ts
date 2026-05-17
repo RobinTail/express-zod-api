@@ -155,6 +155,12 @@ export const responseOnlyHeaders: Record<
     proof: "Defined in RFC 8053, Section 3.",
     reason: "Allows a server to provide optional authentication mechanisms.",
   },
+  p3p: {
+    proof:
+      "W3C P3P Specification (https://www.w3.org/TR/P3P/#Header); the header is only described as being sent by servers in responses. No RFCs or HTTP extensions (including WebDAV, WebSocket, EDIINT, etc.) mention P3P as a request header.",
+    reason:
+      "The P3P header (Platform for Privacy Preferences) is defined by the W3C P3P specification and is intended to be sent by servers in HTTP responses to communicate privacy policies to clients. There is no evidence in any RFC or extension that P3P is used in HTTP requests.",
+  },
   "proxy-authenticate": {
     proof: "Defined in RFC 7235, Section 4.3.",
     reason: "Used in responses for proxy authentication.",

@@ -129,7 +129,6 @@ export const getWellKnownHeaders = () =>
     "oscore",
     "oslc-core-version",
     "overwrite",
-    "p3p",
     "pep",
     "pep-info",
     "permissions-policy",
