@@ -7,7 +7,6 @@ export const getWellKnownHeaders = () =>
     "a-im",
     "accept",
     "accept-additions",
-    "accept-ch",
     "accept-charset",
     "accept-datetime",
     "accept-encoding",

@@ -2,6 +2,12 @@ export const responseOnlyHeaders: Record<
   string,
   { proof: string; reason: string }
 > = {
+  "accept-ch": {
+    proof:
+      "Client Hints specification (https://wicg.github.io/client-hints-infrastructure/): 'The Accept-CH response header field is used by the server to advertise which client hints it would like to receive.'",
+    reason:
+      "The 'Accept-CH' header is defined in the Client Hints specification (not in an RFC, but in the W3C draft and IETF documentation) as a response header sent by the server to indicate which client hints it would like to receive in subsequent requests. It is not used in requests.",
+  },
   "accept-patch": {
     proof:
       "Defined in RFC 5789, Section 3.1. Used by the server to indicate supported PATCH media types.",
