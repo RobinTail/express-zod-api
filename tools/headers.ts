@@ -9,6 +9,7 @@ import { classifyHeaders } from "./rfc-agent.ts";
 
 const dest = "express-zod-api/src/well-known-headers.ts";
 const exceptionsDest = "tools/response-only-headers.ts";
+const batchSize = 5;
 
 const writeDest = async (names: string[]) => {
   const tsCode = await format(
@@ -84,19 +85,16 @@ console.info(
   `Found ${newHeaders.length} new headers: ${newHeaders.join(", ")}`,
 );
 
-const classified = await classifyHeaders(newHeaders);
-
-const responseOnlyNew = classified.filter((h) => h.location === "response");
-const others = classified.filter((h) => h.location !== "response");
-
-for (const { name, proof, reason } of responseOnlyNew)
-  responseOnlyHeaders[name] = { proof, reason };
+for (let i = 0; i < newHeaders.length; i += batchSize) {
+  const chunk = newHeaders.slice(i, i + batchSize);
+  console.info(`Batch ${Math.floor(i / batchSize) + 1}: ${chunk.join(", ")}`);
+  const classified = await classifyHeaders(chunk);
+  console.info(classified);
+  for (const { name, location, proof, reason } of classified) {
+    if (location === "response") responseOnlyHeaders[name] = { proof, reason };
+    else existingNames.add(name);
+  }
+}
 
 await writeExceptions();
-console.info(
-  `Added ${responseOnlyNew.length} response-only headers to exceptions`,
-);
-
-const updatedHeaders = [...existingNames, ...others.map((h) => h.name)];
-await writeDest(updatedHeaders);
-console.info(`Added ${others.length} to well-known-headers.ts`);
+await writeDest([...existingNames]);

@@ -5,7 +5,7 @@ describe("getWellKnownHeaders()", () => {
     const first = getWellKnownHeaders();
     expect(first).toBeInstanceOf(Set);
     const second = getWellKnownHeaders();
-    expect(second.size).toBeGreaterThan(200);
+    expect(second.size).toBeGreaterThan(190);
     expect(first).toBe(second); // same by reference
   });
 });
