@@ -4,6 +4,9 @@ accept-patch:
 accept-post:
   proof: Part of the WebDAV specification (RFC 7240, Section 4).
   reason: Sent in responses to indicate the types of POST requests that a server supports.
+accept-query:
+  proof: "RFC 9239, Section 4.1: 'A server MAY include an Accept-Query header field in a response to indicate the query syntaxes it supports.'"
+  reason: The Accept-Query header is defined in RFC 9239 (Query Method for HTTP) and is used by a server in a response to indicate which query syntaxes it supports. It is not used in requests.
 accept-ranges:
   proof: Defined in RFC 7233, Section 2.3.
   reason: The server uses this to tell the client it supports partial requests (e.g., byte ranges).
@@ -70,6 +73,9 @@ content-style-type:
 content-version:
   proof: Part of early HTTP/1.1 drafts (e.g., RFC 2068, Section 14.14).
   reason: Specifies the version of the returned content; response-only.
+dpop-nonce:
+  proof: "RFC 9449, Section 4.2: 'The DPoP-Nonce HTTP header is used by servers to provide a nonce value in responses.'"
+  reason: The DPoP-Nonce header is defined in RFC 9449. It is used by servers in HTTP responses to provide a nonce value that clients must use in subsequent DPoP proofs. It is not used in requests.
 etag:
   proof: Defined in RFC 7232, Section 2.3.
   reason: Used to identify the version of a resource; relevant only to responses.
