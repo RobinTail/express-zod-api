@@ -55,7 +55,7 @@ jobs:
         if: steps.git-state.outputs.changes == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
-          base: master
+          base: ${{ github.ref_name }}
           branch: ${{ steps.create-branch.outputs.branch-name }}
           commit-message: "Changed well-known headers"
           title: "Well-known headers update"
