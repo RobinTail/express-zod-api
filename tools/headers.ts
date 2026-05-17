@@ -1,15 +1,15 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { format } from "prettier";
-import { parse, stringify } from "yaml";
 import OpenAI from "openai";
 import { z } from "zod";
 import {
   getWellKnownHeaders,
   wellKnownHeadersLastUpdated,
 } from "../express-zod-api/src/well-known-headers.ts";
+import { responseOnlyHeaders } from "./response-only-headers.ts";
 
 const dest = "express-zod-api/src/well-known-headers.ts";
-const exceptionsPath = "tools/response-only-headers.yml";
+const exceptionsDest = "tools/response-only-headers.ts";
 
 const writeDest = async (names: string[]) => {
   const tsCode = await format(
@@ -22,13 +22,21 @@ const writeDest = async (names: string[]) => {
   await writeFile(dest, tsCode, "utf-8");
 };
 
-let responseOnlyHeaders: Record<string, { proof: string; reason: string }> = {};
-try {
-  const yamlContent = await readFile(exceptionsPath, "utf-8");
-  responseOnlyHeaders = parse(yamlContent) as typeof responseOnlyHeaders;
-} catch {
-  console.warn("No exceptions file found, starting fresh");
-}
+const writeExceptions = async () => {
+  const keys = Object.keys(responseOnlyHeaders).sort();
+  const entries = keys.map(
+    (key) =>
+      `"${key}": { proof: ${JSON.stringify(responseOnlyHeaders[key].proof)}, reason: ${JSON.stringify(responseOnlyHeaders[key].reason)} },`,
+  );
+  const tsCode = await format(
+    "export const responseOnlyHeaders: Record<string, { proof: string; reason: string }> = {\n" +
+      entries.join("\n") +
+      "\n};\n",
+    { filepath: exceptionsDest },
+  );
+  await writeFile(exceptionsDest, tsCode, "utf-8");
+};
+
 const exceptionNames = new Set(Object.keys(responseOnlyHeaders));
 
 const response = await fetch(
@@ -149,16 +157,7 @@ const others = classified.filter((h) => h.location !== "response");
 for (const h of responseOnlyNew)
   responseOnlyHeaders[h.name] = { proof: h.proof, reason: h.reason };
 
-const sortedExceptionKeys = Object.keys(responseOnlyHeaders).sort();
-const sortedExceptions: Record<string, { proof: string; reason: string }> = {};
-for (const key of sortedExceptionKeys)
-  sortedExceptions[key] = responseOnlyHeaders[key];
-
-await writeFile(
-  exceptionsPath,
-  stringify(sortedExceptions, { indent: 2, lineWidth: 0 }),
-  "utf-8",
-);
+await writeExceptions();
 console.info(
   `Added ${responseOnlyNew.length} response-only headers to exceptions`,
 );
