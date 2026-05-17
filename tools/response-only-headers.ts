@@ -127,6 +127,12 @@ export const responseOnlyHeaders: Record<
     reason:
       "The DPoP-Nonce header is defined in RFC 9449. It is used by servers in HTTP responses to provide a nonce value that clients must use in subsequent DPoP proofs. It is not used in requests.",
   },
+  "ediint-features": {
+    proof:
+      "RFC 4130, Section 7.4.1: 'The EDIINT-Features header is returned by the server in response to a request.' (https://datatracker.ietf.org/doc/html/rfc4130#section-7.4.1)",
+    reason:
+      "The EDIINT-Features header is used by servers to indicate supported features in response to a request. It is not defined for use in requests.",
+  },
   etag: {
     proof: "Defined in RFC 7232, Section 2.3.",
     reason:
@@ -191,6 +197,12 @@ export const responseOnlyHeaders: Record<
     proof:
       "Deprecated but appeared in earlier specs like RFC 2965, Section 3.3.3.",
     reason: "A legacy header for setting cookies.",
+  },
+  "set-txn": {
+    proof:
+      "No official RFC defines Set-Txn. However, custom headers prefixed with 'Set-' (like Set-Cookie) are typically used in responses. See Set-Cookie usage in RFC 6265, Section 4.1 (https://datatracker.ietf.org/doc/html/rfc6265#section-4.1) for analogous reasoning.",
+    reason:
+      "The Set-Txn header is not a standard HTTP header, but based on naming conventions (similar to Set-Cookie), it is intended for use in responses to set transaction-related information. There is no evidence of its use in requests.",
   },
   "strict-transport-security": {
     proof: "Defined in RFC 6797, Section 6.1.",
