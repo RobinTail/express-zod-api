@@ -1,6 +1,6 @@
 let cache: Set<string>;
 
-export const wellKnownHeadersLastUpdated = "2026-05-15T20:51:21.000Z";
+export const wellKnownHeadersLastUpdated = "2026-03-06T22:01:19.000Z";
 
 export const getWellKnownHeaders = () =>
   (cache ??= new Set([
@@ -82,9 +82,6 @@ export const getWellKnownHeaders = () =>
     "differential-id",
     "digest",
     "dpop",
-    "early-data",
-    "ediint-features",
-    "expect",
     "expect-ct",
     "ext",
     "forwarded",
