@@ -17,13 +17,6 @@ const HeaderSchema = z.object({
 
 const ResponseSchema = z.array(HeaderSchema);
 
-const apiKey = process.env["GITHUB_TOKEN"];
-if (!apiKey) {
-  throw new Error(
-    "GITHUB_TOKEN environment variable is required for classification",
-  );
-}
-
 const tools: ChatCompletionTool[] = [
   {
     type: "function",
@@ -47,6 +40,8 @@ const tools: ChatCompletionTool[] = [
 export const classifyHeaders = async (
   headers: string[],
 ): Promise<z.infer<typeof ResponseSchema>> => {
+  const apiKey = process.env["GITHUB_TOKEN"];
+  if (!apiKey) throw new Error("GITHUB_TOKEN environment variable is required");
   const client = new OpenAI({
     apiKey,
     baseURL: "https://models.github.ai/inference",
