@@ -110,6 +110,7 @@ export const classifyHeaders = async (
   };
 
   let completion = await client.chat.completions.create(agentConfig);
+  let toolCallCount = 0;
 
   while (completion.choices[0].finish_reason === "tool_calls") {
     const choice = completion.choices[0];
@@ -122,7 +123,9 @@ export const classifyHeaders = async (
       if (content.startsWith("Error:")) console.error(content);
       else console.info(`RFC ${number} retrieved (${content.length} chars)`);
       messages.push({ role: "tool", tool_call_id: toolCall.id, content });
+      toolCallCount++;
     }
+    if (toolCallCount >= headers.length) agentConfig.tool_choice = "none";
     completion = await client.chat.completions.create(agentConfig);
   }
 
