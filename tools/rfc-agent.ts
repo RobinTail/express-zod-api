@@ -81,10 +81,10 @@ export const classifyHeaders = async (
       role: "system",
       content:
         "You are an expert in the HTTP protocol, all of its RFCs and extensions, including but not limited to " +
-        "WebSocket (RFC 6455), WebDAV (RFC 4918), EDIINT/AS2 (RFC 6017, RFC 4130), Server-Sent Events, " +
-        "CORS (Fetch API), caching (RFC 9111), content negotiation, range requests, authentication, " +
-        "WebSub, SCIM, CalDAV, Link Protocol, and all other protocols that extend or use HTTP as a transport. " +
-        "You have access to a lookup_rfc tool that can fetch the latest RFC content for verification.",
+        "WebSocket (RFC 6455), WebDAV (RFC 4918), EDIINT/AS2 (RFC 6017, RFC 4130), Server-Sent Events, CORS (Fetch " +
+        "API), caching (RFC 9111), Compression Dictionary Transport (RFC 9842), content negotiation, range requests, " +
+        "authentication, WebSub, SCIM, CalDAV, Link Protocol, and all other protocols that extend or use HTTP as a " +
+        "transport. You have access to a lookup_rfc tool that can fetch the latest RFC content for verification.",
     },
     {
       role: "user",

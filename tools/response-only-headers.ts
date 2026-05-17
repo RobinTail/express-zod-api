@@ -247,6 +247,12 @@ export const responseOnlyHeaders: Record<
     reason:
       "Specifies which origins can access timing information in the response.",
   },
+  "use-as-dictionary": {
+    proof:
+      "RFC 9842, Section 2.1: 'When responding to an HTTP Request, a server can advertise that the response can be used as a dictionary for future requests for URLs that match the rules specified in the \"Use-As-Dictionary\" response header.' Example (line 133): '200 OK\\nUse-As-Dictionary: match=\"/app*js\"'",
+    reason:
+      "The 'Use-As-Dictionary' header is defined in RFC 9842 as a response header sent by the server to advertise that the response can be used as a dictionary for future requests. The RFC explicitly states it is a response header and all examples show it only in responses.",
+  },
   vary: {
     proof: "RFC 9110, 15.8: Server specifies response variations.",
     reason:

@@ -191,7 +191,6 @@ export const getWellKnownHeaders = () =>
     "upgrade",
     "urgency",
     "uri",
-    "use-as-dictionary",
     "user-agent",
     "variant-vary",
     "via",
