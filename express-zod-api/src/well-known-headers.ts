@@ -118,7 +118,6 @@ export const getWellKnownHeaders = () =>
     "method-check-expires",
     "mime-version",
     "negotiate",
-    "nel",
     "odata-entityid",
     "odata-isolation",
     "odata-maxversion",

@@ -145,6 +145,12 @@ export const responseOnlyHeaders: Record<
     reason:
       "Used in redirection responses or to indicate the location of a created resource.",
   },
+  nel: {
+    proof:
+      "The NEL header is specified in the Network Error Logging specification (https://www.w3.org/TR/network-error-logging/), which states: 'The NEL header field is a response header.' No RFC or extension defines NEL as a request header.",
+    reason:
+      "The NEL (Network Error Logging) header is defined to be sent by servers in HTTP responses to instruct user agents to report network errors. It is not defined for use in HTTP requests in any RFC or extension, including WebSocket, WebDAV, EDIINT, or other HTTP-based protocols.",
+  },
   "optional-www-authenticate": {
     proof: "Defined in RFC 8053, Section 3.",
     reason: "Allows a server to provide optional authentication mechanisms.",
