@@ -48,7 +48,7 @@ export const classifyHeaders = async (
     timeout: 30000,
     maxRetries: 0,
   });
-  const headerPattern = headers.join("|");
+  const headerPattern = headers.filter((h) => /^[\w-]+$/.test(h)).join("|");
   const rfcLookupRegex = new RegExp(`\\b(${headerPattern})\\b`, "gi");
 
   const lookupRfc = async (number: number): Promise<string> => {
