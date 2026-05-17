@@ -20,8 +20,6 @@ export const getWellKnownHeaders = () =>
     "alt-used",
     "amp-cache-transform",
     "apply-to-redirect-ref",
-    "authentication-control",
-    "authentication-info",
     "authorization",
     "available-dictionary",
     "c-ext",

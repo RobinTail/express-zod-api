@@ -79,6 +79,18 @@ export const responseOnlyHeaders: Record<
     reason:
       "The Alternates header is defined in RFC 2295 (Transparent Content Negotiation) as a response header containing a variant list for content negotiation. All examples and definitions in RFC 2295 show Alternates only in HTTP responses, and there is no mention of its use in requests.",
   },
+  "authentication-control": {
+    proof:
+      "RFC 8053, Section 4: 'The Authentication-Control header provides more precise control of the client behavior for Web applications using an HTTP authentication protocol.' All syntax and examples show it only in responses.",
+    reason:
+      "RFC 8053 defines Authentication-Control as a response header for servers to control client authentication behavior. It is only sent by the server in responses, not by clients in requests.",
+  },
+  "authentication-info": {
+    proof:
+      "RFC 7615, Section 1 and 3: 'This specification defines the \"Authentication-Info\" ... response header fields.' All examples and definitions show it only in responses.",
+    reason:
+      "RFC 7615 defines Authentication-Info as a response header used by servers to return information after the client's authentication credentials have been accepted. It is never used in requests.",
+  },
   "cache-group-invalidation": {
     proof:
       "Used in proprietary or CDN-specific caching systems (e.g., internal invalidation mechanisms). Not a standard IANA header, but appears only in server responses for cache control.",
