@@ -107,11 +107,11 @@ const completion = await client.chat.completions.create({
     {
       role: "user",
       content:
-        `For each HTTP header in the following list, determine if it can be present ` +
-        `in a request, response, or both. Provide a reason and proof (reference to RFC ` +
-        `or documentation). Respond ONLY with a JSON array matching this schema:\n` +
-        `${JSON.stringify(z.toJSONSchema(ResponseSchema), null, 2)}\n` +
-        `\nHeaders: ${newHeaders.join(", ")}`,
+        `For each HTTP header in the following list, determine if it can be present either only ` +
+        `in a request, only in a response, or both. Provide a reason and proof (reference to RFC ` +
+        `or documentation). Respond according to the schema:\n` +
+        `${JSON.stringify(z.toJSONSchema(ResponseSchema))}\n` +
+        `\nThe list of headers: ${newHeaders.join(", ")}.`,
     },
   ],
   temperature: 0,
