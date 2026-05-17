@@ -17,8 +17,8 @@ const HeaderSchema = z.object({
 
 const ResponseSchema = z.array(HeaderSchema);
 
-const token = process.env["GITHUB_TOKEN"];
-if (!token) {
+const apiKey = process.env["GITHUB_TOKEN"];
+if (!apiKey) {
   throw new Error(
     "GITHUB_TOKEN environment variable is required for classification",
   );
@@ -47,11 +47,9 @@ const tools: ChatCompletionTool[] = [
 export const classifyHeaders = async (
   headers: string[],
 ): Promise<z.infer<typeof ResponseSchema>> => {
-  const endpoint = "https://models.github.ai/inference";
-  const model = "openai/gpt-4.1";
   const client = new OpenAI({
-    baseURL: endpoint,
-    apiKey: token,
+    apiKey,
+    baseURL: "https://models.github.ai/inference",
     timeout: 30000,
     maxRetries: 0,
   });
@@ -108,9 +106,9 @@ export const classifyHeaders = async (
   ];
 
   const agentConfig: ChatCompletionCreateParamsNonStreaming = {
-    model,
     tools,
     messages,
+    model: "openai/gpt-4.1",
     tool_choice: "auto",
     temperature: 0,
     top_p: 1.0,
