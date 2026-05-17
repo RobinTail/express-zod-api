@@ -139,30 +139,22 @@ if (!raw) throw new Error("Empty response from LLM");
 
 console.info("Raw LLM response:", raw);
 
-let classified: z.infer<typeof ResponseSchema>;
-try {
-  const parsed = JSON.parse(raw);
-  classified = ResponseSchema.parse(parsed);
-} catch (err) {
-  console.error("Failed to parse or validate LLM response:", err);
-  process.exit(1);
-}
+const parsed = JSON.parse(raw);
+const classified: z.infer<typeof ResponseSchema> = ResponseSchema.parse(parsed);
 
 const classifiedNames = new Set(classified.map((h) => h.name));
 const missing = newHeaders.filter((n) => !classifiedNames.has(n));
 if (missing.length > 0) {
-  console.error(
-    "LLM response missing classifications for:",
-    missing.join(", "),
+  throw new Error(
+    "LLM response missing classifications for: " + missing.join(", "),
   );
-  process.exit(1);
 }
 
 const responseOnlyNew = classified.filter((h) => h.location === "response");
 const others = classified.filter((h) => h.location !== "response");
 
-for (const h of responseOnlyNew)
-  responseOnlyHeaders[h.name] = { proof: h.proof, reason: h.reason };
+for (const { name, proof, reason } of responseOnlyNew)
+  responseOnlyHeaders[name] = { proof, reason };
 
 await writeExceptions();
 console.info(
