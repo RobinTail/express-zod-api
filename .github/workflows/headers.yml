@@ -59,5 +59,5 @@ jobs:
           branch: ${{ steps.create-branch.outputs.branch-name }}
           commit-message: "Changed well-known headers"
           title: "Well-known headers update"
-          body: "Automated updates to well-known HTTP headers. New headers classified via GitHub Models API (GPT-4.1). Response-only headers moved to `tools/response-only-headers.yml`."
+          body: "Automated updates to well-known HTTP headers. New headers classified via GitHub Models API (GPT-4.1). Response-only headers moved to `tools/response-only-headers.ts`."
           delete-branch: false
