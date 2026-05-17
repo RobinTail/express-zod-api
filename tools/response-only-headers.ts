@@ -119,8 +119,9 @@ export const responseOnlyHeaders: Record<
       "Used to detect infinite loops within CDNs; appears only in responses.",
   },
   "clear-site-data": {
-    proof: "RFC 7873: Server instructs client to clear data.",
-    reason: "Instructs the user agent to clear browsing data.",
+    proof: "W3C Clear Site Data Specification, Section 3.",
+    reason:
+      "Used exclusively by servers to trigger a data wipe on the client side (e.g., during a user logout flow).",
   },
   "content-base": {
     proof:
