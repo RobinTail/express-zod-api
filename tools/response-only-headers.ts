@@ -196,8 +196,9 @@ export const responseOnlyHeaders: Record<
       "Used by the server to provide information about proxy authentication.",
   },
   "proxy-status": {
-    proof: "Defined in RFC 8586, Section 5.6.",
-    reason: "Communicates proxy-specific status information in responses.",
+    proof: "RFC 9209, Section 2.",
+    reason:
+      "Used exclusively by network intermediaries to attach diagnostic telemetry to an outgoing response back to the client.",
   },
   refresh: {
     proof: "A non-standard but widely used header (MDN Docs).",
