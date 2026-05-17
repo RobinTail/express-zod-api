@@ -29,7 +29,8 @@ const tools: ChatCompletionTool[] = [
     function: {
       name: "lookup_rfc",
       description:
-        "Fetch the content of an RFC by its number to verify how a specific HTTP header is defined and whether it can appear in requests, responses, or both",
+        "Search the given RFC number for mentions of the headers in question. " +
+        "Returns excerpts around matching lines.",
       parameters: {
         type: "object",
         properties: {
@@ -61,15 +62,14 @@ export const classifyHeaders = async (
     let totalLength = 0;
     for (let i = 0; i < rfcLines.length; i++) {
       rfcLookupRegex.lastIndex = 0;
-      if (rfcLookupRegex.test(rfcLines[i])) {
-        const start = Math.max(0, i - rfcContextRadius);
-        const end = Math.min(rfcLines.length, i + rfcContextRadius + 1);
-        const excerpt = rfcLines.slice(start, end).join("\n");
-        const block = `--- Context around line ${i + 1} ---\n${excerpt}`;
-        excerpts.push(block);
-        totalLength += block.length;
-        if (totalLength > 5000) break;
-      }
+      if (!rfcLookupRegex.test(rfcLines[i])) continue;
+      const start = Math.max(0, i - rfcContextRadius);
+      const end = Math.min(rfcLines.length, i + rfcContextRadius + 1);
+      const excerpt = rfcLines.slice(start, end).join("\n");
+      const block = `--- Context around line ${i + 1} ---\n${excerpt}`;
+      excerpts.push(block);
+      totalLength += block.length;
+      if (totalLength > 5000) break;
     }
     if (excerpts.length > 0) return excerpts.join("\n\n");
     return text.slice(0, 3000) + "\n\n...(truncated)";
