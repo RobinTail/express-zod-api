@@ -18,6 +18,8 @@ publicHoistPattern:
   - "@types/qs" # used by index.ts, fixes TS2742 for attachRouting
   - "@types/express-serve-static-core" # used by index.ts, fixes TS2742 for attachRouting
   - "rolldown" # used by readableDts tool
+  - "yaml" # used by tools/headers.ts
+  - "zod" # used by tools/headers.ts
 catalogs:
   prod:
     "ramda": "^0.32.0"

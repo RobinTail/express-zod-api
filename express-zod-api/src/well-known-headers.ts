@@ -1,6 +1,7 @@
 let cache: Set<string>;
 
-/** @since 2026-03-06T22:01:19.000Z */
+export const wellKnownHeadersLastUpdated = "2026-05-15T20:51:21.000Z";
+
 export const getWellKnownHeaders = () =>
   (cache ??= new Set([
     "a-im",
@@ -77,8 +78,8 @@ export const getWellKnownHeaders = () =>
     "derived-from",
     "destination",
     "detached-jws",
-    "differential-id",
     "dictionary-id",
+    "differential-id",
     "digest",
     "dpop",
     "dpop-nonce",
