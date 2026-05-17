@@ -70,6 +70,9 @@ content-style-type:
 content-version:
   proof: Part of early HTTP/1.1 drafts (e.g., RFC 2068, Section 14.14).
   reason: Specifies the version of the returned content; response-only.
+dpop-nonce:
+  proof: "IETF draft 'OAuth 2.0 Demonstrating Proof-of-Possession at the Application Layer (DPoP)', Section 4.2: 'The resource server returns the DPoP-Nonce HTTP header in responses.'"
+  reason: The 'DPoP-Nonce' header is used by servers in HTTP responses to indicate a nonce value that the client must use in subsequent requests. It is not defined for use in requests.
 etag:
   proof: Defined in RFC 7232, Section 2.3.
   reason: Used to identify the version of a resource; relevant only to responses.
