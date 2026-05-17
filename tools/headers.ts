@@ -110,14 +110,21 @@ const completion = await client.chat.completions.create({
     {
       role: "system",
       content:
-        "You are an expert in HTTP protocol, all of its RFCs and documentation.",
+        "You are an expert in the HTTP protocol, all of its RFCs and extensions, including but not limited to " +
+        "WebSocket (RFC 6455), WebDAV (RFC 4918), EDIINT/AS2 (RFC 6017, RFC 4130), Server-Sent Events, " +
+        "CORS (Fetch API), caching (RFC 9111), content negotiation, range requests, authentication, " +
+        "WebSub, SCIM, CalDAV, Link Protocol, and all other protocols that extend or use HTTP as a transport.",
     },
     {
       role: "user",
       content:
         `For each HTTP header in the following list, determine if it can be present either only ` +
-        `in a request, only in a response, or both. Provide a reason and proof (reference to RFC ` +
-        `or documentation). Respond according to the schema:\n` +
+        `in a request, only in a response, or both, considering ALL uses across all HTTP extensions ` +
+        `(WebSocket, WebDAV, EDIINT, file transfer, etc.). When classifying a header, consider its ` +
+        `definition across ALL relevant RFCs and specifications, not just one. A header that appears ` +
+        `in both requests and responses in any specification should be classified as 'both', even if ` +
+        `it is most commonly seen in one direction. Provide a reason and proof (reference to ` +
+        `the relevant RFC or documentation). Respond according to the schema:\n` +
         `${JSON.stringify(z.toJSONSchema(ResponseSchema))}\n` +
         `\nThe list of headers: ${newHeaders.join(", ")}.`,
     },
