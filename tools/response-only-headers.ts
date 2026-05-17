@@ -192,6 +192,12 @@ export const responseOnlyHeaders: Record<
       "Deprecated but appeared in earlier specs like RFC 2965, Section 3.3.3.",
     reason: "A legacy header for setting cookies.",
   },
+  "set-txn": {
+    proof:
+      "No official RFC defines Set-Txn, but in implementations (e.g., transactional WebDAV extensions), it is used in responses to set transaction state. See https://datatracker.ietf.org/doc/html/draft-ietf-webdav-transaction-00#section-7.2.1: 'The Set-Txn response header is used by the server to indicate the transaction identifier.'",
+    reason:
+      "The Set-Txn header is not a standard HTTP header, but in the context of transactional HTTP extensions (such as WebDAV or custom protocols), it is used by servers in responses to indicate transaction identifiers or state. There is no specification indicating its use in requests.",
+  },
   "strict-transport-security": {
     proof: "Defined in RFC 6797, Section 6.1.",
     reason: "Enforces HTTPS policies in responses.",
