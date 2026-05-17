@@ -49,7 +49,12 @@ export const classifyHeaders = async (
 ): Promise<z.infer<typeof ResponseSchema>> => {
   const endpoint = "https://models.github.ai/inference";
   const model = "openai/gpt-4.1";
-  const client = new OpenAI({ baseURL: endpoint, apiKey: token });
+  const client = new OpenAI({
+    baseURL: endpoint,
+    apiKey: token,
+    timeout: 30000,
+    maxRetries: 0,
+  });
   const headerPattern = headers.join("|");
   const rfcLookupRegex = new RegExp(`\\b(${headerPattern})\\b`, "gi");
 
