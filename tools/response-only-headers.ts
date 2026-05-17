@@ -73,6 +73,12 @@ export const responseOnlyHeaders: Record<
     proof: "Defined in RFC 7838, Section 3.",
     reason: "The server advertises alternative services in responses.",
   },
+  alternates: {
+    proof:
+      "RFC 2295, Section 8.3 and examples in Sections 10.2, 10.4, and 10.5 show Alternates only in responses. E.g., 'The Alternates header in the response contains the variant list.'",
+    reason:
+      "The Alternates header is defined in RFC 2295 (Transparent Content Negotiation) as a response header containing a variant list for content negotiation. All examples and definitions in RFC 2295 show Alternates only in HTTP responses, and there is no mention of its use in requests.",
+  },
   "cache-group-invalidation": {
     proof:
       "Used in proprietary or CDN-specific caching systems (e.g., internal invalidation mechanisms). Not a standard IANA header, but appears only in server responses for cache control.",

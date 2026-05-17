@@ -18,7 +18,6 @@ export const getWellKnownHeaders = () =>
     "access-control-request-method",
     "alpn",
     "alt-used",
-    "alternates",
     "amp-cache-transform",
     "apply-to-redirect-ref",
     "authentication-control",
