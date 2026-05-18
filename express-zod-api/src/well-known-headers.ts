@@ -173,7 +173,6 @@ export const getWellKnownHeaders = () =>
     "sec-websocket-protocol",
     "sec-websocket-version",
     "security-scheme",
-    "setprofile",
     "signature",
     "signature-input",
     "slug",

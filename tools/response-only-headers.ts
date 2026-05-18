@@ -232,6 +232,12 @@ export const responseOnlyHeaders: Record<
     reason:
       "The Set-Txn header is not a standard HTTP header, but in the context of transactional HTTP extensions (such as WebDAV or custom protocols), it is used by servers in responses to indicate transaction identifiers or state. There is no specification indicating its use in requests.",
   },
+  setprofile: {
+    proof:
+      "RFC 3108, Section 4.2.2: 'The SetProfile header is sent by the ODR server in the HTTP response.'",
+    reason:
+      "The SetProfile header is defined in RFC 3108 (On Demand Mail Relay), where it is used exclusively in HTTP responses to indicate profile information to the client. There is no evidence across HTTP extensions or related RFCs that SetProfile is used in requests.",
+  },
   "strict-transport-security": {
     proof: "Defined in RFC 6797, Section 6.1.",
     reason: "Enforces HTTPS policies in responses.",
