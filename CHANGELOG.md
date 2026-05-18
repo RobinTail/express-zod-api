@@ -2,6 +2,15 @@
 
 ## Version 28
 
+### v28.0.1
+
+- Adjusted the list of well-known headers, recognized by Documentation generator:
+  - Added: cdn-loop;
+  - Removed (not expected in Request): accept-ch, alternates, authentication-control, authentication-info,
+    cross-origin-embedder-policy, cross-origin-embedder-policy-report-only, cross-origin-opener-policy,
+    cross-origin-opener-policy-report-only, cross-origin-resource-policy, dpop-nonce, nel, p3p, public,
+    public-key-pins, public-key-pins-report-only, setprofile, use-as-dictionary.
+
 ### v28.0.0
 
 - Supported Node.js versions: `^22.19.0 || ^24.0.0 || ^26.0.0`;
