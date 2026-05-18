@@ -196,6 +196,24 @@ export const responseOnlyHeaders: Record<
     reason:
       "Used exclusively by network intermediaries to attach diagnostic telemetry to an outgoing response back to the client.",
   },
+  public: {
+    proof:
+      "RFC 2616, Section 14.9.1: 'public' is a cache-response-directive, indicating cacheability of a response. See also RFC 9111 (HTTP Caching).",
+    reason:
+      "The 'public' header is not a standalone HTTP header, but rather a cache-control directive used within the Cache-Control header. It is defined to indicate that a response may be cached by any cache, even if it would normally be non-cacheable or cacheable only within a non-shared cache. This directive is only relevant in HTTP responses, as it describes the cacheability of the response data sent by the server.",
+  },
+  "public-key-pins": {
+    proof:
+      "RFC 7469, Section 2.3.1: 'Public-Key-Pins Response Header Field Processing' describes its use as a response header.",
+    reason:
+      "The 'Public-Key-Pins' header is defined in RFC 7469 as a response header sent by servers to instruct user agents to remember (pin) the host's public keys for a period of time. It is not defined for use in requests, and its semantics are only meaningful when sent by the server to the client.",
+  },
+  "public-key-pins-report-only": {
+    proof:
+      "RFC 7469, Section 2.3.2: 'The Public-Key-Pins-Report-Only HTTP response header field is used by servers to instruct user agents to send pinning violation reports.'",
+    reason:
+      "The Public-Key-Pins-Report-Only header is defined as a response header used by servers to instruct user agents to report pinning violations without enforcing them. It is not defined for use in requests by clients in any RFC or extension, including WebSocket, WebDAV, EDIINT, or W3C specifications.",
+  },
   refresh: {
     proof: "A non-standard but widely used header (MDN Docs).",
     reason: "Indicates redirection or automatic page refresh.",
