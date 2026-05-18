@@ -27,7 +27,7 @@ const makeResponseSchema = (names: string[]) =>
 const lookupRfcSchema = z.function({
   input: [
     z.object({
-      number: z.number().describe("The RFC number to look up"),
+      number: z.int().positive().describe("The RFC number to look up"),
     }),
   ],
   output: z.string(),
