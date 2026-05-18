@@ -223,6 +223,37 @@ describe("Common Helpers", () => {
         "x-request-id": "test",
       });
     });
+
+    test("should include cookies when enabled in user-defined sources", () => {
+      const req = makeRequestMock({ method: "GET" });
+      req.cookies = { session: "abc", theme: "dark" };
+      expect(getInput(req, { get: ["query", "cookies"] })).toEqual({
+        session: "abc",
+        theme: "dark",
+      });
+    });
+
+    test("should include signedCookies when enabled in user-defined sources", () => {
+      const req = makeRequestMock({ method: "GET" });
+      req.signedCookies = { session: "signed-abc" };
+      expect(getInput(req, { get: ["query", "signedCookies"] })).toEqual({
+        session: "signed-abc",
+      });
+    });
+
+    test("should merge cookies and signedCookies with signed overriding unsigned", () => {
+      const req = makeRequestMock({ method: "GET" });
+      req.cookies = { session: "unsigned", theme: "dark" };
+      req.signedCookies = { session: "signed" };
+      expect(
+        getInput(req, { get: ["query", "cookies", "signedCookies"] }),
+      ).toEqual({ session: "signed", theme: "dark" });
+    });
+
+    test("should handle cookies being undefined gracefully", () => {
+      const req = makeRequestMock({ method: "GET" });
+      expect(getInput(req, { get: ["query", "cookies"] })).toEqual({});
+    });
   });
 
   describe("getMessageFromError()", () => {
