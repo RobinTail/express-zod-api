@@ -3,6 +3,7 @@ import { givePort } from "../../tools/ports";
 import {
   appMock,
   compressionMock,
+  cookieParserMock,
   expressJsonMock,
   expressUrlencodedMock,
   expressMock,
@@ -291,6 +292,70 @@ describe("Server", () => {
       expect(appMock.use).toHaveBeenCalledTimes(3);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
+    });
+
+    test("should enable cookie parser when cookies is true", async () => {
+      const configMock = {
+        http: { listen: givePort() },
+        cookies: true,
+        cors: true,
+        startupLogo: false,
+        logger: { level: "warn" },
+      } satisfies ServerConfig;
+      const routingMock = {
+        v1: {
+          test: new EndpointsFactory(defaultResultHandler).build({
+            output: z.object({}),
+            handler: vi.fn(),
+          }),
+        },
+      };
+      await createServer(configMock, routingMock);
+      expect(appMock.use).toHaveBeenCalledTimes(3);
+      expect(cookieParserMock).toHaveBeenCalledTimes(1);
+      expect(cookieParserMock).toHaveBeenCalledWith(undefined, undefined);
+    });
+
+    test("should enable cookie parser with secret", async () => {
+      const configMock = {
+        http: { listen: givePort() },
+        cookies: { secret: "my-secret" },
+        cors: true,
+        startupLogo: false,
+        logger: { level: "warn" },
+      } satisfies ServerConfig;
+      const routingMock = {
+        v1: {
+          test: new EndpointsFactory(defaultResultHandler).build({
+            output: z.object({}),
+            handler: vi.fn(),
+          }),
+        },
+      };
+      await createServer(configMock, routingMock);
+      expect(cookieParserMock).toHaveBeenCalledTimes(1);
+      expect(cookieParserMock).toHaveBeenCalledWith("my-secret", undefined);
+    });
+
+    test("should not register cookie parser when cookies is falsy", async () => {
+      const configMock = {
+        http: { listen: givePort() },
+        cookies: false,
+        cors: true,
+        startupLogo: false,
+        logger: { level: "warn" },
+      } satisfies ServerConfig;
+      const routingMock = {
+        v1: {
+          test: new EndpointsFactory(defaultResultHandler).build({
+            output: z.object({}),
+            handler: vi.fn(),
+          }),
+        },
+      };
+      await createServer(configMock, routingMock);
+      expect(appMock.use).toHaveBeenCalledTimes(2);
+      expect(cookieParserMock).toHaveBeenCalledTimes(0);
     });
 
     test("should enable uploads on request", async () => {

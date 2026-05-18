@@ -81,6 +81,21 @@ export const createUploadFailureHandler =
     next();
   };
 
+export const createCookieParser = async ({
+  config,
+}: {
+  config: ServerConfig;
+}): Promise<RequestHandler> => {
+  type CookieParser = (
+    secret?: string | string[],
+    options?: { decode?: (val: string) => string },
+  ) => RequestHandler;
+  const cookieParser = await loadPeer<CookieParser>("cookie-parser");
+  const settings = typeof config.cookies === "object" ? config.cookies : {};
+  const { secret, decode } = settings;
+  return cookieParser(secret, decode ? { decode } : undefined);
+};
+
 export const createUploadLogger = (
   logger: ActualLogger,
 ): Pick<Console, "log"> => ({ log: logger.debug.bind(logger) });
