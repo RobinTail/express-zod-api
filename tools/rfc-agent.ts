@@ -8,14 +8,21 @@ import type {
 const rfcContextRadius = 3;
 const rfcMaxLen = 3000;
 
-const HeaderSchema = z.object({
-  name: z.string(),
-  location: z.enum(["request", "response", "both"]),
-  reason: z.string(),
-  proof: z.string(),
-});
-
-const ResponseSchema = z.array(HeaderSchema);
+const makeResponseSchema = (names: string[]) =>
+  z
+    .array(
+      z.object({
+        name: z.literal(names).describe("the header name"),
+        location: z
+          .enum(["request", "response", "both"])
+          .describe("classification"),
+        reason: z.string().describe("why this header is classified this way"),
+        proof: z
+          .string()
+          .describe("reference to a relevant RFC or documentation"),
+      }),
+    )
+    .length(names.length);
 
 const tools: ChatCompletionTool[] = [
   {
@@ -48,6 +55,7 @@ export const classifyHeaders = async (
     timeout: 30000,
     maxRetries: 0,
   });
+  const ResponseSchema = makeResponseSchema(headers);
   const headerPattern = headers.filter((h) => /^[\w-]+$/.test(h)).join("|");
   const rfcLookupRegex = new RegExp(`\\b(${headerPattern})\\b`, "gi");
 
@@ -97,8 +105,7 @@ export const classifyHeaders = async (
         `(WebSocket, WebDAV, EDIINT, file transfer, etc.). When classifying a header, consider its ` +
         `definition across ALL relevant RFCs and specifications, not just one. A header that appears ` +
         `in both requests and responses in any specification should be classified as 'both', even if ` +
-        `it is most commonly seen in one direction. Provide a reason and proof (reference to ` +
-        `the relevant RFC or documentation). Respond according to the schema:\n` +
+        `it is most commonly seen in one direction. Provide a reason and a proof. Respond according to the schema:\n` +
         `${JSON.stringify(z.toJSONSchema(ResponseSchema))}\n\n` +
         `The list of headers: ${headers.join(", ")}. ` +
         `Use the lookup_rfc tool when you need to verify the definition of a header across RFCs.`,
