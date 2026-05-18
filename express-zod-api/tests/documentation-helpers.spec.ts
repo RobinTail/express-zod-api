@@ -469,6 +469,25 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
+
+    test("should depict cookie params when enabled via CookieSecurity", () => {
+      expect(
+        depictRequestParams({
+          request: {
+            properties: {
+              session: { type: "string" },
+              page: { type: "string" },
+            },
+            required: ["session", "page"],
+            type: "object",
+          },
+          inputSources: ["query", "cookies", "params"],
+          composition: "inline",
+          security: [[{ type: "cookie", name: "session" }]],
+          ...requestCtx,
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictBody", () => {

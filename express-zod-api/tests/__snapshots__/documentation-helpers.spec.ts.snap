@@ -315,6 +315,33 @@ exports[`Documentation helpers > depictRequestParams() > Features 1180 and 2344:
 ]
 `;
 
+exports[`Documentation helpers > depictRequestParams() > should depict cookie params when enabled via CookieSecurity 1`] = `
+[
+  {
+    "deprecated": undefined,
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
+    "in": "cookie",
+    "name": "session",
+    "required": true,
+    "schema": {
+      "type": "string",
+    },
+  },
+  {
+    "deprecated": undefined,
+    "description": "GET /v1/user/:id Parameter",
+    "examples": undefined,
+    "in": "query",
+    "name": "page",
+    "required": true,
+    "schema": {
+      "type": "string",
+    },
+  },
+]
+`;
+
 exports[`Documentation helpers > depictRequestParams() > should depict none if both query and params are disabled 1`] = `[]`;
 
 exports[`Documentation helpers > depictRequestParams() > should depict only path params if query is disabled 1`] = `

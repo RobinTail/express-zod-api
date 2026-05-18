@@ -299,9 +299,17 @@ export const depictRequestParams = ({
     R.filter((entry: Security) => entry.type === "header"),
     security ?? [],
   ).map(({ name }) => name);
+  const securityCookieNames = R.chain(
+    R.filter((entry: Security) => entry.type === "cookie"),
+    security ?? [],
+  ).map(({ name }) => name);
+  const areCookiesEnabled =
+    inputSources.includes("cookies") || inputSources.includes("signedCookies");
 
   const getLocation = (name: string) => {
     if (areParamsEnabled && pathParams.includes(name)) return "path";
+    if (areCookiesEnabled && securityCookieNames.includes(name))
+      return "cookie";
     if (
       areHeadersEnabled &&
       (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders))
