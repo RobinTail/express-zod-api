@@ -53,9 +53,14 @@ export const classifyHeaders = async (
 
   const lookupRfc = async (number: number): Promise<string> => {
     const url = `https://www.rfc-editor.org/rfc/rfc${number}.txt`;
-    const resp = await fetch(url);
-    if (!resp.ok) return `Error: RFC ${number} not found`;
-    const text = await resp.text();
+    let text: string;
+    try {
+      const resp = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (!resp.ok) return `Error: RFC ${number} not found`;
+      text = await resp.text();
+    } catch {
+      return `Error: Failed to fetch RFC ${number}`;
+    }
     const rfcLines = text.split("\n");
     const excerpts: string[] = [];
     let totalLength = 0;
