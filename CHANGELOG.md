@@ -2,6 +2,14 @@
 
 ## Version 28
 
+### v28.1.0
+
+- Added cookie support:
+  - Cookie parsing via `cookie-parser` can be enabled in `ServerConfig.cookies`;
+  - `"cookies"` and `"signedCookies"` can be used as input sources;
+  - `cookieMiddleware` exposes `setCookie` and `clearCookie` in middleware context;
+  - `CookieSecurity` schemas are depicted as `in: "cookie"` parameters in OpenAPI.
+
 ### v28.0.1
 
 - Adjusted the list of well-known headers, recognized by Documentation generator:

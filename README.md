@@ -818,6 +818,85 @@ factory.build({
 });
 ```
 
+## Cookies
+
+The framework supports cookie parsing and setting via an opt-in feature using `cookie-parser`.
+
+### Enabling cookie parsing
+
+Add `cookies` to your `ServerConfig`. This loads `cookie-parser` and attaches it as global middleware:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+createConfig({
+  // ...
+  cookies: {
+    secret: "my-secret", // optional, enables signed cookies
+    // decode: myDecode,  // optional custom decode function
+  },
+});
+```
+
+### Using cookies as input source
+
+Once parsing is enabled, add `"cookies"` and/or `"signedCookies"` to your input sources:
+
+```ts
+createConfig({
+  inputSources: {
+    get: ["query", "params", "cookies", "signedCookies"],
+  },
+  cookies: { secret: "my-secret" },
+});
+```
+
+For signed cookies to work, you must provide a `secret`. When both sources are enabled and a key exists in both, `signedCookies` takes priority.
+
+### Declaring cookie security schema
+
+Use `CookieSecurity` in your middleware to document cookie-based authentication:
+
+```ts
+import { Middleware } from "express-zod-api";
+import { z } from "zod";
+
+new Middleware({
+  security: { type: "cookie", name: "session" },
+  input: z.object({ session: z.string() }),
+  handler: async ({ input: { session } }) => {
+    // validate session
+    return { userId: "abc" };
+  },
+});
+```
+
+### Setting cookies via middleware
+
+The `cookieMiddleware` exposes `setCookie` and `clearCookie` in the middleware context:
+
+```ts
+import {
+  cookieMiddleware,
+  EndpointsFactory,
+  defaultResultHandler,
+} from "express-zod-api";
+
+const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
+  cookieMiddleware,
+);
+
+const setSession = factory.build({
+  method: "post",
+  path: "/session",
+  output: z.object({ success: z.boolean() }),
+  handler: async ({ ctx: { setCookie } }) => {
+    setCookie("session", "abc123", { httpOnly: true, path: "/" });
+    return { success: true };
+  },
+});
+```
+
 ## Response customization
 
 `ResultHandler` is responsible for transmitting consistent responses containing the endpoint output or an error.
