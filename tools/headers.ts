@@ -43,11 +43,12 @@ const writeExceptions = async () => {
   await writeFile(exceptionsDest, tsCode, "utf-8");
 };
 
-const exceptionNames = new Set(Object.keys(responseOnlyHeaders));
-
 const response = await fetch(
   "https://www.iana.org/assignments/http-fields/field-names.csv",
+  { signal: AbortSignal.timeout(5000) },
 );
+if (!response.ok) throw new Error("Failed to fetch from IANA");
+
 const lastMod = response.headers.get("last-modified");
 if (!lastMod) throw new Error("Can not get Last-Modified header from response");
 const state = new Date(lastMod);
@@ -75,6 +76,7 @@ const allHeaders = lines
   )
   .map(({ name }) => name.toLowerCase());
 
+const exceptionNames = new Set(Object.keys(responseOnlyHeaders));
 const newHeaders = allHeaders.filter(
   (name) => !existingNames.has(name) && !exceptionNames.has(name),
 );
