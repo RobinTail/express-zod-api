@@ -142,6 +142,35 @@ export const responseOnlyHeaders: Record<
     proof: "Part of early HTTP/1.1 drafts (e.g., RFC 2068, Section 14.14).",
     reason: "Specifies the version of the returned content; response-only.",
   },
+  "cross-origin-embedder-policy": {
+    proof:
+      "https://wicg.github.io/cross-origin-embedder-policy/#cross-origin-embedder-policy-header",
+    reason:
+      "The Cross-Origin-Embedder-Policy (COEP) header is defined to be sent by servers in HTTP responses to instruct browsers how to handle cross-origin resources. It is not defined for use in HTTP requests in any RFC or W3C specification.",
+  },
+  "cross-origin-embedder-policy-report-only": {
+    proof:
+      "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy-Report-Only and https://wicg.github.io/cross-origin-embedder-policy/#cross-origin-embedder-policy-report-only",
+    reason:
+      "The Cross-Origin-Embedder-Policy-Report-Only header is defined by the W3C and WHATWG specifications as a response header only. It is used by servers to inform browsers about the embedder policy in a report-only mode, and is not sent by clients in requests.",
+  },
+  "cross-origin-opener-policy": {
+    proof:
+      "https://html.spec.whatwg.org/multipage/browsing-the-web.html#cross-origin-opener-policy",
+    reason:
+      "The Cross-Origin-Opener-Policy (COOP) header is specified to be sent in HTTP responses by servers to control the document's browsing context group. There is no specification or RFC that defines its use in HTTP requests.",
+  },
+  "cross-origin-opener-policy-report-only": {
+    proof:
+      "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy-Report-Only and https://html.spec.whatwg.org/multipage/origin.html#cross-origin-opener-policy-report-only",
+    reason:
+      "The Cross-Origin-Opener-Policy-Report-Only header is specified as a response header in the W3C and WHATWG documentation. It is used by servers to indicate opener policy in report-only mode, and is not defined for use in HTTP requests.",
+  },
+  "cross-origin-resource-policy": {
+    proof: "https://fetch.spec.whatwg.org/#http-cross-origin-resource-policy",
+    reason:
+      "The Cross-Origin-Resource-Policy (CORP) header is defined to be sent in HTTP responses to indicate who can load the resource. It is not defined for use in HTTP requests in any RFC or W3C specification.",
+  },
   "dpop-nonce": {
     proof:
       "RFC 9449, Section 4.2: 'The DPoP-Nonce HTTP header is used by servers to provide a nonce value in responses.'",
