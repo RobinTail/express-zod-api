@@ -48,7 +48,7 @@ const tools: ChatCompletionTool[] = [
 
 export const classifyHeaders = async (
   headers: string[],
-): Promise<z.infer<typeof ResponseSchema>> => {
+): Promise<z.infer<ReturnType<typeof makeResponseSchema>>> => {
   const apiKey = process.env["GITHUB_TOKEN"];
   if (!apiKey) throw new Error("GITHUB_TOKEN environment variable is required");
   const client = new OpenAI({
