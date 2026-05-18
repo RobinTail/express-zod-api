@@ -95,7 +95,7 @@ export const classifyHeaders = async (
         "WebSocket (RFC 6455), WebDAV (RFC 4918), EDIINT/AS2 (RFC 6017, RFC 4130), Server-Sent Events, CORS (Fetch " +
         "API), caching (RFC 9111), Compression Dictionary Transport (RFC 9842), content negotiation, range requests, " +
         "authentication, WebSub, SCIM, CalDAV, Link Protocol, and all other protocols that extend or use HTTP as a " +
-        "transport. You have access to a lookup_rfc tool that can fetch the latest RFC content for verification.",
+        "transport. When your knowledge is uncertain — use the lookup_rfc tool that can fetch the latest RFC content.",
     },
     {
       role: "user",
@@ -107,8 +107,7 @@ export const classifyHeaders = async (
         `in both requests and responses in any specification should be classified as 'both', even if ` +
         `it is most commonly seen in one direction. Provide a reason and a proof. Respond according to the schema:\n` +
         `${JSON.stringify(z.toJSONSchema(ResponseSchema))}\n\n` +
-        `The list of headers: ${headers.join(", ")}. ` +
-        `Use the lookup_rfc tool when you need to verify the definition of a header across RFCs.`,
+        `The list of headers: ${headers.join(", ")}.`,
     },
   ];
 
