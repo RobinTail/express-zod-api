@@ -24,6 +24,15 @@ const makeResponseSchema = (names: string[]) =>
     )
     .length(names.length);
 
+const lookupRfcSchema = z.function({
+  input: [
+    z.object({
+      number: z.number().describe("The RFC number to look up"),
+    }),
+  ],
+  output: z.string(),
+});
+
 const tools: ChatCompletionTool[] = [
   {
     type: "function",
@@ -32,14 +41,7 @@ const tools: ChatCompletionTool[] = [
       description:
         "Search the given RFC number for mentions of the headers in question. " +
         "Returns excerpts around matching lines.",
-      parameters: {
-        type: "object",
-        properties: {
-          number: { type: "number", description: "The RFC number to look up" },
-        },
-        required: ["number"],
-        additionalProperties: false,
-      },
+      parameters: lookupRfcSchema.def.input.def.items[0].toJSONSchema(),
     },
   },
 ];
@@ -59,7 +61,8 @@ export const classifyHeaders = async (
   const headerPattern = headers.filter((h) => /^[\w-]+$/.test(h)).join("|");
   const rfcLookupRegex = new RegExp(`\\b(${headerPattern})\\b`, "gi");
 
-  const lookupRfc = async (number: number): Promise<string> => {
+  const lookupRfc = lookupRfcSchema.implementAsync(async ({ number }) => {
+    console.info(`Looking up RFC ${number}...`);
     const url = `https://www.rfc-editor.org/rfc/rfc${number}.txt`;
     let text: string;
     try {
@@ -85,7 +88,7 @@ export const classifyHeaders = async (
     }
     if (excerpts.length > 0) return excerpts.join("\n\n");
     return text.slice(0, rfcMaxLen) + "…";
-  };
+  });
 
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
@@ -102,8 +105,8 @@ export const classifyHeaders = async (
       content:
         `For each HTTP header in the following list, determine if it can be present either only ` +
         `in a request, only in a response, or both, considering ALL uses across all HTTP extensions ` +
-        `(WebSocket, WebDAV, EDIINT, file transfer, etc.). When classifying a header, consider its ` +
-        `definition across ALL relevant RFCs and specifications, not just one. A header that appears ` +
+        `(WebSocket, WebDAV, EDIINT, file transfer, W3C specifications, etc.). When classifying a header, consider ` +
+        `its definition across ALL relevant RFCs and specifications, not just one. A header that appears ` +
         `in both requests and responses in any specification should be classified as 'both', even if ` +
         `it is most commonly seen in one direction. Provide a reason and a proof. Respond according to the schema:\n` +
         `${JSON.stringify(z.toJSONSchema(ResponseSchema))}\n\n` +
@@ -128,11 +131,9 @@ export const classifyHeaders = async (
     messages.push(choice.message);
     for (const toolCall of choice.message.tool_calls ?? []) {
       if (!("function" in toolCall)) continue;
-      const { number } = JSON.parse(toolCall.function.arguments);
-      console.info(`Looking up RFC ${number}...`);
-      const content = await lookupRfc(Number(number) || 0);
+      const content = await lookupRfc(JSON.parse(toolCall.function.arguments));
       if (content.startsWith("Error:")) console.error(content);
-      else console.info(`RFC ${number} retrieved (${content.length} chars)`);
+      else console.info(`Retrieved (${content.length} chars)`);
       messages.push({ role: "tool", tool_call_id: toolCall.id, content });
       toolCallCount++;
     }
