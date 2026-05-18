@@ -32,6 +32,7 @@ export const getWellKnownHeaders = () =>
     "cal-managed-id",
     "caldav-timezones",
     "capsule-protocol",
+    "cdn-loop",
     "cert-not-after",
     "cert-not-before",
     "client-cert",

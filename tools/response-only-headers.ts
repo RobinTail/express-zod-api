@@ -113,11 +113,6 @@ export const responseOnlyHeaders: Record<
       "An extension header often used by CDNs to communicate caching strategies; see examples in CDN-specific docs (e.g., Akamai or Cloudflare).",
     reason: "Relevant to response caching.",
   },
-  "cdn-loop": {
-    proof: "Defined in RFC 8586, Section 2.",
-    reason:
-      "Used to detect infinite loops within CDNs; appears only in responses.",
-  },
   "clear-site-data": {
     proof: "W3C Clear Site Data Specification, Section 3.",
     reason:
