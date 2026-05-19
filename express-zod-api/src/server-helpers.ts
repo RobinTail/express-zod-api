@@ -1,3 +1,4 @@
+import type cookieParser from "cookie-parser";
 import type fileUpload from "express-fileupload";
 import { loadPeer } from "./peer-helpers";
 import type { AbstractResultHandler } from "./result-handler";
@@ -86,14 +87,10 @@ export const createCookieParser = async ({
 }: {
   config: ServerConfig;
 }): Promise<RequestHandler> => {
-  type CookieParser = (
-    secret?: string | string[],
-    options?: { decode?: (val: string) => string },
-  ) => RequestHandler;
-  const cookieParser = await loadPeer<CookieParser>("cookie-parser");
+  const parser = await loadPeer<typeof cookieParser>("cookie-parser");
   const settings = typeof config.cookies === "object" ? config.cookies : {};
-  const { secret, decode } = settings;
-  return cookieParser(secret, decode ? { decode } : undefined);
+  const { secret, ...rest } = settings;
+  return parser(secret, Object.keys(rest).length ? rest : undefined);
 };
 
 export const createUploadLogger = (
