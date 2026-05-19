@@ -49,10 +49,12 @@
   "peerDependencies": {
     "@express-zod-api/zod-plugin": "workspace:^",
     "@types/compression": "^1.7.5",
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.0",
     "@types/express-fileupload": "^1.5.0",
     "@types/http-errors": "^2.0.2",
     "compression": "^1.8.0",
+    "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
     "express-fileupload": "^1.5.0",
     "http-errors": "^2.0.1",
@@ -64,6 +66,9 @@
       "optional": true
     },
     "@types/compression": {
+      "optional": true
+    },
+    "@types/cookie-parser": {
       "optional": true
     },
     "@types/express": {
@@ -78,6 +83,9 @@
     "compression": {
       "optional": true
     },
+    "cookie-parser": {
+      "optional": true
+    },
     "express-fileupload": {
       "optional": true
     },
@@ -88,6 +96,7 @@
   "devDependencies": {
     "@express-zod-api/zod-plugin": "workspace:^",
     "@types/compression": "catalog:dev",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/depd": "^1.1.37",
     "@types/express": "catalog:dev",
@@ -97,6 +106,7 @@
     "@types/ramda": "catalog:dev",
     "camelize-ts": "catalog:dev",
     "compression": "catalog:dev",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "depd": "^2.0.0",
     "express": "catalog:dev",
