@@ -589,19 +589,16 @@ describe("Documentation", () => {
       const spec = new Documentation({
         config: createConfig({
           cors: true,
-          logger: { level: "silent" },
-          http: { listen: givePort() },
           inputSources: { get: ["query", "cookies"] },
         }),
         routing: {
           v1: {
-            getSomething: defaultEndpointsFactory.addMiddleware(mw).build({
+            getSomething: defaultEndpointsFactory.addMiddleware(mw).buildVoid({
               input: z.object({
                 session: z.string(),
                 page: z.number(),
               }),
-              output: z.object({}),
-              handler: async () => ({}),
+              handler: vi.fn(),
             }),
           },
         },
