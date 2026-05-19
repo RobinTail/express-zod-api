@@ -1,6 +1,7 @@
 import type compression from "compression";
 import type { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
+import type cookieParser from "cookie-parser";
 import type { ServerOptions } from "node:https";
 import type { BuiltinLoggerConfig } from "./builtin-logger";
 import type { AbstractEndpoint } from "./endpoint";
@@ -129,13 +130,10 @@ type UploadOptions = Pick<
   beforeUpload?: BeforeUpload;
 };
 
-interface CookieParserOptions {
+interface CookieParserOptions extends cookieParser.CookieParseOptions {
   /** @desc The secret string or array used by cookie-parser for signed cookies */
   /** @default undefined (no signed cookies) */
-  secret?: string | string[];
-  /** @desc Custom decode function for cookie values */
-  /** @default decodeURIComponent */
-  decode?: (val: string) => string;
+  secret?: Parameters<typeof cookieParser>[0];
 }
 
 type CompressionOptions = Pick<
