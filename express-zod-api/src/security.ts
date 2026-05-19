@@ -119,4 +119,4 @@ const pickNames = (
 export const getSecurityNames = (
   containers: LogicalContainer<Security>[],
   type: NamedSecurityType,
-): Set<string> => new Set(R.chain((c) => pickNames(c, type), containers));
+): Set<string> => new Set(R.chain((one) => pickNames(one, type), containers));
