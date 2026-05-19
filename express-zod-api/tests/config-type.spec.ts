@@ -42,7 +42,7 @@ describe("ConfigType", () => {
   });
 
   describe("InputSource", () => {
-    test("should include cookies and signedCookies", () => {
+    test("should list the selected properties of Request", () => {
       expectTypeOf<InputSource>().toEqualTypeOf<
         | "query"
         | "body"
