@@ -16,8 +16,12 @@ describe("Cookie middleware", () => {
           middleware: createCookieMiddleware(baseOptions),
         });
         const { setCookie, clearCookie } = output as {
-          setCookie: (typeof responseMock)["cookie"];
-          clearCookie: (typeof responseMock)["clearCookie"];
+          setCookie: Awaited<
+            ReturnType<ReturnType<typeof createCookieMiddleware>["execute"]>
+          >["setCookie"];
+          clearCookie: Awaited<
+            ReturnType<ReturnType<typeof createCookieMiddleware>["execute"]>
+          >["clearCookie"];
         };
         expect(typeof setCookie).toBe("function");
         expect(typeof clearCookie).toBe("function");
@@ -25,6 +29,11 @@ describe("Cookie middleware", () => {
         expect(responseMock.cookies).toHaveProperty("session", {
           options: { ...baseOptions, httpOnly: false },
           value: "abc123",
+        });
+        setCookie("prefs", { theme: "dark", lang: "en" });
+        expect(responseMock.cookies).toHaveProperty("prefs", {
+          value: { theme: "dark", lang: "en" },
+          options: baseOptions ?? {},
         });
         clearCookie("session");
         expect(responseMock.cookies).toHaveProperty("session", {
