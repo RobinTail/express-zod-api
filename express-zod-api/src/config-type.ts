@@ -132,7 +132,6 @@ type UploadOptions = Pick<
 
 interface CookieParserOptions extends cookieParser.CookieParseOptions {
   /** @desc The secret string or array used by cookie-parser for signed cookies */
-  /** @default undefined (no signed cookies) */
   secret?: Parameters<typeof cookieParser>[0];
 }
 
