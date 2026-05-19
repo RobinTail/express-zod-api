@@ -88,8 +88,9 @@ export const createCookieParser = async ({
   config: ServerConfig;
 }): Promise<RequestHandler> => {
   const parser = await loadPeer<typeof cookieParser>("cookie-parser");
-  const settings = typeof config.cookies === "object" ? config.cookies : {};
-  const { secret, ...rest } = settings;
+  const { secret, ...rest } = {
+    ...(typeof config.cookies === "object" && config.cookies),
+  };
   return parser(secret, Object.keys(rest).length ? rest : undefined);
 };
 
