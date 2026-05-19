@@ -873,17 +873,17 @@ new Middleware({
 
 ### Setting cookies via middleware
 
-The `cookieMiddleware` exposes `setCookie` and `clearCookie` in the middleware context:
+The `createCookieMiddleware(options?)` creates a middleware that exposes `setCookie` and `clearCookie` in the context. Base options are applied to every call; per-call options override them:
 
 ```ts
 import {
-  cookieMiddleware,
+  createCookieMiddleware,
   EndpointsFactory,
   defaultResultHandler,
 } from "express-zod-api";
 
 const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
-  cookieMiddleware,
+  createCookieMiddleware({ httpOnly: true, path: "/" }),
 );
 
 const setSession = factory.build({
@@ -891,7 +891,7 @@ const setSession = factory.build({
   path: "/session",
   output: z.object({ success: z.boolean() }),
   handler: async ({ ctx: { setCookie } }) => {
-    setCookie("session", "abc123", { httpOnly: true, path: "/" });
+    setCookie("session", "abc123", { httpOnly: false }); // overrides base
     return { success: true };
   },
 });

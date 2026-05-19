@@ -8,7 +8,7 @@ export { getMessageFromError } from "./common-helpers";
 export { ensureHttpError } from "./result-helpers";
 export { BuiltinLogger } from "./builtin-logger";
 export { Middleware } from "./middleware";
-export { cookieMiddleware } from "./cookie-middleware";
+export { createCookieMiddleware } from "./cookie-middleware";
 export {
   ResultHandler,
   defaultResultHandler,

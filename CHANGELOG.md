@@ -7,7 +7,7 @@
 - Added cookie support:
   - Cookie parsing via `cookie-parser` can be enabled in `ServerConfig.cookies`;
   - `"cookies"` and `"signedCookies"` can be used as input sources;
-  - `cookieMiddleware` exposes `setCookie` and `clearCookie` in middleware context;
+  - `createCookieMiddleware(options)` creates a middleware that exposes `setCookie` and `clearCookie` with inherited base options;
   - `CookieSecurity` schemas are depicted as `in: "cookie"` parameters in OpenAPI.
 
 ### v28.0.1
