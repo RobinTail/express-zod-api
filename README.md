@@ -818,82 +818,46 @@ factory.build({
 });
 ```
 
-## Cookies
+## Cookies as an input source
 
-The framework supports cookie parsing and setting via an opt-in feature using `cookie-parser`.
-
-### Enabling cookie parsing
-
-Add `cookies` to your `ServerConfig`. This loads `cookie-parser` and attaches it as global middleware:
+Install `cookie-parser` as well as `@types/cookie-parser`, enable `cookies` in your config, add `"cookies"` and/or
+`"signedCookies"` to your `inputSources`:
 
 ```ts
 import { createConfig } from "express-zod-api";
 
-createConfig({
-  // ...
-  cookies: {
-    secret: "my-secret", // optional, enables signed cookies
-    // decode: myDecode,  // optional custom decode function
+const config = createConfig({
+  cookies: { secret: "my-secret" }, // or true; the secret enables signedCookies
+  inputSources: {
+    get: ["query", "params", "cookies", "signedCookies"], // for methods of your choice
   },
 });
 ```
 
-### Using cookies as input source
-
-Once parsing is enabled, add `"cookies"` and/or `"signedCookies"` to your input sources:
+Consider `createCookieMiddleware()` that makes a Middleware providing `setCookie()` and `clearCookie()` helpers:
 
 ```ts
-createConfig({
-  inputSources: {
-    get: ["query", "params", "cookies", "signedCookies"],
+import { createCookieMiddleware } from "express-zod-api";
+
+const cookieAssistingFactory = factory.addMiddleware(
+  createCookieMiddleware({ httpOnly: true, path: "/" }), // base options
+);
+
+const sessionSettingEndpoint = cookieAssistingFactory.buildVoid({
+  handler: async ({ ctx: { setCookie } }) => {
+    setCookie("session", "abc123", { httpOnly: false }); // overriden options
   },
-  cookies: { secret: "my-secret" },
 });
 ```
 
-For signed cookies to work, you must provide a `secret`. When both sources are enabled and a key exists in both, `signedCookies` takes priority.
-
-### Declaring cookie security schema
-
-Use `CookieSecurity` in your middleware to document cookie-based authentication:
+When handling cookies in a Middleware, declare its security to improve [Documentation](#creating-documentation):
 
 ```ts
 import { Middleware } from "express-zod-api";
-import { z } from "zod";
 
 new Middleware({
   security: { type: "cookie", name: "session" },
   input: z.object({ session: z.string() }),
-  handler: async ({ input: { session } }) => {
-    // validate session
-    return { userId: "abc" };
-  },
-});
-```
-
-### Setting cookies via middleware
-
-The `createCookieMiddleware(options?)` creates a middleware that exposes `setCookie` and `clearCookie` in the context. Base options are applied to every call; per-call options override them:
-
-```ts
-import {
-  createCookieMiddleware,
-  EndpointsFactory,
-  defaultResultHandler,
-} from "express-zod-api";
-
-const factory = new EndpointsFactory(defaultResultHandler).addMiddleware(
-  createCookieMiddleware({ httpOnly: true, path: "/" }),
-);
-
-const setSession = factory.build({
-  method: "post",
-  path: "/session",
-  output: z.object({ success: z.boolean() }),
-  handler: async ({ ctx: { setCookie } }) => {
-    setCookie("session", "abc123", { httpOnly: false }); // overrides base
-    return { success: true };
-  },
 });
 ```
 
