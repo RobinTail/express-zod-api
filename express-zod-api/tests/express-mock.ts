@@ -3,7 +3,7 @@ const expressRawMock = vi.fn();
 const expressUrlencodedMock = vi.fn();
 const compressionMock = vi.fn();
 const fileUploadMock = vi.fn();
-const cookieParserMock = vi.fn(() => vi.fn());
+const cookieParserMock = vi.fn();
 
 vi.mock("compression", () => ({ default: compressionMock }));
 vi.mock("express-fileupload", () => ({ default: fileUploadMock }));
