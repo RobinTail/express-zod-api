@@ -280,15 +280,7 @@ describe("Server", () => {
         startupLogo: false,
         logger: { level: "warn" },
       } satisfies ServerConfig;
-      const routingMock = {
-        v1: {
-          test: new EndpointsFactory(defaultResultHandler).build({
-            output: z.object({}),
-            handler: vi.fn(),
-          }),
-        },
-      };
-      await createServer(configMock, routingMock);
+      await createServer(configMock, {});
       expect(appMock.use).toHaveBeenCalledTimes(3);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
@@ -304,15 +296,7 @@ describe("Server", () => {
           startupLogo: false,
           logger: { level: "warn" },
         } satisfies ServerConfig;
-        const routingMock = {
-          v1: {
-            test: new EndpointsFactory(defaultResultHandler).build({
-              output: z.object({}),
-              handler: vi.fn(),
-            }),
-          },
-        };
-        await createServer(configMock, routingMock);
+        await createServer(configMock, {});
         expect(appMock.use).toHaveBeenCalledTimes(3);
         expect(cookieParserMock).toHaveBeenCalledTimes(1);
         expect(cookieParserMock).toHaveBeenCalledWith(
