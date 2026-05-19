@@ -1,6 +1,6 @@
 import { Middleware } from "./middleware";
 import type { CookieOptions } from "express";
-import type { FlatObject } from "./common-helpers";
+import type { z } from "zod";
 
 /**
  * @desc Creates a Middleware providing cookie-setting convenience methods.
@@ -11,10 +11,10 @@ import type { FlatObject } from "./common-helpers";
 export const createCookieMiddleware = (baseOptions?: CookieOptions) =>
   new Middleware({
     handler: async ({ response }) => ({
-      /** @desc Sets a cookie on the response. Express converts object values to JSON. */
+      /** @desc Sets a cookie on the response. Express converts non-string values to JSON. */
       setCookie: (
         name: string,
-        value: string | FlatObject,
+        value: string | z.core.util.JSONType,
         overrides?: CookieOptions,
       ) => {
         response.cookie(name, value, { ...baseOptions, ...overrides });
