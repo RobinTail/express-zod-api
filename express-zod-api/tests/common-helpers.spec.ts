@@ -225,8 +225,10 @@ describe("Common Helpers", () => {
     });
 
     test("should include cookies when enabled in user-defined sources", () => {
-      const req = makeRequestMock({ method: "GET" });
-      req.cookies = { session: "abc", theme: "dark" };
+      const req = makeRequestMock({
+        method: "GET",
+        cookies: { session: "abc", theme: "dark" },
+      });
       expect(getInput(req, { get: ["query", "cookies"] })).toEqual({
         session: "abc",
         theme: "dark",
@@ -234,17 +236,21 @@ describe("Common Helpers", () => {
     });
 
     test("should include signedCookies when enabled in user-defined sources", () => {
-      const req = makeRequestMock({ method: "GET" });
-      req.signedCookies = { session: "signed-abc" };
+      const req = makeRequestMock({
+        method: "GET",
+        signedCookies: { session: "signed-abc" },
+      });
       expect(getInput(req, { get: ["query", "signedCookies"] })).toEqual({
         session: "signed-abc",
       });
     });
 
     test("should merge cookies and signedCookies with signed overriding unsigned", () => {
-      const req = makeRequestMock({ method: "GET" });
-      req.cookies = { session: "unsigned", theme: "dark" };
-      req.signedCookies = { session: "signed" };
+      const req = makeRequestMock({
+        method: "GET",
+        cookies: { session: "unsigned", theme: "dark" },
+        signedCookies: { session: "signed" },
+      });
       expect(
         getInput(req, { get: ["query", "cookies", "signedCookies"] }),
       ).toEqual({ session: "signed", theme: "dark" });
