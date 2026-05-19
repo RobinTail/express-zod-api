@@ -368,7 +368,7 @@ describe("Documentation helpers", () => {
       { name: "authorization", expected: true },
       {
         name: "secure",
-        familiar: ["secure"],
+        familiar: new Set(["secure"]),
         expected: true,
       },
       { name: "unknown", expected: false },
@@ -464,7 +464,7 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["query", "headers", "params"],
           composition: "inline",
-          security: [[{ type: "header", name: "secure" }]],
+          securityHeaders: new Set(["secure"]),
           ...requestCtx,
         }),
       ).toMatchSnapshot();
@@ -483,7 +483,7 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["query", "cookies", "params"],
           composition: "inline",
-          security: [[{ type: "cookie", name: "session" }]],
+          securityCookies: new Set(["session"]),
           ...requestCtx,
         }),
       ).toMatchSnapshot();
