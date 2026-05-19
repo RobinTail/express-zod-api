@@ -2,7 +2,7 @@ import { Middleware } from "./middleware";
 import type { CookieOptions } from "express";
 
 /**
- * @desc Creates a middleware providing cookie-setting convenience methods.
+ * @desc Creates a Middleware providing cookie-setting convenience methods.
  * @param baseOptions — Default options applied to every setCookie / clearCookie call.
  * @desc Per-call options are spread over base options, so you can override them individually.
  * @example createCookieMiddleware()
