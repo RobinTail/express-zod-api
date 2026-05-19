@@ -5,7 +5,6 @@ import type { z } from "zod";
 /**
  * @desc Creates a Middleware providing cookie-setting convenience methods.
  * @param baseOptions — Default options applied to every setCookie / clearCookie call.
- * @example createCookieMiddleware()
  * @example createCookieMiddleware({ httpOnly: true, secure: true, path: "/" })
  */
 export const createCookieMiddleware = (baseOptions?: CookieOptions) =>
