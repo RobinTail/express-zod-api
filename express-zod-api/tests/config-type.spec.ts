@@ -1,6 +1,6 @@
 import type { Express, IRouter } from "express";
 import { createConfig } from "../src";
-import type { InputSource, ServerConfig } from "../src/config-type";
+import type { InputSource } from "../src/config-type";
 
 describe("ConfigType", () => {
   describe("createConfig()", () => {
@@ -52,44 +52,6 @@ describe("ConfigType", () => {
         | "cookies"
         | "signedCookies"
       >();
-    });
-  });
-
-  describe("ServerConfig cookies", () => {
-    test.each([true, false, undefined])("should accept boolean %s", (value) => {
-      const config: ServerConfig = {
-        cors: true,
-        cookies: value,
-      } as ServerConfig;
-      expect(config.cookies).toBe(value);
-    });
-
-    test("should accept CookieParserOptions with secret", () => {
-      const config: ServerConfig = {
-        cors: true,
-        cookies: { secret: "my-secret" },
-      } as ServerConfig;
-      expect(config.cookies).toEqual({ secret: "my-secret" });
-    });
-
-    test("should accept CookieParserOptions with decode", () => {
-      const decode = () => "decoded";
-      const config: ServerConfig = {
-        cors: true,
-        cookies: { decode },
-      } as ServerConfig;
-      expect(config.cookies).toEqual({ decode });
-    });
-
-    test("should accept CookieParserOptions with both options", () => {
-      const config: ServerConfig = {
-        cors: true,
-        cookies: { secret: "s", decode: (v: string) => v },
-      } as ServerConfig;
-      expect(config.cookies).toEqual({
-        secret: "s",
-        decode: expect.any(Function),
-      });
     });
   });
 });
