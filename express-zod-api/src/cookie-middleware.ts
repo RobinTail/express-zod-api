@@ -26,7 +26,11 @@ export const createCookieMiddleware = (baseOptions?: CookieOptions) =>
         response.cookie(name, value, { ...baseOptions, ...overrides });
       },
       /** @desc Clears a cookie on the response. */
-      clearCookie: (name: string, overrides?: CookieOptions) => {
+      clearCookie: (
+        name: string,
+        /** Express ignores certain options: expires, maxAge */
+        overrides?: Omit<CookieOptions, "expires" | "maxAge">,
+      ) => {
         response.clearCookie(name, { ...baseOptions, ...overrides });
       },
     }),

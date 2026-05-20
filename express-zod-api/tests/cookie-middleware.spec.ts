@@ -42,13 +42,11 @@ describe("Cookie middleware", () => {
           options: {
             ...baseOptions,
             path: "/",
-            expires: expect.any(Date), // unstable
+            expires: expect.any(Date),
           },
           value: "",
         });
-        expect(
-          Number(responseMock.cookies["session"].options.expires),
-        ).toBeLessThan(10); // usually 1
+        expect(Number(responseMock.cookies["session"].options.expires)).toBe(1);
       },
     );
   });
