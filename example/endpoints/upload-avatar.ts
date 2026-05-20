@@ -2,6 +2,8 @@ import { z } from "zod";
 import { ez } from "express-zod-api";
 import { createHash } from "node:crypto";
 import { cookieAuthenticatedFactory } from "../factories.ts";
+import assert from "node:assert/strict";
+import createHttpError from "http-errors";
 
 /** @desc The endpoint demonstrates handling a file upload and cookie as an input source */
 export const uploadAvatarEndpoint = cookieAuthenticatedFactory.build({
@@ -19,7 +21,7 @@ export const uploadAvatarEndpoint = cookieAuthenticatedFactory.build({
     otherInputs: z.record(z.string(), z.any()),
   }),
   handler: async ({ input: { avatar, ...rest }, ctx: { session } }) => {
-    if (!session.token) throw new Error("Unauthorized");
+    assert(session.token, createHttpError(401, "Unauthorized"));
     return {
       name: avatar.name,
       size: avatar.size,
