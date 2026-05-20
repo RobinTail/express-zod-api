@@ -3,6 +3,7 @@ import { givePort } from "../../tools/ports";
 import {
   appMock,
   compressionMock,
+  cookieParserMock,
   expressJsonMock,
   expressUrlencodedMock,
   expressMock,
@@ -279,19 +280,31 @@ describe("Server", () => {
         startupLogo: false,
         logger: { level: "warn" },
       } satisfies ServerConfig;
-      const routingMock = {
-        v1: {
-          test: new EndpointsFactory(defaultResultHandler).build({
-            output: z.object({}),
-            handler: vi.fn(),
-          }),
-        },
-      };
-      await createServer(configMock, routingMock);
+      await createServer(configMock, {});
       expect(appMock.use).toHaveBeenCalledTimes(3);
       expect(compressionMock).toHaveBeenCalledTimes(1);
       expect(compressionMock).toHaveBeenCalledWith(undefined);
     });
+
+    test.each([true, { secret: "my-secret" }])(
+      "should enable cookie parser on demand %#",
+      async (cookies) => {
+        const configMock = {
+          http: { listen: givePort() },
+          cookies,
+          cors: true,
+          startupLogo: false,
+          logger: { level: "warn" },
+        } satisfies ServerConfig;
+        await createServer(configMock, {});
+        expect(appMock.use).toHaveBeenCalledTimes(3);
+        expect(cookieParserMock).toHaveBeenCalledTimes(1);
+        expect(cookieParserMock).toHaveBeenCalledWith(
+          typeof cookies === "object" ? cookies.secret : undefined,
+          undefined,
+        );
+      },
+    );
 
     test("should enable uploads on request", async () => {
       const configMock = {

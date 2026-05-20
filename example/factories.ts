@@ -7,7 +7,11 @@ import {
   EventStreamFactory,
   defaultEndpointsFactory,
 } from "express-zod-api";
-import { authMiddleware } from "./middlewares.ts";
+import {
+  authMiddleware,
+  cookieAssistingMiddleware,
+  sessionMiddleware,
+} from "./middlewares.ts";
 import { createReadStream } from "node:fs";
 import { z } from "zod";
 import { stat } from "node:fs/promises";
@@ -15,6 +19,15 @@ import { stat } from "node:fs/promises";
 /** @desc This factory extends the default one by enforcing the authentication using the specified middleware */
 export const keyAndTokenAuthenticatedEndpointsFactory =
   defaultEndpointsFactory.addMiddleware(authMiddleware);
+
+/** @desc This factory adds session read from cookie into context */
+export const cookieAuthenticatedFactory =
+  defaultEndpointsFactory.addMiddleware(sessionMiddleware);
+
+/** @desc This factory adds setCookie() helper to context */
+export const cookieAssistedFactory = defaultEndpointsFactory.addMiddleware(
+  cookieAssistingMiddleware,
+);
 
 /** @desc This factory sends the file as string located in the "data" property of the endpoint's output */
 export const fileSendingEndpointsFactory = new EndpointsFactory(

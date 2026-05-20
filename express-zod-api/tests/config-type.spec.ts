@@ -1,5 +1,6 @@
 import type { Express, IRouter } from "express";
 import { createConfig } from "../src";
+import type { InputSource } from "../src/config-type";
 
 describe("ConfigType", () => {
   describe("createConfig()", () => {
@@ -37,6 +38,20 @@ describe("ConfigType", () => {
       };
       const config = createConfig(argument);
       expect(config).toEqual(argument);
+    });
+  });
+
+  describe("InputSource", () => {
+    test("should list the selected properties of Request", () => {
+      expectTypeOf<InputSource>().toEqualTypeOf<
+        | "query"
+        | "body"
+        | "files"
+        | "params"
+        | "headers"
+        | "cookies"
+        | "signedCookies"
+      >();
     });
   });
 });

@@ -1,3 +1,10 @@
+import * as R from "ramda";
+import {
+  isLogicalAnd,
+  isLogicalOr,
+  type LogicalContainer,
+} from "./logical-container";
+
 export interface BasicSecurity {
   type: "basic";
 }
@@ -93,3 +100,23 @@ export type Security<K extends string = string, S extends string = string> =
   | CookieSecurity
   | OpenIdSecurity
   | OAuth2Security<S>;
+
+type NamedSecurityType = Extract<Security, { name: string }>["type"];
+
+const pickNames = (
+  container: LogicalContainer<Security>,
+  type: NamedSecurityType,
+): string[] => {
+  if (isLogicalAnd(container))
+    return R.chain((one) => pickNames(one, type), container.and);
+  if (isLogicalOr(container))
+    return R.chain((one) => pickNames(one, type), container.or);
+  if (container.type === type) return [container.name];
+  return [];
+};
+
+/** @desc Extract security names of a given type from logical containers without generating combinations */
+export const getSecurityNames = (
+  containers: LogicalContainer<Security>[],
+  type: NamedSecurityType,
+): Set<string> => new Set(R.chain((one) => pickNames(one, type), containers));

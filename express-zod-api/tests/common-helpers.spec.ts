@@ -223,6 +223,31 @@ describe("Common Helpers", () => {
         "x-request-id": "test",
       });
     });
+
+    test.each([
+      {
+        cookies: { session: "abc", theme: "dark" },
+      },
+      {
+        signedCookies: { session: "signed-abc" },
+      },
+      {
+        cookies: { session: "unsigned", theme: "dark" },
+        signedCookies: { session: "signed" },
+      },
+      {}, // graceful handling expected
+    ])("should include cookies when enabled %#", (props) => {
+      const req = makeRequestMock({
+        method: "GET",
+        ...props,
+      });
+      expect(
+        getInput(req, { get: ["query", "cookies", "signedCookies"] }),
+      ).toEqual({
+        ...props.cookies,
+        ...props.signedCookies,
+      });
+    });
   });
 
   describe("getMessageFromError()", () => {

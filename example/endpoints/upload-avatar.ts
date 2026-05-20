@@ -1,8 +1,12 @@
 import { z } from "zod";
-import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { ez } from "express-zod-api";
 import { createHash } from "node:crypto";
+import { cookieAuthenticatedFactory } from "../factories.ts";
+import assert from "node:assert/strict";
+import createHttpError from "http-errors";
 
-export const uploadAvatarEndpoint = defaultEndpointsFactory.build({
+/** @desc The endpoint demonstrates handling a file upload and cookie as an input source */
+export const uploadAvatarEndpoint = cookieAuthenticatedFactory.build({
   method: "post",
   tag: "files",
   description: "Handles a file upload.",
@@ -16,11 +20,14 @@ export const uploadAvatarEndpoint = defaultEndpointsFactory.build({
     hash: z.string(),
     otherInputs: z.record(z.string(), z.any()),
   }),
-  handler: async ({ input: { avatar, ...rest } }) => ({
-    name: avatar.name,
-    size: avatar.size,
-    mime: avatar.mimetype,
-    hash: createHash("sha1").update(avatar.data).digest("hex"),
-    otherInputs: rest,
-  }),
+  handler: async ({ input: { avatar, ...rest }, ctx: { session } }) => {
+    assert(session.token, createHttpError(401, "Unauthorized"));
+    return {
+      name: avatar.name,
+      size: avatar.size,
+      mime: avatar.mimetype,
+      hash: createHash("sha1").update(avatar.data).digest("hex"),
+      otherInputs: rest,
+    };
+  },
 });

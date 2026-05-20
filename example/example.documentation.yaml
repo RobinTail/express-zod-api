@@ -466,6 +466,79 @@ paths:
           description: HEAD /v1/user/list Positive response
         "400":
           description: HEAD /v1/user/list Negative response
+  /v1/login:
+    post:
+      operationId: PostV1Login
+      tags:
+        - cookies
+      requestBody:
+        description: POST /v1/login Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  minLength: 1
+                password:
+                  type: string
+                  minLength: 1
+              required:
+                - username
+                - password
+        required: true
+      responses:
+        "200":
+          description: POST /v1/login Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                    additionalProperties: false
+                required:
+                  - status
+                  - data
+                additionalProperties: false
+        "400":
+          description: POST /v1/login Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                    additionalProperties: false
+                required:
+                  - status
+                  - error
+                additionalProperties: false
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
   /v1/avatar/send:
     get:
       operationId: GetV1AvatarSend
@@ -571,6 +644,18 @@ paths:
       description: Handles a file upload.
       tags:
         - files
+      parameters:
+        - name: session
+          in: cookie
+          required: true
+          description: POST /v1/avatar/upload Parameter
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+            required:
+              - token
       requestBody:
         description: POST /v1/avatar/upload Request body
         content:
@@ -583,8 +668,9 @@ paths:
                   format: binary
               required:
                 - avatar
-              additionalProperties: {}
         required: true
+      security:
+        - APIKEY_3: []
       responses:
         "200":
           description: POST /v1/avatar/upload Positive response
@@ -1068,6 +1154,10 @@ components:
       type: apiKey
       in: header
       name: token
+    APIKEY_3:
+      type: apiKey
+      in: cookie
+      name: session
   links: {}
   callbacks: {}
 tags:

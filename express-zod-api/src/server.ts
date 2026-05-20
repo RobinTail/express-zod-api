@@ -14,6 +14,7 @@ import { loadPeer } from "./peer-helpers";
 import { defaultResultHandler } from "./result-handler";
 import { initRouting, type Parsers, type Routing } from "./routing";
 import {
+  createCookieParser,
   createLoggingMiddleware,
   createNotFoundHandler,
   createCatcher,
@@ -78,6 +79,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
       ),
     );
   }
+  if (config.cookies) app.use(await createCookieParser({ config }));
   await config.beforeRouting?.({ app, getLogger });
 
   const parsers: Parsers = {

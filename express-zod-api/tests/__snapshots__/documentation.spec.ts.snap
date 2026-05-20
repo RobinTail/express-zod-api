@@ -1343,6 +1343,119 @@ servers:
 "
 `;
 
+exports[`Documentation > Basic cases > should handle CookieSecurity in params and security section 1`] = `
+"openapi: 3.1.0
+info:
+  title: Testing CookieSecurity
+  version: 3.4.5
+paths:
+  /v1/getSomething:
+    get:
+      operationId: GetV1GetSomething
+      parameters:
+        - name: session
+          in: cookie
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: true
+          description: GET /v1/getSomething Parameter
+          schema:
+            type: number
+      security:
+        - APIKEY_1: []
+      responses:
+        "200":
+          description: GET /v1/getSomething Positive response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: success
+                  data:
+                    type: object
+                    properties: {}
+                    additionalProperties: false
+                required:
+                  - status
+                  - data
+                additionalProperties: false
+        "400":
+          description: GET /v1/getSomething Negative response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    const: error
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                      - message
+                    additionalProperties: false
+                required:
+                  - status
+                  - error
+                additionalProperties: false
+              examples:
+                example1:
+                  value:
+                    status: error
+                    error:
+                      message: Sample error message
+    head:
+      operationId: HeadV1GetSomething
+      parameters:
+        - name: session
+          in: cookie
+          required: true
+          description: HEAD /v1/getSomething Parameter
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: true
+          description: HEAD /v1/getSomething Parameter
+          schema:
+            type: number
+      security:
+        - APIKEY_1: []
+      responses:
+        "200":
+          description: HEAD /v1/getSomething Positive response
+        "400":
+          description: HEAD /v1/getSomething Negative response
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes:
+    APIKEY_1:
+      type: apiKey
+      in: cookie
+      name: session
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://example.com
+"
+`;
+
 exports[`Documentation > Basic cases > should handle bigint, boolean, date, null and readonly 1`] = `
 "openapi: 3.1.0
 info:

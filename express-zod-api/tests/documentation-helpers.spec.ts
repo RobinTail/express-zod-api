@@ -368,7 +368,7 @@ describe("Documentation helpers", () => {
       { name: "authorization", expected: true },
       {
         name: "secure",
-        familiar: ["secure"],
+        familiar: new Set(["secure"]),
         expected: true,
       },
       { name: "unknown", expected: false },
@@ -464,7 +464,26 @@ describe("Documentation helpers", () => {
           },
           inputSources: ["query", "headers", "params"],
           composition: "inline",
-          security: [[{ type: "header", name: "secure" }]],
+          securityHeaders: new Set(["secure"]),
+          ...requestCtx,
+        }),
+      ).toMatchSnapshot();
+    });
+
+    test("should depict cookie params when enabled via CookieSecurity", () => {
+      expect(
+        depictRequestParams({
+          request: {
+            properties: {
+              session: { type: "string" },
+              page: { type: "string" },
+            },
+            required: ["session", "page"],
+            type: "object",
+          },
+          inputSources: ["query", "cookies", "params"],
+          composition: "inline",
+          securityCookies: new Set(["session"]),
           ...requestCtx,
         }),
       ).toMatchSnapshot();

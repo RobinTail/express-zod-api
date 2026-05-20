@@ -1,6 +1,7 @@
 import type compression from "compression";
 import type { IRouter, Request, RequestHandler } from "express";
 import type fileUpload from "express-fileupload";
+import type cookieParser from "cookie-parser";
 import type { ServerOptions } from "node:https";
 import type { BuiltinLoggerConfig } from "./builtin-logger";
 import type { AbstractEndpoint } from "./endpoint";
@@ -12,7 +13,13 @@ import type { GetLogger } from "./server-helpers";
 
 export type InputSource = keyof Pick<
   Request,
-  "query" | "body" | "files" | "params" | "headers"
+  | "query"
+  | "body"
+  | "files"
+  | "params"
+  | "headers"
+  | "cookies"
+  | "signedCookies"
 >;
 export type InputSources = Record<Method, InputSource[]>;
 
@@ -123,6 +130,11 @@ type UploadOptions = Pick<
   beforeUpload?: BeforeUpload;
 };
 
+interface CookieParserOptions extends cookieParser.CookieParseOptions {
+  /** @desc The secret string or array used by cookie-parser for signed cookies */
+  secret?: Parameters<typeof cookieParser>[0];
+}
+
 type CompressionOptions = Pick<
   compression.CompressionOptions,
   "threshold" | "level" | "strategy" | "chunkSize" | "memLevel"
@@ -181,6 +193,13 @@ export interface ServerConfig extends CommonConfig {
    * @requires compression
    */
   compression?: boolean | CompressionOptions;
+  /**
+   * @desc Enable cookie parsing via cookie-parser.
+   * @requires cookie-parser
+   * @example true
+   * @example { secret: "my-secret" }
+   */
+  cookies?: boolean | CookieParserOptions;
   /**
    * @desc Configure or customize the parser for request query string
    * @example "simple" // for "node:querystring" module, array elements must be repeated: ?a=1&a=2

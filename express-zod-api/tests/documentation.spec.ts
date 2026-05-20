@@ -581,6 +581,34 @@ describe("Documentation", () => {
       expect(spec).toMatchSnapshot();
     });
 
+    test("should handle CookieSecurity in params and security section", () => {
+      const mw = new Middleware({
+        security: { type: "cookie", name: "session" },
+        handler: vi.fn(),
+      });
+      const spec = new Documentation({
+        config: createConfig({
+          cors: true,
+          inputSources: { get: ["query", "cookies"] },
+        }),
+        routing: {
+          v1: {
+            getSomething: defaultEndpointsFactory.addMiddleware(mw).buildVoid({
+              input: z.object({
+                session: z.string(),
+                page: z.number(),
+              }),
+              handler: vi.fn(),
+            }),
+          },
+        },
+        version: "3.4.5",
+        title: "Testing CookieSecurity",
+        serverUrl: "https://example.com",
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
     test("should ensure the uniq operation ids", () => {
       const spec = new Documentation({
         config: sampleConfig,

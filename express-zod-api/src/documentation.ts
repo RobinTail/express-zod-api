@@ -15,6 +15,7 @@ import { getInputSources, makeCleanId } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
 import { processContainers } from "./logical-container";
 import type { ClientMethod } from "./method";
+import { getSecurityNames } from "./security";
 import {
   depictBody,
   depictRequestParams,
@@ -202,12 +203,12 @@ export class Documentation extends OpenApiBuilder {
       );
 
       const request = depictRequest({ ...commons, schema: inputSchema });
-      const security = processContainers(endpoint.security);
       const depictedParams = depictRequestParams({
         ...commons,
         inputSources,
         isHeader,
-        security,
+        securityHeaders: getSecurityNames(endpoint.security, "header"),
+        securityCookies: getSecurityNames(endpoint.security, "cookie"),
         request,
         description: descriptions?.requestParameter?.({
           method,
@@ -256,7 +257,7 @@ export class Documentation extends OpenApiBuilder {
         : undefined;
 
       const securityRefs = depictSecurityRefs(
-        depictSecurity(security, inputSources),
+        depictSecurity(processContainers(endpoint.security), inputSources),
         scopes,
         (securitySchema) => {
           const name = this.#ensureUniqSecuritySchemaName(securitySchema);

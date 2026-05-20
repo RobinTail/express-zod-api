@@ -34,17 +34,18 @@ Start your API server with I/O schema validation and custom middlewares in minut
    15. [Child logger](#child-logger)
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
-   2. [Headers as input source](#headers-as-an-input-source)
-   3. [Response customization](#response-customization)
-   4. [Empty response](#empty-response)
-   5. [Non-JSON response](#non-json-response) including file downloads
-   6. [Error handling](#error-handling)
-   7. [Production mode](#production-mode)
-   8. [HTML Forms (URL encoded)](#html-forms-url-encoded)
-   9. [File uploads](#file-uploads)
-   10. [Connect to your own express app](#connect-to-your-own-express-app)
-   11. [Testing endpoints](#testing-endpoints)
-   12. [Testing middlewares](#testing-middlewares)
+   2. [Headers as an input source](#headers-as-an-input-source)
+   3. [Cookies](#cookies)
+   4. [Response customization](#response-customization)
+   5. [Empty response](#empty-response)
+   6. [Non-JSON response](#non-json-response) including file downloads
+   7. [Error handling](#error-handling)
+   8. [Production mode](#production-mode)
+   9. [HTML Forms (URL encoded)](#html-forms-url-encoded)
+   10. [File uploads](#file-uploads)
+   11. [Connect to your own express app](#connect-to-your-own-express-app)
+   12. [Testing endpoints](#testing-endpoints)
+   13. [Testing middlewares](#testing-middlewares)
 6. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [End-to-End Type Safety](#end-to-end-type-safety)
@@ -815,6 +816,49 @@ factory.build({
     "x-request-id": z.string(), // this one is from request.headers
     id: z.string(), // this one is from request.query
   }), // ...
+});
+```
+
+## Cookies
+
+Install `cookie-parser` as well as `@types/cookie-parser` and enable `cookies` in your config. To validate cookies add
+`"cookies"` and/or `"signedCookies"` to your `inputSources` (the order [matters](#customizing-input-sources)!):
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  cookies: { secret: "my-secret" }, // or true; the secret enables signedCookies
+  inputSources: {
+    get: ["query", "params", "cookies", "signedCookies"], // for methods of your choice
+  },
+});
+```
+
+Consider `createCookieMiddleware()` that makes a Middleware providing `setCookie()` and `clearCookie()` helpers,
+as well as `getCookie()` — alternative to the cookies as an input source:
+
+```ts
+import { createCookieMiddleware, Middleware } from "express-zod-api";
+
+const cookieDrivenFactory = factory
+  .addMiddleware(
+    createCookieMiddleware({ httpOnly: true, sameSite: "lax", path: "/" }), // recommended base options
+  )
+  .addMiddleware(
+    new Middleware({
+      security: { type: "cookie", name: "session" }, // improves Documentation
+      input: z.object({ session: z.string() }), // alternatively, use getCookie
+      handler: async ({ input: { session }, ctx: { getCookie } }) => {
+        assert.equal(session, getCookie("session")); // getCookie reads from signedCookies first
+      },
+    }),
+  );
+
+const sessionSettingEndpoint = cookieDrivenFactory.buildVoid({
+  handler: async ({ ctx: { getCookie, setCookie } }) => {
+    setCookie("session", "abc123", { httpOnly: false }); // overridden cookie options
+  },
 });
 ```
 

@@ -205,6 +205,38 @@ interface HeadV1UserListNegativeResponseVariants {
   400: HeadV1UserListNegativeVariant1;
 }
 
+/** post /v1/login */
+type PostV1LoginInput = {
+  username: string;
+  password: string;
+};
+
+/** post /v1/login */
+type PostV1LoginPositiveVariant1 = {
+  status: "success";
+  data: {
+    message: string;
+  };
+};
+
+/** post /v1/login */
+interface PostV1LoginPositiveResponseVariants {
+  200: PostV1LoginPositiveVariant1;
+}
+
+/** post /v1/login */
+type PostV1LoginNegativeVariant1 = {
+  status: "error";
+  error: {
+    message: string;
+  };
+};
+
+/** post /v1/login */
+interface PostV1LoginNegativeResponseVariants {
+  400: PostV1LoginNegativeVariant1;
+}
+
 /** get /v1/avatar/send */
 type GetV1AvatarSendInput = {
   userId: string;
@@ -291,6 +323,9 @@ interface HeadV1AvatarStreamNegativeResponseVariants {
 
 /** post /v1/avatar/upload */
 type PostV1AvatarUploadInput = {
+  session: {
+    token: string;
+  };
   avatar: any;
 };
 
@@ -513,6 +548,7 @@ export type Path =
   | "/v1/user/:id"
   | "/v1/user/create"
   | "/v1/user/list"
+  | "/v1/login"
   | "/v1/avatar/send"
   | "/v1/avatar/stream"
   | "/v1/avatar/upload"
@@ -531,6 +567,7 @@ export interface Input {
   "post /v1/user/create": PostV1UserCreateInput;
   "get /v1/user/list": GetV1UserListInput;
   "head /v1/user/list": HeadV1UserListInput;
+  "post /v1/login": PostV1LoginInput;
   /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendInput;
   /** @deprecated */
@@ -554,6 +591,7 @@ export interface PositiveResponse {
   "post /v1/user/create": SomeOf<PostV1UserCreatePositiveResponseVariants>;
   "get /v1/user/list": SomeOf<GetV1UserListPositiveResponseVariants>;
   "head /v1/user/list": SomeOf<HeadV1UserListPositiveResponseVariants>;
+  "post /v1/login": SomeOf<PostV1LoginPositiveResponseVariants>;
   /** @deprecated */
   "get /v1/avatar/send": SomeOf<GetV1AvatarSendPositiveResponseVariants>;
   /** @deprecated */
@@ -577,6 +615,7 @@ export interface NegativeResponse {
   "post /v1/user/create": SomeOf<PostV1UserCreateNegativeResponseVariants>;
   "get /v1/user/list": SomeOf<GetV1UserListNegativeResponseVariants>;
   "head /v1/user/list": SomeOf<HeadV1UserListNegativeResponseVariants>;
+  "post /v1/login": SomeOf<PostV1LoginNegativeResponseVariants>;
   /** @deprecated */
   "get /v1/avatar/send": SomeOf<GetV1AvatarSendNegativeResponseVariants>;
   /** @deprecated */
@@ -607,6 +646,8 @@ export interface EncodedResponse {
     GetV1UserListNegativeResponseVariants;
   "head /v1/user/list": HeadV1UserListPositiveResponseVariants &
     HeadV1UserListNegativeResponseVariants;
+  "post /v1/login": PostV1LoginPositiveResponseVariants &
+    PostV1LoginNegativeResponseVariants;
   /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendPositiveResponseVariants &
     GetV1AvatarSendNegativeResponseVariants;
@@ -655,6 +696,9 @@ export interface Response {
   "head /v1/user/list":
     | PositiveResponse["head /v1/user/list"]
     | NegativeResponse["head /v1/user/list"];
+  "post /v1/login":
+    | PositiveResponse["post /v1/login"]
+    | NegativeResponse["post /v1/login"];
   /** @deprecated */
   "get /v1/avatar/send":
     | PositiveResponse["get /v1/avatar/send"]
@@ -702,6 +746,7 @@ export const endpointTags = {
   "post /v1/user/create": ["users"],
   "get /v1/user/list": ["users"],
   "head /v1/user/list": ["users"],
+  "post /v1/login": ["cookies"],
   "get /v1/avatar/send": ["files", "users"],
   "head /v1/avatar/send": ["files", "users"],
   "get /v1/avatar/stream": ["users", "files"],
