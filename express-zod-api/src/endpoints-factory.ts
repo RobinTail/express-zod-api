@@ -22,9 +22,10 @@ import {
   Middleware,
 } from "./middleware";
 import {
-  AbstractResultHandler,
+  type Result,
   arrayResultHandler,
   defaultResultHandler,
+  ResultHandler,
 } from "./result-handler";
 
 interface BuildProps<
@@ -73,10 +74,11 @@ export class EndpointsFactory<
   IN extends IOSchema | undefined = undefined,
   CTX extends FlatObject = EmptyObject,
   SCO extends string = string,
+  OUT extends IOSchema = IOSchema,
 > {
   protected schema = undefined as IN;
   protected middlewares: AbstractMiddleware[] = [];
-  constructor(protected resultHandler: AbstractResultHandler) {}
+  constructor(protected resultHandler: ResultHandler<Result, Result, OUT>) {}
 
   #extend<
     AIN extends IOSchema | undefined,
@@ -86,7 +88,8 @@ export class EndpointsFactory<
     const factory = new EndpointsFactory<
       Extension<IN, AIN>,
       (CTX extends EmptyObject ? RET : CTX) & RET,
-      SCO & ASCO
+      SCO & ASCO,
+      OUT
     >(this.resultHandler);
     factory.middlewares = this.middlewares.concat(middleware);
     factory.schema = ensureExtension(this.schema, middleware.schema);
@@ -121,7 +124,7 @@ export class EndpointsFactory<
     return this.#extend(new Middleware({ handler: getContext }));
   }
 
-  public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({
+  public build<BOUT extends OUT, BIN extends IOSchema = EmptySchema>({
     input = emptySchema as unknown as BIN,
     output: outputSchema,
     operationId,
@@ -153,18 +156,20 @@ export class EndpointsFactory<
   }
 
   /** @desc shorthand for returning {} while having output schema z.object({}) */
-  public buildVoid<BIN extends IOSchema = EmptySchema>({
-    handler,
-    ...rest
-  }: Omit<BuildProps<BIN, z.ZodVoid, IN, CTX, SCO>, "output">) {
+  public buildVoid<BIN extends IOSchema = EmptySchema>(
+    ...args: EmptySchema extends OUT
+      ? [params: Omit<BuildProps<BIN, z.ZodVoid, IN, CTX, SCO>, "output">]
+      : never
+  ): Endpoint<FinalInputSchema<IN, BIN>, EmptySchema, CTX> {
+    const [{ handler, ...rest }] = args;
     return this.build({
       ...rest,
-      output: emptySchema,
+      output: emptySchema as unknown as OUT,
       handler: async (props) => {
         await handler(props);
-        return {};
+        return {} as unknown as z.input<OUT>;
       },
-    });
+    }) as unknown as Endpoint<FinalInputSchema<IN, BIN>, EmptySchema, CTX>;
   }
 }
 
