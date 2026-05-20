@@ -822,7 +822,7 @@ factory.build({
 ## Cookies
 
 Install `cookie-parser` as well as `@types/cookie-parser` and enable `cookies` in your config. To validate cookies add
-`"cookies"` and/or `"signedCookies"` to your `inputSources`:
+`"cookies"` and/or `"signedCookies"` to your `inputSources` (the order [matters](#customizing-input-sources)!):
 
 ```ts
 import { createConfig } from "express-zod-api";
@@ -843,7 +843,7 @@ import { createCookieMiddleware, Middleware } from "express-zod-api";
 
 const cookieDrivenFactory = factory
   .addMiddleware(
-    createCookieMiddleware({ httpOnly: true, path: "/" }), // base options
+    createCookieMiddleware({ httpOnly: true, sameSite: "lax", path: "/" }), // recommended base options
   )
   .addMiddleware(
     new Middleware({
