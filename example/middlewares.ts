@@ -34,7 +34,11 @@ export const sessionMiddleware = new Middleware({
 });
 
 /** @desc This middleware provides setCookie() helper to context */
-export const cookieAssistingMiddleware = createCookieMiddleware({ path: "/" });
+export const cookieAssistingMiddleware = createCookieMiddleware({
+  httpOnly: true,
+  sameSite: "lax",
+  path: "/",
+});
 
 export const methodProviderMiddleware = new Middleware({
   handler: async ({ request }) => ({
