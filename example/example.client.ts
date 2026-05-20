@@ -215,7 +215,6 @@ type PostV1LoginInput = {
 type PostV1LoginPositiveVariant1 = {
   status: "success";
   data: {
-    success: boolean;
     message: string;
   };
 };

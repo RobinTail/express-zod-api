@@ -330,7 +330,7 @@ describe("Example", async () => {
       });
       expect(response.status).toBe(200);
       expect(await response.json()).toEqual({
-        data: { message: "Logged in", success: true },
+        data: { message: "Logged in" },
         status: "success",
       });
       expect(response.headers.get("set-cookie")).toMatch(/^session=j/);
