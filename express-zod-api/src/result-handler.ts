@@ -155,13 +155,8 @@ globalRegistry.add(arrayNegativeSchema, {
  * @desc This handler expects your endpoint to have the property 'items' in the output object schema
  * */
 export const arrayResultHandler = new ResultHandler({
-  positive: (output) => {
-    const responseSchema =
-      output instanceof z.ZodObject &&
-      "items" in output.shape &&
-      output.shape.items instanceof z.ZodArray
-        ? output.shape.items
-        : z.array(z.any());
+  positive: (output: z.ZodObject<{ items: z.ZodArray<z.ZodTypeAny> }>) => {
+    const responseSchema = output.shape.items;
     if (getExamples(responseSchema).length) return responseSchema; // has examples on the items, or pull down:
     const examples = getExamples(output)
       .filter(
