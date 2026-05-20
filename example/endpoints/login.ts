@@ -9,8 +9,8 @@ export const loginEndpoint = cookieAssistedFactory.build({
   method: "post",
   tag: "cookies",
   input: z.object({
-    username: z.string().optional(),
-    password: z.string().optional(),
+    username: z.string().trim().nonempty(),
+    password: z.string().trim().nonempty(),
   }),
   output: z.object({ message: z.string() }),
   handler: async ({ input: { username, password }, ctx: { setCookie } }) => {

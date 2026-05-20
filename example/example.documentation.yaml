@@ -480,8 +480,14 @@ paths:
               properties:
                 username:
                   type: string
+                  minLength: 1
                 password:
                   type: string
+                  minLength: 1
+              required:
+                - username
+                - password
+        required: true
       responses:
         "200":
           description: POST /v1/login Positive response

@@ -207,8 +207,8 @@ interface HeadV1UserListNegativeResponseVariants {
 
 /** post /v1/login */
 type PostV1LoginInput = {
-  username?: string | undefined;
-  password?: string | undefined;
+  username: string;
+  password: string;
 };
 
 /** post /v1/login */
