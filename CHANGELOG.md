@@ -7,7 +7,8 @@
 - Added support for cookie handling:
   - Cookie parsing can be enabled and configured in config (requires to install `cookie-parser`);
   - `cookies` and `signedCookies` can be used as `inputSources` in config;
-  - `createCookieMiddleware()` creates a middleware that exposes `setCookie()` and `clearCookie()` helpers into context;
+  - `createCookieMiddleware()` creates a Middleware that exposes `setCookie()` and `clearCookie()` helpers into context
+    as well as the `getCookie()` one as an alternative to using cookies withint `inputSources`;
   - Documentation depicts request parameters when Middleware has `security` schema with `type: cookie`.
 
 ### v28.0.1

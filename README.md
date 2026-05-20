@@ -35,7 +35,7 @@ Start your API server with I/O schema validation and custom middlewares in minut
 5. [Advanced features](#advanced-features)
    1. [Customizing input sources](#customizing-input-sources)
    2. [Headers as an input source](#headers-as-an-input-source)
-   3. [Cookies as an input source](#cookies-as-an-input-source)
+   3. [Cookies](#cookies)
    4. [Response customization](#response-customization)
    5. [Empty response](#empty-response)
    6. [Non-JSON response](#non-json-response) including file downloads
@@ -819,10 +819,10 @@ factory.build({
 });
 ```
 
-## Cookies as an input source
+## Cookies
 
-Install `cookie-parser` as well as `@types/cookie-parser`, enable `cookies` in your config, add `"cookies"` and/or
-`"signedCookies"` to your `inputSources`:
+Install `cookie-parser` as well as `@types/cookie-parser` and enable `cookies` in your config. To validate cookies add
+`"cookies"` and/or `"signedCookies"` to your `inputSources`:
 
 ```ts
 import { createConfig } from "express-zod-api";
@@ -835,30 +835,30 @@ const config = createConfig({
 });
 ```
 
-Consider `createCookieMiddleware()` that makes a Middleware providing `setCookie()` and `clearCookie()` helpers:
+Consider `createCookieMiddleware()` that makes a Middleware providing `setCookie()` and `clearCookie()` helpers,
+as well as `getCookie()` — alternative to the cookies as an input source:
 
 ```ts
-import { createCookieMiddleware } from "express-zod-api";
+import { createCookieMiddleware, Middleware } from "express-zod-api";
 
-const cookieAssistingFactory = factory.addMiddleware(
-  createCookieMiddleware({ httpOnly: true, path: "/" }), // base options
-);
+const cookieDrivenFactory = factory
+  .addMiddleware(
+    createCookieMiddleware({ httpOnly: true, path: "/" }), // base options
+  )
+  .addMiddleware(
+    new Middleware({
+      security: { type: "cookie", name: "session" }, // improves Documentation
+      input: z.object({ session: z.string() }), // alternatively, use getCookie
+      handler: async ({ input: { session }, ctx: { getCookie } }) => {
+        assert.equal(session, getCookie("session")); // getCookie reads from signedCookies first
+      },
+    }),
+  );
 
-const sessionSettingEndpoint = cookieAssistingFactory.buildVoid({
-  handler: async ({ ctx: { setCookie } }) => {
-    setCookie("session", "abc123", { httpOnly: false }); // overriden options
+const sessionSettingEndpoint = cookieDrivenFactory.buildVoid({
+  handler: async ({ ctx: { getCookie, setCookie } }) => {
+    setCookie("session", "abc123", { httpOnly: false }); // overridden cookie options
   },
-});
-```
-
-When handling cookies in a Middleware, declare its security to improve [Documentation](#creating-documentation):
-
-```ts
-import { Middleware } from "express-zod-api";
-
-new Middleware({
-  security: { type: "cookie", name: "session" },
-  input: z.object({ session: z.string() }),
 });
 ```
 

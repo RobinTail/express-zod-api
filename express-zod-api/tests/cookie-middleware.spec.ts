@@ -14,17 +14,19 @@ describe("Cookie middleware", () => {
       async (baseOptions) => {
         const { output, responseMock } = await testMiddleware({
           middleware: createCookieMiddleware(baseOptions),
+          requestProps: {
+            cookies: { session: "asdf" },
+            signedCookies: { session: "qwerty" },
+          },
         });
-        const { setCookie, clearCookie } = output as {
-          setCookie: Awaited<
-            ReturnType<ReturnType<typeof createCookieMiddleware>["execute"]>
-          >["setCookie"];
-          clearCookie: Awaited<
-            ReturnType<ReturnType<typeof createCookieMiddleware>["execute"]>
-          >["clearCookie"];
-        };
+        const { getCookie, setCookie, clearCookie } = output as Awaited<
+          ReturnType<ReturnType<typeof createCookieMiddleware>["execute"]>
+        >;
+        expect(typeof getCookie).toBe("function");
         expect(typeof setCookie).toBe("function");
         expect(typeof clearCookie).toBe("function");
+        expect(getCookie("missing")).toBeUndefined();
+        expect(getCookie("session")).toBe("qwerty");
         setCookie("session", "abc123", { httpOnly: false });
         expect(responseMock.cookies).toHaveProperty("session", {
           options: { ...baseOptions, httpOnly: false },

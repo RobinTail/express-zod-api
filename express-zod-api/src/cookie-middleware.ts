@@ -9,7 +9,14 @@ import type { z } from "zod";
  */
 export const createCookieMiddleware = (baseOptions?: CookieOptions) =>
   new Middleware({
-    handler: async ({ response }) => ({
+    handler: async ({ request, response }) => ({
+      /**
+       * @desc Reads a cookie value. Checks signedCookies first, then falls back to cookies.
+       * @requires cookie-parser
+       * @see ServerConfig.cookies
+       * */
+      getCookie: (name: string): z.core.util.JSONType | undefined =>
+        request.signedCookies?.[name] ?? request.cookies?.[name],
       /** @desc Sets a cookie on the response. Express converts non-string values to JSON. */
       setCookie: (
         name: string,
