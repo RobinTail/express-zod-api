@@ -856,7 +856,7 @@ const cookieDrivenFactory = factory
   );
 
 const sessionSettingEndpoint = cookieDrivenFactory.buildVoid({
-  handler: async ({ ctx: { getCookie, setCookie } }) => {
+  handler: async ({ ctx: { setCookie } }) => {
     setCookie("session", "abc123", { httpOnly: false }); // overridden cookie options
   },
 });
