@@ -32,13 +32,14 @@ export const cookieAssistedFactory = defaultEndpointsFactory.addMiddleware(
 /** @desc This factory sends the file as string located in the "data" property of the endpoint's output */
 export const fileSendingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
-    positive: { schema: z.string(), mimeType: "image/svg+xml" },
+    positive: (output: z.ZodObject<{ data: z.ZodString }>) => ({
+      schema: output.shape.data,
+      mimeType: "image/svg+xml",
+    }),
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: ({ response, error, output }) => {
       if (error) return void response.status(400).send(error.message);
-      if ("data" in output && typeof output.data === "string")
-        response.type("svg").send(output.data);
-      else response.status(400).send("Data is missing");
+      response.type("svg").send(output.data);
     },
   }),
 );
@@ -46,20 +47,19 @@ export const fileSendingEndpointsFactory = new EndpointsFactory(
 /** @desc This one streams the file using the "filename" property of the endpoint's output */
 export const fileStreamingEndpointsFactory = new EndpointsFactory(
   new ResultHandler({
-    positive: { schema: ez.buffer(), mimeType: "image/*" },
+    positive: ({}: z.ZodObject<{ filename: z.ZodString }>) => ({
+      schema: ez.buffer(),
+      mimeType: "image/*",
+    }),
     negative: { schema: z.string(), mimeType: "text/plain" },
     handler: async ({ response, error, output, request: { method } }) => {
       if (error) return void response.status(400).send(error.message);
-      if ("filename" in output && typeof output.filename === "string") {
-        const target = response.attachment(output.filename);
-        if (method === "HEAD") {
-          const { size } = await stat(output.filename);
-          return void target.set("Content-Length", `${size}`).end();
-        }
-        createReadStream(output.filename).pipe(target);
-      } else {
-        response.status(400).send("Filename is missing");
+      const target = response.attachment(output.filename);
+      if (method === "HEAD") {
+        const { size } = await stat(output.filename);
+        return void target.set("Content-Length", `${size}`).end();
       }
+      createReadStream(output.filename).pipe(target);
     },
   }),
 );

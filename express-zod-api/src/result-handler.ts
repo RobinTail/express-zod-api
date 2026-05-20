@@ -19,8 +19,8 @@ import {
 } from "./result-helpers";
 import { getExamples } from "./metadata";
 
-type Handler<RES = unknown> = (
-  params: DiscriminatedResult & {
+type Handler<RES = unknown, OUT extends FlatObject = FlatObject> = (
+  params: DiscriminatedResult<OUT> & {
     /** null in case of failure to parse or to find the matching endpoint (error: not found) */
     input: FlatObject | null;
     /** can be empty: check presence of the required property using "in" operator */
@@ -68,9 +68,12 @@ export class ResultHandler<
     /** @desc A description of the API response in case of error (schema, status code, MIME type) */
     negative: NEG | LazyResult<NEG>;
     /** @desc The actual implementation to transmit the response in any case */
-    handler: Handler<z.output<ResultSchema<POS> | ResultSchema<NEG>>>;
+    handler: Handler<
+      z.output<ResultSchema<POS> | ResultSchema<NEG>>,
+      z.input<OUT> & FlatObject
+    >;
   }) {
-    super(params.handler);
+    super(params.handler as Handler);
     this.#positive = params.positive;
     this.#negative = params.negative;
   }
