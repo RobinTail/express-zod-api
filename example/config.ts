@@ -13,6 +13,7 @@ export const config = createConfig({
     limitError: createHttpError(413, "The file is too large"), // affects uploadAvatarEndpoint
   },
   compression: true, // affects sendAvatarEndpoint
+  cookies: true, // for uploadAvatarEndpoint
   // third-party middlewares serving their own routes or establishing their own routing besides the API
   beforeRouting: ({ app }) => {
     app.use(
@@ -23,6 +24,7 @@ export const config = createConfig({
   },
   inputSources: {
     patch: ["headers", "body", "params"], // affects authMiddleware used by updateUserEndpoint
+    post: ["body", "params", "files", "cookies"], // cookies for uploadAvatarEndpoint
   },
   cors: true,
 });
@@ -47,5 +49,6 @@ declare module "express-zod-api" {
     files: unknown;
     subscriptions: unknown;
     forms: unknown;
+    cookies: unknown;
   }
 }

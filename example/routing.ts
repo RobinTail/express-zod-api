@@ -12,6 +12,7 @@ import { retrieveUserEndpoint } from "./endpoints/retrieve-user.ts";
 import { sendAvatarEndpoint } from "./endpoints/send-avatar.ts";
 import { updateUserEndpoint } from "./endpoints/update-user.ts";
 import { streamAvatarEndpoint } from "./endpoints/stream-avatar.ts";
+import { loginEndpoint } from "./endpoints/login.ts";
 
 export const routing: Routing = {
   v1: {
@@ -29,6 +30,7 @@ export const routing: Routing = {
       // this one demonstrates the legacy array-based response
       list: listUsersEndpoint,
     },
+    login: loginEndpoint,
     avatar: {
       // custom result handler examples with a file serving
       send: sendAvatarEndpoint.deprecated(), // demo for deprecated route

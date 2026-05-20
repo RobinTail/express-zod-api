@@ -236,7 +236,14 @@ describe("Example", async () => {
       data.append("obj[some]", "thing");
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/upload`,
-        { method: "POST", body: data },
+        {
+          method: "POST",
+          body: data,
+          headers: {
+            Cookie:
+              "session=j%3A%7B%22token%22%3A%2294f29246-fee7-4940-9a3e-7e1ac0387641%22%7D; Path=/",
+          },
+        },
       );
       expect(response.headers.get("access-control-allow-methods")).toBe(
         "POST, OPTIONS",
@@ -250,10 +257,10 @@ describe("Example", async () => {
           otherInputs: {
             arr: ["456", "789"],
             num: "123",
-            obj: {
-              some: "thing",
-            },
+            obj: { some: "thing" },
             str: "test string value",
+            Path: "/", // from cookie
+            session: { token: "94f29246-fee7-4940-9a3e-7e1ac0387641" },
           },
           size: 48687,
         },
@@ -313,6 +320,20 @@ describe("Example", async () => {
       );
       await vi.waitFor(() => assert(stack.length > 2), { timeout: 5e3 });
       subscription.source.close();
+    });
+
+    test("Should send readable cookies", async () => {
+      const response = await fetch(`http://localhost:${port}/v1/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: "admin", password: "test" }),
+      });
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({
+        data: { message: "Logged in", success: true },
+        status: "success",
+      });
+      expect(response.headers.get("set-cookie")).toMatch(/^session=j/);
     });
   });
 
