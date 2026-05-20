@@ -20,9 +20,11 @@ import { stat } from "node:fs/promises";
 export const keyAndTokenAuthenticatedEndpointsFactory =
   defaultEndpointsFactory.addMiddleware(authMiddleware);
 
+/** @desc This factory adds session read from cookie into context */
 export const cookieAuthenticatedFactory =
   defaultEndpointsFactory.addMiddleware(sessionMiddleware);
 
+/** @desc This factory adds setCookie() helper to context */
 export const cookieAssistedFactory = defaultEndpointsFactory.addMiddleware(
   cookieAssistingMiddleware,
 );

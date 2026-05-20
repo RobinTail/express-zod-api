@@ -2,6 +2,7 @@ import { cookieAssistedFactory } from "../factories.ts";
 import { z } from "zod";
 import { randomUUID, hash } from "node:crypto";
 
+/** @desc The endpoint demonstrates setting a cookie */
 export const loginEndpoint = cookieAssistedFactory.build({
   method: "post",
   tag: "cookies",

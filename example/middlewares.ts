@@ -26,12 +26,14 @@ export const authMiddleware = new Middleware({
   },
 });
 
+/** @desc This middleware uses cookie as an input source and reads session from it */
 export const sessionMiddleware = new Middleware({
   security: { type: "cookie", name: "session" },
   input: z.object({ session: z.object({ token: z.string() }) }),
   handler: async ({ input: { session } }) => ({ session }),
 });
 
+/** @desc This middleware provides setCookie() helper to context */
 export const cookieAssistingMiddleware = createCookieMiddleware({ path: "/" });
 
 export const methodProviderMiddleware = new Middleware({

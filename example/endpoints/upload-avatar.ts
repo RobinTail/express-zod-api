@@ -3,6 +3,7 @@ import { ez } from "express-zod-api";
 import { createHash } from "node:crypto";
 import { cookieAuthenticatedFactory } from "../factories.ts";
 
+/** @desc The endpoint demonstrates handling a file upload and cookie as an input source */
 export const uploadAvatarEndpoint = cookieAuthenticatedFactory.build({
   method: "post",
   tag: "files",

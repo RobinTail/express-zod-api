@@ -30,7 +30,7 @@ export const routing: Routing = {
       // this one demonstrates the legacy array-based response
       list: listUsersEndpoint,
     },
-    login: loginEndpoint,
+    login: loginEndpoint, // demonstrates cookie sending
     avatar: {
       // custom result handler examples with a file serving
       send: sendAvatarEndpoint.deprecated(), // demo for deprecated route
