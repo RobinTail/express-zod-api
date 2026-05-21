@@ -190,15 +190,15 @@ export function createResultHandler<
 
 ## What does NOT change
 
-| Module | Reason |
-|--------|--------|
-| `AbstractResultHandler` | Stays as-is: no type params, `getPositiveResponse(output: IOSchema)` |
-| `ResultSchema<R>`, `DiscriminatedResult`, `normalize()` | Pure runtime or unrelated |
-| `Endpoint` class | Constructor still accepts `AbstractResultHandler` |
-| `Endpoint.execute()` runtime logic | Unchanged |
-| Public API exports (`index.ts`) | No symbol removal |
-| Generators (`Integration`, `Documentation`) | Consume `NormalizedResponse[]` |
-| `example/` directory factories | Won't narrow unless/until annotated |
+| Module                                                  | Reason                                                               |
+| ------------------------------------------------------- | -------------------------------------------------------------------- |
+| `AbstractResultHandler`                                 | Stays as-is: no type params, `getPositiveResponse(output: IOSchema)` |
+| `ResultSchema<R>`, `DiscriminatedResult`, `normalize()` | Pure runtime or unrelated                                            |
+| `Endpoint` class                                        | Constructor still accepts `AbstractResultHandler`                    |
+| `Endpoint.execute()` runtime logic                      | Unchanged                                                            |
+| Public API exports (`index.ts`)                         | No symbol removal                                                    |
+| Generators (`Integration`, `Documentation`)             | Consume `NormalizedResponse[]`                                       |
+| `example/` directory factories                          | Won't narrow unless/until annotated                                  |
 
 ---
 
