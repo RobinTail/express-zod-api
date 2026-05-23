@@ -336,7 +336,6 @@ describe("Example", async () => {
         status: "success",
       });
       expect(response.headers.get("set-cookie")).toMatch(/^session=j/);
-      console.log(response.headers.get("set-cookie"));
     });
   });
 
