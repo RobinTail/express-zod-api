@@ -1,43 +1,49 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Example > Client > Issue #2177: should handle path params correctly 1`] = `
-{
-  "createdAt": "2022-01-22T00:00:00.000Z",
-  "name": "Alan Turing",
-}
+[
+  200,
+  {
+    "createdAt": "2022-01-22T00:00:00.000Z",
+    "name": "Alan Turing",
+  },
+]
 `;
 
 exports[`Example > Client > Should perform the request with a positive response 1`] = `
-{
-  "features": [
-    {
-      "features": [
-        {
-          "title": "Above 180cm",
-        },
-      ],
-      "title": "Tall",
-    },
-    {
-      "title": "Young",
-    },
-    {
-      "features": [
-        {
-          "features": [
-            {
-              "title": "About Typescript",
-            },
-          ],
-          "title": "Tells funny jokes",
-        },
-      ],
-      "title": "Cute",
-    },
-  ],
-  "id": 10,
-  "name": "John Doe",
-}
+[
+  200,
+  {
+    "features": [
+      {
+        "features": [
+          {
+            "title": "Above 180cm",
+          },
+        ],
+        "title": "Tall",
+      },
+      {
+        "title": "Young",
+      },
+      {
+        "features": [
+          {
+            "features": [
+              {
+                "title": "About Typescript",
+              },
+            ],
+            "title": "Tells funny jokes",
+          },
+        ],
+        "title": "Cute",
+      },
+    ],
+    "id": 10,
+    "name": "John Doe",
+  },
+]
 `;
 
 exports[`Example > Negative > GET request should fail on missing input param 1`] = `

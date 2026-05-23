@@ -3,8 +3,6 @@ type Type1 = {
   features?: Type1[] | undefined;
 };
 
-type SomeOf<T> = T[keyof T];
-
 /** get /v1/user/retrieve */
 type GetV1UserRetrieveInput = {
   /** a numeric string containing the id of the user */
@@ -19,19 +17,9 @@ type GetV1UserRetrievePositiveVariant1 = {
 };
 
 /** get /v1/user/retrieve */
-interface GetV1UserRetrievePositiveResponseVariants {
-  200: GetV1UserRetrievePositiveVariant1;
-}
-
-/** get /v1/user/retrieve */
 type GetV1UserRetrieveNegativeVariant1 = {
   message: string;
 };
-
-/** get /v1/user/retrieve */
-interface GetV1UserRetrieveNegativeResponseVariants {
-  400: GetV1UserRetrieveNegativeVariant1;
-}
 
 /** head /v1/user/retrieve */
 type HeadV1UserRetrieveInput = {
@@ -43,17 +31,7 @@ type HeadV1UserRetrieveInput = {
 type HeadV1UserRetrievePositiveVariant1 = undefined;
 
 /** head /v1/user/retrieve */
-interface HeadV1UserRetrievePositiveResponseVariants {
-  200: HeadV1UserRetrievePositiveVariant1;
-}
-
-/** head /v1/user/retrieve */
 type HeadV1UserRetrieveNegativeVariant1 = undefined;
-
-/** head /v1/user/retrieve */
-interface HeadV1UserRetrieveNegativeResponseVariants {
-  400: HeadV1UserRetrieveNegativeVariant1;
-}
 
 /** delete /v1/user/:id/remove */
 type DeleteV1UserIdRemoveInput = {
@@ -65,17 +43,7 @@ type DeleteV1UserIdRemoveInput = {
 type DeleteV1UserIdRemovePositiveVariant1 = undefined;
 
 /** delete /v1/user/:id/remove */
-interface DeleteV1UserIdRemovePositiveResponseVariants {
-  204: DeleteV1UserIdRemovePositiveVariant1;
-}
-
-/** delete /v1/user/:id/remove */
 type DeleteV1UserIdRemoveNegativeVariant1 = undefined;
-
-/** delete /v1/user/:id/remove */
-interface DeleteV1UserIdRemoveNegativeResponseVariants {
-  404: DeleteV1UserIdRemoveNegativeVariant1;
-}
 
 /** patch /v1/user/:id */
 type PatchV1UserIdInput = {
@@ -95,19 +63,9 @@ type PatchV1UserIdPositiveVariant1 = {
 };
 
 /** patch /v1/user/:id */
-interface PatchV1UserIdPositiveResponseVariants {
-  200: PatchV1UserIdPositiveVariant1;
-}
-
-/** patch /v1/user/:id */
 type PatchV1UserIdNegativeVariant1 = {
   message: string;
 };
-
-/** patch /v1/user/:id */
-interface PatchV1UserIdNegativeResponseVariants {
-  400: PatchV1UserIdNegativeVariant1;
-}
 
 /** post /v1/user/create */
 type PostV1UserCreateInput = {
@@ -124,12 +82,6 @@ type PostV1UserCreatePositiveVariant1 = {
 };
 
 /** post /v1/user/create */
-interface PostV1UserCreatePositiveResponseVariants {
-  201: PostV1UserCreatePositiveVariant1;
-  202: PostV1UserCreatePositiveVariant1;
-}
-
-/** post /v1/user/create */
 type PostV1UserCreateNegativeVariant1 = {
   status: "exists";
   id: number;
@@ -140,13 +92,6 @@ type PostV1UserCreateNegativeVariant2 = {
   status: "error";
   reason: string;
 };
-
-/** post /v1/user/create */
-interface PostV1UserCreateNegativeResponseVariants {
-  409: PostV1UserCreateNegativeVariant1;
-  400: PostV1UserCreateNegativeVariant2;
-  500: PostV1UserCreateNegativeVariant2;
-}
 
 /** get /v1/user/list */
 type GetV1UserListInput = {
@@ -160,17 +105,7 @@ type GetV1UserListPositiveVariant1 = {
 }[];
 
 /** get /v1/user/list */
-interface GetV1UserListPositiveResponseVariants {
-  200: GetV1UserListPositiveVariant1;
-}
-
-/** get /v1/user/list */
 type GetV1UserListNegativeVariant1 = string;
-
-/** get /v1/user/list */
-interface GetV1UserListNegativeResponseVariants {
-  400: GetV1UserListNegativeVariant1;
-}
 
 /** head /v1/user/list */
 type HeadV1UserListInput = {
@@ -181,17 +116,7 @@ type HeadV1UserListInput = {
 type HeadV1UserListPositiveVariant1 = undefined;
 
 /** head /v1/user/list */
-interface HeadV1UserListPositiveResponseVariants {
-  200: HeadV1UserListPositiveVariant1;
-}
-
-/** head /v1/user/list */
 type HeadV1UserListNegativeVariant1 = undefined;
-
-/** head /v1/user/list */
-interface HeadV1UserListNegativeResponseVariants {
-  400: HeadV1UserListNegativeVariant1;
-}
 
 /** post /v1/login */
 type PostV1LoginInput = {
@@ -205,19 +130,9 @@ type PostV1LoginPositiveVariant1 = {
 };
 
 /** post /v1/login */
-interface PostV1LoginPositiveResponseVariants {
-  200: PostV1LoginPositiveVariant1;
-}
-
-/** post /v1/login */
 type PostV1LoginNegativeVariant1 = {
   message: string;
 };
-
-/** post /v1/login */
-interface PostV1LoginNegativeResponseVariants {
-  400: PostV1LoginNegativeVariant1;
-}
 
 /** get /v1/avatar/send */
 type GetV1AvatarSendInput = {
@@ -228,17 +143,7 @@ type GetV1AvatarSendInput = {
 type GetV1AvatarSendPositiveVariant1 = string;
 
 /** get /v1/avatar/send */
-interface GetV1AvatarSendPositiveResponseVariants {
-  200: GetV1AvatarSendPositiveVariant1;
-}
-
-/** get /v1/avatar/send */
 type GetV1AvatarSendNegativeVariant1 = string;
-
-/** get /v1/avatar/send */
-interface GetV1AvatarSendNegativeResponseVariants {
-  400: GetV1AvatarSendNegativeVariant1;
-}
 
 /** head /v1/avatar/send */
 type HeadV1AvatarSendInput = {
@@ -249,17 +154,7 @@ type HeadV1AvatarSendInput = {
 type HeadV1AvatarSendPositiveVariant1 = undefined;
 
 /** head /v1/avatar/send */
-interface HeadV1AvatarSendPositiveResponseVariants {
-  200: HeadV1AvatarSendPositiveVariant1;
-}
-
-/** head /v1/avatar/send */
 type HeadV1AvatarSendNegativeVariant1 = undefined;
-
-/** head /v1/avatar/send */
-interface HeadV1AvatarSendNegativeResponseVariants {
-  400: HeadV1AvatarSendNegativeVariant1;
-}
 
 /** get /v1/avatar/stream */
 type GetV1AvatarStreamInput = {
@@ -270,17 +165,7 @@ type GetV1AvatarStreamInput = {
 type GetV1AvatarStreamPositiveVariant1 = Buffer;
 
 /** get /v1/avatar/stream */
-interface GetV1AvatarStreamPositiveResponseVariants {
-  200: GetV1AvatarStreamPositiveVariant1;
-}
-
-/** get /v1/avatar/stream */
 type GetV1AvatarStreamNegativeVariant1 = string;
-
-/** get /v1/avatar/stream */
-interface GetV1AvatarStreamNegativeResponseVariants {
-  400: GetV1AvatarStreamNegativeVariant1;
-}
 
 /** head /v1/avatar/stream */
 type HeadV1AvatarStreamInput = {
@@ -291,17 +176,7 @@ type HeadV1AvatarStreamInput = {
 type HeadV1AvatarStreamPositiveVariant1 = undefined;
 
 /** head /v1/avatar/stream */
-interface HeadV1AvatarStreamPositiveResponseVariants {
-  200: HeadV1AvatarStreamPositiveVariant1;
-}
-
-/** head /v1/avatar/stream */
 type HeadV1AvatarStreamNegativeVariant1 = undefined;
-
-/** head /v1/avatar/stream */
-interface HeadV1AvatarStreamNegativeResponseVariants {
-  400: HeadV1AvatarStreamNegativeVariant1;
-}
 
 /** post /v1/avatar/upload */
 type PostV1AvatarUploadInput = {
@@ -321,19 +196,9 @@ type PostV1AvatarUploadPositiveVariant1 = {
 };
 
 /** post /v1/avatar/upload */
-interface PostV1AvatarUploadPositiveResponseVariants {
-  200: PostV1AvatarUploadPositiveVariant1;
-}
-
-/** post /v1/avatar/upload */
 type PostV1AvatarUploadNegativeVariant1 = {
   message: string;
 };
-
-/** post /v1/avatar/upload */
-interface PostV1AvatarUploadNegativeResponseVariants {
-  400: PostV1AvatarUploadNegativeVariant1;
-}
 
 /** post /v1/avatar/raw */
 type PostV1AvatarRawInput = Buffer;
@@ -344,19 +209,9 @@ type PostV1AvatarRawPositiveVariant1 = {
 };
 
 /** post /v1/avatar/raw */
-interface PostV1AvatarRawPositiveResponseVariants {
-  200: PostV1AvatarRawPositiveVariant1;
-}
-
-/** post /v1/avatar/raw */
 type PostV1AvatarRawNegativeVariant1 = {
   message: string;
 };
-
-/** post /v1/avatar/raw */
-interface PostV1AvatarRawNegativeResponseVariants {
-  400: PostV1AvatarRawNegativeVariant1;
-}
 
 /** get /v1/events/stream */
 type GetV1EventsStreamInput = {
@@ -373,17 +228,7 @@ type GetV1EventsStreamPositiveVariant1 = {
 };
 
 /** get /v1/events/stream */
-interface GetV1EventsStreamPositiveResponseVariants {
-  200: GetV1EventsStreamPositiveVariant1;
-}
-
-/** get /v1/events/stream */
 type GetV1EventsStreamNegativeVariant1 = string;
-
-/** get /v1/events/stream */
-interface GetV1EventsStreamNegativeResponseVariants {
-  400: GetV1EventsStreamNegativeVariant1;
-}
 
 /** head /v1/events/stream */
 type HeadV1EventsStreamInput = {
@@ -395,17 +240,7 @@ type HeadV1EventsStreamInput = {
 type HeadV1EventsStreamPositiveVariant1 = undefined;
 
 /** head /v1/events/stream */
-interface HeadV1EventsStreamPositiveResponseVariants {
-  200: HeadV1EventsStreamPositiveVariant1;
-}
-
-/** head /v1/events/stream */
 type HeadV1EventsStreamNegativeVariant1 = undefined;
-
-/** head /v1/events/stream */
-interface HeadV1EventsStreamNegativeResponseVariants {
-  400: HeadV1EventsStreamNegativeVariant1;
-}
 
 /** post /v1/forms/feedback */
 type PostV1FormsFeedbackInput = {
@@ -420,19 +255,9 @@ type PostV1FormsFeedbackPositiveVariant1 = {
 };
 
 /** post /v1/forms/feedback */
-interface PostV1FormsFeedbackPositiveResponseVariants {
-  200: PostV1FormsFeedbackPositiveVariant1;
-}
-
-/** post /v1/forms/feedback */
 type PostV1FormsFeedbackNegativeVariant1 = {
   message: string;
 };
-
-/** post /v1/forms/feedback */
-interface PostV1FormsFeedbackNegativeResponseVariants {
-  400: PostV1FormsFeedbackNegativeVariant1;
-}
 
 /** get /v2/users/list */
 type GetV2UsersListInput = {
@@ -460,19 +285,9 @@ type GetV2UsersListPositiveVariant1 = {
 };
 
 /** get /v2/users/list */
-interface GetV2UsersListPositiveResponseVariants {
-  200: GetV2UsersListPositiveVariant1;
-}
-
-/** get /v2/users/list */
 type GetV2UsersListNegativeVariant1 = {
   message: string;
 };
-
-/** get /v2/users/list */
-interface GetV2UsersListNegativeResponseVariants {
-  400: GetV2UsersListNegativeVariant1;
-}
 
 /** head /v2/users/list */
 type HeadV2UsersListInput = {
@@ -488,17 +303,7 @@ type HeadV2UsersListInput = {
 type HeadV2UsersListPositiveVariant1 = undefined;
 
 /** head /v2/users/list */
-interface HeadV2UsersListPositiveResponseVariants {
-  200: HeadV2UsersListPositiveVariant1;
-}
-
-/** head /v2/users/list */
 type HeadV2UsersListNegativeVariant1 = undefined;
-
-/** head /v2/users/list */
-interface HeadV2UsersListNegativeResponseVariants {
-  400: HeadV2UsersListNegativeVariant1;
-}
 
 export type Path =
   | "/v1/user/retrieve"
@@ -542,156 +347,118 @@ export interface Input {
 }
 
 export interface PositiveResponse {
-  "get /v1/user/retrieve": SomeOf<GetV1UserRetrievePositiveResponseVariants>;
-  "head /v1/user/retrieve": SomeOf<HeadV1UserRetrievePositiveResponseVariants>;
-  "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemovePositiveResponseVariants>;
-  "patch /v1/user/:id": SomeOf<PatchV1UserIdPositiveResponseVariants>;
-  "post /v1/user/create": SomeOf<PostV1UserCreatePositiveResponseVariants>;
-  "get /v1/user/list": SomeOf<GetV1UserListPositiveResponseVariants>;
-  "head /v1/user/list": SomeOf<HeadV1UserListPositiveResponseVariants>;
-  "post /v1/login": SomeOf<PostV1LoginPositiveResponseVariants>;
+  "get /v1/user/retrieve": GetV1UserRetrievePositiveVariant1;
+  "head /v1/user/retrieve": HeadV1UserRetrievePositiveVariant1;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemovePositiveVariant1;
+  "patch /v1/user/:id": PatchV1UserIdPositiveVariant1;
+  "post /v1/user/create": PostV1UserCreatePositiveVariant1;
+  "get /v1/user/list": GetV1UserListPositiveVariant1;
+  "head /v1/user/list": HeadV1UserListPositiveVariant1;
+  "post /v1/login": PostV1LoginPositiveVariant1;
   /** @deprecated */
-  "get /v1/avatar/send": SomeOf<GetV1AvatarSendPositiveResponseVariants>;
+  "get /v1/avatar/send": GetV1AvatarSendPositiveVariant1;
   /** @deprecated */
-  "head /v1/avatar/send": SomeOf<HeadV1AvatarSendPositiveResponseVariants>;
-  "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamPositiveResponseVariants>;
-  "head /v1/avatar/stream": SomeOf<HeadV1AvatarStreamPositiveResponseVariants>;
-  "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadPositiveResponseVariants>;
-  "post /v1/avatar/raw": SomeOf<PostV1AvatarRawPositiveResponseVariants>;
-  "get /v1/events/stream": SomeOf<GetV1EventsStreamPositiveResponseVariants>;
-  "head /v1/events/stream": SomeOf<HeadV1EventsStreamPositiveResponseVariants>;
-  "post /v1/forms/feedback": SomeOf<PostV1FormsFeedbackPositiveResponseVariants>;
-  "get /v2/users/list": SomeOf<GetV2UsersListPositiveResponseVariants>;
-  "head /v2/users/list": SomeOf<HeadV2UsersListPositiveResponseVariants>;
+  "head /v1/avatar/send": HeadV1AvatarSendPositiveVariant1;
+  "get /v1/avatar/stream": GetV1AvatarStreamPositiveVariant1;
+  "head /v1/avatar/stream": HeadV1AvatarStreamPositiveVariant1;
+  "post /v1/avatar/upload": PostV1AvatarUploadPositiveVariant1;
+  "post /v1/avatar/raw": PostV1AvatarRawPositiveVariant1;
+  "get /v1/events/stream": GetV1EventsStreamPositiveVariant1;
+  "head /v1/events/stream": HeadV1EventsStreamPositiveVariant1;
+  "post /v1/forms/feedback": PostV1FormsFeedbackPositiveVariant1;
+  "get /v2/users/list": GetV2UsersListPositiveVariant1;
+  "head /v2/users/list": HeadV2UsersListPositiveVariant1;
 }
 
 export interface NegativeResponse {
-  "get /v1/user/retrieve": SomeOf<GetV1UserRetrieveNegativeResponseVariants>;
-  "head /v1/user/retrieve": SomeOf<HeadV1UserRetrieveNegativeResponseVariants>;
-  "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemoveNegativeResponseVariants>;
-  "patch /v1/user/:id": SomeOf<PatchV1UserIdNegativeResponseVariants>;
-  "post /v1/user/create": SomeOf<PostV1UserCreateNegativeResponseVariants>;
-  "get /v1/user/list": SomeOf<GetV1UserListNegativeResponseVariants>;
-  "head /v1/user/list": SomeOf<HeadV1UserListNegativeResponseVariants>;
-  "post /v1/login": SomeOf<PostV1LoginNegativeResponseVariants>;
+  "get /v1/user/retrieve": GetV1UserRetrieveNegativeVariant1;
+  "head /v1/user/retrieve": HeadV1UserRetrieveNegativeVariant1;
+  "delete /v1/user/:id/remove": DeleteV1UserIdRemoveNegativeVariant1;
+  "patch /v1/user/:id": PatchV1UserIdNegativeVariant1;
+  "post /v1/user/create":
+    | PostV1UserCreateNegativeVariant1
+    | PostV1UserCreateNegativeVariant2;
+  "get /v1/user/list": GetV1UserListNegativeVariant1;
+  "head /v1/user/list": HeadV1UserListNegativeVariant1;
+  "post /v1/login": PostV1LoginNegativeVariant1;
   /** @deprecated */
-  "get /v1/avatar/send": SomeOf<GetV1AvatarSendNegativeResponseVariants>;
+  "get /v1/avatar/send": GetV1AvatarSendNegativeVariant1;
   /** @deprecated */
-  "head /v1/avatar/send": SomeOf<HeadV1AvatarSendNegativeResponseVariants>;
-  "get /v1/avatar/stream": SomeOf<GetV1AvatarStreamNegativeResponseVariants>;
-  "head /v1/avatar/stream": SomeOf<HeadV1AvatarStreamNegativeResponseVariants>;
-  "post /v1/avatar/upload": SomeOf<PostV1AvatarUploadNegativeResponseVariants>;
-  "post /v1/avatar/raw": SomeOf<PostV1AvatarRawNegativeResponseVariants>;
-  "get /v1/events/stream": SomeOf<GetV1EventsStreamNegativeResponseVariants>;
-  "head /v1/events/stream": SomeOf<HeadV1EventsStreamNegativeResponseVariants>;
-  "post /v1/forms/feedback": SomeOf<PostV1FormsFeedbackNegativeResponseVariants>;
-  "get /v2/users/list": SomeOf<GetV2UsersListNegativeResponseVariants>;
-  "head /v2/users/list": SomeOf<HeadV2UsersListNegativeResponseVariants>;
+  "head /v1/avatar/send": HeadV1AvatarSendNegativeVariant1;
+  "get /v1/avatar/stream": GetV1AvatarStreamNegativeVariant1;
+  "head /v1/avatar/stream": HeadV1AvatarStreamNegativeVariant1;
+  "post /v1/avatar/upload": PostV1AvatarUploadNegativeVariant1;
+  "post /v1/avatar/raw": PostV1AvatarRawNegativeVariant1;
+  "get /v1/events/stream": GetV1EventsStreamNegativeVariant1;
+  "head /v1/events/stream": HeadV1EventsStreamNegativeVariant1;
+  "post /v1/forms/feedback": PostV1FormsFeedbackNegativeVariant1;
+  "get /v2/users/list": GetV2UsersListNegativeVariant1;
+  "head /v2/users/list": HeadV2UsersListNegativeVariant1;
 }
 
 export interface EncodedResponse {
-  "get /v1/user/retrieve": GetV1UserRetrievePositiveResponseVariants &
-    GetV1UserRetrieveNegativeResponseVariants;
-  "head /v1/user/retrieve": HeadV1UserRetrievePositiveResponseVariants &
-    HeadV1UserRetrieveNegativeResponseVariants;
-  "delete /v1/user/:id/remove": DeleteV1UserIdRemovePositiveResponseVariants &
-    DeleteV1UserIdRemoveNegativeResponseVariants;
-  "patch /v1/user/:id": PatchV1UserIdPositiveResponseVariants &
-    PatchV1UserIdNegativeResponseVariants;
-  "post /v1/user/create": PostV1UserCreatePositiveResponseVariants &
-    PostV1UserCreateNegativeResponseVariants;
-  "get /v1/user/list": GetV1UserListPositiveResponseVariants &
-    GetV1UserListNegativeResponseVariants;
-  "head /v1/user/list": HeadV1UserListPositiveResponseVariants &
-    HeadV1UserListNegativeResponseVariants;
-  "post /v1/login": PostV1LoginPositiveResponseVariants &
-    PostV1LoginNegativeResponseVariants;
-  /** @deprecated */
-  "get /v1/avatar/send": GetV1AvatarSendPositiveResponseVariants &
-    GetV1AvatarSendNegativeResponseVariants;
-  /** @deprecated */
-  "head /v1/avatar/send": HeadV1AvatarSendPositiveResponseVariants &
-    HeadV1AvatarSendNegativeResponseVariants;
-  "get /v1/avatar/stream": GetV1AvatarStreamPositiveResponseVariants &
-    GetV1AvatarStreamNegativeResponseVariants;
-  "head /v1/avatar/stream": HeadV1AvatarStreamPositiveResponseVariants &
-    HeadV1AvatarStreamNegativeResponseVariants;
-  "post /v1/avatar/upload": PostV1AvatarUploadPositiveResponseVariants &
-    PostV1AvatarUploadNegativeResponseVariants;
-  "post /v1/avatar/raw": PostV1AvatarRawPositiveResponseVariants &
-    PostV1AvatarRawNegativeResponseVariants;
-  "get /v1/events/stream": GetV1EventsStreamPositiveResponseVariants &
-    GetV1EventsStreamNegativeResponseVariants;
-  "head /v1/events/stream": HeadV1EventsStreamPositiveResponseVariants &
-    HeadV1EventsStreamNegativeResponseVariants;
-  "post /v1/forms/feedback": PostV1FormsFeedbackPositiveResponseVariants &
-    PostV1FormsFeedbackNegativeResponseVariants;
-  "get /v2/users/list": GetV2UsersListPositiveResponseVariants &
-    GetV2UsersListNegativeResponseVariants;
-  "head /v2/users/list": HeadV2UsersListPositiveResponseVariants &
-    HeadV2UsersListNegativeResponseVariants;
-}
-
-export interface Response {
   "get /v1/user/retrieve":
-    | PositiveResponse["get /v1/user/retrieve"]
-    | NegativeResponse["get /v1/user/retrieve"];
+    | [200, GetV1UserRetrievePositiveVariant1]
+    | [400, GetV1UserRetrieveNegativeVariant1];
   "head /v1/user/retrieve":
-    | PositiveResponse["head /v1/user/retrieve"]
-    | NegativeResponse["head /v1/user/retrieve"];
+    | [200, HeadV1UserRetrievePositiveVariant1]
+    | [400, HeadV1UserRetrieveNegativeVariant1];
   "delete /v1/user/:id/remove":
-    | PositiveResponse["delete /v1/user/:id/remove"]
-    | NegativeResponse["delete /v1/user/:id/remove"];
+    | [204, DeleteV1UserIdRemovePositiveVariant1]
+    | [404, DeleteV1UserIdRemoveNegativeVariant1];
   "patch /v1/user/:id":
-    | PositiveResponse["patch /v1/user/:id"]
-    | NegativeResponse["patch /v1/user/:id"];
+    | [200, PatchV1UserIdPositiveVariant1]
+    | [400, PatchV1UserIdNegativeVariant1];
   "post /v1/user/create":
-    | PositiveResponse["post /v1/user/create"]
-    | NegativeResponse["post /v1/user/create"];
+    | [201, PostV1UserCreatePositiveVariant1]
+    | [202, PostV1UserCreatePositiveVariant1]
+    | [409, PostV1UserCreateNegativeVariant1]
+    | [400, PostV1UserCreateNegativeVariant2]
+    | [500, PostV1UserCreateNegativeVariant2];
   "get /v1/user/list":
-    | PositiveResponse["get /v1/user/list"]
-    | NegativeResponse["get /v1/user/list"];
+    | [200, GetV1UserListPositiveVariant1]
+    | [400, GetV1UserListNegativeVariant1];
   "head /v1/user/list":
-    | PositiveResponse["head /v1/user/list"]
-    | NegativeResponse["head /v1/user/list"];
+    | [200, HeadV1UserListPositiveVariant1]
+    | [400, HeadV1UserListNegativeVariant1];
   "post /v1/login":
-    | PositiveResponse["post /v1/login"]
-    | NegativeResponse["post /v1/login"];
+    | [200, PostV1LoginPositiveVariant1]
+    | [400, PostV1LoginNegativeVariant1];
   /** @deprecated */
   "get /v1/avatar/send":
-    | PositiveResponse["get /v1/avatar/send"]
-    | NegativeResponse["get /v1/avatar/send"];
+    | [200, GetV1AvatarSendPositiveVariant1]
+    | [400, GetV1AvatarSendNegativeVariant1];
   /** @deprecated */
   "head /v1/avatar/send":
-    | PositiveResponse["head /v1/avatar/send"]
-    | NegativeResponse["head /v1/avatar/send"];
+    | [200, HeadV1AvatarSendPositiveVariant1]
+    | [400, HeadV1AvatarSendNegativeVariant1];
   "get /v1/avatar/stream":
-    | PositiveResponse["get /v1/avatar/stream"]
-    | NegativeResponse["get /v1/avatar/stream"];
+    | [200, GetV1AvatarStreamPositiveVariant1]
+    | [400, GetV1AvatarStreamNegativeVariant1];
   "head /v1/avatar/stream":
-    | PositiveResponse["head /v1/avatar/stream"]
-    | NegativeResponse["head /v1/avatar/stream"];
+    | [200, HeadV1AvatarStreamPositiveVariant1]
+    | [400, HeadV1AvatarStreamNegativeVariant1];
   "post /v1/avatar/upload":
-    | PositiveResponse["post /v1/avatar/upload"]
-    | NegativeResponse["post /v1/avatar/upload"];
+    | [200, PostV1AvatarUploadPositiveVariant1]
+    | [400, PostV1AvatarUploadNegativeVariant1];
   "post /v1/avatar/raw":
-    | PositiveResponse["post /v1/avatar/raw"]
-    | NegativeResponse["post /v1/avatar/raw"];
+    | [200, PostV1AvatarRawPositiveVariant1]
+    | [400, PostV1AvatarRawNegativeVariant1];
   "get /v1/events/stream":
-    | PositiveResponse["get /v1/events/stream"]
-    | NegativeResponse["get /v1/events/stream"];
+    | [200, GetV1EventsStreamPositiveVariant1]
+    | [400, GetV1EventsStreamNegativeVariant1];
   "head /v1/events/stream":
-    | PositiveResponse["head /v1/events/stream"]
-    | NegativeResponse["head /v1/events/stream"];
+    | [200, HeadV1EventsStreamPositiveVariant1]
+    | [400, HeadV1EventsStreamNegativeVariant1];
   "post /v1/forms/feedback":
-    | PositiveResponse["post /v1/forms/feedback"]
-    | NegativeResponse["post /v1/forms/feedback"];
+    | [200, PostV1FormsFeedbackPositiveVariant1]
+    | [400, PostV1FormsFeedbackNegativeVariant1];
   "get /v2/users/list":
-    | PositiveResponse["get /v2/users/list"]
-    | NegativeResponse["get /v2/users/list"];
+    | [200, GetV2UsersListPositiveVariant1]
+    | [400, GetV2UsersListNegativeVariant1];
   "head /v2/users/list":
-    | PositiveResponse["head /v2/users/list"]
-    | NegativeResponse["head /v2/users/list"];
+    | [200, HeadV2UsersListPositiveVariant1]
+    | [400, HeadV2UsersListNegativeVariant1];
 }
 
 export type Request = keyof Input;
@@ -737,7 +504,7 @@ export type Implementation<T = unknown> = (
   path: string,
   params: Record<string, any>,
   ctx?: T,
-) => Promise<any>;
+) => Promise<[number, any]>;
 
 type Pagination =
   | {
@@ -761,9 +528,10 @@ const defaultImplementation: Implementation = async (method, path, params) => {
     },
   );
   const contentType = response.headers.get("content-type");
-  if (!contentType) return;
+  if (!contentType) return [response.status, undefined];
   const isJSON = contentType.startsWith("application/json");
-  return response[isJSON ? "json" : "text"]();
+  const body = await response[isJSON ? "json" : "text"]();
+  return [response.status, body];
 };
 
 export class Client<T> {
@@ -774,9 +542,13 @@ export class Client<T> {
     request: K,
     params: Input[K],
     ctx?: T,
-  ): Promise<Response[K]> {
+  ): Promise<EncodedResponse[K]> {
     const [method, path] = parseRequest(request);
-    return this.implementation(method, ...substitute(path, params), ctx);
+    return this.implementation(
+      method,
+      ...substitute(path, params),
+      ctx,
+    ) as Promise<EncodedResponse[K]>;
   }
   public static hasMore(response: Pagination): boolean {
     if ("nextCursor" in response) return response.nextCursor !== null;

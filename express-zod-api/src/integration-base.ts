@@ -10,7 +10,7 @@ import type {
   OffsetPaginatedResult,
 } from "./paginated-schema";
 
-type IOKind = "input" | "response" | ResponseVariant | "encoded";
+type IOKind = "input" | ResponseVariant | "encoded";
 type SSEShape = ReturnType<typeof makeEventSchema>["shape"];
 type Store = Record<IOKind, ts.TypeNode>;
 
@@ -61,9 +61,9 @@ export abstract class IntegrationBase {
     clientConst: "client",
     contentTypeConst: "contentType",
     isJsonConst: "isJSON",
+    bodyConst: "body",
     sourceProp: "source",
     methodType: "Method",
-    someOfType: "SomeOf",
     requestType: "Request",
     paginationType: "Pagination",
   } satisfies Record<string, string>;
@@ -74,7 +74,6 @@ export abstract class IntegrationBase {
     positive: "PositiveResponse",
     negative: "NegativeResponse",
     encoded: "EncodedResponse",
-    response: "Response",
   };
 
   /**
@@ -83,17 +82,6 @@ export abstract class IntegrationBase {
    * */
   protected makeMethodType = () =>
     this.api.makePublicLiteralType(this.#ids.methodType, clientMethods);
-
-  /**
-   * @example type SomeOf<T> = T[keyof T];
-   * @internal
-   * */
-  protected makeSomeOfType = () =>
-    this.api.makeType(
-      this.#ids.someOfType,
-      this.api.makeIndexed("T", this.api.makeKeyOf("T")),
-      { params: ["T"] },
-    );
 
   /**
    * @example export type Request = keyof Input;
@@ -105,13 +93,6 @@ export abstract class IntegrationBase {
       this.api.makeKeyOf(this.interfaces.input),
       { expose: true },
     );
-
-  /**
-   * @example SomeOf<_>
-   * @internal
-   **/
-  protected someOf = ({ name }: ts.TypeAliasDeclaration) =>
-    this.api.ensureTypeNode(this.#ids.someOfType, [name]);
 
   /**
    * @example export type Path = "/v1/user/retrieve" | ___;
@@ -169,7 +150,12 @@ export abstract class IntegrationBase {
           [this.#ids.paramsArgument]: this.api.makeRecordStringAny(),
           [this.#ids.ctxArgument]: { optional: true, type: "T" },
         },
-        this.api.makePromise(this.api.ts.SyntaxKind.AnyKeyword),
+        this.api.makePromise(
+          this.api.f.createTupleTypeNode([
+            this.api.ensureTypeNode(this.api.ts.SyntaxKind.NumberKeyword),
+            this.api.ensureTypeNode(this.api.ts.SyntaxKind.AnyKeyword),
+          ]),
+        ),
       ),
       {
         expose: true,
@@ -374,27 +360,32 @@ export abstract class IntegrationBase {
             this.#ids.requestParameter,
           ),
         ),
-        // return this.implementation(___)
+        // return this.implementation(___) as Promise<EncodedResponse[K]>
         this.api.f.createReturnStatement(
-          this.api.makeCall(
-            this.api.f.createThis(),
-            this.#ids.implementationArgument,
-          )(
-            this.#ids.methodParameter,
-            this.api.f.createSpreadElement(
-              this.api.makeCall(this.#ids.substituteFn)(
-                this.#ids.pathParameter,
-                this.#ids.paramsArgument,
+          this.api.f.createAsExpression(
+            this.api.makeCall(
+              this.api.f.createThis(),
+              this.#ids.implementationArgument,
+            )(
+              this.#ids.methodParameter,
+              this.api.f.createSpreadElement(
+                this.api.makeCall(this.#ids.substituteFn)(
+                  this.#ids.pathParameter,
+                  this.#ids.paramsArgument,
+                ),
               ),
+              this.#ids.ctxArgument,
             ),
-            this.#ids.ctxArgument,
+            this.api.makePromise(
+              this.api.makeIndexed(this.interfaces.encoded, "K"),
+            ),
           ),
         ),
       ],
       {
         typeParams: { K: this.#ids.requestType },
         returns: this.api.makePromise(
-          this.api.makeIndexed(this.interfaces.response, "K"),
+          this.api.makeIndexed(this.interfaces.encoded, "K"),
         ),
       },
     );
@@ -531,13 +522,21 @@ export abstract class IntegrationBase {
       )(this.api.literally("content-type")),
     );
 
-    // if (!contentType) return;
+    // if (!contentType) return [response.status, undefined];
     const noBodyStatement = this.api.f.createIfStatement(
       this.api.f.createPrefixUnaryExpression(
         this.api.ts.SyntaxKind.ExclamationToken,
         this.api.makeId(this.#ids.contentTypeConst),
       ),
-      this.api.f.createReturnStatement(),
+      this.api.f.createReturnStatement(
+        this.api.f.createArrayLiteralExpression([
+          this.api.f.createPropertyAccessExpression(
+            this.api.makeId(this.#ids.responseConst),
+            propOf<Response>("status"),
+          ),
+          this.api.makeId(this.#ids.undefinedValue),
+        ]),
+      ),
     );
 
     // const isJSON = contentType.startsWith("application/json");
@@ -549,16 +548,30 @@ export abstract class IntegrationBase {
       )(this.api.literally(contentTypes.json)),
     );
 
-    // return response[isJSON ? "json" : "text"]();
+    // const body = await response[isJSON ? "json" : "text"]();
+    const bodyStatement = this.api.makeConst(
+      this.#ids.bodyConst,
+      this.api.f.createAwaitExpression(
+        this.api.makeCall(
+          this.#ids.responseConst,
+          this.api.makeTernary(
+            this.#ids.isJsonConst,
+            this.api.literally(propOf<Response>("json")),
+            this.api.literally(propOf<Response>("text")),
+          ),
+        )(),
+      ),
+    );
+
+    // return [response.status, body];
     const returnStatement = this.api.f.createReturnStatement(
-      this.api.makeCall(
-        this.#ids.responseConst,
-        this.api.makeTernary(
-          this.#ids.isJsonConst,
-          this.api.literally(propOf<Response>("json")),
-          this.api.literally(propOf<Response>("text")),
+      this.api.f.createArrayLiteralExpression([
+        this.api.f.createPropertyAccessExpression(
+          this.api.makeId(this.#ids.responseConst),
+          propOf<Response>("status"),
         ),
-      )(),
+        this.api.makeId(this.#ids.bodyConst),
+      ]),
     );
 
     return this.api.makeConst(
@@ -576,6 +589,7 @@ export abstract class IntegrationBase {
           contentTypeStatement,
           noBodyStatement,
           isJsonConst,
+          bodyStatement,
           returnStatement,
         ]),
         { isAsync: true },

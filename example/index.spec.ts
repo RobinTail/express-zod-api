@@ -555,7 +555,7 @@ describe("Example", async () => {
       });
       expect(response).toMatchSnapshot();
       expectTypeOf(response).toExtend<
-        { id: number; name: string } | { message: string }
+        [200, { id: number; name: string }] | [400, { message: string }]
       >();
     });
 
@@ -569,13 +569,9 @@ describe("Example", async () => {
       });
       expect(typeof response).toBe("object");
       expect(response).toMatchSnapshot();
-      expectTypeOf<{
-        name: string;
-        createdAt: string;
-      }>().toExtend<typeof response>();
-      expectTypeOf<{
-        message: string;
-      }>().toExtend<typeof response>();
+      expectTypeOf(response).toEqualTypeOf<
+        [200, { name: string; createdAt: string }] | [400, { message: string }]
+      >();
     });
 
     test("Issue #2182: should deny unlisted combination of path and method", async () => {
@@ -588,8 +584,8 @@ describe("Example", async () => {
       const response = await client.provide("delete /v1/user/:id/remove", {
         id: "12",
       });
-      expect(response).toBeUndefined();
-      expectTypeOf(response).toBeUndefined();
+      expect(response[1]).toBeUndefined();
+      expectTypeOf(response).toExtend<[number, undefined]>();
     });
   });
 });

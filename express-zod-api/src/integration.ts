@@ -1,7 +1,6 @@
-import * as R from "ramda";
 import type ts from "typescript";
 import { z } from "zod";
-import { responseVariants, type ResponseVariant } from "./api-response";
+import { responseVariants } from "./api-response";
 import { IntegrationBase } from "./integration-base";
 import { shouldHaveContent, makeCleanId } from "./common-helpers";
 import { loadPeer } from "./peer-helpers";
@@ -65,7 +64,7 @@ interface FormattedPrintingOptions {
 }
 
 export class Integration extends IntegrationBase {
-  readonly #program: ts.Node[] = [this.makeSomeOfType()];
+  readonly #program: ts.Node[] = [];
   readonly #aliases = new Map<object, ts.TypeAliasDeclaration>();
   #usage: Array<ts.Node | string> = [];
 
@@ -106,45 +105,41 @@ export class Integration extends IntegrationBase {
         { comment: request },
       );
       this.#program.push(input);
-      const dictionaries = responseVariants.reduce(
-        (agg, responseVariant) => {
-          const responses = endpoint.getResponses(responseVariant);
-          const props = R.chain(([idx, { schema, mimeTypes, statusCodes }]) => {
-            const hasBody = shouldHaveContent(method, mimeTypes);
-            const variantType = this.api.makeType(
-              entitle(responseVariant, "variant", `${idx + 1}`),
-              zodToTs(hasBody ? schema : noBodySchema, ctxOut),
-              { comment: request },
-            );
-            this.#program.push(variantType);
-            return statusCodes.map((code) =>
-              this.api.makeInterfaceProp(code, variantType.name),
-            );
-          }, Array.from(responses.entries()));
-          const dict = this.api.makeInterface(
-            entitle(responseVariant, "response", "variants"),
-            props,
+      const positiveBare: ts.TypeNode[] = [];
+      const negativeBare: ts.TypeNode[] = [];
+      const encodedTuples: ts.TypeNode[] = [];
+      for (const responseVariant of responseVariants) {
+        const responses = endpoint.getResponses(responseVariant);
+        const target =
+          responseVariant === "positive" ? positiveBare : negativeBare;
+        for (const [idx, { schema, mimeTypes, statusCodes }] of Array.from(
+          responses.entries(),
+        )) {
+          const hasBody = shouldHaveContent(method, mimeTypes);
+          const variantType = this.api.makeType(
+            entitle(responseVariant, "variant", `${idx + 1}`),
+            zodToTs(hasBody ? schema : noBodySchema, ctxOut),
             { comment: request },
           );
-          this.#program.push(dict);
-          return Object.assign(agg, { [responseVariant]: dict });
-        },
-        {} as Record<ResponseVariant, ts.TypeAliasDeclaration>,
-      );
+          this.#program.push(variantType);
+          const ref = this.api.ensureTypeNode(variantType.name);
+          for (const code of statusCodes) {
+            target.push(ref);
+            encodedTuples.push(
+              this.api.f.createTupleTypeNode([
+                this.api.makeLiteralType(code),
+                ref,
+              ]),
+            );
+          }
+        }
+      }
       this.paths.add(path);
-      const literalIdx = this.api.makeLiteralType(request);
       const store = {
         input: this.api.ensureTypeNode(input.name),
-        positive: this.someOf(dictionaries.positive),
-        negative: this.someOf(dictionaries.negative),
-        response: this.api.makeUnion([
-          this.api.makeIndexed(this.interfaces.positive, literalIdx),
-          this.api.makeIndexed(this.interfaces.negative, literalIdx),
-        ]),
-        encoded: this.api.f.createIntersectionTypeNode([
-          this.api.ensureTypeNode(dictionaries.positive.name),
-          this.api.ensureTypeNode(dictionaries.negative.name),
-        ]),
+        positive: this.api.makeUnion(positiveBare),
+        negative: this.api.makeUnion(negativeBare),
+        encoded: this.api.makeUnion(encodedTuples),
       };
       this.registry.set(request, { isDeprecated, store });
       this.tags.set(request, tags);
