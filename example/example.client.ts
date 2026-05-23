@@ -538,11 +538,7 @@ export class Client<T> {
   public constructor(
     protected readonly implementation: Implementation<T> = defaultImplementation,
   ) {}
-  public provide<K extends Request>(
-    request: K,
-    params: Input[K],
-    ctx?: T,
-  ): Promise<EncodedResponse[K]> {
+  public provide<K extends Request>(request: K, params: Input[K], ctx?: T) {
     const [method, path] = parseRequest(request);
     return this.implementation(
       method,

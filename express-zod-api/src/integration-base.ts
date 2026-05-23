@@ -337,7 +337,7 @@ export abstract class IntegrationBase {
     );
   };
 
-  // public provide<K extends MethodPath>(request: K, params: Input[K]): Promise<Response[K]> {}
+  // public provide<K extends Request>(request: K, params: Input[K], ctx?: T) {}
   #makeProvider = () =>
     this.api.makePublicMethod(
       this.#ids.provideMethod,
@@ -384,9 +384,6 @@ export abstract class IntegrationBase {
       ],
       {
         typeParams: { K: this.#ids.requestType },
-        returns: this.api.makePromise(
-          this.api.makeIndexed(this.interfaces.encoded, "K"),
-        ),
       },
     );
 
