@@ -123,10 +123,9 @@ describe("Example", async () => {
         `http://localhost:${port}/v2/users/list?${query}`,
       );
       expect(response.status).toBe(200);
-      const json = (await response.json()) as {
+      const { users } = (await response.json()) as {
         users?: Array<{ role: string }>;
       };
-      const users = json.users;
       if (!Array.isArray(users)) fail("response.data.users should be an array");
       expect(
         users.every((one: { role: string }) =>
