@@ -101,8 +101,7 @@ describe("Testing", () => {
         expect(responseMock._isJSON()).toBe(!errorHandler);
         if (responseMock._isJSON()) {
           expect(responseMock._getJSONData()).toEqual({
-            status: "error",
-            error: { message: "something went wrong" },
+            message: "something went wrong",
           });
         } else {
           expect(responseMock._getData()).toMatch(/something went wrong/);

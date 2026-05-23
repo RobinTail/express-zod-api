@@ -5,10 +5,10 @@ HTTP status codes already discriminate success vs error.
 
 ## Before / After
 
-| | Success | Error |
-|---|---|---|
-| **Current** | `{ status: "success", data: <output> }` | `{ status: "error", error: { message } }` |
-| **Proposed** | `<output>` (bare) | `{ message }` (bare) |
+|              | Success                                 | Error                                     |
+| ------------ | --------------------------------------- | ----------------------------------------- |
+| **Current**  | `{ status: "success", data: <output> }` | `{ status: "error", error: { message } }` |
+| **Proposed** | `<output>` (bare)                       | `{ message }` (bare)                      |
 
 ## Rationale
 
@@ -36,33 +36,33 @@ HTTP status codes already discriminate success vs error.
 
 ### Phase 2 — Unit tests (`express-zod-api/tests/`)
 
-| File | Change |
-|---|---|
-| `result-handler.spec.ts` | All `toEqual`, `toMatchSnapshot`, `expectTypeOf` assertions for `defaultResultHandler` expect unwrapped shapes |
-| `__snapshots__/result-handler.spec.ts.snap` | Regenerate — all `{status:"success",data:…}` → `…`, all `{status:"error",error:{message:…}}` → `{message:…}` |
-| `__snapshots__/integration.spec.ts.snap` | Variant types stay as bare body `T`; *Variants interface values change to `[200, T]` / `[400, {message:string}]` tuples. `Response` interface removed. |
-| `server.spec.ts` | Check for hardcoded response-body assertions referencing `status`/`data`/`error` wrapper, update if found |
-| `routing.spec.ts` | Same |
-| `endpoint.spec.ts` | Same |
-| `system.spec.ts` | Same |
+| File                                        | Change                                                                                                                                                  |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `result-handler.spec.ts`                    | All `toEqual`, `toMatchSnapshot`, `expectTypeOf` assertions for `defaultResultHandler` expect unwrapped shapes                                          |
+| `__snapshots__/result-handler.spec.ts.snap` | Regenerate — all `{status:"success",data:…}` → `…`, all `{status:"error",error:{message:…}}` → `{message:…}`                                            |
+| `__snapshots__/integration.spec.ts.snap`    | Variant types stay as bare body `T`; \*Variants interface values change to `[200, T]` / `[400, {message:string}]` tuples. `Response` interface removed. |
+| `server.spec.ts`                            | Check for hardcoded response-body assertions referencing `status`/`data`/`error` wrapper, update if found                                               |
+| `routing.spec.ts`                           | Same                                                                                                                                                    |
+| `endpoint.spec.ts`                          | Same                                                                                                                                                    |
+| `system.spec.ts`                            | Same                                                                                                                                                    |
 
 ### Phase 3 — Example workspace
 
-| File | Change |
-|---|---|
-| `example/index.spec.ts` | Update `toMatchObject`, `toEqual`, `toMatchSnapshot` calls that assert `{status, data}`, `{status, error}` |
-| `example/__snapshots__/index.spec.ts.snap` | Regenerate |
-| `example/example.client.ts` | Regenerate via `Integration` — *Variants interface values become `[status, body]` tuples; `Response` interface removed; `EncodedResponse` is the primary consumer type |
-| `example/example.documentation.yaml` | Regenerate via `Documentation` — OpenAPI schemas drop the envelope |
+| File                                       | Change                                                                                                                                                                  |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `example/index.spec.ts`                    | Update `toMatchObject`, `toEqual`, `toMatchSnapshot` calls that assert `{status, data}`, `{status, error}`                                                              |
+| `example/__snapshots__/index.spec.ts.snap` | Regenerate                                                                                                                                                              |
+| `example/example.client.ts`                | Regenerate via `Integration` — \*Variants interface values become `[status, body]` tuples; `Response` interface removed; `EncodedResponse` is the primary consumer type |
+| `example/example.documentation.yaml`       | Regenerate via `Documentation` — OpenAPI schemas drop the envelope                                                                                                      |
 
 **Not affected:** `statusDependingFactory` / `fileSendingEndpointsFactory` / `fileStreamingEndpointsFactory` — these use custom `ResultHandler` instances, not `defaultResultHandler`.
 
 ### Phase 4 — Documentation
 
-| File | Change |
-|---|---|
-| `README.md` | Update `DefaultResponse<OUT>`, the `curl` example, the testing section, and the custom `ResultHandler` template |
-| `CHANGELOG.md` | Add breaking-change entry with `diff` code block (major release convention) |
+| File           | Change                                                                                                          |
+| -------------- | --------------------------------------------------------------------------------------------------------------- |
+| `README.md`    | Update `DefaultResponse<OUT>`, the `curl` example, the testing section, and the custom `ResultHandler` template |
+| `CHANGELOG.md` | Add breaking-change entry with `diff` code block (major release convention)                                     |
 
 ### Phase 5 — Client-side discrimination: `EncodedResponse` with tuple variants
 
@@ -79,7 +79,7 @@ The `*Variant#` types stay as bare body types — they describe only the respons
 type GetV1UserRetrievePositiveVariant1 = { id: number; name: string };
 ```
 
-The *Variants interface values wrap them in a `[statusCode, body]` tuple at the property level:
+The \*Variants interface values wrap them in a `[statusCode, body]` tuple at the property level:
 
 ```typescript
 // Before (bare body in interface):
@@ -97,9 +97,9 @@ The `EncodedResponse` intersection carries these tuples:
 
 ```typescript
 export interface EncodedResponse {
-  "get /v1/user/retrieve":
-    { 200: [200, { id: number; name: string }] }
-    & { 400: [400, { message: string }] };
+  "get /v1/user/retrieve": { 200: [200, { id: number; name: string }] } & {
+    400: [400, { message: string }];
+  };
 }
 
 // SomeOf unwraps to a discriminated tuple union:
@@ -113,12 +113,14 @@ discriminated union directly — no `ToTuple` helper needed.
 ### Consumer usage
 
 ```typescript
-const [status, body] = await client.provide("get /v1/user/retrieve", { id: "10" });
+const [status, body] = await client.provide("get /v1/user/retrieve", {
+  id: "10",
+});
 //    ^ 200 | 400          ^ PosVariant | NegVariant
 if (status === 200) {
-  body // narrowed to PosVariant
+  body; // narrowed to PosVariant
 } else {
-  body // narrowed to NegVariant
+  body; // narrowed to NegVariant
 }
 ```
 
@@ -167,15 +169,15 @@ const defaultImplementation: Implementation = async (method, path, params) => {
 
 ### Code-generation changes needed
 
-| File | Change |
-|---|---|
-| `integration-base.ts:IOKind` | Remove `"response"` from the union type (no more `Response` interface) |
-| `integration-base.ts:interfaces` | Remove `response: "Response"` entry |
-| `integration-base.ts:162-178` (`makeImplementationType`) | Return type: `Promise<any>` → `Promise<[number, any]>` |
-| `integration-base.ts:354-400` (`#makeProvider`) | Return type: `Promise<SomeOf<EncodedResponse[K]>>` instead of `Promise<Response[K]>` |
+| File                                                        | Change                                                                                                                       |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `integration-base.ts:IOKind`                                | Remove `"response"` from the union type (no more `Response` interface)                                                       |
+| `integration-base.ts:interfaces`                            | Remove `response: "Response"` entry                                                                                          |
+| `integration-base.ts:162-178` (`makeImplementationType`)    | Return type: `Promise<any>` → `Promise<[number, any]>`                                                                       |
+| `integration-base.ts:354-400` (`#makeProvider`)             | Return type: `Promise<SomeOf<EncodedResponse[K]>>` instead of `Promise<Response[K]>`                                         |
 | `integration-base.ts:446-585` (`makeDefaultImplementation`) | Return `[response.status, body]` tuple instead of bare `body`; handle no-body early return as `[response.status, undefined]` |
-| `integration-base.ts:makePublicInterfaces` | Remove `"response"` from the `IOKind` iteration |
-| `integration.ts:109-148` (`onEndpoint`) | Generate tuple variant types and use `SomeOf<EncodedResponse[K]>` for `store.response` (or remove `store.response` entirely) |
+| `integration-base.ts:makePublicInterfaces`                  | Remove `"response"` from the `IOKind` iteration                                                                              |
+| `integration.ts:109-148` (`onEndpoint`)                     | Generate tuple variant types and use `SomeOf<EncodedResponse[K]>` for `store.response` (or remove `store.response` entirely) |
 
 The key change in `integration.ts` — the variant type generation stays the same (bare body), only the
 interface property value changes to a tuple:
@@ -200,7 +202,8 @@ const variantType = this.api.makeType(
 );
 this.#program.push(variantType);
 return statusCodes.map((code) =>
-  this.api.makeInterfaceProp(code,
+  this.api.makeInterfaceProp(
+    code,
     this.api.f.createTupleTypeNode([
       this.api.f.createNumericLiteral(code),
       this.api.ensureTypeNode(variantType.name),
@@ -216,6 +219,7 @@ variant type is created once and each interface property independently wraps it 
 ### Phase 6 — Migration rule (`migration/`)
 
 Add a new rule in `migration/index.ts` that:
+
 - Detects usage of `defaultResultHandler` / `defaultEndpointsFactory` and warns about the new response shape
 - Flags client-side patterns like `response.status === "success"`, `response.data`, `response.error` that must be updated
 - Provides instruction (or auto-fix) to create a compat `ResultHandler` for users who want to keep the old envelope

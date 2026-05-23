@@ -167,8 +167,7 @@ describe("EndpointsFactory", () => {
       });
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
-        error: { message: "Rejected" },
-        status: "error",
+        message: "Rejected",
       });
       expect(middleware).toHaveBeenCalledTimes(1);
     });
@@ -210,8 +209,7 @@ describe("EndpointsFactory", () => {
       });
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
-        error: { message: "This one has failed" },
-        status: "error",
+        message: "This one has failed",
       });
       expect(middleware).toHaveBeenCalledTimes(1);
     });
@@ -246,8 +244,7 @@ describe("EndpointsFactory", () => {
       });
       expect(responseMock._getStatusCode()).toBe(401);
       expect(responseMock._getJSONData()).toEqual({
-        error: { message: "This one has failed" },
-        status: "error",
+        message: "This one has failed",
       });
       expect(middleware).toHaveBeenCalledTimes(1);
     });

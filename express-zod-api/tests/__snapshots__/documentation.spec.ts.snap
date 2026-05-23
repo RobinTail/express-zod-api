@@ -18,17 +18,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: GET /v1/getSome/thing Negative response
@@ -37,27 +27,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: coolOperationId__HEAD
       summary: thing is the path segment
@@ -101,17 +79,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: GET /v1/getSome/thing Negative response
@@ -120,27 +88,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: headCoolOperationId
       summary: thing is the path segment
@@ -168,17 +124,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: POST /v1/getSome/thing Negative response
@@ -187,27 +133,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -242,17 +176,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: GET /v1/getSome/thing Negative response
@@ -261,27 +185,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomeThing
       summary: operationIdEndpoint
@@ -303,17 +215,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: GET /v1/getSome/:thing Negative response
@@ -322,27 +224,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomeThing2
       summary: thing is the path parameter
@@ -401,20 +291,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      num:
-                        type: number
-                    required:
-                      - num
-                    additionalProperties: false
+                  num:
+                    type: number
                 required:
-                  - status
-                  - data
+                  - num
                 additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
@@ -423,27 +303,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       parameters:
@@ -488,17 +356,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: POST /v1/setSomething Negative response
@@ -507,27 +365,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
   /v1/updateSomething:
     put:
       operationId: PutV1UpdateSomething
@@ -547,17 +393,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: PUT /v1/updateSomething Negative response
@@ -566,27 +402,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -639,20 +463,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      whatever:
-                        type: number
-                    required:
-                      - whatever
-                    additionalProperties: false
+                  whatever:
+                    type: number
                 required:
-                  - status
-                  - data
+                  - whatever
                 additionalProperties: false
         "400":
           description: DELETE /v1/deleteSomething Negative response
@@ -661,27 +475,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -742,24 +544,14 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  literal:
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      literal:
-                        type: string
-                        const: something
-                      transformation:
-                        type: number
-                    required:
-                      - literal
-                      - transformation
-                    additionalProperties: false
+                    const: something
+                  transformation:
+                    type: number
                 required:
-                  - status
-                  - data
+                  - literal
+                  - transformation
                 additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
@@ -768,27 +560,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -849,46 +629,36 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    oneOf:
-                      - type: object
+                oneOf:
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        const: success
+                      data: {}
+                    required:
+                      - status
+                      - data
+                    additionalProperties: false
+                  - type: object
+                    properties:
+                      status:
+                        type: string
+                        const: error
+                      error:
+                        type: object
                         properties:
-                          status:
+                          message:
                             type: string
-                            const: success
-                          data: {}
                         required:
-                          - status
-                          - data
+                          - message
                         additionalProperties: false
-                      - type: object
-                        properties:
-                          status:
-                            type: string
-                            const: error
-                          error:
-                            type: object
-                            properties:
-                              message:
-                                type: string
-                            required:
-                              - message
-                            additionalProperties: false
-                        required:
-                          - status
-                          - error
-                        additionalProperties: false
-                    discriminator:
-                      propertyName: status
-                required:
-                  - status
-                  - data
-                additionalProperties: false
+                    required:
+                      - status
+                      - error
+                    additionalProperties: false
+                discriminator:
+                  propertyName: status
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -896,27 +666,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -970,30 +728,20 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
+                  and:
                     type: object
                     properties:
-                      and:
-                        type: object
-                        properties:
-                          five:
-                            type: integer
-                            minimum: 0
-                            maximum: 9007199254740991
-                          six:
-                            type: string
-                        required:
-                          - five
-                          - six
+                      five:
+                        type: integer
+                        minimum: 0
+                        maximum: 9007199254740991
+                      six:
+                        type: string
                     required:
-                      - and
-                    additionalProperties: false
+                      - five
+                      - six
                 required:
-                  - status
-                  - data
+                  - and
                 additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
@@ -1002,27 +750,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -1098,43 +834,33 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      nullable:
-                        type:
-                          - string
-                          - "null"
-                      literal:
-                        type:
-                          - string
-                          - "null"
-                        const: test
-                      multiliteral:
-                        type:
-                          - string
-                          - "null"
-                        enum:
-                          - one
-                          - two
-                      enum:
-                        type:
-                          - string
-                          - "null"
-                        enum:
-                          - test
-                    required:
-                      - nullable
-                      - literal
-                      - multiliteral
-                      - enum
-                    additionalProperties: false
+                  nullable:
+                    type:
+                      - string
+                      - "null"
+                  literal:
+                    type:
+                      - string
+                      - "null"
+                    const: test
+                  multiliteral:
+                    type:
+                      - string
+                      - "null"
+                    enum:
+                      - one
+                      - two
+                  enum:
+                    type:
+                      - string
+                      - "null"
+                    enum:
+                      - test
                 required:
-                  - status
-                  - data
+                  - nullable
+                  - literal
+                  - multiliteral
+                  - enum
                 additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
@@ -1143,27 +869,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       parameters:
@@ -1280,24 +994,14 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      or:
-                        anyOf:
-                          - type: string
-                          - type: integer
-                            exclusiveMinimum: 0
-                            maximum: 9007199254740991
-                    required:
-                      - or
-                    additionalProperties: false
+                  or:
+                    anyOf:
+                      - type: string
+                      - type: integer
+                        exclusiveMinimum: 0
+                        maximum: 9007199254740991
                 required:
-                  - status
-                  - data
+                  - or
                 additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
@@ -1306,27 +1010,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -1374,17 +1066,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
@@ -1393,27 +1075,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       parameters:
@@ -1499,38 +1169,28 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  "null":
+                    type: "null"
+                  dateOut:
+                    description: YYYY-MM-DDTHH:mm:ss.sssZ
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      "null":
-                        type: "null"
-                      dateOut:
-                        description: YYYY-MM-DDTHH:mm:ss.sssZ
-                        type: string
-                        format: date-time
-                        externalDocs:
-                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                      buffer:
-                        externalDocs:
-                          description: raw binary data
-                          url: https://swagger.io/specification/#working-with-binary-data
-                      based:
-                        type: string
-                        format: base64
-                        contentEncoding: base64
-                        pattern: ^$|^(?:[0-9a-zA-Z+/]{4})*(?:(?:[0-9a-zA-Z+/]{2}==)|(?:[0-9a-zA-Z+/]{3}=))?$
-                    required:
-                      - "null"
-                      - dateOut
-                      - buffer
-                      - based
-                    additionalProperties: false
+                    format: date-time
+                    externalDocs:
+                      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                  buffer:
+                    externalDocs:
+                      description: raw binary data
+                      url: https://swagger.io/specification/#working-with-binary-data
+                  based:
+                    type: string
+                    format: base64
+                    contentEncoding: base64
+                    pattern: ^$|^(?:[0-9a-zA-Z+/]{4})*(?:(?:[0-9a-zA-Z+/]{2}==)|(?:[0-9a-zA-Z+/]{3}=))?$
                 required:
-                  - status
-                  - data
+                  - "null"
+                  - dateOut
+                  - buffer
+                  - based
                 additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
@@ -1539,27 +1199,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -1599,20 +1247,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      zodExample:
-                        $ref: "#/components/schemas/Schema2"
-                    required:
-                      - zodExample
-                    additionalProperties: false
+                  zodExample:
+                    $ref: "#/components/schemas/Schema2"
                 required:
-                  - status
-                  - data
+                  - zodExample
                 additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
@@ -1621,27 +1259,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas:
     Schema1:
@@ -1817,22 +1443,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  bigint:
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      bigint:
-                        type: string
-                        format: bigint
-                        pattern: ^-?\\d+$
-                    required:
-                      - bigint
-                    additionalProperties: false
+                    format: bigint
+                    pattern: ^-?\\d+$
                 required:
-                  - status
-                  - data
+                  - bigint
                 additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
@@ -1841,27 +1457,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -1971,21 +1575,11 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  nonempty:
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      nonempty:
-                        type: string
-                        minLength: 1
-                    required:
-                      - nonempty
-                    additionalProperties: false
+                    minLength: 1
                 required:
-                  - status
-                  - data
+                  - nonempty
                 additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
@@ -1994,27 +1588,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -2063,23 +1645,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      nativeEnum:
-                        type: number
-                        enum:
-                          - 1
-                          - 2
-                    required:
-                      - nativeEnum
-                    additionalProperties: false
+                  nativeEnum:
+                    type: number
+                    enum:
+                      - 1
+                      - 2
                 required:
-                  - status
-                  - data
+                  - nativeEnum
                 additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
@@ -2088,27 +1660,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -2149,80 +1709,70 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
+                  simple:
                     type: object
-                    properties:
-                      simple:
-                        type: object
-                        propertyNames:
-                          type: string
-                        additionalProperties:
-                          type: integer
-                          minimum: -9007199254740991
-                          maximum: 9007199254740991
-                      stringy:
-                        type: object
-                        propertyNames:
-                          type: string
-                          pattern: "[A-Z]+"
-                        additionalProperties:
-                          type: boolean
-                      numeric:
-                        type: object
-                        propertyNames:
-                          type: integer
-                          minimum: -9007199254740991
-                          maximum: 9007199254740991
-                        additionalProperties:
-                          type: boolean
-                      literal:
-                        type: object
-                        propertyNames:
-                          type: string
-                          const: only
-                        additionalProperties:
-                          type: boolean
-                        required:
-                          - only
-                      union:
-                        type: object
-                        propertyNames:
-                          anyOf:
-                            - type: string
-                              const: option1
-                            - type: string
-                              const: option2
-                        additionalProperties:
-                          type: boolean
-                        required:
-                          - option1
-                          - option2
-                      enum:
-                        type: object
-                        propertyNames:
-                          type: string
-                          enum:
-                            - option1
-                            - option2
-                        additionalProperties:
-                          type: boolean
-                        required:
-                          - option1
-                          - option2
+                    propertyNames:
+                      type: string
+                    additionalProperties:
+                      type: integer
+                      minimum: -9007199254740991
+                      maximum: 9007199254740991
+                  stringy:
+                    type: object
+                    propertyNames:
+                      type: string
+                      pattern: "[A-Z]+"
+                    additionalProperties:
+                      type: boolean
+                  numeric:
+                    type: object
+                    propertyNames:
+                      type: integer
+                      minimum: -9007199254740991
+                      maximum: 9007199254740991
+                    additionalProperties:
+                      type: boolean
+                  literal:
+                    type: object
+                    propertyNames:
+                      type: string
+                      const: only
+                    additionalProperties:
+                      type: boolean
                     required:
-                      - simple
-                      - stringy
-                      - numeric
-                      - literal
-                      - union
-                      - enum
-                    additionalProperties: false
+                      - only
+                  union:
+                    type: object
+                    propertyNames:
+                      anyOf:
+                        - type: string
+                          const: option1
+                        - type: string
+                          const: option2
+                    additionalProperties:
+                      type: boolean
+                    required:
+                      - option1
+                      - option2
+                  enum:
+                    type: object
+                    propertyNames:
+                      type: string
+                      enum:
+                        - option1
+                        - option2
+                    additionalProperties:
+                      type: boolean
+                    required:
+                      - option1
+                      - option2
                 required:
-                  - status
-                  - data
+                  - simple
+                  - stringy
+                  - numeric
+                  - literal
+                  - union
+                  - enum
                 additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
@@ -2231,27 +1781,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -2302,20 +1840,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      transform:
-                        type: number
-                    required:
-                      - transform
-                    additionalProperties: false
+                  transform:
+                    type: number
                 required:
-                  - status
-                  - data
+                  - transform
                 additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
@@ -2324,27 +1852,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -2415,23 +1931,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      empty:
-                        type: array
-                        prefixItems: []
-                        items:
-                          not: {}
-                    required:
-                      - empty
-                    additionalProperties: false
+                  empty:
+                    type: array
+                    prefixItems: []
+                    items:
+                      not: {}
                 required:
-                  - status
-                  - data
+                  - empty
                 additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
@@ -2440,27 +1946,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -2500,19 +1994,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      any: {}
-                    required:
-                      - any
-                    additionalProperties: false
+                  any: {}
                 required:
-                  - status
-                  - data
+                  - any
                 additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
@@ -2521,27 +2005,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       parameters:
@@ -2603,20 +2075,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      boolean:
-                        type: boolean
-                    required:
-                      - boolean
-                    additionalProperties: false
+                  boolean:
+                    type: boolean
                 required:
-                  - status
-                  - data
+                  - boolean
                 additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
@@ -2625,27 +2087,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       parameters:
@@ -2816,20 +2266,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      number:
-                        summary: My custom schema
-                    required:
-                      - number
-                    additionalProperties: false
+                  number:
+                    summary: My custom schema
                 required:
-                  - status
-                  - data
+                  - number
                 additionalProperties: false
         "400":
           description: GET /v1/:name Negative response
@@ -2838,27 +2278,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1Name
       parameters:
@@ -2936,20 +2364,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  user_name:
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      user_name:
-                        type: string
-                    required:
-                      - user_name
-                    additionalProperties: false
                 required:
-                  - status
-                  - data
+                  - user_name
                 additionalProperties: false
         "400":
           description: GET /v1/test Negative response
@@ -2958,27 +2376,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1Test
       parameters:
@@ -3044,20 +2450,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  user_name:
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      user_name:
-                        type: string
-                    required:
-                      - user_name
-                    additionalProperties: false
                 required:
-                  - status
-                  - data
+                  - user_name
                 additionalProperties: false
         "400":
           description: GET /v1/test Negative response
@@ -3066,27 +2462,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1Test
       parameters:
@@ -3146,17 +2530,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: GET /v1/test Negative response
@@ -3165,27 +2539,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1Test
       parameters:
@@ -3259,17 +2621,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: POST /v1/test Negative response
@@ -3278,27 +2630,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -3350,17 +2690,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: PUT /v1/test Negative response
@@ -3369,27 +2699,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -3433,23 +2751,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      arr:
-                        minItems: 1
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - arr
-                    additionalProperties: false
+                  arr:
+                    minItems: 1
+                    type: array
+                    items:
+                      type: string
                 required:
-                  - status
-                  - data
+                  - arr
                 additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
@@ -3458,27 +2766,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       parameters:
@@ -3521,23 +2817,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      arr:
-                        minItems: 1
-                        type: array
-                        items:
-                          type: string
-                    required:
-                      - arr
-                    additionalProperties: false
+                  arr:
+                    minItems: 1
+                    type: array
+                    items:
+                      type: string
                 required:
-                  - status
-                  - data
+                  - arr
                 additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
@@ -3546,27 +2832,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -3623,37 +2897,27 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    anyOf:
-                      - type: object
-                        properties:
-                          id:
-                            type: string
-                          field1:
-                            type: string
-                        required:
-                          - id
-                          - field1
-                        additionalProperties: false
-                      - type: object
-                        properties:
-                          id:
-                            type: string
-                          field2:
-                            type: string
-                        required:
-                          - id
-                          - field2
-                        additionalProperties: false
-                required:
-                  - status
-                  - data
-                additionalProperties: false
+                anyOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                      field1:
+                        type: string
+                    required:
+                      - id
+                      - field1
+                    additionalProperties: false
+                  - type: object
+                    properties:
+                      id:
+                        type: string
+                      field2:
+                        type: string
+                    required:
+                      - id
+                      - field2
+                    additionalProperties: false
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -3661,27 +2925,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -3724,17 +2976,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
@@ -3743,27 +2985,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       deprecated: true
@@ -3830,42 +3060,23 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  a:
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      a:
-                        type: string
-                      b:
-                        type: string
-                    required:
-                      - a
-                      - b
-                    additionalProperties: false
-                    examples:
-                      - a: first
-                        b: prefix_first
-                      - a: second
-                        b: prefix_second
+                  b:
+                    type: string
                 required:
-                  - status
-                  - data
+                  - a
+                  - b
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: success
-                    data:
-                      a: first
-                      b: prefix_first
+                    a: first
+                    b: prefix_first
                 example2:
                   value:
-                    status: success
-                    data:
-                      a: second
-                      b: prefix_second
+                    a: second
+                    b: prefix_second
         "400":
           description: POST /v1/addSomething Negative response
           content:
@@ -3873,27 +3084,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -3943,9 +3142,7 @@ paths:
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadHrisEmployees
       parameters:
@@ -3969,35 +3166,15 @@ components:
       type: string
     GetHrisEmployeesPositiveResponse:
       type: object
-      properties:
-        status:
-          type: string
-          const: success
-        data:
-          type: object
-          properties: {}
-          additionalProperties: false
-      required:
-        - status
-        - data
+      properties: {}
       additionalProperties: false
     GetHrisEmployeesNegativeResponse:
       type: object
       properties:
-        status:
+        message:
           type: string
-          const: error
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-          required:
-            - message
-          additionalProperties: false
       required:
-        - status
-        - error
+        - message
       additionalProperties: false
   responses: {}
   parameters: {}
@@ -4050,29 +3227,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      num:
-                        type: number
-                    required:
-                      - num
-                    additionalProperties: false
-                    examples:
-                      - num: 123
+                  num:
+                    type: number
                 required:
-                  - status
-                  - data
+                  - num
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: success
-                    data:
-                      num: 123
+                    num: 123
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -4080,27 +3243,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -4158,31 +3309,17 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      num:
-                        type: number
-                        examples:
-                          - 123
-                    required:
-                      - num
-                    additionalProperties: false
+                  num:
+                    type: number
                     examples:
-                      - num: 123
+                      - 123
                 required:
-                  - status
-                  - data
+                  - num
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: success
-                    data:
-                      num: 123
+                    num: 123
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -4190,27 +3327,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -4254,29 +3379,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  numericStr:
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      numericStr:
-                        type: string
-                    required:
-                      - numericStr
-                    additionalProperties: false
-                    examples:
-                      - numericStr: "123"
                 required:
-                  - status
-                  - data
+                  - numericStr
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: success
-                    data:
-                      numericStr: "123"
+                    numericStr: "123"
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -4284,27 +3395,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       parameters:
@@ -4371,29 +3470,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  numericStr:
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      numericStr:
-                        type: string
-                    required:
-                      - numericStr
-                    additionalProperties: false
-                    examples:
-                      - numericStr: "123"
                 required:
-                  - status
-                  - data
+                  - numericStr
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: success
-                    data:
-                      numericStr: "123"
+                    numericStr: "123"
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -4401,27 +3486,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -4467,31 +3540,17 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      numericStr:
-                        examples:
-                          - "456"
-                        type: string
-                    required:
-                      - numericStr
-                    additionalProperties: false
+                  numericStr:
                     examples:
-                      - numericStr: "456"
+                      - "456"
+                    type: string
                 required:
-                  - status
-                  - data
+                  - numericStr
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: success
-                    data:
-                      numericStr: "456"
+                    numericStr: "456"
         "400":
           description: GET /v1/getSomething Negative response
           content:
@@ -4499,27 +3558,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       parameters:
@@ -4590,31 +3637,17 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      numericStr:
-                        examples:
-                          - "456"
-                        type: string
-                    required:
-                      - numericStr
-                    additionalProperties: false
+                  numericStr:
                     examples:
-                      - numericStr: "456"
+                      - "456"
+                    type: string
                 required:
-                  - status
-                  - data
+                  - numericStr
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: success
-                    data:
-                      numericStr: "456"
+                    numericStr: "456"
         "400":
           description: POST /v1/getSomething Negative response
           content:
@@ -4622,27 +3655,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -4684,23 +3705,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      result:
-                        type: integer
-                        exclusiveMinimum: 0
-                        maximum: 9007199254740991
-                        description: some positive integer
-                    required:
-                      - result
-                    additionalProperties: false
+                  result:
+                    type: integer
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
+                    description: some positive integer
                 required:
-                  - status
-                  - data
+                  - result
                 additionalProperties: false
         "400":
           description: GET /v1/getSomething Negative response
@@ -4709,27 +3720,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1GetSomething
       parameters:
@@ -4800,17 +3799,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: very negative response of PostV1Name
@@ -4819,27 +3808,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas: {}
   responses: {}
@@ -4895,9 +3872,7 @@ paths:
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas:
     ParameterOfPostV1NameName:
@@ -4908,35 +3883,15 @@ components:
           const: Jane
     SuperPositiveResponseOfV1Name:
       type: object
-      properties:
-        status:
-          type: string
-          const: success
-        data:
-          type: object
-          properties: {}
-          additionalProperties: false
-      required:
-        - status
-        - data
+      properties: {}
       additionalProperties: false
     VeryNegativeResponseOfPostV1Name:
       type: object
       properties:
-        status:
+        message:
           type: string
-          const: error
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-          required:
-            - message
-          additionalProperties: false
       required:
-        - status
-        - error
+        - message
       additionalProperties: false
     TheBodyOfRequest:
       type: object
@@ -4992,17 +3947,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: GET /v1/:name Negative response
@@ -5011,27 +3956,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1Name
       parameters:
@@ -5107,17 +4040,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties: {}
-                    additionalProperties: false
-                required:
-                  - status
-                  - data
+                properties: {}
                 additionalProperties: false
         "400":
           description: POST /v1/:name Negative response
@@ -5126,27 +4049,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
 components:
   schemas:
     NameParam:
