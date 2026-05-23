@@ -1,5 +1,26 @@
 # Changelog
 
+## Version 29
+
+### v29.0.0
+
+- Breaking change: The `defaultResultHandler` no longer wraps endpoint output in
+  `{ status: "success", data: … }` and error messages in `{ status: "error", error: { message: … } }`:
+  - On success, the endpoint output is sent as-is (bare JSON object);
+  - On error, the body is `{ message: … }` (without `error` wrapper and `status` field);
+  - The HTTP status code (`200` vs `4xx`/`5xx`) already discriminates success vs error, making the
+    `status` string redundant;
+  - `DefaultResponse<OUT>` type is simplified to `OUT | { message: string }`;
+  - `arrayResultHandler` is not affected — it already returns bare arrays and plain-text errors.
+
+```diff
+- { "status": "success", "data": { "greetings": "Hello!" } }
++ { "greetings": "Hello!" }
+
+- { "status": "error", "error": { "message": "Not found" } }
++ { "message": "Not found" }
+```
+
 ## Version 28
 
 ### v28.1.0

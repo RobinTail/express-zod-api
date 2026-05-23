@@ -273,7 +273,7 @@ curl -L -X GET 'localhost:8090/v1/hello?name=Rick'
 You should receive the following response:
 
 ```json
-{ "status": "success", "data": { "greetings": "Hello, Rick. Happy coding!" } }
+{ "greetings": "Hello, Rick. Happy coding!" }
 ```
 
 # Basic features
@@ -869,8 +869,8 @@ The `defaultResultHandler` sets the HTTP status code and ensures the following t
 
 ```ts
 type DefaultResponse<OUT> =
-  | { status: "success"; data: OUT } // Positive response
-  | { status: "error"; error: { message: string } }; // or Negative response
+  | OUT // Positive response
+  | { message: string }; // or Negative response
 ```
 
 You can create your own result handler by using this example as a template:
@@ -885,17 +885,17 @@ import {
 
 const yourResultHandler = new ResultHandler({
   positive: (data) => ({
-    schema: z.object({ data }),
+    schema: data,
     mimeType: "application/json", // optinal or array
   }),
-  negative: z.object({ error: z.string() }),
+  negative: z.object({ message: z.string() }),
   handler: ({ error, input, output, request, response, logger }) => {
     if (error) {
       const { statusCode } = ensureHttpError(error);
       const message = getMessageFromError(error);
-      return void response.status(statusCode).json({ error: message });
+      return void response.status(statusCode).json({ message });
     }
-    response.status(200).json({ data: output });
+    response.status(200).json(output);
   },
 });
 ```
@@ -1108,7 +1108,7 @@ test("should respond successfully", async () => {
   expect(loggerMock._getLogs().error).toHaveLength(0);
   expect(responseMock._getStatusCode()).toBe(200);
   expect(responseMock._getHeaders()).toHaveProperty("x-custom", "one"); // lower case!
-  expect(responseMock._getJSONData()).toEqual({ status: "success" });
+  expect(responseMock._getJSONData()).toEqual({ greetings: "Hello, World" });
 });
 ```
 
