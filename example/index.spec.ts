@@ -328,7 +328,6 @@ describe("Example", async () => {
         message: "Logged in",
       });
       expect(response.headers.get("set-cookie")).toMatch(/^session=j/);
-      console.log(response.headers.get("set-cookie"));
     });
   });
 
