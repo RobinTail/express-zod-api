@@ -2,137 +2,110 @@
 
 exports[`Example > Client > Issue #2177: should handle path params correctly 1`] = `
 {
-  "data": {
-    "createdAt": "2022-01-22T00:00:00.000Z",
-    "name": "Alan Turing",
-  },
-  "status": "success",
+  "createdAt": "2022-01-22T00:00:00.000Z",
+  "name": "Alan Turing",
 }
 `;
 
 exports[`Example > Client > Should perform the request with a positive response 1`] = `
 {
-  "data": {
-    "features": [
-      {
-        "features": [
-          {
-            "title": "Above 180cm",
-          },
-        ],
-        "title": "Tall",
-      },
-      {
-        "title": "Young",
-      },
-      {
-        "features": [
-          {
-            "features": [
-              {
-                "title": "About Typescript",
-              },
-            ],
-            "title": "Tells funny jokes",
-          },
-        ],
-        "title": "Cute",
-      },
-    ],
-    "id": 10,
-    "name": "John Doe",
-  },
-  "status": "success",
+  "features": [
+    {
+      "features": [
+        {
+          "title": "Above 180cm",
+        },
+      ],
+      "title": "Tall",
+    },
+    {
+      "title": "Young",
+    },
+    {
+      "features": [
+        {
+          "features": [
+            {
+              "title": "About Typescript",
+            },
+          ],
+          "title": "Tells funny jokes",
+        },
+      ],
+      "title": "Cute",
+    },
+  ],
+  "id": 10,
+  "name": "John Doe",
 }
 `;
 
 exports[`Example > Negative > GET request should fail on missing input param 1`] = `
 {
-  "error": {
-    "message": "id: Invalid input: expected string, received undefined",
-  },
-  "status": "error",
+  "message": "id: Invalid input: expected string, received undefined",
 }
 `;
 
 exports[`Example > Negative > PATCH request should fail on schema validation 1`] = `
 {
-  "error": {
-    "message": "id: should be greater than or equal to 0",
-  },
-  "status": "error",
+  "message": "id: should be greater than or equal to 0",
 }
 `;
 
 exports[`Example > Negative > Should fail to upload if the file is too large 1`] = `
 {
-  "error": {
-    "message": "The file is too large",
-  },
-  "status": "error",
+  "message": "The file is too large",
 }
 `;
 
 exports[`Example > Negative > Should respond with error to the missing static file request 1`] = `
 {
-  "error": {
-    "message": "Can not GET /public/missing.svg",
-  },
-  "status": "error",
+  "message": "Can not GET /public/missing.svg",
 }
 `;
 
 exports[`Example > Positive > Should accept raw data 0 1`] = `
 {
-  "data": {
-    "length": 48687,
-  },
-  "status": "success",
+  "length": 48687,
 }
 `;
 
 exports[`Example > Positive > Should accept raw data 1 1`] = `
 {
-  "data": {
-    "length": 48687,
-  },
-  "status": "success",
+  "length": 48687,
 }
 `;
 
 exports[`Example > Positive > Should handle valid GET request 1`] = `
 {
-  "data": {
-    "features": [
-      {
-        "features": [
-          {
-            "title": "Above 180cm",
-          },
-        ],
-        "title": "Tall",
-      },
-      {
-        "title": "Young",
-      },
-      {
-        "features": [
-          {
-            "features": [
-              {
-                "title": "About Typescript",
-              },
-            ],
-            "title": "Tells funny jokes",
-          },
-        ],
-        "title": "Cute",
-      },
-    ],
-    "id": 50,
-    "name": "John Doe",
-  },
-  "status": "success",
+  "features": [
+    {
+      "features": [
+        {
+          "title": "Above 180cm",
+        },
+      ],
+      "title": "Tall",
+    },
+    {
+      "title": "Young",
+    },
+    {
+      "features": [
+        {
+          "features": [
+            {
+              "title": "About Typescript",
+            },
+          ],
+          "title": "Tells funny jokes",
+        },
+      ],
+      "title": "Cute",
+    },
+  ],
+  "id": 50,
+  "name": "John Doe",
 }
 `;
 
@@ -175,46 +148,43 @@ exports[`Example > Positive > Should respond with array (legacy API ResultHandle
 
 exports[`Example > Positive > Should respond with paginated list (ez.paginated) 1`] = `
 {
-  "data": {
-    "limit": 20,
-    "offset": 0,
-    "total": 8,
-    "users": [
-      {
-        "name": "Maria Merian",
-        "role": "manager",
-      },
-      {
-        "name": "Mary Anning",
-        "role": "operator",
-      },
-      {
-        "name": "Marie Skłodowska Curie",
-        "role": "admin",
-      },
-      {
-        "name": "Henrietta Leavitt",
-        "role": "manager",
-      },
-      {
-        "name": "Lise Meitner",
-        "role": "operator",
-      },
-      {
-        "name": "Alice Ball",
-        "role": "admin",
-      },
-      {
-        "name": "Gerty Cori",
-        "role": "manager",
-      },
-      {
-        "name": "Helen Taussig",
-        "role": "operator",
-      },
-    ],
-  },
-  "status": "success",
+  "limit": 20,
+  "offset": 0,
+  "total": 8,
+  "users": [
+    {
+      "name": "Maria Merian",
+      "role": "manager",
+    },
+    {
+      "name": "Mary Anning",
+      "role": "operator",
+    },
+    {
+      "name": "Marie Skłodowska Curie",
+      "role": "admin",
+    },
+    {
+      "name": "Henrietta Leavitt",
+      "role": "manager",
+    },
+    {
+      "name": "Lise Meitner",
+      "role": "operator",
+    },
+    {
+      "name": "Alice Ball",
+      "role": "admin",
+    },
+    {
+      "name": "Gerty Cori",
+      "role": "manager",
+    },
+    {
+      "name": "Helen Taussig",
+      "role": "operator",
+    },
+  ],
 }
 `;
 
@@ -226,9 +196,6 @@ exports[`Example > Positive > Should stream an image with a correct header 1`] =
 
 exports[`Example > Protocol > Issue #2706: Should handle parser failures but retain CORS headers 1`] = `
 {
-  "error": {
-    "message": StringMatching /Unterminated string in JSON at position 14/,
-  },
-  "status": "error",
+  "message": StringMatching /Unterminated string in JSON at position 14/,
 }
 `;

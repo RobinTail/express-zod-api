@@ -13,12 +13,9 @@ type GetV1UserRetrieveInput = {
 
 /** get /v1/user/retrieve */
 type GetV1UserRetrievePositiveVariant1 = {
-  status: "success";
-  data: {
-    id: number;
-    name: string;
-    features: Type1[];
-  };
+  id: number;
+  name: string;
+  features: Type1[];
 };
 
 /** get /v1/user/retrieve */
@@ -28,10 +25,7 @@ interface GetV1UserRetrievePositiveResponseVariants {
 
 /** get /v1/user/retrieve */
 type GetV1UserRetrieveNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
+  message: string;
 };
 
 /** get /v1/user/retrieve */
@@ -95,12 +89,9 @@ type PatchV1UserIdInput = {
 
 /** patch /v1/user/:id */
 type PatchV1UserIdPositiveVariant1 = {
-  status: "success";
-  data: {
-    name: string;
-    /** account creation date */
-    createdAt: string;
-  };
+  name: string;
+  /** account creation date */
+  createdAt: string;
 };
 
 /** patch /v1/user/:id */
@@ -110,10 +101,7 @@ interface PatchV1UserIdPositiveResponseVariants {
 
 /** patch /v1/user/:id */
 type PatchV1UserIdNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
+  message: string;
 };
 
 /** patch /v1/user/:id */
@@ -213,10 +201,7 @@ type PostV1LoginInput = {
 
 /** post /v1/login */
 type PostV1LoginPositiveVariant1 = {
-  status: "success";
-  data: {
-    message: string;
-  };
+  message: string;
 };
 
 /** post /v1/login */
@@ -226,10 +211,7 @@ interface PostV1LoginPositiveResponseVariants {
 
 /** post /v1/login */
 type PostV1LoginNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
+  message: string;
 };
 
 /** post /v1/login */
@@ -331,14 +313,11 @@ type PostV1AvatarUploadInput = {
 
 /** post /v1/avatar/upload */
 type PostV1AvatarUploadPositiveVariant1 = {
-  status: "success";
-  data: {
-    name: string;
-    size: number;
-    mime: string;
-    hash: string;
-    otherInputs: Record<string, any>;
-  };
+  name: string;
+  size: number;
+  mime: string;
+  hash: string;
+  otherInputs: Record<string, any>;
 };
 
 /** post /v1/avatar/upload */
@@ -348,10 +327,7 @@ interface PostV1AvatarUploadPositiveResponseVariants {
 
 /** post /v1/avatar/upload */
 type PostV1AvatarUploadNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
+  message: string;
 };
 
 /** post /v1/avatar/upload */
@@ -364,10 +340,7 @@ type PostV1AvatarRawInput = Buffer;
 
 /** post /v1/avatar/raw */
 type PostV1AvatarRawPositiveVariant1 = {
-  status: "success";
-  data: {
-    length: number;
-  };
+  length: number;
 };
 
 /** post /v1/avatar/raw */
@@ -377,10 +350,7 @@ interface PostV1AvatarRawPositiveResponseVariants {
 
 /** post /v1/avatar/raw */
 type PostV1AvatarRawNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
+  message: string;
 };
 
 /** post /v1/avatar/raw */
@@ -446,10 +416,7 @@ type PostV1FormsFeedbackInput = {
 
 /** post /v1/forms/feedback */
 type PostV1FormsFeedbackPositiveVariant1 = {
-  status: "success";
-  data: {
-    crc: number;
-  };
+  crc: number;
 };
 
 /** post /v1/forms/feedback */
@@ -459,10 +426,7 @@ interface PostV1FormsFeedbackPositiveResponseVariants {
 
 /** post /v1/forms/feedback */
 type PostV1FormsFeedbackNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
+  message: string;
 };
 
 /** post /v1/forms/feedback */
@@ -482,20 +446,17 @@ type GetV2UsersListInput = {
 
 /** get /v2/users/list */
 type GetV2UsersListPositiveVariant1 = {
-  status: "success";
-  data: {
-    /** Page of users */
-    users: {
-      name: string;
-      role: "manager" | "operator" | "admin";
-    }[];
-    /** Total number of users */
-    total: number;
-    /** Page size used */
-    limit: number;
-    /** Offset used */
-    offset: number;
-  };
+  /** Page of users */
+  users: {
+    name: string;
+    role: "manager" | "operator" | "admin";
+  }[];
+  /** Total number of users */
+  total: number;
+  /** Page size used */
+  limit: number;
+  /** Offset used */
+  offset: number;
 };
 
 /** get /v2/users/list */
@@ -505,10 +466,7 @@ interface GetV2UsersListPositiveResponseVariants {
 
 /** get /v2/users/list */
 type GetV2UsersListNegativeVariant1 = {
-  status: "error";
-  error: {
-    message: string;
-  };
+  message: string;
 };
 
 /** get /v2/users/list */
