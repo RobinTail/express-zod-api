@@ -278,24 +278,51 @@ export const legacyResultHandler = new ResultHandler({
 
 | File                                      | Change                                                                                                                                              |
 | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `migration/index.ts`                      | Add esquery selectors for `defaultResultHandler` / `defaultEndpointsFactory`; `create()` generates the compat handler                               |
+| `migration/index.ts`                      | Add esquery selectors for `defaultResultHandler` / `defaultEndpointsFactory`; `create()` generates the compat handler (table above)                 |
+| `migration/index.ts`                      | Add consumer-side transformations for `client.provide()` call sites (see below)                                                                     |
 | `express-zod-api/src/integration-base.ts` | Generate a deprecated `Response` alias: `/** @deprecated Use EncodedResponse instead. */ type Response = { [K in Request]: EncodedResponse[K][1] }` |
 
-> The generated `Response` type maps each request key to the body (second tuple element), preserving the old
-> interface name. The `@deprecated` JSDoc nudges consumers toward `EncodedResponse`.
+#### deprecated `Response` alias
 
-_(Example stays on `default_` — the demo represents the latest defaults.)\*
+The generated `Response` type maps each request key to the body (second tuple element), preserving the old
+interface name. The `@deprecated` JSDoc nudges consumers toward `EncodedResponse`.
 
-The `store` object no longer needs `response` — `Client.provide()` returns the type inline:
+#### Consumer-side `client.provide()` migration
+
+Since `client.provide()` now returns `Promise<[statusCode, body]>` instead of `Promise<body>`, call sites must be updated:
+
+| Pattern     | Before                                     | After                                                 |
+| ----------- | ------------------------------------------ | ----------------------------------------------------- |
+| **Await**   | `const response = await client.provide(…)` | `const [status, response] = await client.provide(…)`  |
+| **.then()** | `client.provide(…).then(response => {…})`  | `client.provide(…).then(([status, response]) => {…})` |
+
+The migration rule should:
+
+1. Detect variable declarations whose initializer is `await client.provide(…)` and add destructuring:
+   - `const response = await client.provide(url, params);`
+   - → `const [status, response] = await client.provide(url, params);`
+   - Preserve the original variable name as the body position (second element).
+2. Detect `.then(response => …)` / `.then((response) => …)` callbacks on `client.provide(…)` and add tuple destructuring to the parameter.
+3. Insert a `@todo` JSDoc comment on the declaration or callback indicating that success/error discrimination should now use status code checks (e.g., `status === 200`) instead of `response.status === "success"`.
+
+#### Custom implementation in `new Client()` argument
+
+If the user passes a custom implementation to `new Client(myImpl)` (i.e., not the default), the `return` statement
+must wrap the existing value as the second element of a tuple:
 
 ```typescript
-// Current #makeProvider return type:
-returns: this.api.makePromise(
-  this.api.makeIndexed(this.interfaces.response, "K"),
-),
+// Before:
+return response.json();
 
-// Proposed:
-returns: this.api.makePromise(
-  this.api.makeIndexed(this.interfaces.encoded, "K"),
-),
+// After:
+/** @todo Response.status must be the status-code in the first place of this tuple */
+return [response.status, await response.json()];
 ```
+
+The migration rule should:
+
+1. Detect `new Client(…)` calls with a non-trivial argument (an identifier or function expression).
+2. Find `return` statements inside that implementation's body.
+3. Wrap the existing expression as the second element: `return [response.status, <existing>]`.
+4. If the existing expression is an `await` call, preserve it: `return [response.status, await <expr>]`.
+5. Insert a `@todo` JSDoc comment directly above the `return` to flag manual adjustment.
