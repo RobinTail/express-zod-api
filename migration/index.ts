@@ -100,10 +100,11 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             to: replacement,
           },
           fix: (fixer) => {
-            const decl = node.parent as TSESTree.ImportDeclaration;
-            const specifiers = decl.specifiers;
+            const { parent: declaration } = node;
+            if (declaration.type !== NT.ImportDeclaration) return null;
+            const specifiers = declaration.specifiers;
             const source = ctx.sourceCode.getText();
-            const indent = " ".repeat(decl.loc.start.column);
+            const indent = " ".repeat(declaration.loc.start.column);
             const handlerText = legacyHandlerCode(indent);
             const lines: string[] = [];
 
@@ -141,12 +142,12 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
               return [
                 fixer.removeRange(removeRange),
                 fixer.insertTextAfterRange(
-                  decl.range,
+                  declaration.range,
                   `\n\n${lines.join("\n")}`,
                 ),
               ];
             }
-            return fixer.replaceTextRange(decl.range, lines.join("\n"));
+            return fixer.replaceTextRange(declaration.range, lines.join("\n"));
           },
         });
       },
