@@ -2,59 +2,24 @@ import {
   AST_NODE_TYPES as NT,
   ESLintUtils,
   type TSESLint,
+  type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
-import {
-  queryNamedProp,
-  type NamedProp,
-  getPropName,
-  changeProp,
-} from "./helpers.ts";
 
 interface Queries {
-  wrongMethodBehavior: NamedProp;
-  methodLikeRouteBehavior: NamedProp;
-  hasSummaryFromDescription: NamedProp;
-  noContent: NamedProp;
-  shortDescription: NamedProp;
-  brandHandling: NamedProp;
+  legacyImport: TSESTree.ImportSpecifier;
+  provideCall: TSESTree.CallExpression;
+  clientNew: TSESTree.NewExpression;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  wrongMethodBehavior:
-    `${NT.CallExpression}[callee.name="createConfig"] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("wrongMethodBehavior"),
-  methodLikeRouteBehavior:
-    `${NT.CallExpression}[callee.name="createConfig"] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("methodLikeRouteBehavior"),
-  hasSummaryFromDescription:
-    `${NT.NewExpression}[callee.name="Documentation"] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("hasSummaryFromDescription"),
-  noContent:
-    `${NT.NewExpression}[callee.name="Integration"] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("noContent"),
-  shortDescription:
-    `${NT.CallExpression}[callee.property.name=/^(build|buildVoid)$/] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("shortDescription"),
-  brandHandling:
-    `${NT.NewExpression}[callee.name=/^(Documentation|Integration)$/] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("brandHandling"),
+  legacyImport:
+    `ImportSpecifier[imported.name="defaultResultHandler"],` +
+    `ImportSpecifier[imported.name="defaultEndpointsFactory"]`,
+  provideCall: `CallExpression[callee.property.name="provide"]`,
+  clientNew: `NewExpression[callee.name="Client"][arguments.length>0]`,
 };
-
-const brandHandlingTodo = [
-  "@todo Manual migration required:",
-  "1. Install `@express-zod-api/zod-plugin` as a dependency;",
-  "2. Import it, ideally at the top of the file declaring your `Routing`;",
-  "3. Replace `.brand()` with `.xBrand()` on the branded schemas (provided by the plugin);",
-  'Alternatively, use `.meta({ "x-brand": ... })` on the schemas instead (without plugin).',
-];
 
 const listen = <
   S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
@@ -68,6 +33,39 @@ const listen = <
       }),
     {},
   );
+
+const legacyHandlerCode = (indent: string) =>
+  [
+    "export const legacyResultHandler = new ResultHandler({",
+    '  positive: (output) => z.object({ status: z.literal("success"), data: output }),',
+    "  negative: z.object({",
+    '    status: z.literal("error"),',
+    "    error: z.object({ message: z.string() }),",
+    "  }),",
+    "  handler: ({ error, input, output, request, response, logger }) => {",
+    "    if (error) {",
+    "      const httpError = ensureHttpError(error);",
+    "      return void response",
+    "        .status(httpError.statusCode)",
+    "        .set(httpError.headers)",
+    "        .json({",
+    '          status: "error",',
+    "          // @todo ensure it's appropriate to expose the error message",
+    "          error: { message: httpError.message },",
+    "        });",
+    "    }",
+    "    response.status(200)",
+    '      .json({ status: "success", data: output });',
+    "  },",
+    "});",
+  ]
+    .map((line) => `${indent}${line}`)
+    .join("\n");
+
+const needsImport = (source: string, name: string) => {
+  const re = new RegExp(`\\b${name}\\b`);
+  return re.test(source);
+};
 
 const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0]}`;
 
@@ -87,78 +85,178 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
   },
   create: (ctx) =>
     listen({
-      wrongMethodBehavior: (node) =>
-        changeProp({
-          ctx,
-          node,
-          to: "hintAllowedMethods",
-          assign: (value) => {
-            if (value.type === NT.Literal && typeof value.value === "number")
-              return value.value === 405 ? "true" : "false";
-            else if (value.type === NT.Identifier && value.name === "undefined")
-              return "undefined";
-            else return null;
-          },
-        }),
-      methodLikeRouteBehavior: (node) =>
-        changeProp({
-          ctx,
-          node,
-          to: "recognizeMethodDependentRoutes",
-          assign: (value) => {
-            if (value.type === NT.Identifier && value.name === "undefined")
-              return "undefined";
-            else if (
-              value.type === NT.Literal &&
-              typeof value.value === "string"
-            )
-              return value.value === "method" ? "true" : "false";
-            else return null;
-          },
-        }),
-      hasSummaryFromDescription: (node) => {
-        const value = node.value;
-        const isDisabled = value.type === NT.Literal && value.value === false;
+      legacyImport: (node) => {
+        const imported = (node.imported as TSESTree.Identifier).name;
+        const replacement =
+          imported === "defaultResultHandler"
+            ? "legacyResultHandler"
+            : "legacyEndpointsFactory";
         ctx.report({
           node,
-          messageId: isDisabled ? "change" : "remove",
+          messageId: "change",
           data: {
-            subject: "property",
-            ...(isDisabled && {
-              from: getPropName(node),
-              to: "summarizer",
-            }),
+            subject: "import",
+            from: imported,
+            to: replacement,
           },
           fix: (fixer) => {
-            if (isDisabled) {
-              return fixer.replaceText(
-                node,
-                "summarizer: ({ summary, trim }) => trim(summary)",
+            const decl = node.parent as TSESTree.ImportDeclaration;
+            const specifiers = decl.specifiers;
+            const source = ctx.sourceCode.getText();
+            const afterDecl = decl.range[1];
+            const indent = " ".repeat(decl.loc.start.column);
+            const handlerText = legacyHandlerCode(indent);
+            const lines: string[] = [];
+
+            if (!source.includes('from "zod"'))
+              lines.push(`${indent}import { z } from "zod";`);
+            const needed = ["ResultHandler", "ensureHttpError"].filter(
+              (n) => !needsImport(source, n),
+            );
+            if (needed.length) {
+              lines.push(
+                `${indent}import { ${needed.join(", ")} } from "express-zod-api";`,
               );
             }
-            const after = ctx.sourceCode.getTokenAfter(node);
-            const end = node.range[1] + (after?.value === "," ? 1 : 0);
-            return fixer.removeRange([node.range[0], end]);
+            if (
+              imported === "defaultEndpointsFactory" &&
+              !needsImport(source, "EndpointsFactory")
+            ) {
+              lines.push(
+                `${indent}import { EndpointsFactory } from "express-zod-api";`,
+              );
+            }
+            lines.push(handlerText);
+            if (imported === "defaultEndpointsFactory") {
+              lines.push(
+                `${indent}export const legacyEndpointsFactory = new EndpointsFactory(legacyResultHandler);`,
+              );
+            }
+            const remaining = specifiers.filter((s) => s !== node);
+            if (remaining.length) {
+              const after = ctx.sourceCode.getTokenAfter(node);
+              const removeRange: [number, number] =
+                after?.value === ","
+                  ? [node.range[0], after.range[1]]
+                  : node.range;
+              return [
+                fixer.removeRange(removeRange),
+                fixer.insertTextAfterRange(
+                  [decl.range[0], afterDecl],
+                  `\n\n${lines.join("\n")}`,
+                ),
+              ];
+            }
+            return [
+              fixer.replaceTextRange(
+                [decl.range[0], afterDecl],
+                lines.join("\n"),
+              ),
+            ];
           },
         });
       },
-      noContent: (node) => changeProp({ ctx, node, to: "noBodySchema" }),
-      shortDescription: (node) => changeProp({ ctx, node, to: "summary" }),
-      brandHandling: (node) => {
-        const existing = ctx.sourceCode.getCommentsBefore(node);
-        if (existing.some(({ value }) => value.includes(brandHandlingTodo[0])))
-          return; // already annotated
-        const indent = " ".repeat(node.loc.start.column);
-        const body = brandHandlingTodo
-          .map((line) => `${indent} * ${line}`)
-          .join("\n");
-        const comment = `/**\n${body}\n${indent} */\n${indent}`;
-        ctx.report({
-          node,
-          messageId: "add",
-          data: { subject: "plugin", to: "your app" },
-          fix: (fixer) => fixer.insertTextBefore(node, comment),
-        });
+      provideCall: (node) => {
+        const sourceCode = ctx.sourceCode;
+        const parent = node.parent;
+        if (
+          parent.type === NT.AwaitExpression &&
+          parent.parent.type === NT.VariableDeclarator
+        ) {
+          const declarator = parent.parent;
+          const varDecl = declarator.parent as TSESTree.VariableDeclaration;
+          if (!declarator.id || declarator.id.type !== NT.Identifier) return;
+          const oldName = sourceCode.getText(declarator.id);
+          ctx.report({
+            node,
+            messageId: "change",
+            data: {
+              subject: "assignment",
+              from: `${oldName} = await client.provide(`,
+              to: `[status, ${oldName}] = await client.provide(`,
+            },
+            fix: (fixer) => [
+              fixer.insertTextBefore(
+                varDecl,
+                `/** @todo discriminate by status === 200 instead of response.status === "success" */\n`,
+              ),
+              fixer.replaceText(declarator.id, `[status, ${oldName}]`),
+            ],
+          });
+        } else if (
+          parent.type === NT.MemberExpression &&
+          parent.property.type === NT.Identifier &&
+          parent.property.name === "then" &&
+          parent.parent.type === NT.CallExpression
+        ) {
+          const thenCall = parent.parent;
+          const callback = thenCall.arguments[0];
+          if (
+            !callback ||
+            (callback.type !== NT.ArrowFunctionExpression &&
+              callback.type !== NT.FunctionExpression)
+          )
+            return;
+          const param = callback.params[0];
+          if (!param || param.type !== NT.Identifier) return;
+          const oldName = sourceCode.getText(param);
+          ctx.report({
+            node,
+            messageId: "change",
+            data: {
+              subject: "callback",
+              from: `(${oldName}) =>`,
+              to: `([status, ${oldName}]) =>`,
+            },
+            fix: (fixer) => [
+              fixer.insertTextBefore(
+                param,
+                `/** @todo discriminate by status === 200 instead of response.status === "success" */\n`,
+              ),
+              fixer.replaceText(param, `[status, ${oldName}]`),
+            ],
+          });
+        }
+      },
+      clientNew: (node) => {
+        const impl = node.arguments[0];
+        let body: TSESTree.BlockStatement | undefined;
+        if (
+          impl &&
+          (impl.type === NT.ArrowFunctionExpression ||
+            impl.type === NT.FunctionExpression) &&
+          impl.body.type === NT.BlockStatement
+        )
+          body = impl.body;
+
+        if (!body) return;
+        const sourceCode = ctx.sourceCode;
+        for (const stmt of body.body) {
+          if (stmt.type !== NT.ReturnStatement) continue;
+          const retArg = stmt.argument;
+          if (!retArg) continue;
+          const argSource = sourceCode.getText(retArg);
+          const hasAwait = retArg.type === NT.AwaitExpression;
+          ctx.report({
+            node: stmt,
+            messageId: "change",
+            data: {
+              subject: "return",
+              from: `return ${argSource}`,
+              to: `return [response.status, ${hasAwait ? argSource : `await ${argSource}`}]`,
+            },
+            fix: (fixer) => [
+              fixer.insertTextBefore(
+                stmt,
+                `/** @todo ensure response.status is the status-code in the first place of this tuple */\n`,
+              ),
+              fixer.replaceText(
+                retArg,
+                `[response.status, ${hasAwait ? "" : "await "}${argSource}]`,
+              ),
+            ],
+          });
+        }
       },
     }),
 });

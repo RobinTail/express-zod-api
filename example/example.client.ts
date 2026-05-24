@@ -461,6 +461,11 @@ export interface EncodedResponse {
     | [400, HeadV2UsersListNegativeVariant1];
 }
 
+/** @deprecated Use EncodedResponse instead. */
+export type Response = {
+  [K in Request]: EncodedResponse[K][1];
+};
+
 export type Request = keyof Input;
 
 export const endpointTags = {

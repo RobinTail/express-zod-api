@@ -105,8 +105,8 @@ export abstract class IntegrationBase {
    * @example export interface Input { "get /v1/user/retrieve": GetV1UserRetrieveInput; }
    * @internal
    * */
-  protected makePublicInterfaces = () =>
-    (Object.keys(this.interfaces) as IOKind[]).map((kind) =>
+  protected makePublicInterfaces = () => {
+    const interfaces = (Object.keys(this.interfaces) as IOKind[]).map((kind) =>
       this.api.makeInterface(
         this.interfaces[kind],
         Array.from(this.registry).map(([request, { store, isDeprecated }]) =>
@@ -115,6 +115,25 @@ export abstract class IntegrationBase {
         { expose: true },
       ),
     );
+    const mappedType = this.api.f.createMappedTypeNode(
+      undefined,
+      this.api.makeTypeParams({ K: this.#ids.requestType })[0],
+      undefined,
+      undefined,
+      this.api.makeIndexed(
+        this.api.makeIndexed(this.interfaces.encoded, "K"),
+        this.api.makeLiteralType(1),
+      ),
+      undefined,
+    );
+    return [
+      ...interfaces,
+      this.api.makeType("Response", mappedType, {
+        expose: true,
+        comment: "@deprecated Use EncodedResponse instead.",
+      }),
+    ];
+  };
 
   /**
    * @example export const endpointTags = { "get /v1/user/retrieve": ["users"] }

@@ -39,6 +39,11 @@ export interface EncodedResponse {
     | [400, PostV1CustomNegativeVariant1];
 }
 
+/** @deprecated Use EncodedResponse instead. */
+export type Response = {
+  [K in Request]: EncodedResponse[K][1];
+};
+
 export type Request = keyof Input;
 "
 `;
@@ -96,6 +101,11 @@ export interface EncodedResponse {
     | [400, HeadV1PathNegativeVariant1];
 }
 
+/** @deprecated Use EncodedResponse instead. */
+export type Response = {
+  [K in Request]: EncodedResponse[K][1];
+};
+
 export type Request = keyof Input;
 "
 `;
@@ -135,6 +145,11 @@ export interface EncodedResponse {
     | [200, GetV1PathPositiveVariant1]
     | [400, GetV1PathNegativeVariant1];
 }
+
+/** @deprecated Use EncodedResponse instead. */
+export type Response = {
+  [K in Request]: EncodedResponse[K][1];
+};
 
 export type Request = keyof Input;
 "
@@ -192,6 +207,11 @@ export interface EncodedResponse {
     | [500, PostV1MtplNegativeVariant2];
 }
 
+/** @deprecated Use EncodedResponse instead. */
+export type Response = {
+  [K in Request]: EncodedResponse[K][1];
+};
+
 export type Request = keyof Input;
 "
 `;
@@ -245,6 +265,11 @@ export interface EncodedResponse {
     ];
 }
 
+/** @deprecated Use EncodedResponse instead. */
+export type Response = {
+    [K in Request]: EncodedResponse[K][1];
+};
+
 export type Request = keyof Input;"
 `;
 
@@ -297,6 +322,11 @@ export interface EncodedResponse {
     ];
 }
 
+/** @deprecated Use EncodedResponse instead. */
+export type Response = {
+    [K in Request]: EncodedResponse[K][1];
+};
+
 export type Request = keyof Input;"
 `;
 
@@ -337,6 +367,11 @@ export interface EncodedResponse {
     | [200, PostV1TestWithDashesPositiveVariant1]
     | [400, PostV1TestWithDashesNegativeVariant1];
 }
+
+/** @deprecated Use EncodedResponse instead. */
+export type Response = {
+  [K in Request]: EncodedResponse[K][1];
+};
 
 export type Request = keyof Input;
 

@@ -23,360 +23,87 @@ describe("Migration", async () => {
 
   tester.run(ruleName, theRule, {
     valid: [
-      `createConfig({ hintAllowedMethods: false });`,
-      `createConfig({ recognizeMethodDependentRoutes: true });`,
-      `new Documentation({ summarizer: ({summary, trim}) => trim(summary) });`,
-      `new Integration({ noBodySchema: z.undefined() });`,
-      `factory.build({ summary: "hello" });`,
-      `factory.buildVoid({ summary: "hello" });`,
-      `factory.build({ brandHandling: { [myBrand]: rule } });`, // unrelated usage
-      `new Documentation({\n  /**\n   * @todo Manual migration required:\n   */\n  brandHandling: { [myBrand]: rule },\n});`,
+      `import { EndpointsFactory } from "express-zod-api";`,
+      `import { ResultHandler } from "express-zod-api";`,
     ],
     invalid: [
       {
-        name: "wrongMethodBehavior=404",
-        code: `createConfig({ wrongMethodBehavior: 404 });`,
-        output: `createConfig({ hintAllowedMethods: false });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "wrongMethodBehavior",
-              to: "hintAllowedMethods",
-            },
-          },
-        ],
-      },
-      {
-        name: "wrongMethodBehavior=405",
-        code: `createConfig({ wrongMethodBehavior: 405 });`,
-        output: `createConfig({ hintAllowedMethods: true });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "wrongMethodBehavior",
-              to: "hintAllowedMethods",
-            },
-          },
-        ],
-      },
-      {
-        name: "wrongMethodBehavior=undefined",
-        code: `createConfig({ wrongMethodBehavior: undefined });`,
-        output: `createConfig({ hintAllowedMethods: undefined });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "wrongMethodBehavior",
-              to: "hintAllowedMethods",
-            },
-          },
-        ],
-      },
-      {
-        name: "wrongMethodBehavior is wrong",
-        code: `createConfig({ wrongMethodBehavior: "wrong" });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "wrongMethodBehavior",
-              to: "hintAllowedMethods",
-            },
-          },
-        ],
-      },
-      {
-        name: "methodLikeRouteBehavior=method",
-        code: `createConfig({ methodLikeRouteBehavior: "method" });`,
-        output: `createConfig({ recognizeMethodDependentRoutes: true });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "methodLikeRouteBehavior",
-              to: "recognizeMethodDependentRoutes",
-            },
-          },
-        ],
-      },
-      {
-        name: "methodLikeRouteBehavior=path",
-        code: `createConfig({ methodLikeRouteBehavior: "path" });`,
-        output: `createConfig({ recognizeMethodDependentRoutes: false });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "methodLikeRouteBehavior",
-              to: "recognizeMethodDependentRoutes",
-            },
-          },
-        ],
-      },
-      {
-        name: "methodLikeRouteBehavior=undefined",
-        code: `createConfig({ methodLikeRouteBehavior: undefined });`,
-        output: `createConfig({ recognizeMethodDependentRoutes: undefined });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "methodLikeRouteBehavior",
-              to: "recognizeMethodDependentRoutes",
-            },
-          },
-        ],
-      },
-      {
-        name: "methodLikeRouteBehavior is wrong",
-        code: `createConfig({ methodLikeRouteBehavior: 123 });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "methodLikeRouteBehavior",
-              to: "recognizeMethodDependentRoutes",
-            },
-          },
-        ],
-      },
-      {
-        name: "hasSummaryFromDescription=true (first)",
-        code: `new Documentation({ hasSummaryFromDescription: true, other: 1 });`,
-        output: `new Documentation({  other: 1 });`,
-        errors: [
-          {
-            messageId: "remove",
-            data: { subject: "property" },
-          },
-        ],
-      },
-      {
-        name: "hasSummaryFromDescription=undefined (last)",
-        code: `new Documentation({ other: 1, hasSummaryFromDescription: undefined });`,
-        output: `new Documentation({ other: 1,  });`,
-        errors: [
-          {
-            messageId: "remove",
-            data: { subject: "property" },
-          },
-        ],
-      },
-      {
-        name: "hasSummaryFromDescription=false",
-        code: `new Documentation({ hasSummaryFromDescription: false });`,
-        output: `new Documentation({ summarizer: ({ summary, trim }) => trim(summary) });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "hasSummaryFromDescription",
-              to: "summarizer",
-            },
-          },
-        ],
-      },
-      {
-        name: "noContent=z.undefined()",
-        code: `new Integration({ noContent: z.undefined() });`,
-        output: `new Integration({ noBodySchema: z.undefined() });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "noContent",
-              to: "noBodySchema",
-            },
-          },
-        ],
-      },
-      {
-        name: "noContent=undefined",
-        code: `new Integration({ noContent: undefined });`,
-        output: `new Integration({ noBodySchema: undefined });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "noContent",
-              to: "noBodySchema",
-            },
-          },
-        ],
-      },
-      {
-        name: "shortDescription in build()",
-        code: `factory.build({ shortDescription: "Retrieves the user." });`,
-        output: `factory.build({ summary: "Retrieves the user." });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "shortDescription",
-              to: "summary",
-            },
-          },
-        ],
-      },
-      {
-        name: "shortDescription in buildVoid()",
-        code: `factory.buildVoid({ shortDescription: "Retrieves the user." });`,
-        output: `factory.buildVoid({ summary: "Retrieves the user." });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "shortDescription",
-              to: "summary",
-            },
-          },
-        ],
-      },
-      {
-        name: "wrongMethodBehavior with string key",
-        code: `createConfig({ "wrongMethodBehavior": 405 });`,
-        output: `createConfig({ hintAllowedMethods: true });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "wrongMethodBehavior",
-              to: "hintAllowedMethods",
-            },
-          },
-        ],
-      },
-      {
-        name: "noContent with string key",
-        code: `new Integration({ "noContent": z.undefined() });`,
-        output: `new Integration({ noBodySchema: z.undefined() });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "noContent",
-              to: "noBodySchema",
-            },
-          },
-        ],
-      },
-      {
-        name: "hasSummaryFromDescription=false with string key",
-        code: `new Documentation({ "hasSummaryFromDescription": false });`,
-        output: `new Documentation({ summarizer: ({ summary, trim }) => trim(summary) });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "hasSummaryFromDescription",
-              to: "summarizer",
-            },
-          },
-        ],
-      },
-      {
-        name: "shortDescription with string key in build()",
-        code: `factory.build({ "shortDescription": "Retrieves the user." });`,
-        output: `factory.build({ summary: "Retrieves the user." });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "shortDescription",
-              to: "summary",
-            },
-          },
-        ],
-      },
-      {
-        name: "brandHandling in Documentation",
-        code:
-          `new Documentation({\n` +
-          `  brandHandling: { [myBrand]: rule },\n` +
-          `});`,
+        name: "defaultResultHandler import",
+        code: `import { defaultResultHandler } from "express-zod-api";`,
         output:
-          `new Documentation({\n` +
-          `  /**\n` +
-          `   * @todo Manual migration required:\n` +
-          `   * 1. Install \`@express-zod-api/zod-plugin\` as a dependency;\n` +
-          `   * 2. Import it, ideally at the top of the file declaring your \`Routing\`;\n` +
-          `   * 3. Replace \`.brand()\` with \`.xBrand()\` on the branded schemas (provided by the plugin);\n` +
-          `   * Alternatively, use \`.meta({ "x-brand": ... })\` on the schemas instead (without plugin).\n` +
-          `   */\n` +
-          `  brandHandling: { [myBrand]: rule },\n` +
+          `import { z } from "zod";\n` +
+          `import { ResultHandler, ensureHttpError } from "express-zod-api";\n` +
+          `export const legacyResultHandler = new ResultHandler({\n` +
+          `  positive: (output) => z.object({ status: z.literal("success"), data: output }),\n` +
+          `  negative: z.object({\n` +
+          `    status: z.literal("error"),\n` +
+          `    error: z.object({ message: z.string() }),\n` +
+          `  }),\n` +
+          `  handler: ({ error, input, output, request, response, logger }) => {\n` +
+          `    if (error) {\n` +
+          `      const httpError = ensureHttpError(error);\n` +
+          `      return void response\n` +
+          `        .status(httpError.statusCode)\n` +
+          `        .set(httpError.headers)\n` +
+          `        .json({\n` +
+          `          status: "error",\n` +
+          `          // @todo ensure it's appropriate to expose the error message
+          error: { message: httpError.message },\n` +
+          `        });\n` +
+          `    }\n` +
+          `    response.status(200)\n` +
+          `      .json({ status: "success", data: output });\n` +
+          `  },\n` +
           `});`,
         errors: [
           {
-            messageId: "add",
-            data: { subject: "plugin", to: "your app" },
+            messageId: "change",
+            data: {
+              subject: "import",
+              from: "defaultResultHandler",
+              to: "legacyResultHandler",
+            },
           },
         ],
       },
       {
-        name: "brandHandling in Integration",
-        code:
-          `new Integration({\n` +
-          `  brandHandling: { [myBrand]: rule },\n` +
-          `});`,
+        name: "defaultEndpointsFactory import",
+        code: `import { defaultEndpointsFactory } from "express-zod-api";`,
         output:
-          `new Integration({\n` +
-          `  /**\n` +
-          `   * @todo Manual migration required:\n` +
-          `   * 1. Install \`@express-zod-api/zod-plugin\` as a dependency;\n` +
-          `   * 2. Import it, ideally at the top of the file declaring your \`Routing\`;\n` +
-          `   * 3. Replace \`.brand()\` with \`.xBrand()\` on the branded schemas (provided by the plugin);\n` +
-          `   * Alternatively, use \`.meta({ "x-brand": ... })\` on the schemas instead (without plugin).\n` +
-          `   */\n` +
-          `  brandHandling: { [myBrand]: rule },\n` +
-          `});`,
+          `import { z } from "zod";\n` +
+          `import { ResultHandler, ensureHttpError } from "express-zod-api";\n` +
+          `import { EndpointsFactory } from "express-zod-api";\n` +
+          `export const legacyResultHandler = new ResultHandler({\n` +
+          `  positive: (output) => z.object({ status: z.literal("success"), data: output }),\n` +
+          `  negative: z.object({\n` +
+          `    status: z.literal("error"),\n` +
+          `    error: z.object({ message: z.string() }),\n` +
+          `  }),\n` +
+          `  handler: ({ error, input, output, request, response, logger }) => {\n` +
+          `    if (error) {\n` +
+          `      const httpError = ensureHttpError(error);\n` +
+          `      return void response\n` +
+          `        .status(httpError.statusCode)\n` +
+          `        .set(httpError.headers)\n` +
+          `        .json({\n` +
+          `          status: "error",\n` +
+          `          // @todo ensure it's appropriate to expose the error message
+          error: { message: httpError.message },\n` +
+          `        });\n` +
+          `    }\n` +
+          `    response.status(200)\n` +
+          `      .json({ status: "success", data: output });\n` +
+          `  },\n` +
+          `});\n` +
+          `export const legacyEndpointsFactory = new EndpointsFactory(legacyResultHandler);`,
         errors: [
           {
-            messageId: "add",
-            data: { subject: "plugin", to: "your app" },
-          },
-        ],
-      },
-      {
-        name: "brandHandling with string key",
-        code:
-          `new Documentation({\n` +
-          `  "brandHandling": { [myBrand]: rule },\n` +
-          `});`,
-        output:
-          `new Documentation({\n` +
-          `  /**\n` +
-          `   * @todo Manual migration required:\n` +
-          `   * 1. Install \`@express-zod-api/zod-plugin\` as a dependency;\n` +
-          `   * 2. Import it, ideally at the top of the file declaring your \`Routing\`;\n` +
-          `   * 3. Replace \`.brand()\` with \`.xBrand()\` on the branded schemas (provided by the plugin);\n` +
-          `   * Alternatively, use \`.meta({ "x-brand": ... })\` on the schemas instead (without plugin).\n` +
-          `   */\n` +
-          `  "brandHandling": { [myBrand]: rule },\n` +
-          `});`,
-        errors: [
-          {
-            messageId: "add",
-            data: { subject: "plugin", to: "your app" },
+            messageId: "change",
+            data: {
+              subject: "import",
+              from: "defaultEndpointsFactory",
+              to: "legacyEndpointsFactory",
+            },
           },
         ],
       },
