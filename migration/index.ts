@@ -103,7 +103,6 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             const decl = node.parent as TSESTree.ImportDeclaration;
             const specifiers = decl.specifiers;
             const source = ctx.sourceCode.getText();
-            const afterDecl = decl.range[1];
             const indent = " ".repeat(decl.loc.start.column);
             const handlerText = legacyHandlerCode(indent);
             const lines: string[] = [];
@@ -142,17 +141,12 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
               return [
                 fixer.removeRange(removeRange),
                 fixer.insertTextAfterRange(
-                  [decl.range[0], afterDecl],
+                  decl.range,
                   `\n\n${lines.join("\n")}`,
                 ),
               ];
             }
-            return [
-              fixer.replaceTextRange(
-                [decl.range[0], afterDecl],
-                lines.join("\n"),
-              ),
-            ];
+            return fixer.replaceTextRange(decl.range, lines.join("\n"));
           },
         });
       },
