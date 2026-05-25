@@ -14,9 +14,7 @@ interface Queries {
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  legacyImport:
-    `ImportSpecifier[imported.name="defaultResultHandler"],` +
-    `ImportSpecifier[imported.name="defaultEndpointsFactory"]`,
+  legacyImport: `ImportSpecifier[imported.name=/^default(ResultHandler|EndpointsFactory)$/]`,
   provideCall: `CallExpression[callee.property.name="provide"]`,
   clientNew: `NewExpression[callee.name="Client"][arguments.length>0]`,
 };
