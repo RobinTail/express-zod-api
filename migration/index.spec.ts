@@ -71,7 +71,7 @@ describe("Migration", async () => {
         code: `import { defaultEndpointsFactory } from "express-zod-api";`,
         output:
           `import { z } from "zod";\n` +
-`import { ResultHandler, ensureHttpError, EndpointsFactory } from "express-zod-api";\n` +
+          `import { ResultHandler, ensureHttpError, EndpointsFactory } from "express-zod-api";\n` +
           `export const legacyResultHandler = new ResultHandler({\n` +
           `  positive: (output) => z.object({ status: z.literal("success"), data: output }),\n` +
           `  negative: z.object({\n` +

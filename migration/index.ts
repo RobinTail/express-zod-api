@@ -1,4 +1,4 @@
-import { hasImport } from "./helpers.ts";
+import { hasImport, getRangeWithComma } from "./helpers.ts";
 import {
   AST_NODE_TYPES as NT,
   ESLintUtils,
@@ -114,13 +114,8 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             }
             const remaining = specifiers.filter((s) => s !== node);
             if (remaining.length) {
-              const after = ctx.sourceCode.getTokenAfter(node);
-              const removeRange: [number, number] =
-                after?.value === ","
-                  ? [node.range[0], after.range[1]]
-                  : node.range;
               return [
-                fixer.removeRange(removeRange),
+                fixer.removeRange(getRangeWithComma(ctx, node)),
                 fixer.insertTextAfterRange(
                   declaration.range,
                   `\n\n${lines.join("\n")}`,
