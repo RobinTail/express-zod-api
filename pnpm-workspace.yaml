@@ -42,3 +42,6 @@ catalogs:
 overrides:
   "@scarf/scarf": "-"
   "lightningcss": "-"
+minimumReleaseAgeExclude:
+  # Renovate security update: qs@6.15.2
+  - qs@6.15.2
