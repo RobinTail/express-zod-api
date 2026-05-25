@@ -125,7 +125,6 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         });
       },
       provideCall: (node) => {
-        const sourceCode = ctx.sourceCode;
         const parent = node.parent;
         if (
           parent.type === NT.AwaitExpression &&
@@ -134,7 +133,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           const declarator = parent.parent;
           const varDecl = declarator.parent as TSESTree.VariableDeclaration;
           if (!declarator.id || declarator.id.type !== NT.Identifier) return;
-          const oldName = sourceCode.getText(declarator.id);
+          const oldName = ctx.sourceCode.getText(declarator.id);
           ctx.report({
             node,
             messageId: "change",
@@ -167,7 +166,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             return;
           const param = callback.params[0];
           if (!param || param.type !== NT.Identifier) return;
-          const oldName = sourceCode.getText(param);
+          const oldName = ctx.sourceCode.getText(param);
           ctx.report({
             node,
             messageId: "change",
