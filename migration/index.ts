@@ -125,13 +125,12 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
         });
       },
       provideCall: (node) => {
-        const parent = node.parent;
+        const { parent } = node;
         if (
           parent.type === NT.AwaitExpression &&
           parent.parent.type === NT.VariableDeclarator
         ) {
           const declarator = parent.parent;
-          const varDecl = declarator.parent as TSESTree.VariableDeclaration;
           if (!declarator.id || declarator.id.type !== NT.Identifier) return;
           const oldName = ctx.sourceCode.getText(declarator.id);
           ctx.report({
@@ -144,7 +143,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             },
             fix: (fixer) => [
               fixer.insertTextBefore(
-                varDecl,
+                declarator.parent,
                 `/** @todo discriminate by status === 200 instead of response.status === "success" */\n`,
               ),
               fixer.replaceText(declarator.id, `[status, ${oldName}]`),
