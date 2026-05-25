@@ -34,7 +34,7 @@ const listen = <
     {},
   );
 
-const legacyHandlerCode = (indent: string) =>
+const legacyHandlerCode = () =>
   [
     "export const legacyResultHandler = new ResultHandler({",
     '  positive: (output) => z.object({ status: z.literal("success"), data: output }),',
@@ -58,9 +58,7 @@ const legacyHandlerCode = (indent: string) =>
     '      .json({ status: "success", data: output });',
     "  },",
     "});",
-  ]
-    .map((line) => `${indent}${line}`)
-    .join("\n");
+  ].join("\n");
 
 const needsImport = (source: string, name: string) => {
   const re = new RegExp(`\\b${name}\\b`);
@@ -104,32 +102,28 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             if (declaration.type !== NT.ImportDeclaration) return null;
             const specifiers = declaration.specifiers;
             const source = ctx.sourceCode.getText();
-            const indent = " ".repeat(declaration.loc.start.column);
-            const handlerText = legacyHandlerCode(indent);
+            const handlerText = legacyHandlerCode();
             const lines: string[] = [];
 
             if (!source.includes('from "zod"'))
-              lines.push(`${indent}import { z } from "zod";`);
+              lines.push(`import { z } from "zod";`);
             const needed = ["ResultHandler", "ensureHttpError"].filter(
               (n) => !needsImport(source, n),
             );
             if (needed.length) {
               lines.push(
-                `${indent}import { ${needed.join(", ")} } from "express-zod-api";`,
+                `import { ${needed.join(", ")} } from "express-zod-api";`,
               );
             }
             if (
               imported === "defaultEndpointsFactory" &&
               !needsImport(source, "EndpointsFactory")
-            ) {
-              lines.push(
-                `${indent}import { EndpointsFactory } from "express-zod-api";`,
-              );
-            }
+            )
+              lines.push(`import { EndpointsFactory } from "express-zod-api";`);
             lines.push(handlerText);
             if (imported === "defaultEndpointsFactory") {
               lines.push(
-                `${indent}export const legacyEndpointsFactory = new EndpointsFactory(legacyResultHandler);`,
+                `export const legacyEndpointsFactory = new EndpointsFactory(legacyResultHandler);`,
               );
             }
             const remaining = specifiers.filter((s) => s !== node);
