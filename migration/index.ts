@@ -6,7 +6,7 @@ import {
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
 
 interface Queries {
-  legacyImport: TSESTree.ImportSpecifier;
+  legacyImport: TSESTree.ImportSpecifier & { imported: TSESTree.Identifier };
   provideCall: TSESTree.CallExpression;
   clientNew: TSESTree.NewExpression;
 }
@@ -83,9 +83,9 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
   create: (ctx) =>
     listen({
       legacyImport: (node) => {
-        const imported = (node.imported as TSESTree.Identifier).name;
+        const { name: importName } = node.imported;
         const replacement =
-          imported === "defaultResultHandler"
+          importName === "defaultResultHandler"
             ? "legacyResultHandler"
             : "legacyEndpointsFactory";
         ctx.report({
@@ -93,7 +93,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           messageId: "change",
           data: {
             subject: "import",
-            from: imported,
+            from: importName,
             to: replacement,
           },
           fix: (fixer) => {
@@ -114,12 +114,12 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
               );
             }
             if (
-              imported === "defaultEndpointsFactory" &&
+              importName === "defaultEndpointsFactory" &&
               !needsImport(source, "EndpointsFactory")
             )
               lines.push(`import { EndpointsFactory } from "express-zod-api";`);
             lines.push(legacyHandlerCode);
-            if (imported === "defaultEndpointsFactory") {
+            if (importName === "defaultEndpointsFactory") {
               lines.push(
                 `export const legacyEndpointsFactory = new EndpointsFactory(legacyResultHandler);`,
               );
