@@ -82,10 +82,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
     listen({
       legacyImport: (node) => {
         const { name: importName } = node.imported;
-        const replacement =
-          importName === "defaultResultHandler"
-            ? "legacyResultHandler"
-            : "legacyEndpointsFactory";
+        const replacement = importName.replace("default", "legacy");
         ctx.report({
           node,
           messageId: "change",
