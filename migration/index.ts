@@ -90,9 +90,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
           fix: (fixer) => {
             const { parent: declaration } = node;
             if (declaration.type !== NT.ImportDeclaration) return null;
-            const specifiers = declaration.specifiers;
             const lines: string[] = [];
-
             if (!hasImport(ctx, "zod")) lines.push(`import { z } from "zod";`);
             const needed = ["ResultHandler", "ensureHttpError"]
               .concat(
@@ -112,7 +110,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
                 `export const legacyEndpointsFactory = new EndpointsFactory(legacyResultHandler);`,
               );
             }
-            const remaining = specifiers.filter((s) => s !== node);
+            const remaining = declaration.specifiers.filter((s) => s !== node);
             if (remaining.length) {
               return [
                 fixer.removeRange(getRangeWithComma(ctx, node)),
