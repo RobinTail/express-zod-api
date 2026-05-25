@@ -1,3 +1,4 @@
+import { hasImport } from "./helpers.ts";
 import {
   AST_NODE_TYPES as NT,
   ESLintUtils,
@@ -98,8 +99,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             const source = ctx.sourceCode.getText();
             const lines: string[] = [];
 
-            if (!source.includes('from "zod"'))
-              lines.push(`import { z } from "zod";`);
+            if (!hasImport(ctx, "zod")) lines.push(`import { z } from "zod";`);
             const needed = ["ResultHandler", "ensureHttpError"].filter(
               (n) => !needsImport(source, n),
             );

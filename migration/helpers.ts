@@ -1,5 +1,14 @@
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils";
 
+export const hasImport = (
+  ctx: TSESLint.RuleContext<string, unknown[]>,
+  sourceValue: string,
+) =>
+  ctx.sourceCode.ast.body.some(
+    (stmt): stmt is TSESTree.ImportDeclaration =>
+      stmt.type === "ImportDeclaration" && stmt.source.value === sourceValue,
+  );
+
 export type NamedProp = TSESTree.PropertyNonComputedName & {
   key: TSESTree.Identifier | TSESTree.StringLiteral;
 };
