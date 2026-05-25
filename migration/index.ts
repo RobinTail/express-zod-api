@@ -58,11 +58,6 @@ const legacyHandlerCode = [
   "});",
 ].join("\n");
 
-const needsImport = (source: string, name: string) => {
-  const re = new RegExp(`\\b${name}\\b`);
-  return re.test(source);
-};
-
 const ruleName = `v${process.env.TSDOWN_VERSION?.split(".")[0]}`;
 
 const theRule = ESLintUtils.RuleCreator.withoutDocs({
@@ -96,12 +91,11 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             const { parent: declaration } = node;
             if (declaration.type !== NT.ImportDeclaration) return null;
             const specifiers = declaration.specifiers;
-            const source = ctx.sourceCode.getText();
             const lines: string[] = [];
 
             if (!hasImport(ctx, "zod")) lines.push(`import { z } from "zod";`);
             const needed = ["ResultHandler", "ensureHttpError"].filter(
-              (n) => !needsImport(source, n),
+              (n) => !hasImport(ctx, "express-zod-api", n),
             );
             if (needed.length) {
               lines.push(
@@ -110,7 +104,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             }
             if (
               importName === "defaultEndpointsFactory" &&
-              !needsImport(source, "EndpointsFactory")
+              !hasImport(ctx, "express-zod-api", "EndpointsFactory")
             )
               lines.push(`import { EndpointsFactory } from "express-zod-api";`);
             lines.push(legacyHandlerCode);
