@@ -94,19 +94,18 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             const lines: string[] = [];
 
             if (!hasImport(ctx, "zod")) lines.push(`import { z } from "zod";`);
-            const needed = ["ResultHandler", "ensureHttpError"].filter(
-              (n) => !hasImport(ctx, "express-zod-api", n),
-            );
+            const needed = ["ResultHandler", "ensureHttpError"]
+              .concat(
+                importName === "defaultEndpointsFactory"
+                  ? ["EndpointsFactory"]
+                  : [],
+              )
+              .filter((n) => !hasImport(ctx, "express-zod-api", n));
             if (needed.length) {
               lines.push(
                 `import { ${needed.join(", ")} } from "express-zod-api";`,
               );
             }
-            if (
-              importName === "defaultEndpointsFactory" &&
-              !hasImport(ctx, "express-zod-api", "EndpointsFactory")
-            )
-              lines.push(`import { EndpointsFactory } from "express-zod-api";`);
             lines.push(legacyHandlerCode);
             if (importName === "defaultEndpointsFactory") {
               lines.push(
