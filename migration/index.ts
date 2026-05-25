@@ -34,31 +34,30 @@ const listen = <
     {},
   );
 
-const legacyHandlerCode = () =>
-  [
-    "export const legacyResultHandler = new ResultHandler({",
-    '  positive: (output) => z.object({ status: z.literal("success"), data: output }),',
-    "  negative: z.object({",
-    '    status: z.literal("error"),',
-    "    error: z.object({ message: z.string() }),",
-    "  }),",
-    "  handler: ({ error, input, output, request, response, logger }) => {",
-    "    if (error) {",
-    "      const httpError = ensureHttpError(error);",
-    "      return void response",
-    "        .status(httpError.statusCode)",
-    "        .set(httpError.headers)",
-    "        .json({",
-    '          status: "error",',
-    "          // @todo ensure it's appropriate to expose the error message",
-    "          error: { message: httpError.message },",
-    "        });",
-    "    }",
-    "    response.status(200)",
-    '      .json({ status: "success", data: output });',
-    "  },",
-    "});",
-  ].join("\n");
+const legacyHandlerCode = [
+  "export const legacyResultHandler = new ResultHandler({",
+  '  positive: (output) => z.object({ status: z.literal("success"), data: output }),',
+  "  negative: z.object({",
+  '    status: z.literal("error"),',
+  "    error: z.object({ message: z.string() }),",
+  "  }),",
+  "  handler: ({ error, input, output, request, response, logger }) => {",
+  "    if (error) {",
+  "      const httpError = ensureHttpError(error);",
+  "      return void response",
+  "        .status(httpError.statusCode)",
+  "        .set(httpError.headers)",
+  "        .json({",
+  '          status: "error",',
+  "          // @todo ensure it's appropriate to expose the error message",
+  "          error: { message: httpError.message },",
+  "        });",
+  "    }",
+  "    response.status(200)",
+  '      .json({ status: "success", data: output });',
+  "  },",
+  "});",
+].join("\n");
 
 const needsImport = (source: string, name: string) => {
   const re = new RegExp(`\\b${name}\\b`);
@@ -102,7 +101,6 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
             if (declaration.type !== NT.ImportDeclaration) return null;
             const specifiers = declaration.specifiers;
             const source = ctx.sourceCode.getText();
-            const handlerText = legacyHandlerCode();
             const lines: string[] = [];
 
             if (!source.includes('from "zod"'))
@@ -120,7 +118,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
               !needsImport(source, "EndpointsFactory")
             )
               lines.push(`import { EndpointsFactory } from "express-zod-api";`);
-            lines.push(handlerText);
+            lines.push(legacyHandlerCode);
             if (imported === "defaultEndpointsFactory") {
               lines.push(
                 `export const legacyEndpointsFactory = new EndpointsFactory(legacyResultHandler);`,
