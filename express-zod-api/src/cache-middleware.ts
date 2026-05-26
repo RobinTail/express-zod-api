@@ -121,38 +121,52 @@ const formatCacheControl = (policy: CachePolicy): string => {
   return parts.join(", ");
 };
 
+type KeysOfType<T, U> = {
+  [K in keyof T]: T[K] extends U ? K : never;
+}[keyof T];
+
+const numericDirectives = new Map<
+  string,
+  KeysOfType<Required<CacheControl>, number>
+>([
+  ["max-age", "maxAge"],
+  ["max-stale", "maxStale"],
+  ["min-fresh", "minFresh"],
+  ["stale-if-error", "staleIfError"],
+]);
+
+const booleanDirectives = new Map<
+  string,
+  KeysOfType<Required<CacheControl>, boolean>
+>([
+  ["no-cache", "noCache"],
+  ["no-store", "noStore"],
+  ["no-transform", "noTransform"],
+  ["only-if-cached", "onlyIfCached"],
+]);
+
 const parseCacheControl = (
   header: string | undefined,
 ): CacheControl | undefined => {
   if (!header) return undefined;
-  const directives = header
-    .toLowerCase()
-    .split(",")
-    .map((one) => one.trim());
+  const directives = new Map<string, string | undefined>(
+    header
+      .toLowerCase()
+      .split(",")
+      .map((one) => {
+        const [name, value] = one.trim().split("=");
+        return [name.trim(), value];
+      }),
+  );
   const policy: CacheControl = {};
-  for (const directive of directives) {
-    if (directive.startsWith("max-age")) {
-      const value = parseInt(directive.split("=").pop()?.trim() ?? "", 10);
-      if (!isNaN(value)) policy.maxAge = value;
-    } else if (directive.startsWith("max-stale")) {
-      const value = parseInt(directive.split("=").pop()?.trim() ?? "", 10);
-      if (!isNaN(value)) policy.maxStale = value;
-    } else if (directive.startsWith("min-fresh")) {
-      const value = parseInt(directive.split("=").pop()?.trim() ?? "", 10);
-      if (!isNaN(value)) policy.minFresh = value;
-    } else if (directive.startsWith("stale-if-error")) {
-      const value = parseInt(directive.split("=").pop()?.trim() ?? "", 10);
-      if (!isNaN(value)) policy.staleIfError = value;
-    } else if (directive === "no-cache") {
-      policy.noCache = true;
-    } else if (directive === "no-store") {
-      policy.noStore = true;
-    } else if (directive === "no-transform") {
-      policy.noTransform = true;
-    } else if (directive === "only-if-cached") {
-      policy.onlyIfCached = true;
+  for (const [directive, key] of numericDirectives) {
+    if (directives.has(directive)) {
+      const value = parseInt(directives.get(directive)?.trim() ?? "", 10);
+      if (!isNaN(value)) policy[key] = value;
     }
   }
+  for (const [directive, key] of booleanDirectives)
+    if (directives.has(directive)) policy[key] = true;
   return policy;
 };
 
