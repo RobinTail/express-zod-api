@@ -105,7 +105,7 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-None-Match
          */
         getIfNoneMatch: (): string | undefined =>
-          request.headers["if-none-match"] as string | undefined,
+          request.headers["if-none-match"],
 
         /**
          * @desc Reads and parses the If-Modified-Since request header containing the timestamp of the client's cached copy into a Date object (invalid or missing dates return undefined). Compare this to the current Last-Modified to decide whether to return 304 Not Modified.
@@ -123,9 +123,7 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control
          */
         getRequestCacheControl: (): CachePolicy | undefined =>
-          parseCacheControl(
-            request.headers["cache-control"] as string | undefined,
-          ),
+          parseCacheControl(request.headers["cache-control"]),
 
         /**
          * @desc Sets the Cache-Control response header to control how (and for how long) browsers, proxies and CDNs may cache this response. Use the CachePolicy to configure max-age (freshness lifetime), scope (public vs private), and revalidation behavior.
