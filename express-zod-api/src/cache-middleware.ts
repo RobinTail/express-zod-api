@@ -28,17 +28,17 @@ interface CachePolicy {
    */
   noStore?: boolean;
   /**
-   * @desc Forces caches to revalidate stale responses with the origin server before reusing them. Without this, caches may serve stale data in certain circumstances.
+   * @desc Forces all caches to revalidate stale responses with the origin server before reusing them.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#must-revalidate
    */
   mustRevalidate?: boolean;
   /**
-   * @desc Same as mustRevalidate, but applies only to shared caches (proxies and CDNs), not to browser caches.
+   * @desc Forces proxies and CDNs to revalidate stale responses with the origin server before reusing them.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#proxy-revalidate
    */
   proxyRevalidate?: boolean;
   /**
-   * @desc Indicates that the response body will never change. Used together with a long max-age on cache-busted static assets (e.g. bundle.a1b2c3.js). This tells the browser it never needs to revalidate, even on reload.
+   * @desc Indicates that the response body will never change.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#immutable
    */
   immutable?: boolean;
