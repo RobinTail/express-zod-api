@@ -18,7 +18,7 @@ interface CachePolicy {
    */
   scope?: "public" | "private";
   /**
-   * @desc Forces the client to revalidate with the server on every request, even if the cached response is still fresh. The server returns 304 Not Modified if the content hasn't changed, saving bandwidth while ensuring the client always gets the latest version.
+   * @desc Forces the client to revalidate with the server on every request, even if the cached response is still fresh.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#no-cache
    */
   noCache?: boolean;
