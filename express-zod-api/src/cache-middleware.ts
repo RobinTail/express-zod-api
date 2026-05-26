@@ -64,7 +64,6 @@ const parseCacheControl = (
 ): CachePolicy | undefined => {
   if (!header) return undefined;
   const directives = header.split(",").map((d) => d.trim().toLowerCase());
-  if (directives.length === 0) return undefined;
   const policy: CachePolicy = {};
   for (const directive of directives) {
     if (directive.startsWith("max-age=")) {
