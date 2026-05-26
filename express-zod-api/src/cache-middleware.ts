@@ -44,3 +44,45 @@ interface CachePolicy {
    */
   immutable?: boolean;
 }
+
+const formatCacheControl = (policy: CachePolicy): string => {
+  const parts: string[] = [];
+  if (policy.scope) parts.push(policy.scope);
+  if (policy.noStore) parts.push("no-store");
+  if (policy.noCache) parts.push("no-cache");
+  if (policy.maxAge !== undefined) parts.push(`max-age=${policy.maxAge}`);
+  if (policy.mustRevalidate) parts.push("must-revalidate");
+  if (policy.proxyRevalidate) parts.push("proxy-revalidate");
+  if (policy.immutable) parts.push("immutable");
+  return parts.join(", ");
+};
+
+const parseCacheControl = (
+  header: string | undefined,
+): CachePolicy | undefined => {
+  if (!header) return undefined;
+  const directives = header.split(",").map((d) => d.trim().toLowerCase());
+  if (directives.length === 0) return undefined;
+  const policy: CachePolicy = {};
+  for (const directive of directives) {
+    if (directive.startsWith("max-age=")) {
+      const value = parseInt(directive.slice(8), 10);
+      if (!isNaN(value)) policy.maxAge = value;
+    } else if (directive === "public") {
+      policy.scope = "public";
+    } else if (directive === "private") {
+      policy.scope = "private";
+    } else if (directive === "no-cache") {
+      policy.noCache = true;
+    } else if (directive === "no-store") {
+      policy.noStore = true;
+    } else if (directive === "must-revalidate") {
+      policy.mustRevalidate = true;
+    } else if (directive === "proxy-revalidate") {
+      policy.proxyRevalidate = true;
+    } else if (directive === "immutable") {
+      policy.immutable = true;
+    }
+  }
+  return policy;
+};
