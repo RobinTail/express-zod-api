@@ -66,8 +66,8 @@ const parseCacheControl = (
     .map((one) => one.trim());
   const policy: CachePolicy = {};
   for (const directive of directives) {
-    if (directive.startsWith("max-age=")) {
-      const value = parseInt(directive.slice(8), 10);
+    if (directive.startsWith("max-age")) {
+      const value = parseInt(directive.split("=").pop()?.trim() ?? "", 10);
       if (!isNaN(value)) policy.maxAge = value;
     } else if (directive === "public") {
       policy.scope = "public";

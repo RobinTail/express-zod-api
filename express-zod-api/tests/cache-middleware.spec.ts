@@ -62,6 +62,10 @@ describe("Cache middleware", () => {
 
       test.each([
         ["public, max-age=3600", { maxAge: 3600, scope: "public" }],
+        ["max-age = 3600", { maxAge: 3600 }],
+        ["max-age= 3600", { maxAge: 3600 }],
+        ["max-age =3600", { maxAge: 3600 }],
+        ["max-age = ", {}],
         ["no-cache, private", { noCache: true, scope: "private" }],
         [
           "no-store, no-cache, must-revalidate",
