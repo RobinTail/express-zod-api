@@ -116,6 +116,26 @@ describe("Endpoint", () => {
       expect(handlerMock).toHaveBeenCalledTimes(0);
       expect(responseMock.writableEnded).toBeTruthy();
     });
+
+    test("should exit before output validation when endpoint closes the stream", async () => {
+      const endpoint = defaultEndpointsFactory
+        .addMiddleware({
+          handler: async ({ response }) => ({
+            notModified: () => response.status(304).end(),
+          }),
+        })
+        .build({
+          output: z.looseObject({}),
+          handler: async ({ ctx }) => {
+            ctx.notModified();
+            return { test: 123 }; // ignored
+          },
+        });
+      const { responseMock } = await testEndpoint({ endpoint });
+      expect(responseMock._getStatusCode()).toBe(304);
+      expect(responseMock.writableEnded).toBeTruthy();
+      expect(responseMock._getData()).toBe("");
+    });
   });
 
   describe(".deprecated()", () => {

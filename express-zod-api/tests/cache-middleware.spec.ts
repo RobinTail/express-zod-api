@@ -1,10 +1,4 @@
-import {
-  createCacheMiddleware,
-  defaultEndpointsFactory,
-  testEndpoint,
-  testMiddleware,
-} from "../src";
-import { z } from "zod";
+import { createCacheMiddleware, testMiddleware } from "../src";
 
 describe("Cache middleware", () => {
   describe("createCacheMiddleware", () => {
@@ -182,22 +176,6 @@ describe("Cache middleware", () => {
         });
         const notModified = output.notModified as () => void;
         notModified();
-        expect(responseMock._getStatusCode()).toBe(304);
-        expect(responseMock.writableEnded).toBeTruthy();
-      });
-
-      test("should prevent output validation after 304", async () => {
-        const endpoint = defaultEndpointsFactory
-          .addMiddleware(createCacheMiddleware())
-          .build({
-            method: "get",
-            output: z.object({}),
-            handler: async ({ ctx }) => {
-              (ctx as { notModified: () => void }).notModified();
-              return {} as never;
-            },
-          });
-        const { responseMock } = await testEndpoint({ endpoint });
         expect(responseMock._getStatusCode()).toBe(304);
         expect(responseMock.writableEnded).toBeTruthy();
       });
