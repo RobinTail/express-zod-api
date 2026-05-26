@@ -6,14 +6,14 @@ import { Middleware } from "./middleware";
  */
 interface CachePolicy {
   /**
-   * @desc The freshness lifetime in seconds. After this time the cached response is considered stale and must be revalidated or re-fetched.
+   * @desc After this time (in seconds) the cached response is considered stale and must be revalidated or re-fetched.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#max-age
    */
   maxAge?: number;
   /**
-   * @desc Restricts which caches may store the response. "public" allows any cache (browser, proxy, CDN). "private" restricts to the browser only — use for responses containing personalized or user-specific content.
-   * @example "public" — suitable for static assets, API responses without user-specific data
-   * @example "private" — suitable for user profiles, dashboards, authenticated content
+   * @desc Restricts which caches may store the response.
+   * @example "public" — any cache (browser, proxy, CDN); for static assets, responses without user-specific data.
+   * @example "private" — browser only; for user-specific and personalized content.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#response_directives
    */
   scope?: "public" | "private";
