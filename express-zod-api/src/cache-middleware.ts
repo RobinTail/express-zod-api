@@ -1,15 +1,67 @@
 import { Middleware } from "./middleware";
 
 /**
- * @desc Directives to configure how browsers, proxies, and CDNs cache the response.
- * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching
+ * @desc Directives shared by both request and response Cache-Control headers.
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#cache_directives
  */
-interface CachePolicy {
+interface CommonDirectives {
   /**
-   * @desc After this time (in seconds) the cached response is considered stale and must be revalidated or re-fetched.
+   * @desc Response: the response remains fresh for N seconds after it was generated.
+   * @desc Request: the client will accept a stored response that was generated at most N seconds ago.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#max-age
    */
   maxAge?: number;
+  /**
+   * @desc Forces revalidation with the server before reuse.
+   * @desc In a response this tells caches to revalidate; in a request it asks caches to revalidate.
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#no-cache
+   */
+  noCache?: boolean;
+  /**
+   * @desc Prevents storing the response in any cache. In a response this instructs caches not to store.
+   * @desc In a request it asks caches not to store the request or its response.
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#no-store
+   */
+  noStore?: boolean;
+  /**
+   * @desc Prevents intermediaries from transforming the response body (e.g. converting images).
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#no-transform
+   */
+  noTransform?: boolean;
+  /**
+   * @desc Allows a stale cached response to be reused for N seconds when the origin server returns an error.
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#stale-if-error
+   */
+  staleIfError?: number;
+}
+
+/**
+ * @desc Directives that clients send in requests to express their caching preferences.
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#request_directives
+ */
+interface CacheControl extends CommonDirectives {
+  /**
+   * @desc The client will accept a stored response that is stale for up to N seconds beyond its freshness lifetime.
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#max-stale
+   */
+  maxStale?: number;
+  /**
+   * @desc The client requires a stored response that will remain fresh for at least N more seconds.
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#min-fresh
+   */
+  minFresh?: number;
+  /**
+   * @desc The client wants a response only from the cache. If no cached response is available, a 504 Gateway Timeout is returned.
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#only-if-cached
+   */
+  onlyIfCached?: boolean;
+}
+
+/**
+ * @desc Directives that servers send in responses to control how caches store and reuse the response.
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#response_directives
+ */
+interface CachePolicy extends CommonDirectives {
   /**
    * @desc Restricts which caches may store the response.
    * @example "public" — any cache (browser, proxy, CDN); for static assets, responses without user-specific data.
@@ -18,15 +70,10 @@ interface CachePolicy {
    */
   scope?: "public" | "private";
   /**
-   * @desc Forces the client to revalidate with the server on every request, even if the cached response is still fresh.
-   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#no-cache
+   * @desc Overrides max-age for shared caches (proxies, CDNs). Ignored by private (browser) caches.
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#s-maxage
    */
-  noCache?: boolean;
-  /**
-   * @desc Prevents storing the response in cache at all. Consider noCache instead.
-   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#no-store
-   */
-  noStore?: boolean;
+  sMaxAge?: number;
   /**
    * @desc Forces all caches to revalidate stale responses with the origin server before reusing them.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#must-revalidate
@@ -38,10 +85,21 @@ interface CachePolicy {
    */
   proxyRevalidate?: boolean;
   /**
-   * @desc Indicates that the response body will never change.
+   * @desc A cache must understand the caching requirements for the response's status code before storing it.
+   * @desc Pair with no-store as a fallback for caches that don't support it.
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#must-understand
+   */
+  mustUnderstand?: boolean;
+  /**
+   * @desc Indicates that the response body will never change while fresh.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#immutable
    */
   immutable?: boolean;
+  /**
+   * @desc Allows a stale response to be served in the background while the cache revalidates it, for up to N seconds.
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#stale-while-revalidate
+   */
+  staleWhileRevalidate?: number;
 }
 
 const formatCacheControl = (policy: CachePolicy): string => {
@@ -50,39 +108,49 @@ const formatCacheControl = (policy: CachePolicy): string => {
   if (policy.noStore) parts.push("no-store");
   if (policy.noCache) parts.push("no-cache");
   if (policy.maxAge !== undefined) parts.push(`max-age=${policy.maxAge}`);
+  if (policy.sMaxAge !== undefined) parts.push(`s-maxage=${policy.sMaxAge}`);
   if (policy.mustRevalidate) parts.push("must-revalidate");
   if (policy.proxyRevalidate) parts.push("proxy-revalidate");
+  if (policy.mustUnderstand) parts.push("must-understand");
   if (policy.immutable) parts.push("immutable");
+  if (policy.noTransform) parts.push("no-transform");
+  if (policy.staleWhileRevalidate !== undefined)
+    parts.push(`stale-while-revalidate=${policy.staleWhileRevalidate}`);
+  if (policy.staleIfError !== undefined)
+    parts.push(`stale-if-error=${policy.staleIfError}`);
   return parts.join(", ");
 };
 
 const parseCacheControl = (
   header: string | undefined,
-): CachePolicy | undefined => {
+): CacheControl | undefined => {
   if (!header) return undefined;
   const directives = header
     .toLowerCase()
     .split(",")
     .map((one) => one.trim());
-  const policy: CachePolicy = {};
+  const policy: CacheControl = {};
   for (const directive of directives) {
     if (directive.startsWith("max-age")) {
       const value = parseInt(directive.split("=").pop()?.trim() ?? "", 10);
       if (!isNaN(value)) policy.maxAge = value;
-    } else if (directive === "public") {
-      policy.scope = "public";
-    } else if (directive === "private") {
-      policy.scope = "private";
+    } else if (directive.startsWith("max-stale")) {
+      const value = parseInt(directive.split("=").pop()?.trim() ?? "", 10);
+      if (!isNaN(value)) policy.maxStale = value;
+    } else if (directive.startsWith("min-fresh")) {
+      const value = parseInt(directive.split("=").pop()?.trim() ?? "", 10);
+      if (!isNaN(value)) policy.minFresh = value;
+    } else if (directive.startsWith("stale-if-error")) {
+      const value = parseInt(directive.split("=").pop()?.trim() ?? "", 10);
+      if (!isNaN(value)) policy.staleIfError = value;
     } else if (directive === "no-cache") {
       policy.noCache = true;
     } else if (directive === "no-store") {
       policy.noStore = true;
-    } else if (directive === "must-revalidate") {
-      policy.mustRevalidate = true;
-    } else if (directive === "proxy-revalidate") {
-      policy.proxyRevalidate = true;
-    } else if (directive === "immutable") {
-      policy.immutable = true;
+    } else if (directive === "no-transform") {
+      policy.noTransform = true;
+    } else if (directive === "only-if-cached") {
+      policy.onlyIfCached = true;
     }
   }
   return policy;
@@ -129,10 +197,10 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
         },
 
         /**
-         * @desc Reads and parses the Cache-Control request header. This reveals the client's caching intent.
+         * @desc Reads and parses the Cache-Control request header to reveal the client's caching intent.
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control
          */
-        getRequestCacheControl: (): CachePolicy | undefined =>
+        getRequestCacheControl: (): CacheControl | undefined =>
           parseCacheControl(request.headers["cache-control"]),
 
         /**

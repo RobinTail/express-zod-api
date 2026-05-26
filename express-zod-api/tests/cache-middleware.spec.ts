@@ -58,40 +58,46 @@ describe("Cache middleware", () => {
       );
 
       test.each([
-        ["public, max-age=3600", { maxAge: 3600, scope: "public" }],
+        ["max-age=3600", { maxAge: 3600 }],
         ["max-age = 3600", { maxAge: 3600 }],
         ["max-age= 3600", { maxAge: 3600 }],
         ["max-age =3600", { maxAge: 3600 }],
         ["max-age = ", {}],
-        ["no-cache, private", { noCache: true, scope: "private" }],
+        ["no-cache", { noCache: true }],
+        ["no-store, no-cache", { noStore: true, noCache: true }],
+        ["no-transform", { noTransform: true }],
         [
-          "no-store, no-cache, must-revalidate",
-          { noStore: true, noCache: true, mustRevalidate: true },
+          "no-transform, only-if-cached",
+          { noTransform: true, onlyIfCached: true },
         ],
-        [
-          "proxy-revalidate, immutable",
-          { proxyRevalidate: true, immutable: true },
-        ],
+        ["max-stale=3600", { maxStale: 3600 }],
+        ["min-fresh=600", { minFresh: 600 }],
+        ["stale-if-error=86400", { staleIfError: 86400 }],
         [undefined, undefined],
         ["", undefined],
-        ["no-cache, no-transform, only-if-cached", { noCache: true }],
+        [
+          "no-cache, no-transform, only-if-cached",
+          { noCache: true, noTransform: true, onlyIfCached: true },
+        ],
         ["max-age=abc", {}],
-      ] as const)(
-        "getRequestCacheControl should parse %s",
-        async (header, expected) => {
-          const { output } = await testMiddleware({
-            middleware: createCacheMiddleware(),
-            requestProps: {
-              headers:
-                header !== undefined ? { "cache-control": header } : undefined,
-            } as never,
-          });
-          const getter = output.getRequestCacheControl as () =>
-            | Record<string, unknown>
-            | undefined;
-          expect(getter()).toEqual(expected);
-        },
-      );
+        ["public", {}],
+        ["private", {}],
+        ["must-revalidate", {}],
+        ["proxy-revalidate", {}],
+        ["immutable", {}],
+      ])("getRequestCacheControl should parse %s", async (header, expected) => {
+        const { output } = await testMiddleware({
+          middleware: createCacheMiddleware(),
+          requestProps: {
+            headers:
+              header !== undefined ? { "cache-control": header } : undefined,
+          } as never,
+        });
+        const getter = output.getRequestCacheControl as () =>
+          | Record<string, unknown>
+          | undefined;
+        expect(getter()).toEqual(expected);
+      });
     });
 
     describe("response setters", () => {
@@ -112,6 +118,21 @@ describe("Cache middleware", () => {
         [
           { maxAge: 31536000, scope: "public", immutable: true },
           "public, max-age=31536000, immutable",
+        ],
+        [{ sMaxAge: 3600 }, "s-maxage=3600"],
+        [{ mustUnderstand: true }, "must-understand"],
+        [{ noTransform: true }, "no-transform"],
+        [{ staleWhileRevalidate: 86400 }, "stale-while-revalidate=86400"],
+        [{ staleIfError: 86400 }, "stale-if-error=86400"],
+        [
+          {
+            mustRevalidate: true,
+            mustUnderstand: true,
+            noTransform: true,
+            staleWhileRevalidate: 60,
+            staleIfError: 120,
+          },
+          "must-revalidate, must-understand, no-transform, stale-while-revalidate=60, stale-if-error=120",
         ],
       ])(
         "setCachePolicy(%j) should set cache-control to %s",
