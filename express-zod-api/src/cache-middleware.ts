@@ -23,7 +23,7 @@ interface CachePolicy {
    */
   noCache?: boolean;
   /**
-   * @desc Prevents caches from storing the response at all. Use sparingly — prefer noCache instead when possible, because it preserves back/forward navigation cache and reduces server load through conditional requests.
+   * @desc Prevents storing the response in cache at all. Consider noCache instead.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#no-store
    */
   noStore?: boolean;
