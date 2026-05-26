@@ -101,11 +101,21 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
 
       return {
         /**
-         * @desc Reads the If-None-Match request header containing the ETag of the client's cached copy.
+         * @desc Reads and parses the If-None-Match request header into an array of ETags. Can also be '*' wildcard.
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-None-Match
          */
-        getIfNoneMatch: (): string | undefined =>
-          request.headers["if-none-match"],
+        getIfNoneMatch: (): string[] | "*" | undefined => {
+          const raw = request.headers["if-none-match"];
+          if (!raw) return undefined;
+          const trimmed = raw.trim();
+          if (trimmed === "*") return trimmed;
+          return trimmed.split(",").map((etag) =>
+            etag
+              .trim()
+              .replace(/^(?:W\/)?"/, "")
+              .replace(/"$/, ""),
+          );
+        },
 
         /**
          * @desc Reads and parses the If-Modified-Since request header having the timestamp of the client's cached copy.

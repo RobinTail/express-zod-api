@@ -10,22 +10,25 @@ describe("Cache middleware", () => {
 
     describe("request getters", () => {
       test.each([
-        ['"abc"', '"abc"'],
+        ['"abc"', ["abc"]],
+        ['"abc", "def"', ["abc", "def"]],
+        ["*", "*"],
+        ['W/"abc"', ["abc"]],
         [undefined, undefined],
-      ] as const)(
-        "getIfNoneMatch should return %s",
-        async (header, expected) => {
-          const { output } = await testMiddleware({
-            middleware: createCacheMiddleware(),
-            requestProps: {
-              headers:
-                header !== undefined ? { "if-none-match": header } : undefined,
-            } as never,
-          });
-          const getter = output.getIfNoneMatch as () => string | undefined;
-          expect(getter()).toBe(expected);
-        },
-      );
+      ])("getIfNoneMatch should return %s", async (header, expected) => {
+        const { output } = await testMiddleware({
+          middleware: createCacheMiddleware(),
+          requestProps: {
+            headers:
+              header !== undefined ? { "if-none-match": header } : undefined,
+          } as never,
+        });
+        const getter = output.getIfNoneMatch as () =>
+          | string[]
+          | "*"
+          | undefined;
+        expect(getter()).toEqual(expected);
+      });
 
       test.each([
         ["Tue, 22 Feb 2022 22:00:00 GMT", new Date("2022-02-22T22:00:00Z")],
