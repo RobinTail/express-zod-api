@@ -1,5 +1,9 @@
 import { Middleware } from "./middleware";
 
+/**
+ * @desc Cache-Control directives represented as a typed object. Use with createCacheMiddleware or setCachePolicy to configure how browsers, proxies and CDNs cache the response.
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching
+ */
 interface CachePolicy {
   /**
    * @desc The freshness lifetime in seconds. After this time the cached response is considered stale and must be revalidated or re-fetched.
@@ -88,6 +92,11 @@ const parseCacheControl = (
   return policy;
 };
 
+/**
+ * @desc Creates a Middleware providing caching helpers for setting Cache-Control, ETag, Last-Modified, Vary, Expires, Clear-Site-Data headers and sending 304 Not Modified responses.
+ * @param defaultPolicy — Optional default Cache-Control policy applied when no setCachePolicy() is called in the handler.
+ * @example createCacheMiddleware({ noCache: true, scope: "private" })
+ */
 export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
   new Middleware({
     handler: async ({ request, response }) => {
