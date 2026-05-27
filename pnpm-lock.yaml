@@ -58,9 +58,6 @@ overrides:
   '@scarf/scarf': '-'
   lightningcss: '-'
 
-patchedDependencies:
-  '@babel/types@8.0.0-rc.5': 5cf9681a284768c56c598afdde3508fbaa28b4b4b01969bbb4bd9bcb19120101
-
 importers:
 
   .:
@@ -1955,7 +1952,7 @@ snapshots:
   '@babel/generator@8.0.0-rc.4':
     dependencies:
       '@babel/parser': 8.0.0-rc.4
-      '@babel/types': 8.0.0-rc.5(patch_hash=5cf9681a284768c56c598afdde3508fbaa28b4b4b01969bbb4bd9bcb19120101)
+      '@babel/types': 8.0.0-rc.5
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
       '@types/jsesc': 2.5.1
@@ -1977,14 +1974,14 @@ snapshots:
 
   '@babel/parser@8.0.0-rc.4':
     dependencies:
-      '@babel/types': 8.0.0-rc.5(patch_hash=5cf9681a284768c56c598afdde3508fbaa28b4b4b01969bbb4bd9bcb19120101)
+      '@babel/types': 8.0.0-rc.5
 
   '@babel/types@7.29.0':
     dependencies:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@babel/types@8.0.0-rc.5(patch_hash=5cf9681a284768c56c598afdde3508fbaa28b4b4b01969bbb4bd9bcb19120101)':
+  '@babel/types@8.0.0-rc.5':
     dependencies:
       '@babel/helper-string-parser': 8.0.0-rc.5
       '@babel/helper-validator-identifier': 8.0.0-rc.5
