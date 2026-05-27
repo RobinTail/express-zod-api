@@ -58,7 +58,7 @@ overrides:
   '@scarf/scarf': '-'
   lightningcss: '-'
 
-pnpmfileChecksum: sha256-plDYtBirBnj6t2yO9W/A0iUu6XJKzbR3dl/b5XNHJWY=
+pnpmfileChecksum: sha256-YDrL38AkX5yQ+KXYaGBrzm2DQS06AJRgUhGwY3D8HPc=
 
 importers:
 
@@ -333,7 +333,7 @@ packages:
 
   '@babel/generator@8.0.0-rc.4':
     resolution: {integrity: sha512-YZ+FuIgkj7KrIb2a2X1XiY0QYgDxAbVbYP64SjwJzOK3euCsUerzenh2oqdsmKuPSlhzmFOOklnxzHAzXagvpw==}
-    engines: {node: ^20.19.0 || >=22.12.0}
+    engines: {node: ^22.18.0 || >=24.0.0}
 
   '@babel/helper-string-parser@7.27.1':
     resolution: {integrity: sha512-qMlSxKbpRlAridDExk92nSobyDdpPijUq2DW6oDnUqd0iOGxmQjyqhMIihI9+zv4LPyZdRje2cavWPbCbWm3eA==}
@@ -341,7 +341,7 @@ packages:
 
   '@babel/helper-string-parser@8.0.0-rc.5':
     resolution: {integrity: sha512-sN7R8rBvDurfaziNfDEIjIntlazmlkCDGO4SNl2RJ3wRCn+QxspLV7hzYAE8WWVd2joVuT8sUxeePdLp2idI1A==}
-    engines: {node: ^22.18.0 || >=24.11.0}
+    engines: {node: ^22.18.0 || >=24.0.0}
 
   '@babel/helper-validator-identifier@7.28.5':
     resolution: {integrity: sha512-qSs4ifwzKJSV39ucNjsvc6WVHs6b7S03sOh2OcHF9UHfVPqWWALUsNUVzhSBiItjRZoLHx7nIarVjqKVusUZ1Q==}
@@ -349,11 +349,11 @@ packages:
 
   '@babel/helper-validator-identifier@8.0.0-rc.4':
     resolution: {integrity: sha512-HTD3bskipk5MSm08twTW6832jzIXUhxMddy4NPPzIMuyMEsrs0ZgwAaMj5ubB5+6hMlUjDu17vNconEmwsmpYg==}
-    engines: {node: ^20.19.0 || >=22.12.0}
+    engines: {node: ^22.18.0 || >=24.0.0}
 
   '@babel/helper-validator-identifier@8.0.0-rc.5':
     resolution: {integrity: sha512-ehJDxHvtbZ85RtX/L2fi0h9AGsBNqB5Euv1EB8RMAvGYvD+2X+QbpzzOpbklnNXO+WSZJNOaetw2BBj27xsWVg==}
-    engines: {node: ^22.18.0 || >=24.11.0}
+    engines: {node: ^22.18.0 || >=24.0.0}
 
   '@babel/parser@7.29.3':
     resolution: {integrity: sha512-b3ctpQwp+PROvU/cttc4OYl4MzfJUWy6FZg+PMXfzmt/+39iHVF0sDfqay8TQM3JA2EUOyKcFZt75jWriQijsA==}
@@ -362,7 +362,7 @@ packages:
 
   '@babel/parser@8.0.0-rc.4':
     resolution: {integrity: sha512-0S/1yefMa15N4i2v3t8Fw9pgMHhf2gF6Lc1UEXI96Ls6FNAjqvHHZouZ2ZS/deqLhbMFtmfVeFac6iTsvFbLwA==}
-    engines: {node: ^20.19.0 || >=22.12.0}
+    engines: {node: ^22.18.0 || >=24.0.0}
     hasBin: true
 
   '@babel/types@7.29.0':
