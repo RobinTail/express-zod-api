@@ -42,3 +42,5 @@ catalogs:
 overrides:
   "@scarf/scarf": "-"
   "lightningcss": "-"
+patchedDependencies:
+  '@babel/types@8.0.0-rc.5': patches/@babel__types@8.0.0-rc.5.patch

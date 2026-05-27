@@ -1,0 +1,13 @@
+diff --git a/package.json b/package.json
+index 5fbd9b57ebe9c4350a6e8077455b57078a71b0a0..a95ae84d17dc94526cb956d56c7e811eef85edd3 100644
+--- a/package.json
++++ b/package.json
+@@ -25,7 +25,7 @@
+     "@babel/parser": "^8.0.0-rc.5"
+   },
+   "engines": {
+-    "node": "^22.18.0 || >=24.11.0"
++    "node": "^22.18.0 || >=24.0.0"
+   },
+   "exports": {
+     ".": {
