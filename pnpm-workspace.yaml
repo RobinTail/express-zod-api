@@ -42,7 +42,3 @@ catalogs:
 overrides:
   "@scarf/scarf": "-"
   "lightningcss": "-"
-packageExtensions:
-  "@babel/types@8.0.0-rc.5":
-    engines:
-      node: ">=24.0.0"
