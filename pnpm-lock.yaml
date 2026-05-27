@@ -58,6 +58,8 @@ overrides:
   '@scarf/scarf': '-'
   lightningcss: '-'
 
+packageExtensionsChecksum: sha256-6IfBl7vmCjdunjIEOFWrv06zw+e0Kt48m0kuNiBUvhw=
+
 importers:
 
   .:
