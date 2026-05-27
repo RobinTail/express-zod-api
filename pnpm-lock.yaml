@@ -58,6 +58,8 @@ overrides:
   '@scarf/scarf': '-'
   lightningcss: '-'
 
+pnpmfileChecksum: sha256-ywho0OBkmPtD//9foXJBldvHhsj7aVHY8yTQRquBXfs=
+
 importers:
 
   .:
@@ -369,7 +371,7 @@ packages:
 
   '@babel/types@8.0.0-rc.5':
     resolution: {integrity: sha512-JeSVu/m8x/zpp4CLjYHVNXuhEyOkhPXuxM8YOXjh6L4LlvQNKuUNOTo5KdBuKAcTDHw8DquToTaEkhsBqPXOaA==}
-    engines: {node: ^22.18.0 || >=24.11.0}
+    engines: {node: '>=24.0.0'}
 
   '@bcoe/v8-coverage@1.0.2':
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
