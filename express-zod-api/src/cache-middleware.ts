@@ -149,24 +149,18 @@ const parseCacheControl = (
   header: string | undefined,
 ): CacheControl | undefined => {
   if (!header) return undefined;
-  const directives = new Map<string, string | undefined>(
-    header
-      .toLowerCase()
-      .split(",")
-      .map((one) => {
-        const [name, value] = one.trim().split("=");
-        return [name.trim(), value];
-      }),
-  );
   const policy: CacheControl = {};
-  for (const [directive, key] of numericDirectives) {
-    if (directives.has(directive)) {
-      const value = parseInt(directives.get(directive)?.trim() ?? "", 10);
-      if (!isNaN(value)) policy[key] = value;
+  for (const one of header.split(",")) {
+    const [name, raw] = one.split("=");
+    const numericKey = numericDirectives.get(name.trim());
+    if (numericKey) {
+      const value = parseInt(raw?.trim() ?? "", 10);
+      if (!isNaN(value)) policy[numericKey] = value;
+      continue;
     }
+    const booleanKey = booleanDirectives.get(name.trim());
+    if (booleanKey) policy[booleanKey] = true;
   }
-  for (const [directive, key] of booleanDirectives)
-    if (directives.has(directive)) policy[key] = true;
   return policy;
 };
 
