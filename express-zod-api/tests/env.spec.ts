@@ -95,15 +95,22 @@ describe("Environment checks", () => {
         decode: (str) => new Date(str),
         encode: (date) => date.toISOString(),
       });
-      const {
-        in: to,
-        out: from,
-        transform: encode,
-        reverseTransform: decode,
-      } = schema._zod.def;
-      const reversed = z.codec(from, to, { decode, encode });
+      const reversed = z.invertCodec(schema);
       expect(reversed.parse(new Date("2022-01-01T00:00:00.000Z"))).toBe(
         "2022-01-01T00:00:00.000Z",
+      );
+    });
+
+    test("Codec strictly typed methods still validate inputs in runtime", () => {
+      const schema = z.codec(z.string(), z.number(), {
+        decode: Number,
+        encode: String,
+      });
+      expect(() => schema.decode(true as unknown as string)).toThrow(
+        /expected string, received boolean/,
+      );
+      expect(() => schema.encode(false as unknown as number)).toThrow(
+        /expected number, received boolean/,
       );
     });
 
