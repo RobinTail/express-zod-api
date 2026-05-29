@@ -476,7 +476,9 @@ describe("Endpoint", () => {
       const endpoint = factory.build({
         method: "post",
         output: z.object({
-          test: z.number().transform(() => assert.fail("Something unexpected")),
+          test: z.number().transform(() => {
+            throw "Something unexpected";
+          }),
         }),
         handler: async () => ({
           test: 123,
@@ -496,12 +498,13 @@ describe("Endpoint", () => {
         new ResultHandler({
           positive: z.object({}),
           negative: z.object({}),
-          handler: () => assert.fail("Something unexpected happened"),
+          handler: () => {
+            throw "Something unexpected happened";
+          },
         }),
       );
-      const endpoint = factory.build({
-        output: z.object({ test: z.string() }),
-        handler: async () => ({ test: "OK" }),
+      const endpoint = factory.buildVoid({
+        handler: vi.fn(),
       });
       const { loggerMock, responseMock } = await testEndpoint({ endpoint });
       expect(loggerMock._getLogs().error).toMatchSnapshot();
@@ -513,12 +516,13 @@ describe("Endpoint", () => {
 
     test("thrown in middleware and caught in execute()", async () => {
       const factory = new EndpointsFactory(defaultResultHandler).addMiddleware({
-        handler: async () => assert.fail("Something went wrong"),
+        handler: async () => {
+          throw "Something went wrong";
+        },
       });
-      const endpoint = factory.build({
+      const endpoint = factory.buildVoid({
         method: "post",
-        output: z.object({}),
-        handler: async () => ({}),
+        handler: vi.fn(),
       });
       const { responseMock, loggerMock } = await testEndpoint({
         endpoint,

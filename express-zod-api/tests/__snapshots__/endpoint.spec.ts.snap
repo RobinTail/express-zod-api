@@ -116,7 +116,7 @@ exports[`Endpoint > Issue #585: Handling non-Error exceptions > thrown in #handl
   [
     "Result handler failure",
     ResultHandlerError({
-      "cause": AssertionError({
+      "cause": Error({
         "message": "Something unexpected happened",
       }),
       "message": "Something unexpected happened",

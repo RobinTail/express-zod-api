@@ -254,9 +254,7 @@ export class Endpoint<
   }) {
     let finalInput: z.output<IN>; // final input types transformations for handler
     try {
-      finalInput = (await this.#def.inputSchema.parseAsync(
-        input,
-      )) as z.output<IN>;
+      finalInput = await this.#def.inputSchema.parseAsync(input);
     } catch (e) {
       throw e instanceof z.ZodError ? new InputValidationError(e) : e;
     }
