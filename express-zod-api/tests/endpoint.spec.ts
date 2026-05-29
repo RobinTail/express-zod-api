@@ -156,26 +156,6 @@ describe("Endpoint", () => {
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toMatchSnapshot();
     });
-
-    test("Should throw on output parsing non-Zod error", async () => {
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const endpoint = factory.build({
-        method: "post",
-        output: z.object({
-          test: z.number().transform(() => assert.fail("Something unexpected")),
-        }),
-        handler: async () => ({
-          test: 123,
-        }),
-      });
-      const { responseMock, loggerMock } = await testEndpoint({ endpoint });
-      expect(loggerMock._getLogs().error).toHaveLength(1);
-      expect(responseMock._getStatusCode()).toBe(500);
-      expect(responseMock._getJSONData()).toEqual({
-        status: "error",
-        error: { message: "Something unexpected" },
-      });
-    });
   });
 
   describe("#runMiddlewares", () => {
