@@ -150,7 +150,7 @@ const parseCacheControl = (
 ): CacheControl | undefined => {
   if (!header) return undefined;
   const policy: CacheControl = {};
-  for (const one of header.split(",")) {
+  for (const one of header.toLowerCase().split(",")) {
     const [name, raw] = one.split("=");
     const numericKey = numericDirectives.get(name.trim());
     if (numericKey) {

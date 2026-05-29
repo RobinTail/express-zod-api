@@ -85,6 +85,17 @@ describe("Cache middleware", () => {
         ["must-revalidate", {}],
         ["proxy-revalidate", {}],
         ["immutable", {}],
+        ["Max-Age=3600", { maxAge: 3600 }],
+        ["NO-CACHE", { noCache: true }],
+        ["No-Store, No-Transform", { noStore: true, noTransform: true }],
+        ["MAX-STALE=600", { maxStale: 600 }],
+        [
+          "No-Cache, No-Transform, Only-If-Cached",
+          { noCache: true, noTransform: true, onlyIfCached: true },
+        ],
+        ["MIXED-no-Store", {}],
+        ["max-stale=, MAX-AGE=3600", { maxAge: 3600 }],
+        ["Max-Age = 3600", { maxAge: 3600 }],
       ])("getRequestCacheControl should parse %s", async (header, expected) => {
         const { output } = await testMiddleware({
           middleware: createCacheMiddleware(),
