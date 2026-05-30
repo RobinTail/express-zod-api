@@ -1,0 +1,155 @@
+---
+title: Introduction
+description: Build type-safe REST APIs with Express, Zod, and TypeScript in minutes
+---
+
+## What is Express Zod API?
+
+Express Zod API is a TypeScript-first framework that helps you build production-ready REST APIs with automatic input/output validation, type safety, and OpenAPI documentation generation. It combines the power of Express.js, Zod validation, and TypeScript to eliminate boilerplate and ensure type safety across your entire API.
+
+<CardGroup cols={2}>
+  <Card title="Type-Safe by Default" icon="shield-check">
+    Full TypeScript integration with automatic type inference from Zod schemas
+  </Card>
+  <Card title="Auto-Generated Docs" icon="book">
+    OpenAPI 3.1 documentation generated directly from your code
+  </Card>
+  <Card title="End-to-End Type Safety" icon="link">
+    Export client types to your frontend for complete type safety
+  </Card>
+  <Card title="Built on Express" icon="server">
+    Leverage the mature Express.js ecosystem with added type safety
+  </Card>
+</CardGroup>
+
+## Why Express Zod API?
+
+Building REST APIs often involves repetitive tasks: validating input, handling errors consistently, maintaining documentation, and ensuring type safety between frontend and backend. Express Zod API solves these problems by:
+
+### Validation Made Easy
+
+Define your input and output schemas once using Zod, and validation happens automatically. No more manual type checking or runtime errors from unexpected data types.
+
+```typescript
+import { z } from "zod";
+import { defaultEndpointsFactory } from "express-zod-api";
+
+const endpoint = defaultEndpointsFactory.build({
+  input: z.object({
+    userId: z.string().transform(Number),
+    email: z.string().email(),
+  }),
+  output: z.object({
+    success: z.boolean(),
+  }),
+  handler: async ({ input }) => {
+    // input is fully typed and validated
+    return { success: true };
+  },
+});
+```
+
+### Consistent Error Handling
+
+All errors are handled uniformly with appropriate HTTP status codes. Input validation errors automatically return `400`, while custom errors can use any status code you need.
+
+### Documentation That Never Goes Stale
+
+Your API documentation is generated directly from your code. When you change an endpoint, the documentation updates automatically.
+
+### Frontend Integration
+
+Export TypeScript types and a fully-typed client for your frontend. Changes to your API are immediately reflected in your client code, catching breaking changes at compile time.
+
+## Key Features
+
+<AccordionGroup>
+  <Accordion title="Schema-Based Validation">
+    - Automatic validation of request body, query parameters, and path params
+    - Type transformations (string to number, date parsing, etc.)
+    - Custom refinements for complex validation logic
+    - File upload validation with size limits
+  </Accordion>
+
+  <Accordion title="Middleware System">
+    - Type-safe middleware with context passing
+    - Authentication and authorization helpers
+    - Compatible with native Express middlewares
+    - Composable middleware chains
+  </Accordion>
+
+  <Accordion title="Flexible Routing">
+    - Nested and flat route syntax
+    - Path parameters with validation
+    - Method-based routing
+    - Static file serving
+  </Accordion>
+
+  <Accordion title="Documentation & Integration">
+    - OpenAPI 3.1 specification generation
+    - Swagger UI integration
+    - TypeScript client generation
+    - End-to-end type safety
+  </Accordion>
+
+  <Accordion title="Production-Ready Features">
+    - CORS configuration
+    - HTTPS support
+    - Response compression
+    - Custom loggers (Winston, Pino)
+    - Graceful shutdown
+    - Testing utilities
+  </Accordion>
+</AccordionGroup>
+
+## Who Should Use Express Zod API?
+
+Express Zod API is perfect for:
+
+- **TypeScript developers** building REST APIs who want compile-time type safety
+- **Full-stack teams** who need guaranteed type safety between frontend and backend
+- **API developers** who are tired of maintaining separate API documentation
+- **Teams migrating** from JavaScript to TypeScript who want a smooth transition
+- **Startups and agencies** who need to build reliable APIs quickly
+
+## Comparison with Alternatives
+
+<Note>
+  **Coming from tRPC?** Express Zod API provides similar type safety but for REST APIs instead of RPC-style endpoints. You get standard HTTP methods, OpenAPI docs, and compatibility with any HTTP client.
+</Note>
+
+<Note>
+  **Coming from NestJS?** Express Zod API is lighter weight with less boilerplate. It focuses on type safety through Zod schemas rather than decorators, making it easier to learn and maintain.
+</Note>
+
+<Note>
+  **Using plain Express?** Express Zod API adds automatic validation, type safety, documentation generation, and consistent error handling while keeping the familiar Express patterns you know.
+</Note>
+
+## Core Concepts
+
+Before diving in, here are the main concepts you'll work with:
+
+- **Endpoints**: Your API route handlers with validated input/output
+- **Factories**: Used to create endpoints, optionally with middleware attached
+- **Middlewares**: Reusable logic for authentication, logging, etc.
+- **Result Handlers**: Control how responses are formatted
+- **Routing**: Define your API structure as a nested object
+- **Config**: Central configuration for server, CORS, logging, etc.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Set up Express Zod API in your project
+  </Card>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Build your first API in minutes
+  </Card>
+  <Card title="How It Works" icon="diagram-project" href="/how-it-works">
+    Understand the architecture and data flow
+  </Card>
+  <Card title="Examples" icon="code" href="/examples">
+    Explore real-world code examples
+  </Card>
+</CardGroup>

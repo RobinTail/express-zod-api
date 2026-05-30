@@ -1,0 +1,526 @@
+---
+title: How It Works
+description: Understand the Express Zod API architecture, data flow, and core concepts
+---
+
+## Architecture Overview
+
+Express Zod API builds on top of Express.js, adding a layer of type safety and automatic validation. Understanding how data flows through the system will help you build better APIs.
+
+<Frame>
+  <img src="https://raw.githubusercontent.com/RobinTail/express-zod-api/master/dataflow.svg" alt="Express Zod API Data Flow Diagram" />
+</Frame>
+
+## The Request Lifecycle
+
+When a request hits your API, it goes through several stages:
+
+<Steps>
+  <Step title="Request Parsing">
+    Express parses the incoming request, extracting:
+    - `request.body` (JSON or form data)
+    - `request.query` (URL query parameters)
+    - `request.params` (path parameters like `:id`)
+    - `request.headers` (HTTP headers)
+    - `request.files` (uploaded files, if enabled)
+  </Step>
+
+  <Step title="Input Combination">
+    Express Zod API combines configured input sources into a single `input` object based on the HTTP method:
+    
+    ```typescript
+    // Default input sources
+    {
+      get: ["query", "params"],
+      post: ["body", "params", "files"],
+      put: ["body", "params"],
+      patch: ["body", "params"],
+      delete: ["query", "params"],
+    }
+    ```
+  </Step>
+
+  <Step title="Middleware Execution">
+    Middlewares run in order, each receiving:
+    - `input`: Validated input from previous middleware or request
+    - `request`: The original Express request
+    - `response`: The Express response object
+    - `logger`: The configured logger
+    - `ctx`: Context from previous middlewares
+    
+    Each middleware can:
+    - Validate additional input
+    - Perform authentication/authorization
+    - Add data to `ctx` for the endpoint handler
+    - Throw errors to stop execution
+  </Step>
+
+  <Step title="Input Validation">
+    The combined input is validated against the endpoint's input schema:
+    
+    ```typescript
+    input: z.object({
+      userId: z.string().transform(Number),
+      email: z.string().email(),
+    })
+    ```
+    
+    If validation fails, a `400 Bad Request` response is sent automatically.
+  </Step>
+
+  <Step title="Handler Execution">
+    Your endpoint handler receives:
+    - `input`: Fully validated and typed input
+    - `ctx`: Context from middlewares
+    - `logger`: Logger for this request
+    - `request`: Original Express request (for advanced use)
+    - `response`: Express response (rarely needed)
+    
+    The handler returns an `output` object or throws an error.
+  </Step>
+
+  <Step title="Output Validation">
+    The handler's output is validated against the output schema:
+    
+    ```typescript
+    output: z.object({
+      id: z.number(),
+      name: z.string(),
+    })
+    ```
+    
+    If validation fails, a `500 Internal Server Error` is sent (this indicates a bug in your code).
+  </Step>
+
+  <Step title="Response Formatting">
+    The `ResultHandler` formats the response:
+    - **Success**: Wraps output in a standard format (default: `{ status: "success", data: {...} }`)
+    - **Error**: Formats errors consistently (default: `{ status: "error", error: { message: "..." } }`)
+    - Sets appropriate HTTP status codes
+    - Adds headers (CORS, content-type, etc.)
+  </Step>
+</Steps>
+
+## Core Components
+
+### 1. Schemas (Zod)
+
+Schemas define the shape and validation rules for your data:
+
+```typescript
+import { z } from "zod";
+
+const userSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  age: z.number().int().positive().optional(),
+});
+```
+
+**Key features:**
+- Type inference: TypeScript types are automatically derived
+- Transformations: Convert data types (e.g., string to number)
+- Refinements: Custom validation logic
+- Composition: Combine schemas with `.merge()`, `.extend()`, etc.
+
+### 2. Endpoints
+
+Endpoints are the core building blocks of your API:
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const endpoint = defaultEndpointsFactory.build({
+  method: "post",               // HTTP method(s)
+  input: z.object({...}),       // Input validation schema
+  output: z.object({...}),      // Output validation schema
+  handler: async ({ input, ctx, logger }) => {
+    // Your business logic here
+    return { ... };             // Must match output schema
+  },
+});
+```
+
+**Handler parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `input` | Validated input | Combines body, query, params based on method |
+| `ctx` | Context object | Data provided by middlewares |
+| `logger` | Logger instance | For logging (debug, info, warn, error) |
+| `request` | Express Request | Raw request object (advanced use) |
+| `response` | Express Response | Raw response object (advanced use) |
+
+### 3. Middlewares
+
+Middlewares provide reusable logic that runs before endpoint handlers:
+
+```typescript
+import { Middleware } from "express-zod-api";
+import { z } from "zod";
+import createHttpError from "http-errors";
+
+const authMiddleware = new Middleware({
+  // Optional: security info for documentation
+  security: {
+    type: "header",
+    name: "authorization",
+  },
+  // Input validation for the middleware
+  input: z.object({
+    key: z.string(),
+  }),
+  // Middleware logic
+  handler: async ({ input, request, logger }) => {
+    const token = request.headers.authorization;
+    
+    if (!token) {
+      throw createHttpError(401, "Missing authorization header");
+    }
+    
+    // Authenticate user...
+    const user = await authenticateUser(token, input.key);
+    
+    // Return context for the endpoint
+    return { user };
+  },
+});
+```
+
+**Attaching middlewares:**
+
+```typescript
+const authenticatedFactory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware);
+
+const protectedEndpoint = authenticatedFactory.build({
+  handler: async ({ ctx: { user } }) => {
+    // user is available from authMiddleware
+    return { message: `Hello, ${user.name}` };
+  },
+});
+```
+
+### 4. Factories
+
+Factories create endpoints, optionally with pre-attached middlewares:
+
+```typescript
+import { EndpointsFactory, defaultEndpointsFactory } from "express-zod-api";
+
+// Default factory (no middlewares)
+const publicEndpoint = defaultEndpointsFactory.build({...});
+
+// Factory with authentication
+const authFactory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware);
+
+const privateEndpoint = authFactory.build({...});
+
+// Factory with custom result handler
+import { ResultHandler } from "express-zod-api";
+
+const customFactory = new EndpointsFactory(
+  new ResultHandler({
+    positive: (data) => ({ schema: z.object({ data }), ... }),
+    negative: z.object({ error: z.string() }),
+    handler: ({ response, error, output }) => {
+      // Custom response formatting
+    },
+  })
+);
+```
+
+### 5. Result Handlers
+
+Result handlers control how responses are formatted and sent:
+
+```typescript
+import { ResultHandler } from "express-zod-api";
+import { z } from "zod";
+
+const customResultHandler = new ResultHandler({
+  // Success response schema
+  positive: (data) => ({
+    schema: z.object({
+      success: z.literal(true),
+      data,
+    }),
+    mimeType: "application/json",
+  }),
+  
+  // Error response schema
+  negative: z.object({
+    success: z.literal(false),
+    error: z.string(),
+  }),
+  
+  // How to send the response
+  handler: ({ response, error, output }) => {
+    if (error) {
+      response.status(error.statusCode || 500).json({
+        success: false,
+        error: error.message,
+      });
+    } else {
+      response.status(200).json({
+        success: true,
+        data: output,
+      });
+    }
+  },
+});
+```
+
+### 6. Routing
+
+Routing maps endpoints to URL paths:
+
+```typescript
+import { Routing } from "express-zod-api";
+
+const routing: Routing = {
+  // Nested syntax: /v1/users/list
+  v1: {
+    users: {
+      list: listUsersEndpoint,
+      // Path params: /v1/users/:id
+      ":id": getUserEndpoint,
+    },
+  },
+  
+  // Flat syntax: /api/health
+  "api/health": healthEndpoint,
+  
+  // Explicit method: POST /v1/users
+  "post /v1/users": createUserEndpoint,
+  
+  // Method-based routing: /v1/user
+  "v1/user": {
+    get: getUserEndpoint,
+    post: createUserEndpoint,
+    delete: deleteUserEndpoint,
+  },
+};
+```
+
+### 7. Configuration
+
+Configuration centralizes all server settings:
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  // Server configuration
+  http: {
+    listen: 8080,  // Port, UNIX socket, or Net.ListenOptions
+  },
+  
+  // Optional HTTPS
+  https: {
+    options: {
+      cert: fs.readFileSync("cert.pem"),
+      key: fs.readFileSync("key.pem"),
+    },
+    listen: 443,
+  },
+  
+  // CORS settings
+  cors: true,  // or false, or custom function
+  
+  // Logger configuration
+  logger: {
+    level: "debug",
+    color: true,
+  },
+  
+  // Input sources per method
+  inputSources: {
+    get: ["query", "params"],
+    post: ["body", "params", "files"],
+  },
+  
+  // File upload configuration
+  upload: {
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  },
+  
+  // Response compression
+  compression: true,
+});
+```
+
+## Data Flow Example
+
+Let's trace a request through the entire system:
+
+<Steps>
+  <Step title="Request arrives">
+    ```bash
+    POST /v1/users
+    Content-Type: application/json
+    
+    { "name": "Jane", "email": "jane@example.com" }
+    ```
+  </Step>
+
+  <Step title="Express parses request">
+    ```javascript
+    request.body = { name: "Jane", email: "jane@example.com" }
+    request.params = {}
+    request.query = {}
+    ```
+  </Step>
+
+  <Step title="Input sources combined">
+    ```javascript
+    input = { 
+      ...request.body,    // { name: "Jane", email: "jane@example.com" }
+      ...request.params,  // {}
+    }
+    ```
+  </Step>
+
+  <Step title="Middleware validates & adds context">
+    ```typescript
+    // Auth middleware validates token
+    const user = await authenticateToken(request.headers.authorization);
+    ctx = { user }; // Available to handler
+    ```
+  </Step>
+
+  <Step title="Input validated against schema">
+    ```typescript
+    const validatedInput = inputSchema.parse(input);
+    // ✅ { name: "Jane", email: "jane@example.com" }
+    ```
+  </Step>
+
+  <Step title="Handler executes">
+    ```typescript
+    const output = await handler({ input: validatedInput, ctx, logger });
+    // Returns: { id: 123, name: "Jane", email: "jane@example.com" }
+    ```
+  </Step>
+
+  <Step title="Output validated">
+    ```typescript
+    const validatedOutput = outputSchema.parse(output);
+    // ✅ { id: 123, name: "Jane", email: "jane@example.com" }
+    ```
+  </Step>
+
+  <Step title="Result handler formats response">
+    ```typescript
+    response.status(200).json({
+      status: "success",
+      data: validatedOutput,
+    });
+    ```
+  </Step>
+</Steps>
+
+## Type Safety Flow
+
+One of Express Zod API's biggest advantages is end-to-end type safety:
+
+```typescript
+import { z } from "zod";
+import { defaultEndpointsFactory } from "express-zod-api";
+
+// 1. Define schemas
+const inputSchema = z.object({
+  userId: z.string().transform(Number),
+});
+
+const outputSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+
+// 2. Create endpoint
+const endpoint = defaultEndpointsFactory.build({
+  input: inputSchema,
+  output: outputSchema,
+  handler: async ({ input }) => {
+    // TypeScript knows: input.userId is number
+    const id: number = input.userId; ✅
+    
+    return {
+      id,
+      name: "John",
+    }; // ✅ Matches output schema
+    
+    // return { id }; ❌ TypeScript error: missing 'name'
+  },
+});
+
+// 3. Type-safe client (generated)
+const result = await client.provide("get /v1/user", { userId: "123" });
+// TypeScript knows: result.data is { id: number, name: string }
+const name: string = result.data.name; ✅
+```
+
+## Error Handling Flow
+
+Errors can occur at multiple stages:
+
+```typescript
+import createHttpError from "http-errors";
+
+// 1. Input validation error (automatic)
+POST /v1/users { "email": "invalid" }
+→ 400 Bad Request
+
+// 2. Middleware error (thrown)
+const authMiddleware = new Middleware({
+  handler: async ({ request }) => {
+    if (!request.headers.authorization) {
+      throw createHttpError(401, "Unauthorized");
+    }
+  },
+});
+→ 401 Unauthorized
+
+// 3. Handler error (thrown)
+const endpoint = factory.build({
+  handler: async ({ input }) => {
+    if (!userExists(input.userId)) {
+      throw createHttpError(404, "User not found");
+    }
+  },
+});
+→ 404 Not Found
+
+// 4. Output validation error (automatic)
+const endpoint = factory.build({
+  output: z.object({ id: z.number() }),
+  handler: async () => {
+    return { id: "not a number" }; // Bug in code!
+  },
+});
+→ 500 Internal Server Error
+```
+
+All errors are caught and formatted by the `ResultHandler`.
+
+## Next Steps
+
+Now that you understand how Express Zod API works:
+
+<CardGroup cols={2}>
+  <Card title="Middleware Guide" icon="layer-group" href="/middleware">
+    Learn to create and chain middlewares
+  </Card>
+  <Card title="Advanced Validation" icon="filter" href="/validation">
+    Master Zod schemas and transformations
+  </Card>
+  <Card title="Custom Result Handlers" icon="code" href="/result-handlers">
+    Customize response formatting
+  </Card>
+  <Card title="API Documentation" icon="book" href="/documentation">
+    Generate OpenAPI specs automatically
+  </Card>
+</CardGroup>

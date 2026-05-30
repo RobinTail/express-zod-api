@@ -1,0 +1,375 @@
+---
+title: File Uploads
+description: Handle file uploads in your API endpoints with validation, size limits, and security controls.
+---
+
+## Overview
+
+Express Zod API provides built-in support for file uploads using the `express-fileupload` library (based on Busboy). You can easily accept file uploads with full validation and size limiting.
+
+## Installation
+
+First, install the required dependencies:
+
+```bash
+npm install express-fileupload @types/express-fileupload
+```
+
+## Basic Configuration
+
+Enable file uploads in your configuration:
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  upload: true, // Enable with default settings
+  // ... other config
+});
+```
+
+## Advanced Configuration
+
+Configure upload limits and restrictions:
+
+```typescript
+import { createConfig } from "express-zod-api";
+import createHttpError from "http-errors";
+
+const config = createConfig({
+  upload: {
+    limits: {
+      fileSize: 51200, // 50 KB in bytes
+      files: 5, // Maximum number of files
+    },
+    limitError: createHttpError(413, "The file is too large"),
+    beforeUpload: ({ request, logger }) => {
+      // Add custom authorization logic
+      if (!canUpload(request)) {
+        throw createHttpError(403, "Not authorized to upload");
+      }
+    },
+    debug: true, // Enable debug logging (default)
+  },
+  // ... other config
+});
+```
+
+<Note>
+The `limitError` option replaces the deprecated `limitHandler` option. If not set, files will have a `.truncated` property set to `true` when they exceed the size limit.
+</Note>
+
+## Using ez.upload() Schema
+
+Define file upload fields in your input schema:
+
+```typescript
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
+
+const uploadAvatarEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  description: "Handles a file upload.",
+  input: z.object({
+    avatar: ez.upload(), // Single file upload
+  }),
+  output: z.object({
+    name: z.string(),
+    size: z.number().nonnegative(),
+    mime: z.string(),
+  }),
+  handler: async ({ input: { avatar } }) => ({
+    name: avatar.name,
+    size: avatar.size,
+    mime: avatar.mimetype,
+  }),
+});
+```
+
+<Warning>
+The request content type **must** be `multipart/form-data` for file uploads to work.
+</Warning>
+
+## File Object Properties
+
+The uploaded file object has the following properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | `string` | Original filename |
+| `data` | `Buffer` | File contents as a Buffer |
+| `size` | `number` | File size in bytes |
+| `mimetype` | `string` | MIME type (e.g., "image/png") |
+| `md5` | `string` | MD5 hash of the file |
+| `truncated` | `boolean` | True if file was truncated due to size limit |
+| `mv()` | `function` | Function to move the file to a new location |
+
+## Complete Upload Example
+
+```typescript
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
+import { createHash } from "node:crypto";
+import { writeFile } from "node:fs/promises";
+
+const uploadAvatarEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  tag: "files",
+  description: "Handles a file upload.",
+  input: z.object({
+    avatar: ez.upload(),
+    userId: z.string(), // Additional fields work alongside uploads
+  }),
+  output: z.object({
+    name: z.string(),
+    size: z.number().nonnegative(),
+    mime: z.string(),
+    hash: z.string(),
+  }),
+  handler: async ({ input: { avatar, userId } }) => {
+    // Calculate hash
+    const hash = createHash("sha1").update(avatar.data).digest("hex");
+
+    // Save file
+    const filename = `uploads/${userId}-${avatar.name}`;
+    await avatar.mv(filename); // Use built-in move function
+    // Or: await writeFile(filename, avatar.data);
+
+    return {
+      name: avatar.name,
+      size: avatar.size,
+      mime: avatar.mimetype,
+      hash,
+    };
+  },
+});
+```
+
+## Multiple Files
+
+Accept multiple files in a single request:
+
+```typescript
+const uploadMultipleEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    documents: z.array(ez.upload()), // Array of files
+  }),
+  output: z.object({
+    count: z.number(),
+    totalSize: z.number(),
+  }),
+  handler: async ({ input: { documents } }) => {
+    const totalSize = documents.reduce((sum, doc) => sum + doc.size, 0);
+
+    return {
+      count: documents.length,
+      totalSize,
+    };
+  },
+});
+```
+
+## Mixed Input with Files
+
+Combine file uploads with other input data:
+
+```typescript
+import { z } from "zod";
+import { ez, defaultEndpointsFactory } from "express-zod-api";
+
+const uploadWithMetadataEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.looseObject({
+    avatar: ez.upload(),
+    // Other fields from multipart/form-data
+  }),
+  output: z.object({
+    name: z.string(),
+    size: z.number(),
+    hash: z.string(),
+    otherInputs: z.record(z.string(), z.any()),
+  }),
+  handler: async ({ input: { avatar, ...rest } }) => {
+    const hash = createHash("sha1").update(avatar.data).digest("hex");
+
+    return {
+      name: avatar.name,
+      size: avatar.size,
+      hash,
+      otherInputs: rest, // All other fields
+    };
+  },
+});
+```
+
+## Validation and Security
+
+### File Type Validation
+
+```typescript
+const uploadImageEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    image: ez.upload().refine(
+      (file) => file.mimetype.startsWith("image/"),
+      "File must be an image",
+    ),
+  }),
+  // ...
+});
+```
+
+### Size Validation
+
+```typescript
+const uploadSmallFileEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    file: ez.upload().refine(
+      (file) => file.size <= 1024 * 1024, // 1 MB
+      "File must be smaller than 1 MB",
+    ),
+  }),
+  // ...
+});
+```
+
+### Extension Validation
+
+```typescript
+const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif"];
+
+const uploadImageEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    image: ez.upload().refine(
+      (file) =>
+        ALLOWED_EXTENSIONS.some((ext) => file.name.toLowerCase().endsWith(ext)),
+      "Invalid file extension",
+    ),
+  }),
+  // ...
+});
+```
+
+## Error Handling
+
+### Handling Upload Limits
+
+When `limitError` is configured, exceeding the limit throws an error:
+
+```typescript
+import createHttpError from "http-errors";
+
+const config = createConfig({
+  upload: {
+    limits: { fileSize: 51200 }, // 50 KB
+    limitError: createHttpError(413, "The file is too large"),
+  },
+});
+
+// Client receives 413 status with error message
+```
+
+### Without limitError
+
+If `limitError` is not set, check the `truncated` property:
+
+```typescript
+const endpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    file: ez.upload(),
+  }),
+  output: z.object({ success: z.boolean() }),
+  handler: async ({ input: { file } }) => {
+    if (file.truncated) {
+      throw createHttpError(413, "File was too large and was truncated");
+    }
+
+    // Process file
+    return { success: true };
+  },
+});
+```
+
+## Authorization Example
+
+Restrict uploads to authorized users:
+
+```typescript
+import { createConfig } from "express-zod-api";
+import createHttpError from "http-errors";
+
+const config = createConfig({
+  upload: {
+    limits: { fileSize: 5242880 }, // 5 MB
+    beforeUpload: ({ request, logger }) => {
+      // Check authentication
+      const token = request.headers.authorization;
+      if (!token) {
+        throw createHttpError(401, "Authentication required");
+      }
+
+      // Verify token
+      const isValid = verifyToken(token);
+      if (!isValid) {
+        throw createHttpError(403, "Invalid token");
+      }
+
+      logger.info("Upload authorized");
+    },
+  },
+});
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Set Appropriate Size Limits">
+    Always configure `limits.fileSize` to prevent abuse and resource exhaustion. Choose a limit appropriate for your use case.
+  </Accordion>
+
+  <Accordion title="Validate File Types">
+    Never trust the client-provided MIME type alone. Validate file contents or use magic number detection for critical applications.
+  </Accordion>
+
+  <Accordion title="Use beforeUpload for Authorization">
+    Implement authorization checks in `beforeUpload` to reject unauthorized uploads before processing.
+  </Accordion>
+
+  <Accordion title="Sanitize Filenames">
+    Always sanitize uploaded filenames to prevent path traversal attacks:
+    ```typescript
+    const safeName = path.basename(avatar.name).replace(/[^a-zA-Z0-9.-]/g, '_');
+    ```
+  </Accordion>
+
+  <Accordion title="Store Files Outside Web Root">
+    Store uploaded files outside your web server's document root and serve them through controlled endpoints.
+  </Accordion>
+</AccordionGroup>
+
+## Client-Side Example
+
+```typescript
+// Using fetch with FormData
+const formData = new FormData();
+formData.append("avatar", fileInput.files[0]);
+formData.append("userId", "123");
+
+const response = await fetch("/v1/avatar/upload", {
+  method: "POST",
+  body: formData,
+  // Don't set Content-Type header - browser sets it automatically with boundary
+});
+
+const result = await response.json();
+```
+
+## Related Topics
+
+- [HTML Forms](/advanced/html-forms) - Working with form data
+- [Raw Data](/advanced/raw-data) - Accepting raw binary data
+- [Input Sources](/advanced/input-sources) - Configuring input sources

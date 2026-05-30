@@ -1,0 +1,220 @@
+---
+title: "Integration"
+description: "Generate type-safe TypeScript clients from your API"
+---
+
+## Overview
+
+The `Integration` class generates TypeScript client code with full type safety from your API routes.
+
+```typescript
+import { Integration } from "express-zod-api";
+import typescript from "typescript";
+
+const client = new Integration({
+  typescript,
+  routing,
+  config,
+  variant: "client",
+});
+
+const code = await client.printFormatted();
+fs.writeFileSync("client.ts", code);
+```
+
+## Configuration
+
+<ParamField path="typescript" type="typeof import('typescript')" required>
+  TypeScript compiler API
+</ParamField>
+
+<ParamField path="routing" type="Routing" required>
+  Your API routing object
+</ParamField>
+
+<ParamField path="config" type="Config" required>
+  Your Express Zod API configuration
+</ParamField>
+
+<ParamField path="variant" type="'client' | 'types'">
+  Generation mode:
+  
+  - `"client"`: Full client with fetch implementation
+  - `"types"`: Types only for DIY clients
+  
+  Default: `"client"`
+</ParamField>
+
+## Methods
+
+### print()
+
+Generates unformatted TypeScript code.
+
+```typescript
+const code = client.print();
+```
+
+### printFormatted()
+
+Generates formatted TypeScript code using Prettier.
+
+```typescript
+const code = await client.printFormatted();
+```
+
+### Integration.create()
+
+Async factory method that imports TypeScript automatically.
+
+```typescript
+const client = await Integration.create({
+  routing,
+  config,
+  variant: "client",
+});
+```
+
+## Generated Client
+
+The generated client provides:
+
+```typescript
+// In your frontend/client code
+import { Client } from "./generated-client";
+
+const client = new Client({
+  baseUrl: "https://api.example.com",
+});
+
+// Type-safe requests
+const user = await client.provide("get /users/:id", {
+  id: "123",
+});
+
+// All inputs and outputs are fully typed
+const newPost = await client.provide("post /posts", {
+  title: "Hello World",
+  content: "...",
+});
+```
+
+## Custom Implementation
+
+Override the default fetch implementation:
+
+```typescript
+import { Client, Implementation } from "./generated-client";
+import axios from "axios";
+
+const axiosImplementation: Implementation = async ({
+  method,
+  url,
+  body,
+  headers,
+}) => {
+  const response = await axios({ method, url, data: body, headers });
+  return response.data;
+};
+
+const client = new Client(axiosImplementation);
+```
+
+## Examples
+
+### Generate Client
+
+```typescript
+import { Integration } from "express-zod-api";
+import typescript from "typescript";
+import { writeFileSync } from "fs";
+
+const client = new Integration({
+  typescript,
+  routing,
+  config,
+  variant: "client",
+});
+
+const code = await client.printFormatted();
+writeFileSync("src/api-client.ts", code);
+```
+
+### Generate Types Only
+
+```typescript
+const types = new Integration({
+  typescript,
+  routing,
+  config,
+  variant: "types",
+});
+
+const code = await types.printFormatted();
+writeFileSync("src/api-types.ts", code);
+```
+
+### Using the Generated Client
+
+```typescript
+import { Client } from "./api-client";
+
+const client = new Client({
+  baseUrl: process.env.API_URL,
+});
+
+// GET request
+const users = await client.provide("get /users", {
+  limit: 10,
+  offset: 0,
+});
+
+// POST request
+const created = await client.provide("post /users", {
+  name: "John Doe",
+  email: "john@example.com",
+});
+
+// Path parameters
+const user = await client.provide("get /users/:id", {
+  id: "123",
+});
+
+// Server-Sent Events
+import { Subscription } from "./api-client";
+
+const subscription = new Subscription("get /events", {});
+
+subscription.on("message", (data) => {
+  console.log("Received:", data);
+});
+
+subscription.on("error", (error) => {
+  console.error("Error:", error);
+});
+```
+
+### Pagination Support
+
+```typescript
+const response = await client.provide("get /users", {
+  limit: 20,
+  offset: 0,
+});
+
+// Check if more pages available
+if (client.hasMore(response)) {
+  console.log("More users available");
+}
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="End-to-End Type Safety" href="/integration/end-to-end-type-safety">
+    Complete client generation guide
+  </Card>
+  <Card title="Documentation" href="/api/documentation">
+    Generate OpenAPI specs
+  </Card>
+</CardGroup>

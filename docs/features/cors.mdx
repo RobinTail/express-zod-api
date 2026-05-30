@@ -1,0 +1,334 @@
+---
+title: CORS (Cross-Origin Resource Sharing)
+description: Enable and configure CORS for your Express Zod API
+---
+
+Cross-Origin Resource Sharing (CORS) is a security mechanism that allows your API to be accessed from web pages on different domains. Express Zod API provides built-in CORS configuration.
+
+## Enabling CORS
+
+CORS is disabled by default. You must explicitly enable it in your configuration:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: { listen: 8090 },
+  cors: true, // Enable CORS with default headers
+});
+```
+
+<Warning>
+CORS must be explicitly set to `true` or `false`. This ensures you make a conscious decision about cross-origin access to your API.
+</Warning>
+
+## Default CORS Headers
+
+When you set `cors: true`, the following headers are sent:
+
+```
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+Access-Control-Allow-Headers: Content-Type, Authorization
+```
+
+## Custom CORS Configuration
+
+For more control, you can provide a function that returns custom CORS headers:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  cors: ({ defaultHeaders, request, endpoint, logger }) => ({
+    ...defaultHeaders,
+    "Access-Control-Allow-Origin": "https://example.com",
+    "Access-Control-Max-Age": "5000",
+    "Access-Control-Allow-Credentials": "true",
+  }),
+});
+```
+
+### Configuration Parameters
+
+The CORS function receives:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `defaultHeaders` | `Record<string, string>` | Default CORS headers |
+| `request` | `Request` | Express request object |
+| `endpoint` | `AbstractEndpoint` | The matched endpoint |
+| `logger` | `ActualLogger` | Logger instance |
+
+## Common CORS Patterns
+
+### Allow Specific Origin
+
+```ts
+const config = createConfig({
+  cors: ({ defaultHeaders }) => ({
+    ...defaultHeaders,
+    "Access-Control-Allow-Origin": "https://myapp.com",
+  }),
+});
+```
+
+### Allow Multiple Origins
+
+```ts
+const allowedOrigins = [
+  "https://app.example.com",
+  "https://admin.example.com",
+  "http://localhost:3000",
+];
+
+const config = createConfig({
+  cors: ({ defaultHeaders, request }) => {
+    const origin = request.headers.origin;
+    
+    if (origin && allowedOrigins.includes(origin)) {
+      return {
+        ...defaultHeaders,
+        "Access-Control-Allow-Origin": origin,
+      };
+    }
+    
+    return defaultHeaders;
+  },
+});
+```
+
+### Environment-Based Configuration
+
+```ts
+const config = createConfig({
+  cors: ({ defaultHeaders }) => {
+    if (process.env.NODE_ENV === "production") {
+      return {
+        ...defaultHeaders,
+        "Access-Control-Allow-Origin": "https://myapp.com",
+      };
+    }
+    
+    // Allow all origins in development
+    return defaultHeaders;
+  },
+});
+```
+
+### Allow Credentials
+
+For requests that include cookies or authentication:
+
+```ts
+const config = createConfig({
+  cors: ({ defaultHeaders }) => ({
+    ...defaultHeaders,
+    "Access-Control-Allow-Origin": "https://myapp.com",
+    "Access-Control-Allow-Credentials": "true",
+  }),
+});
+```
+
+<Warning>
+When using `Access-Control-Allow-Credentials: true`, you cannot use `Access-Control-Allow-Origin: *`. You must specify an exact origin.
+</Warning>
+
+### Custom Allowed Headers
+
+```ts
+const config = createConfig({
+  cors: ({ defaultHeaders }) => ({
+    ...defaultHeaders,
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Api-Key",
+  }),
+});
+```
+
+### Expose Response Headers
+
+To make custom response headers available to the client:
+
+```ts
+const config = createConfig({
+  cors: ({ defaultHeaders }) => ({
+    ...defaultHeaders,
+    "Access-Control-Expose-Headers": "X-Total-Count, X-Page-Number",
+  }),
+});
+```
+
+## Async CORS Configuration
+
+Your CORS function can be asynchronous for database lookups or external validation:
+
+```ts
+const config = createConfig({
+  cors: async ({ defaultHeaders, request, logger }) => {
+    const origin = request.headers.origin;
+    
+    // Check if origin is allowed
+    const allowed = await db.allowedOrigins.exists({ origin });
+    
+    if (allowed) {
+      logger.info(`CORS: Allowed origin ${origin}`);
+      return {
+        ...defaultHeaders,
+        "Access-Control-Allow-Origin": origin,
+      };
+    }
+    
+    logger.warn(`CORS: Rejected origin ${origin}`);
+    return defaultHeaders;
+  },
+});
+```
+
+## Endpoint-Specific CORS
+
+If you need different CORS rules for specific endpoints, use middleware or response customization:
+
+```ts
+import { Middleware } from "express-zod-api";
+
+const publicMiddleware = new Middleware({
+  handler: async ({ request, response }) => {
+    // Set CORS headers for public endpoints
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    return {};
+  },
+});
+
+const publicEndpointsFactory = defaultEndpointsFactory
+  .addMiddleware(publicMiddleware);
+```
+
+<Info>
+The global `cors` configuration applies to all endpoints. For endpoint-specific headers, consider using [middleware](/essentials/middlewares) or [response customization](/essentials/response-customization).
+</Info>
+
+## Preflight Requests
+
+Express Zod API automatically handles OPTIONS preflight requests when CORS is enabled. You don't need to configure anything special.
+
+## Testing CORS
+
+Test CORS with curl:
+
+```bash
+# Preflight request
+curl -X OPTIONS http://localhost:8090/api/users \
+  -H "Origin: https://example.com" \
+  -H "Access-Control-Request-Method: POST" \
+  -v
+
+# Actual request
+curl -X POST http://localhost:8090/api/users \
+  -H "Origin: https://example.com" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John"}' \
+  -v
+```
+
+Look for `Access-Control-*` headers in the response.
+
+## Common CORS Headers
+
+| Header | Description |
+|--------|-------------|
+| `Access-Control-Allow-Origin` | Which origins can access the resource |
+| `Access-Control-Allow-Methods` | Which HTTP methods are allowed |
+| `Access-Control-Allow-Headers` | Which request headers are allowed |
+| `Access-Control-Allow-Credentials` | Whether credentials can be sent |
+| `Access-Control-Max-Age` | How long preflight results can be cached |
+| `Access-Control-Expose-Headers` | Which response headers can be read by client |
+
+## Security Considerations
+
+<Card title="Don't Use * in Production" icon="shield-halved">
+Avoid `Access-Control-Allow-Origin: *` in production. Specify exact origins.
+</Card>
+
+<Card title="Validate Origins" icon="check">
+When allowing multiple origins, validate them against a whitelist.
+</Card>
+
+<Card title="Be Careful with Credentials" icon="key">
+Only enable credentials for trusted origins. Never combine with `*`.
+</Card>
+
+<Card title="Limit Exposed Headers" icon="eye-slash">
+Only expose headers that clients need. Don't expose sensitive information.
+</Card>
+
+## Complete Example
+
+Here's a production-ready CORS configuration:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
+
+const config = createConfig({
+  http: { listen: 8090 },
+  cors: ({ defaultHeaders, request, logger }) => {
+    const origin = request.headers.origin;
+    
+    // Development: allow all
+    if (process.env.NODE_ENV === "development") {
+      return {
+        ...defaultHeaders,
+        "Access-Control-Allow-Credentials": "true",
+      };
+    }
+    
+    // Production: whitelist only
+    if (origin && allowedOrigins.includes(origin)) {
+      logger.debug(`CORS: Allowed ${origin}`);
+      return {
+        ...defaultHeaders,
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Max-Age": "3600",
+      };
+    }
+    
+    logger.warn(`CORS: Rejected ${origin}`);
+    return {}; // No CORS headers = request blocked
+  },
+});
+```
+
+## Troubleshooting
+
+### CORS Error in Browser Console
+
+If you see:
+```
+Access to fetch at 'http://api.example.com' from origin 'http://app.example.com' 
+has been blocked by CORS policy
+```
+
+**Solutions:**
+- Ensure `cors: true` is set in config
+- Check that the origin is in your allowlist
+- Verify headers are being sent (use browser DevTools)
+
+### Credentials Not Working
+
+**Requirements for credentials:**
+1. `Access-Control-Allow-Credentials: true`
+2. `Access-Control-Allow-Origin` must be a specific origin (not `*`)
+3. Client must send `credentials: 'include'` in fetch
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="HTTPS" icon="lock" href="/features/https">
+    Enable HTTPS for secure connections
+  </Card>
+  <Card title="Compression" icon="file-zipper" href="/features/compression">
+    Compress responses for better performance
+  </Card>
+</CardGroup>

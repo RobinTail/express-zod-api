@@ -1,0 +1,171 @@
+---
+title: Customizing Input Sources
+description: Learn how to customize which request properties are combined into the validated input for your endpoints and middlewares.
+---
+
+## Overview
+
+Express Zod API allows you to customize which `request` properties are combined into the `input` that gets validated and made available to your endpoints and middlewares. This gives you fine-grained control over where input data comes from.
+
+## Default Configuration
+
+The framework provides sensible defaults for each HTTP method:
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  inputSources: {
+    get: ["query", "params"],
+    post: ["body", "params", "files"],
+    put: ["body", "params"],
+    patch: ["body", "params"],
+    delete: ["query", "params"],
+  },
+});
+```
+
+<Note>
+The order matters! Each item in the array has higher priority than the previous one. Later sources can override values from earlier sources.
+</Note>
+
+## Available Sources
+
+You can include any of these request properties:
+
+- `query` - Query string parameters
+- `body` - Request body (parsed JSON)
+- `params` - Path parameters (route params)
+- `files` - Uploaded files (when file upload is enabled)
+- `headers` - Request headers (see [Headers as Input Source](/advanced/input-sources#headers-as-input-source))
+
+## Customizing for Specific Methods
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  inputSources: {
+    get: ["query", "params"],
+    // Allow DELETE to accept body data
+    delete: ["body", "params"],
+    // Include files for PATCH requests
+    patch: ["body", "params", "files"],
+  },
+});
+```
+
+## Headers as Input Source
+
+You can enable request headers as an input source, though this is an opt-in feature that requires careful consideration.
+
+### Configuration
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  inputSources: {
+    get: ["headers", "query", "params"], // headers have lowest priority
+  },
+});
+```
+
+<Warning>
+Give headers the **lowest priority** among other `inputSources` to avoid accidentally overwriting important data.
+</Warning>
+
+### Best Practices
+
+1. **Use Middlewares for Headers**: Consider handling headers in a `Middleware` and declaring them in the `security` property to improve generated documentation.
+
+2. **Lowercase Headers**: Request headers acquired this way are always lowercase when describing validation schemas.
+
+### Example with Middleware
+
+```typescript
+import { Middleware } from "express-zod-api";
+import { z } from "zod";
+
+const headerAuthMiddleware = new Middleware({
+  security: { type: "header", name: "token" }, // documented in OpenAPI
+  input: z.object({
+    token: z.string(),
+  }),
+  handler: async ({ input: { token } }) => {
+    // Validate token
+    return { userId: "123" };
+  },
+});
+```
+
+### Example with Endpoint
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const endpoint = defaultEndpointsFactory.build({
+  input: z.object({
+    "x-request-id": z.string(), // from request.headers (lowercase)
+    id: z.string(), // from request.query
+  }),
+  output: z.object({ success: z.boolean() }),
+  handler: async ({ input }) => {
+    // input["x-request-id"] and input.id are both available
+    return { success: true };
+  },
+});
+```
+
+## Priority Order Example
+
+When multiple sources contain the same property name, the last one wins:
+
+```typescript
+const config = createConfig({
+  inputSources: {
+    post: ["query", "body", "params"],
+    // If query, body, and params all have "id",
+    // the value from params will be used
+  },
+});
+```
+
+## Use Cases
+
+### API Versioning via Headers
+
+```typescript
+const config = createConfig({
+  inputSources: {
+    get: ["headers", "query", "params"],
+  },
+});
+
+const endpoint = factory.build({
+  input: z.object({
+    "api-version": z.string().optional(),
+    id: z.string(),
+  }),
+  // ...
+});
+```
+
+### Flexible DELETE Operations
+
+```typescript
+const config = createConfig({
+  inputSources: {
+    delete: ["body", "query", "params"],
+  },
+});
+
+// Now DELETE can accept data from body or query
+```
+
+## Related Topics
+
+- [Middlewares](/core-concepts/middlewares) - Using middlewares for header authentication
+- [File Uploads](/advanced/file-uploads) - Including files in input sources
+- [HTML Forms](/advanced/html-forms) - Working with form data

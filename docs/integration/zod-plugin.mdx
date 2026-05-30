@@ -1,0 +1,185 @@
+---
+title: Zod Plugin
+description: Learn how Express Zod API extends Zod with additional runtime helpers and methods
+---
+
+Express Zod API augments Zod using the standalone [Zod Plugin](https://www.npmjs.com/package/@express-zod-api/zod-plugin) package, adding runtime helpers and convenience methods that the framework relies on.
+
+## What the Plugin Provides
+
+The plugin extends Zod functionality with several helpful methods and modifications:
+
+### `.example()` Method
+
+A shorthand for adding examples to any schema:
+
+```typescript
+import { z } from "zod";
+
+const schema = z.string()
+  .example("test")
+  .example("another");
+
+schema.meta(); // { examples: ["test", "another"] }
+```
+
+This is equivalent to `.meta({ examples: [...] })` but more convenient. Examples appear in generated documentation.
+
+### `.deprecated()` Method
+
+Mark schemas as deprecated:
+
+```typescript
+const endpoint = factory.build({
+  input: z.object({
+    oldField: z.string().deprecated(), // marks the property as deprecated
+    newField: z.string(),
+  }),
+});
+```
+
+This is shorthand for `.meta({ deprecated: true })` and appears in OpenAPI documentation.
+
+### `.label()` Method
+
+Available on `ZodDefault` schemas as a shorthand for setting default metadata:
+
+```typescript
+const schema = z.string()
+  .default("example")
+  .label("Example Label");
+```
+
+### `.remap()` Method
+
+Renames object properties while maintaining type safety:
+
+```typescript
+import { z } from "zod";
+
+const schema = z.object({ 
+  user_name: z.string(), 
+  id: z.number() 
+}).remap({
+  user_name: "userName", // rename to camelCase
+  // "id" remains unchanged
+});
+```
+
+You can also use a transformation function:
+
+```typescript
+import camelize from "camelize-ts";
+import { z } from "zod";
+
+const schema = z.object({ 
+  user_id: z.string() 
+}).remap((outputs) => camelize(outputs, /* shallow: */ true));
+```
+
+See [Transformations](/features/transformations) for more details.
+
+### Modified `.brand()` Method
+
+The `.brand()` method is enhanced to make brands available at runtime:
+
+```typescript
+import { z } from "zod";
+import { getBrand } from "@express-zod-api/zod-plugin";
+
+const myBrand = Symbol("MyBrand");
+const schema = z.string().brand(myBrand);
+
+getBrand(schema); // returns the brand symbol
+schema.meta(); // { "x-brand": myBrand }
+```
+
+This enables custom handling in Documentation and Integration generators.
+
+## Helpers
+
+### `getBrand()`
+
+Retrieves the brand from a schema:
+
+```typescript
+import { getBrand } from "@express-zod-api/zod-plugin";
+
+const brand = getBrand(schema);
+```
+
+## Installation
+
+The plugin is installed automatically as a dependency of Express Zod API. It requires:
+
+- Zod `^4.3.4`
+- Node.js (compatible with Express Zod API requirements)
+
+## How It Works
+
+The plugin uses module augmentation to extend Zod's types and prototypes. It works in both ESM and CommonJS environments:
+
+```typescript
+// Simply import Zod as usual
+import { z } from "zod";
+
+// All plugin methods are automatically available
+const schema = z.string().example("test").deprecated();
+```
+
+<Note>
+The plugin extends Zod globally when Express Zod API is imported, so you don't need to import or configure anything separately.
+</Note>
+
+## Compatibility
+
+The plugin is designed to work seamlessly with:
+
+- OpenAPI documentation generation
+- TypeScript client generation  
+- All standard Zod schema types
+- Zod v4.x (for Zod v3.x, use Express Zod API versions below 24.0.0)
+
+## Example Usage
+
+Here's a complete example using multiple plugin features:
+
+```typescript
+import { z } from "zod";
+import { defaultEndpointsFactory, getBrand } from "express-zod-api";
+
+const myBrand = Symbol("UserId");
+
+const updateUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    userId: z.string()
+      .brand(myBrand)
+      .example("user_123")
+      .describe("The unique user identifier"),
+    // Old field being phased out
+    legacyId: z.number()
+      .optional()
+      .deprecated(),
+  }),
+  output: z.object({
+    user_name: z.string(),
+    created_at: z.string(),
+  }).remap({
+    user_name: "userName",
+    created_at: "createdAt",
+  }),
+  handler: async ({ input }) => {
+    // Handler implementation
+    return { userName: "John", createdAt: new Date().toISOString() };
+  },
+});
+
+console.log(getBrand(updateUserEndpoint.inputSchema.shape.userId)); // Symbol(UserId)
+```
+
+This example demonstrates:
+- Setting examples for documentation
+- Marking deprecated fields
+- Using branded types
+- Remapping output property names

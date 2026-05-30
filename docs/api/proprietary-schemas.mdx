@@ -1,0 +1,177 @@
+---
+title: "Proprietary Schemas"
+description: "Framework-specific schema types and brands"
+---
+
+## Overview
+
+Express Zod API uses branded types to distinguish its proprietary schemas from regular Zod schemas. These brands enable special handling for dates, files, forms, and raw data.
+
+```typescript
+import { ez } from "express-zod-api";
+```
+
+## The ez Object
+
+All proprietary schemas are accessed through the `ez` object:
+
+```typescript
+export const ez = {
+  dateIn,
+  dateOut,
+  form,
+  upload,
+  raw,
+  buffer,
+  paginated,
+};
+```
+
+## Schema Brands
+
+Each proprietary schema has a unique brand for type identification:
+
+```typescript
+type ProprietaryBrand =
+  | typeof ezFormBrand
+  | typeof ezDateInBrand
+  | typeof ezDateOutBrand
+  | typeof ezUploadBrand
+  | typeof ezRawBrand
+  | typeof ezBufferBrand;
+```
+
+## Date Schemas
+
+### ezDateInBrand
+
+Identifies schemas created with `ez.dateIn()`.
+
+```typescript
+import { ez } from "express-zod-api";
+
+const schema = ez.dateIn();
+// Brand: ezDateInBrand
+// Input: ISO string
+// Output: Date object
+```
+
+### ezDateOutBrand
+
+Identifies schemas created with `ez.dateOut()`.
+
+```typescript
+const schema = ez.dateOut();
+// Brand: ezDateOutBrand
+// Input: Date object
+// Output: ISO string
+```
+
+## File Schemas
+
+### ezUploadBrand
+
+Identifies file upload schemas created with `ez.upload()`.
+
+```typescript
+const schema = ez.upload();
+// Brand: ezUploadBrand
+// Content-Type: multipart/form-data
+```
+
+### ezBufferBrand
+
+Identifies buffer schemas for binary responses.
+
+```typescript
+const schema = ez.buffer();
+// Brand: ezBufferBrand
+// Used in ResultHandler positive schemas
+```
+
+## Form Schema
+
+### ezFormBrand
+
+Identifies form data schemas created with `ez.form()`.
+
+```typescript
+const schema = ez.form({ name: z.string() });
+// Brand: ezFormBrand
+// Content-Type: application/x-www-form-urlencoded
+```
+
+## Raw Data Schema
+
+### ezRawBrand
+
+Identifies raw buffer schemas created with `ez.raw()`.
+
+```typescript
+const schema = ez.raw();
+// Brand: ezRawBrand
+// Input: Raw Buffer from request body
+```
+
+## Brand Usage
+
+The framework uses these brands internally to:
+
+1. **Select correct parsers** - Form data, JSON, multipart, or raw
+2. **Generate accurate OpenAPI specs** - Correct content types and schemas
+3. **Transform data** - Convert between Date objects and ISO strings
+4. **Validate input** - Apply appropriate validation logic
+
+## Type Safety
+
+Brands ensure type safety throughout the request/response cycle:
+
+```typescript
+// Input transformation
+ez.dateIn() // string -> Date
+ez.raw()    // raw body -> Buffer
+ez.form()   // form data -> validated object
+ez.upload() // multipart -> UploadedFile
+
+// Output transformation  
+ez.dateOut() // Date -> string
+ez.buffer()  // Buffer -> binary response
+```
+
+## Combining Schemas
+
+Proprietary schemas work seamlessly with regular Zod schemas:
+
+```typescript
+import { z } from "zod";
+import { ez } from "express-zod-api";
+
+const input = z.object({
+  title: z.string(),
+  publishDate: ez.dateIn(),
+  image: ez.upload().optional(),
+});
+
+const output = z.object({
+  id: z.string(),
+  createdAt: ez.dateOut(),
+  url: z.string().url(),
+});
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="ez Schemas" href="/api/ez-schemas">
+    Complete ez schema reference
+  </Card>
+  <Card title="Zod Plugin" href="/integration/zod-plugin">
+    Zod extensions and helpers
+  </Card>
+  <Card title="Schema Validation" href="/features/schema-validation">
+    Input/output validation
+  </Card>
+  <Card title="OpenAPI" href="/integration/openapi">
+    OpenAPI schema generation
+  </Card>
+</CardGroup>

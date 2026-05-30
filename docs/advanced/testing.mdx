@@ -1,0 +1,442 @@
+---
+title: Testing
+description: Learn how to test your endpoints and middlewares using the built-in testing utilities.
+---
+
+## Overview
+
+Express Zod API provides specialized testing utilities that make it easy to test your endpoints and middlewares without running a full server. The framework uses `node-mocks-http` internally to mock request and response objects.
+
+## Testing Endpoints
+
+Use the `testEndpoint()` function to test your endpoints:
+
+```typescript
+import { testEndpoint } from "express-zod-api";
+import { describe, test, expect } from "vitest"; // or jest
+
+test("should respond successfully", async () => {
+  const { responseMock, loggerMock } = await testEndpoint({
+    endpoint: yourEndpoint,
+    requestProps: {
+      method: "POST", // default: GET
+      body: { name: "John" }, // incoming data as if after parsing (JSON)
+    },
+  });
+
+  expect(loggerMock._getLogs().error).toHaveLength(0);
+  expect(responseMock._getStatusCode()).toBe(200);
+  expect(responseMock._getHeaders()).toHaveProperty("x-custom", "one"); // lower case!
+  expect(responseMock._getJSONData()).toEqual({
+    status: "success",
+    data: { greeting: "Hello, John!" },
+  });
+});
+```
+
+## Testing Middlewares
+
+Test middlewares individually using `testMiddleware()`:
+
+```typescript
+import { z } from "zod";
+import { Middleware, testMiddleware } from "express-zod-api";
+
+const middleware = new Middleware({
+  input: z.object({ test: z.string() }),
+  handler: async ({ ctx, input: { test } }) => ({
+    collectedContext: Object.keys(ctx),
+    testLength: test.length,
+  }),
+});
+
+test("should execute middleware", async () => {
+  const { output, responseMock, loggerMock } = await testMiddleware({
+    middleware,
+    requestProps: {
+      method: "POST",
+      body: { test: "something" },
+    },
+    ctx: { prev: "accumulated" },
+  });
+
+  expect(loggerMock._getLogs().error).toHaveLength(0);
+  expect(output).toEqual({
+    collectedContext: ["prev"],
+    testLength: 9,
+  });
+});
+```
+
+## Complete Testing Examples
+
+### Testing a Simple GET Endpoint
+
+```typescript
+import { defaultEndpointsFactory } from "express-zod-api";
+import { testEndpoint } from "express-zod-api";
+import { z } from "zod";
+
+const getUserEndpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({
+    id: z.string(),
+  }),
+  output: z.object({
+    id: z.number(),
+    name: z.string(),
+  }),
+  handler: async ({ input: { id } }) => ({
+    id: parseInt(id, 10),
+    name: "John Doe",
+  }),
+});
+
+test("GET /user should return user data", async () => {
+  const { responseMock, loggerMock } = await testEndpoint({
+    endpoint: getUserEndpoint,
+    requestProps: {
+      method: "GET",
+      query: { id: "123" },
+    },
+  });
+
+  expect(loggerMock._getLogs().error).toHaveLength(0);
+  expect(responseMock._getStatusCode()).toBe(200);
+  expect(responseMock._getJSONData()).toEqual({
+    status: "success",
+    data: {
+      id: 123,
+      name: "John Doe",
+    },
+  });
+});
+```
+
+### Testing POST with Validation Errors
+
+```typescript
+test("POST /user should fail with invalid input", async () => {
+  const { responseMock, loggerMock } = await testEndpoint({
+    endpoint: createUserEndpoint,
+    requestProps: {
+      method: "POST",
+      body: {
+        name: "", // Invalid: empty string
+      },
+    },
+  });
+
+  expect(responseMock._getStatusCode()).toBe(400);
+  const responseData = responseMock._getJSONData();
+  expect(responseData).toHaveProperty("status", "error");
+  expect(responseData.error.message).toContain("String must contain at least 1 character");
+});
+```
+
+### Testing Authentication Middleware
+
+```typescript
+import { Middleware } from "express-zod-api";
+import { z } from "zod";
+import createHttpError from "http-errors";
+
+const authMiddleware = new Middleware({
+  security: {
+    and: [
+      { type: "input", name: "key" },
+      { type: "header", name: "token" },
+    ],
+  },
+  input: z.object({
+    key: z.string().min(1),
+    token: z.string().min(1),
+  }),
+  handler: async ({ input: { key, token } }) => {
+    if (key !== "123" || token !== "456") {
+      throw createHttpError(401, "Invalid credentials");
+    }
+    return { user: { id: 1, name: "Jane Doe" } };
+  },
+});
+
+test("should authenticate with valid credentials", async () => {
+  const { output, loggerMock } = await testMiddleware({
+    middleware: authMiddleware,
+    requestProps: {
+      method: "POST",
+      body: { key: "123" },
+      headers: { token: "456" },
+    },
+  });
+
+  expect(loggerMock._getLogs().error).toHaveLength(0);
+  expect(output).toEqual({
+    user: { id: 1, name: "Jane Doe" },
+  });
+});
+
+test("should reject invalid credentials", async () => {
+  const { responseMock } = await testMiddleware({
+    middleware: authMiddleware,
+    requestProps: {
+      method: "POST",
+      body: { key: "wrong" },
+      headers: { token: "456" },
+    },
+  });
+
+  expect(responseMock._getStatusCode()).toBe(401);
+});
+```
+
+### Testing with Context
+
+```typescript
+const protectedEndpoint = defaultEndpointsFactory
+  .addMiddleware(authMiddleware)
+  .build({
+    input: z.object({ action: z.string() }),
+    output: z.object({ message: z.string() }),
+    handler: async ({ input, ctx }) => ({
+      message: `${ctx.user.name} performed ${input.action}`,
+    }),
+  });
+
+test("should use context from middleware", async () => {
+  const { responseMock } = await testEndpoint({
+    endpoint: protectedEndpoint,
+    requestProps: {
+      method: "POST",
+      body: { key: "123", action: "update" },
+      headers: { token: "456" },
+    },
+  });
+
+  expect(responseMock._getStatusCode()).toBe(200);
+  expect(responseMock._getJSONData()).toEqual({
+    status: "success",
+    data: { message: "Jane Doe performed update" },
+  });
+});
+```
+
+## Testing Options
+
+### requestProps
+
+Additional properties to set on the Request mock:
+
+```typescript
+requestProps: {
+  method: "POST",          // HTTP method
+  body: {},                // Request body (parsed JSON)
+  query: {},               // Query parameters
+  params: {},              // Path parameters
+  headers: {},             // Request headers
+  // ... any other Request properties
+}
+```
+
+### responseOptions
+
+Options for the Response mock (see [node-mocks-http](https://www.npmjs.com/package/node-mocks-http)):
+
+```typescript
+responseOptions: {
+  // Custom response options
+}
+```
+
+### configProps
+
+Additional configuration properties:
+
+```typescript
+configProps: {
+  cors: true,
+  inputSources: { post: ["body", "params"] },
+  // ... any config options
+}
+```
+
+### loggerProps
+
+Additional logger properties:
+
+```typescript
+loggerProps: {
+  // Custom logger properties
+}
+```
+
+## Logger Mock Methods
+
+The logger mock provides a special `_getLogs()` method:
+
+```typescript
+const logs = loggerMock._getLogs();
+
+console.log(logs.info);   // Array of info logs
+console.log(logs.debug);  // Array of debug logs
+console.log(logs.warn);   // Array of warning logs
+console.log(logs.error);  // Array of error logs
+```
+
+### Example
+
+```typescript
+test("should log debug information", async () => {
+  const { loggerMock } = await testEndpoint({
+    endpoint: myEndpoint,
+    requestProps: { method: "GET" },
+  });
+
+  const debugLogs = loggerMock._getLogs().debug;
+  expect(debugLogs.length).toBeGreaterThan(0);
+  expect(debugLogs[0]).toContain("Processing request");
+});
+```
+
+## Response Mock Methods
+
+The response mock provides these assertion helpers:
+
+```typescript
+responseMock._getStatusCode()    // Get HTTP status code
+responseMock._getJSONData()      // Get JSON response data
+responseMock._getHeaders()       // Get response headers (lowercase)
+responseMock._getData()          // Get raw response data
+responseMock._isJSON()           // Check if response is JSON
+responseMock._isUTF8()           // Check if response is UTF-8
+```
+
+## Testing File Uploads
+
+```typescript
+import { testEndpoint } from "express-zod-api";
+import { ez } from "express-zod-api";
+
+const uploadEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    avatar: ez.upload(),
+  }),
+  output: z.object({
+    size: z.number(),
+  }),
+  handler: async ({ input: { avatar } }) => ({
+    size: avatar.size,
+  }),
+});
+
+test("should handle file upload", async () => {
+  const mockFile = {
+    name: "test.png",
+    data: Buffer.from("fake image data"),
+    size: 1024,
+    mimetype: "image/png",
+    mv: vi.fn(),
+  };
+
+  const { responseMock } = await testEndpoint({
+    endpoint: uploadEndpoint,
+    requestProps: {
+      method: "POST",
+      body: { avatar: mockFile },
+    },
+  });
+
+  expect(responseMock._getStatusCode()).toBe(200);
+  expect(responseMock._getJSONData().data.size).toBe(1024);
+});
+```
+
+## Testing Custom Result Handlers
+
+```typescript
+const customHandler = new ResultHandler({
+  positive: (data) => ({
+    schema: z.object({ result: z.string() }),
+    mimeType: "application/json",
+  }),
+  negative: z.object({ error: z.string() }),
+  handler: ({ error, output, response }) => {
+    if (error) {
+      return void response.status(400).json({ error: error.message });
+    }
+    response.status(200).json({ result: output });
+  },
+});
+
+const customFactory = new EndpointsFactory(customHandler);
+
+test("should use custom result handler", async () => {
+  const endpoint = customFactory.build({
+    input: z.object({}),
+    output: z.string(),
+    handler: async () => "success",
+  });
+
+  const { responseMock } = await testEndpoint({ endpoint });
+
+  expect(responseMock._getJSONData()).toEqual({ result: "success" });
+});
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Test Both Success and Error Cases">
+    Always test both successful responses and error conditions to ensure your error handling works correctly.
+  </Accordion>
+
+  <Accordion title="Check Logger Output">
+    Verify that no unexpected errors were logged using `loggerMock._getLogs().error`.
+  </Accordion>
+
+  <Accordion title="Test Middleware Chains">
+    Test middlewares individually and then test endpoints with middlewares attached to ensure proper context passing.
+  </Accordion>
+
+  <Accordion title="Use Snapshots for Complex Responses">
+    For complex response structures, consider using snapshot testing to detect unexpected changes.
+  </Accordion>
+
+  <Accordion title="Mock External Dependencies">
+    Mock database calls and external services to keep tests fast and isolated.
+  </Accordion>
+</AccordionGroup>
+
+## Integration Testing
+
+For full integration tests, start the actual server:
+
+```typescript
+import { createServer } from "express-zod-api";
+import { config } from "./config";
+import { routing } from "./routing";
+
+let server;
+
+beforeAll(async () => {
+  const { servers } = await createServer(config, routing);
+  server = servers[0];
+});
+
+afterAll(() => {
+  server?.close();
+});
+
+test("integration test", async () => {
+  const response = await fetch("http://localhost:8080/v1/user/123");
+  const data = await response.json();
+  expect(data).toEqual({ status: "success", data: { id: 123 } });
+});
+```
+
+## Related Topics
+
+- [Middlewares](/core-concepts/middlewares) - Creating and using middlewares
+- [Endpoints](/core-concepts/endpoints) - Building endpoints
+- [Error Handling](/core-concepts/error-handling) - Handling errors

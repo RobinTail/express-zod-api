@@ -1,0 +1,195 @@
+---
+title: "ResultHandler"
+description: "Customize API responses and error handling"
+---
+
+## Overview
+
+The `ResultHandler` class controls how your API sends responses and handles errors. It defines response schemas for success and error cases.
+
+```typescript
+import { ResultHandler } from "express-zod-api";
+import { z } from "zod";
+
+const customResultHandler = new ResultHandler({
+  positive: (data) => ({
+    schema: z.object({ success: z.literal(true), data }),
+    mimeType: "application/json",
+  }),
+  negative: z.object({ success: z.literal(false), error: z.string() }),
+  handler: ({ error, output, response }) => {
+    if (error) {
+      response.status(error.statusCode || 500).json({
+        success: false,
+        error: error.message,
+      });
+    } else {
+      response.status(200).json({ success: true, data: output });
+    }
+  },
+});
+```
+
+## Configuration
+
+### positive
+
+**Type**: `(output: Schema) => { schema: Schema; mimeType: string | string[] | null }`
+
+**Description**: Defines success response schema.
+
+```typescript
+positive: (data) => ({
+  schema: z.object({ data }),
+  mimeType: "application/json",
+})
+```
+
+### negative
+
+**Type**: `Schema`
+
+**Description**: Error response schema.
+
+```typescript
+negative: z.object({ error: z.string() })
+```
+
+### handler
+
+**Type**: `(params: HandlerParams) => void`
+
+**Required**: Yes
+
+**Description**: Sends the actual response.
+
+**Parameters**:
+
+<ParamField path="output" type="any">
+  Validated endpoint output (on success)
+</ParamField>
+
+<ParamField path="error" type="Error | null">
+  Error object (on failure)
+</ParamField>
+
+<ParamField path="request" type="Request">
+  Express request object
+</ParamField>
+
+<ParamField path="response" type="Response">
+  Express response object
+</ParamField>
+
+<ParamField path="logger" type="Logger">
+  Logger instance
+</ParamField>
+
+<ParamField path="input" type="any">
+  Validated input
+</ParamField>
+
+## Pre-built Result Handlers
+
+### defaultResultHandler
+
+Standard JSON responses:
+
+```typescript
+// Success
+{ "status": "success", "data": { ... } }
+
+// Error
+{ "status": "error", "error": { "message": "..." } }
+```
+
+### arrayResultHandler
+
+(Deprecated) Returns arrays directly for legacy APIs.
+
+## Examples
+
+### Custom Status Codes
+
+```typescript
+const customStatusHandler = new ResultHandler({
+  positive: (data) => ({
+    schema: z.object({ data }),
+    mimeType: "application/json",
+    statusCode: 201,
+  }),
+  negative: z.object({ error: z.string() }),
+  handler: ({ error, output, response }) => {
+    if (error) {
+      const status = error.statusCode || 500;
+      response.status(status).json({ error: error.message });
+    } else {
+      response.status(201).json({ data: output });
+    }
+  },
+});
+```
+
+### Non-JSON Responses
+
+```typescript
+import { ez } from "express-zod-api";
+
+const fileHandler = new ResultHandler({
+  positive: { schema: ez.buffer(), mimeType: "image/png" },
+  negative: { schema: z.string(), mimeType: "text/plain" },
+  handler: ({ error, output, response }) => {
+    if (error) {
+      response.status(400).send(error.message);
+    } else if (output.buffer) {
+      response.type("image/png").send(output.buffer);
+    }
+  },
+});
+```
+
+### Empty Responses
+
+```typescript
+const emptyHandler = new ResultHandler({
+  positive: { statusCode: 204, mimeType: null, schema: z.never() },
+  negative: { statusCode: 404, mimeType: null, schema: z.never() },
+  handler: ({ error, response }) => {
+    response.status(error ? 404 : 204).end();
+  },
+});
+```
+
+## Error Helpers
+
+### ensureHttpError()
+
+Normalizes errors to have status codes:
+
+```typescript
+import { ensureHttpError } from "express-zod-api";
+
+const httpError = ensureHttpError(error);
+console.log(httpError.statusCode); // 400, 401, 500, etc.
+```
+
+### getMessageFromError()
+
+Extracts error message:
+
+```typescript
+import { getMessageFromError } from "express-zod-api";
+
+const message = getMessageFromError(error);
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="Response Customization" href="/advanced/response-customization">
+    Advanced response patterns
+  </Card>
+  <Card title="Error Handling" href="/concepts/error-handling">
+    Error handling concepts
+  </Card>
+</CardGroup>

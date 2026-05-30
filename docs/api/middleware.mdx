@@ -1,0 +1,179 @@
+---
+title: "Middleware"
+description: "Create reusable middleware for authentication, logging, and context"
+---
+
+## Overview
+
+Middleware executes before endpoint handlers, providing authentication, context, and input validation. Middleware can be chained and composed.
+
+```typescript
+import { Middleware } from "express-zod-api";
+import { z } from "zod";
+
+const authMiddleware = new Middleware({
+  input: z.object({ token: z.string() }),
+  handler: async ({ input, request }) => {
+    const user = await validateToken(input.token);
+    return { user };
+  },
+});
+```
+
+## Configuration
+
+### input
+
+**Type**: `ZodObject`
+
+Input validation schema for the middleware.
+
+### handler
+
+**Type**: `Handler<Input, Output, Context>`
+
+**Required**: Yes
+
+Async function that returns context for endpoints.
+
+### security
+
+**Type**: `SecuritySchema`
+
+Security requirements for OpenAPI documentation.
+
+```typescript
+security: {
+  and: [
+    { type: "input", name: "key" },
+    { type: "header", name: "token" },
+  ],
+}
+```
+
+## Handler Return Value
+
+The middleware handler must return an object that becomes part of the endpoint's context:
+
+```typescript
+handler: async ({ input }) => {
+  const user = await getUser(input.userId);
+  const permissions = await getPermissions(user);
+  
+  return { user, permissions }; // Available in ctx
+}
+```
+
+## Chaining Middleware
+
+```typescript
+const factory = defaultEndpointsFactory
+  .addMiddleware(authMiddleware)
+  .addMiddleware({
+    handler: async ({ ctx: { user } }) => {
+      const settings = await getSettings(user.id);
+      return { settings };
+    },
+  });
+
+// Endpoints have ctx: { user, settings }
+```
+
+## Security Declarations
+
+Declare security requirements for documentation:
+
+```typescript
+// API Key
+security: { type: "input", name: "apiKey" }
+
+// Bearer Token
+security: { type: "header", name: "authorization" }
+
+// OAuth2
+security: {
+  type: "oauth2",
+  flows: {
+    authorizationCode: {
+      authorizationUrl: "https://auth.example.com/oauth/authorize",
+      tokenUrl: "https://auth.example.com/oauth/token",
+      scopes: { read: "Read access", write: "Write access" },
+    },
+  },
+}
+
+// Multiple requirements (AND)
+security: {
+  and: [
+    { type: "input", name: "key" },
+    { type: "header", name: "token" },
+  ],
+}
+
+// Alternative requirements (OR)
+security: {
+  or: [
+    { type: "header", name: "authorization" },
+    { type: "input", name: "apiKey" },
+  ],
+}
+```
+
+## Examples
+
+### Authentication Middleware
+
+```typescript
+import createHttpError from "http-errors";
+
+const authMiddleware = new Middleware({
+  security: { type: "header", name: "authorization" },
+  handler: async ({ request }) => {
+    const token = request.headers.authorization?.replace("Bearer ", "");
+    
+    if (!token) {
+      throw createHttpError(401, "Missing token");
+    }
+    
+    const user = await verifyJWT(token);
+    if (!user) {
+      throw createHttpError(401, "Invalid token");
+    }
+    
+    return { user };
+  },
+});
+```
+
+### Rate Limiting Middleware
+
+```typescript
+const rateLimitMiddleware = new Middleware({
+  handler: async ({ request, logger }) => {
+    const ip = request.ip;
+    const count = await redis.incr(`rate:${ip}`);
+    
+    if (count === 1) {
+      await redis.expire(`rate:${ip}`, 60);
+    }
+    
+    if (count > 100) {
+      logger.warn(`Rate limit exceeded for ${ip}`);
+      throw createHttpError(429, "Too many requests");
+    }
+    
+    return {};
+  },
+});
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="EndpointsFactory" href="/api/endpoints-factory">
+    Add middleware to factories
+  </Card>
+  <Card title="Authentication Guide" href="/guides/authentication">
+    Complete authentication examples
+  </Card>
+</CardGroup>

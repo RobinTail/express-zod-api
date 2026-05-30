@@ -1,0 +1,342 @@
+---
+title: Response Compression
+description: Enable GZIP and Brotli compression for faster API responses
+---
+
+Response compression reduces the size of your API responses, improving performance and reducing bandwidth costs. Express Zod API supports GZIP and Brotli compression through the `compression` package.
+
+## Installation
+
+First, install the required packages:
+
+```bash
+npm install compression @types/compression
+# or
+pnpm add compression @types/compression
+# or
+yarn add compression @types/compression
+```
+
+## Enabling Compression
+
+Enable compression in your configuration:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: { listen: 8090 },
+  compression: true, // Enable with default settings
+});
+```
+
+That's it! Your API responses will now be compressed automatically.
+
+## Configuration Options
+
+For more control, pass configuration options:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: { listen: 8090 },
+  compression: {
+    threshold: "1kb", // Only compress responses larger than 1KB
+    level: 6, // Compression level (0-9, default: 6)
+  },
+});
+```
+
+### Available Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `threshold` | `string \| number` | `1024` | Minimum response size to compress (bytes or string like "1kb") |
+| `level` | `number` | `6` | Compression level (0=none, 9=max, -1=default) |
+| `strategy` | `number` | - | Compression strategy for GZIP |
+| `chunkSize` | `number` | `16384` | Chunk size for compression |
+| `memLevel` | `number` | `8` | Memory level for GZIP (1-9) |
+
+## How It Works
+
+When a client sends a request with the `Accept-Encoding` header, the server responds with compressed data:
+
+<CodeGroup>
+```bash Request
+curl -H "Accept-Encoding: br, gzip, deflate" \
+  https://api.example.com/v1/users
+```
+
+```http Response Headers
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Encoding: br
+Vary: Accept-Encoding
+```
+</CodeGroup>
+
+The client automatically decompresses the response.
+
+## Compression Algorithms
+
+Express Zod API supports multiple compression algorithms:
+
+1. **Brotli** (`br`) - Best compression, slower
+2. **GZIP** (`gzip`) - Good compression, fast
+3. **Deflate** (`deflate`) - Older, less efficient
+
+The server automatically chooses the best algorithm based on the client's `Accept-Encoding` header.
+
+## What Gets Compressed?
+
+Only responses with **compressible content types** are compressed:
+
+- `application/json` ✅
+- `text/html` ✅
+- `text/plain` ✅
+- `text/css` ✅
+- `application/javascript` ✅
+- `image/jpeg` ❌ (already compressed)
+- `image/png` ❌ (already compressed)
+- `video/*` ❌ (already compressed)
+
+## Minimum Size Threshold
+
+Small responses aren't worth compressing due to overhead. Set a threshold:
+
+```ts
+const config = createConfig({
+  compression: {
+    threshold: "1kb", // Don't compress responses smaller than 1KB
+  },
+});
+```
+
+Common threshold values:
+- **`1kb`** (1024 bytes) - Default, good for most APIs
+- **`512`** (512 bytes) - More aggressive
+- **`2kb`** (2048 bytes) - Less aggressive
+
+## Compression Levels
+
+Balance compression ratio vs. CPU usage:
+
+```ts
+const config = createConfig({
+  compression: {
+    level: 6, // Default
+    // level: 1, // Fastest, less compression
+    // level: 9, // Slowest, max compression
+  },
+});
+```
+
+| Level | Speed | Compression | Use Case |
+|-------|-------|-------------|----------|
+| 1 | Fastest | Minimal | High-traffic APIs, CPU-constrained |
+| 6 | Balanced | Good | Default, most use cases |
+| 9 | Slowest | Maximum | Low-traffic, bandwidth-constrained |
+
+## Real-World Example
+
+From the Express Zod API example:
+
+```ts
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: { listen: 8090 },
+  compression: true, // Affects image streaming endpoint
+  upload: {
+    limits: { fileSize: 51200 },
+  },
+});
+```
+
+## Testing Compression
+
+Verify compression is working:
+
+```bash
+# Test with curl
+curl -H "Accept-Encoding: gzip" \
+  -v \
+  https://api.example.com/v1/users
+
+# Look for:
+# < Content-Encoding: gzip
+```
+
+Or use browser DevTools:
+1. Open Network tab
+2. Make request to your API
+3. Check response headers for `Content-Encoding: gzip` or `Content-Encoding: br`
+4. Compare "Size" vs "Transferred" columns
+
+## Performance Impact
+
+### Benefits
+
+- **Reduced bandwidth**: 60-80% smaller responses for JSON
+- **Faster transfer**: Especially on slow connections
+- **Lower costs**: Reduced data transfer fees
+
+### Trade-offs
+
+- **CPU usage**: Compression takes processing time
+- **Latency**: Minimal increase for compression/decompression
+- **Memory**: Buffering during compression
+
+### Benchmarks
+
+Typical JSON response (10KB uncompressed):
+
+| Algorithm | Size | Ratio | Compression Time |
+|-----------|------|-------|------------------|
+| None | 10KB | - | - |
+| GZIP (level 6) | 2.5KB | 75% | ~1ms |
+| Brotli | 2.0KB | 80% | ~2ms |
+
+## When NOT to Use Compression
+
+<Card title="Already Compressed Content" icon="file-zipper">
+Images, videos, and PDFs are already compressed. Don't compress them again.
+</Card>
+
+<Card title="Very Small Responses" icon="minimize">
+Responses under 150 bytes may become larger when compressed due to overhead.
+</Card>
+
+<Card title="CPU-Constrained Servers" icon="microchip">
+If CPU is your bottleneck, compression may hurt more than help.
+</Card>
+
+<Card title="Streaming Responses" icon="water">
+Streaming with compression is complex. Consider pre-compression instead.
+</Card>
+
+## Advanced Configuration
+
+### Environment-Based
+
+```ts
+const config = createConfig({
+  compression: process.env.NODE_ENV === "production" ? {
+    threshold: "1kb",
+    level: 6,
+  } : false, // Disable in development
+});
+```
+
+### Custom Filter
+
+While Express Zod API doesn't expose the filter directly, you can use `beforeRouting`:
+
+```ts
+import compression from "compression";
+
+const config = createConfig({
+  compression: false, // Disable built-in
+  beforeRouting: ({ app }) => {
+    app.use(
+      compression({
+        filter: (req, res) => {
+          // Custom logic
+          if (req.headers["x-no-compression"]) {
+            return false;
+          }
+          return compression.filter(req, res);
+        },
+      })
+    );
+  },
+});
+```
+
+## Monitoring Compression
+
+Add logging to track compression effectiveness:
+
+```ts
+const config = createConfig({
+  compression: { threshold: "1kb" },
+  beforeRouting: ({ app, getLogger }) => {
+    const logger = getLogger();
+    
+    app.use((req, res, next) => {
+      const originalWrite = res.write;
+      const originalEnd = res.end;
+      let uncompressedSize = 0;
+      
+      res.write = function (chunk: any, ...args: any[]) {
+        if (chunk) uncompressedSize += chunk.length;
+        return originalWrite.apply(res, [chunk, ...args]);
+      };
+      
+      res.end = function (chunk: any, ...args: any[]) {
+        if (chunk) uncompressedSize += chunk.length;
+        
+        const compressed = res.getHeader("content-encoding");
+        if (compressed && uncompressedSize > 0) {
+          logger.debug("Compressed response", {
+            path: req.path,
+            uncompressedSize,
+            encoding: compressed,
+          });
+        }
+        
+        return originalEnd.apply(res, [chunk, ...args]);
+      };
+      
+      next();
+    });
+  },
+});
+```
+
+## Best Practices
+
+<Card title="Always Enable in Production" icon="check">
+Compression is a free performance win for most APIs. Enable it.
+</Card>
+
+<Card title="Use Default Settings" icon="sliders">
+The defaults (level 6, threshold 1KB) work well for most cases.
+</Card>
+
+<Card title="Test with Real Data" icon="flask">
+Benchmark with your actual API responses to find optimal settings.
+</Card>
+
+<Card title="Monitor CPU Usage" icon="gauge">
+If CPU spikes after enabling compression, reduce the level or increase threshold.
+</Card>
+
+## Common Issues
+
+### Compression Not Working
+
+Check:
+1. Client sends `Accept-Encoding: gzip, deflate, br`
+2. Response is compressible (JSON, text)
+3. Response size exceeds threshold
+4. No other middleware interferes
+
+### Performance Degradation
+
+If compression slows your API:
+1. Lower compression level (6 → 3)
+2. Increase threshold (1KB → 5KB)
+3. Profile to find bottleneck
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Logging" icon="file-lines" href="/features/logging">
+    Configure logging for your API
+  </Card>
+  <Card title="HTTPS" icon="lock" href="/features/https">
+    Enable secure connections
+  </Card>
+</CardGroup>

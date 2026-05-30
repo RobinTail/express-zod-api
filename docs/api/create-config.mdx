@@ -1,0 +1,329 @@
+---
+title: "createConfig"
+description: "Create a configuration object for your Express Zod API server"
+---
+
+## Overview
+
+The `createConfig()` function creates a configuration object that controls the behavior of your Express Zod API server. It accepts a configuration object and returns a validated config ready for use with `createServer()` or `attachRouting()`.
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: { listen: 8090 },
+  cors: true,
+  logger: { level: "debug" },
+});
+```
+
+## Signature
+
+```typescript
+function createConfig(options: CommonConfig & (ServerConfig | AppConfig)): Config
+```
+
+## Configuration Options
+
+The configuration object accepts options from three categories:
+
+<CardGroup cols={3}>
+  <Card title="Common Options" icon="gear" href="#common-options">
+    CORS, logging, error handling, input sources
+  </Card>
+  <Card title="Server Options" icon="server" href="#server-options">
+    HTTP/HTTPS server configuration
+  </Card>
+  <Card title="App Options" icon="puzzle-piece" href="#app-options">
+    Attach to existing Express app
+  </Card>
+</CardGroup>
+
+## Common Options
+
+These options are available in all configurations:
+
+<ParamField path="cors" type="boolean | HeadersProvider" required>
+  Enable CORS and optionally customize headers
+  
+  ```typescript
+  // Simple enable
+  cors: true
+  
+  // Custom headers
+  cors: ({ defaultHeaders, request, endpoint, logger }) => ({
+    ...defaultHeaders,
+    "Access-Control-Max-Age": "5000",
+  })
+  ```
+</ParamField>
+
+<ParamField path="logger" type="LoggerConfig | Logger">
+  Built-in logger configuration or custom logger instance
+  
+  ```typescript
+  // Built-in logger
+  logger: { level: "debug", color: true, depth: 2 }
+  
+  // Custom logger (Winston, Pino, etc)
+  logger: winston.createLogger({ ... })
+  ```
+</ParamField>
+
+<ParamField path="errorHandler" type="ResultHandler">
+  Custom result handler for routing and parsing errors
+  
+  Default: `defaultResultHandler`
+</ParamField>
+
+<ParamField path="inputSources" type="Partial<InputSources>">
+  Customize which request properties are merged into `input`
+  
+  ```typescript
+  inputSources: {
+    get: ["query", "params"],
+    post: ["body", "params", "files"],
+  }
+  ```
+</ParamField>
+
+<ParamField path="childLoggerProvider" type="function">
+  Create a child logger for each request with custom context
+  
+  ```typescript
+  childLoggerProvider: ({ parent, request }) =>
+    parent.child({ requestId: uuid() })
+  ```
+</ParamField>
+
+<ParamField path="accessLogger" type="function | null">
+  Custom access logging function or `null` to disable
+  
+  ```typescript
+  accessLogger: ({ method, path }, logger) =>
+    logger.info(`${method} ${path}`)
+  ```
+</ParamField>
+
+<ParamField path="wrongMethodBehavior" type="404 | 405">
+  How to respond when wrong HTTP method is used
+  
+  - `404`: Not Found
+  - `405`: Method Not Allowed (includes Allow header)
+  
+  Default: `405`
+</ParamField>
+
+<ParamField path="methodLikeRouteBehavior" type="'method' | 'path'">
+  How to treat routing keys that look like HTTP methods
+  
+  Default: `"method"`
+</ParamField>
+
+<ParamField path="startupLogo" type="boolean">
+  Show the Express Zod API logo on startup
+  
+  Default: `true`
+</ParamField>
+
+## Server Options
+
+Use these options when creating a standalone server:
+
+<ParamField path="http" type="{ listen: number | string | ListenOptions }">
+  HTTP server configuration
+  
+  ```typescript
+  http: { listen: 8090 }
+  http: { listen: "/var/run/app.sock" }
+  http: { listen: { port: 8090, host: "0.0.0.0" } }
+  ```
+</ParamField>
+
+<ParamField path="https" type="{ options: ServerOptions, listen: number | string | ListenOptions }">
+  HTTPS server configuration with TLS certificates
+  
+  ```typescript
+  https: {
+    options: {
+      cert: fs.readFileSync("cert.pem"),
+      key: fs.readFileSync("key.pem"),
+    },
+    listen: 443,
+  }
+  ```
+</ParamField>
+
+<ParamField path="gracefulShutdown" type="GracefulShutdownConfig">
+  Graceful shutdown configuration
+  
+  ```typescript
+  gracefulShutdown: {
+    timeout: 30000,
+    events: ["SIGTERM", "SIGINT"],
+    beforeShutdown: async () => {
+      await db.disconnect();
+    },
+  }
+  ```
+</ParamField>
+
+<ParamField path="beforeRouting" type="function">
+  Configure Express app before routing is attached
+  
+  ```typescript
+  beforeRouting: ({ app, getLogger }) => {
+    app.use("/docs", swaggerUi.serve, swaggerUi.setup(docs));
+  }
+  ```
+</ParamField>
+
+<ParamField path="jsonParser" type="RequestHandler | false">
+  Custom JSON body parser or `false` to disable
+  
+  Default: `express.json()`
+</ParamField>
+
+<ParamField path="formParser" type="RequestHandler | false">
+  Custom URL-encoded form parser or `false` to disable
+  
+  Default: `express.urlencoded({ extended: false })`
+</ParamField>
+
+<ParamField path="upload" type="boolean | UploadOptions">
+  Enable file uploads with optional configuration
+  
+  ```typescript
+  upload: {
+    limits: { fileSize: 1024 * 1024 * 5 }, // 5MB
+    limitError: createHttpError(413, "File too large"),
+    beforeUpload: ({ request }) => {
+      if (!isAuthorized(request)) throw createHttpError(403);
+    },
+  }
+  ```
+</ParamField>
+
+<ParamField path="compression" type="boolean | CompressionOptions">
+  Enable GZIP/Brotli compression
+  
+  ```typescript
+  compression: { threshold: "1kb", level: 6 }
+  ```
+</ParamField>
+
+<ParamField path="queryParser" type="'simple' | 'extended' | function">
+  Query string parser
+  
+  - `"simple"`: Node's querystring module
+  - `"extended"`: qs module with nested objects
+  - Custom function: `(str) => qs.parse(str, { comma: true })`
+  
+  Default: `"simple"`
+</ParamField>
+
+## App Options
+
+Use when attaching to an existing Express application:
+
+<ParamField path="app" type="Express | Router" required>
+  Express application or router instance
+  
+  ```typescript
+  import express from "express";
+  
+  const app = express();
+  const config = createConfig({
+    app,
+    cors: true,
+    logger: { level: "info" },
+  });
+  ```
+</ParamField>
+
+## Examples
+
+### Minimal Configuration
+
+```typescript
+import { createConfig } from "express-zod-api";
+
+const config = createConfig({
+  http: { listen: 8090 },
+  cors: false,
+});
+```
+
+### Production Configuration
+
+```typescript
+import { createConfig } from "express-zod-api";
+import winston from "winston";
+import createHttpError from "http-errors";
+
+const config = createConfig({
+  https: {
+    options: {
+      cert: fs.readFileSync("/etc/ssl/cert.pem"),
+      key: fs.readFileSync("/etc/ssl/key.pem"),
+    },
+    listen: 443,
+  },
+  cors: ({ defaultHeaders }) => ({
+    ...defaultHeaders,
+    "Access-Control-Allow-Origin": process.env.ALLOWED_ORIGIN,
+  }),
+  logger: winston.createLogger({
+    level: "info",
+    format: winston.format.json(),
+    transports: [new winston.transports.File({ filename: "api.log" })],
+  }),
+  upload: {
+    limits: { fileSize: 10 * 1024 * 1024 },
+    limitError: createHttpError(413, "File exceeds 10MB limit"),
+  },
+  compression: { threshold: "1kb", level: 6 },
+  gracefulShutdown: {
+    timeout: 30000,
+    beforeShutdown: async () => {
+      await db.disconnect();
+      await redis.quit();
+    },
+  },
+});
+```
+
+### With Existing Express App
+
+```typescript
+import express from "express";
+import { createConfig } from "express-zod-api";
+
+const app = express();
+
+// Add your own middleware
+app.use("/health", (req, res) => res.send("OK"));
+
+const config = createConfig({
+  app,
+  cors: true,
+  logger: { level: "debug" },
+});
+```
+
+## See Also
+
+<CardGroup cols={2}>
+  <Card title="Config Options" icon="list" href="/api/config-options">
+    Detailed reference for all configuration options
+  </Card>
+  <Card title="createServer" icon="server" href="/api/server">
+    Start a server with your configuration
+  </Card>
+  <Card title="Production Mode" icon="shield" href="/advanced/production-mode">
+    Production deployment best practices
+  </Card>
+  <Card title="CORS" icon="globe" href="/features/cors">
+    Configure cross-origin resource sharing
+  </Card>
+</CardGroup>

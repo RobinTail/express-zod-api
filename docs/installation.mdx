@@ -1,0 +1,317 @@
+---
+title: Installation
+description: Install Express Zod API and configure your TypeScript project
+---
+
+## Prerequisites
+
+Before installing Express Zod API, make sure you have:
+
+- **Node.js**: Version 20.19.0, 22.12.0, or 24.0.0 or higher
+- **TypeScript**: Version 5.1.3 or higher
+- **Package Manager**: npm, yarn, or pnpm
+
+<Note>
+  Express Zod API requires TypeScript and works best with strict type checking enabled.
+</Note>
+
+## Install with Package Manager
+
+Choose your preferred package manager and install Express Zod API along with its required peer dependencies:
+
+<Tabs>
+  <Tab title="npm">
+    ```bash
+    # Install core dependencies
+    npm install express-zod-api express zod http-errors
+
+    # Install TypeScript type definitions
+    npm install -D @types/express @types/node @types/http-errors
+    ```
+  </Tab>
+  <Tab title="pnpm">
+    ```bash
+    # Install core dependencies
+    pnpm add express-zod-api express zod http-errors
+
+    # Install TypeScript type definitions
+    pnpm add -D @types/express @types/node @types/http-errors
+    ```
+  </Tab>
+  <Tab title="yarn">
+    ```bash
+    # Install core dependencies
+    yarn add express-zod-api express zod http-errors
+
+    # Install TypeScript type definitions
+    yarn add -D @types/express @types/node @types/http-errors
+    ```
+  </Tab>
+</Tabs>
+
+## Required Dependencies
+
+Here's what each dependency does:
+
+| Package | Purpose | Type |
+|---------|---------|------|
+| `express-zod-api` | The main framework | Runtime |
+| `express` | Web server (v5.x) | Runtime (peer) |
+| `zod` | Schema validation (v4.x) | Runtime (peer) |
+| `http-errors` | HTTP error handling | Runtime (peer) |
+| `@types/express` | Express TypeScript types | Dev (peer) |
+| `@types/node` | Node.js TypeScript types | Dev (peer) |
+| `@types/http-errors` | HTTP errors TypeScript types | Dev (peer) |
+
+<Warning>
+  Express Zod API requires **Express v5** and **Zod v4**. If you're using older versions, you'll need to upgrade or use an older version of Express Zod API (v23.x for Zod 3.x).
+</Warning>
+
+## Optional Dependencies
+
+Depending on your needs, you may want to install these optional packages:
+
+### File Uploads
+
+For handling file uploads with multipart/form-data:
+
+<Tabs>
+  <Tab title="npm">
+    ```bash
+    npm install express-fileupload
+    npm install -D @types/express-fileupload
+    ```
+  </Tab>
+  <Tab title="pnpm">
+    ```bash
+    pnpm add express-fileupload
+    pnpm add -D @types/express-fileupload
+    ```
+  </Tab>
+  <Tab title="yarn">
+    ```bash
+    yarn add express-fileupload
+    yarn add -D @types/express-fileupload
+    ```
+  </Tab>
+</Tabs>
+
+### Response Compression
+
+For enabling gzip/brotli compression:
+
+<Tabs>
+  <Tab title="npm">
+    ```bash
+    npm install compression
+    npm install -D @types/compression
+    ```
+  </Tab>
+  <Tab title="pnpm">
+    ```bash
+    pnpm add compression
+    pnpm add -D @types/compression
+    ```
+  </Tab>
+  <Tab title="yarn">
+    ```bash
+    yarn add compression
+    yarn add -D @types/compression
+    ```
+  </Tab>
+</Tabs>
+
+### Documentation UI
+
+For serving interactive Swagger documentation:
+
+<Tabs>
+  <Tab title="npm">
+    ```bash
+    npm install swagger-ui-express
+    npm install -D @types/swagger-ui-express
+    ```
+  </Tab>
+  <Tab title="pnpm">
+    ```bash
+    pnpm add swagger-ui-express
+    pnpm add -D @types/swagger-ui-express
+    ```
+  </Tab>
+  <Tab title="yarn">
+    ```bash
+    yarn add swagger-ui-express
+    yarn add -D @types/swagger-ui-express
+    ```
+  </Tab>
+</Tabs>
+
+## TypeScript Configuration
+
+Express Zod API requires specific TypeScript compiler options to work correctly. Update your `tsconfig.json`:
+
+```json tsconfig.json
+{
+  "compilerOptions": {
+    // Required for Express Zod API
+    "strict": true,
+    "skipLibCheck": true,
+
+    // Recommended settings
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+<Steps>
+  <Step title="Enable strict mode">
+    The `strict` option enables all strict type checking options. This is essential for catching type errors early and ensuring Express Zod API works as expected.
+  </Step>
+  
+  <Step title="Skip library checks">
+    The `skipLibCheck` option improves compilation speed by skipping type checking of declaration files. This is safe and recommended.
+  </Step>
+  
+  <Step title="Configure module system">
+    Express Zod API works with both CommonJS and ES modules. The example above uses ES modules (`"module": "ESNext"`), which is recommended for new projects.
+  </Step>
+</Steps>
+
+<Note>
+  **Using CommonJS?** Set `"module": "commonjs"` and `"moduleResolution": "node"` instead. Both module systems are fully supported.
+</Note>
+
+## Project Structure
+
+Here's a recommended project structure for your Express Zod API application:
+
+```
+my-api/
+├── src/
+│   ├── config.ts          # Server configuration
+│   ├── index.ts           # Entry point
+│   ├── routing.ts         # Route definitions
+│   ├── endpoints/
+│   │   ├── users.ts       # User-related endpoints
+│   │   └── auth.ts        # Auth-related endpoints
+│   ├── middlewares/
+│   │   ├── auth.ts        # Authentication middleware
+│   │   └── logging.ts     # Logging middleware
+│   └── factories/
+│       └── authenticated.ts # Factories with middleware
+├── package.json
+└── tsconfig.json
+```
+
+## Verify Installation
+
+Create a simple test file to verify everything is installed correctly:
+
+```typescript test.ts
+import { createConfig, createServer, defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const config = createConfig({
+  http: { listen: 8080 },
+  cors: true,
+});
+
+const endpoint = defaultEndpointsFactory.build({
+  method: "get",
+  input: z.object({}),
+  output: z.object({ message: z.string() }),
+  handler: async () => ({ message: "Hello, Express Zod API!" }),
+});
+
+const routing = {
+  test: endpoint,
+};
+
+createServer(config, routing);
+console.log("Server running on http://localhost:8080");
+```
+
+Run it with:
+
+<Tabs>
+  <Tab title="tsx (recommended)">
+    ```bash
+    npx tsx test.ts
+    ```
+  </Tab>
+  <Tab title="ts-node">
+    ```bash
+    npx ts-node test.ts
+    ```
+  </Tab>
+  <Tab title="Compile first">
+    ```bash
+    npx tsc
+    node dist/test.js
+    ```
+  </Tab>
+</Tabs>
+
+If you see "Server running on http://localhost:8080", you're all set!
+
+<Note>
+  The `tsx` package is recommended for running TypeScript files directly during development. Install it with `npm install -D tsx`.
+</Note>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Module resolution errors">
+    If you see errors about module resolution:
+    
+    1. Make sure `@types/node` is installed
+    2. Check that your `tsconfig.json` has correct `moduleResolution` setting
+    3. For ES modules, ensure your `package.json` has `"type": "module"`
+  </Accordion>
+
+  <Accordion title="Peer dependency warnings">
+    Express Zod API has several peer dependencies that must be installed:
+    
+    - `express` (required)
+    - `zod` (required)
+    - `http-errors` (required)
+    - `typescript` (required for development)
+    
+    Some peer dependencies are optional and only needed if you use specific features (compression, file uploads, etc.).
+  </Accordion>
+
+  <Accordion title="Type errors with Zod">
+    If you're seeing type errors related to Zod:
+    
+    1. Ensure you're using Zod v4.x (check with `npm list zod`)
+    2. Make sure `strict` mode is enabled in `tsconfig.json`
+    3. Clear your TypeScript cache: `rm -rf node_modules/.cache`
+  </Accordion>
+
+  <Accordion title="Express version conflicts">
+    Express Zod API requires Express v5.x. If you have v4.x:
+    
+    ```bash
+    npm install express@^5.0.0 @types/express@^5.0.0
+    ```
+    
+    Note that Express v5 has some breaking changes from v4. See the [Express migration guide](https://expressjs.com/en/guide/migrating-5.html).
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+Now that you have Express Zod API installed, let's build your first API:
+
+<Card title="Quickstart Guide" icon="rocket" href="/quickstart">
+  Create a working API in under 5 minutes
+</Card>

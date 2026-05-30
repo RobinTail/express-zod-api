@@ -1,0 +1,260 @@
+---
+title: Refinements
+description: Add custom validation logic to your Zod schemas in Express Zod API
+---
+
+Refinements allow you to implement additional validation logic beyond Zod's built-in validators. They're useful for business rules, complex constraints, and custom validation that depends on multiple fields.
+
+## Basic Refinements
+
+Use `.refine()` to add custom validation to any Zod schema:
+
+```ts
+import { z } from "zod";
+import { Middleware } from "express-zod-api";
+
+const nicknameConstraintMiddleware = new Middleware({
+  input: z.object({
+    nickname: z
+      .string()
+      .min(1)
+      .refine(
+        (nick) => !/^\d.*$/.test(nick),
+        "Nickname cannot start with a digit",
+      ),
+  }),
+  handler: async ({ input }) => {
+    // nickname is guaranteed not to start with a digit
+    return {};
+  },
+});
+```
+
+## Validation Errors
+
+When a refinement fails, Express Zod API returns a `400 Bad Request` with the custom error message:
+
+<CodeGroup>
+```json Request
+{
+  "nickname": "123gamer"
+}
+```
+
+```json Response (400)
+{
+  "status": "error",
+  "error": {
+    "message": "Nickname cannot start with a digit"
+  }
+}
+```
+</CodeGroup>
+
+## Multi-Field Refinements
+
+You can refine the entire input object to validate relationships between fields:
+
+```ts
+const endpoint = endpointsFactory.build({
+  input: z
+    .object({
+      email: z.string().email().optional(),
+      id: z.string().optional(),
+      otherThing: z.string().optional(),
+    })
+    .refine(
+      (inputs) => Object.keys(inputs).length >= 1,
+      "Please provide at least one property",
+    ),
+  // ...
+});
+```
+
+This ensures at least one field is provided, which is common for partial update endpoints.
+
+## Common Use Cases
+
+### Password Strength
+
+```ts
+z.object({
+  password: z
+    .string()
+    .min(8)
+    .refine(
+      (pwd) => /[A-Z]/.test(pwd) && /[a-z]/.test(pwd) && /[0-9]/.test(pwd),
+      "Password must contain uppercase, lowercase, and numbers",
+    ),
+})
+```
+
+### Date Range Validation
+
+```ts
+import { ez } from "express-zod-api";
+
+z.object({
+  startDate: ez.dateIn(),
+  endDate: ez.dateIn(),
+})
+.refine(
+  (data) => data.endDate > data.startDate,
+  "End date must be after start date",
+)
+```
+
+### Conditional Requirements
+
+```ts
+z.object({
+  type: z.enum(["email", "phone"]),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+})
+.refine(
+  (data) => {
+    if (data.type === "email") return !!data.email;
+    if (data.type === "phone") return !!data.phone;
+    return true;
+  },
+  "Email is required when type is 'email', phone is required when type is 'phone'",
+)
+```
+
+### Unique Array Elements
+
+```ts
+z.object({
+  tags: z
+    .array(z.string())
+    .refine(
+      (tags) => new Set(tags).size === tags.length,
+      "Tags must be unique",
+    ),
+})
+```
+
+## Advanced Refinements
+
+### Custom Error Paths
+
+For better error messages, you can specify which field the error relates to:
+
+```ts
+z.object({
+  password: z.string(),
+  confirmPassword: z.string(),
+})
+.refine(
+  (data) => data.password === data.confirmPassword,
+  {
+    message: "Passwords don't match",
+    path: ["confirmPassword"], // Error points to confirmPassword field
+  },
+)
+```
+
+### Async Refinements
+
+Refinements can be asynchronous for database lookups or external validations:
+
+```ts
+z.object({
+  username: z
+    .string()
+    .min(3)
+    .refine(
+      async (username) => {
+        const exists = await db.users.findOne({ username });
+        return !exists;
+      },
+      "Username is already taken",
+    ),
+})
+```
+
+<Warning>
+Async refinements add latency to request validation. Use them sparingly and consider caching results when possible.
+</Warning>
+
+## Refinements in Endpoints
+
+You can use refinements in both input and output schemas:
+
+```ts
+import { defaultEndpointsFactory } from "express-zod-api";
+import { z } from "zod";
+
+const createUserEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    username: z
+      .string()
+      .min(3)
+      .max(20)
+      .refine(
+        (name) => /^[a-zA-Z0-9_]+$/.test(name),
+        "Username can only contain letters, numbers, and underscores",
+      ),
+    age: z
+      .number()
+      .refine(
+        (age) => age >= 13,
+        "Must be at least 13 years old",
+      ),
+  }),
+  output: z.object({
+    id: z.string(),
+    username: z.string(),
+    age: z.number(),
+  }),
+  handler: async ({ input }) => {
+    // All refinements have passed
+    const user = await db.users.create(input);
+    return user;
+  },
+});
+```
+
+## Error Handling
+
+When multiple refinements fail, all error messages are combined in the response:
+
+```json
+{
+  "status": "error",
+  "error": {
+    "message": "Username can only contain letters, numbers, and underscores; Must be at least 13 years old"
+  }
+}
+```
+
+## Best Practices
+
+<Card title="Write Clear Error Messages" icon="message">
+Error messages should tell users exactly what's wrong and how to fix it.
+</Card>
+
+<Card title="Validate Early" icon="bolt">
+Use refinements for validation that can happen before hitting the database.
+</Card>
+
+<Card title="Keep Refinements Focused" icon="bullseye">
+Each refinement should check one specific thing. Multiple simple refinements are better than one complex one.
+</Card>
+
+<Card title="Consider Performance" icon="gauge-high">
+Complex or async refinements add overhead. Profile your endpoints if you notice slowness.
+</Card>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Transformations" icon="wand-magic-sparkles" href="/features/transformations">
+    Transform data during validation
+  </Card>
+  <Card title="Schema Validation" icon="shield-check" href="/features/schema-validation">
+    Learn more about basic validation
+  </Card>
+</CardGroup>

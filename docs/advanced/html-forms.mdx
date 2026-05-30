@@ -1,0 +1,416 @@
+---
+title: HTML Forms (URL Encoded)
+description: Handle HTML form submissions with URL-encoded data in your API endpoints.
+---
+
+## Overview
+
+Express Zod API supports traditional HTML form submissions using the `application/x-www-form-urlencoded` content type. This is useful for accepting data from standard HTML forms without JavaScript or for APIs that need to support form-based workflows.
+
+## Using ez.form()
+
+Use the proprietary `ez.form()` schema to describe form input:
+
+```typescript
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
+
+const submitFeedbackEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.form({
+    name: z.string().min(1),
+    email: z.email(),
+    message: z.string().min(1),
+  }),
+  output: z.object({
+    success: z.boolean(),
+    crc: z.number(),
+  }),
+  handler: async ({ input: { name, email, message } }) => ({
+    success: true,
+    crc: [name, email, message].reduce((acc, { length }) => acc + length, 0),
+  }),
+});
+```
+
+## Configuration
+
+Forms are parsed using the `formParser` configuration option, which defaults to `express.urlencoded()`:
+
+```typescript
+import { createConfig } from "express-zod-api";
+import express from "express";
+
+const config = createConfig({
+  // Default form parser (you can customize it)
+  formParser: express.urlencoded({ extended: true }),
+  // ... other config
+});
+```
+
+## Content Type Requirement
+
+<Warning>
+The request content type **must** be `application/x-www-form-urlencoded` (the default for HTML forms without file uploads).
+</Warning>
+
+## Using Custom z.object()
+
+You can also use a regular `z.object()` with form fields:
+
+```typescript
+import { z } from "zod";
+
+const endpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: z.object({
+    username: z.string(),
+    password: z.string(),
+    remember: z.enum(["on", "off"]).optional(),
+  }),
+  // ...
+});
+```
+
+## Complete Form Example
+
+```typescript
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
+import createHttpError from "http-errors";
+
+const contactFormEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  tag: "forms",
+  shortDescription: "Submit a contact form",
+  input: ez.form({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email address"),
+    phone: z.string().optional(),
+    subject: z.string().min(1, "Subject is required"),
+    message: z.string().min(10, "Message must be at least 10 characters"),
+    subscribe: z.enum(["yes", "no"]).optional().default("no"),
+  }),
+  output: z.object({
+    id: z.string(),
+    receivedAt: z.string(),
+  }),
+  handler: async ({ input, logger }) => {
+    logger.info("Contact form submitted", { email: input.email });
+
+    // Process form submission
+    const id = await saveContactForm(input);
+
+    // Send email notification
+    if (input.subscribe === "yes") {
+      await subscribeToNewsletter(input.email);
+    }
+
+    return {
+      id,
+      receivedAt: new Date().toISOString(),
+    };
+  },
+});
+```
+
+## HTML Form Example
+
+Here's how to create an HTML form that submits to this endpoint:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contact Form</title>
+</head>
+<body>
+  <form action="/v1/contact" method="POST">
+    <div>
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+
+    <div>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+
+    <div>
+      <label for="phone">Phone:</label>
+      <input type="tel" id="phone" name="phone">
+    </div>
+
+    <div>
+      <label for="subject">Subject:</label>
+      <input type="text" id="subject" name="subject" required>
+    </div>
+
+    <div>
+      <label for="message">Message:</label>
+      <textarea id="message" name="message" rows="5" required></textarea>
+    </div>
+
+    <div>
+      <label>
+        <input type="checkbox" name="subscribe" value="yes">
+        Subscribe to newsletter
+      </label>
+    </div>
+
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
+```
+
+## Form Validation
+
+### Required Fields
+
+```typescript
+input: ez.form({
+  name: z.string().min(1, "Name is required"),
+  email: z.email("Valid email is required"),
+})
+```
+
+### Optional Fields
+
+```typescript
+input: ez.form({
+  name: z.string(),
+  phone: z.string().optional(),
+  website: z.string().url().optional(),
+})
+```
+
+### Default Values
+
+```typescript
+input: ez.form({
+  name: z.string(),
+  country: z.string().default("US"),
+  newsletter: z.enum(["yes", "no"]).default("no"),
+})
+```
+
+### Custom Validation
+
+```typescript
+input: ez.form({
+  email: z.string().email(),
+  confirmEmail: z.string().email(),
+}).refine(
+  (data) => data.email === data.confirmEmail,
+  {
+    message: "Emails don't match",
+    path: ["confirmEmail"],
+  }
+)
+```
+
+## Arrays in Forms
+
+```typescript
+input: ez.form({
+  interests: z.array(z.string()),
+  // HTML: <input name="interests[]" value="coding">
+  //       <input name="interests[]" value="reading">
+})
+```
+
+## Checkboxes
+
+### Single Checkbox
+
+```typescript
+input: ez.form({
+  agree: z.enum(["on"]).optional(),
+  // or convert to boolean:
+  agree: z
+    .enum(["on"])
+    .optional()
+    .transform((val) => val === "on"),
+})
+```
+
+### Multiple Checkboxes
+
+```typescript
+input: ez.form({
+  preferences: z.array(z.string()).optional().default([]),
+  // HTML: <input type="checkbox" name="preferences[]" value="email">
+  //       <input type="checkbox" name="preferences[]" value="sms">
+})
+```
+
+## Radio Buttons
+
+```typescript
+input: ez.form({
+  plan: z.enum(["basic", "premium", "enterprise"]),
+})
+```
+
+```html
+<input type="radio" name="plan" value="basic" required>
+<input type="radio" name="plan" value="premium" required>
+<input type="radio" name="plan" value="enterprise" required>
+```
+
+## Select Dropdowns
+
+```typescript
+input: ez.form({
+  country: z.string(),
+  categories: z.array(z.string()), // For multi-select
+})
+```
+
+```html
+<!-- Single select -->
+<select name="country">
+  <option value="US">United States</option>
+  <option value="UK">United Kingdom</option>
+</select>
+
+<!-- Multi-select -->
+<select name="categories[]" multiple>
+  <option value="tech">Technology</option>
+  <option value="business">Business</option>
+</select>
+```
+
+## Handling Extra Fields
+
+To accept unlisted extra fields, use `passthrough()`:
+
+```typescript
+import { ez } from "express-zod-api";
+import { z } from "zod";
+
+const endpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.form(
+    z.object({
+      name: z.string(),
+      email: z.email(),
+    }).passthrough() // Accept extra fields
+  ),
+  // ...
+});
+```
+
+## Authentication Forms
+
+```typescript
+import { defaultEndpointsFactory, ez } from "express-zod-api";
+import { z } from "zod";
+import createHttpError from "http-errors";
+
+const loginEndpoint = defaultEndpointsFactory.build({
+  method: "post",
+  input: ez.form({
+    username: z.string().min(3),
+    password: z.string().min(8),
+    remember: z.enum(["on"]).optional(),
+  }),
+  output: z.object({
+    token: z.string(),
+    expiresAt: z.string(),
+  }),
+  handler: async ({ input: { username, password, remember } }) => {
+    const user = await db.findUser(username);
+    if (!user || !(await verifyPassword(password, user.hash))) {
+      throw createHttpError(401, "Invalid credentials");
+    }
+
+    const expiresIn = remember === "on" ? "30d" : "1d";
+    const token = generateToken(user, expiresIn);
+
+    return {
+      token,
+      expiresAt: new Date(Date.now() + parseExpiry(expiresIn)).toISOString(),
+    };
+  },
+});
+```
+
+## CSRF Protection
+
+Implement CSRF protection for forms:
+
+```typescript
+import { Middleware } from "express-zod-api";
+import { z } from "zod";
+import createHttpError from "http-errors";
+
+const csrfMiddleware = new Middleware({
+  input: z.object({
+    _csrf: z.string(),
+  }),
+  handler: async ({ input: { _csrf }, request }) => {
+    // Verify CSRF token
+    const isValid = verifyCsrfToken(_csrf, request.session);
+    if (!isValid) {
+      throw createHttpError(403, "Invalid CSRF token");
+    }
+    return {};
+  },
+});
+
+const formFactory = defaultEndpointsFactory.addMiddleware(csrfMiddleware);
+```
+
+## File Uploads with Forms
+
+<Note>
+For file uploads, use `multipart/form-data` instead. See [File Uploads](/advanced/file-uploads) for details.
+</Note>
+
+## Client-Side JavaScript Submission
+
+```javascript
+// Using Fetch API
+const formData = new URLSearchParams();
+formData.append('name', 'John Doe');
+formData.append('email', 'john@example.com');
+formData.append('message', 'Hello!');
+
+const response = await fetch('/v1/contact', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  },
+  body: formData.toString(),
+});
+
+const result = await response.json();
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Validate on Both Sides">
+    Always validate on both client (HTML5 validation) and server (Zod schemas) for security and user experience.
+  </Accordion>
+
+  <Accordion title="Use Appropriate Field Types">
+    Use specific HTML input types (`email`, `url`, `tel`, etc.) to improve mobile UX and enable browser validation.
+  </Accordion>
+
+  <Accordion title="Provide Clear Error Messages">
+    Use Zod's custom error messages to provide user-friendly feedback when validation fails.
+  </Accordion>
+
+  <Accordion title="Handle Empty Strings">
+    HTML forms send empty strings for blank fields. Use `.min(1)` to require non-empty values or `.optional()` for truly optional fields.
+  </Accordion>
+</AccordionGroup>
+
+## Related Topics
+
+- [File Uploads](/advanced/file-uploads) - Using multipart/form-data for files
+- [Input Sources](/advanced/input-sources) - Customizing input sources
+- [Validation](/core-concepts/validation) - Schema validation concepts
