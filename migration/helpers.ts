@@ -1,5 +1,31 @@
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils";
 
+export const getRangeWithComma = (
+  ctx: TSESLint.RuleContext<string, unknown[]>,
+  node: TSESTree.Node,
+): [number, number] => {
+  const after = ctx.sourceCode.getTokenAfter(node);
+  return after?.value === "," ? [node.range[0], after.range[1]] : node.range;
+};
+
+export const hasImport = (
+  ctx: TSESLint.RuleContext<string, unknown[]>,
+  sourceValue: string,
+  importName?: string,
+) =>
+  ctx.sourceCode.ast.body.some(
+    (stmt): stmt is TSESTree.ImportDeclaration =>
+      stmt.type === "ImportDeclaration" &&
+      stmt.source.value === sourceValue &&
+      (importName === undefined ||
+        stmt.specifiers.some(
+          (spec) =>
+            spec.type === "ImportSpecifier" &&
+            "name" in spec.imported &&
+            spec.imported.name === importName,
+        )),
+  );
+
 export type NamedProp = TSESTree.PropertyNonComputedName & {
   key: TSESTree.Identifier | TSESTree.StringLiteral;
 };

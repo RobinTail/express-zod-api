@@ -31,12 +31,7 @@ describe("CJS Test", async () => {
       );
       expect(response.status).toBe(200);
       const json = await response.json();
-      expect(json).toEqual({
-        status: "success",
-        data: {
-          greetings: "Hello, Rick. Happy coding!",
-        },
-      });
+      expect(json).toEqual({ greetings: "Hello, Rick. Happy coding!" });
     });
   });
 });

@@ -27,30 +27,20 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  id:
+                    type: integer
+                    minimum: 0
+                    maximum: 9007199254740991
+                  name:
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        minimum: 0
-                        maximum: 9007199254740991
-                      name:
-                        type: string
-                      features:
-                        type: array
-                        items:
-                          $ref: "#/components/schemas/Feature"
-                    required:
-                      - id
-                      - name
-                      - features
-                    additionalProperties: false
+                  features:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Feature"
                 required:
-                  - status
-                  - data
+                  - id
+                  - name
+                  - features
                 additionalProperties: false
         "400":
           description: GET /v1/user/retrieve Negative response
@@ -59,27 +49,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV1UserRetrieve
       summary: Retrieves the user.
@@ -198,42 +176,27 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  name:
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                        examples:
-                          - John Doe
-                      createdAt:
-                        description: account creation date
-                        type: string
-                        format: date-time
-                        externalDocs:
-                          url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
-                        examples:
-                          - 2021-12-31T00:00:00.000Z
-                    required:
-                      - name
-                      - createdAt
-                    additionalProperties: false
                     examples:
-                      - name: John Doe
-                        createdAt: 2021-12-31T00:00:00.000Z
+                      - John Doe
+                  createdAt:
+                    description: account creation date
+                    type: string
+                    format: date-time
+                    externalDocs:
+                      url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                    examples:
+                      - 2021-12-31T00:00:00.000Z
                 required:
-                  - status
-                  - data
+                  - name
+                  - createdAt
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: success
-                    data:
-                      name: John Doe
-                      createdAt: 2021-12-31T00:00:00.000Z
+                    name: John Doe
+                    createdAt: 2021-12-31T00:00:00.000Z
         "400":
           description: PATCH /v1/user/:id Negative response
           content:
@@ -241,27 +204,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
   /v1/user/create:
     post:
       operationId: PostV1UserCreate
@@ -496,20 +447,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - data
+                  - message
                 additionalProperties: false
         "400":
           description: POST /v1/login Negative response
@@ -518,27 +459,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
   /v1/avatar/send:
     get:
       operationId: GetV1AvatarSend
@@ -679,37 +608,27 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  name:
                     type: string
-                    const: success
-                  data:
+                  size:
+                    type: integer
+                    minimum: 0
+                    maximum: 9007199254740991
+                  mime:
+                    type: string
+                  hash:
+                    type: string
+                  otherInputs:
                     type: object
-                    properties:
-                      name:
-                        type: string
-                      size:
-                        type: integer
-                        minimum: 0
-                        maximum: 9007199254740991
-                      mime:
-                        type: string
-                      hash:
-                        type: string
-                      otherInputs:
-                        type: object
-                        propertyNames:
-                          type: string
-                        additionalProperties: {}
-                    required:
-                      - name
-                      - size
-                      - mime
-                      - hash
-                      - otherInputs
-                    additionalProperties: false
+                    propertyNames:
+                      type: string
+                    additionalProperties: {}
                 required:
-                  - status
-                  - data
+                  - name
+                  - size
+                  - mime
+                  - hash
+                  - otherInputs
                 additionalProperties: false
         "400":
           description: POST /v1/avatar/upload Negative response
@@ -718,27 +637,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
   /v1/avatar/raw:
     post:
       operationId: PostV1AvatarRaw
@@ -761,22 +668,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      length:
-                        type: integer
-                        minimum: 0
-                        maximum: 9007199254740991
-                    required:
-                      - length
-                    additionalProperties: false
+                  length:
+                    type: integer
+                    minimum: 0
+                    maximum: 9007199254740991
                 required:
-                  - status
-                  - data
+                  - length
                 additionalProperties: false
         "400":
           description: POST /v1/avatar/raw Negative response
@@ -785,27 +682,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
   /v1/events/stream:
     get:
       operationId: GetV1EventsStream
@@ -906,22 +791,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      crc:
-                        type: integer
-                        exclusiveMinimum: 0
-                        maximum: 9007199254740991
-                    required:
-                      - crc
-                    additionalProperties: false
+                  crc:
+                    type: integer
+                    exclusiveMinimum: 0
+                    maximum: 9007199254740991
                 required:
-                  - status
-                  - data
+                  - crc
                 additionalProperties: false
         "400":
           description: POST /v1/forms/feedback Negative response
@@ -930,27 +805,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
   /v2/users/list:
     get:
       operationId: GetV2UsersList
@@ -1001,54 +864,44 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    const: success
-                  data:
-                    type: object
-                    properties:
-                      users:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            name:
-                              type: string
-                            role:
-                              type: string
-                              enum:
-                                - manager
-                                - operator
-                                - admin
-                          required:
-                            - name
-                            - role
-                          additionalProperties: false
-                        description: Page of users
-                      total:
-                        type: integer
-                        minimum: 0
-                        maximum: 9007199254740991
-                        description: Total number of users
-                      limit:
-                        type: integer
-                        minimum: 1
-                        maximum: 9007199254740991
-                        description: Page size used
-                      offset:
-                        type: integer
-                        minimum: 0
-                        maximum: 9007199254740991
-                        description: Offset used
-                    required:
-                      - users
-                      - total
-                      - limit
-                      - offset
-                    additionalProperties: false
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        role:
+                          type: string
+                          enum:
+                            - manager
+                            - operator
+                            - admin
+                      required:
+                        - name
+                        - role
+                      additionalProperties: false
+                    description: Page of users
+                  total:
+                    type: integer
+                    minimum: 0
+                    maximum: 9007199254740991
+                    description: Total number of users
+                  limit:
+                    type: integer
+                    minimum: 1
+                    maximum: 9007199254740991
+                    description: Page size used
+                  offset:
+                    type: integer
+                    minimum: 0
+                    maximum: 9007199254740991
+                    description: Offset used
                 required:
-                  - status
-                  - data
+                  - users
+                  - total
+                  - limit
+                  - offset
                 additionalProperties: false
         "400":
           description: GET /v2/users/list Negative response
@@ -1057,27 +910,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  status:
+                  message:
                     type: string
-                    const: error
-                  error:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                    required:
-                      - message
-                    additionalProperties: false
                 required:
-                  - status
-                  - error
+                  - message
                 additionalProperties: false
               examples:
                 example1:
                   value:
-                    status: error
-                    error:
-                      message: Sample error message
+                    message: Sample error message
     head:
       operationId: HeadV2UsersList
       summary: Lists users with pagination.
