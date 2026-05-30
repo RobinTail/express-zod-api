@@ -215,18 +215,6 @@ describe("ResultHandler", () => {
   test("arrayResultHandler should fail when there is no items prop in the output", () => {
     const responseMock = makeResponseMock();
     const loggerMock = makeLoggerMock();
-    const positiveSchema = arrayResultHandler
-      .getPositiveResponse(
-        z
-          .object({ anything: z.number() })
-          .meta({ examples: [{ anything: 118 }] }),
-      )
-      .pop()?.schema;
-    expect(positiveSchema).toHaveProperty(["_zod", "def", "type"], "array");
-    expect(positiveSchema).toHaveProperty(
-      ["_zod", "def", "element", "_zod", "def", "type"],
-      "any",
-    );
     expect(() =>
       arrayResultHandler.execute({
         error: null,

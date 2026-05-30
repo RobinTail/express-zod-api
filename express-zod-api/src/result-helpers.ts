@@ -17,9 +17,9 @@ import { getExamples } from "./metadata";
 export type ResultSchema<R extends Result> =
   R extends Result<infer S> ? S : never;
 
-export type DiscriminatedResult =
+export type DiscriminatedResult<OUT extends FlatObject = FlatObject> =
   | {
-      output: FlatObject;
+      output: OUT;
       error: null;
     }
   | {

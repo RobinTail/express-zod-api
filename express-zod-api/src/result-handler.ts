@@ -19,8 +19,8 @@ import {
 } from "./result-helpers";
 import { getExamples } from "./metadata";
 
-type Handler<RES = unknown> = (
-  params: DiscriminatedResult & {
+type Handler<RES = unknown, OUT extends FlatObject = FlatObject> = (
+  params: DiscriminatedResult<OUT> & {
     /** null in case of failure to parse or to find the matching endpoint (error: not found) */
     input: FlatObject | null;
     /** can be empty: check presence of the required property using "in" operator */
@@ -57,25 +57,29 @@ export abstract class AbstractResultHandler {
 export class ResultHandler<
   POS extends Result,
   NEG extends Result,
+  OUT extends IOSchema = IOSchema,
 > extends AbstractResultHandler {
-  readonly #positive: POS | LazyResult<POS, [IOSchema]>;
+  readonly #positive: POS | LazyResult<POS, [OUT]>;
   readonly #negative: NEG | LazyResult<NEG>;
 
   constructor(params: {
     /** @desc A description of the API response in case of success (schema, status code, MIME type) */
-    positive: POS | LazyResult<POS, [IOSchema]>;
+    positive: POS | LazyResult<POS, [OUT]>;
     /** @desc A description of the API response in case of error (schema, status code, MIME type) */
     negative: NEG | LazyResult<NEG>;
     /** @desc The actual implementation to transmit the response in any case */
-    handler: Handler<z.output<ResultSchema<POS> | ResultSchema<NEG>>>;
+    handler: Handler<
+      z.output<ResultSchema<POS> | ResultSchema<NEG>>,
+      z.input<OUT> & FlatObject
+    >;
   }) {
-    super(params.handler);
+    super(params.handler as Handler);
     this.#positive = params.positive;
     this.#negative = params.negative;
   }
 
   /** @internal */
-  public override getPositiveResponse(output: IOSchema) {
+  public override getPositiveResponse(output: OUT) {
     return normalize(this.#positive, {
       variant: "positive",
       args: [output],
@@ -154,13 +158,8 @@ globalRegistry.add(arrayNegativeSchema, {
  * @desc This handler expects your endpoint to have the property 'items' in the output object schema
  * */
 export const arrayResultHandler = new ResultHandler({
-  positive: (output) => {
-    const responseSchema =
-      output instanceof z.ZodObject &&
-      "items" in output.shape &&
-      output.shape.items instanceof z.ZodArray
-        ? output.shape.items
-        : z.array(z.any());
+  positive: (output: z.ZodObject<{ items: z.ZodArray<z.ZodType> }>) => {
+    const responseSchema = output.shape.items;
     if (getExamples(responseSchema).length) return responseSchema; // has examples on the items, or pull down:
     const examples = getExamples(output)
       .filter(
