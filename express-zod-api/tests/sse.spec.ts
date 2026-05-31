@@ -116,6 +116,7 @@ describe("SSE", () => {
     test.each<Parameters<typeof makeResultHandler>[0]>([
       { test: z.string(), another: z.number() },
       { single: z.string() },
+      {},
     ])(
       "should create ResultHandler describing possible events and handling generic errors %#",
       (events) => {

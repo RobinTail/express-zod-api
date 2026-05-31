@@ -169,3 +169,38 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
   },
 ]
 `;
+
+exports[`SSE > makeResultHandler() > should create ResultHandler describing possible events and handling generic errors 2 1`] = `
+[
+  {
+    "mimeTypes": [
+      "application/json",
+    ],
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "description": "no events specified",
+      "not": {},
+    },
+    "statusCodes": [
+      200,
+    ],
+  },
+]
+`;
+
+exports[`SSE > makeResultHandler() > should create ResultHandler describing possible events and handling generic errors 2 2`] = `
+[
+  {
+    "mimeTypes": [
+      "text/plain",
+    ],
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "string",
+    },
+    "statusCodes": [
+      400,
+    ],
+  },
+]
+`;
