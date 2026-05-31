@@ -430,11 +430,11 @@ describe("Server", () => {
       expect(configMock.errorHandler.handler).toHaveBeenCalledTimes(0);
       expect(infoMethod).toHaveBeenCalledTimes(0);
       expect(appMock.get).toHaveBeenCalledTimes(1);
-      expect(appMock.get.mock.calls[0][0]).toBe("/v1/test");
+      expect(appMock.get.mock.calls[0]![0]).toBe("/v1/test");
       expect(appMock.post).toHaveBeenCalledTimes(1);
-      expect(appMock.post.mock.calls[0][0]).toBe("/v1/test");
+      expect(appMock.post.mock.calls[0]![0]).toBe("/v1/test");
       expect(appMock.options).toHaveBeenCalledTimes(1);
-      expect(appMock.options.mock.calls[0][0]).toBe("/v1/test");
+      expect(appMock.options.mock.calls[0]![0]).toBe("/v1/test");
     });
   });
 });

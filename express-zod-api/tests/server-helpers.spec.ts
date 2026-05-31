@@ -54,7 +54,7 @@ describe("Server helpers", () => {
         });
         await handler(error, makeRequestMock(), makeResponseMock(), vi.fn());
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy.mock.calls[0][0].error).toEqual(
+        expect(spy.mock.calls[0]![0].error).toEqual(
           error instanceof Error ? error : new Error(error),
         );
       },
@@ -83,14 +83,13 @@ describe("Server helpers", () => {
       await handler(requestMock, responseMock, next);
       expect(next).toHaveBeenCalledTimes(0);
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy.mock.calls[0]).toHaveLength(1);
-      expect(spy.mock.calls[0][0].error).toEqual(
+      expect(spy.mock.calls[0]![0].error).toEqual(
         createHttpError(404, "Can not POST /v1/test"),
       );
-      expect(spy.mock.calls[0][0].input).toBeNull();
-      expect(spy.mock.calls[0][0].output).toBeNull();
-      expect(spy.mock.calls[0][0].request).toEqual(requestMock);
-      expect(spy.mock.calls[0][0].response).toEqual(responseMock);
+      expect(spy.mock.calls[0]![0].input).toBeNull();
+      expect(spy.mock.calls[0]![0].output).toBeNull();
+      expect(spy.mock.calls[0]![0].request).toEqual(requestMock);
+      expect(spy.mock.calls[0]![0].response).toEqual(responseMock);
     });
 
     test.each([() => fail("I am faulty"), () => Promise.reject("I am faulty")])(
@@ -194,7 +193,7 @@ describe("Server helpers", () => {
       const error = createHttpError(403, "Not authorized");
       beforeUploadMock.mockRejectedValueOnce(error);
       await expect(() =>
-        parsers[0](requestMock, responseMock, nextMock),
+        parsers[0]!(requestMock, responseMock, nextMock),
       ).rejects.toThrowError(error);
       expect(nextMock).not.toHaveBeenCalled();
     });
@@ -202,7 +201,7 @@ describe("Server helpers", () => {
     test("should install the uploader with its special logger", async () => {
       const internalMw = vi.fn();
       fileUploadMock.mockImplementationOnce(() => internalMw);
-      await parsers[0](requestMock, responseMock, nextMock);
+      await parsers[0]!(requestMock, responseMock, nextMock);
       expect(beforeUploadMock).toHaveBeenCalledWith({
         request: requestMock,
         logger: loggerMock,

@@ -407,11 +407,11 @@ export class TypescriptAPI {
       typeof arg === "string" ? this.makeId(arg) : arg,
     );
     return this.f.createConditionalExpression(
-      condition,
+      condition!, // ensured by tuple type
       this.f.createToken(this.ts.SyntaxKind.QuestionToken),
-      positive,
+      positive!, // ensured by tuple type
       this.f.createToken(this.ts.SyntaxKind.ColonToken),
-      negative,
+      negative!, // ensured by tuple type
     );
   };
 

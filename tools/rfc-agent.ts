@@ -77,7 +77,7 @@ export const classifyHeaders = async (
     let totalLength = 0;
     for (let i = 0; i < rfcLines.length; i++) {
       rfcLookupRegex.lastIndex = 0;
-      if (!rfcLookupRegex.test(rfcLines[i])) continue;
+      if (!rfcLookupRegex.test(rfcLines[i]!)) continue;
       const start = Math.max(0, i - rfcContextRadius);
       const end = Math.min(rfcLines.length, i + rfcContextRadius + 1);
       const excerpt = rfcLines.slice(start, end).join("\n");
@@ -126,7 +126,7 @@ export const classifyHeaders = async (
   let completion = await client.chat.completions.create(agentConfig);
   let toolCallCount = 0;
 
-  while (completion.choices[0].finish_reason === "tool_calls") {
+  while (completion.choices[0]?.finish_reason === "tool_calls") {
     const choice = completion.choices[0];
     messages.push(choice.message);
     for (const toolCall of choice.message.tool_calls ?? []) {
@@ -141,7 +141,7 @@ export const classifyHeaders = async (
     completion = await client.chat.completions.create(agentConfig);
   }
 
-  const raw = completion.choices[0].message.content;
+  const raw = completion.choices[0]?.message.content;
   if (!raw) throw new Error("Empty response from LLM");
 
   const parsed = JSON.parse(raw);

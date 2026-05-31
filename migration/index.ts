@@ -146,7 +146,7 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
       shortDescription: (node) => changeProp({ ctx, node, to: "summary" }),
       brandHandling: (node) => {
         const existing = ctx.sourceCode.getCommentsBefore(node);
-        if (existing.some(({ value }) => value.includes(brandHandlingTodo[0])))
+        if (existing.some(({ value }) => value.includes(brandHandlingTodo[0]!)))
           return; // already annotated
         const indent = " ".repeat(node.loc.start.column);
         const body = brandHandlingTodo

@@ -2,6 +2,11 @@
 
 ## Version 28
 
+### v28.1.1
+
+- Depicting Endpoints built on `new EventStreamFactory({})` (having empty argument) will throw a `ResultHandlerError`:
+  - Applies to `Documentation`, `Integration` as well as self-diagnostics (starting the server in development mode).
+
 ### v28.1.0
 
 - Added support for cookie handling:

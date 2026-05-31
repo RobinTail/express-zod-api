@@ -114,9 +114,9 @@ describe("EndpointsFactory", () => {
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
       expect(newFactory["middlewares"].length).toBe(1);
-      expect(newFactory["middlewares"][0].schema).toBeUndefined();
+      expect(newFactory["middlewares"][0]!.schema).toBeUndefined();
       const { output: options } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+        middleware: newFactory["middlewares"][0]!,
       });
       expect(options).toEqual({
         option1: "some value",
@@ -137,13 +137,13 @@ describe("EndpointsFactory", () => {
         provider: (req) => ({ result: req.body.test }),
       });
       expect(newFactory["middlewares"].length).toBe(1);
-      expect(newFactory["middlewares"][0].schema).toBeUndefined();
+      expect(newFactory["middlewares"][0]!.schema).toBeUndefined();
       const {
         output: options,
         responseMock,
         requestMock,
       } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+        middleware: newFactory["middlewares"][0]!,
       });
       expect(middleware).toHaveBeenCalledTimes(1);
       expect(middleware).toHaveBeenCalledWith(
@@ -162,8 +162,9 @@ describe("EndpointsFactory", () => {
         assert.fail("Rejected"),
       );
       const newFactory = factory[method](middleware);
+      expect(newFactory["middlewares"].length).toBe(1);
       const { responseMock } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+        middleware: newFactory["middlewares"][0]!,
       });
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
@@ -186,7 +187,7 @@ describe("EndpointsFactory", () => {
         responseMock,
         requestMock,
       } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+        middleware: newFactory["middlewares"][0]!,
       });
       expect(middleware).toHaveBeenCalledTimes(1);
       expect(middleware).toHaveBeenCalledWith(
@@ -205,8 +206,9 @@ describe("EndpointsFactory", () => {
         next(new Error("This one has failed"));
       });
       const newFactory = factory[method](middleware);
+      expect(newFactory["middlewares"].length).toBe(1);
       const { responseMock } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+        middleware: newFactory["middlewares"][0]!,
       });
       expect(responseMock._getStatusCode()).toBe(500);
       expect(responseMock._getJSONData()).toEqual({
@@ -225,8 +227,9 @@ describe("EndpointsFactory", () => {
           return value;
         });
         const newFactory = factory[method](middleware);
+        expect(newFactory["middlewares"].length).toBe(1);
         const { responseMock } = await testMiddleware({
-          middleware: newFactory["middlewares"][0],
+          middleware: newFactory["middlewares"][0]!,
         });
         expect(responseMock._getStatusCode()).toBe(200);
         expect(middleware).toHaveBeenCalledTimes(1);
@@ -241,8 +244,9 @@ describe("EndpointsFactory", () => {
       const newFactory = factory[method](middleware, {
         transformer: (err) => createHttpError(401, err.message),
       });
+      expect(newFactory["middlewares"].length).toBe(1);
       const { responseMock } = await testMiddleware({
-        middleware: newFactory["middlewares"][0],
+        middleware: newFactory["middlewares"][0]!,
       });
       expect(responseMock._getStatusCode()).toBe(401);
       expect(responseMock._getJSONData()).toEqual({

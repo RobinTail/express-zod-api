@@ -177,16 +177,17 @@ describe("App in production mode", async () => {
   const {
     servers: [server],
   } = await createServer(config, routing);
-  await vi.waitFor(() => assert(server.listening), { timeout: 1e4 });
+  expect(server).toBeTruthy();
+  await vi.waitFor(() => assert(server!.listening), { timeout: 1e4 });
   expect(warnMethod).toHaveBeenCalledWith(
     "DeprecationError (express): Sample deprecation message",
     expect.any(Array), // stack
   );
 
   afterAll(async () => {
-    server.close();
+    server!.close();
     // this approach works better than .close() callback
-    await vi.waitFor(() => assert(!server.listening), { timeout: 1e4 });
+    await vi.waitFor(() => assert(!server!.listening), { timeout: 1e4 });
     vi.restoreAllMocks();
     vi.unstubAllEnvs();
   });
@@ -606,7 +607,7 @@ describe("App in production mode", async () => {
         timeout: 1000,
       });
       await setTimeout(1500);
-      expect(server.listening).toBeFalsy();
+      expect(server!.listening).toBeFalsy();
       expect(beforeExit).toHaveBeenCalledOnce();
       expect(exitSpy).toHaveBeenCalled();
     });
