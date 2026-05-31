@@ -51,7 +51,7 @@ interface CacheControl extends CommonDirectives {
    */
   minFresh?: number;
   /**
-   * @desc The client wants a response only from the cache. If no cached response is available, a 504 Gateway Timeout is returned.
+   * @desc The client wants a response only from the cache. Throw createHttpError(504) in this case.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#only-if-cached
    */
   onlyIfCached?: boolean;
