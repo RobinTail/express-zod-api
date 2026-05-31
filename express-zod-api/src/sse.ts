@@ -10,7 +10,7 @@ import {
   getPublicErrorMessage,
   logServerError,
 } from "./result-helpers";
-import { ResultHandlerError } from "./errors.ts";
+import { ResultHandlerError } from "./errors";
 
 type EventsMap = Record<string, z.ZodType>;
 
