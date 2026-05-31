@@ -151,14 +151,14 @@ const parseCacheControl = (
   if (!header) return undefined;
   const policy: CacheControl = {};
   for (const one of header.toLowerCase().split(",")) {
-    const [name, raw] = one.split("=");
-    const numericKey = numericDirectives.get(name.trim());
+    const [name, raw] = one.split("="); // split always gives at least one element
+    const numericKey = numericDirectives.get(name!.trim());
     if (numericKey) {
       const value = parseInt(raw?.trim() ?? "", 10);
       if (!isNaN(value)) policy[numericKey] = value;
       continue;
     }
-    const booleanKey = booleanDirectives.get(name.trim());
+    const booleanKey = booleanDirectives.get(name!.trim());
     if (booleanKey) policy[booleanKey] = true;
   }
   return policy;
