@@ -29,7 +29,7 @@ interface RoutingWalkerParams {
 /** @example delete /v1/user/retrieve —> [/v1/user/retrieve, delete] */
 const detachMethod = (subject: string): [string, Method?] => {
   const [method, rest] = subject.trim().split(/ (.+)/, 2);
-  if (rest && isMethod(method)) return [rest, method];
+  if (rest && isMethod(method!)) return [rest, method];
   return [subject];
 };
 
@@ -91,7 +91,7 @@ export const walkRouting = ({
   const stack = processEntries(config, routing);
   const visited = new Set<string>();
   for (let idx = 0; idx < stack.length; idx++) {
-    const [path, element, explicitMethod] = stack[idx];
+    const [path, element, explicitMethod] = stack[idx]!; // ensured by loop condition
     if (element instanceof AbstractEndpoint) {
       if (explicitMethod) {
         checkDuplicate(explicitMethod, path, visited);

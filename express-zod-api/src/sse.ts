@@ -35,7 +35,7 @@ export const formatEvent = <E extends EventsMap>(
   event: keyof E,
   data: unknown,
 ) =>
-  makeEventSchema(String(event), events[event])
+  makeEventSchema(String(event), events[event]!) // ensured by key type
     .transform((props) =>
       [
         `event: ${props.event}`,
@@ -88,6 +88,7 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
       const [first, ...rest] = Object.entries(events).map(([event, schema]) =>
         makeEventSchema(event, schema),
       );
+      if (!first) return z.never().describe("no events specified");
       return {
         mimeType: contentTypes.sse,
         schema: rest.length

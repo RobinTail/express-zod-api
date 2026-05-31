@@ -190,13 +190,13 @@ describe("ResultHandler", () => {
         }),
       );
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema.meta()).toMatchSnapshot();
+      expect(apiResponse[0]!.schema.meta()).toMatchSnapshot();
     });
 
     test("should generate negative response example", () => {
       const apiResponse = subject.getNegativeResponse();
       expect(apiResponse).toHaveLength(1);
-      expect(apiResponse[0].schema.meta()).toMatchSnapshot();
+      expect(apiResponse[0]!.schema.meta()).toMatchSnapshot();
     });
   });
 
@@ -209,7 +209,7 @@ describe("ResultHandler", () => {
       }),
     );
     expect(apiResponse).toHaveLength(1);
-    expect(apiResponse[0].schema.meta()).toMatchSnapshot();
+    expect(apiResponse[0]!.schema.meta()).toMatchSnapshot();
   });
 
   test("arrayResultHandler should fail when there is no items prop in the output", () => {
