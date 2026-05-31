@@ -10,6 +10,7 @@ import {
   getPublicErrorMessage,
   logServerError,
 } from "./result-helpers";
+import { ResultHandlerError } from "./errors.ts";
 
 type EventsMap = Record<string, z.ZodType>;
 
@@ -82,20 +83,21 @@ export const makeMiddleware = <E extends EventsMap>(events: E) =>
     },
   });
 
-export const makeResultHandler = <E extends EventsMap>(events: E) =>
-  new ResultHandler({
-    positive: () => {
-      const [first, ...rest] = Object.entries(events).map(([event, schema]) =>
-        makeEventSchema(event, schema),
-      );
-      if (!first) return z.never().describe("no events specified");
-      return {
-        mimeType: contentTypes.sse,
-        schema: rest.length
-          ? z.discriminatedUnion("event", [first, ...rest])
-          : first,
-      };
-    },
+export const makeResultHandler = <E extends EventsMap>(events: E) => {
+  const [first, ...rest] = Object.entries(events).map(([event, schema]) =>
+    makeEventSchema(event, schema),
+  );
+  if (!first) {
+    const cause = new Error("At least one SSE event is required.");
+    throw new ResultHandlerError(cause);
+  }
+  return new ResultHandler({
+    positive: () => ({
+      mimeType: contentTypes.sse,
+      schema: rest.length
+        ? z.discriminatedUnion("event", [first, ...rest])
+        : first,
+    }),
     negative: { mimeType: "text/plain", schema: z.string() },
     handler: async ({ response, error, logger, request, input }) => {
       if (error) {
@@ -111,6 +113,7 @@ export const makeResultHandler = <E extends EventsMap>(events: E) =>
       response.end();
     },
   });
+};
 
 export class EventStreamFactory<E extends EventsMap> extends EndpointsFactory<
   undefined,

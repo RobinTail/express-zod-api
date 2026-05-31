@@ -116,7 +116,6 @@ describe("SSE", () => {
     test.each<Parameters<typeof makeResultHandler>[0]>([
       { test: z.string(), another: z.number() },
       { single: z.string() },
-      {},
     ])(
       "should create ResultHandler describing possible events and handling generic errors %#",
       (events) => {
@@ -154,11 +153,17 @@ describe("SSE", () => {
         expect(negativeResponse.writableEnded).toBeTruthy();
       },
     );
+
+    test("should throw when events map is empty", () => {
+      expect(() => makeResultHandler({})).toThrowErrorMatchingSnapshot();
+    });
   });
 
   describe("EventStreamFactory()", () => {
     test("should inherit from EndpointsFactory", () => {
-      expect(new EventStreamFactory({})).toBeInstanceOf(EndpointsFactory);
+      expect(new EventStreamFactory({ test: z.boolean() })).toBeInstanceOf(
+        EndpointsFactory,
+      );
     });
 
     test("should combine SSE Middleware with corresponding ResultHandler and return Endpoint", async () => {
