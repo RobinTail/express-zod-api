@@ -125,25 +125,25 @@ type KeysOfType<T, U> = {
   [K in keyof T]: T[K] extends U ? K : never;
 }[keyof T];
 
-const numericDirectives = new Map<
+const numericDirectives: Record<
   string,
   KeysOfType<Required<CacheControl>, number>
->([
-  ["max-age", "maxAge"],
-  ["max-stale", "maxStale"],
-  ["min-fresh", "minFresh"],
-  ["stale-if-error", "staleIfError"],
-]);
+> = {
+  "max-age": "maxAge",
+  "max-stale": "maxStale",
+  "min-fresh": "minFresh",
+  "stale-if-error": "staleIfError",
+};
 
-const booleanDirectives = new Map<
+const booleanDirectives: Record<
   string,
   KeysOfType<Required<CacheControl>, boolean>
->([
-  ["no-cache", "noCache"],
-  ["no-store", "noStore"],
-  ["no-transform", "noTransform"],
-  ["only-if-cached", "onlyIfCached"],
-]);
+> = {
+  "no-cache": "noCache",
+  "no-store": "noStore",
+  "no-transform": "noTransform",
+  "only-if-cached": "onlyIfCached",
+};
 
 const parseCacheControl = (
   header: string | undefined,
@@ -152,13 +152,13 @@ const parseCacheControl = (
   const policy: CacheControl = {};
   for (const one of header.toLowerCase().split(",")) {
     const [name, raw] = one.split("="); // split always gives at least one element
-    const numericKey = numericDirectives.get(name!.trim());
+    const numericKey = numericDirectives[name!.trim()];
     if (numericKey) {
       const value = parseInt(raw?.trim() ?? "", 10);
       if (!isNaN(value)) policy[numericKey] = value;
       continue;
     }
-    const booleanKey = booleanDirectives.get(name!.trim());
+    const booleanKey = booleanDirectives[name!.trim()];
     if (booleanKey) policy[booleanKey] = true;
   }
   return policy;
