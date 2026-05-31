@@ -2,6 +2,10 @@
 
 ## Version 28
 
+### v28.1.1
+
+- The `EventStreamFactory` will throw a `ResultHandlerError` when the argument is an empty object.
+
 ### v28.1.0
 
 - Added support for cookie handling:
