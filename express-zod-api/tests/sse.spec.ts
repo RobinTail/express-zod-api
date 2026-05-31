@@ -153,6 +153,13 @@ describe("SSE", () => {
         expect(negativeResponse.writableEnded).toBeTruthy();
       },
     );
+
+    test("its ::getPositiveResponse() method should throw when events map is empty", () => {
+      const rh = makeResultHandler({});
+      expect(() =>
+        rh.getPositiveResponse(z.object({})),
+      ).toThrowErrorMatchingSnapshot();
+    });
   });
 
   describe("EventStreamFactory()", () => {

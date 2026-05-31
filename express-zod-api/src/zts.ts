@@ -37,7 +37,8 @@ const onLiteral: Producer = (
       ? api.ensureTypeNode(api.ts.SyntaxKind.UndefinedKeyword)
       : api.makeLiteralType(entry),
   );
-  return values.length === 1 ? values[0] : api.makeUnion(values);
+  // ensured by runtime check since Zod 4.0.9 4e7a3ef180f6a5525d9021638e9df20b3ca50456
+  return values.length === 1 ? values[0]! : api.makeUnion(values);
 };
 
 const onTemplateLiteral: Producer = (
@@ -134,12 +135,12 @@ const onRecord: Producer = (
   { next, api },
 ) => {
   const [keyNode, valueNode] = [def.keyType, def.valueType].map(next);
-  const primary = api.ensureTypeNode("Record", [keyNode, valueNode]);
+  const primary = api.ensureTypeNode("Record", [keyNode!, valueNode!]);
   const isLoose = def.mode === "loose";
   if (!isLoose) return primary;
   return api.f.createIntersectionTypeNode([
     primary,
-    api.ensureTypeNode("Record", ["PropertyKey", valueNode]),
+    api.ensureTypeNode("Record", ["PropertyKey", valueNode!]),
   ]);
 };
 

@@ -134,8 +134,8 @@ export const depictIntersection = R.tryCatch<Depicter>(
 
 /** @since OAS 3.1 nullable replaced with type array having null */
 export const depictNullable: Depicter = ({ jsonSchema }) => {
-  if (!jsonSchema.anyOf) return jsonSchema;
-  const original = jsonSchema.anyOf[0];
+  if (!jsonSchema.anyOf || !jsonSchema.anyOf.length) return jsonSchema;
+  const original = jsonSchema.anyOf[0]!;
   return Object.assign(original, { type: makeNullableType(original.type) });
 };
 

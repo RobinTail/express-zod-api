@@ -2,6 +2,11 @@
 
 ## Version 28
 
+### v28.1.1
+
+- Depicting Endpoints built on `new EventStreamFactory({})` (having empty argument) will throw a `ResultHandlerError`:
+  - Applies to `Documentation`, `Integration` as well as self-diagnostics (starting the server in development mode).
+
 ### v28.1.0
 
 - Added support for cookie handling:
@@ -25,7 +30,7 @@
 - Supported Node.js versions: `^22.19.0 || ^24.0.0 || ^26.0.0`;
 - Zod compatibility: `^4.3.4` (supports Zod 4.4+ without upper limit);
 - The Zod plugin is no longer installed automatically — it's an optional peer dependency now:
-  - To keep using `.example()`, `.label()`, `.remap()`, `.deprecated()` and methods on schemas, as well as runtime
+  - To keep using `.example()`, `.label()`, `.remap()` and `.deprecated()` methods on schemas, as well as runtime
     distinguishable brands, install the `@express-zod-api/zod-plugin` manually and import it (ideally at the top of a
     file declaring your `Routing`);
   - Breaking change: `ZodType::brand()` method is no longer patched by the plugin:

@@ -107,8 +107,7 @@ export const flattenIO = (
   const stack: Stack = [R.pair(false, jsonSchema)]; // [isOptional, JSON Schema]
   const flat: FlattenObjectSchema = { type: "object", properties: {} };
   const flatRequired: string[] = [];
-  for (let idx = 0; idx < stack.length; idx++) {
-    const [isOptional, entry] = stack[idx];
+  for (const [isOptional, entry] of stack) {
     if (entry.description) flat.description ??= entry.description;
     stack.push(...processAllOf(entry, mode, isOptional));
     stack.push(...processVariants(entry));
