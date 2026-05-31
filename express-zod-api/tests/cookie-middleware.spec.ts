@@ -46,7 +46,7 @@ describe("Cookie middleware", () => {
           },
           value: "",
         });
-        expect(Number(responseMock.cookies["session"]?.options.expires)).toBe(
+        expect(Number(responseMock.cookies["session"]!.options.expires)).toBe(
           1,
         );
       },
