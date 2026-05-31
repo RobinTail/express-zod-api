@@ -4,7 +4,8 @@
 
 ### v28.1.1
 
-- The `EventStreamFactory` will throw a `ResultHandlerError` when the argument is an empty object.
+- Depicting Endpoints built on `new EventStreamFactory({})` (having empty argument) will throw a `ResultHandlerError`:
+  - Applies to `Documentation`, `Integration` as well as self-diagnostics (starting the server in development mode).
 
 ### v28.1.0
 
