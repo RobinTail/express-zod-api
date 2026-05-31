@@ -29,7 +29,7 @@ interface RoutingWalkerParams {
 /** @example delete /v1/user/retrieve —> [/v1/user/retrieve, delete] */
 const detachMethod = (subject: string): [string, Method?] => {
   const [method, rest] = subject.trim().split(/ (.+)/, 2);
-  if (rest && isMethod(method!)) return [rest, method];
+  if (rest && isMethod(method!)) return [rest, method]; // ensured by split: at least one element guaranteed
   return [subject];
 };
 
