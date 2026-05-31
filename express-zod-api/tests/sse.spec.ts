@@ -154,16 +154,17 @@ describe("SSE", () => {
       },
     );
 
-    test("should throw when events map is empty", () => {
-      expect(() => makeResultHandler({})).toThrowErrorMatchingSnapshot();
+    test("its ::getPositiveResponse() method should throw when events map is empty", () => {
+      const rh = makeResultHandler({});
+      expect(() =>
+        rh.getPositiveResponse(z.object({})),
+      ).toThrowErrorMatchingSnapshot();
     });
   });
 
   describe("EventStreamFactory()", () => {
     test("should inherit from EndpointsFactory", () => {
-      expect(new EventStreamFactory({ test: z.boolean() })).toBeInstanceOf(
-        EndpointsFactory,
-      );
+      expect(new EventStreamFactory({})).toBeInstanceOf(EndpointsFactory);
     });
 
     test("should combine SSE Middleware with corresponding ResultHandler and return Endpoint", async () => {

@@ -29,6 +29,15 @@ exports[`SSE > makeEventSchema() > should make a valid schema of SSE event 1`] =
 }
 `;
 
+exports[`SSE > makeResultHandler() > its ::getPositiveResponse() method should throw when events map is empty 1`] = `
+ResultHandlerError({
+  "cause": Error({
+    "message": "At least one SSE event is required.",
+  }),
+  "message": "At least one SSE event is required.",
+})
+`;
+
 exports[`SSE > makeResultHandler() > should create ResultHandler describing possible events and handling generic errors 0 1`] = `
 [
   {
@@ -168,13 +177,4 @@ exports[`SSE > makeResultHandler() > should create ResultHandler describing poss
     ],
   },
 ]
-`;
-
-exports[`SSE > makeResultHandler() > should throw when events map is empty 1`] = `
-ResultHandlerError({
-  "cause": Error({
-    "message": "At least one SSE event is required.",
-  }),
-  "message": "At least one SSE event is required.",
-})
 `;
