@@ -21,7 +21,7 @@ describe("Cache middleware", () => {
           requestProps: {
             headers:
               header !== undefined ? { "if-none-match": header } : undefined,
-          } as never,
+          },
         });
         const getter = output.getIfNoneMatch as () =>
           | string[]
@@ -34,28 +34,25 @@ describe("Cache middleware", () => {
         ["Tue, 22 Feb 2022 22:00:00 GMT", new Date("2022-02-22T22:00:00Z")],
         [undefined, undefined],
         ["garbage", undefined],
-      ] as const)(
-        "getIfModifiedSince should return %s",
-        async (header, expected) => {
-          const { output } = await testMiddleware({
-            middleware: createCacheMiddleware(),
-            requestProps: {
-              headers:
-                header !== undefined
-                  ? { "if-modified-since": header }
-                  : undefined,
-            } as never,
-          });
-          const getter = output.getIfModifiedSince as () => Date | undefined;
-          const result = getter();
-          if (expected instanceof Date) {
-            expect(result).toBeInstanceOf(Date);
-            expect(result?.getTime()).toBe(expected.getTime());
-          } else {
-            expect(result).toBeUndefined();
-          }
-        },
-      );
+      ])("getIfModifiedSince should return %s", async (header, expected) => {
+        const { output } = await testMiddleware({
+          middleware: createCacheMiddleware(),
+          requestProps: {
+            headers:
+              header !== undefined
+                ? { "if-modified-since": header }
+                : undefined,
+          },
+        });
+        const getter = output.getIfModifiedSince as () => Date | undefined;
+        const result = getter();
+        if (expected instanceof Date) {
+          expect(result).toBeInstanceOf(Date);
+          expect(result?.getTime()).toBe(expected.getTime());
+        } else {
+          expect(result).toBeUndefined();
+        }
+      });
 
       test.each([
         ["max-age=3600", { maxAge: 3600 }],
@@ -102,7 +99,7 @@ describe("Cache middleware", () => {
           requestProps: {
             headers:
               header !== undefined ? { "cache-control": header } : undefined,
-          } as never,
+          },
         });
         const getter = output.getCacheControl as () =>
           | Record<string, unknown>
@@ -146,12 +143,12 @@ describe("Cache middleware", () => {
           "must-revalidate, must-understand, no-transform, stale-while-revalidate=60, stale-if-error=120",
         ],
       ])(
-        "setCachePolicy(%j) should set cache-control to %s",
+        "addCachePolicy(%j) should set cache-control to %s",
         async (policy, expected) => {
           const { output, responseMock } = await testMiddleware({
             middleware: createCacheMiddleware(),
           });
-          const setter = output.setCachePolicy as (p: unknown) => void;
+          const setter = output.addCachePolicy as (p: unknown) => void;
           setter(policy);
           expect(responseMock._getHeaders()).toHaveProperty(
             "cache-control",
@@ -176,17 +173,14 @@ describe("Cache middleware", () => {
           "Mon, 28 Feb 2022 22:22:22 GMT",
         ],
         ["clearSiteData", [], "clear-site-data", '"cache"'],
-      ] as const)(
-        "%s should set %s header",
-        async (method, args, header, expected) => {
-          const { output, responseMock } = await testMiddleware({
-            middleware: createCacheMiddleware(),
-          });
-          const setter = output[method] as (...args: unknown[]) => void;
-          setter(...args);
-          expect(responseMock._getHeaders()).toHaveProperty(header, expected);
-        },
-      );
+      ])("%s should set %s header", async (method, args, header, expected) => {
+        const { output, responseMock } = await testMiddleware({
+          middleware: createCacheMiddleware(),
+        });
+        const setter = output[method] as (...args: unknown[]) => void;
+        setter(...args);
+        expect(responseMock._getHeaders()).toHaveProperty(header, expected);
+      });
 
       test.each([
         [["Accept-Language"], "Accept-Language"],
@@ -217,13 +211,12 @@ describe("Cache middleware", () => {
     });
 
     describe("default policy", () => {
-      test("should apply Cache-Control when no setCachePolicy is called", async () => {
+      test("should apply Cache-Control when no addCachePolicy is called", async () => {
         const { responseMock } = await testMiddleware({
           middleware: createCacheMiddleware({
             noCache: true,
             scope: "private",
           }),
-          requestProps: {} as never,
         });
         expect(responseMock._getHeaders()).toHaveProperty(
           "cache-control",
@@ -231,19 +224,33 @@ describe("Cache middleware", () => {
         );
       });
 
-      test("should be overridden by explicit setCachePolicy call", async () => {
+      test("should merge with defaultPolicy on explicit addCachePolicy call", async () => {
         const { output, responseMock } = await testMiddleware({
           middleware: createCacheMiddleware({
             noCache: true,
             scope: "private",
           }),
-          requestProps: {} as never,
         });
-        const setter = output.setCachePolicy as (p: unknown) => void;
-        setter({ maxAge: 3600, scope: "public" });
+        const setter = output.addCachePolicy as (p: unknown) => void;
+        setter({ maxAge: 3600, scope: "public" }); // noCache preserved from default
         expect(responseMock._getHeaders()).toHaveProperty(
           "cache-control",
-          "public, max-age=3600",
+          "public, no-cache, max-age=3600",
+        );
+      });
+
+      test("should allow opting out of default directive via undefined", async () => {
+        const { output, responseMock } = await testMiddleware({
+          middleware: createCacheMiddleware({
+            noCache: true,
+            scope: "private",
+          }),
+        });
+        const setter = output.addCachePolicy as (p: unknown) => void;
+        setter({ scope: "public", noCache: undefined });
+        expect(responseMock._getHeaders()).toHaveProperty(
+          "cache-control",
+          "public",
         );
       });
     });

@@ -212,11 +212,16 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
           parseCacheControl(request.headers["cache-control"]),
 
         /**
-         * @desc Sets the Cache-Control response header to configure cache lifetime and revalidation behavior.
+         * @desc Augments the Cache-Control response header, merging with the defaultPolicy if provided.
+         * @desc Pass `undefined` for a directive to unset the default value.
+         * @see defaultPolicy
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching
          */
-        setCachePolicy: (policy: CachePolicy): void => {
-          response.setHeader("Cache-Control", formatCacheControl(policy));
+        addCachePolicy: (policy: CachePolicy): void => {
+          response.setHeader(
+            "Cache-Control",
+            formatCacheControl({ ...defaultPolicy, ...policy }),
+          );
         },
 
         /**
@@ -249,7 +254,7 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
         },
 
         /**
-         * @desc Sets the Expires response header with an explicit expiration date. Consider setCachePolicy({ maxAge }).
+         * @desc Sets the Expires response header with an explicit expiration date. Consider addCachePolicy({ maxAge }).
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Expires
          */
         setExpires: (date: Date): void => {
