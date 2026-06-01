@@ -26,8 +26,8 @@ import {
   arrayResultHandler,
   defaultResultHandler,
 } from "./result-handler";
-import { createCacheMiddleware } from "./cache-middleware.ts";
-import { createCookieMiddleware } from "./cookie-middleware.ts";
+import { createCacheMiddleware } from "./cache-middleware";
+import { createCookieMiddleware } from "./cookie-middleware";
 
 interface BuildProps<
   IN extends IOSchema,
