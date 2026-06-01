@@ -843,9 +843,7 @@ as well as `getCookie()` — alternative to the cookies as an input source:
 import { createCookieMiddleware, Middleware } from "express-zod-api";
 
 const cookieDrivenFactory = factory
-  .addMiddleware(
-    createCookieMiddleware({ httpOnly: true, sameSite: "lax", path: "/" }), // recommended base options
-  )
+  .useCookies({ httpOnly: true, sameSite: "lax", path: "/" }) // shorthand, recommended base options
   .addMiddleware(
     new Middleware({
       security: { type: "cookie", name: "session" }, // improves Documentation
@@ -872,7 +870,7 @@ It covers all standard `Cache-Control` directives, conditional request handling,
 import { createCacheMiddleware } from "express-zod-api";
 
 const avatarEndpoint = factory
-  .addMiddleware(createCacheMiddleware({ maxAge: 3600, scope: "public" })) // applies to every response
+  .useCache({ maxAge: 3600, scope: "public" }) // shorthand, the policy applies to every response
   .build({
     output: z.object({ avatar: z.string() }),
     handler: async ({

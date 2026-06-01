@@ -17,7 +17,8 @@
     - `setExpires()` — sets the `Expires` response header;
     - `clearSiteData()` — sets the `Clear-Site-Data` header with `cache` directive;
     - `notModified()` — sends an HTTP 304 response and ends the stream;
-- Adjusted the Endpoint execution to skip output validation in case `response.writableEnded` (`notModified` called).
+- Adjusted the Endpoint execution to skip output validation in case `response.writableEnded` (`notModified` called);
+- Added two shorthand methods to `EndpointsFactory` class: `useCache()` and `useCookies()`.
 
 ### v28.1.1
 

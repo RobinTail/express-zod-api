@@ -8,6 +8,8 @@ import {
   ResultHandler,
   testMiddleware,
 } from "../src";
+import * as cookieMw from "../src/cookie-middleware";
+import * as cacheMw from "../src/cache-middleware";
 import type { EmptyObject } from "../src/common-helpers";
 import { Endpoint } from "../src/endpoint";
 import { z } from "zod";
@@ -123,6 +125,24 @@ describe("EndpointsFactory", () => {
         option2: "other value",
       });
       expect(newFactory["resultHandler"]).toStrictEqual(resultHandlerMock);
+    });
+  });
+
+  describe(".useCookies", () => {
+    test("should add created cookie middleware", () => {
+      const spy = vi.spyOn(cookieMw, "createCookieMiddleware");
+      const factory = defaultEndpointsFactory.useCookies({ priority: "high" });
+      expect(spy).toHaveBeenCalledWith({ priority: "high" });
+      expect(factory["middlewares"]).toHaveLength(1);
+    });
+  });
+
+  describe(".useCache", () => {
+    test("should add created cache middleware", () => {
+      const spy = vi.spyOn(cacheMw, "createCacheMiddleware");
+      const factory = defaultEndpointsFactory.useCache({ maxAge: 100 });
+      expect(spy).toHaveBeenCalledWith({ maxAge: 100 });
+      expect(factory["middlewares"]).toHaveLength(1);
     });
   });
 

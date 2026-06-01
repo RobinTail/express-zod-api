@@ -26,6 +26,8 @@ import {
   arrayResultHandler,
   defaultResultHandler,
 } from "./result-handler";
+import { createCacheMiddleware } from "./cache-middleware";
+import { createCookieMiddleware } from "./cookie-middleware";
 
 interface BuildProps<
   IN extends IOSchema,
@@ -105,6 +107,16 @@ export class EndpointsFactory<
     return this.#extend(
       subject instanceof Middleware ? subject : new Middleware(subject),
     );
+  }
+
+  /** @desc Shorthand for .addMiddleware(createCookieMiddleware()) */
+  public useCookies(...args: Parameters<typeof createCookieMiddleware>) {
+    return this.#extend(createCookieMiddleware(...args));
+  }
+
+  /** @desc Shorthand for .addMiddleware(createCacheMiddleware()) */
+  public useCache(...args: Parameters<typeof createCacheMiddleware>) {
+    return this.#extend(createCacheMiddleware(...args));
   }
 
   public use = this.addExpressMiddleware;

@@ -39,7 +39,7 @@ interface CommonDirectives {
  * @desc Directives that clients send in requests to express their caching preferences.
  * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#request_directives
  */
-interface CacheControl extends CommonDirectives {
+export interface CacheControl extends CommonDirectives {
   /**
    * @desc The client will accept a stored response that is stale for up to N seconds beyond its freshness lifetime.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#max-stale
@@ -61,7 +61,7 @@ interface CacheControl extends CommonDirectives {
  * @desc Directives that servers send in responses to control how caches store and reuse the response.
  * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control#response_directives
  */
-interface CachePolicy extends CommonDirectives {
+export interface CachePolicy extends CommonDirectives {
   /**
    * @desc Restricts which caches may store the response.
    * @example "public" — any cache (browser, proxy, CDN); for static assets, responses without user-specific data.
