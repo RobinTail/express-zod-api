@@ -557,8 +557,8 @@ describe("Example", async () => {
     }
 
     test.skipIf(!response)("should be valid", async () => {
-      const json = await response!.json();
       expect(response!.status).toBe(200);
+      const json = await response!.json();
       if (
         typeof json === "object" &&
         json !== null &&
