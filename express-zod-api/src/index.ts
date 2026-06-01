@@ -41,6 +41,7 @@ export type { TagOverrides } from "./common-helpers";
 
 // Issues 952, 1182, 1269: Insufficient exports for consumer's declaration
 import type {} from "qs"; // fixes TS2742 for attachRouting, makeRequestMock, testEndpoint, testMiddleware
+export type { CacheControl, CachePolicy } from "./cache-middleware";
 export type { Routing } from "./routing";
 export type { FlatObject } from "./common-helpers";
 export type { Method } from "./method";
