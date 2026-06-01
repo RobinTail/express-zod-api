@@ -126,10 +126,7 @@ describe("Endpoint", () => {
         })
         .build({
           output: z.looseObject({}),
-          handler: async ({ ctx }) => {
-            ctx.notModified();
-            return { test: 123 }; // ignored
-          },
+          handler: async ({ ctx }) => ctx.notModified() as never,
         });
       const { responseMock } = await testEndpoint({ endpoint });
       expect(responseMock._getStatusCode()).toBe(304);

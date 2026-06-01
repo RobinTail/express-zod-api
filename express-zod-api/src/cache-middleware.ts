@@ -266,6 +266,7 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
 
         /**
          * @desc Sends an HTTP 304 Not Modified empty response and ends the response stream.
+         * @example return ctx.notModified() as never; // to satisfy the handler's return type
          * @see getIfNoneMatch
          * @see getIfModifiedSince
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/304
