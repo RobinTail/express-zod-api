@@ -15,7 +15,7 @@ describe("Cache middleware", () => {
         ["*", "*"],
         ['W/"abc"', ["abc"]],
         [undefined, undefined],
-      ])("getIfNoneMatch should return %s", async (header, expected) => {
+      ])("ifNoneMatch should return %s", async (header, expected) => {
         const { output } = await testMiddleware({
           middleware: createCacheMiddleware(),
           requestProps: {
@@ -23,18 +23,14 @@ describe("Cache middleware", () => {
               header !== undefined ? { "if-none-match": header } : undefined,
           },
         });
-        const getter = output.getIfNoneMatch as () =>
-          | string[]
-          | "*"
-          | undefined;
-        expect(getter()).toEqual(expected);
+        expect(output.ifNoneMatch).toEqual(expected);
       });
 
       test.each([
         ["Tue, 22 Feb 2022 22:00:00 GMT", new Date("2022-02-22T22:00:00Z")],
         [undefined, undefined],
         ["garbage", undefined],
-      ])("getIfModifiedSince should return %s", async (header, expected) => {
+      ])("ifModifiedSince should return %s", async (header, expected) => {
         const { output } = await testMiddleware({
           middleware: createCacheMiddleware(),
           requestProps: {
@@ -44,8 +40,7 @@ describe("Cache middleware", () => {
                 : undefined,
           },
         });
-        const getter = output.getIfModifiedSince as () => Date | undefined;
-        const result = getter();
+        const result = output.ifModifiedSince as Date | undefined;
         if (expected instanceof Date) {
           expect(result).toBeInstanceOf(Date);
           expect(result?.getTime()).toBe(expected.getTime());
@@ -93,7 +88,7 @@ describe("Cache middleware", () => {
         ["MIXED-no-Store", {}],
         ["max-stale=, MAX-AGE=3600", { maxAge: 3600 }],
         ["Max-Age = 3600", { maxAge: 3600 }],
-      ])("getCacheControl should parse %s", async (header, expected) => {
+      ])("cacheControl should parse %s", async (header, expected) => {
         const { output } = await testMiddleware({
           middleware: createCacheMiddleware(),
           requestProps: {
@@ -101,10 +96,7 @@ describe("Cache middleware", () => {
               header !== undefined ? { "cache-control": header } : undefined,
           },
         });
-        const getter = output.getCacheControl as () =>
-          | Record<string, unknown>
-          | undefined;
-        expect(getter()).toEqual(expected);
+        expect(output.cacheControl).toEqual(expected);
       });
     });
 

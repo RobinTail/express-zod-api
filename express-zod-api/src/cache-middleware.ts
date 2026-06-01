@@ -177,10 +177,10 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
 
       return {
         /**
-         * @desc Reads and parses the If-None-Match request header into an array of ETags. Can also be '*' wildcard.
+         * @desc Provides the parsed If-None-Match request header into an array of ETags. Can also be '*' wildcard.
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-None-Match
          */
-        getIfNoneMatch: (): string[] | "*" | undefined => {
+        get ifNoneMatch(): string[] | "*" | undefined {
           const raw = request.headers["if-none-match"];
           if (!raw) return undefined;
           const trimmed = raw.trim();
@@ -194,10 +194,10 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
         },
 
         /**
-         * @desc Reads and parses the If-Modified-Since request header having the timestamp of the client's cached copy.
+         * @desc Provides the parsed If-Modified-Since request header having the timestamp of the client's cached copy.
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Modified-Since
          */
-        getIfModifiedSince: (): Date | undefined => {
+        get ifModifiedSince(): Date | undefined {
           const value = request.headers["if-modified-since"];
           if (!value) return undefined;
           const date = new Date(value);
@@ -205,11 +205,12 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
         },
 
         /**
-         * @desc Reads and parses the Cache-Control request header to reveal the client's caching intent.
+         * @desc Provides the parsed Cache-Control request header to reveal the client's caching intent.
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control
          */
-        getCacheControl: (): CacheControl | undefined =>
-          parseCacheControl(request.headers["cache-control"]),
+        get cacheControl(): CacheControl | undefined {
+          return parseCacheControl(request.headers["cache-control"]);
+        },
 
         /**
          * @desc Augments the Cache-Control response header, merging with the defaultPolicy if provided.
@@ -226,7 +227,7 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
 
         /**
          * @desc Sets the ETag response header with a unique identifier for this version of the resource.
-         * @see getIfNoneMatch
+         * @see ifNoneMatch
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/ETag
          */
         setETag: (value: string): void => {
@@ -238,7 +239,7 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
 
         /**
          * @desc Sets the Last-Modified response header to the timestamp when the resource was last changed.
-         * @see getIfModifiedSince
+         * @see ifModifiedSince
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Last-Modified
          */
         setLastModified: (date: Date): void => {
@@ -272,8 +273,8 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
         /**
          * @desc Sends an HTTP 304 Not Modified empty response and ends the response stream.
          * @example return ctx.notModified() as never; // to satisfy the handler's return type
-         * @see getIfNoneMatch
-         * @see getIfModifiedSince
+         * @see ifNoneMatch
+         * @see ifModifiedSince
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/304
          */
         notModified: (): void => {

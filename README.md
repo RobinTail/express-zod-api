@@ -876,10 +876,10 @@ const avatarEndpoint = factory
   .build({
     output: z.object({ avatar: z.string() }),
     handler: async ({
-      ctx: { getIfNoneMatch, setETag, notModified, addCachePolicy },
+      ctx: { ifNoneMatch, setETag, notModified, addCachePolicy },
     }) => {
       const etag = `"avatar-v2"`;
-      if (getIfNoneMatch()?.includes(etag)) return notModified() as never; // skips validation, sends 304
+      if (ifNoneMatch?.includes(etag)) return notModified() as never; // skips validation, sends 304
       setETag(etag);
       addCachePolicy({ staleWhileRevalidate: 86400 }); // extends the default policy
       return { avatar: "https://example.com/avatar.png" };

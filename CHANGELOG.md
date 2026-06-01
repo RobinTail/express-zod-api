@@ -6,11 +6,11 @@
 
 - Added `createCacheMiddleware()` function for solving most of the caching problems:
   - The function accepts an optional default policy to apply `Cache-Control` header to every response;
-  - It returns a Middleware providing several caching helpers to context:
-    - `getIfNoneMatch()` — reads and parses the `If-None-Match` request header into an array of ETags or `"*"`;
-    - `getIfModifiedSince()` — reads and parses the `If-Modified-Since` request header into a `Date`;
-    - `getCacheControl()` — reads and parses the request's `Cache-Control` header into a typed object;
-    - `addCachePolicy()` — sets the `Cache-Control` response header from a typed object;
+  - It returns a Middleware providing several properties and caching helpers to context:
+    - `cacheControl` — the parsed request's `Cache-Control` header into a typed object;
+    - `ifNoneMatch` — the parsed `If-None-Match` request header into an array of ETags or `"*"`;
+    - `ifModifiedSince` — the parsed `If-Modified-Since` request header into a `Date`;
+    - `addCachePolicy()` — extends the default policy into the `Cache-Control` response header;
     - `setETag()` — sets the `ETag` response header;
     - `setLastModified()` — sets the `Last-Modified` response header;
     - `setVary()` — sets the `Vary` response header;
