@@ -395,7 +395,7 @@ connection, consider shorthand method `addContext`. For static values consider r
 import { readFile } from "node:fs/promises";
 import { defaultEndpointsFactory } from "express-zod-api";
 
-const endpointsFactory = defaultEndpointsFactory.addContext(async () => {
+const endpointsFactory = defaultEndpointsFactory.addContext(async (ctx) => {
   // caution: new connection on every request:
   const db = mongoose.connect("mongodb://connection.string");
   const privateKey = await readFile("private-key.pem", "utf-8");
