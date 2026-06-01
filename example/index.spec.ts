@@ -540,19 +540,25 @@ describe("Example", async () => {
     });
   });
 
-  describe("OpenAPI Documentation", () => {
-    test("should be valid", { retry: 3 }, async () => {
-      const data = await readFile("example.documentation.yaml", "utf-8");
-      const response = await fetch(
-        "https://validator.swagger.io/validator/debug",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/yaml" },
-          body: data,
-        },
+  describe("OpenAPI Documentation", async () => {
+    const data = await readFile("example.documentation.yaml", "utf-8");
+    let response: Response | undefined;
+    try {
+      response = await fetch("https://validator.swagger.io/validator/debug", {
+        method: "POST",
+        headers: { "Content-Type": "application/yaml" },
+        body: data,
+        signal: AbortSignal.timeout(3000),
+      });
+    } catch {
+      console.warn(
+        "OpenAPI validation skipped: Swagger validator is unreachable",
       );
-      expect(response.status).toBe(200);
-      const json = await response.json();
+    }
+
+    test.skipIf(!response)("should be valid", async () => {
+      expect(response!.status).toBe(200);
+      const json = await response!.json();
       if (
         typeof json === "object" &&
         json !== null &&
