@@ -36,16 +36,17 @@ Start your API server with I/O schema validation and custom middlewares in minut
    1. [Customizing input sources](#customizing-input-sources)
    2. [Headers as an input source](#headers-as-an-input-source)
    3. [Cookies](#cookies)
-   4. [Response customization](#response-customization)
-   5. [Empty response](#empty-response)
-   6. [Non-JSON response](#non-json-response) including file downloads
-   7. [Error handling](#error-handling)
-   8. [Production mode](#production-mode)
-   9. [HTML Forms (URL encoded)](#html-forms-url-encoded)
-   10. [File uploads](#file-uploads)
-   11. [Connect to your own express app](#connect-to-your-own-express-app)
-   12. [Testing endpoints](#testing-endpoints)
-   13. [Testing middlewares](#testing-middlewares)
+   4. [Caching](#caching)
+   5. [Response customization](#response-customization)
+   6. [Empty response](#empty-response)
+   7. [Non-JSON response](#non-json-response) including file downloads
+   8. [Error handling](#error-handling)
+   9. [Production mode](#production-mode)
+   10. [HTML Forms (URL encoded)](#html-forms-url-encoded)
+   11. [File uploads](#file-uploads)
+   12. [Connect to your own express app](#connect-to-your-own-express-app)
+   13. [Testing endpoints](#testing-endpoints)
+   14. [Testing middlewares](#testing-middlewares)
 6. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [End-to-End Type Safety](#end-to-end-type-safety)
@@ -862,6 +863,30 @@ const sessionSettingEndpoint = cookieDrivenFactory.buildVoid({
 });
 ```
 
+## Caching
+
+Consider the `createCacheMiddleware()` that provides helpers for HTTP caching following the MDN HTTP Caching guide.
+It covers all standard `Cache-Control` directives, conditional request handling, and the "Not Modified" (304) flow:
+
+```ts
+import { createCacheMiddleware } from "express-zod-api";
+
+const avatarEndpoint = factory
+  .addMiddleware(createCacheMiddleware({ maxAge: 3600, scope: "public" })) // applies to every response
+  .build({
+    output: z.object({ avatar: z.string() }),
+    handler: async ({
+      ctx: { getIfNoneMatch, setETag, notModified, addCachePolicy },
+    }) => {
+      const etag = `"avatar-v2"`;
+      if (getIfNoneMatch()?.includes(etag)) return notModified() as never; // skips validation, sends 304
+      setETag(etag);
+      addCachePolicy({ staleWhileRevalidate: 86400 }); // extends the default policy
+      return { avatar: "https://example.com/avatar.png" };
+    },
+  });
+```
+
 ## Response customization
 
 `ResultHandler` is responsible for transmitting consistent responses containing the endpoint output or an error.
@@ -960,7 +985,7 @@ it normalizes errors into consistent HTTP responses with sensible status codes. 
   - `OutputValidationError`: handler violates `output` schema, the default status code is `500`;
   - `HttpError`: can be thrown in handlers with help of `createHttpError()`, its `.statusCode` is used for response;
   - For other errors the default status code is `500`;
-- Routing, parsing and upload issues:
+- Routing, parsing, and upload issues:
   - Handled by `ResultHandler` configured as `errorHandler` (the defaults is `defaultResultHandler`);
   - Parsing errors: passed through as-is (typically `HttpError` with `4XX` code used for response by default);
   - Routing errors: `404` or `405`, based on `hintAllowedMethods` configuration;
