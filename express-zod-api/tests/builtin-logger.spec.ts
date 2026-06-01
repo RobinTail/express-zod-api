@@ -1,16 +1,18 @@
 import { performance } from "node:perf_hooks";
 import * as util from "node:util";
-import {
-  blueMock,
-  greenMock,
-  customMock,
-  redMock,
-  cyanMock,
-} from "./ansis-mock";
+import { blue, green, red, cyanBright } from "ansis";
 import * as R from "ramda";
 import { BuiltinLogger, type BuiltinLoggerConfig } from "../src/builtin-logger";
+import { styles } from "../src/logger-helpers";
 
+vi.mock("ansis");
 vi.mock("node:util", { spy: true });
+
+const blueMock = vi.mocked(blue);
+const greenMock = vi.mocked(green);
+const redMock = vi.mocked(red);
+const cyanMock = vi.mocked(cyanBright);
+const customMock = vi.mocked(styles.warn);
 
 describe("BuiltinLogger", () => {
   beforeEach(() => {
