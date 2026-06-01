@@ -129,6 +129,12 @@ export class EndpointsFactory<
     return this.#extend(new ExpressMiddleware(...params));
   }
 
+  /**
+   * @desc Extends the context available to Endpoints built on this factory by resolving additional properties
+   *       from an asynchronous callback. The callback receives the current accumulated context, allowing further
+   *       context values to depend on previously provided ones. This is a shorthand for addMiddleware() with no schema.
+   * @see addMiddleware
+   * */
   public addContext<RET extends FlatObject>(
     provider: (current: CTX) => Promise<RET>,
   ) {
