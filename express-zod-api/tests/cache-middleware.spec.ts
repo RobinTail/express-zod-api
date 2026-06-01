@@ -96,7 +96,7 @@ describe("Cache middleware", () => {
         ["MIXED-no-Store", {}],
         ["max-stale=, MAX-AGE=3600", { maxAge: 3600 }],
         ["Max-Age = 3600", { maxAge: 3600 }],
-      ])("getRequestCacheControl should parse %s", async (header, expected) => {
+      ])("getCacheControl should parse %s", async (header, expected) => {
         const { output } = await testMiddleware({
           middleware: createCacheMiddleware(),
           requestProps: {
@@ -104,7 +104,7 @@ describe("Cache middleware", () => {
               header !== undefined ? { "cache-control": header } : undefined,
           } as never,
         });
-        const getter = output.getRequestCacheControl as () =>
+        const getter = output.getCacheControl as () =>
           | Record<string, unknown>
           | undefined;
         expect(getter()).toEqual(expected);

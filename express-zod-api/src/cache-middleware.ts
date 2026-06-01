@@ -208,7 +208,7 @@ export const createCacheMiddleware = (defaultPolicy?: CachePolicy) =>
          * @desc Reads and parses the Cache-Control request header to reveal the client's caching intent.
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control
          */
-        getRequestCacheControl: (): CacheControl | undefined =>
+        getCacheControl: (): CacheControl | undefined =>
           parseCacheControl(request.headers["cache-control"]),
 
         /**
