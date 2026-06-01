@@ -129,8 +129,12 @@ export class EndpointsFactory<
     return this.#extend(new ExpressMiddleware(...params));
   }
 
-  public addContext<RET extends FlatObject>(getContext: () => Promise<RET>) {
-    return this.#extend(new Middleware({ handler: getContext }));
+  public addContext<RET extends FlatObject>(
+    provider: (current: CTX) => Promise<RET>,
+  ) {
+    return this.#extend(
+      new Middleware({ handler: ({ ctx }) => provider(ctx) }),
+    );
   }
 
   public build<BOUT extends IOSchema, BIN extends IOSchema = EmptySchema>({

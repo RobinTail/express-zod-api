@@ -106,25 +106,29 @@ describe("EndpointsFactory", () => {
   describe(".addContext()", () => {
     test("Should create a new factory with an empty-input middleware and the same result handler", async () => {
       const factory = new EndpointsFactory(resultHandlerMock);
-      const newFactory = factory.addContext(async () => ({
-        option1: "some value",
-        option2: "other value",
-      }));
+      const newFactory = factory
+        .addContext(async () => ({ option1: "some value" }))
+        .addContext(async (ctx) => ({
+          option2: `not ${ctx.option1}`,
+        }));
       expectTypeOf(newFactory).toEqualTypeOf<
-        EndpointsFactory<undefined, { option1: string; option2: string }>
+        EndpointsFactory<undefined, { option1: string } & { option2: string }>
       >();
       expect(factory["middlewares"]).toStrictEqual([]);
       expect(factory["resultHandler"]).toStrictEqual(resultHandlerMock);
-      expect(newFactory["middlewares"].length).toBe(1);
+      expect(newFactory["middlewares"].length).toBe(2);
       expect(newFactory["middlewares"][0]!.schema).toBeUndefined();
-      const { output: options } = await testMiddleware({
+      expect(newFactory["middlewares"][1]!.schema).toBeUndefined();
+      const { output: first } = await testMiddleware({
         middleware: newFactory["middlewares"][0]!,
       });
-      expect(options).toEqual({
-        option1: "some value",
-        option2: "other value",
-      });
+      expect(first).toEqual({ option1: "some value" });
       expect(newFactory["resultHandler"]).toStrictEqual(resultHandlerMock);
+      const { output: second } = await testMiddleware({
+        middleware: newFactory["middlewares"][1]!,
+        ctx: { option1: "some value" },
+      });
+      expect(second).toEqual({ option2: "not some value" });
     });
   });
 
