@@ -16,7 +16,8 @@
     - `setVary()` — sets the `Vary` response header;
     - `setExpires()` — sets the `Expires` response header;
     - `clearSiteData()` — sets the `Clear-Site-Data` header with `cache` directive;
-    - `notModified()` — sends an HTTP 304 response and ends the stream.
+    - `notModified()` — sends an HTTP 304 response and ends the stream;
+- Adjusted the Endpoint execution to skip output validation in case `response.writableEnded` (`notModified` called).
 
 ### v28.1.1
 
