@@ -2,6 +2,11 @@
 
 ## Version 28
 
+### v28.3.0
+
+- `EndpointsFactory::addContext()` now passes the previously accumulated context to its callback:
+  - The argument function receives the current context as the first argument.
+
 ### v28.2.0
 
 - Added `createCacheMiddleware()` function for solving most of the caching problems:
