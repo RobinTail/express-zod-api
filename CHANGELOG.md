@@ -2,6 +2,23 @@
 
 ## Version 28
 
+### v28.2.0
+
+- Added `createCacheMiddleware()` function for solving most of the caching problems:
+  - The function accepts an optional default policy to apply `Cache-Control` header to every response;
+  - It returns a Middleware providing several properties and caching helpers to context:
+    - `cacheControl` — the parsed request's `Cache-Control` header into a typed object;
+    - `ifNoneMatch` — the parsed `If-None-Match` request header into an array of ETags or `"*"`;
+    - `ifModifiedSince` — the parsed `If-Modified-Since` request header into a `Date`;
+    - `addCachePolicy()` — extends the default policy into the `Cache-Control` response header;
+    - `setETag()` — sets the `ETag` response header;
+    - `setLastModified()` — sets the `Last-Modified` response header;
+    - `setVary()` — sets the `Vary` response header;
+    - `setExpires()` — sets the `Expires` response header;
+    - `clearSiteData()` — sets the `Clear-Site-Data` header with `cache` directive;
+    - `notModified()` — sends an HTTP 304 response and ends the stream;
+- Adjusted the Endpoint execution to skip output validation in case `response.writableEnded` (`notModified` called).
+
 ### v28.1.1
 
 - Depicting Endpoints built on `new EventStreamFactory({})` (having empty argument) will throw a `ResultHandlerError`:

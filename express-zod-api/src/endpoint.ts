@@ -310,16 +310,13 @@ export class Endpoint<
       if (response.writableEnded) return;
       if (method === ("options" satisfies CORSMethod))
         return void response.status(200).end();
-      result = {
-        output: await this.#parseOutput(
-          await this.#parseAndRunHandler({
-            input,
-            logger,
-            ctx: ctx as CTX, // ensured the complete CTX by writableEnded condition and try-catch
-          }),
-        ),
-        error: null,
-      };
+      const output = await this.#parseAndRunHandler({
+        input,
+        logger,
+        ctx: ctx as CTX, // ensured the complete CTX by writableEnded condition and try-catch
+      });
+      if (response.writableEnded) return; // Endpoint closed the stream (304)
+      result = { output: await this.#parseOutput(output), error: null };
     } catch (e) {
       result = { output: null, error: ensureError(e) };
     }

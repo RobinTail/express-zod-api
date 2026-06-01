@@ -39,6 +39,8 @@ exports[`Index Entrypoint > exports > arrayResultHandler should have certain val
 
 exports[`Index Entrypoint > exports > attachRouting should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint > exports > createCacheMiddleware should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint > exports > createConfig should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > createCookieMiddleware should have certain value 1`] = `[Function]`;
@@ -83,6 +85,7 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "BuiltinLogger",
   "Middleware",
   "createCookieMiddleware",
+  "createCacheMiddleware",
   "ResultHandler",
   "defaultResultHandler",
   "arrayResultHandler",

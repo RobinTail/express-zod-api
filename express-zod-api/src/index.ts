@@ -9,6 +9,7 @@ export { ensureHttpError } from "./result-helpers";
 export { BuiltinLogger } from "./builtin-logger";
 export { Middleware } from "./middleware";
 export { createCookieMiddleware } from "./cookie-middleware";
+export { createCacheMiddleware } from "./cache-middleware";
 export {
   ResultHandler,
   defaultResultHandler,
