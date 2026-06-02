@@ -28,8 +28,9 @@ describe("Example", async () => {
   });
 
   describe("Positive", () => {
-    test("Should handle OPTIONS request", async () => {
+    test("Should handle OPTIONS request", async ({ signal }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/100`, {
+        signal,
         method: "OPTIONS",
       });
       expect(response.status).toBe(200);
@@ -48,8 +49,9 @@ describe("Example", async () => {
       );
     });
 
-    test("Should handle valid POST request", async () => {
+    test("Should handle valid POST request", async ({ signal }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/create`, {
+        signal,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: "John Doe" }),
@@ -62,8 +64,9 @@ describe("Example", async () => {
       });
     });
 
-    test("Should handle valid PATCH request", async () => {
+    test("Should handle valid PATCH request", async ({ signal }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
+        signal,
         method: "PATCH",
         headers: {
           token: "456",
@@ -90,9 +93,10 @@ describe("Example", async () => {
       expect(true).toBeTruthy();
     });
 
-    test("Should handle valid GET request", async () => {
+    test("Should handle valid GET request", async ({ signal }) => {
       const response = await fetch(
         `http://localhost:${port}/v1/user/retrieve?test=123&id=50`,
+        { signal },
       );
       expect(response.status).toBe(200);
       const json = await response.json();
@@ -103,27 +107,36 @@ describe("Example", async () => {
       expect(true).toBeTruthy();
     });
 
-    test("Should respond with array (legacy API ResultHandler)", async () => {
-      const response = await fetch(`http://localhost:${port}/v1/user/list`);
+    test("Should respond with array (legacy API ResultHandler)", async ({
+      signal,
+    }) => {
+      const response = await fetch(`http://localhost:${port}/v1/user/list`, {
+        signal,
+      });
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
 
-    test("Should respond with paginated list (ez.paginated)", async () => {
-      const response = await fetch(`http://localhost:${port}/v2/users/list`);
+    test("Should respond with paginated list (ez.paginated)", async ({
+      signal,
+    }) => {
+      const response = await fetch(`http://localhost:${port}/v2/users/list`, {
+        signal,
+      });
       expect(response.status).toBe(200);
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
 
-    test.each([
+    test.for([
       "roles=admin,operator",
       "roles[]=admin&roles[]=operator",
       "roles=admin&roles=operator",
-    ])("Should support arrays in query %#", async (query) => {
+    ])("Should support arrays in query %#", async (query, { signal }) => {
       const response = await fetch(
         `http://localhost:${port}/v2/users/list?${query}`,
+        { signal },
       );
       expect(response.status).toBe(200);
       const json = (await response.json()) as {
@@ -138,9 +151,10 @@ describe("Example", async () => {
       ).toBeTruthy();
     });
 
-    test("Should send an image with a correct header", async () => {
+    test("Should send an image with a correct header", async ({ signal }) => {
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/send?userId=123`,
+        { signal },
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
@@ -157,10 +171,12 @@ describe("Example", async () => {
       expect(hash).toMatchSnapshot();
     });
 
-    test("Should inform on content length for sendable image", async () => {
+    test("Should inform on content length for sendable image", async ({
+      signal,
+    }) => {
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/send?userId=123`,
-        { method: "HEAD" },
+        { signal, method: "HEAD" },
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
@@ -171,10 +187,10 @@ describe("Example", async () => {
       expect(response.headers.get("Content-Length")).toBe("48687");
     });
 
-    test("Should stream an image with a correct header", async () => {
+    test("Should stream an image with a correct header", async ({ signal }) => {
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/stream?userId=123`,
-        { headers: { "Accept-Encoding": "br, gzip, deflate" } },
+        { signal, headers: { "Accept-Encoding": "br, gzip, deflate" } },
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
@@ -195,10 +211,12 @@ describe("Example", async () => {
       expect(hash).toMatchSnapshot();
     });
 
-    test("Should inform on content length for streaming image", async () => {
+    test("Should inform on content length for streaming image", async ({
+      signal,
+    }) => {
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/stream?userId=123`,
-        { method: "HEAD" },
+        { signal, method: "HEAD" },
       );
       expect(response.status).toBe(200);
       expect(response.headers.has("Content-type")).toBeTruthy();
@@ -210,8 +228,10 @@ describe("Example", async () => {
       expect(response.headers.get("Content-Length")).toBe("48687");
     });
 
-    test("Should serve static files", async () => {
-      const response = await fetch(`http://localhost:${port}/public/logo.svg`);
+    test("Should serve static files", async ({ signal }) => {
+      const response = await fetch(`http://localhost:${port}/public/logo.svg`, {
+        signal,
+      });
       expect(response.status).toBe(200);
       expect(response.headers.get("Content-type")).toBe("image/svg+xml");
       const hash = createHash("sha1")
@@ -220,7 +240,7 @@ describe("Example", async () => {
       expect(hash).toMatchSnapshot();
     });
 
-    test("Should upload the file", async () => {
+    test("Should upload the file", async ({ signal }) => {
       const filename = "assets/logo.svg";
       const logo = await readFile(filename, "utf-8");
       const data = new FormData();
@@ -237,6 +257,7 @@ describe("Example", async () => {
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/upload`,
         {
+          signal,
           method: "POST",
           body: data,
           headers: {
@@ -270,11 +291,12 @@ describe("Example", async () => {
       });
     });
 
-    test.each([
+    test.for([
       readFileSync("assets/logo.svg"),
       createReadStream("assets/logo.svg"),
-    ])("Should accept raw data %#", async (subject) => {
+    ])("Should accept raw data %#", async (subject, { signal }) => {
       const response = await fetch(`http://localhost:${port}/v1/avatar/raw`, {
+        signal,
         method: "POST",
         body: subject,
         headers: { "Content-Type": "application/octet-stream" },
@@ -284,7 +306,7 @@ describe("Example", async () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("Should accept URL encoded HTML form", async () => {
+    test("Should accept URL encoded HTML form", async ({ signal }) => {
       const data = new URLSearchParams();
       data.append("name", "John Doe");
       data.append("email", "john@example.com");
@@ -292,6 +314,7 @@ describe("Example", async () => {
       const response = await fetch(
         `http://localhost:${port}/v1/forms/feedback`,
         {
+          signal,
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
           body: data.toString(),
@@ -304,10 +327,14 @@ describe("Example", async () => {
       });
     });
 
-    test("Should handle no content", async () => {
+    test("Should handle no content", async ({ signal }) => {
       const response = await fetch(
         `http://localhost:${port}/v1/user/50/remove`,
-        { method: "DELETE", headers: { "Content-Type": "application/json" } },
+        {
+          signal,
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        },
       );
       expect(response.status).toBe(204);
       expect(response.headers.get("content-type")).toBeNull();
@@ -324,8 +351,9 @@ describe("Example", async () => {
       subscription.source.close();
     });
 
-    test("Should send readable cookies", async () => {
+    test("Should send readable cookies", async ({ signal }) => {
       const response = await fetch(`http://localhost:${port}/v1/login`, {
+        signal,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: "admin", password: "test" }),
@@ -340,8 +368,11 @@ describe("Example", async () => {
   });
 
   describe("Protocol", () => {
-    test("Issue #2706: Should handle parser failures but retain CORS headers", async () => {
+    test("Issue #2706: Should handle parser failures but retain CORS headers", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/create`, {
+        signal,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: '{"name": "Test', // no closing bracket
@@ -362,18 +393,24 @@ describe("Example", async () => {
   });
 
   describe("Negative", () => {
-    test("GET request should fail on missing input param", async () => {
+    test("GET request should fail on missing input param", async ({
+      signal,
+    }) => {
       const response = await fetch(
         `http://localhost:${port}/v1/user/retrieve?test=123`,
+        { signal },
       );
       expect(response.status).toBe(400);
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
 
-    test("GET request should fail on specific value in handler implementation", async () => {
+    test("GET request should fail on specific value in handler implementation", async ({
+      signal,
+    }) => {
       const response = await fetch(
         `http://localhost:${port}/v1/user/retrieve?test=123&id=101`,
+        { signal },
       );
       expect(response.status).toBe(404);
       const json = await response.json();
@@ -387,8 +424,11 @@ describe("Example", async () => {
       expect(true).toBeTruthy();
     });
 
-    test("POST request should respond with a conflict on assertion of uniqueness", async () => {
+    test("POST request should respond with a conflict on assertion of uniqueness", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/create`, {
+        signal,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: "James McGill" }),
@@ -398,8 +438,9 @@ describe("Example", async () => {
       expect(json).toEqual({ status: "exists", id: 16 });
     });
 
-    test("POST request should fail on demand", async () => {
+    test("POST request should fail on demand", async ({ signal }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/create`, {
+        signal,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: "Gimme Jimmy" }),
@@ -409,8 +450,11 @@ describe("Example", async () => {
       expect(json).toEqual({ status: "error", reason: "That went wrong" });
     });
 
-    test("PATCH request should fail on auth middleware key check", async () => {
+    test("PATCH request should fail on auth middleware key check", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
+        signal,
         method: "PATCH",
         headers: {
           token: "456",
@@ -432,8 +476,11 @@ describe("Example", async () => {
       });
     });
 
-    test("PATCH request should fail on auth middleware token check", async () => {
+    test("PATCH request should fail on auth middleware token check", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
+        signal,
         method: "PATCH",
         headers: {
           token: "123",
@@ -455,8 +502,11 @@ describe("Example", async () => {
       });
     });
 
-    test("PATCH request should fail on schema validation", async () => {
+    test("PATCH request should fail on schema validation", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/-50`, {
+        signal,
         method: "PATCH",
         headers: {
           token: "456",
@@ -473,8 +523,11 @@ describe("Example", async () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("PATCH request should fail on specific value in handler implementation", async () => {
+    test("PATCH request should fail on specific value in handler implementation", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/101`, {
+        signal,
         method: "PATCH",
         headers: {
           token: "456",
@@ -496,9 +549,12 @@ describe("Example", async () => {
       });
     });
 
-    test("Should respond with error to the missing static file request", async () => {
+    test("Should respond with error to the missing static file request", async ({
+      signal,
+    }) => {
       const response = await fetch(
         `http://localhost:${port}/public/missing.svg`,
+        { signal },
       );
       expect(response.status).toBe(404);
       expect(response.headers.get("Content-type")).toBe(
@@ -507,7 +563,9 @@ describe("Example", async () => {
       expect(await response.json()).toMatchSnapshot();
     });
 
-    test("Should fail to upload if the file is too large", async () => {
+    test("Should fail to upload if the file is too large", async ({
+      signal,
+    }) => {
       const filename = "assets/dataflow.svg";
       const logo = await readFile(filename, "utf-8");
       const data = new FormData();
@@ -518,7 +576,7 @@ describe("Example", async () => {
       );
       const response = await fetch(
         `http://localhost:${port}/v1/avatar/upload`,
-        { method: "POST", body: data },
+        { signal, method: "POST", body: data },
       );
       expect(response.status).toBe(413);
       expect(response.headers.get("access-control-allow-methods")).toBe(
@@ -528,9 +586,10 @@ describe("Example", async () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("Should handle errors for SSE endpoints", async () => {
+    test("Should handle errors for SSE endpoints", async ({ signal }) => {
       const response = await fetch(
         `http://localhost:${port}/v1/events/stream?trigger=failure`,
+        { signal },
       );
       expect(response.status).toBe(500);
       expect(response.headers.get("content-type")).toBe(
@@ -541,14 +600,14 @@ describe("Example", async () => {
   });
 
   describe("OpenAPI Documentation", () => {
-    test.extend("response", async () => {
+    test.extend("response", async ({ signal }) => {
       const data = await readFile("example.documentation.yaml", "utf-8");
       try {
         return await fetch("https://validator.swagger.io/validator/debug", {
           method: "POST",
           headers: { "Content-Type": "application/yaml" },
           body: data,
-          signal: AbortSignal.timeout(3000),
+          signal: AbortSignal.any([signal, AbortSignal.timeout(3000)]),
         });
       } catch (e) {
         console.warn(e);
