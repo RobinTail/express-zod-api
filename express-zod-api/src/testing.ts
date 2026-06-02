@@ -15,6 +15,7 @@ import {
   type RequestOptions,
   type ResponseOptions,
 } from "node-mocks-http";
+import { AbstractMiddleware } from "./middleware";
 import { defaultResultHandler } from "./result-handler";
 
 export const makeRequestMock = <REQ extends RequestOptions>(props?: REQ) =>
@@ -114,6 +115,10 @@ export const testEndpoint = async <
   return { requestMock, responseMock, loggerMock };
 };
 
+interface MiddlewareLike<RET extends FlatObject> {
+  execute(...params: Parameters<AbstractMiddleware["execute"]>): Promise<RET>;
+}
+
 export const testMiddleware = async <
   LOG extends FlatObject,
   REQ extends RequestOptions,
@@ -124,15 +129,7 @@ export const testMiddleware = async <
   ...rest
 }: TestingProps<REQ, LOG> & {
   /** @desc The middleware to test */
-  middleware: {
-    execute(params: {
-      input: unknown;
-      ctx: FlatObject;
-      request: Request;
-      response: Response;
-      logger: ActualLogger;
-    }): Promise<RET>;
-  };
+  middleware: MiddlewareLike<RET>;
   /** @desc The aggregated returns of previously executed middlewares */
   ctx?: FlatObject;
 }) => {
