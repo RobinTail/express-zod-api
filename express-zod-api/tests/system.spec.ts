@@ -193,9 +193,10 @@ describe("App in production mode", async () => {
   });
 
   describe("Positive", () => {
-    test("Should handle valid GET request", async () => {
+    test("Should handle valid GET request", async ({ signal }) => {
       const response = await fetch(
         `http://127.0.0.1:${port}/v1/test?key=123&something=joke`,
+        { signal },
       );
       expect(response.status).toBe(200);
       const json = await response.json();
@@ -211,8 +212,9 @@ describe("App in production mode", async () => {
       });
     });
 
-    test("Should handle valid POST request", async () => {
+    test("Should handle valid POST request", async ({ signal }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
+        signal,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -236,10 +238,13 @@ describe("App in production mode", async () => {
       });
     });
 
-    test("Issue 158: should use query for POST on demand", async () => {
+    test("Issue 158: should use query for POST on demand", async ({
+      signal,
+    }) => {
       const response = await fetch(
         `http://127.0.0.1:${port}/v1/test?key=123&something=joke`,
         {
+          signal,
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -260,12 +265,12 @@ describe("App in production mode", async () => {
       });
     });
 
-    test.each(["gzip", "br"])(
+    test.for(["gzip", "br"])(
       "Should %s-compress the response in case it is supported by client",
-      async (alg) => {
+      async (alg, { signal }) => {
         const response = await fetch(
           `http://127.0.0.1:${port}/v1/test?key=123&something=joke`,
-          { headers: { "Accept-Encoding": `${alg}, deflate` } },
+          { signal, headers: { "Accept-Encoding": `${alg}, deflate` } },
         );
         expect(response.status).toBe(200);
         expect(response.headers.get("Content-Encoding")).toBe(alg);
@@ -274,8 +279,9 @@ describe("App in production mode", async () => {
       },
     );
 
-    test("Should execute native express middleware", async () => {
+    test("Should execute native express middleware", async ({ signal }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/corsed`, {
+        signal,
         method: "GET",
       });
       expect(response.status).toBe(200);
@@ -292,8 +298,9 @@ describe("App in production mode", async () => {
       );
     });
 
-    test("Should handle URL encoded request", async () => {
+    test("Should handle URL encoded request", async ({ signal }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/form`, {
+        signal,
         method: "POST",
         headers: { "content-type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ name: "test", message: "ok" }).toString(),
@@ -303,8 +310,9 @@ describe("App in production mode", async () => {
       expect(json).toEqual({ status: "success", data: {} });
     });
 
-    test("Should handle raw request", async () => {
+    test("Should handle raw request", async ({ signal }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/raw`, {
+        signal,
         method: "POST",
         headers: { "content-type": "application/octet-stream" },
         body: Buffer.from("testing"),
@@ -314,7 +322,7 @@ describe("App in production mode", async () => {
       expect(json).toEqual({ status: "success", data: { crc: 7 } });
     });
 
-    test("Should handle upload request", async () => {
+    test("Should handle upload request", async ({ signal }) => {
       const filename = "../logo.svg";
       const logo = await readFile(filename, "utf-8");
       const data = new FormData();
@@ -324,6 +332,7 @@ describe("App in production mode", async () => {
         filename,
       );
       const response = await fetch(`http://localhost:${port}/v1/upload`, {
+        signal,
         method: "POST",
         body: data,
       });
@@ -334,8 +343,11 @@ describe("App in production mode", async () => {
   });
 
   describe("Negative", () => {
-    test("Should call Last Resort Handler in case of faulty ResultHandler", async () => {
+    test("Should call Last Resort Handler in case of faulty ResultHandler", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/faulty`, {
+        signal,
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -350,10 +362,13 @@ describe("App in production mode", async () => {
       expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
-    test("Should treat custom errors in middleware input validations as they are", async () => {
+    test("Should treat custom errors in middleware input validations as they are", async ({
+      signal,
+    }) => {
       const response = await fetch(
         `http://127.0.0.1:${port}/v1/faulty?mwError=1`,
         {
+          signal,
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -366,10 +381,13 @@ describe("App in production mode", async () => {
       expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
-    test("Should treat custom errors in endpoint input validations as they are", async () => {
+    test("Should treat custom errors in endpoint input validations as they are", async ({
+      signal,
+    }) => {
       const response = await fetch(
         `http://127.0.0.1:${port}/v1/faulty?epError=1`,
         {
+          signal,
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -382,11 +400,12 @@ describe("App in production mode", async () => {
       expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
-    test.each(["beforeRouting", "accessLogger"])(
+    test.for(["beforeRouting", "accessLogger"])(
       "Should treat %s error as internal",
-      async (path) => {
+      async (path, { signal }) => {
         const response = await fetch(
           `http://127.0.0.1:${port}/trigger/${path}`,
+          { signal },
         );
         expect(await response.json()).toEqual({
           status: "error",
@@ -396,7 +415,7 @@ describe("App in production mode", async () => {
       },
     );
 
-    test("Should treat beforeUpload error as internal", async () => {
+    test("Should treat beforeUpload error as internal", async ({ signal }) => {
       const filename = "../logo.svg";
       const logo = await readFile(filename, "utf-8");
       const data = new FormData();
@@ -407,7 +426,7 @@ describe("App in production mode", async () => {
       );
       const response = await fetch(
         `http://localhost:${port}/v1/upload?trigger=beforeUpload`,
-        { method: "POST", body: data },
+        { signal, method: "POST", body: data },
       );
       expect(response.status).toBe(500);
       const json = await response.json();
@@ -419,15 +438,18 @@ describe("App in production mode", async () => {
   });
 
   describe("Protocol", () => {
-    test("Should fail on invalid path", async () => {
-      const response = await fetch(`http://127.0.0.1:${port}/v1/wrong`);
+    test("Should fail on invalid path", async ({ signal }) => {
+      const response = await fetch(`http://127.0.0.1:${port}/v1/wrong`, {
+        signal,
+      });
       expect(response.status).toBe(404);
       const json = await response.json();
       expect(json).toMatchSnapshot();
     });
 
-    test("Should fail on invalid method", async () => {
+    test("Should fail on invalid method", async ({ signal }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
+        signal,
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -443,8 +465,9 @@ describe("App in production mode", async () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("Should handle JSON parser failures", async () => {
+    test("Should handle JSON parser failures", async ({ signal }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
+        signal,
         method: "POST", // valid method this time
         headers: {
           "Content-Type": "application/json",
@@ -462,8 +485,9 @@ describe("App in production mode", async () => {
       });
     });
 
-    test("Should handle URL encoded parser failures", async () => {
+    test("Should handle URL encoded parser failures", async ({ signal }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/form`, {
+        signal,
         method: "POST",
         headers: { "content-type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
@@ -480,8 +504,9 @@ describe("App in production mode", async () => {
       });
     });
 
-    test("Should handle Raw parser failures", async () => {
+    test("Should handle Raw parser failures", async ({ signal }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/raw`, {
+        signal,
         method: "POST",
         headers: { "content-type": "application/octet-stream" },
         body: Buffer.alloc(100),
@@ -494,8 +519,9 @@ describe("App in production mode", async () => {
       });
     });
 
-    test("Should fail when missing content type header", async () => {
+    test("Should fail when missing content type header", async ({ signal }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
+        signal,
         method: "POST",
         body: JSON.stringify({
           key: "123",
@@ -509,8 +535,11 @@ describe("App in production mode", async () => {
   });
 
   describe("Validation", () => {
-    test("Should fail on middleware input type mismatch", async () => {
+    test("Should fail on middleware input type mismatch", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
+        signal,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -525,8 +554,11 @@ describe("App in production mode", async () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("Should fail on middleware refinement mismatch", async () => {
+    test("Should fail on middleware refinement mismatch", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
+        signal,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -541,8 +573,9 @@ describe("App in production mode", async () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("Should fail on handler input type mismatch", async () => {
+    test("Should fail on handler input type mismatch", async ({ signal }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
+        signal,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -557,8 +590,9 @@ describe("App in production mode", async () => {
       expect(json).toMatchSnapshot();
     });
 
-    test("Should fail on handler output type mismatch", async () => {
+    test("Should fail on handler output type mismatch", async ({ signal }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
+        signal,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -574,8 +608,11 @@ describe("App in production mode", async () => {
       expect(errorMethod.mock.lastCall).toMatchSnapshot();
     });
 
-    test("Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error", async () => {
+    test("Problem 787: Should NOT treat ZodError thrown from within the handler as IOSchema validation error", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://127.0.0.1:${port}/v1/test`, {
+        signal,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -593,11 +630,13 @@ describe("App in production mode", async () => {
   });
 
   describe("Shutdown", () => {
-    test("should terminate suspended request gracefully on signal", async () => {
+    test("should terminate suspended request gracefully on signal", async ({
+      signal,
+    }) => {
       const exitSpy = vi
         .spyOn(process, "exit")
         .mockImplementation(vi.fn<typeof process.exit>());
-      fetch(`http://127.0.0.1:${port}/v1/long`).catch((err) =>
+      fetch(`http://127.0.0.1:${port}/v1/long`, { signal }).catch((err) =>
         expect(err).toHaveProperty("message", "fetch failed"),
       );
       await setTimeout(500);
