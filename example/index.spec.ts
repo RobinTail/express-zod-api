@@ -550,13 +550,11 @@ describe("Example", async () => {
           body: data,
           signal: AbortSignal.timeout(3000),
         });
-      } catch {
-        console.warn(
-          "OpenAPI validation skipped: Swagger validator is unreachable",
-        );
+      } catch (e) {
+        console.warn(e);
       }
     })("should be valid", async ({ response, skip }) => {
-      if (!response) return skip();
+      if (!response) return skip("Swagger validator is unreachable");
       expect(response.status).toBe(200);
       const json = await response.json();
       if (
