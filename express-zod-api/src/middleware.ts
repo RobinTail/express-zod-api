@@ -9,10 +9,10 @@ import type { ActualLogger } from "./logger-helpers";
 import { isPromise } from "node:util/types";
 
 type Handler<IN, CTX, RET> = (params: {
-  /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware */
+  /** @desc The inputs from the enabled input sources validated against the input schema of the Middleware. */
   input: IN;
   /**
-   * @desc The returns of the previously executed Middlewares (typed when chaining Middlewares)
+   * @desc The returns of the previously executed Middlewares (typed when chaining Middlewares).
    * @link https://github.com/RobinTail/express-zod-api/discussions/1250
    * */
   ctx: CTX;
@@ -20,7 +20,7 @@ type Handler<IN, CTX, RET> = (params: {
   request: Request;
   /** @link https://expressjs.com/en/5x/api.html#res */
   response: Response;
-  /** @desc The instance of the configured logger */
+  /** @desc The instance of the configured logger. */
   logger: ActualLogger;
 }) => Promise<RET>;
 
@@ -38,6 +38,11 @@ export abstract class AbstractMiddleware {
   }): Promise<FlatObject>;
 }
 
+/**
+ * @desc A Middleware that validates its input schema, executes its handler, and returns context properties available to
+ *       next middlewares and the Endpoint handler. Can also declare security schemas for Documentation.
+ * @see EndpointsFactory#addMiddleware
+ * */
 export class Middleware<
   CTX extends FlatObject,
   RET extends FlatObject,
@@ -61,11 +66,14 @@ export class Middleware<
      * @see defaultInputSources
      * */
     input?: IN;
-    /** @desc Declaration of the security schemas implemented within the handler */
+    /**
+     * @desc Declaration of the security schemas implemented within the handler (used by Documentation).
+     * @see Documentation
+     * */
     security?: LogicalContainer<
       Security<Extract<keyof z.input<IN>, string>, SCO>
     >;
-    /** @desc The handler returning a context available to Endpoints */
+    /** @desc The handler returning a context available to Endpoints. */
     handler: Handler<z.output<IN>, CTX, RET>;
   }) {
     super();
@@ -106,6 +114,11 @@ export class Middleware<
   }
 }
 
+/**
+ * @desc A wrapper around native Express middlewares that converts them into the framework's Middleware instances.
+ *       Optionally, a `provider` can extend the context, and a `transformer` can convert caught errors.
+ * @see EndpointsFactory#addExpressMiddleware
+ * */
 export class ExpressMiddleware<
   R extends Request,
   S extends Response,
@@ -118,7 +131,9 @@ export class ExpressMiddleware<
       provider = () => ({}) as RET,
       transformer = (err: Error) => err,
     }: {
+      /** @desc Extracts context properties from request and response after the native middleware execution. */
       provider?: (request: R, response: S) => RET | Promise<RET>;
+      /** @desc Transforms errors caught from the native middleware before they propagate further. */
       transformer?: (err: Error) => Error;
     } = {},
   ) {

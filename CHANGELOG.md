@@ -5,7 +5,8 @@
 ### v28.3.0
 
 - `EndpointsFactory::addContext()` now passes the previously accumulated context to its callback:
-  - The argument function receives the current context as the first argument.
+  - The argument function receives the current context as the first argument;
+- Improved the declaration file for most of the essential entities.
 
 ### v28.2.0
 
