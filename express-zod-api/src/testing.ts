@@ -134,33 +134,26 @@ export const testMiddleware = async <
   ctx?: FlatObject;
 }) => {
   const {
-    requestMock,
-    responseMock,
-    loggerMock,
     configMock: { inputSources, errorHandler = defaultResultHandler },
+    ...mocks
   } = makeTestingMocks(rest);
-  const input = getInput(requestMock, inputSources);
+  const input = getInput(mocks.requestMock, inputSources);
   const commons = {
-    request: requestMock,
-    response: responseMock,
-    logger: loggerMock,
+    request: mocks.requestMock,
+    response: mocks.responseMock,
+    logger: mocks.loggerMock,
     input,
     ctx,
   };
   try {
     const output = await middleware.execute(commons);
-    return { requestMock, responseMock, loggerMock, output };
+    return { ...mocks, output };
   } catch (e) {
     await errorHandler.execute({
       ...commons,
       error: ensureError(e),
       output: null,
     });
-    return {
-      requestMock,
-      responseMock,
-      loggerMock,
-      output: {} as Partial<RET>,
-    };
+    return { ...mocks, output: {} as Partial<RET> };
   }
 };
