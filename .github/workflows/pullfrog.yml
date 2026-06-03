@@ -12,16 +12,14 @@ on:
         description: Run name
 
 permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
-  issues: write
-  actions: read
-  checks: read
+  contents: read
 
 jobs:
   pullfrog:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read    
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
