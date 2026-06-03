@@ -115,42 +115,45 @@ export const testEndpoint = async <
   return { requestMock, responseMock, loggerMock };
 };
 
+interface MiddlewareLike<RET extends FlatObject> {
+  execute(...params: Parameters<AbstractMiddleware["execute"]>): Promise<RET>;
+}
+
 export const testMiddleware = async <
   LOG extends FlatObject,
   REQ extends RequestOptions,
+  RET extends FlatObject,
 >({
   middleware,
   ctx = {},
   ...rest
 }: TestingProps<REQ, LOG> & {
   /** @desc The middleware to test */
-  middleware: AbstractMiddleware;
+  middleware: MiddlewareLike<RET>;
   /** @desc The aggregated returns of previously executed middlewares */
   ctx?: FlatObject;
 }) => {
   const {
-    requestMock,
-    responseMock,
-    loggerMock,
     configMock: { inputSources, errorHandler = defaultResultHandler },
+    ...mocks
   } = makeTestingMocks(rest);
-  const input = getInput(requestMock, inputSources);
+  const input = getInput(mocks.requestMock, inputSources);
   const commons = {
-    request: requestMock,
-    response: responseMock,
-    logger: loggerMock,
+    request: mocks.requestMock,
+    response: mocks.responseMock,
+    logger: mocks.loggerMock,
     input,
     ctx,
   };
   try {
     const output = await middleware.execute(commons);
-    return { requestMock, responseMock, loggerMock, output };
+    return { ...mocks, output };
   } catch (e) {
     await errorHandler.execute({
       ...commons,
       error: ensureError(e),
       output: null,
     });
-    return { requestMock, responseMock, loggerMock, output: {} };
+    return { ...mocks, output: {} as Partial<RET> };
   }
 };

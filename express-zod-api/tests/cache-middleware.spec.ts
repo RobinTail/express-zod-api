@@ -1,4 +1,8 @@
-import { createCacheMiddleware, testMiddleware } from "../src";
+import {
+  createCacheMiddleware,
+  testMiddleware,
+  type CachePolicy,
+} from "../src";
 
 describe("Cache middleware", () => {
   describe("createCacheMiddleware", () => {
@@ -40,8 +44,8 @@ describe("Cache middleware", () => {
                 : undefined,
           },
         });
-        const result = output.ifModifiedSince as Date | undefined;
-        if (expected instanceof Date) {
+        const result = output.ifModifiedSince;
+        if (expected) {
           expect(result).toBeInstanceOf(Date);
           expect(result?.getTime()).toBe(expected.getTime());
         } else {
@@ -101,7 +105,7 @@ describe("Cache middleware", () => {
     });
 
     describe("response setters", () => {
-      test.each([
+      test.each<[CachePolicy, string]>([
         [{ maxAge: 3600, scope: "public" }, "public, max-age=3600"],
         [{ noCache: true }, "no-cache"],
         [{ noCache: true, scope: "private" }, "private, no-cache"],
@@ -140,8 +144,7 @@ describe("Cache middleware", () => {
           const { output, responseMock } = await testMiddleware({
             middleware: createCacheMiddleware(),
           });
-          const setter = output.addCachePolicy as (p: unknown) => void;
-          setter(policy);
+          output.addCachePolicy?.(policy);
           expect(responseMock._getHeaders()).toHaveProperty(
             "cache-control",
             expected,
@@ -149,7 +152,14 @@ describe("Cache middleware", () => {
         },
       );
 
-      test.each([
+      test.each<
+        [
+          "setETag" | "setLastModified" | "setExpires" | "clearSiteData",
+          [any?],
+          string,
+          string,
+        ]
+      >([
         ["setETag", ["abc"], "etag", '"abc"'],
         ["setETag", ['"abc"'], "etag", '"abc"'],
         [
@@ -169,8 +179,8 @@ describe("Cache middleware", () => {
         const { output, responseMock } = await testMiddleware({
           middleware: createCacheMiddleware(),
         });
-        const setter = output[method] as (...args: unknown[]) => void;
-        setter(...args);
+        const setter = output[method];
+        setter?.(...args);
         expect(responseMock._getHeaders()).toHaveProperty(header, expected);
       });
 
@@ -184,8 +194,7 @@ describe("Cache middleware", () => {
         const { output, responseMock } = await testMiddleware({
           middleware: createCacheMiddleware(),
         });
-        const setter = output.setVary as (...h: string[]) => void;
-        setter(...headers);
+        output.setVary?.(...headers);
         expect(responseMock._getHeaders()).toHaveProperty("vary", expected);
       });
     });
@@ -195,8 +204,7 @@ describe("Cache middleware", () => {
         const { output, responseMock } = await testMiddleware({
           middleware: createCacheMiddleware(),
         });
-        const notModified = output.notModified as () => void;
-        notModified();
+        output.notModified?.();
         expect(responseMock._getStatusCode()).toBe(304);
         expect(responseMock.writableEnded).toBeTruthy();
       });
@@ -223,8 +231,7 @@ describe("Cache middleware", () => {
             scope: "private",
           }),
         });
-        const setter = output.addCachePolicy as (p: unknown) => void;
-        setter({ maxAge: 3600, scope: "public" }); // noCache preserved from default
+        output.addCachePolicy?.({ maxAge: 3600, scope: "public" }); // noCache preserved from default
         expect(responseMock._getHeaders()).toHaveProperty(
           "cache-control",
           "public, no-cache, max-age=3600",
@@ -238,8 +245,7 @@ describe("Cache middleware", () => {
             scope: "private",
           }),
         });
-        const setter = output.addCachePolicy as (p: unknown) => void;
-        setter({ scope: "public", noCache: undefined });
+        output.addCachePolicy?.({ scope: "public", noCache: undefined });
         expect(responseMock._getHeaders()).toHaveProperty(
           "cache-control",
           "public",

@@ -2,6 +2,13 @@
 
 ## Version 28
 
+### v28.4.0
+
+- Improved `testMiddleware()` to return the typed `output` property:
+  - Changed from `Record<string, unknown>` to `Partial<RET>`, where `RET` is the context type the Middleware returns;
+  - This should simplify testing the context properties, especially functional ones;
+  - If Middleware throws, the `output` would still be an empty object, which is aligned with its new type.
+
 ### v28.3.0
 
 - `EndpointsFactory::addContext()` now passes the previously accumulated context to its callback:
