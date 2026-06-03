@@ -42,3 +42,5 @@ catalogs:
 overrides:
   "@scarf/scarf": "-"
   "lightningcss": "-"
+minimumReleaseAgeExclude:
+  - openapi3-ts@4.6.0
