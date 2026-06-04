@@ -193,6 +193,7 @@ export const depictTuple: Depicter = ({ zodSchema, jsonSchema }) => {
 };
 
 const isBool = (subject: unknown) => typeof subject === "boolean";
+const fromBoolToLegacy = (schema: boolean) => (schema ? {} : { not: {} });
 
 const makeSample = (depicted: SchemaObject) => {
   if (isBool(depicted)) return undefined;
@@ -415,7 +416,9 @@ const depict = (
           ];
         if (depicter) {
           const overrides = depicter(zodCtx, ctx);
-          const copy = isBool(overrides) ? overrides : { ...overrides };
+          const copy = isBool(overrides)
+            ? fromBoolToLegacy(overrides)
+            : { ...overrides };
           for (const key in zodCtx.jsonSchema) delete zodCtx.jsonSchema[key];
           Object.assign(zodCtx.jsonSchema, copy);
         }
