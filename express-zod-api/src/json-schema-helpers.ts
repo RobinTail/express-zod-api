@@ -1,7 +1,7 @@
 import * as R from "ramda";
 import { combinations, isObject, type FlatObject } from "./common-helpers";
 import type { z } from "zod";
-import type { SchemaObject } from "openapi3-ts/oas31";
+import type { SchemaObject } from "openapi3-ts/oas32";
 
 type MergeMode = "coerce" | "throw";
 type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &

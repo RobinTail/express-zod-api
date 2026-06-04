@@ -13,7 +13,7 @@ import {
   type TagObject,
   isReferenceObject,
   isSchemaObject,
-} from "openapi3-ts/oas31";
+} from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
 import type { NormalizedResponse, ResponseVariant } from "./api-response";

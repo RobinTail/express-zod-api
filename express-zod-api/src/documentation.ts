@@ -6,7 +6,7 @@ import {
   type SecuritySchemeObject,
   type SecuritySchemeType,
   OpenApiBuilder,
-} from "openapi3-ts/oas31";
+} from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";

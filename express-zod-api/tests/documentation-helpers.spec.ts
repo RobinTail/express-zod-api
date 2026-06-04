@@ -1,4 +1,4 @@
-import type { SchemaObject } from "openapi3-ts/oas31";
+import type { SchemaObject } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
