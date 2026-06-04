@@ -29,6 +29,10 @@ const importConcerns = [
     message: "use .ts extension for relative imports",
   },
   {
+    selector: "ImportDeclaration[source.value=/openapi3-ts\\/oas3(0|1)/]",
+    message: "import from /oas32 instead",
+  },
+  {
     selector:
       "ImportDeclaration[source.value=/openapi3-ts/] > " +
       "ImportSpecifier[imported.name='SchemaObject']",
