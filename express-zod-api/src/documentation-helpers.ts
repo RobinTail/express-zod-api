@@ -8,6 +8,7 @@ import {
   type ResponseObject,
   type SchemaObject,
   type SchemaObjectType,
+  type SchemaObjectValue,
   type SecurityRequirementObject,
   type SecuritySchemeObject,
   type TagObject,
@@ -50,7 +51,7 @@ import { getWellKnownHeaders } from "./well-known-headers";
 interface ReqResCommons {
   makeRef: (
     key: object | string,
-    value: SchemaObject | ReferenceObject,
+    value: SchemaObjectValue | ReferenceObject,
     proposedName?: string,
   ) => ReferenceObject;
   path: string;
@@ -67,7 +68,7 @@ export type Depicter = (
     jsonSchema: z.core.JSONSchema.BaseSchema;
   },
   oasCtx: OpenAPIContext,
-) => z.core.JSONSchema.BaseSchema | SchemaObject;
+) => z.core.JSONSchema.BaseSchema | SchemaObjectValue;
 
 /** @desc Using defaultIsHeader when returns null or undefined */
 export type IsHeader = (
@@ -141,7 +142,7 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
 
 /** @since v24.3.1 schema compliance is fully delegated to Zod */
 const asOAS = (subject: z.core.JSONSchema.BaseSchema) =>
-  subject as SchemaObject | ReferenceObject;
+  subject as SchemaObjectValue | ReferenceObject;
 
 export const depictDateIn: Depicter = (
   { jsonSchema: { examples, description } },
@@ -192,11 +193,9 @@ export const depictTuple: Depicter = ({ zodSchema, jsonSchema }) => {
   return { ...jsonSchema, items: { not: {} } };
 };
 
-const isBool = (subject: unknown) => typeof subject === "boolean";
-const fromBoolToLegacy = (schema: boolean) => (schema ? {} : { not: {} });
+const isBooleanSchema = (subject: SchemaObject) => typeof subject === "boolean";
 
-const makeSample = (depicted: SchemaObject) => {
-  if (isBool(depicted)) return undefined;
+const makeSample = (depicted: SchemaObjectValue) => {
   const firstType = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
@@ -225,17 +224,19 @@ export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
     ctx.isResponse ? "in" : "out"
   ];
   if (!isSchema<z.core.$ZodTransform>(target, "transform")) return jsonSchema;
-  const src = asOAS(depict(opposite, { ctx }));
-  if (isSchemaObject(src)) {
+  const opposingDepiction = asOAS(depict(opposite, { ctx }));
+  if (isSchemaObject(opposingDepiction)) {
     if (!ctx.isResponse) {
-      if (isBool(src)) return src;
-      const { type: opposingType, ...rest } = src;
+      const { type: opposingType, ...rest } = opposingDepiction;
       return {
         ...rest,
         format: `${rest.format || opposingType} (preprocessed)`,
       };
     } else {
-      const targetType = getTransformedType(target, makeSample(src));
+      const targetType = getTransformedType(
+        target,
+        makeSample(opposingDepiction),
+      );
       if (targetType && ["number", "string", "boolean"].includes(targetType)) {
         return {
           ...jsonSchema,
@@ -332,12 +333,10 @@ export const depictRequestParams = ({
         in: location,
         deprecated: jsonSchema.deprecated,
         required: flat.required?.includes(name) || false,
-        description: (!isBool(depicted) && depicted.description) || description,
+        description: depicted.description || description,
         schema: result,
         examples: enumerateExamples(
-          isSchemaObject(depicted) &&
-            !isBool(depicted) &&
-            depicted.examples?.length
+          isSchemaObject(depicted) && depicted.examples?.length
             ? depicted.examples // own examples or from the flat:
             : R.pluck(
                 name,
@@ -415,12 +414,9 @@ const depict = (
             brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type
           ];
         if (depicter) {
-          const overrides = depicter(zodCtx, ctx);
-          const copy = isBool(overrides)
-            ? fromBoolToLegacy(overrides)
-            : { ...overrides };
+          const overrides = { ...depicter(zodCtx, ctx) };
           for (const key in zodCtx.jsonSchema) delete zodCtx.jsonSchema[key];
-          Object.assign(zodCtx.jsonSchema, copy);
+          Object.assign(zodCtx.jsonSchema, overrides);
         }
       },
     },
@@ -433,12 +429,13 @@ const depict = (
 };
 
 export const excludeParamsFromDepiction = (
-  subject: SchemaObject | ReferenceObject,
+  subject: SchemaObjectValue | ReferenceObject,
   names: string[],
-): [SchemaObject | ReferenceObject, boolean] => {
-  if (isReferenceObject(subject) || isBool(subject)) return [subject, false];
+): [SchemaObjectValue | ReferenceObject, boolean] => {
+  if (isReferenceObject(subject)) return [subject, false];
   let hasRequired = false;
   const subTransformer = R.map((entry: SchemaObject | ReferenceObject) => {
+    if (isBooleanSchema(entry)) return entry;
     const [sub, subRequired] = excludeParamsFromDepiction(entry, names);
     hasRequired = hasRequired || subRequired;
     return sub;
@@ -452,7 +449,7 @@ export const excludeParamsFromDepiction = (
     oneOf: subTransformer,
     anyOf: subTransformer,
   };
-  const result: SchemaObject = R.evolve(transformers, subject);
+  const result: SchemaObjectValue = R.evolve(transformers, subject);
   return [result, hasRequired || Boolean(result.required?.length)];
 };
 
@@ -488,7 +485,7 @@ export const depictResponse = ({
     }),
   );
   const examples = [];
-  if (isSchemaObject(response) && !isBool(response) && response.examples) {
+  if (isSchemaObject(response) && response.examples) {
     examples.push(...response.examples);
     delete response.examples; // moving them up
   }
@@ -627,20 +624,20 @@ export const depictBody = ({
   mimeType: string;
   paramNames: string[];
 }) => {
-  const [pure, hasRequired] = excludeParamsFromDepiction(
+  const [withoutParams, hasRequired] = excludeParamsFromDepiction(
     asOAS(request),
     paramNames,
   );
   const examples = [];
-  if (isSchemaObject(pure) && !isBool(pure) && pure.examples) {
-    examples.push(...pure.examples);
-    delete pure.examples; // pull up
+  if (isSchemaObject(withoutParams) && withoutParams.examples) {
+    examples.push(...withoutParams.examples);
+    delete withoutParams.examples; // pull up
   }
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, pure, makeCleanId(description))
-        : pure,
+        ? makeRef(schema, withoutParams, makeCleanId(description))
+        : withoutParams,
     examples: enumerateExamples(
       examples.length
         ? examples

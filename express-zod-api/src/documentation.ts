@@ -2,7 +2,7 @@ import {
   type OperationObject,
   type ReferenceObject,
   type ResponsesObject,
-  type SchemaObject,
+  type SchemaObjectValue,
   type SecuritySchemeObject,
   type SecuritySchemeType,
   OpenApiBuilder,
@@ -114,7 +114,7 @@ export class Documentation extends OpenApiBuilder {
 
   #makeRef(
     key: object | string,
-    value: SchemaObject | ReferenceObject,
+    value: SchemaObjectValue | ReferenceObject,
     proposedName?: string,
   ): ReferenceObject {
     let name = this.#references.get(key); // search in the cache by the given key

@@ -1,4 +1,4 @@
-import type { SchemaObject } from "openapi3-ts/oas32";
+import type { SchemaObjectValue } from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
 import { ez } from "../src";
@@ -47,7 +47,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("excludeParamsFromDepiction()", () => {
-    test.each<SchemaObject>([
+    test.each<SchemaObjectValue>([
       {
         type: "object",
         properties: { a: { type: "string" }, b: { type: "string" } },
@@ -291,7 +291,7 @@ describe("Documentation helpers", () => {
       },
     );
 
-    test.each<SchemaObject>([
+    test.each<SchemaObjectValue>([
       { type: "null" },
       {
         anyOf: [{ type: "null" }, { type: "null" }],
