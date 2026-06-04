@@ -192,10 +192,10 @@ export const depictTuple: Depicter = ({ zodSchema, jsonSchema }) => {
   return { ...jsonSchema, items: { not: {} } };
 };
 
-const isBooleanSchema = (subject: SchemaObject) => typeof subject === "boolean";
+const isBool = (subject: unknown) => typeof subject === "boolean";
 
 const makeSample = (depicted: SchemaObject) => {
-  if (isBooleanSchema(depicted)) return undefined;
+  if (isBool(depicted)) return undefined;
   const firstType = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
@@ -333,12 +333,11 @@ export const depictRequestParams = ({
         in: location,
         deprecated: jsonSchema.deprecated,
         required: flat.required?.includes(name) || false,
-        description:
-          (!isBooleanSchema(depicted) && depicted.description) || description,
+        description: (!isBool(depicted) && depicted.description) || description,
         schema: result,
         examples: enumerateExamples(
           isSchemaObject(depicted) &&
-            !isBooleanSchema(depicted) &&
+            !isBool(depicted) &&
             depicted.examples?.length
             ? depicted.examples // own examples or from the flat:
             : R.pluck(
@@ -417,9 +416,12 @@ const depict = (
             brand && brand in rules ? brand : zodCtx.zodSchema._zod.def.type
           ];
         if (depicter) {
-          const overrides = { ...depicter(zodCtx, ctx) };
+          const overrides = depicter(zodCtx, ctx);
           for (const key in zodCtx.jsonSchema) delete zodCtx.jsonSchema[key];
-          Object.assign(zodCtx.jsonSchema, overrides);
+          Object.assign(
+            zodCtx.jsonSchema,
+            isBool(overrides) ? overrides : { ...overrides },
+          );
         }
       },
     },
