@@ -13,8 +13,7 @@ export interface DateInParams extends Omit<
 export const dateIn = ({ examples, ...rest }: DateInParams = {}) => {
   const schema = z.union([
     z.iso.date(),
-    z.iso.datetime(),
-    z.iso.datetime({ local: true }),
+    z.iso.datetime({ local: true, offset: true }),
   ]);
 
   return schema
