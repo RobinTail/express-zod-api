@@ -437,7 +437,7 @@ export const excludeParamsFromDepiction = (
   subject: SchemaObject | ReferenceObject,
   names: string[],
 ): [SchemaObject | ReferenceObject, boolean] => {
-  if (isReferenceObject(subject)) return [subject, false];
+  if (isReferenceObject(subject) || isBool(subject)) return [subject, false];
   let hasRequired = false;
   const subTransformer = R.map((entry: SchemaObject | ReferenceObject) => {
     const [sub, subRequired] = excludeParamsFromDepiction(entry, names);
