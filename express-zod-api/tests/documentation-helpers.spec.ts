@@ -47,7 +47,7 @@ describe("Documentation helpers", () => {
   });
 
   describe("excludeParamsFromDepiction()", () => {
-    test.each<SchemaObjectValue>([
+    test.each<z.core.JSONSchema.BaseSchema>([
       {
         type: "object",
         properties: { a: { type: "string" }, b: { type: "string" } },
