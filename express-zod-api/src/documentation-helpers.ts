@@ -417,11 +417,9 @@ const depict = (
           ];
         if (depicter) {
           const overrides = depicter(zodCtx, ctx);
+          const copy = isBool(overrides) ? overrides : { ...overrides };
           for (const key in zodCtx.jsonSchema) delete zodCtx.jsonSchema[key];
-          Object.assign(
-            zodCtx.jsonSchema,
-            isBool(overrides) ? overrides : { ...overrides },
-          );
+          Object.assign(zodCtx.jsonSchema, copy);
         }
       },
     },

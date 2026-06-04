@@ -14,8 +14,11 @@ paths:
         - name: id
           in: query
           required: true
-          description: GET /v1/user/retrieve Parameter
-          schema: {}
+          description: a numeric string containing the id of the user
+          schema:
+            description: a numeric string containing the id of the user
+            type: string
+            pattern: \d+
       responses:
         "200":
           description: GET /v1/user/retrieve Positive response
@@ -87,8 +90,11 @@ paths:
         - name: id
           in: query
           required: true
-          description: HEAD /v1/user/retrieve Parameter
-          schema: {}
+          description: a numeric string containing the id of the user
+          schema:
+            description: a numeric string containing the id of the user
+            type: string
+            pattern: \d+
       responses:
         "200":
           description: HEAD /v1/user/retrieve Positive response
@@ -103,8 +109,11 @@ paths:
         - name: id
           in: path
           required: true
-          description: DELETE /v1/user/:id/remove Parameter
-          schema: {}
+          description: numeric string
+          schema:
+            description: numeric string
+            type: string
+            pattern: \d+
       responses:
         "204":
           description: DELETE /v1/user/:id/remove Positive response
@@ -134,7 +143,13 @@ paths:
           in: path
           required: true
           description: PATCH /v1/user/:id Parameter
-          schema: {}
+          schema:
+            type: string
+            examples:
+              - "12"
+          examples:
+            example1:
+              value: "12"
       requestBody:
         description: PATCH /v1/user/:id Request body
         content:
@@ -159,6 +174,8 @@ paths:
                   pattern: ^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$
                   externalDocs:
                     url: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
+                  examples:
+                    - 1963-04-21
               required:
                 - key
                 - name
@@ -168,6 +185,7 @@ paths:
                 value:
                   key: 1234-5678-90
                   name: John Doe
+                  birthday: 1963-04-21
         required: true
       security:
         - APIKEY_1: []
@@ -534,7 +552,9 @@ paths:
           in: query
           required: true
           description: GET /v1/avatar/send Parameter
-          schema: {}
+          schema:
+            type: string
+            pattern: \d+
       responses:
         "200":
           description: GET /v1/avatar/send Positive response
@@ -560,7 +580,9 @@ paths:
           in: query
           required: true
           description: HEAD /v1/avatar/send Parameter
-          schema: {}
+          schema:
+            type: string
+            pattern: \d+
       responses:
         "200":
           description: HEAD /v1/avatar/send Positive response
@@ -578,7 +600,9 @@ paths:
           in: query
           required: true
           description: GET /v1/avatar/stream Parameter
-          schema: {}
+          schema:
+            type: string
+            pattern: \d+
       responses:
         "200":
           description: GET /v1/avatar/stream Positive response
@@ -605,7 +629,9 @@ paths:
           in: query
           required: true
           description: HEAD /v1/avatar/stream Parameter
-          schema: {}
+          schema:
+            type: string
+            pattern: \d+
       responses:
         "200":
           description: HEAD /v1/avatar/stream Positive response
