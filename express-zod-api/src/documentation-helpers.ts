@@ -192,7 +192,10 @@ export const depictTuple: Depicter = ({ zodSchema, jsonSchema }) => {
   return { ...jsonSchema, items: { not: {} } };
 };
 
+const isBooleanSchema = (subject: SchemaObject) => typeof subject === "boolean";
+
 const makeSample = (depicted: SchemaObject) => {
+  if (isBooleanSchema(depicted)) return undefined;
   const firstType = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
