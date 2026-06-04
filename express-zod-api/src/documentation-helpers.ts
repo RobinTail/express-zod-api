@@ -78,9 +78,6 @@ export type IsHeader = (
 
 export type BrandHandling = Record<string | symbol, Depicter>;
 
-const isoDateDocumentationUrl =
-  "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString";
-
 const samples = {
   integer: 0,
   number: 0,
@@ -143,20 +140,9 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
 const asOAS = (subject: z.core.JSONSchema.BaseSchema) =>
   subject as SchemaObject | ReferenceObject;
 
-export const depictDateIn: Depicter = (
-  { jsonSchema: { examples, description } },
-  ctx,
-) => {
+export const depictDateIn: Depicter = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
     throw new DocumentationError("Please use ez.dateOut() for output.", ctx);
-  const jsonSchema: z.core.JSONSchema.StringSchema = {
-    description: description || "YYYY-MM-DDTHH:mm:ss.sssZ",
-    type: "string",
-    format: "date-time",
-    pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
-    externalDocs: { url: isoDateDocumentationUrl },
-  };
-  if (examples?.length) jsonSchema.examples = examples;
   return jsonSchema;
 };
 
