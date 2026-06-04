@@ -63,42 +63,6 @@ DocumentationError({
 })
 `;
 
-exports[`Documentation helpers > depictDateOut > should set type:string, description and format 0 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictDateOut > should set type:string, description and format 1 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "type": "string",
-}
-`;
-
-exports[`Documentation helpers > depictDateOut > should set type:string, description and format 2 1`] = `
-{
-  "description": "YYYY-MM-DDTHH:mm:ss.sssZ",
-  "examples": [
-    "2024-01-01",
-  ],
-  "externalDocs": {
-    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString",
-  },
-  "format": "date-time",
-  "type": "string",
-}
-`;
-
 exports[`Documentation helpers > depictDateOut > should throw when ZodDateOut in request 1`] = `
 DocumentationError({
   "cause": "Input schema of an Endpoint assigned to GET method of /v1/user/:id path.",

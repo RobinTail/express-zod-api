@@ -160,19 +160,9 @@ export const depictDateIn: Depicter = (
   return jsonSchema;
 };
 
-export const depictDateOut: Depicter = (
-  { jsonSchema: { examples, description } },
-  ctx,
-) => {
+export const depictDateOut: Depicter = ({ jsonSchema }, ctx) => {
   if (!ctx.isResponse)
     throw new DocumentationError("Please use ez.dateIn() for input.", ctx);
-  const jsonSchema: z.core.JSONSchema.StringSchema = {
-    description: description || "YYYY-MM-DDTHH:mm:ss.sssZ",
-    type: "string",
-    format: "date-time",
-    externalDocs: { url: isoDateDocumentationUrl },
-  };
-  if (examples?.length) jsonSchema.examples = examples;
   return jsonSchema;
 };
 

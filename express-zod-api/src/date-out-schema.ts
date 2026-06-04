@@ -14,4 +14,5 @@ export const dateOut = (meta: DateOutParams = {}) =>
   z
     .date()
     .transform((date) => date.toISOString())
+    .pipe(z.iso.datetime())
     .meta({ ...meta, [brandProperty]: ezDateOutBrand });

@@ -525,18 +525,6 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictDateOut", () => {
-    test.each([
-      { examples: undefined },
-      { examples: [] },
-      { examples: ["2024-01-01"] },
-    ])("should set type:string, description and format %#", ({ examples }) => {
-      expect(
-        depictDateOut(
-          { zodSchema: z.never(), jsonSchema: { examples } },
-          responseCtx,
-        ),
-      ).toMatchSnapshot();
-    });
     test("should throw when ZodDateOut in request", () => {
       expect(() =>
         depictDateOut({ zodSchema: z.never(), jsonSchema: {} }, requestCtx),
