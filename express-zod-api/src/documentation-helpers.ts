@@ -489,7 +489,7 @@ export const depictResponse = ({
     }),
   );
   const examples = [];
-  if (isSchemaObject(response) && response.examples) {
+  if (isSchemaObject(response) && !isBool(response) && response.examples) {
     examples.push(...response.examples);
     delete response.examples; // moving them up
   }
