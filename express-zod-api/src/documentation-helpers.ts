@@ -628,20 +628,20 @@ export const depictBody = ({
   mimeType: string;
   paramNames: string[];
 }) => {
-  const [withoutParams, hasRequired] = excludeParamsFromDepiction(
+  const [pure, hasRequired] = excludeParamsFromDepiction(
     asOAS(request),
     paramNames,
   );
   const examples = [];
-  if (isSchemaObject(withoutParams) && withoutParams.examples) {
-    examples.push(...withoutParams.examples);
-    delete withoutParams.examples; // pull up
+  if (isSchemaObject(pure) && !isBool(pure) && pure.examples) {
+    examples.push(...pure.examples);
+    delete pure.examples; // pull up
   }
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, withoutParams, makeCleanId(description))
-        : withoutParams,
+        ? makeRef(schema, pure, makeCleanId(description))
+        : pure,
     examples: enumerateExamples(
       examples.length
         ? examples
