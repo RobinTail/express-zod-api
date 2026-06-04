@@ -224,19 +224,17 @@ export const depictPipeline: Depicter = ({ zodSchema, jsonSchema }, ctx) => {
     ctx.isResponse ? "in" : "out"
   ];
   if (!isSchema<z.core.$ZodTransform>(target, "transform")) return jsonSchema;
-  const opposingDepiction = asOAS(depict(opposite, { ctx }));
-  if (isSchemaObject(opposingDepiction)) {
+  const src = asOAS(depict(opposite, { ctx }));
+  if (isSchemaObject(src)) {
     if (!ctx.isResponse) {
-      const { type: opposingType, ...rest } = opposingDepiction;
+      if (isBool(src)) return src;
+      const { type: opposingType, ...rest } = src;
       return {
         ...rest,
         format: `${rest.format || opposingType} (preprocessed)`,
       };
     } else {
-      const targetType = getTransformedType(
-        target,
-        makeSample(opposingDepiction),
-      );
+      const targetType = getTransformedType(target, makeSample(src));
       if (targetType && ["number", "string", "boolean"].includes(targetType)) {
         return {
           ...jsonSchema,
