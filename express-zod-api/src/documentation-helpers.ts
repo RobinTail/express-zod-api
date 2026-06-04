@@ -152,7 +152,7 @@ export const depictDateIn: Depicter = (
   const jsonSchema: z.core.JSONSchema.StringSchema = {
     description: description || "YYYY-MM-DDTHH:mm:ss.sssZ",
     type: "string",
-    format: "date-time",
+    format: "date",
     pattern: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?Z?$/.source,
     externalDocs: { url: isoDateDocumentationUrl },
   };
