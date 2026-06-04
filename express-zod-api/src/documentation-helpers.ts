@@ -333,10 +333,13 @@ export const depictRequestParams = ({
         in: location,
         deprecated: jsonSchema.deprecated,
         required: flat.required?.includes(name) || false,
-        description: depicted.description || description,
+        description:
+          (!isBooleanSchema(depicted) && depicted.description) || description,
         schema: result,
         examples: enumerateExamples(
-          isSchemaObject(depicted) && depicted.examples?.length
+          isSchemaObject(depicted) &&
+            !isBooleanSchema(depicted) &&
+            depicted.examples?.length
             ? depicted.examples // own examples or from the flat:
             : R.pluck(
                 name,
