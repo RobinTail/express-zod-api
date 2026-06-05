@@ -456,19 +456,28 @@ export const depictResponse = ({
       ctx: { isResponse: true, makeRef, path, method },
     }),
   );
-  const examples = [];
+  const examples: unknown[] = [];
   if (isSchemaObject(response) && response.examples) {
     examples.push(...response.examples);
     delete response.examples; // moving them up
   }
-  const media: MediaTypeObject = {
-    schema:
-      composition === "components"
-        ? makeRef(schema, response, makeCleanId(description))
-        : response,
-    examples: enumerateExamples(examples),
+  const schemaOrRef =
+    composition === "components"
+      ? makeRef(schema, response, makeCleanId(description))
+      : response;
+  return {
+    description,
+    content: R.fromPairs(
+      mimeTypes.map<[string, MediaTypeObject]>((mt) => {
+        const key: keyof MediaTypeObject =
+          mt === contentTypes.sse ? "itemSchema" : "schema";
+        return [
+          mt,
+          { [key]: schemaOrRef, examples: enumerateExamples(examples) },
+        ];
+      }),
+    ),
   };
-  return { description, content: R.fromPairs(R.xprod(mimeTypes, [media])) };
 };
 
 const depictBearerSecurity = ({

@@ -827,7 +827,7 @@ paths:
           description: GET /v1/events/stream Positive response
           content:
             text/event-stream:
-              schema:
+              itemSchema:
                 type: object
                 properties:
                   data:

@@ -1695,8 +1695,8 @@ paths:
         "201":
           description: GET /v1/getSomething Positive response
           content:
-            application/json: &a1
-              schema:
+            application/json:
+              schema: &a1
                 type: object
                 properties:
                   status:
@@ -1710,7 +1710,8 @@ paths:
                   - status
                   - result
                 additionalProperties: false
-            text/vnd.yaml: *a1
+            text/vnd.yaml:
+              schema: *a1
         "403":
           description: GET /v1/getSomething Negative response
           content:
