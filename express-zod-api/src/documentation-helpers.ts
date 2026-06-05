@@ -404,10 +404,10 @@ const depict = (
 export const excludeParamsFromDepiction = (
   subject: z.core.JSONSchema.BaseSchema,
   names: string[],
-): [z.core.JSONSchema.BaseSchema, boolean] => {
+): [typeof subject, boolean] => {
   if (isReferenceObject(subject)) return [subject, false];
   let hasRequired = false;
-  const subTransformer = R.map((entry: z.core.JSONSchema.BaseSchema) => {
+  const subTransformer = R.map((entry: typeof subject) => {
     const [sub, subRequired] = excludeParamsFromDepiction(entry, names);
     hasRequired = hasRequired || subRequired;
     return sub;
@@ -421,7 +421,7 @@ export const excludeParamsFromDepiction = (
     oneOf: subTransformer,
     anyOf: subTransformer,
   };
-  const result: z.core.JSONSchema.BaseSchema = R.evolve(transformers, subject);
+  const result: typeof subject = R.evolve(transformers, subject);
   return [result, hasRequired || Boolean(result.required?.length)];
 };
 
