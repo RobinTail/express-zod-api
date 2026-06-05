@@ -3,10 +3,7 @@ import { brandProperty } from "./metadata";
 
 export const ezDateOutBrand = Symbol("DateOut");
 
-export interface DateOutParams extends Omit<
-  Parameters<z.ZodString["meta"]>[0],
-  "examples"
-> {
+export interface DateOutParams extends z.core.GlobalMeta {
   examples?: string[];
 }
 

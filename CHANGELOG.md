@@ -7,7 +7,8 @@
 - Changes to the proprietary `Date` handling schemas:
   - Supporting timezones by `ez.dateIn()` schema (e.g. `2021-12-31T23:59:59+02:00`);
   - Piping the transformation of `ez.dateOut()` into the `z.iso.datetime()` schema for certainty;
-  - The Documentation generator removes a custom depiction of both schemas and delegates it to Zod for clarity.
+  - The Documentation generator removes a custom depiction of both schemas and delegates it to Zod for clarity;
+  - Fixed the type of the argument accepting the metadata for both schemas.
 
 ### v28.4.0
 
