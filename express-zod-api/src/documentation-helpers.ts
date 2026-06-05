@@ -626,17 +626,22 @@ export const depictBody = ({
   return body;
 };
 
-export const depictTags = (
-  tags: Partial<Record<Tag, string | { description: string; url?: string }>>,
-) =>
-  Object.entries(tags).reduce<TagObject[]>((agg, [tag, def]) => {
+interface TagDetails extends Pick<
+  TagObject,
+  "summary" | "description" | "externalDocs" | "kind"
+> {
+  /** @desc shorthand for externalDocs.url */
+  url?: string;
+  parent?: Tag;
+}
+
+export const depictTags = (tags: Partial<Record<Tag, string | TagDetails>>) =>
+  Object.entries(tags).reduce<TagObject[]>((agg, [name, def]) => {
     if (!def) return agg;
-    const entry: TagObject = {
-      name: tag,
-      description: typeof def === "string" ? def : def.description,
-    };
-    if (typeof def === "object" && def.url)
-      entry.externalDocs = { url: def.url };
+    if (typeof def === "string") return agg.concat({ name, description: def });
+    const { url, ...tagObject } = def;
+    const entry: TagObject = { ...tagObject, name };
+    if (url) entry.externalDocs = { ...entry.externalDocs, url };
     return agg.concat(entry);
   }, []);
 

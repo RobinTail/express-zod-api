@@ -543,6 +543,33 @@ exports[`Documentation helpers > depictTags() > should accept objects with URLs 
 ]
 `;
 
+exports[`Documentation helpers > depictTags() > should accept objects with summary and parent and kind 1`] = `
+[
+  {
+    "description": "Book catalog and recommendations",
+    "externalDocs": {
+      "description": "Full API documentation",
+      "url": "https://docs.example.com",
+    },
+    "kind": "nav",
+    "name": "books",
+    "parent": "products",
+    "summary": "Books & Literature",
+  },
+  {
+    "description": "Music CD catalog and reviews",
+    "externalDocs": {
+      "description": "External docs site",
+      "url": "https://example.com/docs",
+    },
+    "kind": "nav",
+    "name": "cds",
+    "parent": "products",
+    "summary": "Music CDs",
+  },
+]
+`;
+
 exports[`Documentation helpers > depictTags() > should accept plain descriptions 1`] = `
 [
   {

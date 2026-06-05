@@ -687,6 +687,34 @@ describe("Documentation helpers", () => {
         }),
       ).toMatchSnapshot();
     });
+
+    test("should accept objects with summary and parent and kind", () => {
+      expect(
+        depictTags({
+          books: {
+            description: "Book catalog and recommendations",
+            summary: "Books & Literature",
+            parent: "products",
+            kind: "nav",
+            externalDocs: {
+              url: "https://docs.example.com",
+              description: "Full API documentation",
+            },
+          },
+          cds: {
+            description: "Music CD catalog and reviews",
+            summary: "Music CDs",
+            parent: "products",
+            kind: "nav",
+            url: "https://example.com/docs", // overrides
+            externalDocs: {
+              url: "https://example.com/old-docs",
+              description: "External docs site",
+            },
+          },
+        }),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("trimSummary()", () => {
