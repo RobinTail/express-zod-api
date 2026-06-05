@@ -402,12 +402,12 @@ const depict = (
 };
 
 export const excludeParamsFromDepiction = (
-  subject: SchemaObject | ReferenceObject,
+  subject: z.core.JSONSchema.BaseSchema,
   names: string[],
-): [SchemaObject | ReferenceObject, boolean] => {
+): [typeof subject, boolean] => {
   if (isReferenceObject(subject)) return [subject, false];
   let hasRequired = false;
-  const subTransformer = R.map((entry: SchemaObject | ReferenceObject) => {
+  const subTransformer = R.map((entry: typeof subject) => {
     const [sub, subRequired] = excludeParamsFromDepiction(entry, names);
     hasRequired = hasRequired || subRequired;
     return sub;
@@ -421,7 +421,7 @@ export const excludeParamsFromDepiction = (
     oneOf: subTransformer,
     anyOf: subTransformer,
   };
-  const result: SchemaObject = R.evolve(transformers, subject);
+  const result: typeof subject = R.evolve(transformers, subject);
   return [result, hasRequired || Boolean(result.required?.length)];
 };
 
@@ -596,20 +596,18 @@ export const depictBody = ({
   mimeType: string;
   paramNames: string[];
 }) => {
-  const [withoutParams, hasRequired] = excludeParamsFromDepiction(
-    asOAS(request),
-    paramNames,
-  );
+  const [_pure, hasRequired] = excludeParamsFromDepiction(request, paramNames);
+  const pure = asOAS(_pure);
   const examples = [];
-  if (isSchemaObject(withoutParams) && withoutParams.examples) {
-    examples.push(...withoutParams.examples);
-    delete withoutParams.examples; // pull up
+  if (isSchemaObject(pure) && pure.examples) {
+    examples.push(...pure.examples);
+    delete pure.examples; // pull up
   }
   const media: MediaTypeObject = {
     schema:
       composition === "components"
-        ? makeRef(schema, withoutParams, makeCleanId(description))
-        : withoutParams,
+        ? makeRef(schema, pure, makeCleanId(description))
+        : pure,
     examples: enumerateExamples(
       examples.length
         ? examples
