@@ -505,18 +505,6 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictDateIn", () => {
-    test.each([
-      { examples: undefined },
-      { examples: [] },
-      { examples: ["2024-01-01"] },
-    ])("should set type:string, pattern and format %#", ({ examples }) => {
-      expect(
-        depictDateIn(
-          { zodSchema: z.never(), jsonSchema: { anyOf: [], examples } },
-          requestCtx,
-        ),
-      ).toMatchSnapshot();
-    });
     test("should throw when ZodDateIn in response", () => {
       expect(() =>
         depictDateIn({ zodSchema: z.never(), jsonSchema: {} }, responseCtx),
@@ -525,18 +513,6 @@ describe("Documentation helpers", () => {
   });
 
   describe("depictDateOut", () => {
-    test.each([
-      { examples: undefined },
-      { examples: [] },
-      { examples: ["2024-01-01"] },
-    ])("should set type:string, description and format %#", ({ examples }) => {
-      expect(
-        depictDateOut(
-          { zodSchema: z.never(), jsonSchema: { examples } },
-          responseCtx,
-        ),
-      ).toMatchSnapshot();
-    });
     test("should throw when ZodDateOut in request", () => {
       expect(() =>
         depictDateOut({ zodSchema: z.never(), jsonSchema: {} }, requestCtx),

@@ -586,6 +586,7 @@ In order to solve this problem, the framework provides two custom methods for de
 provides your endpoint handler or middleware with a `Date`. It supports the following formats:
 
 ```text
+2021-12-31T23:59:59+02:00
 2021-12-31T23:59:59.000Z
 2021-12-31T23:59:59Z
 2021-12-31T23:59:59
