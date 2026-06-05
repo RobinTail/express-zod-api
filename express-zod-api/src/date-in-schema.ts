@@ -3,18 +3,14 @@ import { brandProperty } from "./metadata";
 
 export const ezDateInBrand = Symbol("DateIn");
 
-export interface DateInParams extends Omit<
-  Parameters<z.ZodString["meta"]>[0],
-  "examples"
-> {
+export interface DateInParams extends z.core.GlobalMeta {
   examples?: string[];
 }
 
 export const dateIn = ({ examples, ...rest }: DateInParams = {}) => {
   const schema = z.union([
     z.iso.date(),
-    z.iso.datetime(),
-    z.iso.datetime({ local: true }),
+    z.iso.datetime({ local: true, offset: true }),
   ]);
 
   return schema
