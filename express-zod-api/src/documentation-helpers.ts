@@ -473,22 +473,25 @@ export const depictResponse = ({
 
 const depictBearerSecurity = ({
   format: bearerFormat,
+  deprecated,
 }: Extract<Security, { type: "bearer" }>) => {
   const result: SecuritySchemeObject = {
     type: "http",
     scheme: "bearer",
+    deprecated,
   };
   if (bearerFormat) result.bearerFormat = bearerFormat;
   return result;
 };
 const depictInputSecurity = (
-  { name }: Extract<Security, { type: "input" }>,
+  { name, deprecated }: Extract<Security, { type: "input" }>,
   inputSources: InputSource[],
 ) => {
   const result: SecuritySchemeObject = {
     type: "apiKey",
     in: "query",
     name,
+    deprecated,
   };
   if (inputSources?.includes("body")) {
     if (inputSources?.includes("query")) {
@@ -503,32 +506,42 @@ const depictInputSecurity = (
 };
 const depictHeaderSecurity = ({
   name,
+  deprecated,
 }: Extract<Security, { type: "header" }>) => ({
   type: "apiKey" as const,
   in: "header",
   name,
+  deprecated,
 });
 const depictCookieSecurity = ({
   name,
+  deprecated,
 }: Extract<Security, { type: "cookie" }>) => ({
   type: "apiKey" as const,
   in: "cookie",
   name,
+  deprecated,
 });
 const depictOpenIdSecurity = ({
   url: openIdConnectUrl,
+  deprecated,
 }: Extract<Security, { type: "openid" }>) => ({
   type: "openIdConnect" as const,
   openIdConnectUrl,
+  deprecated,
 });
 const depictOAuth2Security = ({
   flows = {},
+  deprecated,
+  oauth2MetadataUrl,
 }: Extract<Security, { type: "oauth2" }>) => ({
   type: "oauth2" as const,
   flows: R.map(
     (flow): OAuthFlowObject => ({ ...flow, scopes: flow.scopes || {} }),
     R.reject(R.isNil, flows) as Required<typeof flows>,
   ),
+  deprecated,
+  oauth2MetadataUrl,
 });
 
 export const depictSecurity = (
@@ -536,7 +549,8 @@ export const depictSecurity = (
   inputSources: InputSource[] = [],
 ): Alternatives<SecuritySchemeObject> => {
   const mapper = (subj: Security): SecuritySchemeObject => {
-    if (subj.type === "basic") return { type: "http", scheme: "basic" };
+    if (subj.type === "basic")
+      return { type: "http", scheme: "basic", deprecated: subj.deprecated };
     else if (subj.type === "bearer") return depictBearerSecurity(subj);
     else if (subj.type === "input")
       return depictInputSecurity(subj, inputSources);

@@ -617,6 +617,35 @@ describe("Documentation helpers", () => {
         ]),
       ).toMatchSnapshot();
     });
+    test("should depict OAuth2 Security with device authorization flow", () => {
+      expect(
+        depictSecurity([
+          [
+            {
+              type: "oauth2",
+              oauth2MetadataUrl:
+                "https://example.com/.well-known/openid-configuration",
+              flows: {
+                deviceAuthorization: {
+                  deviceAuthorizationUrl: "https://example.com/device/auth",
+                  tokenUrl: "https://example.com/device/token",
+                  scopes: { read: "Read access", write: "Write access" },
+                },
+              },
+            },
+          ],
+        ]),
+      ).toMatchSnapshot();
+    });
+    test("should support deprecated flag on security schemes", () => {
+      expect(
+        depictSecurity([
+          [{ type: "basic", deprecated: true }],
+          [{ type: "bearer", deprecated: true }],
+          [{ type: "header", name: "X-API-Key", deprecated: true }],
+        ]),
+      ).toMatchSnapshot();
+    });
   });
 
   describe("depictSecurityRefs()", () => {

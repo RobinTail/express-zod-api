@@ -7,26 +7,31 @@ import {
 
 export interface BasicSecurity {
   type: "basic";
+  deprecated?: boolean;
 }
 
 export interface BearerSecurity {
   type: "bearer";
   format?: "JWT" | string;
+  deprecated?: boolean;
 }
 
 export interface InputSecurity<K extends string> {
   type: "input";
   name: K;
+  deprecated?: boolean;
 }
 
 export interface HeaderSecurity {
   type: "header";
   name: string;
+  deprecated?: boolean;
 }
 
 export interface CookieSecurity {
   type: "cookie";
   name: string;
+  deprecated?: boolean;
 }
 
 /**
@@ -36,6 +41,7 @@ export interface CookieSecurity {
 export interface OpenIdSecurity {
   type: "openid";
   url: string;
+  deprecated?: boolean;
 }
 
 interface AuthUrl {
@@ -44,6 +50,11 @@ interface AuthUrl {
    * @see https://swagger.io/docs/specification/api-host-and-base-path/
    */
   authorizationUrl: string;
+}
+
+interface DeviceAuthUrl {
+  /** @desc The device authorization URL to use for this flow (RFC 8628). Can be relative to the API server URL. */
+  deviceAuthorizationUrl: string;
 }
 
 interface TokenUrl {
@@ -69,12 +80,22 @@ type AuthCodeFlow<S extends string> = AuthUrl &
 type ImplicitFlow<S extends string> = AuthUrl & RefreshUrl & Scopes<S>;
 type PasswordFlow<S extends string> = TokenUrl & RefreshUrl & Scopes<S>;
 type ClientCredFlow<S extends string> = TokenUrl & RefreshUrl & Scopes<S>;
+type DeviceAuthFlow<S extends string> = DeviceAuthUrl &
+  TokenUrl &
+  RefreshUrl &
+  Scopes<S>;
 
 /**
  * @see https://swagger.io/docs/specification/authentication/oauth2/
  */
 export interface OAuth2Security<S extends string> {
   type: "oauth2";
+  deprecated?: boolean;
+  /**
+   * @desc URL to OAuth 2.0 Authorization Server metadata document
+   * @link https://www.rfc-editor.org/rfc/rfc8414
+   * */
+  oauth2MetadataUrl?: string;
   flows?: {
     /** @desc Authorization Code flow (previously called accessCode in OpenAPI 2.0) */
     authorizationCode?: AuthCodeFlow<S>;
@@ -84,6 +105,11 @@ export interface OAuth2Security<S extends string> {
     password?: PasswordFlow<S>;
     /** @desc Client Credentials flow (previously called application in OpenAPI 2.0) */
     clientCredentials?: ClientCredFlow<S>;
+    /**
+     * @desc Device Authorization flow (OAuth 2.0 Device Authorization Grant)
+     * @link https://oauth.net/2/device-flow/
+     * */
+    deviceAuthorization?: DeviceAuthFlow<S>;
   };
 }
 
