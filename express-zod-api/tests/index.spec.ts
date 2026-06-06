@@ -83,10 +83,9 @@ describe("Index Entrypoint", () => {
         type: "header";
         name: string;
       }>().toEqualTypeOf<HeaderSecurity>();
-      expectTypeOf<{
-        type: "input";
-        name: string;
-      }>().toEqualTypeOf<InputSecurity<string>>();
+      expectTypeOf<{ type: "input"; name: string }>().toEqualTypeOf<
+        InputSecurity<string>
+      >();
       expectTypeOf<{ type: "oauth2" }>().toExtend<OAuth2Security<string>>();
       expectTypeOf<{
         type: "openid";
