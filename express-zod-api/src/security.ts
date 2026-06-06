@@ -7,31 +7,26 @@ import {
 
 export interface BasicSecurity {
   type: "basic";
-  deprecated?: boolean;
 }
 
 export interface BearerSecurity {
   type: "bearer";
   format?: "JWT" | string;
-  deprecated?: boolean;
 }
 
 export interface InputSecurity<K extends string> {
   type: "input";
   name: K;
-  deprecated?: boolean;
 }
 
 export interface HeaderSecurity {
   type: "header";
   name: string;
-  deprecated?: boolean;
 }
 
 export interface CookieSecurity {
   type: "cookie";
   name: string;
-  deprecated?: boolean;
 }
 
 /**
@@ -41,7 +36,6 @@ export interface CookieSecurity {
 export interface OpenIdSecurity {
   type: "openid";
   url: string;
-  deprecated?: boolean;
 }
 
 interface AuthUrl {
@@ -90,7 +84,6 @@ type DeviceAuthFlow<S extends string> = DeviceAuthUrl &
  */
 export interface OAuth2Security<S extends string> {
   type: "oauth2";
-  deprecated?: boolean;
   /**
    * @desc URL to OAuth 2.0 Authorization Server metadata document
    * @link https://www.rfc-editor.org/rfc/rfc8414
@@ -118,14 +111,15 @@ export interface OAuth2Security<S extends string> {
  * @param K is an optional input field used by InputSecurity
  * @param S is an optional union of scopes used by OAuth2Security
  * */
-export type Security<K extends string = string, S extends string = string> =
+export type Security<K extends string = string, S extends string = string> = (
   | BasicSecurity
   | BearerSecurity
   | InputSecurity<K>
   | HeaderSecurity
   | CookieSecurity
   | OpenIdSecurity
-  | OAuth2Security<S>;
+  | OAuth2Security<S>
+) & { deprecated?: boolean };
 
 type NamedSecurityType = Extract<Security, { name: string }>["type"];
 

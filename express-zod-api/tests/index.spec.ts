@@ -70,37 +70,26 @@ describe("Index Entrypoint", () => {
         logger: { level: "silent" };
         cors: false;
       }>().toExtend<ServerConfig>();
-      expectTypeOf<{
-        type: "basic";
-        deprecated?: boolean;
-      }>().toEqualTypeOf<BasicSecurity>();
+      expectTypeOf<{ type: "basic" }>().toEqualTypeOf<BasicSecurity>();
       expectTypeOf<{
         type: "bearer";
-        deprecated?: boolean;
         format?: string;
       }>().toEqualTypeOf<BearerSecurity>();
       expectTypeOf<{
         type: "cookie";
-        deprecated?: boolean;
         name: string;
       }>().toEqualTypeOf<CookieSecurity>();
       expectTypeOf<{
         type: "header";
-        deprecated?: boolean;
         name: string;
       }>().toEqualTypeOf<HeaderSecurity>();
       expectTypeOf<{
         type: "input";
-        deprecated?: boolean;
         name: string;
       }>().toEqualTypeOf<InputSecurity<string>>();
-      expectTypeOf<{ type: "oauth2"; deprecated?: boolean }>().toExtend<
-        OAuth2Security<string>
-      >();
       expectTypeOf<{ type: "oauth2" }>().toExtend<OAuth2Security<string>>();
       expectTypeOf<{
         type: "openid";
-        deprecated?: boolean;
         url: string;
       }>().toEqualTypeOf<OpenIdSecurity>();
       expectTypeOf({ schema: z.string() }).toExtend<ApiResponse<z.ZodString>>();
