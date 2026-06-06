@@ -54,7 +54,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -137,7 +137,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -204,7 +204,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -278,7 +278,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -339,7 +339,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -440,7 +440,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -524,7 +524,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -583,7 +583,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -678,7 +678,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -785,7 +785,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -913,7 +913,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -1019,7 +1019,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -1160,7 +1160,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -1323,7 +1323,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -1410,7 +1410,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -1555,7 +1555,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -1637,7 +1637,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -1858,7 +1858,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -2011,7 +2011,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -2105,7 +2105,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -2248,7 +2248,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -2341,7 +2341,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -2457,7 +2457,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -2538,7 +2538,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -2642,7 +2642,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -2855,7 +2855,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -2976,7 +2976,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -3085,7 +3085,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -3184,7 +3184,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -3297,7 +3297,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -3388,7 +3388,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -3477,7 +3477,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -3565,7 +3565,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -3680,7 +3680,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -3762,7 +3762,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -3821,7 +3821,7 @@ paths:
                 - a
             examples:
               example1:
-                value:
+                dataValue:
                   a: first
         required: true
       responses:
@@ -3857,13 +3857,13 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: success
                     data:
                       a: first
                       b: prefix_first
                 example2:
-                  value:
+                  dataValue:
                     status: success
                     data:
                       a: second
@@ -3892,7 +3892,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -3944,7 +3944,7 @@ paths:
                 $ref: "#/components/schemas/GetHrisEmployeesNegativeResponse"
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -4040,7 +4040,7 @@ paths:
                 - str
             examples:
               example1:
-                value:
+                dataValue:
                   key: 1234-56789-01
                   str: test
         required: true
@@ -4071,7 +4071,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: success
                     data:
                       num: 123
@@ -4099,7 +4099,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -4148,7 +4148,7 @@ paths:
                 - str
             examples:
               example1:
-                value:
+                dataValue:
                   key: 1234-56789-01
                   str: test
         required: true
@@ -4181,7 +4181,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: success
                     data:
                       num: 123
@@ -4209,7 +4209,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -4247,7 +4247,7 @@ paths:
             type: string
           examples:
             example1:
-              value: "123"
+              dataValue: "123"
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -4275,7 +4275,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: success
                     data:
                       numericStr: "123"
@@ -4303,7 +4303,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -4318,7 +4318,7 @@ paths:
             type: string
           examples:
             example1:
-              value: "123"
+              dataValue: "123"
       responses:
         "200":
           description: HEAD /v1/getSomething Positive response
@@ -4362,7 +4362,7 @@ paths:
                 - strNum
             examples:
               example1:
-                value:
+                dataValue:
                   strNum: "123"
         required: true
       responses:
@@ -4392,7 +4392,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: success
                     data:
                       numericStr: "123"
@@ -4420,7 +4420,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -4460,7 +4460,7 @@ paths:
               - "123"
           examples:
             example1:
-              value: "123"
+              dataValue: "123"
       responses:
         "200":
           description: GET /v1/getSomething Positive response
@@ -4490,7 +4490,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: success
                     data:
                       numericStr: "456"
@@ -4518,7 +4518,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -4535,7 +4535,7 @@ paths:
               - "123"
           examples:
             example1:
-              value: "123"
+              dataValue: "123"
       responses:
         "200":
           description: HEAD /v1/getSomething Positive response
@@ -4581,7 +4581,7 @@ paths:
                 - strNum
             examples:
               example1:
-                value:
+                dataValue:
                   strNum: "123"
         required: true
       responses:
@@ -4613,7 +4613,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: success
                     data:
                       numericStr: "456"
@@ -4641,7 +4641,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -4728,7 +4728,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -4838,7 +4838,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -4896,7 +4896,7 @@ paths:
                 $ref: "#/components/schemas/VeryNegativeResponseOfPostV1Name"
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -5030,7 +5030,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message
@@ -5145,7 +5145,7 @@ paths:
                 additionalProperties: false
               examples:
                 example1:
-                  value:
+                  dataValue:
                     status: error
                     error:
                       message: Sample error message

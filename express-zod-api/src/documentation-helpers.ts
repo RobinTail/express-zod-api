@@ -235,7 +235,7 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
     ? R.fromPairs(
         R.zip(
           R.times((idx) => `example${idx + 1}`, examples.length),
-          R.map(R.objOf("value"), examples),
+          R.map(R.objOf("dataValue"), examples),
         ),
       )
     : undefined;
