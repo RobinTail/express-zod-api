@@ -2684,6 +2684,121 @@ servers:
 "
 `;
 
+exports[`Documentation > Constructor metadata > should aggregate servers 1`] = `
+[
+  {
+    "description": "Single",
+    "url": "https://s.example.com",
+  },
+  {
+    "url": "https://short.example.com",
+  },
+]
+`;
+
+exports[`Documentation > Constructor metadata > should aggregate servers 2`] = `
+[
+  {
+    "description": "Single",
+    "url": "https://s.example.com",
+  },
+  {
+    "url": "https://short-a.example.com",
+  },
+  {
+    "url": "https://short-b.example.com",
+  },
+]
+`;
+
+exports[`Documentation > Constructor metadata > should aggregate servers 3`] = `
+[
+  {
+    "description": "A",
+    "url": "https://a.example.com",
+  },
+  {
+    "description": "B",
+    "url": "https://b.example.com",
+  },
+  {
+    "url": "https://short.example.com",
+  },
+]
+`;
+
+exports[`Documentation > Constructor metadata > should aggregate servers 4`] = `
+[
+  {
+    "description": "A",
+    "url": "https://a.example.com",
+  },
+  {
+    "description": "B",
+    "url": "https://b.example.com",
+  },
+  {
+    "url": "https://short-a.example.com",
+  },
+  {
+    "url": "https://short-b.example.com",
+  },
+]
+`;
+
+exports[`Documentation > Constructor metadata > should fall back to builder defaults when no metadata provided 1`] = `
+{
+  "title": "app",
+  "version": "version",
+}
+`;
+
+exports[`Documentation > Constructor metadata > should override info with shorthands 1`] = `
+{
+  "summary": "Retained",
+  "title": "Overridden Title",
+  "version": "2.0.0",
+}
+`;
+
+exports[`Documentation > Constructor metadata > should use expanded info and server objects with all fields 1`] = `
+"openapi: 3.2.0
+info:
+  title: Expanded API
+  version: 3.0.0
+  summary: Full info object
+  contact:
+    name: Dev
+    email: dev@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+paths: {}
+components:
+  schemas: {}
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers:
+  - url: https://{env}.example.com/{ver}
+    description: Environment server
+    variables:
+      env:
+        default: api
+        enum:
+          - api
+          - staging
+      ver:
+        default: v1
+"
+`;
+
 exports[`Documentation > Feature #1431: Multiple schemas for different status codes > should depict accordingly 1`] = `
 "openapi: 3.2.0
 info:

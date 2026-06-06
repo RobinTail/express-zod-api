@@ -1,10 +1,12 @@
 import {
+  type InfoObject,
   type OperationObject,
   type ReferenceObject,
   type ResponsesObject,
   type SchemaObjectValue,
   type SecuritySchemeObject,
   type SecuritySchemeType,
+  type ServerObject,
   OpenApiBuilder,
 } from "openapi3-ts/oas32";
 import * as R from "ramda";
@@ -60,9 +62,16 @@ const defaultSummarizer: Summarizer = ({
 }) => trim(summary);
 
 interface DocumentationParams {
-  title: string;
-  version: string;
-  serverUrl: string | [string, ...string[]];
+  /** @desc Full Info Object customization */
+  info?: InfoObject;
+  /** @override info.title — shorthand */
+  title?: string;
+  /** @override info.version — shorthand */
+  version?: string;
+  /** @desc Full Server Object(s) customization */
+  server?: ServerObject | [ServerObject, ...ServerObject[]];
+  /** @desc Shorthand for server.url */
+  serverUrl?: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
   /**
@@ -167,12 +176,38 @@ export class Documentation extends OpenApiBuilder {
     return `${subject.type.toUpperCase()}_${nextId}`;
   }
 
+  #addMetadata({
+    title,
+    version,
+    info,
+    server,
+    serverUrl,
+  }: Pick<
+    DocumentationParams,
+    "title" | "version" | "info" | "server" | "serverUrl"
+  >) {
+    this.addInfo({
+      ...info,
+      title: title ?? info?.title ?? this.rootDoc.info.title,
+      version: version ?? info?.version ?? this.rootDoc.info.version,
+    });
+    if (server) {
+      for (const s of Array.isArray(server) ? server : [server])
+        this.addServer(s);
+    }
+    if (!serverUrl) return;
+    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
+      this.addServer({ url });
+  }
+
   public constructor({
     routing,
     config,
     title,
     version,
     serverUrl,
+    info,
+    server,
     descriptions,
     brandHandling,
     tags,
@@ -182,9 +217,7 @@ export class Documentation extends OpenApiBuilder {
     composition = "inline",
   }: DocumentationParams) {
     super();
-    this.addInfo({ title, version });
-    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
-      this.addServer({ url });
+    this.#addMetadata({ title, version, info, server, serverUrl });
     const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
       const commons = {
         path,
