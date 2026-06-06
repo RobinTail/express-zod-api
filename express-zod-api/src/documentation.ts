@@ -192,8 +192,8 @@ export class Documentation extends OpenApiBuilder {
       version: version ?? info?.version ?? this.rootDoc.info.version,
     });
     if (server) {
-      for (const s of Array.isArray(server) ? server : [server])
-        this.addServer(s);
+      for (const one of Array.isArray(server) ? server : [server])
+        this.addServer(one);
     }
     if (!serverUrl) return;
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
