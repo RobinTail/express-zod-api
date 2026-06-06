@@ -94,7 +94,9 @@ describe("Documentation", () => {
           "https://short-b.example.com",
         ],
       },
-    ])("should aggregate servers", ({ server, serverUrl }) => {
+      { server: ["https://ex.one", "https://ex.two"] },
+      { server: "https://single.example" },
+    ])("should aggregate servers %#", ({ server, serverUrl }) => {
       expect(
         new Documentation({
           config: sampleConfig,

@@ -68,9 +68,16 @@ interface DocumentationParams {
   title?: string;
   /** @override info.version — shorthand */
   version?: string;
-  /** @desc Full Server Object(s) customization */
-  server?: ServerObject | [ServerObject, ...ServerObject[]];
-  /** @desc Shorthand for server.url */
+  /** @desc Server URL(s) or their complete definitions */
+  server?:
+    | string
+    | [string, ...string[]]
+    | ServerObject
+    | [ServerObject, ...ServerObject[]];
+  /**
+   * @deprecated use `server` property instead
+   * @todo remove in v29
+   * */
   serverUrl?: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
@@ -193,7 +200,7 @@ export class Documentation extends OpenApiBuilder {
     });
     if (server) {
       for (const one of Array.isArray(server) ? server : [server])
-        this.addServer(one);
+        this.addServer(typeof one === "string" ? { url: one } : one);
     }
     if (!serverUrl) return;
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)

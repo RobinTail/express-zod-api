@@ -2684,7 +2684,7 @@ servers:
 "
 `;
 
-exports[`Documentation > Constructor metadata > should aggregate servers 1`] = `
+exports[`Documentation > Constructor metadata > should aggregate servers 0 1`] = `
 [
   {
     "description": "Single",
@@ -2696,7 +2696,7 @@ exports[`Documentation > Constructor metadata > should aggregate servers 1`] = `
 ]
 `;
 
-exports[`Documentation > Constructor metadata > should aggregate servers 2`] = `
+exports[`Documentation > Constructor metadata > should aggregate servers 1 1`] = `
 [
   {
     "description": "Single",
@@ -2711,7 +2711,7 @@ exports[`Documentation > Constructor metadata > should aggregate servers 2`] = `
 ]
 `;
 
-exports[`Documentation > Constructor metadata > should aggregate servers 3`] = `
+exports[`Documentation > Constructor metadata > should aggregate servers 2 1`] = `
 [
   {
     "description": "A",
@@ -2727,7 +2727,7 @@ exports[`Documentation > Constructor metadata > should aggregate servers 3`] = `
 ]
 `;
 
-exports[`Documentation > Constructor metadata > should aggregate servers 4`] = `
+exports[`Documentation > Constructor metadata > should aggregate servers 3 1`] = `
 [
   {
     "description": "A",
@@ -2742,6 +2742,25 @@ exports[`Documentation > Constructor metadata > should aggregate servers 4`] = `
   },
   {
     "url": "https://short-b.example.com",
+  },
+]
+`;
+
+exports[`Documentation > Constructor metadata > should aggregate servers 4 1`] = `
+[
+  {
+    "url": "https://ex.one",
+  },
+  {
+    "url": "https://ex.two",
+  },
+]
+`;
+
+exports[`Documentation > Constructor metadata > should aggregate servers 5 1`] = `
+[
+  {
+    "url": "https://single.example",
   },
 ]
 `;
