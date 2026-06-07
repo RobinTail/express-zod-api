@@ -116,9 +116,9 @@ paths:
             pattern: \d+
       responses:
         "204":
-          description: Confirmation of successful action
+          description: Confirmation
         "404":
-          description: Rejection due to missing entity
+          description: Does not exist
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -290,7 +290,7 @@ paths:
         required: true
       responses:
         "201":
-          description: Successful response
+          description: Confirmation on creation
           content:
             application/json:
               schema:
@@ -313,9 +313,9 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
+                description: Confirmation on creation
         "202":
-          description: Successful response
+          description: Confirmation on creation
           content:
             application/json:
               schema:
@@ -338,7 +338,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
+                description: Confirmation on creation
         "400":
           description: Generic error response
           content:
@@ -357,7 +357,7 @@ paths:
                 additionalProperties: false
                 description: Generic error response
         "409":
-          description: Error when entity already exists
+          description: Already exists
           content:
             application/json:
               schema:
@@ -374,7 +374,7 @@ paths:
                   - status
                   - id
                 additionalProperties: false
-                description: Error when entity already exists
+                description: Already exists
         "500":
           description: Generic error response
           content:

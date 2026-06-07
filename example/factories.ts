@@ -90,14 +90,14 @@ export const statusDependingFactory = new EndpointsFactory(
       statusCode: [201, 202],
       schema: z
         .object({ status: z.literal("created"), data })
-        .describe("Successful response"),
+        .describe("Confirmation on creation"),
     }),
     negative: [
       {
         statusCode: 409,
         schema: z
           .object({ status: z.literal("exists"), id: z.int() })
-          .describe("Error when entity already exists"),
+          .describe("Already exists"),
       },
       {
         statusCode: [400, 500],
@@ -132,12 +132,12 @@ export const noContentFactory = new EndpointsFactory(
     positive: {
       statusCode: 204,
       mimeType: null,
-      schema: z.never().describe("Confirmation of successful action"),
+      schema: z.never().describe("Confirmation"),
     },
     negative: {
       statusCode: 404,
       mimeType: null,
-      schema: z.never().describe("Rejection due to missing entity"),
+      schema: z.never().describe("Does not exist"),
     },
     handler: ({ error, response }) => {
       response.status(error ? ensureHttpError(error).statusCode : 204).end(); // no content
