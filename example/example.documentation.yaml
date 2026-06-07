@@ -53,7 +53,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/user/retrieve Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -74,6 +74,7 @@ paths:
                   - status
                   - error
                 additionalProperties: false
+                description: Error response
               examples:
                 example1:
                   value:
@@ -116,9 +117,9 @@ paths:
             pattern: \d+
       responses:
         "204":
-          description: DELETE /v1/user/:id/remove Positive response
+          description: Confirmation of successful action
         "404":
-          description: DELETE /v1/user/:id/remove Negative response
+          description: Rejection due to missing entity
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -236,7 +237,7 @@ paths:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
         "400":
-          description: PATCH /v1/user/:id Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -257,6 +258,7 @@ paths:
                   - status
                   - error
                 additionalProperties: false
+                description: Error response
               examples:
                 example1:
                   value:
@@ -290,7 +292,7 @@ paths:
         required: true
       responses:
         "201":
-          description: POST /v1/user/create Positive response 201
+          description: Successful response
           content:
             application/json:
               schema:
@@ -313,8 +315,9 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
         "202":
-          description: POST /v1/user/create Positive response 202
+          description: Successful response
           content:
             application/json:
               schema:
@@ -337,8 +340,9 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
         "400":
-          description: POST /v1/user/create Negative response 400
+          description: Generic error response
           content:
             application/json:
               schema:
@@ -353,8 +357,9 @@ paths:
                   - status
                   - reason
                 additionalProperties: false
+                description: Generic error response
         "409":
-          description: POST /v1/user/create Negative response 409
+          description: Error when entity already exists
           content:
             application/json:
               schema:
@@ -371,8 +376,9 @@ paths:
                   - status
                   - id
                 additionalProperties: false
+                description: Error when entity already exists
         "500":
-          description: POST /v1/user/create Negative response 500
+          description: Generic error response
           content:
             application/json:
               schema:
@@ -387,6 +393,7 @@ paths:
                   - status
                   - reason
                 additionalProperties: false
+                description: Generic error response
   /v1/user/list:
     get:
       operationId: GetV1UserList
@@ -513,7 +520,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/login Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -534,6 +541,7 @@ paths:
                   - status
                   - error
                 additionalProperties: false
+                description: Error response
               examples:
                 example1:
                   value:
@@ -558,17 +566,19 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: GET /v1/avatar/send Positive response
+          description: An image file
           content:
             image/svg+xml:
               schema:
                 type: string
+                description: An image file
         "400":
-          description: GET /v1/avatar/send Negative response
+          description: Error message
           content:
             text/plain:
               schema:
                 type: string
+                description: Error message
     head:
       operationId: HeadV1AvatarSend
       summary: Sends a file content.
@@ -606,19 +616,21 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: GET /v1/avatar/stream Positive response
+          description: An image stream
           content:
             image/*:
               schema:
+                description: An image stream
                 externalDocs:
                   description: raw binary data
                   url: https://swagger.io/specification/#working-with-binary-data
         "400":
-          description: GET /v1/avatar/stream Negative response
+          description: Error message
           content:
             text/plain:
               schema:
                 type: string
+                description: Error message
     head:
       operationId: HeadV1AvatarStream
       summary: Streams a file content.
@@ -713,7 +725,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/avatar/upload Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -734,6 +746,7 @@ paths:
                   - status
                   - error
                 additionalProperties: false
+                description: Error response
               examples:
                 example1:
                   value:
@@ -780,7 +793,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/avatar/raw Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -801,6 +814,7 @@ paths:
                   - status
                   - error
                 additionalProperties: false
+                description: Error response
               examples:
                 example1:
                   value:
@@ -925,7 +939,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/forms/feedback Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -946,6 +960,7 @@ paths:
                   - status
                   - error
                 additionalProperties: false
+                description: Error response
               examples:
                 example1:
                   value:
@@ -1052,7 +1067,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v2/users/list Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -1073,6 +1088,7 @@ paths:
                   - status
                   - error
                 additionalProperties: false
+                description: Error response
               examples:
                 example1:
                   value:

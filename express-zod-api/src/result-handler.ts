@@ -110,6 +110,7 @@ const defaultNegativeSchema = z.object({
   error: z.object({ message: z.string() }),
 });
 globalRegistry.add(defaultNegativeSchema, {
+  description: "Error response",
   examples: [
     { status: "error", error: { message: "Sample error message" } },
   ] satisfies z.output<typeof defaultNegativeSchema>[],
@@ -130,6 +131,7 @@ export const defaultResultHandler = new ResultHandler({
     const examples = getExamples(output); // pulling down:
     if (examples.length) {
       globalRegistry.add(responseSchema, {
+        description: output.description,
         examples: examples.map((data) => ({
           status: "success" as const,
           data,

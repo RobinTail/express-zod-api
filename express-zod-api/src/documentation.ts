@@ -229,12 +229,14 @@ export class Documentation extends OpenApiBuilder {
               statusCode,
               hasMultipleStatusCodes:
                 apiResponses.length > 1 || statusCodes.length > 1,
-              description: descriptions?.[`${variant}Response`]?.({
-                method,
-                path,
-                operationId,
-                statusCode,
-              }),
+              description:
+                (method === "head" ? undefined : schema.description) ||
+                descriptions?.[`${variant}Response`]?.({
+                  method,
+                  path,
+                  operationId,
+                  statusCode,
+                }),
             });
           }
         }
