@@ -8,7 +8,11 @@ import {
   OpenApiBuilder,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { type ResponseVariant, responseVariants } from "./api-response";
+import {
+  type ResponseVariant,
+  type StatusCode,
+  responseVariants,
+} from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { getInputSources, makeCleanId } from "./common-helpers";
@@ -41,7 +45,7 @@ type Component =
 /** @desc user defined function that creates a component description from its properties */
 type Descriptor = (
   props: Record<"method" | "path" | "operationId", string> & {
-    statusCode?: number; // for response only
+    statusCode?: StatusCode; // for response only
   },
 ) => string;
 
