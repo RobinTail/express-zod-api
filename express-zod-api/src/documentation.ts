@@ -8,7 +8,7 @@ import {
   OpenApiBuilder,
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
-import { responseVariants } from "./api-response";
+import { type ResponseVariant, responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
 import { DocumentationError } from "./errors";
 import { getInputSources, makeCleanId } from "./common-helpers";
@@ -34,8 +34,7 @@ import type { Routing } from "./routing";
 import { walkRouting, withHead, type OnEndpoint } from "./routing-walker";
 
 type Component =
-  | "positiveResponse"
-  | "negativeResponse"
+  | `${ResponseVariant}Response`
   | "requestParameter"
   | "requestBody";
 
