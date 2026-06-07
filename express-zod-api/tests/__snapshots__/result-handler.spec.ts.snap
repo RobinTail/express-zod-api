@@ -48,6 +48,7 @@ exports[`ResultHandler > 'arrayResultHandler' > should forward output schema exa
 
 exports[`ResultHandler > 'arrayResultHandler' > should generate negative response example 1`] = `
 {
+  "description": "Error message",
   "examples": [
     "Sample error message",
   ],

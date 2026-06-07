@@ -443,7 +443,7 @@ paths:
                     - name: Patti Harrison
                       role: admin
         "400":
-          description: GET /v1/user/list Negative response
+          description: Error message
           content:
             text/plain:
               schema:

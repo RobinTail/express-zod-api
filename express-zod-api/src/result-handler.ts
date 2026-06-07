@@ -161,6 +161,7 @@ export const defaultResultHandler = new ResultHandler({
 
 const arrayNegativeSchema = z.string();
 globalRegistry.add(arrayNegativeSchema, {
+  description: "Error message",
   examples: ["Sample error message"] satisfies z.output<
     typeof arrayNegativeSchema
   >[],
