@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export type StatusCode = number | "1XX" | "2XX" | "3XX" | "4XX" | "5XX";
+
 export const defaultStatusCodes = {
   positive: 200,
   negative: 400,
@@ -21,7 +23,7 @@ export interface ApiResponse<S extends z.ZodType> {
    * @desc The status code(s) for this response.
    * @default 200 for a positive response, 400 for a negative one
    * */
-  statusCode?: number | [number, ...number[]];
+  statusCode?: StatusCode | [StatusCode, ...StatusCode[]];
   /**
    * @desc The MIME type(s) of the response.
    * @default "application/json"
@@ -36,6 +38,6 @@ export interface ApiResponse<S extends z.ZodType> {
  * */
 export interface NormalizedResponse {
   schema: z.ZodType;
-  statusCodes: [number, ...number[]];
+  statusCodes: [StatusCode, ...StatusCode[]];
   mimeTypes: [string, ...string[]] | null;
 }

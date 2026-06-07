@@ -49,7 +49,7 @@ export const normalize = <A extends unknown[]>(
     ({ schema, statusCode, mimeType }) => ({
       schema,
       statusCodes:
-        typeof statusCode === "number"
+        typeof statusCode === "number" || typeof statusCode === "string"
           ? [statusCode]
           : statusCode || fallback.statusCodes,
       mimeTypes:
