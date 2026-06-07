@@ -117,7 +117,7 @@ exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`]
 
 exports[`ResultHandler > 'defaultResultHandler' > should forward output schema examples 1`] = `
 {
-  "description": undefined,
+  "description": "Successful response",
   "examples": [
     {
       "data": {

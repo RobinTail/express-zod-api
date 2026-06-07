@@ -195,7 +195,7 @@ paths:
           APIKEY_2: []
       responses:
         "200":
-          description: PATCH /v1/user/:id Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -229,6 +229,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
               examples:
                 example1:
                   value:

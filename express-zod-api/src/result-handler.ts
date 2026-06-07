@@ -131,7 +131,7 @@ export const defaultResultHandler = new ResultHandler({
     const examples = getExamples(output); // pulling down:
     if (examples.length) {
       globalRegistry.add(responseSchema, {
-        description: output.description,
+        description: "Successful response",
         examples: examples.map((data) => ({
           status: "success" as const,
           data,

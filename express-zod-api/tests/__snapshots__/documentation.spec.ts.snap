@@ -3860,7 +3860,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/addSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -3889,6 +3889,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
               examples:
                 example1:
                   value:
@@ -4082,7 +4083,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4105,6 +4106,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
               examples:
                 example1:
                   value:
@@ -4191,7 +4193,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4216,6 +4218,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
               examples:
                 example1:
                   value:
@@ -4288,7 +4291,7 @@ paths:
               value: "123"
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4311,6 +4314,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
               examples:
                 example1:
                   value:
@@ -4406,7 +4410,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4429,6 +4433,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
               examples:
                 example1:
                   value:
@@ -4503,7 +4508,7 @@ paths:
               value: "123"
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4528,6 +4533,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
               examples:
                 example1:
                   value:
@@ -4627,7 +4633,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4652,6 +4658,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
               examples:
                 example1:
                   value:
