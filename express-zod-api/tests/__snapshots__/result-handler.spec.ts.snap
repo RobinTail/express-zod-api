@@ -117,6 +117,7 @@ exports[`ResultHandler > 'defaultResultHandler' > Should handle schema error 1`]
 
 exports[`ResultHandler > 'defaultResultHandler' > should forward output schema examples 1`] = `
 {
+  "description": undefined,
   "examples": [
     {
       "data": {
@@ -135,6 +136,7 @@ exports[`ResultHandler > 'defaultResultHandler' > should forward output schema e
 
 exports[`ResultHandler > 'defaultResultHandler' > should generate negative response example 1`] = `
 {
+  "description": "Error response",
   "examples": [
     {
       "error": {
