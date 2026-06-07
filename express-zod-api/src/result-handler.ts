@@ -129,15 +129,15 @@ export const defaultResultHandler = new ResultHandler({
       data: output,
     });
     const examples = getExamples(output); // pulling down:
-    if (examples.length) {
-      globalRegistry.add(responseSchema, {
-        description: "Successful response",
+    globalRegistry.add(responseSchema, {
+      description: "Successful response",
+      ...(examples.length && {
         examples: examples.map((data) => ({
           status: "success" as const,
           data,
         })),
-      });
-    }
+      }),
+    });
     return responseSchema;
   },
   negative: defaultNegativeSchema,

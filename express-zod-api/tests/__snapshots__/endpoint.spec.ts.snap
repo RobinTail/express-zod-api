@@ -81,6 +81,7 @@ exports[`Endpoint > .getResponses() > should return the positive responses (read
     "schema": {
       "$schema": "https://json-schema.org/draft/2020-12/schema",
       "additionalProperties": false,
+      "description": "Successful response",
       "properties": {
         "data": {
           "additionalProperties": false,

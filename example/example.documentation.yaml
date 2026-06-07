@@ -21,7 +21,7 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: GET /v1/user/retrieve Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -52,6 +52,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
         "400":
           description: Error response
           content:
@@ -496,7 +497,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/login Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -517,6 +518,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
         "400":
           description: Error response
           content:
@@ -683,7 +685,7 @@ paths:
         - APIKEY_3: []
       responses:
         "200":
-          description: POST /v1/avatar/upload Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -721,6 +723,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
         "400":
           description: Error response
           content:
@@ -765,7 +768,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/avatar/raw Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -788,6 +791,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
         "400":
           description: Error response
           content:
@@ -910,7 +914,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/forms/feedback Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -933,6 +937,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
         "400":
           description: Error response
           content:
@@ -1005,7 +1010,7 @@ paths:
                 - admin
       responses:
         "200":
-          description: GET /v2/users/list Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1060,6 +1065,7 @@ paths:
                   - status
                   - data
                 additionalProperties: false
+                description: Successful response
         "400":
           description: Error response
           content:
