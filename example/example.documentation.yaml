@@ -74,7 +74,6 @@ paths:
                   - status
                   - error
                 additionalProperties: false
-                description: Error response
               examples:
                 example1:
                   value:
@@ -229,7 +228,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
               examples:
                 example1:
                   value:
@@ -259,7 +257,6 @@ paths:
                   - status
                   - error
                 additionalProperties: false
-                description: Error response
               examples:
                 example1:
                   value:
@@ -542,7 +539,6 @@ paths:
                   - status
                   - error
                 additionalProperties: false
-                description: Error response
               examples:
                 example1:
                   value:
@@ -747,7 +743,6 @@ paths:
                   - status
                   - error
                 additionalProperties: false
-                description: Error response
               examples:
                 example1:
                   value:
@@ -815,7 +810,6 @@ paths:
                   - status
                   - error
                 additionalProperties: false
-                description: Error response
               examples:
                 example1:
                   value:
@@ -961,7 +955,6 @@ paths:
                   - status
                   - error
                 additionalProperties: false
-                description: Error response
               examples:
                 example1:
                   value:
@@ -1089,7 +1082,6 @@ paths:
                   - status
                   - error
                 additionalProperties: false
-                description: Error response
               examples:
                 example1:
                   value:

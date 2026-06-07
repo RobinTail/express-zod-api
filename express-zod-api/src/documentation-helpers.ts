@@ -460,6 +460,7 @@ export const depictResponse = ({
   if (isSchemaObject(response) && response.examples) {
     examples.push(...response.examples);
     delete response.examples; // moving them up
+    delete response.description;
   }
   const media: MediaTypeObject = {
     schema:
