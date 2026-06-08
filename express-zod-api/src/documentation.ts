@@ -185,18 +185,17 @@ export class Documentation extends OpenApiBuilder {
   #addMetadata({
     title,
     version,
+    serverUrl,
+    tags,
     info,
     server,
-    serverUrl,
-  }: Pick<
-    DocumentationParams,
-    "title" | "version" | "info" | "server" | "serverUrl"
-  >) {
+  }: DocumentationParams) {
     this.addInfo({
       ...info,
       title: title ?? info?.title ?? this.rootDoc.info.title,
       version: version ?? info?.version ?? this.rootDoc.info.version,
     });
+    if (tags) this.rootDoc.tags = depictTags(tags);
     if (server) {
       for (const one of Array.isArray(server) ? server : [server])
         this.addServer(typeof one === "string" ? { url: one } : one);
@@ -206,25 +205,15 @@ export class Documentation extends OpenApiBuilder {
       this.addServer({ url });
   }
 
-  public constructor({
-    routing,
+  #makeEndpointHandler({
     config,
-    title,
-    version,
-    serverUrl,
-    info,
-    server,
     descriptions,
     brandHandling,
-    tags,
     isHeader,
-    hasHeadMethod = true,
     summarizer = defaultSummarizer,
     composition = "inline",
-  }: DocumentationParams) {
-    super();
-    this.#addMetadata({ title, version, info, server, serverUrl });
-    const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
+  }: DocumentationParams): OnEndpoint<ClientMethod> {
+    return (method, path, endpoint) => {
       const commons = {
         path,
         method,
@@ -318,11 +307,13 @@ export class Documentation extends OpenApiBuilder {
       };
       this.addPath(reformatParamsInPath(path), { [method]: operation });
     };
-    walkRouting({
-      routing,
-      config,
-      onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
-    });
-    if (tags) this.rootDoc.tags = depictTags(tags);
+  }
+
+  public constructor({ hasHeadMethod = true, ...rest }: DocumentationParams) {
+    super();
+    this.#addMetadata(rest);
+    const handler = this.#makeEndpointHandler(rest);
+    const onEndpoint = hasHeadMethod ? withHead(handler) : handler;
+    walkRouting({ ...rest, onEndpoint });
   }
 }
