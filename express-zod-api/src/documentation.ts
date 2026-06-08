@@ -166,6 +166,18 @@ export class Documentation extends OpenApiBuilder {
     return `${subject.type.toUpperCase()}_${nextId}`;
   }
 
+  #addMetadata({
+    title,
+    version,
+    serverUrl,
+    tags,
+  }: Pick<DocumentationParams, "title" | "version" | "serverUrl" | "tags">) {
+    this.addInfo({ title, version });
+    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
+      this.addServer({ url });
+    if (tags) this.rootDoc.tags = depictTags(tags);
+  }
+
   #makeEndpointHandler({
     config,
     descriptions,
@@ -289,15 +301,12 @@ export class Documentation extends OpenApiBuilder {
     ...rest
   }: DocumentationParams) {
     super();
-    this.addInfo({ title, version });
-    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
-      this.addServer({ url });
+    this.#addMetadata({ title, version, serverUrl, tags });
     const onEndpoint = this.#makeEndpointHandler({ ...rest, config });
     walkRouting({
       routing,
       config,
       onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
     });
-    if (tags) this.rootDoc.tags = depictTags(tags);
   }
 }
