@@ -166,25 +166,23 @@ export class Documentation extends OpenApiBuilder {
     return `${subject.type.toUpperCase()}_${nextId}`;
   }
 
-  public constructor({
-    routing,
-    config,
-    title,
-    version,
-    serverUrl,
-    descriptions,
+  #makeEndpointHandler({
     brandHandling,
-    tags,
+    descriptions,
+    config,
     isHeader,
-    hasHeadMethod = true,
-    summarizer = defaultSummarizer,
     composition = "inline",
-  }: DocumentationParams) {
-    super();
-    this.addInfo({ title, version });
-    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
-      this.addServer({ url });
-    const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
+    summarizer = defaultSummarizer,
+  }: Pick<
+    DocumentationParams,
+    | "composition"
+    | "brandHandling"
+    | "descriptions"
+    | "config"
+    | "isHeader"
+    | "summarizer"
+  >): OnEndpoint<ClientMethod> {
+    return (method, path, endpoint) => {
       const commons = {
         path,
         method,
@@ -278,6 +276,34 @@ export class Documentation extends OpenApiBuilder {
       };
       this.addPath(reformatParamsInPath(path), { [method]: operation });
     };
+  }
+
+  public constructor({
+    routing,
+    config,
+    title,
+    version,
+    serverUrl,
+    descriptions,
+    brandHandling,
+    tags,
+    isHeader,
+    summarizer,
+    composition,
+    hasHeadMethod = true,
+  }: DocumentationParams) {
+    super();
+    this.addInfo({ title, version });
+    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
+      this.addServer({ url });
+    const onEndpoint = this.#makeEndpointHandler({
+      composition,
+      brandHandling,
+      descriptions,
+      config,
+      isHeader,
+      summarizer,
+    });
     walkRouting({
       routing,
       config,
