@@ -407,7 +407,7 @@ paths:
                 - admin
       responses:
         "200":
-          description: GET /v1/user/list Positive response
+          description: The list of users
           content:
             application/json:
               schema:
@@ -464,7 +464,7 @@ paths:
                 - admin
       responses:
         "200":
-          description: HEAD /v1/user/list Positive response
+          description: The list of users
         "400":
           description: Error message
   /v1/login:

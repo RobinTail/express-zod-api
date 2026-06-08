@@ -25,11 +25,14 @@ export const listUsersEndpoint = arrayRespondingFactory.build({
   }),
   output: z.object({
     // the arrayResultHandler will take the "items" prop as the response
-    items: z.array(z.object({ name: z.string(), role: roleSchema })).example([
-      { name: "Hunter Schafer", role: "manager" },
-      { name: "Laverne Cox", role: "operator" },
-      { name: "Patti Harrison", role: "admin" },
-    ]),
+    items: z
+      .array(z.object({ name: z.string(), role: roleSchema }))
+      .describe("The list of users")
+      .example([
+        { name: "Hunter Schafer", role: "manager" },
+        { name: "Laverne Cox", role: "operator" },
+        { name: "Patti Harrison", role: "admin" },
+      ]),
   }),
   handler: async ({ input: { roles } }) => ({
     items: users.filter(({ role }) => roles?.includes(role) ?? true),
