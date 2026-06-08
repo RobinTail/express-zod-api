@@ -166,25 +166,22 @@ export class Documentation extends OpenApiBuilder {
     return `${subject.type.toUpperCase()}_${nextId}`;
   }
 
-  public constructor({
-    routing,
-    config,
-    title,
-    version,
-    serverUrl,
-    descriptions,
-    brandHandling,
-    tags,
-    isHeader,
-    hasHeadMethod = true,
-    summarizer = defaultSummarizer,
-    composition = "inline",
-  }: DocumentationParams) {
-    super();
+  #addMetadata({ title, version, serverUrl, tags }: DocumentationParams) {
     this.addInfo({ title, version });
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
       this.addServer({ url });
-    const onEndpoint: OnEndpoint<ClientMethod> = (method, path, endpoint) => {
+    if (tags) this.rootDoc.tags = depictTags(tags);
+  }
+
+  #makeEndpointHandler({
+    config,
+    descriptions,
+    brandHandling,
+    isHeader,
+    summarizer = defaultSummarizer,
+    composition = "inline",
+  }: DocumentationParams): OnEndpoint<ClientMethod> {
+    return (method, path, endpoint) => {
       const commons = {
         path,
         method,
@@ -278,11 +275,13 @@ export class Documentation extends OpenApiBuilder {
       };
       this.addPath(reformatParamsInPath(path), { [method]: operation });
     };
-    walkRouting({
-      routing,
-      config,
-      onEndpoint: hasHeadMethod ? withHead(onEndpoint) : onEndpoint,
-    });
-    if (tags) this.rootDoc.tags = depictTags(tags);
+  }
+
+  public constructor({ hasHeadMethod = true, ...rest }: DocumentationParams) {
+    super();
+    this.#addMetadata(rest);
+    const handler = this.#makeEndpointHandler(rest);
+    const onEndpoint = hasHeadMethod ? withHead(handler) : handler;
+    walkRouting({ ...rest, onEndpoint });
   }
 }
