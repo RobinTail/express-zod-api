@@ -167,12 +167,12 @@ export class Documentation extends OpenApiBuilder {
   }
 
   #makeEndpointHandler({
-    brandHandling,
-    descriptions,
     config,
+    descriptions,
+    brandHandling,
     isHeader,
-    composition = "inline",
     summarizer = defaultSummarizer,
+    composition = "inline",
   }: Pick<
     DocumentationParams,
     | "composition"
