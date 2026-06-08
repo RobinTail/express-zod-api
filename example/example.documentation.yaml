@@ -52,7 +52,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -314,7 +313,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Confirmation on creation
         "202":
           description: Confirmation on creation
           content:
@@ -339,7 +337,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Confirmation on creation
         "400":
           description: Generic error response
           content:
@@ -356,7 +353,6 @@ paths:
                   - status
                   - reason
                 additionalProperties: false
-                description: Generic error response
         "409":
           description: Already exists
           content:
@@ -375,7 +371,6 @@ paths:
                   - status
                   - id
                 additionalProperties: false
-                description: Already exists
         "500":
           description: Generic error response
           content:
@@ -392,7 +387,6 @@ paths:
                   - status
                   - reason
                 additionalProperties: false
-                description: Generic error response
   /v1/user/list:
     get:
       operationId: GetV1UserList
@@ -518,7 +512,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -570,14 +563,12 @@ paths:
             image/svg+xml:
               schema:
                 type: string
-                description: An image file
         "400":
           description: Error message
           content:
             text/plain:
               schema:
                 type: string
-                description: Error message
     head:
       operationId: HeadV1AvatarSend
       summary: Sends a file content.
@@ -619,7 +610,6 @@ paths:
           content:
             image/*:
               schema:
-                description: An image stream
                 externalDocs:
                   description: raw binary data
                   url: https://swagger.io/specification/#working-with-binary-data
@@ -629,7 +619,6 @@ paths:
             text/plain:
               schema:
                 type: string
-                description: Error message
     head:
       operationId: HeadV1AvatarStream
       summary: Streams a file content.
@@ -723,7 +712,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -791,7 +779,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -937,7 +924,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -1065,7 +1051,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:

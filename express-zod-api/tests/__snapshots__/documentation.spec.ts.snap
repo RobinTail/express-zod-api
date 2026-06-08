@@ -30,7 +30,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -114,7 +113,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -182,7 +180,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -257,7 +254,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -319,7 +315,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -421,7 +416,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -506,7 +500,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -566,7 +559,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -662,7 +654,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -770,7 +761,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -899,7 +889,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -1006,7 +995,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -1148,7 +1136,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -1312,7 +1299,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -1400,7 +1386,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -1546,7 +1531,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -1629,7 +1613,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -1850,7 +1833,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -2004,7 +1986,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -2099,7 +2080,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -2243,7 +2223,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -2337,7 +2316,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -2454,7 +2432,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -2536,7 +2513,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -2641,7 +2617,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -2855,7 +2830,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -2977,7 +2951,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -3087,7 +3060,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -3187,7 +3159,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -3301,7 +3272,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -3393,7 +3363,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -3483,7 +3452,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -3572,7 +3540,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -3688,7 +3655,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -3771,7 +3737,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -4017,7 +3982,6 @@ components:
         - status
         - data
       additionalProperties: false
-      description: Successful response
     ErrorResponse:
       type: object
       properties:
@@ -4739,7 +4703,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -4850,7 +4813,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: very negative response of PostV1Name
           content:
@@ -4959,7 +4921,6 @@ components:
         - status
         - data
       additionalProperties: false
-      description: Successful response
     VeryNegativeResponseOfPostV1Name:
       type: object
       properties:
@@ -5044,7 +5005,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
@@ -5160,7 +5120,6 @@ paths:
                   - status
                   - data
                 additionalProperties: false
-                description: Successful response
         "400":
           description: Error response
           content:
