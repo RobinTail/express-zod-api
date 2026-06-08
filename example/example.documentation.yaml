@@ -98,9 +98,9 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: HEAD /v1/user/retrieve Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/user/retrieve Negative response
+          description: Error response
   /v1/user/{id}/remove:
     delete:
       operationId: DeleteV1UserIdRemove
@@ -472,7 +472,7 @@ paths:
         "200":
           description: HEAD /v1/user/list Positive response
         "400":
-          description: HEAD /v1/user/list Negative response
+          description: Error message
   /v1/login:
     post:
       operationId: PostV1Login
@@ -595,9 +595,9 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: HEAD /v1/avatar/send Positive response
+          description: An image file
         "400":
-          description: HEAD /v1/avatar/send Negative response
+          description: Error message
   /v1/avatar/stream:
     get:
       operationId: GetV1AvatarStream
@@ -646,9 +646,9 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: HEAD /v1/avatar/stream Positive response
+          description: An image stream
         "400":
-          description: HEAD /v1/avatar/stream Negative response
+          description: Error message
   /v1/avatar/upload:
     post:
       operationId: PostV1AvatarUpload
@@ -1137,9 +1137,9 @@ paths:
                 - admin
       responses:
         "200":
-          description: HEAD /v2/users/list Positive response
+          description: Successful response
         "400":
-          description: HEAD /v2/users/list Negative response
+          description: Error response
 components:
   schemas:
     Feature:

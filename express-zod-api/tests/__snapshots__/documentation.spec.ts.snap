@@ -65,9 +65,9 @@ paths:
       description: thing is the path segment
       responses:
         "200":
-          description: HEAD /v1/getSome/thing Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSome/thing Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -149,9 +149,9 @@ paths:
       description: thing is the path segment
       responses:
         "200":
-          description: HEAD /v1/getSome/thing Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSome/thing Negative response
+          description: Error response
     post:
       operationId: postCoolOperationId
       summary: thing is the path segment
@@ -292,9 +292,9 @@ paths:
       description: thing is the path segment
       responses:
         "200":
-          description: HEAD /v1/getSome/thing Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSome/thing Negative response
+          description: Error response
   /v1/getSome/{thing}:
     get:
       operationId: GetV1GetSomeThing2
@@ -354,9 +354,9 @@ paths:
       description: thing is the path parameter
       responses:
         "200":
-          description: HEAD /v1/getSome/:thing Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSome/:thing Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -470,9 +470,9 @@ paths:
         - HTTP_1: []
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
   /v1/setSomething:
     post:
       operationId: PostV1SetSomething
@@ -1223,9 +1223,9 @@ paths:
             pattern: ^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -1448,9 +1448,9 @@ paths:
         - APIKEY_1: []
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -2575,9 +2575,9 @@ paths:
           schema: {}
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -2689,9 +2689,9 @@ paths:
             format: integer (preprocessed)
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -2907,9 +2907,9 @@ paths:
             type: boolean
       responses:
         "200":
-          description: HEAD /v1/:name Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/:name Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -3029,9 +3029,9 @@ paths:
                 pattern: ^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z||([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$
       responses:
         "200":
-          description: HEAD /v1/test Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/test Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -3127,9 +3127,9 @@ paths:
             type: string
       responses:
         "200":
-          description: HEAD /v1/test Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/test Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -3233,9 +3233,9 @@ paths:
             type: string
       responses:
         "200":
-          description: HEAD /v1/test Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/test Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -3526,9 +3526,9 @@ paths:
               type: string
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
     post:
       operationId: PostV1GetSomething
       requestBody:
@@ -3814,9 +3814,9 @@ paths:
             deprecated: true
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -3994,9 +3994,9 @@ paths:
             $ref: "#/components/schemas/GetHrisEmployeesParameterCursor"
       responses:
         "200":
-          description: HEAD /hris/employees Positive response
+          description: Successful response
         "400":
-          description: HEAD /hris/employees Negative response
+          description: Error response
 components:
   schemas:
     GetHrisEmployeesParameterCursor:
@@ -4356,9 +4356,9 @@ paths:
               value: "123"
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -4573,9 +4573,9 @@ paths:
               value: "123"
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -4780,9 +4780,9 @@ paths:
             description: here is the test
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -4833,7 +4833,7 @@ paths:
         required: true
       responses:
         "200":
-          description: Successful response
+          description: Super positive response of /v1/:name
           content:
             application/json:
               schema:
@@ -4852,7 +4852,7 @@ paths:
                 additionalProperties: false
                 description: Successful response
         "400":
-          description: Error response
+          description: very negative response of PostV1Name
           content:
             application/json:
               schema:
@@ -4920,17 +4920,17 @@ paths:
         required: true
       responses:
         "200":
-          description: Successful response
+          description: Super positive response of /v1/:name
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessfulResponse"
+                $ref: "#/components/schemas/SuperPositiveResponseOfV1Name"
         "400":
-          description: Error response
+          description: very negative response of PostV1Name
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                $ref: "#/components/schemas/VeryNegativeResponseOfPostV1Name"
               examples:
                 example1:
                   value:
@@ -4945,7 +4945,7 @@ components:
           const: John
         - type: string
           const: Jane
-    SuccessfulResponse:
+    SuperPositiveResponseOfV1Name:
       type: object
       properties:
         status:
@@ -4960,7 +4960,7 @@ components:
         - data
       additionalProperties: false
       description: Successful response
-    ErrorResponse:
+    VeryNegativeResponseOfPostV1Name:
       type: object
       properties:
         status:
@@ -5094,9 +5094,9 @@ paths:
             type: boolean
       responses:
         "200":
-          description: HEAD /v1/:name Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/:name Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}

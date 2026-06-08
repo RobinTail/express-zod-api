@@ -436,9 +436,10 @@ export const depictResponse = ({
   hasMultipleStatusCodes,
   statusCode,
   brandHandling,
-  description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
-    hasMultipleStatusCodes ? statusCode : ""
-  }`.trim(),
+  description = schema.description ??
+    `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
+      hasMultipleStatusCodes ? statusCode : ""
+    }`.trim(),
 }: ReqResCommons & {
   schema: z.ZodType;
   composition: "inline" | "components";
