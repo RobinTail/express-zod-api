@@ -440,7 +440,7 @@ export const depictResponse = ({
     hasMultipleStatusCodes ? statusCode : ""
   }`.trim(),
 }: ReqResCommons & {
-  schema: z.core.$ZodType;
+  schema: z.ZodType;
   composition: "inline" | "components";
   description?: string;
   brandHandling?: BrandHandling;
