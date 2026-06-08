@@ -9,10 +9,12 @@ import { promisify } from "node:util";
 export const loginEndpoint = cookieAssistedFactory.build({
   method: "post",
   tag: "cookies",
-  input: z.object({
-    username: z.string().trim().nonempty(),
-    password: z.string().trim().nonempty(),
-  }),
+  input: z
+    .object({
+      username: z.string().trim().nonempty(),
+      password: z.string().trim().nonempty(),
+    })
+    .describe("Login credentials"),
   output: z.object({ message: z.string() }),
   handler: async ({ input: { username, password }, ctx: { setCookie } }) => {
     const key = await promisify<string, string, number, Buffer>(scrypt)(

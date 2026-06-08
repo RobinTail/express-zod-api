@@ -589,7 +589,8 @@ export const depictBody = ({
   makeRef,
   composition,
   paramNames,
-  description = `${method.toUpperCase()} ${path} Request body`,
+  description = request.description ||
+    `${method.toUpperCase()} ${path} Request body`,
 }: ReqResCommons & {
   schema: IOSchema;
   composition: "inline" | "components";
@@ -600,6 +601,7 @@ export const depictBody = ({
 }) => {
   const [_pure, hasRequired] = excludeParamsFromDepiction(request, paramNames);
   const pure = asOAS(_pure);
+  delete pure.description; // pulled up
   const examples = [];
   if (isSchemaObject(pure) && pure.examples) {
     examples.push(...pure.examples);

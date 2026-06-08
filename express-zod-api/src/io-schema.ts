@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { globalRegistry, z } from "zod";
 
 type Base = object & { [Symbol.iterator]?: never };
 
@@ -41,7 +41,11 @@ export const makeFinalInputSchema = <
 >(
   factorySchema: FIN,
   buildSchema: BIN,
-) =>
-  (factorySchema
-    ? factorySchema.and(buildSchema)
-    : buildSchema) as FinalInputSchema<FIN, BIN>;
+) => {
+  const final = (
+    factorySchema ? factorySchema.and(buildSchema) : buildSchema
+  ) as FinalInputSchema<FIN, BIN>;
+  if (factorySchema)
+    globalRegistry.add(final, { description: buildSchema.description });
+  return final;
+};

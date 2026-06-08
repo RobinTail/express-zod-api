@@ -479,7 +479,7 @@ paths:
       tags:
         - cookies
       requestBody:
-        description: POST /v1/login Request body
+        description: Login credentials
         content:
           application/json:
             schema:
