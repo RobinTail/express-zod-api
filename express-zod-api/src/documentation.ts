@@ -284,26 +284,15 @@ export class Documentation extends OpenApiBuilder {
     title,
     version,
     serverUrl,
-    descriptions,
-    brandHandling,
     tags,
-    isHeader,
-    summarizer,
-    composition,
     hasHeadMethod = true,
+    ...rest
   }: DocumentationParams) {
     super();
     this.addInfo({ title, version });
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
       this.addServer({ url });
-    const onEndpoint = this.#makeEndpointHandler({
-      composition,
-      brandHandling,
-      descriptions,
-      config,
-      isHeader,
-      summarizer,
-    });
+    const onEndpoint = this.#makeEndpointHandler({ ...rest, config });
     walkRouting({
       routing,
       config,
