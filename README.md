@@ -1229,7 +1229,7 @@ const yamlString = new Documentation({
   config,
   version: "1.2.3",
   title: "Example API",
-  serverUrl: "https://example.com",
+  server: "https://example.com",
   composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
   // descriptions: { positiveResponse, negativeResponse, requestParameter, requestBody }, // check out these features
 }).getSpecAsYaml();

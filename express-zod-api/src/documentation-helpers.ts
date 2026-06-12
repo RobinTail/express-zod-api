@@ -6,14 +6,14 @@ import {
   type ReferenceObject,
   type RequestBodyObject,
   type ResponseObject,
-  type SchemaObject,
   type SchemaObjectType,
+  type SchemaObjectValue,
   type SecurityRequirementObject,
   type SecuritySchemeObject,
   type TagObject,
   isReferenceObject,
   isSchemaObject,
-} from "openapi3-ts/oas31";
+} from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { z } from "zod";
 import type { NormalizedResponse, ResponseVariant } from "./api-response";
@@ -50,7 +50,7 @@ import { getWellKnownHeaders } from "./well-known-headers";
 interface ReqResCommons {
   makeRef: (
     key: object | string,
-    value: SchemaObject | ReferenceObject,
+    value: SchemaObjectValue | ReferenceObject,
     proposedName?: string,
   ) => ReferenceObject;
   path: string;
@@ -67,7 +67,7 @@ export type Depicter = (
     jsonSchema: z.core.JSONSchema.BaseSchema;
   },
   oasCtx: OpenAPIContext,
-) => z.core.JSONSchema.BaseSchema | SchemaObject;
+) => z.core.JSONSchema.BaseSchema | SchemaObjectValue;
 
 /** @desc Using defaultIsHeader when returns null or undefined */
 export type IsHeader = (
@@ -138,7 +138,7 @@ export const depictNullable: Depicter = ({ jsonSchema }) => {
 
 /** @since v24.3.1 schema compliance is fully delegated to Zod */
 const asOAS = (subject: z.core.JSONSchema.BaseSchema) =>
-  subject as SchemaObject | ReferenceObject;
+  subject as SchemaObjectValue | ReferenceObject;
 
 export const depictDateIn: Depicter = ({ jsonSchema }, ctx) => {
   if (ctx.isResponse)
@@ -168,7 +168,7 @@ export const depictTuple: Depicter = ({ zodSchema, jsonSchema }) => {
   return { ...jsonSchema, items: { not: {} } };
 };
 
-const makeSample = (depicted: SchemaObject) => {
+const makeSample = (depicted: SchemaObjectValue) => {
   const firstType = (
     Array.isArray(depicted.type) ? depicted.type[0] : depicted.type
   ) as keyof typeof samples;
@@ -235,7 +235,7 @@ const enumerateExamples = (examples: unknown[]): ExamplesObject | undefined =>
     ? R.fromPairs(
         R.zip(
           R.times((idx) => `example${idx + 1}`, examples.length),
-          R.map(R.objOf("value"), examples),
+          R.map(R.objOf("dataValue"), examples),
         ),
       )
     : undefined;
@@ -456,39 +456,51 @@ export const depictResponse = ({
       ctx: { isResponse: true, makeRef, path, method },
     }),
   );
-  const examples = [];
+  const examples: unknown[] = [];
   if (isSchemaObject(response) && response.examples) {
     examples.push(...response.examples);
     delete response.examples; // moving them up
   }
-  const media: MediaTypeObject = {
-    schema:
-      composition === "components"
-        ? makeRef(schema, response, makeCleanId(description))
-        : response,
-    examples: enumerateExamples(examples),
+  const schemaOrRef =
+    composition === "components"
+      ? makeRef(schema, response, makeCleanId(description))
+      : response;
+  return {
+    description,
+    content: R.fromPairs(
+      mimeTypes.map<[string, MediaTypeObject]>((mt) => {
+        const key: keyof MediaTypeObject =
+          mt === contentTypes.sse ? "itemSchema" : "schema";
+        return [
+          mt,
+          { [key]: schemaOrRef, examples: enumerateExamples(examples) },
+        ];
+      }),
+    ),
   };
-  return { description, content: R.fromPairs(R.xprod(mimeTypes, [media])) };
 };
 
 const depictBearerSecurity = ({
   format: bearerFormat,
+  deprecated,
 }: Extract<Security, { type: "bearer" }>) => {
   const result: SecuritySchemeObject = {
     type: "http",
     scheme: "bearer",
+    deprecated,
   };
   if (bearerFormat) result.bearerFormat = bearerFormat;
   return result;
 };
 const depictInputSecurity = (
-  { name }: Extract<Security, { type: "input" }>,
+  { name, deprecated }: Extract<Security, { type: "input" }>,
   inputSources: InputSource[],
 ) => {
   const result: SecuritySchemeObject = {
     type: "apiKey",
     in: "query",
     name,
+    deprecated,
   };
   if (inputSources?.includes("body")) {
     if (inputSources?.includes("query")) {
@@ -503,32 +515,42 @@ const depictInputSecurity = (
 };
 const depictHeaderSecurity = ({
   name,
+  deprecated,
 }: Extract<Security, { type: "header" }>) => ({
   type: "apiKey" as const,
   in: "header",
   name,
+  deprecated,
 });
 const depictCookieSecurity = ({
   name,
+  deprecated,
 }: Extract<Security, { type: "cookie" }>) => ({
   type: "apiKey" as const,
   in: "cookie",
   name,
+  deprecated,
 });
 const depictOpenIdSecurity = ({
   url: openIdConnectUrl,
+  deprecated,
 }: Extract<Security, { type: "openid" }>) => ({
   type: "openIdConnect" as const,
   openIdConnectUrl,
+  deprecated,
 });
 const depictOAuth2Security = ({
   flows = {},
+  deprecated,
+  oauth2MetadataUrl,
 }: Extract<Security, { type: "oauth2" }>) => ({
   type: "oauth2" as const,
   flows: R.map(
     (flow): OAuthFlowObject => ({ ...flow, scopes: flow.scopes || {} }),
     R.reject(R.isNil, flows) as Required<typeof flows>,
   ),
+  deprecated,
+  oauth2MetadataUrl,
 });
 
 export const depictSecurity = (
@@ -536,7 +558,8 @@ export const depictSecurity = (
   inputSources: InputSource[] = [],
 ): Alternatives<SecuritySchemeObject> => {
   const mapper = (subj: Security): SecuritySchemeObject => {
-    if (subj.type === "basic") return { type: "http", scheme: "basic" };
+    if (subj.type === "basic")
+      return { type: "http", scheme: "basic", deprecated: subj.deprecated };
     else if (subj.type === "bearer") return depictBearerSecurity(subj);
     else if (subj.type === "input")
       return depictInputSecurity(subj, inputSources);
@@ -626,17 +649,22 @@ export const depictBody = ({
   return body;
 };
 
-export const depictTags = (
-  tags: Partial<Record<Tag, string | { description: string; url?: string }>>,
-) =>
-  Object.entries(tags).reduce<TagObject[]>((agg, [tag, def]) => {
+interface TagDetails extends Pick<
+  TagObject,
+  "summary" | "description" | "externalDocs" | "kind"
+> {
+  /** @desc shorthand for externalDocs.url */
+  url?: string;
+  parent?: Tag;
+}
+
+export const depictTags = (tags: Partial<Record<Tag, string | TagDetails>>) =>
+  Object.entries(tags).reduce<TagObject[]>((agg, [name, def]) => {
     if (!def) return agg;
-    const entry: TagObject = {
-      name: tag,
-      description: typeof def === "string" ? def : def.description,
-    };
-    if (typeof def === "object" && def.url)
-      entry.externalDocs = { url: def.url };
+    if (typeof def === "string") return agg.concat({ name, description: def });
+    const { url, ...tagObject } = def;
+    const entry: TagObject = { ...tagObject, name };
+    if (url) entry.externalDocs = { ...entry.externalDocs, url };
     return agg.concat(entry);
   }, []);
 
