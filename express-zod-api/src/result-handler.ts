@@ -110,6 +110,7 @@ const defaultNegativeSchema = z.object({
   error: z.object({ message: z.string() }),
 });
 globalRegistry.add(defaultNegativeSchema, {
+  description: "Error response",
   examples: [
     { status: "error", error: { message: "Sample error message" } },
   ] satisfies z.output<typeof defaultNegativeSchema>[],
@@ -128,14 +129,15 @@ export const defaultResultHandler = new ResultHandler({
       data: output,
     });
     const examples = getExamples(output); // pulling down:
-    if (examples.length) {
-      globalRegistry.add(responseSchema, {
+    globalRegistry.add(responseSchema, {
+      description: "Successful response",
+      ...(examples.length && {
         examples: examples.map((data) => ({
           status: "success" as const,
           data,
         })),
-      });
-    }
+      }),
+    });
     return responseSchema;
   },
   negative: defaultNegativeSchema,
@@ -159,6 +161,7 @@ export const defaultResultHandler = new ResultHandler({
 
 const arrayNegativeSchema = z.string();
 globalRegistry.add(arrayNegativeSchema, {
+  description: "Error message",
   examples: ["Sample error message"] satisfies z.output<
     typeof arrayNegativeSchema
   >[],

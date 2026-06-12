@@ -13,7 +13,7 @@ paths:
       description: thing is the path segment
       responses:
         "200":
-          description: GET /v1/getSome/thing Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -31,7 +31,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSome/thing Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -64,9 +64,9 @@ paths:
       description: thing is the path segment
       responses:
         "200":
-          description: HEAD /v1/getSome/thing Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSome/thing Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -96,7 +96,7 @@ paths:
       description: thing is the path segment
       responses:
         "200":
-          description: GET /v1/getSome/thing Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -114,7 +114,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSome/thing Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -147,9 +147,9 @@ paths:
       description: thing is the path segment
       responses:
         "200":
-          description: HEAD /v1/getSome/thing Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSome/thing Negative response
+          description: Error response
     post:
       operationId: postCoolOperationId
       summary: thing is the path segment
@@ -163,7 +163,7 @@ paths:
               properties: {}
       responses:
         "200":
-          description: POST /v1/getSome/thing Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -181,7 +181,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSome/thing Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -237,7 +237,7 @@ paths:
       description: thing is the path segment
       responses:
         "200":
-          description: GET /v1/getSome/thing Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -255,7 +255,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSome/thing Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -288,9 +288,9 @@ paths:
       description: thing is the path segment
       responses:
         "200":
-          description: HEAD /v1/getSome/thing Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSome/thing Negative response
+          description: Error response
   /v1/getSome/{thing}:
     get:
       operationId: GetV1GetSomeThing2
@@ -298,7 +298,7 @@ paths:
       description: thing is the path parameter
       responses:
         "200":
-          description: GET /v1/getSome/:thing Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -316,7 +316,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSome/:thing Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -349,9 +349,9 @@ paths:
       description: thing is the path parameter
       responses:
         "200":
-          description: HEAD /v1/getSome/:thing Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSome/:thing Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -395,7 +395,7 @@ paths:
         - HTTP_1: []
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -417,7 +417,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -464,9 +464,9 @@ paths:
         - HTTP_1: []
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
   /v1/setSomething:
     post:
       operationId: PostV1SetSomething
@@ -483,7 +483,7 @@ paths:
             - write
       responses:
         "200":
-          description: POST /v1/setSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -501,7 +501,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/setSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -542,7 +542,7 @@ paths:
         - HTTP_2: []
       responses:
         "200":
-          description: PUT /v1/updateSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -560,7 +560,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: PUT /v1/updateSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -633,7 +633,7 @@ paths:
       operationId: DeleteV1DeleteSomething
       responses:
         "200":
-          description: DELETE /v1/deleteSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -655,7 +655,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: DELETE /v1/deleteSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -736,7 +736,7 @@ paths:
             type: string
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -762,7 +762,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -845,7 +845,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -890,7 +890,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -964,7 +964,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -996,7 +996,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -1092,7 +1092,7 @@ paths:
             pattern: ^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1137,7 +1137,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -1210,9 +1210,9 @@ paths:
             pattern: ^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -1274,7 +1274,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1300,7 +1300,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -1369,7 +1369,7 @@ paths:
         - APIKEY_1: []
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1387,7 +1387,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -1433,9 +1433,9 @@ paths:
         - APIKEY_1: []
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -1494,7 +1494,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1532,7 +1532,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -1592,7 +1592,7 @@ paths:
               $ref: "#/components/schemas/Schema1"
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1614,7 +1614,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -1810,7 +1810,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1834,7 +1834,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -1964,7 +1964,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1987,7 +1987,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -2056,7 +2056,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -2081,7 +2081,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -2142,7 +2142,7 @@ paths:
               properties: {}
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -2224,7 +2224,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -2295,7 +2295,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -2317,7 +2317,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -2408,7 +2408,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -2433,7 +2433,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -2493,7 +2493,7 @@ paths:
           schema: {}
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -2514,7 +2514,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -2551,9 +2551,9 @@ paths:
           schema: {}
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -2596,7 +2596,7 @@ paths:
             format: integer (preprocessed)
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -2618,7 +2618,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -2664,9 +2664,9 @@ paths:
             format: integer (preprocessed)
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -2809,7 +2809,7 @@ paths:
             type: boolean
       responses:
         "200":
-          description: GET /v1/:name Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -2831,7 +2831,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/:name Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -2881,9 +2881,9 @@ paths:
             type: boolean
       responses:
         "200":
-          description: HEAD /v1/:name Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/:name Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -2930,7 +2930,7 @@ paths:
                 pattern: ^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z||([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$
       responses:
         "200":
-          description: GET /v1/test Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -2952,7 +2952,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/test Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -3002,9 +3002,9 @@ paths:
                 pattern: ^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z||([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$
       responses:
         "200":
-          description: HEAD /v1/test Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/test Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -3039,7 +3039,7 @@ paths:
             type: string
       responses:
         "200":
-          description: GET /v1/test Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -3061,7 +3061,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/test Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -3099,9 +3099,9 @@ paths:
             type: string
       responses:
         "200":
-          description: HEAD /v1/test Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/test Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -3142,7 +3142,7 @@ paths:
             type: string
       responses:
         "200":
-          description: GET /v1/test Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -3160,7 +3160,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/test Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -3204,9 +3204,9 @@ paths:
             type: string
       responses:
         "200":
-          description: HEAD /v1/test Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/test Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -3255,7 +3255,7 @@ paths:
               required: []
       responses:
         "200":
-          description: POST /v1/test Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -3273,7 +3273,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/test Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -3346,7 +3346,7 @@ paths:
         required: true
       responses:
         "200":
-          description: PUT /v1/test Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -3364,7 +3364,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: PUT /v1/test Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -3428,7 +3428,7 @@ paths:
               type: string
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -3453,7 +3453,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -3494,9 +3494,9 @@ paths:
               type: string
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
     post:
       operationId: PostV1GetSomething
       requestBody:
@@ -3516,7 +3516,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -3541,7 +3541,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -3620,7 +3620,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -3656,7 +3656,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -3720,7 +3720,7 @@ paths:
             deprecated: true
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -3738,7 +3738,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -3779,9 +3779,9 @@ paths:
             deprecated: true
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -3825,7 +3825,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/addSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -3868,7 +3868,7 @@ paths:
                       a: second
                       b: prefix_second
         "400":
-          description: POST /v1/addSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -3930,17 +3930,17 @@ paths:
             $ref: "#/components/schemas/GetHrisEmployeesParameterCursor"
       responses:
         "200":
-          description: GET /hris/employees Positive response
+          description: Successful response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetHrisEmployeesPositiveResponse"
+                $ref: "#/components/schemas/SuccessfulResponse"
         "400":
-          description: GET /hris/employees Negative response
+          description: Error response
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetHrisEmployeesNegativeResponse"
+                $ref: "#/components/schemas/ErrorResponse"
               examples:
                 example1:
                   value:
@@ -3959,16 +3959,16 @@ paths:
             $ref: "#/components/schemas/GetHrisEmployeesParameterCursor"
       responses:
         "200":
-          description: HEAD /hris/employees Positive response
+          description: Successful response
         "400":
-          description: HEAD /hris/employees Negative response
+          description: Error response
 components:
   schemas:
     GetHrisEmployeesParameterCursor:
       description: An optional cursor string used for pagination. This can be
         retrieved from the \`next\` property of the previous page response.
       type: string
-    GetHrisEmployeesPositiveResponse:
+    SuccessfulResponse:
       type: object
       properties:
         status:
@@ -3982,7 +3982,7 @@ components:
         - status
         - data
       additionalProperties: false
-    GetHrisEmployeesNegativeResponse:
+    ErrorResponse:
       type: object
       properties:
         status:
@@ -4045,7 +4045,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4075,7 +4075,7 @@ paths:
                     data:
                       num: 123
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -4153,7 +4153,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4185,7 +4185,7 @@ paths:
                     data:
                       num: 123
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -4249,7 +4249,7 @@ paths:
               value: "123"
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4279,7 +4279,7 @@ paths:
                     data:
                       numericStr: "123"
         "400":
-          description: GET /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -4320,9 +4320,9 @@ paths:
               value: "123"
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -4366,7 +4366,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4396,7 +4396,7 @@ paths:
                     data:
                       numericStr: "123"
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -4462,7 +4462,7 @@ paths:
               value: "123"
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4494,7 +4494,7 @@ paths:
                     data:
                       numericStr: "456"
         "400":
-          description: GET /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -4537,9 +4537,9 @@ paths:
               value: "123"
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -4585,7 +4585,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4617,7 +4617,7 @@ paths:
                     data:
                       numericStr: "456"
         "400":
-          description: POST /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -4679,7 +4679,7 @@ paths:
             description: here is the test
       responses:
         "200":
-          description: GET /v1/getSomething Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -4704,7 +4704,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/getSomething Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -4743,9 +4743,9 @@ paths:
             description: here is the test
       responses:
         "200":
-          description: HEAD /v1/getSomething Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/getSomething Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -4988,7 +4988,7 @@ paths:
             type: boolean
       responses:
         "200":
-          description: GET /v1/:name Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -5006,7 +5006,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/:name Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -5054,9 +5054,9 @@ paths:
             type: boolean
       responses:
         "200":
-          description: HEAD /v1/:name Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/:name Negative response
+          description: Error response
 components:
   schemas: {}
   responses: {}
@@ -5103,7 +5103,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/:name Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -5121,7 +5121,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/:name Negative response
+          description: Error response
           content:
             application/json:
               schema:

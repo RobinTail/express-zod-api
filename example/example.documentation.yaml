@@ -21,7 +21,7 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: GET /v1/user/retrieve Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -53,7 +53,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v1/user/retrieve Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -97,9 +97,9 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: HEAD /v1/user/retrieve Positive response
+          description: Successful response
         "400":
-          description: HEAD /v1/user/retrieve Negative response
+          description: Error response
   /v1/user/{id}/remove:
     delete:
       operationId: DeleteV1UserIdRemove
@@ -116,9 +116,9 @@ paths:
             pattern: \d+
       responses:
         "204":
-          description: DELETE /v1/user/:id/remove Positive response
+          description: Confirmation
         "404":
-          description: DELETE /v1/user/:id/remove Negative response
+          description: Does not exist
   /v1/user/{id}:
     patch:
       operationId: PatchV1UserId
@@ -194,7 +194,7 @@ paths:
           APIKEY_2: []
       responses:
         "200":
-          description: PATCH /v1/user/:id Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -236,7 +236,7 @@ paths:
                       name: John Doe
                       createdAt: 2021-12-31T00:00:00.000Z
         "400":
-          description: PATCH /v1/user/:id Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -290,7 +290,7 @@ paths:
         required: true
       responses:
         "201":
-          description: POST /v1/user/create Positive response 201
+          description: Confirmation on creation
           content:
             application/json:
               schema:
@@ -314,7 +314,7 @@ paths:
                   - data
                 additionalProperties: false
         "202":
-          description: POST /v1/user/create Positive response 202
+          description: Confirmation on creation
           content:
             application/json:
               schema:
@@ -338,7 +338,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/user/create Negative response 400
+          description: Generic error response
           content:
             application/json:
               schema:
@@ -354,7 +354,7 @@ paths:
                   - reason
                 additionalProperties: false
         "409":
-          description: POST /v1/user/create Negative response 409
+          description: Already exists
           content:
             application/json:
               schema:
@@ -372,7 +372,7 @@ paths:
                   - id
                 additionalProperties: false
         "500":
-          description: POST /v1/user/create Negative response 500
+          description: Generic error response
           content:
             application/json:
               schema:
@@ -407,7 +407,7 @@ paths:
                 - admin
       responses:
         "200":
-          description: GET /v1/user/list Positive response
+          description: The list of users
           content:
             application/json:
               schema:
@@ -437,7 +437,7 @@ paths:
                     - name: Patti Harrison
                       role: admin
         "400":
-          description: GET /v1/user/list Negative response
+          description: Error message
           content:
             text/plain:
               schema:
@@ -464,16 +464,16 @@ paths:
                 - admin
       responses:
         "200":
-          description: HEAD /v1/user/list Positive response
+          description: The list of users
         "400":
-          description: HEAD /v1/user/list Negative response
+          description: Error message
   /v1/login:
     post:
       operationId: PostV1Login
       tags:
         - cookies
       requestBody:
-        description: POST /v1/login Request body
+        description: Login credentials
         content:
           application/json:
             schema:
@@ -491,7 +491,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/login Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -513,7 +513,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/login Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -558,13 +558,13 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: GET /v1/avatar/send Positive response
+          description: An image file
           content:
             image/svg+xml:
               schema:
                 type: string
         "400":
-          description: GET /v1/avatar/send Negative response
+          description: Error message
           content:
             text/plain:
               schema:
@@ -586,9 +586,9 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: HEAD /v1/avatar/send Positive response
+          description: An image file
         "400":
-          description: HEAD /v1/avatar/send Negative response
+          description: Error message
   /v1/avatar/stream:
     get:
       operationId: GetV1AvatarStream
@@ -606,7 +606,7 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: GET /v1/avatar/stream Positive response
+          description: An image stream
           content:
             image/*:
               schema:
@@ -614,7 +614,7 @@ paths:
                   description: raw binary data
                   url: https://swagger.io/specification/#working-with-binary-data
         "400":
-          description: GET /v1/avatar/stream Negative response
+          description: Error message
           content:
             text/plain:
               schema:
@@ -635,9 +635,9 @@ paths:
             pattern: \d+
       responses:
         "200":
-          description: HEAD /v1/avatar/stream Positive response
+          description: An image stream
         "400":
-          description: HEAD /v1/avatar/stream Negative response
+          description: Error message
   /v1/avatar/upload:
     post:
       operationId: PostV1AvatarUpload
@@ -674,7 +674,7 @@ paths:
         - APIKEY_3: []
       responses:
         "200":
-          description: POST /v1/avatar/upload Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -713,7 +713,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/avatar/upload Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -756,7 +756,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/avatar/raw Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -780,7 +780,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/avatar/raw Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -901,7 +901,7 @@ paths:
         required: true
       responses:
         "200":
-          description: POST /v1/forms/feedback Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -925,7 +925,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/forms/feedback Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -996,7 +996,7 @@ paths:
                 - admin
       responses:
         "200":
-          description: GET /v2/users/list Positive response
+          description: Successful response
           content:
             application/json:
               schema:
@@ -1052,7 +1052,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: GET /v2/users/list Negative response
+          description: Error response
           content:
             application/json:
               schema:
@@ -1122,9 +1122,9 @@ paths:
                 - admin
       responses:
         "200":
-          description: HEAD /v2/users/list Positive response
+          description: Successful response
         "400":
-          description: HEAD /v2/users/list Negative response
+          description: Error response
 components:
   schemas:
     Feature:

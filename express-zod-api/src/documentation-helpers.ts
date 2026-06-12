@@ -436,9 +436,10 @@ export const depictResponse = ({
   hasMultipleStatusCodes,
   statusCode,
   brandHandling,
-  description = `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
-    hasMultipleStatusCodes ? statusCode : ""
-  }`.trim(),
+  description = schema.description ??
+    `${method.toUpperCase()} ${path} ${ucFirst(variant)} response ${
+      hasMultipleStatusCodes ? statusCode : ""
+    }`.trim(),
 }: ReqResCommons & {
   schema: z.ZodType;
   composition: "inline" | "components";
@@ -456,6 +457,7 @@ export const depictResponse = ({
       ctx: { isResponse: true, makeRef, path, method },
     }),
   );
+  delete response.description; // pulled up
   const examples = [];
   if (isSchemaObject(response) && response.examples) {
     examples.push(...response.examples);
@@ -587,7 +589,8 @@ export const depictBody = ({
   makeRef,
   composition,
   paramNames,
-  description = `${method.toUpperCase()} ${path} Request body`,
+  description = request.description ||
+    `${method.toUpperCase()} ${path} Request body`,
 }: ReqResCommons & {
   schema: IOSchema;
   composition: "inline" | "components";
@@ -598,6 +601,7 @@ export const depictBody = ({
 }) => {
   const [_pure, hasRequired] = excludeParamsFromDepiction(request, paramNames);
   const pure = asOAS(_pure);
+  delete pure.description; // pulled up
   const examples = [];
   if (isSchemaObject(pure) && pure.examples) {
     examples.push(...pure.examples);
