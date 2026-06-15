@@ -162,10 +162,10 @@ describe("Server helpers", () => {
     });
   });
 
-  describe("createUploadParsers()", async () => {
+  describe("createUploadParsers()", () => {
     const loggerMock = makeLoggerMock();
     const beforeUploadMock = vi.fn();
-    const parsers = await createUploadParsers({
+    const parsers = createUploadParsers({
       config: {
         http: { listen: 1234 },
         upload: {
