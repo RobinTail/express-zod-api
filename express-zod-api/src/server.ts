@@ -72,23 +72,21 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     .use(loggingMiddleware);
 
   if (config.compression) {
-    const compressor = await loadPeer<typeof compression>("compression");
+    const compressor = loadPeer<typeof compression>("compression");
     app.use(
       compressor(
         typeof config.compression === "object" ? config.compression : undefined,
       ),
     );
   }
-  if (config.cookies) app.use(await createCookieParser({ config }));
+  if (config.cookies) app.use(createCookieParser({ config }));
   await config.beforeRouting?.({ app, getLogger });
 
   const parsers: Parsers = {
     json: [config.jsonParser || express.json()],
     raw: [config.rawParser || express.raw(), moveRaw],
     form: [config.formParser || express.urlencoded()],
-    upload: config.upload
-      ? await createUploadParsers({ config, getLogger })
-      : [],
+    upload: config.upload ? createUploadParsers({ config, getLogger }) : [],
   };
   initRouting({ app, routing, getLogger, config, parsers });
 
