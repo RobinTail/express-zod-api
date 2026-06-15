@@ -10,6 +10,7 @@ export { BuiltinLogger } from "./builtin-logger";
 export { Middleware } from "./middleware";
 export { createCookieMiddleware } from "./cookie-middleware";
 export { createCacheMiddleware } from "./cache-middleware";
+export { createRateLimitMiddleware } from "./rate-limit-middleware";
 export {
   ResultHandler,
   defaultResultHandler,

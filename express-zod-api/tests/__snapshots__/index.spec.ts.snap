@@ -45,6 +45,8 @@ exports[`Index Entrypoint > exports > createConfig should have certain value 1`]
 
 exports[`Index Entrypoint > exports > createCookieMiddleware should have certain value 1`] = `[Function]`;
 
+exports[`Index Entrypoint > exports > createRateLimitMiddleware should have certain value 1`] = `[Function]`;
+
 exports[`Index Entrypoint > exports > createServer should have certain value 1`] = `[Function]`;
 
 exports[`Index Entrypoint > exports > defaultEndpointsFactory should have certain value 1`] = `
@@ -86,6 +88,7 @@ exports[`Index Entrypoint > exports > should have certain entities exposed 1`] =
   "Middleware",
   "createCookieMiddleware",
   "createCacheMiddleware",
+  "createRateLimitMiddleware",
   "ResultHandler",
   "defaultResultHandler",
   "arrayResultHandler",
