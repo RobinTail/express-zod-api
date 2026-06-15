@@ -9,12 +9,18 @@ import type {
 import { ExpressMiddleware } from "./middleware";
 import { loadPeer } from "./peer-helpers";
 
+/**
+ * @desc Creates an ExpressMiddleware that enforces rate limits using express-rate-limit.
+ * @requires express-rate-limit
+ * @param options — Partial options passed to the express-rate-limit constructor.
+ * @example createRateLimitMiddleware({ windowMs: 60000, max: 100 })
+ */
 export const createRateLimitMiddleware = (
-  config?: Partial<Options>,
+  options?: Partial<Options>,
 ): ExpressMiddleware<Request, Response, { rateLimit: RateLimitInfo }> => {
   const rateLimit = loadPeer<typeof RateLimitFn>("express-rate-limit");
   const handler = rateLimit({
-    ...config,
+    ...options,
     handler: (_req, _res, next, optionsUsed) => {
       next(createHttpError(429, optionsUsed.message));
     },
