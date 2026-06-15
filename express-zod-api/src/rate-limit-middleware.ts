@@ -23,7 +23,7 @@ export const createRateLimitMiddleware = (options?: Partial<Options>) => {
   });
   return new ExpressMiddleware(handler, {
     provider: (req: AugmentedRequest) => ({
-      rateLimit: req.rateLimit!,
+      rateLimit: req[options?.requestPropertyName ?? "rateLimit"],
     }),
   });
 };
