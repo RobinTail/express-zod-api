@@ -1,8 +1,6 @@
 import createHttpError from "http-errors";
-import type { Request, Response } from "express";
 import type {
   Options,
-  RateLimitInfo,
   AugmentedRequest,
   rateLimit as RateLimitFn,
 } from "express-rate-limit";
@@ -15,9 +13,7 @@ import { loadPeer } from "./peer-helpers";
  * @param options — Partial options passed to the express-rate-limit constructor.
  * @example createRateLimitMiddleware({ windowMs: 60000, max: 100 })
  */
-export const createRateLimitMiddleware = (
-  options?: Partial<Options>,
-): ExpressMiddleware<Request, Response, { rateLimit: RateLimitInfo }> => {
+export const createRateLimitMiddleware = (options?: Partial<Options>) => {
   const rateLimit = loadPeer<typeof RateLimitFn>("express-rate-limit");
   const handler = rateLimit({
     ...options,
@@ -26,7 +22,8 @@ export const createRateLimitMiddleware = (
     },
   });
   return new ExpressMiddleware(handler, {
-    provider: (req: AugmentedRequest) =>
-      ({ rateLimit: req.rateLimit }) as { rateLimit: RateLimitInfo },
+    provider: (req: AugmentedRequest) => ({
+      rateLimit: req.rateLimit!,
+    }),
   });
 };
