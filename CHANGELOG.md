@@ -2,6 +2,13 @@
 
 ## Version 28
 
+### v28.6.0
+
+- Changes to the `Integration` generator:
+  - The `typescript` option is no longer required for constructor;
+  - `Integration.create()` is now deprecated — use `new Integration()` instead;
+  - This is possible thanks to the `require(ESM)` feature, available on all supported Node.js versions;
+
 ### v28.5.0
 
 - Changes to the proprietary `Date` handling schemas:

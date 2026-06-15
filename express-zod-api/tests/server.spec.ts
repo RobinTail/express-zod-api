@@ -1,9 +1,8 @@
+import { compressionMock, cookieParserMock } from "./peers-mock";
 import { moveRaw } from "../src/server-helpers";
 import { givePort } from "../../tools/ports";
 import {
   appMock,
-  compressionMock,
-  cookieParserMock,
   expressJsonMock,
   expressUrlencodedMock,
   expressMock,
