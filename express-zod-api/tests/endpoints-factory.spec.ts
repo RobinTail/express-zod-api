@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
 import createHttpError from "http-errors";
-import { expectTypeOf } from "vitest";
+import { expectTypeOf, vi } from "vitest";
 import {
   EndpointsFactory,
   Middleware,
@@ -10,9 +10,18 @@ import {
 } from "../src";
 import * as cookieMw from "../src/cookie-middleware";
 import * as cacheMw from "../src/cache-middleware";
+import * as rateLimitMw from "../src/rate-limit-middleware";
 import type { EmptyObject } from "../src/common-helpers";
 import { Endpoint } from "../src/endpoint";
 import { z } from "zod";
+
+const rateLimitMock = vi.fn();
+vi.mock("../src/peer-helpers", () => ({
+  loadPeer: (moduleName: string) => {
+    if (moduleName === "express-rate-limit") return rateLimitMock;
+    throw new Error(`Unhandled peer dependency mock: ${moduleName}`);
+  },
+}));
 
 describe("EndpointsFactory", () => {
   const resultHandlerMock = new ResultHandler({
@@ -146,6 +155,16 @@ describe("EndpointsFactory", () => {
       const spy = vi.spyOn(cacheMw, "createCacheMiddleware");
       const factory = defaultEndpointsFactory.useCache({ maxAge: 100 });
       expect(spy).toHaveBeenCalledWith({ maxAge: 100 });
+      expect(factory["middlewares"]).toHaveLength(1);
+    });
+  });
+
+  describe(".useRateLimit", () => {
+    test("should add created rate limit middleware", () => {
+      rateLimitMock.mockReturnValue(vi.fn());
+      const spy = vi.spyOn(rateLimitMw, "createRateLimitMiddleware");
+      const factory = defaultEndpointsFactory.useRateLimit({ max: 20 });
+      expect(spy).toHaveBeenCalledWith({ max: 20 });
       expect(factory["middlewares"]).toHaveLength(1);
     });
   });
