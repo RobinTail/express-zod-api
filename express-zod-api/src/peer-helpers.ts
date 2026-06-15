@@ -1,11 +1,17 @@
+import { createRequire } from "node:module";
 import { MissingPeerError } from "./errors";
 
-export const loadPeer = async <T>(
+const require = createRequire(import.meta.url);
+
+export const loadPeer = <T>(
   moduleName: string,
   moduleExport: string = "default",
-): Promise<T> => {
+): T => {
   try {
-    return (await import(moduleName))[moduleExport];
-  } catch {}
-  throw new MissingPeerError(moduleName);
+    const mod = require(moduleName);
+    if (moduleExport !== "default") return mod[moduleExport] as T;
+    return mod.default !== undefined ? mod.default : mod;
+  } catch {
+    throw new MissingPeerError(moduleName);
+  }
 };
