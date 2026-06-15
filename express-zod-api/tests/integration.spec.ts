@@ -51,7 +51,7 @@ describe("Integration", () => {
   );
 
   test("Should treat optionals the same way as z.infer() by default", async () => {
-    const client = await Integration.create({
+    const client = new Integration({
       config: configMock,
       routing: {
         v1: {
@@ -74,7 +74,7 @@ describe("Integration", () => {
   test.each([undefined, false])(
     "Should support HEAD method by default %#",
     async (hasHeadMethod) => {
-      const client = await Integration.create({
+      const client = new Integration({
         config: configMock,
         hasHeadMethod,
         variant: "types",
@@ -111,7 +111,7 @@ describe("Integration", () => {
         handler: vi.fn(),
       }),
     );
-    const client = await Integration.create({
+    const client = new Integration({
       config: configMock,
       variant: "types",
       routing: {
