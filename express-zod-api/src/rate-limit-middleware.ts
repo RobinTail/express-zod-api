@@ -3,21 +3,16 @@ import type { Request, Response } from "express";
 import type {
   Options,
   RateLimitInfo,
-  RateLimitRequestHandler,
   AugmentedRequest,
+  rateLimit as RateLimitFn,
 } from "express-rate-limit";
 import { ExpressMiddleware } from "./middleware";
 import { loadPeer } from "./peer-helpers";
 
-export const createRateLimitMiddleware = async (
+export const createRateLimitMiddleware = (
   config?: Partial<Options>,
-): Promise<
-  ExpressMiddleware<Request, Response, { rateLimit: RateLimitInfo }>
-> => {
-  const rateLimit =
-    await loadPeer<
-      (passedOptions?: Partial<Options>) => RateLimitRequestHandler
-    >("express-rate-limit");
+): ExpressMiddleware<Request, Response, { rateLimit: RateLimitInfo }> => {
+  const rateLimit = loadPeer<typeof RateLimitFn>("express-rate-limit");
   const handler = rateLimit({
     ...config,
     handler: (_req, _res, next, optionsUsed) => {
