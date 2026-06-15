@@ -181,10 +181,11 @@ export class Integration extends IntegrationBase {
     );
   }
 
+  /** @todo remove async on next major — no longer needed */
   public static async create(params: Omit<IntegrationParams, "typescript">) {
     return new Integration({
       ...params,
-      typescript: await loadPeer<typeof ts>("typescript"),
+      typescript: loadPeer<typeof ts>("typescript"),
     });
   }
 
@@ -233,8 +234,7 @@ export class Integration extends IntegrationBase {
     let format = userDefined;
     if (!format) {
       try {
-        const prettierFormat = (await loadPeer<typeof Prettier>("prettier"))
-          .format;
+        const prettierFormat = loadPeer<typeof Prettier>("prettier").format;
         format = (text) => prettierFormat(text, { filepath: "client.ts" });
       } catch {}
     }
