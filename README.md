@@ -1190,11 +1190,9 @@ safety between your API and frontend. Make sure you have `typescript` installed.
 and using the async `printFormatted()` method.
 
 ```ts
-import typescript from "typescript";
 import { Integration } from "express-zod-api";
 
 const client = new Integration({
-  typescript, // or await Integration.create() to delegate importing
   routing,
   config,
   variant: "client", // <— optional, see also "types" for a DIY solution

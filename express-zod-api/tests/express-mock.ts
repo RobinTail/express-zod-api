@@ -1,13 +1,6 @@
 const expressJsonMock = vi.fn();
 const expressRawMock = vi.fn();
 const expressUrlencodedMock = vi.fn();
-const compressionMock = vi.fn();
-const fileUploadMock = vi.fn();
-const cookieParserMock = vi.fn();
-
-vi.mock("compression", () => ({ default: compressionMock }));
-vi.mock("express-fileupload", () => ({ default: fileUploadMock }));
-vi.mock("cookie-parser", () => ({ default: cookieParserMock }));
 
 const staticHandler = vi.fn();
 const staticMock = vi.fn(() => staticHandler);
@@ -35,9 +28,6 @@ expressMock.static = staticMock;
 vi.mock("express", () => ({ default: expressMock }));
 
 export {
-  compressionMock,
-  fileUploadMock,
-  cookieParserMock,
   expressMock,
   appMock,
   expressJsonMock,

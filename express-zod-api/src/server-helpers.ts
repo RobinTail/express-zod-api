@@ -82,12 +82,12 @@ export const createUploadFailureHandler =
     next();
   };
 
-export const createCookieParser = async ({
+export const createCookieParser = ({
   config,
 }: {
   config: ServerConfig;
-}): Promise<RequestHandler> => {
-  const parser = await loadPeer<typeof cookieParser>("cookie-parser");
+}): RequestHandler => {
+  const parser = loadPeer<typeof cookieParser>("cookie-parser");
   const { secret, ...rest } = {
     ...(typeof config.cookies === "object" && config.cookies),
   };
@@ -98,14 +98,14 @@ export const createUploadLogger = (
   logger: ActualLogger,
 ): Pick<Console, "log"> => ({ log: logger.debug.bind(logger) });
 
-export const createUploadParsers = async ({
+export const createUploadParsers = ({
   getLogger,
   config,
 }: {
   getLogger: GetLogger;
   config: ServerConfig;
-}): Promise<RequestHandler[]> => {
-  const uploader = await loadPeer<typeof fileUpload>("express-fileupload");
+}): RequestHandler[] => {
+  const uploader = loadPeer<typeof fileUpload>("express-fileupload");
   const { limitError, beforeUpload, ...options } = {
     ...(typeof config.upload === "object" && config.upload),
   };
