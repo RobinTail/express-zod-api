@@ -2,59 +2,34 @@ import {
   AST_NODE_TYPES as NT,
   ESLintUtils,
   type TSESLint,
+  type TSESTree,
 } from "@typescript-eslint/utils"; // eslint-disable-line allowed/dependencies -- assumed transitive dependency
-import {
-  queryNamedProp,
-  type NamedProp,
-  getPropName,
-  changeProp,
-} from "./helpers.ts";
+import { queryNamedProp, type NamedProp, getPropName } from "./helpers.ts";
 
 interface Queries {
-  wrongMethodBehavior: NamedProp;
-  methodLikeRouteBehavior: NamedProp;
-  hasSummaryFromDescription: NamedProp;
-  noContent: NamedProp;
-  shortDescription: NamedProp;
-  brandHandling: NamedProp;
+  integrationCreate: TSESTree.CallExpression;
+  createServerAwait: TSESTree.CallExpression;
+  asyncLifecycleHook: NamedProp;
 }
 
 type Listener = keyof Queries;
 
 const queries: Record<Listener, string> = {
-  wrongMethodBehavior:
+  integrationCreate:
+    `${NT.AwaitExpression} > ` +
+    `${NT.CallExpression}[callee.object.name="Integration"][callee.property.name="create"]`,
+  createServerAwait:
+    `${NT.AwaitExpression} > ` +
+    `${NT.CallExpression}[callee.name="createServer"]`,
+  asyncLifecycleHook:
     `${NT.CallExpression}[callee.name="createConfig"] > ` +
     `${NT.ObjectExpression} > ` +
-    queryNamedProp("wrongMethodBehavior"),
-  methodLikeRouteBehavior:
+    queryNamedProp("beforeRouting") +
+    "," +
     `${NT.CallExpression}[callee.name="createConfig"] > ` +
     `${NT.ObjectExpression} > ` +
-    queryNamedProp("methodLikeRouteBehavior"),
-  hasSummaryFromDescription:
-    `${NT.NewExpression}[callee.name="Documentation"] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("hasSummaryFromDescription"),
-  noContent:
-    `${NT.NewExpression}[callee.name="Integration"] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("noContent"),
-  shortDescription:
-    `${NT.CallExpression}[callee.property.name=/^(build|buildVoid)$/] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("shortDescription"),
-  brandHandling:
-    `${NT.NewExpression}[callee.name=/^(Documentation|Integration)$/] > ` +
-    `${NT.ObjectExpression} > ` +
-    queryNamedProp("brandHandling"),
+    queryNamedProp("afterRouting"),
 };
-
-const brandHandlingTodo = [
-  "@todo Manual migration required:",
-  "1. Install `@express-zod-api/zod-plugin` as a dependency;",
-  "2. Import it, ideally at the top of the file declaring your `Routing`;",
-  "3. Replace `.brand()` with `.xBrand()` on the branded schemas (provided by the plugin);",
-  'Alternatively, use `.meta({ "x-brand": ... })` on the schemas instead (without plugin).',
-];
 
 const listen = <
   S extends { [K in Listener]: TSESLint.RuleFunction<Queries[K]> },
@@ -87,77 +62,59 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
   },
   create: (ctx) =>
     listen({
-      wrongMethodBehavior: (node) =>
-        changeProp({
-          ctx,
-          node,
-          to: "hintAllowedMethods",
-          assign: (value) => {
-            if (value.type === NT.Literal && typeof value.value === "number")
-              return value.value === 405 ? "true" : "false";
-            else if (value.type === NT.Identifier && value.name === "undefined")
-              return "undefined";
-            else return null;
-          },
-        }),
-      methodLikeRouteBehavior: (node) =>
-        changeProp({
-          ctx,
-          node,
-          to: "recognizeMethodDependentRoutes",
-          assign: (value) => {
-            if (value.type === NT.Identifier && value.name === "undefined")
-              return "undefined";
-            else if (
-              value.type === NT.Literal &&
-              typeof value.value === "string"
-            )
-              return value.value === "method" ? "true" : "false";
-            else return null;
-          },
-        }),
-      hasSummaryFromDescription: (node) => {
-        const value = node.value;
-        const isDisabled = value.type === NT.Literal && value.value === false;
+      integrationCreate: (node) => {
+        const parent = node.parent;
+        if (!parent || parent.type !== NT.AwaitExpression) return;
         ctx.report({
           node,
-          messageId: isDisabled ? "change" : "remove",
+          messageId: "change",
           data: {
-            subject: "property",
-            ...(isDisabled && {
-              from: getPropName(node),
-              to: "summarizer",
-            }),
+            subject: "Integration.create()",
+            from: "await Integration.create()",
+            to: "new Integration()",
           },
           fix: (fixer) => {
-            if (isDisabled) {
-              return fixer.replaceText(
-                node,
-                "summarizer: ({ summary, trim }) => trim(summary)",
-              );
-            }
-            const after = ctx.sourceCode.getTokenAfter(node);
-            const end = node.range[1] + (after?.value === "," ? 1 : 0);
-            return fixer.removeRange([node.range[0], end]);
+            const args = node.arguments
+              .map((a) => ctx.sourceCode.getText(a))
+              .join(", ");
+            return fixer.replaceText(parent, `new Integration(${args})`);
           },
         });
       },
-      noContent: (node) => changeProp({ ctx, node, to: "noBodySchema" }),
-      shortDescription: (node) => changeProp({ ctx, node, to: "summary" }),
-      brandHandling: (node) => {
-        const existing = ctx.sourceCode.getCommentsBefore(node);
-        if (existing.some(({ value }) => value.includes(brandHandlingTodo[0]!)))
-          return; // already annotated
-        const indent = " ".repeat(node.loc.start.column);
-        const body = brandHandlingTodo
-          .map((line) => `${indent} * ${line}`)
-          .join("\n");
-        const comment = `/**\n${body}\n${indent} */\n${indent}`;
+      createServerAwait: (node) => {
+        const parent = node.parent;
+        if (!parent || parent.type !== NT.AwaitExpression) return;
         ctx.report({
           node,
-          messageId: "add",
-          data: { subject: "plugin", to: "your app" },
-          fix: (fixer) => fixer.insertTextBefore(node, comment),
+          messageId: "remove",
+          data: { subject: "await from createServer()" },
+          fix: (fixer) => {
+            const text = ctx.sourceCode.getText(node);
+            return fixer.replaceText(parent, text);
+          },
+        });
+      },
+      asyncLifecycleHook: (node) => {
+        const value = node.value;
+        const isAsync =
+          (value.type === NT.ArrowFunctionExpression ||
+            value.type === NT.FunctionExpression) &&
+          value.async;
+        if (!isAsync) return;
+        const propName = getPropName(node);
+        ctx.report({
+          node,
+          messageId: "remove",
+          data: { subject: `async from ${propName}` },
+          fix: (fixer) => {
+            const firstToken = ctx.sourceCode.getFirstToken(value);
+            if (!firstToken || firstToken.value !== "async") return null;
+            const nextToken = ctx.sourceCode.getTokenAfter(firstToken);
+            const end = nextToken
+              ? nextToken.range[0]
+              : firstToken.range[0] + 5;
+            return fixer.removeRange([firstToken.range[0], end]);
+          },
         });
       },
     }),

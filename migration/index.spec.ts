@@ -25,360 +25,90 @@ describe("Migration", async () => {
 
   tester.run(ruleName, theRule, {
     valid: [
-      `createConfig({ hintAllowedMethods: false });`,
-      `createConfig({ recognizeMethodDependentRoutes: true });`,
-      `new Documentation({ summarizer: ({summary, trim}) => trim(summary) });`,
-      `new Integration({ noBodySchema: z.undefined() });`,
-      `factory.build({ summary: "hello" });`,
-      `factory.buildVoid({ summary: "hello" });`,
-      `factory.build({ brandHandling: { [myBrand]: rule } });`, // unrelated usage
-      `new Documentation({\n  /**\n   * @todo Manual migration required:\n   */\n  brandHandling: { [myBrand]: rule },\n});`,
+      // integrationCreate
+      `new Integration({})`,
+      `new Integration({ routing, config })`,
+      // createServerAwait
+      `createServer({})`,
+      `const {} = createServer({})`,
+      `const { app } = createServer({})`,
+      // asyncLifecycleHook
+      `createConfig({ beforeRouting: ({ app, logger }) => {} })`,
+      `createConfig({ afterRouting: ({ app, logger }) => {} })`,
+      `createConfig({ beforeRouting: ({ app, logger }) => {}, afterRouting: ({ app, logger }) => {} })`,
     ],
     invalid: [
       {
-        name: "wrongMethodBehavior=404",
-        code: `createConfig({ wrongMethodBehavior: 404 });`,
-        output: `createConfig({ hintAllowedMethods: false });`,
+        name: "integrationCreate",
+        code: `await Integration.create({})`,
+        output: `new Integration({})`,
         errors: [
           {
             messageId: "change",
             data: {
-              subject: "property",
-              from: "wrongMethodBehavior",
-              to: "hintAllowedMethods",
+              subject: "Integration.create()",
+              from: "await Integration.create()",
+              to: "new Integration()",
             },
           },
         ],
       },
       {
-        name: "wrongMethodBehavior=405",
-        code: `createConfig({ wrongMethodBehavior: 405 });`,
-        output: `createConfig({ hintAllowedMethods: true });`,
+        name: "integrationCreate with args",
+        code: `await Integration.create({ routing, config })`,
+        output: `new Integration({ routing, config })`,
         errors: [
           {
             messageId: "change",
             data: {
-              subject: "property",
-              from: "wrongMethodBehavior",
-              to: "hintAllowedMethods",
+              subject: "Integration.create()",
+              from: "await Integration.create()",
+              to: "new Integration()",
             },
           },
         ],
       },
       {
-        name: "wrongMethodBehavior=undefined",
-        code: `createConfig({ wrongMethodBehavior: undefined });`,
-        output: `createConfig({ hintAllowedMethods: undefined });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "wrongMethodBehavior",
-              to: "hintAllowedMethods",
-            },
-          },
-        ],
-      },
-      {
-        name: "wrongMethodBehavior is wrong",
-        code: `createConfig({ wrongMethodBehavior: "wrong" });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "wrongMethodBehavior",
-              to: "hintAllowedMethods",
-            },
-          },
-        ],
-      },
-      {
-        name: "methodLikeRouteBehavior=method",
-        code: `createConfig({ methodLikeRouteBehavior: "method" });`,
-        output: `createConfig({ recognizeMethodDependentRoutes: true });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "methodLikeRouteBehavior",
-              to: "recognizeMethodDependentRoutes",
-            },
-          },
-        ],
-      },
-      {
-        name: "methodLikeRouteBehavior=path",
-        code: `createConfig({ methodLikeRouteBehavior: "path" });`,
-        output: `createConfig({ recognizeMethodDependentRoutes: false });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "methodLikeRouteBehavior",
-              to: "recognizeMethodDependentRoutes",
-            },
-          },
-        ],
-      },
-      {
-        name: "methodLikeRouteBehavior=undefined",
-        code: `createConfig({ methodLikeRouteBehavior: undefined });`,
-        output: `createConfig({ recognizeMethodDependentRoutes: undefined });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "methodLikeRouteBehavior",
-              to: "recognizeMethodDependentRoutes",
-            },
-          },
-        ],
-      },
-      {
-        name: "methodLikeRouteBehavior is wrong",
-        code: `createConfig({ methodLikeRouteBehavior: 123 });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "methodLikeRouteBehavior",
-              to: "recognizeMethodDependentRoutes",
-            },
-          },
-        ],
-      },
-      {
-        name: "hasSummaryFromDescription=true (first)",
-        code: `new Documentation({ hasSummaryFromDescription: true, other: 1 });`,
-        output: `new Documentation({  other: 1 });`,
+        name: "createServer await with variable",
+        code: `const {} = await createServer({})`,
+        output: `const {} = createServer({})`,
         errors: [
           {
             messageId: "remove",
-            data: { subject: "property" },
+            data: { subject: "await from createServer()" },
           },
         ],
       },
       {
-        name: "hasSummaryFromDescription=undefined (last)",
-        code: `new Documentation({ other: 1, hasSummaryFromDescription: undefined });`,
-        output: `new Documentation({ other: 1,  });`,
+        name: "createServer await standalone",
+        code: `await createServer({})`,
+        output: `createServer({})`,
         errors: [
           {
             messageId: "remove",
-            data: { subject: "property" },
+            data: { subject: "await from createServer()" },
           },
         ],
       },
       {
-        name: "hasSummaryFromDescription=false",
-        code: `new Documentation({ hasSummaryFromDescription: false });`,
-        output: `new Documentation({ summarizer: ({ summary, trim }) => trim(summary) });`,
+        name: "beforeRouting async arrow",
+        code: `createConfig({ beforeRouting: async ({ app, logger }) => {} })`,
+        output: `createConfig({ beforeRouting: ({ app, logger }) => {} })`,
         errors: [
           {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "hasSummaryFromDescription",
-              to: "summarizer",
-            },
+            messageId: "remove",
+            data: { subject: "async from beforeRouting" },
           },
         ],
       },
       {
-        name: "noContent=z.undefined()",
-        code: `new Integration({ noContent: z.undefined() });`,
-        output: `new Integration({ noBodySchema: z.undefined() });`,
+        name: "afterRouting async function expression",
+        code: `createConfig({ afterRouting: async function({ app }) {} })`,
+        output: `createConfig({ afterRouting: function({ app }) {} })`,
         errors: [
           {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "noContent",
-              to: "noBodySchema",
-            },
-          },
-        ],
-      },
-      {
-        name: "noContent=undefined",
-        code: `new Integration({ noContent: undefined });`,
-        output: `new Integration({ noBodySchema: undefined });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "noContent",
-              to: "noBodySchema",
-            },
-          },
-        ],
-      },
-      {
-        name: "shortDescription in build()",
-        code: `factory.build({ shortDescription: "Retrieves the user." });`,
-        output: `factory.build({ summary: "Retrieves the user." });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "shortDescription",
-              to: "summary",
-            },
-          },
-        ],
-      },
-      {
-        name: "shortDescription in buildVoid()",
-        code: `factory.buildVoid({ shortDescription: "Retrieves the user." });`,
-        output: `factory.buildVoid({ summary: "Retrieves the user." });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "shortDescription",
-              to: "summary",
-            },
-          },
-        ],
-      },
-      {
-        name: "wrongMethodBehavior with string key",
-        code: `createConfig({ "wrongMethodBehavior": 405 });`,
-        output: `createConfig({ hintAllowedMethods: true });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "wrongMethodBehavior",
-              to: "hintAllowedMethods",
-            },
-          },
-        ],
-      },
-      {
-        name: "noContent with string key",
-        code: `new Integration({ "noContent": z.undefined() });`,
-        output: `new Integration({ noBodySchema: z.undefined() });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "noContent",
-              to: "noBodySchema",
-            },
-          },
-        ],
-      },
-      {
-        name: "hasSummaryFromDescription=false with string key",
-        code: `new Documentation({ "hasSummaryFromDescription": false });`,
-        output: `new Documentation({ summarizer: ({ summary, trim }) => trim(summary) });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "hasSummaryFromDescription",
-              to: "summarizer",
-            },
-          },
-        ],
-      },
-      {
-        name: "shortDescription with string key in build()",
-        code: `factory.build({ "shortDescription": "Retrieves the user." });`,
-        output: `factory.build({ summary: "Retrieves the user." });`,
-        errors: [
-          {
-            messageId: "change",
-            data: {
-              subject: "property",
-              from: "shortDescription",
-              to: "summary",
-            },
-          },
-        ],
-      },
-      {
-        name: "brandHandling in Documentation",
-        code:
-          `new Documentation({\n` +
-          `  brandHandling: { [myBrand]: rule },\n` +
-          `});`,
-        output:
-          `new Documentation({\n` +
-          `  /**\n` +
-          `   * @todo Manual migration required:\n` +
-          `   * 1. Install \`@express-zod-api/zod-plugin\` as a dependency;\n` +
-          `   * 2. Import it, ideally at the top of the file declaring your \`Routing\`;\n` +
-          `   * 3. Replace \`.brand()\` with \`.xBrand()\` on the branded schemas (provided by the plugin);\n` +
-          `   * Alternatively, use \`.meta({ "x-brand": ... })\` on the schemas instead (without plugin).\n` +
-          `   */\n` +
-          `  brandHandling: { [myBrand]: rule },\n` +
-          `});`,
-        errors: [
-          {
-            messageId: "add",
-            data: { subject: "plugin", to: "your app" },
-          },
-        ],
-      },
-      {
-        name: "brandHandling in Integration",
-        code:
-          `new Integration({\n` +
-          `  brandHandling: { [myBrand]: rule },\n` +
-          `});`,
-        output:
-          `new Integration({\n` +
-          `  /**\n` +
-          `   * @todo Manual migration required:\n` +
-          `   * 1. Install \`@express-zod-api/zod-plugin\` as a dependency;\n` +
-          `   * 2. Import it, ideally at the top of the file declaring your \`Routing\`;\n` +
-          `   * 3. Replace \`.brand()\` with \`.xBrand()\` on the branded schemas (provided by the plugin);\n` +
-          `   * Alternatively, use \`.meta({ "x-brand": ... })\` on the schemas instead (without plugin).\n` +
-          `   */\n` +
-          `  brandHandling: { [myBrand]: rule },\n` +
-          `});`,
-        errors: [
-          {
-            messageId: "add",
-            data: { subject: "plugin", to: "your app" },
-          },
-        ],
-      },
-      {
-        name: "brandHandling with string key",
-        code:
-          `new Documentation({\n` +
-          `  "brandHandling": { [myBrand]: rule },\n` +
-          `});`,
-        output:
-          `new Documentation({\n` +
-          `  /**\n` +
-          `   * @todo Manual migration required:\n` +
-          `   * 1. Install \`@express-zod-api/zod-plugin\` as a dependency;\n` +
-          `   * 2. Import it, ideally at the top of the file declaring your \`Routing\`;\n` +
-          `   * 3. Replace \`.brand()\` with \`.xBrand()\` on the branded schemas (provided by the plugin);\n` +
-          `   * Alternatively, use \`.meta({ "x-brand": ... })\` on the schemas instead (without plugin).\n` +
-          `   */\n` +
-          `  "brandHandling": { [myBrand]: rule },\n` +
-          `});`,
-        errors: [
-          {
-            messageId: "add",
-            data: { subject: "plugin", to: "your app" },
+            messageId: "remove",
+            data: { subject: "async from afterRouting" },
           },
         ],
       },
