@@ -2,6 +2,10 @@
 
 ## Version 28
 
+### v28.7.1
+
+- Fix: supporting the latest versions of `express-rate-limit` (v8) for the rate limiting feature.
+
 ### v28.7.0
 
 - Added rate limiting support:
