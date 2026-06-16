@@ -16,7 +16,6 @@ import {
 } from "../src";
 import { givePort } from "../../tools/ports";
 import { setTimeout } from "node:timers/promises";
-import { beforeAll } from "vitest";
 
 describe("App in production mode", () => {
   vi.stubEnv("TSDOWN_STATIC", "production");
