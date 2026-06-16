@@ -1,7 +1,13 @@
 const compressionMock = vi.fn();
 const fileUploadMock = vi.fn();
 const cookieParserMock = vi.fn();
-const rateLimitMock = vi.fn();
+
+const limiterApiMock = { getKey: vi.fn(), resetKey: vi.fn() };
+const rateLimitMock = vi.fn(({}: any) =>
+  Object.assign((_req: any, _res: any, next: any) => {
+    next();
+  }, limiterApiMock),
+);
 
 vi.mock("../src/peer-helpers", () => ({
   loadPeer: (moduleName: string) => {
@@ -20,4 +26,10 @@ vi.mock("../src/peer-helpers", () => ({
   },
 }));
 
-export { compressionMock, fileUploadMock, cookieParserMock, rateLimitMock };
+export {
+  compressionMock,
+  fileUploadMock,
+  cookieParserMock,
+  rateLimitMock,
+  limiterApiMock,
+};

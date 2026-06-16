@@ -1,4 +1,4 @@
-import { rateLimitMock } from "./peers-mock.ts";
+import { limiterApiMock, rateLimitMock } from "./peers-mock.ts";
 import { createRateLimitMiddleware, testMiddleware } from "../src";
 
 describe("Rate limit middleware", () => {
@@ -28,21 +28,18 @@ describe("Rate limit middleware", () => {
     });
 
     test("should call next when within limit", async () => {
-      rateLimitMock.mockReturnValue((_req: any, _res: any, next: any) => {
-        next();
-      });
       const { output } = await testMiddleware({
         middleware: createRateLimitMiddleware(),
       });
-      expect(output).toEqual({});
+      expect(output).toEqual({ rateLimit: limiterApiMock });
     });
 
     test("should reject with 429 when limit exceeded", async () => {
-      rateLimitMock.mockImplementation((options: any) => {
-        return (req: any, res: any, next: any) => {
+      rateLimitMock.mockImplementation((options: any) =>
+        Object.assign((req: any, res: any, next: any) => {
           options.handler(req, res, next, options);
-        };
-      });
+        }, limiterApiMock),
+      );
       const { responseMock } = await testMiddleware({
         middleware: createRateLimitMiddleware({ message: "too fast" }),
       });
@@ -56,14 +53,16 @@ describe("Rate limit middleware", () => {
         remaining: 99,
         resetTime: new Date("2026-01-01T00:00:00Z"),
       };
-      rateLimitMock.mockReturnValue((req: any, _res: any, next: any) => {
-        req.rateLimit = rateLimitInfo;
-        next();
-      });
+      rateLimitMock.mockReturnValue(
+        Object.assign((req: any, _res: any, next: any) => {
+          req.rateLimit = rateLimitInfo;
+          next();
+        }, limiterApiMock),
+      );
       const { output } = await testMiddleware({
         middleware: createRateLimitMiddleware(),
       });
-      expect(output.rateLimit).toEqual(rateLimitInfo);
+      expect(output.rateLimit).toEqual({ ...rateLimitInfo, ...limiterApiMock });
     });
   });
 });

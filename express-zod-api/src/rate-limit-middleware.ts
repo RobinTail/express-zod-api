@@ -3,6 +3,8 @@ import type {
   Options,
   AugmentedRequest,
   rateLimit as RateLimitFn,
+  RateLimitInfo,
+  RateLimitRequestHandler,
 } from "express-rate-limit";
 import { ExpressMiddleware } from "./middleware";
 import { loadPeer } from "./peer-helpers";
@@ -21,9 +23,17 @@ export const createRateLimitMiddleware = (options?: Partial<Options>) => {
       next(createHttpError(429, optionsUsed.message));
     },
   });
+  const { getKey, resetKey } = limiter;
+  const limiterApi: Pick<RateLimitRequestHandler, "getKey" | "resetKey"> = {
+    getKey,
+    resetKey,
+  };
   return new ExpressMiddleware(limiter, {
     provider: (req: AugmentedRequest) => ({
-      rateLimit: req[options?.requestPropertyName ?? "rateLimit"],
+      rateLimit: {
+        ...limiterApi,
+        ...req[options?.requestPropertyName ?? "rateLimit"],
+      } as RateLimitInfo & typeof limiterApi,
     }),
   });
 };
