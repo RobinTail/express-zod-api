@@ -1,5 +1,21 @@
 # Changelog
 
+## Version 29
+
+### v29.0.0
+
+- Supported Node.js versions: `^22.19.0 || ^24.11.0 || ^26.0.0`;
+- The static async method `Integration::create()` removed — use `new Integration()` instead;
+- Server lifecycle hooks (`beforeRouting` and `afterRouting` config options) are no longer async;
+- The `createServer()` function is now synchronous — that should simplify the daily routines for beginners.
+
+```diff
+- await Integration.create({});
++ new Integration({});
+- const {} = await createServer({});
++ const {} = createServer({});
+```
+
 ## Version 28
 
 ### v28.7.1
