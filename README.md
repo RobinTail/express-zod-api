@@ -683,9 +683,7 @@ const config = createConfig({
   }, // ... cors, logger, etc
 });
 
-// 'await' is only needed if you're going to use the returned entities.
-// For top level CJS you can wrap you code with (async () => { ... })()
-const { app, servers, logger } = await createServer(config, routing);
+const { app, servers, logger } = createServer(config, routing);
 ```
 
 Ensure having `@types/node` package installed. At least you need to specify the port (usually it is 443) or UNIX socket,

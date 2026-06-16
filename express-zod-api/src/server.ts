@@ -63,7 +63,7 @@ export const attachRouting = (config: AppConfig, routing: Routing) => {
   return { notFoundHandler, logger };
 };
 
-export const createServer = async (config: ServerConfig, routing: Routing) => {
+export const createServer = (config: ServerConfig, routing: Routing) => {
   const { logger, getLogger, notFoundHandler, catcher, loggingMiddleware } =
     makeCommonEntities(config);
   const app = express()
@@ -80,7 +80,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
     );
   }
   if (config.cookies) app.use(createCookieParser({ config }));
-  await config.beforeRouting?.({ app, getLogger });
+  config.beforeRouting?.({ app, getLogger });
 
   const parsers: Parsers = {
     json: [config.jsonParser || express.json()],
@@ -90,7 +90,7 @@ export const createServer = async (config: ServerConfig, routing: Routing) => {
   };
   initRouting({ app, routing, getLogger, config, parsers });
 
-  await config.afterRouting?.({ app, getLogger });
+  config.afterRouting?.({ app, getLogger });
   app.use(catcher, notFoundHandler);
 
   const created: Array<http.Server | https.Server> = [];
