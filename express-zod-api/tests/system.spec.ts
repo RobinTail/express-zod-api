@@ -16,8 +16,9 @@ import {
 } from "../src";
 import { givePort } from "../../tools/ports";
 import { setTimeout } from "node:timers/promises";
+import { beforeAll } from "vitest";
 
-describe("App in production mode", async () => {
+describe("App in production mode", () => {
   vi.stubEnv("TSDOWN_STATIC", "production");
   vi.stubEnv("NODE_ENV", "production");
   const port = givePort();
@@ -176,13 +177,16 @@ describe("App in production mode", async () => {
   });
   const {
     servers: [server],
-  } = await createServer(config, routing);
+  } = createServer(config, routing);
   expect(server).toBeTruthy();
-  await vi.waitFor(() => assert(server!.listening), { timeout: 1e4 });
-  expect(warnMethod).toHaveBeenCalledWith(
-    "DeprecationError (express): Sample deprecation message",
-    expect.any(Array), // stack
-  );
+
+  beforeAll(async () => {
+    await vi.waitFor(() => assert(server!.listening), { timeout: 1e4 });
+    expect(warnMethod).toHaveBeenCalledWith(
+      "DeprecationError (express): Sample deprecation message",
+      expect.any(Array), // stack
+    );
+  });
 
   afterAll(async () => {
     server!.close();
