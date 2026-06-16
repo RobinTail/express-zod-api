@@ -7,7 +7,7 @@
 - Added rate limiting support:
   - Requires `express-rate-limit` — new optional peer dependency;
   - Added the `createRateLimitMiddleware()` method and `EndpointsFactory::useRateLimit()` shorthand;
-  - When the limit is exceeded, the Middleware throws a `429` HTTP error, handled by your ResultHandler.
+  - When the limit is exceeded, the Middleware throws a `429` HTTP error, handled by your ResultHandler;
   - The middleware provides `rateLimit` property to the context with the current rate limit info (`limit`, `used`,
     `remaining`, `resetTime`) and the limiter API (`getKey()` and `resetKey()` methods) for programmatic management.
 
