@@ -57,6 +57,7 @@
     "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
     "express-fileupload": "^1.5.0",
+    "express-rate-limit": "^7.5.1",
     "http-errors": "^2.0.1",
     "typescript": "^5.1.3 || ^6.0.2",
     "zod": "catalog:peer"
@@ -89,6 +90,9 @@
     "express-fileupload": {
       "optional": true
     },
+    "express-rate-limit": {
+      "optional": true
+    },
     "typescript": {
       "optional": true
     }
@@ -111,6 +115,7 @@
     "depd": "^2.0.0",
     "express": "catalog:dev",
     "express-fileupload": "catalog:dev",
+    "express-rate-limit": "^7.5.1",
     "http-errors": "catalog:dev",
     "node-forge": "^1.3.3",
     "snakify-ts": "^2.3.0",
