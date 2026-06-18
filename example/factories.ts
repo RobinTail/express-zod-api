@@ -16,9 +16,10 @@ import { createReadStream } from "node:fs";
 import { z } from "zod";
 import { stat } from "node:fs/promises";
 
-/** @desc This factory extends the default one by enforcing the authentication using the specified middleware */
-export const keyAndTokenAuthenticatedEndpointsFactory =
-  defaultEndpointsFactory.addMiddleware(authMiddleware);
+/** @desc This factory extends the default one by enforcing rate limiting and authentication */
+export const keyAndTokenAuthenticatedEndpointsFactory = defaultEndpointsFactory
+  .useRateLimit({ windowMs: 60000, max: 10 })
+  .addMiddleware(authMiddleware);
 
 /** @desc This factory adds session read from cookie into context */
 export const cookieAuthenticatedFactory =

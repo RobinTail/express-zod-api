@@ -64,7 +64,9 @@ describe("Example", async () => {
       });
     });
 
-    test("Should handle valid PATCH request", async ({ signal }) => {
+    test("Should handle valid PATCH request with rate limit headers", async ({
+      signal,
+    }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/50`, {
         signal,
         method: "PATCH",
@@ -79,6 +81,10 @@ describe("Example", async () => {
         }),
       });
       expect(response.status).toBe(200);
+      expect(response.headers.get("X-RateLimit-Limit")).toBe("10");
+      expect(
+        Number(response.headers.get("X-RateLimit-Remaining")),
+      ).toBeGreaterThanOrEqual(5);
       const json = await response.json();
       expect(json).toMatchObject({
         status: "success",
@@ -677,6 +683,45 @@ describe("Example", async () => {
       });
       expect(response).toBeUndefined();
       expectTypeOf(response).toBeUndefined();
+    });
+  });
+
+  describe("Rate limiting", () => {
+    test("Should rate limit the update endpoint after exceeding max requests", async ({
+      signal,
+    }) => {
+      const makeValidPatchRequest = () =>
+        fetch(`http://localhost:${port}/v1/user/50`, {
+          signal,
+          method: "PATCH",
+          headers: {
+            token: "456",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            key: "123",
+            name: "John Doe",
+            birthday: "1974-10-28",
+          }),
+        });
+      let response: Response;
+      for (let i = 0; i < 10; i++) {
+        response = await makeValidPatchRequest();
+        if (response.status === 429) break;
+      }
+      expect(response!.status).toBe(429);
+      expect(response!.headers.get("X-RateLimit-Limit")).toBe("10");
+      expect(
+        Number(response!.headers.get("X-RateLimit-Remaining")),
+      ).toBeLessThanOrEqual(0);
+      expect(
+        Number(response!.headers.get("X-RateLimit-Reset")),
+      ).toBeGreaterThan(Date.now() / 1000);
+      const json = await response!.json();
+      expect(json).toMatchObject({
+        status: "error",
+        error: { message: "Too many requests, please try again later." },
+      });
     });
   });
 });

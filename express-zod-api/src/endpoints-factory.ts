@@ -28,6 +28,7 @@ import {
 } from "./result-handler";
 import { createCacheMiddleware } from "./cache-middleware";
 import { createCookieMiddleware } from "./cookie-middleware";
+import { createRateLimitMiddleware } from "./rate-limit-middleware";
 
 interface BuildProps<
   IN extends IOSchema,
@@ -133,6 +134,11 @@ export class EndpointsFactory<
   /** @desc Shorthand for .addMiddleware(createCacheMiddleware()) */
   public useCache(...args: Parameters<typeof createCacheMiddleware>) {
     return this.#extend(createCacheMiddleware(...args));
+  }
+
+  /** @desc Shorthand for .addMiddleware(createRateLimitMiddleware()) */
+  public useRateLimit(...args: Parameters<typeof createRateLimitMiddleware>) {
+    return this.#extend(createRateLimitMiddleware(...args));
   }
 
   /**

@@ -37,16 +37,17 @@ Start your API server with I/O schema validation and custom middlewares in minut
    2. [Headers as an input source](#headers-as-an-input-source)
    3. [Cookies](#cookies)
    4. [Caching](#caching)
-   5. [Response customization](#response-customization)
-   6. [Empty response](#empty-response)
-   7. [Non-JSON response](#non-json-response) including file downloads
-   8. [Error handling](#error-handling)
-   9. [Production mode](#production-mode)
-   10. [HTML Forms (URL encoded)](#html-forms-url-encoded)
-   11. [File uploads](#file-uploads)
-   12. [Connect to your own express app](#connect-to-your-own-express-app)
-   13. [Testing endpoints](#testing-endpoints)
-   14. [Testing middlewares](#testing-middlewares)
+   5. [Rate limiting](#rate-limiting)
+   6. [Response customization](#response-customization)
+   7. [Empty response](#empty-response)
+   8. [Non-JSON response](#non-json-response) including file downloads
+   9. [Error handling](#error-handling)
+   10. [Production mode](#production-mode)
+   11. [HTML Forms (URL encoded)](#html-forms-url-encoded)
+   12. [File uploads](#file-uploads)
+   13. [Connect to your own express app](#connect-to-your-own-express-app)
+   14. [Testing endpoints](#testing-endpoints)
+   15. [Testing middlewares](#testing-middlewares)
 6. [Integration and Documentation](#integration-and-documentation)
    1. [Zod Plugin](#zod-plugin)
    2. [End-to-End Type Safety](#end-to-end-type-safety)
@@ -841,7 +842,7 @@ Consider `createCookieMiddleware()` that makes a Middleware providing `setCookie
 as well as `getCookie()` — alternative to the cookies as an input source:
 
 ```ts
-import { createCookieMiddleware, Middleware } from "express-zod-api";
+import { Middleware } from "express-zod-api";
 
 const cookieDrivenFactory = factory
   .useCookies({ httpOnly: true, sameSite: "lax", path: "/" }) // shorthand, recommended base options
@@ -868,8 +869,6 @@ Consider the `createCacheMiddleware()` that provides helpers for HTTP caching fo
 It covers all standard `Cache-Control` directives, conditional request handling, and the "Not Modified" (304) flow:
 
 ```ts
-import { createCacheMiddleware } from "express-zod-api";
-
 const avatarEndpoint = factory
   .useCache({ maxAge: 3600, scope: "public" }) // shorthand, the policy applies to every response
   .build({
@@ -882,6 +881,21 @@ const avatarEndpoint = factory
       setETag(etag);
       addCachePolicy({ staleWhileRevalidate: 86400 }); // extends the default policy
       return { avatar: "https://example.com/avatar.png" };
+    },
+  });
+```
+
+## Rate limiting
+
+Install `express-rate-limit`. Consider the `createRateLimitMiddleware()` to enable and configure rate limit on a certain
+`EndpointsFactory`. When the limit is exceeded, the Middleware throws a `429` HTTP error, handled by your ResultHandler.
+
+```ts
+const endpoint = factory
+  .useRateLimit({ windowMs: 60000, max: 100 }) // shorthand, or .addMiddleware(createRateLimitMiddleware())
+  .buildVoid({
+    handler: async ({ ctx: { rateLimit, logger } }) => {
+      logger.debug("Features", rateLimit); // { limit, used, remaining, resetTime, getKey, resetKey }
     },
   });
 ```
@@ -1190,11 +1204,9 @@ safety between your API and frontend. Make sure you have `typescript` installed.
 and using the async `printFormatted()` method.
 
 ```ts
-import typescript from "typescript";
 import { Integration } from "express-zod-api";
 
 const client = new Integration({
-  typescript, // or await Integration.create() to delegate importing
   routing,
   config,
   variant: "client", // <— optional, see also "types" for a DIY solution

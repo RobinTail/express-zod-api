@@ -15,7 +15,8 @@ import type { ClientMethod } from "./method";
 import type { CommonConfig } from "./config-type";
 
 interface IntegrationParams {
-  typescript: typeof ts;
+  /** @default loadPeer("typescript") */
+  typescript?: typeof ts;
   routing: Routing;
   config: CommonConfig;
   /**
@@ -81,7 +82,7 @@ export class Integration extends IntegrationBase {
   }
 
   public constructor({
-    typescript,
+    typescript = loadPeer<typeof ts>("typescript"),
     routing,
     config,
     brandHandling,
@@ -181,10 +182,14 @@ export class Integration extends IntegrationBase {
     );
   }
 
+  /**
+   * @deprecated use `new Integration()` without `typescript` option on its argument
+   * @todo remove in the next major — no longer needed
+   * */
   public static async create(params: Omit<IntegrationParams, "typescript">) {
     return new Integration({
       ...params,
-      typescript: await loadPeer<typeof ts>("typescript"),
+      typescript: loadPeer<typeof ts>("typescript"),
     });
   }
 
@@ -233,8 +238,7 @@ export class Integration extends IntegrationBase {
     let format = userDefined;
     if (!format) {
       try {
-        const prettierFormat = (await loadPeer<typeof Prettier>("prettier"))
-          .format;
+        const prettierFormat = loadPeer<typeof Prettier>("prettier").format;
         format = (text) => prettierFormat(text, { filepath: "client.ts" });
       } catch {}
     }
