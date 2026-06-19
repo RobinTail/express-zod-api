@@ -120,7 +120,7 @@
     "node-forge": "^1.3.3",
     "snakify-ts": "^2.3.0",
     "typescript": "catalog:dev",
-    "undici": "^8.2.0",
+    "undici": "^8.5.0",
     "zod": "catalog:dev"
   },
   "keywords": [
