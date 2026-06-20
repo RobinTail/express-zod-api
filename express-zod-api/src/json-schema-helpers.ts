@@ -1,7 +1,7 @@
 import * as R from "ramda";
 import { combinations, isObject, type FlatObject } from "./common-helpers";
 import type { z } from "zod";
-import type { SchemaObject } from "openapi3-ts/oas31";
+import type { SchemaObjectValue } from "openapi3-ts/oas32";
 
 type MergeMode = "coerce" | "throw";
 type FlattenObjectSchema = z.core.JSONSchema.ObjectSchema &
@@ -26,7 +26,7 @@ const mergeableKeys = new Set<string>([
   "examples",
   "description",
   "additionalProperties",
-] satisfies Array<keyof SchemaObject>); // z.core.JSONSchema has index signature
+] satisfies Array<keyof SchemaObjectValue>); // z.core.JSONSchema has index signature
 
 /** @internal */
 export const canMerge = (subject: FlatObject): boolean => {

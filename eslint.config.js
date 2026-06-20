@@ -28,6 +28,16 @@ const importConcerns = [
     selector: "ImportDeclaration[source.value=/\\.js$/]",
     message: "use .ts extension for relative imports",
   },
+  {
+    selector: "ImportDeclaration[source.value=/openapi3-ts\\/oas3(0|1)/]",
+    message: "import from /oas32 instead",
+  },
+  {
+    selector:
+      "ImportDeclaration[source.value=/openapi3-ts/] > " +
+      "ImportSpecifier[imported.name='SchemaObject']",
+    message: "import SchemaObjectValue instead",
+  },
   ...builtinModules.map((mod) => ({
     selector: `ImportDeclaration[source.value='${mod}']`,
     message: `use node:${mod} for the built-in module`,

@@ -25,6 +25,98 @@ describe("Documentation", () => {
     http: { listen: givePort() },
   });
 
+  describe("Constructor metadata", () => {
+    test("should use expanded info and server objects with all fields", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {},
+        info: {
+          title: "Expanded API",
+          version: "3.0.0",
+          summary: "Full info object",
+          contact: { name: "Dev", email: "dev@example.com" },
+          license: { name: "MIT", url: "https://opensource.org/licenses/MIT" },
+        },
+        server: {
+          url: "https://{env}.example.com/{ver}",
+          description: "Environment server",
+          variables: {
+            env: { default: "api", enum: ["api", "staging"] },
+            ver: { default: "v1" },
+          },
+        },
+      }).getSpecAsYaml();
+      expect(spec).toMatchSnapshot();
+    });
+
+    test("should override info with shorthands", () => {
+      expect(
+        new Documentation({
+          config: sampleConfig,
+          routing: {},
+          info: {
+            title: "Expanded Title",
+            version: "1.0.0",
+            summary: "Retained",
+          },
+          title: "Overridden Title",
+          version: "2.0.0",
+        }).rootDoc.info,
+      ).toMatchSnapshot();
+    });
+
+    test.each<Partial<ConstructorParameters<typeof Documentation>[0]>>([
+      {
+        server: { url: "https://s.example.com", description: "Single" },
+        serverUrl: "https://short.example.com",
+      },
+      {
+        server: { url: "https://s.example.com", description: "Single" },
+        serverUrl: [
+          "https://short-a.example.com",
+          "https://short-b.example.com",
+        ],
+      },
+      {
+        server: [
+          { url: "https://a.example.com", description: "A" },
+          { url: "https://b.example.com", description: "B" },
+        ],
+        serverUrl: "https://short.example.com",
+      },
+      {
+        server: [
+          { url: "https://a.example.com", description: "A" },
+          { url: "https://b.example.com", description: "B" },
+        ],
+        serverUrl: [
+          "https://short-a.example.com",
+          "https://short-b.example.com",
+        ],
+      },
+      { server: ["https://ex.one", "https://ex.two"] },
+      { server: "https://single.example" },
+    ])("should aggregate servers %#", ({ server, serverUrl }) => {
+      expect(
+        new Documentation({
+          config: sampleConfig,
+          routing: {},
+          server,
+          serverUrl,
+        }).rootDoc.servers,
+      ).toMatchSnapshot();
+    });
+
+    test("should fall back to builder defaults when no metadata provided", () => {
+      const spec = new Documentation({
+        config: sampleConfig,
+        routing: {},
+      });
+      expect(spec.rootDoc.servers).toHaveLength(0);
+      expect(spec.rootDoc.info).toMatchSnapshot();
+    });
+  });
+
   describe("Basic cases", () => {
     test("should generate the correct schema for DELETE request without body", () => {
       const spec = new Documentation({

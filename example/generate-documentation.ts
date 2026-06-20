@@ -11,7 +11,7 @@ await writeFile(
     config,
     version: manifest.version,
     title: "Example API",
-    serverUrl: "https://example.com",
+    server: "https://example.com",
     tags: {
       users: "Everything about the users",
       files: "Everything about the files processing",

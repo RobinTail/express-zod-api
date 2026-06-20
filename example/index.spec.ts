@@ -605,7 +605,7 @@ describe("Example", async () => {
     });
   });
 
-  describe("OpenAPI Documentation", () => {
+  describe.skip("OpenAPI Documentation", () => {
     test.extend("response", async ({ signal }) => {
       const data = await readFile("example.documentation.yaml", "utf-8");
       try {

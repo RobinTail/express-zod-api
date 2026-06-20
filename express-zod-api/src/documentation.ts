@@ -1,12 +1,14 @@
 import {
+  type InfoObject,
   type OperationObject,
   type ReferenceObject,
   type ResponsesObject,
-  type SchemaObject,
+  type SchemaObjectValue,
   type SecuritySchemeObject,
   type SecuritySchemeType,
+  type ServerObject,
   OpenApiBuilder,
-} from "openapi3-ts/oas31";
+} from "openapi3-ts/oas32";
 import * as R from "ramda";
 import { type ResponseVariant, responseVariants } from "./api-response";
 import { contentTypes } from "./content-type";
@@ -59,9 +61,23 @@ const defaultSummarizer: Summarizer = ({
 }) => trim(summary);
 
 interface DocumentationParams {
-  title: string;
-  version: string;
-  serverUrl: string | [string, ...string[]];
+  /** @desc Full Info Object customization */
+  info?: InfoObject;
+  /** @override info.title — shorthand */
+  title?: string;
+  /** @override info.version — shorthand */
+  version?: string;
+  /** @desc Server URL(s) or their complete definitions */
+  server?:
+    | string
+    | [string, ...string[]]
+    | ServerObject
+    | [ServerObject, ...ServerObject[]];
+  /**
+   * @deprecated use `server` property instead
+   * @todo remove in v29
+   * */
+  serverUrl?: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
   /**
@@ -113,7 +129,7 @@ export class Documentation extends OpenApiBuilder {
 
   #makeRef(
     key: object | string,
-    value: SchemaObject | ReferenceObject,
+    value: SchemaObjectValue | ReferenceObject,
     proposedName?: string,
   ): ReferenceObject {
     let name = this.#references.get(key); // search in the cache by the given key
@@ -166,11 +182,27 @@ export class Documentation extends OpenApiBuilder {
     return `${subject.type.toUpperCase()}_${nextId}`;
   }
 
-  #addMetadata({ title, version, serverUrl, tags }: DocumentationParams) {
-    this.addInfo({ title, version });
+  #addMetadata({
+    title,
+    version,
+    serverUrl,
+    tags,
+    info,
+    server,
+  }: DocumentationParams) {
+    this.addInfo({
+      ...info,
+      title: title ?? info?.title ?? this.rootDoc.info.title,
+      version: version ?? info?.version ?? this.rootDoc.info.version,
+    });
+    if (tags) this.rootDoc.tags = depictTags(tags);
+    if (server) {
+      for (const one of Array.isArray(server) ? server : [server])
+        this.addServer(typeof one === "string" ? { url: one } : one);
+    }
+    if (!serverUrl) return;
     for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
       this.addServer({ url });
-    if (tags) this.rootDoc.tags = depictTags(tags);
   }
 
   #makeEndpointHandler({
