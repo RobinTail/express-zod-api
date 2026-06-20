@@ -160,49 +160,28 @@ interface PostV1UserCreateNegativeResponseVariants {
   500: PostV1UserCreateNegativeVariant2;
 }
 
-/** get /v1/user/list */
-type GetV1UserListInput = {
+/** query /v1/user/list */
+type QueryV1UserListInput = {
   roles?: ("manager" | "operator" | "admin")[] | undefined;
 };
 
-/** get /v1/user/list */
-type GetV1UserListPositiveVariant1 = {
+/** query /v1/user/list */
+type QueryV1UserListPositiveVariant1 = {
   name: string;
   role: "manager" | "operator" | "admin";
 }[];
 
-/** get /v1/user/list */
-interface GetV1UserListPositiveResponseVariants {
-  200: GetV1UserListPositiveVariant1;
+/** query /v1/user/list */
+interface QueryV1UserListPositiveResponseVariants {
+  200: QueryV1UserListPositiveVariant1;
 }
 
-/** get /v1/user/list */
-type GetV1UserListNegativeVariant1 = string;
+/** query /v1/user/list */
+type QueryV1UserListNegativeVariant1 = string;
 
-/** get /v1/user/list */
-interface GetV1UserListNegativeResponseVariants {
-  400: GetV1UserListNegativeVariant1;
-}
-
-/** head /v1/user/list */
-type HeadV1UserListInput = {
-  roles?: ("manager" | "operator" | "admin")[] | undefined;
-};
-
-/** head /v1/user/list */
-type HeadV1UserListPositiveVariant1 = undefined;
-
-/** head /v1/user/list */
-interface HeadV1UserListPositiveResponseVariants {
-  200: HeadV1UserListPositiveVariant1;
-}
-
-/** head /v1/user/list */
-type HeadV1UserListNegativeVariant1 = undefined;
-
-/** head /v1/user/list */
-interface HeadV1UserListNegativeResponseVariants {
-  400: HeadV1UserListNegativeVariant1;
+/** query /v1/user/list */
+interface QueryV1UserListNegativeResponseVariants {
+  400: QueryV1UserListNegativeVariant1;
 }
 
 /** post /v1/login */
@@ -572,8 +551,7 @@ export interface Input {
   "delete /v1/user/:id/remove": DeleteV1UserIdRemoveInput;
   "patch /v1/user/:id": PatchV1UserIdInput;
   "post /v1/user/create": PostV1UserCreateInput;
-  "get /v1/user/list": GetV1UserListInput;
-  "head /v1/user/list": HeadV1UserListInput;
+  "query /v1/user/list": QueryV1UserListInput;
   "post /v1/login": PostV1LoginInput;
   /** @deprecated */
   "get /v1/avatar/send": GetV1AvatarSendInput;
@@ -596,8 +574,7 @@ export interface PositiveResponse {
   "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemovePositiveResponseVariants>;
   "patch /v1/user/:id": SomeOf<PatchV1UserIdPositiveResponseVariants>;
   "post /v1/user/create": SomeOf<PostV1UserCreatePositiveResponseVariants>;
-  "get /v1/user/list": SomeOf<GetV1UserListPositiveResponseVariants>;
-  "head /v1/user/list": SomeOf<HeadV1UserListPositiveResponseVariants>;
+  "query /v1/user/list": SomeOf<QueryV1UserListPositiveResponseVariants>;
   "post /v1/login": SomeOf<PostV1LoginPositiveResponseVariants>;
   /** @deprecated */
   "get /v1/avatar/send": SomeOf<GetV1AvatarSendPositiveResponseVariants>;
@@ -620,8 +597,7 @@ export interface NegativeResponse {
   "delete /v1/user/:id/remove": SomeOf<DeleteV1UserIdRemoveNegativeResponseVariants>;
   "patch /v1/user/:id": SomeOf<PatchV1UserIdNegativeResponseVariants>;
   "post /v1/user/create": SomeOf<PostV1UserCreateNegativeResponseVariants>;
-  "get /v1/user/list": SomeOf<GetV1UserListNegativeResponseVariants>;
-  "head /v1/user/list": SomeOf<HeadV1UserListNegativeResponseVariants>;
+  "query /v1/user/list": SomeOf<QueryV1UserListNegativeResponseVariants>;
   "post /v1/login": SomeOf<PostV1LoginNegativeResponseVariants>;
   /** @deprecated */
   "get /v1/avatar/send": SomeOf<GetV1AvatarSendNegativeResponseVariants>;
@@ -649,10 +625,8 @@ export interface EncodedResponse {
     PatchV1UserIdNegativeResponseVariants;
   "post /v1/user/create": PostV1UserCreatePositiveResponseVariants &
     PostV1UserCreateNegativeResponseVariants;
-  "get /v1/user/list": GetV1UserListPositiveResponseVariants &
-    GetV1UserListNegativeResponseVariants;
-  "head /v1/user/list": HeadV1UserListPositiveResponseVariants &
-    HeadV1UserListNegativeResponseVariants;
+  "query /v1/user/list": QueryV1UserListPositiveResponseVariants &
+    QueryV1UserListNegativeResponseVariants;
   "post /v1/login": PostV1LoginPositiveResponseVariants &
     PostV1LoginNegativeResponseVariants;
   /** @deprecated */
@@ -697,12 +671,9 @@ export interface Response {
   "post /v1/user/create":
     | PositiveResponse["post /v1/user/create"]
     | NegativeResponse["post /v1/user/create"];
-  "get /v1/user/list":
-    | PositiveResponse["get /v1/user/list"]
-    | NegativeResponse["get /v1/user/list"];
-  "head /v1/user/list":
-    | PositiveResponse["head /v1/user/list"]
-    | NegativeResponse["head /v1/user/list"];
+  "query /v1/user/list":
+    | PositiveResponse["query /v1/user/list"]
+    | NegativeResponse["query /v1/user/list"];
   "post /v1/login":
     | PositiveResponse["post /v1/login"]
     | NegativeResponse["post /v1/login"];
@@ -751,8 +722,7 @@ export const endpointTags = {
   "delete /v1/user/:id/remove": ["users"],
   "patch /v1/user/:id": ["users"],
   "post /v1/user/create": ["users"],
-  "get /v1/user/list": ["users"],
-  "head /v1/user/list": ["users"],
+  "query /v1/user/list": ["users"],
   "post /v1/login": ["cookies"],
   "get /v1/avatar/send": ["files", "users"],
   "head /v1/avatar/send": ["files", "users"],

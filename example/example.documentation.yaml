@@ -388,15 +388,15 @@ paths:
                   - reason
                 additionalProperties: false
   /v1/user/list:
-    get:
-      operationId: GetV1UserList
+    query:
+      operationId: QueryV1UserList
       tags:
         - users
       parameters:
         - name: roles
           in: query
           required: false
-          description: GET /v1/user/list Parameter
+          description: QUERY /v1/user/list Parameter
           schema:
             type: array
             items:
@@ -405,9 +405,16 @@ paths:
                 - manager
                 - operator
                 - admin
+      requestBody:
+        description: QUERY /v1/user/list Request body
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
       responses:
         "200":
-          description: GET /v1/user/list Positive response
+          description: QUERY /v1/user/list Positive response
           content:
             application/json:
               schema:
@@ -437,7 +444,7 @@ paths:
                     - name: Patti Harrison
                       role: admin
         "400":
-          description: GET /v1/user/list Negative response
+          description: QUERY /v1/user/list Negative response
           content:
             text/plain:
               schema:
@@ -445,28 +452,6 @@ paths:
               examples:
                 example1:
                   dataValue: Sample error message
-    head:
-      operationId: HeadV1UserList
-      tags:
-        - users
-      parameters:
-        - name: roles
-          in: query
-          required: false
-          description: HEAD /v1/user/list Parameter
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - manager
-                - operator
-                - admin
-      responses:
-        "200":
-          description: HEAD /v1/user/list Positive response
-        "400":
-          description: HEAD /v1/user/list Negative response
   /v1/login:
     post:
       operationId: PostV1Login

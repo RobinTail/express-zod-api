@@ -117,6 +117,7 @@ describe("Example", async () => {
       signal,
     }) => {
       const response = await fetch(`http://localhost:${port}/v1/user/list`, {
+        method: "QUERY",
         signal,
       });
       expect(response.status).toBe(200);
