@@ -1237,8 +1237,7 @@ import { Documentation } from "express-zod-api";
 const yamlString = new Documentation({
   routing, // the same routing and config that you use to start the server
   config,
-  version: "1.2.3",
-  title: "Example API",
+  info: { version: "1.2.3", title: "Example API" },
   server: "https://example.com",
   composition: "inline", // optional, or "components" for keeping schemas in a separate dedicated section using refs
   // descriptions: { positiveResponse, negativeResponse, requestParameter, requestBody }, // check out these features
