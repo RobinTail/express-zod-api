@@ -111,7 +111,7 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
       const register: IRouterMatcher<IRouter> = (
         app as IRouter & { query: IRouterMatcher<IRouter> }
       )[method];
-      if (typeof register !== "function")
+      if (method === "query" && typeof register !== "function")
         throw new RoutingError(`Method is not supported`, method, path);
       register.bind(app)(path, ...handlers);
     }
