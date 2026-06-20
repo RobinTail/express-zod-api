@@ -77,6 +77,7 @@ describe("Routing", () => {
         expect(appMock.put).toHaveBeenCalledTimes(0);
         expect(appMock.delete).toHaveBeenCalledTimes(0);
         expect(appMock.patch).toHaveBeenCalledTimes(0);
+        expect(appMock.query).toHaveBeenCalledTimes(0);
         expect(appMock.options).toHaveBeenCalledTimes(3);
         expect(appMock.get.mock.calls[0]![0]).toBe("/v1/user/get");
         expect(appMock.get.mock.calls[1]![0]).toBe("/v1/user/universal");
@@ -146,12 +147,39 @@ describe("Routing", () => {
       expect(appMock.put).toHaveBeenCalledTimes(1);
       expect(appMock.patch).toHaveBeenCalledTimes(1);
       expect(appMock.delete).toHaveBeenCalledTimes(0);
+      expect(appMock.query).toHaveBeenCalledTimes(0);
       expect(appMock.options).toHaveBeenCalledTimes(1);
       expect(appMock.get.mock.calls[0]![0]).toBe("/v1/user");
       expect(appMock.post.mock.calls[0]![0]).toBe("/v1/user");
       expect(appMock.put.mock.calls[0]![0]).toBe("/v1/user");
       expect(appMock.patch.mock.calls[0]![0]).toBe("/v1/user");
       expect(appMock.options.mock.calls[0]![0]).toBe("/v1/user");
+    });
+
+    test("Should register QUERY endpoints", () => {
+      const handlerMock = vi.fn();
+      const factory = new EndpointsFactory(defaultResultHandler);
+      const queryEndpoint = factory.build({
+        method: "query",
+        output: z.object({}),
+        handler: handlerMock,
+      });
+      const routing: Routing = {
+        v1: {
+          search: queryEndpoint,
+        },
+      };
+      const logger = makeLoggerMock();
+      initRouting({
+        app: appMock as unknown as IRouter,
+        getLogger: () => logger,
+        config: { cors: true },
+        routing,
+      });
+      expect(appMock.query).toHaveBeenCalledTimes(1);
+      expect(appMock.query.mock.calls[0]![0]).toBe("/v1/search");
+      expect(appMock.options).toHaveBeenCalledTimes(1);
+      expect(appMock.options.mock.calls[0]![0]).toBe("/v1/search");
     });
 
     test("Should check if endpoint supports the method it's assigned to", () => {
