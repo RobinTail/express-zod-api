@@ -1,4 +1,4 @@
-import type { IRouter, RequestHandler } from "express";
+import type { IRouter, RequestHandler, IRouterMatcher } from "express";
 import createHttpError from "http-errors";
 import { isProduction } from "./common-helpers";
 import type { CommonConfig } from "./config-type";
@@ -106,7 +106,11 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
         const logger = getLogger(request);
         return endpoint.execute({ request, response, logger, config });
       });
-      app[method](path, ...handlers);
+      /** @todo remove type assertion when Express teams adds the QUERY method into types officially */
+      const register: IRouterMatcher<IRouter> = (
+        app as IRouter & { query: IRouterMatcher<IRouter> }
+      )[method];
+      register(path, ...handlers);
     }
     if (config.hintAllowedMethods === false) continue;
     deprioritized.set(path, createWrongMethodHandler(accessMethods));
