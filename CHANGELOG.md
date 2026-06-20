@@ -8,10 +8,14 @@
 - The static async method `Integration::create()` removed — use `new Integration()` instead;
 - Server lifecycle hooks (`beforeRouting` and `afterRouting` config options) are no longer async;
 - The `createServer()` function is now synchronous — that should simplify the daily routines for beginners;
-- The Documentation generator is featuring the OpenAPI 3.2.0 with better SSE support and other features;
 - Changes to `Documentation` constructor:
   - `serverUrl` renamed to `server` and now also accepts OpenAPI's ServerObject;
   - `title` and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
+- The Documentation generator is featuring the OpenAPI 3.2.0 with better SSE support and other features;
+- Added HTTP QUERY method support (RFC 10008):
+  - The QUERY method is like GET but with a body — safe, idempotent, and cacheable;
+  - Default input sources for QUERY: `["query", "body", "params"]` (from the lowest priority to highest);
+  - Supported by `Integration` and `Documentation` generators.
 
 ```diff
 - await Integration.create({});
@@ -29,13 +33,6 @@
 ```
 
 ## Version 28
-
-### v28.8.0
-
-- Added HTTP QUERY method support (RFC 10008):
-  - The QUERY method is like GET but with a body — safe, idempotent, and cacheable;
-  - Default input sources for QUERY: `["query", "body", "params"]` (from the lowest priority to highest);
-  - Supported by `Integration` and `Documentation` generators.
 
 ### v28.7.1
 
