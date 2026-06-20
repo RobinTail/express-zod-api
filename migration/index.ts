@@ -10,6 +10,7 @@ interface Queries {
   integrationCreate: TSESTree.CallExpression;
   createServerAwait: TSESTree.CallExpression;
   asyncLifecycleHook: NamedProp;
+  documentationConfig: TSESTree.ObjectExpression;
 }
 
 type Listener = keyof Queries;
@@ -29,6 +30,9 @@ const queries: Record<Listener, string> = {
     `${NT.CallExpression}[callee.name="createConfig"] > ` +
     `${NT.ObjectExpression} > ` +
     queryNamedProp("afterRouting"),
+  documentationConfig:
+    `${NT.NewExpression}[callee.name="Documentation"] > ` +
+    `${NT.ObjectExpression}`,
 };
 
 const listen = <
@@ -115,6 +119,51 @@ const theRule = ESLintUtils.RuleCreator.withoutDocs({
               : firstToken.range[0] + 5;
             return fixer.removeRange([firstToken.range[0], end]);
           },
+        });
+      },
+      documentationConfig: (node) => {
+        const parts: string[] = [];
+        let infoItems: string[] | undefined = [];
+        const changelog: Record<string, string> = {};
+
+        for (const prop of node.properties) {
+          if (prop.type !== NT.Property || prop.computed) {
+            parts.push(ctx.sourceCode.getText(prop));
+            continue;
+          }
+          const propName = getPropName(prop as NamedProp);
+          if (propName === "info") {
+            parts.push(ctx.sourceCode.getText(prop));
+            infoItems = undefined;
+          } else if (propName === "title" || propName === "version") {
+            changelog["title, version"] = infoItems ? "info" : "";
+            infoItems?.push(ctx.sourceCode.getText(prop));
+          } else if (propName === "serverUrl") {
+            parts.push(`server: ${ctx.sourceCode.getText(prop.value)}`);
+            changelog.serverUrl = "server";
+          } else {
+            parts.push(ctx.sourceCode.getText(prop));
+          }
+        }
+
+        const entries = Object.entries(changelog);
+        if (!entries.length) return;
+
+        if (infoItems?.length)
+          parts.unshift(`info: { ${infoItems.join(", ")} }`);
+
+        const oldText = ctx.sourceCode.getText(node);
+        const newText = `{ ${parts.join(", ")} }`;
+        if (oldText === newText) return;
+        ctx.report({
+          node,
+          messageId: "change",
+          data: {
+            subject: "Documentation",
+            from: entries.map(([k]) => k).join(", "),
+            to: entries.map(([, v]) => v).join(", "),
+          },
+          fix: (fixer) => fixer.replaceText(node, newText),
         });
       },
     }),

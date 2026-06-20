@@ -7,13 +7,25 @@
 - Supported Node.js versions: `^22.19.0 || ^24.11.0 || ^26.0.0`;
 - The static async method `Integration::create()` removed — use `new Integration()` instead;
 - Server lifecycle hooks (`beforeRouting` and `afterRouting` config options) are no longer async;
-- The `createServer()` function is now synchronous — that should simplify the daily routines for beginners.
+- The `createServer()` function is now synchronous — that should simplify the daily routines for beginners;
+- The Documentation generator is featuring the OpenAPI 3.2.0 with better SSE support and other features;
+- Changes to `Documentation` constructor:
+  - `serverUrl` renamed to `server` and now also accepts OpenAPI's ServerObject;
+  - `title` and `version` must be wrapped into `info`, assignable with OpenAPI's InfoObject;
 
 ```diff
 - await Integration.create({});
 + new Integration({});
 - const {} = await createServer({});
 + const {} = createServer({});
+  new Documentation({
++   info: {
+      title: "Sample API",
+      version: "1.2.3",
++   },
+-   serverUrl: "https://example.com",
++   server: "https://example.com",
+  })
 ```
 
 ## Version 28

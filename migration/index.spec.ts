@@ -36,6 +36,10 @@ describe("Migration", async () => {
       `createConfig({ beforeRouting: ({ app, logger }) => {} })`,
       `createConfig({ afterRouting: ({ app, logger }) => {} })`,
       `createConfig({ beforeRouting: ({ app, logger }) => {}, afterRouting: ({ app, logger }) => {} })`,
+      // documentationConfig
+      `new Documentation({ info: { title: "x", version: "y" }, server: "https://", routing, config })`,
+      `new Documentation({ info: { }, server: "https://", routing, config })`,
+      `new Documentation({ routing, config })`,
     ],
     invalid: [
       {
@@ -109,6 +113,51 @@ describe("Migration", async () => {
           {
             messageId: "remove",
             data: { subject: "async from afterRouting" },
+          },
+        ],
+      },
+      {
+        name: "documentation title, version, and serverUrl",
+        code: `new Documentation({ title: "x", version: "y", serverUrl: "https://", routing, config })`,
+        output: `new Documentation({ info: { title: "x", version: "y" }, server: "https://", routing, config })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "Documentation",
+              from: "title, version, serverUrl",
+              to: "info, server",
+            },
+          },
+        ],
+      },
+      {
+        name: "documentation title and version only",
+        code: `new Documentation({ title: "x", version: "y", routing, config })`,
+        output: `new Documentation({ info: { title: "x", version: "y" }, routing, config })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "Documentation",
+              from: "title, version",
+              to: "info",
+            },
+          },
+        ],
+      },
+      {
+        name: "documentation serverUrl only",
+        code: `new Documentation({ serverUrl: "https://", routing, config })`,
+        output: `new Documentation({ server: "https://", routing, config })`,
+        errors: [
+          {
+            messageId: "change",
+            data: {
+              subject: "Documentation",
+              from: "serverUrl",
+              to: "server",
+            },
           },
         ],
       },
