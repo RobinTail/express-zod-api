@@ -940,31 +940,34 @@ info:
   title: Testing basic cases
 paths:
   /v1/getSomething:
-    post:
-      operationId: PostV1GetSomething
+    query:
+      operationId: QueryV1GetSomething
+      parameters:
+        - name: intersection
+          in: query
+          required: true
+          description: QUERY /v1/getSomething Parameter
+          schema:
+            type: object
+            properties:
+              one:
+                type: string
+              two:
+                type: string
+            required:
+              - one
+              - two
       requestBody:
-        description: POST /v1/getSomething Request body
+        description: QUERY /v1/getSomething Request body
         content:
           application/json:
             schema:
               type: object
-              properties:
-                intersection:
-                  type: object
-                  properties:
-                    one:
-                      type: string
-                    two:
-                      type: string
-                  required:
-                    - one
-                    - two
-              required:
-                - intersection
-        required: true
+              properties: {}
+              required: []
       responses:
         "200":
-          description: POST /v1/getSomething Positive response
+          description: QUERY /v1/getSomething Positive response
           content:
             application/json:
               schema:
@@ -996,7 +999,7 @@ paths:
                   - data
                 additionalProperties: false
         "400":
-          description: POST /v1/getSomething Negative response
+          description: QUERY /v1/getSomething Negative response
           content:
             application/json:
               schema:
