@@ -59,13 +59,14 @@ describe("Documentation", () => {
             version: "1.0.0",
             summary: "Retained",
           },
+          server: "https://example.com",
           title: "Overridden Title",
           version: "2.0.0",
         }).rootDoc.info,
       ).toMatchSnapshot();
     });
 
-    test.each<Partial<ConstructorParameters<typeof Documentation>[0]>>([
+    test.each<Pick<ConstructorParameters<typeof Documentation>[0], "server">>([
       {
         server: { url: "https://s.example.com", description: "Single" },
       },
@@ -82,15 +83,6 @@ describe("Documentation", () => {
         new Documentation({ config: sampleConfig, routing: {}, server }).rootDoc
           .servers,
       ).toMatchSnapshot();
-    });
-
-    test("should fall back to builder defaults when no metadata provided", () => {
-      const spec = new Documentation({
-        config: sampleConfig,
-        routing: {},
-      });
-      expect(spec.rootDoc.servers).toHaveLength(0);
-      expect(spec.rootDoc.info).toMatchSnapshot();
     });
   });
 

@@ -31,7 +31,7 @@ expectTypeOf<TagOverrides>().toEqualTypeOf<{
 new Documentation({
   title: "",
   version: "",
-  serverUrl: "",
+  server: "",
   routing: {},
   config: { cors: false },
   tags: {

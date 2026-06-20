@@ -2725,13 +2725,6 @@ exports[`Documentation > Constructor metadata > should aggregate servers 3 1`] =
 ]
 `;
 
-exports[`Documentation > Constructor metadata > should fall back to builder defaults when no metadata provided 1`] = `
-{
-  "title": "app",
-  "version": "version",
-}
-`;
-
 exports[`Documentation > Constructor metadata > should override info with shorthands 1`] = `
 {
   "summary": "Retained",

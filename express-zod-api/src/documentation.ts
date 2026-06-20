@@ -68,7 +68,7 @@ interface DocumentationParams {
   /** @override info.version — shorthand */
   version?: string;
   /** @desc Server URL(s) or their complete definitions */
-  server?:
+  server:
     | string
     | [string, ...string[]]
     | ServerObject
@@ -184,10 +184,8 @@ export class Documentation extends OpenApiBuilder {
       version: version ?? info?.version ?? this.rootDoc.info.version,
     });
     if (tags) this.rootDoc.tags = depictTags(tags);
-    if (server) {
-      for (const one of Array.isArray(server) ? server : [server])
-        this.addServer(typeof one === "string" ? { url: one } : one);
-    }
+    for (const one of Array.isArray(server) ? server : [server])
+      this.addServer(typeof one === "string" ? { url: one } : one);
   }
 
   #makeEndpointHandler({
