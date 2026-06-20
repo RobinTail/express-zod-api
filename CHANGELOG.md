@@ -30,6 +30,13 @@
 
 ## Version 28
 
+### v28.8.0
+
+- Added HTTP QUERY method support (RFC 10008):
+  - The QUERY method is like GET but with a body — safe, idempotent, and cacheable;
+  - Default input sources for QUERY: `["query", "body", "params"]` (from the lowest priority to highest);
+  - Supported by `Integration` and `Documentation` generators.
+
 ### v28.7.1
 
 - Fix: supporting the latest versions of `express-rate-limit` (v8) for the rate limiting feature.
