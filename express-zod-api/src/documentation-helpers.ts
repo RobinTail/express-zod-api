@@ -482,25 +482,22 @@ export const depictResponse = ({
 
 const depictBearerSecurity = ({
   format: bearerFormat,
-  deprecated,
 }: Extract<Security, { type: "bearer" }>) => {
   const result: SecuritySchemeObject = {
     type: "http",
     scheme: "bearer",
-    deprecated,
   };
   if (bearerFormat) result.bearerFormat = bearerFormat;
   return result;
 };
 const depictInputSecurity = (
-  { name, deprecated }: Extract<Security, { type: "input" }>,
+  { name }: Extract<Security, { type: "input" }>,
   inputSources: InputSource[],
 ) => {
   const result: SecuritySchemeObject = {
     type: "apiKey",
     in: "query",
     name,
-    deprecated,
   };
   if (inputSources?.includes("body")) {
     if (inputSources?.includes("query")) {
@@ -515,33 +512,26 @@ const depictInputSecurity = (
 };
 const depictHeaderSecurity = ({
   name,
-  deprecated,
 }: Extract<Security, { type: "header" }>) => ({
   type: "apiKey" as const,
   in: "header",
   name,
-  deprecated,
 });
 const depictCookieSecurity = ({
   name,
-  deprecated,
 }: Extract<Security, { type: "cookie" }>) => ({
   type: "apiKey" as const,
   in: "cookie",
   name,
-  deprecated,
 });
 const depictOpenIdSecurity = ({
   url: openIdConnectUrl,
-  deprecated,
 }: Extract<Security, { type: "openid" }>) => ({
   type: "openIdConnect" as const,
   openIdConnectUrl,
-  deprecated,
 });
 const depictOAuth2Security = ({
   flows = {},
-  deprecated,
   oauth2MetadataUrl,
 }: Extract<Security, { type: "oauth2" }>) => ({
   type: "oauth2" as const,
@@ -549,7 +539,6 @@ const depictOAuth2Security = ({
     (flow): OAuthFlowObject => ({ ...flow, scopes: flow.scopes || {} }),
     R.reject(R.isNil, flows) as Required<typeof flows>,
   ),
-  deprecated,
   oauth2MetadataUrl,
 });
 
@@ -558,8 +547,7 @@ export const depictSecurity = (
   inputSources: InputSource[] = [],
 ): Alternatives<SecuritySchemeObject> => {
   const mapper = (subj: Security): SecuritySchemeObject => {
-    if (subj.type === "basic")
-      return { type: "http", scheme: "basic", deprecated: subj.deprecated };
+    if (subj.type === "basic") return { type: "http", scheme: "basic" };
     else if (subj.type === "bearer") return depictBearerSecurity(subj);
     else if (subj.type === "input")
       return depictInputSecurity(subj, inputSources);
@@ -568,7 +556,12 @@ export const depictSecurity = (
     else if (subj.type === "openid") return depictOpenIdSecurity(subj);
     else return depictOAuth2Security(subj);
   };
-  return alternatives.map((entries) => entries.map(mapper));
+  return alternatives.map((entries) =>
+    entries.map(({ deprecated, ...rest }) => ({
+      ...mapper(rest),
+      deprecated,
+    })),
+  );
 };
 
 export const depictSecurityRefs = (
