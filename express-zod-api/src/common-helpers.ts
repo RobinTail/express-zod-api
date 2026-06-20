@@ -48,6 +48,7 @@ export const defaultInputSources: InputSources = {
   put: ["body", "params"],
   patch: ["body", "params"],
   delete: ["query", "params"],
+  query: ["query", "body", "params"],
 };
 const fallbackInputSources: InputSource[] = ["body", "query", "params"];
 
