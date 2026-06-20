@@ -23,6 +23,11 @@ exports[`Common Helpers > defaultInputSources > should be declared in a certain 
     "body",
     "params",
   ],
+  "query": [
+    "query",
+    "body",
+    "params",
+  ],
 }
 `;
 
