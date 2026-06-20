@@ -14,7 +14,7 @@ describe("Endpoint", () => {
   describe(".methods", () => {
     test("Should return the correct set of methods (readonly)", () => {
       const endpointMock = new Endpoint({
-        methods: ["get", "post", "put", "delete", "patch"],
+        methods: ["get", "post", "put", "delete", "patch", "query"],
         inputSchema: z.object({}),
         outputSchema: z.object({}),
         handler: vi.fn(),
@@ -25,7 +25,14 @@ describe("Endpoint", () => {
         }),
       });
       const { methods } = endpointMock;
-      expect(methods).toEqual(["get", "post", "put", "delete", "patch"]);
+      expect(methods).toEqual([
+        "get",
+        "post",
+        "put",
+        "delete",
+        "patch",
+        "query",
+      ]);
       expect(() => (methods as any[]).push()).toThrowError(/read only/);
     });
   });
