@@ -10,6 +10,8 @@ import { walkRouting, type OnEndpoint } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import type { GetLogger } from "./server-helpers";
 import * as R from "ramda";
+import assert from "node:assert/strict";
+import { RoutingError } from "./errors.ts";
 
 /**
  * @example { v1: { books: { ":bookId": getBookEndpoint } } }
@@ -110,7 +112,9 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
       const register: IRouterMatcher<IRouter> = (
         app as IRouter & { query: IRouterMatcher<IRouter> }
       )[method];
-      register(path, ...handlers);
+      if (typeof register !== "function")
+        throw new RoutingError(`Method is not supported`, method, path);
+      register.bind(app)(path, ...handlers);
     }
     if (config.hintAllowedMethods === false) continue;
     deprioritized.set(path, createWrongMethodHandler(accessMethods));
