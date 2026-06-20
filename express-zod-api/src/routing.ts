@@ -10,7 +10,6 @@ import { walkRouting, type OnEndpoint } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import type { GetLogger } from "./server-helpers";
 import * as R from "ramda";
-import assert from "node:assert/strict";
 import { RoutingError } from "./errors.ts";
 
 /**
