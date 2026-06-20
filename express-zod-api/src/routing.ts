@@ -108,12 +108,11 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
         return endpoint.execute({ request, response, logger, config });
       });
       /** @todo remove type assertion when Express teams adds the QUERY method into types officially */
-      const register: IRouterMatcher<IRouter> = (
-        app as IRouter & { query: IRouterMatcher<IRouter> }
-      )[method];
+      const register: (path: string, ...handlers: RequestHandler[]) => IRouter =
+        (app as IRouter & { query: IRouterMatcher<IRouter> })[method];
       if (method === "query" && typeof register !== "function")
         throw new RoutingError(`Method is not supported`, method, path);
-      register.bind(app)(path, ...handlers);
+      register.call(app, path, ...handlers);
     }
     if (config.hintAllowedMethods === false) continue;
     deprioritized.set(path, createWrongMethodHandler(accessMethods));
