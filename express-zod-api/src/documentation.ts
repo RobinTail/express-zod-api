@@ -73,11 +73,6 @@ interface DocumentationParams {
     | [string, ...string[]]
     | ServerObject
     | [ServerObject, ...ServerObject[]];
-  /**
-   * @deprecated use `server` property instead
-   * @todo remove in v29
-   * */
-  serverUrl?: string | [string, ...string[]];
   routing: Routing;
   config: CommonConfig;
   /**
@@ -182,14 +177,7 @@ export class Documentation extends OpenApiBuilder {
     return `${subject.type.toUpperCase()}_${nextId}`;
   }
 
-  #addMetadata({
-    title,
-    version,
-    serverUrl,
-    tags,
-    info,
-    server,
-  }: DocumentationParams) {
+  #addMetadata({ title, version, tags, info, server }: DocumentationParams) {
     this.addInfo({
       ...info,
       title: title ?? info?.title ?? this.rootDoc.info.title,
@@ -200,9 +188,6 @@ export class Documentation extends OpenApiBuilder {
       for (const one of Array.isArray(server) ? server : [server])
         this.addServer(typeof one === "string" ? { url: one } : one);
     }
-    if (!serverUrl) return;
-    for (const url of typeof serverUrl === "string" ? [serverUrl] : serverUrl)
-      this.addServer({ url });
   }
 
   #makeEndpointHandler({
