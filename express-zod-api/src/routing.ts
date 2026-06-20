@@ -10,7 +10,7 @@ import { walkRouting, type OnEndpoint } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import type { GetLogger } from "./server-helpers";
 import * as R from "ramda";
-import { RoutingError } from "./errors.ts";
+import { RoutingError } from "./errors";
 
 /**
  * @example { v1: { books: { ":bookId": getBookEndpoint } } }
