@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { getMessageFromError } from "./common-helpers";
 import type { OpenAPIContext } from "./documentation-helpers";
-import type { CORSMethod } from "./method";
+import type { Method } from "./method";
 
 /** @desc An error related to the wrong Routing declaration */
 export class RoutingError extends Error {
   public override name = "RoutingError";
-  public override readonly cause: { method: CORSMethod; path: string };
+  public override readonly cause: { method: Method; path: string };
 
-  constructor(message: string, method: CORSMethod, path: string) {
+  constructor(message: string, method: Method, path: string) {
     super(message);
     this.cause = { method, path };
   }

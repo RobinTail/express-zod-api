@@ -10,7 +10,6 @@ import { walkRouting, type OnEndpoint } from "./routing-walker";
 import { ServeStatic } from "./serve-static";
 import type { GetLogger } from "./server-helpers";
 import * as R from "ramda";
-import { RoutingError } from "./errors";
 
 /**
  * @example { v1: { books: { ":bookId": getBookEndpoint } } }
@@ -110,8 +109,6 @@ export const initRouting = ({ app, config, getLogger, ...rest }: InitProps) => {
       /** @todo remove type assertion when Express teams adds the QUERY method into types officially */
       const register: (path: string, ...handlers: RequestHandler[]) => IRouter =
         (app as IRouter & { query: IRouterMatcher<IRouter> })[method];
-      if (method === "query" && typeof register !== "function")
-        throw new RoutingError(`Method is not supported`, method, path);
       register.call(app, path, ...handlers);
     }
     if (config.hintAllowedMethods === false) continue;
