@@ -605,6 +605,7 @@ describe("Example", async () => {
     });
   });
 
+  /** @todo temporary replaced with oas.yml workflow, restore when the validator supports 3.2 */
   describe.skip("OpenAPI Documentation", () => {
     test.extend("response", async ({ signal }) => {
       const data = await readFile("example.documentation.yaml", "utf-8");
