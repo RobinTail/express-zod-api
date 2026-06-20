@@ -3,7 +3,7 @@ import type { IRouter } from "express";
 export type SomeMethod = Lowercase<string>;
 
 type FamiliarMethod =
-  | Exclude<keyof IRouter, "param" | "use" | "route" | "stack">
+  | Exclude<keyof IRouter, "param" | "use" | "route" | "stack" | "all">
   /** @todo remove when Express team added the "query" method into their types officially */
   | "query";
 
