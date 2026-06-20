@@ -3,8 +3,8 @@
 exports[`Documentation > Basic cases > should be able to specify operation 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Operation IDs
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSome/thing:
     get:
@@ -86,8 +86,8 @@ servers:
 exports[`Documentation > Basic cases > should be able to specify the operationId provider depending on method 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Operation IDs
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSome/thing:
     get:
@@ -227,8 +227,8 @@ servers:
 exports[`Documentation > Basic cases > should ensure the uniq operation ids 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Operation IDs
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSome/thing:
     get:
@@ -371,8 +371,8 @@ servers:
 exports[`Documentation > Basic cases > should ensure uniq security schema names 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Security
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     get:
@@ -625,8 +625,8 @@ servers:
 exports[`Documentation > Basic cases > should generate the correct schema for DELETE request without body 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing DELETE request without body
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/deleteSomething:
     delete:
@@ -701,8 +701,8 @@ servers:
 exports[`Documentation > Basic cases > should generate the correct schema for complex types 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Complex Types
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     get:
@@ -808,8 +808,8 @@ servers:
 exports[`Documentation > Basic cases > should generate the correct schema for discriminated union type 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Discriminated Union Type
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     post:
@@ -936,8 +936,8 @@ servers:
 exports[`Documentation > Basic cases > should generate the correct schema for intersection type 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Intersection and And types
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     post:
@@ -1042,8 +1042,8 @@ servers:
 exports[`Documentation > Basic cases > should generate the correct schema for nullable and optional types 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Nullable and Optional Types
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     get:
@@ -1232,8 +1232,8 @@ servers:
 exports[`Documentation > Basic cases > should generate the correct schema for union type 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Union and Or Types
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     post:
@@ -1346,8 +1346,8 @@ servers:
 exports[`Documentation > Basic cases > should handle CookieSecurity in params and security section 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing CookieSecurity
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     get:
@@ -1459,8 +1459,8 @@ servers:
 exports[`Documentation > Basic cases > should handle bigint, boolean, date, null and readonly 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing additional types
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     post:
@@ -1578,8 +1578,8 @@ servers:
 exports[`Documentation > Basic cases > should handle circular schemas via z.object() 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Lazy
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     post:
@@ -1685,8 +1685,8 @@ servers:
 exports[`Documentation > Basic cases > should handle custom mime types and status codes 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing MIME types and status codes
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     get:
@@ -1751,8 +1751,8 @@ servers:
 exports[`Documentation > Basic cases > should handle different number types 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing numbers
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     post:
@@ -1881,8 +1881,8 @@ servers:
 exports[`Documentation > Basic cases > should handle different string types 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing strings
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     post:
@@ -2034,8 +2034,8 @@ servers:
 exports[`Documentation > Basic cases > should handle enum types 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing enums
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     post:
@@ -2128,8 +2128,8 @@ servers:
 exports[`Documentation > Basic cases > should handle record 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing record
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     post:
@@ -2271,8 +2271,8 @@ servers:
 exports[`Documentation > Basic cases > should handle transformation schema in output 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Transformation in response schema
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     post:
@@ -2364,8 +2364,8 @@ servers:
 exports[`Documentation > Basic cases > should handle tuples 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing tuples
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     post:
@@ -2480,8 +2480,8 @@ servers:
 exports[`Documentation > Basic cases > should handle type any 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing type any
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     get:
@@ -2574,8 +2574,8 @@ servers:
 exports[`Documentation > Basic cases > should handle z.preprocess() 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing z.preprocess()
   version: 3.4.5
+  title: Testing basic cases
 paths:
   /v1/getSomething:
     get:
@@ -2725,14 +2725,6 @@ exports[`Documentation > Constructor metadata > should aggregate servers 3 1`] =
 ]
 `;
 
-exports[`Documentation > Constructor metadata > should override info with shorthands 1`] = `
-{
-  "summary": "Retained",
-  "title": "Overridden Title",
-  "version": "2.0.0",
-}
-`;
-
 exports[`Documentation > Constructor metadata > should use expanded info and server objects with all fields 1`] = `
 "openapi: 3.2.0
 info:
@@ -2774,8 +2766,8 @@ servers:
 exports[`Documentation > Feature #1431: Multiple schemas for different status codes > should depict accordingly 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing multiple schemas for different status codes
   version: 3.4.5
+  title: Testing multiple schemas for different status codes
 paths:
   /v1/mtpl:
     post:
@@ -2870,8 +2862,8 @@ servers:
 exports[`Documentation > Feature #1470: Custom brands > should be handled accordingly in request, response and params 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing custom brands handling
   version: 3.4.5
+  title: Testing custom brands handling
 paths:
   /v1/{name}:
     get:
@@ -2991,8 +2983,8 @@ servers:
 exports[`Documentation > Feature #1869: Top level transformations > should handle explicit renaming 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing top level transformations
   version: 3.4.5
+  title: Testing top level transformations
 paths:
   /v1/test:
     get:
@@ -3112,8 +3104,8 @@ servers:
 exports[`Documentation > Feature #1869: Top level transformations > should handle object-to-object functional transformations and mapping 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing top level transformations
   version: 3.4.5
+  title: Testing top level transformations
 paths:
   /v1/test:
     get:
@@ -3209,8 +3201,8 @@ servers:
 exports[`Documentation > Feature 1180: Headers opt-in params > should describe x- inputs as header params in get request 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing headers params
   version: 3.4.5
+  title: Testing headers params
 paths:
   /v1/test:
     get:
@@ -3314,8 +3306,8 @@ servers:
 exports[`Documentation > Feature 1180: Headers opt-in params > should describe x- inputs as header params in post request 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing headers params
   version: 3.4.5
+  title: Testing headers params
 paths:
   /v1/test:
     post:
@@ -3407,8 +3399,8 @@ servers:
 exports[`Documentation > Feature 1180: Headers opt-in params > should describe x- inputs as header params in put request 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing headers params
   version: 3.4.5
+  title: Testing headers params
 paths:
   /v1/test:
     put:
@@ -3498,8 +3490,8 @@ servers:
 exports[`Documentation > Issue #98 > Should describe non-empty array 1`] = `
 "openapi: 3.2.0
 info:
-  title: "Testing issue #98"
   version: 3.4.5
+  title: "Testing issue #98"
 paths:
   /v1/getSomething:
     get:
@@ -3675,8 +3667,8 @@ servers:
 exports[`Documentation > Issue #98 > should union schemas 1`] = `
 "openapi: 3.2.0
 info:
-  title: "Testing issue #98"
   version: 3.4.5
+  title: "Testing issue #98"
 paths:
   /v1/getSomething:
     post:
@@ -3790,8 +3782,8 @@ servers:
 exports[`Documentation > Metadata > Feature #2390: should support deprecations 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Metadata:deprecations
   version: 3.4.5
+  title: Testing Metadata
 paths:
   /v1/getSomething:
     get:
@@ -3889,8 +3881,8 @@ servers:
 exports[`Documentation > Metadata > Issue #827: .example() should be immutable 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Metadata:example on IO parameter
   version: 3.4.5
+  title: Testing Metadata
 paths:
   /v1/addSomething:
     post:
@@ -4002,8 +3994,8 @@ servers:
 exports[`Documentation > Metadata > Issue #929: the location of the custom description should be on the param level 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Metadata:description
   version: 3.4.5
+  title: Testing Metadata
 paths:
   /hris/employees:
     get:
@@ -4105,8 +4097,8 @@ servers:
 exports[`Documentation > Metadata > should merge endpoint handler examples with its middleware examples 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Metadata:example on IO schema + middleware
   version: 3.4.5
+  title: Testing Metadata
 paths:
   /v1/getSomething:
     post:
@@ -4209,8 +4201,8 @@ servers:
 exports[`Documentation > Metadata > should merge prop examples with middlewares 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Metadata:example on IO schema + middleware
   version: 3.4.5
+  title: Testing Metadata
 paths:
   /v1/getSomething:
     post:
@@ -4319,8 +4311,8 @@ servers:
 exports[`Documentation > Metadata > should pass over examples of each param from the whole IO schema examples (get method) 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Metadata:example on IO schema
   version: 3.4.5
+  title: Testing Metadata
 paths:
   /v1/getSomething:
     get:
@@ -4430,8 +4422,8 @@ servers:
 exports[`Documentation > Metadata > should pass over examples of each param from the whole IO schema examples (post method) 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Metadata:example on IO schema
   version: 3.4.5
+  title: Testing Metadata
 paths:
   /v1/getSomething:
     post:
@@ -4530,8 +4522,8 @@ servers:
 exports[`Documentation > Metadata > should pass over the example of an individual prop in get request 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Metadata:example on IO parameter
   version: 3.4.5
+  title: Testing Metadata
 paths:
   /v1/getSomething:
     get:
@@ -4647,8 +4639,8 @@ servers:
 exports[`Documentation > Metadata > should pass over the example of an individual prop in post request 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Metadata:example on IO parameter
   version: 3.4.5
+  title: Testing Metadata
 paths:
   /v1/getSomething:
     post:
@@ -4751,8 +4743,8 @@ servers:
 exports[`Documentation > Metadata > should pass over the schema description 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing Metadata:description
   version: 3.4.5
+  title: Testing Metadata
 paths:
   /v1/getSomething:
     get:
@@ -4853,8 +4845,8 @@ servers:
 exports[`Documentation > Route Path Params > should handle custom descriptions and descriptors 0 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing route path params
   version: 3.4.5
+  title: Testing route path params
 paths:
   /v1/{name}:
     post:
@@ -4948,8 +4940,8 @@ servers:
 exports[`Documentation > Route Path Params > should handle custom descriptions and descriptors 1 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing route path params
   version: 3.4.5
+  title: Testing route path params
 paths:
   /v1/{name}:
     post:
@@ -5051,8 +5043,8 @@ servers:
 exports[`Documentation > Route Path Params > should handle route path params for GET request 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing route path params
   version: 3.4.5
+  title: Testing route path params
 paths:
   /v1/{name}:
     get:
@@ -5164,8 +5156,8 @@ servers:
 exports[`Documentation > Route Path Params > should handle route path params for POST request 1`] = `
 "openapi: 3.2.0
 info:
-  title: Testing route path params
   version: 3.4.5
+  title: Testing route path params
 paths:
   /v1/{name}:
     post:

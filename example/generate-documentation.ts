@@ -9,8 +9,7 @@ await writeFile(
   new Documentation({
     routing,
     config,
-    version: manifest.version,
-    title: "Example API",
+    info: { version: manifest.version, title: "Example API" },
     server: "https://example.com",
     tags: {
       users: "Everything about the users",

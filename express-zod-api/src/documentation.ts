@@ -61,12 +61,8 @@ const defaultSummarizer: Summarizer = ({
 }) => trim(summary);
 
 interface DocumentationParams {
-  /** @desc Full Info Object customization */
-  info?: InfoObject;
-  /** @override info.title — shorthand */
-  title?: string;
-  /** @override info.version — shorthand */
-  version?: string;
+  /** @desc At least title and version properties are required */
+  info: InfoObject;
   /** @desc Server URL(s) or their complete definitions */
   server:
     | string
@@ -177,12 +173,8 @@ export class Documentation extends OpenApiBuilder {
     return `${subject.type.toUpperCase()}_${nextId}`;
   }
 
-  #addMetadata({ title, version, tags, info, server }: DocumentationParams) {
-    this.addInfo({
-      ...info,
-      title: title ?? info?.title ?? this.rootDoc.info.title,
-      version: version ?? info?.version ?? this.rootDoc.info.version,
-    });
+  #addMetadata({ tags, info, server }: DocumentationParams) {
+    this.addInfo(info);
     if (tags) this.rootDoc.tags = depictTags(tags);
     for (const one of Array.isArray(server) ? server : [server])
       this.addServer(typeof one === "string" ? { url: one } : one);
