@@ -18,6 +18,14 @@
 + new Integration({});
 - const {} = await createServer({});
 + const {} = createServer({});
+  new Documentation({
++   info: {
+      title: "Sample API",
+      version: "1.2.3",
++   },
+-   serverUrl: "https://example.com",
++   server: "https://example.com",
+  })
 ```
 
 ## Version 28
