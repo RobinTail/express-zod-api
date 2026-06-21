@@ -10,6 +10,7 @@ import {
   shouldHaveContent,
   getInputSources,
   emptySchema,
+  assertSync,
   type EmptySchema,
   type EmptyObject,
 } from "../src/common-helpers";
@@ -388,5 +389,23 @@ describe("Common Helpers", () => {
     test("should return false for no MIME types", () => {
       expect(shouldHaveContent("get", null)).toBe(false);
     });
+  });
+
+  describe("assertSync()", () => {
+    test.each([
+      undefined,
+      null,
+      "hello",
+      { foo: 1 },
+      { then: "not a function" },
+    ])("should pass for %s", (value) => {
+      expect(() => assertSync(value)).not.toThrow();
+    });
+    test.each([Promise.resolve(), { then: () => {} }])(
+      "should throw for Thenable %#",
+      (value) => {
+        expect(() => assertSync(value)).toThrow(/sync/);
+      },
+    );
   });
 });

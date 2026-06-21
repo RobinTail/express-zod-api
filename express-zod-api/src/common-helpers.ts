@@ -148,3 +148,12 @@ export const shouldHaveContent = (
   mimeTypes: NormalizedResponse["mimeTypes"],
 ): mimeTypes is NonNullable<NormalizedResponse["mimeTypes"]> =>
   Boolean(mimeTypes) && method !== "head";
+
+export const assertSync = (value: unknown): void => {
+  if (value && typeof (value as PromiseLike<unknown>).then === "function") {
+    throw new Error(
+      "Expected a synchronous function but it returned a Thenable. " +
+        "Remove the async keyword from the callback.",
+    );
+  }
+};

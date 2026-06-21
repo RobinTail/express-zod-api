@@ -25,6 +25,7 @@ import {
   installTerminationListener,
 } from "./server-helpers";
 import { printStartupLogo } from "./startup-logo";
+import { assertSync } from "./common-helpers";
 
 const makeCommonEntities = (config: CommonConfig) => {
   if (config.startupLogo !== false) printStartupLogo(process.stdout);
@@ -80,7 +81,7 @@ export const createServer = (config: ServerConfig, routing: Routing) => {
     );
   }
   if (config.cookies) app.use(createCookieParser({ config }));
-  config.beforeRouting?.({ app, getLogger });
+  assertSync(config.beforeRouting?.({ app, getLogger }));
 
   const parsers: Parsers = {
     json: [config.jsonParser || express.json()],
@@ -90,7 +91,7 @@ export const createServer = (config: ServerConfig, routing: Routing) => {
   };
   initRouting({ app, routing, getLogger, config, parsers });
 
-  config.afterRouting?.({ app, getLogger });
+  assertSync(config.afterRouting?.({ app, getLogger }));
   app.use(catcher, notFoundHandler);
 
   const created: Array<http.Server | https.Server> = [];
