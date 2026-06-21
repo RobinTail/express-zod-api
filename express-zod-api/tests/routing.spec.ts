@@ -42,18 +42,19 @@ describe("Routing", () => {
           recognizeMethodDependentRoutes: false,
         };
         const factory = new EndpointsFactory(defaultResultHandler);
-        const getEndpoint = factory.build({
-          output: z.object({}),
+        const getEndpoint = factory.buildVoid({
           handler: handlerMock,
         });
-        const postEndpoint = factory.build({
+        const postEndpoint = factory.buildVoid({
           method: "post",
-          output: z.object({}),
           handler: handlerMock,
         });
-        const getAndPostEndpoint = factory.build({
+        const getAndPostEndpoint = factory.buildVoid({
           method: ["get", "post"],
-          output: z.object({}),
+          handler: handlerMock,
+        });
+        const queryEndpoint = factory.buildVoid({
+          method: "query",
           handler: handlerMock,
         });
         const routing: Routing = {
@@ -62,6 +63,7 @@ describe("Routing", () => {
               get: getEndpoint, // should be treated as a path
               set: postEndpoint,
               universal: getAndPostEndpoint,
+              search: queryEndpoint,
             },
           },
         };
@@ -77,17 +79,19 @@ describe("Routing", () => {
         expect(appMock.put).toHaveBeenCalledTimes(0);
         expect(appMock.delete).toHaveBeenCalledTimes(0);
         expect(appMock.patch).toHaveBeenCalledTimes(0);
-        expect(appMock.query).toHaveBeenCalledTimes(0);
-        expect(appMock.options).toHaveBeenCalledTimes(3);
+        expect(appMock.query).toHaveBeenCalledTimes(1);
+        expect(appMock.options).toHaveBeenCalledTimes(4);
         expect(appMock.get.mock.calls[0]![0]).toBe("/v1/user/get");
         expect(appMock.get.mock.calls[1]![0]).toBe("/v1/user/universal");
         expect(appMock.post.mock.calls[0]![0]).toBe("/v1/user/set");
         expect(appMock.post.mock.calls[1]![0]).toBe("/v1/user/universal");
+        expect(appMock.query.mock.calls[0]![0]).toBe("/v1/user/search");
         expect(appMock.options.mock.calls[0]![0]).toBe("/v1/user/get");
         expect(appMock.options.mock.calls[1]![0]).toBe("/v1/user/set");
         expect(appMock.options.mock.calls[2]![0]).toBe("/v1/user/universal");
+        expect(appMock.options.mock.calls[3]![0]).toBe("/v1/user/search");
         if (hintAllowedMethods === false) return;
-        expect(appMock.all).toHaveBeenCalledTimes(3);
+        expect(appMock.all).toHaveBeenCalledTimes(4);
         expect(appMock.all.mock.calls[0]![0]).toBe("/v1/user/get");
         expect(appMock.all.mock.calls[1]![0]).toBe("/v1/user/set");
         expect(appMock.all.mock.calls[2]![0]).toBe("/v1/user/universal");
@@ -154,32 +158,6 @@ describe("Routing", () => {
       expect(appMock.put.mock.calls[0]![0]).toBe("/v1/user");
       expect(appMock.patch.mock.calls[0]![0]).toBe("/v1/user");
       expect(appMock.options.mock.calls[0]![0]).toBe("/v1/user");
-    });
-
-    test("Should register QUERY endpoints", () => {
-      const handlerMock = vi.fn();
-      const factory = new EndpointsFactory(defaultResultHandler);
-      const queryEndpoint = factory.build({
-        method: "query",
-        output: z.object({}),
-        handler: handlerMock,
-      });
-      const routing: Routing = {
-        v1: {
-          search: queryEndpoint,
-        },
-      };
-      const logger = makeLoggerMock();
-      initRouting({
-        app: appMock as unknown as IRouter,
-        getLogger: () => logger,
-        config: { cors: true },
-        routing,
-      });
-      expect(appMock.query).toHaveBeenCalledTimes(1);
-      expect(appMock.query.mock.calls[0]![0]).toBe("/v1/search");
-      expect(appMock.options).toHaveBeenCalledTimes(1);
-      expect(appMock.options.mock.calls[0]![0]).toBe("/v1/search");
     });
 
     test("Should check if endpoint supports the method it's assigned to", () => {
