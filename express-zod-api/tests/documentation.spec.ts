@@ -172,7 +172,7 @@ describe("Documentation", () => {
         routing: {
           v1: {
             getSomething: defaultEndpointsFactory.build({
-              method: "post",
+              method: "query",
               input: z.object({
                 intersection: z.intersection(
                   z.object({ one: z.string() }),

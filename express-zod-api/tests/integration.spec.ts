@@ -35,7 +35,7 @@ describe("Integration", () => {
           v1: {
             test: defaultEndpointsFactory
               .build({
-                method: "post",
+                method: "query",
                 input: z.object({
                   features: recursiveSchema,
                 }),
