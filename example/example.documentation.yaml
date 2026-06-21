@@ -392,26 +392,21 @@ paths:
       operationId: QueryV1UserList
       tags:
         - users
-      parameters:
-        - name: roles
-          in: query
-          required: false
-          description: QUERY /v1/user/list Parameter
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - manager
-                - operator
-                - admin
       requestBody:
         description: QUERY /v1/user/list Request body
         content:
           application/json:
             schema:
               type: object
-              properties: {}
+              properties:
+                roles:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - manager
+                      - operator
+                      - admin
       responses:
         "200":
           description: QUERY /v1/user/list Positive response

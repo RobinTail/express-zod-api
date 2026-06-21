@@ -284,7 +284,7 @@ export const depictRequestParams = ({
       (isHeader?.(name, method, path) ?? defaultIsHeader(name, securityHeaders))
     )
       return "header";
-    if (isQueryEnabled) return "query";
+    if (isQueryEnabled && method !== "query") return "query";
   };
 
   return Object.entries(flat.properties).reduce<ParameterObject[]>(

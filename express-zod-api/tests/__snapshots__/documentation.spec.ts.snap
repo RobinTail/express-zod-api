@@ -942,29 +942,26 @@ paths:
   /v1/getSomething:
     query:
       operationId: QueryV1GetSomething
-      parameters:
-        - name: intersection
-          in: query
-          required: true
-          description: QUERY /v1/getSomething Parameter
-          schema:
-            type: object
-            properties:
-              one:
-                type: string
-              two:
-                type: string
-            required:
-              - one
-              - two
       requestBody:
         description: QUERY /v1/getSomething Request body
         content:
           application/json:
             schema:
               type: object
-              properties: {}
-              required: []
+              properties:
+                intersection:
+                  type: object
+                  properties:
+                    one:
+                      type: string
+                    two:
+                      type: string
+                  required:
+                    - one
+                    - two
+              required:
+                - intersection
+        required: true
       responses:
         "200":
           description: QUERY /v1/getSomething Positive response
