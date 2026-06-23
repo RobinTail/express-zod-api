@@ -42,6 +42,3 @@ catalogs:
 overrides:
   "@scarf/scarf": "-"
   "lightningcss": "-"
-minimumReleaseAgeExclude:
-  # Renovate security update: undici@8.5.0
-  - undici@8.5.0
