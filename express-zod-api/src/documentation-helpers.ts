@@ -16,7 +16,11 @@ import {
 } from "openapi3-ts/oas31";
 import * as R from "ramda";
 import { z } from "zod";
-import type { NormalizedResponse, ResponseVariant } from "./api-response";
+import type {
+  NormalizedResponse,
+  ResponseVariant,
+  StatusCode,
+} from "./api-response";
 import { ezBufferBrand } from "./buffer-schema";
 import {
   type FlatObject,
@@ -446,7 +450,7 @@ export const depictResponse = ({
   brandHandling?: BrandHandling;
   mimeTypes: NormalizedResponse["mimeTypes"];
   variant: ResponseVariant;
-  statusCode: number;
+  statusCode: StatusCode;
   hasMultipleStatusCodes: boolean;
 }): ResponseObject => {
   if (!shouldHaveContent(method, mimeTypes)) return { description };
